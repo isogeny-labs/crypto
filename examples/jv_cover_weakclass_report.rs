@@ -47,7 +47,11 @@ fn slope(pts: &[(f64, f64)]) -> (f64, f64) {
     let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
     let b = sxy / sxx;
     let a = my - b * mx;
-    let rss: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - a - b * x).powi(2)).sum();
+    let rss: f64 = xs
+        .iter()
+        .zip(&ys)
+        .map(|(x, y)| (y - a - b * x).powi(2))
+        .sum();
     (b, (rss / (n - 2.0) / sxx).sqrt())
 }
 
@@ -87,22 +91,48 @@ fn compare(ra: &Value, rb: &Value) -> Value {
         && u(rb, "relations") == u(ra, "relations")
         && u(rb, "decompositions") == u(ra, "decompositions")
         && u(rb, "relation_digest") == u(ra, "relation_digest");
-    let correct = ra["correct"] == json!(true) && rb["correct"] == json!(true) && ra["solved"] == json!(true) && rb["solved"] == json!(true);
+    let correct = ra["correct"] == json!(true)
+        && rb["correct"] == json!(true)
+        && ra["solved"] == json!(true)
+        && rb["solved"] == json!(true);
     let mism = u(rb, "mismatches") == 0 && u(ra, "mismatches") == 0;
     // the global counter holds the check and fallback work; it exceeds the per-report sum by the
     // work no report claims (0.3 % in the baseline too), never falls short of it
-    let (g, sm) = (u(rb, "f4_muls") as f64, u(rb, "f4_muls_per_test_sum") as f64);
+    let (g, sm) = (
+        u(rb, "f4_muls") as f64,
+        u(rb, "f4_muls_per_test_sum") as f64,
+    );
     let counter = g >= sm && (g - sm) / g <= 0.01;
     let lower = tb < ta;
     let native_ok = nb <= na;
-    let wstar = if native_ok { f64::INFINITY } else { (ta - tb) / (nb - na) };
+    let wstar = if native_ok {
+        f64::INFINITY
+    } else {
+        (ta - tb) / (nb - na)
+    };
     let mut why = Vec::new();
-    if !eq { why.push("relations differ"); }
-    if !correct { why.push("not solved/correct"); }
-    if !mism { why.push("oracle mismatch"); }
-    if !counter { why.push("f4 counter inconsistent"); }
-    if !lower { why.push("S not lower"); }
-    let status = if !why.is_empty() { "fail" } else if !native_ok { "unresolved" } else { "pass" };
+    if !eq {
+        why.push("relations differ");
+    }
+    if !correct {
+        why.push("not solved/correct");
+    }
+    if !mism {
+        why.push("oracle mismatch");
+    }
+    if !counter {
+        why.push("f4 counter inconsistent");
+    }
+    if !lower {
+        why.push("S not lower");
+    }
+    let status = if !why.is_empty() {
+        "fail"
+    } else if !native_ok {
+        "unresolved"
+    } else {
+        "pass"
+    };
     json!({"status": status, "why": why, "relations_equal": eq, "f4_global_over_per_test_sum": g / sm, "ratio_S_A_over_S_B": ta / tb,
            "native_B_over_A": nb / na, "mul_saving": ta - tb, "break_even_w_muls_per_native_op": wstar,
            "break_even_w_GAE": wstar / f(ra, "c_add_e"), "wall_B_over_A": f(rb, "wall_ms") / f(ra, "wall_ms")})
@@ -117,7 +147,10 @@ fn main() {
         if let Some(rest) = n.strip_prefix('p') {
             let parts: Vec<&str> = rest.trim_end_matches(".json").split('_').collect();
             if parts.len() == 3 && n.ends_with(".json") {
-                if let (Ok(p), Ok(s)) = (parts[0].parse::<u64>(), parts[1].trim_start_matches('s').parse::<u64>()) {
+                if let (Ok(p), Ok(s)) = (
+                    parts[0].parse::<u64>(),
+                    parts[1].trim_start_matches('s').parse::<u64>(),
+                ) {
                     cells.insert((p, s), ());
                 }
             }
@@ -144,24 +177,47 @@ fn main() {
             n,
         )
     };
-    let pooled_all = if all_rho.is_empty() { (1.3, 0.0, 0.0) } else { pool(&all_rho) };
+    let pooled_all = if all_rho.is_empty() {
+        (1.3, 0.0, 0.0)
+    } else {
+        pool(&all_rho)
+    };
     let mut rows: Vec<Value> = Vec::new();
     let mut md = String::from("| p | seed | residuals | relations | digest | S_A | S_B | S_A/S_B | S/rho A | S/rho B | native B/A | F4 muls A | F4 muls B | check muls | fallbacks | B status | B0 status (S_A/S_B0, native B0/A) | A/A |\n|--:|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|:--|\n");
     let mut per_p: BTreeMap<u64, Vec<(f64, f64, f64, f64, f64, f64)>> = BTreeMap::new(); // S/rho A, B, ratio, formula A, formula B, native ratio
     let (mut n_pass, mut n_unres, mut n_fail, mut aa_bad) = (0, 0, 0, 0);
     for &(p, s) in cells.keys() {
-        let Some(ra) = load(raw, p, s, "A") else { continue };
-        let (rb, rb0, ra2) = (load(raw, p, s, "B"), load(raw, p, s, "B0"), load(raw, p, s, "A2"));
+        let Some(ra) = load(raw, p, s, "A") else {
+            continue;
+        };
+        let (rb, rb0, ra2) = (
+            load(raw, p, s, "B"),
+            load(raw, p, s, "B0"),
+            load(raw, p, s, "A2"),
+        );
         let rho = rho_by_p.get(&p).map(|v| pool(v)).unwrap_or(pooled_all);
-        let rho_src = if rho_by_p.contains_key(&p) { "measured at this p" } else { "pooled over all measured p" };
+        let rho_src = if rho_by_p.contains_key(&p) {
+            "measured at this p"
+        } else {
+            "pooled over all measured p"
+        };
         let sqrt_l = (u(&ra, "l") as f64).sqrt();
         let ce = f(&ra, "c_add_e");
         let rho_muls = rho.0 * sqrt_l * ce;
-        let steps_per_op = if rho.0 > 0.0 { rho.1 / (rho.0 * sqrt_l) } else { 1.0 };
+        let steps_per_op = if rho.0 > 0.0 {
+            rho.1 / (rho.0 * sqrt_l)
+        } else {
+            1.0
+        };
         let mut cell = json!({"p": p, "seed": s, "l_bits": f(&ra, "bits"), "rho_source": rho_src, "rho_S": rho.0,
             "rho_runs_pooled": rho.2, "rho_steps_per_group_op": steps_per_op, "A": arm_json(&ra, rho_muls, steps_per_op)});
         let tot_a = u(&ra, "total_muls") as f64;
-        let mut line = format!("| {p} | {s} | {} | {} | {} |", u(&ra, "residuals"), u(&ra, "relations"), if rb.is_some() { "" } else { "A only" });
+        let mut line = format!(
+            "| {p} | {s} | {} | {} | {} |",
+            u(&ra, "residuals"),
+            u(&ra, "relations"),
+            if rb.is_some() { "" } else { "A only" }
+        );
         if let Some(rb) = &rb {
             let c = compare(&ra, rb);
             cell["B"] = arm_json(rb, rho_muls, steps_per_op);
@@ -172,28 +228,49 @@ fn main() {
                 _ => n_fail += 1,
             }
             let tot_b = u(rb, "total_muls") as f64;
-            per_p.entry(p).or_default().push((tot_a / rho_muls, tot_b / rho_muls, tot_a / tot_b, f(&ra, "predicted_s_over_rho"), f(rb, "predicted_s_over_rho"), c["native_B_over_A"].as_f64().unwrap()));
+            per_p.entry(p).or_default().push((
+                tot_a / rho_muls,
+                tot_b / rho_muls,
+                tot_a / tot_b,
+                f(&ra, "predicted_s_over_rho"),
+                f(rb, "predicted_s_over_rho"),
+                c["native_B_over_A"].as_f64().unwrap(),
+            ));
             line = format!("| {p} | {s} | {} | {} | {} | {:.4e} | {:.4e} | {:.4} | {:.1} | {:.1} | {:.3} | {} | {} | {} | {} | {} |",
                 u(&ra, "residuals"), u(&ra, "relations"), if c["relations_equal"] == json!(true) { "equal" } else { "DIFFERENT" },
                 f(&ra, "s"), f(rb, "s"), c["ratio_S_A_over_S_B"].as_f64().unwrap(), tot_a / rho_muls, tot_b / rho_muls,
                 c["native_B_over_A"].as_f64().unwrap(), u(&ra, "f4_muls"), u(rb, "f4_muls"), u(rb, "hilbert_check_muls"),
                 u(rb, "hilbert_fallbacks"), c["status"].as_str().unwrap());
         } else {
-            line += &format!(" {:.4e} | - | - | {:.1} | - | - | {} | - | - | - | - |", f(&ra, "s"), tot_a / rho_muls, u(&ra, "f4_muls"));
+            line += &format!(
+                " {:.4e} | - | - | {:.1} | - | - | {} | - | - | - | - |",
+                f(&ra, "s"),
+                tot_a / rho_muls,
+                u(&ra, "f4_muls")
+            );
         }
         if let Some(r0) = &rb0 {
             let c = compare(&ra, r0);
             cell["B0"] = arm_json(r0, rho_muls, steps_per_op);
             cell["B0_vs_A"] = c.clone();
-            line += &format!(" {} ({:.3}, {:.2}) |", c["status"].as_str().unwrap(), c["ratio_S_A_over_S_B"].as_f64().unwrap(), c["native_B_over_A"].as_f64().unwrap());
+            line += &format!(
+                " {} ({:.3}, {:.2}) |",
+                c["status"].as_str().unwrap(),
+                c["ratio_S_A_over_S_B"].as_f64().unwrap(),
+                c["native_B_over_A"].as_f64().unwrap()
+            );
         } else {
             line += " - |";
         }
         if let Some(r2) = &ra2 {
-            let same = u(r2, "total_muls") == u(&ra, "total_muls") && u(r2, "relation_digest") == u(&ra, "relation_digest") && u(r2, "residuals") == u(&ra, "residuals");
+            let same = u(r2, "total_muls") == u(&ra, "total_muls")
+                && u(r2, "relation_digest") == u(&ra, "relation_digest")
+                && u(r2, "residuals") == u(&ra, "residuals");
             let ratio_aa = f(&ra, "s") / f(r2, "s");
             cell["A2"] = json!({"total_muls": u(r2, "total_muls"), "S": f(r2, "s"), "ratio_A_over_A2": ratio_aa, "identical": same});
-            if !same { aa_bad += 1; }
+            if !same {
+                aa_bad += 1;
+            }
             line += &format!(" {ratio_aa:.3} |\n");
         } else {
             line += " - |\n";
@@ -205,7 +282,11 @@ fn main() {
     let (mut fit_a, mut fit_b) = (Vec::new(), Vec::new());
     md += "\n| p | n seeds | S/rho A mean (sd) [min, max] | S/rho B mean (sd) [min, max] | S_A/S_B mean [min, max] | native B/A mean [min, max] | formula S/rho A | formula S/rho B |\n|--:|--:|:--|:--|:--|:--|--:|--:|\n";
     for (p, v) in &per_p {
-        let col = |i: usize| -> Vec<f64> { v.iter().map(|x| [x.0, x.1, x.2, x.3, x.4, x.5][i]).collect() };
+        let col = |i: usize| -> Vec<f64> {
+            v.iter()
+                .map(|x| [x.0, x.1, x.2, x.3, x.4, x.5][i])
+                .collect()
+        };
         let (ca, cb, cr, pa, pb, cn) = (col(0), col(1), col(2), col(3), col(4), col(5));
         let (a0, a1) = minmax(&ca);
         let (b0, b1) = minmax(&cb);
@@ -253,7 +334,11 @@ fn svg(per_p: &BTreeMap<u64, Vec<(f64, f64, f64, f64, f64, f64)>>, rows: &[Value
     for p in [53.0, 101.0, 251.0, 503.0] {
         s += &format!("<line x1='{:.1}' y1='{y0}' x2='{:.1}' y2='{y1}' stroke='#eee'/><text x='{:.1}' y='{:.1}' text-anchor='middle'>{p}</text>\n", xm(p), xm(p), xm(p), y1 + 16.0);
     }
-    s += &format!("<rect x='{x0}' y='{y0}' width='{}' height='{}' fill='none' stroke='#888'/>\n", x1 - x0, y1 - y0);
+    s += &format!(
+        "<rect x='{x0}' y='{y0}' width='{}' height='{}' fill='none' stroke='#888'/>\n",
+        x1 - x0,
+        y1 - y0
+    );
     s += &format!("<line x1='{x0}' y1='{:.1}' x2='{x1}' y2='{:.1}' stroke='#c00' stroke-dasharray='5 3'/><text x='{:.1}' y='{:.1}' fill='#c00'>rho (S/rho = 1)</text>\n", ym(1.0), ym(1.0), x1 - 110.0, ym(1.0) - 5.0);
     s += &format!("<text x='{:.1}' y='{:.1}' text-anchor='middle'>p</text><text x='18' y='{:.1}' transform='rotate(-90 18 {:.1})' text-anchor='middle'>S / rho (counted F_p multiplications)</text>\n", (x0 + x1) / 2.0, y1 + 36.0, (y0 + y1) / 2.0, (y0 + y1) / 2.0);
     let (mut ma, mut mb) = (Vec::new(), Vec::new());
@@ -261,15 +346,28 @@ fn svg(per_p: &BTreeMap<u64, Vec<(f64, f64, f64, f64, f64, f64)>>, rows: &[Value
         let n = v.len() as f64;
         for (i, x) in v.iter().enumerate() {
             let dx = (i as f64 - (n - 1.0) / 2.0) * 3.0;
-            s += &format!("<circle cx='{:.1}' cy='{:.1}' r='3' fill='#1f5fa8' fill-opacity='0.75'/>\n", xm(*p as f64) - 7.0 + dx, ym(x.0));
+            s += &format!(
+                "<circle cx='{:.1}' cy='{:.1}' r='3' fill='#1f5fa8' fill-opacity='0.75'/>\n",
+                xm(*p as f64) - 7.0 + dx,
+                ym(x.0)
+            );
             s += &format!("<rect x='{:.1}' y='{:.1}' width='6' height='6' fill='#d97a00' fill-opacity='0.8'/>\n", xm(*p as f64) + 4.0 + dx, ym(x.1) - 3.0);
         }
-        ma.push((xm(*p as f64) - 7.0, ym(v.iter().map(|x| x.0).sum::<f64>() / n)));
-        mb.push((xm(*p as f64) + 7.0, ym(v.iter().map(|x| x.1).sum::<f64>() / n)));
+        ma.push((
+            xm(*p as f64) - 7.0,
+            ym(v.iter().map(|x| x.0).sum::<f64>() / n),
+        ));
+        mb.push((
+            xm(*p as f64) + 7.0,
+            ym(v.iter().map(|x| x.1).sum::<f64>() / n),
+        ));
     }
     for (m, c) in [(&ma, "#1f5fa8"), (&mb, "#d97a00")] {
         let pts: Vec<String> = m.iter().map(|q| format!("{:.1},{:.1}", q.0, q.1)).collect();
-        s += &format!("<polyline points='{}' fill='none' stroke='{c}' stroke-width='1.5'/>\n", pts.join(" "));
+        s += &format!(
+            "<polyline points='{}' fill='none' stroke='{c}' stroke-width='1.5'/>\n",
+            pts.join(" ")
+        );
     }
     s += &format!("<circle cx='{}' cy='{}' r='3.5' fill='#1f5fa8'/><text x='{}' y='{}'>A baseline (per seed; line = mean)</text>\n", x0 + 14.0, y0 + 14.0, x0 + 24.0, y0 + 18.0);
     s += &format!("<rect x='{}' y='{}' width='7' height='7' fill='#d97a00'/><text x='{}' y='{}'>B Hilbert stop (per seed; line = mean)</text>\n", x0 + 10.0, y0 + 26.0, x0 + 24.0, y0 + 34.0);
@@ -277,8 +375,23 @@ fn svg(per_p: &BTreeMap<u64, Vec<(f64, f64, f64, f64, f64, f64)>>, rows: &[Value
     if let Some(c) = rows.iter().rev().find(|c| c.get("B").is_some()) {
         let bx0 = 650.0;
         let res = c["A"]["residuals"].as_f64().unwrap_or(1.0);
-        let stages = [("F4 muls", "f4_muls", "#1f5fa8"), ("linear muls", "lin_muls", "#6a3d9a"), ("Weil muls", "weil_muls", "#2a9d8f"), ("post muls", "post_muls", "#999999"), ("verify muls", "verify_muls", "#e0b000"), ("native ops (F4 driver, unpriced)", "f4_native_ops", "#c0392b")];
-        let maxv = stages.iter().map(|(_, k, _)| c["A"][*k].as_f64().unwrap_or(0.0) / res).fold(0.0f64, f64::max) * 1.15;
+        let stages = [
+            ("F4 muls", "f4_muls", "#1f5fa8"),
+            ("linear muls", "lin_muls", "#6a3d9a"),
+            ("Weil muls", "weil_muls", "#2a9d8f"),
+            ("post muls", "post_muls", "#999999"),
+            ("verify muls", "verify_muls", "#e0b000"),
+            (
+                "native ops (F4 driver, unpriced)",
+                "f4_native_ops",
+                "#c0392b",
+            ),
+        ];
+        let maxv = stages
+            .iter()
+            .map(|(_, k, _)| c["A"][*k].as_f64().unwrap_or(0.0) / res)
+            .fold(0.0f64, f64::max)
+            * 1.15;
         s += &format!("<text x='{bx0}' y='60' font-weight='bold'>Per residual, p = {}, seed {} (counts)</text>\n", c["p"], c["seed"]);
         for (si, (name, key, col)) in stages.iter().enumerate() {
             let yy = 78.0 + si as f64 * 56.0;

@@ -1,0 +1,140 @@
+{
+ "schema": "ic-replay-plan/v1",
+ "note": "Sessions whose counters the leaderboard cites, replayed by .github/workflows/ic-leaderboard-replay.yml with `ecbench verify`.  `expect` is what a replay on current main must show: `identical` (every replay reproduces) or `drift` (some replay differs, with the reason and the evidence).  The workflow fails when an `identical` session drifts (new drift), when a `drift` session becomes identical (a stale entry), and when a cited session is missing from this file.  `replay` is `all` or a number of measured runs.",
+ "sessions": [
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "inherited-F4 and F6-IC counters changed after the session was recorded; replays 72/72 at the recording commit 03ac2e467 and 24/72 from main 16e74770d; good at 7ab28103d; main did not compile in between, so the first changing commit is not isolated (bisect.log); #1646 word-wise inherited-F4 rewrite is in the window",
+   "evidence": "research/leaderboard_rigor_20261021/bisect/summary.jsonl"
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n19",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "same counters as n13",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/K13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "same counters as the ladder; matrix F4 and F5 rows also differ at K13",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/K19",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "same counters as the ladder",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+  },
+  {
+   "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "pre-#2043 recording (2245b75, lazy inherited-F4 specialisation charge, no accounting version): the inherited-F4 arms differ under the eager version-2 charge that is the method identity (owner, 2026-10-28), and the root-finder arms lack the two oracle_setup outcome counters added by c8bd952c4; the rho rows reproduce. Replayable only by its recording binary; re-recorded under version 2 as claim-n13-v2",
+   "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+  },
+  {
+   "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/ecbench_rootfind_engine_20261012/audits/audit-claim-n13-v2-run1.json"
+  },
+  {
+   "dir": "research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_k8_k16_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_online_ir_20261004/sessions/mac_arm64_l0_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0-02",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_conductor_gap_20261012/sessions/ell8209-q29",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_conductor_gap_20261012/sessions/ell131101-q37",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ic_oracle_setup_blocked_20261020/sessions/A-1k-8k",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/ic_oracle_setup_blocked_20261020/sessions/B-16k-r2",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n7",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "8 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
+   "replay": "all",
+   "expect": "drift",
+   "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  },
+  {
+   "dir": "research/f4_f5_f6_cross_family_20261011/sessions/X19",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+  }
+ ]
+}

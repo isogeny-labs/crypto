@@ -1,0 +1,33 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\begin{document}
+\section*{Conditional fraction-field pole identity}
+The pinned Lean file \texttt{Common22FractionPole.lean} kernel-checks the
+fraction-field valuation step conditional on the infinity chart.  Let $v$
+be a valuation on a field, and assume $w\ne0$, $w^2=zu$, $v(u)=1$, and
+$z^3g=G$. The two checked implications are:
+\begin{center}
+\begin{tabular}{lll}\toprule
+Theorem & Additional hypothesis & Conclusion\\\midrule
+\texttt{unit\_chart\_pole} & $v(G)=1$ & $v(g)=v(w)^{-6}$\\
+\texttt{linear\_chart\_pole} & $v(G)=v(w)$ & $v(g)=v(w)^{-5}$\\\bottomrule
+\end{tabular}
+\end{center}
+The proof uses multiplicativity of $v$, the chart relation, and cancellation
+of the nonzero value $v(w)$. The first branch corresponds to a unit chart
+residue; the second to the degree-drop branch. These exponents become pole
+orders six and five only after $w$ is identified as a normalized local
+uniformizer of the actual smooth projective curve.
+
+\paragraph{Boundary.} The projective infinity stalk, its embedding in the
+function field, the principal divisor, Mumford reduction, the $\operatorname{Pic}^0$
+class equation, and compiled Rust semantics are not supplied by this file.
+The result changes no target solve or cost ratio. The adjacent CSV records
+both theorem statuses and a null rho ratio; the SVG graph displays only
+the conditional exponents.
+
+\paragraph{Replay.} Run \texttt{lake env lean Common22FractionPole.lean} in
+the pinned formal directory. The successful axiom output is retained in
+\texttt{fraction-pole-build.log}.
+\end{document}

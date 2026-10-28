@@ -1,0 +1,277 @@
+{
+  "id": "IDC1h59e11741f2082561",
+  "independence": "native issuer plus128 extra checks;source-bound universal Lean identity",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound13.lean",
+    "sha256": "19954462f0ac4317d8985a75b4f123418d35b2bbe859347b1f3319c1c24e601c"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610201300,
+  "statement": {
+    "degree_bound": 4,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": -1,
+                              "op": "const"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": -1,
+                              "op": "const"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "a",
+                          "op": "var"
+                        },
+                        {
+                          "args": "a",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "a",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "b",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "b",
+                              "op": "var"
+                            },
+                            {
+                              "args": "b",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": "d",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "quadratic-norm-residual",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "b",
+                  "op": "var"
+                },
+                {
+                  "args": "b",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "y",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": "d",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound13.quadratic_norm_residual",
+    "variables": [
+      "a",
+      "b",
+      "x",
+      "y",
+      "d"
+    ]
+  },
+  "value_digest": "b7b6b3bdd1fbbda7b19428b5f5cb035ba86e3cd22b72b098d7bcced3c881539a"
+}

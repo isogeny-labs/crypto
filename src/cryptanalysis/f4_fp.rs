@@ -65,6 +65,52 @@ pub use super::groebner_f4::Ordering;
 /// non-zero coefficients, sorted with the leading term first.
 pub type Poly = Vec<(Vec<u32>, u64)>;
 
+/// Optional, read-only observations of the regular F4/solve path. Degrees
+/// describe this run, never a certified degree of regularity.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct F4Progress {
+    pub event: &'static str,
+    pub variables: usize,
+    pub step: usize,
+    pub degree: u32,
+    pub rows: usize,
+    pub columns: usize,
+    pub productive_degree: u32,
+    pub field_multiplications: u64,
+    pub elapsed_ms: f64,
+}
+
+thread_local! {
+    static OBSERVER: std::cell::RefCell<Option<std::sync::mpsc::Sender<F4Progress>>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Observe this thread's F4 calls, including substitution-tree calls. The
+/// previous observer is restored on return or unwind; arithmetic is unchanged.
+pub fn observe_progress<T>(
+    sender: std::sync::mpsc::Sender<F4Progress>,
+    f: impl FnOnce() -> T,
+) -> T {
+    struct Restore(Option<std::sync::mpsc::Sender<F4Progress>>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            OBSERVER.with(|slot| {
+                slot.replace(self.0.take());
+            });
+        }
+    }
+    let previous = OBSERVER.with(|slot| slot.replace(Some(sender)));
+    let _restore = Restore(previous);
+    f()
+}
+
+fn notify_progress(progress: F4Progress) {
+    OBSERVER.with(|slot| {
+        if let Some(sender) = slot.borrow().as_ref() {
+            let _ = sender.send(progress);
+        }
+    });
+}
+
 // ── Field arithmetic ───────────────────────────────────────────────
 
 /// Process-wide count of `F_p` multiplications spent in row reduction
@@ -101,6 +147,20 @@ fn count_native(n: u64) {
 #[inline]
 fn count_stair(n: u64) {
     NATIVE_STAIR.fetch_add(n, AtomicOrdering::Relaxed);
+}
+
+thread_local! {
+    /// The same count, on the thread that did the work.
+    static FIELD_OPS_THREAD: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// `F4_FP_THREAD_OPS=1`: [`field_ops_total`] and every report read this
+/// thread's count instead of the process-wide one.  For a study that runs
+/// several solves side by side, each confined to one thread (a one-thread
+/// pool per run), so that no run's count takes in another's.
+fn thread_ops_mode() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_THREAD_OPS").as_deref() == Ok("1"))
 }
 
 /// Per-step diagnostics of the most recent F4 run on this thread (taken with
@@ -269,7 +329,11 @@ fn stair_scan() -> bool {
 }
 
 fn field_ops_now() -> u64 {
-    FIELD_OPS.load(AtomicOrdering::Relaxed)
+    if thread_ops_mode() {
+        FIELD_OPS_THREAD.with(|c| c.get())
+    } else {
+        FIELD_OPS.load(AtomicOrdering::Relaxed)
+    }
 }
 
 /// The process-wide row-reduction counter, for callers that run several
@@ -282,6 +346,10 @@ pub fn field_ops_total() -> u64 {
 #[inline]
 fn count_ops(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
+    // operation is a multiply-subtract
+    super::jv_bitops::row_ops(n as u64);
 }
 
 #[inline]
@@ -290,6 +358,7 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
 }
 
 fn invmod(a: u64, p: u64) -> u64 {
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
     // p prime, a != 0
     if (2..1 << 32).contains(&p) {
         // the same powers, each product reduced by Barrett's method
@@ -394,6 +463,7 @@ fn total_degree(m: &[u32]) -> u32 {
 /// Scale `f` (non-empty, coefficients below `p`) to be monic.
 fn scale_monic(f: &mut Poly, p: u64) {
     let inv = invmod(f[0].1, p);
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, f.len() as u64);
     if (2..1 << 32).contains(&p) {
         let fp = Barrett::new(p);
         for (_, c) in f.iter_mut() {
@@ -428,13 +498,18 @@ fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
     // The sort need not keep equal monomials in their order: they are
     // adjacent either way, and merged by a sum that has no order.
     out.sort_unstable_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
+    let mut merges = 0u64;
+    let scanned = out.len() as u64;
     out.dedup_by(|later, kept| {
         let same = later.0 == kept.0;
         if same {
             kept.1 = (kept.1 + later.1) % p;
+            merges += 1;
         }
         same
     });
+    super::jv_bitops::words(super::jv_bitops::sort_cost(scanned as usize) + scanned);
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, merges);
     // drop the sums that cancelled
     out.retain(|(_, c)| *c != 0);
     if !out.is_empty() {
@@ -1063,7 +1138,12 @@ impl Packed {
         let mut frontier: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         while !frontier.is_empty() {
             // the frontier rows' terms against the monomials known so far
-            count_native(frontier.iter().map(|&(i, _)| self.terms[i].len() as u64).sum());
+            count_native(
+                frontier
+                    .iter()
+                    .map(|&(i, _)| self.terms[i].len() as u64)
+                    .sum(),
+            );
             let known = &ids;
             let mut frows: Vec<Vec<u32>> = frontier
                 .par_iter()
@@ -1216,7 +1296,9 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            let found = alive_idx.iter().position(|&i| self.divides(self.lms[i], mono));
+            let found = alive_idx
+                .iter()
+                .position(|&i| self.divides(self.lms[i], mono));
             count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
             if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
@@ -1307,6 +1389,17 @@ fn gm_update<K: PartialEq>(
     lcmf: impl Fn(&K, &K) -> K,
     coprime: impl Fn(&K, &K) -> bool,
 ) -> Vec<(usize, K)> {
+    // bitop/v1: criterion B tests every held pair (a divisibility and two
+    // lcm compares, a packed monomial being two words each), every alive
+    // element gets a divisibility, coprimality and lcm, and criteria M/F
+    // compare candidate pairs (charged at the quadratic bound)
+    super::jv_bitops::words(
+        if gm {
+            6 * (pairs.len() + above.len()) as u64
+        } else {
+            0
+        } + 6 * k as u64,
+    );
     if gm {
         // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
         // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
@@ -1338,6 +1431,7 @@ fn gm_update<K: PartialEq>(
     }
     let mut kept = vec![true; cand.len()];
     if gm {
+        super::jv_bitops::words(2 * (cand.len() * cand.len()) as u64);
         // Criteria M and F: drop (h, g1) when another pair (h, g2) still
         // standing has an lcm dividing its own; of several with equal lcms
         // the last one stays.  A coprime pair is never dropped here (it may
@@ -1425,7 +1519,9 @@ fn rref32(
         if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
-        let Some(r) = (pr..rows.len()).find(|&r| rows[r][c] != 0) else {
+        let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
+        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        let Some(r) = found else {
             continue;
         };
         rows.swap(pr, r);
@@ -2010,7 +2106,9 @@ fn rref(rows: &mut Vec<Vec<u64>>, fp: Barrett, deadline: Option<Instant>) -> Opt
         if c % 32 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
-        let Some(r) = (pr..rows.len()).find(|&r| rows[r][c] != 0) else {
+        let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
+        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        let Some(r) = found else {
             continue;
         };
         rows.swap(pr, r);
@@ -2055,10 +2153,34 @@ fn rref(rows: &mut Vec<Vec<u64>>, fp: Barrett, deadline: Option<Instant>) -> Opt
 
 /// Degree-bounded F4.
 pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
-    if let Some(chunk) = opts.stop_hilbert {
-        return f4_hilbert_guarded(input, n_vars, p, opts, chunk);
-    }
-    f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
+    notify_progress(F4Progress {
+        event: "begin",
+        variables: n_vars,
+        step: 0,
+        degree: 0,
+        rows: input.len(),
+        columns: 0,
+        productive_degree: 0,
+        field_multiplications: 0,
+        elapsed_ms: 0.0,
+    });
+    let report = if let Some(chunk) = opts.stop_hilbert {
+        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
+    } else {
+        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
+    };
+    notify_progress(F4Progress {
+        event: "complete",
+        variables: n_vars,
+        step: report.steps,
+        degree: report.degree_reached,
+        rows: report.max_rows,
+        columns: report.max_cols,
+        productive_degree: report.solving_degree_max,
+        field_multiplications: report.field_ops,
+        elapsed_ms: report.ms,
+    });
+    report
 }
 
 /// The Hilbert function `prod_i (1 + t + ... + t^(d_i - 1))` of a complete
@@ -2669,7 +2791,37 @@ fn f4_with_arithmetic(
         }
         max_rows = max_rows.max(sparse.len());
         max_cols = max_cols.max(n_cols);
+        notify_progress(F4Progress {
+            event: "matrix",
+            variables: n_vars,
+            step: steps,
+            degree: d,
+            rows: sparse.len(),
+            columns: n_cols,
+            productive_degree: learned.0,
+            field_multiplications: field_ops_now() - ops0,
+            elapsed_ms: t0.elapsed().as_secs_f64() * 1000.0,
+        });
         steps += 1;
+        // bitop/v1 (`jv_bitops`, off unless a study turns it on): symbolic
+        // preprocessing and the matrix build, charged per entry of this
+        // step's matrix (the monomial product, two words; the monomial-set
+        // probe and the column-index probe), per column (the done-set probe,
+        // the reducer search over the basis at its bound, the column sort),
+        // and the pair rows' scans over the reducer columns
+        if super::jv_bitops::enabled() {
+            let entries: u64 = sparse.iter().map(|r| r.len() as u64).sum();
+            let nc = n_cols as u64;
+            super::jv_bitops::probes(2 * entries + nc, 2);
+            super::jv_bitops::words(
+                2 * entries + super::jv_bitops::sort_cost(n_cols) + nc * basis.len() as u64,
+            );
+            let scans: u64 = sparse[..n_pair_rows]
+                .iter()
+                .map(|r| r.first().map_or(0, |e| nc - e.0 as u64))
+                .sum();
+            super::jv_bitops::words(scans);
+        }
         // The reducer rows of symbolic preprocessing have distinct leading
         // columns, none of them an lcm: they are already an echelon form.
         // Reduce each pair row by them alone, column by column, then take
@@ -3291,6 +3443,8 @@ fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Orde
                     0
                 });
                 *v = (*v + mulmod(neg, *gc, p)) % p;
+                super::jv_bitops::row_ops(1);
+                super::jv_bitops::probes(1, 2);
             }
         } else {
             out.push((mono, c));
@@ -3531,6 +3685,8 @@ fn reduce_skipping_packed(
                 Some(fp) if gc < p => fp.reduce(*v + neg * gc),
                 _ => (*v + mulmod(neg, gc, p)) % p,
             };
+            super::jv_bitops::row_ops(1);
+            super::jv_bitops::probes(1, 2);
         }
     }
     // popped in decreasing order: already leading-first
@@ -4655,6 +4811,54 @@ mod degree_bound_solve_tests {
             matches!(s.verdict, Verdict::Inconsistent),
             "{:?}",
             s.verdict
+        );
+    }
+}
+
+#[cfg(test)]
+mod progress_observer_tests {
+    use super::*;
+    #[test]
+    fn observing_and_nested_observers_preserve_the_basis_and_restore_scope() {
+        let input = vec![
+            normalise(&[(vec![2, 0], 1), (vec![0, 1], 4)], 5, Ordering::Grevlex),
+            normalise(&[(vec![1, 1], 1), (vec![0, 0], 4)], 5, Ordering::Grevlex),
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        let reference = f4(&input, 2, 5, &opts);
+        let (outer, outer_rx) = std::sync::mpsc::channel();
+        let (inner, inner_rx) = std::sync::mpsc::channel();
+        let observed = observe_progress(outer, || {
+            observe_progress(inner, || {
+                let _ = f4(&input, 2, 5, &opts);
+            });
+            f4(&input, 2, 5, &opts)
+        });
+        assert_eq!(reference.basis, observed.basis);
+        assert_eq!(reference.solving_degree_max, observed.solving_degree_max);
+        assert_eq!(reference.degree_reached, observed.degree_reached);
+        for events in [
+            outer_rx.into_iter().collect::<Vec<_>>(),
+            inner_rx.into_iter().collect::<Vec<_>>(),
+        ] {
+            assert_eq!(events.first().unwrap().event, "begin");
+            assert_eq!(events.last().unwrap().event, "complete");
+            assert!(events.iter().any(|e| e.event == "matrix"));
+        }
+        let _ = f4(&input, 2, 5, &opts);
+    }
+    #[test]
+    fn observer_is_restored_after_unwind() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        let result =
+            std::panic::catch_unwind(|| observe_progress(tx, || panic!("observer scope control")));
+        assert!(result.is_err());
+        assert!(rx.recv().is_err());
+        let _ = f4(
+            &[normalise(&[(vec![1], 1)], 3, Ordering::Grevlex)],
+            1,
+            3,
+            &F4Options::new(Ordering::Grevlex, 2),
         );
     }
 }
