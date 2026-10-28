@@ -1,6 +1,32 @@
 # n83 spike40 factor bases and matched PDP work
 
 
+## Latest m3–9 binary chain bounds
+
+All84 retained original/baseline/spike40 Koblitz/binary systems passed producer,
+fresh replay and S3-restored replay. These bounds replace the earlier binary
+intervals below; all earlier certificates remain historical evidence.
+
+| m | New binary/Koblitz interval, all retained bases and targets |
+|---|---|
+|3|111–138|
+|4|194–221|
+|5|277–331|
+|6|360–414|
+|7|443–524|
+|8|526–607|
+|9|609–717|
+
+No exact full-chain degree is claimed where the interval has a gap. These are
+stronger certificates on unchanged inputs, not lower degrees caused by a base
+change. Identical bounds do not prove equal actual degrees or order the bases.
+See [summary](evidence/chain/verified-summary.json), [export](experiment-chain.export.json),
+[proof](CHAIN_DESIGN.md), [file encodings](CHAIN_FORMAT.json),
+[storage/restore](evidence/chain-storage.json), and
+[report](reports/run-20261028T1753Z/report.pdf). All360 raw manifest entries and
+all84 immutable progress snapshots are retained. Independent review is pending.
+
+
 ## Latest exact m2 results
 
 All retained original, paired baseline and spike40 m2 systems now have exact

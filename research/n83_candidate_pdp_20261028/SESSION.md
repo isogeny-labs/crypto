@@ -572,3 +572,26 @@ chain blocks and bounded higher-m closure under a new frozen protocol.
 No production failures/timeouts. The whitespace check flagged native log blank
 EOF lines; logs were preserved verbatim and the one check disabled only blank
 EOF warnings. No frozen source or measured data was changed after freeze.
+
+## 2026-10-28 — Chain report and metrics ready
+
+### What was done
+Data19c6cc710c2 committed/pushed before the two-page report. Both final PDF pages
+visually inspected; S3 download byte-equal. Report SHA7c571f51bbce8a0585062c7b459f36be7f83ef57f65553a462f1432c91d0dfae.
+All252 new progress metrics equal committed native summary;1075 recent exported
+rows. README distinguishes new larger-m intervals from exact m2 results and
+retains older evidence tables. Support artifacts have a self-describing index.
+
+### Decisions made
+No exact full-chain degree where bounds differ; identical bounds do not prove
+actual degrees equal or rank the bases. Store large identical archive downloads
+by their existing content-addressed object in support index, without deleting
+local copies or duplicating the same bytes in another archive.
+
+### Open threads
+Final report push, PR2706 current-head status and checkpoint. Independent review,
+full larger-m regularity/LFD and elite-base selection remain open.
+
+### Errors
+No render or production failure in this phase. Initial/final layout artifacts
+are preserved. Previous failures and datasets remain unchanged.
