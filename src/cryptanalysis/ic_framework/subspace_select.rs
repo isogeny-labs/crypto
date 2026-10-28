@@ -40,8 +40,11 @@ pub const MAX_SIEVE_DEGREE: u32 = 26;
 
 /// Why `strict4e` cannot be offered on an instance, or `None` if it can.
 pub fn strict4e_refusal(inst: &BinaryInstance) -> Option<String> {
-    if inst.n % 2 == 0 {
-        return Some(format!("n = {} is even; the 4E criterion needs odd n", inst.n));
+    if inst.n.is_multiple_of(2) {
+        return Some(format!(
+            "n = {} is even; the 4E criterion needs odd n",
+            inst.n
+        ));
     }
     if inst.cofactor != 4 {
         return Some(format!(
@@ -50,7 +53,9 @@ pub fn strict4e_refusal(inst: &BinaryInstance) -> Option<String> {
         ));
     }
     if inst.a != 0 || inst.b != 1 {
-        return Some("the 4E criterion is proved for y^2 + xy = x^3 + 1 (a = 0, b = 1) only".into());
+        return Some(
+            "the 4E criterion is proved for y^2 + xy = x^3 + 1 (a = 0, b = 1) only".into(),
+        );
     }
     if inst.n > MAX_SIEVE_DEGREE {
         return Some(format!(
@@ -100,7 +105,11 @@ impl X4Map {
                 count += 1;
             }
         }
-        Self { n: inst.n, bits, count }
+        Self {
+            n: inst.n,
+            bits,
+            count,
+        }
     }
     #[inline]
     pub fn contains(&self, x: u64) -> bool {
@@ -111,7 +120,7 @@ impl X4Map {
 /// Deterministic splitmix64 stream.
 pub struct SplitMix(pub u64);
 impl SplitMix {
-    pub fn next(&mut self) -> u64 {
+    pub fn next_u64(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -180,7 +189,7 @@ pub fn strict4e_sieve(map: &X4Map, l: u32, seed: u64) -> Result<SelectedBasis, S
             }
             if ok {
                 seen += 1;
-                if rng.next() % seen == 0 {
+                if rng.next_u64().is_multiple_of(seen) {
                     pick = v;
                 }
             }
@@ -208,7 +217,7 @@ pub fn strict4e_sieve(map: &X4Map, l: u32, seed: u64) -> Result<SelectedBasis, S
                     }
                     std::cmp::Ordering::Equal => {
                         ties += 1;
-                        if rng.next() % ties == 0 {
+                        if rng.next_u64().is_multiple_of(ties) {
                             best = v;
                         }
                     }
@@ -238,7 +247,7 @@ pub fn random_basis(n: u32, l: u32, seed: u64) -> Vec<u64> {
     let mut basis: Vec<u64> = Vec::new();
     let mut piv = [0u64; 64];
     while basis.len() < l as usize {
-        let w = rng.next() & ((1u64 << n) - 1);
+        let w = rng.next_u64() & ((1u64 << n) - 1);
         let mut x = w;
         while x != 0 {
             let k = 63 - x.leading_zeros() as usize;
@@ -293,7 +302,10 @@ pub fn gated_rank_select(
 ) -> Result<(SelectedBasis, Vec<ScoredCandidate>), String> {
     let mut pool: Vec<(Vec<u64>, String, SelectedBasis)> = Vec::new();
     let mk_plain = |basis: Vec<u64>| {
-        let x4 = span(&basis)[1..].iter().filter(|&&x| map.contains(x)).count() as u64;
+        let x4 = span(&basis)[1..]
+            .iter()
+            .filter(|&&x| map.contains(x))
+            .count() as u64;
         SelectedBasis {
             x4_in_span: x4,
             span_nonzero: (1u64 << basis.len()) - 1,
@@ -367,7 +379,11 @@ mod tests {
             members += u64::from(truth);
         }
         // Each member abscissa carries two points of <G>: |<G>| = r + ... .
-        assert_eq!(2 * members + 1, inst.r, "n={n}: <G> minus O has 2 points per x");
+        assert_eq!(
+            2 * members + 1,
+            inst.r,
+            "n={n}: <G> minus O has 2 points per x"
+        );
     }
 
     #[test]
@@ -398,7 +414,11 @@ mod tests {
         let mut refused = 0;
         for (a, n) in [(0u8, 17u32), (1, 17), (1, 13), (0, 14), (0, 16), (1, 14)] {
             if let Some(inst) = koblitz_instance(a, n) {
-                assert!(strict4e_refusal(&inst).is_some(), "a={a} n={n} h={}", inst.cofactor);
+                assert!(
+                    strict4e_refusal(&inst).is_some(),
+                    "a={a} n={n} h={}",
+                    inst.cofactor
+                );
                 refused += 1;
             }
         }
@@ -409,9 +429,9 @@ mod tests {
 
     #[test]
     fn default_path_is_unchanged_and_select_refusal_is_clear() {
+        use crate::cryptanalysis::ic_boundary::GroupOps;
         use crate::cryptanalysis::ic_framework::plugins::BinarySubspaceBase;
         use crate::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
-        use crate::cryptanalysis::ic_boundary::GroupOps;
         let inst = koblitz_instance(0, 13).unwrap();
         let g = BinaryGroup(&inst.fast);
         let ctx = InstanceCtx {
@@ -436,7 +456,10 @@ mod tests {
         let s1 = build("binary-subspace:dimension=3,select=strict4e,seed=7").unwrap();
         let s2 = build("binary-subspace:dimension=3,select=strict4e,seed=7").unwrap();
         assert_eq!(s1.subspace_basis, s2.subspace_basis);
-        assert_eq!(s1.cost.native.get("strict4e_x4_in_span"), s1.cost.native.get("strict4e_span_nonzero"));
+        assert_eq!(
+            s1.cost.native.get("strict4e_x4_in_span"),
+            s1.cost.native.get("strict4e_span_nonzero")
+        );
         assert!(build("binary-subspace:dimension=3,select=bogus").is_err());
         assert!(build("binary-subspace:dimension=3,select=strict4e,basis=1;2;4").is_err());
     }
