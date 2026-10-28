@@ -104,3 +104,18 @@ The owner's default EKS route (`isolab-eks`, 2026-10-25) does not fit this study
 AWS request contract (`isolab.eks.request/v1`) takes only an `ecbench.spec/v1` job, `ecbench`
 cannot run IC at m = 83, and custom commands need the EKS MCP `isolab_k8s_run`, which this session
 lacks. The study therefore stays L0 on this VM, as section 3 already states.
+
+**Amendment 3 (2026-10-28, before any precomputed-rho output existed).** Run 3,
+`records/run-20261028T1354Z`, finished the IC arm (16/16 targets, 13:55:00 to 13:57:41Z) and the
+plain-rho control. It was then killed during precomputed-rho arm (a), which started at 13:58:25Z,
+by another container restart (uptime reset; observed at 15:10Z). Arm (a) left no records, and no
+analysis ran. The directory is kept unchanged as evidence.
+
+Cause: both kills fell in long stretches when the session issued no commands, while the run was a
+detached `setsid nohup` process the session harness does not track. The environment reclaims idle
+containers, and an untracked process does not keep one alive. On the 2026-10-16 runners arm (a)
+took about 11 minutes, and every whole job finished in under 2.2 h.
+
+Fix: run 4 executes the same `run.sh` with the same inputs, binaries, configs and seeds as a
+harness-tracked background task. Nothing in the experiment changes. Run 4 is the decision-bearing
+run. Runs 2 and 3 are not combined with it.
