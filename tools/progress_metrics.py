@@ -41,6 +41,29 @@ def show(ref, path):
     return p.stdout if p.returncode == 0 else None
 
 
+def show_many(ref, paths):
+    """Read committed blobs in one Git process, retaining input order."""
+    if not paths:
+        return []
+    request = "".join(f"{ref}:{path}\n" for path in paths).encode()
+    proc = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                          input=request, capture_output=True, check=True)
+    data, offset, result = proc.stdout, 0, []
+    for path in paths:
+        end = data.index(b"\n", offset)
+        header = data[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            result.append(None)
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise RuntimeError(f"Expected committed blob: {ref}:{path}")
+        size = int(header[2])
+        result.append(data[offset:offset + size].decode())
+        offset += size + 1
+    return result
+
+
 def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
@@ -262,8 +285,8 @@ def fall_degree(ref):
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
-    for f in files:
-        for line in (show(ref, f) or "").splitlines():
+    for text in show_many(ref, files):
+        for line in (text or "").splitlines():
             if not line.startswith("{"):
                 continue
             r = json.loads(line)
@@ -316,6 +339,56 @@ def n83_top_quotient(ref, since):
                      source=f"{path}@{commit}")
 
 
+def n83_candidate_datasets(ref, since):
+    """Forward native point counts and replayed fall fields; unknowns stay absent."""
+    study = "research/n83_candidate_pdp_20261028"
+    for name, path in (
+        ("baseline", "research/n83_fixed_factor_base_20261028/data/index.json"),
+        ("spike40", f"{study}/data/index.json"),
+    ):
+        for date, commit, text in file_history(ref, path, since):
+            index = json.loads(text)
+            if index.get("complete") is not True:
+                continue
+            for family in index.get("families", []):
+                for field, unit in (("point_count", "points"), ("liftable_x", "x-values"),
+                                    ("compressed_bytes", "bytes")):
+                    emit(f"n83.base_ell27.{name}.{family['family']}.{field}", family.get(field),
+                         date=date, problem="n83-factor-base-datasets", unit=unit,
+                         label=f"{name} {family['family']} exhaustive base: {field}; no degree claim",
+                         source=f"{path}@{commit}")
+    path = f"{study}/evidence/pdp/paired-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for pair in json.loads(text).get("rows", []):
+            if pair.get("targets_identical") is not True:
+                continue
+            for arm in ("baseline", "spike40"):
+                row = pair.get(arm, {})
+                status = row.get("closure_status", {})
+                if status.get("closure_exit_code") != 0 or status.get("replay_exit_code") != 0:
+                    continue
+                for field in ("last_fall_degree", "closure_rank", "linear_rank"):
+                    emit(f"n83.paired_v2.{arm}.{pair['id']}.{field}", row.get(field),
+                         date=date, problem="n83-paired-fall-degree",
+                         unit="degree" if field == "last_fall_degree" else "rank",
+                         label=f"Paired V2 {arm} {pair['id']}: {field}; producer replay, review pending",
+                         source=f"{path}@{commit}")
+    path = f"{study}/evidence/degree3/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("rows", []):
+            status = row.get("status", {})
+            if (row.get("verified") is not True or status.get("run_exit_code") != 0
+                    or status.get("replay_exit_code") != 0):
+                continue
+            for field in ("last_fall_degree", "last_fall_lower_bound", "last_fall_upper_bound",
+                          "closure_rank", "linear_rank"):
+                emit(f"n83.paired_v3.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-paired-fall-degree",
+                     unit="rank" if field.endswith("rank") else "degree",
+                     label=f"Paired V3 {row['key']}: {field}; producer replay, review pending",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -331,6 +404,7 @@ def main():
     fall_degree(a.ref)
     n83_fixed_fall(a.ref, a.since)
     n83_top_quotient(a.ref, a.since)
+    n83_candidate_datasets(a.ref, a.since)
 
 
 if __name__ == "__main__":

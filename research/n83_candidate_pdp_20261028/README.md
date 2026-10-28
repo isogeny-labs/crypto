@@ -46,9 +46,9 @@ matched targets and asserts unchanged natural baseline source hashes;
 correct selector weights. Six generator tests and eight fall tests pass.
 No candidate degree measurement is claimed by the enumeration report.
 
-The shared progress-metrics exporter was reserved by Conductor task T-705 when
-publication was prepared. Its integration remains a separate pending task;
-actual committed counts are available directly from `data/index.json`.
+The progress-metrics exporter now forwards the committed point counts and
+verified V2/V3 fields. Unknown degrees are omitted. Source values remain in
+`data/index.json` and the native summaries; no degree is inferred from a rank.
 
 ## Completed paired FFD/V2 panel
 
@@ -61,7 +61,7 @@ catalogs completed. The48 target pairs have identical targets and planted tuples
 Both arms have FFD=2 for all32 binary/Koblitz inputs per arm. All16 prime inputs
 per arm have FFD>=5, with exact FFD unknown. For the four binary/Koblitz m2 cases,
 baseline linear rank is53(planted) or54(natural) with LFD=2 certificates; spike40
-linear rank is17 and exact LFD remains unknown. For m3..9, both arms have V2
+linear rank is17 and exact LFD was unknown at the V2 stage. For m3..9, both arms have V2
 linear rank1 and unknown exact LFD. This does not establish a higher spike40 LFD
 or lower regularity. It records a difference in degree-two elimination despite
 identical FFD. No elite-base improvement is established.
@@ -69,6 +69,49 @@ identical FFD. No elite-base improvement is established.
 `PDP_FORMAT.json` and `PDP_COMPONENT_FORMAT.json` describe inputs, equation byte
 offsets, variable blocks, u64 closure-row encoding and operation/replay records.
 `evidence/pdp-storage.json` describes the complete raw archive and S3 provenance.
-The next mathematical measurement is a higher-degree closure on these preserved
-m2 candidate systems, with explicit new-fall witnesses and a separately frozen
-protocol. Larger-m LFD, prime LFD and candidate regularity remain open.
+The degree-three continuation below resolves these preserved m2 systems.
+Larger-m LFD, prime LFD and candidate regularity remain open.
+
+
+## Completed degree-three continuation
+
+Run `n83-degree3-paired-20261028-r1` completed 07:02:11–07:17:39 UTC.
+All eight producers and eight fresh-process replays passed, as did the three
+runtime controls. Both Koblitz and general-binary curves have exact LFD=2 on
+baseline and exact LFD=3 on spike40, for both retained planted and natural
+m2 targets. All eight inputs already have certified FFD=2 in the paired panel.
+These are input-specific certificates, not a universal FFD/LFD verdict or a
+regularity reduction. Candidate degree of regularity remains unmeasured.
+
+Every spike40 result contains an explicit degree-at-most-two polynomial in V3
+whose remainder against the complete V2 space is nonzero. The upper certificate
+is the unit ideal for natural targets, or exhaustive verification of both
+remaining affine assignments for planted targets. The replay checks both complete
+closures and these certificates. Producer replay is not independent review.
+
+- `evidence/degree3/summary.json`: eight native rows, source/base identities,
+  exact LFD, separate bounds, V2 and V3 ranks, and producer/replay status.
+- `evidence/degree3/results/`: full witnesses and upper certificates.
+- `experiment-degree3.export.json` and `protocol-degree3.json`: bound execution
+  records and frozen eight-case contract.
+- `DEGREE3_FORMAT.json`: binary rows, JSONL operations, source encoding and
+  reconstruction details; `DEGREE3_DESIGN.md`: algebra and claim scope.
+- `degree3-archives/.artifacts.json` and `evidence/degree3-storage.json`: nine
+  immutable archives containing the entire 200-file raw run, including inputs,
+  V2 snapshots, V3 traces, executable, controls, logs and environment.
+- `reports/run-20261028T0702Z/report.pdf`: run report and exact-degree comparison.
+
+Hydrate the archives from the repository root and extract into a fresh directory:
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/n83_candidate_pdp_20261028/degree3-archives
+mkdir /tmp/n83-degree3-reconstruction
+for archive in research/n83_candidate_pdp_20261028/degree3-archives/*.tar.xz; do
+  tar -xJf "$archive" -C /tmp/n83-degree3-reconstruction
+done
+(cd /tmp/n83-degree3-reconstruction && sha256sum -c manifest.sha256)
+```
+
+The original fixed-base m2..9 regularity sweep is preserved separately in
+`../n83_fixed_degree_sweep_20261028/`, with certified top-form bounds in
+`../n83_top_quotient_20261028/`. Those bounds do not describe spike40.

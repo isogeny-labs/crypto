@@ -180,3 +180,48 @@ Initial compile needed an explicit pivot-index type; retained failed log.
 Cargo fmt has no --bin option; used rustfmt on only the new file. Four native
 unit tests pass, including genuine degree3 control, negative control, complete
 column indexing, illegal multiplication and altered trace rejection.
+
+
+## Degree-three completion and preservation
+
+### What was done
+
+Run n83-degree3-paired-20261028-r1 completed 07:02:11–07:17:39 UTC. All eight
+producer and fresh-process replay pairs passed. All four baseline systems have
+exact LFD2; all four spike40 systems have exact LFD3 with explicit nonmembership
+witnesses and global upper certificates. All 200 raw manifest entries pass.
+Nine deterministic archives retain the complete tree and are stored by hash.
+The unified export passes file verification with zero findings.
+
+### Decisions made
+
+Keep original fixed-base regularity evidence separate from candidate LFD evidence.
+The original fixed-base sweep had 96 attempts, no completed exact top regularity,
+and later 48 replayed top-quotient certificates; its two archive pointers were
+reverified remotely with zero problems. No duplicate sweep launched. Continue
+larger-m, prime and elite-base work; do not mark the broad goal complete.
+
+### Open threads
+
+Publish data before the report. Independent scientific review and exact-head CI
+remain separate. Candidate regularity and larger-m/prime LFD remain unresolved.
+
+### Errors
+
+The first metrics check took 175.19 seconds on this NFS workspace. Profiling
+identified sequential per-file Git reads in existing fall-degree metrics. One
+cat-file batch retains byte-identical 891-row output and completed in 49.65
+seconds. This is a diagnostic validation, not a scientific speed claim. The
+report venv lacked matplotlib; installed it in that existing scratch venv.
+
+
+### Final data validation
+
+All nine content-addressed archives passed full S3 download and SHA-256 checks;
+the narrow remote checker reports nine hydrated entries and zero problems.
+Interrupted readback outputs were reconciled, existing complete downloads reused,
+and incomplete bytes preserved with an .incomplete suffix before continuing.
+The compatibility readback script uses chunked hashlib on Python3.9. Report
+rendering required quoting the s3:// text in Typst; both final pages were
+rendered and visually inspected. None of these publication corrections changed
+frozen native source, input systems, computed degrees or raw run data.
