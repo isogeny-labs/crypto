@@ -37,10 +37,10 @@ fn value(path: &Path) -> Value {
 fn complete_event_recorded(path: &Path, expected: &str) -> bool {
     fs::read_to_string(path)
         .map(|contents| {
-            contents.lines().any(|line| {
-                serde_json::from_str::<Value>(line)
-                    .map(|event| event["event"].as_str() == Some(expected))
-                    .unwrap_or(false)
+            contents.split_inclusive('\n').any(|line| {
+                line.strip_suffix('\n')
+                    .and_then(|record| serde_json::from_str::<Value>(record).ok())
+                    .is_some_and(|event| event["event"].as_str() == Some(expected))
             })
         })
         .unwrap_or(false)
