@@ -259,6 +259,7 @@ def fall_degree(ref):
     base = "research/fall_degree_bounds_20261008/"
     files = [f for f in ls(ref, base) if f.endswith(".jsonl") and (
         f.startswith(base + "e7/E7_") or f.startswith(base + "e8/E8_")
+        or f == base + "e12/completed-20261028/E_3-24-7.jsonl"
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None

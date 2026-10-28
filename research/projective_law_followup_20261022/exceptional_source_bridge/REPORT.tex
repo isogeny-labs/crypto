@@ -1,0 +1,44 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\begin{document}
+\title{A finite exceptional-dispatch witness for the genus-2 weighted law}
+\author{Source-bound review packet}
+\date{25 October 2026}
+\maketitle
+
+\noindent\textbf{Input.} Over $\mathbf F_{17}$, take
+$C:y^2=x^5+x+2$ and the reduced divisor with
+$u=x^2+6x+5=(x-12)(x-16)$, $v=0$.
+The source-bound checker recomputes that $C$ is smooth and $u\mid f$.
+The compiled Rust fixture checks validity and independent Cantor addition.
+
+\begin{center}
+\begin{tabular}{lll}
+Path & Observed branch & Result\\\hline
+Author public dispatcher & inverse before double & identity\\
+Rust public dispatcher & same\_u\_inverse & Identity\\
+Independent Cantor & $D+D$ & Identity\\
+Author direct doubling & DBL2B0 & $(0,0,0,0,0,0)$\\
+Rust direct doubling & b\_zero\_identity & Identity\\
+\end{tabular}
+\end{center}
+
+\noindent The direct author output has $Z=W=0$ and is not a valid weighted
+divisor. Two normalization denominators would be zero. The author's public
+dispatcher checks the inverse condition first and therefore does not reach
+that subroutine on this input. The public paths have zero undefined inverses
+for this fixture. This is a subroutine edge, not a public-law discrepancy.
+
+\noindent\textbf{Reproduction.} The standardized row is \texttt{ROWS.csv};
+\texttt{run.py} compiles the pinned Rust source plus a temporary test module.
+The initial intentionally failed assertion and corrected passing rerun are
+retained as raw logs. \texttt{check.py} pins the complete author and Rust source
+SHA-256 hashes, checks dispatch order, and evaluates the author expressions.
+The exact command and source URL are in \texttt{README.md}.
+
+\noindent\textbf{Boundary.} This checks one $\mathbf F_{17}$ input. The
+author Magma source was evaluated, not executed in Magma. It establishes no
+universal formula parity, Picard-group theorem, or new cost measurement.
+\end{document}
