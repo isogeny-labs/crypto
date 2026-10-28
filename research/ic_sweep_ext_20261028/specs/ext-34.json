@@ -5,9 +5,14 @@
  "workloads": {
   "curves": [
    {
-    "kind": "prime_search",
-    "bits": 34,
-    "seed": 59299
+    "kind": "prime_explicit",
+    "p": 14775172259,
+    "a": 5911235628,
+    "b": 4243328509,
+    "group_order": 14775195661,
+    "r": 14775195661,
+    "gx": 11720448867,
+    "gy": 10093939013
    }
   ],
   "targets_per_curve": 4,
@@ -183,7 +188,7 @@
    "method": {
     "id": "ic.pipeline",
     "params": {
-     "factor_base": "prime-abscissa:size=8,stride=1000003",
+     "factor_base": "prime-abscissa:size=8,stride=5308871539",
      "oracle": "residual-sweep:m=2",
      "targets": "walk"
     }
@@ -244,18 +249,6 @@
     "id": "ic.pipeline",
     "params": {
      "factor_base": "prime-abscissa:size=1536",
-     "oracle": "mitm-prime-batch:m=2",
-     "targets": "walk-prime-batch-16"
-    }
-   }
-  },
-  {
-   "name": "pair-b16-b3072",
-   "role": "candidate",
-   "method": {
-    "id": "ic.pipeline",
-    "params": {
-     "factor_base": "prime-abscissa:size=3072",
      "oracle": "mitm-prime-batch:m=2",
      "targets": "walk-prime-batch-16"
     }

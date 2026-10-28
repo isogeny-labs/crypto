@@ -5,9 +5,14 @@
  "workloads": {
   "curves": [
    {
-    "kind": "prime_search",
-    "bits": 44,
-    "seed": 59304
+    "kind": "prime_explicit",
+    "p": 8896069481983,
+    "a": 5275565146180,
+    "b": 3651862728644,
+    "group_order": 8896073379637,
+    "r": 8896073379637,
+    "gx": 2620203297683,
+    "gy": 6926902520582
    }
   ],
   "targets_per_curve": 2,
@@ -46,49 +51,25 @@
    }
   },
   {
-   "name": "sweep-b2",
+   "name": "b2-dp4",
    "role": "candidate",
    "method": {
     "id": "ic.pipeline",
     "params": {
      "factor_base": "prime-abscissa:size=2",
-     "oracle": "residual-sweep:m=2",
+     "oracle": "residual-sweep:m=2,dp=4",
      "targets": "walk"
     }
    }
   },
   {
-   "name": "sweep-b8",
+   "name": "b2-dp6",
    "role": "candidate",
    "method": {
     "id": "ic.pipeline",
     "params": {
-     "factor_base": "prime-abscissa:size=8",
-     "oracle": "residual-sweep:m=2",
-     "targets": "walk"
-    }
-   }
-  },
-  {
-   "name": "sweep-b32",
-   "role": "candidate",
-   "method": {
-    "id": "ic.pipeline",
-    "params": {
-     "factor_base": "prime-abscissa:size=32",
-     "oracle": "residual-sweep:m=2",
-     "targets": "walk"
-    }
-   }
-  },
-  {
-   "name": "b8-dp2",
-   "role": "candidate",
-   "method": {
-    "id": "ic.pipeline",
-    "params": {
-     "factor_base": "prime-abscissa:size=8",
-     "oracle": "residual-sweep:m=2,dp=2",
+     "factor_base": "prime-abscissa:size=2",
+     "oracle": "residual-sweep:m=2,dp=6",
      "targets": "walk"
     }
    }
@@ -106,13 +87,13 @@
    }
   },
   {
-   "name": "b32-dp4",
+   "name": "b8-dp6",
    "role": "candidate",
    "method": {
     "id": "ic.pipeline",
     "params": {
-     "factor_base": "prime-abscissa:size=32",
-     "oracle": "residual-sweep:m=2,dp=4",
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=6",
      "targets": "walk"
     }
    }
