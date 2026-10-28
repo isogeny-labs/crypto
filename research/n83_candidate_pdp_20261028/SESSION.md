@@ -144,3 +144,10 @@ The full user goal remains active; no universal theorem or elite base establishe
 
 No unresolved run, export or archive error. Earlier empty parent-directory
 artifact verification and transient uploader warnings remain in preserved logs.
+
+## Next-stage handoff
+
+NEXT_DEGREE3.md records the precise next certificate test on the eight preserved
+m2 paired systems. It is not frozen or launched. The standalone session-receipt
+helper is absent in this checkout and the recovered protocol-tools directory;
+this scoped log, terminal receipt, export and native manifest preserve the run.
