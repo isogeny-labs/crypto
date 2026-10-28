@@ -108,11 +108,14 @@
 //! 2^(−240)` for [`StarkConfig::default`], `4^(−20) = 2^(−40)` for
 //! [`StarkConfig::fast`]).  `F_r` is the BLS12-381 scalar field (`r ≈
 //! 2^254.86`, no extension field), so for any trace this code can
-//! build (`L ≤ 2^32`, `k ≤ n`) `ε_field` is negligible next to the query
-//! term (it evaluates to about `2^(−217.6)` with the `L/r` form of the
-//! last line above; with `L²/r` per challenge it would be about
-//! `2^(−185.7)`).  The field terms are written in the unique-decoding
-//! `L/r` form without list-size factors, and are not tied to one
+//! build (`L ≤ 2^32`, `k ≤ n`) `ε_field` evaluates to about `2^(−217.6)`
+//! with the `L/r` form of the last line above (about `2^(−185.7)` with
+//! `L²/r` per challenge).  That is above the default query term `2^(−240)`,
+//! so for [`StarkConfig::default`] the conjectured error is dominated by
+//! `ε_field`; for [`StarkConfig::fast`] the query term `2^(−40)` dominates.
+//! Either way it is far below the 128-bit SHA-256 ceiling below.  The field
+//! terms are written in the unique-decoding `L/r` form without list-size
+//! factors, and are not tied to one
 //! published statement of the conjecture; treat them as indicative.  `ε_hash`:
 //! every commitment is a SHA-256 Merkle tree, and a SHA-256 collision
 //! (generic cost about `2^128`) lets a prover open one leaf two ways,
