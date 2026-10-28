@@ -19,9 +19,9 @@ for(k=1;k<=13;k++){
  for(j=1;j<=count;j++){powers[j]=deg(terms[1,j]);coefficients[j]=terms[2,j];}
  setring qr25;
  ideal mappedCoefficients=coefficientsMap(coefficients);
- poly numerator=0;
- for(j=1;j<=count;j++){numerator=numerator+mappedCoefficients[j]*(U+(1+c)*n)^powers[j]*b^(ld-powers[j]);}
- poly Q=reduce(numerator,ASideal);
+ poly qrNumerator=0;
+ for(j=1;j<=count;j++){qrNumerator=qrNumerator+mappedCoefficients[j]*(U+(1+c)*n)^powers[j]*b^(ld-powers[j]);}
+ poly Q=reduce(qrNumerator,ASideal);
  if(deg(Q,intvec(1,0,0,0,0))>0){ERROR("registered quotient still depends on n");}
  quotientFunctions[k]=Q;
  print("QUOTIENT_GENERATOR_"+string(k)+"_SOURCE_INDEX_B_POWER");indexes[k];ld;

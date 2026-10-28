@@ -78,3 +78,5 @@ before composing the existing map. Positive04 repeats the same mathematics
 and cap; acceptance still requires every block and no native diagnostics.
 Registered01 rejects reserved ring name quotient. Use qr25 in registered02;
 no equations, localization, number of generators or acceptance rules change.
+Registered03 rejects reserved polynomial name numerator. Registered04 uses
+qrNumerator for that same homogenized polynomial and changes no mathematics.

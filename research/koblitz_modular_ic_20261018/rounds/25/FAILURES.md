@@ -37,3 +37,7 @@ the runner had no upload credentials to refresh it. Only gate.log exists,
 with no native input/output. Record one gate refusal separately from native
 attempt counts. Finish storage metadata, checkpoint again, then launch03
 without concurrent repository mutations until input.sing has been copied.
+
+Q25-registered03 passes the gate and begins native execution, then rejects
+reserved polynomial name numerator. Rename it qrNumerator before04. No
+thirteen-generator conclusion is accepted from this partial run.
