@@ -43,6 +43,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
             Cargo.lock
             tools/volcano-cli/
@@ -71,6 +72,7 @@ jobs:
           path: historical-frobenius-fold
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            tools/factor-base
             Cargo.toml
             src
             examples/n37_frobenius_fold_gate.rs

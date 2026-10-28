@@ -150,7 +150,8 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
+    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
+      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -207,9 +208,39 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   return inputs;
 }
 
+// Directories of the path dependencies Cargo needs to resolve the root
+// package (`name = { path = "..." }`), followed through each dependency's own
+// manifest.  A scope-only sparse checkout has none of them, and Cargo refuses
+// to resolve the workspace without every one.
+export function pathDependencyDirs(cwd) {
+  const dirs = new Set();
+  const queue = ['.'];
+  for (let index = 0; index < queue.length; index++) {
+    const dir = queue[index];
+    const manifestPath = dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`;
+    let manifest;
+    try { manifest = sourceText(cwd, manifestPath); } catch { continue; }
+    for (const match of manifest.matchAll(/=\s*\{[^}\n]*\bpath\s*=\s*"([^"\n]+)"/g)) {
+      const dependency = path.posix.normalize(path.posix.join(dir, match[1]));
+      if (dependency.startsWith('../') || path.posix.isAbsolute(dependency)) {
+        throw new Error(`path dependency escapes the checkout: ${manifestPath}: ${match[1]}`);
+      }
+      if (!dirs.has(dependency)) {
+        dirs.add(dependency);
+        queue.push(dependency);
+      }
+    }
+  }
+  return dirs;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
+  const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
+  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
   const sources = sourceFiles(cwd);
-  materializeSources(cwd, sources);
+  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
+    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
+  materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
