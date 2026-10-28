@@ -261,3 +261,16 @@ pub(super) fn split(gf: &Gf2, domain: &[u64], es: [u64; 3], tests: &mut u64) -> 
     assert_eq!(symmetric_values(gf, roots), es);
     Some(roots)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decode_preserves_the_top_assignment_bit() {
+        let bits = Mask::BITS as usize;
+        let ps = vec![vec![0; bits - 1], vec![7], vec![]];
+        assert_eq!(decode(&ps, (1 as Mask) << (bits - 1)), [0, 7, 0]);
+        assert_eq!(decode(&ps, 0), [0, 0, 0]);
+    }
+}
