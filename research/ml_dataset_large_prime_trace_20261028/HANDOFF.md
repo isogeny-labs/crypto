@@ -1,5 +1,10 @@
 # Native bounded-filter implementation handoff
 
+Update2026-10-28: the parent-owned full gate completed with5191passed,
+0failed,123ignored,exit0. See VALIDATION.md and validation-52ded7.json for
+source binding and freshly read-back canonical S3 evidence. The historical
+implementation handoff below predates that completed gate and is retained.
+
 Implemented after design commit `77160fa8657`, with unchanged base runtime
 `d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83`. Conductor T-748 owns only the
 native filter registration, its child modules and this research directory.
