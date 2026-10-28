@@ -1,0 +1,26 @@
+{
+ "schema":"n83.degree-three-layout/v1",
+ "cases":"Eight saved m2 cases: baseline/spike40 x koblitz/binary x planted/natural; targets unchanged from paired-r1",
+ "inputs/ARM/ID":"Exact input.json and system.sing copied from the prior sealed paired run; source hash checked before and after copying",
+ "v2/ARM/ID":"Exact prior V2 result, binary rows and operation trace. Every V2 row operation is replayed before producing or replaying V3.",
+ "cases/KEY/basis.rows.u64le":{
+  "encoding":"Little-endian binary",
+  "header_bytes":28,
+  "header":["offset0:8 ASCII N83V3R1 followed by newline","offset8:u32 variable count n","offset12:u64 columns C=1+n+choose(n,2)+choose(n,3)","offset20:u64 words W=ceil(C/64)"],
+  "record_bytes":"8*W",
+  "record":"Immutable inserted row; bit c is coefficient of squarefree monomial column c over F2",
+  "columns":{"constant":"0","variable i":"1+i","pair i<j":"1+n+choose(j,2)+i","triple i<j<k":"1+n+choose(n,2)+choose(k,3)+choose(j,2)+i"},
+  "n54":"26290 columns,411 u64 words per row,3288 bytes per row; graded colex order"
+ },
+ "cases/KEY/operations.jsonl":"One row-generation/reduction step per line: exact original equation ID or prior parent row and variable, prior xor_basis_rows IDs, inserted_row ID or null. Queue order is replayed exactly.",
+ "degree_guard":"A variable multiplication is permitted only if ordinary degree(parent)+1<=3 before reduction. All original x_i^2-x_i equations must be present. No degree-three row may be multiplied even when Boolean simplification would lower the product degree.",
+ "cases/KEY/progress.jsonl":"Append-only progress every128 operations, flushed with rows/trace; completion marker only after queue exhaustion. Partial files are preserved and do not certify a final degree.",
+ "cases/KEY/result.json":"Input/source identity, closure rank, linear rank, global upper certificate or null, exact LFD or null, separate lower/upper bounds, V2 hashes, strict-degree-three-fall witness or null.",
+ "strict_degree_three_fall":"v3_row_id with polynomial columns of degree<=2, V2 reduction IDs and a nonzero V2 echelon remainder. Full V3 replay proves membership; complete V2 replay proves nonmembership. Together certify LFD>=3.",
+ "global_upper":"Unit in V3, or linear constraints plus original field equations whose every affine-space assignment satisfies every original input polynomial. Only then upper bound3; already verified V2 exact certificate remains2.",
+ "controls/":"Retained toy sources and complete V2/V3 traces for degree3-only fall, degree2 unit and nonlinear no-upper-certificate controls",
+ "replay/":"Fresh-process producer replay stdout/stderr; independent scientific review is not asserted",
+ "status/":"Actual per-case producer and replay exit codes, including timeouts and errors",
+ "summary.json":"One row per frozen case, with numerical claims only when both producer and replay succeed; regularity and solving degree stay null",
+ "retention":"Complete raw run, input snapshots, executable, frozen protocol, controls, failed/partial cases, environment, terminal and manifest are archived in S3 and referenced by Git. No overwrites of prior runs."
+}

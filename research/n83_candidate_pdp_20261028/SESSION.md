@@ -151,3 +151,32 @@ NEXT_DEGREE3.md records the precise next certificate test on the eight preserved
 m2 paired systems. It is not frozen or launched. The standalone session-receipt
 helper is absent in this checkout and the recovered protocol-tools directory;
 this scoped log, terminal receipt, export and native manifest preserve the run.
+
+## Degree-three instrument prepared
+
+### What was done
+
+Reconciled terminal prior paired run, source8aa23161a62 and no live duplicate.
+Read Caminata-Gorla2112.05579 ordinary-degree V_i/Macaulay definitions and old
+native V2 source. Scoped Conductor check clear. Implemented degree3 closure,
+complete prior V2 replay, explicit nonmembership witness and guarded global
+upper certificates. Refreshed EKS inventory has no duplicate V3 job.
+
+### Decisions made
+
+Use all eight saved m2 Koblitz/binary paired cases without changing targets.
+600s per producer/replay,8GiB virtual,10800s outer; preserve all partial cases.
+ExactLFD3 requires strict V3-vs-V2 witness and global upper certificate. All
+larger-m, prime and regularity requirements remain open.
+
+### Open threads
+
+Freeze final source/protocol, execute eight cases, retain raw traces and producer
+replays in S3/Git, validate/export/report. No new n83 V3 result exists yet.
+
+### Errors
+
+Initial compile needed an explicit pivot-index type; retained failed log.
+Cargo fmt has no --bin option; used rustfmt on only the new file. Four native
+unit tests pass, including genuine degree3 control, negative control, complete
+column indexing, illegal multiplication and altered trace rejection.
