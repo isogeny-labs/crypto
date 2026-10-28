@@ -31,6 +31,11 @@ NodeClaim evidence was unavailable because a read-only query could not assume
 the existing launcher role. See [Kubernetes Job semantics](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
 and [Karpenter disruption semantics](https://karpenter.sh/docs/concepts/disruption/).
 
+The [startup grant-delivery review](STARTUP-GRANT-DELIVERY.md) found no supported
+post-creation delivery route in the generic launcher permissions and mounts. It
+documents an unapplied exact-object ConfigMap proposal and its required issuer
+permission. A projected file alone does not grant the launcher write access.
+
 The benchmark bridge and recovery controller are tied to ecbench. They do not
 provide a generic dataset startup gate or establish CRIU recovery for this CLI.
 
