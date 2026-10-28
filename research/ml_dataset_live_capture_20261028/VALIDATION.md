@@ -87,8 +87,11 @@ pending-run status. See `validation-final-ae0683c.json` and
 ## Integration and deployment limits
 
 The review base is exact unlanded producer snapshot
-`0f55f1c333449d4c85f04448da16fbfec15249cb`. PR #2756 currently publishes
-`d0334808999e039d95bfea5137d0460db2868aea`; those are different versions.
+`0f55f1c333449d4c85f04448da16fbfec15249cb`. At 11:20 UTC, PR #2756 had
+advanced to `0cbf720bf39a85e624bdff9d1d572ea55edb10b7` by merging main into
+its earlier `d0334808999e039d95bfea5137d0460db2868aea` head. It still does
+not contain the inherited 0f55f1c producer-fix lineage. These are different
+versions and require integration review.
 A separate review-base ref preserves the narrow diff without changing the
 producer owner's branch. Reconcile its inherited fixes and main's separate
 store absence-probe change before retargeting and validating a main merge.
