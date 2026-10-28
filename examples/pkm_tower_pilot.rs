@@ -2156,7 +2156,17 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         ^ (cell.g as u64);
     let mut rng = StdRng::seed_from_u64(cell_seed);
     let tower = build_tower(cell.kind, p, cell.t, &mut rng);
-    let (curve, on) = target_curve(p, &tower, cell.m.max(2), &mut rng);
+    // A cell with planted targets needs m distinct base abscissae on the
+    // curve. Random targets need none beyond two. Capping the requirement
+    // at |V| changes nothing for a cell that could be drawn before
+    // (`m ≤ |V|`), and stops the search from looping when `m > |V|`
+    // (research/prime_fall_degree_20261027, Amendment 4).
+    let need = if a.planted == 0 && cell.control != Control::Ladder {
+        cell.m.max(2).min(tower.v.len())
+    } else {
+        cell.m.max(2)
+    };
+    let (curve, on) = target_curve(p, &tower, need, &mut rng);
     let mut targets = Vec::new();
     let planted = if cell.t > a.planted_max_t && cell.control != Control::Ladder {
         0

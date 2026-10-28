@@ -200,3 +200,33 @@ cells are named `DC-*` and are scored like the other `D*` rows.
 these is a *small base* cell (`|V| = 2`). They exist because, with
 `t ≥ 2`, `m ≥ 7` lies beyond both the closure's limits and the F4 engine's
 4-free-variable limit.
+
+## Amendment 4 (2026-10-28, before any C row with m > |V| and before any 1-D row)
+
+**Defect found.** `pkm_tower_pilot` drew the target curve until at least
+`m` base abscissae lay on it. With `|V| = 2^t < m` that search never ends.
+The first C attempt at `(m, t) = (5, 2)` and its F4 twin looped. They were
+stopped and wrote no row. The pilot also forces `t ≥ 2` at `m ≥ 3`, so the
+exploratory `t = 1` ladder of Amendment 3 produced rows only at `m = 2`.
+
+**Fix.** For random-target cells (no planted target), the requirement is
+`min(max(m, 2), |V|)`. A cell drawable before (`m ≤ |V|`) draws the identical
+curve, since the rng is consumed identically. Planted and ladder cells are
+unchanged. Cells C at `t = 2, 3` now include `m > |V|` (flagged *small base*,
+as §5 already provides). Stage C reruns from `m = 2`, and its repeats must
+agree with the rows already written.
+
+**New derived arm (the 1-D specialisation, D6 applied to one summand).**
+Evaluating `z_2` at a grid point `ζ^j` is a degree-non-increasing ring map, so
+the specialisation lemma gives
+`d_F(f) ≥ d_F(q_j)` with `q_j(z) = f(z, ζ^j)`. Here `q_j` is a quadratic in
+`x = g·z` on a single Kummer tower, with no root on `μ_K` because `f` has none
+on the grid. Two parts:
+- (i) For every Kummer `m = 2` closure row, `d_F(q_j)` at 4 grid points.
+  This is a check: the row's `d_F` must be at least their maximum.
+- (ii) A synthetic ladder `t = 2 … 24` at `P1`: random curve, `g`, `x_2`,
+  `x_R`, with `q` checked to have no root on `μ_K`, and 4 draws per `t`.
+
+**Reading for (ii), fixed now:** "1-D grows" if the median rises by `≥ 2`
+over the ladder, "1-D flat" if it is constant, "mixed" otherwise. A rise
+transfers to `m = 2` as a proved lower bound on the measured draws only.
