@@ -20,6 +20,20 @@ the reserved resource lifetime. A separately identified noncompute component
 within prior obligations must cover conservative rounded request, storage and
 download costs for the whole campaign caps; it is not charged twice.
 
+Run input preflight with the exact intended executor before preparing the grant.
+Its `source_commit` and `binary_sha256` identify the executor; the request's
+`protocol_sha256` must use `protocol_file_sha256`, the complete protocol file
+digest, rather than `freeze.protocol_sha256`.
+
+**Current operator limitation:** the request's `plan_sha256` is the SHA-256 of
+the native compact serialization of the parsed `DatasetPlan`. It differs from
+preflight's `plan_file_sha256` and the planning command's existing `sha256`
+output, which hash the saved file. The current CLI does not expose the required
+native plan digest. Do not substitute a file digest or issue a grant from these
+outputs alone; the additive preflight digest output is still pending. The
+request's shard index/count must also match the intended invocation. Retain the
+preflight receipt and exact binding derivation before issuing the grant.
+
 ```sh
 crypto dataset budget admit --dry-run \
   --policy policy.json --ledger /durable/campaign.sqlite --request request.json
@@ -31,6 +45,8 @@ crypto dataset budget status \
 ```
 
 `admit --dry-run` does not create a directory, ledger, grant or cloud request.
+A well-formed rejection still exits successfully as a report: check the JSON
+`admitted` field, not only the process exit code, before reserving anything.
 It reports hypothetical capacity if the authoritative ledger has never existed.
 `reserve` commits the allocation before exporting the grant. Use `--create-ledger`
 only for first initialization. Later reservations open the original ledger and
@@ -43,9 +59,22 @@ there is no automatic reset or quota refund.
 
 A fixed finalization partition protects activation, completion, catalog and
 accounting receipts from ordinary work. A separate finite per-cell `Resources`
-JSON envelope is required for budgeted generation. The request, envelope and
-policy must agree on finite counts and bytes; a trace-size setting alone does not
-bound the number of publication requests or metadata bytes.
+JSON envelope is required for budgeted generation. Its six fields are unsigned
+64-bit integers: `money_micro_usd`, `output_bytes`, `put_attempts`,
+`read_attempts`, `download_bytes`, and `local_bytes`. Zero is a zero allowance,
+not an unlimited setting. The grant's `resources` includes its `finalization`
+partition; the remaining work partition must hold all cell reservations and
+other work cumulatively. Reservations are not automatically refunded after
+failure or completion. A cell allocation does not itself establish actual
+compute cost or a hard filesystem-write limit.
+
+Size finalization for activation and STS, completion objects, catalogs, lab
+receipts, and growing SQLite audit checkpoints, including fresh verification
+reads and permitted retries. The pre-cell minimum check of 64 KiB output,
+two PUT attempts, four read attempts and 256 KiB download is only a floor; it
+does not guarantee sufficient finalization capacity for an arbitrary cell.
+Actual requests fail closed when the needed allocation is unavailable. A
+trace-size setting alone does not bound request counts or metadata bytes.
 
 ## Activate exactly one worker journal
 
@@ -60,7 +89,8 @@ crypto dataset budget activate \
 The owner document contains the grant's exact `job_uid` and `pod_uid`. The launcher
 must reconcile those with the actual Kubernetes objects and distribute a grant
 only to its designated worker; comparing the supplied document is not an
-independent Kubernetes attestation. Activation
+independent Kubernetes attestation. See the [launch-adapter contract](LAUNCH-ADAPTER.md)
+for the required handoff between controller and worker. Activation
 creates the worker journal, conditionally writes its immutable nonce-bearing
 control object, freshly downloads and checks that object, then makes the local
 allocation spendable. Every network attempt consumes the protected allocation.
@@ -69,6 +99,14 @@ activation object with another journal nonce cannot activate a new balance.
 The grant fixes the absolute journal path, and a retained authority marker rejects
 reinitialization after database loss before any credential or activation request.
 Losing the journal does not authorize recreating its remaining quota.
+
+Same-host retries require the original journal path, authority marker, grant,
+owner and Linux boot identity. A replacement host or changed boot identity
+requires reconciliation and a separately issued grant from the retained
+authoritative allocator. Keep the original allocation charged or reserved;
+do not reconstruct or refund its balance from an audit checkpoint. The allocator
+is also bound to its original path and host boot identity, so copying its
+database is not supported automatic recovery.
 
 Credentials are explicit. EKS IRSA uses `AWS_ROLE_ARN` and
 `AWS_WEB_IDENTITY_TOKEN_FILE`, with the exact role admitted by the grant. STS
@@ -80,6 +118,13 @@ pair; temporary static credentials additionally require a session token and
 in a policy, receipt, Git commit or dataset feature. Expired credentials stop
 before a data request.
 
+The transport uses fixed us-east-2 S3 and STS endpoints. It rejects mixed static
+and IRSA credential tuples, configured store endpoint overrides, nonempty
+`HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY` values (including their lowercase forms),
+and `AWS_ENDPOINT_URL`, `AWS_ENDPOINT_URL_S3` or `AWS_ENDPOINT_URL_STS` overrides.
+This is a deployment compatibility requirement; an environment that requires a
+proxy needs a supported, admitted deployment path before launch.
+
 ## Generate, publish, fetch and restore
 
 Pass all four `--budget-*` inputs to S3 generation, publication, exact-object fetch
@@ -87,6 +132,14 @@ and restore. Ordinary operations open an existing active journal; only explicit
 activation creates one. Generation also requires `--budget-cell-envelope` and
 reserves that cell's allocation before starting work. See the concrete pilot
 commands in [OPERATIONS.md](OPERATIONS.md).
+
+On generation resume, keep the same cell envelope: an existing cell reservation
+cannot change. With `--publish`, completed cells receive fresh publication checks
+before new computation, and every request still consumes budget. `--max-cases`
+counts only new attempts; it does not limit those rereads. Standalone
+`dataset publish` instead uses unallocated Work capacity. Unused capacity held
+inside a Cell reservation is not automatically available to that command;
+admit publication allowance separately when using that route.
 
 `dataset budget fetch` downloads one known object using an exact key, SHA-256 and
 byte length. Its key is relative to the supplied remote prefix. It is intended
@@ -99,6 +152,8 @@ the imported producer's original source and binary identity. They still check th
 original plan, protocol and shard. Generation resume requires the original
 producer build. Budget snapshots live in separate restricted sidecars: changing
 an accounting grant cannot change the bytes of an immutable cell receipt.
+A fresh-host reader uses its own issued and activated grant, rather than the
+terminated producer's journal or a copied checkpoint.
 
 ## Interpret the counters precisely
 

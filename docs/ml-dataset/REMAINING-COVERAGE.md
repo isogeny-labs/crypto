@@ -1,5 +1,14 @@
 # Original-scope coverage and remaining work
 
+The native cumulative-budget implementation at `23b3c0e` adds authoritative
+SQLite allocation, bound worker journals, charged native S3/STS attempts and
+budget CLI commands. Its focused dataset tests, strict lint, release build and
+CLI/container preflight passed; final full-library validation is pending.
+A small canonical plan-digest metadata correction is awaiting an active file
+reservation. The [launch adapter contract](LAUNCH-ADAPTER.md) records additional
+actual-UID startup gating and finite resource-lifetime integration still needed.
+No budget grant or new cloud generation wave has been issued by this milestone.
+
 Source `0f55f1c333449d4c85f04448da16fbfec15249cb` adds the merged upstream
 library, exact large-prime feature-domain binding and final lab-receipt
 publication fallback. It passed **5,067 full-library tests, zero failures,
@@ -59,7 +68,7 @@ enormous corpus.
 | Fall degrees | Exact first and last fall degree remain null | Define each invariant for the actual ring and field equations; export degree-fall witnesses, complete lower-degree exclusion/closure evidence and independently checked counterexamples; formalize universal claims separately |
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
 | Complete intermediate artifacts | Curve construction and several native solver adapters still export summaries rather than every internal state | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
-| Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; current-source software checks passed; EKS publication fails because its role only permits the legacy bucket | Resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
+| Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; historical-source software checks passed; native cumulative accounting is implemented, but EKS role access and launch integration remain incomplete | Complete actual-UID grant gating and finite resource-lifetime admission, resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
 | ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; implement separately projected admissible solver-prefix views beyond current structural routing features; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
 

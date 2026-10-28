@@ -64,19 +64,27 @@ crypto dataset status --out /work/dataset
 
 S3 execution requires the activated, source-bound budget session described in
 [BUDGET-CLI.md](BUDGET-CLI.md). The example assumes that finite grant has already
-been issued and activated; it does not create spending authority.
+been issued and activated; it does not create spending authority. Grant issuance
+also requires the native parsed-plan digest. The current CLI exposes only the
+plan file digest, so the missing canonical digest output remains an explicit
+[operator limitation](BUDGET-CLI.md#prepare-one-authoritative-campaign).
 
 Use a digest-pinned image on the repository's EKS Spot lab. Assign disjoint
 shards before submission, record every Job identity, and inspect the existing
 Job and S3 receipts before retrying a submission. Worker-local process leases
 do not provide a distributed cloud lock. The ordinary throughput Job does not
 establish CRIU recovery, isolated benchmark clocks or comparative speed claims.
+The launcher must reconcile actual Job/Pod UIDs with each grant and distribute
+it only to that worker; a matching supplied owner document is not Kubernetes
+attestation. Follow the [launch-adapter contract](LAUNCH-ADAPTER.md) for this handoff.
 
 Run `crypto dataset preflight --plan pilot-plan.json --protocol protocol.json`
 as the actual container UID before launch. It checks readable inputs, the frozen
 protocol, clean compiled source identity and configured lab receipt routing
 without performing cryptography. It does not establish output-directory or
-cloud permissions. Container input modes must grant UID 1000 read access.
+cloud permissions, validate or activate a budget grant, attest a Pod, or reserve
+a cell. Input preflight does not replace admitted worker conditional PUT/GET
+verification. Container input modes must grant UID 1000 read access.
 
 The current lab service supplies a legacy `ISOLAB_RESULTS_URI`. Dataset receipts
 must use the approved bucket: explicitly set a unique campaign/job prefix under
@@ -94,8 +102,13 @@ The first pilot uses 19 shards so a bounded sequential shard crosses method,
 twist and other axes. Derive observed coverage from saved configurations;
 strides divisible by the ten-method axis can accidentally select only one method.
 
-Reissuing the same generation command skips verified completed cells and retries
-their publication when needed. A partial cell requires explicit reconciliation:
+Reissuing the same generation command skips verified completed computation.
+With `--publish`, it performs fresh publication checks for completed cells too;
+those reads and retries consume budget although `--max-cases` counts only new
+attempts. Keep the original per-cell envelope on resume. Standalone
+`dataset publish` uses unallocated Work capacity rather than capacity held inside
+existing Cell reservations; admit separate publication allowance for that route.
+A partial cell requires explicit reconciliation:
 
 ```sh
 crypto dataset reconcile --out /work/dataset --cell CELL_INDEX \
@@ -105,7 +118,11 @@ crypto dataset reconcile --out /work/dataset --cell CELL_INDEX \
 Reconciliation checks local Linux processes and preserves the partial directory
 under an immutable attempt name before allowing another attempt. It cannot
 prove that a worker on another host has terminated. Retain all interrupted
-attempts when moving a campaign to another host.
+attempts when moving a campaign to another host. Worker journals are bound to
+their original absolute path and Linux host boot identity. A replacement host
+needs a separately issued and activated grant after owner/usage reconciliation;
+retain the original allocation without resetting or refunding it. Audit
+checkpoints are evidence, not a spendable replacement journal.
 
 ## Restore from durable receipts
 
@@ -116,7 +133,9 @@ completion marker, catalog locator, status summary or enclosing lab receipt is
 not itself the full receipt accepted by `restore`.
 
 For the scoped pilot remote, download the exact catalog object to a local
-ordinary file, then restore one cell at a time:
+ordinary file, then restore one cell at a time. On a fresh host, the following
+budget paths refer to the reader's own separately issued and activated grant,
+bound to its executor and the original data plan, protocol and shard:
 
 ```sh
 crypto dataset budget fetch \
@@ -218,8 +237,10 @@ conflicts or mismatched bytes cannot produce a successful publication receipt.
 Other `HEAD` errors fail without this fallback. This behavior is local to the
 dataset publisher; it does not change the shared store or the unapplied IAM
 proposal. Bucket-wide listing is not required for this creation path; object
-read/write permissions are still required, and catalog discovery may separately
-use scoped listing. See AWS's [HeadObject permissions](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html)
+read/write permissions are still required. Retain the exact catalog locator
+returned at publication: the budgeted transport disables LIST. External catalog
+discovery is outside this native accounting path and must not be represented as
+metered by it. See AWS's [HeadObject permissions](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html)
 and [conditional-write permissions and behavior](https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html).
 
 Hardware counters use the existing native PMU instrumentation for construction,
@@ -232,9 +253,12 @@ preexisting threads. Multiplexed counts are estimates, not exact instruction
 labels. Interrupted phases retain their start record but may lack a final PMU
 read. Wall times on shared workers are diagnostic.
 
-Trace byte caps apply to worker output before manifest sealing. Manifest and
-publication metadata are accounted separately. The supervisor preserves partial
-files after a killed call; complete native algorithm internals still require
+The supervisor polls worker output before manifest sealing and stops work when
+the trace threshold is exceeded. This can overshoot and is not a hard checked
+filesystem-write limit. Manifest and publication metadata are accounted
+separately; stdout, retained retries and accounting checkpoints also need space.
+The supervisor preserves partial files after a killed call; complete native
+algorithm internals still require
 explicit trace hooks. Capability records name those gaps. Exact first-fall and
 last-fall degrees remain null until a checker establishes their stated algebraic
 definition and all required closure/rank conditions.
@@ -341,8 +365,10 @@ That proposed worker was priced in us-east-1; the producer's EKS lab is in
 us-east-2. Before another cloud wave, reconcile prior Job usage and inventory,
 price and admit the actual EKS node/worker shape, and bind cumulative output
 and request accounting. Preserve the recorded proposed limits of 20 GiB unique
-output, 100,000 PUT requests and 200,000 GET requests; this CLI's per-cell trace
-limit alone does not enforce those campaign-wide limits. The large planning
+output and 100,000 PUT attempts. The original proposal named 200,000 GET requests;
+the implemented conservative read ceiling shares those 200,000 attempts across
+GET, HEAD and explicitly counted STS bootstrap/refresh. The per-cell trace
+threshold alone does not enforce these campaign-wide limits. The large planning
 manifest is not an authorization to launch its cross-product. The role-policy
 approval and this admission gate must both be resolved before a new pilot.
 
