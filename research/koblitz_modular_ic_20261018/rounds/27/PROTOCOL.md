@@ -375,3 +375,9 @@ This does not evaluate ordinary degree460/367 supports, nor isolate a CM sign.
 Same4GiB/1200s native caps. Proper principal-divisor bridge remains written.
 
 QUADRICS02 also rejected before multiplication: rank is reserved. Rename multiplicationRank27; original controls0/1 retained, no rank accepted. Lean06 still failed before elaboration despite CPU0 affinity; the runner incorrectly added a process-address-space ulimit to the inherited -M4096 compiler cap. Remove that extra virtual-address restriction, preserve Lean -M4096 and1200s/CPU0. Lean memory limit is managed allocation, not a4GiB limit on mapped runtime address space. Native Singular retains original4GiB virtual limit.
+
+Written mixed-carrier construction recorded in POLARIZATION.md, based on
+actual free cyclic10 tower and characteristic2 Prym/duality literature.
+Proposed type(1^18,5^6) is a geometric deduction, not a measured lattice or
+explicit theta-section computation. Exact integral E and actual residual
+class are independently native-bound; actual CM-sign projection remains open.
