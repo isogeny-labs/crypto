@@ -496,3 +496,12 @@ chosen-factor valuation theorem. The latter assumes a separable quintic,
 `y²=f(a)`, `2*y≠0`, a nonzero coefficient, and a nonunit chosen factor.
 Characteristic-two order allocation, global Pic⁰ transport, and compiled Rust
 semantics remain open. This packet changes no target or cost row.
+
+The [smooth-point DVR packet](SMOOTH_POINT_DVR.md) combines the two rational
+point cases: `2*y≠0 ∨ f'(a)≠0` is equivalent to one of the explicit affine
+partials of `y²-f(x)` being nonzero, and under the point equation and a
+separable quintic the actual weighted-Proj point stalk is a DVR. Its
+[PDF](SMOOTH_POINT_DVR.pdf), [dependency graph](smooth-point-dvr.svg), and
+[gate CSV](smooth-point-dvr.csv) leave the scheme-theoretic `Smooth`
+equivalence, global Pic⁰ transport, characteristic-two norm-order allocation,
+and compiled Rust semantics open. No target or cost row changes.
