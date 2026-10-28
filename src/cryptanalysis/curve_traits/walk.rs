@@ -685,7 +685,13 @@ pub fn height_above_floor(p: u64, j0: u64, l: u64, depth: u32) -> Option<u32> {
     let w = Word { p };
     let phi: Vec<(usize, usize, u64)> = modular_polynomial(l)
         .into_iter()
-        .map(|(i, j, c)| (i, j, c.mod_floor(&BigInt::from(p)).to_u64().expect("reduced")))
+        .map(|(i, j, c)| {
+            (
+                i,
+                j,
+                c.mod_floor(&BigInt::from(p)).to_u64().expect("reduced"),
+            )
+        })
         .collect();
     if phi.is_empty() {
         return None;
@@ -1182,7 +1188,11 @@ mod tests {
                 if e == 0 {
                     (acc, base, e)
                 } else {
-                    (if e & 1 == 1 { m(acc, base) } else { acc }, m(base, base), e >> 1)
+                    (
+                        if e & 1 == 1 { m(acc, base) } else { acc },
+                        m(base, base),
+                        e >> 1,
+                    )
                 }
             });
             let j = m(m(1728 % p, a3), inv.0);

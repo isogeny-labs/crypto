@@ -1733,7 +1733,9 @@ fn endomorphism(
         timed("orders", &c.slug, || {
             settle_by_walks(&c.model, &dk, walks, &mut levels, &mut contains)
         })?;
-        timed("descent", &c.slug, || settle_by_descent(&c.model, &mut levels))?;
+        timed("descent", &c.slug, || {
+            settle_by_descent(&c.model, &mut levels)
+        })?;
         bound = BigUint::one();
         exact = BigUint::one();
         resolved = true;
