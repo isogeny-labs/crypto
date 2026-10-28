@@ -557,3 +557,14 @@ hypothesis. Its [PDF](LOCAL_NOETHERIAN.pdf),
 from the open coheight-one identification, all-closed-point source-function
 orders, principal divisor, Pic⁰ equality, and compiled Rust correspondence.
 No target or cost row changes.
+
+The [source-order packet](SOURCE_ORDER.md) specializes Mathlib's
+order-of-vanishing operation to the already embedded source `N/B-y` function
+on the actual weighted-Proj curve. Pinned Lean checks the definition and the
+two conditional API boundaries: the defined zero outside coheight one, and
+agreement with the stalk valuation at coheight-one points. Its
+[PDF](SOURCE_ORDER.pdf), [dependency graph](source-order.svg), and
+[12-row gate CSV](source-order.csv) retain closed-point coheight,
+nonvanishing, finite support, the infinity pole, the global principal divisor,
+Pic⁰ equality, and compiled Rust correspondence as open. No target or cost
+row changes.
