@@ -225,3 +225,28 @@ The compatibility readback script uses chunked hashlib on Python3.9. Report
 rendering required quoting the s3:// text in Typst; both final pages were
 rendered and visually inspected. None of these publication corrections changed
 frozen native source, input systems, computed degrees or raw run data.
+
+
+### Publication progress and clarification
+
+Data commit5db9a5159c2 was pushed before the report. All40 V3 metrics exactly
+match the committed native summary; complete exporter time49.34seconds on this
+host. The two-page report's downloaded S3 PDF matches SHA-256
+5802c50bd240b448410b988a7eabf6e0db20cf6b6bcb54b351fdef4dfaee1601.
+PR2706 was updated with the full final study scope.
+
+Clarification of the preceding readback entry: no incomplete download was found
+by the completed reconciliation. The script implements preservation with an
+.incomplete suffix, but it did not need to create one. Six existing downloads
+were reusable, and the remaining three were fetched. No bytes were discarded.
+Fourteen publication support files are archived separately from the sealed run.
+
+
+### Reconstruction and final report
+
+All nine S3-downloaded archives were extracted into a new retained directory.
+Every one of the200 sealed raw-manifest files passed its hash check there.
+The fourteen-file support archive is also remotely verified. Fixed-base index
+readback exactly matches the enumerated point-data index; all96 original sweep
+attempts use ell27 and cover m2..9. The two-page derived report and next-step
+handoff are committed after data. Broader elite-base research remains active.
