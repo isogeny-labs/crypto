@@ -10,8 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCK = "docs/backend-leaderboard/reproduction.lock.json"
-SNAPSHOT = "91424ecf8cc7db04e7c4a2805c9001a02a6106ca"
-LOCK_SHA256 = "5385e70d724341e07922412b007b42e0ce685fde2c3c68f462bc7dd6f8721278"
+SNAPSHOT = "c1eb1ff25e14bcd388cc852a29fa741e56280268"
+LOCK_SHA256 = "9a93e4224835be898394bd1284966db738282a85f431c26aea55731575600f9c"
 # These are the producer/build inputs declared by the sealed native producer.
 # Scientific session inputs and generated report bytes never receive an exemption.
 PRODUCER_INPUTS = {
