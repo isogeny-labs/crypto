@@ -20,3 +20,9 @@ The first6.3KiB checkpoint transport snapshot was accidentally staged with
 source. Preserve its exact committed bytes and history. Subsequent mutable
 transport uses checkpoint-live.tar.xz, untracked and explicitly unignored for
 the checkpoint helper; never overwrite the committed initial snapshot.
+
+Positive03 removes the reserved-name error and checks all5 source residuals,
+8 entries and3 invariants with zero residuals. It is still rejected because
+Singular's map application requires a named polynomial, rather than the
+bare ring variable n or l. Bind sourceNu/sourceLambda and map those in04.
+Cascading later parse errors are not mathematical failures or certificates.

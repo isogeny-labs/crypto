@@ -73,3 +73,6 @@ intermediate-name diagnosis was incomplete. Replace that ideal name by
 kernelCoefficients, retain both failed inputs, and run one corrected positive
 attempt before the unchanged corrupt control and registered quotient call.
 No mathematical input, acceptance rule or resource cap changes.
+Positive03 is rejected on map syntax: bind n and l to named polynomials
+before composing the existing map. Positive04 repeats the same mathematics
+and cap; acceptance still requires every block and no native diagnostics.

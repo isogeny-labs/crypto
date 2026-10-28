@@ -16,7 +16,9 @@ print("REGISTERED_ENTRY_INVARIANCE");
 for(k=1;k<=8;k++){shiftedUnits[k]-units[k];if(shiftedUnits[k]!=units[k]){ERROR("registered entry not invariant");}}
 print("KERNEL_COEFFICIENT_INVARIANCE");
 for(k=1;k<=3;k++){shiftedKernel[k]-kernelCoefficients[k];if(shiftedKernel[k]!=kernelCoefficients[k]){ERROR("kernel coefficient not invariant");}}
-poly imageN=sig(n);poly imageL=sig(l);poly twiceN=sig(imageN);poly twiceL=sig(imageL);
+poly sourceNu=n;poly sourceLambda=l;
+poly imageN=sig(sourceNu);poly imageL=sig(sourceLambda);
+poly twiceN=sig(imageN);poly twiceL=sig(imageL);
 print("INVOLUTION_RESIDUALS");twiceN-n;twiceL-l;
 if(twiceN!=n || twiceL!=l){ERROR("not involutive");}
 poly shiftedEquation=sig(nuEquation);
