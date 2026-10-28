@@ -298,3 +298,41 @@ Their nondivisibilityby3 excludes these direct matches,not all nonconstant
 invariant adjustments. No coefficient search or IC efficiency claim.
 The higher-degree quadratic-generation reference was retrieved bycurl after
 webtimeout;fitztextreadactualProp11 confirms the finite-field statement.
+
+## Prospective complete projective equation construction after ACTION01
+ACTION01 strictPASS:68reconstructed sections at20charts, original Ojet-column
+agreement;actual sigma²=I,rank(sigma+I)=34;34invariant sections andtraceone
+sectiondegree110. Degree14trace detectorrank14. Moveddegreezero membership
+matrixrank68,kernel0, independent recombination. Thus D' is nonprincipal and
+11D' is principal: an actualorder11sourceJacobianclass withTaction6. It lies
+in the Prym by the difference/11torsion argument. This is not a proven nonzero
+projection to either desiredCMsignfactor;the residualsystems overlap at11.
+
+QUADRICS27 uses all68Ojets through388 and all34invariantOjets through128.
+Compute every symmetric product:2346source columns truncatedat257 and595
+quotient columns truncatedat129. Require multiplication ranks196 and98,
+independently recombine ALL kernel vectors and retained pivots, verify
+strictly distinct leading candidate indices. Expected kernel dimensions2150
+and497. Export each homogeneous quadratic and bit-vector certificate
+individually with explicit closedlinks. All data bound byinputSHAmanifest.
+Positivecontrol is actual (b+c)*(1/u)+c²=0 via retained firstRRbasisfunction;
+corrupt with the actual constant section squared and require residue1.
+No sampling,numericalrank,timing or IC-relation-rank claim.
+
+A source quadratic has poles<=2D,degree256;257zero coefficients atO prove
+zero. A quotient quadratic is sigma-invariant,so129zeros atO force129at
+sigmaO too,exceeding256. Equivalently its quotient poledegree is128. The
+invariant34space is complete onH withdegree64. Forboth128>=2*61+2 and
+64>=2*31+2, finite-fieldProp11 gives a closed embedding and idealgenerated
+by degree-two relations. A complete nativeI2basis therefore generates the
+prime saturated homogeneous ideal in THESE new projectivecoordinates.
+Original field coordinates1,b,c,lambda are recovered linearly inC;H has
+fieldF2(E)(Z) andnativeinvariance identifies its quotient. Oldcoupledgraph
+ideal equality,saturation and the det19polarizedembedding are separate
+obligations; do not transfer the new-model saturation claim to those rings.
+All4GiB/1200s caps/checkpoint/immutable-runner rules unchanged.
+
+NewKoblitzTorsion27source formalizes actual five integerprincipal-relation
+combinations,11annihilation,diamond6,movingby4,recoveryby3,conditionalnonzero
+andmixedprojector10recovery. The actual RR nonvanishing and curve/Picard
+bridges remain native/written,not Leanaxioms. Freeze before compiling it.
