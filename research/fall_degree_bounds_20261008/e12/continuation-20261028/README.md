@@ -1,5 +1,9 @@
 # E12 continuation launch record
 
+[Live-launch snapshot and handoff](STATUS.md): E12a and E12c were admitted on
+2026-10-28 UTC, with startup source checks verified. E12b remains unlaunched.
+These are launch observations, not completed scientific results.
+
 [Amendment 13](../../PREREGISTRATION.md) permits one additional E12a and E12c
 attempt after the user's explicit launch request. The exact source, mathematical
 parameters, and acceptance gates remain frozen. E12b awaits the user's choice
@@ -53,6 +57,12 @@ For example:
 EPHEMERAL_REGION=us-east-1 taskq/deploy/ephemeral/ephemeral status JOB
 ```
 
+The current runner does not JSON-escape its `reason` field. While these multiline
+commands run, `status JOB` can fail to parse `status.json` despite an active
+instance. Read the raw status, `job.log`, and EC2 state in that case. Never treat
+a JSON parse error as permission to submit a replacement. Startup snapshots
+preserve the raw status bytes with a `.raw` extension.
+
 On completion, retain original raw files and verify the exact expected draw
 count, `cells_status`, gate logs, source/binary identities, and the Amendment 11
 criteria. E12a's degree-4 dimensions must match E10 draws 0 and 1. E12c can certify
@@ -71,4 +81,4 @@ this establishes permission for the checked request, not capacity or completion.
 Local validation consists of shell syntax, source/launcher identity checks,
 case-selection and duplicate-submission refusal checks, and `git diff --check`.
 The exact frozen engine tests and replay gates run on each launched host before
-its new draws. Conductor task: `T-655`.
+its new draws. Launch task: `T-655`; receipt/handoff task: `T-661`.
