@@ -17,9 +17,24 @@ Earlier SCIS 2010 and 2011 papers by Shimura, Momose, and Chao specifically
 study elliptic curves with weak coverings over cubic extensions in even
 characteristic; their titles are recorded in the primary references of
 Iijima, Momose, and Chao (2013).
-The available abstract does not expose the full case table, and the related
-thesis is access restricted. Therefore this report does **not** claim that
-the triangle type, the trace gate, or its density is new in the literature.
+A 2012 seminar abstract by Shimura reports approximately three-quarters of
+elliptic curves over cubic extensions as weak when the binary base field has
+even degree over `F2`, and approximately one-half when that degree is odd.
+Thus our exact one-half triangle count at `q=16=2^4` is a
+construction-specific lower bound. The reported asymptotic density for the
+wider `(2,...,2)` weak-cover set is larger; our count cannot be presented as
+the full cubic-cover density.
+
+The SCIS 2024 program reports a classification of all ordinary binary
+elliptic curves with non-isogeny-condition covers for extension degree at
+most nine. A 2025 classification poster reports broader even-characteristic
+results and specifies a domain including ordinary genus-one sources with
+`g(x) in k[x]` and coprime base-field and extension degrees. Our normalized
+source has `g(x)=x in k[x]`, base-field degree four, and extension degree
+three, so it falls within that stated domain. This is an inference from the
+published scope, not a match of our exact trace equation to a full case
+table. Those case tables and the related restricted thesis remain unavailable
+to us. The global novelty status of this family is therefore **not established**.
 
 Primary references:
 
@@ -33,6 +48,12 @@ Primary references:
   https://eprint.iacr.org/2013/487.pdf
 * Murai thesis repository entry (full text access restricted),
   https://chuo-u.repo.nii.ac.jp/records/17759
+* Shimura, Waseda number-theory seminar abstract (2012),
+  https://sem-wnt.w.waseda.jp/kako/2012.html
+* SCIS 2024 program, presentation 3A1-4 on ordinary binary elliptic curves,
+  https://www.iwsec.org/scis/2024/program.html
+* Uesato, ISS Square classification poster (2025),
+  https://iss.iisec.ac.jp/sympo24/posters/M2_212poster24.pdf
 * Diem, *On the discrete logarithm problem for plane curves* (2012),
   https://www.numdam.org/item/10.5802/jtnb.815.pdf
 * Joux–Vitse, *Cover and Decomposition Index Calculus on Elliptic Curves made practical*
@@ -81,6 +102,9 @@ values. There is exactly one eligible normalized twist for each `b != 0`:
 4095 of 8190 models, split 2047/2048 by absolute trace. The proof applies
 to all `m>=1`; the finite q=16 census in `census.json` is an independent
 enumeration of its first large example here.
+The 2012 published approximate density for the wider `(2,...,2)` weak-cover
+class over even-degree binary base fields is larger; our exact count is not
+an upper bound for that class.
 
 Choose any nonzero `delta in K` with `Tr_(K/k)(delta)=0`. There are `q^2-1`
 choices, and none lies in `k`. Solve `t0+t0^q=delta`, then put
@@ -260,6 +284,104 @@ numbers are relative to the frozen Hess and simple-restriction inputs whose
 SHA-256 hashes are recorded in `census.json`; they are not a global count
 of newly discovered attacks.
 
+## A second gate: two common branch poles
+
+The triangle gate does not exhaust even the direct degree-two V4 covers.
+Let `V=ker(Tr_(K/k))`, a two-dimensional `k`-space. Given `s=sqrt(b)`,
+choose `A,B in V*` with `A*B=s`. Over `K`, put
+
+```
+f_i(x)=A^(q^i)*x+B^(q^i)/x,  i=0,1,2.
+y0^2+y0=f0(x),    y1^2+y1=f1(x),    y2=y0+y1.
+```
+
+The three `f_i` sum to zero, so Frobenius cycles the quotients and the
+order-three action `sigma(x)=x`, `sigma(y0)=y1`,
+`sigma(y1)=y0+y1` descends the connected V4 cover to `k`.
+The poles `0` and `infinity` have full V4 inertia and conductor two for
+each nontrivial character. Each contributes different exponent six;
+`2g-2=4*(-2)+2*6=4`, so `g=3`. With `X=A*x`, `s=A*B`, the first quotient
+is `y0^2+y0=X+s/X`. Its isomorphism to the normalized `E_(a,b)` is
+
+```
+Y=X*(y0+h)+s,       h^2+h=a.
+```
+
+Consequently this construction selects exactly the trace-zero twist
+`Tr_(K/F2)(a)=0` for every `b` whose square root is a product of two
+nonzero elements of `V`. It is a sufficient cover criterion, not a
+classification of all covers or attacks.
+
+There is an exact **general product count**, valid for every `q=2^m`.
+For `A in V*`, `B=s/A` lies in `V` precisely when
+`Q_s(A)=Tr_(K/k)(s*A^q*A^(q^2))=0`. This is a binary quadratic form on
+`V`. The linear map from `s in K` to the three coefficients of `Q_s` is
+an isomorphism: over an algebraic closure, write the three embeddings
+of `A` as `(u,v,u+v)` and those of `s` as `(s0,s1,s2)`. Then
+`Q_s=s1*u^2+s0*v^2+(s0+s1+s2)*u*v`, an invertible linear change of
+the three `s` coordinates. A nonzero binary quadratic over `F_q` has
+a projective zero exactly when it is a scalar multiple of either a
+double rational linear factor or a product of two distinct rational
+linear factors. Counting those forms gives
+
+```
+# {s in K*: s in V*V*}
+ = (q-1)*((q+1)+binomial(q+1,2))
+ = (q^2-1)*(q+2)/2.
+```
+
+Because squaring permutes `K*`, the same count holds for `b`.
+At `q=16`, it is **2295** `b` values. `two_pole.py` exhausts all 255
+nonzero elements of `V` and obtains exactly **1088** `b` values for which
+`Tr(b^d)=1`; their trace-zero twists fail the triangle gate but pass this
+two-pole gate. Thus the *union of these two particular constructions*
+contains **5183 of 8190** normalized ordinary `K`-isomorphism classes.
+For all `q`, the product count and the size `q^3/2-1` of the triangle's
+trace-zero `b` fiber imply the rigorous union lower bound
+`q^3-1+q^2-q/2`. The sharper `5183` value is an exhaustive `q=16`
+computation, not a proven all-`q` overlap formula. The published broader
+weak-curve density of roughly three quarters for even-degree binary bases
+remains above this two-construction count.
+
+An exact witness outside the triangle gate uses the same pinned
+`K=F_2[w]/(w^12+w^7+w^6+w^5+w^3+w+1)` and bitmask convention:
+
+```
+q=16, a=0, b=3399, A=1079, B=2852, s=A*B, A*B=sqrt(b),
+E: Y^2+XY=X^3+b,  #E(K)=4132=4*1033,
+G=(2305,2550), Q=(2273,2935)=[7]G, [1033]G=O.
+```
+
+The explicit descended affine function field is
+
+```
+x^2*(u^4+2622*u^2+3158*u)
+ = 1821*x^4+373*x^3+1640*x+1.
+```
+
+All coefficients lie in the embedded `F16`; the affine equation requires
+smooth projective normalization. Magma 2.30-1 gives geometric genus three,
+a smooth non-hyperelliptic canonical quartic, and L-polynomial
+`1+35*T^3+4096*T^6`, so its Jacobian has `4132` points over `F16`.
+The exact quartic and its canonical map are in
+`canonical_two_pole_4132.json` and the full Magma receipt. The quotient
+pullback and Frobenius trace were evaluated in the actual Sage Jacobian:
+`Phi(G)` is nonzero of order `1033`, `Phi(Q)=[7]Phi(G)`, and both source
+and target images have the expected order. Jacobian setup took 9.21 s,
+and both map evaluations took 5.09 s on the shared host. These are map
+stage times only.
+
+The catalog class [3.16.a_a_bj](https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_bj)
+already has `has_jacobian=1`, and [Nart–Ritzenthaler (2009)](https://arxiv.org/abs/0905.0546)
+as well as the even-characteristic cubic cover classifications above are
+prior art for the V4 setting. This witness is a rediscovery at the
+isogeny-class level. An exact-equation publication check is unresolved.
+The new result here is an explicit second criterion and construction-specific
+count in this audit; global novelty is not established.
+`TwoPoleGate.lean` kernel-checks the q=16 arithmetic and the doubling
+kernel on the `1033`-order source subgroup. It does not formalize the
+field-product isomorphism, genus, or Jacobian geometry.
+
 ## Attack-cost and novelty limits
 
 The cover equations, canonical quartics, and evaluated correspondence
@@ -303,5 +425,9 @@ lean research/ghs_twisted_v4_triangle_20261027/TriangleGate.lean
 sage -python research/ghs_twisted_v4_triangle_20261027/descent_model.py
 python3 research/ghs_twisted_v4_triangle_20261027/magma_canonical.py
 sage -python research/ghs_twisted_v4_triangle_20261027/subgroup_map.py
+sage -python research/ghs_twisted_v4_triangle_20261027/two_pole.py
+python3 research/ghs_twisted_v4_triangle_20261027/magma_two_pole.py
+sage -python research/ghs_twisted_v4_triangle_20261027/two_pole_map.py
+lean research/ghs_twisted_v4_triangle_20261027/TwoPoleGate.lean
 python3 research/ghs_twisted_v4_triangle_20261027/make_pdf.py
 ```
