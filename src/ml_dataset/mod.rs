@@ -117,7 +117,7 @@ pub struct PlanArgs {
     pub curve_seeds: u64,
     #[arg(long, default_value_t = 8)]
     pub generators: u64,
-    /// Cap all worker output before sealing; manifest/publication metadata are counted separately.
+    /// Number of target-key draws per generator.
     #[arg(long, default_value_t = 64)]
     pub keys: u64,
     #[arg(long, default_value_t = 20261027)]
@@ -153,6 +153,7 @@ pub struct GenerateArgs {
     pub seconds_per_case: u64,
     #[arg(long, default_value_t = 2048)]
     pub memory_mib: u64,
+    /// Cap worker output before sealing; manifest/publication metadata are counted separately.
     #[arg(long, default_value_t = 64)]
     pub trace_mib: u64,
     /// Publish each completed cell before moving on; upload failures stop the wave.
