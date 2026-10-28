@@ -30,3 +30,8 @@ No native/Lean source changes for that layout correction. R24/R25 sourcepins
 still pass. Metadata exporter has a new neutral5-base-cusp count with bridge
 label; verify from committed data after the science-frame commit. No further
 native or Lean trial is in flight. Root source/test remains unchanged.
+
+Publication seal:31 R26 source pins and64 raw members verified; fresh S3
+GetObject is byte-identical, all extracted member hashes pass, deterministic
+repack is byte-identical. R24/R25 pins unchanged. Default and focused metrics
+exit0. No further native/proof call. Existing root-suite limitation retained.
