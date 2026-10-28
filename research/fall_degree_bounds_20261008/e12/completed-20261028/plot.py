@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"] = "none"
+matplotlib.rcParams["svg.hashsalt"] = "e12b-completed-20261028"
 import matplotlib.pyplot as plt
 
 root = Path(__file__).resolve().parent
@@ -27,4 +29,6 @@ ax.set(xlim=(-.3, 3.8), ylim=(3.65, 5.6), xticks=[0, 1, 2, 3], yticks=[4, 5],
 ax.grid(axis="y", alpha=.2)
 ax.spines[["top", "right"]].set_visible(False)
 fig.savefig(root / "draws.svg", metadata={"Date": None})
+svg = root / "draws.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 fig.savefig(root / "draws.png", dpi=160)
