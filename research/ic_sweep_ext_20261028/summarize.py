@@ -183,9 +183,40 @@ def fits(rows, runs):
     return out
 
 
+VARIANTS = [("b8-null-strided", "strided pseudo-random abscissae (null control)"), ("b8-nofold", "no sign fold"),
+            ("b8-hybrid", "pair table added (hybrid)"), ("b8-klprog", "known-log base, progression"),
+            ("b8-klrand", "known-log base, random scalars"), ("b8-dp2", "distinguished points, k = 2"),
+            ("b8-dp4", "distinguished points, k = 4"), ("b8-dp6", "distinguished points, k = 6")]
+
+
+def variant_comparisons(bits_list=range(20, 38, 2)):
+    """Paired S ratio of each B = 8 variant to the plain B = 8 sweep, per size and pooled over sizes."""
+    out = []
+    for arm, label in VARIANTS:
+        per, pooled = {}, []
+        for bits in bits_list:
+            sess = load(bits)
+            recs = [r for s in sess for r in s if not r["warmup"] and r["outcome"]["status"] == "verified"]
+            key = lambda r: (r["session_id"], r["workload"]["target_index"], r["round"])
+            base = {key(r): r["cost"]["s"] for r in recs if r["arm"] == "sweep-b8"}
+            logs = [math.log(r["cost"]["s"] / base[key(r)]) for r in recs if r["arm"] == arm and key(r) in base]
+            if len(logs) < 3:
+                continue
+            m = statistics.mean(logs)
+            se = statistics.stdev(logs) / math.sqrt(len(logs))
+            per[bits] = {"ratio": math.exp(m), "lo": math.exp(m - 1.96 * se), "hi": math.exp(m + 1.96 * se), "n": len(logs)}
+            pooled += logs
+        if pooled:
+            m = statistics.mean(pooled)
+            se = statistics.stdev(pooled) / math.sqrt(len(pooled))
+            out.append({"arm": arm, "label": label, "pooled_ratio": math.exp(m), "lo": math.exp(m - 1.96 * se),
+                        "hi": math.exp(m + 1.96 * se), "n": len(pooled), "per_size": per})
+    return out
+
+
 def svg_lines(path, title, subtitle, series, xlabel, ylabel, xlog=True, W=820, H=460):
     """series: [(label, colour, [(x, y)], dashed)] -> log-log SVG."""
-    L, R, T, B = 70, 150, 54, 56
+    L, R, T, B = 70, 190, 54, 56
     xs = [x for _, _, pts, _ in series for x, _ in pts]
     ys = [y for _, _, pts, _ in series for _, y in pts if y > 0]
     x0, x1 = (math.log2(min(xs)), math.log2(max(xs))) if xlog else (min(xs), max(xs))
@@ -198,8 +229,10 @@ def svg_lines(path, title, subtitle, series, xlabel, ylabel, xlog=True, W=820, H
     for k in range(y0, y1 + 1):
         y = sy(2.0 ** k)
         o.append(f'<line x1="{L}" y1="{y:.1f}" x2="{W-R}" y2="{y:.1f}" stroke="#eee"/><text x="{L-6}" y="{y+4:.1f}" text-anchor="end" fill="#555">{2.0**k:g}</text>')
-    for v in sorted(set(xs)):
-        o.append(f'<text x="{sx(v):.1f}" y="{H-B+16}" text-anchor="middle" fill="#555">{v:g}</text>')
+    ticks = sorted(set(xs))
+    step = max(1, math.ceil(len(ticks) / 8))
+    for v in ticks[::step]:
+        o.append(f'<text x="{sx(v):.1f}" y="{H-B+16}" text-anchor="middle" fill="#555">{v:.4g}</text>')
     o.append(f'<text x="{(L+W-R)/2:.0f}" y="{H-12}" text-anchor="middle" fill="#222">{xlabel}</text>')
     o.append(f'<text x="14" y="{(T+H-B)/2:.0f}" transform="rotate(-90 14 {(T+H-B)/2:.0f})" text-anchor="middle" fill="#222">{ylabel}</text>')
     for label, col, pts, dashed in series:
@@ -210,7 +243,9 @@ def svg_lines(path, title, subtitle, series, xlabel, ylabel, xlog=True, W=820, H
         o.append(f'<polyline fill="none" stroke="{col}" stroke-width="2"{d} points="' + " ".join(f"{sx(x):.1f},{sy(y):.1f}" for x, y in pts) + '"/>')
         for x, y in pts:
             o.append(f'<circle cx="{sx(x):.1f}" cy="{sy(y):.1f}" r="2.5" fill="{col}"/>')
-        o.append(f'<text x="{W-R+6}" y="{sy(pts[-1][1])+4:.1f}" fill="{col}">{label}</text>')
+        slot = [x[0] for x in series].index(label)
+        o.append(f'<line x1="{W-R+6}" y1="{T+10+slot*16}" x2="{W-R+22}" y2="{T+10+slot*16}" stroke="{col}" stroke-width="2"{d}/>')
+        o.append(f'<text x="{W-R+26}" y="{T+14+slot*16}" fill="{col}">{label}</text>')
     o.append("</svg>")
     (HERE / path).write_text("\n".join(o) + "\n")
 
@@ -244,24 +279,82 @@ def figures(rows):
               dp, "table size, MB (compact entries)", "S")
 
 
-def findings(rows, fit, runs):
+def row_law(rows):
+    """Least-squares K = alpha*B + beta for the collision rows used by the abscissa-base sweep, and the dependent share."""
+    pts = [(r["base"], r["rows_used"]) for r in rows if r["arm"].startswith("sweep-b") and r["bits"] <= 36]
+    xs = [b for b, _ in pts]
+    ys = [k for _, k in pts]
+    mx, my = statistics.mean(xs), statistics.mean(ys)
+    alpha = sum((x - mx) * (y - my) for x, y in pts and zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
+    dep = [r["dependent_rows"] / r["rows_used"] for r in rows if r["arm"].startswith("sweep-b") and r["bits"] <= 36 and r["base"] >= 8]
+    return alpha, my - alpha * mx, statistics.mean(dep)
+
+
+def dp_trade(rows, k):
+    """Mean over sizes 20..36 of (S ratio, stored-entry ratio) of the B = 8 dp=k sweep to the plain B = 8 sweep."""
+    sr, er = [], []
+    for bits in range(20, 38, 2):
+        p = next((r for r in rows if r["bits"] == bits and r["arm"] == "sweep-b8"), None)
+        q = next((r for r in rows if r["bits"] == bits and r["arm"] == f"b8-dp{k}"), None)
+        if p and q and q["entries"]:
+            sr.append(q["mean_s"] / p["mean_s"])
+            er.append(p["entries"] / q["entries"])
+    return statistics.mean(sr), statistics.mean(er)
+
+
+def findings(rows, fit, runs, var):
     g = lambda bits, arm, k: next((r[k] for r in rows if r["bits"] == bits and r["arm"] == arm), float("nan"))
     sb = fit["s_vs_bits"]
     fx = lambda n: f"{sb[n]['slope']:+.3f} [{sb[n]['lo']:+.3f}, {sb[n]['hi']:+.3f}]" if n in sb else "n/a"
-    top = max(r["bits"] for r in rows)
+    vr = {v["arm"]: v for v in var}
+    vf = lambda a: f"{vr[a]['pooled_ratio']:.2f} [{vr[a]['lo']:.2f}, {vr[a]['hi']:.2f}]" if a in vr else "n/a"
+    top = max(r["bits"] for r in rows if r["arm"] == "sweep-b2" or r["arm"] == "b2-dp4")
+    big = max(r["bits"] for r in rows if r["arm"] == "pair-walk-b" + str(next((x["base"] for x in rows if x["arm"].startswith("pair-walk-b") and x["bits"] == 36), 0)) and r["bits"] == 36) if False else 36
+    alpha, beta, dep = row_law(rows)
+    e2, e4, e6 = dp_trade(rows, 2)[1], dp_trade(rows, 4)[1], dp_trade(rows, 6)[1]
+    s2, s4, s6 = dp_trade(rows, 2)[0], dp_trade(rows, 4)[0], dp_trade(rows, 6)[0]
     items = [
-        f"<li><b>Exponent in the curve size.</b> Slope of log2 S against log2 r (95% bootstrap interval): sweep B=2 {fx('sweep B=2')}; B=8 {fx('sweep B=8')}; B=128 {fx('sweep B=128')}; "
-        f"rho.negation {fx('rho.negation')}; bsgs.negation {fx('bsgs.negation')}; kangaroo {fx('kangaroo')}; pair-table incumbent {fx('pair-table incumbent (walk, base ~ r^(1/3))')}. "
-        "A fixed-base sweep is flat like the generic searches (S = GAE/sqrt(r) is constant when the work is c*sqrt(r)); the tuned incumbent grows.</li>",
-        f"<li><b>Base size.</b> Slope of log2 S against log2 B per size: " + ", ".join(f"{b}-bit {v['slope']:.2f}" for b, v in fit["s_vs_base"].items()) +
-        " (model 0.5). The constant c in S = c sqrt(2B) ranges over " + ", ".join(f"{b}-bit {v['mean']:.2f}" for b, v in fit["c_const"].items()) + ".</li>",
-        f"<li><b>Generic comparators at {top} bits.</b> rho.negation {g(top,'rho-neg','mean_s'):.2f}, rho.negation_lanes {g(top,'rho-lanes16','mean_s'):.2f}, bsgs.negation {g(top,'bsgs-neg','mean_s'):.2f}, "
-        f"kangaroo {g(top,'kangaroo','mean_s'):.2f}; the sweep at B=2 is {g(top,'sweep-b2','mean_s') if not math.isnan(g(top,'sweep-b2','mean_s')) else g(top,'b2-dp4','mean_s'):.2f}.</li>",
+        "<li><b>What it is.</b> A birthday collision search that runs through the index-calculus pipeline. Evidence: (1) at a fixed base the counted S does not grow with the curve "
+        f"(slope of log2 S against log2 r, 95% bootstrap interval: B=2 {fx('sweep B=2')}, B=8 {fx('sweep B=8')}, B=32 {fx('sweep B=32')}, B=128 {fx('sweep B=128')}), exactly like rho.negation "
+        f"{fx('rho.negation')}, bsgs.negation {fx('bsgs.negation')} and kangaroo {fx('kangaroo')}; the tuned pair-table incumbent grows: {fx('pair-table incumbent (walk, base ~ r^(1/3))')}. "
+        "(2) The collision rows found equal the birthday count N&sup2;/(r 2<sup>k</sup>) in every variant (ratios 0.7 to 1.2, table below). "
+        f"(3) Replacing the smallest abscissae by pseudo-random strided ones changes S by {vf('b8-null-strided')}: the base has no index-calculus structure to contribute. "
+        f"(4) Adding the pair table changes S by {vf('b8-hybrid')}. (5) With a known-log base a single collision row pins the logarithm (rows used = 1): that is a baby-step/giant-step-style search "
+        f"(S ratio to the abscissa base: progression {vf('b8-klprog')}, random scalars {vf('b8-klrand')}).</li>",
+        "<li><b>Cost model.</b> A target contributes 2B signed residuals, one group addition each. After N such additions the expected number of colliding pairs is N&sup2;/r "
+        "(classes {Z, -Z}: N&sup2;/(2 r/2)), without the sign fold N&sup2;/(2r), and N&sup2;/(r 2<sup>k</sup>) when only residuals whose hashed abscissa has k trailing zero bits are kept "
+        "(equal abscissae hash alike, so a pair collides only if it passes the filter). The solve stops when the column of d is pinned, which takes K collision rows: "
+        f"K = {alpha:.2f} B + {beta:.1f} for the abscissa base (least squares over sizes 20 to 36), {dep:.0%} of the rows linearly dependent, and K = 1 for a known-log base. "
+        "So N = sqrt(K r) and S = N/sqrt(r) is about c sqrt(K): flat in r, growing like sqrt(B) once B exceeds a few, smallest at the smallest base. The table holds N entries (N/2<sup>k</sup> with the filter).</li>",
+        f"<li><b>Placement at 36 bits.</b> rho.negation {g(36,'rho-neg','mean_s'):.2f}, rho.negation_lanes {g(36,'rho-lanes16','mean_s'):.2f}, bsgs.negation {g(36,'bsgs-neg','mean_s'):.2f}, kangaroo {g(36,'kangaroo','mean_s'):.2f}; "
+        f"the sweep is {g(36,'sweep-b2','mean_s'):.2f} at B=2, {g(36,'sweep-b8','mean_s'):.2f} at B=8 and {g(36,'sweep-b128','mean_s'):.2f} at B=128; the tuned pair-table incumbent is {g(36,'pair-walk-b2048','mean_s'):.1f}. "
+        "The generic searches stay flat to 44 bits and the plain B = 2 sweep to 40 bits (past that only the limited-memory variants run: memory). The sweep sits between the generic searches and the incumbent, at the generic searches' exponent.</li>",
+        f"<li><b>Distinguished points (B = 8, paired S against the plain sweep, pooled over sizes).</b> k=2 {vf('b8-dp2')}, k=4 {vf('b8-dp4')}, k=6 {vf('b8-dp6')}. "
+        f"Stored residuals fall by only {e2:.1f}, {e4:.1f} and {e6:.1f} times (not 4, 16, 64: the run lasts longer), while S grows {s2:.2f}, {s4:.2f} and {s6:.2f} times, so S x memory falls to "
+        f"{s2/e2:.2f}, {s4/e4:.2f} and {s6/e6:.2f} of the plain sweep's and then flattens. The trade never reaches rho's constant memory at a rho-like S.</li>",
+        f"<li><b>Memory (table entries, 36 bits).</b> sweep B=2 {g(36,'sweep-b2','entries'):.0f}, B=8 {g(36,'sweep-b8','entries'):.0f}; bsgs.negation {g(36,'bsgs-neg','entries'):.0f} baby steps; "
+        f"kangaroo {g(36,'kangaroo','entries'):.0f} distinguished points; rho.negation none; the pair-table incumbent {g(36,'pair-walk-b2048','entries'):.0f}. The counted unit does not see any of it. "
+        "The small-base sweep needs several times BSGS's memory for a larger S, which is the sense in which BSGS dominates it.</li>",
+        "<li><b>Verdict.</b> Not a genuine index calculus: its exponent is the generic one and the algebraic structure of the base contributes nothing measurable. It is a real, verified and cheap arm "
+        "of the pipeline (the lowest S of any abscissa-base arm we have measured; the known-log bases are lower still and are collision searches by construction), but under the owner's rule that relabelling is not an improvement it does not go on the leaderboard; the owner decides.</li>",
     ]
     return "<ul>" + "".join(items) + "</ul>"
 
 
-def report(rows, fit, runs):
+def model_rows(rows):
+    out = []
+    for r in rows:
+        if r.get("collisions_predicted") and r["bits"] in (24, 32, 36):
+            out.append(f"<tr><td>{r['bits']}</td><td>{r['arm']}</td><td>{r['collisions_observed']:.1f}</td><td>{r['collisions_predicted']:.1f}</td>"
+                       f"<td>{r['collisions_observed']/r['collisions_predicted']:.2f}</td></tr>")
+    return "\n".join(out)
+
+
+def variant_rows(var):
+    return "\n".join(f"<tr><td>{v['label']}</td><td>{v['pooled_ratio']:.3f}</td><td>[{v['lo']:.3f}, {v['hi']:.3f}]</td><td>{v['n']}</td></tr>" for v in var)
+
+
+def report(rows, fit, runs, var):
     def fmt(v, spec):
         return "" if v is None or (isinstance(v, float) and math.isnan(v)) else format(v, spec)
     tr = "\n".join(
@@ -277,7 +370,11 @@ table{{border-collapse:collapse;margin:8px 0}}td,th{{border:1px solid #ccc;paddi
 pair-table incumbent, with variants (no sign fold, distinguished points, pair-table hybrid) and base-shape controls.</p>
 {figs}
 <h2>Findings</h2>
-{findings(rows, fit, runs)}
+{findings(rows, fit, runs, var)}
+<h2>Birthday model check (collision rows found against N&sup2; fold / (2 r 2<sup>k</sup>))</h2>
+<table><tr><th>bits</th><th>arm</th><th>observed</th><th>predicted</th><th>ratio</th></tr>{model_rows(rows)}</table>
+<h2>Variants at B = 8, paired S against the plain sweep</h2>
+<table><tr><th>variant</th><th>pooled ratio</th><th>95% interval</th><th>n</th></tr>{variant_rows(var)}</table>
 <h2>All arms</h2>
 <table><tr><th>bits</th><th>arm</th><th>verified</th><th>mean S</th><th>S / rho.negation</th><th>paired S vs incumbent</th><th>table entries</th><th>table MB (compact)</th></tr>
 {tr}</table></body></html>"""
@@ -287,14 +384,15 @@ pair-table incumbent, with variants (no sign fold, distinguished points, pair-ta
 def main():
     rows, runs = collect()
     fit = fits(rows, runs)
+    var = variant_comparisons()
     figures(rows)
-    report(rows, fit, runs)
+    report(rows, fit, runs, var)
     headline = []
     for r in rows:
         headline.append({"name": f"{r['bits']}/{r['arm']}/mean_s", "claimed": r["mean_s"]})
         if "paired_s_vs_incumbent" in r:
             headline.append({"name": f"{r['bits']}/{r['arm']}/paired_s_vs_incumbent", "claimed": r["paired_s_vs_incumbent"]})
-    (HERE / "results.json").write_text(json.dumps({"rows": rows, "fits": fit, "headline": headline}, indent=1, sort_keys=True) + "\n")
+    (HERE / "results.json").write_text(json.dumps({"rows": rows, "fits": fit, "variants": var, "headline": headline}, indent=1, sort_keys=True) + "\n")
     print(len(rows), "rows;", len(headline), "headline numbers")
     print(json.dumps(fit, indent=1)[:3000])
 
