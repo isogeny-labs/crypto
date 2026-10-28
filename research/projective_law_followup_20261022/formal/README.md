@@ -444,3 +444,17 @@ undefined divisions. Its [PDF](../public_source_parity/REPORT.pdf),
 [raw artifact manifest](../public_source_parity/.artifacts.json) preserve the
 result. Magma was unavailable and was not executed; this remains a finite
 source-translation result, not a universal law or revised cost ratio.
+
+The [projective branch zero-order packet](PROJECTIVE_BRANCH_ZERO_ORDER.md)
+proves the proof-side common 2+2 numerator has order one on the actual
+weighted-Proj stalk at a rational simple branch under its Mumford congruence,
+nonzero-determinant, and norm-support hypotheses. The separate
+[nonbranch stalk packet](NONBRANCH_STALK_ORDER.md) proves the actual stalk
+equivalence and that pulled-back `y` is a unit at a rational point with
+`y ≠ 0`. Its [PDF](NONBRANCH_STALK_ORDER.pdf),
+[dependency graph](nonbranch-stalk-order.svg), and
+[standardized gate CSV](nonbranch-stalk-order.csv) distinguish four checked
+items, one conditional norm-order theorem, and seven open gates. The
+nonbranch domain/DVR construction, formula-specific norm transport, global
+divisor/Pic⁰ equation, and compiled Rust semantics remain open. Neither
+packet changes a target or cost row.
