@@ -1188,6 +1188,17 @@ mod committed_replays {
         }
     }
 
+    /// Recorded 2026-10-04: the qualified `word XORs (elimination only)` unit
+    /// was a wall-priced, unpriced lower bound (632 GAE), not the pinned 1832.
+    #[test]
+    fn descent_algebraic_f4_record_replays_with_its_solver_term_unpriced() {
+        if let Some((ok, detail)) =
+            replay("research/ecbench_yield_sweep_20261004/sessions/koblitz", 5)
+        {
+            assert!(ok && detail.contains("pre-"), "{detail}");
+        }
+    }
+
     #[test]
     fn amended_session_replays_under_the_current_counters() {
         if let Some((ok, detail)) = replay("research/ext_endo_rho_20261023/sessions-a1/gls-fp2", 0)
