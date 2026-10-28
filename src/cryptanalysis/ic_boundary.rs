@@ -291,15 +291,38 @@ fn pinned_ratios(
     let doc: serde_json::Value = serde_json::from_str(PINNED_CALIBRATION).ok()?;
     let table = doc.get("instances")?.as_object()?;
     let prefix = format!("{regime}/");
-    let row = table.get(&format!("{prefix}{instance}")).or_else(|| {
-        curve_id::find_same_curve(
-            instance,
-            table
-                .iter()
-                .filter_map(|(key, row)| Some((key.strip_prefix(&prefix)?, row))),
-        )
-    })?;
+    let older = LEGACY_CALIBRATION_BEFORE_1640.with(|c| c.get());
+    let usable = |key: &str| !(older && CALIBRATION_ROWS_ADDED_BY_1640.contains(&key));
+    let row = table
+        .get(&format!("{prefix}{instance}"))
+        .filter(|_| usable(&format!("{prefix}{instance}")))
+        .or_else(|| {
+            curve_id::find_same_curve(
+                instance,
+                table.iter().filter_map(|(key, row)| {
+                    usable(key).then_some(())?;
+                    Some((key.strip_prefix(&prefix)?, row))
+                }),
+            )
+        })?;
     Some(row.as_object()?.clone())
+}
+
+/// Rows `docs/ic/calibration.json` gained in #1640 (`31dd89b67`,
+/// 2026-10-11); the other rows and every value are unchanged since the
+/// table was pinned (`2a69e44ca`, 2026-09-21).
+const CALIBRATION_ROWS_ADDED_BY_1640: [&str; 1] = ["koblitz/K_0 / GF(2^23)"];
+
+thread_local! {
+    static LEGACY_CALIBRATION_BEFORE_1640: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Read the pinned table as it was before #1640 added rows to it, for the
+/// replay of records made before then (`ecbench::legacy`): a curve with no
+/// row is priced as it was, its native units left unpriced.  Per thread;
+/// `false` restores the table.
+pub fn set_legacy_calibration_before_1640(on: bool) {
+    LEGACY_CALIBRATION_BEFORE_1640.with(|c| c.set(on));
 }
 
 impl Calibration {
