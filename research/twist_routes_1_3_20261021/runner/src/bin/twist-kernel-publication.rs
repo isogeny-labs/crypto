@@ -221,8 +221,10 @@ fn models() -> Result<()> {
                 .cloned(),
         );
     }
-    if let Ok(extra) = read(Path::new(S).join("execution-v10/registry-additions.json")) {
-        all_additions.extend(extra.as_array().unwrap().iter().cloned());
+    for wave in ["execution-v10", "execution-v12"] {
+        if let Ok(extra) = read(Path::new(S).join(wave).join("registry-additions.json")) {
+            all_additions.extend(extra.as_array().unwrap().iter().cloned());
+        }
     }
     let mut appended = std::collections::BTreeSet::new();
     for id in &all_additions {
@@ -439,6 +441,105 @@ fn symmetry_export() -> Result<()> {
     e["producer"]["session"] = json!("twist-kernel-symmetry-20261028");
     write(v.join("experiment.export.json"), &e)
 }
+fn quotient_models() -> Result<()> {
+    let v = Path::new(S).join("execution-v12");
+    let data = read(v.join("ADMISSION.json"))?;
+    let old = read(Path::new(S).join("execution-v8/GLOBAL_MODELS_INPUT.json"))?;
+    let mut additions = vec![];
+    let mut global = vec![];
+    for m in data["maps"].as_array().unwrap() {
+        let i = m["line"].as_u64().unwrap() as usize;
+        let j = m["next_line"].as_u64().unwrap() as usize;
+        let mut id = m["intermediate_model"].clone();
+        let word = |k: &str| {
+            id["params"][k]
+                .as_str()
+                .unwrap()
+                .parse::<BigUint>()
+                .unwrap()
+        };
+        let canonical =
+            curve_id::prime(&word("p"), &word("a"), &word("b"), &BigUint::from(823u64)).unwrap();
+        assert_eq!(canonical.slug, id["slug"]);
+        assert_eq!(canonical.icv1, id["icv1"]);
+        assert_eq!(canonical.model_json, id["model_json"]);
+        id["sources"] = json!([format!("{S}/execution-v12/ADMISSION.json")]);
+        additions.push(id.clone());
+        let mut dest = old[j + 1].clone();
+        dest["curve"]["generator"] = m["mapped_generator"].clone();
+        global.push(old[i + 1].clone());
+        global.push(json!({"icv1":id["slug"],"field":old[0]["field"],"curve":{"model":"short-weierstrass","a":m["normalized_velu"]["a"],"b":m["normalized_velu"]["b"],"subgroup_order":823,"cofactor":1,"generator":m["intermediate_generator"],"target_group":"E(F827)"}}));
+        global.push(dest);
+    }
+    write(v.join("registry-additions.json"), &json!(additions))?;
+    write(v.join("GLOBAL_MODELS_INPUT.json"), &json!(global))?;
+    models()
+}
+fn quotient_export() -> Result<()> {
+    let v = Path::new(S).join("execution-v12");
+    let p = read(v.join("protocol.json"))?;
+    let f = read(v.join("FROZEN.json"))?;
+    let a = read(v.join("ADMISSION.json"))?;
+    let h = read(v.join("HOST.json"))?;
+    assert_eq!(
+        a["status"],
+        "native-and-independent-PARI-quotient-squares-verified"
+    );
+    let transport = read(v.join("runs/producer-transport.json"))?;
+    assert_eq!(transport["exit_code"], 0);
+    assert_eq!(transport["binary_sha256"], f["binary"]["sha256"]);
+    let mut e = read(Path::new(S).join("execution-v11/experiment.export.json"))?;
+    e["export_id"] = json!("twist-quotient-cycle-20261028-v1");
+    e["created"] = transport["finished"].clone();
+    e["protocol"] = json!({"path":"protocol.json","sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]});
+    e["source"]["commit"] = f["source_revision"].clone();
+    e["host"] = json!({"path":"HOST.json","sha256":sha(v.join("HOST.json"))?,"class_id":null,"summary":h["summary"]});
+    e["arms"]=json!(p["arms"].as_array().unwrap().iter().map(|a|json!({"id":a["id"],"role":a["role"],"binary_sha256":a["instrument"]["binary_sha256"],"commit":a["instrument"]["commit"]})).collect::<Vec<_>>());
+    let artifacts = vec![
+        file(&v.join("runs.tar.xz"), &v, "raw")?,
+        file(&v.join("RAW_MEMBERS.json"), &v, "receipt")?,
+        file(&v.join("ADMISSION.json"), &v, "receipt")?,
+        file(&v.join("runs/pari-v1/RECEIPT.json"), &v, "receipt")?,
+    ];
+    let mut runs = e["runs"].as_array().unwrap().clone();
+    assert_eq!(runs.len(), 2);
+    for (i, r) in runs.iter_mut().enumerate() {
+        r["run_id"] = json!(format!(
+            "quotient-{}-000",
+            if i == 0 { "native" } else { "pari" }
+        ));
+        r["instance_id"] = json!("p827-eight-fixed-quotient-squares");
+        r["worker"] = p["arms"][i]["instrument"]["binary_sha256"].clone();
+        r["artifacts"] = json!(artifacts);
+        r["measurements"]["counted"] = json!({"generic_squares":a["summary"]["generic_squares"]});
+        r["measurements"]["counters"] = a["summary"].clone();
+        r["verification"] = json!({"status":"verified","verifier":"Native generic maps and independent PARI ellisogeny/quotient-square/complete group checks"});
+        r["backend_ref"] = json!(if i == 0 {
+            "runs/quotient-v1"
+        } else {
+            "runs/pari-v1"
+        });
+        r["started_at"] = if i == 0 {
+            transport["started"].clone()
+        } else {
+            Value::Null
+        };
+        r["finished_at"] = if i == 0 {
+            transport["finished"].clone()
+        } else {
+            Value::Null
+        };
+    }
+    e["runs"] = json!(runs);
+    e["analysis"] = json!({"script":file(&Path::new(S).join("runner/src/quotient_cycle_20261028.rs"),&v,"analysis")?,"blinded":false,"blinding_key_sha256":null,"outputs":[file(&v.join("ADMISSION.json"),&v,"analysis")?],"unmasked_at":null});
+    e["files"] = json!([
+        file(&v.join("FROZEN.json"), &v, "receipt")?,
+        file(&v.join("protocol.json"), &v, "protocol")?
+    ]);
+    e["notes"] = json!([{"kind":"observation","text":"All eight fixed degree17 quotient maps and generic commuting squares; complete finite/kernel checks. No charged cost, novelty, unknown-log or NIST claim. Shared author/host independent CAS; no separate-runner review.","by":"native publication tool"}]);
+    e["producer"]["session"] = json!("twist-quotient-cycle-20261028");
+    write(v.join("experiment.export.json"), &e)
+}
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().skip(1).collect();
     match a.first().map(String::as_str) {
@@ -449,6 +550,8 @@ fn main() -> Result<()> {
         Some("endo-models") => endo_models(),
         Some("endo-export") => endo_export(),
         Some("symmetry-export") => symmetry_export(),
+        Some("quotient-models") => quotient_models(),
+        Some("quotient-export") => quotient_export(),
         _ => Err("admit|export-original|export|models".into()),
     }
 }

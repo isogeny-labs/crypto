@@ -1,0 +1,327 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-quotient-cycle-v1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v12",
+  "question": "Can explicit degree17 maps between all eight successive quotient curves satisfy the exact generic commuting squares?",
+  "claims": [
+    {
+      "id": "quotient-squares",
+      "class": "exact_computation",
+      "text": "Explicit degree17 quotient maps satisfy generic squares and complete finite/kernel checks.",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "class": "out_of_scope",
+      "text": "No charged solving, performance, novelty, unknown-log or NIST result.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Native image-kernel/degree17 maps, curve identities, generic commuting squares and exhaustive rational/kernel checks.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0000000000000000000000000000000000000000",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-quotient-cycle"
+          ]
+        ],
+        "binary_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent GP ellisogeny reconstruction and rational-twist kernel/group replay with generic squares.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0000000000000000000000000000000000000000",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded F101 scaling composition/sign control and prior certified maps; exact verification, no separate statistical arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Every corrupted coefficient fails curve identity and every negated map fails commuting on822 nonidentity points; no statistical null arm."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "kernel line",
+        "levels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Native byte-preserved v8 core and new finite module checker, independent GP ellisogeny.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Frozen v8 all8 source quotients,v10 degree17 kernel/map,v11 kernel permutation; unchanged public fixture.",
+        "how": "All eight archived lines; fixed inverse scale7, no selected sign/kernel/destination."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Shared author/host; independent CAS map/group/linear algebra, exact native replay and conditional Lean group implication."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All8 degree17 map and generic square identities,6584 rational-point checks and136 kernel checks agree; corrupt/sign controls pass."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent CAS exact verification; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic complete finite sets; zero seed is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "All eight source quotients and their fixed v11 successor kernels.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Two unmeasured prospective300s exact runs plus300s metadata allowance; known finite controls are development tests. No observed cost or timing claim."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "generic-squares",
+        "name": "Exact generic commuting squares",
+        "unit": "maps",
+        "kind": "exact",
+        "definition": "Both rational coordinate functions agree generically for all eight quotient maps.",
+        "source": "ADMISSION.json summary.generic_squares",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "generic squares",
+      "rational point checks",
+      "kernel checks",
+      "wrong sign rejections",
+      "corrupt map rejections"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All eight fixed quotient maps; preserve every failed map or300s cap, no substitution or sign choice.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Certify explicit quotient-to-quotient maps and exact squares on the named public fixture; no cost inference.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Generic rational function equality, curve certificates and exhaustive finite checks.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact maps and commuting squares only.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/quotient_cycle_20261028.rs",
+      "sha256": "dfc4cd7374b31e31fe6fae11d8b4ccf7801f167147c9bc63cc85d4777be07066"
+    },
+    "inputs": [
+      "archived v8 maps and source kernel fixture",
+      "v10 admitted alpha/kernel",
+      "v11 admitted successor permutation",
+      "actual native/GP receipts"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded generic/rational/kernel check counts and one certified commuting square."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/quotient-cycle-20261028"
+  },
+  "inadmissible": [
+    "Calling standard isogeny theory novel",
+    "Calling same-base transported rows new independent information",
+    "Claiming a solver speedup without charged costs and strongest matched controls",
+    "Inferring a NIST route from this public p827 example",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v12/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Primary MIT quotient uniqueness/composition/Vélu passages and known endomorphism scope reviewed before implementation.",
+      "verified_by": "Both primary PDFs accessed and relevant theorem passages read on2026-10-28."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorization and documented EKS access/image fallback; bounded local L0 only, no paid resource."
+  }
+}
