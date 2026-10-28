@@ -11,6 +11,9 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
+#[cfg(unix)]
+use std::time::Instant;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -22,6 +25,9 @@ const GRANT: &str = "crypto.ml-dataset.budget-allocation/v1";
 const ZERO: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 const MAX_RECORD: u64 = 128 * 1024;
 const MAX_RECORDS: usize = 1_000_000;
+const CONTROLLER_LOCK_TIMEOUT: Duration = Duration::from_secs(30);
+#[cfg(unix)]
+const LOCK_RETRY_INTERVAL: Duration = Duration::from_millis(10);
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -293,28 +299,111 @@ fn initialization_marker(p: &BudgetPolicy) -> Result<PathBuf, String> {
         .join(format!(".{name}.budget-authority-created")))
 }
 fn locked(path: &Path) -> Result<File, String> {
+    lock_file(path, None)
+}
+fn controller_locked(path: &Path) -> Result<File, String> {
+    lock_file(path, Some(CONTROLLER_LOCK_TIMEOUT))
+}
+fn lock_file(path: &Path, wait: Option<Duration>) -> Result<File, String> {
     #[cfg(not(unix))]
     {
-        let _ = path;
+        let _ = (path, wait);
         Err("durable budget locking requires Unix".into())
     }
     #[cfg(unix)]
     {
-        use std::os::fd::AsRawFd;
-        use std::os::unix::fs::OpenOptionsExt;
-        let file = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC)
-            .open(path)
-            .map_err(err)?;
-        if !file.metadata().map_err(err)?.is_file() {
-            return Err("budget lock is not regular".into());
+        locked_with(path, wait, try_lock)
+    }
+}
+#[cfg(unix)]
+fn try_lock(file: &File) -> std::io::Result<()> {
+    use std::os::fd::AsRawFd;
+    if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
+        Ok(())
+    } else {
+        Err(std::io::Error::last_os_error())
+    }
+}
+#[cfg(unix)]
+fn lock_metadata(path: &Path) -> Result<fs::Metadata, String> {
+    directory(path.parent().ok_or("budget lock lacks parent")?, false)?;
+    let metadata = fs::symlink_metadata(path).map_err(err)?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err("budget lock is not regular".into());
+    }
+    Ok(metadata)
+}
+#[cfg(unix)]
+fn verify_lock_identity(path: &Path, file: &File, initial: &fs::Metadata) -> Result<(), String> {
+    use std::os::unix::fs::MetadataExt;
+    let named = lock_metadata(path)?;
+    let opened = file.metadata().map_err(err)?;
+    if !opened.is_file()
+        || named.dev() != initial.dev()
+        || named.ino() != initial.ino()
+        || opened.dev() != initial.dev()
+        || opened.ino() != initial.ino()
+    {
+        return Err("budget lock path identity changed".into());
+    }
+    Ok(())
+}
+// flock(2) associates locks with open descriptions: replacing a pathname while
+// waiting must not let a stale descriptor authorize a different authority.
+// LOCK_NB reports EWOULDBLOCK for contention; EINTR may be retried, other errors
+// are failures. See https://man7.org/linux/man-pages/man2/flock.2.html and
+// https://doc.rust-lang.org/std/time/struct.Instant.html for the monotonic clock.
+// The deadline bounds retries, not filesystem I/O on an unavailable mount.
+#[cfg(unix)]
+fn locked_with(
+    path: &Path,
+    wait: Option<Duration>,
+    mut attempt: impl FnMut(&File) -> std::io::Result<()>,
+) -> Result<File, String> {
+    use std::os::unix::fs::OpenOptionsExt;
+    // Session contention never waits. Its deadline only bounds repeated EINTR.
+    let timeout = wait.unwrap_or(CONTROLLER_LOCK_TIMEOUT);
+    let deadline = Instant::now()
+        .checked_add(timeout)
+        .ok_or("budget lock deadline overflow")?;
+    let initial = lock_metadata(path)?;
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC | libc::O_NONBLOCK)
+        .open(path)
+        .map_err(err)?;
+    let mut retried = false;
+    let timed_out = || format!("budget lock acquisition timed out: {}", path.display());
+    loop {
+        verify_lock_identity(path, &file, &initial)?;
+        if retried && Instant::now() >= deadline {
+            return Err(timed_out());
         }
-        if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
-            return Err("budget authority/session already locked".into());
+        match attempt(&file) {
+            Ok(()) => {
+                verify_lock_identity(path, &file, &initial)?;
+                if retried && Instant::now() >= deadline {
+                    return Err(timed_out());
+                }
+                return Ok(file);
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock && wait.is_none() => {
+                return Err("budget session already locked".into());
+            }
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::Interrupted
+                ) => {}
+            Err(e) => return Err(format!("budget lock acquisition failed: {e}")),
         }
-        Ok(file)
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        if remaining.is_zero() {
+            return Err(timed_out());
+        }
+        std::thread::sleep(LOCK_RETRY_INTERVAL.min(remaining));
+        retried = true;
     }
 }
 fn records(path: &Path) -> Result<Vec<PathBuf>, String> {
@@ -441,7 +530,8 @@ pub fn allocate(
     if fs::symlink_metadata(out).is_ok() {
         return Err("allocation output already exists".into());
     }
-    let _lock = locked(&p.authority_dir.join("controller.lock"))?;
+    let _lock = controller_locked(&p.authority_dir.join("controller.lock"))?;
+    authority(&p, &hash)?;
     let entries = records(&p.authority_dir.join("allocations"))?;
     if entries.len() >= MAX_RECORDS {
         return Err("controller allocation record cap reached".into());
@@ -540,7 +630,8 @@ impl BudgetSession {
     ) -> Result<Arc<Self>, String> {
         let (p, hash) = policy(policy_path)?;
         authority(&p, &hash)?;
-        let _controller = locked(&p.authority_dir.join("controller.lock"))?;
+        let controller = controller_locked(&p.authority_dir.join("controller.lock"))?;
+        authority(&p, &hash)?;
         let grant_data = read_bytes(allocation_path)?;
         let grant: Allocation = serde_json::from_slice(&grant_data).map_err(err)?;
         if grant.schema != GRANT
@@ -584,6 +675,10 @@ impl BudgetSession {
         }
         let worker = directory(&p.authority_dir.join("workers").join(&grant_hash), false)?;
         let lock = locked(&worker.join("session.lock"))?;
+        // The verified allocation is immutable and this worker is now exclusive.
+        // Its binding and reservation replay do not mutate allocation history;
+        // unrelated allocations can proceed without waiting for that replay.
+        drop(controller);
         let binding = Binding {
             schema: "crypto.ml-dataset.budget-session/v1".into(),
             policy_sha256: hash.clone(),
@@ -816,6 +911,9 @@ mod tests {
     }
     impl Fixture {
         fn new(limits: Limits, reserve: Limits) -> Self {
+            Self::with_allocation(limits, limits, reserve)
+        }
+        fn with_allocation(campaign: Limits, limits: Limits, reserve: Limits) -> Self {
             let root = std::env::temp_dir().join(format!(
                 "dataset-budget-{}-{}",
                 std::process::id(),
@@ -836,7 +934,7 @@ mod tests {
                     bucket: "setec-astronomy-artifacts".into(),
                     prefix: "research/fixture".into(),
                 }],
-                limits,
+                limits: campaign,
                 command_timeout_secs: 1,
             };
             write_new(&policy, &bytes(&p).unwrap()).unwrap();
@@ -1113,7 +1211,241 @@ mod tests {
     fn concurrent_session_open_is_excluded() {
         let f = Fixture::new(limits(), Limits::default());
         let _s = f.open();
-        assert!(BudgetSession::open(&f.policy, &f.grant, &f.journal).is_err());
+        assert!(BudgetSession::open(&f.policy, &f.grant, &f.journal)
+            .err()
+            .unwrap()
+            .contains("budget session already locked"));
+    }
+    #[cfg(unix)]
+    #[test]
+    fn independent_allocations_wait_for_controller_then_both_open() {
+        use std::sync::{mpsc, Barrier};
+        let f =
+            Fixture::with_allocation(limits().add(limits()).unwrap(), limits(), Limits::default());
+        let other_grant = f.root.join("other-grant.json");
+        let other_journal = f.root.join("other-journal");
+        allocate(
+            &f.policy,
+            "attempt-2",
+            limits(),
+            Limits::default(),
+            &other_grant,
+        )
+        .unwrap();
+        let controller_path = f.root.join("authority/controller.lock");
+        let controller = locked(&controller_path).unwrap();
+        let barrier = Barrier::new(3);
+        let (tx, rx) = mpsc::channel();
+        std::thread::scope(|scope| {
+            for (grant, journal) in [(&f.grant, &f.journal), (&other_grant, &other_journal)] {
+                let tx = tx.clone();
+                let policy = &f.policy;
+                let barrier = &barrier;
+                scope.spawn(move || {
+                    barrier.wait();
+                    assert!(tx.send(BudgetSession::open(policy, grant, journal)).is_ok());
+                });
+            }
+            barrier.wait();
+            // Neither waiter may fail fast or create a journal while the
+            // controller is still owned. This is synchronization, not timing evidence.
+            let while_locked = rx.recv_timeout(Duration::from_millis(40));
+            let no_journals = !f.journal.exists() && !other_journal.exists();
+            drop(controller);
+            assert!(matches!(while_locked, Err(mpsc::RecvTimeoutError::Timeout)));
+            assert!(no_journals);
+            let a = rx.recv_timeout(Duration::from_secs(5)).unwrap().unwrap();
+            let b = rx.recv_timeout(Duration::from_secs(5)).unwrap().unwrap();
+            assert_ne!(a.allocation_hash, b.allocation_hash);
+            assert!(f.journal.is_dir());
+            assert!(other_journal.is_dir());
+            // Keeping both sessions alive must not retain the global lock.
+            let _controller = locked(&controller_path).unwrap();
+            for session in [a, b] {
+                session
+                    .reserve(&request(Operation::Head, Phase::Snapshot, 0))
+                    .unwrap();
+                assert_eq!(session.status().unwrap()["sequence"], 1);
+            }
+        });
+    }
+    #[cfg(unix)]
+    #[test]
+    fn allocation_issuance_waits_for_controller_without_spending_early() {
+        use std::sync::{mpsc, Barrier};
+        let f =
+            Fixture::with_allocation(limits().add(limits()).unwrap(), limits(), Limits::default());
+        let controller = locked(&f.root.join("authority/controller.lock")).unwrap();
+        let out = f.root.join("second-grant.json");
+        let barrier = Barrier::new(2);
+        let (tx, rx) = mpsc::channel();
+        std::thread::scope(|scope| {
+            let barrier = &barrier;
+            let policy = &f.policy;
+            let out = &out;
+            scope.spawn(move || {
+                barrier.wait();
+                tx.send(allocate(
+                    policy,
+                    "attempt-2",
+                    limits(),
+                    Limits::default(),
+                    out,
+                ))
+                .unwrap();
+            });
+            barrier.wait();
+            let while_locked = rx.recv_timeout(Duration::from_millis(40));
+            let count = records(&f.root.join("authority/allocations"))
+                .unwrap()
+                .len();
+            let no_export = !out.exists();
+            drop(controller);
+            assert!(matches!(while_locked, Err(mpsc::RecvTimeoutError::Timeout)));
+            assert_eq!(count, 1);
+            assert!(no_export);
+            let result = rx.recv_timeout(Duration::from_secs(5)).unwrap().unwrap();
+            assert_eq!(result["allocation"]["sequence"], 2);
+            assert_eq!(
+                records(&f.root.join("authority/allocations"))
+                    .unwrap()
+                    .len(),
+                2
+            );
+        });
+    }
+    #[cfg(unix)]
+    #[test]
+    fn session_lock_contention_is_not_retried() {
+        let f = Fixture::new(limits(), Limits::default());
+        let session = f.open();
+        let mut attempts = 0;
+        let failure = locked_with(&session.worker.join("session.lock"), None, |file| {
+            attempts += 1;
+            try_lock(file)
+        })
+        .unwrap_err();
+        assert!(failure.contains("budget session already locked"));
+        assert_eq!(attempts, 1);
+        assert_eq!(session.status().unwrap()["sequence"], 0);
+    }
+    #[cfg(unix)]
+    #[test]
+    fn controller_lock_timeout_preserves_existing_owner() {
+        let f = Fixture::new(limits(), Limits::default());
+        let path = f.root.join("authority/controller.lock");
+        let owner = locked(&path).unwrap();
+        let mut attempts = 0;
+        let failure = locked_with(&path, Some(Duration::from_millis(30)), |file| {
+            attempts += 1;
+            try_lock(file)
+        })
+        .unwrap_err();
+        assert!(failure.contains("timed out"));
+        assert!(attempts >= 1);
+        assert!(locked(&path).is_err());
+        drop(owner);
+        assert!(locked(&path).is_ok());
+        assert_eq!(
+            records(&f.root.join("authority/allocations"))
+                .unwrap()
+                .len(),
+            1
+        );
+    }
+    #[cfg(unix)]
+    #[test]
+    fn controller_retries_interruption_and_contention_but_preserves_other_errors() {
+        let f = Fixture::new(limits(), Limits::default());
+        let path = f.root.join("authority/controller.lock");
+        let mut attempts = 0;
+        let lock = locked_with(&path, Some(Duration::from_secs(1)), |file| {
+            attempts += 1;
+            match attempts {
+                1 => Err(std::io::Error::from_raw_os_error(libc::EINTR)),
+                2 => Err(std::io::Error::from_raw_os_error(libc::EWOULDBLOCK)),
+                _ => try_lock(file),
+            }
+        })
+        .unwrap();
+        assert_eq!(attempts, 3);
+        assert!(locked(&path).is_err());
+        drop(lock);
+        for code in [
+            libc::EBADF,
+            libc::EINVAL,
+            libc::ENOLCK,
+            libc::EIO,
+            libc::EACCES,
+        ] {
+            let mut attempts = 0;
+            let failure = locked_with(&path, Some(Duration::from_secs(1)), |_| {
+                attempts += 1;
+                Err(std::io::Error::from_raw_os_error(code))
+            })
+            .unwrap_err();
+            assert!(failure.contains("acquisition failed"));
+            assert!(failure.contains(&std::io::Error::from_raw_os_error(code).to_string()));
+            assert_eq!(attempts, 1);
+            assert!(locked(&path).is_ok());
+        }
+    }
+    #[cfg(unix)]
+    #[test]
+    fn repeated_interruption_obeys_the_same_deadline() {
+        let f = Fixture::new(limits(), Limits::default());
+        let path = f.root.join("authority/controller.lock");
+        let mut attempts = 0;
+        let failure = locked_with(&path, Some(Duration::from_millis(20)), |_| {
+            attempts += 1;
+            Err(std::io::Error::from_raw_os_error(libc::EINTR))
+        })
+        .unwrap_err();
+        assert!(failure.contains("timed out"));
+        assert!(attempts >= 1);
+        assert!(locked(&path).is_ok());
+    }
+    #[cfg(unix)]
+    #[test]
+    fn replaced_lock_path_is_rejected_after_wait_or_success() {
+        for replace_after_success in [false, true] {
+            let f = Fixture::new(limits(), Limits::default());
+            let path = f.root.join("authority/controller.lock");
+            let mut attempts = 0;
+            let failure = locked_with(&path, Some(Duration::from_secs(1)), |file| {
+                attempts += 1;
+                fs::rename(&path, f.root.join("old-controller.lock")).unwrap();
+                write_new(&path, b"").unwrap();
+                if replace_after_success {
+                    try_lock(file)
+                } else {
+                    Err(std::io::Error::from_raw_os_error(libc::EWOULDBLOCK))
+                }
+            })
+            .unwrap_err();
+            assert!(failure.contains("identity changed"));
+            assert_eq!(attempts, 1);
+            assert!(locked(&path).is_ok());
+            assert!(locked(&f.root.join("old-controller.lock")).is_ok());
+        }
+    }
+    #[cfg(unix)]
+    #[test]
+    fn missing_or_nonregular_lock_fails_before_attempt() {
+        use std::os::unix::fs::symlink;
+        let f = Fixture::new(limits(), Limits::default());
+        let absent = f.root.join("absent.lock");
+        let linked = f.root.join("linked.lock");
+        symlink(f.root.join("authority/controller.lock"), &linked).unwrap();
+        for path in [absent, linked, f.root.join("authority")] {
+            let mut attempts = 0;
+            assert!(locked_with(&path, Some(Duration::from_secs(1)), |_| {
+                attempts += 1;
+                Ok(())
+            })
+            .is_err());
+            assert_eq!(attempts, 0);
+        }
     }
     #[cfg(unix)]
     #[test]

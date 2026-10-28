@@ -30,6 +30,15 @@ crypto dataset budget-allocate \
 
 These commands do not launch workers. Allocation limits must fit the campaign's remaining envelope. Failed, timed-out or uncertain requests stay charged, including failed checksums and conditional-write collisions. The controller authority and worker journal must remain available; a stale or missing established journal fails closed. Do not delete journals to retry. A lost allocation remains charged in full and requires a new, separately affordable envelope.
 
+Independent workers may briefly contend for the controller while opening their
+separate allocations. Controller acquisition retries contention and interrupted
+calls for at most 30 seconds on a monotonic clock. Each allocation's session
+lock remains exclusive and fails immediately on contention. Once the allocation
+history has been checked and that session lock acquired, journal replay releases
+the shared controller so unrelated workers can proceed. Lock pathname identity
+is rechecked across waiting; replacement is an error. This deadline bounds lock
+retries, not a filesystem operation stalled on an unavailable mount.
+
 The controller authority must be on durable mounted storage that is not rolled back with a worker snapshot. All replacement hosts must use that same authority. This release does not install the mount or implement an S3-based controller authority. An S3 copy of a worker journal is evidence, not permission to spend its previously recorded remaining balance again.
 
 The counters reserve object-body bytes and explicit AWS CLI command attempts. They do not represent exact wire traffic, service invoices, EC2 runtime, unrelated clients or account-wide dollar enforcement. Dataset compute remains subject to the user's separate **USD100–200 total through tomorrow, maximum USD200** campaign limit and launch admission. No new spending authority follows from a policy example or passing unit test.
