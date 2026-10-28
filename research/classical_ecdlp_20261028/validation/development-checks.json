@@ -193,6 +193,51 @@
       "resulting_head_required_checks": "not yet observed",
       "conductor": "unavailable; local control plane connection refused",
       "note": "The original full-library counts above remain tied to tested_base_revision. This follow-up reruns the archive's 14 tests against the merged library; it does not claim a new full-suite pass or new performance experiment."
+    },
+    {
+      "checked_at": "2026-10-28T20:04:12Z",
+      "previous_pr_head": "6f37ee30f8ab885c24237ff2bcdc46604591baa1",
+      "merged_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/aps_single_relation.rs",
+        "src/cryptanalysis/f4_fp.rs",
+        "src/cryptanalysis/glv_invariant_base.rs"
+      ],
+      "upstream_touched_example": "examples/aps_single_relation_check.rs",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_tests": {
+        "command": "cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T20:04:40Z",
+        "exit_code": 0,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "stdout_sha256": "e5e791c3e3a6596ca34cd4e74670510cf5191eabb1d823babb0e125daff268b5"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "review": {
+        "source_commit": "4cfcece6a5b54e7b714760bb8e88699417b464a8",
+        "completed_without_findings": true,
+        "unresolved_threads": 0
+      },
+      "previous_head_required_checks": {
+        "gate": "success",
+        "size": "success",
+        "artifacts": "success"
+      },
+      "optional_cancelled_parity_job": {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/40749129893/job/123030768311",
+        "stage": "repository checkout",
+        "assertions_ran": false
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "Upstream adds separate APS solver encodings, streaming domains and rational-root extraction. This integration check does not rerun the full library suite, execute historical Python paths or add a performance experiment. The earlier library counts remain tied to base 6187036."
     }
   ]
 }

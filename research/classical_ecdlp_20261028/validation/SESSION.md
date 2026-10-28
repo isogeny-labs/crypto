@@ -75,3 +75,45 @@
 
 - The required artifact job stopped during checkout, before it could validate the package. The new head must obtain its own successful check.
 - Conductor remains unavailable: its local control-plane connection is refused. No task lease is claimed.
+
+## 2026-10-28T19:57:50Z — second merge check-in and APS upstream integration
+
+### What was done (commands, files, features)
+
+- Read current `AGENTS.md`, the latest daily log, task receipts, actual PR head, ruleset, reviews and checks. Required `gate`, `size` and `artifacts` all passed on `6f37ee30f8ab885c24237ff2bcdc46604591baa1`; Codex review still has no findings and there are no unresolved threads.
+- `main` advanced to `8177cd083ed4b07e76a1ddba5df175b01fa34451` through PR #2803. Merged it without conflicts, rebasing or force-pushing. Its changes concern the separate APS solver/example, F4 streaming domains and GLV rational-root extraction. The archive example, reused W12 engine, `ic_boundary.rs`, Cargo files and all 19 historical files are unchanged.
+- All 19 SHA-256 checks, scoped rustfmt and local artifact-policy planning pass. Started rebuilding the archive's 14 tests against the merged library; that invocation is still running at this entry.
+
+### Decisions made (and why)
+
+- The previous head's required checks are successful, but strict up-to-date protection requires integrating the new base and checking the resulting head anew. Preserve the PR's 33-file scope and original evidence.
+- Keep the original full-library invocation and focused reruns tied to base `6187036`; claim no current-head full-suite pass or performance result. Publish only this task-specific session log.
+
+### Open threads (unfinished, pick up next time)
+
+- Finish the archive regression, publish the reviewed base merge and its task-only receipts, then obtain successful current-head required checks before the guarded merge into `main`.
+
+### Errors (what went wrong, how it was handled)
+
+- Optional `parity` on `6f37ee30` was cancelled during checkout, before its assertions ([job](https://github.com/isogeny-labs/crypto/actions/runs/40749129893/job/123030768311)). All three required checks passed. No workflow controls were changed.
+- Conductor's local control plane remains unavailable. No lease is claimed.
+
+## 2026-10-28T20:04:40Z — updated-library archive regression completed
+
+### What was done (commands, files, features)
+
+- The rebuilt `cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2` exited 0: 14 passed, 0 failed, 0 ignored. This includes the seven inherited engine tests and seven archive checks. `development-checks.json` records the source/base identity and complete-output SHA-256.
+- Rechecked the remote feature head and `main`: they remain `6f37ee30` and `8177cd08`. The reviewed native code and all 19 historical files are unchanged; the PR remains confined to its original 33 paths.
+
+### Decisions made (and why)
+
+- Publish this real base merge and the two task-only validation updates. Obtain fresh successful required checks on its resulting head; the previous head's green checks do not satisfy the new head.
+- Keep the full-library validation history explicit and unchanged. This regression is an archive correctness check, not a full-suite invocation or timing experiment.
+
+### Open threads (unfinished, pick up next time)
+
+- Check resulting-head `gate`, `size`, `artifacts` and review protections, then merge with the expected-head-SHA guard using a merge commit and verify the result on GitHub.
+
+### Errors (what went wrong, how it was handled)
+
+- The archive regression has no failures. The separately reported optional checkout cancellation and unavailable Conductor service remain external limitations; neither was bypassed.
