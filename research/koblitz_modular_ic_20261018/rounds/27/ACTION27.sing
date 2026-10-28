@@ -141,9 +141,9 @@ for(acC=1;acC<=20;acC++){
 print("ACTION27_TRACE_ONE_POLE_DEGREE");acTracePoleDegree;
 acExport("sigma-matrix.sing","sigmaColumns",acSigma);
 // Actual degree14 point constraints via the nondegenerate field trace.
-number acPointU=a;
-number acPointV=a^12+a^11+a^8+a^7+a^3+a+1;
-number acPointNu=a^11+a^10+a^8+a^7+a^6+a^4+1;
+number acPointU=alpha27;
+number acPointV=alpha27^12+alpha27^11+alpha27^8+alpha27^7+alpha27^3+alpha27+1;
+number acPointNu=alpha27^11+alpha27^10+alpha27^8+alpha27^7+alpha27^6+alpha27^4+1;
 if(acPointV^2+acPointV+acPointU^3+acPointU!=0){ERROR("degree14 point base equation");}
 number acPointDen=acPointU^16*(acPointU+1)^16;
 list acPointValues;number acPV;number acPQ;
@@ -170,7 +170,7 @@ for(acJ=1;acJ<=14;acJ++){acFieldPivots=insert(acFieldPivots,poly(0),size(acField
 int acFieldRank=0;
 for(acI=0;acI<=13;acI++){
  acBits=0;
- for(acJ=0;acJ<=13;acJ++){if(acAbsoluteTrace(a^(acI+acJ))==1){acBits=acBits+w^acJ;}}
+ for(acJ=0;acJ<=13;acJ++){if(acAbsoluteTrace(alpha27^(acI+acJ))==1){acBits=acBits+w^acJ;}}
  acSolved=acSolve(acBits,acFieldPivots,acFieldCoords);acPoly=acSolved[1];
  if(acPoly!=0){acPivot=deg(acPoly)+1;acFieldPivots[acPivot]=acPoly;acFieldRank=acFieldRank+1;}
 }
@@ -196,7 +196,7 @@ for(acI=1;acI<=68;acI++){
   }
  }
  for(acJ=0;acJ<=13;acJ++){
-  acPV=acAbsoluteTrace(a^acJ*acPointValues[acI]);
+  acPV=acAbsoluteTrace(alpha27^acJ*acPointValues[acI]);
   if(acPV==1){acBits=acBits+w^(2560+acJ);}
  }
  acMembership=insert(acMembership,acBits,size(acMembership));
