@@ -118,7 +118,7 @@ def _prefetch_histories(ref, since):
     ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
         "data/index.json", "evidence/pdp/paired-summary.json",
         "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
-        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json")]
+        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json")]
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda path: _history_log(ref, path, since), paths))
 
@@ -496,6 +496,24 @@ def n83_candidate_datasets(ref, since):
                      date=date, problem="n83-binary-m2-top-regularity",
                      unit="rank" if field.endswith("rank") else "degree",
                      label=f"Original top ideal {row['key']}: {field}; producer replay, review pending",
+                     source=f"{path}@{commit}")
+
+
+    path = f"{study}/evidence/chain/verified-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        status = data.get("status", {})
+        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
+                or data.get("replay_passed") is not True):
+            continue
+        for row in data.get("rows", []):
+            if row.get("verified") is not True:
+                continue
+            for field in ("dreg_lower_bound", "dreg_upper_bound", "selected_blocks"):
+                emit(f"n83.binary_chain.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-binary-chain-top-regularity",
+                     unit="blocks" if field == "selected_blocks" else "degree",
+                     label=f"Original top ideal {row['key']}: {field}; certified bound, review pending",
                      source=f"{path}@{commit}")
 
 

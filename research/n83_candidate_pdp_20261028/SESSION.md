@@ -523,3 +523,27 @@ Independent review and broader FFD/LFD/base-search objectives remain open.
 Initial Typst render required a context block for the page counter. Failed
 render log and original source retained; corrected two-page output inspected.
 No mathematical data or frozen instrument changed.
+
+## 2026-10-28 — Larger-m chain source and design
+
+### What was done
+Reconciled completed m2 batches and current clean branch. Fresh EKS inventory
+shows only terminal failed old jobs, no duplicate. Read primary S3/Weil-descent
+and degree-definition literature. Implemented native chain_upper: exact source
+highest-form support checks, cubic coefficient transformations, final quadratic
+one-generator defect certificate, disjoint block upper bound and explicit lower
+projection. Five native tests pass, including30 explicit small Hilbert cases.
+
+### Decisions made
+Freeze84 original/baseline/spike40 Koblitz/binary m3..9 target identities before
+production. Keep all unknown exact degrees unknown. Immutable per-case cumulative
+snapshots preserve progress history. No base/presentation change or timing claim.
+Lean is limited to elementary slot arithmetic; algebraic bridges remain written.
+
+### Open threads
+Commit source, freeze protocol and checkpoint; execute84 cases and fresh replay;
+restore and replay from S3. Data must be pushed before derived report. Larger-m
+LFD and elite-base search remain unresolved.
+
+### Errors
+No native development test failure so far. No production result exists yet.
