@@ -161,7 +161,7 @@ fn unpack_model(bytes: &[u8], bits: usize) -> Result<Vec<bool>> {
     if bits == 0 || bits > 400_000 || bytes.len() != bits.div_ceil(8) {
         return Err("model certificate bit or byte count differs".into());
     }
-    if bits % 8 != 0 && bytes[bits / 8] >> (bits % 8) != 0 {
+    if !bits.is_multiple_of(8) && bytes[bits / 8] >> (bits % 8) != 0 {
         return Err("model certificate has nonzero padding bits".into());
     }
     Ok((0..bits)
