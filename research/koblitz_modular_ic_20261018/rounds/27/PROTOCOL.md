@@ -343,3 +343,5 @@ free-quotient genus/mixed-dimension arithmetic. Newmodule14named theorems,
 combinedwith18previousnamed results; no full curve/rank formalization claim.
 
 QUADRICS01 rejected before multiplication: kernel is a Singular reserved identifier. Actual-source positive/corrupt controls returned0/1; neither target rank accepted. Rename local list quadraticRelations; same inputs, cap and acceptance tests for retry02. Lean04 stopped at checkpoint credential discovery before compilation; retain gate error and use frozen inherited credential wrapper for Lean05.
+
+Lean05 exited1 before elaboration: failed to create thread, Resource temporarily unavailable. Freeze single CPU0 affinity in addition to existing -j1 and4GiB/1200s caps for retry06. This changes execution resources only, not theorem bytes. Interrupted checkpoint-quadrics02 before native launch to regenerate the assembled input with the corrected identifier; no quadrics02 run directory exists.
