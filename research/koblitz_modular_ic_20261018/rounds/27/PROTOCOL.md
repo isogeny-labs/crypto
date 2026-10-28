@@ -139,3 +139,20 @@ order in a denominator proof,and incomplete denominator simplification.
 It finished exit1 after a migrated-NFS RPC wait. Source/log retained; replace
 map_div bymap_div0 and explicit div_eq_iff denominator reasoning before02.
 No theorem statement or geometric bridge is strengthened by the correction.
+
+## Prospective O-pole coefficient amendment after RR02
+RR02 reaches native finalmarker and all3width ranks19, no native errors, but
+its native exit was NOT captured: the live launcher was expanded forCUSP
+while its child ran and Bash resumed with a truncated command. This is a
+retained wrapper failure, not a strict accepted invocation. Never edit a
+running script, including after its gate. Freeze runner until processexit.
+
+The first family keeps base coefficient O-poles bounded by3 for everyK:
+u^k/(u+1)^K withk<=K is regular atO,apart fromv. This was an incomplete
+coefficient family, not a complete RR proof. NewRR-O family permits
+-K<=k<=2K, widths8,16,24,32, stop at68 or after32/cap. All other source,
+constraint[-512,-1],precision,129jet and independent recombination checks
+unchanged. No input-polynomial independence assumption. Preserve lower-rank
+results, full candidate indices and all source/residual controls. One fresh
+native call at4GiB/1200s; runner copied/hashed as evidence and never edited
+while active. Native exit must actually be recorded for strict acceptance.

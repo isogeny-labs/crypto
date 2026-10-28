@@ -15,3 +15,7 @@ and base b/c orders. Next negativecontrol thenNORM27; new10namedLean source.
 NORM01 andLAMBDA14 PASS. Lambda14 explicitpoint satisfiesoriginal5residuals,
 all8units,nonzero projectionderivative,sourceu recovery. RR01 collisionee
 rejected/stopped,no validmatrixrank. Rawretained; renamebeforeRR02.
+
+RR02 native observes19 atK8/12/16 andcomplete recombination checks, but
+live runner edit causes post-native Bashsyntaxfailure; nativeexitunknown.
+Not strictaccept. FrozenRR-O expandsactual Ocoeffpole bound,allcapsfixed.
