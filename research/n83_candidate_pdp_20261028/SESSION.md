@@ -373,3 +373,26 @@ bytes then descriptive report. Broader FFD/LFD and base-selection task stays ope
 ### Errors
 
 No failed unit control so far; missing full algebraic Lean bridge is explicit.
+
+## 16:38 UTC — Hilbert v2 correction ready
+
+### What was done
+
+Preserved r1 raw archive and failed/cancelled six-cell export. All input hashes
+were checked by launcher, but only first full-source check was reached; zero
+source certificates accepted. Eight v2 native tests passed.
+
+### Decisions made
+
+Separate v2 source and protocol; unchanged six inputs and rank method. Export
+attempt count means batch dispatch; one failed terminated execution and five
+cancelled cells are explicit, not six successful certificate executions.
+
+### Open threads
+
+Freeze and run v2, preserve both attempts and report both outcomes.
+
+### Errors
+
+Initial export formatter used wrong kind, instance IDs and failure outcome
+vocabulary; corrected without changing raw evidence. Diagnostics retained.
