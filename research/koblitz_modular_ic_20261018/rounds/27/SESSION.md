@@ -11,3 +11,7 @@ controls pass;no transported branch accepted. Rename new loop index only.
 
 LAURENT02 accepts20transportedbranches,all original residuals,fifth sigma
 and base b/c orders. Next negativecontrol thenNORM27; new10namedLean source.
+
+NORM01 andLAMBDA14 PASS. Lambda14 explicitpoint satisfiesoriginal5residuals,
+all8units,nonzero projectionderivative,sourceu recovery. RR01 collisionee
+rejected/stopped,no validmatrixrank. Rawretained; renamebeforeRR02.

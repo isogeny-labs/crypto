@@ -477,7 +477,7 @@ lzero("fifth_nu",la(on,la(initialN,initialB)));
 write("chart-series.dump",charts);
 list widths=8,12,16;
 int widthIndex;int width;int il;int jn;int ev;int iu;int ch;int tid;
-int total;int cand;int bound;int ee;int pos;int pivot;int rankJ;
+int total;int cand;int bound;int rrExponent;int pos;int pivot;int rankJ;
 int dependent;int valid;int reductions;int gi;int z;
 list oneChart;list chartCoords;list value;list baseValue;
 poly bits;poly jj;poly comb;poly currentBits;poly currentJet;poly currentComb;
@@ -514,9 +514,9 @@ for(widthIndex=1;widthIndex<=size(widths);widthIndex++){
    if(value[3]<=0 || value[2]<-512){ERROR("RR27 candidate precision/row bound insufficient");}
    if(ch==1 && value[3]<129){ERROR("RR27 evaluation jet precision insufficient");}
    for(tid=1;tid<=size(value[1]);tid++){
-    term=value[1][tid];ee=deg(term)+value[2];
-    if(ee < -bound){bits=bits+w^((ch-1)*512+ee+512);}
-    if(ch==1 && ee>=0 && ee<129){jj=jj+w^ee;}
+    term=value[1][tid];rrExponent=deg(term)+value[2];
+    if(rrExponent < -bound){bits=bits+w^((ch-1)*512+rrExponent+512);}
+    if(ch==1 && rrExponent>=0 && rrExponent<129){jj=jj+w^rrExponent;}
    }
   }
   allBits=insert(allBits,bits,size(allBits));allJets=insert(allJets,jj,size(allJets));

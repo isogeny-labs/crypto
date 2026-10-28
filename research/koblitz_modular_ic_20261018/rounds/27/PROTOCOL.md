@@ -120,3 +120,7 @@ certifies a complete basis. Lower rank only records this family's deficiency;
 rank>68 forces bridge/implementation audit. No map search until completeness.
 Keep exact candidate index,coefficient bitsets,constraint columns and jets.
 All branch/source and precision controls remain in the same native call.
+
+RR01 rejected collision of seed poly ee with coefficient int ee; operator
+stopped this already-failed invocation, native reported0. Rename the new
+integer rrExponent only beforeRR02; no candidate/constraint change.
