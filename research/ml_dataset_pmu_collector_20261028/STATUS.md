@@ -26,3 +26,21 @@ successfully obtained raw tuple; consumers must inspect both.
 
 No PR, cloud worker, fresh scientific measurement or privilege change was made
 for this checkpoint. Original maximum USD200 total campaign cap remains in force.
+
+## Pre-build source-review follow-up
+
+The parent identified that Rust thread affinity alone does not prevent use after
+fork, and that marking finalization complete before reads could hide owned FDs
+from unwind cleanup. The follow-up records and checks original/current PID/TID at
+start and finish, rejects missing identities, and preserves sticky typed context
+failures. A mismatched context closes only its local FD references, without
+resetting/disabling/reading the original owner's event. This matters for inherited
+descriptors after fork. No live fork or hardware campaign is used to test it.
+
+Finalization is now marked complete after cleanup; disable attempts are not
+repeated while unwinding. Six additional mock tests cover identity changes or
+absence before start/finish, unchanged original identity requirements, sticky
+failures, mismatched-context drop and one-time control/read unwind. Total authored
+test functions:25; still awaiting compilation. The private backend's identity
+and close functions must not unwind. Native implementations return OS errors;
+cleanup itself panicking, process abort and SIGKILL are outside the RAII promise.

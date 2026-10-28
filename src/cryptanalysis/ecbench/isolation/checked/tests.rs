@@ -12,6 +12,9 @@ struct State {
     ids: BTreeMap<i32, u64>,
     unsupported: bool,
     panic_id: bool,
+    panic_once: Option<(Operation, i32)>,
+    pid: u32,
+    tid: Option<u32>,
 }
 
 #[derive(Clone)]
@@ -21,6 +24,8 @@ impl Mock {
     fn new() -> Self {
         Self(Rc::new(RefCell::new(State {
             next_fd: 3,
+            pid: 123,
+            tid: Some(124),
             ..State::default()
         })))
     }
@@ -30,6 +35,11 @@ impl Mock {
     fn record(&self, operation: Operation, fd: i32) -> Result<(), CallError> {
         let mut state = self.0.borrow_mut();
         state.operations.push((operation, fd));
+        if state.panic_once == Some((operation, fd)) {
+            state.panic_once = None;
+            drop(state);
+            panic!("one-time mock {operation:?} unwind");
+        }
         if let Some((_, _, errno)) = state
             .faults
             .iter()
@@ -58,7 +68,8 @@ impl Calls for Mock {
         !self.0.borrow().unsupported
     }
     fn identity(&self) -> (u32, Option<u32>) {
-        (123, Some(124))
+        let state = self.0.borrow();
+        (state.pid, state.tid)
     }
     fn open(&mut self, request: &EventRequest) -> Result<i32, CallError> {
         let fd = self.0.borrow().next_fd;
@@ -496,4 +507,136 @@ fn preparation_unwind_still_closes_the_unselected_owned_fd() {
     assert!(result.is_err());
     assert_eq!(mock.count(Operation::Close, 3), 1);
     assert_eq!(mock.count(Operation::EnableGroup, 3), 0);
+}
+
+#[test]
+fn changed_or_missing_identity_before_start_prevents_any_controls_or_reads() {
+    for (pid, tid, expected) in [
+        (999, Some(124), EventStatus::ContextMismatch),
+        (123, Some(999), EventStatus::ContextMismatch),
+        (0, Some(124), EventStatus::ContextUnavailable),
+        (123, None, EventStatus::ContextUnavailable),
+        (123, Some(0), EventStatus::ContextUnavailable),
+    ] {
+        let mock = Mock::new();
+        let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Required));
+        mock.0.borrow_mut().pid = pid;
+        mock.0.borrow_mut().tid = tid;
+        assert!(!collector.start());
+        let report = collector.finish();
+        assert_eq!((report.owner_pid, report.owner_tid), (123, Some(124)));
+        assert_eq!(report.context_checks[0].stage, ContextStage::Start);
+        assert_eq!(report.context_checks[0].current, TaskIdentity { pid, tid });
+        assert_eq!(report.context_checks[1].stage, ContextStage::Finish);
+        for event in &report.attempts[0].events {
+            assert_eq!(event.status, expected);
+        }
+        for operation in [
+            Operation::ResetGroup,
+            Operation::EnableGroup,
+            Operation::DisableGroup,
+            Operation::Read,
+        ] {
+            assert_eq!(mock.count(operation, 3), 0);
+        }
+        assert_eq!(mock.count(Operation::Close, 3), 1);
+        assert_eq!(mock.count(Operation::Close, 4), 1);
+    }
+}
+
+#[test]
+fn changed_or_missing_identity_before_finish_never_controls_original_owner_event() {
+    for (pid, tid, expected) in [
+        (999, Some(124), EventStatus::ContextMismatch),
+        (123, Some(999), EventStatus::ContextMismatch),
+        (0, Some(124), EventStatus::ContextUnavailable),
+        (123, None, EventStatus::ContextUnavailable),
+    ] {
+        let mock = Mock::new();
+        let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Required));
+        assert!(collector.start());
+        mock.0.borrow_mut().pid = pid;
+        mock.0.borrow_mut().tid = tid;
+        let report = collector.finish();
+        assert_eq!(report.context_checks[0].status, ContextStatus::Matched);
+        assert_eq!(report.context_checks[1].current, TaskIdentity { pid, tid });
+        assert!(!report.attempts[0].start_succeeded);
+        for event in &report.attempts[0].events {
+            assert_eq!(event.status, expected);
+            assert_eq!(event.raw, None);
+            assert_eq!(event.cleanup_succeeded, Some(true));
+        }
+        assert_eq!(mock.count(Operation::DisableGroup, 3), 0);
+        assert_eq!(mock.count(Operation::Read, 3), 0);
+        assert_eq!(mock.count(Operation::Close, 3), 1);
+        assert_eq!(mock.count(Operation::Close, 4), 1);
+    }
+}
+
+#[test]
+fn unavailable_original_identity_cannot_be_repaired_by_a_later_identity() {
+    let mock = Mock::new();
+    mock.0.borrow_mut().tid = None;
+    let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Disabled));
+    mock.0.borrow_mut().tid = Some(124);
+    assert!(!collector.start());
+    let report = collector.finish();
+    assert_eq!(report.owner_tid, None);
+    assert!(report
+        .context_checks
+        .iter()
+        .all(|check| check.status == ContextStatus::Unavailable));
+    assert_eq!(
+        report.attempts[0].events[0].status,
+        EventStatus::ContextUnavailable
+    );
+    assert_eq!(mock.count(Operation::EnableGroup, 3), 0);
+}
+
+#[test]
+fn a_context_failure_stays_invalid_after_returning_to_the_original_context() {
+    let mock = Mock::new();
+    let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Disabled));
+    assert!(collector.start());
+    mock.0.borrow_mut().pid = 999;
+    assert!(!collector.start());
+    mock.0.borrow_mut().pid = 123;
+    let report = collector.finish();
+    assert_eq!(report.context_checks.len(), 3);
+    assert_eq!(report.context_checks[1].status, ContextStatus::Mismatch);
+    assert_eq!(report.context_checks[2].status, ContextStatus::Matched);
+    assert_eq!(
+        report.attempts[0].events[0].status,
+        EventStatus::ContextMismatch
+    );
+    assert_eq!(mock.count(Operation::DisableGroup, 3), 1);
+    assert_eq!(mock.count(Operation::Read, 3), 0);
+}
+
+#[test]
+fn changed_context_drop_only_closes_local_references() {
+    let mock = Mock::new();
+    let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Required));
+    assert!(collector.start());
+    mock.0.borrow_mut().pid = 999;
+    drop(collector);
+    assert_eq!(mock.count(Operation::DisableGroup, 3), 0);
+    assert_eq!(mock.count(Operation::Close, 3), 1);
+    assert_eq!(mock.count(Operation::Close, 4), 1);
+}
+
+#[test]
+fn finalization_control_or_read_unwind_keeps_owned_fds_visible_to_cleanup() {
+    for operation in [Operation::DisableGroup, Operation::Read] {
+        let mock = Mock::new();
+        let mut collector = Collector::open(mock.clone(), policy(CyclesPolicy::Required));
+        assert!(collector.start());
+        mock.0.borrow_mut().panic_once = Some((operation, 3));
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| collector.finish()));
+        assert!(result.is_err());
+        assert_eq!(mock.count(Operation::DisableGroup, 3), 1);
+        assert_eq!(mock.count(Operation::Close, 3), 1);
+        assert_eq!(mock.count(Operation::Close, 4), 1);
+        assert_eq!(mock.count(Operation::Read, 4), 0);
+    }
 }

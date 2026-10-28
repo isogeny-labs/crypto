@@ -166,6 +166,8 @@ pub enum EventStatus {
     IdentityFailed,
     CancelledBeforeStart,
     NotStarted,
+    ContextMismatch,
+    ContextUnavailable,
     ControlFailed,
     ReadFailed,
     ShortRead,
@@ -258,12 +260,42 @@ pub struct AttemptRecord {
     pub start_succeeded: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct TaskIdentity {
+    pub pid: u32,
+    pub tid: Option<u32>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ContextStatus {
+    Matched,
+    Mismatch,
+    Unavailable,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ContextStage {
+    Start,
+    Finish,
+    DropCleanup,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct ContextCheck {
+    pub stage: ContextStage,
+    pub current: TaskIdentity,
+    pub status: ContextStatus,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CollectionRecord {
     pub collector_version: &'static str,
     pub policy: CounterPolicy,
     pub owner_pid: u32,
     pub owner_tid: Option<u32>,
+    pub context_checks: Vec<ContextCheck>,
     pub os: &'static str,
     pub architecture: &'static str,
     pub attempts: Vec<AttemptRecord>,
@@ -276,6 +308,11 @@ pub struct CollectionRecord {
     pub clock_valid_for_comparison: bool,
 }
 
+// This private backend's identity/close operations must not unwind. The native
+// implementation only calls the OS and returns errors. Close is never retried,
+// so a hypothetical backend panic before actually closing cannot be repaired
+// safely by reusing that FD. Cleanup guarantees cover caller unwind and a
+// one-time control/read unwind, not panic during cleanup itself or SIGKILL.
 trait Calls {
     fn supported(&self) -> bool;
     fn identity(&self) -> (u32, Option<u32>);
@@ -403,7 +440,9 @@ impl Calls for NativeCalls {
 
 /// Thread-bound native counting session. `start()` must succeed to establish an
 /// interval. `finish()` returns diagnostics even when preparation/control fails.
-/// Drop cleans up descriptors, but cannot persist a measurement receipt.
+/// PID/TID are checked again at start/finish, including after fork. Context
+/// mismatch closes this process's descriptors without controlling the owner's
+/// event. Drop cleans up descriptors, but cannot persist a measurement receipt.
 pub struct CheckedCounters {
     inner: Collector<NativeCalls>,
 }
@@ -427,6 +466,8 @@ struct Collector<C: Calls> {
     record: CollectionRecord,
     fds: Vec<Option<i32>>,
     start_called: bool,
+    context_failed: bool,
+    disable_attempted: bool,
     finalized: bool,
     _thread_bound: PhantomData<Rc<()>>,
 }
@@ -441,6 +482,7 @@ impl<C: Calls> Collector<C> {
                 policy,
                 owner_pid,
                 owner_tid,
+                context_checks: Vec::new(),
                 os: std::env::consts::OS,
                 architecture: std::env::consts::ARCH,
                 attempts: Vec::new(),
@@ -454,6 +496,8 @@ impl<C: Calls> Collector<C> {
             },
             fds: Vec::new(),
             start_called: false,
+            context_failed: false,
+            disable_attempted: false,
             finalized: false,
             _thread_bound: PhantomData,
         };
@@ -625,13 +669,55 @@ impl<C: Calls> Collector<C> {
         self.log(attempt, 0, operation, result.map(|_| 0));
         if !success {
             for event in &mut self.record.attempts[attempt].events {
-                event.status = EventStatus::ControlFailed;
+                if !matches!(
+                    event.status,
+                    EventStatus::ContextMismatch | EventStatus::ContextUnavailable
+                ) {
+                    event.status = EventStatus::ControlFailed;
+                }
             }
         }
         success
     }
 
+    fn check_context(&mut self, stage: ContextStage) -> bool {
+        let (pid, tid) = self.calls.identity();
+        let status = if self.record.owner_pid == 0
+            || pid == 0
+            || !self.record.owner_tid.is_some_and(|tid| tid > 0)
+            || !tid.is_some_and(|tid| tid > 0)
+        {
+            ContextStatus::Unavailable
+        } else if pid != self.record.owner_pid || tid != self.record.owner_tid {
+            ContextStatus::Mismatch
+        } else {
+            ContextStatus::Matched
+        };
+        self.record.context_checks.push(ContextCheck {
+            stage,
+            current: TaskIdentity { pid, tid },
+            status,
+        });
+        if status != ContextStatus::Matched {
+            self.context_failed = true;
+            if let Some(attempt) = self.record.selected_attempt {
+                for event in &mut self.record.attempts[attempt].events {
+                    event.status = if status == ContextStatus::Mismatch {
+                        EventStatus::ContextMismatch
+                    } else {
+                        EventStatus::ContextUnavailable
+                    };
+                }
+                self.record.attempts[attempt].start_succeeded = false;
+            }
+        }
+        status == ContextStatus::Matched
+    }
+
     fn start(&mut self) -> bool {
+        if !self.check_context(ContextStage::Start) || self.context_failed {
+            return false;
+        }
         let Some(attempt) = self.record.selected_attempt else {
             return false;
         };
@@ -662,8 +748,13 @@ impl<C: Calls> Collector<C> {
         if self.finalized {
             return;
         }
-        self.finalized = true;
+        let same_owner = self.check_context(if read {
+            ContextStage::Finish
+        } else {
+            ContextStage::DropCleanup
+        });
         if !self.fds.iter().any(Option::is_some) {
+            self.finalized = true;
             return;
         }
         // During preparation an ID-query panic may precede selection. Every fd
@@ -671,8 +762,21 @@ impl<C: Calls> Collector<C> {
         let Some(attempt) = self.record.attempts.len().checked_sub(1) else {
             return;
         };
-        if self.start_called {
+        // After fork an inherited descriptor can refer to the original owner's
+        // event. Close this process's reference, but never disable/reset/read it.
+        if !same_owner {
+            self.close_all(attempt);
+            self.finalized = true;
+            return;
+        }
+        if self.start_called && !self.disable_attempted {
+            self.disable_attempted = true;
             self.control(attempt, Operation::DisableGroup);
+        }
+        if self.context_failed {
+            self.close_all(attempt);
+            self.finalized = true;
+            return;
         }
         for index in 0..self.fds.len() {
             if !self.start_called {
@@ -731,6 +835,9 @@ impl<C: Calls> Collector<C> {
             }
         }
         self.close_all(attempt);
+        // Set only after cleanup. A read/control unwind leaves still-owned FDs
+        // visible to Drop, without retrying a previously attempted disable.
+        self.finalized = true;
     }
 
     fn finish(mut self) -> CollectionRecord {
