@@ -32,7 +32,7 @@ Treat all of those as lost until the Mac copy is uploaded.
 ## Restart order
 
 1. `cargo build --release --example pkm_tower_pilot --example prime_fall_degree_tools`
-2. `cargo test --lib hky_fp_tower` (G1).
+2. `cargo run --release --example hky_fp_tower_check` (G1, 6 hand cases). PREREGISTRATION §4 names `cargo test --lib hky_fp_tower`, but that module has no `#[test]` functions and runs 0 tests; the cases are in the example.
 3. `run.sh g4` (G4), then `run.sh hky-A` and `run.sh d-A`, then `cap-A`.
    Stage A restarts from t = 1, and its t <= 10 rows must agree with the
    medians above. Disagreement is a reproducibility failure (Amendment 2).
