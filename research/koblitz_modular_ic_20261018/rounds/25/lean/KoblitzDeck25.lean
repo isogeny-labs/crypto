@@ -22,14 +22,17 @@ theorem s3_integer_lift (b n : R) :
 
 theorem s1_invariant [CharP R 2] (a b l : R) : s1 a b (l+a)=s1 a b l := by
   rw [s1_integer_lift]
-  simp [CharP.cast_eq_zero R 2]
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  simp [h2]
 theorem s2_invariant [CharP R 2] (a b l n : R) :
     s2 a b (l+a) (n+b)=s2 a b l n := by
   rw [s2_integer_lift]
-  simp [CharP.cast_eq_zero R 2]
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  simp [h2]
 theorem s3_invariant [CharP R 2] (b n : R) : s3 b (n+b)=s3 b n := by
   rw [s3_integer_lift]
-  simp [CharP.cast_eq_zero R 2]
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  simp [h2]
 
 theorem deck_involutive [CharP R 2] (a b : R) : Function.Involutive (deck a b) := by
   intro p
@@ -59,7 +62,8 @@ theorem mixed_integer_lift (a b l n : R) :
 theorem mixed_norm_relation [CharP R 2] (a b l n : R) :
     a^2*s3 b n=(s2 a b l n)^2+a*b*s2 a b l n+b^2*(s1 a b l-b) := by
   rw [mixed_integer_lift]
-  simp [CharP.cast_eq_zero R 2]
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  simp [h2]
 
 theorem deck_nontrivial (a b l n : R) (ha : a≠0) : deck a b (l,n)≠(l,n) := by
   intro h
