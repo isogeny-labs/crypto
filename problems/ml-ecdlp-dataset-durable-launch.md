@@ -86,6 +86,16 @@ establish that cloud corpus.
   Conditional PUT, fresh ETag-bound GET, byte comparison and contained hashes
   passed at `2026-10-28T14:51:12Z`. This archive records an operational
   assessment, not a successful cloud dataset.
+- **Unimplemented alternative:** a reviewed one-lifetime worker broker could
+  forfeit its fully precharged allocation after failure and admit a replacement
+  only against a fresh allocation. However, a direct S3 claim does not bound
+  bootstrap traffic: D duplicate starts can issue D claim PUTs even when one
+  succeeds. A durable authenticated admission service must reject duplicate
+  sessions before S3 and meter claim/verification traffic. No such EKS-facing
+  service is verified here. The design, failure cases and finite envelope
+  formulas are preserved in a [verified design archive](../research/ml_dataset_policies_20261028/single-use-quota-design-archive.json).
+  It neither replaces v1 admission nor authorizes a launch, and opaque process
+  snapshot recovery remains outside its guarantee.
 - **Not established:** exact worker failure cause from HTTP 403 alone, actual
   billed campaign spend, successful native publication/restoration, full solver
   coverage, trained-model efficacy or a first/last-fall-degree result. No

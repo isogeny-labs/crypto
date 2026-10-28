@@ -1,5 +1,45 @@
 # Implementation handoff
 
+## 2026-10-28 15:09 UTC — publication and deployment evidence preserved
+
+### What was done (commands, files, features)
+
+Published regular policy PR2777 on persistence PR2769. Runtime remains exactly
+the validated d71ec2e source; subsequent commits update evidence and coverage.
+Consumer companion PR2776 is regular and stacked on owner PR2757, with its root
+gate4987/0/122ignored and standalone87/72-fixture validation archived. E12a
+terminal PR2774 merged as 6f6bce15a8432e784a70611222aa8eeb57021c67 at14:40:23Z;
+its final head15a52ae7 has nine successful hosted workflows and no unresolved
+review thread. Its terminal packet is unchanged from the verified artifact
+migration head, and its new delivery receipt passed fresh S3 readback.
+
+### Decisions made (and why)
+
+Keep the original quota contract: the read-only EKS assessment identified no
+eligible mount through permitted reads. The separately recorded one-use grant
+design requires a durable admission service before any S3 bootstrap request;
+it is not implemented or ready to launch. Its full design and the operational
+assessment are preserved in verified S3 archives with adjacent Git receipts.
+No additional job, policy grant, spending allowance or deadline was authorized.
+
+### Open threads (unfinished, pick up next time)
+
+Parent PR2769's checkout-failure retry has not yet been inspected; next check
+is no earlier than15:21Z. ConsumerPR2776 next check is no earlier than15:26Z;
+policyPR2777 follows the50-minute cadence from its latest evidence push. Keep
+feature-branch stacks until their parents land. Binary-root runtime d79f658f
+has9 core,158 dataset and8 CLI tests plus strict combined Clippy passing; its
+fixed-executable full suite93422 is still running. The independent consumer
+root-set increment and sealed fixture replay remain separate pending work.
+The extensive corpus and worker IAM/quota deployment requirements stay open.
+
+### Errors (what went wrong, how it was handled)
+
+App PR attachment calls hung without a completion response; they were
+terminated without retry and attachment remains unconfirmed. PRs themselves
+are published and linked. E12a still has zero completed target draws and exit143;
+its merged evidence does not establish a new degree or justify a retry.
+
 ## 2026-10-28 14:34 UTC — corrected source passes publication gate
 
 ### What was done (commands, files, features)
