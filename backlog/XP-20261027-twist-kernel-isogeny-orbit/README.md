@@ -3,6 +3,13 @@
 Status: **map/correctness phase executed; complete charged solver phase blocked
 and unrun**. No lease or funding for that cost phase.
 
+The [v12/v13 extension](../../research/twist_routes_1_3_20261021/reports/quotient-cycle-20261028/RESULTS.md)
+also constructs all8 degree17 maps between successive quotient models along
+the independently verified eight-kernel cycle. Generic commuting squares,
+all6584 rational/136 kernel points and controls pass native/GP. A name-only
+GP amendment preserves the initial reserved-Pi failure and shared native row.
+Two abstract quotient Lean lemmas pass; complete charged solving stays unrun.
+
 The [v8 report](../../research/twist_routes_1_3_20261021/reports/kernel-relations-20261027/RESULTS.md)
 certifies all8 twist-derived degree7 maps/duals and576 same-base signed query
 sets. All18 matrices preserve their source rows. Ordinary base:40 witness rows,

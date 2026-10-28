@@ -245,3 +245,15 @@ The48 nonzero points form one cycle; the eight lines form the cycle
 Four finite companion-module Lean theorems pass fresh audit; concrete curve
 bridges remain open. This is exact finite symmetry; induced quotient maps
 and charged relation-solving benefit remain unmeasured. No performance row moves.
+
+### 2026-10-28 — explicit maps between the quotient models
+
+[Executed quotient cycle](../../twist_routes_1_3_20261021/reports/quotient-cycle-20261028/RESULTS.md)
+constructs all8 degree17 maps beta_i:E_i→E_M(i), with generic identities
+beta_i psi_i=psi_M(i) alpha and all6584 rational/136 kernel checks. Native and
+independent GP agree after a pre-data variable-name-only correction; the
+original reserved-Pi failure remains with its failed export. The successor
+reuses the single native run, giving3actual processes across both exports.
+Two abstract Lean quotient lemmas pass;83canonical model records/34extensions
+check, and24generator-bound EC1 records retain changed endpoints. Standard
+theory supplies executable routes; charged solving/novelty/NIST benefit remain open.

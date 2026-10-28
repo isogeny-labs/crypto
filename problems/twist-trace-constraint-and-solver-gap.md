@@ -242,3 +242,16 @@ remains open. Source scalar353 still has order274 in the separate823 group.
 The symmetry card's mathematical diagnostic is executed; its PR landing is
 pending. Explicit quotient-to-quotient maps and complete charged solver costs
 are separate follow-ups. No direct mixed-twist relation or IC/NIST speedup.
+
+### 2026-10-28: quotient symmetry has executable maps
+
+[Joint v12/v13 report](../research/twist_routes_1_3_20261021/reports/quotient-cycle-20261028/RESULTS.md)
+independently verifies8 degree17 quotient maps with generic commuting squares,
+6584 rational-point/136 kernel checks and all coefficient/sign controls.
+The original reserved-Pi GP failure remains; its explicit name-only successor
+passes on unchanged native data. Actual total3processes, not4 independent runs.
+Two abstract quotient descent/uniqueness Lean lemmas pass; concrete bridge open.
+All83canonical model records/34extensions and24exact EC1 metadata records check.
+This closes the bounded induced-map construction gap. Complete discovery,
+map evaluation and useful relation-solving costs are still unmeasured; the
+problem remains open, with no cost row, novelty or NIST conclusion promoted.

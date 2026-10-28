@@ -1,21 +1,45 @@
 {
   "schema": "twist.continuation-status/v1",
   "date": "2026-10-28",
-  "current_wave": "execution-v11",
+  "current_wave": "execution-v13",
   "native_source": "ee305333dfb7c7acc19169794de12e6c6538a3be",
   "protocol_sha256": "49ac79e28023c2e4a23f27e299419b8cb15ac577ba50a531ad43d6e0a2ac07dd",
   "exact_verified": {
-    "matrix_mod7": [[3,1],[5,5]],
+    "matrix_mod7": [
+      [
+        3,
+        1
+      ],
+      [
+        5,
+        5
+      ]
+    ],
     "point_order": 48,
     "projective_order": 8,
     "point_checks": 49,
     "addition_checks": 2401,
     "kernel_checks": 8,
-    "line_cycle": [0,4,7,5,2,3,1,6],
+    "line_cycle": [
+      0,
+      4,
+      7,
+      5,
+      2,
+      3,
+      1,
+      6
+    ],
     "independent_PARI": true,
     "finite_module_lean_theorems": 4
   },
-  "science_flow": {"planned":2,"attempted":2,"completed":2,"failed":0,"capped":0},
+  "science_flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "failed": 0,
+    "capped": 0
+  },
   "raw_archive_sha256": "1f0992c77000041a0d7d2be6d8642b5d5e1614442b3d07abc4d7bd22c51e36d5",
   "raw_archive_bytes": 5432,
   "raw_members": 8,
@@ -24,6 +48,39 @@
   "original_full_campaign_complete": false,
   "NIST_result": false,
   "concrete_Lean_bridge": "open",
-  "next": "Construct explicit degree17 maps between the eight quotient curves and verify the commuting squares; complete charged solving remains open.",
-  "root_validation_gap": "problems/twist-root-validation-gap.md"
+  "next": "Complete charged source/destination decomposition and relation-rank repair against strongest matched controls; executable quotient maps now independently verified.",
+  "root_validation_gap": "problems/twist-root-validation-gap.md",
+  "quotient_cycle": {
+    "native_source": "9e612b707a85ed291f470386126b5b7143628c02",
+    "corrected_reference_source": "dc2dddf630c968bc1dcbe6fed5599041b3f8438d",
+    "protocol_v1_sha256": "14c12589c69bb260a9736a8fc332f251c1e18a85c7bba88d981dabb9e54af812",
+    "protocol_v2_sha256": "eb1830642eb242ea23e616cef59ec8515434f07039249849c76e40a9d9a9dcf0",
+    "maps": 8,
+    "generic_squares": 8,
+    "rational_checks": 6584,
+    "kernel_checks": 136,
+    "wrong_sign_rejections": 6576,
+    "corrupt_maps_rejected": 8,
+    "initial_reference": "failed strict verification; reserved Pi identifier",
+    "successor_reference": "name-only correction independently passes",
+    "actual_processes": 3,
+    "shared_native_processes": 1,
+    "abstract_lean_theorems": 2,
+    "canonical_model_records": 83,
+    "extension_model_records": 34,
+    "EC1_model_records": 24,
+    "raw_archives": [
+      {
+        "path": "research/twist_routes_1_3_20261021/execution-v12/runs.tar.xz",
+        "sha256": "c1d62b826606698abb30fd7bc8210a30e4ff0c83ca26bebaa9dea357a1448f08",
+        "bytes": 75692
+      },
+      {
+        "path": "research/twist_routes_1_3_20261021/execution-v13/runs.tar.xz",
+        "sha256": "6f6158ccf368277e9431a6712d57d6e54cf34ac7bedbefd182e797895db14dae",
+        "bytes": 1192
+      }
+    ],
+    "fresh_remote_repack_verified": true
+  }
 }
