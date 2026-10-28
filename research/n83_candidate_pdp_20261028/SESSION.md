@@ -452,3 +452,28 @@ PR conflict and hosted checks are separate from completed data verification.
 Corrected an initial graph axis showing unused negative range and a Typst s3
 URI interpreted as a comment; final graph/PDF inspected after correction.
 First previews and rendering helpers are retained in support archive.
+
+## 2026-10-28 — Binary m2 pair-certificate design and source
+
+### What was done
+Reconciled completed prime Hilbert and prior raw/PR state; no duplicate launched.
+Implemented standalone native binary_pair with full unchanged source validation,
+Rabin field proof, XOR product-coordinate inclusions, explicit inverse and pair
+relations, small explicit Hilbert controls. Five tests pass, including128
+arithmetic comparisons and512 Boolean S3 assignments. Lean slot lemmas compile
+with standard propext/Quot.sound; only the slot arithmetic is formalized.
+
+### Decisions made
+Twelve fixed original/baseline/spike40 Koblitz/binary m2 identities, no new draw.
+Freeze protocol before production; first-zero original-top degree only, no full
+Hilbert function or LFD inference. Existing-host fallback follows retained EKS
+bucket denial. Literature and written proof are in BINARY_PAIR_DESIGN.md.
+
+### Open threads
+Commit source; freeze/commit protocol, upload source and checkpoint; run12 cases
+and fresh replay. Publish all raw bytes and verify downloaded archive before
+claiming results. No new production result exists at this entry.
+
+### Errors
+No native test failure in this phase. Full algebraic theorem is not formalized;
+independent review remains pending. Earlier failed phases remain preserved.
