@@ -156,7 +156,9 @@ fn main() {
                 n_pairs += 1;
                 for (i, &w) in weights.iter().enumerate() {
                     match (priced_s(x, w).unwrap(), priced_s(y, w).unwrap()) {
-                        (Some(sa), Some(sb)) => per_w[i].entry(k.0.clone()).or_default().push((sa, sb)),
+                        (Some(sa), Some(sb)) => {
+                            per_w[i].entry(k.0.clone()).or_default().push((sa, sb))
+                        }
                         _ => unrankable[i] = true,
                     }
                 }
@@ -170,7 +172,7 @@ fn main() {
                     continue;
                 }
                 let ratio = ratio_of_sums(&strata);
-                let ci = cluster_bootstrap_ci(&strata, resamples, seed, |s| ratio_of_sums(s));
+                let ci = cluster_bootstrap_ci(&strata, resamples, seed, ratio_of_sums);
                 let (sa, sb): (f64, f64) = strata
                     .iter()
                     .flatten()
@@ -193,14 +195,19 @@ fn main() {
         let arms = report["arms"].as_array().unwrap().clone();
         let mut out_arms = Vec::new();
         for a in &arms {
-            let b = arms.iter().find(|x| x["curve"] == a["curve"] && x["arm"] == json!(base));
+            let b = arms
+                .iter()
+                .find(|x| x["curve"] == a["curve"] && x["arm"] == json!(base));
             let obj = b.and_then(|b| {
                 if a["verified"] != a["runs"] || b["verified"] != b["runs"] {
                     return None;
                 }
                 let mut worst: f64 = 0.0;
                 for i in 0..weights.len() {
-                    let (x, y) = (a["mean_priced_s"][i].as_f64()?, b["mean_priced_s"][i].as_f64()?);
+                    let (x, y) = (
+                        a["mean_priced_s"][i].as_f64()?,
+                        b["mean_priced_s"][i].as_f64()?,
+                    );
                     worst = worst.max(x / y);
                 }
                 Some(worst)
@@ -222,7 +229,12 @@ fn main() {
         for c in p["weights"].as_array().unwrap() {
             println!(
                 "{} {}->{} w={} ratio={} ci={} pairs={} same_seeds={} verified={}",
-                p["curve"].as_str().unwrap().chars().take(24).collect::<String>(),
+                p["curve"]
+                    .as_str()
+                    .unwrap()
+                    .chars()
+                    .take(24)
+                    .collect::<String>(),
                 p["a"].as_str().unwrap(),
                 p["b"].as_str().unwrap(),
                 c["weight"],
