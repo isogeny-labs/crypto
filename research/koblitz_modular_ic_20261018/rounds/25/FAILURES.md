@@ -30,3 +30,10 @@ Cascading later parse errors are not mathematical failures or certificates.
 Q25-registered01 is rejected at the ring name quotient, also a reserved
 Singular identifier. Its late marker does not count. Rename that ring qr25
 and rerun the unchanged thirteen source-bound pullback certificates in02.
+
+Q25-registered02 is refused before native launch. A concurrent artifact
+manifest update changed the checkpoint fingerprint while gate was running;
+the runner had no upload credentials to refresh it. Only gate.log exists,
+with no native input/output. Record one gate refusal separately from native
+attempt counts. Finish storage metadata, checkpoint again, then launch03
+without concurrent repository mutations until input.sing has been copied.
