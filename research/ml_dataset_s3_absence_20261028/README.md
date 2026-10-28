@@ -139,3 +139,10 @@ the failed diagnostics were retained and tracked dependencies and fixtures were
 materialized. Parallel GPU lock contention was isolated by serial reruns.
 Independent review found the broad Forbidden trigger; it was narrowed and two
 regression fixtures were added before execution.
+
+The repair is published in [PR #2763](https://github.com/isogeny-labs/crypto/pull/2763).
+After creation, `main` advanced to `189ac727fcc4475b42755d4f1c15f97a4a102070`.
+Merging that revision required retaining both appended daily-log entries; it
+changed no root Rust, Cargo, or local dependency input used by the passing checks.
+The backend and regression source hashes remain identical. Auto-merge is enabled;
+hosted validation and review of the resulting revision remain separate gates.
