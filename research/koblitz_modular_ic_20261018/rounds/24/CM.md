@@ -82,6 +82,41 @@ branch above O. This is a complete fiber, not a completed global divisor.
 The source-normalization and finite-flat/DVR steps are written mathematics;
 the Lean map in PROOF_MAP.md states what is formalized.
 
+## Original-coordinate and registered-denominator orders
+
+O24-series-02 uses the four already certified unique smooth-chart lifts,
+computes them modulo w^192, and checks both original chart equations and
+lambda's quadratic at that precision. It uses the exact original n equation
+retained in R22's generic record. Its n coefficient is checked to be
+A^2*Delta. All five original source residuals then vanish modulo w^100.
+Every reported order has a nonzero leading coefficient1 below100. On the
+tame chart, dividing by the order77 denominator leaves at least115 correct
+coefficients, sufficient for all the displayed orders. The polynomial tails
+above that effective precision are not claimed to be the true nu expansion.
+
+| Point | residue lambda | e | b | c | lambda | nu | delta | S | N | nu numerator | nu denominator |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| O1,0 |0|1|3|2|5|0|2|0|0|11|11|
+| O1,1 |1|1|3|2|0|0|2|0|0|11|11|
+| O7,0 |0|7|21|14|11|32|14|44|66|109|77|
+| O7,1 |1|7|21|14|0|21|14|44|66|98|77|
+
+All four points have degree1 over F2; A is a unit. The complete eight-entry
+registered list is exactly nn[1],nn[12],nn[2],nn[2],nn[20],nn[37],nn[65],nn[75].
+Their orders at either unramified point are(3,2,2,2,5,2,0,0), and at either
+ramified point(21,14,14,14,35,14,44,66). These are polynomial entries from
+the original circuit, not a new denominator convention. In particular S,N
+are nn[65],nn[75] with original circuit denominators1.
+
+Finite truncation supplies these exact orders because the unit-Jacobian
+charts have unique formal lifts and because the source rational-function
+identity is fixed. It is not a proof from an arbitrary scalar arc. The
+derived O contributions to zero divisors are16 for lambda,53 for nu,88
+for S and132 for N (sum the four local orders, since each degree is1).
+They do not complete the respective zero divisors elsewhere. No pole of
+lambda or nu occurs above O. The four finite rational polar supports,
+additional zero supports and the complete prescribed RR space remain open.
+
 ## Constant field and geometric integrality
 
 CF24-factor-01 factors the unchanged R22 primitive plane polynomial over
