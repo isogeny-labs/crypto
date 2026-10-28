@@ -345,7 +345,7 @@ fn score(dir: &Path) {
         }
         let dmed: Vec<_> = cs.iter().map(|c| lower_median(&c.d_f)).collect();
         let fmed: Vec<_> = cs.iter().map(|c| lower_median(&c.ffd)).collect();
-        let Dmed: Vec<_> = cs
+        let d_med: Vec<_> = cs
             .iter()
             .map(|c| {
                 if c.d.len() == c.d_f.len() {
@@ -355,7 +355,7 @@ fn score(dir: &Path) {
                 }
             })
             .collect();
-        let gaps: Vec<i64> = Dmed
+        let gaps: Vec<i64> = d_med
             .iter()
             .zip(&fmed)
             .filter_map(|(d, f)| match (d, f) {
@@ -392,11 +392,11 @@ fn score(dir: &Path) {
             cs.last().unwrap().t,
             j(&dmed),
             j(&fmed),
-            j(&Dmed)
+            j(&d_med)
         ));
         ladders_json.push(json!({"p": p, "kind": kind, "m": m, "control": control,
             "t": cs.iter().map(|c| c.t).collect::<Vec<_>>(), "d_F_median": j(&dmed),
-            "ffd_median": j(&fmed), "D_median": j(&Dmed), "H-LFD": hl, "H-FFD": hffd,
+            "ffd_median": j(&fmed), "D_median": j(&d_med), "H-LFD": hl, "H-FFD": hffd,
             "dF<D": lt, "dF=D": eq, "dF>D": gt}));
     }
     // H-m: ladders in m at fixed (p, kind, t) over the C cells.
@@ -772,7 +772,7 @@ fn raw_mul(a: &Raw, b: &Raw, p: u64) -> Raw {
 }
 fn raw_const(n: usize, c: u64, p: u64) -> Raw {
     let mut o = Raw::new();
-    if c % p != 0 {
+    if !c.is_multiple_of(p) {
         o.insert(vec![0; n], c % p);
     }
     o
@@ -1135,7 +1135,9 @@ fn spec_1d(dir: &Path, t_max: u64, draws: u64, cmax: u64) {
             let g = 2 + splitmix(&mut st) % (p - 2);
             let x2 = splitmix(&mut st) % p;
             let xr = splitmix(&mut st) % p;
-            if (mulm(4, mulm(mulm(a, a, p), a, p), p) + mulm(27, mulm(b, b, p), p)) % p == 0 {
+            if (mulm(4, mulm(mulm(a, a, p), a, p), p) + mulm(27, mulm(b, b, p), p))
+                .is_multiple_of(p)
+            {
                 continue;
             }
             // no root of q on V = g·μ_K (else the 1-D system is consistent)

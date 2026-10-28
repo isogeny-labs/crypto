@@ -28,7 +28,7 @@ fn column_count_matches_closure() {
     let ring = HkyRing::new(97, kummer_rules(3, 2, 1), 3);
     let one = ring.from_raw(&[(vec![0; 9], 1)]);
     for c in 0..5 {
-        let cl = closure(&ring, &[one.clone()], c, &HkyLimits::default());
+        let cl = closure(&ring, std::slice::from_ref(&one), c, &HkyLimits::default());
         assert!(cl.contains_one);
         assert_eq!(u128::from(cl.dim()), count_monomials(6, 3, c));
         assert_eq!(cl.cols, count_monomials(6, 3, c));
