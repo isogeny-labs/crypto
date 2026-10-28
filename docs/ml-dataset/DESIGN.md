@@ -216,8 +216,10 @@ records go to Git; raw multi-gigabyte traces go to S3. Checkpoint after every
 completed bounded cell/chunk and at a fixed maximum interval during long calls.
 Report any backend that cannot checkpoint mid-call as such.
 
-Use the existing ephemeral runner for cloud workers, with immutable source
-snapshot, finite TTL and resource limits. Launch a bounded correctness shard
+Use the repository's current EKS Spot lab runner for cloud workers, with an
+immutable source snapshot, digest-pinned image, finite TTL and resource limits.
+Application manifests support completed-cell recovery; the ordinary throughput
+Job does not provide CRIU recovery or timed-comparison isolation. Launch a bounded correctness shard
 first, verify it, then expand a frozen plan in successive finite waves. The
 full requested cross-product stays on the campaign even when a wave covers
 only part of it. No unbounded spending or claim that queued tasks are running.
