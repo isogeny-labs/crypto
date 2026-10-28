@@ -656,6 +656,19 @@ pub fn publish(
     cfg: Config,
     namespace: &str,
 ) -> Result<PublishReceipt, String> {
+    publish_guarded(root, artifacts, manifest, cfg, namespace, None)
+}
+
+/// Dataset supervisors pass one cumulative admission session through every
+/// object, verification read, completion marker and catalog operation.
+pub fn publish_guarded(
+    root: &Path,
+    artifacts: &[Artifact],
+    manifest: &Artifact,
+    cfg: Config,
+    namespace: &str,
+    guard: Option<crate::store::backend::S3Guard>,
+) -> Result<PublishReceipt, String> {
     validate_name(namespace)?;
     catalog_key(namespace, &manifest.sha256)?;
     match cfg.remote.as_ref() {
@@ -664,6 +677,9 @@ pub fn publish(
         }
         Some(_) => {}
         None => return Err("dataset publication requires an explicit S3 or file remote".into()),
+    }
+    if matches!(cfg.remote, Some(RemoteSpec::S3 { .. })) && guard.is_none() {
+        return Err("S3 dataset publication requires cumulative command admission".into());
     }
     // The existing store's multipart path does not enforce If-None-Match.
     // Dataset producers must chunk large objects before publication.
@@ -682,7 +698,10 @@ pub fn publish(
     verify_manifest_binding(&root, artifacts, manifest)?;
     let remote = cfg.remote.as_ref().expect("validated remote").display();
     let index_path = cfg.index_path.clone();
-    let mut store = Store::open(cfg)?;
+    let mut store = match guard {
+        Some(guard) => Store::open_guarded(cfg, guard)?,
+        None => Store::open(cfg)?,
+    };
     // Validate all logical names/conflicts before causing any remote writes.
     for artifact in &all {
         let name = format!("{namespace}/{}", artifact.path);

@@ -26,6 +26,7 @@ use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
 use crate::cryptanalysis::sat::{self, SolveResult};
 use crate::ecc::{CurveParams, Point};
 
+use super::capture::{AttemptBinding, CaptureEmitter, CaptureLimits};
 use super::curves;
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
@@ -68,7 +69,25 @@ struct LiveSink {
     events: File,
     sequence: u64,
 }
-thread_local! { static LIVE_SINK:RefCell<Option<LiveSink>>=const { RefCell::new(None) }; }
+enum EventSink {
+    Legacy(LiveSink),
+    Bound(CaptureEmitter),
+}
+impl EventSink {
+    fn event(&mut self, event: &Value) -> Result<(), String> {
+        match self {
+            Self::Legacy(s) => s.event(event),
+            Self::Bound(s) => s.event(event).map_err(|e| e.to_string()),
+        }
+    }
+    fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), String> {
+        match self {
+            Self::Legacy(s) => s.payload(payload),
+            Self::Bound(s) => s.payload(payload).map_err(|e| e.to_string()),
+        }
+    }
+}
+thread_local! { static LIVE_SINK:RefCell<Option<EventSink>>=const { RefCell::new(None) }; }
 impl LiveSink {
     fn event(&mut self, event: &Value) -> Result<(), String> {
         self.sequence += 1;
@@ -156,11 +175,11 @@ pub fn solve_with_event_sink(
             .map_err(|e| e.to_string())?;
     }
     LIVE_SINK.with(|slot| {
-        *slot.borrow_mut() = Some(LiveSink {
+        *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
             directory: directory.to_owned(),
             events,
             sequence: 0,
-        })
+        }))
     });
     let _guard = LiveSinkGuard;
     live_event(
@@ -175,6 +194,45 @@ pub fn solve_with_event_sink(
     live_event(
         &json!({"kind":"solver_return","outcome":result.as_ref().map(|r|&r.outcome).ok(),"error":result.as_ref().err()}),
     )?;
+    result
+}
+
+/// Bound, capped event capture for supervised dataset attempts. The emitter
+/// commits its initial watermark before the first native call. Its artifacts
+/// can be copied by the supervisor while a native call is still running, but
+/// they do not contain a restorable native solver state.
+pub fn solve_with_bound_event_sink(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+) -> Result<SolverData, String> {
+    if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+        return Err("nested live solver sink".into());
+    }
+    let emitter = CaptureEmitter::create(directory, binding, limits)?;
+    LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+    let _guard = LiveSinkGuard;
+    live_event(&json!({"kind":"solver_begin","solver":config.solver,
+        "family":config.family,"n":config.n,"m":config.m,
+        "work_limit":config.work_limit,"degree_bound":config.degree_bound,
+        "format":"crypto.ml-dataset.live-event/v2",
+        "sync_policy":"event fsync followed by atomic committed watermark",
+        "solver_state_restorable":false}))?;
+    let result = solve(config, case);
+    if let Ok(data) = &result {
+        for payload in &data.artifacts {
+            live_payload(payload)?;
+        }
+    }
+    live_event(&json!({"kind":"solver_return",
+        "outcome":result.as_ref().map(|r| &r.outcome).ok(),
+        "error":result.as_ref().err()}))?;
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(s)) => s.finish().map_err(|e| e.to_string()),
+        _ => Err("bound capture sink disappeared".into()),
+    })?;
     result
 }
 

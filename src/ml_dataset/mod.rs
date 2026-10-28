@@ -1,9 +1,13 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
+pub mod budget;
+pub mod capture;
 pub mod curves;
 pub mod export;
+pub mod live;
 pub mod relations;
 pub mod report;
 pub mod restore;
+pub mod snapshot;
 pub mod solvers;
 pub mod storage;
 pub mod telemetry;
@@ -61,6 +65,8 @@ pub enum DatasetCommand {
         out: PathBuf,
         #[arg(long)]
         remote: Option<String>,
+        #[command(flatten)]
+        budget: live::BudgetArgs,
     },
     /// Show actual method support and instrumentation limits.
     Capabilities,
@@ -79,6 +85,22 @@ pub enum DatasetCommand {
         out: PathBuf,
         #[arg(long)]
         remote: Option<String>,
+        #[command(flatten)]
+        budget: live::BudgetArgs,
+    },
+    /// Download retained partial artifacts without resuming or replaying a solver.
+    RestorePartial(live::RestorePartialArgs),
+    /// Initialize the durable, mounted campaign quota authority once.
+    BudgetInit {
+        #[arg(long)]
+        policy: PathBuf,
+    },
+    /// Reserve a disjoint worker envelope from the campaign quota authority.
+    BudgetAllocate(live::AllocateArgs),
+    #[command(hide = true)]
+    SnapshotWorker {
+        #[arg(long)]
+        request: PathBuf,
     },
     /// Preserve an interrupted attempt after proving no matching worker remains.
     Reconcile {
@@ -161,6 +183,14 @@ pub struct GenerateArgs {
     pub publish: bool,
     #[arg(long)]
     pub remote: Option<String>,
+    #[command(flatten)]
+    pub budget: live::BudgetArgs,
+    /// Publish acknowledged partial artifacts at this interval when --publish is set.
+    #[arg(long, default_value_t = 30)]
+    pub snapshot_seconds: u64,
+    /// Bound each snapshot helper; the solver deadline remains independently enforced.
+    #[arg(long, default_value_t = 120)]
+    pub snapshot_timeout_seconds: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -424,11 +454,17 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         DatasetCommand::Report { out, destination } => {
             println!("{}", report::report_run(out, destination)?);
         }
-        DatasetCommand::Publish { out, remote } => {
+        DatasetCommand::Publish {
+            out,
+            remote,
+            budget,
+        } => {
             let _lease = Lease::acquire(out)?;
+            let budget = budget.open()?;
+            live::require_budget(&live::store_config(out, remote.as_deref())?, &budget)?;
             verify_run(out, true)?;
             for dir in completed_cells(out)? {
-                publish_cell(out, &dir, remote.as_deref())?;
+                publish_cell(out, &dir, remote.as_deref(), &budget)?;
             }
         }
         DatasetCommand::Capabilities => println!("{}", solvers::capabilities()),
@@ -439,7 +475,29 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             receipt,
             out,
             remote,
-        } => println!("{}", restore::restore(receipt, out, remote.as_deref())?),
+            budget,
+        } => {
+            let budget = budget.open()?;
+            let receipt_value: Value = read_json(receipt)?;
+            let destination = remote
+                .as_deref()
+                .or_else(|| receipt_value["remote"].as_str())
+                .ok_or("restore receipt has no remote")?;
+            live::require_budget(&live::store_config(out, Some(destination))?, &budget)?;
+            println!(
+                "{}",
+                restore::restore_guarded(
+                    receipt,
+                    out,
+                    remote.as_deref(),
+                    live::guard(&budget, crate::store::backend::Phase::Restore)
+                )?
+            );
+        }
+        DatasetCommand::RestorePartial(args) => println!("{}", live::restore_partial(args)?),
+        DatasetCommand::BudgetInit { policy } => println!("{}", budget::initialize(policy)?),
+        DatasetCommand::BudgetAllocate(args) => println!("{}", live::allocate(args)?),
+        DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
         DatasetCommand::Reconcile { out, cell, reason } => reconcile(out, *cell, reason)?,
     }
     Ok(())
@@ -618,7 +676,19 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         known_answer = true;
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            if out.join("capture-binding.json").exists() {
+                let binding = read_json(&out.join("capture-binding.json"))?;
+                let limits = read_json(&out.join("capture-limits.json"))?;
+                solvers::solve_with_bound_event_sink(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    binding,
+                    limits,
+                )
+            } else {
+                solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            }
         })?;
         let mut names = BTreeSet::new();
         for artifact in solved.artifacts {
@@ -717,6 +787,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         || a.seconds_per_case == 0
         || a.memory_mib < 128
         || a.trace_mib == 0
+        || (a.publish && (a.snapshot_seconds == 0 || a.snapshot_timeout_seconds == 0))
     {
         return Err("invalid cell, shard, time, memory or trace limit".into());
     }
@@ -736,14 +807,55 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let binary_sha = crate::store::hash_file(&exe)?.0;
     let _lease = Lease::acquire(&a.out)?;
     let out = checked_directory(&a.out, false)?;
+    let budget_policy_sha256 = {
+        // Opening a session holds the allocation's authoritative writer lock.
+        // Drop preflight admission before a helper process opens that journal.
+        let preflight_budget = a.budget.open()?;
+        if a.publish {
+            live::require_budget(
+                &live::store_config(&out, a.remote.as_deref())?,
+                &preflight_budget,
+            )?;
+            if let Ok(uri) = std::env::var("ISOLAB_RESULTS_URI") {
+                if !uri.is_empty() {
+                    live::require_budget(
+                        &live::store_config(&out, Some(&uri))?,
+                        &preflight_budget,
+                    )?;
+                }
+            }
+        }
+        preflight_budget
+            .as_ref()
+            .map(|budget| {
+                budget.status().and_then(|status| {
+                    status["policy_sha256"]
+                        .as_str()
+                        .map(str::to_owned)
+                        .ok_or_else(|| "budget session has no policy identity".into())
+                })
+            })
+            .transpose()?
+    };
     assert_no_workers(&out)?;
     let canonical = serde_json::to_vec(&plan).map_err(|e| e.to_string())?;
     let plan_sha = digest(&canonical);
-    let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
+    let mut binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
         "trace_mib":a.trace_mib,"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
+    if a.publish {
+        binding["partial_capture"] = json!({
+            "schema":"crypto.ml-dataset.capture-policy/v1",
+            "interval_seconds":a.snapshot_seconds,
+            "helper_timeout_seconds":a.snapshot_timeout_seconds,
+            "limits":live::capture_limits(a.trace_mib)?,
+            "snapshot_limits":snapshot::SnapshotLimits::default(),
+            "solver_state_restorable":false,
+            "budget_policy_sha256":budget_policy_sha256,
+        });
+    }
     storage::write_json(&out, "run.json", "run-binding", &binding)?;
     storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
     storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
@@ -757,7 +869,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         if dir.join("manifest.json").exists() {
             verify_resumed_cell(&dir, &binding, &config, index, &plan_sha)?;
             if a.publish {
-                publish_cell(&out, &dir, a.remote.as_deref())?;
+                publish_cell(&out, &dir, a.remote.as_deref(), &a.budget.open()?)?;
             }
             continue;
         }
@@ -798,6 +910,15 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
             "status":"attempt_started"}),
         )?;
+        // The initial source/protocol/attempt context is durable before any
+        // expensive worker starts. Subsequent uploads run outside its monitor.
+        let mut live_capture = if a.publish {
+            let mut capture = live::LiveSupervisor::new(&out, &dir, a)?;
+            capture.flush(snapshot::AttemptStatus::Running, None, None)?;
+            Some(capture)
+        } else {
+            None
+        };
         let stdout = OpenOptions::new()
             .write(true)
             .create_new(true)
@@ -867,9 +988,22 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "output":dir,"process_group":child.child.id()}),
         )?;
         let mut stop_reason = None;
+        let mut publication_failure = None;
         let exit = loop {
             if let Some(status) = child.poll()? {
                 break status;
+            }
+            if let Some(capture) = live_capture.as_mut() {
+                if let Err(error) = capture.poll() {
+                    publication_failure = Some(error);
+                    break child.stop()?;
+                }
+                if capture.capture_stopped()? {
+                    stop_reason = Some("capture_budget_exhausted");
+                }
+                if capture.capacity_exhausted() {
+                    stop_reason = Some("snapshot_chain_limit");
+                }
             }
             let bytes = tree_bytes_while_running(&dir)?;
             if start.elapsed() >= Duration::from_secs(a.seconds_per_case) {
@@ -883,9 +1017,49 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             }
             std::thread::sleep(Duration::from_millis(100));
         };
+        let worker_elapsed = start.elapsed();
         let final_bytes = tree_bytes_while_running(&dir)?;
         if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
             stop_reason = Some("trace_budget_exhausted");
+        }
+        if let Some(error) = publication_failure {
+            storage::write_json(
+                &dir,
+                "publication-failure.json",
+                "local-publication-failure",
+                &json!({
+                    "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
+                    "worker_exit_code":exit.code(), "worker_elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
+                    "remote_terminal_observation_verified":false,
+                    "local_artifacts_retained":true,"wave_stopped":true,
+                }),
+            )?;
+            return Err(format!(
+                "partial publication failed; worker stopped and local artifacts retained: {error}"
+            ));
+        }
+        if let Some(capture) = live_capture.as_mut() {
+            if capture.capture_stopped()? {
+                stop_reason = Some("capture_budget_exhausted");
+            }
+            let status = if stop_reason.is_some() || !exit.success() {
+                snapshot::AttemptStatus::Interrupted
+            } else {
+                snapshot::AttemptStatus::Exited
+            };
+            if let Err(error) = capture.flush(status, exit.code(), stop_reason) {
+                storage::write_json(
+                    &dir,
+                    "publication-failure.json",
+                    "local-publication-failure",
+                    &json!({
+                        "schema":"crypto.ml-dataset.publication-failure/v1","reason":error,
+                        "worker_exit_code":exit.code(),"remote_terminal_observation_verified":false,
+                        "local_artifacts_retained":true,"wave_stopped":true,
+                    }),
+                )?;
+                return Err(error);
+            }
         }
         let mut outcome: Value = if dir.join("result.json").exists() {
             read_json(&dir.join("result.json"))?
@@ -899,7 +1073,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             outcome =
                 json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
         }
-        outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
+        outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
@@ -963,7 +1137,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest)?;
         verify_cell(&dir, true)?;
         if a.publish {
-            publish_cell(&out, &dir, a.remote.as_deref())?;
+            publish_cell(&out, &dir, a.remote.as_deref(), &a.budget.open()?)?;
         }
         attempted += 1;
         let manifest_bytes = crate::store::hash_file(&dir.join("manifest.json"))?.1;
@@ -978,6 +1152,14 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
             "publication_metadata_bytes":publication_bytes})
         );
+        if matches!(
+            stop_reason,
+            Some("capture_budget_exhausted" | "snapshot_chain_limit")
+        ) {
+            return Err(
+                "capture stopped; retained the acknowledged prefix and stopped the wave".into(),
+            );
+        }
     }
     println!("{}", verify_run(&out, true)?);
     Ok(())
@@ -1858,7 +2040,12 @@ fn publication_namespace(binding: &Value, cell: u64) -> Result<String, String> {
     Ok(format!("ml-ecdlp/{run_id}/cells/{cell:012}"))
 }
 
-fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), String> {
+fn publish_cell(
+    root: &Path,
+    dir: &Path,
+    remote: Option<&str>,
+    budget: &Option<std::sync::Arc<budget::BudgetSession>>,
+) -> Result<(), String> {
     let manifest = verify_cell(dir, true)?;
     let path = dir.join("manifest.json");
     let (sha256, bytes) = crate::store::hash_file(&path)?;
@@ -1875,12 +2062,14 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
         cfg.remote = Some(crate::store::backend::RemoteSpec::parse(remote)?);
     }
     let namespace = publication_namespace(&read_json(&dir.join("run.json"))?, manifest.cell_index)?;
-    let receipt = storage::publish(
+    live::require_budget(&cfg, budget)?;
+    let receipt = storage::publish_guarded(
         dir,
         &manifest.artifacts,
         &manifest_artifact,
         cfg,
         &namespace,
+        live::guard(budget, crate::store::backend::Phase::Finalize),
     )?;
     let receipt_file = storage::write_json(
         root,
@@ -1891,7 +2080,7 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
         "publication-receipt",
         &receipt,
     )?;
-    publish_lab_receipt(root, &receipt_file)?;
+    publish_lab_receipt(root, &receipt_file, budget)?;
     println!(
         "{}",
         serde_json::to_string(&receipt).map_err(|e| e.to_string())?
@@ -1902,7 +2091,11 @@ fn publish_cell(root: &Path, dir: &Path, remote: Option<&str>) -> Result<(), Str
 /// The EKS command contract supplies this explicit results destination. Keep a
 /// receipt under that attempt prefix as well as the dataset's stable catalog,
 /// so lab results remain discoverable after Pod/log TTL cleanup.
-fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
+fn publish_lab_receipt(
+    root: &Path,
+    artifact: &Artifact,
+    budget: &Option<std::sync::Arc<budget::BudgetSession>>,
+) -> Result<(), String> {
     let Some(uri) = std::env::var("ISOLAB_RESULTS_URI")
         .ok()
         .filter(|s| !s.is_empty())
@@ -1913,7 +2106,11 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
     let mut cfg = crate::store::Config::discover()?;
     cfg.remote = Some(remote);
     cfg.index_path = root.join("store-index.json");
-    let store = crate::store::Store::open(cfg)?;
+    live::require_budget(&cfg, budget)?;
+    let store = match live::guard(budget, crate::store::backend::Phase::Finalize) {
+        Some(guard) => crate::store::Store::open_guarded(cfg, guard)?,
+        None => crate::store::Store::open(cfg)?,
+    };
     let backend = store.remote()?;
     let key = format!("dataset-receipts/{}.json", artifact.sha256);
     storage::verify_manifest(root, std::slice::from_ref(artifact))?;
