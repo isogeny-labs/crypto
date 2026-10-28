@@ -1,4 +1,5 @@
 //! Native matched S3 benchmark; run via research/polynomial_reuse_20260914/run.py.
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, masks_low64};
 use crypto_lib::{
     binary_ecc::F2mElement,
     cryptanalysis::{
@@ -21,7 +22,7 @@ fn fe(x: u64, n: u32) -> F2mElement {
 }
 fn roots(e: &[F2BoolPoly], nv: usize) -> Vec<u64> {
     (0..1u64 << nv)
-        .filter(|&x| e.iter().all(|p| p.eval(x) == 0))
+        .filter(|&x| e.iter().all(|p| p.eval(mask_from64(x)) == 0))
         .collect()
 }
 fn main() {
@@ -129,7 +130,10 @@ fn main() {
         let original = build_decomposition_system(&basis, &fe(r, n), &b, m, &st).unwrap();
         let truth = roots(&original.equations, nv);
         let equivalent = roots(&eq, nv) == truth;
-        let correct = equivalent && found == truth && sat == truth && !stats.exhausted;
+        let correct = equivalent
+            && masks_low64(&found) == truth
+            && masks_low64(&sat) == truth
+            && !stats.exhausted;
         let verification_ns = start.elapsed().as_nanos();
         let root_xors = matrix_f4_f2_counted(&eq, nv, 3).map(|(_, ops)| ops);
         println!(

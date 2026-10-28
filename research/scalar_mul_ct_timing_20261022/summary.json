@@ -1,0 +1,596 @@
+{
+  "curves": [
+    {
+      "F_B_max": 0.1491420949739598,
+      "R_A_max": 0.47980662076686315,
+      "cost_max": 1.54921593376118,
+      "cost_median": 1.5169807300049014,
+      "cost_min": 1.2943800364310585,
+      "curve": "GOST-3410-2012-256-test",
+      "order_bits": 256,
+      "per_round": [
+        {
+          "F": {
+            "A": 0.5339700462567449,
+            "A2": 0.5511052060520075,
+            "B": 0.03575424789748238
+          },
+          "R": {
+            "A": 0.4660299537432551,
+            "A2": 0.4488947939479925,
+            "B": 1.0357542478974824
+          },
+          "aa_band": 0.07682658050111757,
+          "cost": 1.54921593376118,
+          "full_length_ms": {
+            "A": 70.213328,
+            "B": 108.7756065
+          },
+          "round": 1
+        },
+        {
+          "F": {
+            "A": 0.5699567295705934,
+            "A2": 0.6011590847999191,
+            "B": 0.10697634020287161
+          },
+          "R": {
+            "A": 0.43004327042940665,
+            "A2": 0.39884091520008086,
+            "B": 1.075141808762674
+          },
+          "aa_band": 0.1133188592603378,
+          "cost": 1.2943800364310585,
+          "full_length_ms": {
+            "A": 76.922278,
+            "B": 99.566661
+          },
+          "round": 2
+        },
+        {
+          "F": {
+            "A": 0.5726002091476223,
+            "A2": 0.5702377860677199,
+            "B": 0.10461469150748293
+          },
+          "R": {
+            "A": 0.4273997908523776,
+            "A2": 0.42976221393228003,
+            "B": 0.9518863799878039
+          },
+          "aa_band": 0.12958877734490937,
+          "cost": 1.4733597650805677,
+          "full_length_ms": {
+            "A": 72.986725,
+            "B": 107.535704
+          },
+          "round": 3
+        },
+        {
+          "F": {
+            "A": 0.5981885340911441,
+            "A2": 0.6062172691323094,
+            "B": 0.1491420949739598
+          },
+          "R": {
+            "A": 0.4018114659088558,
+            "A2": 0.39378273086769056,
+            "B": 1.0009230572316707
+          },
+          "aa_band": 0.07996205557807246,
+          "cost": 1.5169807300049014,
+          "full_length_ms": {
+            "A": 67.3964105,
+            "B": 102.239056
+          },
+          "round": 4
+        },
+        {
+          "F": {
+            "A": 0.5201933792331368,
+            "A2": 0.6145260152728977,
+            "B": 0.14803113302101467
+          },
+          "R": {
+            "A": 0.47980662076686315,
+            "A2": 0.38547398472710226,
+            "B": 0.9172968292009352
+          },
+          "aa_band": 0.17093871069162914,
+          "cost": 1.5181269873244916,
+          "full_length_ms": {
+            "A": 66.500212,
+            "B": 100.9557665
+          },
+          "round": 5
+        }
+      ],
+      "profile": {
+        "A": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 70.213328,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 69.715122,
+              "relative_max": 1.0384205830551145,
+              "relative_median": 1.0056550571598177,
+              "relative_min": 0.9301709707557023
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 72.243945,
+              "relative_max": 1.1195828217810795,
+              "relative_median": 0.9898230808410707,
+              "relative_min": 0.8970802385753578
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 69.4070615,
+              "relative_max": 1.0729824613925152,
+              "relative_median": 0.9711791327521813,
+              "relative_min": 0.90230117079996
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 63.6226145,
+              "relative_max": 1.0023989171643544,
+              "relative_median": 0.9440059793688864,
+              "relative_min": 0.7770237706688822
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 50.425086,
+              "relative_max": 0.7589858438272574,
+              "relative_median": 0.7427287021465334,
+              "relative_min": 0.6716267101996972
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 38.867705,
+              "relative_max": 0.5844749036288787,
+              "relative_median": 0.5242707218333197,
+              "relative_min": 0.4895128724993448
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 31.907242,
+              "relative_max": 0.47980662076686315,
+              "relative_median": 0.43004327042940665,
+              "relative_min": 0.4018114659088558
+            }
+          ],
+          "rounds": 5
+        },
+        "A2": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 74.7064585,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 72.131476,
+              "relative_max": 1.0614525935047434,
+              "relative_median": 0.9655319961392629,
+              "relative_min": 0.8141372403290981
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 76.825075,
+              "relative_max": 1.0478430149248028,
+              "relative_median": 1.0279938062446792,
+              "relative_min": 0.8946934494317412
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 70.92301,
+              "relative_max": 0.9805206838072975,
+              "relative_median": 0.9575350809587069,
+              "relative_min": 0.8524432608559789
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 62.128642,
+              "relative_max": 0.9536660140300989,
+              "relative_median": 0.8361557640118447,
+              "relative_min": 0.7978746507416156
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 49.779325,
+              "relative_max": 0.7428581573645897,
+              "relative_median": 0.6643832139359143,
+              "relative_min": 0.639281018705163
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 36.2177645,
+              "relative_max": 0.5328181017753678,
+              "relative_median": 0.4931314783245674,
+              "relative_min": 0.4539713768894274
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 30.015962,
+              "relative_max": 0.4488947939479925,
+              "relative_median": 0.39884091520008086,
+              "relative_min": 0.38547398472710226
+            }
+          ],
+          "rounds": 5
+        },
+        "B": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 102.239056,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 101.0953595,
+              "relative_max": 1.0153535177804145,
+              "relative_median": 0.9632397280741716,
+              "relative_min": 0.914213676937414
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 103.6745985,
+              "relative_max": 1.0941989959872211,
+              "relative_median": 1.0120238079297679,
+              "relative_min": 0.8540306553691185
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 102.347041,
+              "relative_max": 1.1069763402028716,
+              "relative_median": 0.9904310715105045,
+              "relative_min": 0.8577643556398534
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 106.915444,
+              "relative_max": 1.0878208971977075,
+              "relative_median": 0.9828990840883062,
+              "relative_min": 0.8508579050260402
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 101.3455255,
+              "relative_max": 1.086364355434195,
+              "relative_median": 1.003860690810564,
+              "relative_min": 0.9216288433839611
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 101.280697,
+              "relative_max": 1.0968839961400332,
+              "relative_median": 0.9418332073224722,
+              "relative_min": 0.8519688669789853
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 102.361772,
+              "relative_max": 1.075141808762674,
+              "relative_median": 1.0009230572316707,
+              "relative_min": 0.9172968292009352
+            }
+          ],
+          "rounds": 5
+        }
+      }
+    },
+    {
+      "F_B_max": 0.21186683855332455,
+      "R_A_max": 0.4368163537661649,
+      "cost_max": 1.4221466698848368,
+      "cost_median": 1.3590385045022138,
+      "cost_min": 1.289734490238723,
+      "curve": "SM2",
+      "order_bits": 256,
+      "per_round": [
+        {
+          "F": {
+            "A": 0.5839275189796653,
+            "A2": 0.5915585392071265,
+            "B": 0.03149656419569791
+          },
+          "R": {
+            "A": 0.4160724810203347,
+            "A2": 0.40844146079287347,
+            "B": 1.0007998527991324
+          },
+          "aa_band": 0.19663482587665015,
+          "cost": 1.3299021260736532,
+          "full_length_ms": {
+            "A": 98.024779,
+            "B": 130.363362
+          },
+          "round": 1
+        },
+        {
+          "F": {
+            "A": 0.6231022279863903,
+            "A2": 0.5919563398432425,
+            "B": 0.21186683855332455
+          },
+          "R": {
+            "A": 0.3768977720136097,
+            "A2": 0.4080436601567575,
+            "B": 0.8545915439255215
+          },
+          "aa_band": 0.1257809042060154,
+          "cost": 1.4221466698848368,
+          "full_length_ms": {
+            "A": 95.1078745,
+            "B": 135.257347
+          },
+          "round": 2
+        },
+        {
+          "F": {
+            "A": 0.5799346340272707,
+            "A2": 0.5880404102809991,
+            "B": 0.057594840758306454
+          },
+          "R": {
+            "A": 0.42006536597272925,
+            "A2": 0.411959589719001,
+            "B": 1.0301012159906133
+          },
+          "aa_band": 0.097417389140952,
+          "cost": 1.289734490238723,
+          "full_length_ms": {
+            "A": 93.537352,
+            "B": 120.638349
+          },
+          "round": 3
+        },
+        {
+          "F": {
+            "A": 0.5975210051721975,
+            "A2": 0.5670598625505718,
+            "B": 0.0793757786672783
+          },
+          "R": {
+            "A": 0.4024789948278024,
+            "A2": 0.43294013744942816,
+            "B": 0.9420010725393091
+          },
+          "aa_band": 0.09888469643219178,
+          "cost": 1.3590385045022138,
+          "full_length_ms": {
+            "A": 87.748388,
+            "B": 119.253438
+          },
+          "round": 4
+        },
+        {
+          "F": {
+            "A": 0.5631836462338351,
+            "A2": 0.6242853762757468,
+            "B": 0.12021434942012832
+          },
+          "R": {
+            "A": 0.4368163537661649,
+            "A2": 0.3757146237242533,
+            "B": 0.9548227773537625
+          },
+          "aa_band": 0.2285121050578195,
+          "cost": 1.4136519510339083,
+          "full_length_ms": {
+            "A": 88.842459,
+            "B": 125.5923155
+          },
+          "round": 5
+        }
+      ],
+      "profile": {
+        "A": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 93.537352,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 93.0241895,
+              "relative_max": 1.0470690539981564,
+              "relative_median": 0.9835385921847362,
+              "relative_min": 0.9689556531384382
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 87.5977955,
+              "relative_max": 1.0126297044524624,
+              "relative_median": 0.9696156241639448,
+              "relative_min": 0.7777704859706952
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 84.94002,
+              "relative_max": 0.9560746174303888,
+              "relative_median": 0.9316863461924794,
+              "relative_min": 0.8645464113630242
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 74.249007,
+              "relative_max": 0.8643502384232128,
+              "relative_median": 0.8342886853129248,
+              "relative_min": 0.7937899182777807
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 59.825428,
+              "relative_max": 0.682050717558481,
+              "relative_median": 0.6395886426205437,
+              "relative_min": 0.6258627249629052
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 46.88921,
+              "relative_max": 0.555274145439851,
+              "relative_median": 0.4882629880756987,
+              "relative_min": 0.4678400720601969
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 38.807839,
+              "relative_max": 0.4368163537661649,
+              "relative_median": 0.4160724810203347,
+              "relative_min": 0.3768977720136097
+            }
+          ],
+          "rounds": 5
+        },
+        "A2": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 97.789174,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 92.8927565,
+              "relative_max": 1.054312424239694,
+              "relative_median": 0.984629244337415,
+              "relative_min": 0.9253501462871576
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 91.2323725,
+              "relative_max": 1.0011266883602852,
+              "relative_median": 0.952047635972232,
+              "relative_min": 0.9172275214285013
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 82.0368525,
+              "relative_max": 0.9005889964665339,
+              "relative_median": 0.842356475454587,
+              "relative_min": 0.7748759319438233
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 72.687311,
+              "relative_max": 0.8100482080582279,
+              "relative_median": 0.7349728786087073,
+              "relative_min": 0.7067347231822474
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 63.026361,
+              "relative_max": 0.7206574957486414,
+              "relative_median": 0.6517149097146804,
+              "relative_min": 0.6156876861451628
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 46.258858,
+              "relative_max": 0.5289341195261457,
+              "relative_median": 0.48450399629112634,
+              "relative_min": 0.41162983563312977
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 40.285188,
+              "relative_max": 0.43294013744942816,
+              "relative_median": 0.40844146079287347,
+              "relative_min": 0.3757146237242533
+            }
+          ],
+          "rounds": 5
+        },
+        "B": {
+          "classes": [
+            {
+              "leading_zeros": 0,
+              "ms_median": 125.5923155,
+              "relative_max": 1.0,
+              "relative_median": 1.0,
+              "relative_min": 1.0
+            },
+            {
+              "leading_zeros": 8,
+              "ms_median": 123.0431055,
+              "relative_max": 1.031496564195698,
+              "relative_median": 0.9962233332006747,
+              "relative_min": 0.8797856505798717
+            },
+            {
+              "leading_zeros": 16,
+              "ms_median": 120.264133,
+              "relative_max": 1.013863849261574,
+              "relative_median": 0.9905289271408678,
+              "relative_min": 0.897857138401115
+            },
+            {
+              "leading_zeros": 32,
+              "ms_median": 123.799036,
+              "relative_max": 1.001579779577388,
+              "relative_median": 0.9857214233780092,
+              "relative_min": 0.9547350429696067
+            },
+            {
+              "leading_zeros": 64,
+              "ms_median": 125.4713755,
+              "relative_max": 1.0072512318637838,
+              "relative_median": 0.9975978526850205,
+              "relative_min": 0.9276492425953025
+            },
+            {
+              "leading_zeros": 128,
+              "ms_median": 125.4261845,
+              "relative_max": 1.0396875084886978,
+              "relative_median": 1.0085174279631781,
+              "relative_min": 0.8450464949604549
+            },
+            {
+              "leading_zeros": 192,
+              "ms_median": 126.28646,
+              "relative_max": 1.0575948407583065,
+              "relative_median": 0.9857605160566509,
+              "relative_min": 0.7881331614466754
+            },
+            {
+              "leading_zeros": 224,
+              "ms_median": 119.9184035,
+              "relative_max": 1.0301012159906133,
+              "relative_median": 0.9548227773537625,
+              "relative_min": 0.8545915439255215
+            }
+          ],
+          "rounds": 5
+        }
+      }
+    }
+  ],
+  "delta": 0.2285121050578195,
+  "left_out_contended": [],
+  "pinned_identical": true,
+  "rounds_complete": 5,
+  "runs": 15,
+  "schema": "scalar-mul-ct-timing-summary/v1",
+  "verdicts": {
+    "closed_on_B": true,
+    "leak_present_on_A": true
+  }
+}

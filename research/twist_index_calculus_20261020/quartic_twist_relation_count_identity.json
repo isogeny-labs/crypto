@@ -1,0 +1,180 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hf0237ddd316cd9d8",
+  "statement": {
+    "name": "signed four-factor falling-factorial expansion",
+    "source": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.md; the expectation proof additionally uses a uniform residual and linearity of expectation",
+    "variables": [
+      "B"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 16
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "const",
+                  "args": 0
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "const",
+                  "args": -1
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "const",
+                  "args": -2
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "const",
+                  "args": -3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 16
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -96
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 176
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -96
+            },
+            {
+              "op": "var",
+              "args": "B"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 6073459649184089934,
+  "value_digest": "877983021acc5464554a6fc82096f88bfbb1f116126aa573aaa9ed44befa9eed",
+  "independence": "issued by this native example; checked by identity_certificate::check_with_extra with 32 independent domain-separated points",
+  "proof": null
+}

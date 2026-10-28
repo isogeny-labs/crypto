@@ -796,7 +796,10 @@ fn compose(f1: Form, f2: Form, delta: i128) -> Form {
 /// when `Δ` is too large for this word arithmetic.
 pub fn class_order(dk: &BigInt, f: &BigUint, l: u64, limit: u64) -> Result<Option<u64>, ()> {
     let delta = dk * BigInt::from(f.clone()) * BigInt::from(f.clone());
-    if delta.bits() > 60 {
+    // Reduced forms have a ≤ √(|Δ|/3) and c ≤ |Δ|/4; composition multiplies
+    // at most three such quantities of √|Δ| size or one of each, so for
+    // |Δ| < 2^80 every product stays below 2^120.
+    if delta.bits() > 80 {
         return Err(());
     }
     let delta = delta.to_i128().ok_or(())?;
@@ -960,6 +963,20 @@ mod tests {
             let _ = dk;
             assert!(best > 0 || h == BigUint::one(), "d={d}");
         }
+        // Past 2^60: d_K = −49087, f = 7³·31543 (Δ of 63 bits), the floor
+        // candidate of icv1-f2m61-tm1864788689; PARI's qfbpow says the prime
+        // forms above 13, 17 and 19 do not have the orders 17934, 17934 and
+        // 5978 there, while they do for f = 7³ (`qfbpow(Q, r) == Q^0`).
+        let dk = BigInt::from(-49087);
+        for (f, holds) in [(343u64, true), (343 * 31543, false)] {
+            for (l, r) in [(13u64, 17934u64), (17, 17934), (19, 5978)] {
+                let order = class_order(&dk, &BigUint::from(f), l, r).expect("within 2^80");
+                assert_eq!(order.is_some_and(|o| r % o == 0), holds, "f={f} l={l}");
+                if holds {
+                    assert_eq!(order, Some(r), "f={f} l={l}");
+                }
+            }
+        }
         // h(−23) = 3: a prime above 2 is not used, but above 3 has order 3.
         assert_eq!(
             class_order(&BigInt::from(-23), &BigUint::one(), 3, 10),
@@ -1063,7 +1080,7 @@ mod tests {
             Some((x3, md(lam * (x1 - x3) - y1)))
         };
         let n = super::super::certify::count_prime(p, a as u64, b as u64);
-        if n % l != 0 {
+        if !n.is_multiple_of(l) {
             return None;
         }
         let j = |a: i128, b: i128| {
@@ -1186,12 +1203,12 @@ mod tests {
                     let mut rest = v as u64;
                     let mut ell = 2u64;
                     while rest > 1 {
-                        if rest % ell != 0 {
+                        if !rest.is_multiple_of(ell) {
                             ell += 1;
                             continue;
                         }
                         let mut depth = 0u32;
-                        while rest % ell == 0 {
+                        while rest.is_multiple_of(ell) {
                             rest /= ell;
                             depth += 1;
                         }
@@ -1223,7 +1240,7 @@ mod tests {
                     let mut d = 2u64;
                     while rest > 1 {
                         let mut e = 0;
-                        while rest % d == 0 {
+                        while rest.is_multiple_of(d) {
                             rest /= d;
                             e += 1;
                         }

@@ -792,7 +792,7 @@ pub fn exact_ic_probe_with_arity<F: PrimeField>(
     let nonzero_scalar = |rng: &mut StdRng| {
         let bits = c.order.bits() as usize;
         let mut bytes = vec![0u8; bits.div_ceil(8)];
-        let top_mask = if bits % 8 == 0 {
+        let top_mask = if bits.is_multiple_of(8) {
             u8::MAX
         } else {
             (1u8 << (bits % 8)) - 1
