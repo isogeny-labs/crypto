@@ -111,8 +111,11 @@ does not satisfy the strict measurement requirement.
 
 The earlier root `cargo test --release --lib` attempt was blocked by the original
 partial import's absent Cargo.toml. The 2026-10-28 continuation uses a proper
-sparse clone and records its current release-validation outcome in the shared
-session log; the earlier standalone tests are distinct. The five original S3 uploads and fresh-cache byte checks
+sparse clone. Its root release build stopped at compiler allocation failure
+under both 4-GiB and 12-GiB virtual ceilings; library tests did not execute.
+The [validation record](../native_end_to_end/access/20261028-local-validation.json)
+retains all attempts. The earlier standalone tests are distinct.
+The five original S3 uploads and fresh-cache byte checks
 were completed on 2026-10-28. Conductor, Lean/Lake and the remaining native
 measurement/release obligations stay open. Benchmark/leaderboard admission
 is not requested.

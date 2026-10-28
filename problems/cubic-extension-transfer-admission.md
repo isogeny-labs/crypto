@@ -29,8 +29,10 @@ does not settle those research questions.
   denies its required `codebuild:BatchGetBuilds` action; no worker was submitted.
 - **Tool status:** Rust 1.99.1 is installed and prior standalone native tests
   pass. The old partial import lacked Cargo.toml; the current continuation uses
-  a proper sparse clone and records release validation in the shared session
-  log. Conductor and Lean/Lake remain unavailable.
+  a proper sparse clone. Root release compilation failed under 4-GiB and 12-GiB
+  virtual ceilings before tests ran; all attempts are retained in the
+  [validation record](../research/cubic_extension_transfer_20261025/native_end_to_end/access/20261028-local-validation.json).
+  Conductor and Lean/Lake remain unavailable.
   CLI access is available; the earlier authentication warning was caused by
   sandbox network denial. No root release-test pass is claimed.
 - **Missing implementation:** native forward construction and complete inverse
