@@ -29,17 +29,17 @@ for(e=1;e<=10;e++){if(histogram[e]!=6){ERROR("wrong character fiber");}}
 print("DELTA_CHARACTER_EXPONENT");deltaExponent;
 if(deltaExponent!=5){ERROR("wrong delta character");}
 ring f26=11,(z),dp;
-int i;int j;int ord;int k;number eigen;number sigmaValue;number normValue;
+int i;int j;int subgroupSize;int k;number eigen;number sigmaValue;number normValue;
 intvec orders=1,2,5,10;
 for(i=1;i<=4;i++){
  k=primitives[i];eigen=2^k;sigmaValue=eigen^5;
  print("PRIMITIVE_DIAMOND_SIGMA "+string(k));eigen;sigmaValue;
  if(sigmaValue!=-1){ERROR("primitive factor is not minus");}
  for(j=1;j<=4;j++){
-  ord=orders[j];normValue=0;
-  int a;for(a=0;a<ord;a++){normValue=normValue+eigen^(a*(10/ord));}
-  print("SUBGROUP_NORM "+string(k)+" "+string(ord));normValue;
-  if(ord==1){if(normValue!=1){ERROR("trivial norm positive control");}}
+  subgroupSize=orders[j];normValue=0;
+  int a;for(a=0;a<subgroupSize;a++){normValue=normValue+eigen^(a*(10/subgroupSize));}
+  print("SUBGROUP_NORM "+string(k)+" "+string(subgroupSize));normValue;
+  if(subgroupSize==1){if(normValue!=1){ERROR("trivial norm positive control");}}
   else{if(normValue!=0){ERROR("nontrivial diamond norm not zero");}}
  }
 }

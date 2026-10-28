@@ -58,3 +58,7 @@ finite sets only, no sampling, coefficient search, rank or cost comparison.
 Checkpoint current source/raw before every invocation and do not mutate
 repository state while checkpoint/gate runs. Use task-owned TMPDIR because
 /tmp is inode-exhausted. Seal raw once finished, publish current existing PR.
+
+Prospective implementation correction before CHAR02: CHAR01 rejects reserved
+identifier ord. Rename subgroupSize; all equations, finite sets, detector and
+caps stay unchanged. This is an implementation retry, not a new search arm.
