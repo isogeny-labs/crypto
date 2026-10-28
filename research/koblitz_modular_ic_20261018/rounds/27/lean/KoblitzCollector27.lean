@@ -1,4 +1,5 @@
 import Mathlib.Algebra.CharP.Basic
+import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
 import Lean.Elab.Tactic.Omega
@@ -60,5 +61,33 @@ theorem prym_dimension_numeric : (61 : ℤ) - 31 = 30 := by decide
 theorem rr_dimensions_numeric :
     (128 : ℤ) > 2*61-2 ∧ 128+1-61=68 ∧
     (64 : ℤ) > 2*31-2 ∧ 64+1-31=34 ∧ (68 : ℤ)=34+34 := by decide
+
+def cuspRelation (t : ZMod 11) : ZMod 11 :=
+  11 + 7*t^2 + 11*t^3 + 5*t^4
+
+theorem cusp_relation_at_six : cuspRelation 6 = 0 := by decide
+
+theorem cusp_relation_other_primitive (t : ZMod 11)
+    (ht : t=2 ∨ t=7 ∨ t=8) : cuspRelation t ≠ 0 := by
+  rcases ht with rfl|rfl|rfl <;> decide
+
+theorem cusp_bezout_evaluation : ∀ t : ZMod 11,
+    (2*t^2+t+5)*(t^5+1)+(4*t^3+2*t^2-5)*cuspRelation t=t+5 := by decide
+
+theorem cusp_common_root_exact : ∀ t : ZMod 11,
+    (t^5+1=0 ∧ cuspRelation t=0) ↔ t=6 := by decide
+
+theorem cusp_determinant_factorization :
+    (1477212 : ℤ)=2^2*3*11*19^2*31 := by decide
+
+theorem cusp_determinant_eleven_once :
+    1477212 % 11=0 ∧ 1477212 % 121≠0 := by decide
+
+theorem source_genus_from_tame_degree (g : ℤ)
+    (h : 2*g-2=5*(2*6)+10*6) : g=61 := by omega
+
+theorem jet_129_degree_obstruction (zeroDegree poleDegree : ℤ)
+    (hz : 129 ≤ zeroDegree) (hp : poleDegree ≤ 128)
+    (hbalance : zeroDegree ≤ poleDegree) : False := by omega
 
 end KoblitzCollector27

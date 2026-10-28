@@ -156,3 +156,10 @@ unchanged. No input-polynomial independence assumption. Preserve lower-rank
 results, full candidate indices and all source/residual controls. One fresh
 native call at4GiB/1200s; runner copied/hashed as evidence and never edited
 while active. Native exit must actually be recorded for strict acceptance.
+
+BeforeLean02,add finite cusp-evaluation/Bezout/common-root checks and actual
+integer determinant factorization/11valuation,conditional source genus from
+the complete tame different,129jet degree obstruction. Geometry remains
+written. Source count18named theorem declarations. Local cache is a byte-
+verified copy of pinned compiled dependencies; an initial overinclusive
+source-comment parser copied extra modules,not a missing-library result.
