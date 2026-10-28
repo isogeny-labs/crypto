@@ -140,3 +140,20 @@ An initial test-append patch failed context verification because the new file
 was missing its final closing brace. No partial test patch was applied. The
 brace and tests were then added together and scoped Rustfmt parsed the result.
 This is a source-edit correction, not a passing native build or test result.
+
+## Published delivery, 2026-10-28 15:38 UTC
+
+Regular [PR2782](https://github.com/isogeny-labs/crypto/pull/2782) was opened
+at source head `e7bf3799180dbf7d6f3ce5cc2d7d5cd19a106bc3`, stacked on policy
+PR2777. Native source remains exactly d79. Hosted CI is pending; do not poll
+before the normal 50-minute cadence after the latest push. Feature-base PRs
+cannot enable auto-merge. The companion independent consumer is regular
+[PR2781](https://github.com/isogeny-labs/crypto/pull/2781), based on the original
+consumer delivery branch after PR2776 merged there without changing its tree.
+
+The 34,412-byte delivery reconciliation packet is durable at
+`s3://setec-astronomy-artifacts/ml-dataset/20261028/operations/delivery-reconciliation/9de7dcee6d651736eb40d637a0075a0d2396049cb3721da1d3c221cc9b48b8d8/reconciliation.tar.gz`.
+Conditional PUT, ETag-bound fresh GET, byte comparison and contained hashes
+passed at15:37:07Z. This retains the externally advanced producer ownership
+snapshot and the PR2769 review-base merge event; both are point-in-time evidence.
+No branch was taken over or implementation duplicated.
