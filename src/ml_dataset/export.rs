@@ -22,6 +22,10 @@ const MERGE_FAN_IN: usize = 8;
 const SPLIT_DOMAIN: &str = "ml-dataset-whole-field-size-split-v1";
 const STANDARD_PDP_DOMAIN: &str = "cyclic-subgroup-factor-base";
 const KUMMER_PDP_DOMAIN: &str = "prime-kummer-full-curve";
+const FROBENIUS_LARGE_PRIME_DOMAIN: &str = "cyclic-subgroup-signed-frobenius-large-prime";
+const GENERIC_LARGE_PRIME_DOMAIN: &str = "cyclic-subgroup-identity-signed-large-prime";
+const LARGE_PRIME_DOMAIN_ROLE: &str = "exact-large-prime-discovery-domains";
+const LARGE_PRIME_TRANSCRIPT_ROLE: &str = "large-prime-elimination-transcript";
 
 fn text(value: &Value, name: &str) -> Result<String, String> {
     value
@@ -170,6 +174,198 @@ fn pkm_feature_projection(public: &Value, base: &Value, pkm: &Value) -> Result<V
     Ok(projected)
 }
 
+fn signed_domain_projection(domain: &Value) -> Result<Value, String> {
+    let signed = domain["signed"]
+        .as_array()
+        .ok_or("missing signed-column map")?
+        .iter()
+        .map(|row| {
+            Ok(json!({"column":integer(&row["column"],"signed column")?,
+                "coefficient":integer(&row["coefficient"],"signed coefficient")?}))
+        })
+        .collect::<Result<Vec<Value>, String>>()?;
+    Ok(
+        json!({"points":points(&domain["points"],"signed-domain points")?,
+        "columns":points(&domain["columns"],"signed-domain columns")?,"signed":signed}),
+    )
+}
+
+/// Keep only public domain structure, never pool-construction receipts, logs,
+/// sampled queries or elimination results. The transcript is replayed before
+/// its projected definition is compared with the separately saved domain.
+fn large_prime_feature_projection(
+    public: &Value,
+    base: &Value,
+    domain: &Value,
+    transcript: &Value,
+) -> Result<Value, String> {
+    super::relations::verify_transcript(public, base, transcript)?;
+    let mut projected = feature_projection(public, base)?;
+    let m = integer(&public["m"], "relation arity")?;
+    let small_summands = m.checked_sub(2).ok_or("invalid large-prime arity")?;
+    match transcript["schema"].as_str() {
+        Some("ml-ecdlp-large-prime-transcript/v1") => {
+            let actual = json!({
+                "small_points":points(&domain["small_points"],"small points")?,
+                "residual_points":points(&domain["residual_points"],"residual points")?,
+                "lambda":decimal(&domain["lambda"],"Frobenius eigenvalue")?,
+                "frobenius_power":integer(&domain["frobenius_power"],"Frobenius power")?,
+            });
+            let expected = json!({
+                "small_points":points(&transcript["small_base"]["points"],"verified small points")?,
+                "residual_points":points(&transcript["residual_pool"]["points"],"verified residual points")?,
+                "lambda":decimal(&transcript["model"]["lambda"],"verified Frobenius eigenvalue")?,
+                "frobenius_power":1,
+            });
+            if actual != expected || transcript["model"]["frobenius_power"] != 1 {
+                return Err(
+                    "saved Frobenius large-prime domain differs from verified transcript".into(),
+                );
+            }
+            let orbits = transcript["small_base"]["signed_orbits"]
+                .as_array()
+                .ok_or("missing signed Frobenius orbits")?
+                .iter()
+                .map(|row| {
+                    row.as_array()
+                        .ok_or("invalid signed Frobenius orbit")?
+                        .iter()
+                        .map(|v| integer(v, "orbit point index").map(Value::from))
+                        .collect::<Result<Vec<_>, _>>()
+                        .map(Value::Array)
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let signed = transcript["small_base"]["signed_orbit_of"]
+                .as_array()
+                .ok_or("missing signed Frobenius column map")?
+                .iter()
+                .map(|row| {
+                    let row = row
+                        .as_array()
+                        .filter(|r| r.len() == 3)
+                        .ok_or("invalid signed Frobenius column map")?;
+                    Ok(json!({"column":integer(&row[0],"orbit column")?,
+                        "frobenius_exponent":integer(&row[1],"orbit exponent")?,
+                        "negated":boolean(&row[2],"orbit sign")?}))
+                })
+                .collect::<Result<Vec<Value>, String>>()?;
+            projected["pdp_domain"] = json!(FROBENIUS_LARGE_PRIME_DOMAIN);
+            projected["factor_base"] = json!({"rule":"signed-frobenius-closure",
+                "points":actual["small_points"],"signed_orbits":orbits,"signed":signed});
+            projected["residual_domain"] = json!({"points":actual["residual_points"]});
+            projected["large_prime_action"] = json!({"kind":"frobenius-with-signed-negation",
+                "lambda":actual["lambda"],"frobenius_power":1});
+        }
+        Some("ml-ecdlp-generic-large-prime-transcript/v1") => {
+            if domain["orbit_action"] != "identity-with-signed-negation" {
+                return Err("invalid generic large-prime orbit action".into());
+            }
+            let small = signed_domain_projection(&domain["small"])?;
+            let residual = signed_domain_projection(&domain["residual"]["domain"])?;
+            if small != signed_domain_projection(&transcript["small"])?
+                || residual != signed_domain_projection(&transcript["residual"]["domain"])?
+            {
+                return Err(
+                    "saved generic large-prime domain differs from verified transcript".into(),
+                );
+            }
+            projected["pdp_domain"] = json!(GENERIC_LARGE_PRIME_DOMAIN);
+            projected["factor_base"] = small;
+            projected["factor_base"]["rule"] = json!("identity-with-signed-negation");
+            projected["residual_domain"] = residual;
+            projected["large_prime_action"] = json!({"kind":"identity-with-signed-negation"});
+        }
+        _ => return Err("unsupported large-prime transcript schema".into()),
+    }
+    projected["relation_query"] = json!({"target_form":"a*generator+b*target",
+        "small_summands":small_summands,"residual_summands":2,
+        "identity_residual_pairs_admitted":false});
+    Ok(projected)
+}
+
+fn large_prime_artifact<'a>(
+    artifacts: &'a [Artifact],
+    role: &str,
+    paths: &[&str],
+) -> Result<Option<&'a Artifact>, String> {
+    let mut found = None;
+    for artifact in artifacts
+        .iter()
+        .filter(|a| a.role == role || paths.contains(&a.path.as_str()))
+    {
+        if artifact.role != role
+            || artifact.encoding != "json"
+            || !paths.contains(&artifact.path.as_str())
+            || found.replace(artifact).is_some()
+        {
+            return Err(format!("ambiguous or invalid {role} artifact"));
+        }
+    }
+    Ok(found)
+}
+
+fn large_prime_cell_projection(
+    directory: &Path,
+    artifacts: &[Artifact],
+    public: &Value,
+    base: &Value,
+) -> Result<Option<Value>, String> {
+    let domain = large_prime_artifact(
+        artifacts,
+        LARGE_PRIME_DOMAIN_ROLE,
+        &[
+            "large-prime-domains.json",
+            "generic-large-prime-domains.json",
+        ],
+    )?;
+    let transcript = large_prime_artifact(
+        artifacts,
+        LARGE_PRIME_TRANSCRIPT_ROLE,
+        &[
+            "large-prime-transcript.json",
+            "generic-large-prime-transcript.json",
+        ],
+    )?;
+    let (Some(domain), Some(transcript)) = (domain, transcript) else {
+        // Partial live payloads remain in restricted provenance. Without the
+        // replayable transcript this view cannot certify the exact domain.
+        return Ok(None);
+    };
+    let generic = transcript.path == "generic-large-prime-transcript.json";
+    if (domain.path == "generic-large-prime-domains.json") != generic {
+        return Err("large-prime domain/transcript route mismatch".into());
+    }
+    let domain: Value = super::read_json(&directory.join(&domain.path))?;
+    let transcript: Value = super::read_json(&directory.join(&transcript.path))?;
+    if generic != (transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1") {
+        return Err("large-prime transcript path/schema mismatch".into());
+    }
+    let inputs = large_prime_feature_projection(public, base, &domain, &transcript)?;
+    let recovered = if transcript["recovered_scalar"].is_null() {
+        None
+    } else if generic {
+        Some(integer(&transcript["recovered_scalar"], "recovered scalar")?.to_string())
+    } else {
+        Some(decimal(
+            &transcript["recovered_scalar"],
+            "recovered scalar",
+        )?)
+    };
+    for certificate in artifacts
+        .iter()
+        .filter(|a| a.role == "restricted-independent-scalar-label")
+    {
+        let label: Value = super::read_json(&directory.join(&certificate.path))?;
+        if Some(decimal(&label["scalar"], "independent scalar")?) != recovered
+            || point(&label["generator"])? != inputs["generator"]
+            || point(&label["target"])? != inputs["target"]
+        {
+            return Err("large-prime scalar certificate differs from verified transcript".into());
+        }
+    }
+    Ok(Some(inputs))
+}
+
 /// A verified success certificate must refer to the same domain as its row.
 /// Hash consistency alone does not bind two independently stored definitions.
 fn verify_projected_pdp_domain(
@@ -182,6 +378,14 @@ fn verify_projected_pdp_domain(
         .filter(|a| a.role == "independently-verified-pdp")
     {
         let label: Value = super::read_json(&directory.join(&certificate.path))?;
+        if [FROBENIUS_LARGE_PRIME_DOMAIN, GENERIC_LARGE_PRIME_DOMAIN]
+            .iter()
+            .any(|domain| inputs["pdp_domain"] == *domain)
+        {
+            return Err(
+                "target PDP certificate cannot label a large-prime relation-query domain".into(),
+            );
+        }
         if inputs["pdp_domain"] == KUMMER_PDP_DOMAIN {
             if kummer_definition_projection(&label["factor_base_definition"])?
                 != inputs["factor_base"]
@@ -566,6 +770,7 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let mut unsealed = 0u64;
     let mut unavailable = 0u64;
     let mut missing_alternative_base = 0u64;
+    let mut missing_large_prime_domain = 0u64;
     let mut domain_counts = std::collections::BTreeMap::<String, u64>::new();
     let mut split_counts = std::collections::BTreeMap::<String, u64>::new();
     let shard_count = integer(&binding["shard_count"], "shard_count")?;
@@ -625,6 +830,14 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                     .artifacts
                     .iter()
                     .find(|a| a.path == "pkm-factor-base.json");
+                if manifest.config.solver != "double-large-prime"
+                    && manifest.artifacts.iter().any(|a| {
+                        [LARGE_PRIME_DOMAIN_ROLE, LARGE_PRIME_TRANSCRIPT_ROLE]
+                            .contains(&a.role.as_str())
+                    })
+                {
+                    return Err("large-prime domain on a different solver source cell".into());
+                }
                 let inputs = if manifest.config.solver == "pkm" {
                     if let Some(artifact) = alternative {
                         if artifact.role != "explicit-alternative-kummer-factor-base"
@@ -645,7 +858,17 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                     {
                         return Err("alternative factor base on a non-PKM source cell".into());
                     }
-                    Some(feature_projection(&public, &base)?)
+                    if manifest.config.solver == "double-large-prime" {
+                        let inputs =
+                            large_prime_cell_projection(&dir, &manifest.artifacts, &public, &base)?;
+                        if inputs.is_none() {
+                            missing_large_prime_domain += 1;
+                            feature_status = "missing_verified_large_prime_domain_or_transcript";
+                        }
+                        inputs
+                    } else {
+                        Some(feature_projection(&public, &base)?)
+                    }
                 };
                 if let Some(inputs) = inputs {
                     verify_projected_pdp_domain(&dir, &manifest.artifacts, &inputs)?;
@@ -741,13 +964,15 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
         "sealed_source_cells":sealed,"unsealed_attempts_excluded":unsealed,"cells_without_verified_features":unavailable,
         "cells_without_verified_alternative_factor_base":missing_alternative_base,"feature_occurrences_by_pdp_domain":domain_counts,
+        "cells_without_verified_large_prime_domain":missing_large_prime_domain,
         "feature_occurrences":feature_occurrences,"unique_feature_rows":unique_features,"restricted_target_rows":target_rows,
-        "feature_identity":"SHA256 of canonical strictly projected public inputs, actual factor base and PDP domain; solver and source provenance excluded",
+        "feature_identity":"SHA256 of canonical strictly projected public inputs, actual small/residual factor bases, column actions and PDP/relation-query domain; solver and source provenance excluded",
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v2","only_features_jsonl_is_model_input":true,
+        "feature_policy":{"version":"strict-structural-allowlist-v3","only_features_jsonl_is_model_input":true,
             "pkm_domain":"verified exact alternative Kummer base; missing base excluded from matched routing features",
+            "large_prime_domain":"exact saved small/residual domains bound to independently replayed transcript; signed Frobenius and identity/sign routes have distinct identities; missing domain or transcript excluded with provenance retained",
             "cross_domain_routing_labels_matched":false,
             "excluded":["private witness","sampling seeds","curve/generator/key indices","configuration","order certificates","construction candidates","construction trace","solver outcomes","solver event streams","labels","source paths"]},
         "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES,
@@ -779,6 +1004,9 @@ mod tests {
             self.source_with_backends(false, false)
         }
         fn source_with_backends(&self, pkm: bool, include_pkm_base: bool) -> PathBuf {
+            self.source_with_method("prime", if pkm { "pkm" } else { "bsgs" }, include_pkm_base)
+        }
+        fn source_with_method(&self, family: &str, method: &str, run_solver: bool) -> PathBuf {
             let source = self.0.join("source");
             fs::create_dir(&source).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1","purpose":"native export correctness fixture"});
@@ -792,8 +1020,8 @@ mod tests {
                 schema: "crypto.ml-dataset.plan/v1".into(),
                 field_sizes: vec![11],
                 arities: vec![2],
-                families: vec!["prime".into()],
-                solvers: vec!["enumerate".into(), if pkm { "pkm" } else { "bsgs" }.into()],
+                families: vec![family.into()],
+                solvers: vec!["enumerate".into(), method.into()],
                 curve_seeds: 8,
                 generators: 2,
                 keys: 2,
@@ -848,15 +1076,17 @@ mod tests {
                 }
                 let mut outcome = json!({"status":"not_attempted","known_answer_verified":true,"factor_base_verified":true,
                     "solver_completed":false,"scalar_recovered_without_witness":false,"scalar_replay_verified":false});
-                if config.solver == "pkm" && include_pkm_base {
+                if config.solver == method && run_solver {
                     let mut solver_case = case.clone();
                     solver_case.private_witness = Value::Null;
                     let result = crate::ml_dataset::solvers::solve(&config, &solver_case).unwrap();
+                    let required_role = if method == "pkm" {
+                        "explicit-alternative-kummer-factor-base"
+                    } else {
+                        LARGE_PRIME_DOMAIN_ROLE
+                    };
                     assert!(
-                        result
-                            .artifacts
-                            .iter()
-                            .any(|a| a.path == "pkm-factor-base.json"),
+                        result.artifacts.iter().any(|a| a.role == required_role),
                         "{}",
                         result.outcome
                     );
@@ -1138,6 +1368,289 @@ mod tests {
         let index = fs::read_to_string(out.join("restricted/index.jsonl")).unwrap();
         assert!(index.contains("cells/000000000125"));
         assert!(index.contains("witness.json"));
+    }
+
+    #[test]
+    fn large_prime_features_bind_actual_domains_without_construction_or_label_leakage() {
+        for (family, expected_domain) in [
+            ("koblitz", FROBENIUS_LARGE_PRIME_DOMAIN),
+            ("prime", GENERIC_LARGE_PRIME_DOMAIN),
+        ] {
+            let f = Fixture::new();
+            let source = f.source_with_method(family, "double-large-prime", true);
+            let out = f.0.join("training");
+            let exported = export(&source, &out).unwrap();
+            assert_eq!(exported["export"]["unique_feature_rows"], 2);
+            assert_eq!(
+                exported["export"]["feature_occurrences_by_pdp_domain"][expected_domain],
+                1
+            );
+            let features: Vec<Value> = fs::read_to_string(out.join("features.jsonl"))
+                .unwrap()
+                .lines()
+                .map(|line| serde_json::from_str(line).unwrap())
+                .collect();
+            let ordinary = features
+                .iter()
+                .find(|v| v["inputs"]["pdp_domain"] == STANDARD_PDP_DOMAIN)
+                .unwrap();
+            let relation = features
+                .iter()
+                .find(|v| v["inputs"]["pdp_domain"] == expected_domain)
+                .unwrap();
+            assert_ne!(ordinary["feature_id"], relation["feature_id"]);
+            assert_eq!(ordinary["inputs"]["target"], relation["inputs"]["target"]);
+            assert_eq!(ordinary["split_component"], relation["split_component"]);
+            assert_eq!(relation["inputs"]["relation_query"]["small_summands"], 0);
+            assert_eq!(relation["inputs"]["relation_query"]["residual_summands"], 2);
+            let targets: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+                .unwrap()
+                .lines()
+                .map(|line| serde_json::from_str(line).unwrap())
+                .collect();
+            let label = targets
+                .iter()
+                .find(|v| v["solver"] == "double-large-prime")
+                .unwrap();
+            assert_eq!(label["feature_id"], relation["feature_id"]);
+            assert_eq!(label["pdp_domain"], expected_domain);
+
+            let dir = source.join("cells/000000000125");
+            let manifest: CellManifest =
+                crate::ml_dataset::read_json(&dir.join("manifest.json")).unwrap();
+            let public: Value = crate::ml_dataset::read_json(&dir.join("public.json")).unwrap();
+            let base: Value = crate::ml_dataset::read_json(&dir.join("factor-base.json")).unwrap();
+            let domain_artifact = manifest
+                .artifacts
+                .iter()
+                .find(|a| a.role == LARGE_PRIME_DOMAIN_ROLE)
+                .unwrap();
+            let transcript_artifact = manifest
+                .artifacts
+                .iter()
+                .find(|a| a.role == LARGE_PRIME_TRANSCRIPT_ROLE)
+                .unwrap();
+            let mut domain: Value =
+                crate::ml_dataset::read_json(&dir.join(&domain_artifact.path)).unwrap();
+            let transcript: Value =
+                crate::ml_dataset::read_json(&dir.join(&transcript_artifact.path)).unwrap();
+            let marker = "FORBIDDEN_LARGE_PRIME_LOG_OR_FUTURE_VALUE";
+            domain["seed"] = json!(marker);
+            domain["hidden_logs"] = json!(marker);
+            domain["recovered_scalar"] = json!(marker);
+            if family == "koblitz" {
+                assert_eq!(
+                    relation["inputs"]["factor_base"]["points"],
+                    domain["small_points"]
+                );
+                assert_eq!(
+                    relation["inputs"]["residual_domain"]["points"],
+                    domain["residual_points"]
+                );
+                assert_ne!(
+                    relation["inputs"]["factor_base"]["points"],
+                    ordinary["inputs"]["factor_base"]["points"]
+                );
+                for row in domain["small_points"].as_array_mut().unwrap() {
+                    row["scalar"] = json!(marker);
+                }
+            } else {
+                assert_eq!(
+                    relation["inputs"]["factor_base"]["points"],
+                    domain["small"]["points"]
+                );
+                assert_eq!(
+                    relation["inputs"]["residual_domain"]["points"],
+                    domain["residual"]["domain"]["points"]
+                );
+                domain["residual"]["construction"] = json!({"private":marker});
+                domain["residual"]["projection_metrics"] = json!({"private":marker});
+                for key in ["points", "columns"] {
+                    for row in domain["small"][key].as_array_mut().unwrap() {
+                        row["scalar"] = json!(marker);
+                    }
+                    for row in domain["residual"]["domain"][key].as_array_mut().unwrap() {
+                        row["scalar"] = json!(marker);
+                    }
+                }
+                for row in domain["small"]["signed"].as_array_mut().unwrap() {
+                    row["future_pivot"] = json!(marker);
+                }
+            }
+            let projected =
+                large_prime_feature_projection(&public, &base, &domain, &transcript).unwrap();
+            assert_eq!(projected, relation["inputs"]);
+            let encoded = serde_json::to_string(&projected).unwrap();
+            for forbidden in [
+                marker,
+                "scalar",
+                "seed",
+                "construction",
+                "future_pivot",
+                "projection_metrics",
+                "recovered_column_logs",
+            ] {
+                assert!(!encoded.contains(forbidden), "{forbidden}");
+            }
+
+            // A scalar certificate can be individually group-valid yet not be
+            // a recovery of this relation transcript. Bind the two artifacts.
+            let mut certificates = manifest.artifacts.clone();
+            certificates.retain(|a| a.role != "restricted-independent-scalar-label");
+            let witness: Value = crate::ml_dataset::read_json(&dir.join("witness.json")).unwrap();
+            let scalar = if transcript["recovered_scalar"].is_null() {
+                witness["scalar"].clone()
+            } else {
+                json!("0")
+            };
+            let certificate = json!({"scalar":scalar,
+                "generator":public["generator"],"target":public["target"]});
+            if transcript["recovered_scalar"].is_null() {
+                crate::ml_dataset::solvers::verify_solution_artifact(
+                    &public,
+                    &base,
+                    "restricted-independent-scalar-label",
+                    &certificate,
+                )
+                .unwrap();
+            }
+            certificates.push(
+                storage::write_json(
+                    &dir,
+                    "mismatched-scalar.json",
+                    "restricted-independent-scalar-label",
+                    &certificate,
+                )
+                .unwrap(),
+            );
+            assert!(
+                large_prime_cell_projection(&dir, &certificates, &public, &base)
+                    .unwrap_err()
+                    .contains("scalar certificate differs")
+            );
+
+            let mut duplicate = manifest.artifacts.clone();
+            duplicate.push(domain_artifact.clone());
+            assert!(
+                large_prime_cell_projection(&dir, &duplicate, &public, &base)
+                    .unwrap_err()
+                    .contains("ambiguous")
+            );
+
+            let certificate = storage::write_json(
+                &dir,
+                "mismatched-pdp.json",
+                "independently-verified-pdp",
+                &json!({}),
+            )
+            .unwrap();
+            assert!(
+                verify_projected_pdp_domain(&dir, &[certificate], &projected)
+                    .unwrap_err()
+                    .contains("cannot label a large-prime")
+            );
+            let mut wrong_residual = domain.clone();
+            let residual = if family == "koblitz" {
+                &mut wrong_residual["residual_points"]
+            } else {
+                &mut wrong_residual["residual"]["domain"]["points"]
+            };
+            residual
+                .as_array_mut()
+                .unwrap()
+                .push(public["generator"].clone());
+            assert!(
+                large_prime_feature_projection(&public, &base, &wrong_residual, &transcript)
+                    .unwrap_err()
+                    .contains("domain differs from verified transcript")
+            );
+
+            // A consistent new SHA does not certify a substituted discovery
+            // domain. Exact replay and domain comparison must still reject it.
+            let key = if family == "koblitz" {
+                "small_points"
+            } else {
+                "small"
+            };
+            if family == "koblitz" {
+                domain[key].as_array_mut().unwrap().pop();
+            } else {
+                domain[key]["signed"][0]["coefficient"] = json!(0);
+            }
+            fs::write(
+                dir.join(&domain_artifact.path),
+                serde_json::to_vec(&domain).unwrap(),
+            )
+            .unwrap();
+            let mut forged_manifest = manifest;
+            let artifact = forged_manifest
+                .artifacts
+                .iter_mut()
+                .find(|a| a.role == LARGE_PRIME_DOMAIN_ROLE)
+                .unwrap();
+            (artifact.sha256, artifact.bytes) =
+                crate::store::hash_file(&dir.join(&artifact.path)).unwrap();
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec(&forged_manifest).unwrap(),
+            )
+            .unwrap();
+            assert!(export(&source, &f.0.join("forged-domain-export"))
+                .unwrap_err()
+                .contains("domain differs from verified transcript"));
+            assert!(!f.0.join("forged-domain-export/manifest.json").exists());
+        }
+    }
+
+    #[test]
+    fn missing_large_prime_domain_or_transcript_excludes_features_and_retains_provenance() {
+        for missing_role in [LARGE_PRIME_DOMAIN_ROLE, LARGE_PRIME_TRANSCRIPT_ROLE] {
+            let f = Fixture::new();
+            let source = f.source_with_method("prime", "double-large-prime", true);
+            let dir = source.join("cells/000000000125");
+            let mut manifest: CellManifest =
+                crate::ml_dataset::read_json(&dir.join("manifest.json")).unwrap();
+            let missing = manifest
+                .artifacts
+                .iter()
+                .find(|a| a.role == missing_role)
+                .unwrap()
+                .path
+                .clone();
+            manifest.artifacts.retain(|a| a.role != missing_role);
+            fs::remove_file(dir.join(missing)).unwrap();
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec(&manifest).unwrap(),
+            )
+            .unwrap();
+            let out = f.0.join("training");
+            let exported = export(&source, &out).unwrap();
+            assert_eq!(exported["export"]["sealed_source_cells"], 2);
+            assert_eq!(exported["export"]["unique_feature_rows"], 1);
+            assert_eq!(
+                exported["export"]["cells_without_verified_large_prime_domain"],
+                1
+            );
+            let targets: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+                .unwrap()
+                .lines()
+                .map(|line| serde_json::from_str(line).unwrap())
+                .collect();
+            let row = targets
+                .iter()
+                .find(|v| v["solver"] == "double-large-prime")
+                .unwrap();
+            assert!(row["feature_id"].is_null());
+            assert!(row["pdp_domain"].is_null());
+            assert_eq!(
+                row["feature_status"],
+                "missing_verified_large_prime_domain_or_transcript"
+            );
+            assert!(fs::read_to_string(out.join("restricted/index.jsonl"))
+                .unwrap()
+                .contains("cells/000000000125"));
+        }
     }
 
     #[test]

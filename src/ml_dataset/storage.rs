@@ -425,6 +425,43 @@ fn publication_head(
     }
 }
 
+/// Prepare an authorized immutable S3 object for the caller's final readback.
+/// Success here is not a publication acknowledgement: the caller must always
+/// download and verify bytes before writing its durable completion receipt.
+pub(super) fn prepare_s3_publication(
+    backend: &dyn Backend,
+    remote: &RemoteSpec,
+    key: &str,
+    source: &Path,
+    artifact: &Artifact,
+    scratch: &Path,
+) -> Result<(), String> {
+    if !matches!(remote, RemoteSpec::S3 { bucket, .. } if bucket == "setec-astronomy-artifacts") {
+        return Err("dataset S3 publication requires the approved bucket".into());
+    }
+    check_relative(key)?;
+    if artifact.bytes > SINGLE_PUT_MAX {
+        return Err("dataset receipt exceeds immutable single-PUT limit".into());
+    }
+    check_file(source, &artifact.sha256, artifact.bytes)?;
+    match publication_head(backend, Some(remote), key, source, artifact, scratch)? {
+        Some(meta) => {
+            if meta.bytes != artifact.bytes
+                || meta
+                    .sha256
+                    .as_ref()
+                    .is_some_and(|sha| sha != &artifact.sha256)
+            {
+                return Err(format!(
+                    "{key}: existing size or digest mismatch; refusing overwrite"
+                ));
+            }
+        }
+        None => backend.put(key, source, &artifact.sha256)?,
+    }
+    Ok(())
+}
+
 fn publish_object(
     store: &mut Store,
     root: &Path,
@@ -564,31 +601,14 @@ fn publish_catalog(
             }
         }
         Some(RemoteSpec::S3 { bucket, .. }) if bucket == "setec-astronomy-artifacts" => {
-            if artifact.bytes > SINGLE_PUT_MAX {
-                return Err("catalog receipt exceeds immutable single-PUT limit".into());
-            }
-            match publication_head(
+            prepare_s3_publication(
                 store.remote()?,
-                store.cfg.remote.as_ref(),
+                store.cfg.remote.as_ref().expect("matched S3 remote"),
                 &key,
                 &source,
                 &artifact,
                 root,
-            )? {
-                Some(meta) => {
-                    if meta.bytes != artifact.bytes
-                        || meta
-                            .sha256
-                            .as_ref()
-                            .is_some_and(|sha| sha != &artifact.sha256)
-                    {
-                        return Err(format!(
-                            "catalog {key}: existing size or digest mismatch; refusing overwrite"
-                        ));
-                    }
-                }
-                None => store.remote()?.put(&key, &source, &artifact.sha256)?,
-            }
+            )?;
         }
         _ => return Err("catalog publication requires an authorized S3 or file remote".into()),
     }
@@ -908,6 +928,65 @@ mod tests {
             *backend.calls.borrow(),
             ["head", "conditional-put", "head", "get"]
         );
+    }
+
+    #[test]
+    fn lab_receipt_preparation_uses_conditional_fallback_and_preserves_conflicts() {
+        let f = Fixture::new();
+        let artifact = write_json(
+            &f.0,
+            "receipt.json",
+            "publication-receipt",
+            &json!({"fixture":true}),
+        )
+        .unwrap();
+        let source = f.0.join(&artifact.path);
+        let key = format!("dataset-receipts/{}.json", artifact.sha256);
+        let backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        prepare_s3_publication(
+            &backend,
+            &dataset_s3_remote(),
+            &key,
+            &source,
+            &artifact,
+            &f.0,
+        )
+        .unwrap();
+        assert_eq!(
+            *backend.calls.borrow(),
+            ["head", "conditional-put", "head", "get"]
+        );
+        let verified = f.0.join("lab-final-readback.json");
+        backend.get(&key, &verified).unwrap();
+        check_file(&verified, &artifact.sha256, artifact.bytes).unwrap();
+
+        let corrupt = vec![b'x'; artifact.bytes as usize];
+        let backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        *backend.object.borrow_mut() = Some(corrupt.clone());
+        assert!(prepare_s3_publication(
+            &backend,
+            &dataset_s3_remote(),
+            &key,
+            &source,
+            &artifact,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("readback failed"));
+        assert_eq!(backend.object.borrow().as_ref(), Some(&corrupt));
+
+        let mut backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        backend.put_error = Some("put-object AccessDenied".into());
+        assert!(prepare_s3_publication(
+            &backend,
+            &dataset_s3_remote(),
+            &key,
+            &source,
+            &artifact,
+            &f.0
+        )
+        .is_err());
+        assert!(backend.object.borrow().is_none());
     }
 
     #[test]

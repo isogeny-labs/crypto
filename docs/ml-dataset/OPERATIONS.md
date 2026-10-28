@@ -271,18 +271,26 @@ separately verified Kummer base and the `prime-kummer-full-curve` domain, so its
 outcomes cannot be matched to `cyclic-subgroup-factor-base` routing rows.
 PKM cells without a saved, verified alternative base retain restricted target
 and provenance rows but have a null feature identity and an explicit exclusion
-count. Unsealed attempts appear in the restricted index without fabricated
-feature or target rows.
+count. Large-prime rows use the actual saved small and residual domains, checked
+against the independently replayed relation transcript. Signed Frobenius closure
+and identity/sign columns have distinct domain identities; neither is matched
+to ordinary PDP rows. Their structural inputs retain public column actions and
+state that each query decomposes `aG+bQ` into `m-2` small points and two residual
+points. Scalar certificates must agree with that transcript. Missing domain or
+transcript artifacts leave a null feature identity, an explicit exclusion count
+and retained restricted provenance; conflicting domains fail export. Unsealed
+attempts appear in the restricted index without fabricated feature or target rows.
 
 Use a separate destination outside the source tree. Export refuses the source
 root, its ancestors and paths inside `cells/`, and rejects symlink ancestors.
 Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
-policy is `strict-structural-allowlist-v2`; its domain-aware feature identities
+policy is `strict-structural-allowlist-v3`; its domain-aware feature identities
 must not be mixed with earlier export identities without regeneration.
 
-Use public equations, factor-base coordinates and admissible prefix states as
-features. Keep answers, future pivots, recovered logs, construction seeds and
+The current export is a structural routing view. Sequential equation or solver
+policy views still need a separate projection of admissible prefix states.
+Keep answers, future pivots, recovered logs, construction seeds and
 future conflict clauses in the target/restricted partition. Group equivalent
 presentations, signs, Frobenius orbits, generators, twists and related cases in
 the same holdout component. The initial conservative split groups by field size;
@@ -294,6 +302,10 @@ resource predictors with censoring, and measure learned SAT or elimination
 policies against frozen classical baselines with held-out instances. A neural
 prediction about hidden algebraic structure becomes a mathematical result only
 after independent symbolic or formal verification.
+
+The [durable-launch obstruction record](../../problems/ml-ecdlp-dataset-durable-launch.md)
+tracks the remaining worker S3 access and cumulative campaign-budget gates;
+software checks and exported local fixtures do not establish a cloud corpus.
 
 ## Shared campaign reservation and independent consumer
 

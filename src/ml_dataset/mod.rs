@@ -1915,9 +1915,19 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
     let store = crate::store::Store::open(cfg)?;
     let backend = store.remote()?;
     let key = format!("dataset-receipts/{}.json", artifact.sha256);
-    if backend.head(&key)?.is_none() {
-        backend.put(&key, &root.join(&artifact.path), &artifact.sha256)?;
-    }
+    storage::verify_manifest(root, std::slice::from_ref(artifact))?;
+    storage::prepare_s3_publication(
+        backend,
+        store
+            .cfg
+            .remote
+            .as_ref()
+            .expect("validated lab receipt remote"),
+        &key,
+        &root.join(&artifact.path),
+        artifact,
+        root,
+    )?;
     let scratch = checked_directory(&root.join("remote-verification"), true)?;
     let temporary = scratch.join(format!("{}-{}.json", artifact.sha256, unix_nanos()?));
     OpenOptions::new()
