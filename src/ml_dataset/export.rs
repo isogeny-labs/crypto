@@ -165,7 +165,7 @@ fn policy_projection(value: &Value) -> Result<Value, String> {
     let policy: FactorBasePolicy =
         serde_json::from_value(value.clone()).map_err(|e| e.to_string())?;
     Ok(match policy {
-        FactorBasePolicy::Legacy => json!({"kind":"legacy"}),
+        FactorBasePolicy::Legacy {} => json!({"kind":"legacy"}),
         FactorBasePolicy::SampledXProjectedControl { candidate_limit } => {
             json!({"kind":"sampled_x_projected_control","candidate_limit":candidate_limit})
         }

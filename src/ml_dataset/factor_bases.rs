@@ -254,7 +254,7 @@ pub(super) fn build(
     };
 
     let (candidate_limit, units, finite_domain) = match policy {
-        FactorBasePolicy::Legacy => {
+        FactorBasePolicy::Legacy {} => {
             let end = (requested as u64 * 32 + 128).min(c.q());
             (
                 end - 1,
@@ -511,7 +511,7 @@ mod tests {
             for twist in [false, true] {
                 let cfg = config(family, 11, twist);
                 let legacy = curves::generate(&cfg).unwrap();
-                let (_, explicit) = with_policy(cfg, FactorBasePolicy::Legacy);
+                let (_, explicit) = with_policy(cfg, FactorBasePolicy::Legacy {});
                 assert_eq!(legacy.public_instance, explicit.public_instance);
                 assert_eq!(legacy.private_witness, explicit.private_witness);
                 for field in [
@@ -849,7 +849,7 @@ mod tests {
         )
         .is_err());
         different = cfg;
-        different.factor_base_policy = Some(FactorBasePolicy::Legacy);
+        different.factor_base_policy = Some(FactorBasePolicy::Legacy {});
         assert!(curves::verify_factor_base_config(
             &different,
             &case.public_instance,

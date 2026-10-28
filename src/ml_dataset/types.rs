@@ -6,7 +6,9 @@ use serde_json::Value;
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum FactorBasePolicy {
-    Legacy,
+    // A zero-field struct keeps the same JSON as a unit variant while ensuring
+    // serde applies deny_unknown_fields to the recipe payload.
+    Legacy {},
     SampledXProjectedControl {
         candidate_limit: u64,
     },
@@ -23,7 +25,7 @@ pub enum FactorBasePolicy {
 impl FactorBasePolicy {
     pub fn name(&self) -> &'static str {
         match self {
-            Self::Legacy => "legacy",
+            Self::Legacy {} => "legacy",
             Self::SampledXProjectedControl { .. } => "sampled_x_projected_control",
             Self::BinarySubspaceIntersection { .. } => "binary_subspace_intersection",
             Self::BinaryFrobeniusUnionIntersection { .. } => "binary_frobenius_union_intersection",
@@ -35,7 +37,7 @@ impl FactorBasePolicy {
             return Err("factor-base policy field size must be 3..61".into());
         }
         let (basis, limit) = match self {
-            Self::Legacy => return Ok(()),
+            Self::Legacy {} => return Ok(()),
             Self::SampledXProjectedControl { candidate_limit } => (None, *candidate_limit),
             Self::BinarySubspaceIntersection {
                 basis,
@@ -165,8 +167,8 @@ mod policy_tests {
                     .is_err()
             );
         }
-        assert!(FactorBasePolicy::Legacy.validate(2).is_err());
-        assert!(FactorBasePolicy::Legacy.validate(62).is_err());
+        assert!(FactorBasePolicy::Legacy {}.validate(2).is_err());
+        assert!(FactorBasePolicy::Legacy {}.validate(62).is_err());
         assert!(FactorBasePolicy::BinarySubspaceIntersection {
             basis: vec![1 << 60],
             candidate_limit: 1
@@ -176,11 +178,28 @@ mod policy_tests {
     }
     #[test]
     fn policy_serde_is_tagged_and_strict() {
-        let good =
-            r#"{"kind":"binary_frobenius_union_intersection","basis":[1,2],"candidate_limit":32}"#;
-        let p: FactorBasePolicy = serde_json::from_str(good).unwrap();
-        assert_eq!(p.name(), "binary_frobenius_union_intersection");
-        assert_eq!(serde_json::to_string(&p).unwrap(), good);
+        for (good, name) in [
+            (r#"{"kind":"legacy"}"#, "legacy"),
+            (
+                r#"{"kind":"sampled_x_projected_control","candidate_limit":32}"#,
+                "sampled_x_projected_control",
+            ),
+            (
+                r#"{"kind":"binary_subspace_intersection","basis":[1,2],"candidate_limit":32}"#,
+                "binary_subspace_intersection",
+            ),
+            (
+                r#"{"kind":"binary_frobenius_union_intersection","basis":[1,2],"candidate_limit":32}"#,
+                "binary_frobenius_union_intersection",
+            ),
+        ] {
+            let p: FactorBasePolicy = serde_json::from_str(good).unwrap();
+            assert_eq!(p.name(), name);
+            assert_eq!(serde_json::to_string(&p).unwrap(), good);
+            let mut unknown: Value = serde_json::from_str(good).unwrap();
+            unknown["extra"] = Value::from(1);
+            assert!(serde_json::from_value::<FactorBasePolicy>(unknown).is_err());
+        }
         for bad in [
             r#"{"kind":"legacy","extra":1}"#,
             r#"{"kind":"unknown"}"#,
@@ -196,7 +215,7 @@ mod policy_tests {
         assert!(parsed.factor_base_policy.is_none());
         assert_eq!(serde_json::to_string(&parsed).unwrap(), legacy);
         let mut explicit = parsed;
-        explicit.factor_base_policy = Some(FactorBasePolicy::Legacy);
+        explicit.factor_base_policy = Some(FactorBasePolicy::Legacy {});
         assert!(serde_json::to_string(&explicit)
             .unwrap()
             .contains("factor_base_policy"));

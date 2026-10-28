@@ -2454,7 +2454,7 @@ mod tests {
         explicit.schema = "crypto.ml-dataset.plan/v2".into();
         assert!(explicit.validate().is_err());
         explicit.factor_base_policies = vec![
-            FactorBasePolicy::Legacy,
+            FactorBasePolicy::Legacy {},
             FactorBasePolicy::SampledXProjectedControl {
                 candidate_limit: 256,
             },
@@ -2487,7 +2487,9 @@ mod tests {
         explicit.schema = legacy.schema.clone();
         assert!(explicit.validate().is_err());
         explicit.schema = "crypto.ml-dataset.plan/v2".into();
-        explicit.factor_base_policies.push(FactorBasePolicy::Legacy);
+        explicit
+            .factor_base_policies
+            .push(FactorBasePolicy::Legacy {});
         assert!(explicit.validate().is_err());
         explicit.factor_base_policies = vec![FactorBasePolicy::BinarySubspaceIntersection {
             basis: vec![1, 2, 3],

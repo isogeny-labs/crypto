@@ -826,7 +826,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(polynomial, p)?;
                 if polynomial.len() != 2
                     || *root >= p
-                    || (vmul(polynomial[1], *root, p) + polynomial[0]) % p != 0
+                    || !(vmul(polynomial[1], *root, p) + polynomial[0]).is_multiple_of(p)
                 {
                     return Err("linear root identity failed".into());
                 }

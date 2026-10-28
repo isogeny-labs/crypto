@@ -2274,7 +2274,10 @@ pub(super) fn verify_prime_root_artifact(
     codes.sort_unstable();
     codes.dedup();
     let limit = config.work_limit.min(TRACE_EVENT_CAP);
-    if artifact["p"] != p.to_string() || artifact["effective_work_limit"] != limit {
+    let modulus_decimal = p.to_string();
+    if artifact["p"].as_str() != Some(modulus_decimal.as_str())
+        || artifact["effective_work_limit"] != limit
+    {
         return Err("prime root modulus or budget binding differs".into());
     }
     let queries = artifact["queries"]
@@ -2292,9 +2295,10 @@ pub(super) fn verify_prime_root_artifact(
             return Err("root queries continue past terminal state".into());
         }
         let x = codes[index];
+        let fixed_x_decimal = x.to_string();
         let coeff = prime_root_coefficients(p, a, b, x, xr);
         if row["call_index"] != index
-            || row["fixed_x"] != x.to_string()
+            || row["fixed_x"].as_str() != Some(fixed_x_decimal.as_str())
             || row["work_before"] != used
             || row["coefficient_setup_work"] != PRIME_S3_SETUP_WORK
             || row["coefficients_constant_first"] != json!(coeff)
@@ -2339,8 +2343,9 @@ pub(super) fn verify_prime_root_artifact(
                 return Err("root lifts continue after terminal state".into());
             }
             let root = roots[j];
+            let root_decimal = root.to_string();
             let eval = 2 * coeff.len() as u64;
-            if check["x"] != root.to_string()
+            if check["x"].as_str() != Some(root_decimal.as_str())
                 || check["evaluation_work"] != eval
                 || limit.saturating_sub(used) < eval
             {
