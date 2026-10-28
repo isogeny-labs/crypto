@@ -11,11 +11,15 @@ mkdir -p "$here/runs"
 mkdir "$base"
 "$repo/scripts/checkpoint.sh" gate > "$base/gate.log" 2>&1
 case "$name" in
- cf-factor)
+ cf-factor|cf-corrupt)
   printf 'ring r4=(2,a),(u,l),dp;minpoly=a^2+a+1;\n' > "$base/input.sing"
   sed -n '/^poly f=/p' "$here/../22/runs/cm22-plane-places.sing" >> "$base/input.sing"
   cat "$here/CF24.sing" >> "$base/input.sing"
-  marker=CF24_FACTORIZATION_ALL_CHECKS_PASS ;;
+  marker=CF24_FACTORIZATION_ALL_CHECKS_PASS
+  if [ "$name" = cf-corrupt ];then sed -i 's/print("PRODUCT_RESIDUAL");product-f;/product=product+1;print("PRODUCT_RESIDUAL");product-f;/' "$base/input.sing";fi ;;
+ o-charts)
+  cp "$here/O24-charts.sing" "$base/input.sing"
+  marker=O24_CHARTS_ALL_CHECKS_PASS ;;
  *) echo 'unknown case' >&2; exit 1 ;;
 esac
 sha256sum "$base/input.sing" > "$base/source.sha256"

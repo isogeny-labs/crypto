@@ -79,3 +79,30 @@ diagram/PDF and faithful Lean in the existing PR 2683. Keep all R01-23 evidence
 immutable. The five rational charts, additional zero supports, complete RR,
 actual F2 factor map/descent/nonzero order-11 action, node187 polynomial
 membership, quotient geometry and arbitrary reverse evaluator remain open.
+
+## Frozen O24 chart construction, after CF24 and before chart data
+
+CF24-factor-01 completes with a single degree-32 irreducible factor over F4,
+exact product, derivative gcd 1, and both field controls. It supplies no
+constant witness. The full constant-field conclusion uses the written bounds
+w|16 and w|10 together with nonsplitting over F4.
+
+At the base point O use t=u/v and q=1/(t^3*v). Check the exact base chart
+E0=q+1+(1+t)*t^3*q^2 and the original b,c substitutions below. Put
+Delta=t^11*d and C=t^14*e in the existing degree-8 tower H(Z); require the
+exact polynomial divisions and d(0,1)=e(0,1)=A(0,1)=1.
+
+Unramified chart: Z=t^3*y. Check H(Z)/t^14, the quadratic
+lambda^2+A*lambda=Z+b, and the original Tate equation. Verify the Jacobian
+in (q,y,lambda) is a unit at t=0,q=y=1,lambda=0 and 1.
+
+Tame chart: t=w^7*x^2, Z=w^11*x^3, with q=x=1 at w=0. Check
+H(Z)=w^88*x^24*(1+A^2*d*x+w^11*d*x^4+w^10*e*x^4),
+the same lambda equation and unit Jacobian in (q,x,lambda). Retain rational
+inverses w=Z^2/t^3 and x=t^11/Z^7. Source-bound generic identification,+regular local rings and proper degree exhaustion must precede any claim of
+four normalized points with weighted sum 1+1+7+7=16.
+
+Only after these chart checks pass, freeze the finite-precision coefficient
+evaluation of nu and all eight original registered entries. No mere Newton
+slope or finite projected factor multiplicity supplies a geometric branch.
+All resource limits, checkpoint and no-new-job/claim rules above persist.
