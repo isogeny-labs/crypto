@@ -1,0 +1,21 @@
+digraph proof {
+  graph [rankdir=TB, bgcolor="white", label="Guarded fall-degree proof dependencies (derived results)", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", fontname="Helvetica", fontsize=11];
+  edge [color="#39546b", fontname="Helvetica", fontsize=10];
+  sources [label="Primary sources\nclosure definition; S3 formulas"];
+  local [label="Three-abscissa ordinary-ring proof\nstaged quadratic normalization + resultant"];
+  odd [label="Characteristic > 3\nexact pair (4,5)", fillcolor="#e4f3e7"];
+  binary [label="Ordinary binary curve\nlast fall 4 on cube orbits; 5 otherwise", fillcolor="#e4f3e7"];
+  growing [label="Growing explicit membership cardinality B\nlinear degree bounds, not bit-complexity bounds", fillcolor="#e4f3e7"];
+  native [label="Native sparse replay\nchecks recorded proof DAGs", fillcolor="#e9eef8"];
+  lean [label="Checked Lean identities (partial)\nfull closure/grid/curve bridges open", fillcolor="#fff2d7"];
+  boolean [label="Growing Boolean Weil descent\nencoding/degree transfer UNPROVED", fillcolor="#fce5e5"];
+  sources -> local;
+  local -> odd;
+  local -> binary;
+  odd -> growing;
+  binary -> growing;
+  local -> native [label="finite instances"];
+  local -> lean [label="identity layer only"];
+  growing -> boolean [style=dashed, label="missing transfer"];
+}
