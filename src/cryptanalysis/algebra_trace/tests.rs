@@ -27,12 +27,22 @@ fn capture(
     degree: u32,
     limits: TraceLimits,
 ) -> (Result<TracedMatrixOutcome, TraceFailure>, Vec<Vec<u8>>) {
+    capture_declared(polys, n_vars, degree, limits, &binding())
+}
+
+fn capture_declared(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    limits: TraceLimits,
+    declared: &TraceBinding,
+) -> (Result<TracedMatrixOutcome, TraceFailure>, Vec<Vec<u8>>) {
     let mut lines = Vec::new();
     let result = matrix_f4_f2_traced(
         polys,
         n_vars,
         degree,
-        &binding(),
+        declared,
         limits,
         Instant::now() + Duration::from_secs(30),
         &mut || false,
@@ -327,7 +337,23 @@ fn selected_unsupported_profiles_and_native_caps_are_checked_in_child_processes(
 #[ignore = "isolated environment helper, invoked by its parent test"]
 fn selected_profile_child() {
     let expected = std::env::var("F4_TRACE_TEST_EXPECTED").expect("child test authorization");
-    let (result, lines) = capture(&[F2BoolPoly::one(0)], 0, 0, TraceLimits::default());
+    let export = std::env::var_os("F4_TRACE_CENSORED_FIXTURE_DIR").map(std::path::PathBuf::from);
+    let mut declared = binding();
+    if let Some(destination) = &export {
+        assert_eq!(expected, "native_size");
+        assert!(destination.is_absolute() && !destination.exists());
+        declared.source_commit =
+            std::env::var("F4_TRACE_SOURCE_COMMIT").expect("F4_TRACE_SOURCE_COMMIT");
+        declared.producer_sha256 =
+            std::env::var("F4_TRACE_PRODUCER_SHA256").expect("F4_TRACE_PRODUCER_SHA256");
+    }
+    let (result, lines) = capture_declared(
+        &[F2BoolPoly::one(0)],
+        0,
+        0,
+        TraceLimits::default(),
+        &declared,
+    );
     let failure = result.unwrap_err();
     if expected == "unsupported" {
         assert!(matches!(failure.reason, TraceStop::UnsupportedProfile(_)));
@@ -337,6 +363,25 @@ fn selected_profile_child() {
         assert_eq!(failure.reason, TraceStop::NativeSizeLimit);
         assert!(!lines.is_empty());
         assert_prefix(&lines, &failure.prefix);
+    }
+    if let Some(destination) = export {
+        use std::io::Write;
+        std::fs::create_dir(&destination).expect("censored fixture destination must be new");
+        let mut stream = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(destination.join("native_size.jsonl"))
+            .unwrap();
+        for line in lines {
+            stream.write_all(&line).unwrap();
+        }
+        stream.sync_all().unwrap();
+        let receipt = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(destination.join("native_size.failure.json"))
+            .unwrap();
+        serde_json::to_writer(receipt, &failure).unwrap();
     }
 }
 
