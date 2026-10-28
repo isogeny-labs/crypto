@@ -1,0 +1,28 @@
+ring norms27=(2,b,c,l,n),(x),dp;
+number aa=1+c;
+number gl=l/(l+aa);number gn=n/(n+b);
+number sl=(l+aa)/l;number sn=(n+b)/n;
+print("ACTUAL_NORM_ONE_AND_NONTRIVIAL_RATIOS");gl*sl-1;gn*sn-1;
+if(gl*sl!=1 || gn*sn!=1 || gl==1 || gn==1){ERROR("actual ratio norm/control failed");}
+number z=b+l^2+aa*l;number u=aa*n+b*l;number v=n^2+b*n;
+number sz=b+(l+aa)^2+aa*(l+aa);
+number su=aa*(n+b)+b*(l+aa);number sv=(n+b)^2+b*(n+b);
+number ss=z*u+v;number st=sz*su+sv;
+number nn=b^3+aa*b^2*z+aa^2*b*u+aa^3*v;
+number nt=b^3+aa*b^2*sz+aa^2*b*su+aa^3*sv;
+print("ALL_REGISTERED_RATIO_IDENTITIES");
+ideal registered=b,b+c*aa^3,c,c,b*(b+c),b+c+c^2,ss,nn;
+ideal conjugated=b,b+c*aa^3,c,c,b*(b+c),b+c+c^2,st,nt;
+int j;for(j=1;j<=8;j++){
+ if(registered[j]!=conjugated[j] || registered[j]/conjugated[j]!=1){ERROR("registered invariant ratio failure");}
+}
+// Constructive degree-two Hilbert90 with actual ratios.
+number liftL=1+gl;number liftN=1+gn;
+if(liftL/(1+sl)!=gl || liftN/(1+sn)!=gn){ERROR("Hilbert90 recovery failed");}
+print("HILBERT90_RATIOS_PASS");
+ring free27=2,(b,ib,aa),dp;
+ideal fixedIdeal=b,aa,b*ib+1;
+matrix witness[1][3]=ib,0,1;
+if((matrix(fixedIdeal)*transpose(witness))[1,1]!=1){ERROR("b-unit fixed locus certificate failed");}
+print("B_UNIT_FIXED_LOCUS_IDEAL_CERTIFICATE");witness;
+print("NORM27_ALL_CHECKS_PASS");quit;

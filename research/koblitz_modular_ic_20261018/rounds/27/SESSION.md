@@ -8,3 +8,6 @@ First prospective source: Laurent arithmetic with propagated absolute precision,
 
 LAURENT01 rejected identifier collision entry,allraw retained. Helper
 controls pass;no transported branch accepted. Rename new loop index only.
+
+LAURENT02 accepts20transportedbranches,all original residuals,fifth sigma
+and base b/c orders. Next negativecontrol thenNORM27; new10namedLean source.

@@ -53,3 +53,33 @@ geometric bridges rather than assuming missing geometry as axioms.
 Prospective correction before LAURENT02:01 retains native exit0/late marker
 but wrapperrejects the collision between seed poly entry and new int entry.
 Rename only the new loop index to index27. No chart or precision change.
+
+## Prospective norm/geometry and RR extension after accepted LAURENT02
+LAURENT02 accepts all20cusps and original residuals with positive propagated
+precision. Retain01 collision failure. Make checkpoint-live transport visible
+to checkpoints; no raw lost (01/02 present in the newly included archive).
+NORM27 adds one exact native call for actual lambda/nu norm-one ratios,
+nontriviality, all8registered invariant ratios=1, constructive Hilbert90 and
+an explicit ideal membership1 in (b,A,b*ib+1). These algebraic certificates
+support, but do not formalize, the proper free-action argument below.
+
+Potential proper quotient bridge: outside five cusps b is a unit; lambda is
+integral from monic G and nu is regular except possibly SS5/Z5, whose original
+charts already certify regularity. Thus sigma(nu)-nu=b excludes fixed geometric
+points there. At O,lambda residue swaps0/1, and T transports this to every
+cusp while commuting with sigma=T^5. A free constant Z/2 action gives an etale
+proper quotient; Riemann-Hurwitz would give genus31 and Prym dimension30.
+Check coverage and state the geometric bridge explicitly before concluding.
+References read before deduction: Stacks0BXX,07S7,0C1B. In particular no
+prime-to-characteristic ramification assumption is silently used in char2.
+Lean certifies only universal ratio/fixed-action algebra and conditional
+integer genus/dimension calculations, not quotient schemes or RH.
+
+RR construction proposal: all original lambda/nu are regular away cusps under
+these same charts. Candidate rational monomials with denominators only
+u(u+1),lambda/nu powers, are therefore regular elsewhere. Impose ALL20cusp
+principal-part bounds by linear algebra over F2 using certified precision.
+If68independent valid functions are found, RRdimension68 certifies completeness;
+fewer do not. An actual source-basis independence calculation is mandatory.
+Freeze precise monomial range and matrix source before RR data; do not claim
+completeness from a kernel count without independence and pole exhaustiveness.
