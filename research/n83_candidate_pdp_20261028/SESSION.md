@@ -349,3 +349,27 @@ d407c26a8a75bcac15229f705efacf245481250741fc0926f6a65c48fe609805.
 The complete native402-file reconstruction is verified. Publication helpers
 and all metric output bytes are archived separately. Exact finite regularity,
 larger-m/prime LFD, held-out comparisons and elite-base selection remain open.
+
+## Prime m2 Hilbert method, predata
+
+### What was done
+
+Reconciled clean bb370682aa8 and EKS overview with no duplicate active job.
+Read primary subset-inclusion diagonal and positive-characteristic Lefschetz
+proofs. Implemented native strict-source, Lucas primality, rank/Hilbert and
+explicit matrix controls for six retained prime m2 inputs. Prior data untouched.
+
+### Decisions made
+
+Use original two fixed-base inputs plus four paired inputs, with separate
+identities. Freeze source/protocol before applying to those sources. Same
+recorded existing-host fallback; no performance or elite-base claim.
+
+### Open threads
+
+Complete Lean finite-arithmetic check, freeze, run and replay, publish all raw
+bytes then descriptive report. Broader FFD/LFD and base-selection task stays open.
+
+### Errors
+
+No failed unit control so far; missing full algebraic Lean bridge is explicit.

@@ -117,7 +117,8 @@ def _prefetch_histories(ref, since):
         "research/n83_fixed_factor_base_20261028/data/index.json",
     ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
         "data/index.json", "evidence/pdp/paired-summary.json",
-        "evidence/degree3/summary.json", "evidence/top/verified-summary.json")]
+        "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
+        "evidence/hilbert/verified-summary.json")]
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda path: _history_log(ref, path, since), paths))
 
@@ -459,6 +460,24 @@ def n83_candidate_datasets(ref, since):
                 emit(f"n83.paired_top.{proof['id']}.graded_quotient_isomorphic", 1,
                      date=date, problem="n83-paired-top-regularity", unit="certificate",
                      label=f"Prime paired top quotients {proof['id']}: diagonal isomorphism; review pending",
+                     source=f"{path}@{commit}")
+
+
+    path = f"{study}/evidence/hilbert/verified-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        status = data.get("status", {})
+        if (status.get("producer_exit_code") != 0 or status.get("replay_exit_code") != 0
+                or data.get("replay_passed") is not True):
+            continue
+        for row in data.get("rows", []):
+            if row.get("verified") is not True:
+                continue
+            for field in ("dreg_exact", "last_nonzero_degree", "total_dimension"):
+                emit(f"n83.prime_m2_hilbert.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-prime-m2-top-regularity",
+                     unit="dimension" if field == "total_dimension" else "degree",
+                     label=f"Original top ideal {row['key']}: exact {field}; producer replay, review pending",
                      source=f"{path}@{commit}")
 
 
