@@ -10,9 +10,11 @@ mkdir -p "$base"
 "$repo/scripts/checkpoint.sh" gate > "$base/gate.log" 2>&1
 awk '/^poly unitprod=1;/{exit} {print}' "$here/../22/runs/cm22-incidence.sing" > "$base/input.sing"
 sed -n 's/^generic\[2\]=/poly nuEquation=/p' "$here/../22/runs/cm22-generic-qr-01.log" | sed 's/$/;/' >> "$base/input.sing"
-cat "$here/DECK25.sing" >> "$base/input.sing"
+marker=DECK25_ALL_CHECKS_PASS
+if [ "$name" = quotient ];then cat "$here/Q25.sing" >> "$base/input.sing";marker=Q25_REGISTERED_QUOTIENT_ALL_CHECKS_PASS
+else cat "$here/DECK25.sing" >> "$base/input.sing";fi
 case "$name" in
- positive) ;;
+ positive|quotient) ;;
  corrupt) sed -i 's/print("KERNEL_COEFFICIENT_INVARIANCE");/shiftedKernel[2]=shiftedKernel[2]+1;print("KERNEL_COEFFICIENT_INVARIANCE");/' "$base/input.sing" ;;
  *) exit 1 ;;
 esac
@@ -26,5 +28,5 @@ set -e
 printf '%s\n' "$rc" > "$base/exit.txt"
 date -u +%FT%TZ > "$base/finished-utc.txt"
 tar -cJf "$here/checkpoint-evidence.tar.xz" -C "$here" runs
-if [ "$rc" != 0 ] || rg -q '^ *\?' "$base/native.log" || ! rg -qx DECK25_ALL_CHECKS_PASS "$base/native.log";then echo "FAIL $attempt native=$rc";exit 1;fi
+if [ "$rc" != 0 ] || rg -q '^ *\?' "$base/native.log" || ! rg -qx "$marker" "$base/native.log";then echo "FAIL $attempt native=$rc";exit 1;fi
 echo "PASS $attempt"

@@ -46,3 +46,21 @@ ramification/genus at the remaining rational supports, full polarized quotient,
 RR, F2 factor map/nonzero order11 action, node187 membership and arbitrary
 reverse-divisor/460/367 obligations stay open. The cross-repository protocol
 checker is absent; no generic validator pass is claimed.
+
+## Frozen b-unit invariant chart, before its data
+
+The first deck call has zero original residual/unit/kernel and generic-nu
+invariance residuals, but is rejected because intermediate names collide
+with n^2/l^2 notation. Correct the names and repeat only that bounded check.
+Add one focused native quotient chart using the already registered unit b:
+U=A*n+b*l, V=n^2+b*n. Work with the monic Artin-Schreier relation
+n^2+b*n+V and inverse b*l=U+A*n, never dividing by A.
+
+For each of the5 original residuals and8 registered entries, homogenize in
+l to its actual l-degree d, substitute b*l=U+A*n, and reduce modulo the
+monic n relation. Require no remaining n and an exact pullback identity
+Q(U,V,b,c)=b^d*P(n,l,b,c) in the original polynomial ring. Retain all13 Q
+equations, powers d and zero residuals. Check the derivative is b, a unit
+on the actual registered open. This gives an explicit affine quotient
+presentation via mutually inverse coordinate maps; the proper boundary,
+polarization and order11 action remain separate. Native caps unchanged.

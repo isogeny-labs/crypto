@@ -71,6 +71,17 @@ theorem deck_nontrivial (a b l n : R) (ha : a≠0) : deck a b (l,n)≠(l,n) := b
   apply ha
   linear_combination hh
 
+theorem quotient_inverse_numerator [CharP R 2] (a b l n : R) :
+    s2 a b l n+a*n=b*l := by
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  unfold s2
+  linear_combination a*n*h2
+
+theorem quotient_s1_equation [CharP R 2] (a b l n : R) :
+    b^2*s1 a b l=b^3+a^2*s3 b n+(s2 a b l n)^2+a*b*s2 a b l n := by
+  have h2 : (2:R)=0 := CharP.cast_eq_zero R 2
+  linear_combination -(mixed_norm_relation a b l n)-((s2 a b l n)^2+a*b*s2 a b l n)*h2
+
 end KoblitzDeck25
 #print axioms KoblitzDeck25.s1_integer_lift
 #print axioms KoblitzDeck25.s2_integer_lift
@@ -84,3 +95,5 @@ end KoblitzDeck25
 #print axioms KoblitzDeck25.mixed_integer_lift
 #print axioms KoblitzDeck25.mixed_norm_relation
 #print axioms KoblitzDeck25.deck_nontrivial
+#print axioms KoblitzDeck25.quotient_inverse_numerator
+#print axioms KoblitzDeck25.quotient_s1_equation
