@@ -357,7 +357,7 @@ fn compare_replay(
     let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
     let mut accounting = false;
     if !(total_ok && phases_ok && counts_ok) && pre_class_setup_record(r) {
-        if let Some((ph, tot)) = legacy_class_setup(&rep) {
+        if let Some((ph, tot)) = legacy_class_setup(rep) {
             let g: Vec<f64> = ph.iter().map(|p| p.gae).collect();
             if same_gae(&g, tot) == (true, true) && ints(&ph) == ints(&r.phases) {
                 (total_ok, phases_ok, counts_ok, accounting) = (true, true, true, true);
