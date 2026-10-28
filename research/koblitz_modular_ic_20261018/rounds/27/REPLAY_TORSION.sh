@@ -17,10 +17,10 @@ deps=$(awk 'NR!=10' "$here/../22/runs/proof-cache-source-roots.txt" | paste -sd 
 export LEAN_PATH="$build:$deps"
 lean_bin=/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean
 set +e
-(cd "$build";ulimit -v 4194304;timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 -o KoblitzTorsion27.olean KoblitzTorsion27.lean) > "$raw/compile.log" 2>&1
+(cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 -o KoblitzTorsion27.olean KoblitzTorsion27.lean) > "$raw/compile.log" 2>&1
 rc=$?;printf '%s\n' "$rc" > "$raw/compile.exit"
 if [ "$rc" = 0 ];then
- (cd "$build";ulimit -v 4194304;timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 --run AuditAxioms.lean KoblitzCollector27 KoblitzTorsion27) > "$raw/audit.log" 2>&1
+ (cd "$build";timeout 1200 taskset -c 0 "$lean_bin" -j1 -M4096 --run AuditAxioms.lean KoblitzCollector27 KoblitzTorsion27) > "$raw/audit.log" 2>&1
  rc=$?;printf '%s\n' "$rc" > "$raw/audit.exit"
 fi
 exit "$rc"

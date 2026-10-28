@@ -10,8 +10,8 @@ matrix one[5][5]=1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1;
 int scalar=134292;
 if(11*scalar!=1477212 || scalar%11!=4){ERROR("reverse cusp prime-to11 scalar mismatch");}
 matrix wanted=scalar*one-d*phi;
-matrix inverse=inverse(principal);
-matrix certificate=inverse*wanted;
+matrix inverseMatrix27=inverse(principal);
+matrix certificate=inverseMatrix27*wanted;
 int i;int j;
 for(i=1;i<=5;i++){for(j=1;j<=5;j++){
  if(denominator(leadcoef(certificate[i,j]))!=1){ERROR("cusp recovery witness is not integral");}

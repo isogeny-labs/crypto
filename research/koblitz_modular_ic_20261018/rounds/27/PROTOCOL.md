@@ -373,3 +373,5 @@ nonzero order11 proof this identifies the full11primary cusp subgroup and
 its coordinate e(6) after prime-to11 scalar134292. Corrupt one witness.
 This does not evaluate ordinary degree460/367 supports, nor isolate a CM sign.
 Same4GiB/1200s native caps. Proper principal-divisor bridge remains written.
+
+QUADRICS02 also rejected before multiplication: rank is reserved. Rename multiplicationRank27; original controls0/1 retained, no rank accepted. Lean06 still failed before elaboration despite CPU0 affinity; the runner incorrectly added a process-address-space ulimit to the inherited -M4096 compiler cap. Remove that extra virtual-address restriction, preserve Lean -M4096 and1200s/CPU0. Lean memory limit is managed allocation, not a4GiB limit on mapped runtime address space. Native Singular retains original4GiB virtual limit.

@@ -17,7 +17,7 @@ print("QUADRICS27_ACTUAL_SOURCE_POSITIVE_AND_CORRUPTED_CONTROLS");good;bad;
 if(good!=0 || bad!=1){ERROR("source-bound quadratic identity controls failed");}
 proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string label){
  list columns;list pivotPolys;list pivotCombinations;list quadraticRelations;
- int i;int j;int k;int p;int term;int index;int rank=0;int n=count*(count+1) div 2;
+ int i;int j;int k;int p;int term;int index;int multiplicationRank27=0;int n=count*(count+1) div 2;
  intmat pairs[n][2];poly value;poly combination;poly residue;
  for(i=1;i<=precision;i++){
   pivotPolys=insert(pivotPolys,poly(0),size(pivotPolys));
@@ -31,7 +31,7 @@ proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string l
   while(value!=0){
    if(leadcoef(value)!=1){ERROR("nonbinary multiplication matrix");}
    p=deg(value)+1;
-   if(pivotPolys[p]==0){pivotPolys[p]=value;pivotCombinations[p]=combination;rank=rank+1;break;}
+   if(pivotPolys[p]==0){pivotPolys[p]=value;pivotCombinations[p]=combination;multiplicationRank27=multiplicationRank27+1;break;}
    value=value+pivotPolys[p];combination=combination+pivotCombinations[p];
   }
   if(value==0){
@@ -41,8 +41,8 @@ proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string l
   k=k+1;
  }
  }
- print("QUADRICS27_COUNTS "+label+" basis,monomials,rank,quadraticRelations");count;n;rank;size(quadraticRelations);
- if(k!=n || rank!=expectedRank || rank+size(quadraticRelations)!=n){ERROR("quadratic multiplication rank mismatch");}
+ print("QUADRICS27_COUNTS "+label+" basis,monomials,multiplicationRank27,quadraticRelations");count;n;multiplicationRank27;size(quadraticRelations);
+ if(k!=n || multiplicationRank27!=expectedRank || multiplicationRank27+size(quadraticRelations)!=n){ERROR("quadratic multiplication multiplicationRank27 mismatch");}
  // Independently recombine from saved original product columns.
  for(i=1;i<=size(quadraticRelations);i++){
   residue=0;combination=quadraticRelations[i];
