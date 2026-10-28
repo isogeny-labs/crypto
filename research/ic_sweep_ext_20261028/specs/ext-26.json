@@ -1,0 +1,285 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "extended residual-sweep study, 26-bit prime curve",
+ "description": "lead ICP-residual-partial-relations, exhaustive: sizes, variants, base shapes, generic comparators",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 26,
+    "seed": 59294
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-lanes16",
+   "role": "candidate",
+   "method": {
+    "id": "rho.negation_lanes",
+    "params": {
+     "lanes": "16"
+    }
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "kangaroo",
+   "role": "candidate",
+   "method": {
+    "id": "kangaroo.vow"
+   }
+  },
+  {
+   "name": "sweep-b2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=16",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b32",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=64",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "sweep-b128",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-dp2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-dp4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-dp6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,dp=6",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-nofold",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,fold=0",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-hybrid",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "oracle": "residual-sweep:m=2,pairs=1",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-null-strided",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8,stride=1000003",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-klprog",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=8",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "b8-klrand",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=8,scalars=random",
+     "oracle": "residual-sweep:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "pair-walk-b384",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=384",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "pair-b16-b192",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=192",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "pair-b16-b384",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=384",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "pair-b16-b768",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=768",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 3600
+ }
+}

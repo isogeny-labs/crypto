@@ -2264,19 +2264,41 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 pub struct ResidualSweepOracle {
     /// Residuals kept at most; later ones are still looked up.
     cap: usize,
+    /// Identify `Z` with `−Z` (the signed-class fold).  Off: only equal points collide.
+    fold: bool,
+    /// Distinguished-point filter: only residuals whose hashed abscissa has this
+    /// many trailing zero bits are stored or probed.
+    dp_bits: u32,
+    /// Also probe the negation-folded pair table once a target (hybrid).
+    pairs: bool,
+    table: Option<PairTable>,
     negs: Vec<PrimePoint>,
+    /// key -> (a, b, index, y bit)
     store: HashMap<u64, (u64, u64, u32, bool)>,
     stored: u64,
     sweeps: u64,
     collisions: u64,
     identity_hits: u64,
     cap_misses: u64,
+    dp_skipped: u64,
+    pair_hits: u64,
+}
+
+fn sweep_mix(x: u64) -> u64 {
+    let mut z = x.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
 }
 
 impl ResidualSweepOracle {
     pub fn new() -> Self {
         Self {
             cap: 1 << 24,
+            fold: true,
+            dp_bits: 0,
+            pairs: false,
+            table: None,
             negs: Vec::new(),
             store: HashMap::new(),
             stored: 0,
@@ -2284,6 +2306,8 @@ impl ResidualSweepOracle {
             collisions: 0,
             identity_hits: 0,
             cap_misses: 0,
+            dp_skipped: 0,
+            pair_hits: 0,
         }
     }
 }
@@ -2305,7 +2329,7 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
 
     fn describe(&self, _params: &Params) -> String {
         "every residual R − P_i of a target stored by abscissa; a collision of two residuals is a \
-         base-only relation (single large prime, no pair table)"
+         base-only relation (single large prime, no pair table unless pairs=1)"
             .into()
     }
 
@@ -2313,6 +2337,15 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         &[
             ("m", "must be 2"),
             ("cap", "most residuals kept (default 16777216)"),
+            ("fold", "1 (default): Z and −Z collide; 0: only equal points collide"),
+            (
+                "dp",
+                "k (default 0): store and probe only residuals whose hashed abscissa has k trailing zero bits",
+            ),
+            (
+                "pairs",
+                "1: also probe the negation-folded pair table once a target (hybrid); default 0",
+            ),
         ]
     }
 
@@ -2321,15 +2354,37 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         ctx: &InstanceCtx<PrimeCurve>,
         fb: &FactorBase<PrimePoint>,
         params: &Params,
-        _ops: &mut GroupOps,
+        ops: &mut GroupOps,
     ) -> Result<(), String> {
-        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m" && key != "cap") {
-            return Err("residual-sweep accepts only m=2 and cap".into());
+        const KEYS: [&str; 5] = ["m", "cap", "fold", "dp", "pairs"];
+        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| !KEYS.contains(&key.as_str())) {
+            return Err("residual-sweep accepts only m=2, cap, fold, dp and pairs".into());
         }
         self.cap = params.u64_or("cap", 1 << 24)? as usize;
+        self.fold = params.u64_or("fold", 1)? != 0;
+        self.dp_bits = params.u64_or("dp", 0)? as u32;
+        if self.dp_bits > 40 {
+            return Err("residual-sweep dp must be at most 40".into());
+        }
+        self.pairs = params.u64_or("pairs", 0)? != 0;
         self.negs = fb.points.iter().map(|p| ctx.group.neg(*p)).collect();
         self.store.clear();
+        self.table = None;
+        if self.pairs {
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+            ops.merge(table.build_ops);
+            self.table = Some(table);
+        }
         Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(PairTable::work_counters)
+                .unwrap_or_default(),
+        )
     }
 
     fn decompose(
@@ -2357,6 +2412,13 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
         let g = ctx.group;
         let mut out = Vec::new();
         self.sweeps += 1;
+        if let Some(table) = self.table.as_ref() {
+            if let Some(summands) = decompose_mitm(g, fb, table, 2, ops, counters, point) {
+                self.pair_hits += 1;
+                out.push(Relation::Summands(summands));
+            }
+        }
+        let dp_mask = (1u64 << self.dp_bits) - 1;
         for (i, neg) in self.negs.iter().enumerate() {
             let z = g.add(ops, point, *neg);
             if g.is_identity(&z) {
@@ -2368,12 +2430,21 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
                 });
                 continue;
             }
+            if self.dp_bits > 0 && sweep_mix(z.x) & dp_mask != 0 {
+                self.dp_skipped += 1;
+                continue;
+            }
             counters.lookups += 1;
             let ybit = z.y > g.neg(z).y;
-            match self.store.get(&z.x) {
+            let key = if self.fold {
+                z.x
+            } else {
+                (z.x << 1) | u64::from(ybit)
+            };
+            match self.store.get(&key) {
                 Some(&(a2, b2, i2, ybit2)) => {
                     let i2 = i2 as usize;
-                    let t_plus = ybit == ybit2;
+                    let t_plus = !self.fold || ybit == ybit2;
                     self.collisions += 1;
                     let (ra, rb, second) = if t_plus {
                         (
@@ -2392,7 +2463,7 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
                 }
                 None => {
                     if self.store.len() < self.cap {
-                        self.store.insert(z.x, (a, b, i as u32, ybit));
+                        self.store.insert(key, (a, b, i as u32, ybit));
                         self.stored += 1;
                     } else {
                         self.cap_misses += 1;
@@ -2410,6 +2481,8 @@ impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
             ("collisions".to_string(), self.collisions),
             ("identity_hits".to_string(), self.identity_hits),
             ("cap_misses".to_string(), self.cap_misses),
+            ("dp_skipped".to_string(), self.dp_skipped),
+            ("pair_hits".to_string(), self.pair_hits),
         ])
     }
 }
