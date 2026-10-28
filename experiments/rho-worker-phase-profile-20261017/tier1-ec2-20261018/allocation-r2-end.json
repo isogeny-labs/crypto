@@ -1,0 +1,99 @@
+{
+  "architecture": "x86_64",
+  "boot_cmdline": "BOOT_IMAGE=(hd0,gpt1)/boot/vmlinuz-6.18.54-121.166.amzn2023.x86_64 root=UUID=e1ba73b6-3ec8-4e69-a6ea-a5ee393d5bf6 ro console=tty0 console=ttyS0,115200n8 nvme_core.io_timeout=4294967295 rd.emergency=poweroff rd.shell=0 selinux=1 security=selinux quiet nohz_full=15 irqaffinity=0-14 isolcpus=managed_irq,15 rcu_nocbs=15",
+  "build": {
+    "binary_sha256": "c3c85633fc354ef62dedcc5b187db3c05f457376d7ef8c55611625c11ae6066a",
+    "cargo": {
+      "argv": [
+        "cargo",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05) (Amazon Linux 1.98.1-1.amzn2023)"
+    },
+    "q_manifest_sha256": "f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8",
+    "rustc": {
+      "argv": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "rustc 1.98.1 (48a229cea 2026-09-01) (Amazon Linux 1.98.1-1.amzn2023)"
+    },
+    "source_bundle_sha256": "2a0a7b6e04c8592f2d2be5c58ff7f226b9f39edf2a8d45b8d27afd04bcecf20c"
+  },
+  "captured_unix_ns": 1792371697375527665,
+  "cgroups": {
+    "init.scope": {
+      "cpu_max": "max 100000",
+      "cpus": "0-14",
+      "memory_max": "max",
+      "memory_nodes": "0"
+    },
+    "rho.slice/rho-runner.slice": {
+      "cpu_max": null,
+      "cpus": "0-15",
+      "memory_max": "max",
+      "memory_nodes": "0"
+    },
+    "system.slice": {
+      "cpu_max": "max 100000",
+      "cpus": "0-14",
+      "memory_max": "max",
+      "memory_nodes": "0"
+    },
+    "user.slice": {
+      "cpu_max": "max 100000",
+      "cpus": "0-14",
+      "memory_max": "max",
+      "memory_nodes": "0"
+    }
+  },
+  "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+  "frequency_governor": null,
+  "hard_stop_schedule": {
+    "argv": [
+      "systemctl",
+      "cat",
+      "rho-hard-stop.timer"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "stdout": "# /etc/systemd/system/rho-hard-stop.timer\n[Unit]\nDescription=Four-hour hard lifetime limit for rho benchmark host\n[Timer]\nOnCalendar=2026-10-19 03:15:00 UTC\nPersistent=true\n[Install]\nWantedBy=timers.target"
+  },
+  "hard_stop_timer": {
+    "argv": [
+      "systemctl",
+      "is-active",
+      "rho-hard-stop.timer"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "stdout": "active"
+  },
+  "host": "ip-172-31-2-92.us-east-2.compute.internal",
+  "host_exclusivity": "unproven_cloud_physical_host",
+  "irq_effective_affinity_checked": 72,
+  "irq_selected_cpu_overlap": [],
+  "irqbalance": {
+    "argv": [
+      "systemctl",
+      "is-active",
+      "irqbalance"
+    ],
+    "exit_code": 3,
+    "stderr": "",
+    "stdout": "inactive"
+  },
+  "isolated_cpus": "",
+  "kernel": "6.18.54-121.166.amzn2023.x86_64",
+  "nohz_full": "15",
+  "numa_nodes": "0",
+  "online_cpus": "0-15",
+  "schema": "rho-worker-ec2-tier1-allocation-v1",
+  "selected_cpu": 15,
+  "selected_cpu_siblings": "15",
+  "tier": "tier1_cloud_instance"
+}

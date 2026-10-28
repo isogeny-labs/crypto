@@ -9,18 +9,21 @@ name: Rust all targets compile
 # compiles, so a field added in src is checked against every caller in the
 # tree. It runs on any Rust change and takes the cargo cache with it.
 on:
-  workflow_dispatch:
   pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+  push:
+    branches: [main]
+  workflow_dispatch:
 concurrency:
   group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   scope:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -43,6 +46,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /build.rs
             /rustfmt.toml
@@ -62,8 +66,8 @@ jobs:
 
   check:
     needs: scope
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
       contents: read
@@ -78,7 +82,9 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /Cargo.toml
+            /tools/factor-base/
             /tools/volcano-cli/
             /isogeny_algos/
             /Cargo.lock
@@ -102,4 +108,9 @@ jobs:
       # Warnings stay out of the gate: this job answers "does it compile",
       # and the examples carry dead code on purpose.
       - run: RUSTFLAGS=-Awarnings cargo check --workspace --all-targets
+      # `wide-vars` (128-bit monomial masks, up to 128 Boolean unknowns) is off
+      # by default, so the line above never compiles it, and code that assumes
+      # 64-bit monomials lands without anyone noticing. Type-check the library
+      # and its tests with it on.
+      - run: RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars
       - run: cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib

@@ -1,0 +1,801 @@
+{
+  "cost_model": {
+    "advantage_margin_bits": 8.0,
+    "elliptic_group_op_mults": 10.0,
+    "enge_gaudry_c": 1.4142135623730951,
+    "extension_decomposition_degree_exponent": 3.0,
+    "extension_measured_solve_mults": [
+      [
+        3,
+        876000.0
+      ],
+      [
+        4,
+        86900000000.0
+      ]
+    ],
+    "hyperelliptic_ic_genus_polynomial_exponent": 2.0,
+    "jacobian_group_op_extrapolation_exponent": 2.347,
+    "jacobian_group_op_mults_measured": [
+      [
+        2,
+        164.7
+      ],
+      [
+        3,
+        338.7
+      ],
+      [
+        4,
+        569.6
+      ],
+      [
+        5,
+        937.1
+      ],
+      [
+        6,
+        1354.9
+      ],
+      [
+        8,
+        2620.9
+      ],
+      [
+        10,
+        4585.6
+      ],
+      [
+        12,
+        7236.2
+      ],
+      [
+        14,
+        10843.5
+      ],
+      [
+        16,
+        15343.5
+      ],
+      [
+        20,
+        27984.7
+      ],
+      [
+        24,
+        46335.5
+      ],
+      [
+        32,
+        102282.5
+      ]
+    ],
+    "karatsuba_exponent": 1.585
+  },
+  "curves": [
+    {
+      "name": "sect113r1",
+      "slug": "icv1-f2m113-tm122610772499221213-97df4ac6",
+      "summary": "sect113r1/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "ECC2K-130",
+      "slug": "icv1-f2m131-tm22283658519494248867-115e0dc5",
+      "summary": "ecc2k-130/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "K-163",
+      "slug": "icv1-f2m163-tm4845466632539410776804317-e15e581e",
+      "summary": "k-163/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "B-163",
+      "slug": "icv1-f2m163-tm6224022517221266226059365-31d88d74",
+      "summary": "b-163/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "P-192",
+      "slug": "icv1-fp192-t31607402316713927207482677199-52e4af59",
+      "summary": "p-192/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "secp256k1",
+      "slug": "icv1-fp256-t432420386565659656852420866390673177327-76dadd18",
+      "summary": "secp256k1/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "toy-k1-n15",
+      "slug": "unregistered-toy-k1-n15",
+      "summary": "toy-k1-n15/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "toy-k0-n15",
+      "slug": "unregistered-toy-k0-n15",
+      "summary": "toy-k0-n15/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "toy-k1-n21",
+      "slug": "unregistered-toy-k1-n21",
+      "summary": "toy-k1-n21/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "toy-k1-n35",
+      "slug": "unregistered-toy-k1-n35",
+      "summary": "toy-k1-n35/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "mnt/mnt1",
+      "slug": "icv1-fp170-tm52213820118540299389901413-869d5d3c",
+      "summary": "control-mnt1/summary.json",
+      "verdict": "class-weak"
+    },
+    {
+      "name": "BLS12-381",
+      "slug": "icv1-fp381-tm15132376222941642751-961de9ba",
+      "summary": "control-bls12-381/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "BN254",
+      "slug": "icv1-fp254-t129607518034317099905336561907183648775-8181e611",
+      "summary": "boundary-bn254/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "BN318",
+      "slug": "icv1-fp318-t548079839685593379889100768354473324754975588407-f4d63804",
+      "summary": "boundary-bn318/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "BLS12-638",
+      "slug": "icv1-fp638-tm121684554101595739501484314722271-a81b2097",
+      "summary": "boundary-bls12-638/summary.json",
+      "verdict": "no weakness found in scope"
+    },
+    {
+      "name": "BN350",
+      "slug": "icv1-fp350-t35917316178020966140770026648761406645010658995732487-6e1654f7",
+      "summary": "boundary-bn350/summary.json",
+      "verdict": "class-weak"
+    },
+    {
+      "name": "BN446",
+      "slug": "icv1-fp446-t10109980000181489923001201093401906549415298505746886291297633566727-278b8869",
+      "summary": "boundary-bn446/summary.json",
+      "verdict": "class-weak"
+    }
+  ],
+  "factor_budget": 262144,
+  "factor_hints_loaded": 3478,
+  "files": [
+    {
+      "bytes": 5867,
+      "path": "sect113r1/ghs_proper_subfield.json",
+      "sha256": "8aaa5844e2ff5f418804913b5714be504289d819e86aaa4d0b05e8b42a5c09ad"
+    },
+    {
+      "bytes": 9670,
+      "path": "sect113r1/ghs_l_1.json",
+      "sha256": "cd17b7fd3dbcfc0d3304e66450eaa8964947b763c605be38cc1dece9b49de0d6"
+    },
+    {
+      "bytes": 11138,
+      "path": "sect113r1/isogeny_class_invariants.json",
+      "sha256": "8ea446469703d5162ae8f615897829b933e375bc66cebc6e949b94f77e66f391"
+    },
+    {
+      "bytes": 7892,
+      "path": "sect113r1/isogeny_ghs_extension_l_1.json",
+      "sha256": "5a2cefdcb5ab1e4746ae08a3e000c1f2dae06485d759129686260f5d7aea7e9b"
+    },
+    {
+      "bytes": 9917,
+      "path": "sect113r1/isogeny_explicit_degree5.json",
+      "sha256": "68fccfe1456ef37b2d7574ee6fa3145441e3e29dc0187674f714263836f4da48"
+    },
+    {
+      "bytes": 10603,
+      "path": "sect113r1/cover_binary_g3_deg3.json",
+      "sha256": "298da59b24d860a80d8ef009185d1fcd02fd237e001a02e99a6b6f560d698566"
+    },
+    {
+      "bytes": 9981,
+      "path": "sect113r1/cover_genus_sweep.json",
+      "sha256": "52d52aa61d60b21f53a0c1bd3ecedbde4dd28514e4711d72534c652e69c8349e"
+    },
+    {
+      "bytes": 9527,
+      "path": "sect113r1/pairing_tate_mov_frey_ruck.json",
+      "sha256": "7791d7a2e4bf51ca48a4b61c2d7eafa6f3adeeffc53fd56ec679c8c635d5e034"
+    },
+    {
+      "bytes": 8002,
+      "path": "sect113r1/summary.json",
+      "sha256": "afc718eda1cc8fde58923b06c583e85fab57bdf228ce03add476f5d8bdabe4dd"
+    },
+    {
+      "bytes": 5866,
+      "path": "ecc2k-130/ghs_proper_subfield.json",
+      "sha256": "27e122a3b421f3cd85c0d4d303851bcb511a1f84badf96d854ef4c60c631959e"
+    },
+    {
+      "bytes": 10239,
+      "path": "ecc2k-130/ghs_l_1.json",
+      "sha256": "921cb076f72a98db1d7f1f596e05902a647b71d873abf5ba65f07df114a49083"
+    },
+    {
+      "bytes": 11607,
+      "path": "ecc2k-130/isogeny_class_invariants.json",
+      "sha256": "4f92cc88d05a4bd3a00b61ff07830bca6c70f532534d2ed2bdc97e162f50b2f9"
+    },
+    {
+      "bytes": 11115,
+      "path": "ecc2k-130/cover_binary_g3_deg3.json",
+      "sha256": "d5ec63d731868e4a15a5c81f8804064ddcdab3455d2a513171eebf0a973e61d1"
+    },
+    {
+      "bytes": 10265,
+      "path": "ecc2k-130/cover_genus_sweep.json",
+      "sha256": "66b74be78ec3b7348d510aaa4f8298bcf570720157e483a37e25793c45ba35b7"
+    },
+    {
+      "bytes": 9573,
+      "path": "ecc2k-130/pairing_tate_mov_frey_ruck.json",
+      "sha256": "01822726ce38cf88296fcca81cc7d4562099a6b6a60a5841ac2c111f083d461d"
+    },
+    {
+      "bytes": 6486,
+      "path": "ecc2k-130/summary.json",
+      "sha256": "d1b4b81d853f2297a24cfc18bcfa66793663bd0ca76624bba80d22fadcdef8b1"
+    },
+    {
+      "bytes": 5919,
+      "path": "k-163/ghs_proper_subfield.json",
+      "sha256": "e561bfd0249a4fad851d9c02fcf6f1d8ea23156422b0f2976b8be1e6646062b0"
+    },
+    {
+      "bytes": 10292,
+      "path": "k-163/ghs_l_1.json",
+      "sha256": "215e2efbe6c075de30fa15bc41f28228b428f7e8a8986946c507822d56863499"
+    },
+    {
+      "bytes": 12233,
+      "path": "k-163/isogeny_class_invariants.json",
+      "sha256": "eb79680c95a5d75882350f34fd9b4cfa8d9d4399989db7b82905c721ec4d1510"
+    },
+    {
+      "bytes": 11181,
+      "path": "k-163/cover_binary_g3_deg3.json",
+      "sha256": "036be9765da791ed77f4872c26116a9ab54d70438090a4cbab0e765430fab628"
+    },
+    {
+      "bytes": 10322,
+      "path": "k-163/cover_genus_sweep.json",
+      "sha256": "3a45580d8c12605a4c3d797916b4cb15d802df92836987c57e36bd56f998b573"
+    },
+    {
+      "bytes": 9678,
+      "path": "k-163/pairing_tate_mov_frey_ruck.json",
+      "sha256": "c4a60ee45e5b33377af92be1242e633a7ad04fe36177859fb5e6a0055faf8369"
+    },
+    {
+      "bytes": 6467,
+      "path": "k-163/summary.json",
+      "sha256": "b13f342b2b3472184735fc32704f9ff11f22c05c6ef6b3512cb2be06f0f45363"
+    },
+    {
+      "bytes": 5888,
+      "path": "b-163/ghs_proper_subfield.json",
+      "sha256": "1a4ee40e7257a5c189edb0b2eec1bc42fc91de62494075d76125beb6ad2159ad"
+    },
+    {
+      "bytes": 9728,
+      "path": "b-163/ghs_l_1.json",
+      "sha256": "432715751b1c3208d0386c0b666f999e790b2fbf93c3ace2372d1f47c918aaac"
+    },
+    {
+      "bytes": 11250,
+      "path": "b-163/isogeny_class_invariants.json",
+      "sha256": "6550107767a10cbde4b248de252a25e71d713a5c465bf8ae8a443cb650297b7a"
+    },
+    {
+      "bytes": 7721,
+      "path": "b-163/isogeny_ghs_extension_l_1.json",
+      "sha256": "74cbece8a28a15145fd03cd42dd32d2e7e9f69ccbd92aefbabb44259a2af71bc"
+    },
+    {
+      "bytes": 10692,
+      "path": "b-163/cover_binary_g3_deg3.json",
+      "sha256": "67e8a732b2f1f56b308ebedc3f841d65b16f7c2da9ba3a2e7347283532cbd33e"
+    },
+    {
+      "bytes": 10072,
+      "path": "b-163/cover_genus_sweep.json",
+      "sha256": "3e3b5781c36066b0c3c7ede3bcdcd824848c8d8d7f6b35c0eae64acaf142e433"
+    },
+    {
+      "bytes": 9657,
+      "path": "b-163/pairing_tate_mov_frey_ruck.json",
+      "sha256": "15198c20aa066fcd44b9e350f6a151b389c3f9e9519c3ec8977823322bf8708e"
+    },
+    {
+      "bytes": 7205,
+      "path": "b-163/summary.json",
+      "sha256": "200016e2ee46db85ed4b3b1532e52cbb594b5588fae7a9124ebb984a5fffec00"
+    },
+    {
+      "bytes": 5220,
+      "path": "p-192/ghs.json",
+      "sha256": "627041cc0df638fe0038819c046ee8e8abce87b4ee1c2dccece9ff60f538f5f6"
+    },
+    {
+      "bytes": 11516,
+      "path": "p-192/isogeny_class_invariants.json",
+      "sha256": "56c377c4eaf4d0a9cc739cf05ea4fdbb8d8cccbecc6b608ca3cdf52869cc49b2"
+    },
+    {
+      "bytes": 9371,
+      "path": "p-192/cover_prime_g2_deg2.json",
+      "sha256": "fab3b60499d0d4fa031c4bea3b0f5fe06fb7e9d4ca89d4ae28a3fa0f8f223717"
+    },
+    {
+      "bytes": 10111,
+      "path": "p-192/cover_genus_sweep.json",
+      "sha256": "6e7a3d0ea94a136a24115ab30c87d06e9b8051324dc65c3b1ec569acbe8dba4b"
+    },
+    {
+      "bytes": 9725,
+      "path": "p-192/pairing_tate_mov_frey_ruck.json",
+      "sha256": "2cd60a1ebcb7061d4962aa4fc0d508c3bfdda29f1fe738ddcf43fd937ab0590b"
+    },
+    {
+      "bytes": 5651,
+      "path": "p-192/summary.json",
+      "sha256": "db7f1da57e5d415b6e3835e3801ae989b229f9225c935ed7ef9546c33c89b456"
+    },
+    {
+      "bytes": 5293,
+      "path": "secp256k1/ghs.json",
+      "sha256": "90b51842f8b5d218d89d671e4f3486a1612c7bc940df32f1b77da12ac9ca14e1"
+    },
+    {
+      "bytes": 12862,
+      "path": "secp256k1/isogeny_class_invariants.json",
+      "sha256": "fc104063a7ec87fc2f403505b0921b9eccf3bfe0f3672529257ba4f42e1886e0"
+    },
+    {
+      "bytes": 9438,
+      "path": "secp256k1/cover_prime_g2_deg2.json",
+      "sha256": "782bcd290c3a8a83fadd83e8089e4445ad53a54677ff983f4355be4e4b8b71d5"
+    },
+    {
+      "bytes": 10415,
+      "path": "secp256k1/cover_genus_sweep.json",
+      "sha256": "0a55655e835ea3b818c17dd1334a9cf0bb5b7357bee67977e7b5e0efdb59fbb6"
+    },
+    {
+      "bytes": 9869,
+      "path": "secp256k1/pairing_tate_mov_frey_ruck.json",
+      "sha256": "c95aaefb374f925bc4478ecaea6d830818cd11e64ce9de6a427d28064a8a4eb1"
+    },
+    {
+      "bytes": 5762,
+      "path": "secp256k1/summary.json",
+      "sha256": "15088ae95d231fe3e1a0393f884d7ae4925da9f7d8bb2c0b53c5977b04eb5836"
+    },
+    {
+      "bytes": 9948,
+      "path": "toy-k1-n15/ghs_l_1.json",
+      "sha256": "fa675ec041857b99106b3fbbceb2b90884af7028c702fc452dc2e0403fbe9995"
+    },
+    {
+      "bytes": 9874,
+      "path": "toy-k1-n15/ghs_l_3.json",
+      "sha256": "786e90e9278a573b67aa718855a6f8722d2a39e8ef8591acfe7e0c422ecb8b78"
+    },
+    {
+      "bytes": 9875,
+      "path": "toy-k1-n15/ghs_l_5.json",
+      "sha256": "146c8e336114497b7881076b4e5ff9314bb7c67584b32dd85769f4985a56dca0"
+    },
+    {
+      "bytes": 10841,
+      "path": "toy-k1-n15/isogeny_class_invariants.json",
+      "sha256": "8b2e881198fa9eadf15711427fe9dba9deff8e8903fc0c2fb3aa0b6a22dd8c21"
+    },
+    {
+      "bytes": 9931,
+      "path": "toy-k1-n15/cover_binary_g3_deg3.json",
+      "sha256": "d0b29ee196b402ba6992b4c8cbb2fce7164ed8586a5d136b6611ec6c5fb1fa0c"
+    },
+    {
+      "bytes": 10048,
+      "path": "toy-k1-n15/cover_genus_sweep.json",
+      "sha256": "8383febca8029f2dacda46e947e8b92a03a3e58a2d07dfa11f87d3e27f164002"
+    },
+    {
+      "bytes": 9142,
+      "path": "toy-k1-n15/pairing_tate_mov_frey_ruck.json",
+      "sha256": "cf55cf92d24a62130fe33887357dd7524f0bfda82b22f3667116792bb5182a00"
+    },
+    {
+      "bytes": 9694,
+      "path": "toy-k1-n15/controls/subfield_subgroup_ghs_l_3.json",
+      "sha256": "190f3564e7eecf85d92b49fbb53c2cdaa7d5e01ad168ee6b82de357638e27e95"
+    },
+    {
+      "bytes": 9697,
+      "path": "toy-k1-n15/controls/subfield_subgroup_ghs_l_5.json",
+      "sha256": "229e62a5a93f54f8eecf098ba52b75b62945745b49e2abb67046615ec14ef177"
+    },
+    {
+      "bytes": 8478,
+      "path": "toy-k1-n15/summary.json",
+      "sha256": "1eed5de012177166b1a3bd1039d529520566b52f3d1ef99d98bc0f711ba75f0e"
+    },
+    {
+      "bytes": 9950,
+      "path": "toy-k0-n15/ghs_l_1.json",
+      "sha256": "27c0a78e23b0f647fba46928b1fc38b113e40942d45f25fe7c5e906340e30273"
+    },
+    {
+      "bytes": 9871,
+      "path": "toy-k0-n15/ghs_l_3.json",
+      "sha256": "70af3a0b76d118b93d21648226060e4f17a4071e7f99fea923668090beea9c28"
+    },
+    {
+      "bytes": 9875,
+      "path": "toy-k0-n15/ghs_l_5.json",
+      "sha256": "98e0dad6616154001a81fd516127bfde24551e5caadd8b60c0d7c6f24a877970"
+    },
+    {
+      "bytes": 10841,
+      "path": "toy-k0-n15/isogeny_class_invariants.json",
+      "sha256": "f00f5dfe57177807d011f215a337a35983a9fed587e8bb262ea1e5ac45b7b904"
+    },
+    {
+      "bytes": 9935,
+      "path": "toy-k0-n15/cover_binary_g3_deg3.json",
+      "sha256": "37150afedc48b949dd3c7de6164bbfa44ea6570f56ba34375d22886db7bcc26e"
+    },
+    {
+      "bytes": 10053,
+      "path": "toy-k0-n15/cover_genus_sweep.json",
+      "sha256": "2f7c9f4f63f9f29fcae71a534072d4771c8592db37b758a456ab6452af6ae5cf"
+    },
+    {
+      "bytes": 9141,
+      "path": "toy-k0-n15/pairing_tate_mov_frey_ruck.json",
+      "sha256": "38e992c9bc88a55145b0230f5d75ce74148270550ce51d50423601879cfe16fc"
+    },
+    {
+      "bytes": 9698,
+      "path": "toy-k0-n15/controls/subfield_subgroup_ghs_l_5.json",
+      "sha256": "a724b652a5b0a4ba3349c1c9395ecd1becff1d8b199f0d817ab19ff3bd444006"
+    },
+    {
+      "bytes": 7791,
+      "path": "toy-k0-n15/summary.json",
+      "sha256": "b895f20dfd50a1ce2ed4acbd46ba5479b7731709477f1151e35a629c96a1627a"
+    },
+    {
+      "bytes": 10026,
+      "path": "toy-k1-n21/ghs_l_1.json",
+      "sha256": "a504fcf32c0aeadc89cfed9ade546be7f1d38720b0a5816dadd042aaf10091bb"
+    },
+    {
+      "bytes": 9893,
+      "path": "toy-k1-n21/ghs_l_3.json",
+      "sha256": "2684ee556803a4668515e4c3ceea99c0eeddfec85fb713fa374b2442be6e61ae"
+    },
+    {
+      "bytes": 9679,
+      "path": "toy-k1-n21/ghs_l_7.json",
+      "sha256": "12a9106a47c4988005db03234d3d10a111349340882798435415fb7e662938fc"
+    },
+    {
+      "bytes": 11062,
+      "path": "toy-k1-n21/isogeny_class_invariants.json",
+      "sha256": "e226321aa907226806008a56b74aae5216675a015491472418ea8ea908678feb"
+    },
+    {
+      "bytes": 9941,
+      "path": "toy-k1-n21/cover_binary_g3_deg3.json",
+      "sha256": "bf3b50b91e54d3adbf182cc40fc5b1e59cb4edb6e64f9fab6d073b98c8f40a15"
+    },
+    {
+      "bytes": 10060,
+      "path": "toy-k1-n21/cover_genus_sweep.json",
+      "sha256": "7534346e188c2fb4cd5c3a3f23b474f17c0a1e03d94e9a977691f8ee366e5b99"
+    },
+    {
+      "bytes": 9145,
+      "path": "toy-k1-n21/pairing_tate_mov_frey_ruck.json",
+      "sha256": "4d3b61d15d8ff9a32f3f7962603c48d5ad895ecc570e10f10927621727b83f1b"
+    },
+    {
+      "bytes": 7109,
+      "path": "toy-k1-n21/summary.json",
+      "sha256": "6422abf432a936a84e1c690dbd35ba25770880a6886e32b94183540c3388ebf8"
+    },
+    {
+      "bytes": 10096,
+      "path": "toy-k1-n35/ghs_l_1.json",
+      "sha256": "f165f973659aeb3fbc4afa5d0783f9dab314bcc0befe8c4c67c9aa948eefe6f4"
+    },
+    {
+      "bytes": 9916,
+      "path": "toy-k1-n35/ghs_l_5.json",
+      "sha256": "f49b2cda394ed06f39e09b608d7c958ab3476707ba49f93ff6d1af0f8aacf61a"
+    },
+    {
+      "bytes": 9908,
+      "path": "toy-k1-n35/ghs_l_7.json",
+      "sha256": "d096f233b7f1f3be607889e2249edcac9a8fe2476b5f448614882596621c4b3c"
+    },
+    {
+      "bytes": 11406,
+      "path": "toy-k1-n35/isogeny_class_invariants.json",
+      "sha256": "bf2907ce9ffaca3eae026d0afb7536d71923ab07d0ae017d12460c9568943fd0"
+    },
+    {
+      "bytes": 9962,
+      "path": "toy-k1-n35/cover_binary_g3_deg3.json",
+      "sha256": "dc0b117de9ddc4375363548ffa7c4963e69a862671c50daeb264b663d14f91df"
+    },
+    {
+      "bytes": 10085,
+      "path": "toy-k1-n35/cover_genus_sweep.json",
+      "sha256": "ef3f872dfd2383a0b58354f6510a6bcfb3d38679e4bebbbbf4a1dde80a00529f"
+    },
+    {
+      "bytes": 9168,
+      "path": "toy-k1-n35/pairing_tate_mov_frey_ruck.json",
+      "sha256": "e5b1428e7d475c60332ce33238388bd5e394cf4b7f49e425e18d04c145375caf"
+    },
+    {
+      "bytes": 9744,
+      "path": "toy-k1-n35/controls/subfield_subgroup_ghs_l_5.json",
+      "sha256": "1aee9b3627015cd8f55865b91211bca00ce16a310f1e944430ab52ac957d9a3f"
+    },
+    {
+      "bytes": 7802,
+      "path": "toy-k1-n35/summary.json",
+      "sha256": "e864545b8ad1c86856fe88ae0f998d72ddf0b144b392b031251de889cf1621c2"
+    },
+    {
+      "bytes": 5293,
+      "path": "control-mnt1/ghs.json",
+      "sha256": "365dadc277ba2d884111724cb30e1b024f990b11808365c131a0c972616799ac"
+    },
+    {
+      "bytes": 12413,
+      "path": "control-mnt1/isogeny_class_invariants.json",
+      "sha256": "5db0f5e77b5054ce37f58d319b41db051f67ab87441edbaf7fe67fb08ce40281"
+    },
+    {
+      "bytes": 9441,
+      "path": "control-mnt1/cover_prime_g2_deg2.json",
+      "sha256": "bb413fbc30a3bf125234564145d25fd1aa1c4c16c7f96c24e5e82d97f83e28ec"
+    },
+    {
+      "bytes": 10192,
+      "path": "control-mnt1/cover_genus_sweep.json",
+      "sha256": "7615696a702415d4b7e70b85b257f3cfc248dfed3a28cac892221b5b986c70e7"
+    },
+    {
+      "bytes": 9744,
+      "path": "control-mnt1/pairing_tate_mov_frey_ruck.json",
+      "sha256": "fc02f002ca45b5226ba02db9985732418e7ac7920a8972ecd89fb83da2395411"
+    },
+    {
+      "bytes": 5697,
+      "path": "control-mnt1/summary.json",
+      "sha256": "b6b7e59094ea4c6bc2bab4d2f4c0913a4743784c58beb87ab328699e0ddaaa5e"
+    },
+    {
+      "bytes": 5436,
+      "path": "control-bls12-381/ghs.json",
+      "sha256": "0d67b41bb22b82bce4efeb56dbf0119510eb7b5a509b99e6e2fd51965fc324de"
+    },
+    {
+      "bytes": 14100,
+      "path": "control-bls12-381/isogeny_class_invariants.json",
+      "sha256": "b504ae2e05be87a4258babeb89e1d2ee57594e16eb3d344d8e8a0828e46ede7c"
+    },
+    {
+      "bytes": 9589,
+      "path": "control-bls12-381/cover_prime_g2_deg2.json",
+      "sha256": "353133cf2e2e0cb8ddc9c4781b46f7bbac2ae8e661823433551ccabf8235cf6a"
+    },
+    {
+      "bytes": 10583,
+      "path": "control-bls12-381/cover_genus_sweep.json",
+      "sha256": "35299d1737b5d8e7012f127b7b3f99c2c8d36ad67781a325c922c3b0812f6f92"
+    },
+    {
+      "bytes": 9898,
+      "path": "control-bls12-381/pairing_tate_mov_frey_ruck.json",
+      "sha256": "ebb241e87b6d91fd27e249fbc30e7243c12b1b4524ab51dc938d1cd0a47e5f82"
+    },
+    {
+      "bytes": 5852,
+      "path": "control-bls12-381/summary.json",
+      "sha256": "7b360461065ea3623adbf762b8763041b586f3ab02c1e1afaa1a88254e5a4a35"
+    },
+    {
+      "bytes": 5229,
+      "path": "boundary-bn254/ghs.json",
+      "sha256": "faf20be8a8112f3fafd69ee14f2026ac29084fcfd979644a4e8bc20715fc6a12"
+    },
+    {
+      "bytes": 12895,
+      "path": "boundary-bn254/isogeny_class_invariants.json",
+      "sha256": "7ed5f69608cbc83eb343d9f4f96f18f22522953d68ebf2743df7dc48ab816399"
+    },
+    {
+      "bytes": 9382,
+      "path": "boundary-bn254/cover_prime_g2_deg2.json",
+      "sha256": "d069b3ee3d459de46a87a757acb72eb5f44ff72184464c6bfd00efa41595f23d"
+    },
+    {
+      "bytes": 10360,
+      "path": "boundary-bn254/cover_genus_sweep.json",
+      "sha256": "b6d794ebb340e693dff35dbad4e05ed1132a25501ed72248d27bdf891de38d4b"
+    },
+    {
+      "bytes": 9688,
+      "path": "boundary-bn254/pairing_tate_mov_frey_ruck.json",
+      "sha256": "78b34491ac08fc1ac13528ba76a97e6776b0f22d3cc5b8a855fff5397a625514"
+    },
+    {
+      "bytes": 5819,
+      "path": "boundary-bn254/summary.json",
+      "sha256": "1110e9820a63f39c47f99ac6721631b930efddc9ceca66fd64d228886823134d"
+    },
+    {
+      "bytes": 5317,
+      "path": "boundary-bn318/ghs.json",
+      "sha256": "d9a26688f3265b7754a79b186b9300471fdbe0dfb8bc2ee4643219c534cee02e"
+    },
+    {
+      "bytes": 12391,
+      "path": "boundary-bn318/isogeny_class_invariants.json",
+      "sha256": "861e99e93915ee9808986e62281f896cd1e33335c0854c3933e675931450cb9d"
+    },
+    {
+      "bytes": 9467,
+      "path": "boundary-bn318/cover_prime_g2_deg2.json",
+      "sha256": "9bb68d18a8bfa2555fcef5b08df05431e2067bae1574f038ff4d37f24b3ef12a"
+    },
+    {
+      "bytes": 10462,
+      "path": "boundary-bn318/cover_genus_sweep.json",
+      "sha256": "e2baaaeb6adf0bc5af0d88fc35d58a9a9b78031d3deec4c391df72e4bf14bd97"
+    },
+    {
+      "bytes": 9841,
+      "path": "boundary-bn318/pairing_tate_mov_frey_ruck.json",
+      "sha256": "7524556132b636cd9a6c29c44f37b406ae59cfbdd76449d2af08303bf6406df3"
+    },
+    {
+      "bytes": 5845,
+      "path": "boundary-bn318/summary.json",
+      "sha256": "08b1de9763561560bcbe723d88b0b4155325ba0bbae10c55d9c1061db1d9f724"
+    },
+    {
+      "bytes": 5824,
+      "path": "boundary-bls12-638/ghs.json",
+      "sha256": "48eebc94c684cf7f7ecdc5fc445b93b1d02aa36c0eb7536f992b393e2d43ca41"
+    },
+    {
+      "bytes": 14881,
+      "path": "boundary-bls12-638/isogeny_class_invariants.json",
+      "sha256": "882149dea97b1a019466cba31e8b8ce8b75ff0a436a8128f64131fda202aedb9"
+    },
+    {
+      "bytes": 9979,
+      "path": "boundary-bls12-638/cover_prime_g2_deg2.json",
+      "sha256": "e79f99a0587bb8490ab66507a4845ad16ce92f3436debfce85ed329011f33377"
+    },
+    {
+      "bytes": 10974,
+      "path": "boundary-bls12-638/cover_genus_sweep.json",
+      "sha256": "26091d075f238d9e5346ccfe5aeb3f788f95b6a5e054aa97cc135969b011d012"
+    },
+    {
+      "bytes": 10379,
+      "path": "boundary-bls12-638/pairing_tate_mov_frey_ruck.json",
+      "sha256": "70e5ccdeae32495b291f4319b9a1a56a6788ab0845d64490541bfafa164c502b"
+    },
+    {
+      "bytes": 5923,
+      "path": "boundary-bls12-638/summary.json",
+      "sha256": "883a53f8dcaa93f6dc6a61b08a74b5098468ded03a871dea8fc8e56d8dc85527"
+    },
+    {
+      "bytes": 5365,
+      "path": "boundary-bn350/ghs.json",
+      "sha256": "8b1329463ac6e48237718702d1fbe7a3e75d2333e2eabd11fe8baa1369640775"
+    },
+    {
+      "bytes": 12991,
+      "path": "boundary-bn350/isogeny_class_invariants.json",
+      "sha256": "4d8b3d85782972fc038cebfacf825a797bacda8e8c134fc32b83dfb2d6812b9c"
+    },
+    {
+      "bytes": 9515,
+      "path": "boundary-bn350/cover_prime_g2_deg2.json",
+      "sha256": "dca6ee75ba4f39d484d2b847719835564482a3ddcf73e2402a6acf8d1d205b40"
+    },
+    {
+      "bytes": 10510,
+      "path": "boundary-bn350/cover_genus_sweep.json",
+      "sha256": "4ce8a25a9f8ac1182c62d061f4ae1309345dc2433367e18d65b3dcaf36c1a7db"
+    },
+    {
+      "bytes": 9893,
+      "path": "boundary-bn350/pairing_tate_mov_frey_ruck.json",
+      "sha256": "a67da54d3a1685581f4cf77e0eeab2d888297108f52977a37de094ef21abb9e6"
+    },
+    {
+      "bytes": 5822,
+      "path": "boundary-bn350/summary.json",
+      "sha256": "6d393d4bf5c35f49aae67751fa3c5245e8816e21ec67c572a5fb10eeac41e733"
+    },
+    {
+      "bytes": 5509,
+      "path": "boundary-bn446/ghs.json",
+      "sha256": "6ec3bff5c04593d43de4917eb8db8a154bbf83c1a3acbd0abbf7e5b689385b73"
+    },
+    {
+      "bytes": 12845,
+      "path": "boundary-bn446/isogeny_class_invariants.json",
+      "sha256": "0983029878020ea1b0dc85cf11deb6659538e8350ec6555d80c50851ea5ac398"
+    },
+    {
+      "bytes": 9653,
+      "path": "boundary-bn446/cover_prime_g2_deg2.json",
+      "sha256": "503e03e2024e7053f02793911dd099d145449ce62813820ae970f7518e81d5a7"
+    },
+    {
+      "bytes": 10650,
+      "path": "boundary-bn446/cover_genus_sweep.json",
+      "sha256": "db46491ffa5bf31d90e470bcdb922169b6b02be3a119684a482163dd1cb624e0"
+    },
+    {
+      "bytes": 10063,
+      "path": "boundary-bn446/pairing_tate_mov_frey_ruck.json",
+      "sha256": "7fa3463d35d151f406c9ba7b66a6cdf1014f537c27966c65232ede580c8caffd"
+    },
+    {
+      "bytes": 5833,
+      "path": "boundary-bn446/summary.json",
+      "sha256": "342e9e54da5f77039052c38d4df2003453abf7efccd7581e732bafb255aec7e6"
+    },
+    {
+      "bytes": 3886,
+      "path": "controls/synthetic_formula_advantage.json",
+      "sha256": "07b58609890e2b39b0530595fe5b94b3770197657a8feba555feecb23367d234"
+    }
+  ],
+  "nondeterministic_files_excluded": [
+    "run-log.json",
+    "controls/hec_ic_control.json",
+    "controls/hec_ic_control_extended.json"
+  ],
+  "schema": "transfer-audit/index/v1",
+  "seed": 20261011,
+  "tool": "transfer-audit/2"
+}

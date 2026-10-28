@@ -13,11 +13,15 @@
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
+//! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
+//! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
+//! | [`koblitz_descent`] | `ic.koblitz_descent`: the ledger §23 one-target Koblitz index calculus, charged by counted group operations |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
 //! | [`conductor_gap`] | CM crater/floor curve pairs with a certified prime endomorphism-conductor gap |
 //! | [`spec`] | the experiment spec and its deterministic expansion |
 //! | [`host`] | the host capsule and its environment class |
 //! | [`isolation`] | CPU reservation, eviction, pinning, NUMA binding, kernel counters |
+//! | [`legacy`] | the accounting of the past under which committed records still replay |
 //! | [`record`] | the record, the child protocol, isolation grading |
 //! | [`runner`] | sessions: interleaved measured children, sealed append-only records |
 //! | [`signals`] | interruption: the host is restored and no child outlives the runner |
@@ -38,6 +42,7 @@
 
 pub mod audit;
 pub mod band;
+pub mod best2_model;
 pub mod bounds;
 pub mod calibration;
 pub mod callgrind;
@@ -48,22 +53,36 @@ pub mod claw;
 pub mod cm_folded;
 pub mod compare;
 pub mod conductor_gap;
+pub mod cover_quartic;
 pub mod db;
+pub mod ext;
 pub mod fbm;
 pub mod fp4;
 pub mod frontier;
 pub mod full_price;
 pub mod generic;
+pub mod ghs_cover;
 pub mod gpu;
 pub mod host;
+pub mod hyper;
+pub mod hyper_ic;
+pub mod isogeny;
 pub mod isolab;
 pub mod isolation;
+pub mod jacobian;
+pub mod known_log;
+pub mod koblitz_descent;
+pub mod legacy;
 pub mod methods;
+pub mod plane_quartic;
 pub mod record;
 pub mod resources;
 pub mod runner;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod three_leads;
 pub mod trend;
+pub mod wordram_price;
+pub mod work;
 pub mod workload;

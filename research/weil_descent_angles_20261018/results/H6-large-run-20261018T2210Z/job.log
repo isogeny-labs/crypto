@@ -1,0 +1,72 @@
+examples/n2_routes.rs: OK
+bits 44 inst 2 target 0 done
+bits 44 inst 1 target 0 done
+bits 44 inst 0 target 0 done
+bits 44 inst 2 target 1 done
+bits 44 inst 1 target 1 done
+bits 44 inst 0 target 1 done
+bits 44 inst 0 target 2 done
+bits 48 inst 0 target 0 done
+bits 44 inst 2 target 2 done
+bits 44 inst 0 target 3 done
+bits 44 inst 1 target 2 done
+bits 44 inst 0 target 4 done
+bits 44 inst 1 target 3 done
+bits 44 inst 2 target 3 done
+bits 44 inst 0 target 5 done
+bits 44 inst 1 target 4 done
+bits 44 inst 0 target 6 done
+bits 44 inst 2 target 4 done
+bits 44 inst 1 target 5 done
+bits 44 inst 0 target 7 done
+bits 48 inst 1 target 0 done
+bits 44 inst 0 target 8 done
+bits 44 inst 2 target 5 done
+bits 44 inst 1 target 6 done
+bits 44 inst 0 target 9 done
+bits 44 inst 2 target 6 done
+bits 44 inst 1 target 7 done
+bits 48 inst 0 target 1 done
+bits 48 inst 2 target 0 done
+bits 44 inst 1 target 8 done
+bits 44 inst 2 target 7 done
+bits 44 inst 2 target 8 done
+bits 44 inst 1 target 9 done
+bits 44 inst 2 target 9 done
+bits 48 inst 2 target 1 done
+bits 48 inst 1 target 1 done
+bits 48 inst 0 target 2 done
+bits 48 inst 2 target 2 done
+bits 48 inst 0 target 3 done
+bits 48 inst 1 target 2 done
+bits 48 inst 2 target 3 done
+bits 48 inst 1 target 3 done
+bits 48 inst 0 target 4 done
+bits 48 inst 0 target 5 done
+bits 48 inst 2 target 4 done
+bits 48 inst 1 target 4 done
+bits 48 inst 2 target 5 done
+bits 48 inst 0 target 6 done
+bits 48 inst 0 target 7 done
+bits 48 inst 1 target 5 done
+bits 48 inst 2 target 6 done
+bits 48 inst 0 target 8 done
+bits 48 inst 1 target 6 done
+bits 48 inst 2 target 7 done
+bits 48 inst 2 target 8 done
+bits 48 inst 1 target 7 done
+bits 48 inst 0 target 9 done
+bits 48 inst 1 target 8 done
+bits 48 inst 2 target 9 done
+bits 48 inst 1 target 9 done
+O/J bits 44 arm J c 2: IC/rho ratio in [0.988, 2.961] over 12 cells -> unresolved; steps/p 0.295 (rho 0.328)
+O/J bits 44 arm D c 2: IC/rho ratio in [28.403, 80.874] over 6 cells -> rho cheaper in every cell; steps/p 0.342 (rho 0.328)
+O/J bits 48 arm J c 2: IC/rho ratio in [0.768, 2.316] over 12 cells -> unresolved; steps/p 0.311 (rho 0.448)
+O/J bits 48 arm D c 2: IC/rho ratio in [28.134, 86.838] over 6 cells -> rho cheaper in every cell; steps/p 0.433 (rho 0.448)
+O/J scaling arm R c 0: cost ~ p^1.213
+O/J scaling arm J c 2: cost ~ p^1.038
+O/J scaling arm D c 2: cost ~ p^1.263
+K6 bits 44: rho steps/p mean 0.3284 (s.e. 0.0262, 30 runs) vs 0.886*sqrt(ell)/p mean 0.3132
+K6 bits 48: rho steps/p mean 0.4478 (s.e. 0.0418, 30 runs) vs 0.886*sqrt(ell)/p mean 0.4430
+O/J all answers verified: true
+done in 514.8s

@@ -110,6 +110,7 @@ impl Fq {
         self.mul(a, a)
     }
     pub fn conj(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 1);
         E2([a.0[0], (self.p - a.0[1]) % self.p])
     }
     pub fn pow(&self, a: &E2, mut e: u128) -> E2 {
@@ -131,6 +132,7 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
+        super::jv_bitops::rng_words(2);
         E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
@@ -189,6 +191,7 @@ impl Fld for Fq {
         E2([sm(a.0[0], b.0[0], self.p), sm(a.0[1], b.0[1], self.p)])
     }
     fn neg(&self, a: &E2) -> E2 {
+        super::jv_bitops::hook_adds(self.p, 2);
         E2([(self.p - a.0[0]) % self.p, (self.p - a.0[1]) % self.p])
     }
     fn mul(&self, a: &E2, b: &E2) -> E2 {
@@ -211,6 +214,7 @@ impl Fld for Fq {
             p,
         );
         let ni = inv_mod(norm, p);
+        super::jv_bitops::hook_adds(p, 1);
         E2([mm(a.0[0], ni, p), mm((p - a.0[1]) % p, ni, p)])
     }
 }
@@ -1339,6 +1343,27 @@ fn trace_cache() -> &'static Mutex<HashMap<u64, TraceEntry>> {
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+thread_local! {
+    static TRACE_SCOPE: Cell<u64> = const { Cell::new(0) };
+}
+
+/// Key traces recorded and replayed on this thread by `scope` as well as
+/// `p` (`0`, the default, is the process-wide cache keyed by `p` alone).  A
+/// study that runs each instance on its own thread gives each run its own
+/// scope, so every run starts with no recorded trace (cold) and runs side by
+/// side do not share one.
+pub fn set_trace_scope(scope: u64) {
+    TRACE_SCOPE.with(|c| c.set(scope));
+}
+
+fn trace_key(p: u64) -> u64 {
+    p.wrapping_add(
+        TRACE_SCOPE
+            .with(Cell::get)
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15),
+    )
+}
+
 /// Forget the recorded traces (tests).
 pub fn clear_traces() {
     trace_cache().lock().unwrap().clear();
@@ -1383,25 +1408,26 @@ pub fn solve_zero_dim_mode(
     mode: LinMode,
 ) -> (Vec<Vec<u64>>, ZeroDimStats) {
     let mut st = ZeroDimStats::default();
+    let key = trace_key(p);
     let r = if !trace {
         f4_fp::f4(input, n, p, opts)
     } else {
         let have = trace_cache()
             .lock()
             .unwrap()
-            .get(&p)
+            .get(&key)
             .map(|e| e.trace.clone());
         match have {
             Some(t) => {
                 // a diverging replay finishes as a full run inside the engine
                 let r = f4_fp::f4_replay(input, n, p, opts, &t);
                 let mut cache = trace_cache().lock().unwrap();
-                if let Some(e) = cache.get_mut(&p) {
+                if let Some(e) = cache.get_mut(&key) {
                     if Arc::ptr_eq(&e.trace, &t) {
                         if r.trace_mismatch {
                             e.diverged += 1;
                             if e.diverged >= 3 && e.diverged > e.held {
-                                cache.remove(&p);
+                                cache.remove(&key);
                             }
                         } else {
                             e.held += 1;
@@ -1421,7 +1447,7 @@ pub fn solve_zero_dim_mode(
                     trace_cache()
                         .lock()
                         .unwrap()
-                        .entry(p)
+                        .entry(key)
                         .or_insert_with(|| TraceEntry {
                             trace: Arc::new(t),
                             held: 0,
@@ -1458,7 +1484,41 @@ pub fn solve_zero_dim_mode(
         st.incomplete = true;
         return (Vec::new(), st);
     }
-    let lms: Vec<&Vec<u32>> = r.basis.iter().map(|g| &g[0].0).collect();
+    let sols = linear_stage_from_basis(&r.basis, input, n, p, rng, mode, &mut st, t_lin);
+    (sols, st)
+}
+
+/// The linear stage of [`solve_zero_dim_mode`] alone: from a Gröbner basis
+/// (monic, grevlex, as `f4_fp` returns it) of a zero-dimensional ideal to its
+/// `F_p`-rational solutions, each checked against `input`. It draws one `u64`
+/// from `rng`, as the solver always did. `t_lin` is when the stage's clock
+/// starts; the stage writes `delta`, `lin_muls`, `lin_ms`, `lin_fallback`,
+/// `nonseparating`, `incomplete` and `inconsistent` into `st`.
+#[allow(clippy::too_many_arguments)]
+pub fn linear_stage_from_basis(
+    basis: &[f4_fp::Poly],
+    input: &[f4_fp::Poly],
+    n: usize,
+    p: u64,
+    rng: &mut StdRng,
+    mode: LinMode,
+    st: &mut ZeroDimStats,
+    t_lin: Instant,
+) -> Vec<Vec<u64>> {
+    if mode == LinMode::Fast {
+        let mut fs = super::zero_dim_la::FastStats::default();
+        if let Some(sols) = super::zero_dim_la::fast_stage(basis, input, n, p, rng, &mut fs) {
+            st.delta = fs.delta;
+            st.lin_muls = fs.muls();
+            st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
+            return sols;
+        }
+        st.lin_fallback += 1;
+        let sols = linear_stage_from_basis(basis, input, n, p, rng, LinMode::Dense, st, t_lin);
+        st.lin_muls += fs.muls();
+        return sols;
+    }
+    let lms: Vec<&Vec<u32>> = basis.iter().map(|g| &g[0].0).collect();
     // the smallest pure power of each variable
     let mut cap = vec![u32::MAX; n];
     for lm in &lms {
@@ -1468,7 +1528,7 @@ pub fn solve_zero_dim_mode(
     }
     if cap.contains(&u32::MAX) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // standard monomials by pruned depth-first search
     let mut std_mons: Vec<Vec<u32>> = Vec::new();
@@ -1502,13 +1562,13 @@ pub fn solve_zero_dim_mode(
     let mut mono = vec![0u32; n];
     if !walk(0, &mut mono, &cap, &lms, &mut std_mons) {
         st.incomplete = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     let delta = std_mons.len();
     st.delta = delta;
     if delta == 0 {
         st.inconsistent = true;
-        return (Vec::new(), st);
+        return Vec::new();
     }
     // Monomials packed eight bits per variable; divisibility by the guard-bit
     // trick (exponents stay below 128).
@@ -1533,8 +1593,7 @@ pub fn solve_zero_dim_mode(
         .enumerate()
         .map(|(i, m)| (pack(m), i))
         .collect();
-    let bas: Vec<(u64, Vec<(u64, u64)>)> = r
-        .basis
+    let bas: Vec<(u64, Vec<(u64, u64)>)> = basis
         .iter()
         .map(|g| {
             (
@@ -1612,7 +1671,7 @@ pub fn solve_zero_dim_mode(
                     nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
                 else {
                     st.incomplete = true;
-                    return (Vec::new(), st);
+                    return Vec::new();
                 };
                 target.push(None);
                 nz.push(
@@ -1756,6 +1815,7 @@ pub fn solve_zero_dim_mode(
                 z[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     z[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let w1 = z[chain_of[one_idx]];
                 if w1 == 0 {
@@ -1791,7 +1851,7 @@ pub fn solve_zero_dim_mode(
                     nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
                 else {
                     st.incomplete = true;
-                    return (Vec::new(), st);
+                    return Vec::new();
                 };
                 for (k, &c) in col.iter().enumerate() {
                     mi[k][j] = c;
@@ -1840,6 +1900,7 @@ pub fn solve_zero_dim_mode(
                 w[free] = 1;
                 for (ri, &pc) in piv.iter().enumerate() {
                     w[pc] = (p - a[ri][free]) % p;
+                    super::jv_bitops::hook_adds(p, 1);
                 }
                 let Some(kk) = w.iter().position(|&x| x != 0) else {
                     continue;
@@ -1875,7 +1936,7 @@ pub fn solve_zero_dim_mode(
     sols.dedup();
     st.lin_muls = cnt;
     st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
-    (sols, st)
+    sols
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -1883,15 +1944,54 @@ pub enum LinMode {
     Dense,
     Sparse,
     L1a,
+    /// `zero_dim_la::fast_stage` (transposed Krylov and the rational read-out),
+    /// with the dense stage when it gives up.
+    Fast,
 }
 
-/// `JV_LIN=dense|l1a|sparse` (default sparse), read once.
+/// `JV_DUMP_INSTANCE=<path>`: append one JSON line per solved DLP with the
+/// field tower (`F_p²` = `F_p[i]/(i² − w)`, `F_p⁶` = `F_p²[θ]/(θ³ − s)`), the
+/// curve `y² = x³ + a₂x² + a₄x`, `G`, `Q`, `l`, the planted `d` and the
+/// solved `dd`, so an independent program can check `dd·G = Q`. It reads
+/// values only; no counter moves.
+fn dump_instance(f: &Fq3, ec: &EllE, spec: &Spec, seed: u64, dd: u64) {
+    let Ok(path) = std::env::var("JV_DUMP_INSTANCE") else {
+        return;
+    };
+    let e2 = |x: &E2| format!("[{},{}]", x.0[0], x.0[1]);
+    let e6 = |x: &E6| format!("[{},{},{}]", e2(&x.0[0]), e2(&x.0[1]), e2(&x.0[2]));
+    let pt = |q: &PtE6| {
+        format!(
+            "{{\"x\":{},\"y\":{},\"inf\":{}}}",
+            e6(&q.x),
+            e6(&q.y),
+            q.inf
+        )
+    };
+    let line = format!(
+        "{{\"p\":{},\"seed\":{},\"w\":{},\"s\":{},\"a2\":{},\"a4\":{},\"l\":{},\"g\":{},\"q\":{},\"d\":{},\"dd\":{},\"lin\":\"{}\"}}\n",
+        spec.p, seed, f.f.w, e2(&f.s), e6(&ec.a2), e6(&ec.a4), spec.l, pt(&spec.g), pt(&spec.q), spec.d, dd, lin_mode_name()
+    );
+    use std::io::Write;
+    let mut out = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .expect("JV_DUMP_INSTANCE");
+    out.write_all(line.as_bytes())
+        .expect("JV_DUMP_INSTANCE write");
+}
+
+/// `JV_LIN=dense|l1a|sparse|fast` (default fast since
+/// research/postgb_linear_stage_20261026; `sparse` is the earlier default),
+/// read once.
 fn lin_mode() -> LinMode {
     static MODE: OnceLock<LinMode> = OnceLock::new();
     *MODE.get_or_init(|| match std::env::var("JV_LIN").as_deref() {
         Ok("dense") => LinMode::Dense,
         Ok("l1a") => LinMode::L1a,
-        _ => LinMode::Sparse,
+        Ok("sparse") => LinMode::Sparse,
+        _ => LinMode::Fast,
     })
 }
 
@@ -1900,6 +2000,7 @@ pub fn lin_mode_name() -> &'static str {
         LinMode::Dense => "dense",
         LinMode::L1a => "l1a",
         LinMode::Sparse => "sparse",
+        LinMode::Fast => "fast",
     }
 }
 
@@ -2390,6 +2491,7 @@ pub fn nagao_decompose(
         let mut options: Vec<(usize, Vec<i8>)> = Vec::with_capacity(6);
         for &x in &roots {
             let xe = f.from_fp(x);
+            super::jv_bitops::probe(1);
             let Some(&i) = by_x.get(&x) else {
                 continue 'sol;
             };
@@ -2567,6 +2669,102 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
             l = ec.add(&l, &mults[j].2);
             a = (a + mults[j].0) % n;
             b = (b + mults[j].1) % n;
+            if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
+                break 'outer;
+            }
+        }
+    }
+    let ops = ec.ops();
+    RhoRunE {
+        seed,
+        steps,
+        group_ops: ops,
+        s: ops as f64 / (n as f64).sqrt(),
+        correct: found == Some(spec.d),
+    }
+}
+
+/// [`rho_e`] on the classes `{±P}`: the negation map, the strongest rho on
+/// this curve (`y² = x³ + a₂x² + a₄x` with `α ∉ F_q` has only `±1` and no
+/// Frobenius acting on it). The same 32 multipliers, exhaustive storage of
+/// canonical representatives (the one of `P`, `−P` with the smaller `y`), the
+/// coefficients negated with the point. Fruitless 2-cycles are avoided by
+/// look-ahead (Wiener–Zuccherato): when the next point would pick the same
+/// multiplier, the next multiplier is tried, and after `r` tries the point is
+/// doubled. Longer fruitless cycles end in a stored collision with `db = 0`,
+/// and the walk restarts. Every group operation is charged.
+pub fn rho_e_neg(spec: &Spec, seed: u64) -> RhoRunE {
+    let f = Fq3::new(spec.p);
+    let ec = EllE::new(&f, &spec.alpha);
+    let n = spec.l;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D06);
+    let r = 32usize;
+    let mults: Vec<(u64, u64, PtE6)> = (0..r)
+        .map(|_| {
+            let al = rng.gen_range(0..n);
+            let be = rng.gen_range(1..n);
+            (al, be, ec.add(&ec.mul(&spec.g, al), &ec.mul(&spec.q, be)))
+        })
+        .collect();
+    // (point, a, b) with point = aG + bQ, made canonical in its class {±P}.
+    let canon = |pt: PtE6, a: u64, b: u64| -> (PtE6, u64, u64) {
+        let ny = f.neg(&pt.y);
+        if !pt.inf && ny < pt.y {
+            (
+                PtE6 {
+                    x: pt.x,
+                    y: ny,
+                    inf: false,
+                },
+                (n - a) % n,
+                (n - b) % n,
+            )
+        } else {
+            (pt, a, b)
+        }
+    };
+    let index = |pt: &PtE6| -> usize {
+        let h = pt.x.0[0].0[0]
+            ^ pt.x.0[0].0[1].wrapping_mul(0x9E37_79B9)
+            ^ pt.x.0[1].0[0].rotate_left(17)
+            ^ pt.x.0[2].0[1].rotate_left(33);
+        (mix64(h) % r as u64) as usize
+    };
+    let mut table: HashMap<PtE6, (u64, u64)> = HashMap::new();
+    let mut steps = 0u64;
+    let mut found = None;
+    'outer: loop {
+        let a0 = rng.gen_range(0..n);
+        let b0 = rng.gen_range(1..n);
+        let start = ec.add(&ec.mul(&spec.g, a0), &ec.mul(&spec.q, b0));
+        let (mut l, mut a, mut b) = canon(start, a0, b0);
+        loop {
+            steps += 1;
+            if let Some(&(a2, b2)) = table.get(&l) {
+                let db = (b + n - b2) % n;
+                if db != 0 {
+                    let da = (a2 + n - a) % n;
+                    found = Some(mm(da, inv_mod(db, n), n));
+                    break 'outer;
+                }
+                break;
+            }
+            table.insert(l, (a, b));
+            let mut j = index(&l);
+            let mut next = None;
+            for _ in 0..r {
+                let c = canon(
+                    ec.add(&l, &mults[j].2),
+                    (a + mults[j].0) % n,
+                    (b + mults[j].1) % n,
+                );
+                if index(&c.0) != j {
+                    next = Some(c);
+                    break;
+                }
+                j = (j + 1) % r;
+            }
+            (l, a, b) = next.unwrap_or_else(|| canon(ec.add(&l, &l), 2 * a % n, 2 * b % n));
             if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
                 break 'outer;
             }
@@ -3070,6 +3268,10 @@ pub struct CoverDlpReport {
     pub post_muls: u64,
     pub verify_muls: u64,
     pub oracle_muls: u64,
+    /// Milliseconds in F4 and in the linear stage, summed over the Nagao
+    /// tests (time per test on its own thread, not elapsed wall time).
+    pub f4_ms: f64,
+    pub lin_ms: f64,
     /// `C_cov` as the run paid it, per residual.
     pub c_cov: f64,
     pub unknowns: usize,
@@ -3089,6 +3291,14 @@ pub struct CoverDlpReport {
     pub rho_s_mean: f64,
     pub rho_s_sd: f64,
     pub s_over_rho: f64,
+    /// `JV_RHO_NEG=1`: as many [`rho_e_neg`] runs as `rho`, after the clock,
+    /// and `S` over their mean; absent otherwise.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub rho_neg: Vec<RhoRunE>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rho_neg_s_mean: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub s_over_rho_neg: Option<f64>,
     pub relation_over_rho: f64,
     pub r: f64,
     pub r_last: f64,
@@ -3156,6 +3366,10 @@ pub fn run_cover_dlp(
     let mut next_attempt = unknowns;
     let mut la_ops = 0u64;
     let cap = 400 * (unknowns as u64) * 720;
+    // Opt-in, read-only: JV_LP_LOG=1 prints one `LPLOG {json}` line per decomposition
+    // (its six factor-base indices and abscissae).  Used by the large-prime
+    // feasibility study; nothing below depends on it.
+    let lp_log = std::env::var("JV_LP_LOG").is_ok();
     'collect: while rep.residuals < cap {
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
@@ -3203,6 +3417,8 @@ pub fn run_cover_dlp(
             rep.residuals += 1;
             rep.weil_muls += cost.weil_muls;
             rep.lin_muls += cost.lin_muls;
+            rep.f4_ms += cost.f4_ms;
+            rep.lin_ms += cost.lin_ms;
             rep.post_muls += cost.post_muls;
             rep.verify_muls += vm;
             if cost.incomplete {
@@ -3230,6 +3446,17 @@ pub fn run_cover_dlp(
             for d in decs {
                 any = true;
                 rep.decompositions += 1;
+                if lp_log {
+                    eprintln!(
+                        "LPLOG {{\"p\":{},\"seed\":{},\"residual\":{},\"base\":{},\"idx\":{:?},\"x\":{:?}}}",
+                        p,
+                        seed,
+                        rep.residuals,
+                        small,
+                        d.terms.iter().map(|t| t.0).collect::<Vec<_>>(),
+                        d.terms.iter().map(|t| base[t.0].x).collect::<Vec<_>>()
+                    );
+                }
                 let mut cols: Vec<(usize, u64)> = d
                     .terms
                     .iter()
@@ -3272,6 +3499,7 @@ pub fn run_cover_dlp(
                     if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
                         rep.solved = true;
                         rep.correct = dd == Some(spec.d);
+                        dump_instance(&ctx.f, &ec, &spec, seed, dd.unwrap());
                         rep.unknowns = sel.len();
                         rep.filtered_out = full_rels.len() - sel.len();
                         rep.la_ops_last = la_ops - before;
@@ -3330,6 +3558,17 @@ pub fn run_cover_dlp(
     rep.predicted_s_over_rho =
         360.0 * p as f64 * rep.c_cov / (rep.rho_s_mean * sqrt_l * c_e) + rep.r;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
+    if std::env::var("JV_RHO_NEG").as_deref() == Ok("1") {
+        rep.rho_neg = (0..rho_runs as u64)
+            .into_par_iter()
+            .map(|k| rho_e_neg(&spec, seed * 1000 + k))
+            .collect();
+        if !rep.rho_neg.is_empty() {
+            let m = rep.rho_neg.iter().map(|r| r.s).sum::<f64>() / rep.rho_neg.len() as f64;
+            rep.rho_neg_s_mean = Some(m);
+            rep.s_over_rho_neg = Some(rep.s / m);
+        }
+    }
     rep
 }
 
@@ -3360,6 +3599,45 @@ pub struct StudySystem {
     pub top_muls: u64,
     pub top_staircase: Option<usize>,
     pub modes: Vec<StudyMode>,
+}
+
+/// The Weil-restricted Nagao systems of `run_stop_study`'s jobs: `random`
+/// residuals `aG + bQ` and `constructed` ones with a planted six-point
+/// decomposition, each as its six quadrics in six unknowns over `F_p`, with
+/// `true` on the constructed ones. Degenerate residuals are skipped. This is
+/// the corpus input of `research/postgb_linear_stage_20261027`.
+pub fn nagao_systems(
+    p: u64,
+    seed: u64,
+    random: usize,
+    constructed: usize,
+) -> Vec<(Vec<f4_fp::Poly>, bool)> {
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
+    let base = factor_base(&ctx, &mut rng);
+    let jac = ctx.jac();
+    let mut jobs: Vec<(Div<E2>, bool)> = Vec::new();
+    for _ in 0..random {
+        let a = rng.gen_range(0..spec.l);
+        let b = rng.gen_range(1..spec.l);
+        jobs.push((
+            jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128)),
+            false,
+        ));
+    }
+    for _ in 0..constructed {
+        jobs.push((planted(&jac, &base, &mut rng).0, true));
+    }
+    jobs.into_iter()
+        .filter(|(r, _)| r.u.len() == 4)
+        .map(|(r, pl)| {
+            let mut v = r.v.clone();
+            v.resize(3, E2::ZERO);
+            let forms = weil_forms(&ctx.f.f, &ctx.cov.hx, &r.u, &v);
+            (forms.polys(&ctx.reim, p), pl)
+        })
+        .collect()
 }
 
 pub fn run_stop_study(
@@ -3734,6 +4012,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn nagao_finds_planted_six_sums_and_agrees_with_the_oracle() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
@@ -3820,7 +4102,7 @@ mod tests {
                         }
                     }
                     let mut outs = Vec::new();
-                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a] {
+                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a, LinMode::Fast] {
                         let mut r = StdRng::seed_from_u64(5 + trial as u64);
                         let (sols, st) =
                             solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
@@ -3833,6 +4115,7 @@ mod tests {
                     }
                     assert_eq!(outs[0].0, outs[1].0, "sparse p={p} n={n} trial={trial}");
                     assert_eq!(outs[0].0, outs[2].0, "l1a p={p} n={n} trial={trial}");
+                    assert_eq!(outs[0].0, outs[3].0, "fast p={p} n={n} trial={trial}");
                     if planted.len() == 1 {
                         assert!(outs[1].0.contains(&planted[0]), "planted lost p={p} n={n}");
                     }
@@ -3906,6 +4189,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn the_solver_loses_no_rational_solution_at_small_p() {
         // p = 53: a Krylov minimal polynomial of one vector loses a root with
         // probability 1/p, a non-separating form likewise.  Plant many sums.
@@ -3956,6 +4243,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn stopped_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
@@ -4051,6 +4342,22 @@ mod tests {
     }
 
     #[test]
+    fn negation_rho_finds_the_planted_logarithm_in_fewer_operations() {
+        // p = 53: the stored walk on {±P} against the plain one, same seeds;
+        // the negation map should need about 1/sqrt(2) of the operations.
+        let spec = generate_spec(53, 1);
+        let (mut plain, mut neg) = (0.0, 0.0);
+        for run in 0..8u64 {
+            let a = rho_e(&spec, 200 + run);
+            let b = rho_e_neg(&spec, 200 + run);
+            assert!(a.correct && b.correct, "run {run}: {a:?} {b:?}");
+            plain += a.s;
+            neg += b.s;
+        }
+        assert!(neg < plain, "negation map S {neg} not below plain {plain}");
+    }
+
+    #[test]
     fn distinguished_point_rho_finds_the_planted_logarithm() {
         // p = 53: l ≈ 2^32, sqrt l ≈ 6.5·10⁴ steps; three runs, two walkers
         let spec = generate_spec(53, 1);
@@ -4062,6 +4369,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        debug_assertions,
+        ignore = "F4 solves exceed their 120 s budget in a debug build; run with --release"
+    )]
     fn replayed_f4_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let traced = Ctx::with_trace(&spec, true);
