@@ -47,7 +47,7 @@ stage2)
   # Amendment 2: survivors of stage 1, the baseline grid and rho-frob on fresh targets.
   sv=${2:?survivors json}
   for n in 37 41 43 47; do
-    arms=$(jq -c --argjson s "$(jq -c --arg n $n '.[$n]' "$sv")" '[.arms[] | select(.name=="rho-frob" or (.name|startswith("base-k")) or ([.name]|inside($s)))]' specs/train-n$n.json)
+    arms=$(jq -c --argjson s "$(jq -c --arg n $n '.[$n]' "$sv")" '[.arms[] | select(.name=="rho-frob" or (.name|startswith("base-k")) or (.name as $x | $s | index($x) != null))]' specs/train-n$n.json)
     spec "DLP tuning STAGE 2 Koblitz n=$n" ${A[$n]} $n $S2_T $S2_TARGET_SEED $S2_ALG_SEED "$arms" specs/stage2-n$n.json
   done ;;
 train)

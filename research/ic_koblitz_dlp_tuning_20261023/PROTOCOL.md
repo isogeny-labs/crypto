@@ -257,3 +257,12 @@ The new seeds are disjoint from the train seeds above and from the holdout seeds
 is replaced by: stage 1 about 53 s x 8 per curve (about 7 min at n = 37; the larger curves are
 measured, not assumed); stage 2 about 11 cells x 48 targets; holdout unchanged. `run_session.sh`,
 `prune.sh` and the stage generators are part of the frozen commands.
+
+## Amendment 3 (2026-10-28, before any stage-2 run): generator bug
+
+`make_specs.sh stage2` selected survivors with jq `inside`, which matches strings by substring, so
+cells such as `dlp-k1-c1` and `dlp-k4-c1` rode along with `dlp-k1-c10` and `dlp-k4-c10` (18 to 22 arms
+instead of 16). Fixed to exact name matching; stage-2 specs regenerated (16 arms each: `rho-frob`, 5
+baseline cells, the 10 survivors) before any stage-2 run. `survivors.json` is unchanged. Stage 1 was
+run with the binary of Amendment 1 (SHA-256 `91263a52…`); the stage-1 audit of n = 47 was interrupted
+by a host restart and re-run with that same saved binary.
