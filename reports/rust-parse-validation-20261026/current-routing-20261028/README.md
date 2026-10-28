@@ -20,3 +20,12 @@ content-addressed pointer and raw checksum manifest exactly. The oversized
 blob is absent from the current index and has its generated managed ignore
 entry. No original validation log, plan, raw result or scientific status is
 rewritten. These software controls do not revalidate historical performance.
+
+The current remote branch and compiler/report repair #2731 were integrated by
+ordinary merges, preserving both source histories. The integrated library
+Clippy run passes with -D warnings and all 13 method controls pass again.
+Sparse checkout initially removed compile-time source/test fixtures during
+those merges; their exact tracked patterns are now retained, and both initial
+missing-input logs remain alongside the final successful checks. Earlier #2731
+all-targets Clippy, adapter, subspace and report-reproduction evidence retains
+its original exact-head scope. No scientific input or published report changes.
