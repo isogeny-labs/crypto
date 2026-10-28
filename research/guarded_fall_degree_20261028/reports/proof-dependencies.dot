@@ -9,13 +9,15 @@ digraph proof {
   growing [label="Growing explicit membership cardinality B\nlinear degree bounds, not bit-complexity bounds", fillcolor="#e4f3e7"];
   native [label="Native sparse replay\nchecks recorded proof DAGs", fillcolor="#e9eef8"];
   lean [label="Checked Lean identities (partial)\nfull closure/grid/curve bridges open", fillcolor="#fff2d7"];
-  boolean [label="Growing Boolean Weil descent\nencoding/degree transfer UNPROVED", fillcolor="#fce5e5"];
+  boolupper [label="Fully Boolean binary one-auxiliary chain\nd_F <= 3 ell + 1 via affine specialization", fillcolor="#e4f3e7"];
+  boolean [label="Growing Boolean lower bounds / exact degrees\ncardinality lower-bound transfer UNPROVED", fillcolor="#fce5e5"];
   sources -> local;
+  sources -> boolupper [label="binary formula + Boolean indicators"];
   local -> odd;
   local -> binary;
   odd -> growing;
   binary -> growing;
   local -> native [label="finite instances"];
   local -> lean [label="identity layer only"];
-  growing -> boolean [style=dashed, label="missing transfer"];
+  growing -> boolean [style=dashed, label="missing lower-bound transfer"];
 }

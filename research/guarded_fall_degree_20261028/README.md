@@ -39,12 +39,29 @@ The first-fall column is the stated **ordinary-ring** convention. Do not
 identify it with a finite-field truncated syzygy definition when truncation
 changes the relevant degree.
 
+A separate direct theorem covers the fully Boolean binary chain: encode
+`x,y,z` by three linear `ell`-bit maps into `GF(2^n)`, encode the single
+shared `u` (and optional guard variable `v`) by `n` bits each, and include
+every bit equation `b^2+b`. For every unsatisfiable instance, with or without
+the inverse guard,
+
+```text
+d_F <= 3*ell+1,  ell>=1.
+```
+
+This bound is independent of `n` and needs no rational-lift assumption.
+Fixing the base bits leaves an affine system in the auxiliary bits; staged
+assignment indicators give the degree bound. Proof size may be exponential.
+It establishes an upper bound for this exact encoding, with no first-fall
+equality or growing lower bound.
+
 ## Proofs and executable checks
 
 - [Degree-five proof and matching lower bound](proofs/universal_five_symmetric_audit.txt).
 - [Growing-cardinality proof](extensions/growing_b/proof.txt) and
   [binary bridge](extensions/growing_b/binary_bridge.txt).
 - [Characteristic-two proof and classification](extensions/characteristic_two/extension_proof.txt).
+- [Fully Boolean binary upper bound](extensions/characteristic_two/boolean_upper_bound.txt).
 - [Native prime-modulus DAG replay](native/README.txt): exact sparse polynomial
   arithmetic with strict input binding; no search and no Python execution.
 - [Native binary-field checker](extensions/char2_compute/native/README.txt):
@@ -79,7 +96,10 @@ Here `B` is cardinality and the membership input has degree `B`. A subspace
 base of dimension `ell` usually has cardinality `2^ell`. The growing lower
 bound therefore depends on the explicit membership degree. It proves no
 linear lower bound in the number of variables of a fixed-degree Boolean
-encoding. An applicable transfer theorem remains unresolved.
+encoding. Those lower bounds still have no applicable transfer theorem.
+The direct Boolean upper bound above uses a separate affine-specialization
+argument; applying it to E12 requires checking that its actual encoding
+matches the stated generators and auxiliary blocks.
 
 ## Evidence and historical provenance
 

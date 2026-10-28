@@ -6,7 +6,7 @@ It is not an experiment timing report or a claimed ECDLP improvement.
 ![Proof dependencies and the open encoding bridge](proof-dependencies.svg)
 
 The solid arrows are dependencies in the written derivations. The dashed
-bridge to growing Boolean Weil descent is unproved. The Lean box covers only
+bridge to growing Boolean lower bounds is unproved. The Lean box covers only
 the identity declarations in the proof map, not the complete degree theorem.
 
 ## Result
@@ -28,6 +28,16 @@ For growing cardinality `B`, the odd-characteristic bounds are
 These bounds are derived, not fitted to measurements. They involve a degree-`B`
 membership input and do not prove analogous growth in a fixed-degree Boolean
 presentation.
+
+For the fully Boolean binary two-S3 chain with a single shared auxiliary
+`u`, three linear `ell`-bit base embeddings, and explicit equations for every
+bit, a separate direct argument proves `d_F <= 3*ell+1` for `ell>=1`,
+independently of `n`. It holds with or without the inverse guard and needs
+no rational-lift assumption. After fixing the base bits, the remaining
+equations are affine in all auxiliary bits. Support-aware staged assignment
+indicators localize each affine contradiction within the stated cap.
+This may require exponentially many proof rows; it gives no growing lower
+bound. See [the complete proof](../extensions/characteristic_two/boolean_upper_bound.txt).
 
 ## Method and verification
 
@@ -66,8 +76,9 @@ does not execute Lean or certify the closure theorem.
 [Sources](../SOURCES.md) records the primary literature checked and links to
 the existing fall-degree ledger and E12 continuation. The latter's mixed
 labels and independent-replay limitation are unchanged. There is no transfer
-theorem here that converts coefficient-field cardinality bounds into Boolean
-Weil-descent degree bounds.
+theorem here that converts coefficient-field cardinality lower bounds into
+Boolean Weil-descent lower bounds. The direct Boolean upper theorem applies
+only after the actual input encoding is checked against its hypotheses.
 
 No performance dashboard, leaderboard, or benchmark graph changed: this work
 has no measured cost ratio, speed improvement, or full-DLP result to add to
@@ -75,7 +86,8 @@ those axes. The study-local graph records dependencies rather than invented
 measurements. The historical Python sources and raw parameter/certificate
 files are provenance evidence; the new execution paths are native.
 
-The remaining research obligation is an explicit, checked transfer of the
-encoding and degree notion, or a separate proof for the Boolean systems.
+The remaining research obligation is a growing Boolean lower bound or exact
+degree result, together with an encoding audit before applying the new upper
+theorem to any existing ledger.
 Partial Lean identity verification does not discharge it. Larger-cardinality
 exact last-fall values also remain open between the proved bounds.
