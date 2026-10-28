@@ -138,3 +138,27 @@
 ### Errors (what went wrong, how it was handled)
 
 - No archive build or integrity failure occurred. Conductor remains unavailable; no lease or protection bypass is claimed. The rejected full shared daily-log upload was not retried.
+
+## 2026-10-28T21:06:41Z — required-gate failure investigation and ecbench integration
+
+### What was done (commands, files, features)
+
+- Read current `AGENTS.md`, latest daily log, PR head, main, ruleset, reviews, comments and checks. On `519d9ece`, required `size` and `artifacts` passed; required `gate` failed during artifact download setup with `ConnectionResetError(104, 'Connection reset by peer')`, exit 2 ([job](https://github.com/isogeny-labs/crypto/actions/runs/40761280409/job/123073990717)). Validation assertions did not run. The failed evidence download lies outside this PR's archive and was reported on the PR.
+- Merged current main `7fe71c4a85aa65a3e4fd1ba9b11b90374fcbadfd` (PR #2798) without conflicts. Inspected its ecbench method/accounting and hyperelliptic-report changes. The archive's execution dependencies, reviewed native example, reused W12 engine, arithmetic, Cargo files and frozen fixtures are unchanged.
+- `cargo check --release --locked --example classical_ecdlp_archive` on the completed integration exited 0. All 19 historical SHA-256 checks and scoped formatting pass. The PR remains confined to the same 33 paths.
+- Codex review of unchanged original code `4cfcece` remains completed without findings; no unresolved threads or new findings exist. Copilot's quota-limited COMMENTED review supplies no approval or finding; the current rules require zero approvals and resolved threads.
+
+### Decisions made (and why)
+
+- Treat the failed required gate as a failure and require fresh successful current-head checks. Integrate the real main update; change no unrelated download or workflow controls and bypass no protection.
+- Retain the 14-test regression on its actual base `8177cd08` and the earlier full-library history on `6187036`. This integration adds a compilation check, no new test-suite invocation, performance experiment or historical Python execution.
+- Continue publishing only this task-specific session record. Do not retry the rejected full shared daily-log upload.
+
+### Open threads (unfinished, pick up next time)
+
+- Publish the reviewed base merge and receipts, check its required `gate`, `size`, `artifacts` and protections, then perform the authorized guarded merge commit only after they succeed. Verify GitHub reports merged and record the merge SHA and validation on the PR.
+
+### Errors (what went wrong, how it was handled)
+
+- The required gate failed on an external evidence-download connection reset, before validation. It was reported with its job link; no local assertion or workflow control was changed to work around it.
+- Conductor's local service remains unavailable (connection refused); no lease is claimed. The archive compilation and integrity checks have no failures.

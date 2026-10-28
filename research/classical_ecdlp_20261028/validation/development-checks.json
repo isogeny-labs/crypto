@@ -276,6 +276,62 @@
       "resulting_head_required_checks": "not yet observed",
       "conductor": "unavailable; local control plane connection refused",
       "note": "Main advanced again during the preceding build/publication. Integrate the current base, preserve the completed test's actual revision, and obtain fresh required checks. No full-suite invocation, historical Python execution or performance experiment was added."
+    },
+    {
+      "checked_at": "2026-10-28T21:05:29Z",
+      "previous_pr_head": "519d9ece5a1c9514712b1205e3893a42caf44255",
+      "merged_main": "7fe71c4a85aa65a3e4fd1ba9b11b90374fcbadfd",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/ecbench/cm_folded.rs",
+        "src/cryptanalysis/ecbench/cover_quartic.rs",
+        "src/cryptanalysis/ecbench/hyper_ic.rs",
+        "src/cryptanalysis/ecbench/methods.rs",
+        "src/cryptanalysis/hyperelliptic_index_calculus.rs"
+      ],
+      "upstream_change_scope": "Separate ecbench method accounting, applicability checks and hyperelliptic report accounting (PR #2798).",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_regression": {
+        "tested_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "note": "Retain the completed regression's actual revision. The later ecbench update changes none of the archive's execution dependencies; no new test invocation is claimed here."
+      },
+      "compile_check": {
+        "command": "cargo check --release --locked --example classical_ecdlp_archive",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T21:06:41Z",
+        "exit_code": 0,
+        "combined_output_sha256": "47f86418590260fbc374bc0878887192caa5631628aa8259995400d9fbddfd97"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "previous_head_required_checks": {
+        "gate": "failure",
+        "size": "success",
+        "artifacts": "success"
+      },
+      "required_gate_failure": {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/40761280409/job/123073990717",
+        "stage": "artifact download setup",
+        "error": "ConnectionResetError(104, 'Connection reset by peer')",
+        "exit_code": 2,
+        "validation_assertions_ran": false,
+        "failed_evidence_outside_this_pr_scope": true,
+        "workflow_controls_changed": false
+      },
+      "review": {
+        "source_commit": "4cfcece6a5b54e7b714760bb8e88699417b464a8",
+        "completed_without_findings": true,
+        "unresolved_threads": 0,
+        "copilot_review": "Unable to review due to quota; COMMENTED state, not an approval or finding."
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "The failed required gate is not a pass. Integrate the new main and require fresh current-head checks; do not change unrelated download/workflow controls or bypass protections. No full-suite invocation, historical Python execution or performance experiment was added."
     }
   ]
 }
