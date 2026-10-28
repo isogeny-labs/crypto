@@ -15,3 +15,11 @@ where `(B,A,C,Q,Rbar) = Common22SupportHead.coefficientData(...)`. The checked `
 Pinned Mathlib `AlgebraicGeometry/OrderOfVanishing.lean` defines `Scheme.ordHom` and `Scheme.ord` only under `[IsIntegral X] [IsLocallyNoetherian X]`, with a point `z` satisfying `coheight z = 1` for the non-junk order. This packet proves `IsIntegral X` via the prior theorem but contains no checked `IsLocallyNoetherian X`, no identification of all closed support points with coheight-one points, and no finite-support divisor construction. Existing rational-point DVR/norm lemmas apply at specified rational points; a prior exact F3 diagnostic has irreducible quadratic supports and demonstrates why those rational points alone are insufficient for the input class. The next direct proof obligations are local Noetherianity, all-closed-point order compatibility of the source function with the existing norm identity, finite support, the infinity pole, and the global principal-divisor/Pic0 class equality. Compiled runtime correspondence is a separate gate.
 
 The [CSV status table](source-function-field.csv), [SVG dependency graph](source-function-field.svg), [PDF report](SOURCE_FUNCTION_FIELD.pdf), and [direct Lean output](source-function-field-lean.log) give a reviewable record. No DLP experiments or cost comparisons were run. The PDF and source checksums are recorded in the session log.
+
+An independent scratch check recompiled `WeightedProjIntegral`,
+`WeightedProjOverlapNonempty`, `WeightedProjIsIntegral`, and this source module
+with pinned Lean 4.34.1 against the repository's cached Mathlib revision.
+The final [independent compiler receipt](source-function-field-independent-lean.log)
+records exit code 0 and the standard axiom lists; its SHA-256 is
+`591d9f0baea50f185dc0f5cba1975e718d8b4951dbefc35eac2507b7c1731b23`.
+This check did not add a divisor or runtime theorem.
