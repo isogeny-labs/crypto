@@ -293,7 +293,8 @@ are still missing. [`IsogenyGate.lean`](IsogenyGate.lean) checks the finite
 count and three modular discriminant values. It does not formalize Tate's
 theorem or the geometric isogeny.
 
-The [`degree-three branch-supported certificate`](degree3_branch_supported_receipt.json)
+The degree-three branch-supported certificate (stored by checksum in
+[`.artifacts.json`](.artifacts.json))
 tests a different direct-cover route on all 60 cataloged genus-three models
 in these classes. For each model and each of the 24 permutations of the
 branch-root divisor `(2,1,-2,-1)`, it forms the `48 x 24` binary
@@ -308,6 +309,10 @@ exclude maps with other zeros or poles, another model, a higher-degree
 cover, or an isogeny correspondence.
 
 ## Replay and proof scope
+
+The 1.25 MB degree-three matrix receipt is kept in the artifact store.
+Run `python3 tools/artifacts/artifacts.py pull research/ghs_q16_genus3_subcovers_20261028`
+before an audit-only replay, or regenerate it with the Sage command below.
 
 ```sh
 TMPDIR=/Volumes/SSD990/llm/tmp /Volumes/SSD990/cryptanalysis/third_party/sage-binary/sage -python research/ghs_q16_genus3_subcovers_20261028/search.py
