@@ -1,5 +1,8 @@
 # E12 continuation launch record
 
+[Dataset persistence](S3_PERSISTENCE.md) records S3 destinations, periodic live
+archives, checksums, retention, and the distinction from solver-memory recovery.
+
 **E12b update, October 27 Pacific:** the user selected one new Spot attempt,
 which has now launched. See [its receipt and handoff](E12B_STATUS.md).
 Amendment 15 permits `launch.sh b-spot`: cell `3:24:7`, four draws, cap 4,

@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{array}
+\usepackage{url}
+\usepackage{graphicx}
+\begin{document}
+\begin{center}\Large Four follow-ups: cross-lead review packet\\[2pt]
+\normalsize Frozen public 21-model, 1,260-target cohort; 22 October 2026\end{center}
+\noindent\textbf{Accounting.} Full cold candidate cost divided by same-process matched negation-rho cost at $M+0.5S+10I$ and 0.1 source-addition equivalents per native logical operation. The external column uses the archived wrapped graph collector where measured. Values are ratios of summed costs across the stated targets; the accompanying SVG shows per-size ratios. All 36 price cells and exact source grid paths are in \texttt{results/standard-cost-grid.csv}.
+\par\medskip
+\begin{center}\small\begin{tabular}{l|r r|r r}
+Arm & Candidate & Rho & Candidate/rho & Candidate/external\\\hline
+Full base, 16 jumps & 1,260 & 1,260 & 2.448830 & 1.000000\\
+Full base, 8 jumps & 1,260 & 1,260 & 2.447173 & 0.999323\\
+Full base, 32 jumps & 1,260 & 1,260 & 2.453278 & 1.001816\\
+Half base, 16 jumps & 1,260 & 1,260 & 3.017732 & 1.232316\\
+Quarter base, 16 jumps & 1,260 & 1,260 & 3.919193 & 1.600435\\
+Projective wrapper & 1,260 & 1,260 & 3.793783 & 1.549223\\
+Retained weighted state & 1,260 & 1,260 & 4.179297 & 1.706651\\
+Kummer differential, uncached & 1,260 & 1,260 & 14.356662 & ---\\
+\end{tabular}\end{center}
+\noindent\textbf{Validation.} Factor-base arms have 6,300 candidate and 6,300 rho source-scalar checks. Each projective-law arm has 1,260 candidate and 1,260 rho source-scalar checks. Its independent Rust validator recomputed 576 price cells. A separate 42-model audit checked 1,224,000 finite weighted additions against Cantor. Exact integer-polynomial certificates and written divisor arguments now cover the implemented 1+1, 1+2, and 2+2 branch map for the implemented mapped family of smooth monic quintics with zero $x^4$ coefficient over odd-characteristic fields, with valid reduced inputs and nonzero weights. This includes coprime degree drops, same-$u$ composition/doubling, and shared support. No faithful mechanized theorem or independent mathematical review has been recorded. Kummer's paired uncached collector and fresh rho each passed 1,260 source-scalar checks. Study-specific raw JSONL, validators, manifests, and hashes remain in their source directories.
+\par\medskip
+\noindent\textbf{Point-driven pencil.} The validated sparse-rank continuation has 543 distinct candidate solves and 544 source-verified rho solves. One 32-bit target reached four coefficient caps across online, peel and Markowitz variants; all four candidate costs and ratios are null. Another 717 original targets have no completed candidate solve. Nine 60-target curves and one 28-bit single target have all 36 paired online/peel/rho prices. The next table retains representative prices and cells where peel costs less than online; the companion pencil SVG shows all-cell ranges.
+\par\medskip
+\begin{center}\small\begin{tabular}{r|r|r r|r}
+$p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
+739 & 60 & 0.898244 & 11.615357 & 24/36\\
+1,151 & 60 & 0.796603 & 22.836038 & 24/36\\
+1,187 & 60 & 0.736053 & 22.877204 & 24/36\\
+3,371 & 60 & 0.379821 & 93.480568 & 24/36\\
+3,527 & 60 & 0.393296 & 105.157423 & 24/36\\
+3,931 & 60 & 0.365357 & 121.367036 & 24/36\\
+11,731 & 60 & 0.278124 & 1,204.654657 & 24/36\\
+11,887 & 60 & 0.282829 & 1,090.655477 & 24/36\\
+12,143 & 60 & 0.269806 & 1,146.700226 & 24/36\\
+48,383 & 1 & 0.233555 & 22,644.843832 & 24/36\\
+\end{tabular}\end{center}
+\noindent Every paired curve also has 12/36 cells where peel costs more than online and 0/36 where peel costs less than rho. A separate p=739 Markowitz-priority arm has 60 verified solves; at the same price it costs 1.204855 times peel and 13.994822 times rho, with 0/36 cells cheaper than either. The 28-bit row is one target, not a cohort mean. The grid and target index retain 1,510 pencil arm-target rows and four unpriced cap attempts.
+\par\medskip
+\noindent\textbf{Kummer collector.} The coordinate gate checked 8,820 labeled cases on all 1,260 targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Signed Recover repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). The differential collector solved 1,260 DLPs with fresh same-process rho controls. Its full-cold candidate/rho range is 8.959687--55.935424 over 36 cells, with zero cells below rho. A cached-inverse arm also solved 1,260 targets; its 12.945664 representative ratio uses archived same-source rho from a separate process and is retained only in its source study.
+\par\medskip
+\noindent\textbf{Review files.} \path{REPORT.md} links each source study and its raw data. \path{DATA_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. The target index has 12,850 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. The three SVGs show factor-base/law/Kummer prices, paired pencil prices, and pencil cohort coverage. The CSVs and summary JSON support independent regrouping without using this report's wording.
+\clearpage
+\noindent\textbf{Measured price ratios.} The first graph shows candidate divided by matched rho at the representative price for complete factor-base, law, and Kummer arms. The second shows the degree-peeling collector divided by its matched online control: each line is the full 36-cell range and each dot is the representative price. Its last curve has one target; the others have 60. Source: the standardized price grid.
+\begin{center}
+\includegraphics[width=0.90\linewidth]{cost-ratios.png}
+\includegraphics[width=0.90\linewidth]{pencil-ratios.png}
+\end{center}
+\clearpage
+\noindent\textbf{Pencil cohort coverage.} The chart has one bar per order size, with 180 public targets each. A blue segment means at least one source-verified candidate solve was indexed for that workload key; orange denotes an indexed cap without a verified candidate; gray means the integrated pencil studies have no row for that key. Gray is an evidence gap, not a measured failure or zero cost. The accompanying \path{results/pencil-coverage.csv} retains every workload ID, source record, and arm status. Across all sizes the counts are 543 verified, one capped, and 716 without an indexed pencil record.
+\begin{center}
+\includegraphics[width=0.94\linewidth]{pencil-coverage.png}
+\end{center}
+\end{document}
