@@ -1,5 +1,19 @@
 # Standalone binary root module handoff
 
+## Completed integrated validation, 2026-10-28 15:31 UTC
+
+The integrated runtime `d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83` now passes
+the full library suite (5183 passed, 0 failed, 123 ignored), native root9,
+dataset158, CLI8 and strict integrated Clippy. The independent consumer's
+51 retained software fixture cells include30 checked completed root sets.
+The [final validation record](VALIDATION.md) gives the precise source, scope,
+limitations, binary identities, retained failures and freshly verified S3
+archives. All pending-test statements below are historical. Hosted delivery,
+actual cloud publication and broad corpus coverage remain separate obligations.
+
+No new campaign worker or experiment retry was launched. The original total
+USD200 ceiling and existing approvals, owners and deadlines are unchanged.
+
 ## Integration update, 2026-10-28
 
 The original standalone snapshot below is retained as history. The parent
@@ -126,3 +140,20 @@ An initial test-append patch failed context verification because the new file
 was missing its final closing brace. No partial test patch was applied. The
 brace and tests were then added together and scoped Rustfmt parsed the result.
 This is a source-edit correction, not a passing native build or test result.
+
+## Published delivery, 2026-10-28 15:38 UTC
+
+Regular [PR2782](https://github.com/isogeny-labs/crypto/pull/2782) was opened
+at source head `e7bf3799180dbf7d6f3ce5cc2d7d5cd19a106bc3`, stacked on policy
+PR2777. Native source remains exactly d79. Hosted CI is pending; do not poll
+before the normal 50-minute cadence after the latest push. Feature-base PRs
+cannot enable auto-merge. The companion independent consumer is regular
+[PR2781](https://github.com/isogeny-labs/crypto/pull/2781), based on the original
+consumer delivery branch after PR2776 merged there without changing its tree.
+
+The 34,412-byte delivery reconciliation packet is durable at
+`s3://setec-astronomy-artifacts/ml-dataset/20261028/operations/delivery-reconciliation/9de7dcee6d651736eb40d637a0075a0d2396049cb3721da1d3c221cc9b48b8d8/reconciliation.tar.gz`.
+Conditional PUT, ETag-bound fresh GET, byte comparison and contained hashes
+passed at15:37:07Z. This retains the externally advanced producer ownership
+snapshot and the PR2769 review-base merge event; both are point-in-time evidence.
+No branch was taken over or implementation duplicated.
