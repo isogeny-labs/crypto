@@ -339,13 +339,28 @@ mod tests {
         serde_json::from_str(text).unwrap()
     }
 
+    /// Whether this build's `serde_json` keeps number lexemes
+    /// (`arbitrary_precision`, as the root crate does).  A crate that
+    /// includes this file without it (`tools/backend-leaderboard`) parses
+    /// `1e400` as an error and a wide integer as an `f64`.
+    fn keeps_lexemes() -> bool {
+        serde_json::from_str::<Value>("1e400").is_ok()
+    }
+
     #[test]
     fn non_finite_and_non_integer_lexemes_are_refused() {
         // `1e400` is not an `f64`, so `is_f64()` is false for it and a
         // check on that alone would write the lexeme into the identity.
+        // Without lexemes the parser refuses it first, which also keeps it
+        // out of an identity.
         for lexeme in ["1e400", "-1e400", "1E400", "1e2", "1.0", "0.5e-3"] {
-            let v = parsed(&format!("{{\"x\":{lexeme}}}"));
-            assert!(canonical(&v).is_err(), "{lexeme} must be refused");
+            match serde_json::from_str::<Value>(&format!("{{\"x\":{lexeme}}}")) {
+                Ok(v) => assert!(canonical(&v).is_err(), "{lexeme} must be refused"),
+                Err(_) => assert!(!keeps_lexemes(), "{lexeme} must parse with lexemes"),
+            }
+        }
+        if !keeps_lexemes() {
+            return;
         }
         assert!(is_nonfinite_lexeme(match &parsed("1e400") {
             Value::Number(n) => n,
