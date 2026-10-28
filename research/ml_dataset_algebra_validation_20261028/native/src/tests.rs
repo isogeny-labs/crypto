@@ -26,7 +26,7 @@ fn limits() -> Limits {
 fn begin(q: u8, d: u8, inputs: &[Vec<u8>]) -> Event {
     Event::Begin {
         profile: PROFILE.into(),
-        binding: binding(),
+        binding: Box::new(binding()),
         n_vars: q,
         degree: d,
         input_count: inputs.len() as u64,
@@ -366,7 +366,8 @@ fn scalar_oracle_matches_exhaustive_span_cardinality() {
     }
     let packed = vec![vec![1, 0, 0], vec![0, 1, 0], vec![1, 1, 0], vec![0, 0, 1]];
     assert_eq!(scalar_rank(&packed, 129, &mut 0).unwrap(), 3);
-    assert!(scalar_rank(&packed, 129, &mut WORK_CAP).is_err());
+    let mut exhausted = WORK_CAP;
+    assert!(scalar_rank(&packed, 129, &mut exhausted).is_err());
 }
 
 #[test]

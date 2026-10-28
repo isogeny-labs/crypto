@@ -77,7 +77,7 @@ pub enum StopReason {
 pub enum Event {
     Begin {
         profile: String,
-        binding: Binding,
+        binding: Box<Binding>,
         n_vars: u8,
         degree: u8,
         input_count: u64,

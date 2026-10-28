@@ -189,7 +189,10 @@ impl Replay {
             "wrong profile/ring/order/kernel",
         )?;
         validate_binding(&binding)?;
-        require(&binding == expected, "trusted caller binding mismatch")?;
+        require(
+            binding.as_ref() == expected,
+            "trusted caller binding mismatch",
+        )?;
         require(
             n_vars <= 8 && degree <= 4 && input_count <= 64,
             "unsupported input dimensions",
