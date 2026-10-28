@@ -72,4 +72,16 @@ change of K, seed, targets or configs after the first run.
 
 ## Amendments
 
-None.
+**Amendment 1 (2026-10-28, after the first run and before any IC measurement).** The first run,
+`records/run-20261028T1156Z`, started at 11:56:52Z. The IC arm and all three precomputed-rho arms
+exited with status 127 at launch: `env: '/usr/bin/time': No such file or directory`. This host lacks
+GNU time, which `run.sh` uses for the resource receipts, while the GitHub runners the 2026-10-16
+control used have it.
+
+Only the empty-table plain-rho positive control ran (16 targets in about 45 s). No IC, precomputed-rho
+or analysis output exists. That directory is kept unchanged as the record of the failed attempt.
+
+The fix is to install the distribution package `time` (GNU Time) at `/usr/bin/time`. Nothing in
+`run.sh`, the binaries (`scratchpad/n83bin/`, same SHA-256s), the configs, the targets or the seeds
+changes. The run is repeated once into a new directory, and that second run is the decision-bearing
+one. Its plain-rho control is a fresh re-run under the same seeds, not a reuse of the first.
