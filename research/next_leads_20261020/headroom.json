@@ -1,0 +1,39 @@
+{
+  "genus2": {
+    "all_logical_over_rho": 1.5506775025509072,
+    "field_additions_only_over_rho": 1.2630765990883859,
+    "max_total_cost_fraction_to_tie_rho": 0.3470481139877574,
+    "minimum_total_cost_reduction_fraction_to_tie_rho": 0.6529518860122425,
+    "paired_targets": 1260,
+    "processed_divisors": 221270948,
+    "projective_GAE": 3137323980.3047647,
+    "projective_all_logical_GAE": 1688381340.4000003,
+    "projective_field_additions": 13752407950,
+    "projective_field_additions_only_GAE": 1375240794.9999993,
+    "projective_over_rho": 2.881444847832472,
+    "rho_GAE": 1088802370.3333328
+  },
+  "genus3_f257": {
+    "cold_GAE": 568870295.0,
+    "destination_verification_increment_GAE": 317106337.2,
+    "initial_relation_GAE": 4095227.5,
+    "initial_relation_fraction_of_cold": 0.007198877382057715,
+    "mapped_setup_and_descent_GAE": 234373284.9,
+    "mapped_setup_descent_destination_verification_GAE": 551479622.1,
+    "scalar_relation_and_recovery_GAE": 13287315.4,
+    "source_verification_GAE": 8130.0
+  },
+  "inputs": [
+    "research/five_leads_e2e_20261019/sessions_projective_chart_v2/order-genus-{16,20,24,28,32,36,40}/records.jsonl",
+    "research/five_leads_e2e_20261019/results/genus2-projective-summary.json",
+    "research/five_leads_e2e_20261019/results/tian-genus3-f257-line-sieve-cost-summary.json",
+    "research/five_leads_e2e_20261019/correctness/tian-genus3-f257-line-sieve-mapped-dlp-v1.json"
+  ],
+  "interpretation": "Algebraic counterfactuals from observed counters, not measured implementations. Genus-2 floors hold the existing logical-operation counts fixed. Genus-3 mapped setup and descent are inseparable in these snapshots.",
+  "price": {
+    "I_per_M": 10.0,
+    "S_per_M": 0.5,
+    "native_per_logical": 0.1
+  },
+  "schema": "next-leads-cost-headroom/v1"
+}

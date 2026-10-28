@@ -333,6 +333,12 @@ tool's own `suite` command as schema `transfer-audit/certificate/v2` (tool `tran
 F9 records and `run-log.json` of the first run are kept as they were. [RESULTS.md](RESULTS.md)
 section 10 lists each change with the effect on the recorded numbers.
 
+*Note added 2026-10-27, after review of PR #2658.* "Nothing above is rewritten" held for this file but
+not for the certificates: the v2 regeneration wrote over the v1 certificates, index and report files at
+their original paths, which removed the first run's committed set from the tree. That conflicts with
+AGENTS.md ("Do not rewrite frozen evidence"). The v1 set is restored byte for byte in
+[`v1/`](v1/README.md) from commit `3f31162cd`; the files outside `v1/` remain v2.
+
 1. **Baseline (section 4).** The model's `sqrt(pi r / 4)` is rho *with* negation (`c = 2`); section 4
    divided it by `sqrt(c)` with `c >= 2`, counting negation twice and putting every baseline 0.5 bit
    too low. The baseline is `sqrt(pi r / (2c))`: a class of `c` elements (negation included) enters as
