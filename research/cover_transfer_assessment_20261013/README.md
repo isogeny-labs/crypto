@@ -11,6 +11,14 @@ fontsize: 10pt
 
 # Outcome
 
+Throughout this dated report, "current" refers to catalog commit
+`728304718cb0ab6df70da620a908a5f76f175293`, the 15,791-map cohort assessed on
+2026-10-24. The live geometry catalog has since grown to 20,592 maps. Its
+4,801 added maps and 15 added EC1 representations are outside this assessment;
+they inherit no transfer or subgroup-support conclusion from it. See the
+[coverage gap](../../problems/catalog-cover-subgroup-certificates-incomplete.md)
+for the separate current-catalog obligation.
+
 Every current cover map and every linked EC1 representation now has an
 explicit v2 assessment. Classification is complete; implementation support is
 not. In particular, the complete inventory must not be read as a complete
@@ -588,6 +596,12 @@ python3 -m pip install pypdf==6.0.0
 python3 set_pdf_metadata.py
 pdfinfo cover_transfer_assessment_20261013.pdf
 ```
+
+When the Tectonic bundle endpoint is unavailable, the same Markdown source can
+be rendered with installed XeLaTeX using `--pdf-engine=xelatex`. Then run
+`python3 set_pdf_metadata.py --pdf-engine xelatex` so the PDF identifies the
+engine actually used. This changes rendering provenance, without changing the
+assessment cohort or the proof boundary.
 
 # Open obligations
 
