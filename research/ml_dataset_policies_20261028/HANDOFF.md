@@ -91,3 +91,51 @@ fixture changes. Serde's internally tagged unit variant ignored extra fields;
 the strict struct-variant route addresses that actual failing check. Migration
 interrupted a local software test, not a fresh research run. No interrupted or
 failed check was relabeled as passing.
+
+## 2026-10-28 13:29 UTC — focused validation and consumer contract gap
+
+### What was done (commands, files, features)
+
+Runtime source `2a53a76b5ee9a74e3fd894bfdf6d6e74750129fc` passes all eight
+prime-root tests, 153 dataset tests (zero failures, one ignored), eight native
+CLI integration tests, strict Rust 1.98 release-library Clippy and scoped
+formatting. Its full library suite is still running; no full-suite pass is
+claimed. The post-migration source checkpoint was freshly downloaded and its
+archive, Git bundle and handoff bytes checked:
+`s3://setec-astronomy-artifacts/checkpoints/crypto/codex__ml-policies-roots-20261028/20261028T130733Z-2a53a76b5ee9/checkpoint.tar.gz`,
+162604 bytes, SHA-256
+`d8ced8e5f0e370b8dd555d82e9cbbe9eb63b87efc42fd0e55632fcadd1a2ee2e`.
+
+Read-only review of independent consumer PR #2757 at
+`b1ec04d1de276eabdca790754670aaa4fab5d87f` found that its native consumer
+subtree (`6236e4f23c9c3b7d516a9edd292d705ec2af56ac`) rejects plan/v2 and
+factor-base/v2. The consumer's static view has separate identity and split
+contracts; it does not independently validate the producer's v4 training view.
+
+### Decisions made (and why)
+
+Implement consumer compatibility on a separate branch, preserving its owner's
+existing branch. Require versioned strict plan fields and hashing, the policy
+radix and config/domain binding before accepting v2 point domains. Keep
+independent construction, subgroup, root-stream and UNSAT claims false unless
+separately verified. Retain the consumer view as an explicitly distinct
+contract instead of equating it to producer v4. No new experimental draw or
+cloud launch is authorized by these software checks.
+
+### Open threads (unfinished, pick up next time)
+
+Wait for the existing full suites, preserve source-bound terminal results in
+canonical S3, and deliver the pending dependent PRs. Complete and validate the
+consumer companion on sealed producer outputs. Real worker S3 publication,
+durable quota authority and the extensive solved corpus remain incomplete.
+The total USD 200 ceiling and all previous job deadlines remain unchanged.
+
+### Errors (what went wrong, how it was handled)
+
+The first migrated parent suite exposed absent C++ tooling; the replacement
+host now has gcc-c++ and perl-Digest-SHA, and all six device-emulation checks
+pass. The first policy full suite exposed absent tracked runtime fixtures;
+the sparse profile now materializes the exact parent fixture paths. Those
+interrupted logs and diagnostics are retained. Source tests were not edited
+or skipped to obtain a pass. The independent consumer incompatibility is an
+open integration gap, not a validated training roundtrip.
