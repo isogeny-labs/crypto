@@ -16,6 +16,15 @@ its scope, but active registration/integration is now unresolved. Preserve the
 strict2287-extension assertion; do not lower it to the current1324 or choose one
 whole registry side. Full library validation is not claimed green.
 
+2026-10-28 [literal field review](validation/registry-field-review-20261028/README.md)
+narrows the150 changed shared records:103 source-only,24 alias-only,22 changes
+to representation citations, and one model with two added representation
+entries/descriptive labels. All shared stored model definitions and retained
+representation parameter payloads are identical as JSON values. No new native
+validity result or active registry repair follows; preserve those main-side
+updates when retrieving the1921 missing study records. Combined native/catalog
+validation and the strict2287 assertion remain required.
+
 | Requested/required item | Status | Evidence or remaining gap |
 | --- | --- | --- |
 | PR in `aburan28/crypto` | complete | PR #2381, extended on its existing branch |

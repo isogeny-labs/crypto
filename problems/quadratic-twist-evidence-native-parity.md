@@ -278,6 +278,16 @@ Do not restore a whole registry side or fabricate cover rows. Frozen evidence
 and generic mathematics are not disproved by this integration loss; the active
 registry requirement is reopened, and full-library CI remains unresolved.
 
+The [2026-10-28 literal JSON field review](../research/quadratic_twist_evidence_20261021/validation/registry-field-review-20261028/README.md)
+classifies all150 shared-record changes without curve arithmetic:103 top-level
+source-only,24 alias-only,22 existing representation citation-only, and one
+model gaining two representation records and descriptive metadata. All shared
+model encodings and existing representation parameter payloads are unchanged
+as stored values. No representation is removed. This narrows the metadata
+reconciliation, but neither validates the two new entries nor produces an active
+union/catalog. Preserve main-side records and retrieve missing study records
+from the pinned prior input, then meet all existing native validation gates.
+
 The initial import supplied historical evidence and a certificate-only auditor.
 The 2026-10-21 continuation closes the full native replay and identity-record gaps,
 installs the missing proof/test toolchains, and proves 14 algebraic implications
