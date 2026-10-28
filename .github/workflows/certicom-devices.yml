@@ -71,7 +71,24 @@ jobs:
       matrix:
         phase: [library, cli]
     steps:
+      # This repository carries large research archives that the Metal build does
+      # not read.  Materializing them consumed about three minutes of this job's
+      # fixed 25-minute budget and made an otherwise passing cold qualification
+      # time out.  Keep the exact Rust crate, its local dependencies and device
+      # harness while leaving unrelated evidence blobs off the macOS runner.
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.lock
+            /Cargo.toml
+            /src/
+            /tests/certicom_solvers.rs
+            /gpu/certicom/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
       - name: Compile native Metal shader and worker
         run: make -C gpu/certicom metal
       - name: Probe whether this macOS runner exposes a Metal device
