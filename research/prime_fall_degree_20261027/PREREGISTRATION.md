@@ -163,3 +163,18 @@ rounds ran at `P0 = 786433 = 3·2^18 + 1`. Changes:
   it runs to `cmax`. The gate needs only that `1` never enters.
 
 No rule of §6 changes.
+
+## Amendment 2 (2026-10-28, before any C, B or null/naive row)
+
+Stage A had produced Kummer `m = 2` rows for `t ≤ 10` at `P1`, and G4 rows.
+No other measured row existed. The host is shared, with about 32 GB total and
+little free. Changes, all to resources and order:
+
+- Per-closure `max_entries` drops from `6·10⁸` to `3·10⁸` (about 2.4 GB of
+  rows). Larger closures read as censored (`d_F ≥ c`), as §2 defines.
+- Two chains run at once, with 7 rayon threads each: (1) C, then B;
+  (2) A, then the F4 runs `d-A`, `d-B`. A restarts from `t = 1`. Its
+  `t ≤ 10` rows are recomputed, and the repeats must agree. Disagreement is a
+  reproducibility failure and stops the study.
+
+No hypothesis, rule or cell changes.
