@@ -400,3 +400,20 @@ This does not construct the scalar-C5 lifts or a complete reverse divisor.
 No finite candidate set is promoted as selected images or relation rank.
 Four4GiB/1200s caps may be applied individually; initial frozen invocation
 processes these4inorder under the same single cap. No replacement of targets.
+
+## Prospective complete RR F32 equivariant elliptic-map equations
+Build actual34invariant basis h_i withh_1=1 and exact trace preimages l_i,
+all from checked68sigma matrix and389jets. Every equivariant candidate in
+L(D) is X=sum a_i h_i,Y=sum a_i l_i+b_i h_i, sigmaX=X,sigmaY=Y+X.
+Native coefficient construction of the entire elliptic identity
+Y2+XY+X3+c0X2+1 uses385O coefficients (poles<=3D degree384). Add all68F32
+field equations, c0inF2, and Rabinowitsch nonconstant-X block (33auxiliaries).
+455equations cover both ordinary target signs in this EXACT prescribedspace,
+not a coefficient box. Native same-field genus3-to-elliptic polynomial
+identity and actual corruption provide controls. Every trace preimage checked.
+Producer4GiB/1200; solver separately4GiB/1200, no silent cap increase.
+IfGBunit, require explicit unitlift and full independent multiplication.
+Nonunit/cap is unresolved, not an evaluated map or universal exclusion.
+Any successful point still needs function-field identities,descent and actual
+nonzero11 action; no CM inclusion is assumed. Checkpoint assembled producer
+and its output before each native call; retain every attempt.
