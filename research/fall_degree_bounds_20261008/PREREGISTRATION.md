@@ -800,3 +800,35 @@ launched. This amendment is committed and pushed before the new submission.
 Submission uses selection `b-spot` in `e12/continuation-20261028/launch.sh`,
 with a separate receipt directory. This amendment does not relaunch E12a/E12c
 or authorize any further E12b attempt.
+
+## Amendment 16 (2026-10-27 Pacific, 2026-10-28 UTC): persist live E12 output files
+
+The user requested assurance that datasets are persisted to S3. Inspection found
+the existing runner uploads its main log every 15 seconds, but uploads `/work/out`
+only on exit or Spot notice. At inspection E12b already had partial draw data,
+while E12a/E12c's new-cell output files were empty. Immediate file snapshots were
+requested through SSM command `fe4fcb90-c33a-4440-a0cd-de464130bf0c` to protect
+existing bytes before installing a periodic uploader. No solver was restarted.
+
+For the three admitted continuation job IDs, install a low-priority systemd
+oneshot/timer that captures `/work/out` and available host/resource metadata to
+`s3://ephemeral-runs-104186811093-us-east-1/jobs/<job>/snapshots/` about once per
+minute. Each unique archive has a SHA-256 manifest published after S3 verifies
+the archive checksum; `snapshots/latest.json` points to the newest committed
+snapshot. Archive and manifest writes are conditional on absence. The existing
+final upload under `out/` is unchanged and cannot be overwritten by this helper.
+
+The helper validates the local job ID, refuses other jobs, respects its original
+deadline, and uses a lock to prevent overlapping uploads. Failed uploads are
+reported in the existing job log and retried by the timer; this is an artifact
+upload retry, never a solver retry. The timer does not extend instance lifetime.
+No engine, draw, seed, gate, scientific reading, or compute budget changes.
+All timings remain diagnostic; additional file I/O precludes a timing comparison.
+
+Snapshots capture live files and may contain a partial last record. They are not
+atomic solver-memory checkpoints and do not enable mid-closure resume. Each
+saved archive's bytes are independently verifiable; only complete draw records
+and all original gates can support a later scientific reading. Preserve the
+initial snapshots, installation receipts, readback hashes, and uploader source
+under `e12/continuation-20261028/`. The observed bucket lifecycle expires `cache/`
+objects only; it defines no expiration for these `jobs/` keys.
