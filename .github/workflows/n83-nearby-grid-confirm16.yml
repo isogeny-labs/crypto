@@ -104,6 +104,7 @@ jobs:
           # This job needs the producers and sealed N83 inputs, while the full
           # repository checkout exhausted the runner's 4 GiB disk preflight.
           sparse-checkout: |
+            tools/factor-base
             src
             examples
             docs/curves
