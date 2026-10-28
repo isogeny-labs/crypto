@@ -19,7 +19,7 @@
 
 ## Open threads (unfinished, pick up next time)
 
-- Compile and run focused/native regression checks only after the parent grants the Cargo slot. The separate checker must validate complete schedules and independent arithmetic; producer claims remain false even on a completed stream. No launch or performance claim follows.
+- All source-bound local gates and independent native replay now passed, as detailed in VALIDATION.md. Hosted exact-head CI/review and bottom-up delivery remain pending. Producer claims remain false even on a completed stream. No launch or performance claim follows.
 - Fixture emitter: run the exact ignored test cryptanalysis::koblitz_groebner::algebra_trace::tests::write_checker_fixtures with F4_TRACE_FIXTURE_DIR naming a new absolute external directory, F4_TRACE_SOURCE_COMMIT naming the exact40-digit source commit, and F4_TRACE_PRODUCER_SHA256 naming the64-digit executing test-binary SHA256. It writes five bounded JSONL streams plus prefix receipts. These metadata values remain caller declarations.
 - Censored fixture emitter: invoke the exact ignored selected_profile_child test with F4_TRACE_TEST_EXPECTED=native_size, F4_F2_MAX_ROWS=0, F4_TRACE_CENSORED_FIXTURE_DIR naming a new absolute directory, and the same source/binary metadata variables. It writes native_size.jsonl plus native_size.failure.json. Environment changes are confined to that child process.
 
@@ -28,3 +28,10 @@
 - Previous local PR status note suggested the wrong later check cadence. Additive external CADENCE-CORRECTION.md changes next unchanged PR2756 check to about20:17UTC, preserving the immutable S3 design archive. No extra poll occurred.
 - The first background heartbeat did not survive its shell and the original lease expired. Edits paused, exact scopes were checked and T-756 was reclaimed as attempt2/fencing_epoch3 before continuing. The retained heartbeat session now renews the current lease; external receipts are under /home/ec2-user/ml-dataset-resume-20261028/f4-trace-implementation.
 - Source review identified that elimination can densify output rows. Workspace admission now separately reserves the actual output popcount before readback rather than assuming source-row sparsity.
+
+## 18:07 UTC final validation and preservation
+
+- Final source 29973950752 passed 14 focused tests and strict release lint. Parent ran the immutable e368482f executable once for the full library gate: 5,197 passed, zero failed, 125 ignored. The earlier 12 native RREF regressions remain applicable by exact runtime-source equality. Earlier pending statements above describe their historical points only.
+- Separate checker PR2800 passed actual native interoperability: ranks 0/1/1/2/92, 68 genuine nonzero start-word XORs, four rehashed corruption rejections, and a four-event cap-zero prefix with no final rank. All six CLI reports matched library reports. Parent source review found no actionable producer defect.
+- Accepted source archive53f2f989 and terminal full-gate archivee5dbfcf4 passed fresh readback, content hashes and incremental source-bundle verification. The preceding c6fb086c archive is quarantined because its exclusion assertion found a copied live full log. It remains immutable; the accepted correction used a finite completed-file allowlist. Exact URIs and claim boundaries are in VALIDATION.md/VALIDATION.json.
+- Native runtime, tests, fixtures and shared Cargo output were not changed or re-executed during final delivery. Scope remains a bounded native Boolean F4 single-call API. Hosted PR checks and integration remain separate. Source metadata is not execution attestation; no scientific dataset or fall-degree result was generated.
