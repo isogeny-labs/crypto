@@ -4,7 +4,7 @@
 #
 # For every Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
-#     then audit every module the project itself built;
+#     explicitly build every tracked Lean source, then audit every built module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
 # One frozen historical failed source is checked as an expected-failure target
@@ -53,7 +53,8 @@ done
 discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
-  git ls-files -- '*lakefile.toml' '*lakefile.lean' | xargs -r -n1 dirname | sort -u
+  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -v '^tools/lean/selftest/' \
+    | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
   git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
     d=$(dirname "$f")
@@ -134,13 +135,35 @@ run_target() {
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      local mods
-      mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-        | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-      if [ -z "$mods" ]; then
-        status=FAIL_no_modules
-      elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
-        status=FAIL_audit
+      local mods f module
+      local -a sources=()
+      # A default target may omit an entire tracked module. The +Module
+      # syntax works in both supported Lake versions; an unregistered source
+      # fails closed rather than silently escaping the axiom audit.
+      while IFS= read -r -d '' f; do
+        case "$f" in
+          *.lean) ;;
+          *) continue ;;
+        esac
+        case "$f" in
+          "$t/lakefile.lean"|*/AxiomAudit.lean) continue ;;
+        esac
+        module=${f#"$t"/}
+        module=${module%.lean}
+        sources+=("+${module//\//.}")
+      done < <(cd "$root" && git ls-files -z -- "$t")
+      if [ ${#sources[@]} -eq 0 ]; then
+        status=FAIL_no_sources
+      elif ! (cd "$root/$t" && lake build "${sources[@]}") > "$log/source-build.log" 2>&1; then
+        status=FAIL_source_build
+      else
+        mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
+          | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
+        if [ -z "$mods" ]; then
+          status=FAIL_no_modules
+        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+          status=FAIL_audit
+        fi
       fi
     fi
   else
@@ -158,7 +181,7 @@ run_target() {
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
   fi
   # `sorry` that elaborated without being used by a theorem still warns at build time.
-  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log"; then
+  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log" "$log/source-build.log" 2>/dev/null; then
     status=FAIL_sorry_warning
   fi
   echo "$status" > "$log/status"
@@ -169,7 +192,7 @@ run_target() {
   tr=$(grep -o '[0-9]* trusted' "$log/audit.log" 2>/dev/null | grep -o '[0-9]*' || echo 0)
   printf '%-22s %4s thm %3s trusted  %s\n' "$status" "${n:-0}" "${tr:-0}" "$t"
   if [ "$status" != PASS ]; then
-    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" 2>/dev/null | head -5 | sed 's/^/    /'
+    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" "$log/source-build.log" 2>/dev/null | head -5 | sed 's/^/    /'
     return 1
   fi
 }
