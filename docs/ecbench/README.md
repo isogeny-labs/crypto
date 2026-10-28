@@ -1,5 +1,14 @@
 # ecbench: one harness for every ECDLP method
 
+The experimental `ic.trace_line_2lp` method compares actual embedded subfield
+lines and trace-selected multiplicative shifts on polynomial-basis binary
+instances with N=4d. It runs the exact bounded four-summand MITM/2LP collector,
+retains every accepted relation, and exposes construction, lookup, LP and LA
+work as uncharged counters. Its GAE is a lower bound, not complete C1 cost.
+It does not implement an algebraic Gaudry–Diem trial-cost measurement. Parameters,
+prospective controls, replay and remaining gates are in the
+[trace-line study](../../research/trace_c1_2lp_20261027/README.md).
+
 `ecbench` measures Pollard rho (in its variants), baby-step giant-step,
 the kangaroo, and index calculus **behind one interface, on the same
 single-target workloads, in the same unit, under the same isolation, into
@@ -458,6 +467,7 @@ Curves of higher genus and the transfers are described in
 | `cheon.pminus1_comb`, `cheon.pminus1_naive`, `cheon.pplus1_comb` | every addition and doubling of the comb tables (comb) or per-step double-and-add (naive), the baby and giant steps, the shift, the `n + 1` polynomial multi-scalar sums, and the final `[α]G = Q` check; phases `p-1:*` / `p+1:*`. The auxiliary inputs come from the workload's **static-DH oracle** (`P ↦ [α]P`): `d − 1` queries for `n − 1`, `2d − 1` for `n + 1`; the queries are a **separate resource**, in `counters.oracle_queries` and `oracle_server_group_ops` and `detail.oracle`, **not** in `total_gae` | hash inserts and lookups, scalar-field multiplications, `F_{n²}` multiplications |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
 | `transfer.isogeny` | the inner method's phases (`target:*`, on the isogenous curve, the same unit), the source check `[k]G` (`verify`) | the kernel search and the two point maps, `F_p` multiplications and inversions (`transfer`, 0 GAE) |
 | `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
@@ -1115,6 +1125,76 @@ who rewrites every observation and reseals every hash could forge a
 quieter run. Git history and the replay on another host are the
 witnesses against that, as with ICMS.
 
+**Legacy accounting.** The rule was broken before it was enforced: after
+sessions were recorded, several merges changed what the same
+`ic.pipeline` / `pdp3-koblitz` ids count, and sessions of both
+generations are committed under identical ids and parameters, so the id
+cannot say which accounting a record has. `src/cryptanalysis/ecbench/legacy.rs`
+holds the named profiles of the past; a replay that does not reproduce
+under the current accounting is tried under each in turn and accepted
+only if the **whole** record then reproduces (answer, totals, phases,
+counters, native counters, factor base, unpriced list). The receipt's
+replay detail names the profile (`pre-2043`, `pre-2043-priced`, `pre-1646`, `pre-A1 endomorphism counters`). New
+sessions are recorded and replayed under the current accounting only.
+The changes: #1774 (`c8b1594f6`) priced the qualified F4 word-XOR unit
+by count (before, a wall-priced solver term was taken back out and the
+run was a lower bound); linear harvest on by default (`d1d034d94`,
+`9e69f57ef`) and F6-IC gate-first on by default (`d72e8b04d`) changed the
+F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
+host charge the eager rewrite that x86-64 already charged, where before
+it rewrote lazily and charged only the rows read (the Apple-silicon
+records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/K_0 / GF(2^23)` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
+`pair_table_kind`, `pair_table_points` and `window_div` were added to
+`pdp3-koblitz`'s set-up counters later; a record without one is compared
+without it. `engine=rootfind-window-negfold` without `window_div` is the
+`⌈|F|/3⌉` window it was before the divisor became a parameter.
+A change of accounting still needs a new id: do not add a profile to
+excuse one.
+
+*Who may use a profile.* A legacy accounting excuses a difference, so it
+is offered only to a record whose `binary_sha256` is on that profile's
+closed list in `legacy.rs` (the same pattern as `PRE_CLASS_SETUP_BINARIES`),
+and only to an index-calculus record (`ic.*`) carrying no `bitop/v1` work
+counters (every binary since 2026-10-16 writes them). A record from any
+other binary, including everything the current harness writes, replays
+exactly; the lists were found by scanning the committed sessions that
+needed each profile, and each entry names its binary SHA-256, the
+`git_commit` its session names (informational: matching is by binary hash)
+and its sessions:
+
+- `pre-2043`: `1e972df4…fe531` (rootfind_engine claim-n13, claim-n19,
+  smoke-koblitz, abandoned/claim-n13-interrupted); `394e0c1b…ec973`
+  (rootfind_improve claim-n13, select, window-d4); `1622e3fa…372dc`
+  (rootfind_parity claim-n13, claim-n13-v2, cycle2, cycle4, cycle4b, cycle5);
+  `de2e66bc…20c` (rootfind_parity cycle1); `b978f0e4…cccdf` (yield_sweep
+  koblitz, da-f4 arms); `712a58bb…ebad` (f6 ladder n7, exhausted runs);
+  `9bb9a1a6…b8b68` (factor_bases koblitz17-algebraic, exhausted runs).
+- `pre-2043-priced`: `27fd2653…b76c` (rootfind_faster claim-n13-v3, cycle1,
+  cycle3).
+- `pre-1646`: `712a58bb…ebad` (f6 ladder n13, n19); `b2596e9d…d3845`
+  (all_candidates koblitz); `b978f0e4…cccdf` (yield_sweep koblitz).
+- set-up descriptors and `window_div` absent: `1e972df4…fe531`,
+  `394e0c1b…ec973`, `de2e66bc…20c`.
+- pre-A1 endomorphism counters: `87bac344…148f` (ext_endo_rho
+  `sessions/{gls-fp2,subfield-fp3}`; `sessions-a1/` replays exactly).
+
+The full digests and commits are in `legacy.rs`; a test checks they are 64-
+and 40-hex, and that the same committed record with an unlisted binary is
+not excused, for every profile.
+
+*Still failing.* `research/f6_ic_ecbench_ladder_20261005/sessions/n23` does
+not replay: its `ic-f6` records (4 of 6 sampled replays; the rho records
+reproduce) fail under every profile above. The nearest accounting,
+`pre-1646`, gives `solver_ops` 9,189,627,347 against 9,189,892,368
+recorded (0.003 % apart), but the search is not the same one: recorded
+`splits` 72,409 against 71,936, `reductions` 169,304 against 163,371,
+`infeasible_branches` 71,890 against 66,430 and `geometric_refutations`
+0 against 4,987, while the gate's other counters (support checks 133,842,
+witnesses 100, residual lookups 235, group additions 914) match. Another
+change to the F6 node oracle between 2026-10-05 and 2026-10-11, or an
+uncommitted recording binary, is the likely cause; it has not been found,
+and no profile that only nearly matches is offered for it.
+
 **Independent runner (isolab).** `ecbench isolab-job` writes an
 `isolab.job/v1` that runs a spec on a lab worker:
 
@@ -1447,3 +1527,65 @@ answer, expose GPU device and contention telemetry, and pass independent
 answer replay under the same record contract. The specific acceptance test
 and remaining device-validation gap are tracked in
 [the GPU matched-workload problem](../../problems/ecbench-gpu-matched-workload-contract.md).
+
+### Frozen finite-extension replication methods (three leads, 2026-10-18)
+
+`CurveSpec::ThreeLeads` records the complete source model, field representation,
+certified order, prime subgroup and generator. It validates the field,
+singularity, Hasse bound and subgroup; smaller witnesses require exhaustive
+point counts. Larger quadratic witnesses use a prime-order point with r>4p,
+which determines the unique group order in the Hasse interval. The fixture
+manifest separately retains the certificate and common generation work.
+
+The `three_leads` adapter shares its native arithmetic with the independent
+study driver. `rho.three_leads_{plain,negation,jacobian}_v1` charge initialization,
+all walk/collision/escape/restart work and post-solver verification. The
+Jacobian arm also charges explicit Scholten transfer and destination setup.
+These memoized rho implementations use O(sqrt(r)) collision memory, retained
+beside the index-calculus graph's memory; they are not memory-free rho timings.
+
+`ic.three_leads_genus2_v2` charges the cover, both transfers, walk initialization,
+Mumford arithmetic, root finding, signed large-prime graph elimination and
+restarts. It discards repeated split divisor classes up to sign and restarts
+on any repeated walk divisor, including unsplit states. It does not extract
+scalars from those walk collisions. The independent and unfiltered modes
+are separately specified controls. v1 preserves the diagnosed unsplit-cycle
+exhaustions and remains available for replay.
+
+`ic.three_leads_decomposition_v2` charges building/projecting a subfield or
+Kummer/Dickson base, full cofactor-offset walk initialization, actual binary
+linearized/S3 roots, rational point lifts, point-sum verification, and
+incremental elimination of unknown factor-base logarithms. Each step makes
+a counted seeded jump choice and includes initial/restarted relation targets.
+v1 preserves the earlier fixed-partition sampler, including its exhausted
+small-sumset attempts. Methods never receive the planted logarithm.
+
+All primitive M/S/I counters are actual ledger observations. Odd quadratic
+operations expand into F_p operations. Binary operations use the named ambient
+field unit. Recorded GAE uses the declared conversion S/M=0.75, I/M=10 and a
+counted generic source addition; it is not a host-time calibration. The study
+also reports all twelve cells S/M in {0,0.5,1}, I/M in {1,10,100,1000}, plus
+symmetric native-operation sensitivity. Native counters denote logical field
+additions, RNG/scalar/graph operations and lookup calls, rather than physical
+hash buckets, allocations or CPU instructions. They do not establish a complete
+wall cost. Count-only L0 sessions make no timing or fastest-implementation claim.
+
+Protocol, derivation, raw sessions, replay receipts and claim verdicts:
+[`three_leads_e2e_20261018`](../../research/three_leads_e2e_20261018/README.md).
+
+### Seeded P+M / P-M selection model (v1)
+
+`rho.plus_model_v1` and `rho.best2_model_v1` are prime-field diagnostic model
+arms, with required `jumps`, `walks`, `dp_bits`, and `cap_multiple` parameters.
+They charge setup, starts and every group operation (two complete candidate
+additions for BEST2), including cycle-seek steps and escape doublings. Hash,
+canonicalisation, DP/table probes and coefficient work have explicit
+`_uncharged` counters; apply the standard sensitivity band to both arms.
+The runner independently verifies the returned scalar. These arms use hashed
+group keys rather than CUDA coordinate limbs and do not measure the shared
+field inversion or actual GPU solve cost. Existing rho IDs remain unchanged.
+
+The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbench-model.json)
+and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
+record the unexecuted integration/session/replay requirements. No model result
+may be multiplied by standalone GPU throughput to claim measured NIST savings.

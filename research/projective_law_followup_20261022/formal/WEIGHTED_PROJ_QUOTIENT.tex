@@ -1,0 +1,18 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Weighted quotient: checked $Z=1$ specialization}
+For any field $K$, a Lean proof constructs a surjective $K$-algebra map
+from the ordinary quotient of $K[X,Y,Z]$ by
+$Y^2-X^5Z-a_3X^3Z^3-a_2X^2Z^4-a_1XZ^5-a_0Z^6$
+to $K[x,y]/(y^2-x^5-a_3x^3-a_2x^2-a_1x-a_0)$.
+The map sends $(X,Y,Z)$ to $(x,y,1)$; $Z-1$ lies in its kernel.
+The compiler exited zero and all eight theorem audits list only
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+The exact kernel, quotient grading, degree-zero localization isomorphism,
+infinity chart, and $\mathrm{Pic}^0$ transfer remain open. No cost ratio changes.
+Source and log hashes and replay command are in \texttt{WEIGHTED\_PROJ\_QUOTIENT.md};
+machine-readable statuses are in \texttt{weighted-proj-quotient.csv}.
+\end{document}

@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 import build_lab_browser as browser
 
@@ -85,6 +86,21 @@ class RepositoryInputsTests(unittest.TestCase):
         loose.unlink()
         with self.assertRaisesRegex(OSError, r"HEAD:tracked/off\.json"):
             source.read_text("tracked/off.json")
+
+    def test_core_leaderboard_is_scanned_beyond_the_general_file_limit(self):
+        core_id = "IC1N83Ckb1a1fb183264PDP4rootRCguidedLAgaussTDdirectISO0h6f30a77abf9e"
+        other_id = "IC1N83Ckb1a1fb191232PDP4rootRCguidedLAgaussTDdirectISO0h37b9b2d5dc7a"
+        directory = self.root / "docs" / "ic"
+        directory.mkdir(parents=True)
+        (directory / "leaderboard.json").write_text('{"candidate":"' + core_id + '"}\n')
+        (directory / "large-note.json").write_text('{"candidate":"' + other_id + '"}\n')
+        self.git("add", "docs")
+        self.git("commit", "-qm", "candidate inputs")
+        source = browser.RepositoryInputs(str(self.root))
+        with mock.patch.object(browser, "MAX_SCAN_BYTES", 32):
+            rows = browser.candidate_identities(source)
+        self.assertEqual([row["candidate_id"] for row in rows], [core_id])
+        self.assertEqual(rows[0]["where"], ["docs/ic/leaderboard.json"])
 
     def test_non_git_root_fails_closed(self):
         with tempfile.TemporaryDirectory() as root:
