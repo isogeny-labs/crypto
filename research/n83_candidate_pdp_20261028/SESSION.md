@@ -547,3 +547,28 @@ LFD and elite-base search remain unresolved.
 
 ### Errors
 No native development test failure so far. No production result exists yet.
+
+
+## 2026-10-28 17:56 UTC — Chain certificates and S3 replay complete
+
+### What was done
+Run17:53:44–17:56:19UTC completed84 original/baseline/spike40 Koblitz/binary m3..9
+certificates and84 fresh replays; producer/replay exit0. All84 restored replays
+pass and360 raw files match before/after. Native intervals are recorded in
+NEXT_EXACT.md and evidence/chain/verified-summary.json. Export has zero findings.
+Raw archive SHA5da13e39bbc9db23f61a2fbd709da896bda04b1bb8eacbe78c218011758d579d,
+358357680 bytes; all84 immutable progress snapshots retained.
+
+### Decisions made
+Data commit/push precedes report. This is improved knowledge of unchanged
+highest-form ideals, not lower observed regularity or an elite-base gain. Full
+larger-m degrees and LFD remain unknown. Preserve every previous phase.
+
+### Open threads
+Report, PR update and exact-head status; independent review. Explore overlapping
+chain blocks and bounded higher-m closure under a new frozen protocol.
+
+### Errors
+No production failures/timeouts. The whitespace check flagged native log blank
+EOF lines; logs were preserved verbatim and the one check disabled only blank
+EOF warnings. No frozen source or measured data was changed after freeze.

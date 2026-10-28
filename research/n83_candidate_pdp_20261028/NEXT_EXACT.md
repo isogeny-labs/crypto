@@ -70,3 +70,27 @@ certificate condition, not a different-degree assertion. Before any new base
 search, define matched target sampling and keep source/preprocessing constant.
 Prime larger-m positive-dimensional top quotients, larger-m LFD and prime LFD
 remain unresolved. No elite base or universal FFD/LFD result is established.
+
+
+## 2026-10-28 update:84 larger-m binary chain intervals tightened
+
+Run n83-binary-chain-20261028-r1 completed84 producer certificates and84 fresh
+replays; S3-restored executable replayed all84 and all360 raw manifest entries
+matched before/after. All84 cumulative partial summaries are immutable and kept.
+Original/baseline/spike40, Koblitz/binary, planted/natural now share these bounds:
+m3[111,138],m4[194,221],m5[277,331],m6[360,414],m7[443,524],m8[526,607],m9[609,717].
+These are stronger certificates on unchanged sources, not a base improvement.
+Every larger-m exact full-chain degree remains unknown. Source8ccd4eb9729;
+protocolce0a47828dbf3f0dcfe311cefd43730ab671dcf9ac1da7e0cee8ecd2d9a1fb72.
+See CHAIN_DESIGN.md, CHAIN_FORMAT.json and experiment-chain.export.json. Do not
+repeat this completed84-case batch. Every earlier dataset remains evidence.
+
+The method selects disjoint original S3 components and leaves overlap information
+unused. Next investigate overlaps/multigraded structure for exact m3 regularity,
+and bounded native higher-m LFD closure on retained systems. Do not equate a
+closure plateau with stabilization; keep strict nonmembership witnesses and any
+unresolved lower bound. Held-out matched targets and base selection remain open.
+The current base-independent interval proof cannot rank baseline/spike40.
+Prime larger-m original top quotients remain positive-dimensional; a different
+presentation needs explicit separate arms. No elite base or universal FFD/LFD
+conclusion is established. Independent scientific review remains pending.
