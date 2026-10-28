@@ -296,3 +296,42 @@ The source commit had not finished when an initial predata freeze read HEAD.
 Its subsequent Git staging failed on the live index lock; no lock was removed
 and no production launched. Preserved that freeze and log, verified the completed
 94b5400d9cb source bytes, and filed version2 amendment before affected data.
+
+
+## Paired top-form batch complete
+
+### What was done
+
+Run n83-paired-top-20261028-r1 completed15:40:16–15:45:17UTC. All96 certificate
+computations and fresh replays passed, as did16 explicit prime graded-map checks.
+All402 raw manifest hashes pass. Native binary/Koblitz lower bounds are28,111,
+194,277,360,443,526,609 for m2..9 in both arms and both targets. Upper bounds
+stay55,165,275,385,495,605,715,825; original linear-top rank0 throughout. Prime
+m2 interval29..55; m3..9 positive-dimensional top quotients. The prime maps
+identify paired graded top quotients. Export passes file validation with zero
+findings. Full raw archive and frozen source are in shared content-addressed S3.
+
+### Decisions made
+
+Preserve all failed maps and old looser bounds. Do not transfer a certificate
+improvement into a factor-base quality claim. Do not equate prime graded-map
+certificates with affine-selector ideal equivalence. Keep the full goal active.
+
+### Open threads
+
+Finish full raw-archive download/reconstruction, data commit, committed metrics
+check, report publication and PR refresh. Independent scientific review and
+exact-head CI remain separate from producer verification.
+
+### Errors
+
+A mismatched bracket in the new export-governance helper was caught by Python
+compilation and fixed before packaging. Frozen native code and measurement data
+were unchanged. The report's long hashes were given separate lines for legibility.
+
+### Full retention verification
+
+Downloaded the240963688-byte archive from S3, verified its SHA-256, extracted
+it into a fresh retained directory and checked all402 original file hashes.
+Both report pages are rendered and inspected. All64 binary certificates expose
+the recorded27-selector plus83(m-2)-intermediate successful map.

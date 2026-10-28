@@ -387,6 +387,25 @@ def n83_candidate_datasets(ref, since):
                      unit="rank" if field.endswith("rank") else "degree",
                      label=f"Paired V3 {row['key']}: {field}; producer replay, review pending",
                      source=f"{path}@{commit}")
+    path = f"{study}/evidence/top/verified-summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        for row in data.get("rows", []):
+            if row.get("verified") is not True:
+                continue
+            for field in ("dreg_lower_bound", "dreg_upper_bound", "linear_top_rank",
+                          "top_quotient_dimension_lower_bound"):
+                emit(f"n83.paired_top.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-paired-top-regularity",
+                     unit="degree" if field.startswith("dreg_") else "dimension",
+                     label=f"Original top ideal {row['key']}: {field}; certified bound, review pending",
+                     source=f"{path}@{commit}")
+        for proof in data.get("prime_isomorphisms", []):
+            if proof.get("verified") is True:
+                emit(f"n83.paired_top.{proof['id']}.graded_quotient_isomorphic", 1,
+                     date=date, problem="n83-paired-top-regularity", unit="certificate",
+                     label=f"Prime paired top quotients {proof['id']}: diagonal isomorphism; review pending",
+                     source=f"{path}@{commit}")
 
 
 def main():

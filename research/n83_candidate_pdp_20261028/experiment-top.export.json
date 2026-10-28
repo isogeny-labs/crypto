@@ -1,0 +1,5405 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/top.rs",
+      "kind": "analysis",
+      "bytes": 25071,
+      "sha256": "f5b1e96383422f81ad84f4bbc441b02d1f974b2f240cb2976db7a3962081aeba"
+    },
+    "outputs": [
+      {
+        "path": "evidence/top/verified-summary.json",
+        "kind": "summary",
+        "bytes": 67067,
+        "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    },
+    {
+      "id": "baseline-prime",
+      "role": "baseline",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    },
+    {
+      "id": "spike40-prime",
+      "role": "candidate",
+      "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+      "binary_sha256": "5bbcafb370fea6310cd78c377aacc613cad3d8e4ff9b0f322d79c8f987322e4c",
+      "image_digest": null
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-28",
+  "export_id": "N83-PAIRED-TOP-20261028",
+  "files": [
+    {
+      "path": "evidence/top/host.txt",
+      "kind": "raw",
+      "bytes": 3504,
+      "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m2-natural.json",
+      "kind": "raw",
+      "bytes": 7682,
+      "sha256": "41fcd2e14efd0cec01bc0ffd6eca96ee68d1bef1f8236cfb6fb24bcebc0e664c"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m2-planted.json",
+      "kind": "raw",
+      "bytes": 7682,
+      "sha256": "a590bd88a7cbbb5d805c3cb686f79b55071b9cfe1b193a5d050840d0eb79bb6a"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m3-natural.json",
+      "kind": "raw",
+      "bytes": 11135,
+      "sha256": "c38521e5b2a69800978c0660433aa95c4b26098e9d6f8f81dc01cd03f0e69071"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m3-planted.json",
+      "kind": "raw",
+      "bytes": 11135,
+      "sha256": "8dba98e46321a98660669d7a6539eaad3674ac204ad1973e5ef1439e786fe7f9"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m4-natural.json",
+      "kind": "raw",
+      "bytes": 14598,
+      "sha256": "773c49f0f18b7597dfca313c11318656878a55f7937ad555c40cd11072e44233"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m4-planted.json",
+      "kind": "raw",
+      "bytes": 14598,
+      "sha256": "9c27a6115c3108295fe5d7799e2fdb6945cc090449a819206cd97ec496fde2f5"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m5-natural.json",
+      "kind": "raw",
+      "bytes": 18079,
+      "sha256": "ea14fce824fbc652f7700d78e30bab6d7fd2730bc2c9e8fd0f84a7ba0e7c73f7"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m5-planted.json",
+      "kind": "raw",
+      "bytes": 18079,
+      "sha256": "55e49b21e62dd94431650f9aa9aa0e3db3df14429be1ae364c416d2ed7463b5c"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m6-natural.json",
+      "kind": "raw",
+      "bytes": 21560,
+      "sha256": "9bebfd8f5d8b72ccd64ced123a1d23a168b9445d14b2e44a9f68b7e02f118046"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m6-planted.json",
+      "kind": "raw",
+      "bytes": 21560,
+      "sha256": "3487460c0f17296804d725482846ba3ff55af12d5fe8f6ffae8cdd2c924e91ac"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m7-natural.json",
+      "kind": "raw",
+      "bytes": 25041,
+      "sha256": "0d757973e70f132944aa720159acb10e82a8f7dc198e7cf6dea1cccfcda5282a"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m7-planted.json",
+      "kind": "raw",
+      "bytes": 25041,
+      "sha256": "62b090a14bef7fbea542fd6e991885ed19a7cecf4875804d8abc0ac4126ad28a"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m8-natural.json",
+      "kind": "raw",
+      "bytes": 28522,
+      "sha256": "4e0b0e8c2ce8921c7f0c6a8bdf285241d254ebd814ee9328fcfa8b0af8f1de8c"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m8-planted.json",
+      "kind": "raw",
+      "bytes": 28522,
+      "sha256": "299e1227006a4bca104852852d5f700bcf88ec7c5fea8e1ce5c3bf1595c6120d"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m9-natural.json",
+      "kind": "raw",
+      "bytes": 32003,
+      "sha256": "1dc87065fc7c9facf019cbb5fb582aac34d05aa8d05f47aa5ee4090e616562f1"
+    },
+    {
+      "path": "evidence/top/isomorphisms/isomorphism-prime-m9-planted.json",
+      "kind": "raw",
+      "bytes": 32003,
+      "sha256": "4a353d6fab42bf429a1ecb360688626933f952e9b7406a1d9c7c50cac617a4d9"
+    },
+    {
+      "path": "evidence/top/manifest.sha256",
+      "kind": "raw",
+      "bytes": 46852,
+      "sha256": "df25704c059eb845ebc2f3203e352730d751ba0d5c4820c86c8ccff154f0030f"
+    },
+    {
+      "path": "evidence/top/producer.log",
+      "kind": "raw",
+      "bytes": 6480,
+      "sha256": "46f655df9f04202b752108af1816a7ba2827e7ea4000a726f1c65885d9a54b67"
+    },
+    {
+      "path": "evidence/top/replay.json",
+      "kind": "raw",
+      "bytes": 18432,
+      "sha256": "fd514a977656162ae388c0678a9f6cb66c0d9756de0eb2f3f7ac8bb513267e01"
+    },
+    {
+      "path": "evidence/top/replay.log",
+      "kind": "raw",
+      "bytes": 6384,
+      "sha256": "3603f93651aa94858e2db6b0564597685c67efed0f1568ff98526ec28c003454"
+    },
+    {
+      "path": "evidence/top/status.json",
+      "kind": "raw",
+      "bytes": 55,
+      "sha256": "3d25e3ede527345e9e78b08da5161c9414bb92b9b5cc9f9a406f64941266bb1c"
+    },
+    {
+      "path": "evidence/top/summary.json",
+      "kind": "raw",
+      "bytes": 64754,
+      "sha256": "22d82c8b7404a8528359844cbe2baa34c3d946fd69984c9632fad2eabf80c65d"
+    },
+    {
+      "path": "evidence/top/terminal.json",
+      "kind": "raw",
+      "bytes": 197,
+      "sha256": "aa69b5d783460cbf4ec19fd2db369652acd978a161e575dc24dcbd27761ae1e6"
+    },
+    {
+      "path": "evidence/top/verified-summary.json",
+      "kind": "raw",
+      "bytes": 67067,
+      "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+    },
+    {
+      "path": "top-archives/runs.tar.xz",
+      "kind": "raw",
+      "bytes": 240963688,
+      "sha256": "f295b9dc318d075346df6d32966edd14f906536e36df0b2000987f848e627993"
+    },
+    {
+      "path": "TOP_FORMAT.json",
+      "kind": "raw",
+      "bytes": 2444,
+      "sha256": "fa8f9f1c8007f3d3431d56ecd81c29e3bae19c449b660fe94f4dc21402427540"
+    },
+    {
+      "path": "TOP_DESIGN.md",
+      "kind": "raw",
+      "bytes": 5017,
+      "sha256": "f055757acab7f5ff971bdb069354e6546e495d443b4c290d39ea2431e23d91c4"
+    }
+  ],
+  "flow": {
+    "planned": 96,
+    "attempted": 96,
+    "completed": 96,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "class_id": "existing-spot-L0",
+    "path": "evidence/top/host.txt",
+    "sha256": "773aa1ae9fd8c38357c4afc12f513340e413b777f82301fa7366dfa7c2c7ee87",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux ip-172-31-17-173.us-east-2.compute.internal 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "All96 retained paired systems are included; only successful producer plus replay admits numeric bounds."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Six deterministic binary projections retain their failed surviving monomials; greedy maps are not claimed optimal."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Original linear top generators strengthen an upper bound without changing the ideal. Intersecting intervals do not rank bases."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Sixteen prime diagonal maps, when verified, identify graded top quotients only; no affine Boolean-selector ideal equivalence is asserted."
+    },
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "No new LFD, intermediate solving-degree, timing or universal FFD/LFD verdict is measured."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "role": "producer",
+    "model": null,
+    "session": "n83-paired-top-20261028-r1"
+  },
+  "protocol": {
+    "path": "protocol-top.json",
+    "protocol_id": "N83-PAIRED-TOP-20261028",
+    "sha256": "5b0a75feb54abe9be95f384be778d804e985656e608a11c2684c40ea9312edb7",
+    "version": 2
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 28,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 29,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m2-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 29,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 29,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m2-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 29,
+          "dreg_upper_bound": 55,
+          "top_quotient_dimension_lower_bound": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m2-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 111,
+          "dreg_upper_bound": 165,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m3-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m3-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m3-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m3-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 194,
+          "dreg_upper_bound": 275,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m4-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m4-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m4-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m4-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 277,
+          "dreg_upper_bound": 385,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m5-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m5-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m5-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m5-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 360,
+          "dreg_upper_bound": 495,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m6-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m6-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m6-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m6-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 443,
+          "dreg_upper_bound": 605,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m7-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m7-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m7-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m7-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 526,
+          "dreg_upper_bound": 715,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m8-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m8-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m8-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m8-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-koblitz-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-koblitz-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-koblitz",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-koblitz-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-koblitz-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-binary-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-binary-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-binary",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-binary-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "dreg_lower_bound": 609,
+          "dreg_upper_bound": 825,
+          "top_quotient_dimension_lower_bound": 0,
+          "linear_top_rank": 0
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-binary-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m9-planted.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m9-planted",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "baseline-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/baseline-prime-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "baseline-prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    },
+    {
+      "arm": "spike40-prime",
+      "artifacts": [
+        {
+          "path": "evidence/top/verified-summary.json",
+          "kind": "summary",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "s3://setec-astronomy-artifacts/runs/n83-paired-top-20261028-r1/local/certificates/spike40-prime-m9-natural.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "top_quotient_dimension_lower_bound": 1
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "spike40-prime-m9-natural",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "Fresh-process full source, projection, linear XOR and paired prime map recomputation; producer implementation, independent review pending"
+      },
+      "warmup": false,
+      "worker": "ip-172-31-17-173.us-east-2.compute.internal"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "94b5400d9cbd670a048307809e439c6859fa24a0",
+    "dirty": false
+  }
+}

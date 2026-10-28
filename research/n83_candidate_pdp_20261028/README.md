@@ -81,7 +81,8 @@ runtime controls. Both Koblitz and general-binary curves have exact LFD=2 on
 baseline and exact LFD=3 on spike40, for both retained planted and natural
 m2 targets. All eight inputs already have certified FFD=2 in the paired panel.
 These are input-specific certificates, not a universal FFD/LFD verdict or a
-regularity reduction. Candidate degree of regularity remains unmeasured.
+regularity reduction. Candidate degree of regularity was unmeasured at the V3 stage; the top-form
+certificate continuation below now supplies bounds.
 
 Every spike40 result contains an explicit degree-at-most-two polynomial in V3
 whose remainder against the complete V2 space is nonzero. The upper certificate
@@ -115,3 +116,53 @@ done
 The original fixed-base m2..9 regularity sweep is preserved separately in
 `../n83_fixed_degree_sweep_20261028/`, with certified top-form bounds in
 `../n83_top_quotient_20261028/`. Those bounds do not describe spike40.
+
+
+## Completed paired top-form regularity certificates
+
+Run `n83-paired-top-20261028-r1` completed 15:40:16–15:45:17 UTC. All96 retained
+systems,96 fresh replays and16 prime graded-isomorphism checks passed. Ten
+native unit controls pass. No production failure, timeout, retry or exclusion.
+The full402-file raw run is retained; unknown exact finite degrees stay unknown.
+
+| m | Koblitz and binary, both bases and targets | Prime, both bases and targets |
+|---|---|---|
+|2|28 <= dreg <= 55|29 <= dreg <= 55|
+|3|111 <= dreg <= 165|positive-dimensional top quotient|
+|4|194 <= dreg <= 275|positive-dimensional top quotient|
+|5|277 <= dreg <= 385|positive-dimensional top quotient|
+|6|360 <= dreg <= 495|positive-dimensional top quotient|
+|7|443 <= dreg <= 605|positive-dimensional top quotient|
+|8|526 <= dreg <= 715|positive-dimensional top quotient|
+|9|609 <= dreg <= 825|positive-dimensional top quotient|
+
+The stronger binary lower maps retain27 base selectors and83(m-2) intermediate
+variables. These strengthen a certificate on unchanged inputs; they do not
+indicate a new harder input or a base-quality difference. The original linear-top
+rank is0 in every binary case, so this additional upper detector does not tighten
+the upper bound. All six candidate maps, including failures, remain archived.
+
+For every prime pair, an explicit invertible diagonal map identifies the original
+top-form ideals. This proves equal graded Hilbert functions and regularity under
+the recorded convention for these presentations. It is not an equivalence of
+affine Boolean-selector ideals. For prime m3..9 the top quotient has positive
+dimension, hence no finite graded vanishing degree; CM regularity is distinct.
+
+`evidence/top/verified-summary.json` carries96 producer/replay joins and16 map
+receipts; `evidence/top/isomorphisms/` exposes the explicit prime maps.
+`experiment-top.export.json` is bound to version2 of `protocol-top.json`.
+`TOP_FORMAT.json` documents every source/certificate field and monomial encoding.
+`evidence/top-storage.json` and `top-archives/.artifacts.json` identify the complete
+raw archive, including inputs,112 certificates, source-linked failed maps,
+instrument, controls, logs, host, terminal, partial summary and402-file manifest.
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/n83_candidate_pdp_20261028/top-archives
+mkdir /tmp/n83-paired-top-reconstruction
+tar -xJf research/n83_candidate_pdp_20261028/top-archives/runs.tar.xz -C /tmp/n83-paired-top-reconstruction
+(cd /tmp/n83-paired-top-reconstruction && sha256sum -c manifest.sha256)
+```
+
+The two-page report is `reports/run-20261028T1540Z/report.pdf` with editable
+plot data/source. Producer replay is not independent review. Exact finite
+regularity, larger-m/prime LFD and an elite-base improvement remain open.
