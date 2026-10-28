@@ -11,14 +11,13 @@ proc invUnit(poly p){
  if(tr(p*answer)!=1){ERROR("truncated unit inverse failed");}
  return(answer);
 }
-proc ord(poly p){
- int value=0;
+proc wVal(poly p){
  if(p==0){ERROR("order unresolved at retained precision");return(-999);}
- while(subst(p,w,0)==0){p=p/w;value++;}
- return(value);
+ // In this univariate global ordering the last term has least exponent.
+ return(deg(p[size(p)]));
 }
 proc recordOrder(string name,poly p){
- int value=ord(p);
+ int value=wVal(p);
  print("ORDER "+name+" "+string(value)+" LEAD "+string(subst(p/w^value,w,0)));
  if(value<0 || value>=100){ERROR("valuation outside certified precision");}
 }
@@ -26,6 +25,8 @@ int kind;int branch;int k;int j;
 poly tt;poly qq;poly xx;poly yy;poly zz;poly bb;poly cc;poly aa;poly dd;poly ee;
 poly ll;poly nnum;poly nden;poly nu;poly residue;int denorder;int numorder;
 ideal lifted;ideal evaluatedUnits;
+print("VALUATION_HELPER_CONTROLS");wVal(1+w^191);wVal(w+w^3);wVal(w^7+w^179);
+if(wVal(1+w^191)!=0 || wVal(w+w^3)!=1 || wVal(w^7+w^179)!=7){ERROR("univariate valuation controls failed");}
 for(kind=0;kind<=1;kind++){
  qq=1;xx=1;yy=1;
  if(kind==0){
@@ -60,7 +61,7 @@ for(kind=0;kind<=1;kind++){
   if(tr(ll^2+aa*ll+zz+bb)!=0){ERROR("lambda series residual");}
   map getnu=r,0,ll,bb,cc;
   nnum=tr(getnu(nuEquation));nden=tr(getnu(nuCoefficient));
-  numorder=ord(nnum);denorder=ord(nden);
+  numorder=wVal(nnum);denorder=wVal(nden);
   print("NU_NUMERATOR_DENOMINATOR_ORDERS");numorder;denorder;
   if(numorder<denorder){ERROR("nu has a pole; Laurent adaptation not frozen");}
   nu=tr((nnum/w^denorder)*invUnit(nden/w^denorder));

@@ -131,3 +131,10 @@ Finite truncation identifies a valuation only with the already certified
 unique smooth-chart lift and exact rational function identity. It is not a
 standalone simultaneous arc for node187 or a complete global divisor. Retain
 the truncations, all residuals and orders; no timing claim is made.
+
+Before o24-series-02, correct the rejected order helper: in the fixed
+univariate global ordering compute the degree of the last polynomial term.
+Require helper(1+w^191)=0, helper(w+w^3)=1, helper(w^7+w^179)=7 before any
+geometry is evaluated. This corrects implementation, not a precision increase,
+pole assumption or chart change. The first attempt's highest-degree outputs
+and resulting source failures are retained and are not interpreted as orders.

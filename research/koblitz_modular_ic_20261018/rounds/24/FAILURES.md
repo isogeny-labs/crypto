@@ -14,6 +14,12 @@
   the failed declarations; exit 1 is retained and no proof/audit pass is
   claimed. Preserve the exact failed source. Replace the numeral conversion
   explicitly and use the already available omega tactic with d nonzero.
+- o24-series-01: the order helper reports the highest degrees of nonmonomial
+  polynomials (for example 179 for a series beginning w^7), so its subsequent
+  nu division and original-source residuals fail. The wrapper rejects the run.
+  Those numbers are not valuations or a nu-pole result. Replace the helper
+  by the degree of the last term in this univariate global ordering and add
+  explicit unit/order-1/order-7 controls before evaluating any chart.
 
 All R01-23 failures, capped normalizations, validation limitations and missing
 first-host raw logs remain as previously recorded. No failed computation is
