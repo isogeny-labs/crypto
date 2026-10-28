@@ -97,3 +97,39 @@ build with its full source commit and `CRYPTO_BUILD_GIT_DIRTY=false` provenance;
 the test does not bypass that admission rule. Failed attempts remain retained
 separately. Validation evidence distinguishes completed checks from pending
 interoperability and cloud work.
+
+## Recorded validation, 2026-10-28
+
+Consumer source `8d55079e37f2c5f2f506edf20670f018354edd56` passed 87 native
+release tests (80 library, 7 integration), strict all-target Clippy, formatting
+and release build. The opt-in interoperability test separately passed against
+producer source `d71ec2ef5ab9b7f2a038f61c941af10297a775ad` and binary SHA256
+`63c95dd788f267d1c4cc6323a33b67f607390dc669730c13e99eb156a0004c07`.
+
+| Software check | Observed result |
+| --- | --- |
+| Planned, sealed and audited cells | 72 each |
+| Producer-reported outcomes | 41 verified, 19 partial, 12 unsupported |
+| Independently checked positive certificates | 22 |
+| Exported records / unsupported rows with null features | 72 / 12 |
+| Root-artifact cells retained without independent root-set claims | 6 |
+| Rehashed recipe, seed and status substitutions | Rejected |
+| Producer replay | Passed over the same 72 sealed cells |
+
+All cells use n=5 and m=2. The 41 producer-reported verified outcomes are not
+41 independently proved mathematical results; independent arithmetic coverage
+is the 22 positive certificates listed separately. The test makes no solver
+timing, cost or fall-degree comparison.
+
+The source, consumer executable, raw logs, first failed provenance admission
+and all sealed cells are archived at
+`s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/consumer-policy-compatibility/f6e4f49cb829728dd8d2688f97415a4e4d526cbfce6e155a1353cbeb273119e9/validation.tar.gz`.
+The 1,471,427-byte archive was conditionally created, freshly downloaded with
+its ETag, compared byte-for-byte and SHA256-checked. All 2,139 inner file hashes
+passed. The consumer then audited the restored 72 cells and rechecked the 22
+positive certificates. This proves a controller archive roundtrip; the worker
+publication and completion-receipt fetch paths remain outside this check.
+Exact receipts and raw local checks are in
+[evidence/policy-compatibility-20261028/](evidence/policy-compatibility-20261028/).
+Parent-owned root-library checks, current-head CI and PR delivery are separate
+gates; this record does not claim they have passed.

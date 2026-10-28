@@ -58,3 +58,48 @@ The first pinned producer binary (SHA256
 planned successfully but rejected generation before any cell because its
 build had no `CRYPTO_BUILD_GIT_COMMIT`. This failed admission is retained in
 `interop-01.log` and `interop-01/`. No override or data retry occurred.
+
+## 2026-10-28 14:00 UTC — sealed software interoperability and S3 readback passed
+
+### What was done (commands, files, features)
+
+Committed implementation as 8d55079e37f2c5f2f506edf20670f018354edd56. A complete
+resume record passed the checkpoint gate and its canonical S3 checkpoint was
+freshly downloaded, hashed, extracted and Git-bundle verified. The source-bound
+producer d71ec2ef5ab9b7f2a038f61c941af10297a775ad was copied and its SHA checked.
+The opt-in interop-02 test generated and audited all 72 software cells, checked
+22 positive certificates independently, replayed the producer and exported
+72 records with 12 unsupported-feature exclusions. Six root-artifact cells
+remain explicitly outside independent root-set verification. All recipe, seed
+and status substitution checks passed. The normal release suite passed 87 tests
+and ignored the separately executed interoperability test; strict Clippy,
+formatting and release build passed.
+
+### Decisions made (and why)
+
+Preserve the earlier zero-cell provenance failure and gate failure; use a new
+directory for the successful fixture. Keep source byte hashes, observed
+producer statuses and independent coverage separate. Exact cells, code,
+consumer executable and raw logs were uploaded using conditional S3 creation.
+An ETag-bound fresh download matched all archive bytes and 2,139 inner hashes.
+The independent consumer then audited the restored 72 cells and checked 22
+positive certificates again. Durability details are in
+evidence/policy-compatibility-20261028/durability.json.
+
+### Open threads (unfinished, pick up next time)
+
+Root owns the root-library gate, PR publication and coordination with the
+existing consumer owner. No new consumer implementation changes were needed
+after source8d55079 passed interoperability. The producer training-export v4
+bundle, actual EKS worker publication, completion-receipt fetch of these cells,
+large-size corpus and mathematical goals remain outside this software check.
+The original campaign budget, approvals and deadlines remain unchanged.
+
+### Errors (what went wrong, how it was handled)
+
+The checkpoint helper's explicit gate required a complete resume even with a
+software-fixture skip reason, so the record was completed and persisted before
+generation. An archive command initially used repository-root pathspecs from
+a nested directory; it failed before publication and was rerun from the root.
+Only the validated final archive was uploaded. No original cell was rewritten;
+negative mutation tests used a separate copy and its contents were retained.
