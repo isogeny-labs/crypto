@@ -176,3 +176,15 @@ counts and export framing before any dependent basis-action/torsion run.
 A necessary export-recovery replay must assert20charts,68basis vectors and
 1568candidate columns,print all finalbasis vectors,and explicitly close each
 output link. Retain all originals. No result is promoted from a receipt count.
+
+IO01 strictPASS: internal list has3elements; implicit and explicit-closed
+bulk list writes retain only2, while individual closed-link writes retain3.
+This isolates a native serializer behavior, not missing in-memory arithmetic.
+Before dependent calculations, necessary RR-export replay uses ONLY the
+successfulK16family, unchanged768precision/constraints/129jets/caps. Assert
+20charts and1568columns, print allbasis vectors and write individually framed
+native source assignments for all20charts,68basis vectors,1568constraints
+and1568jets, with closed links. No bulk list writer. Retain originalfiles.
+Use the frozen generic custom-source runner branch for future inputs; never
+edit that runner while a process uses it. This replay recovers unavailable
+required outputs; it is not a new or enlarged RR search.
