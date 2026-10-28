@@ -160,6 +160,7 @@ impl Fixture {
             twists: true,
             protocol_sha256: Some(digest(&fs::read(cell.join("protocol.json")).unwrap())),
             split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
         };
         let canonical_plan_sha = digest(&serde_json::to_vec(&plan).unwrap());
         write_json(&cell.join("plan.json"), &plan);
@@ -721,5 +722,69 @@ fn cli_s3_without_complete_budget_arguments_rejects_before_aws_process() {
         .arg(fixture.root.join("absent-policy.json"));
     failure(&fixture.run(command), "provide all of --budget-policy");
     assert!(!destination.exists());
+    fixture.assert_no_aws();
+}
+
+#[test]
+fn cli_plan_freezes_explicit_policy_axis_without_running_or_publishing_cells() {
+    let fixture = Fixture::new();
+    let recipes = fixture.root.join("policies.json");
+    write_json(
+        &recipes,
+        &json!([
+            {"kind":"legacy"},
+            {"kind":"sampled_x_projected_control","candidate_limit":256},
+            {"kind":"binary_subspace_intersection","basis":[1,2,4],"candidate_limit":8}
+        ]),
+    );
+    let destination = fixture.root.join("policy-plan.json");
+    let mut command = fixture.command();
+    command
+        .args([
+            "plan",
+            "--n",
+            "23",
+            "--m",
+            "2",
+            "--families",
+            "koblitz,prime",
+            "--solvers",
+            "root",
+            "--curve-seeds",
+            "1",
+            "--generators",
+            "1",
+            "--keys",
+            "1",
+        ])
+        .arg("--factor-base-policies")
+        .arg(&recipes)
+        .arg("--out")
+        .arg(&destination);
+    success(&fixture.run(command));
+    let plan: DatasetPlan = read_json(&destination);
+    plan.validate().unwrap();
+    assert_eq!(plan.schema, "crypto.ml-dataset.plan/v2");
+    assert_eq!(plan.cell_count().unwrap(), 12);
+    assert_eq!(plan.factor_base_policies.len(), 3);
+    assert_eq!(
+        plan.cell(0)
+            .unwrap()
+            .factor_base_policy
+            .as_ref()
+            .unwrap()
+            .name(),
+        "legacy"
+    );
+    assert_eq!(
+        plan.cell(1)
+            .unwrap()
+            .factor_base_policy
+            .as_ref()
+            .unwrap()
+            .name(),
+        "sampled_x_projected_control"
+    );
+    assert!(!fixture.root.join("cells").exists());
     fixture.assert_no_aws();
 }

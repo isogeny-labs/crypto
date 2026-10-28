@@ -933,6 +933,7 @@ mod tests {
             key_index: 2,
             seed: 42,
             factor_base_size: 2,
+            factor_base_policy: None,
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),

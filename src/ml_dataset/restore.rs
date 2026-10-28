@@ -553,6 +553,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: Vec::new(),
             };
             let binding = json!({"schema":"crypto.ml-dataset.run/v1",
                 "plan_sha256":super::super::digest(&serde_json::to_vec(&plan).unwrap()),
