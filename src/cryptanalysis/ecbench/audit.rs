@@ -455,9 +455,12 @@ pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
 /// compressed (`records.jsonl.gz`) ones included, and the accounting
 /// study's two sessions
 /// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).
-/// A record from any other binary, including every record the current
-/// harness writes, must replay exactly.
-pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 6] = [
+/// The last two wrote `rho.gls` / `rho.frobenius_orbit` records before
+/// their eigenvalue check was charged to the total (2026-10-28); they were
+/// found by reading every `spec.json` added to this repository since the
+/// methods were registered.  A record from any other binary, including
+/// every record the current harness writes, must replay exactly.
+pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 8] = [
     (
         "0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6",
         "c9db37d01bc776a1e8594ce5495e58ba2ccf5a1d",
@@ -496,6 +499,18 @@ pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 6] = [
         "7ed39a752b6cd9cd62f015ca9416a8af85e3dc5b",
         "research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}",
     ),
+    // `rho.gls` / `rho.frobenius_orbit`, whose eigenvalue check on `G` was
+    // charged to the total from 2026-10-28 (`methods::solve_endo_orbit`).
+    (
+        "87bac3448d63e3c1dcd841a2d23b565c09477c855eda0febf11a03d9931d148f",
+        "6bf8d5c2f51dbdd1b134b11a02396e1e4ac76b68",
+        "research/ext_endo_rho_20261023/sessions/{gls-fp2,subfield-fp3}",
+    ),
+    (
+        "1153d340d7b81a58ff9622c81e9bed51396dc2b2e48b6ae0016e7d7a0799a6bc",
+        "a2eefe194c7db611d12bc26128b99cc1addebf09",
+        "research/ext_endo_rho_20261023/sessions-a1/{gls-fp2,subfield-fp3}",
+    ),
 ];
 
 /// Whether `r` may be replayed under the pre-2026-10-18 class set-up
@@ -504,8 +519,10 @@ pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 6] = [
 /// changed; the record carries no `detail.class_setup` (every binary since
 /// the correction writes it); and the record names a listed producer.
 pub fn pre_class_setup_record(r: &Record) -> bool {
-    matches!(r.method.id.as_str(), "rho.quartic" | "rho.cubic")
-        && r.detail.get("class_setup").is_none()
+    matches!(
+        r.method.id.as_str(),
+        "rho.quartic" | "rho.cubic" | "rho.gls" | "rho.frobenius_orbit"
+    ) && r.detail.get("class_setup").is_none()
         && PRE_CLASS_SETUP_BINARIES
             .iter()
             .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
@@ -523,30 +540,6 @@ pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> 
     (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
 }
 
-/// The phases a `kangaroo.vow` record written before 2026-10-18 carries.
-/// Those binaries charged a kangaroo's re-placement after a same-kind
-/// collision to `setup`; it is search.  The total is unchanged.  The
-/// replay reports the re-placement work it moved (`detail.
-/// restarts_in_search`, computed by the replay), and this moves it back.
-pub fn legacy_restart_phase(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
-    let moved = rep.detail.get("restarts_in_search")?;
-    let field = |k: &str| moved.get(k).and_then(serde_json::Value::as_u64);
-    let (adds, doubles, sm) = (field("adds")?, field("doubles")?, field("scalar_mults")?);
-    let mut phases = rep.phases.clone();
-    let si = phases.iter().position(|p| p.name == "setup")?;
-    let wi = phases.iter().position(|p| p.name == "search")?;
-    let w = &mut phases[wi];
-    w.adds = w.adds.checked_sub(adds)?;
-    w.doubles = w.doubles.checked_sub(doubles)?;
-    w.scalar_mults = w.scalar_mults.checked_sub(sm)?;
-    w.gae = (w.adds + w.doubles) as f64;
-    let s = &mut phases[si];
-    s.adds += adds;
-    s.doubles += doubles;
-    s.scalar_mults += sm;
-    s.gae = (s.adds + s.doubles) as f64;
-    Some((phases, rep.total_gae))
-}
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -827,16 +820,6 @@ impl Ledger {
     }
 }
 
-/// Phases that do not sum to the total on purpose, by method id: records of
-/// `rho.cubic` and `rho.quartic` written before 2026-10-18 leave their
-/// set-up scalar multiplication out of the total (DEEP_DIVE §1.4; those
-/// records replay through [`legacy_class_setup`]).  The harness has charged
-/// it in the total since, under the frozen ids and under the `_v2` ids
-/// (phase `automorphism_setup`), so their current records do sum, and the
-/// exemption only spares the old ones.  Every other method's phases sum to
-/// its total.
-pub const PHASE_SUM_EXEMPT_METHODS: &[&str] = &["rho.cubic", "rho.quartic"];
-
 /// Relative tolerance of the phases-sum-to-total check.  Phases and total
 /// are sums of the same terms in different orders, and the totals of the
 /// sessions recorded on 2026-10-04..09 are rounded to single precision
@@ -871,13 +854,44 @@ fn counts_field_ops(r: &Record, started_unix_ms: u128) -> bool {
 /// binary wrote it (the committed `research/prime_rho_automorphism_20261015`
 /// and every main-binary record since); its bound is the count rebuilt from
 /// the spec (`curve`, never read from the record), so a record cannot raise
-/// it.
+/// it.  [`prime_automorphism_group`] bounds it from the curve's identity
+/// as well, whichever rule the spec's workload was built under.
 fn automorphisms_bound(r: &Record, curve: &CurveFacts) -> u32 {
     let own = r.boundaries.automorphisms_available;
     if r.boundaries.floor_rule.is_none() {
         own.max(curve.automorphisms_available)
+            .max(prime_automorphism_group(curve))
     } else {
         own
+    }
+}
+
+/// The order of a prime curve's automorphism group over `F_p`, read from its
+/// ICV1 identity (`ICV1:fp-<p>:<trace>:<order>:<j>:…`): 6 when `j = 0` and
+/// `p ≡ 1 (mod 3)`, 4 when `j = 1728` and `p ≡ 1 (mod 4)`, otherwise 2 (`±1`).
+/// The recorded `automorphisms_available` is 2 on every prime curve (the
+/// first floor rule), so a `rho.cubic` or `rho.quartic` record that used the
+/// curve's ζ₃ or ι is held to this bound instead.  0 for any other family.
+pub fn prime_automorphism_group(curve: &CurveFacts) -> u32 {
+    let mut parts = curve.icv1.split(':');
+    let (Some("ICV1"), Some(field), Some(_), Some(_), Some(j)) = (
+        parts.next(),
+        parts.next(),
+        parts.next(),
+        parts.next(),
+        parts.next(),
+    ) else {
+        return 0;
+    };
+    let Some(p) = field.strip_prefix("fp-") else {
+        return 0;
+    };
+    // An unparsable characteristic keeps the larger, structural bound.
+    let residue = |m: u128| p.parse::<u128>().map_or(true, |p| p % m == 1);
+    match j {
+        "0" if residue(3) => 6,
+        "1728" if residue(4) => 4,
+        _ => 2,
     }
 }
 
@@ -927,7 +941,10 @@ fn consistency_problems(
     }
     // Phases sum to the total.
     if let Some(total) = r.cost.total_gae {
-        if !PHASE_SUM_EXEMPT_METHODS.contains(&r.method.id.as_str()) {
+        // A named pre-fix producer's class-set-up record is short of its
+        // phase sum by exactly the set-up, which its replay checks
+        // (`legacy_class_setup`); every other record sums to its total.
+        if !pre_class_setup_record(r) {
             let sum: f64 = r.phases.iter().map(|p: &PhaseRecord| p.gae).sum();
             let tol = PHASE_SUM_TOLERANCE * sum.abs().max(total.abs());
             let within = (sum - total).abs() <= tol;
@@ -1127,26 +1144,14 @@ fn replay_one(
             };
             let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
             let mut accounting = false;
-            if !(total_ok && phases_ok && counts_ok) {
-                type Undo = fn(&SolveReport) -> Option<(Vec<PhaseRecord>, f64)>;
-                // The class set-up reconstruction is for the listed
-                // pre-fix producers only ([`pre_class_setup_record`]);
-                // any other record must replay exactly.
-                let undos: [(bool, Undo); 2] = [
-                    (pre_class_setup_record(r), legacy_class_setup),
-                    (true, legacy_restart_phase),
-                ];
-                for (admitted, undo) in undos {
-                    if !admitted {
-                        continue;
-                    }
-                    let Some((phases, total)) = undo(&rep) else {
-                        continue;
-                    };
+            // The pre-fix class set-up reconstruction is for the named
+            // producers' records only (`pre_class_setup_record`), never for a
+            // record the current harness wrote short of its own set-up.
+            if !(total_ok && phases_ok && counts_ok) && pre_class_setup_record(r) {
+                if let Some((phases, total)) = legacy_class_setup(&rep) {
                     let gae: Vec<f64> = phases.iter().map(|p| p.gae).collect();
                     if same_gae(&gae, total) == (true, true) && ints(&phases) == ints(&r.phases) {
                         (total_ok, phases_ok, counts_ok, accounting) = (true, true, true, true);
-                        break;
                     }
                 }
             }
@@ -1832,8 +1837,14 @@ pub(crate) mod tests {
         let mut curve = rec.workload.curve.clone();
         curve.automorphisms_available = 4;
         assert_eq!(super::automorphisms_bound(&rec, &curve), 4);
-        // The curve the spec rebuilds to has only 2: nothing to allow.
-        assert_eq!(super::automorphisms_bound(&rec, &rec.workload.curve), 2);
+        // A curve with only 2 (generic j, so its identity allows 2 as well):
+        // nothing to allow.
+        let mut generic = rec.workload.curve.clone();
+        generic.icv1 = generic.icv1.replace(":1728:", ":17:");
+        assert_eq!(super::automorphisms_bound(&rec, &generic), 2);
+        // The record's own j = 1728 identity allows 4 even when the spec's
+        // figure is the first rule's 2.
+        assert_eq!(super::automorphisms_bound(&rec, &rec.workload.curve), 4);
         let mut other_binary = rec.clone();
         other_binary.binary_sha256 = Some("0".repeat(64));
         assert_eq!(super::automorphisms_bound(&other_binary, &curve), 4);
@@ -2725,6 +2736,27 @@ pub(crate) mod tests {
         assert!(!rep.ok);
         assert!(problems_with(&rep, "counters"), "{:?}", rep.problems);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The structural bound: ζ₃ on `j = 0` and ι on `j = 1728` exist over
+    /// `F_p` only for `p ≡ 1` mod 3 and mod 4.
+    #[test]
+    fn the_prime_automorphism_group_follows_j_and_p() {
+        let rec: Record = from_str_legacy_floats(PRE_FIX_QUARTIC_RECORD).unwrap();
+        let mut c = rec.workload.curve.clone();
+        assert_eq!(prime_automorphism_group(&c), 4); // p = 2463541 ≡ 1 mod 4
+        for (icv1, want) in [
+            ("ICV1:fp-2463541:2780:2460762:1728:unk:unk:r:x", 4),
+            ("ICV1:fp-2463543:2780:2460762:1728:unk:unk:r:x", 2),
+            ("ICV1:fp-2463541:2780:2460762:0:unk:unk:r:x", 6),
+            ("ICV1:fp-2463539:2780:2460762:0:unk:unk:r:x", 2),
+            ("ICV1:fp-2463541:2780:2460762:17:unk:unk:r:x", 2),
+            ("ICV1:f2-83:0:0:0:unk:unk:r:x", 0),
+            ("not an identity", 0),
+        ] {
+            c.icv1 = icv1.into();
+            assert_eq!(prime_automorphism_group(&c), want, "{icv1}");
+        }
     }
 
     #[test]

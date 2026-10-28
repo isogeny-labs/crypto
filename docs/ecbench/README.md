@@ -846,15 +846,19 @@ from their `setup` and `automorphism_setup` phases. At the review's sizes the fr
 (n = 19) theory, almost all of it 32 full-size jump scalars; at n = 13, with
 about eleven expected steps, even eight jumps cost more than the search.
 
-*The factor-base inventory is outside the measured span.* An index-calculus
-run names its factor base in the record (`factor_base`: the `FB1h…` id, size and
-description), which needs the base rebuilt after `run_pipeline`. The measured
-child used to rebuild it before closing its scheduler, hardware-counter and
-Callgrind windows, so those, and `max_rss_kib`, included work that is neither
-the solve nor counted in `S`. `methods::solve_measured` now returns without it
-and the child calls `methods::complete` after every window has closed
-(`methods::solve` calls both for any other caller). No count changes: a replay
-of the committed `ic.pipeline` and `ic.shared_rank` sessions is identical.
+*The factor-base inventory.* An index-calculus run names its factor base in
+the record (`factor_base`: the `FB1h…` id, size and description). The measured
+child used to rebuild the base for that after `run_pipeline`, before closing
+its scheduler, hardware-counter and Callgrind windows, so those, and
+`max_rss_kib`, included a second build that is neither the solve nor counted
+in `S`. `ic.pipeline` now builds the base once and describes the base the run
+used (`run_pipeline_with_base`): no second build, but the description (hashing
+the base) still falls after the timed solve (`wall_ns`, the online phases) and
+inside those process windows. `ic.shared_rank` still rebuilds its inventory, so
+`methods::solve_measured` returns without it and the child calls
+`methods::complete` after every window has closed (`methods::solve` calls both
+for any other caller). No count changes: a replay of the committed
+`ic.pipeline` and `ic.shared_rank` sessions is identical.
 
 **Calibration.** The unit has been checked against theory in
 [`research/ecbench_calibration_20261002`](../../research/ecbench_calibration_20261002/README.md).
@@ -1195,9 +1199,9 @@ the exact figure.
 The audit also recomputes every derived figure from the record's own
 counts (`S = total/√r`, the floor, the ratio, the lower-bound flag) and
 checks each record against what needs no replay: phases sum to the total
-(except `rho.cubic` and `rho.quartic` records written before
-2026-10-18, whose total left out the class set-up,
-`audit::PHASE_SUM_EXEMPT_METHODS`), `automorphisms_used` does not exceed
+(except a class-set-up record from one of the named pre-fix producers,
+`audit::pre_class_setup_record`, whose replay checks the shortfall),
+`automorphisms_used` does not exceed
 `automorphisms_available`, `role` is the spec arm's, `env_class_id` and
 `binary_sha256` are the host capsule's, `field_ops` is present where the
 method counts field operations on a prime curve, and `status_counts`,
@@ -1241,7 +1245,7 @@ historical reconstruction it needed:
 |:--|:--|
 | `identical` | every compared figure is bit for bit the record's |
 | `identical (legacy gae rounding, …)` | an `ic.pipeline` record from before 2026-10-05 whose solver wall term was removed by subtraction, reproduced from the record's own solver term |
-| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the six pre-fix producers, whose total left out the class set-up |
+| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the six pre-fix producers, or a `rho.gls` / `rho.frobenius_orbit` record from one of the two written before 2026-10-28, whose total left out the class set-up (the string keeps its original date) |
 
 
 **A method's counts are frozen by its id.** Changing what a registered

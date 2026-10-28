@@ -769,15 +769,18 @@ pub struct CurveFacts {
 /// the first rule, [`legacy_automorphisms`]: `A = 2` on every prime curve.
 pub const FLOOR_RULE_V2: &str = "automorphisms/v2";
 
-/// The automorphism count the first floor rule gave a curve: `2n` on a
-/// Koblitz curve (signed Frobenius), 2 (negation) on every other.  Kept so
-/// that a committed record, which carries no `floor_rule`, recomputes to the
-/// floor it was written with; a `j = 0` or `j = 1728` prime curve read 2.
+/// The automorphism count the first floor rule gave a curve: 2 (negation)
+/// on every prime curve, `j = 0` and `j = 1728` included; on every other
+/// family the count [`FLOOR_RULE_V2`] also gives (`2n` on a Koblitz curve,
+/// the class size on an `extension` curve: 4 for GLS ψ, 6 for a subfield
+/// curve's π; 2 elsewhere), because the second rule changed prime curves
+/// only.  Kept so that a committed record, which carries no `floor_rule`,
+/// recomputes to the floor it was written with.
 pub fn legacy_automorphisms(curve: &CurveFacts) -> u32 {
-    if curve.family == "koblitz" {
-        2 * curve.field_degree.unwrap_or(1)
-    } else {
+    if curve.family == "prime" {
         2
+    } else {
+        curve.automorphisms_available
     }
 }
 

@@ -536,7 +536,6 @@ fn verify_for_load(path: &Path) -> Result<(), String> {
     ))
 }
 
-
 /// `kind`, curve and factor-base id read from an object's name, by the
 /// convention `factor-bases/<ICV1 slug>/<FB1 id>.json`.
 fn store_name_parts(name: &str) -> (String, Option<String>, Option<String>) {
