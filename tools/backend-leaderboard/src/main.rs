@@ -100,11 +100,16 @@ enum Command {
         #[arg(long)]
         expected_lock_sha256: String,
     },
+    /// Verify the extended frozen R0 report and its native producer snapshot.
+    VerifyFrozenReport,
 }
 
 fn run(cli: Cli) -> Result<(), String> {
     if (cli.check || cli.seal) && cli.command.is_some() {
         return Err("--check/--seal cannot be combined with a subcommand".into());
+    }
+    if matches!(&cli.command, Some(Command::VerifyFrozenReport)) {
+        return reproduction::verify_frozen_report(&cli.root);
     }
     let lock = if cli.seal {
         reproduction::compiled_check(&cli.root)?;
@@ -152,6 +157,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 &rerun_audit,
                 &binary,
             )?,
+            Command::VerifyFrozenReport => unreachable!("handled before report generation"),
         };
         receipt["lock_sha256"] = serde_json::Value::String(canonical::sha256_hex(
             &std::fs::read(&cli.lock).map_err(|e| e.to_string())?,

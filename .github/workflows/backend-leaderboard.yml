@@ -96,6 +96,4 @@ jobs:
           cargo +1.99.1 test --locked --manifest-path tools/backend-leaderboard/Cargo.toml
           cargo +1.99.1 clippy --locked --manifest-path tools/backend-leaderboard/Cargo.toml --all-targets -- -D warnings
       - name: Frozen report matches its reviewed source snapshot and sealed outputs
-        run: |
-          python3 tools/backend-leaderboard/test_check_frozen_report.py
-          python3 tools/backend-leaderboard/check_frozen_report.py
+        run: cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- verify-frozen-report
