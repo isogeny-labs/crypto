@@ -127,6 +127,11 @@ def collect():
                    "base": base_size(v[0]) if v[0]["method"]["id"] == "ic.pipeline" else None}
             # time-memory: group additions times table bytes, per r (dimensionless)
             row["tm_per_r"] = row["mean_s"] * math.sqrt(2 ** log2_r) * row["bytes"] / 2 ** log2_r if row["bytes"] else 0.0
+            if v[0]["method"]["id"] == "ic.pipeline":
+                row["rows_used"] = statistics.mean(r["counters"].get("matrix_rows", 0) for r in v)
+                row["rank_at_stop"] = statistics.mean(r["counters"].get("matrix_rank", 0) for r in v)
+                row["dependent_rows"] = statistics.mean(r["counters"].get("matrix_dependent", 0) for r in v)
+                row["s_over_sqrt_rows"] = row["mean_s"] / math.sqrt(row["rows_used"]) if row["rows_used"] else None
             if inc and arm != inc_arm:
                 pairs = [(r, inc[key(r)]) for r in v if key(r) in inc]
                 if pairs:
@@ -136,15 +141,15 @@ def collect():
                 b = row["base"]
                 chk = []
                 for r in v:
-                    probed = phase_native(r, "sweeps") * 2 * b if b else None
-                    kept = 1.0
                     params = r["method"]["params"]["oracle"]
                     dp = int(params.split("dp=")[1].split(",")[0]) if "dp=" in params else 0
-                    probed = probed / 2 ** dp if probed else None
-                    fold = 2.0 if "fold=0" not in params else 1.0
-                    rows_found = (phase_native(r, "collisions") or 0) + (phase_native(r, "identity_hits") or 0)
-                    if probed:
-                        chk.append((rows_found, probed ** 2 * fold / (2 * 2 ** log2_r)))
+                    fold = 1.0 if "fold=0" in params else 2.0       # classes: r (no fold) or r/2 (signed fold)
+                    probed = phase_native(r, "sweeps") * 2 * b       # one residual per base point and sign
+                    r_exact = r["workload"]["curve"]["r"]
+                    # equal abscissae hash alike, so a pair collides only if it passes the filter: /2^dp
+                    predicted = probed ** 2 * fold / (2 * r_exact) / 2 ** dp
+                    found = (phase_native(r, "collisions") or 0) + (phase_native(r, "identity_hits") or 0)
+                    chk.append((found, predicted))
                 if chk:
                     row["collisions_observed"] = statistics.mean(c[0] for c in chk)
                     row["collisions_predicted"] = statistics.mean(c[1] for c in chk)
