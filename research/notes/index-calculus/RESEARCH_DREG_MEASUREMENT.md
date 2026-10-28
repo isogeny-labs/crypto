@@ -991,5 +991,7 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
 - Both are quadratic. Neither refutes at degree 3 on the committed (22, 6)
   and (21, 7) draws, and their degree-4 matrices are 5.1–5.5 times the plain
   system's (`research/dreg_pair_invariant_20261028/RESULTS.md`).
-- Making the system quadratic with auxiliary unknowns does not lower the
-  MutantXL closure degree here.
+- At (22, 6), making the system quadratic with auxiliary unknowns does not
+  lower the MutantXL closure degree.
+- At (21, 7), degree 4 of the quadratic arms is unmeasured: a sparse run
+  capped at 10⁹ entries. A lower degree there is not excluded.

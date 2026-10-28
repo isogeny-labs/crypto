@@ -1,4 +1,4 @@
-# Results: the summand-swap invariant does not lower the closure degree of the chained S₃ descent
+# Results: the summand-swap invariant does not refute below degree 4 at ℓ = 6; degree 4 at ℓ = 7 is unresolved (chained S₃ descent)
 
 - **Scoring.** Natively scored by `dreg_invariant_score runs/` (`score-output.txt`)
   against `PREREGISTRATION.md`: commit `d708ad2ee`, Amendment 1 made after the
@@ -50,20 +50,36 @@
 - **Registered verdicts: H_none at (22, 6) and H_none at (21, 7).** D_Q < D_B
   holds on 0 of 4 draws in each cell. The mechanism reading (Q against R) is
   not read under H_none.
+  - **The two labels differ in strength.** At (22, 6), H_none is *measured*:
+    Q does not refute at 3, and B refutes at 4, so D_Q ≥ D_B.
+  - At (21, 7), H_none comes from the pre-registered convention that
+    "unmeasured at 4" counts as H_none. **It is not evidence that Q fails at
+    degree 4.** B does not refute at 4 there, so Q refuting at 4 would be a
+    lower degree. The scorer reports this as "Q unmeasured below D_B on 4 of
+    4 (not excluded)".
 - **Predictions.** I gave H_lower at (22, 6) about 0.4 and at (21, 7) about
   0.25, with H_none as the central guess at (22, 6). The result is H_none in
   both cells.
 
 ## What it does and does not say
 
-- **Same or higher degree, at a larger matrix.** Adding the invariant `p`
-  makes every equation quadratic, but the closure does not refute at degree
-  3. At (22, 6), where B refutes at 4, Q's degree is therefore at least B's,
-  and its degree-4 matrix has 5.1–5.5 times B's columns. So the invariant arm
-  costs more at every degree that could matter. At (21, 7) Q's degree 4 is
-  unmeasured, and it would need 637,393 columns, 5.1 times B's.
-- **Quadratisation alone does not help either.** The matched control R,
-  which is also quadratic but not invariant, behaves the same at degree 3.
+- **At (22, 6): same or higher degree, at a larger matrix (measured).**
+  - Adding the invariant `p` makes every equation quadratic, but the closure
+    does not refute at degree 3.
+  - B refutes at 4, so Q's degree is at least B's, and Q's degree-4 matrix
+    has 5.1–5.5 times B's columns.
+  - In this cell the invariant arm costs more at every degree that could
+    matter.
+- **At (21, 7): unresolved at degree 4.** Neither Q nor R refutes at 3. Their
+  degree 4 is unmeasured, so this study does not exclude a lower degree here.
+  - B does not refute at 4, so its closure degree is at least 5, with
+    C(42, ≤ 5) = 974,982 columns.
+  - Q's degree-4 matrix has 637,393 columns.
+  - So if Q refuted at 4, it would refute at a lower degree *and* a smaller
+    matrix than B. This is the open question the study leaves.
+- **At degree 3, quadratisation alone does not help either.** The matched
+  control R is also quadratic but not invariant, and it behaves the same at
+  degree 3.
 - **Unregistered descriptive reading.** At (22, 6), Q closes a larger share
   of its degree-3 matrix (rank / columns 0.41–0.44) than B (0.37–0.38) or R
   (0.28). The invariant does produce more degree-3 relations than the
@@ -76,18 +92,27 @@
 
 ## What this means for ECC2K-130 (derived)
 
-- **This closes the pair-invariant lever for the chain at m = 3.** It does
-  not lower the closure degree, and it raises the matrix size at the degree
-  the plain system already needs.
-  - At m = 4 the second cubic link `e₁x₃e₂` has no summand-swap symmetry and
-    would need the R construction, which also did not help at m = 3.
-  - Neither auxiliary is a route to a cheaper degree-of-regularity row.
+- **Where the plain system refutes at 4 (ℓ ≤ 6), the pair invariant does not
+  help.** Measured at (22, 6): no lower degree, and a larger matrix.
+- **Where the plain system does not refute at 4 (ℓ = 7), it is not
+  resolved.** Degree 4 of Q (and R) at (21, 7) is the measurement that
+  decides it. It is the cell where degree-of-regularity costs rise, so a
+  refutation there would matter. It is not closed by this study.
+- **At m = 4** the second cubic link `e₁x₃e₂` has no summand-swap symmetry,
+  and it would need an auxiliary like R's.
 - **No row moves and none beats rho.** Against the success criterion this is
   a negative, not an improvement over the index-calculus baseline. Class:
   stage diagnostic. There is no `S`, no rho ratio, and no benchmark or
   leaderboard row.
 
 ## Successors (not run)
+
+- **Degree 4 of Q and R at (21, 7).** This decides the open cell.
+  - The dense matrix has 637,393 columns, which needs a large-memory host
+    (the open lead `LEAD-ICE-descent-closure-degree-at-scale` already asks
+    for ≥ 250 GB).
+  - The sparse closure needs more than 10⁹ entries, which ran past 12 GB
+    here.
 
 - **The invariants as a *replacement*, not an addition.** Eliminate the
   summand coordinates of x₁ and x₂ in favour of `s` and `p` with the

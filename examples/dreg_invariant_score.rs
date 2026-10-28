@@ -74,6 +74,12 @@ fn monomials_up_to(n: u64, d: u64) -> u64 {
     total
 }
 
+/// The registered dense degree-3 measurement: the entry exists and either
+/// refuted or saturated (an unbuilt or unsaturated degree is no reading).
+fn measured_at_3(v: &Value) -> bool {
+    entry(v, 3).is_some_and(|e| e["closure_refuted"] == true || e["saturated"] == true)
+}
+
 fn show(r: &Reading) -> String {
     r.degree
         .map_or(format!(">{}", r.measured), |d| d.to_string())
@@ -95,7 +101,7 @@ fn main() {
     let mut rows = Vec::new();
     let mut verdicts = Vec::new();
     for (cell, unsat, sat) in CELLS {
-        let (mut lower, mut q_lt_r, mut r_le_q) = (0, 0, 0);
+        let (mut lower, mut q_lt_r, mut r_le_q, mut unresolved) = (0, 0, 0, 0);
         for d in unsat {
             let draw = format!("d{d}");
             let Some(b) = load(dir, &format!("B.{cell}.{draw}")) else {
@@ -124,6 +130,9 @@ fn main() {
                 };
                 if v["identity_check"] != true {
                     fail(format!("V1: {name} identity check not true"));
+                }
+                if !measured_at_3(&v) {
+                    fail(format!("{name}: no saturated degree-3 measurement"));
                 }
                 let r = arm_reading(dir, arm, cell, &draw).expect("loaded");
                 let e3 = entry(&v, 3);
@@ -154,6 +163,12 @@ fn main() {
                     .is_some_and(|dq| br.degree.is_none_or(|db| dq < db))
                 {
                     lower += 1;
+                }
+                // Not lower, yet not excluded: Q has no reading at some
+                // degree below B's (B refutes above Q's measured degree + 1,
+                // or not at all), so Q could still refute below B there.
+                if q.degree.is_none() && br.degree.is_none_or(|db| db > q.measured + 1) {
+                    unresolved += 1;
                 }
                 let key = |x: &Reading| x.degree.unwrap_or(u64::MAX);
                 if q.degree.is_some() && key(q) < key(r) {
@@ -189,6 +204,9 @@ fn main() {
                         if v["identity_check"] != true {
                             fail(format!("V1: {name} identity check not true"));
                         }
+                        if !measured_at_3(&v) {
+                            fail(format!("{name}: no saturated degree-3 measurement"));
+                        }
                     }
                 }
             }
@@ -208,11 +226,11 @@ fn main() {
             "unresolved".to_string()
         };
         verdicts.push(format!(
-            r#"{{"cell":"{cell}","q_lower_than_b":{lower},"verdict":"{verdict}","mechanism":"{mechanism}"}}"#
+            r#"{{"cell":"{cell}","q_lower_than_b":{lower},"verdict":"{verdict}","unresolved_below_b":{unresolved},"mechanism":"{mechanism}"}}"#
         ));
         if !plot {
             println!(
-                "cell ({}): D_Q < D_B on {lower} of 4 -> {verdict}; mechanism: {mechanism}",
+                "cell ({}): D_Q < D_B on {lower} of 4 -> {verdict}; Q unmeasured below D_B on {unresolved} of 4 (not excluded); mechanism: {mechanism}",
                 cell.replace('-', ", ")
             );
         }
@@ -225,7 +243,7 @@ fn main() {
         );
     } else {
         println!(
-            "validity (V1 identity, V2 positive control, V3 soundness): {}",
+            "validity (V1 identity, V2 positive control, V3 soundness, degree-3 measured): {}",
             if valid { "valid" } else { "INVALID" }
         );
     }

@@ -60,5 +60,8 @@
   523,686–637,393 columns.
 - *Validity:* the identity check is true on 22 of 22 systems, the positive
   control is reproduced, and no satisfiable draw is refuted. Valid.
-- *Registered verdicts:* H_none at (22, 6) and H_none at (21, 7).
+- *Registered verdicts:* H_none at (22, 6), which is measured, and H_none
+  at (21, 7), which follows the registered convention for an unmeasured
+  degree 4. Q is unmeasured below B's degree on 4 of 4 draws at (21, 7), so
+  a lower degree is not excluded there.
 - *Per-run values:* in `score-output.txt` and `runs/`.
