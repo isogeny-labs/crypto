@@ -42,6 +42,11 @@ about other targets. Caveat: non-multiplication native work in the eigen step (X
 lookups) is not counted for either IC arm; the lever removes it roughly in proportion, but that is not
 measured.
 
+Against the prediction PROTOCOL.md froze: m = 12 (0.8543) falls inside its predicted interval
+[0.85, 0.97]. m = 14 (0.8154) falls just *outside* its predicted [0.82, 0.95], on the favourable side.
+The prediction is recorded as missed, not adjusted. Added 2026-10-28 after the independent validation
+(`validation/VALIDATOR_REPORT.md`) pointed out the omission.
+
 Per-trial components at m = 12 (300 random targets, `examples/d4_char2_profile`, F_q mults): root
 finding 55,505 -> 22,977; total 224,196 -> 191,435; charpoly 87,728, echelon 54,809, normal forms
 21,913 unchanged (asserted equal in the unit test). In-process wall per trial 4.595 ms -> 4.439 ms
