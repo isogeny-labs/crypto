@@ -1,5 +1,38 @@
 # Collector implementation status
 
+## Current validation: focused gates passed, full library pending
+
+Compiled runtime source: `9ab6260a2aa57ca4df3729d6d17f10fefea312f5`.
+Toolchain 1.98.0, release profile, clean/full-commit build metadata. All 25 checked
+collector mock tests passed, with 0 failed and 0 ignored. Strict Clippy for the
+release library, all test targets and crypto binary passed with warnings denied.
+Source hashes were checked before/after and the worktree remained clean.
+
+The immutable library test executable is 248471168 bytes, SHA256
+`fcf2d574774547a204c2a19f2c17ffe97796c34039f35435d0d24e5073040d57`.
+The parent owns the one full-library run against that copy; its live log and
+unfinished result are deliberately absent from the focused validation archive.
+No duplicate full-suite run or live PMU/fork campaign was started here.
+
+No CLI or dataset caller invokes the new CheckedCounters API. CLI integration
+tests are therefore inapplicable to this increment; the source reference search
+and applicability note are retained alongside the native logs. Legacy API and
+dataset records remain unchanged. Hardware-independent, whole-worker and full
+execution claims remain false.
+
+The source bundle, executable, completed logs and metadata are preserved in the
+canonical S3 archive described by `FOCUSED_VALIDATION_RECEIPT.json`. Conditional
+PUT, fresh ETag-bound GET, archive SHA-256/length/byte comparison, all 30 inner
+hashes, bundle verification and restored executable byte comparison passed.
+The archived source STATUS.md intentionally retains its pre-validation wording;
+the packet's VALIDATION.json records the later completed focused/lint results.
+
+Preparation diagnostic: sparse materialization succeeded; the first hash list
+included a nonexistent build.rs. That list was corrected before Cargo began.
+No compilation, focused-test or lint failure occurred.
+
+## Implementation history
+
 2026-10-28: native implementation authored after design commit3c7964ae0a7.
 This is an unvalidated implementation checkpoint, not a measurement result.
 
