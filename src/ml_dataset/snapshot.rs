@@ -793,15 +793,14 @@ fn load_chain(
             None if anchor.ordinal != 0 => {
                 return Err("partial chain is missing its predecessor".into())
             }
-            Some(previous) => {
+            Some(previous)
                 if previous.ordinal.checked_add(1) != Some(anchor.ordinal)
                     || previous.binding_sha256 != anchor.binding_sha256
                     || previous.run_sha256 != anchor.run_sha256
                     || previous.attempt_sha256 != anchor.attempt_sha256
-                    || previous.remote != anchor.remote
-                {
-                    return Err("partial receipt predecessor identity/ordinal mismatch".into());
-                }
+                    || previous.remote != anchor.remote =>
+            {
+                return Err("partial receipt predecessor identity/ordinal mismatch".into());
             }
             _ => {}
         }
