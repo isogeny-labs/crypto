@@ -110,6 +110,27 @@ genus sweeps but **their full attack costs have not been measured**.
 
 ## Rigorous necessary genus bound
 
+There is a bound for **all 66 equations** under any algebraic transfer.
+For source order `N`, let `t=4097-N`. The Frobenius polynomial of the
+Weil restriction `Res_(K/k)(E_b)` is
+
+```text
+P_t(X) = X^6 - t X^3 + 4096.
+```
+
+`irreducibility.py` gives finite Rabin irreducibility certificates:
+`t=123` and `t=119` remain irreducible modulo 11, while `t=-81`
+remains irreducible modulo 5. Hence all three polynomials are
+irreducible over the rationals by Gauss's lemma. The three Weil
+restrictions are therefore simple abelian threefolds over `k`.
+Any nonzero algebraic homomorphism from one of them into a Jacobian
+has a three-dimensional image, so its target curve must have genus
+**at least three**. This covers every model in the three source-order
+classes, including the order-17 subgroup class. It is a necessary
+bound for algebraic cover/isogeny transfers; it says nothing by itself
+about whether a useful map or a faster algorithm exists.
+
+An independent, subgroup-specific bound uses only cardinalities.
 For any prime-order source subgroup `r`, if a homomorphism to a Jacobian
 `J(C)(F_q)` is nonzero on that subgroup, Lagrange's theorem gives
 `r | #J(C)(F_q)`. The Weil bound gives
@@ -173,6 +194,7 @@ python3 research/ghs_q16_genus4_frontier_20261028/run.py --order 3974
 python3 research/ghs_q16_genus4_frontier_20261028/run.py --order 3978
 python3 research/ghs_q16_genus4_frontier_20261028/run.py --order 4178
 python3 research/ghs_q16_genus4_frontier_20261028/smooth17.py
+sage -python research/ghs_q16_genus4_frontier_20261028/irreducibility.py
 python3 research/ghs_q16_genus4_frontier_20261028/audit.py
 lean research/ghs_q16_genus4_frontier_20261028/GenusBound.lean
 ```

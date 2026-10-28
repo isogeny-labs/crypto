@@ -6,7 +6,8 @@ mathematical input: its order is at most (sqrt(16)+1)^4 = 625. A nonzero
 image of a prime-order subgroup makes that prime divide the target order.
 The first two theorems prove the numerical contradiction under these
 explicit hypotheses. The Magma genus sweep and subgroup-map coordinate
-checks are separate executable certificates, not Lean theorems here.
+checks, and the Sage modular irreducibility certificates, are separate
+executable inputs, not Lean theorems here.
 -/
 
 namespace GHSQ16GenusBound

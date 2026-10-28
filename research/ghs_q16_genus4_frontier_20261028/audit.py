@@ -107,6 +107,18 @@ assert split_receipt["response"]["truncated"] is False
 assert split_receipt["response"]["stdout"].strip() == (
     "GENUS4_PARAMS 30 ALL_ZERO_SPLIT true GENUS6 450 GENUS7 3585 REJECTIONS 30"
 )
+irr = json.loads((HERE / "irreducibility_receipt.json").read_text())
+assert irr["schema"] == "ghs-q16-simple-weil-polynomial-v1"
+assert len(irr["records"]) == 3
+for cert, (n, p) in zip(irr["records"], [(3974, 11), (3978, 11), (4178, 5)]):
+    trace = 4097 - n
+    assert cert["source_order"] == n and cert["trace"] == trace
+    assert cert["modulus_prime"] == p
+    assert cert["weil_polynomial_high_to_low"] == [1, 0, 0, -trace, 0, 0, 4096]
+    assert cert["gcd_x_p2_minus_x"] == cert["gcd_x_p3_minus_x"] == "1"
+    assert cert["x_p6_mod_f"] == "z" and cert["irreducible_mod_p"] is True
+for row in report["classes"]:
+    row["algebraic_transfer_genus_lower_bound"] = 3
 (HERE / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
 for row in report["classes"]:
     a = row["representative_attack"]

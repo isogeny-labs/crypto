@@ -113,7 +113,13 @@ story.extend([
       "of order r, h_b(G_b) nonzero of order r, and h_b(7G_b)=7h_b(G_b). "
       "The exact G_b and reduced Mumford images are in the 66-model receipts."),
     heading("Necessary genus bound for any transfer"),
-    P("If a prime-order subgroup r maps nontrivially into J(C)(F_q), then "
+    P("For every one of the 66 source models, the Weil-restriction "
+      "Frobenius polynomial is X^6 - tX^3 + 4096, with t in {123, 119, -81}. "
+      "Sage Rabin tests prove these polynomials irreducible modulo 11, 11, "
+      "and 5 respectively. By the finite-field isogeny theorem, each "
+      "restriction is a simple threefold. Any nonzero algebraic transfer "
+      "from it to a Jacobian requires target genus at least three."),
+    P("Independently, if a prime-order subgroup r maps nontrivially into J(C)(F_q), then "
       "r divides #J(C)(F_q). The Weil bound implies "
       "r &lt;= (sqrt(q)+1)^(2g). At q=16, genus at most two gives "
       "#J &lt;= 5^4 = 625; hence the r=1,987 and r=2,089 subgroups require "
