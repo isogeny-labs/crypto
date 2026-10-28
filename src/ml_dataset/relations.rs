@@ -23,6 +23,9 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashMap, HashSet};
 
+#[path = "relations_generic.rs"]
+mod generic;
+
 fn point(p: &BinaryPoint) -> Value {
     match p {
         BinaryPoint::Infinity => Value::Null,
@@ -387,7 +390,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
     }
     let kc = match model(&case.public_instance) {
         Ok(kc) => kc,
-        Err(reason) => return Ok(unsupported(&reason)),
+        Err(_) => return generic::solve(config, case),
     };
     let q = curves::binary_point(&case.public_instance["target"], kc.n)?;
     if q == BinaryPoint::Infinity
@@ -602,6 +605,9 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
 /// Rebuild the native graph from retained public partials and independently
 /// check every source combination, rank certificate and recovered scalar.
 pub fn verify_transcript(public: &Value, factor_base: &Value, t: &Value) -> Result<(), String> {
+    if t["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
+        return generic::verify(public, factor_base, t);
+    }
     if t["schema"] != "ml-ecdlp-large-prime-transcript/v1" || t["target"] != public["target"] {
         return Err("wrong large-prime transcript identity".into());
     }
@@ -722,12 +728,16 @@ pub fn verify_transcript(public: &Value, factor_base: &Value, t: &Value) -> Resu
     let mut sources = BTreeMap::new();
     let mut completed = Vec::new();
     let mut ranks = Vec::new();
+    let mut determined_scalar = None;
     for (trial, event) in t["attempts"]
         .as_array()
         .ok_or("missing query attempts")?
         .iter()
         .enumerate()
     {
+        if residuals.is_empty() || determined_scalar.is_some() {
+            return Err("query outside declared large-prime lifecycle".into());
+        }
         if event["trial"].as_u64() != Some(trial as u64) {
             return Err("nonsequential attempt record".into());
         }
@@ -799,6 +809,10 @@ pub fn verify_transcript(public: &Value, factor_base: &Value, t: &Value) -> Resu
                 let reduced =
                     gaussian_eliminate_mod_n_particular(&mut values, &mut rhs, &kc.subgroup_order)
                         .ok_or("rank replay failed")?;
+                let target_column = fb.signed_orbits.len();
+                if reduced.determined.get(target_column) == Some(&true) {
+                    determined_scalar = Some(reduced.values[target_column].clone());
+                }
                 ranks.push(json!({"completed_rows":completed.len(),"columns":fb.signed_orbits.len()+1,"rank":reduced.rank,"determined_columns":reduced.determined,"rref":values.iter().map(|row|row.iter().map(ToString::to_string).collect::<Vec<_>>()).collect::<Vec<_>>(),"reduced_rhs":rhs.iter().map(ToString::to_string).collect::<Vec<_>>()}));
             }
         } else {
@@ -817,6 +831,13 @@ pub fn verify_transcript(public: &Value, factor_base: &Value, t: &Value) -> Resu
         || t["rank_history"] != json!(ranks)
     {
         return Err("completed rows or ranks differ on replay".into());
+    }
+    if t["recovered_scalar"] != json!(determined_scalar.as_ref().map(ToString::to_string))
+        || (!residuals.is_empty()
+            && determined_scalar.is_none()
+            && t["attempts"].as_array().ok_or("missing attempts")?.len() != query_cap)
+    {
+        return Err("large-prime recovery or terminal completeness differs on replay".into());
     }
     if !t["recovered_scalar"].is_null() {
         let scalar = big(&t["recovered_scalar"])?;
@@ -864,6 +885,9 @@ pub fn verify_membership_provenance(
     factor_base: &Value,
     saved: &Value,
 ) -> Result<(), String> {
+    if saved["schema"] == "ml-ecdlp-generic-large-prime-membership/v1" {
+        return generic::verify_membership(public, factor_base, saved);
+    }
     if saved["schema"] != "ml-ecdlp-large-prime-membership-provenance/v1"
         || saved["generator"] != public["generator"]
         || saved["used_in_relation_elimination"] != false
@@ -929,6 +953,25 @@ mod tests {
         );
         let transcript: Value = serde_json::from_slice(&result.artifacts[0].bytes).unwrap();
         verify_transcript(&case.public_instance, &case.factor_base, &transcript).unwrap();
+        let mut truncated = transcript.clone();
+        truncated["attempts"] = json!([]);
+        truncated["completed_rows"] = json!([]);
+        truncated["rank_history"] = json!([]);
+        truncated["recovered_scalar"] = Value::Null;
+        truncated["recovered_column_logs"] = Value::Null;
+        assert!(
+            verify_transcript(&case.public_instance, &case.factor_base, &truncated)
+                .unwrap_err()
+                .contains("terminal completeness")
+        );
+        let mut omitted = transcript.clone();
+        omitted["recovered_scalar"] = Value::Null;
+        omitted["recovered_column_logs"] = Value::Null;
+        assert!(
+            verify_transcript(&case.public_instance, &case.factor_base, &omitted)
+                .unwrap_err()
+                .contains("terminal completeness")
+        );
         let membership: Value = serde_json::from_slice(&result.artifacts[3].bytes).unwrap();
         verify_membership_provenance(&case.public_instance, &case.factor_base, &membership)
             .unwrap();

@@ -1,12 +1,23 @@
 # Original-scope coverage and remaining work
 
 This is an implementation handoff, not a completed-corpus certificate. Read the
-committed test log, frozen campaign manifest, per-cell outcomes and S3 receipts
-for executed coverage. The first centralized dataset test run found five
-failures; fixes for even-degree lifting, repeated-prime subgroup extraction and
-small-field cardinality have been applied, with the subsequent centralized run
-still responsible for validating them. No performance comparison follows from
-these correctness tests.
+committed test manifests, frozen campaign manifest, per-cell outcomes and S3
+receipts for executed coverage. Source `4c94f1dfc9b` passed 49 focused and 5,016
+full-library tests (122 ignored, zero failures); its six validation files were
+uploaded and download-verified. The subsequent SAT-event, generic-large-prime
+and report increment passed 59 focused tests plus four native observer tests.
+Later changes include prime-F4 modulus guards, PKM actual-domain export,
+run-binding checks, lint fixes and Koblitz terminal-completeness replay. Central
+Clippy and the final full-library run for that combined source remain pending;
+the superseded final-suite compile is not a completed validation result. No
+performance comparison follows from these correctness tests.
+
+Cloud pilot 001 exposed unreadable container input modes; pilot 002 reached
+publication but failed with S3 `HeadObject` HTTP 403. The worker-role access
+proposal is prepared but has not been applied. The earlier local-role upload
+does not demonstrate EKS worker access, and neither pilot establishes cloud
+durability. See the [worker access proposal](../../research/ml_dataset_20261028/worker-s3-policy-proposal.md)
+for the retained failure and exact proposed scope.
 
 ## Preserve the whole campaign
 
@@ -22,40 +33,53 @@ enormous corpus.
 
 | Area | Current implementation boundary | Remaining acceptance condition |
 |---|---|---|
-| Curve construction | Native arithmetic, Koblitz trace recurrence, exact Hasse certificates for general curves, exhaustive small-field certificates, trace-one binary twists and nonsquare prime twists | Run requested-boundary tests and a frozen all-degree correctness wave; independently replay every order and scalar certificate, including repeated largest-prime factors and rank-two rational torsion |
+| Curve construction | Native arithmetic, Koblitz trace recurrence, exact Hasse certificates for general curves, exhaustive small-field certificates, trace-one binary twists and nonsquare prime twists; bounded tests cover n = 23, 24, 31, 47, 61 across families and twists | Validate the combined source and run the frozen all-degree correctness wave; independently replay every order and scalar certificate, including repeated largest-prime factors and rank-two rational torsion |
 | Prime cofactors | `CurveParams.h` is a u32; larger exact cofactors are explicitly unsupported | Introduce an exact-cofactor representation for generic solver adapters, without truncating or replacing the selected curve |
 | Repeated prime factors | Remove all r factors from the clearing scalar, then trim the sampled r-primary point to exact order r; repeated-r membership uses bounded BSGS in the actual generated cyclic subgroup | Preserve and charge this diagnostic setup separately; membership logs remain private; validate membership against the generated subgroup rather than accepting all rational r-torsion |
 | Factor bases | Small-x lifting, per-point prime-primary projection, signed membership and exact orbit records | Add independently declared polynomial-subspace, Frobenius-union, quotient, PKM and learned base policies as separate populations, with rejection probabilities, selection costs and matched solver domains |
-| General ECDLP recovery | Independent bounded BSGS exists for all three families; native large-prime scalar recovery initially admits actual F2-coefficient Koblitz models | Add actual index-calculus relation collection, modular rank, descent and scalar recovery for general binary and prime models; all m and twist cells remain visible until admitted |
-| Double large primes | Explicit public residual pool, exact pair lookup, native signed-Frobenius elimination, source coefficients, rank and independent recovery verification | Generalize residual discovery/column representation to non-F2 binary twists and prime curves; export internal pivot snapshots and every reduction operation; retain ineffective and capped graph runs |
-| Binary SAT | Chained S3 finite-domain circuits are admitted only under explicit variable/clause/model/work caps, with independently checked point-sign lifts | Export CDCL decision/trail/reason/conflict/learned/deleted-clause/restart streams and proof artifacts; independently check UNSAT proofs; extend practical admitted coverage at m=2..15 without interpreting a cap as UNSAT |
+| General ECDLP recovery | Independent bounded BSGS and native large-prime scalar recovery now have adapters for all three families and both twist positions; generic recovery uses identity/sign symmetry where Frobenius does not preserve the model | Validate actual cloud coverage and practical relation yield at requested sizes; extend target descent and factor-base policies; preserve insufficient-rank and resource-capped outcomes |
+| Double large primes | Native signed-Frobenius elimination for admitted Koblitz models, plus native sparse graph/hypergraph filtering for general binary/twists/prime; source coefficients, modular rank and determined-target recovery are checked; both replayers now enforce complete terminal attempt histories, pending combined-source tests | Export internal pivot snapshots and every reduction operation; validate broad natural targets and retain ineffective and capped graph runs |
+| Sampling replay | Public algebra and independent scalar certificates are replayed; seeds and sampling indices are retained in restricted provenance | Reconstruct curve, generator, key and solver-query draws from the frozen configuration in a separate sampling audit; the current relation verifier checks the recorded coefficients and group equations but does not prove that they came from the declared RNG stream |
+| Binary SAT | Chained S3 finite-domain circuits with checked point-sign lifts and bounded native decision/assignment/reason/conflict/learning/deletion/backjump/restart/XOR streams; sticky sink failure returns Unknown | Add full encoder gate maps, clause-minimization derivations and independently checked UNSAT proofs; extend practical admitted coverage at m=2..15 without interpreting a cap as UNSAT |
 | Prime SAT | No prime-field SAT adapter is yet declared complete | Integrate an actual prime-field bit-vector/modular encoding with exact domain maps, verified models and proof-checkable outcomes |
-| F4/F5 | Native Boolean matrix engines and prime F4 have scoped adapters; Boolean exact selector systems currently use m=2 | Integrate larger-m native algebra with exact ring/quotient/order maps and export matrices, row provenance, pivots, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
+| F4/F5 | Native Boolean matrix engines and prime F4 have scoped m = 2 adapters; the prime F4 backend requires p < 2^32 and 1..32 distinct factor-base abscissae; larger prime moduli retain the public S3/membership equations with an explicit unsupported outcome and no native elimination | Extend the native prime-field arithmetic before claiming F4 support at n = 47..61 or p = 2^61-1; integrate larger-m algebra with exact ring/quotient/order maps and export matrices, row provenance, pivots, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
 | F6 | Native geometric four-sum index has its own declared m=4 lane | Expose each implemented F6 algebraic/geometric variant separately, document its exact operation, and integrate the remaining arities without changing what the F6 name denotes |
 | Root solvers | Native S3 univariate root routes are m=2 adapters | Export factorization/GCD/intermediate root states; integrate higher-m elimination/root extraction and certify completeness separately from finding one valid root |
-| Weil descent and PKM | Boolean exact selector restriction is scoped to m=2; native prime Kummer-tower PKM adapter has m=2/3 and modulus restrictions | Preserve full tower/basis/modulus/quotient maps; extend legitimate native coverage to requested higher m and larger primes, including p=2^61-1; do not substitute a PKM audit score or a different factor base without recording it |
+| Weil descent and PKM | Boolean exact selector restriction is scoped to m = 2; native prime Kummer-tower PKM supports m = 2/3 and p < 2^31, with exact alternative Kummer points, column/sign maps, prepared equations and bounded grid extraction retained | Preserve every tower/basis/modulus/quotient intermediate; extend legitimate native coverage to requested higher m and larger primes, including p = 2^61-1; retain separate cost for finite-grid fallback; rational Kummer points outside the target subgroup make this PDP evidence, not completed ECDLP recovery |
 | Fall degrees | Exact first and last fall degree remain null | Define each invariant for the actual ring and field equations; export degree-fall witnesses, complete lower-degree exclusion/closure evidence and independently checked counterexamples; formalize universal claims separately |
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
 | Complete intermediate artifacts | Curve construction and several native solver adapters still export summaries rather than every internal state | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
-| Durable publication | Plan/lease/shard/content-addressed publication machinery is under integration | Demonstrate actual bounded generation, kill/resume without duplication, immutable S3 upload plus download-and-hash receipts, source/binary identity, finite execution limits and committed indexes |
-| ML consumer | Public arithmetic inputs and private scalar/provenance artifacts are separated; current split component conservatively groups an entire n | Implement a strict feature allowlist that excludes seeds, key/generator indices, private scalars, membership logs, post-decision state and scalar-search tables; construct merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
+| Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; earlier-source checks passed, while current-source validation is pending; EKS publication fails because its role only permits the legacy bucket | Resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
+| ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features reconstruct and verify the actual Kummer base, carry a distinct PDP-domain identity, and require success labels to bind that same domain; PKM cells missing their actual base retain provenance but receive no matched feature | Validate the combined export source and a real restored cloud training view; retain the current conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
 
 ## Next discriminating validation
 
-1. Complete centralized native tests, including n23/24/31/47/61 for each family
-   and twist, the n11/n12 repeated-prime controls, prime n7 cardinality, and a
-   genuine large-prime recovery test whose private witness is absent.
+1. Complete centralized checks for the final immutable source, preserving native
+   tests for n = 23, 24, 31, 47, 61 for each family and twist, the n = 11/12
+   repeated-prime controls, prime n = 7 cardinality, and genuine large-prime
+   recovery tests whose private witness is absent. Earlier-source passes do not
+   discharge this check.
 2. Re-run tamper checks on wrong curves/twists/scalars, factor-base membership,
    source coefficients, residual-pool setup, unused pair-table entries, arity,
-   declared budgets, recovered factor-base logs and subgroup identity.
-3. Freeze a correctness pilot that names all requested cells even when only a
-   bounded subset is executed in the first wave. Export outcomes by family,
+   declared budgets, recovered factor-base logs and subgroup identity. Include
+   truncated unresolved Koblitz attempts and erased scalar recovery, prime F4
+   equations retained at p = 2^61-1 without invoking the unsupported backend,
+   forged or missing PKM bases, mismatched PDP-domain labels and mismatched
+   source/binary/resource bindings on resume.
+3. Preserve the frozen 720-cell correctness pilot and complete full requested
+   campaign plan. Export actual outcomes by family,
    degree, twist, m, solver, subgroup size and construction/replay status.
 4. Run that pilot on the authorized finite backend, checkpoint actual artifacts
    to the approved S3 bucket, verify round trips, and commit receipts and a
    source-linked report. Only then expand finite waves using verified cells and
    preserve the unsuccessful cells as research data.
+
+The replay review follows the native exact-source-combination contract in
+`src/cryptanalysis/large_prime_filter.rs`, the determined-column contract in
+`src/cryptanalysis/ec_index_calculus.rs`, and the algebra/claim boundaries in
+[DESIGN.md](DESIGN.md). Source review supports those contracts; it is not a new
+execution result or a proof of a first- or last-fall-degree conjecture.
 
 The immediate reproducible failure modes are implementation limits, not claims
 that index calculus, a twist, a fall-degree conjecture or machine learning cannot

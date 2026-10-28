@@ -20,6 +20,8 @@ const CHUNK_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RECORD_BYTES: usize = 64 * 1024 * 1024;
 const MERGE_FAN_IN: usize = 8;
 const SPLIT_DOMAIN: &str = "ml-dataset-whole-field-size-split-v1";
+const STANDARD_PDP_DOMAIN: &str = "cyclic-subgroup-factor-base";
+const KUMMER_PDP_DOMAIN: &str = "prime-kummer-full-curve";
 
 fn text(value: &Value, name: &str) -> Result<String, String> {
     value
@@ -128,6 +130,7 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
         })
         .collect::<Result<Vec<Value>, String>>()?;
     Ok(json!({
+        "pdp_domain":STANDARD_PDP_DOMAIN,
         "family":text(&public["family"],"family")?,"n":integer(&public["n"],"n")?,
         "m":integer(&public["m"],"m")?,"twist":boolean(&public["twist"],"twist")?,
         "field":field,"curve":curve,"generator":point(&public["generator"])?,
@@ -142,6 +145,54 @@ fn feature_projection(public: &Value, base: &Value) -> Result<Value, String> {
             "frobenius_action":action(&base["frobenius_action"],"frobenius_action")?,
             "frobenius_power":integer(&base["frobenius_power"],"factor_base.frobenius_power")?,"orbits":orbits},
     }))
+}
+
+/// Only the public mathematical definition enters the identity. Cost, logs,
+/// seeds, construction history, and future fields on the artifact stay out.
+fn kummer_definition_projection(definition: &Value) -> Result<Value, String> {
+    if definition["kind"] != "prime-kummer" || definition["subgroup_filtered"] != false {
+        return Err("unsupported Kummer feature domain".into());
+    }
+    Ok(json!({
+        "rule":"prime-kummer",
+        "t":integer(&definition["t"],"Kummer height")?,
+        "g":decimal(&definition["g"],"Kummer coset")?,
+        "points":points(&definition["points"],"Kummer points")?,
+        "subgroup_filtered":false,
+    }))
+}
+
+fn pkm_feature_projection(public: &Value, base: &Value, pkm: &Value) -> Result<Value, String> {
+    super::solvers::verify_pkm_factor_base(public, base, pkm)?;
+    let mut projected = feature_projection(public, base)?;
+    projected["pdp_domain"] = json!(KUMMER_PDP_DOMAIN);
+    projected["factor_base"] = kummer_definition_projection(&pkm["definition"])?;
+    Ok(projected)
+}
+
+/// A verified success certificate must refer to the same domain as its row.
+/// Hash consistency alone does not bind two independently stored definitions.
+fn verify_projected_pdp_domain(
+    directory: &Path,
+    artifacts: &[Artifact],
+    inputs: &Value,
+) -> Result<(), String> {
+    for certificate in artifacts
+        .iter()
+        .filter(|a| a.role == "independently-verified-pdp")
+    {
+        let label: Value = super::read_json(&directory.join(&certificate.path))?;
+        if inputs["pdp_domain"] == KUMMER_PDP_DOMAIN {
+            if kummer_definition_projection(&label["factor_base_definition"])?
+                != inputs["factor_base"]
+            {
+                return Err("PDP certificate differs from exported Kummer factor base".into());
+            }
+        } else if label.get("factor_base_definition").is_some() {
+            return Err("PDP certificate overrides the exported standard factor base".into());
+        }
+    }
+    Ok(())
 }
 
 fn split_for_size(n: u64) -> (String, &'static str) {
@@ -452,16 +503,47 @@ fn install(out: &Path, staged: &Path, relative: &str, role: &str) -> Result<Arti
     Ok(artifact)
 }
 
+fn output_directory(root: &Path, requested: &Path) -> Result<PathBuf, String> {
+    let absolute = if requested.is_absolute() {
+        requested.to_path_buf()
+    } else {
+        std::env::current_dir()
+            .map_err(|e| e.to_string())?
+            .join(requested)
+    };
+    if absolute
+        .components()
+        .any(|part| matches!(part, std::path::Component::ParentDir))
+    {
+        return Err("parent traversal in export destination".into());
+    }
+    let mut ancestor = absolute.as_path();
+    loop {
+        match fs::symlink_metadata(ancestor) {
+            Ok(_) => break,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                ancestor = ancestor
+                    .parent()
+                    .ok_or("export destination has no existing ancestor")?;
+            }
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+    let parent = super::checked_directory(ancestor, false)?;
+    let candidate = parent.join(absolute.strip_prefix(ancestor).map_err(|e| e.to_string())?);
+    if root.starts_with(&candidate) || candidate.starts_with(root.join("cells")) {
+        return Err("export destination overlaps source cell storage".into());
+    }
+    super::checked_directory(&candidate, true)
+}
+
 /// Export local canonical records into a projection safe from known-answer and
 /// solver-outcome leakage. This does not download remote sources or train a model.
 pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let root = super::checked_directory(root, false)?;
     let _source_lease = super::Lease::acquire(&root)?;
     let (plan, binding, plan_sha) = super::bound_run(&root)?;
-    let out = super::checked_directory(out, true)?;
-    if root.starts_with(&out) || out.starts_with(root.join("cells")) {
-        return Err("export destination overlaps source cell storage".into());
-    }
+    let out = output_directory(&root, out)?;
     let _out_lease = super::Lease::acquire(&out)?;
     let restricted = super::checked_directory(&out.join("restricted"), true)?;
     #[cfg(unix)]
@@ -483,6 +565,8 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
     let mut unavailable = 0u64;
+    let mut missing_alternative_base = 0u64;
+    let mut domain_counts = std::collections::BTreeMap::<String, u64>::new();
     let mut split_counts = std::collections::BTreeMap::<String, u64>::new();
     let shard_count = integer(&binding["shard_count"], "shard_count")?;
     let shard_index = integer(&binding["shard_index"], "shard_index")?;
@@ -532,20 +616,55 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
             let mut feature_id = None;
             let mut component = None;
             let mut split = None;
+            let mut feature_status = "missing_verified_public_inputs";
+            let mut pdp_domain = None;
             if has("public.json") && has("factor-base.json") && has("witness.json") {
                 let public: Value = super::read_json(&dir.join("public.json"))?;
                 let base: Value = super::read_json(&dir.join("factor-base.json"))?;
-                let inputs = feature_projection(&public, &base)?;
-                let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
-                let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
-                let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
-                features.push(&id, &row)?;
-                feature_occurrences += 1;
-                *split_counts.entry(partition.into()).or_default() += 1;
-                feature_id = Some(id);
-                component = Some(group);
-                split = Some(partition);
-            } else {
+                let alternative = manifest
+                    .artifacts
+                    .iter()
+                    .find(|a| a.path == "pkm-factor-base.json");
+                let inputs = if manifest.config.solver == "pkm" {
+                    if let Some(artifact) = alternative {
+                        if artifact.role != "explicit-alternative-kummer-factor-base"
+                            || artifact.encoding != "json"
+                        {
+                            return Err("invalid PKM factor-base artifact role or encoding".into());
+                        }
+                        let pkm: Value = super::read_json(&dir.join(&artifact.path))?;
+                        Some(pkm_feature_projection(&public, &base, &pkm)?)
+                    } else {
+                        missing_alternative_base += 1;
+                        feature_status = "missing_verified_alternative_factor_base";
+                        None
+                    }
+                } else {
+                    if alternative.is_some()
+                        || manifest.outcome["factor_base_variant"] == "prime-kummer"
+                    {
+                        return Err("alternative factor base on a non-PKM source cell".into());
+                    }
+                    Some(feature_projection(&public, &base)?)
+                };
+                if let Some(inputs) = inputs {
+                    verify_projected_pdp_domain(&dir, &manifest.artifacts, &inputs)?;
+                    let domain = text(&inputs["pdp_domain"], "PDP domain")?;
+                    let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
+                    let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
+                    let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
+                    features.push(&id, &row)?;
+                    feature_occurrences += 1;
+                    *split_counts.entry(partition.into()).or_default() += 1;
+                    *domain_counts.entry(domain.clone()).or_default() += 1;
+                    feature_id = Some(id);
+                    component = Some(group);
+                    split = Some(partition);
+                    pdp_domain = Some(domain);
+                    feature_status = "available";
+                }
+            }
+            if feature_id.is_none() {
                 unavailable += 1;
             }
             let witness_ref = manifest.artifacts.iter().find(|a| a.path == "witness.json");
@@ -579,10 +698,10 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                 }
             }
             targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,
-                "feature_id":feature_id,"split_component":component,"split":split,"solver":manifest.config.solver,
+                "feature_id":feature_id,"pdp_domain":pdp_domain,"split_component":component,"split":split,"solver":manifest.config.solver,
                 "labels":manifest.outcome,"known_answer_scalar":known_scalar,"independently_recovered_scalar":independent_scalar,
                 "witness_artifact":witness_ref,"solution_certificates":certificate_refs,
-                "feature_status":if feature_id.is_some(){"available"}else{"missing_verified_public_inputs"}}))?;
+                "feature_status":feature_status}))?;
             index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
                 "feature_id":feature_id,"cell":relative,"source_manifest_sha256":manifest_sha,
                 "source_run_sha256":source_run_sha,"source_artifacts":manifest.artifacts,"status":"verified_sealed_cell"}))?;
@@ -621,12 +740,15 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
         "sealed_source_cells":sealed,"unsealed_attempts_excluded":unsealed,"cells_without_verified_features":unavailable,
+        "cells_without_verified_alternative_factor_base":missing_alternative_base,"feature_occurrences_by_pdp_domain":domain_counts,
         "feature_occurrences":feature_occurrences,"unique_feature_rows":unique_features,"restricted_target_rows":target_rows,
-        "feature_identity":"SHA256 of canonical strictly projected public inputs and factor base; solver and source provenance excluded",
+        "feature_identity":"SHA256 of canonical strictly projected public inputs, actual factor base and PDP domain; solver and source provenance excluded",
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v1","only_features_jsonl_is_model_input":true,
+        "feature_policy":{"version":"strict-structural-allowlist-v2","only_features_jsonl_is_model_input":true,
+            "pkm_domain":"verified exact alternative Kummer base; missing base excluded from matched routing features",
+            "cross_domain_routing_labels_matched":false,
             "excluded":["private witness","sampling seeds","curve/generator/key indices","configuration","order certificates","construction candidates","construction trace","solver outcomes","solver event streams","labels","source paths"]},
         "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES,
             "source_cell_values_materialized":true,"total_process_rss_bound_claimed":false},
@@ -654,6 +776,9 @@ mod tests {
             Self(root)
         }
         fn source(&self) -> PathBuf {
+            self.source_with_backends(false, false)
+        }
+        fn source_with_backends(&self, pkm: bool, include_pkm_base: bool) -> PathBuf {
             let source = self.0.join("source");
             fs::create_dir(&source).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1","purpose":"native export correctness fixture"});
@@ -668,7 +793,7 @@ mod tests {
                 field_sizes: vec![11],
                 arities: vec![2],
                 families: vec!["prime".into()],
-                solvers: vec!["enumerate".into(), "bsgs".into()],
+                solvers: vec!["enumerate".into(), if pkm { "pkm" } else { "bsgs" }.into()],
                 curve_seeds: 8,
                 generators: 2,
                 keys: 2,
@@ -721,10 +846,50 @@ mod tests {
                 for path in ["stdout.log", "stderr.log"] {
                     artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
                 }
-                storage::write_json(&dir,"manifest.json","manifest",&CellManifest {schema:"crypto.ml-dataset.cell/v1".into(),
-                    cell_index,plan_sha256:plan_sha.clone(),config,
-                    outcome:json!({"status":"not_attempted","known_answer_verified":true,"factor_base_verified":true,
-                        "solver_completed":false,"scalar_recovered_without_witness":false,"scalar_replay_verified":false}),artifacts}).unwrap();
+                let mut outcome = json!({"status":"not_attempted","known_answer_verified":true,"factor_base_verified":true,
+                    "solver_completed":false,"scalar_recovered_without_witness":false,"scalar_replay_verified":false});
+                if config.solver == "pkm" && include_pkm_base {
+                    let mut solver_case = case.clone();
+                    solver_case.private_witness = Value::Null;
+                    let result = crate::ml_dataset::solvers::solve(&config, &solver_case).unwrap();
+                    assert!(
+                        result
+                            .artifacts
+                            .iter()
+                            .any(|a| a.path == "pkm-factor-base.json"),
+                        "{}",
+                        result.outcome
+                    );
+                    for payload in result.artifacts {
+                        artifacts.push(
+                            storage::write_bytes(
+                                &dir,
+                                &payload.path,
+                                &payload.role,
+                                &payload.encoding,
+                                &payload.bytes,
+                            )
+                            .unwrap(),
+                        );
+                    }
+                    outcome = result.outcome;
+                    outcome["known_answer_verified"] = json!(true);
+                    outcome["factor_base_verified"] = json!(true);
+                }
+                storage::write_json(
+                    &dir,
+                    "manifest.json",
+                    "manifest",
+                    &CellManifest {
+                        schema: "crypto.ml-dataset.cell/v1".into(),
+                        cell_index,
+                        plan_sha256: plan_sha.clone(),
+                        config,
+                        outcome,
+                        artifacts,
+                    },
+                )
+                .unwrap();
             }
             source
         }
@@ -852,6 +1017,159 @@ mod tests {
         fs::write(source.join("cells/000000000124/witness.json"), b"corrupt").unwrap();
         assert!(export(&source, &f.0.join("bad-export")).is_err());
         assert!(!f.0.join("bad-export/manifest.json").exists());
+    }
+
+    #[test]
+    fn pkm_uses_its_verified_actual_base_and_distinct_routing_identity() {
+        let f = Fixture::new();
+        let source = f.source_with_backends(true, true);
+        let out = f.0.join("training");
+        let exported = export(&source, &out).unwrap();
+        assert_eq!(exported["export"]["unique_feature_rows"], 2);
+        assert_eq!(
+            exported["export"]["feature_occurrences_by_pdp_domain"][STANDARD_PDP_DOMAIN],
+            1
+        );
+        assert_eq!(
+            exported["export"]["feature_occurrences_by_pdp_domain"][KUMMER_PDP_DOMAIN],
+            1
+        );
+        let features: Vec<Value> = fs::read_to_string(out.join("features.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        let standard = features
+            .iter()
+            .find(|v| v["inputs"]["pdp_domain"] == STANDARD_PDP_DOMAIN)
+            .unwrap();
+        let kummer = features
+            .iter()
+            .find(|v| v["inputs"]["pdp_domain"] == KUMMER_PDP_DOMAIN)
+            .unwrap();
+        assert_ne!(standard["feature_id"], kummer["feature_id"]);
+        assert_eq!(standard["inputs"]["target"], kummer["inputs"]["target"]);
+        assert_eq!(standard["split_component"], kummer["split_component"]);
+        let dir = source.join("cells/000000000125");
+        let public: Value = crate::ml_dataset::read_json(&dir.join("public.json")).unwrap();
+        let base: Value = crate::ml_dataset::read_json(&dir.join("factor-base.json")).unwrap();
+        let mut pkm: Value =
+            crate::ml_dataset::read_json(&dir.join("pkm-factor-base.json")).unwrap();
+        assert_eq!(
+            kummer["inputs"]["factor_base"]["points"],
+            pkm["definition"]["points"]
+        );
+        assert_eq!(kummer["inputs"]["factor_base"]["t"], pkm["definition"]["t"]);
+        assert_eq!(kummer["inputs"]["factor_base"]["g"], pkm["definition"]["g"]);
+
+        let marker = "FORBIDDEN_PKM_LOG_OR_FUTURE_VALUE";
+        pkm["construction_cost"] = json!({"secret":marker});
+        pkm["seed"] = json!(marker);
+        pkm["private_witness"] = json!(marker);
+        pkm["definition"]["hidden_logs"] = json!(marker);
+        pkm["definition"]["variant"] = json!(marker);
+        for row in pkm["definition"]["points"].as_array_mut().unwrap() {
+            row["scalar"] = json!(marker);
+        }
+        let projected = pkm_feature_projection(&public, &base, &pkm).unwrap();
+        assert_eq!(projected, kummer["inputs"]);
+        let encoded = serde_json::to_string(&projected).unwrap();
+        for forbidden in [
+            marker,
+            "scalar",
+            "seed",
+            "construction",
+            "hidden_logs",
+            "private_witness",
+        ] {
+            assert!(!encoded.contains(forbidden), "{forbidden}");
+        }
+        pkm["definition"]["g"] = json!("0");
+        assert!(pkm_feature_projection(&public, &base, &pkm).is_err());
+
+        // Certificate definitions must match the saved feature domain even
+        // when the certificate is stored with its own consistent digest.
+        let certificate_dir = f.0.join("certificate");
+        fs::create_dir(&certificate_dir).unwrap();
+        let mut other_definition =
+            crate::ml_dataset::read_json::<Value>(&dir.join("pkm-factor-base.json")).unwrap()
+                ["definition"]
+                .clone();
+        other_definition["g"] = json!("0");
+        let certificate = storage::write_json(
+            &certificate_dir,
+            "pdp.json",
+            "independently-verified-pdp",
+            &json!({"factor_base_definition":other_definition}),
+        )
+        .unwrap();
+        assert!(
+            verify_projected_pdp_domain(&certificate_dir, &[certificate], &kummer["inputs"])
+                .unwrap_err()
+                .contains("differs from exported Kummer")
+        );
+    }
+
+    #[test]
+    fn pkm_without_actual_base_retains_provenance_but_has_no_matched_feature() {
+        let f = Fixture::new();
+        let source = f.source_with_backends(true, false);
+        let out = f.0.join("training");
+        let exported = export(&source, &out).unwrap();
+        assert_eq!(exported["export"]["sealed_source_cells"], 2);
+        assert_eq!(exported["export"]["unique_feature_rows"], 1);
+        assert_eq!(exported["export"]["restricted_target_rows"], 2);
+        assert_eq!(
+            exported["export"]["cells_without_verified_alternative_factor_base"],
+            1
+        );
+        let targets: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        let pkm = targets.iter().find(|row| row["solver"] == "pkm").unwrap();
+        assert!(pkm["feature_id"].is_null());
+        assert!(pkm["pdp_domain"].is_null());
+        assert_eq!(
+            pkm["feature_status"],
+            "missing_verified_alternative_factor_base"
+        );
+        let index = fs::read_to_string(out.join("restricted/index.jsonl")).unwrap();
+        assert!(index.contains("cells/000000000125"));
+        assert!(index.contains("witness.json"));
+    }
+
+    #[test]
+    fn rejected_overlap_leaves_source_directories_and_manifests_intact() {
+        let f = Fixture::new();
+        let source = f.source();
+        let original = fs::read(source.join("cells/000000000124/manifest.json")).unwrap();
+        for destination in [
+            source.join("cells/report"),
+            source.join("cells/000000000124/derived"),
+        ] {
+            assert!(export(&source, &destination)
+                .unwrap_err()
+                .contains("overlaps"));
+            assert!(!destination.exists());
+        }
+        assert_eq!(fs::read_dir(source.join("cells")).unwrap().count(), 2);
+        assert_eq!(
+            fs::read(source.join("cells/000000000124/manifest.json")).unwrap(),
+            original
+        );
+        assert_eq!(
+            crate::ml_dataset::verify_run(&source, true).unwrap()["completed_receipts"],
+            2
+        );
+        #[cfg(unix)]
+        {
+            let alias = f.0.join("source-alias");
+            std::os::unix::fs::symlink(&source, &alias).unwrap();
+            assert!(export(&source, &alias.join("cells/report")).is_err());
+            assert!(!source.join("cells/report").exists());
+        }
     }
 
     #[test]

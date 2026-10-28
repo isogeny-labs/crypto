@@ -2,6 +2,7 @@
 pub mod curves;
 pub mod export;
 pub mod relations;
+pub mod report;
 pub mod restore;
 pub mod solvers;
 pub mod storage;
@@ -30,6 +31,13 @@ pub enum DatasetCommand {
     Plan(PlanArgs),
     /// Execute a bounded number of cells, preserving failures and resuming verified cells.
     Generate(GenerateArgs),
+    /// Check readable frozen inputs, clean build identity and receipt routing without running cryptography.
+    Preflight {
+        #[arg(long)]
+        plan: PathBuf,
+        #[arg(long)]
+        protocol: PathBuf,
+    },
     /// Hash-check every artifact and independently replay known-answer identities.
     Verify {
         #[arg(long)]
@@ -39,6 +47,13 @@ pub enum DatasetCommand {
     Status {
         #[arg(long)]
         out: PathBuf,
+    },
+    /// Write an immutable partial coverage and measurement report from retained artifacts.
+    Report {
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        destination: PathBuf,
     },
     /// Publish all completed cell manifests and round-trip their bytes through the store.
     Publish {
@@ -298,9 +313,36 @@ fn numbers(s: &str) -> Result<Vec<u32>, String> {
     Ok(result)
 }
 
+pub(super) const JSON_INPUT_MAX_BYTES: u64 = 32 * 1024 * 1024;
+
+fn read_json_bytes(path: &Path) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    let metadata = fs::symlink_metadata(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err(format!(
+            "{}: JSON input must be a regular file",
+            path.display()
+        ));
+    }
+    if metadata.len() > JSON_INPUT_MAX_BYTES {
+        return Err(format!("{}: JSON input exceeds32MiB limit", path.display()));
+    }
+    let file = File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut bytes = Vec::new();
+    file.take(JSON_INPUT_MAX_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("{}: {e}", path.display()))?;
+    if bytes.len() as u64 > JSON_INPUT_MAX_BYTES {
+        return Err(format!(
+            "{}: JSON input grew beyond32MiB limit",
+            path.display()
+        ));
+    }
+    Ok(bytes)
+}
+
 fn read_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T, String> {
-    serde_json::from_slice(&fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?)
-        .map_err(|e| format!("{}: {e}", path.display()))
+    serde_json::from_slice(&read_json_bytes(path)?).map_err(|e| format!("{}: {e}", path.display()))
 }
 
 pub fn digest(bytes: &[u8]) -> String {
@@ -347,12 +389,39 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             );
         }
         DatasetCommand::Generate(a) => generate(a)?,
+        DatasetCommand::Preflight { plan, protocol } => {
+            let parsed: DatasetPlan = read_json(plan)?;
+            parsed.validate()?;
+            let protocol_bytes = read_json_bytes(protocol)?;
+            verify_protocol(&parsed, &protocol_bytes)?;
+            let source = generation_source()?;
+            let receipt_uri = std::env::var("ISOLAB_RESULTS_URI")
+                .ok()
+                .filter(|v| !v.is_empty());
+            if let Some(uri) = &receipt_uri {
+                lab_receipt_remote(uri)?;
+            }
+            println!(
+                "{}",
+                json!({"schema":"crypto.ml-dataset.preflight/v1",
+                "source_commit":source,"source_dirty":false,
+                "binary_sha256":crate::store::hash_file(&std::env::current_exe().map_err(|e|e.to_string())?)?.0,
+                "plan_file_sha256":crate::store::hash_file(plan)?.0,
+                "protocol_file_sha256":digest(&protocol_bytes),
+                "planned_cells":parsed.cell_count()?,"generated_cells":0,
+                "lab_receipt_uri":receipt_uri,"cloud_permissions_checked":false,
+                "output_permissions_checked":false,"scientific_computation_performed":false})
+            );
+        }
         DatasetCommand::Worker { config, out } => worker(&read_json(config)?, out)?,
         DatasetCommand::Verify { out } => {
             println!("{}", verify_run(out, true)?);
         }
         DatasetCommand::Status { out } => {
             println!("{}", verify_run(out, false)?);
+        }
+        DatasetCommand::Report { out, destination } => {
+            println!("{}", report::report_run(out, destination)?);
         }
         DatasetCommand::Publish { out, remote } => {
             let _lease = Lease::acquire(out)?;
@@ -608,6 +677,38 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     Ok(())
 }
 
+fn verify_resumed_cell(
+    dir: &Path,
+    binding: &Value,
+    config: &CaseConfig,
+    index: u64,
+    plan_sha: &str,
+) -> Result<(), String> {
+    let manifest = verify_cell(dir, true)?;
+    if manifest.plan_sha256 != plan_sha
+        || &manifest.config != config
+        || manifest.cell_index != index
+        || read_json::<Value>(&dir.join("run.json"))? != *binding
+    {
+        return Err(format!(
+            "cell {index} mismatches frozen plan or run binding"
+        ));
+    }
+    Ok(())
+}
+
+fn generation_source() -> Result<&'static str, String> {
+    let source = crate::build_provenance::git_commit()
+        .ok_or("build with CRYPTO_BUILD_GIT_COMMIT before generation")?;
+    if source.len() != 40 || !source.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err("build source must be a complete 40-character Git commit".into());
+    }
+    if crate::build_provenance::git_dirty() != Some(false) {
+        return Err("generation requires CRYPTO_BUILD_GIT_DIRTY=false build provenance".into());
+    }
+    Ok(source)
+}
+
 fn generate(a: &GenerateArgs) -> Result<(), String> {
     if a.max_cases == 0
         || a.shard_count == 0
@@ -620,15 +721,15 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     }
     let plan: DatasetPlan = read_json(&a.plan)?;
     plan.validate()?;
-    let protocol = fs::read(&a.protocol).map_err(|e| format!("{}: {e}", a.protocol.display()))?;
+    let protocol = read_json_bytes(&a.protocol)?;
     verify_protocol(&plan, &protocol)?;
-    let source = crate::build_provenance::git_commit()
-        .ok_or("build with CRYPTO_BUILD_GIT_COMMIT before generation")?;
-    if source.len() != 40 || !source.bytes().all(|b| b.is_ascii_hexdigit()) {
-        return Err("build source must be a complete 40-character Git commit".into());
-    }
-    if crate::build_provenance::git_dirty() != Some(false) {
-        return Err("generation requires CRYPTO_BUILD_GIT_DIRTY=false build provenance".into());
+    let source = generation_source()?;
+    if a.publish {
+        if let Ok(uri) = std::env::var("ISOLAB_RESULTS_URI") {
+            if !uri.is_empty() {
+                lab_receipt_remote(&uri)?;
+            }
+        }
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let binary_sha = crate::store::hash_file(&exe)?.0;
@@ -653,13 +754,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         let config = plan.cell(index)?;
         let dir = cells.join(format!("{index:012}"));
         if dir.join("manifest.json").exists() {
-            let manifest = verify_cell(&dir, true)?;
-            if manifest.plan_sha256 != plan_sha
-                || manifest.config != config
-                || manifest.cell_index != index
-            {
-                return Err(format!("cell {index} mismatches frozen plan"));
-            }
+            verify_resumed_cell(&dir, &binding, &config, index, &plan_sha)?;
             if a.publish {
                 publish_cell(&out, &dir, a.remote.as_deref())?;
             }
@@ -1166,10 +1261,7 @@ fn bound_run(root: &Path) -> Result<(DatasetPlan, Value, String), String> {
     }
     let plan: DatasetPlan = read_json(&root.join("plan.json"))?;
     plan.validate()?;
-    verify_protocol(
-        &plan,
-        &fs::read(root.join("protocol.json")).map_err(|e| e.to_string())?,
-    )?;
+    verify_protocol(&plan, &read_json_bytes(&root.join("protocol.json"))?)?;
     let hash = digest(&serde_json::to_vec(&plan).map_err(|e| e.to_string())?);
     let binding: Value = read_json(&root.join("run.json"))?;
     if binding["schema"] != "crypto.ml-dataset.run/v1" || binding["plan_sha256"] != hash {
@@ -1485,11 +1577,17 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                 )?;
             }
             if artifact.role == "large-prime-elimination-transcript" {
-                relations::verify_transcript(
-                    &public,
-                    &base,
-                    &read_json(&dir.join(&artifact.path))?,
-                )?;
+                let transcript: Value = read_json(&dir.join(&artifact.path))?;
+                let requested_work =
+                    if transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
+                        transcript["requested_work"].as_u64()
+                    } else {
+                        transcript["requested_work_limit"].as_u64()
+                    };
+                if requested_work != Some(manifest.config.work_limit) {
+                    return Err("relation transcript work limit differs from frozen cell".into());
+                }
+                relations::verify_transcript(&public, &base, &transcript)?;
             }
             if [
                 "independently-verified-pdp",
@@ -1810,13 +1908,7 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
     else {
         return Ok(());
     };
-    let remote = crate::store::backend::RemoteSpec::parse(&uri)?;
-    if !matches!(&remote, crate::store::backend::RemoteSpec::S3 {bucket, prefix} if bucket == "setec-astronomy-artifacts" && !prefix.is_empty())
-    {
-        return Err(
-            "lab receipt destination must be a nonempty prefix in setec-astronomy-artifacts".into(),
-        );
-    }
+    let remote = lab_receipt_remote(&uri)?;
     let mut cfg = crate::store::Config::discover()?;
     cfg.remote = Some(remote);
     cfg.index_path = root.join("store-index.json");
@@ -1848,9 +1940,35 @@ fn publish_lab_receipt(root: &Path, artifact: &Artifact) -> Result<(), String> {
     Ok(())
 }
 
+fn lab_receipt_remote(uri: &str) -> Result<crate::store::backend::RemoteSpec, String> {
+    let remote = crate::store::backend::RemoteSpec::parse(uri)?;
+    if !matches!(&remote, crate::store::backend::RemoteSpec::S3 {bucket, prefix} if bucket == "setec-astronomy-artifacts" && !prefix.is_empty())
+    {
+        return Err(
+            "lab receipt destination must be a nonempty prefix in setec-astronomy-artifacts".into(),
+        );
+    }
+    Ok(remote)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn lab_receipt_routing_rejects_legacy_bucket_before_generation() {
+        assert!(
+            lab_receipt_remote("s3://setec-astronomy-artifacts/ml-dataset-lab/runs/test/").is_ok()
+        );
+        for invalid in [
+            "s3://isolab-results-104186811093-us-east-2/runs/test/",
+            "s3://setec-astronomy-artifacts",
+            "file:///tmp/dataset-receipts",
+            "https://example.invalid/receipts",
+        ] {
+            assert!(lab_receipt_remote(invalid).is_err(), "accepted {invalid}");
+        }
+    }
+
     fn plan() -> DatasetPlan {
         DatasetPlan {
             schema: "crypto.ml-dataset.plan/v1".into(),
@@ -1982,6 +2100,49 @@ mod tests {
             .contains("SHA-256"));
         fs::write(f.0.join("protocol.json"), changed).unwrap();
         assert!(bound_run(&f.0).is_err());
+    }
+
+    #[test]
+    fn resume_rejects_valid_same_plan_cell_from_another_run_binding() {
+        let fixture = TempRun::new();
+        let (plan, binding, protocol) = fixture.bound();
+        let dir = fixture.failed_cell(&plan, &binding, &protocol);
+        let config = plan.cell(1).unwrap();
+        let hash = binding["plan_sha256"].as_str().unwrap();
+        verify_resumed_cell(&dir, &binding, &config, 1, hash).unwrap();
+        for (field, changed) in [
+            ("source_commit", json!("c".repeat(40))),
+            ("binary_sha256", json!("d".repeat(64))),
+            ("seconds_per_case", json!(17)),
+            ("memory_mib", json!(1024)),
+            ("trace_mib", json!(32)),
+            ("shard_count", json!(3)),
+        ] {
+            let mut other = binding.clone();
+            other[field] = changed;
+            assert!(
+                verify_resumed_cell(&dir, &other, &config, 1, hash)
+                    .unwrap_err()
+                    .contains("run binding"),
+                "{field}"
+            );
+        }
+        // The individually valid retained cell is never edited by rejection.
+        verify_cell(&dir, true).unwrap();
+    }
+
+    #[test]
+    fn oversized_json_input_is_rejected_before_parsing_or_allocation() {
+        let fixture = TempRun::new();
+        let path = fixture.0.join("oversized.json");
+        let file = File::create(&path).unwrap();
+        file.set_len(JSON_INPUT_MAX_BYTES + 1).unwrap();
+        assert!(read_json::<Value>(&path)
+            .unwrap_err()
+            .contains("exceeds32MiB"));
+        assert!(read_json_bytes(&fixture.0)
+            .unwrap_err()
+            .contains("regular file"));
     }
 
     #[test]

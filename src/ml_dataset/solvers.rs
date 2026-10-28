@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use num_bigint::BigUint;
@@ -30,6 +31,37 @@ use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
 const TRACE_EVENT_CAP: u64 = 100_000;
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
+
+const SAT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
+const SAT_EVENT_CAP_REASON: &str = "native SAT event trace budget exhausted";
+
+#[derive(Default)]
+struct SatEventLog {
+    bytes: Vec<u8>,
+    events: u64,
+}
+impl SatEventLog {
+    fn append(
+        &mut self,
+        pattern: u32,
+        event: &sat::SolverEvent,
+        byte_cap: usize,
+        event_cap: u64,
+    ) -> Result<(), String> {
+        let row = json!({"schema":"ml-dataset.sat-event/v1","pattern":pattern,"sequence":self.events+1,"native":event});
+        let bytes = serde_json::to_vec(&row).map_err(|e| e.to_string())?;
+        if self.events >= event_cap || self.bytes.len().saturating_add(bytes.len() + 1) > byte_cap {
+            return Err(SAT_EVENT_CAP_REASON.into());
+        }
+        // Write before advancing the in-memory prefix; interruption preserves
+        // every successful event. A sink error is never swallowed by SAT.
+        live_event(&row)?;
+        self.bytes.extend_from_slice(&bytes);
+        self.bytes.push(b'\n');
+        self.events += 1;
+        Ok(())
+    }
+}
 
 struct LiveSink {
     directory: PathBuf,
@@ -152,26 +184,27 @@ pub fn capabilities() -> Value {
         "solvers":[
             {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
-            {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"original formulas, models, rejects, aggregate counters","gaps":["decisions/trail/reasons/learned clause stream","UNSAT proof"]},
+            {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native Boolean matrix F4 plus splitting; native prime F4 plus bounded finite-domain extraction","trace":"original systems, reduced rows, splitting nodes or useful-row replay schedule","gaps":["internal pivot operations at every node","complete critical-pair stream"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,2],"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; native prime F4 for p<2^32 plus bounded finite-domain extraction","trace":"original systems (also retained for larger unsupported prime moduli), reduced rows, splitting nodes or useful-row replay schedule","gaps":["prime-field elimination at p>=2^32","internal pivot operations at every node","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"each polynomial, returned roots, lift checks","gaps":["internal factorization and gcd states"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
-            {"id":"double-large-prime","families":["koblitz"],"m":[2,15],"kind":"native verified two-residual elimination with actual F2-coefficient model, exact signed Frobenius closure and full-rank recovery","trace":"partial candidates, completed rows, source coefficients and rank/recovery transcript","gaps":["general binary and prime curves","even-degree twists outside F2"]}
+            {"id":"double-large-prime","families":["koblitz","binary","prime"],"m":[2,15],"kind":"native verified two-residual elimination with signed Frobenius for admitted Koblitz models or identity/sign action with generic sparse filtering; recovery of determined target columns","trace":"residual discovery, exact domains, partial candidates, source coefficients, native sparse filtering and modular rank/recovery certificates","gaps":["internal pivot-selection events","complete private filter mutation stream"]}
         ],
-        "global_gaps":["hardware instructions require permitted worker PMU; interrupted calls may lose counter readback","exact first fall degree certificates","exact last fall degree certificates","private native SAT and matrix internal event streams"],
+        "global_gaps":["hardware instructions require permitted worker PMU; interrupted calls may lose counter readback","exact first fall degree certificates","exact last fall degree certificates","private native matrix internals and SAT watch/heap/minimization internals"],
         "checkpoint_mid_call":"exposed events and completed payloads when using solve_with_event_sink; native opaque calls retain their last checkpoint",
         "interrupted_trace_loss_possible":true,
         "checkpoint_reason":"Each emitted event and completed payload is fsynced; interruption inside an uninstrumented native call can lose private intermediate states",
-        "bounded_search_event_cap":TRACE_EVENT_CAP,"sat_formula_trace_byte_cap":TRACE_BYTE_CAP
+        "bounded_search_event_cap":TRACE_EVENT_CAP,"sat_formula_trace_byte_cap":TRACE_BYTE_CAP,
+        "sat_native_event_byte_cap":SAT_EVENT_BYTE_CAP,"sat_native_event_count_cap":TRACE_EVENT_CAP
     })
 }
 
 #[derive(Clone)]
 enum Group {
-    Binary(BinaryCurve),
+    Binary(Box<BinaryCurve>),
     Prime(CurveParams),
 }
 #[derive(Clone, Debug, PartialEq)]
@@ -209,7 +242,9 @@ impl Group {
         if case.public_instance["family"] == "prime" {
             Ok(Self::Prime(curves::prime_curve(&case.public_instance)?))
         } else {
-            Ok(Self::Binary(curves::binary_curve(&case.public_instance)?))
+            Ok(Self::Binary(Box::new(curves::binary_curve(
+                &case.public_instance,
+            )?)))
         }
     }
     fn point(&self, value: &Value) -> Result<Element, String> {
@@ -767,6 +802,7 @@ fn sat_solve(
     let mut attempts = 0;
     let mut complete_patterns = 0;
     let deadline = Instant::now() + Duration::from_secs(10);
+    let trace = Arc::new(Mutex::new(SatEventLog::default()));
     'patterns: for pattern in 0..patterns {
         if attempts >= limit || Instant::now() >= deadline {
             break;
@@ -811,11 +847,40 @@ fn sat_solve(
         live_event(
             &json!({"kind":"sat_call_begin","pattern":pattern,"conflict_budget":enc.solver.conflict_budget}),
         )?;
+        let output = Arc::clone(&trace);
+        // Initial clauses/units are included by the native attachment snapshot.
+        // Installation failure is sticky and solve returns Unknown below.
+        let installation = enc.solver.set_event_observer(move |event| {
+            output
+                .lock()
+                .map_err(|_| "SAT trace mutex poisoned".to_string())?
+                .append(pattern, event, SAT_EVENT_BYTE_CAP, TRACE_EVENT_CAP)
+        });
         let verdict = enc.solver.solve();
+        let observer_error = enc.solver.event_observer_error().map(str::to_owned);
+        if let Err(error) = installation {
+            if observer_error.is_none() {
+                return Err(error);
+            }
+        }
         let stats = &enc.solver.stats;
         conflicts = conflicts.saturating_add(stats.conflicts);
         let mut row = json!({"pattern":pattern,"verdict":format!("{verdict:?}"),"variables":enc.solver.n_vars(),"and_gates":enc.n_and_gates,"s3_nodes":enc.n_s3_nodes,
             "native_counters":{"decisions":stats.decisions,"conflicts":stats.conflicts,"propagations":stats.propagations,"restarts":stats.restarts,"xor_passes":stats.xor_passes,"xor_row_ops":stats.xor_row_ops,"xor_row_scans":stats.xor_row_scans,"learnt_clauses":stats.learnt_clauses,"clause_visits":stats.clause_visits,"clause_lit_visits":stats.clause_lit_visits,"analyze_lit_visits":stats.analyze_lit_visits,"word_ops":enc.solver.word_ops()},"unsat_proof_checked":false});
+        if let Some(error) = observer_error {
+            if verdict != SolveResult::Unknown {
+                return Err("SAT observer failure was not censored".into());
+            }
+            row["observer_error"] = json!(error);
+            live_event(&json!({"kind":"sat_call_result","result":row}))?;
+            summaries.push(row);
+            if error != SAT_EVENT_CAP_REASON {
+                return Err(format!("native SAT event sink failed: {error}"));
+            }
+            data.outcome["reason"] = json!(error);
+            data.outcome["trace_budget_exhausted"] = json!(true);
+            break;
+        }
         match verdict {
             SolveResult::Sat => {
                 let model = enc.solver.model();
@@ -862,7 +927,20 @@ fn sat_solve(
     data.outcome["identity_patterns_attempted"] = json!(attempts);
     data.outcome["counters"] =
         json!({"sat_conflicts":conflicts,"group_lift_add_calls":lift_calls,"sat_calls":attempts});
-    data.outcome["trace_gaps"]=json!(["CDCL decisions, trails, reasons, learned/deleted clauses, and internal parity pivots are not exported","Only the first SAT model of each pattern is attempted; rejected lifts leave the pattern inconclusive"]);
+    let mut log = trace
+        .lock()
+        .map_err(|_| "SAT trace mutex poisoned".to_string())?;
+    data.outcome["native_event_trace"] = json!({"events":log.events,"bytes":log.bytes.len(),"event_cap":TRACE_EVENT_CAP,"byte_cap":SAT_EVENT_BYTE_CAP,
+        "proof_checked":false,"scope":"native semantic search events; clause arena IDs and XOR matrix row operations","gate_map":"summand blocks are DIMACS 1..=m*n; bit j is coefficient of field basis element x^j; remaining gate provenance not exported"});
+    let payload = ArtifactPayload {
+        path: "sat-native-events.jsonl".into(),
+        role: "native-sat-search-events".into(),
+        encoding: "jsonl".into(),
+        bytes: std::mem::take(&mut log.bytes),
+    };
+    live_payload(&payload)?;
+    data.artifacts.push(payload);
+    data.outcome["trace_gaps"]=json!(["No independently checked UNSAT proof; analysis events do not certify clause minimization","Private watch movements and heap mutations are not exported","Only the first SAT model of each pattern is attempted; rejected lifts leave the pattern inconclusive"]);
     save(
         &mut data,
         "sat-attempts.json",
@@ -1160,6 +1238,109 @@ fn verify_kummer_domain(
     Ok(out)
 }
 
+/// Reconstruct the small public Kummer base without running PKM elimination.
+/// This also rejects a proper subset or forged column/sign map, so an exported
+/// feature graph describes the actual domain used by the native oracle.
+pub(super) fn verify_pkm_factor_base(
+    public: &Value,
+    factor_base: &Value,
+    artifact: &Value,
+) -> Result<(), String> {
+    use crate::cryptanalysis::ic_boundary::{GroupOps, PrimeCurve, PrimeInstance, PrimePoint};
+    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
+    use crate::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
+    let case = CaseData {
+        public_instance: public.clone(),
+        private_witness: Value::Null,
+        factor_base: factor_base.clone(),
+    };
+    let group = Group::read(&case)?;
+    let definition = &artifact["definition"];
+    let actual_points = verify_kummer_domain(&group, &case, definition)?;
+    if definition["subgroup_filtered"] != false || definition["known_logs"] != false {
+        return Err("unexpected PKM factor-base provenance flags".into());
+    }
+    let Group::Prime(curve) = &group else {
+        return Err("PKM base requires a prime curve".into());
+    };
+    let p = curve.p.to_u64().ok_or("invalid PKM modulus")?;
+    if p >= 1 << 31 {
+        return Err("PKM base exceeds native adapter modulus bound".into());
+    }
+    let point = |name: &str| -> Result<PrimePoint, String> {
+        match group.point(&public[name])? {
+            Element::Prime(Point::Affine { x, y }) => Ok(PrimePoint::affine(
+                x.value.to_u64().ok_or("PKM coordinate exceeds u64")?,
+                y.value.to_u64().ok_or("PKM coordinate exceeds u64")?,
+            )),
+            _ => Err("PKM public point must be affine".into()),
+        }
+    };
+    let generator = point("generator")?;
+    let target = point("target")?;
+    let r = group.order().ok_or("missing PKM subgroup order")?;
+    let cofactor = public["curve"]["cofactor"]
+        .as_str()
+        .and_then(|s| s.parse::<u64>().ok())
+        .ok_or("invalid PKM cofactor")?;
+    let instance = PrimeInstance {
+        name: "dataset-prime-kummer-verification".into(),
+        curve: PrimeCurve {
+            p,
+            a: curve.a.to_u64().ok_or("invalid PKM coefficient")?,
+            b: curve.b.to_u64().ok_or("invalid PKM coefficient")?,
+        },
+        group_order: r.checked_mul(cofactor).ok_or("PKM order overflow")?,
+        r,
+        cofactor,
+        generator: (generator.x, generator.y),
+    };
+    let ctx = InstanceCtx {
+        group: &instance.curve,
+        generator,
+        target,
+        r,
+        cofactor,
+        group_order: instance.group_order,
+        name: instance.name.clone(),
+        field_degree: None,
+    };
+    let mut params = Params::default();
+    params
+        .set("t", definition["t"].as_u64().unwrap().to_string())
+        .set("g", definition["g"].as_str().unwrap());
+    let base = PrimeKummerBase {
+        instance: &instance,
+    }
+    .build(&ctx, &params, &mut GroupOps::default())?;
+    let expected_points: Vec<_> = base
+        .points
+        .iter()
+        .map(|p| json!({"x":p.x.to_string(),"y":p.y.to_string()}))
+        .collect();
+    if json!(actual_points.iter().map(Element::json).collect::<Vec<_>>()) != json!(expected_points)
+        || artifact["columns"] != json!(base.columns)
+        || artifact["column_of"] != json!(base.col_of)
+        || artifact["coefficient_of"]
+            != json!(base
+                .coef_of
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>())
+        || artifact["abscissae"]
+            != json!(base
+                .abscissa_list
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>())
+    {
+        return Err(
+            "PKM domain or column/sign map differs from native public reconstruction".into(),
+        );
+    }
+    Ok(())
+}
+
 fn pkm_solve(
     config: &CaseConfig,
     case: &CaseData,
@@ -1395,9 +1576,20 @@ fn prime_f4(
         member = next;
     }
     let order = Ordering::Grevlex;
-    let mut input = vec![f4_fp::normalise(&terms, p, order)];
+    // f4_fp::Barrett::new asserts this narrower bound, even though some
+    // polynomial helpers support larger u64 primes. Preserve the public
+    // equations without entering any native elimination for unsupported p.
+    let backend_applicable = (2..1u64 << 32).contains(&p);
+    let normalize = |terms: &[(Vec<u32>, u64)]| {
+        if backend_applicable {
+            f4_fp::normalise(terms, p, order)
+        } else {
+            terms.iter().filter(|(_, c)| *c != 0).cloned().collect()
+        }
+    };
+    let mut input = vec![normalize(&terms)];
     for axis in 0..2 {
-        input.push(f4_fp::normalise(
+        input.push(normalize(
             &member
                 .iter()
                 .enumerate()
@@ -1407,8 +1599,6 @@ fn prime_f4(
                     (e, c)
                 })
                 .collect::<Vec<_>>(),
-            p,
-            order,
         ));
     }
     let mut data = SolverData {
@@ -1431,14 +1621,25 @@ fn prime_f4(
         &mut data,
         "prime-f4-input.json",
         "complete-prime-field-polynomial-system",
-        &json!({"modulus":p.to_string(),"variables":["x0","x1"],"monomial_order":"degrevlex","polynomials":encode(&input),"factor_base_x":codes.iter().map(ToString::to_string).collect::<Vec<_>>(),"target_x":xr.to_string()}),
+        &json!({"modulus":p.to_string(),"variables":["x0","x1"],"monomial_order":"degrevlex","native_normalization_applied":backend_applicable,"native_modulus_limit_exclusive":"4294967296","polynomials":encode(&input),"factor_base_x":codes.iter().map(ToString::to_string).collect::<Vec<_>>(),"target_x":xr.to_string()}),
     )?;
+    if !backend_applicable {
+        data.outcome = outcome(
+            "unsupported",
+            "Native prime F4 elimination requires 2 <= p < 2^32; the public S3 and exact finite-domain membership system was retained without running F4",
+        );
+        data.outcome["native_backend_invoked"] = json!(false);
+        data.outcome["algebra_completed"] = json!(false);
+        data.outcome["native_modulus_limit_exclusive"] = json!("4294967296");
+        return Ok(data);
+    }
     let mut opts = F4Options::new(order, config.degree_bound.min(12))
         .with_budget(Duration::from_secs(5))
         .capturing_run_log();
     opts.max_pairs_per_step = Some(config.work_limit.clamp(1, 256) as usize);
     live_event(&json!({"kind":"prime_f4_native_begin","degree_bound":opts.max_degree,"n_vars":2}))?;
     let (report, trace) = f4_fp::f4_record(&input, 2, p, &opts);
+    data.outcome["native_backend_invoked"] = json!(true);
     let log = f4_fp::take_run_log();
     save(
         &mut data,
@@ -1744,6 +1945,35 @@ fn root_solve(
 mod tests {
     use super::*;
     #[test]
+    fn native_sat_trace_caps_preserve_an_exact_accepted_prefix() {
+        let mut log = SatEventLog::default();
+        let event = sat::SolverEvent::SolveBegin {
+            conflicts: 0,
+            conflict_budget: 10,
+        };
+        log.append(3, &event, 4096, 1).unwrap();
+        let prefix = log.bytes.clone();
+        assert_eq!(
+            log.append(3, &event, 4096, 1).unwrap_err(),
+            SAT_EVENT_CAP_REASON
+        );
+        assert_eq!(log.bytes, prefix);
+        assert_eq!(log.events, 1);
+        let mut tiny = SatEventLog::default();
+        assert_eq!(
+            tiny.append(0, &event, 1, 100).unwrap_err(),
+            SAT_EVENT_CAP_REASON
+        );
+        assert!(tiny.bytes.is_empty());
+        let row: Value = serde_json::from_slice(&prefix).unwrap();
+        assert_eq!(row["sequence"], 1);
+        assert_eq!(row["pattern"], 3);
+        assert_eq!(
+            serde_json::from_value::<sat::SolverEvent>(row["native"].clone()).unwrap(),
+            event
+        );
+    }
+    #[test]
     fn finite_domain_selector_is_exact_for_non_subspace_codes() {
         let codes = vec![
             BigUint::from(3u32),
@@ -1758,7 +1988,7 @@ mod tests {
     #[test]
     fn wrong_target_does_not_pass_group_lift() {
         let c = BinaryCurve::test_curve_f256();
-        let group = Group::Binary(c.clone());
+        let group = Group::Binary(Box::new(c.clone()));
         let p = Element::Binary(c.generator.clone());
         let domain = vec![p.clone(), group.neg(&p)];
         let xs = vec![p.x().unwrap(), p.x().unwrap()];
@@ -1769,7 +1999,7 @@ mod tests {
     #[test]
     fn exhaustive_pdp_trace_replays_every_transition() {
         let c = BinaryCurve::test_curve_f256();
-        let group = Group::Binary(c.clone());
+        let group = Group::Binary(Box::new(c.clone()));
         let p = Element::Binary(c.generator.clone());
         let target = group.mul(&p, 3);
         let mut search = Search {
@@ -1857,6 +2087,21 @@ mod tests {
         for solver in ["enumerate", "root", "f4", "f5", "sat"] {
             cfg.solver = solver.into();
             let result = solve(&cfg, &case).unwrap();
+            if solver == "sat" {
+                let trace = result
+                    .artifacts
+                    .iter()
+                    .find(|a| a.role == "native-sat-search-events")
+                    .unwrap();
+                let events: Vec<Value> = String::from_utf8(trace.bytes.clone())
+                    .unwrap()
+                    .lines()
+                    .map(|line| serde_json::from_str(line).unwrap())
+                    .collect();
+                assert!(events.iter().any(|e| e["native"]["kind"] == "assignment"));
+                assert!(events.iter().any(|e| e["native"]["kind"] == "solve_end"));
+                assert_eq!(result.outcome["native_event_trace"]["proof_checked"], false);
+            }
             assert_eq!(
                 result.outcome["pdp_witness_verified"], true,
                 "{solver}: {}",
@@ -1884,6 +2129,165 @@ mod tests {
             )
             .is_err());
         }
+    }
+
+    #[test]
+    fn prime61_f4_retains_public_equations_without_entering_small_prime_backend() {
+        for twist in [false, true] {
+            let mut cfg = config("prime", "f4");
+            cfg.n = 61;
+            cfg.twist = twist;
+            cfg.factor_base_size = 4;
+            cfg.work_limit = 64;
+            cfg.degree_bound = 2;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            let p = &points[0];
+            case.public_instance["target"] = group.add(p, p).json();
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(result.outcome["status"], "unsupported");
+            assert_eq!(result.outcome["native_backend_invoked"], false);
+            assert_eq!(result.outcome["solver_completed"], false);
+            assert_eq!(result.outcome["algebra_completed"], false);
+            assert_eq!(result.outcome["pdp_witness_verified"], false);
+            assert!(!result
+                .artifacts
+                .iter()
+                .any(|a| a.path == "prime-f4-output.json"));
+            let input = result
+                .artifacts
+                .iter()
+                .find(|a| a.path == "prime-f4-input.json")
+                .unwrap();
+            let input: Value = serde_json::from_slice(&input.bytes).unwrap();
+            let modulus = (BigUint::from(1u8) << 61usize) - BigUint::from(1u8);
+            assert_eq!(input["modulus"], modulus.to_string());
+            assert_eq!(input["native_normalization_applied"], false);
+            let x = p.x().unwrap();
+            // Independently evaluate S3 and both membership polynomials at the
+            // public planted two-point decomposition using arbitrary precision.
+            let polys = input["polynomials"].as_array().unwrap();
+            assert_eq!(polys.len(), 3);
+            for polynomial in polys {
+                let value =
+                    polynomial
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .fold(BigUint::from(0u8), |sum, term| {
+                            let coefficient: BigUint =
+                                term["coefficient"].as_str().unwrap().parse().unwrap();
+                            let exponent: u32 = term["exponents"]
+                                .as_array()
+                                .unwrap()
+                                .iter()
+                                .map(|e| e.as_u64().unwrap() as u32)
+                                .sum();
+                            (sum + coefficient * x.modpow(&BigUint::from(exponent), &modulus))
+                                % &modulus
+                        });
+                assert_eq!(value, BigUint::from(0u8));
+            }
+        }
+        let caps = capabilities();
+        let f4 = caps["solvers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|entry| entry["id"] == "f4")
+            .unwrap();
+        assert_eq!(f4["prime_modulus_limit_exclusive"], "4294967296");
+    }
+
+    #[test]
+    #[ignore = "360-cell endpoint integration sweep; native SAT has an independent 10-second per-call deadline"]
+    fn all_adapter_endpoints_return_structured_outcomes() {
+        let methods = [
+            "enumerate",
+            "bsgs",
+            "sat",
+            "weil",
+            "f4",
+            "f5",
+            "f6",
+            "root",
+            "pkm",
+            "double-large-prime",
+        ];
+        let mut visited = 0;
+        for n in [23, 61] {
+            for family in ["koblitz", "binary", "prime"] {
+                for twist in [false, true] {
+                    let mut cfg = config(family, "enumerate");
+                    cfg.n = n;
+                    cfg.twist = twist;
+                    cfg.factor_base_size = 4;
+                    cfg.work_limit = 64;
+                    cfg.degree_bound = 2;
+                    let mut case = curves::generate(&cfg).unwrap();
+                    case.private_witness = Value::Null;
+                    for m in [2, 4, 15] {
+                        cfg.m = m;
+                        case.public_instance["m"] = json!(m);
+                        for method in methods {
+                            cfg.solver = method.into();
+                            let label =
+                                format!("{family} n={n} twist={twist} m={m} solver={method}");
+                            let result =
+                                solve(&cfg, &case).unwrap_or_else(|e| panic!("{label}: {e}"));
+                            assert_eq!(
+                                result.outcome["schema"], "ml-dataset.solver-outcome/v1",
+                                "{label}"
+                            );
+                            assert!(
+                                matches!(
+                                    result.outcome["status"].as_str(),
+                                    Some(
+                                        "verified" | "partial" | "unsupported" | "budget_exhausted"
+                                    )
+                                ),
+                                "{label}: {}",
+                                result.outcome
+                            );
+                            assert!(
+                                result.outcome["reason"]
+                                    .as_str()
+                                    .is_some_and(|s| !s.is_empty()),
+                                "{label}"
+                            );
+                            assert!(result.outcome["solver_completed"].is_boolean(), "{label}");
+                            assert!(result.outcome["first_fall_degree"].is_null(), "{label}");
+                            assert!(result.outcome["last_fall_degree"].is_null(), "{label}");
+                            if matches!(
+                                result.outcome["status"].as_str(),
+                                Some("unsupported" | "budget_exhausted")
+                            ) {
+                                assert_eq!(result.outcome["solver_completed"], false, "{label}");
+                            }
+                            for artifact in result.artifacts.iter().filter(|a| {
+                                matches!(
+                                    a.role.as_str(),
+                                    "independently-verified-pdp"
+                                        | "restricted-independent-scalar-label"
+                                )
+                            }) {
+                                verify_solution_artifact(
+                                    &case.public_instance,
+                                    &case.factor_base,
+                                    &artifact.role,
+                                    &serde_json::from_slice(&artifact.bytes).unwrap(),
+                                )
+                                .unwrap_or_else(|e| panic!("{label}: {e}"));
+                            }
+                            visited += 1;
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(visited, 360);
     }
 
     #[test]
@@ -1921,6 +2325,27 @@ mod tests {
             )
             .unwrap();
             if solver == "pkm" {
+                let base_artifact = result
+                    .artifacts
+                    .iter()
+                    .find(|a| a.path == "pkm-factor-base.json")
+                    .unwrap();
+                let base: Value = serde_json::from_slice(&base_artifact.bytes).unwrap();
+                verify_pkm_factor_base(&case.public_instance, &case.factor_base, &base).unwrap();
+                let mut subset = base.clone();
+                subset["definition"]["points"].as_array_mut().unwrap().pop();
+                assert!(
+                    verify_pkm_factor_base(&case.public_instance, &case.factor_base, &subset)
+                        .is_err()
+                );
+                let mut wrong_map = base.clone();
+                wrong_map["coefficient_of"][0] = json!("0");
+                assert!(verify_pkm_factor_base(
+                    &case.public_instance,
+                    &case.factor_base,
+                    &wrong_map
+                )
+                .is_err());
                 assert_eq!(label["factor_base_definition"]["kind"], "prime-kummer");
                 label["factor_base_definition"]["g"] = json!("0");
                 assert!(verify_solution_artifact(

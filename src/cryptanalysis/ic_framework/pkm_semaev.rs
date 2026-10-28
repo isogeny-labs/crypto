@@ -686,7 +686,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 let (sols, mults) = self.grid(curve, x_r, false);
                 if let Some(snapshot) = &mut self.dataset_artifact {
                     snapshot["grid_extraction_attempted"] = serde_json::json!(true);
-                    snapshot["grid_root_x"] = serde_json::json!(sols.iter().map(|xs|xs.iter().map(ToString::to_string).collect::<Vec<_>>()).collect::<Vec<_>>());
+                    snapshot["grid_root_x"] = serde_json::json!(sols
+                        .iter()
+                        .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                        .collect::<Vec<_>>());
                     snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
                 }
                 self.bump("pkm_grid_fp_mults_uncharged", mults);
@@ -780,7 +783,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 let (sols, mults) = self.grid(curve, x_r, false);
                 if let Some(snapshot) = &mut self.dataset_artifact {
                     snapshot["grid_extraction_attempted"] = serde_json::json!(true);
-                    snapshot["grid_root_x"] = serde_json::json!(sols.iter().map(|xs|xs.iter().map(ToString::to_string).collect::<Vec<_>>()).collect::<Vec<_>>());
+                    snapshot["grid_root_x"] = serde_json::json!(sols
+                        .iter()
+                        .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                        .collect::<Vec<_>>());
                     snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
                 }
                 self.bump("pkm_grid_fp_mults_uncharged", mults);

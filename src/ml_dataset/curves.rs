@@ -23,22 +23,22 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 
-type WPoint = Option<(u64, u64)>;
+pub(super) type WPoint = Option<(u64, u64)>;
 
 #[derive(Clone)]
-enum Arithmetic {
+pub(super) enum Arithmetic {
     Binary { fast: FastBinaryCurve, b: u64 },
     Prime(FastCurve),
 }
 
 impl Arithmetic {
-    fn q(&self) -> u64 {
+    pub(super) fn q(&self) -> u64 {
         match self {
             Self::Binary { fast, .. } => 1u64 << fast.n,
             Self::Prime(c) => c.f.p,
         }
     }
-    fn add(&self, p: WPoint, q: WPoint) -> WPoint {
+    pub(super) fn add(&self, p: WPoint, q: WPoint) -> WPoint {
         match self {
             Self::Binary { fast, .. } => fast.add(p, q),
             Self::Prime(c) => c
@@ -46,13 +46,13 @@ impl Arithmetic {
                 .map(|p| c.canonical(p)),
         }
     }
-    fn neg(&self, p: WPoint) -> WPoint {
+    pub(super) fn neg(&self, p: WPoint) -> WPoint {
         match self {
             Self::Binary { .. } => FastBinaryCurve::neg(p),
             Self::Prime(c) => p.map(|(x, y)| (x, if y == 0 { 0 } else { c.f.p - y })),
         }
     }
-    fn mul(&self, p: WPoint, k: u64) -> WPoint {
+    pub(super) fn mul(&self, p: WPoint, k: u64) -> WPoint {
         match self {
             Self::Binary { fast, .. } => fast.scalar_mul(p, &BigUint::from(k)),
             Self::Prime(c) => c
@@ -60,9 +60,9 @@ impl Arithmetic {
                 .map(|p| c.canonical(p)),
         }
     }
-    fn lift(&self, x: u64) -> Vec<WPoint> {
+    pub(super) fn lift(&self, x: u64) -> Vec<WPoint> {
         match self {
-            Self::Binary { fast, b } if fast.n % 2 == 1 => fast.points_with_x(*b, x),
+            Self::Binary { fast, b } if !fast.n.is_multiple_of(2) => fast.points_with_x(*b, x),
             Self::Binary { fast, b } => {
                 // The optimized lift returns None for even degrees above20.
                 // The library's general lift solves the Artin-Schreier linear
@@ -103,7 +103,7 @@ impl Arithmetic {
             },
         }
     }
-    fn on_curve(&self, p: WPoint) -> bool {
+    pub(super) fn on_curve(&self, p: WPoint) -> bool {
         let Some((x, y)) = p else { return true };
         if x >= self.q() || y >= self.q() {
             return false;
@@ -124,7 +124,7 @@ impl Arithmetic {
             Self::Prime(_) => p,
         }
     }
-    fn reference_mul(&self, p: WPoint, k: u64) -> WPoint {
+    pub(super) fn reference_mul(&self, p: WPoint, k: u64) -> WPoint {
         match self {
             Self::Prime(c) => {
                 let generic = c.to_textbook(p.map(|(x, y)| c.point(x, y)));
@@ -165,15 +165,58 @@ impl Arithmetic {
             }
         }
     }
+    pub(super) fn reference_add(&self, p: WPoint, q: WPoint) -> WPoint {
+        match self {
+            Self::Prime(c) => {
+                let a =
+                    crate::ecc::field::FieldElement::new(c.f.from_mont(c.a).into(), c.f.p.into());
+                let left = c.to_textbook(p.map(|(x, y)| c.point(x, y)));
+                let right = c.to_textbook(q.map(|(x, y)| c.point(x, y)));
+                match left.add_vartime(&right, &a) {
+                    Point::Infinity => None,
+                    Point::Affine { x, y } => Some((
+                        x.value.to_u64().expect("word field"),
+                        y.value.to_u64().expect("word field"),
+                    )),
+                }
+            }
+            Self::Binary { fast, b } => {
+                let c = BinaryCurve {
+                    m: fast.n,
+                    irreducible: IrreduciblePoly {
+                        degree: fast.n,
+                        low_terms: (0..fast.n)
+                            .filter(|i| fast.gf.irr & (1u64 << i) != 0)
+                            .collect(),
+                    },
+                    a: fast.element(fast.a),
+                    b: fast.element(*b),
+                    generator: BinaryPoint::Infinity,
+                    order: 1u64.into(),
+                    cofactor: 1u64.into(),
+                };
+                let lift = |p: WPoint| {
+                    p.map_or(BinaryPoint::Infinity, |(x, y)| BinaryPoint::Affine {
+                        x: fast.element(x),
+                        y: fast.element(y),
+                    })
+                };
+                match point_add(&c, &lift(p), &lift(q)) {
+                    BinaryPoint::Infinity => None,
+                    BinaryPoint::Affine { x, y } => Some((fast.word(&x), fast.word(&y))),
+                }
+            }
+        }
+    }
 }
 
 fn u(v: u64) -> Value {
     Value::String(v.to_string())
 }
-fn point_json(p: WPoint) -> Value {
+pub(super) fn point_json(p: WPoint) -> Value {
     p.map_or(Value::Null, |(x, y)| json!({"x": u(x), "y": u(y)}))
 }
-fn number(v: &Value, name: &str) -> Result<u64, String> {
+pub(super) fn number(v: &Value, name: &str) -> Result<u64, String> {
     let s = v
         .as_str()
         .ok_or_else(|| format!("{name} must be a canonical decimal string"))?;
@@ -183,7 +226,7 @@ fn number(v: &Value, name: &str) -> Result<u64, String> {
     }
     Ok(n)
 }
-fn point_words(v: &Value) -> Result<WPoint, String> {
+pub(super) fn point_words(v: &Value) -> Result<WPoint, String> {
     if v.is_null() {
         return Ok(None);
     }
@@ -240,7 +283,7 @@ fn prime_projection(
 ) -> (WPoint, u64) {
     let mut clearing = order;
     let mut multiplicity = 0;
-    while clearing > 0 && clearing % r == 0 {
+    while clearing > 0 && clearing.is_multiple_of(r) {
         clearing /= r;
         multiplicity += 1;
     }
@@ -334,7 +377,7 @@ impl SubgroupProjector {
         if r <= 2
             || !is_prime_u64(r)
             || order == 0
-            || order % r != 0
+            || !order.is_multiple_of(r)
             || order / r != cofactor
             || generator.is_none()
             || !arithmetic.on_curve(generator)
@@ -346,8 +389,9 @@ impl SubgroupProjector {
         if factors.last().map(|&(p, _)| p) != Some(r) {
             return Err("projection subgroup differs from largest prime factor".into());
         }
-        let membership =
-            (cofactor % r == 0).then(|| CyclicMembership::new(&arithmetic, generator, r));
+        let membership = cofactor
+            .is_multiple_of(r)
+            .then(|| CyclicMembership::new(&arithmetic, generator, r));
         Ok(Self {
             arithmetic,
             order,
@@ -480,7 +524,7 @@ fn certify_count(c: &Arithmetic, rng: &mut StdRng) -> Result<(u64, Value), Strin
         let factors = factor(candidate).map_err(|e|format!("{e}; construction_trace_partial=true; current_point={}; candidate={candidate}; completed_attempts={}",point_json(p),json!(attempts)))?;
         let mut order = candidate;
         for &(prime, _) in &factors {
-            while order % prime == 0 && c.mul(p, order / prime).is_none() {
+            while order.is_multiple_of(prime) && c.mul(p, order / prime).is_none() {
                 order /= prime;
             }
         }
@@ -491,7 +535,7 @@ fn certify_count(c: &Arithmetic, rng: &mut StdRng) -> Result<(u64, Value), Strin
                 .filter_map(|&(prime, _)| {
                     let mut tmp = order;
                     let mut e = 0;
-                    while tmp % prime == 0 {
+                    while tmp.is_multiple_of(prime) {
                         tmp /= prime;
                         e += 1;
                     }
@@ -532,7 +576,9 @@ fn construct(config: &CaseConfig) -> Result<(Arithmetic, Value, Value, u64, Valu
             let a = rng.gen_range(0..p);
             let b = rng.gen_range(0..p);
             let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
-            if (4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128) % p as u128 != 0 {
+            if !(4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128)
+                .is_multiple_of(p as u128)
+            {
                 break (a, b);
             }
             rejected.push(json!({"a":u(a),"b":u(b),"reason":"singular"}));
@@ -624,7 +670,9 @@ fn construct(config: &CaseConfig) -> Result<(Arithmetic, Value, Value, u64, Valu
         };
         let k = (1..=n)
             .find(|&k| {
-                n % k == 0 && fast.gf.sqr_k(actual_a, k) == actual_a && fast.gf.sqr_k(b, k) == b
+                n.is_multiple_of(k)
+                    && fast.gf.sqr_k(actual_a, k) == actual_a
+                    && fast.gf.sqr_k(b, k) == b
             })
             .ok_or("coefficient field not found")?;
         let field = json!({"characteristic":"2","degree":n,"irreducible_low_terms":irr.low_terms,"basis":"polynomial-lsb-first","polynomial_irreducibility":"native-rabin-test"});
@@ -689,8 +737,9 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
     );
     let multiplier = generator_rng.gen_range(1..subgroup);
     let generator = arithmetic.mul(base_generator, multiplier);
-    let membership =
-        (cofactor % subgroup == 0).then(|| CyclicMembership::new(&arithmetic, generator, subgroup));
+    let membership = cofactor
+        .is_multiple_of(subgroup)
+        .then(|| CyclicMembership::new(&arithmetic, generator, subgroup));
     let mut key_rng = StdRng::seed_from_u64(
         config.seed.rotate_left(7)
             ^ config.curve_seed
@@ -871,7 +920,7 @@ pub fn prime_curve(v: &Value) -> Result<CurveParams, String> {
         return Err("noncanonical prime coefficients".into());
     }
     let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
-    if (4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128) % p as u128 == 0 {
+    if (4u128 * mul(mul(a, a), a) as u128 + 27u128 * mul(b, b) as u128).is_multiple_of(p as u128) {
         return Err("singular prime curve".into());
     }
     let (gx, gy) = point_words(&v["generator"])?.ok_or("infinite generator")?;
@@ -902,7 +951,7 @@ pub fn prime_point(v: &Value, c: &CurveParams) -> Result<Point, String> {
     }
 }
 
-fn arithmetic(v: &Value) -> Result<Arithmetic, String> {
+pub(super) fn arithmetic(v: &Value) -> Result<Arithmetic, String> {
     match v["family"].as_str() {
         Some("prime") => Ok(Arithmetic::Prime(
             FastCurve::from_params(&prime_curve(v)?).ok_or("unsupported prime parameters")?,
@@ -929,7 +978,6 @@ fn verify_certificate(
     base_a: u64,
     base_b: u64,
     twist: bool,
-    twist_parameter: u64,
 ) -> Result<(), String> {
     let (lo, hi) = hasse(c.q());
     if !(lo..=hi).contains(&order) {
@@ -971,7 +1019,7 @@ fn verify_certificate(
             let r = number(&certificate["point_order"], "certificate point order")?;
             if r == 0
                 || r > order
-                || order % r != 0
+                || !order.is_multiple_of(r)
                 || p.is_none()
                 || !c.on_curve(p)
                 || c.reference_mul(p, r).is_some()
@@ -1022,7 +1070,6 @@ fn verify_certificate(
                 base_a,
                 base_b,
                 false,
-                twist_parameter,
             )?;
         }
         _ => return Err("unknown cardinality certificate".into()),
@@ -1030,11 +1077,10 @@ fn verify_certificate(
     Ok(())
 }
 
-/// Verify the algebra and scalar with the library's separate general point
-/// arithmetic, rather than trusting the fast arithmetic used for construction.
-pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
+/// Verify public curve, twist, cardinality and subgroup facts without witness
+/// access. Exact target membership in <G> follows only from a scalar replay.
+pub fn verify_public(public: &Value) -> Result<(), String> {
     if public["schema"] != "ml-ecdlp-instance/v1"
-        || private["schema"] != "ml-ecdlp-private-witness/v1"
         || !public["m"].as_u64().is_some_and(|m| (2..=15).contains(&m))
     {
         return Err("invalid instance/witness schema or arity".into());
@@ -1098,13 +1144,14 @@ pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
         base_a,
         base_b,
         twist,
-        d,
     )?;
     let degree = match &c {
         Arithmetic::Prime(_) => 1,
         Arithmetic::Binary { fast, b } => (1..=fast.n)
             .find(|&k| {
-                fast.n % k == 0 && fast.gf.sqr_k(fast.a, k) == fast.a && fast.gf.sqr_k(*b, k) == *b
+                fast.n.is_multiple_of(k)
+                    && fast.gf.sqr_k(fast.a, k) == fast.a
+                    && fast.gf.sqr_k(*b, k) == *b
             })
             .ok_or("no coefficient field")?,
     };
@@ -1113,6 +1160,23 @@ pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
     {
         return Err("incorrect coefficient field or Frobenius action".into());
     }
+    for name in ["generator", "target"] {
+        let p = point_words(&public[name])?;
+        if p.is_none() || !c.on_curve(p) || c.reference_mul(p, subgroup).is_some() {
+            return Err(format!("invalid public subgroup point {name}"));
+        }
+    }
+    Ok(())
+}
+
+/// Verify the algebra and scalar with the library's separate general point
+/// arithmetic, rather than trusting the fast arithmetic used for construction.
+pub fn verify(public: &Value, private: &Value) -> Result<(), String> {
+    verify_public(public)?;
+    if private["schema"] != "ml-ecdlp-private-witness/v1" {
+        return Err("invalid private witness schema".into());
+    }
+    let subgroup = number(&public["curve"]["subgroup_order"], "subgroup order")?;
     let scalar = number(&private["scalar"], "private scalar")?;
     let multiplier = number(&private["generator_multiplier"], "generator multiplier")?;
     if scalar == 0 || scalar >= subgroup || multiplier == 0 || multiplier >= subgroup {
@@ -1193,7 +1257,7 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if r <= 2
         || !is_prime_u64(r)
         || order == 0
-        || order % r != 0
+        || !order.is_multiple_of(r)
         || order / r != cofactor
         || generator.is_none()
         || !c.on_curve(generator)
@@ -1205,7 +1269,9 @@ pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
     if factors.last().map(|&(p, _)| p) != Some(r) {
         return Err("factor-base subgroup differs from largest prime factor".into());
     }
-    let membership = (cofactor % r == 0).then(|| CyclicMembership::new(&c, generator, r));
+    let membership = cofactor
+        .is_multiple_of(r)
+        .then(|| CyclicMembership::new(&c, generator, r));
     let points = base["points"]
         .as_array()
         .ok_or("missing factor base points")?;
@@ -1402,7 +1468,7 @@ mod tests {
         let c = arithmetic(public).unwrap();
         let order = number(&public["curve"]["group_order"], "order").unwrap();
         let r = number(&public["curve"]["subgroup_order"], "r").unwrap();
-        assert_eq!(order % (r * r), 0);
+        assert!(order.is_multiple_of(r * r));
         let generator = point_words(&public["generator"]).unwrap();
         let mut projector = SubgroupProjector::new(public).unwrap();
         let mut admitted = HashSet::new();
@@ -1452,7 +1518,7 @@ mod tests {
         let exhaustive = 1 + (0..c.q()).map(|x| c.lift(x).len() as u64).sum::<u64>();
         let (count, cert) = certify_count(&c, &mut rng).unwrap();
         assert_eq!(count, exhaustive);
-        verify_certificate(&c, &cert, count, 2036, 17, false, 1).unwrap();
+        verify_certificate(&c, &cert, count, 2036, 17, false).unwrap();
     }
     #[test]
     fn requested_boundaries_all_families_and_twists_replay() {

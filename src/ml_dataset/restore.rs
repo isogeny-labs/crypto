@@ -18,6 +18,11 @@ use crate::store::backend::{object_key, RemoteSpec};
 use crate::store::index::{validate_name, validate_sha256};
 use crate::store::{Config, Store};
 
+/// Bound restore I/O before trusting a downloaded producer run binding. The
+/// producer's trace_mib may describe a much larger job and is not an authority
+/// to allocate local resources. Larger restores fail explicitly, never truncate.
+const RESTORE_MAX_BYTES: u64 = 1024 * 1024 * 1024;
+
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 struct CompletionRecord {
@@ -50,7 +55,34 @@ fn checked_receipt(path: &Path) -> Result<PublishReceipt, String> {
     if !metadata.is_file() || metadata.file_type().is_symlink() {
         return Err("publication receipt must be a regular file".into());
     }
+    if metadata.len() > super::JSON_INPUT_MAX_BYTES {
+        return Err(format!(
+            "publication receipt exceeds {}-byte JSON input limit",
+            super::JSON_INPUT_MAX_BYTES
+        ));
+    }
     super::read_json(&path)
+}
+
+fn replay_parses_json(artifact: &Artifact) -> bool {
+    [
+        "manifest.json",
+        "plan.json",
+        "run.json",
+        "protocol.json",
+        "config.json",
+        "public.json",
+        "witness.json",
+        "factor-base.json",
+    ]
+    .contains(&artifact.path.as_str())
+        || [
+            "independently-verified-pdp",
+            "restricted-independent-scalar-label",
+            "restricted-large-prime-membership-provenance",
+            "large-prime-elimination-transcript",
+        ]
+        .contains(&artifact.role.as_str())
 }
 
 fn validate_object(object: &PublishedObject, namespace: &str) -> Result<(), String> {
@@ -107,9 +139,21 @@ fn validate_receipt(receipt: &PublishReceipt, remote: Option<&str>) -> Result<Re
         return Err("restore remote override must match the receipt remote; a mirror cannot attest the original remote".into());
     }
     let mut paths = BTreeSet::new();
-    let mut total = 0u64;
+    if receipt.completion.artifact.bytes > super::JSON_INPUT_MAX_BYTES {
+        return Err("completion receipt exceeds JSON input limit".into());
+    }
+    let mut total = receipt.completion.artifact.bytes;
     for object in &receipt.objects {
         validate_object(object, &receipt.namespace)?;
+        if replay_parses_json(&object.artifact)
+            && object.artifact.bytes > super::JSON_INPUT_MAX_BYTES
+        {
+            return Err(format!(
+                "parsed artifact {} exceeds {}-byte JSON input limit",
+                object.artifact.path,
+                super::JSON_INPUT_MAX_BYTES
+            ));
+        }
         if !paths.insert(object.artifact.path.as_str()) {
             return Err("duplicate publication artifact path".into());
         }
@@ -119,6 +163,9 @@ fn validate_receipt(receipt: &PublishReceipt, remote: Option<&str>) -> Result<Re
         total = total
             .checked_add(object.artifact.bytes)
             .ok_or("receipt byte count overflow")?;
+        if total > RESTORE_MAX_BYTES {
+            return Err(format!("restore exceeds {RESTORE_MAX_BYTES}-byte aggregate budget; larger restores require an explicitly configured implementation, no data was truncated"));
+        }
     }
     let manifest = receipt
         .objects
@@ -200,6 +247,16 @@ fn download(
     let destination = storage::contained_path(scratch, &name, false)?;
     if fs::symlink_metadata(&destination).is_ok() {
         return Err("fresh download destination unexpectedly exists".into());
+    }
+    let remote_meta = store
+        .remote()?
+        .head(&object.object_key)?
+        .ok_or_else(|| format!("remote restore object missing: {}", object.object_key))?;
+    if remote_meta.bytes != object.artifact.bytes {
+        return Err(format!(
+            "remote restore size differs from receipt for {}; refusing download",
+            object.object_key
+        ));
     }
     store.remote()?.get(&object.object_key, &destination)?;
     storage::check_file(&destination, &object.artifact.sha256, object.artifact.bytes)
@@ -346,7 +403,10 @@ pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<
     // Existing completed cells must all share the exact binding. This also
     // rejects a directory assembled from unrelated source builds or caps.
     for existing in super::completed_cells(&out)? {
-        let existing_manifest = super::verify_cell(&existing, true)?;
+        // Existing cells still receive full byte/provenance checks. Their
+        // arithmetic was replayed on activation; replaying every unrelated
+        // cell on every insertion makes N restores perform O(N²) replays.
+        let existing_manifest = super::verify_cell(&existing, false)?;
         if super::read_json::<Value>(&existing.join("run.json"))? != binding
             || existing_manifest.cell_index % shard_count != shard_index
             || existing.file_name().and_then(|n| n.to_str())
@@ -425,6 +485,7 @@ pub fn restore(receipt_path: &Path, out: &Path, remote: Option<&str>) -> Result<
         "remote":receipt.remote,"manifest_sha256":receipt.manifest_sha256,
         "completion_sha256":receipt.completion.artifact.sha256,"objects_downloaded_and_verified":receipt.objects.len()+1,
         "remote_rechecked":true,"native_replay_performed":true,"publication_confirmations":confirmations,
+        "restore_aggregate_byte_limit":RESTORE_MAX_BYTES,"parsed_json_byte_limit":super::JSON_INPUT_MAX_BYTES,
         "source_binary_required_for_read_replay":false,"run_binding_preserved":true,"attempt_directory":attempt});
     storage::write_json(
         &attempt,
@@ -724,6 +785,110 @@ mod tests {
             b"preserve"
         );
         assert!(!out.join("cells/000000000000/manifest.json").exists());
+    }
+
+    #[test]
+    fn rejects_oversized_receipts_parsed_artifacts_and_aggregate_before_downloads() {
+        let fixture = Fixture::new(256);
+        let oversized = fixture.root.join("oversized-receipt.json");
+        File::create(&oversized)
+            .unwrap()
+            .set_len(super::super::JSON_INPUT_MAX_BYTES + 1)
+            .unwrap();
+        let out = fixture.root.join("oversized-output");
+        assert!(restore(&oversized, &out, None)
+            .unwrap_err()
+            .contains("JSON input limit"));
+        assert!(!out.exists());
+
+        let (_, receipt) = fixture.publish(0);
+        let mut oversized = receipt.clone();
+        oversized
+            .objects
+            .iter_mut()
+            .find(|o| o.artifact.path == "public.json")
+            .unwrap()
+            .artifact
+            .bytes = super::super::JSON_INPUT_MAX_BYTES + 1;
+        let path = fixture.root.join("oversized-public.json");
+        fs::write(&path, serde_json::to_vec(&oversized).unwrap()).unwrap();
+        assert!(restore(&path, &out, None)
+            .unwrap_err()
+            .contains("parsed artifact public.json"));
+        assert!(!out.exists());
+
+        oversized = receipt.clone();
+        oversized.completion.artifact.bytes = super::super::JSON_INPUT_MAX_BYTES + 1;
+        fs::write(&path, serde_json::to_vec(&oversized).unwrap()).unwrap();
+        assert!(restore(&path, &out, None)
+            .unwrap_err()
+            .contains("completion receipt exceeds"));
+        assert!(!out.exists());
+
+        oversized = receipt;
+        oversized
+            .objects
+            .iter_mut()
+            .find(|o| o.artifact.path == "stdout.log")
+            .unwrap()
+            .artifact
+            .bytes = RESTORE_MAX_BYTES;
+        fs::write(&path, serde_json::to_vec(&oversized).unwrap()).unwrap();
+        assert!(restore(&path, &out, None)
+            .unwrap_err()
+            .contains("aggregate budget"));
+        assert!(!out.exists());
+    }
+
+    #[test]
+    fn oversized_remote_object_is_rejected_before_download_and_existing_hash_audit_remains() {
+        let fixture = Fixture::new(256);
+        let (path, receipt) = fixture.publish(0);
+        let object_index = receipt
+            .objects
+            .iter()
+            .position(|o| o.artifact.path == "stdout.log")
+            .unwrap();
+        let remote = fixture
+            .root
+            .join("remote")
+            .join(&receipt.objects[object_index].object_key);
+        let original = fs::read(&remote).unwrap();
+        fs::OpenOptions::new()
+            .write(true)
+            .open(&remote)
+            .unwrap()
+            .set_len(RESTORE_MAX_BYTES + 1)
+            .unwrap();
+        let out = fixture.root.join("oversized-remote-output");
+        assert!(restore(&path, &out, None)
+            .unwrap_err()
+            .contains("remote restore size differs"));
+        let attempts = out
+            .join(".restore")
+            .join(&receipt.completion.artifact.sha256);
+        let attempt = fs::read_dir(attempts)
+            .unwrap()
+            .next()
+            .unwrap()
+            .unwrap()
+            .path();
+        assert!(!attempt
+            .join("downloads")
+            .join(format!("object-{:08}.download", object_index + 1))
+            .exists());
+        assert!(!out.join("cells/000000000000/manifest.json").exists());
+        fs::write(&remote, original).unwrap();
+        restore(&path, &out, None).unwrap();
+
+        // Removing repeated arithmetic replay must retain the full local hash
+        // audit when a later cell is appended to this run.
+        fs::write(out.join("cells/000000000000/stdout.log"), b"tampered").unwrap();
+        let (next, _) = fixture.publish(1);
+        assert!(restore(&next, &out, None)
+            .unwrap_err()
+            .contains("artifact mismatch"));
+        assert!(!out.join("cells/000000000001/manifest.json").exists());
     }
 
     #[test]

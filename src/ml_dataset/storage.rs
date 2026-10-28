@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 
 use super::types::Artifact;
 use crate::hash::sha256::Sha256;
-use crate::store::backend::{object_key, RemoteSpec, SINGLE_PUT_MAX};
+use crate::store::backend::{object_key, Backend, Meta, RemoteSpec, SINGLE_PUT_MAX};
 use crate::store::index::{validate_name, validate_sha256};
 use crate::store::{hash_file, Config, PushMeta, Store};
 
@@ -371,6 +371,60 @@ fn roundtrip(store: &Store, artifact: &Artifact, scratch: &Path) -> Result<(), S
         .map_err(|e| format!("remote round-trip failed: {e}"))
 }
 
+/// A denied S3 HEAD is ambiguous when ListBucket is unavailable. It is never
+/// evidence of absence. Only this authorized dataset S3 path may instead try
+/// the backend's immutable single PUT, then require fresh metadata and bytes.
+/// Other backends/errors and shared Store behavior retain their existing rules.
+fn publication_head(
+    backend: &dyn Backend,
+    remote: Option<&RemoteSpec>,
+    key: &str,
+    source: &Path,
+    artifact: &Artifact,
+    scratch: &Path,
+) -> Result<Option<Meta>, String> {
+    match backend.head(key) {
+        Ok(meta) => Ok(meta),
+        Err(error)
+            if matches!(remote, Some(RemoteSpec::S3 { bucket, .. }) if bucket == "setec-astronomy-artifacts")
+                && error.starts_with("aws head-object failed")
+                && (error.contains("(403)")
+                    || error.contains("(Forbidden)")
+                    || error.contains("(AccessDenied)")) =>
+        {
+            if artifact.bytes > SINGLE_PUT_MAX {
+                return Err("HEAD-denied publication exceeds immutable single-PUT limit".into());
+            }
+            check_file(source, &artifact.sha256, artifact.bytes)?;
+            backend.put(key, source, &artifact.sha256).map_err(|e| {
+                format!(
+                    "conditional dataset PUT after denied HEAD failed: {e}; initial HEAD: {error}"
+                )
+            })?;
+            let meta = backend
+                .head(key)?
+                .ok_or("dataset object absent after conditional PUT")?;
+            if meta.bytes != artifact.bytes
+                || meta
+                    .sha256
+                    .as_ref()
+                    .is_some_and(|sha| sha != &artifact.sha256)
+            {
+                return Err(
+                    "dataset metadata differs after conditional PUT; refusing acknowledgement"
+                        .into(),
+                );
+            }
+            let temp = TempFile::new(scratch)?;
+            backend.get(key, &temp.path)?;
+            check_file(&temp.path, &artifact.sha256, artifact.bytes)
+                .map_err(|e| format!("conditional dataset PUT readback failed: {e}"))?;
+            Ok(Some(meta))
+        }
+        Err(error) => Err(error),
+    }
+}
+
 fn publish_object(
     store: &mut Store,
     root: &Path,
@@ -392,7 +446,14 @@ fn publish_object(
             ));
         }
     }
-    if let Some(meta) = store.remote()?.head(&key)? {
+    if let Some(meta) = publication_head(
+        store.remote()?,
+        store.cfg.remote.as_ref(),
+        &key,
+        &source,
+        artifact,
+        root,
+    )? {
         if meta.bytes != artifact.bytes
             || meta
                 .sha256
@@ -506,7 +567,14 @@ fn publish_catalog(
             if artifact.bytes > SINGLE_PUT_MAX {
                 return Err("catalog receipt exceeds immutable single-PUT limit".into());
             }
-            match store.remote()?.head(&key)? {
+            match publication_head(
+                store.remote()?,
+                store.cfg.remote.as_ref(),
+                &key,
+                &source,
+                &artifact,
+                root,
+            )? {
                 Some(meta) => {
                     if meta.bytes != artifact.bytes
                         || meta
@@ -655,6 +723,7 @@ pub fn publish(
 mod tests {
     use super::*;
     use serde_json::json;
+    use std::cell::RefCell;
 
     struct Fixture(PathBuf);
     impl Fixture {
@@ -697,6 +766,244 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    /// Models an immutable S3 object with an ambiguous initial HEAD response.
+    /// Existing bytes are never replaced, even when a conditional PUT races.
+    struct DeniedHeadBackend {
+        first_error: RefCell<Option<String>>,
+        object: RefCell<Option<Vec<u8>>>,
+        put_error: Option<String>,
+        get_error: Option<String>,
+        calls: RefCell<Vec<&'static str>>,
+    }
+    impl DeniedHeadBackend {
+        fn new(error: &str) -> Self {
+            Self {
+                first_error: RefCell::new(Some(error.into())),
+                object: RefCell::new(None),
+                put_error: None,
+                get_error: None,
+                calls: RefCell::new(Vec::new()),
+            }
+        }
+    }
+    impl Backend for DeniedHeadBackend {
+        fn describe(&self) -> String {
+            "mock immutable S3".into()
+        }
+        fn head(&self, _key: &str) -> Result<Option<Meta>, String> {
+            self.calls.borrow_mut().push("head");
+            if let Some(error) = self.first_error.borrow_mut().take() {
+                return Err(error);
+            }
+            Ok(self.object.borrow().as_ref().map(|bytes| Meta {
+                bytes: bytes.len() as u64,
+                sha256: None,
+            }))
+        }
+        fn put(&self, _key: &str, source: &Path, _sha256: &str) -> Result<(), String> {
+            self.calls.borrow_mut().push("conditional-put");
+            if let Some(error) = &self.put_error {
+                return Err(error.clone());
+            }
+            let mut object = self.object.borrow_mut();
+            if object.is_none() {
+                *object = Some(fs::read(source).map_err(|e| e.to_string())?);
+            }
+            // A same-size existing object with unavailable checksum is accepted
+            // by the native backend after 412; only full readback proves bytes.
+            Ok(())
+        }
+        fn get(&self, _key: &str, destination: &Path) -> Result<(), String> {
+            self.calls.borrow_mut().push("get");
+            if let Some(error) = &self.get_error {
+                return Err(error.clone());
+            }
+            fs::write(
+                destination,
+                self.object.borrow().as_ref().ok_or("missing object")?,
+            )
+            .map_err(|e| e.to_string())
+        }
+        fn list(&self, _prefix: &str) -> Result<Vec<(String, u64)>, String> {
+            panic!("dataset fallback must not list a bucket")
+        }
+    }
+
+    fn dataset_s3_remote() -> RemoteSpec {
+        RemoteSpec::S3 {
+            bucket: "setec-astronomy-artifacts".into(),
+            prefix: "ml-dataset/test".into(),
+        }
+    }
+
+    #[test]
+    fn denied_s3_head_conditionally_creates_cas_and_catalog_then_reads_back() {
+        let f = Fixture::new();
+        let (artifacts, _) = f.shard();
+        let artifact = &artifacts[0];
+        let source = f.0.join(&artifact.path);
+        for key in [
+            object_key(&artifact.sha256).unwrap(),
+            catalog_key("dataset/test", &artifact.sha256).unwrap(),
+        ] {
+            let backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+            let result = publication_head(
+                &backend,
+                Some(&dataset_s3_remote()),
+                &key,
+                &source,
+                artifact,
+                &f.0,
+            )
+            .unwrap();
+            assert_eq!(result.unwrap().bytes, artifact.bytes);
+            assert_eq!(
+                *backend.calls.borrow(),
+                ["head", "conditional-put", "head", "get"]
+            );
+            assert_eq!(
+                backend.object.borrow().as_deref(),
+                Some(b"abcdef".as_slice())
+            );
+        }
+    }
+
+    #[test]
+    fn denied_s3_head_never_acknowledges_denied_writes_or_reads() {
+        let f = Fixture::new();
+        let (artifacts, _) = f.shard();
+        let artifact = &artifacts[0];
+        let source = f.0.join(&artifact.path);
+        let key = object_key(&artifact.sha256).unwrap();
+        let mut backend = DeniedHeadBackend::new("aws head-object failed: (AccessDenied)");
+        backend.put_error = Some("put-object AccessDenied".into());
+        assert!(publication_head(
+            &backend,
+            Some(&dataset_s3_remote()),
+            &key,
+            &source,
+            artifact,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("conditional dataset PUT after denied HEAD failed"));
+        assert_eq!(*backend.calls.borrow(), ["head", "conditional-put"]);
+        assert!(backend.object.borrow().is_none());
+
+        let mut backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        backend.get_error = Some("get-object AccessDenied".into());
+        assert!(publication_head(
+            &backend,
+            Some(&dataset_s3_remote()),
+            &key,
+            &source,
+            artifact,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("get-object AccessDenied"));
+        assert_eq!(
+            *backend.calls.borrow(),
+            ["head", "conditional-put", "head", "get"]
+        );
+    }
+
+    #[test]
+    fn denied_s3_head_preserves_conflicts_and_rejects_forged_existing_bytes() {
+        let f = Fixture::new();
+        let (artifacts, _) = f.shard();
+        let artifact = &artifacts[0];
+        let source = f.0.join(&artifact.path);
+        let key = object_key(&artifact.sha256).unwrap();
+        let backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        *backend.object.borrow_mut() = Some(b"ABCDEF".to_vec());
+        assert!(publication_head(
+            &backend,
+            Some(&dataset_s3_remote()),
+            &key,
+            &source,
+            artifact,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("readback failed"));
+        assert_eq!(
+            backend.object.borrow().as_deref(),
+            Some(b"ABCDEF".as_slice())
+        );
+        assert_eq!(
+            *backend.calls.borrow(),
+            ["head", "conditional-put", "head", "get"]
+        );
+
+        let mut backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        *backend.object.borrow_mut() = Some(b"other".to_vec());
+        backend.put_error = Some("PreconditionFailed: conflicting immutable object".into());
+        assert!(publication_head(
+            &backend,
+            Some(&dataset_s3_remote()),
+            &key,
+            &source,
+            artifact,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("PreconditionFailed"));
+        assert_eq!(
+            backend.object.borrow().as_deref(),
+            Some(b"other".as_slice())
+        );
+        assert_eq!(*backend.calls.borrow(), ["head", "conditional-put"]);
+    }
+
+    #[test]
+    fn publication_fallback_rejects_non403_errors_other_remotes_and_oversize() {
+        let f = Fixture::new();
+        let (artifacts, _) = f.shard();
+        let artifact = &artifacts[0];
+        let source = f.0.join(&artifact.path);
+        let key = object_key(&artifact.sha256).unwrap();
+        for (error, remote) in [
+            (
+                "aws head-object failed: (500) InternalError",
+                dataset_s3_remote(),
+            ),
+            (
+                "aws head-object failed: (403) Forbidden",
+                RemoteSpec::Dir(f.0.join("remote")),
+            ),
+            (
+                "aws head-object failed: (403) Forbidden",
+                RemoteSpec::S3 {
+                    bucket: "another-bucket".into(),
+                    prefix: String::new(),
+                },
+            ),
+        ] {
+            let backend = DeniedHeadBackend::new(error);
+            assert_eq!(
+                publication_head(&backend, Some(&remote), &key, &source, artifact, &f.0)
+                    .unwrap_err(),
+                error
+            );
+            assert_eq!(*backend.calls.borrow(), ["head"]);
+        }
+        let mut oversized = artifact.clone();
+        oversized.bytes = SINGLE_PUT_MAX + 1;
+        let backend = DeniedHeadBackend::new("aws head-object failed: (403) Forbidden");
+        assert!(publication_head(
+            &backend,
+            Some(&dataset_s3_remote()),
+            &key,
+            &source,
+            &oversized,
+            &f.0
+        )
+        .unwrap_err()
+        .contains("single-PUT limit"));
+        assert_eq!(*backend.calls.borrow(), ["head"]);
     }
 
     #[test]
