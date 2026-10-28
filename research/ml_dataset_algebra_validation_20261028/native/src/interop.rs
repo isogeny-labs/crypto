@@ -7,12 +7,20 @@ use std::{
     path::Path,
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 struct Prefix {
     acknowledged_events: u64,
     acknowledged_bytes: u64,
     last_sha256: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct NativeFailure {
+    reason: StopReason,
+    prefix: Prefix,
+    claims: Claims,
 }
 
 fn bounded_file(path: &Path, cap: usize) -> Vec<u8> {
@@ -159,11 +167,53 @@ fn replay_native_fixtures_and_rehashed_multiword_mutations() {
             "records":events.len(),"actual_nonzero_suffix_offset_xors":multiword.len()}),
         );
     }
+    let censored = bounded_file(&fixture_dir.join("native_row_cap0.jsonl"), STREAM_CAP);
+    let report = verify(Cursor::new(&censored), &expected).unwrap();
+    assert!(!report.matrix_trace_complete && report.independent_rank.is_none());
+    assert_eq!(report.stop_reason, Some(StopReason::NativeSizeLimit));
+    assert!(!report.stop_reason_independently_verified);
+    let failure: NativeFailure = serde_json::from_slice(&bounded_file(
+        &fixture_dir.join("native_row_cap0.failure.json"),
+        4096,
+    ))
+    .unwrap();
+    assert_eq!(failure.reason, StopReason::NativeSizeLimit);
+    assert_eq!(failure.claims, Claims::unclaimed());
+    assert_eq!(
+        failure.prefix.acknowledged_events,
+        report.acknowledged_records
+    );
+    assert_eq!(
+        failure.prefix.acknowledged_bytes,
+        report.acknowledged_bytes as u64
+    );
+    assert_eq!(failure.prefix.last_sha256, report.last_record_sha256);
+    let events: Vec<Event> = censored
+        .split(|c| *c == b'\n')
+        .filter(|s| !s.is_empty())
+        .map(|s| serde_json::from_slice::<Record>(s).unwrap().event)
+        .collect();
+    assert_eq!(events.len(), 4);
+    assert!(matches!(
+        events[0],
+        Event::Begin {
+            native_row_cap: 0,
+            ..
+        }
+    ));
+    assert!(
+        matches!(&events[2], Event::Candidate { terms, matrix_row: Some(0), .. } if terms == &[0])
+    );
+    let just_candidate = verify(Cursor::new(rehash(&events[..3])), &expected).unwrap();
+    assert!(!just_candidate.matrix_trace_complete && just_candidate.independent_rank.is_none());
+    save(&output_dir.join("native_row_cap0.review.json"), &report);
     save(
         &output_dir.join("interop.json"),
         &serde_json::json!({
             "schema":"crypto.boolean-matrix-software-interop/v1", "fixtures":counts,
             "rehashed_multiword_mutations_rejected":4, "independent_rank_checks":5,
+            "native_censored_row_cap_prefix_checked":true,
+            "censored_raw_sha256":digest(&censored),
             "producer_execution_attested":false,"scientific_dataset_generated":false,
             "first_or_last_fall_degree_claim":false
         }),
