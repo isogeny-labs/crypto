@@ -235,12 +235,16 @@ export function pathDependencyDirs(cwd) {
 }
 
 export function materializeInputs(cwd = process.cwd()) {
-  const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
-  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
-  const sources = sourceFiles(cwd);
+  // Every path crate's manifest, build script and sources, followed through
+  // their manifests; never the crate's other files (archives, fixtures that
+  // no source embeds).
+  const crates = [...pathDependencyDirs(cwd)];
+  const crateFiles = trackedFiles(cwd).filter(file => crates.some(dir => file === `${dir}/Cargo.toml`
+    || file === `${dir}/build.rs` || (file.startsWith(`${dir}/src/`) && file.endsWith('.rs'))));
+  const sources = new Set([...sourceFiles(cwd), ...crateFiles.filter(file => file.endsWith('.rs'))]);
   const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
     && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
-  materializeSources(cwd, new Set([...sources, ...manifests]));
+  materializeSources(cwd, new Set([...sources, ...manifests, ...crateFiles]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
