@@ -26,6 +26,10 @@ PRODUCER_INPUTS = {
     ("band.rs", "canonical.rs", "stats.rs", "methods.rs")
 } | {"src/cryptanalysis/curve_aliases.json", "docs/ic/calibration.json",
      "docs/ecbench/BACKEND_REPRODUCTION.md"}
+# The live manifest selects the sessions the *current* report cites; it may move
+# (e.g. to a re-recorded session) while the archived report is still rebuilt from
+# the snapshot's own manifest below. Session records stay frozen either way.
+CURRENT_SELECTION = {"docs/backend-leaderboard/manifest.json"}
 
 
 def sha256(data):
@@ -46,7 +50,7 @@ def verify_live_evidence(root, lock):
     if not PRODUCER_INPUTS <= set(lock["files"]):
         raise ValueError("frozen producer inventory incomplete")
     for name, expected in lock["files"].items():
-        if name not in PRODUCER_INPUTS:
+        if name not in PRODUCER_INPUTS | CURRENT_SELECTION:
             if sha256(checked_path(root, name).read_bytes()) != expected:
                 raise ValueError(f"frozen scientific input changed: {name}")
     for name, expected in lock["outputs"].items():

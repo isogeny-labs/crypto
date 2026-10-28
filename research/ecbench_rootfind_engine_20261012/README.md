@@ -66,7 +66,8 @@ arms are now complete counts rather than lower bounds: `ic-f4-m3` 534.859 [476.5
 (37.9× strong rho), `ic-f4-m2` 35.758 [30.5, 41.9] (2.53×). That is an accounting change, not a
 regression. With both engines complete, `ic-rootfind / ic-f4` ops is 0.0726 (m3) and 0.7938 (m2),
 but the §5a band (0, 0.1 and 1 GAE per unpriced operation) is unresolved for both pairs, so
-neither engine ranks above the other. Report, graph and PDF:
+neither engine ranks above the other. The IC replay plan and the backend leaderboard
+(`docs/backend-leaderboard/`) cite `claim-n13-v2`. Report, graph and PDF:
 [`reports/run-20261028T0403Z/`](reports/run-20261028T0403Z/REPORT.md).
 
 Smoke Koblitz: `ic-rootfind-m2 / ic-mitm-m2` ops = **1.000** [1.000, 1.000]
