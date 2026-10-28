@@ -467,6 +467,7 @@ Curves of higher genus and the transfers are described in
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
 | `transfer.isogeny` | the inner method's phases (`target:*`, on the isogenous curve, the same unit), the source check `[k]G` (`verify`) | the kernel search and the two point maps, `F_p` multiplications and inversions (`transfer`, 0 GAE) |
 | `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
@@ -1439,3 +1440,65 @@ answer, expose GPU device and contention telemetry, and pass independent
 answer replay under the same record contract. The specific acceptance test
 and remaining device-validation gap are tracked in
 [the GPU matched-workload problem](../../problems/ecbench-gpu-matched-workload-contract.md).
+
+### Frozen finite-extension replication methods (three leads, 2026-10-18)
+
+`CurveSpec::ThreeLeads` records the complete source model, field representation,
+certified order, prime subgroup and generator. It validates the field,
+singularity, Hasse bound and subgroup; smaller witnesses require exhaustive
+point counts. Larger quadratic witnesses use a prime-order point with r>4p,
+which determines the unique group order in the Hasse interval. The fixture
+manifest separately retains the certificate and common generation work.
+
+The `three_leads` adapter shares its native arithmetic with the independent
+study driver. `rho.three_leads_{plain,negation,jacobian}_v1` charge initialization,
+all walk/collision/escape/restart work and post-solver verification. The
+Jacobian arm also charges explicit Scholten transfer and destination setup.
+These memoized rho implementations use O(sqrt(r)) collision memory, retained
+beside the index-calculus graph's memory; they are not memory-free rho timings.
+
+`ic.three_leads_genus2_v2` charges the cover, both transfers, walk initialization,
+Mumford arithmetic, root finding, signed large-prime graph elimination and
+restarts. It discards repeated split divisor classes up to sign and restarts
+on any repeated walk divisor, including unsplit states. It does not extract
+scalars from those walk collisions. The independent and unfiltered modes
+are separately specified controls. v1 preserves the diagnosed unsplit-cycle
+exhaustions and remains available for replay.
+
+`ic.three_leads_decomposition_v2` charges building/projecting a subfield or
+Kummer/Dickson base, full cofactor-offset walk initialization, actual binary
+linearized/S3 roots, rational point lifts, point-sum verification, and
+incremental elimination of unknown factor-base logarithms. Each step makes
+a counted seeded jump choice and includes initial/restarted relation targets.
+v1 preserves the earlier fixed-partition sampler, including its exhausted
+small-sumset attempts. Methods never receive the planted logarithm.
+
+All primitive M/S/I counters are actual ledger observations. Odd quadratic
+operations expand into F_p operations. Binary operations use the named ambient
+field unit. Recorded GAE uses the declared conversion S/M=0.75, I/M=10 and a
+counted generic source addition; it is not a host-time calibration. The study
+also reports all twelve cells S/M in {0,0.5,1}, I/M in {1,10,100,1000}, plus
+symmetric native-operation sensitivity. Native counters denote logical field
+additions, RNG/scalar/graph operations and lookup calls, rather than physical
+hash buckets, allocations or CPU instructions. They do not establish a complete
+wall cost. Count-only L0 sessions make no timing or fastest-implementation claim.
+
+Protocol, derivation, raw sessions, replay receipts and claim verdicts:
+[`three_leads_e2e_20261018`](../../research/three_leads_e2e_20261018/README.md).
+
+### Seeded P+M / P-M selection model (v1)
+
+`rho.plus_model_v1` and `rho.best2_model_v1` are prime-field diagnostic model
+arms, with required `jumps`, `walks`, `dp_bits`, and `cap_multiple` parameters.
+They charge setup, starts and every group operation (two complete candidate
+additions for BEST2), including cycle-seek steps and escape doublings. Hash,
+canonicalisation, DP/table probes and coefficient work have explicit
+`_uncharged` counters; apply the standard sensitivity band to both arms.
+The runner independently verifies the returned scalar. These arms use hashed
+group keys rather than CUDA coordinate limbs and do not measure the shared
+field inversion or actual GPU solve cost. Existing rho IDs remain unchanged.
+
+The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbench-model.json)
+and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
+record the unexecuted integration/session/replay requirements. No model result
+may be multiplied by standalone GPU throughput to claim measured NIST savings.
