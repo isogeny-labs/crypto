@@ -1,0 +1,102 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-HEIC-ROUND15-1
+experiment_id: HEIC-ROUND15
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+bus_address: executor-mechanical-heic-round15
+background: false
+commit: 16e7f5487d5145583fe5c08040874543b10d2a7b
+write_scope:
+  - research/notes/index-calculus/round15/run1/
+receipt: research/notes/index-calculus/round15/run1/receipt.json
+must_not_exist:
+  - research/notes/index-calculus/round15/run1/receipt.json
+  - research/notes/index-calculus/round15/run1/cmd1.stdout
+  - research/notes/index-calculus/round15/run1/cmd1.stderr
+  - research/notes/index-calculus/round15/run1/cmd2.stdout
+  - research/notes/index-calculus/round15/run1/cmd2.stderr
+  - research/notes/index-calculus/round15/run1/cmd3.stdout
+  - research/notes/index-calculus/round15/run1/cmd4.stdout
+  - research/notes/index-calculus/round15/run1/cmd5.stdout
+  - research/notes/index-calculus/round15/run1/cmd6.stdout
+  - research/notes/index-calculus/round15/run1/cmd7.stdout
+  - research/notes/index-calculus/round15/run1/cmd8.stdout
+  - research/notes/index-calculus/round15/run1/cmd9.stdout
+binds:
+  - path: /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/hyperelliptic_rho_collide_first
+    sha256: 8a732b5daec8ed702ad1dd730828954a7837f9bab4faed6d325700f63bb1a623
+  - path: tools/isolated_bench.py
+    sha256: cf0f3f206280dfbbe9b5efa5aad99869572b475690e11a62650f1e39b5dcc970
+commands:
+  - id: r15-mkdir
+    argv: [mkdir, /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd1.stdout
+    stderr: research/notes/index-calculus/round15/run1/cmd1.stderr
+  - id: r15-rho
+    argv:
+      - python3
+      - tools/isolated_bench.py
+      - run
+      - --wait
+      - --cpus
+      - "3"
+      - --max-other-cpu
+      - "1.0"
+      - --out
+      - /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/isolated_bench.jsonl
+      - --label
+      - R15
+      - --
+      - sh
+      - -c
+      - "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/hyperelliptic_rho_collide_first > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt 2>&1"
+    env:
+      RAYON_NUM_THREADS: "1"
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd2.stdout
+    stderr: research/notes/index-calculus/round15/run1/cmd2.stderr
+  - id: r15-lines
+    argv: [wc, -l, /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd3.stdout
+  - id: r15-lines-1-20
+    argv: [sed, -n, "1,20p", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd4.stdout
+  - id: r15-lines-21-40
+    argv: [sed, -n, "21,40p", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd5.stdout
+  - id: r15-lines-41-60
+    argv: [sed, -n, "41,60p", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd6.stdout
+  - id: r15-lines-61-80
+    argv: [sed, -n, "61,80p", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd7.stdout
+  - id: r15-lines-81-100
+    argv: [sed, -n, "81,100p", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd8.stdout
+  - id: r15-record
+    argv: [tail, -n, "1", /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/isolated_bench.jsonl]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/notes/index-calculus/round15/run1/cmd9.stdout
+stop_when:
+  - "python3 tools/task_card.py run prints a line that starts with IMPEDIMENT"
+  - "python3 tools/task_card.py run exits with status 2"
+  - "the dispatch text differs from the text python3 tools/task_card.py prompt prints for this card"
+  - "the directory /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1 already exists before the command starts"
+notes: "Command 1 creates the empty directory /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1 with mkdir, which fails if it exists. Command 2 runs the frozen binary once, pinned to CPU 3 by tools/isolated_bench.py, and writes its table and verdict lines to /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/R15.txt. Commands 3 to 9 only print that file and the last record of /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r15/attempt1/isolated_bench.jsonl. The argument --max-other-cpu 1.0 lets the run start while the agent harness uses some CPU. This run reports counted group operations only, which are deterministic in the seed and hold at any isolation level; isolation gates wall-clock figures, which this run does not report. Core pinning and the conditions record stay, and the record may be marked contended. Return all of it verbatim and compute nothing."

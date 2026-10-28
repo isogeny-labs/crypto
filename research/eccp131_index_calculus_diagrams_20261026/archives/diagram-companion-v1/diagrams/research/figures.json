@@ -1,0 +1,62 @@
+[
+  {
+    "number": 1,
+    "title": "Relations as a module over the target prime field",
+    "name": "01-relation-module",
+    "notes": "A retraction onto the cyclic order-n component is an explicit hypothesis; such a retraction does not exist for every subgroup of an arbitrary finite abelian group. If #G=hn with gcd(h,n)=1, [h] followed by the inverse of h modulo n supplies one. For the ECCp-131 cover, f* composed with [2 inverse modulo n] and f_* supplies a retraction onto the embedded elliptic group. The matrix columns are logarithms of projected factor-base elements. A usable left-kernel vector must have nonzero pairing with b; a raw count of relations does not certify this."
+  },
+  {
+    "number": 2,
+    "title": "Divisor smoothness: factorization and support",
+    "name": "02-divisor-smoothness",
+    "notes": "This page uses an odd-degree imaginary model with one rational point at infinity. The factorization formula is displayed for squarefree u. The probability is a counting heuristic, not a universal theorem for structured factor bases or an embedded elliptic subgroup. B counts the signed set of admissible degree-one classes; quotienting by the involution changes the bookkeeping. In the small-genus large-prime variation, the exceptional primes here are degree-one places outside the chosen factor base."
+  },
+  {
+    "number": 3,
+    "title": "Summation polynomials and Weil restriction",
+    "name": "03-summation-weil",
+    "notes": "Semaev polynomials characterize geometric point-sum relations. Each variable of S_(m+1) has degree 2^(m\u22121). For x_i in the base field, coefficient expansion over a degree-d extension gives d equations; independence is an additional condition. The fixed-d Gaudry cost is a heuristic algorithmic regime, not an unconditional bound for every curve, target specialization, or factor base. For a,b,x_R and x_i all in the base field, the other coefficient equations vanish identically. This statement does not cover arbitrary nonrational affine x-lines."
+  },
+  {
+    "number": 4,
+    "title": "Covers, norm maps and elliptic factors",
+    "name": "04-covers-prym",
+    "notes": "For C2 the other elliptic quotient is u=X^(\u22122), v=Y/X^3, with equation v\u00b2=b u\u00b3+a u\u00b2+1. The two quotient maps give a (2,2)-split Jacobian. The sextic has two rational infinity points, so the fiber divisor uses infinity_+ + infinity_- as reference. A general even-degree reduced-divisor convention needs care. For C3, the projective equation W^4=X^3 Z+aXZ^3+bZ^4 is smooth when the elliptic cubic is squarefree and the characteristic exceeds 3; its degree-two cover has an abelian-surface Prym. The norm\u2013pullback identity proves injectivity on odd-order torsion, without implying that the full Jacobian is cyclic."
+  },
+  {
+    "number": 5,
+    "title": "Frobenius decomposes the extension-field groups",
+    "name": "05-frobenius-components",
+    "notes": "For ECCp-131 the full quadratic group is odd and decomposes into the +1 and \u22121 eigenspaces, identified with the curve and its quadratic twist over Fp. For the cubic group, T3 is surjective onto E(Fp), since multiplication by 3 is invertible there; rho3 is its normalized retraction. The verified coprimality also separates the target prime from ker T3. Infinity is excluded from the literal x-coordinate factor base on the cubic side. Nonrational affine x-lines produce other factor bases; projecting their relations remains valid but does not prove a universal algorithmic lower bound."
+  },
+  {
+    "number": 6,
+    "title": "Complexity regimes: ambient group or target subgroup?",
+    "name": "06-complexity-regimes",
+    "notes": "The default chart holds the embedded target order n\u2248q fixed while retaining the original field; its rho cost is sqrt(n), even in a larger Jacobian. The displayed IC bars in that mode are ambient benchmarks, marked with a dagger: their model/class-group and relation-statistics assumptions do not automatically hold for split covers. The equal-field mode instead assumes a large generic subgroup of order about q^g. The equal-group mode compares independently parameterized generic groups of order N, using q\u2248N^(1/g); it does not describe the covers of ECCp-131. Hyperelliptic q^(2\u22122/g) statements require fixed genus and the hypotheses of the selected theorem/algorithm, including cyclic class-group assumptions in the cited rigorous result. The plane-quartic O-tilde(q) result uses its own geometric conditions. These are upper-bound regimes, not lower bounds or measured runtimes."
+  },
+  {
+    "number": 7,
+    "title": "Worked extraction: three rows can determine k\u2014or fail",
+    "name": "07-worked-kernel",
+    "notes": "This is a constructed toy example, not harvested attack data. The curve over F571 is the coefficient reduction of the challenge curve; its order is 557. Q=[37]P and the chosen factor-base points are [11]P and [23]P, used only to construct and verify the rows. In the usable mode, a=(494,469,332), b=(2,3,7), w=(-1,-1,1), w^Ta=483 and w^Tb=2. Changing a3 to 406 and b3 to 5 keeps all rows valid but makes both pairings zero; the augmented rank falls to 2, so these rows alone leave k free."
+  },
+  {
+    "number": 8,
+    "title": "Partial relations: cancel the large-prime columns",
+    "name": "08-partial-relations",
+    "notes": "The large-prime coefficient rows are (1,-1,0), (0,1,-1), and (-1,0,1), so their sum is zero. Signs matter: arbitrary relations with two exceptional terms do not automatically cancel around every unsigned cycle. The numerical check realizes the identities in the toy order-557 elliptic component with factor-base logs 11,23,31 and exceptional logs 5,9,14. It is an algebraic illustration of the recombination mechanism, not a claim that these data were collected in a hyperelliptic factor-base search. In the small-genus large-prime variation, the exceptional classes represented by the graph are degree-one places outside the selected factor base."
+  },
+  {
+    "number": 9,
+    "title": "Fiber smoothness is a structured distribution",
+    "name": "09-fiber-census",
+    "notes": "For the published ECCp-131 curve, the quadratic character of x_P is +1 and that of x_Q is \u22121. The Q fiber is nevertheless an Fp-rational degree-two divisor because Frobenius swaps its geometric points. The plot uses a different, explicitly labeled toy curve E/F571: y\u00b2=x\u00b3+508x+137, #E=557. Its genus-two companion quotient has order 609, hence #J=339213. The signed factor-base point set F_B is stable under the deck and hyperelliptic involutions, and excludes X=0 and infinity. Let S_B consist of classes of A+A'\u2212D_infinity supported on F_B with distinct X. There are B(B\u22121)/2 unordered point pairs, of which B/2 share an X; hence |S_B|=B\u00b2/2\u2212B. They give distinct classes because nonspecial degree-two divisors on a genus-two curve are unique in their linear-equivalence class; distinct X excludes the hyperelliptic pencil. Exactly B/2 nonidentity elliptic targets have their full fiber in F_B. Thus the two displayed probabilities have different sampling spaces and are exact in this toy setup. The E targets and support-pair encodings are enumerated; the whole Jacobian is not. These counts are not an attack-cost estimate. The final projection identity is for a split fiber over P, with the specified infinity reference."
+  },
+  {
+    "number": 10,
+    "title": "From more roots to less total work",
+    "name": "10-cost-accounting",
+    "notes": "The sliders are an illustrative phase-average model, not ECCp-131 measurements. Baseline A uses trial cost 1, verified-row probability 0.02, and effective information fraction 0.5, giving cost 100 per effective row. Alternative B initially has twice the verified-row yield but four times the trial cost, giving 200. Effective information is a modeling proxy encompassing rank/recombination; it is not automatically an independent Bernoulli success probability and may vary during collection. The sparse linear-algebra estimate describes a near-square filtered matrix and Wiedemann-style Krylov work, omitting algorithm-specific preconditioning, logarithmic factors, block strategies and dense-fill effects. Costs require a common calibrated work unit before comparison with rho or a different solver."
+  }
+]

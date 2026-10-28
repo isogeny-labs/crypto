@@ -1,0 +1,150 @@
+{
+  "schema": "s5-plain-c4-validator/v1",
+  "status": "pass",
+  "independent": true,
+  "independence": "jq recomputation from the raw per-solve records; shares no code with the Rust summary (examples/gaudry_quartic_c4_options_summary.rs) that produced the claimed numbers. Same repository author; not a second person.",
+  "method": "research/s5_plain_c4_options_20261019/validation/validate.sh",
+  "raw_data": [
+    {
+      "path": "../../research/s5_plain_c4_options_20261019/raw/s5_p269_seed1_r13.json",
+      "sha256": "f713fd6c292493b65037ae900bcae6234b6e8d19fa4f3a9212ecb202d191987b"
+    },
+    {
+      "path": "../../research/s5_plain_c4_options_20261019/raw/s5_p269_seed1.json",
+      "sha256": "f32c4d225942aab7a177fc8afe8b8d449862e3929c53369fc3db34a4772eebe6"
+    },
+    {
+      "path": "../../research/s5_plain_c4_options_20261019/raw/s5_p269_seed1_constructed4_replay.json",
+      "sha256": "703c6a4a64c6209551f76293889b0601f8de0136d854d7d553c95f9ae7d0d83b"
+    },
+    {
+      "path": "../../research/s5_plain_c4_options_20261019/validation/rho_reference.json",
+      "sha256": "900abdaad61267ccc6b48bf0a8ba8b5130d0dd593201c8f07f4002ca48af2be8"
+    }
+  ],
+  "headline": [
+    {
+      "name": "committed_mean_c4",
+      "claimed": 1.2093E+12,
+      "recomputed": 1209304470030,
+      "rel_tol": 0.00005
+    },
+    {
+      "name": "sparsest_chains_mean_c4",
+      "claimed": 1.6750E+11,
+      "recomputed": 167499719261.69232,
+      "rel_tol": 0.00005
+    },
+    {
+      "name": "sparsest_chains_ratio_of_means",
+      "claimed": 7.22,
+      "recomputed": 7.219740279926376,
+      "rel_tol": 0.001
+    },
+    {
+      "name": "replay_mean_c4",
+      "claimed": 8.69E+10,
+      "recomputed": 86897990971.75,
+      "rel_tol": 0.001
+    },
+    {
+      "name": "replay_ratio_of_means",
+      "claimed": 13.90,
+      "recomputed": 13.899423032851344,
+      "rel_tol": 0.001
+    },
+    {
+      "name": "replay_n",
+      "claimed": 12,
+      "recomputed": 12,
+      "rel_tol": 0
+    },
+    {
+      "name": "replay_fallbacks",
+      "claimed": 1,
+      "recomputed": 1,
+      "rel_tol": 0
+    },
+    {
+      "name": "sparsest_ratio_of_means",
+      "claimed": 3.93,
+      "recomputed": 3.9300686491847956,
+      "rel_tol": 0.002
+    },
+    {
+      "name": "solves_oracle_equal",
+      "claimed": 59,
+      "recomputed": 59,
+      "rel_tol": 0
+    },
+    {
+      "name": "solves_total",
+      "claimed": 59,
+      "recomputed": 59,
+      "rel_tol": 0
+    },
+    {
+      "name": "constructed_planted_found",
+      "claimed": 4,
+      "recomputed": 4,
+      "rel_tol": 0
+    },
+    {
+      "name": "rho_mean_fp_muls",
+      "claimed": 773556.2,
+      "recomputed": 773556.2,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "rho_runs_verified",
+      "claimed": 20,
+      "recomputed": 20,
+      "rel_tol": 0
+    },
+    {
+      "name": "band_ic_lower_bound",
+      "claimed": 86897990971.75,
+      "recomputed": 86897990971.75,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "band_rho_w0",
+      "claimed": 773556.2,
+      "recomputed": 773556.2,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "band_rho_w01",
+      "claimed": 1025086.9,
+      "recomputed": 1025086.9,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "band_rho_w1",
+      "claimed": 3288863.2,
+      "recomputed": 3288863.2,
+      "rel_tol": 1E-9
+    }
+  ],
+  "recomputed_all": {
+    "committed_mean_c4": 1209304470030,
+    "sparsest_chains_mean_c4": 167499719261.69232,
+    "sparsest_chains_ratio_of_means": 7.219740279926376,
+    "replay_mean_c4": 86897990971.75,
+    "replay_ratio_of_means": 13.899423032851344,
+    "replay_n": 12,
+    "replay_fallbacks": 1,
+    "sparsest_ratio_of_means": 3.9300686491847956,
+    "solves_oracle_equal": 59,
+    "solves_total": 59,
+    "constructed_planted_found": 4,
+    "rho_mean_fp_muls": 773556.2,
+    "rho_runs_verified": 20,
+    "fp_muls_per_add": 97.0,
+    "rho_native_ops_mean": 25931,
+    "band_ic_lower_bound": 86897990971.75,
+    "band_rho_w0": 773556.2,
+    "band_rho_w01": 1025086.9,
+    "band_rho_w1": 3288863.2
+  }
+}

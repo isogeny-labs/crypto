@@ -1,0 +1,42 @@
+{
+  "schema": "quotient-calibration-approved-publication/v1",
+  "observed_at_utc": "2026-10-25T21:44:15Z",
+  "repository": "aburan28/crypto",
+  "pull_request": 2569,
+  "last_verified_remote_head": "055b53c2661f120d20505a1be640a68c8ca1e86f",
+  "authorization": {
+    "explicit_user_approval_received": true,
+    "enable_auto_merge_for_pr_2569": true,
+    "upload_exact_validation_archive_to_named_remote": true,
+    "further_approval_required_for_these_actions": false
+  },
+  "archive": {
+    "path": "research/quotient_calibration_20261025/reports/run-20261025T1845Z/runs.tar.xz",
+    "sha256": "ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+    "bytes": 67540,
+    "hash_and_size_rechecked": true,
+    "remote": "s3://setec-astronomy-artifacts/store",
+    "object_key": "store/sha256/ae/ae5e8b6973db769db3ccef01fb81ba5837702a26221206134091a8bdff3bad2a",
+    "artifact_push_exit_code": 2,
+    "artifact_push_error": "Unable to locate credentials",
+    "uploaded": false,
+    "remote_readback_verified": false
+  },
+  "github": {
+    "connector_repository_read_http_status": 404,
+    "connector_pr_read_http_status": 404,
+    "gh_pr_read_http_status": 404,
+    "git_remote_read_http_status": 403,
+    "git_remote_error": "Write access to repository not granted",
+    "current_pr_head_verification": "blocked_by_access",
+    "auto_merge_enable_execution": "not_attempted_without_current_head_verification",
+    "auto_merge_last_verified_state": "disabled",
+    "merged": "not_verified_currently"
+  },
+  "environment": {
+    "aws_cli_installed": "aws-cli/1.46.2; botocore/1.43.62",
+    "configured_aws_outbound_identity": false,
+    "outbound_identity_manifest_available": false
+  },
+  "next_action": "Restore the GitHub connection's access to aburan28/crypto and configure supported AWS access. Then recheck the current PR head/review/CI state, enable authorized auto-merge, upload the unchanged archive with tools/artifacts, verify fresh remote readback and push the generated publication manifest. Do not request approval again for these same actions."
+}

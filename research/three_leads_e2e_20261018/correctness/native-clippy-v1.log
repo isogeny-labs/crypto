@@ -1,0 +1,145 @@
+    Checking typenum v1.20.1
+    Checking memchr v2.8.3
+    Checking itoa v1.0.18
+    Checking cpufeatures v0.2.17
+    Checking cfg-if v1.0.5
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking generic-array v0.14.7
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking serde_json v1.0.151
+    Checking serde v1.0.229
+    Checking three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error: manually reimplementing `div_ceil`
+   --> ../../../src/cryptanalysis/three_leads.rs:419:25
+    |
+419 |             self.pow(a, (odd + 1) / 2),
+    |                         ^^^^^^^^^^^^^ help: consider using `.div_ceil()`: `odd.div_ceil(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_div_ceil
+    = note: `-D clippy::manual-div-ceil` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_div_ceil)]`
+
+error: manually reimplementing `div_ceil`
+   --> ../../../src/cryptanalysis/three_leads.rs:471:63
+    |
+471 |         let (mut c, mut x, mut t, mut m) = (pow(z, d), pow(a, (d + 1) / 2), pow(a, d), s);
+    |                                                               ^^^^^^^^^^^ help: consider using `.div_ceil()`: `d.div_ceil(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_div_ceil
+
+error: manual implementation of `.is_multiple_of()`
+   --> ../../../src/cryptanalysis/three_leads.rs:585:12
+    |
+585 |         if p % q == 0 {
+    |            ^^^^^^^^^^ help: replace with: `p.is_multiple_of(q)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: manual implementation of `.is_multiple_of()`
+   --> ../../../src/cryptanalysis/three_leads.rs:613:12
+    |
+613 |         if n % p == 0 {
+    |            ^^^^^^^^^^ help: replace with: `n.is_multiple_of(p)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: manual implementation of `.is_multiple_of()`
+   --> ../../../src/cryptanalysis/three_leads.rs:615:19
+    |
+615 |             while n % p == 0 {
+    |                   ^^^^^^^^^^ help: replace with: `n.is_multiple_of(p)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: redundant guard
+   --> ../../../src/cryptanalysis/three_leads.rs:767:24
+    |
+767 |             Some(y) if y == 0 => vec![Point::affine(x, 0)],
+    |                        ^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#redundant_guards
+    = note: `-D clippy::redundant-guards` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::redundant_guards)]`
+help: try
+    |
+767 -             Some(y) if y == 0 => vec![Point::affine(x, 0)],
+767 +             Some(0) => vec![Point::affine(x, 0)],
+    |
+
+error: manual implementation of `.is_multiple_of()`
+    --> ../../../src/cryptanalysis/three_leads.rs:1254:16
+     |
+1254 |             || self.h % self.r == 0
+     |                ^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.h.is_multiple_of(self.r)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: manual implementation of `.is_multiple_of()`
+    --> ../../../src/cryptanalysis/three_leads.rs:1289:24
+     |
+1289 |                     || (self.curve.f.p - 1) % (1 << self.parameter) != 0
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!(self.curve.f.p - 1).is_multiple_of(1 << self.parameter)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: manual implementation of `.is_multiple_of()`
+    --> ../../../src/cryptanalysis/three_leads.rs:1338:41
+     |
+1338 |                         if r > 4 * p && h % r != 0 {
+     |                                         ^^^^^^^^^^ help: replace with: `!h.is_multiple_of(r)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: method `next` can be confused for the standard trait method `std::iter::Iterator::next`
+    --> ../../../src/cryptanalysis/three_leads.rs:1377:5
+     |
+1377 | /     pub fn next(&mut self) -> u64 {
+1378 | |         self.0 = self.0.wrapping_add(0x9e3779b97f4a7c15);
+1379 | |         mix(self.0)
+1380 | |     }
+     | |_____^
+     |
+     = help: consider implementing the trait `std::iter::Iterator` or choosing a less ambiguous method name
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#should_implement_trait
+     = note: `-D clippy::should-implement-trait` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::should_implement_trait)]`
+
+error: this loop never actually loops
+    --> ../../../src/cryptanalysis/three_leads.rs:1965:9
+     |
+1965 | /         for &p in &base.raw {
+1966 | |             return Some(vec![p, e.neg(p)]);
+1967 | |         }
+     | |_________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#never_loop
+     = note: `#[deny(clippy::never_loop)]` on by default
+help: if you need the first element of the iterator, try writing
+     |
+1965 -         for &p in &base.raw {
+1965 +         if let Some(&p) = base.raw.iter().next() {
+     |
+
+error: this function has too many arguments (8/7)
+    --> ../../../src/cryptanalysis/three_leads.rs:2327:1
+     |
+2327 | / fn rho_native<G: NativeGroup>(
+2328 | |     g: &G,
+2329 | |     p: G::Element,
+2330 | |     q: G::Element,
+...    |
+2335 | |     counts: impl Fn() -> Counts,
+2336 | | ) -> (Option<u64>, Vec<NativePhase>, BTreeMap<String, u64>) {
+     | |___________________________________________________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+     = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: could not compile `three-leads-study` (lib) due to 12 previous errors

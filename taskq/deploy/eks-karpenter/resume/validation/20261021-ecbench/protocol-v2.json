@@ -1,0 +1,21 @@
+{
+  "schema": "isolab.recovery-qualification/v1",
+  "deadline_utc": "2026-10-21T06:25:00Z",
+  "purpose": "Qualify the deployed native ecbench process tree for CRIU checkpointing; every timing sample in this run is invalid for benchmark admission",
+  "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+  "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+  "instance_type": "c8a.2xlarge",
+  "cpu": 4,
+  "memory": "4Gi",
+  "criu": "4.2.1",
+  "acceptance": [
+    "native ecbench starts as UID 1000 with dropped capabilities",
+    "capture actual open descriptors while a native child is active",
+    "CRIU dump must complete without ignoring unsupported descriptors",
+    "retain failure receipts and never admit measurements crossing a checkpoint"
+  ],
+  "conditional_next_step": "A successful dump requires actual replacement-worker restore and new epoch qualification before any readiness claim; failure identifies a workload-specific runtime gap.",
+  "supersedes": "protocol.json",
+  "reason": "The deployed native harness rejects prime_search above 32 bits before launching a child; preserve that failed admission, use the supported 32-bit public fixture for descriptor qualification",
+  "spec": "spec-v2.json"
+}

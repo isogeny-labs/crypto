@@ -18,10 +18,9 @@ const rustConfig = /^(Cargo\.(toml|lock)|build\.rs|rust-toolchain(\.toml)?|rustf
 // paths do not belong to the root Cargo package, so classify their own sources,
 // manifests, build script and embedded inputs explicitly.
 const isogenyCliRust = /^tools\/isogeny-cli\//;
-// The root crate depends on this path crate (`volcano-cli` in Cargo.toml), so
-// its sources and manifests, and those of its `isogeny_algos` path dependency,
-// are root-package inputs, not an independent lane.
-const volcanoCliRust = /^tools\/volcano-cli\//;
+// The root crate depends on volcano-cli and factor-base. Their sources and
+// manifests, and volcano-cli's isogeny_algos dependency, are root inputs.
+const rootPathCrateRust = /^tools\/(?:volcano-cli|factor-base)\//;
 const isogenyAlgosInputs = /^isogeny_algos\/(?:Cargo\.toml|build\.rs|src\/.*\.rs)$/;
 const isogenyEmbeddedInputs = new Set([
   'docs/curves/registry.json',
@@ -45,7 +44,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
   for (const file of files) {
     if (control.test(file)) return Object.fromEntries(scopes.map(key => [key, true]));
     const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file)
-      || (volcanoCliRust.test(file) && !prose.test(file)) || isogenyAlgosInputs.test(file);
+      || (rootPathCrateRust.test(file) && !prose.test(file)) || isogenyAlgosInputs.test(file);
     const releaseAttributes = file === '.gitattributes';
     result.rust_root ||= root || sharedAnalysis.test(file) || file === 'scripts/clippy-maintained.sh';
     result.rust_cd ||= /^cd_attack\/(src|tests|examples|benches)\//.test(file) && !prose.test(file)
@@ -55,7 +54,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     result.release_rust ||= /^src\//.test(file) && !prose.test(file) || rustConfig.test(file)
       || file === 'tests/fixtures/ecbench_manifest_small.json'
       || /^docs\/curves\//.test(file) || embedded.has(file)
-      || isogenyCliRust.test(file) || volcanoCliRust.test(file) || isogenyAlgosInputs.test(file)
+      || isogenyCliRust.test(file) || rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)
       || rustReleasePayload.test(file) || rustReleaseRootPayload.test(file)
       || releaseAttributes || embedded.has(file)
       || isogenyCliRust.test(file) || isogenyAlgosInputs.test(file)
@@ -68,6 +67,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^gpu\/(ecc|ecc2k|semaev|macaulay|btcpuzzle)\//.test(file) && !prose.test(file);
     result.release_cuda ||= client || releaseAttributes;
     result.ecbench_replay ||= root
+      || /^research\/factor_base_shape_leads_20261018\//.test(file) && !prose.test(file)
       || /^docs\/(ecbench|bounds)\//.test(file) && !prose.test(file)
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
@@ -207,7 +207,35 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   return inputs;
 }
 
+// Directories of the path dependencies Cargo needs to resolve the root
+// package (`name = { path = "..." }`), followed through each dependency's own
+// manifest.  A scope-only sparse checkout has none of them, and Cargo refuses
+// to resolve the workspace without every one.
+export function pathDependencyDirs(cwd) {
+  const dirs = new Set();
+  const queue = ['.'];
+  for (let index = 0; index < queue.length; index++) {
+    const dir = queue[index];
+    const manifestPath = dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`;
+    let manifest;
+    try { manifest = sourceText(cwd, manifestPath); } catch { continue; }
+    for (const match of manifest.matchAll(/=\s*\{[^}\n]*\bpath\s*=\s*"([^"\n]+)"/g)) {
+      const dependency = path.posix.normalize(path.posix.join(dir, match[1]));
+      if (dependency.startsWith('../') || path.posix.isAbsolute(dependency)) {
+        throw new Error(`path dependency escapes the checkout: ${manifestPath}: ${match[1]}`);
+      }
+      if (!dirs.has(dependency)) {
+        dirs.add(dependency);
+        queue.push(dependency);
+      }
+    }
+  }
+  return dirs;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
+  const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
+  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
   const sources = sourceFiles(cwd);
   materializeSources(cwd, sources);
   const inputs = [...embeddedInputs(cwd, sources)];

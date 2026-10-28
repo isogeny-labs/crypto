@@ -1,0 +1,353 @@
+#!/usr/bin/env python3
+"""Allocate two bounded RunPod hosts for the frozen N83 high-K panel."""
+
+import argparse
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal, ROUND_UP
+import hashlib
+import json
+import os
+import sys
+from pathlib import Path
+import subprocess
+import time
+import tomllib
+from urllib import error as url_error
+from urllib import request as url_request
+
+from research.n83_crossfamily_current_20261025 import arms, run, source_bundle
+
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+API_URL = "https://api.runpod.io/graphql"
+GPU_TYPES = ("NVIDIA GeForce RTX 4090", "NVIDIA GeForce RTX 4090")
+IMAGE = "runpod/base:1.0.2-ubuntu2404"
+CAP_SECONDS = 360 * 60
+PRICE_CAP_PER_HOUR = Decimal("0.34")
+TOTAL_CAP_USD = Decimal("4.20")
+CONTAINER_DISK_GB = 30
+CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
+MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
+READBACK_ATTEMPTS = 30
+READBACK_DELAY_SECONDS = 2
+
+
+def now():
+    return datetime.now(timezone.utc)
+
+
+def iso(value):
+    return value.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def sha(blob):
+    return hashlib.sha256(blob).hexdigest()
+
+
+def projected_total(prices):
+    hours = Decimal(CAP_SECONDS) / Decimal(3600)
+    compute = sum(prices, Decimal(0)) * hours
+    disk = (Decimal(len(prices) * CONTAINER_DISK_GB) *
+            CONTAINER_DISK_USD_PER_GB_MONTH * hours /
+            MIN_BILLING_MONTH_HOURS)
+    return (compute + disk).quantize(Decimal("0.01"), rounding=ROUND_UP)
+
+
+def write(path, record):
+    path.write_text(json.dumps(record, sort_keys=True, indent=2) + "\n")
+
+
+def configured_key():
+    key = os.environ.get("RUNPOD_API_KEY")
+    if not key:
+        config = Path.home() / ".runpod/config.toml"
+        if config.is_file():
+            key = tomllib.loads(config.read_text()).get("apikey")
+    if not isinstance(key, str) or not key:
+        raise ValueError("RunPod API key is not configured")
+    return key
+
+
+def graphql(query, key):
+    request = url_request.Request(
+        API_URL, data=json.dumps({"query": query}).encode(),
+        headers={"Content-Type": "application/json",
+                 "Authorization": "Bearer " + key}, method="POST")
+    try:
+        with url_request.urlopen(request, timeout=30) as response:
+            result = json.load(response)
+    except url_error.HTTPError as error:
+        raise ValueError(f"RunPod API HTTP {error.code}") from None
+    if result.get("errors") or not isinstance(result.get("data"), dict):
+        errors = result.get("errors") or []
+        detail = "; ".join(str(item.get("message", "unknown"))
+                           for item in errors if isinstance(item, dict))
+        detail = detail.replace(key, "[redacted]")[:1000]
+        raise ValueError("RunPod GraphQL response failed" +
+                         (": " + detail if detail else ""))
+    return result["data"]
+
+
+def provider_pods(key):
+    query = ("query { myself { pods { id name desiredStatus costPerHr "
+             "createdAt machineId memoryInGb vcpuCount imageName gpuCount "
+             "containerDiskInGb volumeInGb "
+             "podType machine { gpuTypeId } } } }")
+    return graphql(query, key)["myself"]["pods"]
+
+
+def readback(name, key, pods=provider_pods):
+    for attempt in range(READBACK_ATTEMPTS):
+        matches = [pod for pod in pods(key)
+                   if pod.get("name") == name and pod.get("id")]
+        if len(matches) > 1:
+            raise ValueError("duplicate named RunPod allocations")
+        if (matches and matches[0].get("createdAt") and
+                matches[0].get("machineId") and
+                (matches[0].get("machine") or {}).get("gpuTypeId") and
+                matches[0].get("desiredStatus") == "RUNNING"):
+            return matches[0]
+        if attempt + 1 < READBACK_ATTEMPTS:
+            time.sleep(READBACK_DELAY_SECONDS)
+    raise ValueError("RunPod allocation readback is incomplete")
+
+
+def terminate(pod_id, key):
+    graphql("mutation { podTerminate(input: { podId: " +
+            json.dumps(pod_id) + " }) }", key)
+    for _ in range(12):
+        if not any(pod.get("id") == pod_id for pod in provider_pods(key)):
+            return True
+        time.sleep(5)
+    return False
+
+
+def arm_guard(output):
+    """Start a separate local deadline process before buying any Pod time."""
+    log = open(output / "deadline_guard.log", "ab", buffering=0)
+    try:
+        child = subprocess.Popen(
+            [sys.executable, "-m",
+             "research.n83_crossfamily_current_20261025.deadline_guard",
+             "--allocation-dir", str(output)], cwd=ROOT, stdin=subprocess.DEVNULL,
+            stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+    finally:
+        log.close()
+    for _ in range(50):
+        if child.poll() is not None:
+            raise ValueError("local RunPod deadline guard exited before arming")
+        if (output / "deadline_guard.ready").is_file():
+            return child
+        time.sleep(0.1)
+    raise ValueError("local RunPod deadline guard did not arm")
+
+
+def mutation(name, terminate_at, gpu_type):
+    return (
+        "mutation { podFindAndDeployOnDemand(input: { name: " +
+        json.dumps(name) + ", gpuTypeId: " + json.dumps(gpu_type) +
+        ", gpuCount: 1, cloudType: COMMUNITY, minMemoryInGb: 27, "
+        "minVcpuCount: 4, imageName: " + json.dumps(IMAGE) +
+        ", templateId: \"runpod-ubuntu\", containerDiskInGb: 30, "
+        "volumeInGb: 0, "
+        "startSsh: true, supportPublicIp: true, ports: \"22/tcp\", terminateAfter: " +
+        json.dumps(terminate_at) +
+        " }) { id name desiredStatus costPerHr machineId memoryInGb "
+        "vcpuCount imageName gpuCount containerDiskInGb volumeInGb "
+        "createdAt podType machine { gpuTypeId } } }")
+
+
+def valid_pod(pod, expected_name, expected_gpu_type):
+    price = Decimal(str(pod.get("costPerHr")))
+    if (pod.get("name") != expected_name or
+            pod.get("desiredStatus") != "RUNNING" or
+            not isinstance(pod.get("id"), str) or
+            not pod["id"].isalnum() or
+            not isinstance(pod.get("machineId"), str) or
+            not pod["machineId"] or
+            pod.get("imageName") != IMAGE or
+            int(pod.get("memoryInGb")) < 27 or
+            int(pod.get("vcpuCount")) < 4 or
+            int(pod.get("gpuCount")) != 1 or
+            (pod.get("machine") or {}).get("gpuTypeId") != expected_gpu_type or
+            int(pod.get("containerDiskInGb")) != CONTAINER_DISK_GB or
+            Decimal(str(pod.get("volumeInGb") or 0)) != 0 or
+            price <= 0 or price > PRICE_CAP_PER_HOUR or
+            not pod.get("createdAt")):
+        raise ValueError("RunPod allocation violates frozen host or price cap")
+    return price
+
+
+def frozen_head():
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"],
+                                   cwd=ROOT, text=True).strip()
+    status = subprocess.check_output(["git", "status", "--porcelain"],
+                                     cwd=ROOT, text=True)
+    if status:
+        raise ValueError("source checkout must be clean before allocation")
+    if sha((ROOT / "examples/koblitz_orbit_dlp_fast.rs").read_bytes()) != run.SOURCE_SHA256:
+        raise ValueError("IC source differs from frozen panel")
+    run.fixture()
+    expected, regenerated = run.generator.produce()
+    if any((HERE / name).read_bytes() != blob for name, blob in expected.items()):
+        raise ValueError("full historical fixture replay differs")
+    if regenerated != json.loads((HERE / "fixture_manifest.json").read_text()):
+        raise ValueError("full historical manifest replay differs")
+    arms.choose()
+    return head
+
+
+def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
+             terminate_pod=terminate, guard=arm_guard):
+    head = frozen_head()
+    if (bundle_proof.get("source_head_sha") != head or
+            not isinstance(bundle_proof.get("source_archive_sha256"), str) or
+            len(bundle_proof["source_archive_sha256"]) != 64 or
+            not isinstance(bundle_proof.get("source_manifest_sha256"), str) or
+            len(bundle_proof["source_manifest_sha256"]) != 64):
+        raise ValueError("source bundle differs from allocation head")
+    if output.exists():
+        raise ValueError("allocation output already exists")
+    names = [f"n83-crossfamily-{head[:12]}-s{i}" for i in range(2)]
+    before = pods(key)
+    if any(pod.get("name") in names for pod in before):
+        raise ValueError("matching Pod already exists; inspect before retry")
+    output.mkdir(parents=True)
+    started = now()
+    terminate_at = iso(started + timedelta(seconds=CAP_SECONDS))
+    write(output / "allocation_plan.json", {
+        "schema": "n83.crossfamily-current-allocation-plan/v1",
+        "source_head_sha": head, "names": names,
+        "gpu_types": list(GPU_TYPES),
+        "started_utc": iso(started),
+        "source_archive_sha256": bundle_proof["source_archive_sha256"],
+        "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
+        "image_name": IMAGE, "min_memory_gb": 27, "min_vcpus": 4,
+        "cap_seconds": CAP_SECONDS, "terminate_at_utc": terminate_at,
+        "price_cap_per_hour_usd": str(PRICE_CAP_PER_HOUR),
+        "container_disk_gb_per_pod": CONTAINER_DISK_GB,
+        "container_disk_usd_per_gb_month":
+        str(CONTAINER_DISK_USD_PER_GB_MONTH),
+        "minimum_billing_month_hours": int(MIN_BILLING_MONTH_HOURS),
+        "total_reserved_cap_usd": str(TOTAL_CAP_USD),
+        "existing_named_pods": [],
+    })
+    guard_process = guard(output)
+    acquired = []
+    observed = []
+    uncertain = False
+    try:
+        for stratum, name in enumerate(names):
+            if guard_process.poll() is not None:
+                raise ValueError("local RunPod deadline guard exited")
+            try:
+                response = api(mutation(name, terminate_at,
+                                        GPU_TYPES[stratum]), key)
+                raw = response["podFindAndDeployOnDemand"]
+                if not isinstance(raw, dict) or not raw.get("id"):
+                    raise ValueError("RunPod mutation returned no Pod ID")
+                acquired.append(raw["id"])
+                pod = readback(name, key, pods)
+            except Exception:
+                uncertain = True
+                try:
+                    matches = [p.get("id") for p in pods(key)
+                               if p.get("name") == name and p.get("id")]
+                    acquired.extend(x for x in matches if x not in acquired)
+                except Exception:
+                    pass
+                raise
+            price = valid_pod(pod, name, GPU_TYPES[stratum])
+            if pod["id"] != raw["id"]:
+                raise ValueError("RunPod mutation ID and readback differ")
+            projected = projected_total(
+                [Decimal(str(p["costPerHr"])) for p in observed] + [price])
+            if projected > TOTAL_CAP_USD:
+                raise ValueError("two-Pod reservation exceeds total cap")
+            observed.append(pod)
+            write(output / f"provider_readback_s{stratum}.json", pod)
+        if len({p["id"] for p in observed}) != 2 or len({p["machineId"] for p in observed}) != 2:
+            raise ValueError("two distinct RunPod machines required")
+        snapshot = {
+            "schema": "n83.crossfamily-current-runpod-snapshot/v1",
+            "source_head_sha": head, "recorded_utc": iso(now()),
+            "source_archive_sha256": bundle_proof["source_archive_sha256"],
+            "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
+            "pods": [{"stratum": i, "pod_id": p["id"],
+                      "machine_id": p["machineId"],
+                      "desired_status": p["desiredStatus"],
+                      "cost_per_hr": p["costPerHr"],
+                      "gpu_type_id": p["machine"]["gpuTypeId"],
+                      "image_name": p["imageName"]}
+                     for i, p in enumerate(observed)],
+            "projected_compute_and_container_disk_usd": str(projected),
+        }
+        snapshot_path = output / "provider_snapshot.json"
+        write(snapshot_path, snapshot)
+        snapshot_sha = sha(snapshot_path.read_bytes())
+        for i, pod in enumerate(snapshot["pods"]):
+            write(output / f"allocation_s{i}.json", {
+                "schema": "n83.crossfamily-current-runpod-allocation/v1",
+                "source_head_sha": head, "snapshot_sha256": snapshot_sha,
+                "source_archive_sha256": bundle_proof["source_archive_sha256"],
+                "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
+                "stratum": i, **pod,
+            })
+        return {"status": "PASS_TWO_BUDGETED_PODS", "source_head_sha": head,
+                "snapshot_sha256": snapshot_sha,
+                "pod_ids": [p["id"] for p in observed]}
+    except Exception as error:
+        cleanup = {}
+        for pod_id in dict.fromkeys(acquired):
+            try:
+                cleanup[pod_id] = terminate_pod(pod_id, key)
+            except Exception:
+                cleanup[pod_id] = False
+        write(output / "allocation_failure.json", {
+            "status": "UNRESOLVED_PROVIDER_MUTATION" if uncertain or
+                      not all(cleanup.values()) else "FAILED_ALLOCATIONS_TERMINATED",
+            "error_type": type(error).__name__,
+            "error_detail": str(error).replace(key, "[redacted]")[:1000],
+            "allocated_pod_ids": acquired,
+            "terminated_and_absent": cleanup,
+            "recorded_utc": iso(now()),
+        })
+        raise
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--source-bundle", type=Path)
+    parser.add_argument("--execute", action="store_true")
+    args = parser.parse_args()
+    head = frozen_head()
+    bundle_proof = None
+    if args.source_bundle is not None:
+        path = args.source_bundle.resolve()
+        record = source_bundle.verify(path / "source.tar.gz",
+                                      path / "manifest.json")
+        bundle_proof = {
+            "source_head_sha": record["source_head_sha"],
+            "source_archive_sha256": record["source_archive_sha256"],
+            "source_manifest_sha256": source_bundle.digest(path / "manifest.json"),
+        }
+        if bundle_proof["source_head_sha"] != head:
+            raise ValueError("source bundle differs from allocation head")
+    if not args.execute:
+        print(json.dumps({"status": "READY_FOR_CREDENTIAL_AND_DISPATCH",
+                          "source_head_sha": head,
+                          "source_bundle_verified": bundle_proof is not None,
+                          "projected_max_usd": str(projected_total(
+                              [PRICE_CAP_PER_HOUR, PRICE_CAP_PER_HOUR]))},
+                         sort_keys=True))
+        return
+    if bundle_proof is None:
+        raise ValueError("--source-bundle is required for allocation")
+    print(json.dumps(allocate(args.output.resolve(), configured_key(), bundle_proof),
+                     sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
