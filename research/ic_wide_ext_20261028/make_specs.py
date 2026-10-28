@@ -45,3 +45,35 @@ if __name__ == "__main__":
     for bits in BASE:
         (HERE / "specs" / f"diag-{bits}.json").write_text(json.dumps(diag(bits), indent=1) + "\n")
         print("wrote", f"specs/diag-{bits}.json")
+
+
+# ---- joint tuning grid (base size x lanes x oracle) -------------------------------------
+GRID_BASES = {28: [256, 512, 1024, 2048], 32: [512, 1024, 2048, 4096]}
+GRID_TARGETS = ["walk", "walk-prime-batch-16", "walk-prime-batch-32"]
+
+
+def grid(bits):
+    arms = [arm("rho-neg", "reference", {"id": "rho.negation"})]
+    for b in GRID_BASES[bits]:
+        for t in GRID_TARGETS:
+            arms.append(arm(f"b{b}-{t.replace('walk-prime-batch-', 'L').replace('walk', 'W')}", "candidate",
+                            ic(b, "mitm-prime-batch:m=2", t)))
+        arms.append(arm(f"b{b}-blk-L32", "candidate", ic(b, "mitm-prime-blocked:m=2", "walk-prime-batch-32")))
+    return spec(f"joint tuning grid, {bits}-bit", bits, arms)
+
+
+def ladder(bits, targets=2, rounds=2):
+    b = {34: 2048, 36: 4096}[bits]
+    arms = [arm("rho-neg", "reference", {"id": "rho.negation"}),
+            arm("walk", "candidate", ic(b, "mitm-prime-batch:m=2", "walk")),
+            arm("L16", "candidate", ic(b, "mitm-prime-batch:m=2", "walk-prime-batch-16")),
+            arm("L32", "candidate", ic(b, "mitm-prime-batch:m=2", "walk-prime-batch-32"))]
+    return spec(f"extended ladder, {bits}-bit", bits, arms, targets=targets, rounds=rounds, seed=59297 + bits)
+
+
+if __name__ == "__main__":
+    for bits in GRID_BASES:
+        (HERE / "specs" / f"grid-{bits}.json").write_text(json.dumps(grid(bits), indent=1) + "\n")
+        print("wrote", f"specs/grid-{bits}.json")
+    # The size ladder stops at 32 bits: `prime_search` takes 8 <= bits <= 32 (ecbench plan), so 34/36-bit
+    # curves need another curve family; `ladder()` above is kept for that.

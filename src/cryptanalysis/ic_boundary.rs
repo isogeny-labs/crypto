@@ -7741,10 +7741,23 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     // exists, the four stages of a lane round are timed and reported as
     // `diag_*_ns` counters (a measured child does not inherit the environment).
     // Absent, nothing is timed and no counter is added.
-    let lane_diag =
-        lane_config.is_some() && std::path::Path::new("/dev/shm/lane_diag.on").exists();
+    let lane_diag = lane_config.is_some() && std::path::Path::new("/dev/shm/lane_diag.on").exists();
     let (mut diag_prep_ns, mut diag_add_ns, mut diag_queue_ns, mut diag_touch_ns) =
         (0u64, 0u64, 0u64, 0u64);
+    // Per-trial split of the shared loop under the same marker: cycle counts of the
+    // target draw, the guard insert and the oracle call (TSC; no counter without it).
+    let diag_cycles = || -> u64 {
+        #[cfg(target_arch = "x86_64")]
+        {
+            // SAFETY: rdtsc has no preconditions.
+            unsafe { core::arch::x86_64::_rdtsc() }
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            0
+        }
+    };
+    let (mut diag_draw_cy, mut diag_guard_cy, mut diag_oracle_cy) = (0u64, 0u64, 0u64);
     // `bitop/v1`-only bookkeeping (`PhaseCost::work`): the coefficient
     // updates modulo `r`, the step hashes, and the random draws of the
     // target stream, none of which the group-operation ledger sees.
@@ -7918,6 +7931,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // Exclusive phase marks (no-ops without an `ic_measurement`
         // session): drawing the target-dependent query point.
         measurement::mark(measurement::Phase::TargetQuery);
+        let diag_c0 = if lane_diag { diag_cycles() } else { 0 };
         let (point, a, b, lane_id) = match targets {
             TargetSource::Random | TargetSource::RandomUnguarded => {
                 rng_draws += 2;
@@ -8037,6 +8051,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             }
         };
         trials += 1;
+        let diag_c1 = if lane_diag { diag_cycles() } else { 0 };
         // The guard: a target this run has already decomposed carries no
         // relation the matrix does not hold, and taking it again would
         // pin the logarithm by collision rather than by relation.
@@ -8054,8 +8069,15 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 continue;
             }
         }
+        let diag_c2 = if lane_diag { diag_cycles() } else { 0 };
         measurement::mark(measurement::Phase::TargetPdp);
         let relations = oracle(&mut rel.group_ops, &mut ctr, point, a, b);
+        if lane_diag {
+            let c3 = diag_cycles();
+            diag_draw_cy += diag_c1 - diag_c0;
+            diag_guard_cy += diag_c2 - diag_c1;
+            diag_oracle_cy += c3 - diag_c2;
+        }
         if relations.is_empty() {
             continue;
         }
@@ -8213,6 +8235,9 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             rel.count("lane_prepared", lane_prepared);
             rel.count("lane_unused_prepared", lane_queue.len() as u64);
             if lane_diag {
+                rel.count("diag_draw_cy", diag_draw_cy);
+                rel.count("diag_guard_cy", diag_guard_cy);
+                rel.count("diag_oracle_cy", diag_oracle_cy);
                 rel.count("diag_prep_ns", diag_prep_ns);
                 rel.count("diag_add_ns", diag_add_ns);
                 rel.count("diag_queue_ns", diag_queue_ns);
