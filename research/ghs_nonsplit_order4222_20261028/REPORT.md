@@ -61,7 +61,11 @@ L_C(T) = 1 + 125 T^3 + 4096 T^6.
 This polynomial is the exact `poly` value `[1,0,0,125,0,0,4096]` for
 LMFDB class `3.16.a_a_ev`. The class has `p_rank=3`, `is_simple=true`, and
 `is_geometrically_simple=false`. The pinned polynomial and canonical-map
-receipt is `canonical_4222_receipt.json`.
+receipt is `canonical_4222_receipt.json`. An independent Sage count finds
+`#C(F_16)=17`, `#C(F_256)=257`, and `#C(F_4096)=4472`; the last count uses
+the 1117 split affine fibers of the V4 cover plus four points at infinity.
+Newton identities and the genus-three functional equation recover the same
+L-polynomial. See `independent_counts_4222.json`.
 
 ## Subgroup-preserving correspondence
 
@@ -162,6 +166,7 @@ From the repository root:
 ```sh
 sage -python research/ghs_nonsplit_order4222_20261028/source_4222.py
 python3 research/ghs_nonsplit_order4222_20261028/magma_canonical_4222.py
+sage -python research/ghs_nonsplit_order4222_20261028/independent_counts_4222.py
 sage -python research/ghs_nonsplit_order4222_20261028/quotient_4222.py
 python3 research/ghs_nonsplit_order4222_20261028/parse_quotient_4222.py
 sage -python research/ghs_nonsplit_order4222_20261028/subgroup_map_4222.py
