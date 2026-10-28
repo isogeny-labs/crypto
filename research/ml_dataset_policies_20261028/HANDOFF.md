@@ -1,5 +1,42 @@
 # Implementation handoff
 
+## 2026-10-28 14:34 UTC — corrected source passes publication gate
+
+### What was done (commands, files, features)
+
+Validated source `d71ec2ef5ab9b7f2a038f61c941af10297a775ad`: full release
+library 5169 passed, zero failed, 123 ignored; binary-field 19, prime-root 8,
+dataset 153 and CLI integration 8 passed. Strict scoped Clippy and formatting
+passed. The binary-field batched-squaring counter correction is included.
+The source-bound CLI also produced 72 sealed consumer fixtures; 22 positive
+PDP certificates were independently checked. Preserved the final logs, CLI,
+patch and hashes in canonical S3 and verified a fresh download and all contained
+hashes. Exact receipts and limits are in VALIDATION.md and validation-d71ec2e.json.
+
+### Decisions made (and why)
+
+Deliver a regular PR stacked on persistence PR2769. Keep local software gates,
+hosted review, real worker publication and scientific corpus completion
+separate. Root scope now covers only policy research documentation and the
+shared log; T743 owns the subsequent binary-root adapter integration. T739 owns
+the separate consumer publication. USD200 total and original deadlines stand.
+
+### Open threads (unfinished, pick up next time)
+
+Deliver the dependent PR and inspect current-head CI/review on the registered
+cadence. The parent validation job encountered a checkout transport failure
+before tests; one failed-job retry is pending. Resolve the producer/main
+lineage and verify that integrated source before landing. Worker IAM and the
+durable mounted quota authority are unresolved. Broad corpus production,
+complete solver coverage and operation/intermediate capture remain unfinished.
+
+### Errors (what went wrong, how it was handled)
+
+Retained the original validation and preflight failures. The source packaging
+step initially encountered a tracked file omitted by sparse checkout; switched
+to hashing source-commit Git objects, then completed the archive roundtrip.
+No data or test was discarded, and no additional research job was launched.
+
 ## 2026-10-28 12:15 UTC — implementation ready for native checks
 
 ### What was done (commands, files, features)
