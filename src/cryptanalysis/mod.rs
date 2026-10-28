@@ -119,6 +119,8 @@ pub mod boomerang;
 pub mod bsgs_fast;
 pub mod canonical_lift;
 pub mod certicom131_symlp;
+pub mod certicom_dlp;
+pub mod certicom_dlp_cli;
 pub mod cga_hnc;
 pub mod challenge_ladder;
 pub mod cheon_attack;
@@ -231,7 +233,6 @@ pub mod joux_vitse;
 pub mod joux_vitse_edwards;
 pub mod jv_bitops;
 pub mod jv_cover;
-pub mod zero_dim_la;
 pub mod jv_isogeny_walk;
 pub mod jv_quartic;
 pub mod jv_quintic;
@@ -360,6 +361,8 @@ pub mod sparse_macaulay;
 pub mod statistical;
 pub mod subfield_fp3;
 pub mod symmetrized_semaev;
+pub mod three_leads;
+pub mod three_leads_followup;
 pub mod tls12_kdf;
 pub mod tls13_kdf;
 pub mod two_rank_null;
@@ -372,6 +375,7 @@ pub mod weil_charts;
 pub mod wide_gf2m;
 pub mod wide_groebner;
 pub mod wide_sixsum;
+pub mod zero_dim_la;
 
 pub use aut_folded_rho::{
     apply_aut, aut_folded_rho_dlp, canonical_form, AutElt, FoldedRhoOptions, FoldedRhoSolution,
