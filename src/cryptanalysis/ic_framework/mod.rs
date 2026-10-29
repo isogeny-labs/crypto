@@ -1256,7 +1256,12 @@ mod tests {
         );
         let dn = &deferred.decomposition.cost;
         let count = |c: &PhaseCost, key: &str| c.native.get(key).copied().unwrap_or(0);
-        for key in ["relations", "stride_steps", "stride_restarts", "stride_renewals"] {
+        for key in [
+            "relations",
+            "stride_steps",
+            "stride_restarts",
+            "stride_renewals",
+        ] {
             assert_eq!(count(dn, key), count(rn, key), "{key}");
         }
         let eager_skips = count(rn, "repeated_targets_skipped");
