@@ -1,3 +1,4 @@
+if(mcAllowed!=1){print("MAPSOLVE27_NOT_ADMITTED");quit;}
 print("MAPSOLVE27_BOUNDED_GROEBNER_START");
 ideal mapGB=std(mapEquations);
 if(size(mapGB)==1 && mapGB[1]==1){

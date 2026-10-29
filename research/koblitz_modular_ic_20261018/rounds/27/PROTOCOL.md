@@ -430,3 +430,5 @@ savedH/Lbasisvectors, compare every cubic coefficient to the generated
 polynomial equation evaluated by independent ringmaps. Constant/nonconstant
 block must be1/0, allfield constraints0. No fixed vectors are solutions or
 map claims. Solver can start ONLY after both complete controls pass.
+
+MAPSOLVE01 rejected/stoppedSIGTERM143 after cross-ring indexing errors. No GB conclusion accepted. Whole polynomial ideals must first be evaluated while mapTarget iscurrent, then transfer ONLYconstant results to validation ring. Freeze910 explicit successful checks and0failures with nativequit-before-solver on mismatch; independent mcAllowed admission guard in solver. Native ERROR alone is not a control-flow stop. Retain exactfailedinput/log/exit; sameequationsandcaps inretry02.
