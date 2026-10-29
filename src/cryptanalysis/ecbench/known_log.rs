@@ -55,6 +55,7 @@ enum Table {
 }
 
 impl Table {
+    #[cfg(test)]
     fn entries(&self) -> u64 {
         match self {
             Self::Pair(t) => t.entries,
