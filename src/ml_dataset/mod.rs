@@ -1830,6 +1830,87 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     Ok(())
 }
 
+/// New generic v2 claims require the exact independently replayable transcript
+/// and one bound payload per native batch. V1 behavior remains in its replayer.
+fn verify_generic_filter_artifacts(
+    dir: &Path,
+    manifest: &CellManifest,
+    complete_factor_base: bool,
+) -> Result<(), String> {
+    let transcripts: Vec<_> = manifest
+        .artifacts
+        .iter()
+        .filter(|a| {
+            a.role == "large-prime-elimination-transcript"
+                || a.path == "generic-large-prime-transcript.json"
+        })
+        .collect();
+    let payloads: Vec<_> = manifest
+        .artifacts
+        .iter()
+        .filter(|a| {
+            a.role == relations::FILTER_CERTIFICATE_ROLE
+                || a.path.starts_with("generic-large-prime-filter-batch-")
+        })
+        .collect();
+    let mut v2 = None;
+    for artifact in &transcripts {
+        let value: Value = read_json(&dir.join(&artifact.path))?;
+        if value["schema"] == relations::GENERIC_V2_SCHEMA {
+            if v2.is_some()
+                || transcripts.len() != 1
+                || artifact.path != "generic-large-prime-transcript.json"
+                || artifact.role != "large-prime-elimination-transcript"
+                || artifact.encoding != "json"
+            {
+                return Err("generic v2 transcript role/path/uniqueness differs".into());
+            }
+            v2 = Some(value);
+        }
+    }
+    let claimed = manifest.outcome.get("filter_trace_policy").is_some()
+        || manifest.outcome.get("filter_trace_censored").is_some()
+        || manifest
+            .outcome
+            .get("recorded_row_transitions_verified")
+            .is_some();
+    let Some(transcript) = v2 else {
+        return if claimed || !payloads.is_empty() {
+            Err("generic filter trace claims/payloads lack their v2 transcript".into())
+        } else {
+            Ok(())
+        };
+    };
+    if !complete_factor_base || manifest.config.solver != "double-large-prime" {
+        return Err("generic v2 filter transcript lacks public relation domain".into());
+    }
+    let public: Value = read_json(&dir.join("public.json"))?;
+    let base: Value = read_json(&dir.join("factor-base.json"))?;
+    relations::verify_generic_v2_labels(
+        &public,
+        &base,
+        &manifest.config,
+        &transcript,
+        &manifest.outcome,
+    )?;
+    let expected = relations::generic_v2_filter_payloads(&transcript)?;
+    if payloads.len() != expected.len() {
+        return Err("generic v2 native batch payload count differs".into());
+    }
+    for payload in expected {
+        let matches: Vec<_> = payloads.iter().filter(|a| a.path == payload.path).collect();
+        if matches.len() != 1 || matches[0].role != payload.role || matches[0].encoding != "json" {
+            return Err("generic v2 native batch payload role/path differs".into());
+        }
+        let actual: Value = read_json(&dir.join(&payload.path))?;
+        let wanted: Value = serde_json::from_slice(&payload.bytes).map_err(|e| e.to_string())?;
+        if actual != wanted {
+            return Err("generic v2 native batch payload differs from transcript".into());
+        }
+    }
+    Ok(())
+}
+
 fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     checked_directory(dir, false)?;
     let metadata = fs::symlink_metadata(dir.join("manifest.json")).map_err(|e| e.to_string())?;
@@ -1865,6 +1946,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
+    verify_generic_filter_artifacts(dir, &manifest, complete_factor_base)?;
     let root_certificates: Vec<_> = manifest
         .artifacts
         .iter()
@@ -1973,12 +2055,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             }
             if artifact.role == "large-prime-elimination-transcript" {
                 let transcript: Value = read_json(&dir.join(&artifact.path))?;
-                let requested_work =
-                    if transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
-                        transcript["requested_work"].as_u64()
-                    } else {
-                        transcript["requested_work_limit"].as_u64()
-                    };
+                let requested_work = if transcript["schema"]
+                    == "ml-ecdlp-generic-large-prime-transcript/v1"
+                    || transcript["schema"] == relations::GENERIC_V2_SCHEMA
+                {
+                    transcript["requested_work"].as_u64()
+                } else {
+                    transcript["requested_work_limit"].as_u64()
+                };
                 if requested_work != Some(manifest.config.work_limit) {
                     return Err("relation transcript work limit differs from frozen cell".into());
                 }
