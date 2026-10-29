@@ -1,0 +1,16 @@
+int mcI;number mcCoefficient;
+for(mcI=1;mcI<=385;mcI++){
+ mcCoefficient=leadcoef(subst(mcExpected1,w,0));
+ if(mcSample1(mapEquations[mcI])!=mcCoefficient){ERROR("first actual-jet map equation control failed");}
+ mcExpected1=(mcExpected1+mcCoefficient)/w;
+ mcCoefficient=leadcoef(subst(mcExpected2,w,0));
+ if(mcSample2(mapEquations[mcI])!=mcCoefficient){ERROR("second actual-jet map equation control failed");}
+ mcExpected2=(mcExpected2+mcCoefficient)/w;
+}
+if(mcExpected1!=0 || mcExpected2!=0){ERROR("actual-jet map control not exhausted");}
+for(mcI=386;mcI<=454;mcI++){
+ if(mcSample1(mapEquations[mcI])!=0 || mcSample2(mapEquations[mcI])!=0){ERROR("map coefficient finite-field constraint control failed");}
+}
+if(mcSample1(mapEquations[455])!=1 || mcSample2(mapEquations[455])!=0){ERROR("actual constant/nonconstant X block control failed");}
+print("MAPCHECK27_TWO_FULL_SOURCE_JET_CONTROLS_PASS");
+setring mapTarget27;

@@ -421,3 +421,12 @@ and its output before each native call; retain every attempt.
 After next host replacement boot a578e16f, reconciliation found no native/proof processes, Diem deadline-expired, legacy complete, EKS one unrelated failed ML job and no active jobs. No launches duplicated. Lean08 completed exit1: broad simp converts integer scalar-zero to natural scalar-zero without closing it. Replace ONLY simplification by explicit zsmul_zero/add_zero/neg_zero list. Rebuild Collector object because host-local verified object was lost, not because prior proof evidence failed. REVERSE01 full integral witness passed but final control used polynomial remainder by11 inQ (always0), not integer remainder. Check exact evaluated integer14469 instead. Original failures/source retained; no mathematical rejection.
 
 Post-migration checkpoint first failed before launch because shasum was absent; installed standard perl-Digest-SHA, retry checkpoint succeeded. DIRECT01 rejected number/poly assignment at linear roots; all4cubic factor counts are3 but no point accepted. Extract constant coefficient with leadcoef inretry02. MAPBUILD01 rejected reserved argument monomial; its late455-equation marker is unaccepted. Rename symbolText27, add >1000coefficient-term guard. Basis34/trace preimages remain independently checked in retry; no empty-map verdict from invalid producer.
+
+MAPBUILD02 strictPASS:34invariants andpreimages,646907binary coefficient terms,
+455equations. Before solver data, add TWO independent actual-source-jet
+specialization checks coveringALL455equations: (a1=1,allothercoeff0) and
+(a2=beta32,b3=1,c0=1,auxv1=1/beta32). Recompute X/Y fromoriginal68jets and
+savedH/Lbasisvectors, compare every cubic coefficient to the generated
+polynomial equation evaluated by independent ringmaps. Constant/nonconstant
+block must be1/0, allfield constraints0. No fixed vectors are solutions or
+map claims. Solver can start ONLY after both complete controls pass.
