@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.73in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\title{Branch factor transported to weighted Proj}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This is a conditional polynomial and projective-stalk proof, not a target experiment or cost comparison. The editable diagram, gate CSV, Lean sources, and compiler logs are beside this PDF.
+
+\section*{Checked statement}
+For polynomials $f,u_1,u_2,n,U$ over a field and a rational point $a$, assume
+\[
+f(a)=0,\qquad n^2-u_1u_2U=b^2f,\qquad u_1(a)u_2(a)U(a)=0.
+\]
+The checked polynomial theorem specializes the norm identity at ordinate zero and uses the factor theorem to conclude
+\[
+(X-a)\mid n.
+\]
+The second checked theorem defines the coefficient map and $x$ germ through the actual weighted-Proj branch-stalk isomorphism. It proves that the image of $X-a$ equals the projective $x-a$ germ and composes this with the norm theorem: the mapped polynomial $n(x)$ has a local factor $x-a$.
+
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Norm identity plus rational branch-support root\par\vspace{5pt}
+$\Downarrow$ checked pointwise branch overlap: $n(a)=0$\par\vspace{5pt}
+$\Downarrow$ checked polynomial factor theorem\par\vspace{5pt}
+$(X-a)\mid n$ and $n(x)=(x-a)t$ in the actual projective stalk
+\end{minipage}}
+\end{center}
+
+\section*{Verification and remaining gates}
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero for the polynomial source. Its theorem axiom audit lists only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Polynomial source SHA-256:\par\smallskip\noindent{\scriptsize\texttt{7e583e29d15de7b4eba06d1cbb93a8eb52812c57039248791389d723317b8051}}.\par\smallskip\noindent Projective source SHA-256: {\scriptsize\texttt{20fce390a60291aab9950d24c99005ea8fc79d2b944a42ad91939bf40c932ce0}}.
+
+The concrete source-style norm theorem is separately checked. This packet does not identify the mapped polynomial with the compiled runtime numerator on every branch, prove that $B$ is a local unit, or combine all local orders into the claimed global principal divisor and $\mathrm{Pic}^0$ equation. The frozen 1,260-target rows and matched-rho ratios remain unchanged.
+\end{document}
