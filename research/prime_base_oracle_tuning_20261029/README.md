@@ -72,7 +72,7 @@ At 20 bits the gap to rho narrows from 9.5× to 7.7× at w = 0, and from 12.9× 
 - **`size/inc`:** identical to `sel/inc` at every size, because `R*(b)` uses the incumbent oracle.
 - **`stride/inc`:** `prime-abscissa:size=N*,stride=7919` with the same oracle is the small-abscissa control.
   - At 20 bits: 0.809 [0.758, 0.868] (w = 0) and 0.715 [0.661, 0.778] (w = 1).
-  - At 32 bits: 0.989 [0.960, 1.019] (w = 0) and 0.983 [0.939, 1.029] (w = 1).
+  - At 32 bits: 0.989 [0.960, 1.018] (w = 0) and 0.983 [0.938, 1.029] (w = 1).
   - `ecbench band` ranks `stride < sel` at every size. This is read as a control only (§7.3): choosing the smallest abscissae buys nothing measurable here. The 20-bit gain comes from N, not from which abscissae fill the base.
 - **Random-base control:** absent. This is recorded as a gap (PROTOCOL.md §12.2).
 - **Panel K** (`analysis/band-kummer.md`) is descriptive only.
@@ -84,6 +84,10 @@ At 20 bits the gap to rho narrows from 9.5× to 7.7× at w = 0, and from 12.9× 
 There, the w = 0.1 selection rule (§4.4) picked a smaller base. On the holdout, the total falls at w = 0 and rises by 13–19% at w = 1. At w = 0 only charged group operations count, and w = 1 adds the native operations at full price. So the smaller base trades charged work for native work. The protocol reads this as work moved into uncharged native operations, not as an improvement. On the train curves the w = 1 minimum sits at the incumbent N at 28 and 32 bits. At 24 bits it sits at N 115 (21.8 vs 23.6 at N 162, 8 runs per cell), which the holdout did not reproduce (1.126 [1.073, 1.179]).
 
 ## Scope and limits
+
+- **Leaderboard promotion is pending.** PROTOCOL.md §13 requires a second-host replay (`ecbench-independent-runner`) before a leaderboard promotion. The validation here is a same-host, same-binary replay. So this PR lands the result, its validation and the benchmarks entry. The prime-field section of the IC leaderboard follows once a replay on a distinct host class (isolab-eks) reproduces the 20-bit holdout session.
+- **Larger than predicted.** The 20-bit gain (18–27%) exceeds the pre-registered §10 prediction 4 ("any holdout gain is under about 10%"). The prediction was wrong; the decision rule does not depend on it.
+- **Shallow train minimum.** On the 20-bit train curve, N 45 beat N 64 by little: 11.243 against 11.413 at w = 0.1, 8 runs each. At w = 1, N 64 was lower (19.46 against 22.10). A larger N might do better at 20 bits, and this card did not test that on the holdout.
 
 - **Engineering class:** one parameter (N) at one size. One holdout curve per size, so no exponent claim and no pooled claim across sizes.
 - **Counted unit only:** ecbench GAE with the §5a pricing of native operations. No wall-clock claim. The harness's median wall time per run is recorded in `analysis/table-holdout.md` (20 bits: inc 2.49 ms, sel 1.73 ms), but it is not admitted as a claim.
@@ -110,4 +114,4 @@ There, the w = 0.1 selection rule (§4.4) picked a smaller base. On the holdout,
 - **Selection:** `select/selection-P*.json`; frozen hash `3d4461e9455d6cd2` (`select/FROZEN.sha256`).
 - **Raw sessions:** stored in the artifact store under `sessions/` (`.artifacts.json` pointers).
 - **Run report:** [`reports/run-20261029T0129Z/`](reports/run-20261029T0129Z/).
-- **Validation:** `VALIDATION.json` (replay certificate and validator report).
+- **Validation:** [`VALIDATION.json`](VALIDATION.json): verdict passed for row `icv1-fp20-tm565-6d7d1d32`, with caveats. It names [`replay-certificate.json`](replay-certificate.json) and [`validator-report.json`](validator-report.json); the validator's receipts are in [`validation/`](validation/). The validator replayed holdout-P20 (672/672 identical), train-P20 and its extensions on a different core of the same host, re-ran all 84 comparisons byte-identically, and recomputed the ratios independently.
