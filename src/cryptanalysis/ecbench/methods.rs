@@ -147,10 +147,17 @@ const K4_PARAMS: &[ParamDecl] = &[
 ];
 
 const THREE_LEADS_PENCIL_PARAMS: &[ParamDecl] = &[
-    ParamDecl { name: "small_denominator", default: None,
-        help: "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection" },
-    ParamDecl { name: "matrix_coefficient_cap", default: None,
-        help: "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks" },
+    ParamDecl {
+        name: "small_denominator",
+        default: None,
+        help: "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection",
+    },
+    ParamDecl {
+        name: "matrix_coefficient_cap",
+        default: None,
+        help:
+            "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks",
+    },
 ];
 const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     name: "trial_cap",
@@ -2072,7 +2079,10 @@ pub fn solve(
     }
     if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
         if let Some(window) = &mut rep.online {
-            let sum = window.phases_ns.values().try_fold(0u64, |total, ns| total.checked_add(*ns));
+            let sum = window
+                .phases_ns
+                .values()
+                .try_fold(0u64, |total, ns| total.checked_add(*ns));
             if sum != Some(window.wall_ns) {
                 return Err("pencil online phase sum differs from window".into());
             }
@@ -2081,7 +2091,8 @@ pub fn solve(
                 "first source multiplication check completed inside pencil core"
             } else {
                 "pencil coefficient cap or walk exhaustion; no verified solution"
-            }.into();
+            }
+            .into();
             window.mapping = "query: target validation, labels, source query and transfer, plus intervening control bookkeeping; PDP: point-driven sieve; relation check: polynomial, point and Jacobian checks; descent: signed graph and residual elimination; recovery check: first source multiplication. Additional adapter verification is outside online and charged in cold group counts.".into();
             if let Some(reason) = window.zero_phases.get_mut("target_relation_check") {
                 *reason = "no sieve candidate reached the separate polynomial, point and Jacobian verification stage".into();

@@ -480,3 +480,17 @@ PR checks/review and the original qualified execution/cohort objective remain.
 
 ### Errors
 None in the focused eight-test recheck; initial failures retained in full.
+
+## 2026-10-29 PR2860 formatting follow-up
+
+Reconciled artifact-store bot head 772e8d0e8ffebf641450c1d66a44528cc27a0723.
+The original root test log remains available by its artifact manifest digest.
+CI rustfmt identified three formatting-only hunks in ecbench/methods.rs.
+Applied rustfmt and refreshed the affected source-manifest digests.
+Added the existing dependency materializer to the fmt job so its sparse
+checkout can resolve the shared pencil native_solver module.
+Validation: all four changed root Rust files pass rustfmt --check; all
+source-manifest entries verify. No algorithm or measured evidence changed.
+The local Node test command could not start because node is absent from PATH;
+this is not a passing workflow test. Remote CI remains authoritative for it.
+No experiments or generators were launched. Cohort completion remains open.
