@@ -27,11 +27,14 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
       .schema == "ic-replay-partition/v1" and .dir == $dir and .binary == $binary and
       .roster_sha256 == $roster and .index == $i and .partition == $p and .partitions == $n and
       (.plan_sha256|test("^[0-9a-f]{64}$")) and
-      (.mode == "explicit" or .mode == "cached-full" or .mode == "empty")' "$base.partition.json" >/dev/null
+      (.mode == "explicit" or .mode == "cached-explicit" or .mode == "cached-full" or .mode == "empty")' "$base.partition.json" >/dev/null
     cmp "$candidates" "$base.candidates.json"
     jq -e --argjson p "$p" --argjson n "$parts" --slurpfile selected "$base.selected.json" \
       '[to_entries[] | select(.key % $n == $p) | .value] == $selected[0]' "$candidates" >/dev/null
     mode=$(jq -r .mode "$base.partition.json")
+    if [[ $mode == cached-explicit ]]; then
+      [[ $(sha256sum "$base.cache-source.json" | cut -d' ' -f1) == "$(jq -r .cache_binding_sha256 "$base.partition.json")" ]]
+    fi
     if [[ $mode == cached-full ]]; then
       cached=$((cached+1)); receipts+=("$base.receipt.json")
     else

@@ -29,6 +29,15 @@ candidate count, and every candidate identity. Reuse is labeled `cached-full`;
 neither a partial receipt nor a union summary can substitute. `REPLAY_START_INDEX`
 changes only execution order and still visits the entire roster once.
 
+`REPLAY_PARTITION_CACHE` may name an earlier output directory for that same
+partition. Completed explicit native receipts can resume only with the same
+roster, partition, candidate vector, selected identities, native probe count,
+input and executable hashes, and successful native status binding. Reuse is
+labeled `cached-explicit`, preserving the native receipts and a hash-bound copy
+of the prior partition binding. An interrupted or missing binding is rerun;
+an invalid completed binding is rejected. A partial cache never substitutes
+for the other partitions or for full coverage.
+
 The workflow also divides the roster into eight disjoint session groups using
 `REPLAY_GROUP_INDEX/REPLAY_GROUP_COUNT`, with at most four matrix jobs active.
 Each group retains the four record partitions and the original per-job timeout.

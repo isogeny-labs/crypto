@@ -93,6 +93,37 @@ done
 jq '.sessions=[]' "$REPLAY_PLAN" > empty-plan.json
 REPLAY_PLAN="$tmp/empty-plan.json" fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/cached" 4
 unset REPLAY_RECEIPT_CACHE
+for p in 0 1 2; do
+  REPLAY_PARTITION_CACHE="$tmp/good/$p" METADATA_STUB_EXIT=7 \
+    pass bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/$p" "$p" 4
+done
+pass bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/3" 3 4
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/resumed" 4
+cp "$tmp/good/0/0000.receipt.json" original-part.json
+for mutation in '.auditor_binary_sha256=("0"*64)' '.replays[0].seq=99' '.checks.records_hash=false'; do
+  jq "$mutation" original-part.json > "$tmp/good/0/0000.receipt.json"
+  REPLAY_PARTITION_CACHE="$tmp/good/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+done
+cp original-part.json "$tmp/good/0/0000.receipt.json"
+cp "$tmp/good/0/0000.probe.json" original-probe.json
+jq '.replay_candidates=2' original-probe.json > "$tmp/good/0/0000.probe.json"
+REPLAY_PARTITION_CACHE="$tmp/good/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+cp original-probe.json "$tmp/good/0/0000.probe.json"
+printf '1\n' > "$tmp/good/0/0000.receipt.json.exit"
+REPLAY_PARTITION_CACHE="$tmp/good/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+printf '0\n' > "$tmp/good/0/0000.receipt.json.exit"
+cp "$tmp/good/0/0000.partition.json" original-partition.json
+jq '.partition=1' original-partition.json > "$tmp/good/0/0000.partition.json"
+REPLAY_PARTITION_CACHE="$tmp/good/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+cp original-partition.json "$tmp/good/0/0000.partition.json"
+printf 'changed\n' >> research/study/session/spec.json
+REPLAY_PARTITION_CACHE="$tmp/good/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+printf '{}\n' > research/study/session/spec.json
+REPLAY_PARTITION_CACHE="$tmp/good/0" pass bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+printf '\n' >> "$tmp/resumed/0/0000.cache-source.json"
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/resumed" 4
+REPLAY_PARTITION_CACHE="$tmp/good/0" pass bash "$here/replay_partition.sh" ./fake-native "$tmp/resumed/0" 0 4
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/resumed" 4
 cp -a research/study/session research/study/session-b
 jq '.sessions += .sessions | .sessions[1].dir="research/study/session-b"' "$REPLAY_PLAN" > grouped-plan.json
 export REPLAY_PLAN="$tmp/grouped-plan.json" REPLAY_GROUP_COUNT=2

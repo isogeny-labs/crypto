@@ -32,6 +32,31 @@ audit() {
   ((status <= 1)) && check_native "$receipt" && check_files "$receipt" "$dir" || return 1
   if [[ $(jq -r .ok "$receipt") == true ]]; then [[ $status == 0 ]]; else [[ $status == 1 ]]; fi
 }
+check_partition_cache() {
+  local cached=$1
+  jq -e --arg dir "$dir" --arg binary "$binary" --arg roster "$roster_hash" \
+    --argjson i "$i" --argjson p "$part" --argjson n "$parts" '
+    .schema == "ic-replay-partition/v1" and .dir == $dir and .binary == $binary and
+    .roster_sha256 == $roster and .index == $i and .partition == $p and .partitions == $n and
+    (.mode == "explicit" or .mode == "cached-explicit")' "$cached.partition.json" >/dev/null || return 1
+  cmp "$cached.candidates.json" "$base.candidates.json" || return 1
+  cmp "$cached.selected.json" "$base.selected.json" || return 1
+  check_native "$cached.probe.json" || return 1
+  check_native "$cached.receipt.json" || return 1
+  check_files "$cached.receipt.json" "$dir" || return 1
+  jq -e -L "$here" --slurpfile candidates "$base.candidates.json" \
+    --slurpfile selected "$base.selected.json" --slurpfile probe "$cached.probe.json" '
+    include "replay_native";
+    $probe[0].replay_selection == "sample" and
+    $probe[0].replay_candidates == ($candidates[0]|length) and ($probe[0].replays|length) == 1 and
+    ([$probe[0].replays[]|{seq,record_id}] - $candidates[0]|length) == 0 and
+    .replay_selection == "explicit" and (.replays|replay_keys) == $selected[0] and
+    .files == $probe[0].files and .session_id == $probe[0].session_id' "$cached.receipt.json" >/dev/null || return 1
+  local kind
+  for kind in probe receipt; do
+    [[ $(cat "$cached.$kind.json.exit") == "$(jq -r 'if .ok then 0 else 1 end' "$cached.$kind.json")" ]] || return 1
+  done
+}
 n=$(jq '.sessions|length' "$plan")
 start=${REPLAY_START_INDEX:-0}
 [[ $start =~ ^[0-9]+$ ]] && ((start < n)) || exit 2
@@ -62,15 +87,26 @@ for ((offset=0; offset<n; offset++)); do
   jq --argjson p "$part" --argjson n "$parts" '[to_entries[] | select(.key % $n == $p) | .value]' \
     "$base.candidates.json" > "$base.selected.json"
   mode=explicit
+  cache_binding=null
   cache=${REPLAY_RECEIPT_CACHE:-}/$tag.receipt.json
-  if [[ -n ${REPLAY_RECEIPT_CACHE:-} && -s $cache ]]; then
+  partial=${REPLAY_PARTITION_CACHE:-}/$tag
+  if [[ -n ${REPLAY_PARTITION_CACHE:-} && -s $partial.partition.json ]] &&
+      jq -e '.mode == "explicit" or .mode == "cached-explicit"' "$partial.partition.json" >/dev/null; then
+    check_partition_cache "$partial" || { echo "$dir: invalid completed partition cache"; exit 1; }
+    for suffix in probe.json probe.json.exit probe.json.stderr receipt.json receipt.json.exit receipt.json.stderr; do
+      cp "$partial.$suffix" "$base.$suffix"
+    done
+    cp "$partial.partition.json" "$base.cache-source.json"
+    cache_binding=$(sha256sum "$base.cache-source.json" | cut -d' ' -f1)
+    mode="cached-explicit"
+  elif [[ -n ${REPLAY_RECEIPT_CACHE:-} && -s $cache ]]; then
     check_native "$cache"
     check_files "$cache" "$dir"
     jq -e -L "$here" --slurpfile candidates "$base.candidates.json" 'include "replay_native";
       .replay_selection == "all" and .replay_candidates == ($candidates[0]|length) and
       (.replays|replay_keys) == $candidates[0]' "$cache" >/dev/null
     cp "$cache" "$base.receipt.json"
-    mode=cached-full
+    mode="cached-full"
   else
     audit "$base.probe.json" --replay 1 --replay-seed 0
     jq -e --slurpfile candidates "$base.candidates.json" '
@@ -92,10 +128,12 @@ for ((offset=0; offset<n; offset++)); do
     fi
   fi
   jq -n --arg schema ic-replay-partition/v1 --arg dir "$dir" --arg binary "$binary" \
-    --arg plan_sha256 "$plan_hash" --arg roster_sha256 "$roster_hash" --arg mode "$mode" --argjson index "$i" \
+    --arg plan_sha256 "$plan_hash" --arg roster_sha256 "$roster_hash" --arg mode "$mode" \
+    --arg cache_binding_sha256 "$cache_binding" --argjson index "$i" \
     --argjson partition "$part" --argjson partitions "$parts" \
     '{schema:$schema,dir:$dir,binary:$binary,plan_sha256:$plan_sha256,
       roster_sha256:$roster_sha256,mode:$mode,index:$index,
-      partition:$partition,partitions:$partitions}' > "$base.partition.json"
+      partition:$partition,partitions:$partitions} +
+      (if $mode == "cached-explicit" then {cache_binding_sha256:$cache_binding_sha256} else {} end)' > "$base.partition.json"
   echo "$dir: partition $part/$parts $mode ($(jq length "$base.selected.json") records)"
 done
