@@ -874,6 +874,23 @@ fn read_typed<T: for<'de> Deserialize<'de>>(
     serde_json::from_slice(&read_bounded(dir, path, admitted_file_cap(path, limits))?)
         .map_err(|e| e.to_string())
 }
+fn verify_censored_outcome(outcome: &Value) -> Result<(), String> {
+    if outcome["solver_completed"] != false
+        || [
+            "pdp_witness_verified",
+            "exhaustive_no_decomposition",
+            "native_backend_invoked",
+            "algebra_completed",
+            "native_statistics_complete",
+            "extraction_complete",
+        ]
+        .iter()
+        .any(|key| !outcome[*key].is_null() && outcome[*key] != false)
+    {
+        return Err("censored supervisor promoted wide F4 completion".into());
+    }
+    Ok(())
+}
 fn verify_unproved_claims(outcome: &Value) -> Result<(), String> {
     for key in [
         "trace_complete",
@@ -932,20 +949,7 @@ pub(super) fn verify(
             .iter()
             .all(|a| a.role == "unregistered-partial-artifact" && a.encoding == "native")
     {
-        if outcome["solver_completed"] != false
-            || [
-                "pdp_witness_verified",
-                "exhaustive_no_decomposition",
-                "native_backend_invoked",
-                "algebra_completed",
-                "native_statistics_complete",
-                "extraction_complete",
-            ]
-            .iter()
-            .any(|key| outcome[*key] == true)
-        {
-            return Err("partial wide F4 bytes promoted to completed claims".into());
-        }
+        verify_censored_outcome(outcome)?;
         return Ok(());
     }
     let reserved = artifacts.iter().any(|a| {
@@ -1004,6 +1008,41 @@ pub(super) fn verify(
     ]
     .iter()
     .any(|key| outcome[*key] == true);
+    if wide_config
+        && context.is_some()
+        && outcome["status"] == "error"
+        && !reserved
+        && !declared
+        && !claimed
+        && partial.is_empty()
+    {
+        // Ordinary workers return exit0 with a bound error result after setup
+        // failure. This exception cannot hide registered or unlisted wide data.
+        if [INPUT, RESULT, EVENTS, EXTRACT]
+            .iter()
+            .any(|p| fs::symlink_metadata(dir.join(p)).is_ok())
+        {
+            return Err("pre-solver error retains unlisted wide artifacts".into());
+        }
+        verify_censored_outcome(outcome)?;
+        artifact(artifacts, "result.json", "solver-outcome", "json", true)?;
+        let retained: Value = serde_json::from_slice(&read_bounded(dir, "result.json", RESERVE)?)
+            .map_err(|e| e.to_string())?;
+        verify_unproved_claims(&retained)?;
+        verify_censored_outcome(&retained)?;
+        let mut claimed_outcome = outcome.clone();
+        claimed_outcome
+            .as_object_mut()
+            .ok_or("worker outcome is not an object")?
+            .remove("supervisor");
+        if retained != claimed_outcome
+            || retained["status"] != "error"
+            || retained["reason"].as_str().is_none()
+        {
+            return Err("pre-solver error differs from retained worker result".into());
+        }
+        return Ok(());
+    }
     let expected = wide_config && (context.is_some() || claimed);
     if !reserved
         && !declared
@@ -1261,12 +1300,7 @@ pub(super) fn verify(
     );
     let retained_outcome: Value;
     let outcome = if censored {
-        if outcome["solver_completed"] != false
-            || outcome["pdp_witness_verified"] == true
-            || outcome["exhaustive_no_decomposition"] == true
-        {
-            return Err("censored supervisor promoted wide F4 completion".into());
-        }
+        verify_censored_outcome(outcome)?;
         artifact(artifacts, "result.json", "solver-outcome", "json", true)?;
         retained_outcome = serde_json::from_slice(&read_bounded(dir, "result.json", RESERVE)?)
             .map_err(|e| e.to_string())?;
@@ -1302,6 +1336,15 @@ pub(super) fn verify(
         return Err("wide F4 outcome counters mismatch".into());
     }
     let persistence_failed = outcome.get("live_persistence_errors").is_some();
+    let expected_status = if result.pdp_witness_verified && !persistence_failed {
+        "verified"
+    } else {
+        "partial"
+    };
+    if outcome["status"] != expected_status {
+        return Err("wide worker status differs from verified witness/persistence state".into());
+    }
+
     if outcome["termination"] != result.stop
         || outcome["solver_completed"]
             != json!(

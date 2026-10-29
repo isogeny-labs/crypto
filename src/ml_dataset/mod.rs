@@ -4315,6 +4315,9 @@ mod tests {
     }
 
     fn wide_prime_f4_cell_fixture(fixture: &TempRun, twist: bool) -> PathBuf {
+        wide_prime_f4_cell_fixture_kind(fixture, twist, false)
+    }
+    fn wide_prime_f4_cell_fixture_kind(fixture: &TempRun, twist: bool, negative: bool) -> PathBuf {
         let m = 2;
         let (mut plan, mut binding, protocol) = fixture.bound();
         plan.field_sizes = vec![61];
@@ -4349,8 +4352,8 @@ mod tests {
         let mut sum = None;
         // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
         // This constructs a group witness independently of S3 equations.
-        for i in 0..m {
-            let summand = if i < 2 || i % 2 == 1 {
+        for i in 0..if negative { 3 } else { m } {
+            let summand = if negative || i < 2 || i % 2 == 1 {
                 point
             } else {
                 arithmetic.neg(point)
@@ -4365,7 +4368,9 @@ mod tests {
         curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
         assert!(case.private_witness.is_null());
 
-        let dir = fixture.0.join(format!("cell-wide-f4-twist{twist}"));
+        let dir = fixture
+            .0
+            .join(format!("cell-wide-f4-twist{twist}-negative{negative}"));
         fs::create_dir(&dir).unwrap();
         let mut artifacts = vec![
             storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
@@ -4404,7 +4409,7 @@ mod tests {
         assert_eq!(context.launch, launch);
         let solved = solvers::solve_with_context(&config, &case, Some(&context)).unwrap();
         assert_eq!(
-            solved.outcome["pdp_witness_verified"], true,
+            solved.outcome["pdp_witness_verified"], !negative,
             "{}",
             solved.outcome
         );
@@ -4450,6 +4455,19 @@ mod tests {
             let fixture = TempRun::new();
             let dir = wide_prime_f4_cell_fixture(&fixture, twist);
             verify_cell(&dir, true).unwrap();
+            let negative = wide_prime_f4_cell_fixture_kind(&fixture, twist, true);
+            let negative_manifest = verify_cell(&negative, true).unwrap();
+            assert_eq!(negative_manifest.outcome["status"], "partial");
+            assert_eq!(
+                negative_manifest.outcome["exhaustive_no_decomposition"],
+                true
+            );
+            let mislabeled = altered_cell(
+                &negative,
+                &fixture.0.join("negative-mislabeled-verified"),
+                |_, manifest| manifest.outcome["status"] = json!("verified"),
+            );
+            assert!(verify_cell(&mislabeled, true).is_err());
             let retained = altered_cell(
                 &dir,
                 &fixture.0.join("retained-censored"),
@@ -4465,6 +4483,22 @@ mod tests {
                     manifest.outcome = json!({"status":"timeout","solver_completed":false});
                 },
             );
+            for flag in [
+                "native_backend_invoked",
+                "algebra_completed",
+                "native_statistics_complete",
+                "extraction_complete",
+            ] {
+                let bad = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("outer-censored-{flag}")),
+                    |_, manifest| manifest.outcome[flag] = json!(true),
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "outer censored outcome accepted {flag}"
+                );
+            }
             // First prove the unchanged registered producer result is valid
             // beneath outer censorship; each following failure is nonvacuous.
             verify_cell(&retained, true).unwrap();
@@ -4573,6 +4607,41 @@ mod tests {
                 },
             );
             verify_cell(&presolver, true).unwrap();
+            let setup_error = altered_cell(
+                &presolver,
+                &fixture.0.join("presolver-error"),
+                |path, manifest| {
+                    manifest.outcome = json!({"status":"error","reason":"fixed software fixture: curve setup failed","solver_completed":false,"scalar_recovered_without_witness":false,"known_answer_verified":false,"factor_base_verified":false});
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "result.json",
+                            "solver-outcome",
+                            &manifest.outcome,
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            verify_cell(&setup_error, true).unwrap();
+            let hidden = altered_cell(
+                &dir,
+                &fixture.0.join("completed-relabeled-error"),
+                |path, manifest| {
+                    manifest.outcome = json!({"status":"error","reason":"fabricated","solver_completed":false,"scalar_recovered_without_witness":false});
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "result.json",
+                            "solver-outcome",
+                            &manifest.outcome,
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            assert!(verify_cell(&hidden, true).is_err());
+
             for forbidden in [
                 "trace_complete",
                 "first_fall_degree",
