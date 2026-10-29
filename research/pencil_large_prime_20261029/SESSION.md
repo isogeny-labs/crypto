@@ -610,3 +610,17 @@ Build-only GitHub dispatch for source3d99a998, exact controller memory propagati
 
 ### Errors
 Local staticmusl build failed because x86_64-linux-musl-gcc is absent; raw log retained. No compiler substitution or experimental-result claim.
+
+## 2026-10-29 static build verification
+
+### What was done
+Existing GitHub run40919051188 completed successfully. Downloaded artifact12918062407; binary SHA256 matches build-info. Static binary reproduces all1260 archived workload identities, coordinates and seeds, and all9 prepared plans exactly (7 cohort,2 gates). Receipts in static_build_validation/.
+
+### Decisions made
+Retain instrument source3d99a998 unchanged. Plan validation executes no solvers and supplies no measured cost ratio. Controller/runtime bundle manifests also verified offline; no deployment.
+
+### Open threads
+PR2869 merge conflict, pending scoped infrastructure authorization, immutable image/runtime identities, protocol freeze, staged gate, full cohort and independent review.
+
+### Errors
+An initial fetch command used the artifact directory and correctly failed because it is not a Git repository; retried in the source worktree.
