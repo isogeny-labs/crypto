@@ -64,6 +64,18 @@ verified encoder or contraction implementation becomes available.
 
 ## Resolution and history
 
+2026-10-29 prime-field companion extension: the user's prime counterpart is
+officially Certicom ECCp-131. The paired
+[implementation and validation receipt](https://github.com/isogeny-labs/cryptanalysis/blob/73498317bbabad289bbfd47ca6ab3d81f80e1083/experiments/hashed-ecdl-tensor-reference/prime-development/README.md)
+now composes canonical prime-field arithmetic, modular Fourier multiplication,
+point validity/addition, fixed-cofactor image and affine hash constraints with
+the scalar BTN engine. Its 39 combined development tests pass, including 16
+OpenSSL multiples of published P/Q. The actual-target graph's 1,564,506 edges
+compile consistently; default u_0=0 exact summation exceeds the configured
+2,000,000-operation budget and produces no witness. Native Rust integration,
+general ell, full soundness/complexity audit and both challenge solves remain
+open. This progress does not close the checkboxes or assert a speedup.
+
 2026-10-29 companion update: a scalar ell=1 executable Cauchy/mode/Hermite
 reference and characteristic-two coordinate encoder are being published in
 [cryptanalysis](https://github.com/isogeny-labs/cryptanalysis/tree/a182e2a63c53f4de804744df2c43b0876a9f2c59/experiments/hashed-ecdl-tensor-reference),
