@@ -34,3 +34,13 @@ sum overanyfield withnonzero scale;the polynomialwithgiven sum/product equals
 the product oflinearroot factors overanycommutativering. Characteristic2
 nativeformula usesplusfor minus. This formalizes the algebra only,not a
 sourcecover identification. SamepinnedLean/mathlib,-j1-M4096/1200,CPU0,audit.
+
+Prospective secondcoefficient evaluation: bind actualdegree12field and3curve
+roots in acceptedR28input. Nonzerounweighted secondcoefficient permits sum/
+product extraction. Check exactquadratic reconstruction frommatchingoriginal
+linearroots;totalmultiplicity2; repeatedrootweight2retained. Computeeach
+second-imageFrobeniusorbit andexportexactfield/coordinates/multiplicities.
+KeepR28simple436/284/83imagechecks as regressions. A zero second denominator
+remainsunresolved. Finiteflatnorm andcommutingmultiplication operators give
+the same elementary symmetric multiset evenfornonreduced sourcefibers; do
+not infer that the fullC5lift or originalsourcepoint has been constructed.
