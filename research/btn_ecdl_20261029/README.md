@@ -21,6 +21,7 @@ No speed-up, no ECC2K-130 discrete logarithm, no leaderboard or benchmark row.
 | `ecc2k130_check.py` | the same encoding on the ECC2K-130 field and curve |
 | `width.py` | treewidth estimate (min-fill) of the relation network |
 | `test_enc7.py` | the n = 7 count check with cutset conditioning |
+| `gpu_contract.py` | device contractor: CuPy on a GPU, NumPy fallback, cutset as a batch axis |
 
 ## Verified results (local, seeded)
 
@@ -46,6 +47,25 @@ No speed-up, no ECC2K-130 discrete logarithm, no leaderboard or benchmark row.
   A witness derived from reference arithmetic on random curve points satisfies
   all predicates (0 violated); flipping one bit of the output violates 1.
   Factor-base predicates are omitted at this size (a 131-bit table).
+
+## GPU contractor (`gpu_contract.py`)
+
+Compiles the elimination order and einsum strings once, turns the cutset bits
+into a batch axis (all 2^k conditioned contractions run as one batched einsum
+per step, chunked to `--mem-gb`), and keeps tables as float64 on the device
+(cuBLAS DGEMM). Counts stay exact below 2^53, which the code checks.
+
+* `--selftest --brute` (`gpu_selftest.log`, NumPy backend): three n = 5 targets,
+  unbatched, batched over a 3-bit cut, `btn.contract` and brute force all agree
+  (40, 40, 42).
+* `--n 7 --cut 7 --R 40 59 --brute --mem-gb 4 --backend numpy` (`gpu_n7.log`):
+  count 112 = brute force 112, width 26 after the cut, 539 s on this CPU
+  container (the looped `test_enc7.py` took 336 s; batching costs memory
+  traffic on a CPU).
+* **Not run on a GPU.** This container has no GPU, CuPy or PyTorch. The CuPy
+  path is untested and no GPU timing is claimed. Run it with
+  `pip install cupy-cuda12x` and `python3 gpu_contract.py --backend cupy --selftest --brute`
+  first; repo rules route measured runs through isolab-eks.
 
 ## What this does not show
 
