@@ -6456,6 +6456,137 @@ impl PairTable {
     }
 }
 
+/// **A table of every signed `k`-sum of a base** (`k = 3` or `4`), keyed by
+/// the sum's abscissa as [`PairTable`] is, so one probe decides a
+/// `k`-summand decomposition.  The pair table's two-summand search costs a
+/// table of `|F|²` entries and needs about `0.4·|F|` relations; this one
+/// trades a smaller base for a table of about `2^{k−1}·C(|F|, k)` entries,
+/// so the generic cost `|F|^k + |F|·p/|F|^k` falls from `p^{2/3}` (pairs)
+/// to `p^{3/5}` (`k = 3`) and `p^{4/7}` (`k = 4`).  Still generic: as `k`
+/// grows it approaches baby-step giant-step, never below it.
+///
+/// One sum per orbit under negation: summands above strictly increasing
+/// abscissae, the first with a fixed sign.  Each partial sum is one
+/// addition, reused by every completion below it.
+pub struct KSumTable {
+    map: FastMap<[u32; 4]>,
+    pub k: u32,
+    pub entries: u64,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    /// Inserts tried during the build, kept or not.
+    pub insert_attempts: u64,
+    /// `x_index` reads of the build, one per abscissa.
+    pub index_lookups: u64,
+}
+
+impl KSumTable {
+    pub fn build_negation_folded<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+    ) -> Result<Self, String> {
+        if !(3..=4).contains(&k) {
+            return Err(format!("a k-sum table needs k = 3 or 4, not {k}"));
+        }
+        let start = Instant::now();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len() as u64;
+        let estimate = (1u64 << (k - 1)) * (a.pow(k) / if k == 3 { 6 } else { 24 });
+        let mut t = Self {
+            map: fast_map(estimate as usize + 1),
+            k,
+            entries: 0,
+            build_ops: GroupOps::default(),
+            build_wall_ns: 0,
+            insert_attempts: 0,
+            index_lookups: a,
+        };
+        let mut idx = [u32::MAX; 4];
+        t.extend(g, fb, &groups, 0, 0, None, &mut idx);
+        t.entries = t.map.len() as u64;
+        t.build_wall_ns = start.elapsed().as_nanos() as u64;
+        Ok(t)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn extend<G: CountedGroup>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        groups: &[&Vec<usize>],
+        depth: usize,
+        from: usize,
+        partial: Option<G::Elt>,
+        idx: &mut [u32; 4],
+    ) {
+        let last = depth + 1 == self.k as usize;
+        for (ai, group) in groups.iter().enumerate().skip(from) {
+            let signs: &[usize] = if depth == 0 { &group[..1] } else { group };
+            for &j in signs {
+                let s = match partial {
+                    None => fb.points[j],
+                    Some(p) => g.add(&mut self.build_ops, p, fb.points[j]),
+                };
+                if g.is_identity(&s) {
+                    continue;
+                }
+                idx[depth] = j as u32;
+                if last {
+                    self.map.entry(g.key(&s) >> 1).or_insert(*idx);
+                    self.insert_attempts += 1;
+                } else {
+                    self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
+                }
+            }
+        }
+        idx[depth] = u32::MAX;
+    }
+
+    /// The build's work beside its group operations, for `bitop/v1`.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.insert_attempts > 0 {
+            out.insert("table_insert_attempts".to_string(), self.insert_attempts);
+        }
+        if self.index_lookups > 0 {
+            out.insert("lookups".to_string(), self.index_lookups);
+        }
+        out
+    }
+
+    /// Signed indices of `k` base points summing to `target`, if the table
+    /// holds a sum equal to `±target`; one probe, and `k − 1` additions to
+    /// confirm a key match.
+    pub fn probe<G: CountedGroup>(
+        &self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        target: G::Elt,
+    ) -> Option<Vec<usize>> {
+        *lookups += 1;
+        let idx = self.map.get(&(g.key(&target) >> 1))?;
+        let summands: Vec<usize> = idx[..self.k as usize].iter().map(|&i| i as usize).collect();
+        let mut s = fb.points[summands[0]];
+        for &i in &summands[1..] {
+            s = g.add(ops, s, fb.points[i]);
+        }
+        if s == target {
+            Some(summands)
+        } else if s == g.neg(target) {
+            Some(summands.iter().map(|&i| fb.neg_index[i]).collect())
+        } else {
+            None
+        }
+    }
+}
+
 /// Bits of a table entry that hold the second index; the rotation that
 /// canonicalised the entry's sum sits above them.
 const FROB_INDEX_BITS: u32 = 26;

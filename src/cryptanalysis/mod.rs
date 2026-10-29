@@ -206,6 +206,7 @@ pub mod groebner_f4;
 pub mod group_op_count;
 pub mod hash_attacks;
 pub mod hilbert_class_poly;
+pub mod hky_fp_tower;
 pub mod hnp_ecdsa;
 pub mod hwcost;
 pub mod hyperelliptic_ic_bench;
