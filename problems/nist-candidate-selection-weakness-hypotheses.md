@@ -307,3 +307,10 @@ tracks the concrete remaining steps. Unblock by restoring automatic review,
 executing the same authorized upload, verifying a full remote GET, passing
 artifact admission, and normally pushing the existing branch. Those steps
 publish the empirical result; they do not resolve historical attribution.
+
+2026-10-29T15:45Z storage update: automatic review recovered; the identical tools/artifacts
+plot upload succeeds and a full remote GET verifies every original byte.
+The new pointer/receipt are bound separately, preserving all 51 result hashes
+and 77 previous parent lines. The temporary artifact-storage obstacle above
+is resolved. Normal push and current-head checks remain delivery steps; the
+historical and vulnerability obstructions are unchanged.

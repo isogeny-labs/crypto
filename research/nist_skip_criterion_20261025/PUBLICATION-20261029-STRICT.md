@@ -1,3 +1,22 @@
+# Strict-count publication: storage correction verified
+
+Update 2026-10-29T15:45Z: automatic review recovered and the same original artifact
+upload succeeded. A full remote GET of the standalone plot matches all
+85,071 original bytes and SHA-256. The artifact pointer and verified receipt
+are bound additively by `strict_elkies_20261029/CUSTODY-SHA256SUMS`; all 51
+original result bindings and the prior 77 parent lines remain unchanged.
+The parent manifest now has 78 bindings. Root `.gitignore` carries the exact
+plot entry, preserving the study's already bound `.gitignore`.
+
+To hydrate the plot and all evidence for the reports, use:
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/nist_skip_criterion_20261025/strict_elkies_20261029
+```
+
+The earlier storage obstruction below is resolved. Normal branch publication
+and current-head hosted checks remain pending at this recorded checkpoint.
+
 # Strict-count result: publication state
 
 At 15:31 UTC on 29 October 2026, the empirical result and PDFs are complete
