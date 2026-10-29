@@ -1,9 +1,13 @@
 # Native index-calculus tournament: round 0026
 
-**Decision:** `batch16` passes the registered incumbent gate on this bounded
-panel. This is an **engineering** improvement in complete cold instruction
-cost, with unchanged factor-base support and no exponent claim. The winning
-configuration remains above the paired rho reference on all five curves.
+**Decision:** `batch16` reduces complete cold instruction cost on this bounded
+panel, with unchanged factor-base support and no exponent claim. The native
+decision file passes its registered incumbent gate, including a wall-time
+condition. Because the hosted runner recorded no core reservation or contention
+receipt, that wall-time condition is **unqualified** under AGENTS.md §10;
+promotion awaits an isolated confirmation on a newly registered round. The
+instruction result is an **engineering** improvement. The selected configuration
+remains above the paired rho reference on all five curves.
 
 The [protocol](../../goal_20261028/native_pilot/PROTOCOL.md) was committed
 before [workflow run 40721688128](https://github.com/isogeny-labs/crypto/actions/runs/40721688128)
@@ -27,8 +31,8 @@ scalar-field linear algebra, individual log/descent, final verification and
 reporting. `S = Ir / sqrt(r)` is reported in the
 [native measurements](measurements.json); `2^x Ir` below is the logarithm of
 mean complete cold Ir. Neither is a group-addition equivalent, and there is
-no measured conversion to counted GAE. Native cold wall time is a separate
-secondary metric.
+no measured conversion to counted GAE. Native cold wall time is an unisolated
+secondary diagnostic, excluded from any qualified speed claim.
 
 The deliberately weak rank floor is `Ir >= K`, where `K` is the verified
 factor-base rank: at least one relation-producing trial per independent
@@ -61,7 +65,7 @@ Development selected `batch16`; selection retained it over `batch32`.
 The final confirmation and replay each comprise 60 targets × three repeats
 for `incumbent`, `batch16` and rho. Confirmation gives
 `batch16/incumbent = 0.630 [0.578, 0.676]` in Ir and
-`0.762 [0.740, 0.783]` in native cold wall time (paired 95% intervals).
+`0.762 [0.740, 0.783]` in unisolated native cold wall time (paired 95% intervals).
 Replay gives `0.630 [0.578, 0.676]` Ir and
 `0.759 [0.736, 0.779]` wall time. Every cell passes the registered 1.10
 per-cell cap. The complete cold **IC/rho** comparison is

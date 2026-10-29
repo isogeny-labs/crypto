@@ -2125,6 +2125,8 @@ def markdown(doc: dict) -> str:
           "is still cheaper on every curve; this rho is not qualified as globally strongest. "
           "The factor base was fixed within each paired arm, so this panel does not choose a new base. "
           "`2^x Ir` is guest instructions, with no measured curve-addition conversion. "
+          "The hosted wall times lack core-reservation and contention receipts, so the native "
+          "wall condition is unqualified and promotion awaits an isolated new round. "
           "The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.", "",
           "| ICV1 curve | Signed base B | Was: incumbent | batch16 | S (Ir/√r) | IC/incumbent | IC/rho (1.0× parity) |",
           "|:--|--:|--:|--:|--:|--:|--:|"]
@@ -3041,7 +3043,8 @@ def page(doc: dict, standalone: bool) -> str:
              '<strong>1.0× IC/rho is parity.</strong> Guest instruction counts have no measured '
              'curve-addition conversion. The factor base was fixed between paired arms; this round '
              'does not choose a different base. The rank floor is the weak Ir ≥ K, and no scaling '
-             'exponent was promoted.</p>'
+             'exponent was promoted. Hosted wall times lack isolation receipts; the native wall '
+             'condition is unqualified and promotion awaits an isolated new round.</p>'
              f'<p><a href="{esc(repo_link + pilot["report"])}">Full result</a> · '
              f'<a href="{esc(repo_link + pilot["source"])}">Frozen per-cell data</a> · '
              f'{pilot["audit"]["trial_receipts"]:,} native-audited trial receipts.</p>'
