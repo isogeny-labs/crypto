@@ -1018,9 +1018,16 @@ pub(super) fn verify(
     {
         // Ordinary workers return exit0 with a bound error result after setup
         // failure. This exception cannot hide registered or unlisted wide data.
-        if [INPUT, RESULT, EVENTS, EXTRACT]
-            .iter()
-            .any(|p| fs::symlink_metadata(dir.join(p)).is_ok())
+        if [
+            INPUT,
+            RESULT,
+            EVENTS,
+            EXTRACT,
+            "pdp-witness.json",
+            "solver-domain.json",
+        ]
+        .iter()
+        .any(|p| fs::symlink_metadata(dir.join(p)).is_ok())
         {
             return Err("pre-solver error retains unlisted wide artifacts".into());
         }

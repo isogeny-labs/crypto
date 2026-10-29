@@ -4611,6 +4611,10 @@ mod tests {
                 &presolver,
                 &fixture.0.join("presolver-error"),
                 |path, manifest| {
+                    for name in ["pdp-witness.json", "solver-domain.json"] {
+                        fs::remove_file(path.join(name)).unwrap();
+                        manifest.artifacts.retain(|a| a.path != name);
+                    }
                     manifest.outcome = json!({"status":"error","reason":"fixed software fixture: curve setup failed","solver_completed":false,"scalar_recovered_without_witness":false,"known_answer_verified":false,"factor_base_verified":false});
                     manifest.artifacts.push(
                         storage::write_json(
