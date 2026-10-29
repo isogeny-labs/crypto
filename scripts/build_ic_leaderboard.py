@@ -80,6 +80,10 @@ SOURCES = {
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
+    "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+    "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
+    "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
+    "d4_char2_cmp_m14": "research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
@@ -994,6 +998,46 @@ def postgb_linear_stage_component() -> dict:
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["postgb_linear_stage"],
             "validation": ("validated: replay certificate, validator report and the matched rho reference "
                            f"with the §5a band ({study}/validation/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def d4_char2_frob_roots_component() -> dict:
+    """Frobenius-semilinear squaring in the F_q root finding of the char-2 D4
+    index calculus (`frob_roots=1`), from research/ic_d4_char2_lever_20261023:
+    per-target S of the base and lever arms and the matched rho.negation priced
+    at w = 0, 0.1 and 1 GAE per unpriced native operation, copied from the
+    study's tabulate.sh tables (made from the session records), and the paired
+    lever/base ratio from its ecbench comparisons. A component improvement: the
+    same trials, relations and logarithms, fewer counted multiplications; these
+    curves have no row in tables A-C. Its standing comes from the study's
+    VALIDATION.json."""
+    study = "research/ic_d4_char2_lever_20261023"
+    rows = []
+    for key, m in (("d4_char2_m12", 12), ("d4_char2_m14", 14)):
+        arms: dict[int, dict] = {}
+        for line in (REPO / SOURCES[key]).read_text().splitlines():
+            f = line.split("\t")
+            if int(f[0]) != m or f[4] != "verified":
+                raise SystemExit(f"{SOURCES[key]}: unexpected curve or an unverified run")
+            arms.setdefault(int(f[1]), {})[f[2]] = [float(x) for x in f[3:4] + f[6:9]]
+        for t, a in sorted(arms.items()):
+            if a["ic-base-aa"][0] != a["ic-base"][0]:
+                raise SystemExit(f"{SOURCES[key]}: A/A arm differs from the base on target {t}")
+            base, lever, rho = a["ic-base"][0], a["ic-lever"][0], a["ic-base"][1:]
+            rows.append({"m": m, "target": t, "base": base, "lever": lever, "ratio": lever / base,
+                         "base_over_rho": [base / r for r in rho], "lever_over_rho": [lever / r for r in rho]})
+    paired = {}
+    for key, m in (("d4_char2_cmp_m12", 12), ("d4_char2_cmp_m14", 14)):
+        o = load(SOURCES[key])["ops"]
+        if o.get("status") != "ok" or not o.get("same_seeds"):
+            raise SystemExit(f"{SOURCES[key]}: comparison not ok or seeds differ")
+        paired[m] = {"ratio": o["ratio_b_over_a"], "ci95": o["ci95"], "pairs": o["pairs"]}
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "paired": paired, "class": "engineering",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["d4_char2_m12"],
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -2013,6 +2057,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
+        "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
@@ -2310,6 +2355,24 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    d4 = doc["d4_char2_frob_roots_component"]
+    L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
+          "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
+          "the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction "
+          "(`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. "
+          "These curves have no row in tables A–C. "
+          f"{d4['unit']}; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.", "",
+          "| curve | target | S before → after | after ÷ before | IC ÷ rho-neg before → after (w = 0 / 0.1 / 1) |",
+          "|:--|--:|:--|:--|:--|"]
+    for r in d4["rows"]:
+        band = " / ".join(f"{b:.2f} → {a:.2f}" for b, a in zip(r["base_over_rho"], r["lever_over_rho"]))
+        L.append(f"| m = {r['m']} | {r['target']} | {r['base']:.4g} → {r['lever']:.4g} | **{r['ratio']:.4f}** | {band} |")
+    pr = "; ".join(f"m = {m}: {p['ratio']:.4f} [{p['ci95'][0]:.4f}, {p['ci95'][1]:.4f}] over {p['pairs']} pair(s)"
+                   for m, p in sorted(d4["paired"].items()))
+    L += ["", f"Paired lever ÷ base (ecbench compare): {pr}. Rho stays ahead at every weight; the IC ÷ rho column is "
+              "the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + d4['report']}) · [study](../../{d4['study']}) · [data](../../{d4['source']}).", "",
+          d4["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -3273,6 +3336,28 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    d4 = doc["d4_char2_frob_roots_component"]
+    P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
+             'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
+             '<p>On the k = 4 characteristic-2 ladder, each squaring modulo h in the F<sub>q</sub> root finding is '
+             'done as Σ a<sub>i</sub>²X<sup>2i</sup> with a per-modulus table instead of a generic product and '
+             'reduction (<code>frob_roots=1</code>). Same trials, relations and logarithms; every executed '
+             'multiplication is still counted. These curves have no row in tables A–C. '
+             f'{esc(d4["unit"])}; IC S counts F<sub>q</sub> multiplications only (the eigen step\'s XOR and table-lookup work is not emitted), so it is a lower bound; '
+             f'only rho is repriced across the §5a band, and whether the gain survives pricing that work is unverified.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>Target</th><th>S before → after</th>'
+             '<th>after ÷ before</th><th>IC ÷ rho-neg before → after (w = 0 / 0.1 / 1)</th></tr></thead><tbody>')
+    for r in d4["rows"]:
+        band = " / ".join(f"{b:.2f} → {a:.2f}" for b, a in zip(r["base_over_rho"], r["lever_over_rho"]))
+        P.append(f'<tr><td>m = {r["m"]}</td><td>{r["target"]}</td><td>{r["base"]:.4g} → {r["lever"]:.4g}</td>'
+                 f'<td><b>{r["ratio"]:.4f}</b></td><td>{band}</td></tr>')
+    pr = "; ".join(f"m = {m}: {p['ratio']:.4f} [{p['ci95'][0]:.4f}, {p['ci95'][1]:.4f}] over {p['pairs']} pair(s)"
+                   for m, p in sorted(d4["paired"].items()))
+    P.append('</tbody></table></div>'
+             f'<p>Paired lever ÷ base (ecbench compare): {esc(pr)}. Rho stays ahead at every weight; the IC ÷ rho '
+             'column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(d4["report"], "Report")} · {gh(d4["study"], "study")} · {gh(d4["source"], "data")}.</p>'
+             f'<p class="muted">{esc(d4["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '

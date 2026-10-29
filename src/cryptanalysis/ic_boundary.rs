@@ -2822,6 +2822,241 @@ pub fn rho_batch_with<G: CountedGroup, C: RhoClasses<G>>(
     }
 }
 
+/// A preprocessing-rho table ([`PreprocessingRho::build`]) and the
+/// walker it was built with.
+pub struct PreprocessingRho<'a, G: CountedGroup, C: RhoClasses<G>> {
+    g: &'a G,
+    generator: G::Elt,
+    r: u64,
+    shape: WalkShape,
+    walker: TunedWalker<'a, G, C>,
+    table: FastMap<u64>,
+    /// The jump table and the precomputation stride: target-blind.
+    pub setup_ops: GroupOps,
+    /// The precomputation's walks: target-blind.
+    pub precompute_ops: GroupOps,
+    pub entries: u64,
+    pub dp_bits: u32,
+    pub precompute_wall_ns: u64,
+    pub counters: BTreeMap<String, u64>,
+}
+
+/// One target's online walk against a [`PreprocessingRho`] table.
+#[derive(Clone, Debug, Default)]
+pub struct PreprocessingOnline {
+    pub recovered: Option<u64>,
+    /// Everything after the target arrives, verification included.
+    pub ops: GroupOps,
+    pub verification_ops: u64,
+    pub wall_ns: u64,
+    pub counters: BTreeMap<String, u64>,
+}
+
+impl<'a, G: CountedGroup, C: RhoClasses<G>> PreprocessingRho<'a, G, C> {
+    /// **Preprocessing rho** (Bernstein–Lange 2013): a table of `entries`
+    /// distinguished points built from walks in `G` alone; [`Self::solve`]
+    /// then walks one target until a walk ends on a stored point.
+    ///
+    /// The walk is [`rho_batch_with`]'s: the tuned walker on `classes`,
+    /// jumps `[c_j]G` only, so a point's trail does not depend on any
+    /// target.  The table and every online walk use this one
+    /// [`TunedWalker`] and jump table, escapes included, so they are the
+    /// same map.  Jumps and the precomputation's starts come from
+    /// `table_seed`.  Precomputation starts are `[k·t]G` with `b = 0`; each
+    /// new distinguished point is stored with its `a`, and a repeated one is
+    /// counted and dropped.  The build stops at `entries` points or after
+    /// `max_precompute` walk operations.
+    ///
+    /// With `dp_bits = None` the walk length is `2^d ≈ √(N/entries)` for
+    /// `N = r/A` classes, which puts the online cost near `2√(N/S)`.
+    /// Generic: it sits on `S·T² ≈ N`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build(
+        g: &'a G,
+        classes: &'a C,
+        generator: G::Elt,
+        r: u64,
+        entries: u64,
+        dp_bits: Option<u32>,
+        table_seed: u64,
+        max_precompute: u64,
+        walk: RhoWalk,
+    ) -> Self {
+        let n = (r as f64) / f64::from(classes.automorphisms().max(1));
+        let d = dp_bits.unwrap_or_else(|| {
+            let w = (n / entries.max(1) as f64).sqrt();
+            w.log2().round().max(0.0) as u32
+        });
+        let walk = RhoWalk {
+            dp_bits: Some(d),
+            ..walk
+        };
+        let shape = WalkShape::of(r, walk);
+        let mut setup_ops = GroupOps::default();
+        let mut precompute_ops = GroupOps::default();
+        let mut rng = StdRng::seed_from_u64(table_seed);
+        let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
+            .map(|_| {
+                let c = rng.gen_range(1..r.max(2));
+                (g.mul(&mut setup_ops, generator, c), c % r, 0)
+            })
+            .collect();
+        let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk);
+        let t0 = Instant::now();
+        let mut table: FastMap<u64> = fast_map(entries as usize + 1);
+        let mut tally = WalkTally::default();
+        let mut ta = rng.gen_range(1..r.max(2));
+        let mut stride = g.mul(&mut setup_ops, generator, ta);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            stride = g.mul(&mut setup_ops, generator, ta);
+        }
+        let (mut sx, mut sa) = (stride, ta % r);
+        let (mut walks, mut starts, mut repeats) = (0u64, 0u64, 0u64);
+        while (table.len() as u64) < entries && tally.walk_ops() < max_precompute {
+            walks += 1;
+            if walks > 1 {
+                sx = g.add(&mut precompute_ops, sx, stride);
+                sa = addmod(sa, ta, r);
+                starts += 1;
+            }
+            if g.is_identity(&sx) {
+                continue;
+            }
+            // The walker's budget bounds the tally's running total.
+            if let WalkEnd::Distinguished(x, a, _) =
+                walker.walk(&mut precompute_ops, &mut tally, sx, sa, 0, max_precompute)
+            {
+                if table.insert(g.key(&x), a).is_some() {
+                    repeats += 1;
+                }
+            }
+        }
+        let mut counters = BTreeMap::new();
+        for (name, v) in [
+            ("jumps", shape.jumps as u64),
+            ("jump_coefficient_bits", u64::from(shape.coefficient_bits)),
+            ("distinguished_point_bits", u64::from(shape.dp_bits)),
+            ("setup_additions", setup_ops.adds),
+            ("setup_doublings", setup_ops.doubles),
+            ("table_entries", table.len() as u64),
+            ("table_entries_requested", entries),
+            ("precompute_walks", walks),
+            ("precompute_start_additions", starts),
+            ("precompute_walk_operations", tally.walk_ops()),
+            ("precompute_repeated_points", repeats),
+            ("precompute_walks_capped", tally.capped),
+            ("precompute_walks_abandoned", tally.abandoned),
+            (
+                "precompute_canonicalisations_uncharged",
+                tally.canonicalisations,
+            ),
+            ("table_inserts_uncharged", walks),
+        ] {
+            counters.insert(name.to_string(), v);
+        }
+        Self {
+            g,
+            generator,
+            r,
+            dp_bits: shape.dp_bits,
+            shape,
+            walker,
+            entries: table.len() as u64,
+            table,
+            setup_ops,
+            precompute_ops,
+            precompute_wall_ns: t0.elapsed().as_nanos() as u64,
+            counters,
+        }
+    }
+
+    /// One target: walks from `[k]([t_a]G + [t_b]Q)`, seeded by `seed`,
+    /// until one ends at a stored `[a₂]G` and `[a]G + [b]Q = [a₂]G` gives
+    /// the logarithm; a walk ending at an unstored point is a miss.  The
+    /// table is not changed, so targets are independent.
+    pub fn solve(&mut self, target: G::Elt, seed: u64, max_steps: u64) -> PreprocessingOnline {
+        let (g, r, generator) = (self.g, self.r, self.generator);
+        let t0 = Instant::now();
+        let mut out = PreprocessingOnline::default();
+        let mut rng = StdRng::seed_from_u64(seed);
+        let mut tally = WalkTally::default();
+        let ops = &mut out.ops;
+        let gq = g.add(ops, generator, target);
+        let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+        let mut stride = joint_mul(g, ops, generator, target, gq, ta, tb);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            tb = rng.gen_range(1..r.max(2));
+            stride = joint_mul(g, ops, generator, target, gq, ta, tb);
+        }
+        let (mut x0, mut a0, mut b0) = (stride, ta % r, tb % r);
+        let (mut walks, mut starts, mut misses, mut useless) = (0u64, 0u64, 0u64, 0u64);
+        while tally.walk_ops() < max_steps && walks < max_steps {
+            walks += 1;
+            if walks > 1 {
+                x0 = g.add(ops, x0, stride);
+                a0 = addmod(a0, ta, r);
+                b0 = addmod(b0, tb, r);
+                starts += 1;
+            }
+            if g.is_identity(&x0) {
+                continue;
+            }
+            let WalkEnd::Distinguished(x, a, b) =
+                self.walker.walk(ops, &mut tally, x0, a0, b0, max_steps)
+            else {
+                continue;
+            };
+            let Some(&a2) = self.table.get(&g.key(&x)) else {
+                misses += 1;
+                continue;
+            };
+            // [a]G + [b]Q = [a₂]G  ⇒  d = (a₂ − a)/b
+            if let Some(inv) = invmod(b, r) {
+                let d = mulmod(submod(a2, a, r), inv, r);
+                let before = ops.gae();
+                let check = g.mul(ops, generator, d);
+                out.verification_ops += (ops.gae() - before) as u64;
+                if check == target {
+                    out.recovered = Some(d);
+                    break;
+                }
+            }
+            useless += 1;
+        }
+        out.wall_ns = t0.elapsed().as_nanos() as u64;
+        let mut counters = tuned_counters(
+            &self.shape,
+            GroupOps::default(),
+            starts,
+            &tally,
+            out.verification_ops,
+            useless,
+        );
+        // The walk's shape and set-up are the table's, reported once by
+        // `build`; a caller merging both ledgers must not count them twice.
+        for name in [
+            "jumps",
+            "jump_coefficient_bits",
+            "distinguished_point_bits",
+            "setup_additions",
+            "setup_doublings",
+        ] {
+            counters.remove(name);
+        }
+        for (name, v) in [
+            ("online_walks", walks),
+            ("online_misses", misses),
+            ("table_lookups_uncharged", walks),
+        ] {
+            counters.insert(name.to_string(), v);
+        }
+        out.counters = counters;
+        out
+    }
+}
+
 /// The matched reference for `A = 2`: [`rho_reference_walk`] with
 /// [`RhoWalk::negation`].
 pub fn rho_reference_negation<G: CountedGroup>(
@@ -6143,20 +6378,26 @@ impl PairTable {
     }
 }
 
-/// **A table of every signed `k`-sum of a base** (`k = 3` or `4`), keyed by
+/// Largest arity a [`KSumTable`] builds, and the bits each packed summand
+/// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
+const KSUM_MAX_K: u32 = 5;
+const KSUM_INDEX_BITS: u32 = 12;
+
+/// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
 /// `k`-summand decomposition.  The pair table's two-summand search costs a
 /// table of `|F|²` entries and needs about `0.4·|F|` relations; this one
 /// trades a smaller base for a table of about `2^{k−1}·C(|F|, k)` entries,
 /// so the generic cost `|F|^k + |F|·p/|F|^k` falls from `p^{2/3}` (pairs)
-/// to `p^{3/5}` (`k = 3`) and `p^{4/7}` (`k = 4`).  Still generic: as `k`
+/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`) and `p^{5/9}` (`k = 5`).  Still generic: as `k`
 /// grows it approaches baby-step giant-step, never below it.
 ///
 /// One sum per orbit under negation: summands above strictly increasing
 /// abscissae, the first with a fixed sign.  Each partial sum is one
 /// addition, reused by every completion below it.
 pub struct KSumTable {
-    map: FastMap<[u32; 4]>,
+    /// The summands of each kept sum, [`KSUM_INDEX_BITS`] bits apiece.
+    map: FastMap<u64>,
     pub k: u32,
     pub entries: u64,
     pub build_ops: GroupOps,
@@ -6173,8 +6414,14 @@ impl KSumTable {
         fb: &FactorBase<G::Elt>,
         k: u32,
     ) -> Result<Self, String> {
-        if !(3..=4).contains(&k) {
-            return Err(format!("a k-sum table needs k = 3 or 4, not {k}"));
+        if !(3..=KSUM_MAX_K).contains(&k) {
+            return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
+        }
+        if fb.points.len() >= 1 << KSUM_INDEX_BITS {
+            return Err(format!(
+                "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
+                fb.points.len()
+            ));
         }
         let start = Instant::now();
         let groups: Vec<&Vec<usize>> = fb
@@ -6183,7 +6430,8 @@ impl KSumTable {
             .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
             .collect();
         let a = groups.len() as u64;
-        let estimate = (1u64 << (k - 1)) * (a.pow(k) / if k == 3 { 6 } else { 24 });
+        let combinations = (0..u64::from(k)).fold(1u64, |c, i| c * (a - i) / (i + 1));
+        let estimate = (1u64 << (k - 1)) * combinations;
         let mut t = Self {
             map: fast_map(estimate as usize + 1),
             k,
@@ -6193,7 +6441,7 @@ impl KSumTable {
             insert_attempts: 0,
             index_lookups: a,
         };
-        let mut idx = [u32::MAX; 4];
+        let mut idx = [u32::MAX; KSUM_MAX_K as usize];
         t.extend(g, fb, &groups, 0, 0, None, &mut idx);
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
@@ -6209,7 +6457,7 @@ impl KSumTable {
         depth: usize,
         from: usize,
         partial: Option<G::Elt>,
-        idx: &mut [u32; 4],
+        idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
         let last = depth + 1 == self.k as usize;
         for (ai, group) in groups.iter().enumerate().skip(from) {
@@ -6224,7 +6472,11 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
-                    self.map.entry(g.key(&s) >> 1).or_insert(*idx);
+                    let packed = idx[..self.k as usize]
+                        .iter()
+                        .rev()
+                        .fold(0u64, |w, &i| (w << KSUM_INDEX_BITS) | u64::from(i));
+                    self.map.entry(g.key(&s) >> 1).or_insert(packed);
                     self.insert_attempts += 1;
                 } else {
                     self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
@@ -6258,8 +6510,11 @@ impl KSumTable {
         target: G::Elt,
     ) -> Option<Vec<usize>> {
         *lookups += 1;
-        let idx = self.map.get(&(g.key(&target) >> 1))?;
-        let summands: Vec<usize> = idx[..self.k as usize].iter().map(|&i| i as usize).collect();
+        let packed = *self.map.get(&(g.key(&target) >> 1))?;
+        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
+        let summands: Vec<usize> = (0..self.k)
+            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
+            .collect();
         let mut s = fb.points[summands[0]];
         for &i in &summands[1..] {
             s = g.add(ops, s, fb.points[i]);
@@ -10925,6 +11180,68 @@ mod tests {
         assert!(ls.is_power_of_two());
         assert!(
             ParallelRho::default_dp_bits(&small, ls) < ParallelRho::default_dp_bits(&large, ll)
+        );
+    }
+
+    /// Preprocessing rho: the table is target-blind (same ledger and
+    /// entries for every target), every target is recovered, and the
+    /// online walks cost about `2√(N/S)`, far below plain rho's
+    /// `√(πr/4)` — which they could not if the online map differed from
+    /// the precomputation's.
+    #[test]
+    fn preprocessing_rho_table_is_target_blind_and_online_walks_are_short() {
+        let r = 1_000_000_007u64;
+        let grp = Cyclic(r);
+        let gen = 5u64;
+        let classes = NegationClasses { r };
+        let entries = 4096u64;
+        let runs = 24u64;
+        let build = || {
+            PreprocessingRho::build(
+                &grp,
+                &classes,
+                gen,
+                r,
+                entries,
+                None,
+                20261028,
+                1 << 34,
+                RhoWalk::negation(),
+            )
+        };
+        let mut table = build();
+        assert_eq!(table.entries, entries);
+        let again = build();
+        assert_eq!(
+            (
+                table.setup_ops,
+                table.precompute_ops,
+                table.counters.clone()
+            ),
+            (
+                again.setup_ops,
+                again.precompute_ops,
+                again.counters.clone()
+            )
+        );
+        let mut online = 0.0f64;
+        for seed in 0..runs {
+            let d = 1 + mix(seed + 77) % (r - 1);
+            let res = table.solve(mulmod(gen, d, r), seed, 1 << 32);
+            assert_eq!(res.recovered, Some(d), "seed {seed}");
+            assert!(!res.counters.contains_key("distinguished_point_bits"));
+            assert!(!res.counters.contains_key("jumps"));
+            online += res.counters["walk_operations"] as f64 / runs as f64;
+        }
+        let bl = 2.0 * ((r as f64 / 2.0) / entries as f64).sqrt();
+        let plain = (std::f64::consts::PI * r as f64 / 4.0).sqrt();
+        assert!(
+            online < 3.0 * bl,
+            "online {online:.0} against 2√(N/S) = {bl:.0}"
+        );
+        assert!(
+            online < plain / 10.0,
+            "online {online:.0} against plain {plain:.0}"
         );
     }
 
