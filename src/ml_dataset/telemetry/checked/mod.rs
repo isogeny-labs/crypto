@@ -37,6 +37,9 @@ pub(crate) fn install_policy(root: &Path) -> Result<Artifact, String> {
     )
 }
 
+// The local integration uses this classifier only for registry assertions.
+// Remote snapshot callers are not part of this integration.
+#[cfg(test)]
 pub(crate) fn role(path: &str) -> Option<&'static str> {
     if path == POLICY_PATH {
         return Some("restricted-measurement-policy");
