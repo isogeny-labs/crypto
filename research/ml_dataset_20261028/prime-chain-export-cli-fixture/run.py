@@ -40,6 +40,21 @@ def source_inventory(root):
     return len(receipt["inventory"])
 
 
+def scratch_bytes(root):
+    total = 0
+    def walk_error(error):
+        if not isinstance(error, FileNotFoundError):
+            raise error
+    for directory, _, files in os.walk(root, onerror=walk_error):
+        for name in files:
+            try:
+                total += (Path(directory) / name).stat().st_size
+            except FileNotFoundError:
+                # Export atomically removes its staging directory on completion.
+                continue
+    return total
+
+
 def command(binary, source, destination, scratch, number, expected_exit, records):
     argv = [str(binary), "dataset", "--color", "never", "export", "--out", str(source), "--destination", str(destination)]
     env = {"PATH": "/usr/bin:/bin", "LANG": "C", "LC_ALL": "C", "RAYON_NUM_THREADS": "1"}
@@ -61,11 +76,13 @@ def command(binary, source, destination, scratch, number, expected_exit, records
             while child.poll() is None:
                 if time.monotonic() - started > 60:
                     raise TimeoutError("export command exceeded60seconds")
-                output_bytes = sum(p.stat().st_size for p in scratch.rglob("*") if p.is_file())
+                output_bytes = scratch_bytes(scratch)
                 if output_bytes > 64 * 1024**2:
                     raise RuntimeError("polled fixture output exceeded64MiB")
                 time.sleep(0.05)
             exit_code = child.wait()
+            if scratch_bytes(scratch) > 64 * 1024**2:
+                raise RuntimeError("fixture output exceeded64MiB at command exit")
     finally:
         if child is not None and child.poll() is None:
             os.killpg(child.pid, signal.SIGKILL)
