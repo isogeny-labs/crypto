@@ -498,4 +498,9 @@ pub use crate as kernel;
 #[cfg(feature = "producer")]
 pub use five_leads_study::three_leads as engine;
 #[cfg(feature = "producer")]
+#[path = "../../../src/cryptanalysis/ic_measurement.rs"]
+// The root-only external Callgrind dump entry is unused by this standalone crate.
+#[expect(dead_code, reason = "shared clock includes a root-only Callgrind entry")]
+pub mod measurement;
+#[cfg(feature = "producer")]
 pub mod native_solver;
