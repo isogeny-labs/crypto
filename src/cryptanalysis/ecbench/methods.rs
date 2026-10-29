@@ -55,8 +55,8 @@ use crate::cryptanalysis::ic_boundary::{
     price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, rho_walk_with_policy,
     signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult, RhoResult, RhoWalk,
-    WalkPolicy,
+    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult,
+    RhoResult, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -150,6 +150,19 @@ const K4_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const THREE_LEADS_PENCIL_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "small_denominator",
+        default: None,
+        help: "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection",
+    },
+    ParamDecl {
+        name: "matrix_coefficient_cap",
+        default: None,
+        help:
+            "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks",
+    },
+];
 const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     name: "trial_cap",
     default: None,
@@ -192,7 +205,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -439,6 +452,7 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v2",family:"ic",summary:"Point-driven pencil with signed symbolic elimination; cold setup per target; cost remains explicitly incomplete",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
@@ -496,6 +510,20 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.preprocessing",
+            family: "rho",
+            summary: "Bernstein–Lange preprocessing rho on {P, −P} (A = 2): a target-blind table of `entries` distinguished points from walks in G only, then the target's walks on the same map until one ends on a stored point; S counts the table, the precomputation and the online walk",
+            entry: "ic_boundary::PreprocessingRho::{build, solve}(NegationClasses, RhoWalk::negation())",
+            applies: Applies::PrimeOnly,
+            params: &[
+                ParamDecl { name: "entries", default: None, help: "S, distinguished points kept in the target-blind table" },
+                ParamDecl { name: "dp_bits", default: Some("0"), help: "distinguished-point bits; 0 takes round(log2 √(r/(2S)))" },
+                ParamDecl { name: "table_seed", default: Some("20261028"), help: "seed of the jumps and the precomputation starts (target-independent)" },
+                ParamDecl { name: "precompute_cap", default: Some("0"), help: "bound on precomputation walk operations; 0 takes 64·√(r·S) + 2^20" },
+                ParamDecl { name: "cap_multiple", default: Some("64"), help: "online step budget as a multiple of √r before the run counts as exhausted" },
+            ],
         },
         MethodDecl {
             id: "ic.k4_gaudry",
@@ -981,6 +1009,21 @@ pub fn registry() -> &'static [MethodDecl] {
                 ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
                 ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
                 ParamDecl { name: "max_pair_work", default: None, help: "hard bound on size*(size+1) pair-construction attempts" },
+                ParamDecl { name: "max_trials", default: None, help: "maximum target-dependent queries; at most one subgroup cycle" },
+            ],
+        },
+        MethodDecl {
+            id: "ic.known_log_ksum_v1",
+            family: "ic",
+            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3, 4, 5) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
+            entry: "ecbench::known_log::{prepare_ksum,recover}",
+            applies: Applies::PrimeOnly,
+            params: &[
+                ParamDecl { name: "size", default: None, help: "unsigned base points; signed point count is twice this (at most 2047)" },
+                ParamDecl { name: "k", default: None, help: "summands, 3, 4 or 5" },
+                ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
+                ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
+                ParamDecl { name: "max_sums", default: None, help: "hard bound on the table's 2^(k-1)·C(size,k) sums, checked before any work" },
                 ParamDecl { name: "max_trials", default: None, help: "maximum target-dependent queries; at most one subgroup cycle" },
             ],
         },
@@ -2510,6 +2553,32 @@ pub fn solve_measured(
         Some(Err(e)) => rep.online_error = Some(e.to_string()),
         None => rep.online_error = Some("a measurement session was already active".into()),
     }
+    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        if let Some(window) = &mut rep.online {
+            let sum = window
+                .phases_ns
+                .values()
+                .try_fold(0u64, |total, ns| total.checked_add(*ns));
+            if sum != Some(window.wall_ns) {
+                return Err("pencil online phase sum differs from window".into());
+            }
+            window.start_event = "source target validity check after target-blind curve, base and empty solver setup".into();
+            window.stop_event = if rep.recovered.is_some() {
+                "first source multiplication check completed inside pencil core"
+            } else {
+                "pencil coefficient cap or walk exhaustion; no verified solution"
+            }
+            .into();
+            window.mapping = "query: target validation, labels, source query and transfer, plus intervening control bookkeeping; PDP: point-driven sieve; relation check: polynomial, point and Jacobian checks; descent: signed graph and residual elimination; recovery check: first source multiplication. Additional adapter verification is outside online and charged in cold group counts.".into();
+            if let Some(reason) = window.zero_phases.get_mut("target_relation_check") {
+                *reason = "no sieve candidate reached the separate polynomial, point and Jacobian verification stage".into();
+            }
+        }
+    } else if m.id.starts_with("rho.three_leads_") && rep.recovered.is_none() {
+        if let Some(window) = &mut rep.online {
+            window.stop_event = "rho cap exhausted; no verified solution".into();
+        }
+    }
     Ok(rep)
 }
 
@@ -2558,13 +2627,25 @@ fn solve_inner(
         ));
     }
     match (inst, d.family) {
-        (Instance::Prime(i), _) if m.id == "ic.known_log_mitm2_v1" => solve_known_log(
+        (Instance::Prime(i), _)
+            if m.id == "ic.known_log_mitm2_v1" || m.id == "ic.known_log_ksum_v1" =>
+        {
+            solve_known_log(
+                m,
+                &i.curve,
+                i.generator_point(),
+                PrimePoint::affine(tx, ty),
+                i.r,
+                curve,
+                seed,
+            )
+        }
+        (Instance::Prime(i), _) if m.id == "rho.preprocessing" => solve_preprocessing(
             m,
             &i.curve,
             i.generator_point(),
             PrimePoint::affine(tx, ty),
             i.r,
-            curve,
             seed,
         ),
         (Instance::Binary(i), _) if m.id == "ic.known_log_mitm2_v1" => solve_known_log(
@@ -4090,6 +4171,14 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
         w.start_event = "first target-dependent Q+[a]H query after the target-blind base and pair table are complete".into();
         w.mapping = "known-log two-sum recovery: query generation, pair-table PDP, full-point witness check, direct scalar combination (no matrix), and final [d]G=Q verification".into();
     }
+    if id == "ic.known_log_ksum_v1" {
+        w.start_event = "first target-dependent Q+[a]H query after the target-blind base and k-sum table are complete".into();
+        w.mapping = "known-log k-sum recovery: query generation, k-sum-table PDP, full-point witness check (k − 1 additions), direct scalar combination (no matrix), and final [d]G=Q verification".into();
+    }
+    if id == "rho.preprocessing" {
+        w.start_event = "first target-dependent operation (G + Q and the online stride) after the target-blind jump table and distinguished-point table are complete".into();
+        w.mapping = "preprocessing rho: the online walks on the precomputation's map, table lookups at distinguished points, and final [d]G=Q verification".into();
+    }
     Some(w)
 }
 
@@ -4804,6 +4893,87 @@ fn factor_base_facts<E: Copy>(
     })
 }
 
+fn solve_preprocessing<G: CountedGroup>(
+    m: &ResolvedMethod,
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let entries = param_u64(m, "entries")?;
+    if entries == 0 {
+        return Err("rho.preprocessing needs entries > 0".into());
+    }
+    let dp_bits = match param_u64(m, "dp_bits")? {
+        0 => None,
+        d if d <= 40 => Some(d as u32),
+        _ => return Err("rho.preprocessing dp_bits must lie in 0..=40".into()),
+    };
+    let table_seed = param_u64(m, "table_seed")?;
+    let max_precompute = match param_u64(m, "precompute_cap")? {
+        0 => (64.0 * (r as f64 * entries as f64).sqrt()) as u64 + (1 << 20),
+        c => c,
+    };
+    let cap = rho_cap(r, param_u64(m, "cap_multiple")? as f64);
+    let classes = NegationClasses { r };
+    let started = Instant::now();
+    measurement::mark(Phase::Precompute);
+    let mut table = PreprocessingRho::build(
+        g,
+        &classes,
+        generator,
+        r,
+        entries,
+        dp_bits,
+        table_seed,
+        max_precompute,
+        RhoWalk::negation(),
+    );
+    measurement::begin_online(Phase::RhoSolve);
+    let online = table.solve(target, seed, cap);
+    measurement::end_online();
+    let wall = started.elapsed().as_nanos() as u64;
+    let mut counters = table.counters.clone();
+    for (name, v) in &online.counters {
+        *counters.entry(name.clone()).or_default() += v;
+    }
+    let mut setup = ops_phase("setup", table.setup_ops);
+    setup.wall_ns = None;
+    let mut precompute = ops_phase("precompute", table.precompute_ops);
+    precompute.wall_ns = Some(table.precompute_wall_ns);
+    let mut search = ops_phase("search", online.ops);
+    search.gae = online.ops.gae() - online.verification_ops as f64;
+    search.wall_ns = Some(online.wall_ns);
+    let verify = PhaseRecord {
+        name: "internal_verification".into(),
+        gae: online.verification_ops as f64,
+        ..Default::default()
+    };
+    let phases = vec![setup, precompute, search, verify];
+    let short = table.entries < entries;
+    Ok(SolveReport {
+        recovered: online.recovered.map(u128::from),
+        exhausted: online.recovered.is_none(),
+        total_gae: phases.iter().map(|p| p.gae).sum(),
+        phases,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        solve_wall_ns: wall,
+        detail: json!({
+            "table": {"entries": table.entries, "requested": entries, "short": short,
+                "dp_bits": table.dp_bits, "table_seed": table_seed},
+            "query_law": "online walks start at [k]([t_a]G + [t_b]Q), t seeded by the run seed",
+            "recovery_law": "a walk ending at a stored [a2]G gives log_G(Q) = (a2 - a)/b mod r",
+            "cost_scope": "cold, one target: jump table, precomputation and online walk all charged; table lookups and canonicalisations unpriced",
+        }),
+        field_ops: field_ops_of(g, &[table.setup_ops, table.precompute_ops, online.ops]),
+        ..Default::default()
+    })
+}
+
 fn solve_known_log<G: CountedGroup>(
     m: &ResolvedMethod,
     group: &G,
@@ -4817,14 +4987,20 @@ fn solve_known_log<G: CountedGroup>(
     if max_trials == 0 {
         return Err("known-log max_trials must be positive".into());
     }
+    let ksum = m.id == "ic.known_log_ksum_v1";
     let params = super::known_log::Parameters {
         size: usize::try_from(param_u64(m, "size")?).map_err(|_| "base size exceeds usize")?,
         base_seed: param_u64(m, "base_seed")?,
         base_multiplier: param_u64(m, "base_multiplier")?,
-        max_pair_work: param_u64(m, "max_pair_work")?,
+        max_pair_work: param_u64(m, if ksum { "max_sums" } else { "max_pair_work" })?,
     };
     let started = Instant::now();
-    let prepared = super::known_log::prepare(group, generator, r, params)?;
+    let prepared = if ksum {
+        let k = u32::try_from(param_u64(m, "k")?).map_err(|_| "k exceeds u32")?;
+        super::known_log::prepare_ksum(group, generator, r, params, k)?
+    } else {
+        super::known_log::prepare(group, generator, r, params)?
+    };
     let recovered = super::known_log::recover(group, &prepared, target, seed, max_trials)?;
     let wall = started.elapsed().as_nanos() as u64;
     let mut counters = prepared.counters.clone();
@@ -4890,7 +5066,11 @@ fn solve_known_log<G: CountedGroup>(
             "query_law": "Q+[a+t]H; a seeded uniformly, no repeats before r queries; H=[u]G",
             "recovery_law": "log_G(Q)=u*(log_H(F_i)+log_H(F_j)-a-t) mod r",
             "linear_algebra": {"name":"none", "reason":"no unknown factor-base logarithms"},
-            "table_memory": "negation-folded pair table, one witness per distinct signed sum class; peak RSS recorded by runner",
+            "table_memory": if ksum {
+                "negation-folded k-sum table, one witness per distinct signed sum class, summand indices packed in a u64; peak RSS recorded by runner"
+            } else {
+                "negation-folded pair table, one witness per distinct signed sum class; peak RSS recorded by runner"
+            },
             "cost_scope": "cold, one target, all group operations plus explicitly unpriced native work",
         }),
         field_ops: field_ops_of(group, &ledgers),
