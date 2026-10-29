@@ -39,3 +39,5 @@ The first metadata export used a null seed because no fresh randomness was drawn
 
 ## 15:00 UTC reconciliation
 The restored replay driver is terminal exit0; all12 cases and both post-replay manifests passed. Remote branch still b810295b60a8; no duplicate job was launched. The shared daily log is now reserved by T-804, so this scoped handoff retains the new entry. This phase is progress; broad exact-degree and elite-base requirements remain open.
+
+The metadata CSV initially used Python csv standard CRLF endings, flagged by Git whitespace checking. The original CSV/index and findings are retained; the published view uses LF, with the navigation hash refreshed. No field value or native evidence changed. This correction is a separate commit.
