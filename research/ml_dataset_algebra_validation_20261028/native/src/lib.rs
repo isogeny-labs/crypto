@@ -199,7 +199,7 @@ impl Replay {
         )?;
         require(hex(&input_sha256, 64), "noncanonical input hash")?;
         validate_limits(&limits)?;
-        Ok(Self {
+        let mut replay = Self {
             q: n_vars,
             degree,
             input_count: input_count as usize,
@@ -224,7 +224,11 @@ impl Replay {
             admission: 0,
             work: 0,
             oracle_rank: None,
-        })
+        };
+        if replay.input_count == 0 {
+            replay.verify_input_digest()?;
+        }
+        Ok(replay)
     }
 
     fn work(&mut self, n: usize) -> Result<()> {
@@ -266,6 +270,9 @@ impl Replay {
         )?;
         self.work(terms.len())?;
         self.inputs.push(terms.clone());
+        if self.inputs.len() == self.input_count {
+            self.verify_input_digest()?;
+        }
         Ok(())
     }
 
@@ -611,7 +618,6 @@ pub fn verify<R: BufRead>(mut reader: R, expected: &Binding) -> Result<Report> {
     let mut replay: Option<Replay> = None;
     let mut terminal = false;
     let mut total = 0;
-    let mut input_hash_checked = false;
     while let Some((bytes, complete)) = line(&mut reader, &mut total)? {
         require(!terminal, "data after terminal event")?;
         if !complete {
@@ -656,10 +662,6 @@ pub fn verify<R: BufRead>(mut reader: R, expected: &Binding) -> Result<Report> {
             } else if state.inputs.len() < state.input_count {
                 state.input(&record.event)?;
             } else {
-                if !input_hash_checked {
-                    state.verify_input_digest()?;
-                    input_hash_checked = true;
-                }
                 let wanted = state.next()?;
                 require(
                     record.event == wanted,

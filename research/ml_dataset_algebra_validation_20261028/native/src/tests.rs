@@ -137,6 +137,61 @@ fn hand_constant_and_all_censored_prefixes() {
     }
 }
 
+fn assert_censored_input_digest(inputs: Vec<Vec<u8>>) {
+    let mut events = vec![begin(1, 1, &inputs)];
+    events.extend(inputs.iter().enumerate().map(|(i, terms)| Event::Input {
+        index: i as u64,
+        terms: terms.clone(),
+    }));
+    for wrong_digest in [false, true] {
+        let mut supplied = events.clone();
+        if wrong_digest {
+            if let Event::Begin { input_sha256, .. } = &mut supplied[0] {
+                *input_sha256 = "f".repeat(64);
+            }
+        }
+        for prefix_len in 1..=supplied.len() {
+            let prefix = &supplied[..prefix_len];
+            for ending in 0..3 {
+                let mut bytes = stream(prefix);
+                match ending {
+                    1 => {
+                        let mut stopped = prefix.to_vec();
+                        stopped.push(Event::Stopped {
+                            reason: StopReason::Cancelled,
+                            acknowledged_before_stop: prefix_len as u64,
+                        });
+                        bytes = stream(&stopped);
+                    }
+                    2 => bytes.extend_from_slice(b"{\"schema\":\"unfinished"),
+                    _ => (),
+                }
+                let result = verify(Cursor::new(bytes), &binding());
+                if wrong_digest && prefix_len == supplied.len() {
+                    assert_eq!(result.unwrap_err(), "input digest mismatch");
+                } else {
+                    let report = result.unwrap();
+                    assert!(!report.matrix_trace_complete);
+                    assert_eq!(report.independent_rank, None);
+                    assert_eq!(report.named_admission_model_checked, None);
+                    assert!(!report.input_encoding_checked);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn censored_prefix_checks_the_digest_at_empty_begin() {
+    assert_censored_input_digest(vec![]);
+}
+
+#[test]
+fn censored_prefix_checks_the_digest_at_the_last_input() {
+    assert_censored_input_digest(vec![vec![1]]);
+    assert_censored_input_digest(vec![vec![1], vec![0]]);
+}
+
 #[test]
 fn empty_and_zero_polynomial_have_different_candidate_counts() {
     let empty = vec![
