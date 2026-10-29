@@ -10,7 +10,7 @@ dest=s3://setec-astronomy-artifacts/runs/n83-degree4-propagation-20261029-r1/loc
 upload(){ aws s3 sync "$out" "$dest" --region us-east-2 --only-show-errors; }
 finish(){
  code=$?;trap - EXIT
- if [[ -n ${uploader:-} ]];then kill "$uploader" 2>/dev/null || true;wait "$uploader" 2>/dev/null || true;fi
+ if [[ -n ${uploader:-} ]];then touch "$out/uploader.stop";wait "$uploader" || true;fi
  jq -n --argjson code "$code" --arg start "$started" --arg end "$(date -u +%FT%TZ)" '{exit_code:$code,started_at:$start,finished_at:$end,backend:"existing_host",run_id:"n83-degree4-propagation-20261029-r1",wall_valid:false}' > "$out/terminal.json"
  (cd "$out" && find . -type f ! -name manifest.sha256 -print0 | sort -z | xargs -0 sha256sum > manifest.sha256)
  upload || exit 91
@@ -33,7 +33,7 @@ while IFS=$'\t' read -r key arm id directory v2directory;do
  jq --arg key "$key" '.extensions.cases[]|select(.key==$key)' "$study/protocol-degree4-propagation.json" > "$out/case-specs/$key.json"
 done < <(jq -r '.extensions.cases[]|[.key,.arm,.id,.directory,.v2directory]|@tsv' "$study/protocol-degree4-propagation.json")
 upload
-(while sleep 30;do upload;done) &
+(while sleep 30;do [[ ! -e "$out/uploader.stop" ]] || break;upload;done) &
 uploader=$!
 ulimit -v 8388608
 "$out/instrument" selfcheck "$out/controls" > "$out/controls.log" 2>&1

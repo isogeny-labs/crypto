@@ -38,3 +38,8 @@ flagged a final blank line in the copied test log. Git copies normalize trailing
 blank lines; original command output remains unchanged in support. No native
 failure or production run occurred. Metric source paths explicitly name nested
 state fields before protocol freeze.
+
+Before protocol freeze, adjusted the shell uploader to drain an active upload
+before the terminal manifest and final upload. The stop marker is retained and
+documented. This avoids overlapping final writers; native source and binary are
+unchanged. Shell syntax passed; no production data existed during the change.

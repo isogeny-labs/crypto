@@ -18,13 +18,26 @@
     "summary.json": "Native per-case status join; failed or unattempted cases do not acquire numerical conclusions",
     "status/summary-after-KEY.json": "Write-once cumulative summary after each attempted case",
     "logs/,replay/,host.txt,terminal.json": "Actual process outcomes, non-secret host and diagnostic launcher boundaries",
-    "manifest.sha256": "SHA256 of every final raw payload except this inventory"
+    "manifest.sha256": "SHA256 of every final raw payload except this inventory",
+    "uploader.stop": "Terminal marker: request background uploader exit and wait for any active upload before final manifest/upload; prevents concurrent final writers"
   },
   "added_rows_binary": {
     "magic": "N83F4S1\n",
     "header_bytes": 44,
-    "header_after_magic": ["variables:u32le", "columns:u64le", "words_per_row:u64le", "complete_v3_parent_rows:u64le", "planned_seed_count:u64le"],
-    "production": {"variables":164, "columns":735295, "words_per_row":11489, "bytes_per_row":91912, "planned_seeds":249},
+    "header_after_magic": [
+      "variables:u32le",
+      "columns:u64le",
+      "words_per_row:u64le",
+      "complete_v3_parent_rows:u64le",
+      "planned_seed_count:u64le"
+    ],
+    "production": {
+      "variables": 164,
+      "columns": 735295,
+      "words_per_row": 11489,
+      "bytes_per_row": 91912,
+      "planned_seeds": 249
+    },
     "rows": "LSB-first bits in little-endian u64 words; unused final-word bits zero; only inserted nonzero rows are stored",
     "columns": "Same graded colex squarefree columns through degree3 as DEGREE4_WITNESS_FORMAT.json",
     "ids": "Global row ID equals complete V3 rank plus this file's zero-based row index",
@@ -40,7 +53,13 @@
     "inserted_row": "Global inserted row ID or null when remainder is zero",
     "membership_degree_bound": "Always4; this is distinct from working_degree3"
   },
-  "limits": {"total_rows":65536, "new_operations":262144, "affine_free_variables":12, "seconds_per_producer_or_replay":1800, "virtual_memory_bytes":8589934592},
+  "limits": {
+    "total_rows": 65536,
+    "new_operations": 262144,
+    "affine_free_variables": 12,
+    "seconds_per_producer_or_replay": 1800,
+    "virtual_memory_bytes": 8589934592
+  },
   "stopping": "First unit certificate, restricted queue exhaustion, row cap or operation cap; unit takes precedence when coincident. All cases attempted without automatic retry.",
   "claims": {
     "upper_four": "Only verified1 in V4 or exhaustive affine completion of the original ideal; valid even if the restricted queue remains pending",
