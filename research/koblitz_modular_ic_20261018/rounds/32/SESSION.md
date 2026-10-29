@@ -40,3 +40,9 @@ audit.exit receipt; downstream rendering consequently lacked its inputs.
 Waited for the completed runner and reran metadata/rendering sequentially;
 no scientific calculation repeated. A truthful short operator-observed record
 is retained; original complete postprocessing stderr was not durably copied.
+
+Root software-check final receipt: initial sparse resolution101; materialized
+src/isogeny_algos, then offline release --lib reached1200seconds(exit124),
+with missing embedded unrelated fixtures and allocation failure under4GiB.
+No root test summary, cap increase or full-suite pass. Full logs copied to
+software-validation before sealing this round. All scientific runners are done.
