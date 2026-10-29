@@ -321,3 +321,25 @@ checks pass and earlier approval-service obstacles are resolved. Hosted
 gate/size/artifacts are running and PR review has not returned; no merge or
 current-head hosted approval is claimed. The finite criterion and PDF are
 published deliverables. Historical attribution and weakness remain open.
+
+2026-10-29 validation expansion: the user's requested controls now include
+10,000 accepted prime-order curves per field, each publication's percentile,
+the full100--5000cutoff sweep, a written fixed criterion before new data,
+and an ECDLP mechanism assessment. The [new design and native preparation](../research/nist_skip_criterion_20261025/random_curve_validation_20261029/README.md)
+retain all four requirements. Primary generation, exact sweep production,
+independent sweep verification and tied-percentile/Holm analysis have native
+preparation implementations with passing bounded development tests. They
+have not generated a new baseline or extended cutoff result. Full-journal
+verification, production recovery/scheduling and an approved PARI worker
+route remain gaps; the portable EKS contracts inspected support ecbench.
+
+The fixed primary statistic is strict+1count at691 in the lower direction;
+new uniform-seed calibration would use the pinned SHA1 curve map and explicit
+acceptance conventions. Already examined P384/P521 cannot be unseen holdouts.
+A robust calibrated deviation would still not establish a historical
+selector, a security motive or a DLP advantage. The [mechanism note](../research/nist_skip_criterion_20261025/random_curve_validation_20261029/MECHANISM.md)
+states the missing transfer/solver/cost obligations. The first discriminating
+execution remains a separately labelled bounded pilot followed by the full
+60000accepted-curve primary cohort, not a substitute small run. Exit requires
+complete verified journals, matched percentile/uncertainty output and the
+full cutoff report under a committed execution freeze and checkpoint.
