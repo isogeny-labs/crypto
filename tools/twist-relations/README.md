@@ -6,6 +6,29 @@ transfer or establish a general twist-assisted speedup. All arithmetic, selectio
 relation collection, linear algebra, verification, reports, and orchestration
 inside the executable are native Rust. No Python execution path is used.
 
+## TR-04 bounded relation-finding audit
+
+The additive `twist-tr04` executable implements the separately drafted
+[finite protocol](../../research/twist_relations_tr04_20261029/PROTOCOL.md).
+It covers all coefficient models over p=7,11,19, B=2,3, seven selectors,
+eight candidate reads and eight G/Q walk increments. Weighted enumeration
+represents every declared candidate/query word exactly; rejected selectors
+and unattained ranks retain their mass and paid work. It reports exact rank
+distributions and unconditional expected work vectors in separate units.
+
+The existing workflow's manual `tr04` suite runs all arms together in three
+parallel field shards on `crypto-eks-linux`, with source/evidence checkpoint
+gates and independent structural verification. Its native report preserves
+failed/missing attempts and hashes compact portable evidence. Primitive
+counter independence and physical runtime admission remain explicitly unset.
+
+**Current status:** implementation and development validation; the study
+protocol remains draft and the workflow refuses primary execution until its
+source/analysis identities, measured preflight estimate and protocol freeze
+are complete. No TR-04 scientific run, finite-census result or runtime gain
+is recorded. See the study README for remaining prerequisites. Existing
+TR01-03 evidence and commands below retain their own scope.
+
 ## Build and check
 
 From the repository root (Rust 1.99.1 is the pinned CI toolchain):
