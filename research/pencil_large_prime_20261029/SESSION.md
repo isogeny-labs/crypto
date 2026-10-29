@@ -503,3 +503,96 @@ parent audit overhead as the remaining accounting boundary work. Per-arm
 process RSS is already available. EXECUTION_NEXT_STEP.json preserves these
 findings and the unchanged upper gate; it is not an executable protocol.
 A fresh isolab Job listing had no active Jobs; no submission was made.
+
+## 2026-10-29 common cold-cost observations (T-820)
+
+Implemented optional child/record method_call_wall_ns around methods::solve,
+preserving the legacy solve timer. It includes method setup, internal checks
+and report construction. Parent mathematical verification has its own
+parent_audit_verification_ns observation and does not inherit child L2.
+Older records deserialize with the fields absent; absent fields are omitted
+on serialization. Runner censoring still removes accepted results and audit
+measurements for watchdog-expired output. TIMING_CONTRACT.json defines scopes.
+
+Validation in progress: rustfmt and scoped diff checks pass. The initial
+release test invocation used a wrong exact module filter and ran zero tests;
+this is not a regression pass. Corrected build/test is live in exec session
+82538, log /tmp/pencil-common-cold-test-recheck.log. Run the runner watchdog
+regression and required root library suite after focused validation and final
+source edits. No experimental data, timing ratio or cohort was produced.
+
+Read-only archive verification matched SHA256
+550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339,
+1260 distinct workload IDs,21 curves with60 targets each, and all1260
+archived algorithm seeds. Planner currently includes warmups in seed index;
+T-821 implements an opt-in measured-index policy preserving legacy plans.
+Native workload ID/coordinate parity still requires the compiled plan check.
+
+Corrected focused cold-boundary test completed:1 passed,0 failed. Retained
+as cold-boundary-test.log. T-821 implementation is complete: opt-in
+measurement.algorithm_seed_round=measured_index preserves the first archived
+seed despite warmups; default absolute is omitted from serialization.
+Checked references: docs/ecbench/README.md seed pairing contract and
+https://serde.rs/field-attrs.html. Added legacy identity and paired seed
+regressions; these have not yet been reported as passed.
+Combined required root suite is live in exec session8835, log
+/tmp/pencil-cold-seed-root-tests.log. Do not start a duplicate suite.
+Current code changes remain uncommitted pending validation. No new cohort.
+
+## 2026-10-29 paired diagnostics and archive parity preparation
+
+PR2860 merged at f680bd28038f0cc9a15fe351f506967303b03355; last read still
+had the ecbench harness check running. Current uncommitted work is on
+codex/pencil-timing-export-20261029.
+
+Full release library suite finished:5154 passed,1 failed,123 ignored. Both
+seed-policy regressions and the watchdog regression passed. GPU capsule test
+failed on its lock; same compiled binary serial recheck passed1/1. Preserve
+initial failure, not a clean full-suite label. The later addition of optional
+time.online_clock_diagnostics is compiled by the native build but needs its
+updated regression rerun. Root suite handle8835 is terminal(exit101); recheck
+86880 is terminal(exit0). Native ecbench build is still live in handle13328,
+log /tmp/pencil-native-ecbench-build.log; do not duplicate it.
+
+Standalone paired_export uses common cold and explicit-clean online clocks,
+retains absent/failing pairs and independent memory/audit observations, and
+supports candidate/rho plus shared rho/rho_AA in three arms.8 tests passed;
+paired_export/cargo-test.log is retained. All qualified ratios stay null until
+reviewed A/A evidence for these exact windows exists. No cohort was processed.
+
+prepare_native_parity.py reproducibly extracts seven original specifications
+and a205402-byte projection of1260 archived identities/coordinates/seeds,
+without planted answers. Preparation reproduced expected-workloads.jsonl
+byte-for-byte. Its check mode invokes only ecbench plan --doc; native parity
+is pending the build. These archived specs are validation inputs, not the
+new executable protocol. No cloud jobs or experiments launched.
+
+Native build13328 completed(exit0). Run-free native parity29938 completed
+(exit0), comparing all1260 archived workload IDs,targets,target seeds/indices
+and first algorithm seeds exactly. Retained native_parity/result.json, all
+seven raw plans, and a payload hash manifest. No solver was run. Binary hash
+0da4de11053815be21549e3d0af14efcf303fa65af2bc7f38403e87ba5bacfc1.
+This is a local dirty-source validation build, not the pinned experiment image.
+Updated ecbench regression suite remains live:11411,
+/tmp/pencil-final-ecbench-tests.log. It covers the later online diagnostics
+field and runs ecbench tests serially. Do not duplicate.
+
+PR2860 lab parity was canceled after checkout exhausted its10-minute limit;
+no parity script ran. Post-merge main run40909710263 at
+17805c0db9bd92e8b1cfd10c5c10130c36aad3ce passed all three parity scripts.
+Harness unit tests passed and integration tests were still running at last
+read. No unsupported source repair or retry performed.
+
+## 2026-10-29 timing and input validation completion
+
+### What was done
+Final ecbench module suite: 287 passed, 0 failed, 1 ignored. Plan-aware paired exporter: 12 passed. All 1,260 archived inputs and first measured seeds match the native prepared plans. These plans contain 22,680 executions (18,900 measured, 3,780 warmups); none was executed by planning. Logs and native plans are retained.
+
+### Decisions made
+Research scope is public synthetic mathematics. Known-answer checks are correctness controls; no deployed-key recovery claims. Standard A/A direction is rho_AA/rho with the frozen operational tolerance [0.90,1.10], not a confidence interval.
+
+### Open threads
+Commit/source/image identity, complete frozen protocol, staged EKS gate, full cohort, independent review and measured reports remain.
+
+### Errors
+The earlier full-library run had one GPU test-lock failure (5,154 passed, 1 failed, 123 ignored); its same-binary serial recheck passed. Preserve both logs.
