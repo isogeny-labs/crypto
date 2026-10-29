@@ -606,6 +606,30 @@ closure degree.
     falls.
   - The orbit-aware split rule (`RESEARCH_EXOTIC_COORDINATES.md` §18).
 
+## Invariant guess at ℓ = 8 (2026-10-29): never worse than a raw guess, not reliably enough
+
+`research/dreg_invariant_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) compares two three-guess sets on the committed (22, 8) draws.
+
+- **The arms.**
+  - The invariant arm fixes `a₇ + b₇`, a coordinate of `s = x₁ + x₂`, which
+    the first link sees in place of the two summands.
+  - The raw arm fixes `a₇`.
+  - Both also fix `c₇` and one intermediate coordinate, so they differ only
+    in the guess that touches the first link.
+- **Result.** The invariant arm refutes at degree 4 on every branch of draws
+  5 and 6; the raw arm does so on draw 6 only.
+  - The registered verdict is mixed (invariant split 2/4, raw fails 1/4).
+  - Paired by draw, the invariant guess is never worse.
+- **Comparison.** The committed raw set `{7, 15, 23}`, which spends two
+  guesses on the pair, suffices on 1 of 4.
+- **What it weakens.** The summand-dimension reading (§12), since the
+  invariant arm leaves both summands at dimension 8.
+- **What it is not.** No row moves: the extrapolated guess count at
+  ℓ = 33 stays far above the break-even of 6.
+- **Disclosure.** The soundness rule was replaced after the data, because the
+  satisfiable branches holding solutions ran out of memory (Amendment 1).
+
 ## Reproducing
 
 ```sh
