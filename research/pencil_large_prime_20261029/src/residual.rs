@@ -1,7 +1,7 @@
 //! Retained row space for the graph's emitted small-variable constraints.
 //! Caps count coefficients, not bytes or total memory. No row is silently lost.
 
-use crate::{accumulate, is_prime, mul, neg, pow, Error, Sparse};
+use crate::{accumulate, inverse, is_prime, mul, neg, reduce, Error, Sparse};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -69,6 +69,10 @@ impl Basis {
     pub fn rows(&self) -> impl Iterator<Item = &Sparse> {
         self.rows.values()
     }
+    /// Lookup by normalized leading column without scanning all stored rows.
+    pub fn pivot(&self, column: usize) -> Option<&Sparse> {
+        self.rows.get(&column)
+    }
 
     /// Incorporate a homogeneous equation. On a cap outcome the basis is
     /// unchanged, but counters retain work already performed. A working cap
@@ -80,7 +84,7 @@ impl Basis {
         let mut row = Sparse::new();
         for &(i, value) in terms {
             self.counts.input_terms += 1;
-            let value = value % self.p;
+            let value = reduce(value, self.p);
             if value != 0 && !row.contains_key(&i) && row.len() == self.limits.working_coefficients
             {
                 return Ok(Insert::WorkingCap);
@@ -101,7 +105,7 @@ impl Basis {
                     return Ok(Insert::RetainedCap);
                 }
                 self.counts.inversions += 1;
-                let inverse = pow(value, self.p - 2, self.p);
+                let inverse = inverse(value, self.p);
                 for coefficient in row.values_mut() {
                     *coefficient = mul(*coefficient, inverse, self.p);
                     self.counts.normalization_multiplications += 1;
