@@ -30,6 +30,28 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - name: Replay gate rejects missing inputs and invalid receipts
+        run: bash scripts/ic_audit/test_replay_checks.sh
+      - name: Pull only frozen inputs read by the native replay
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            "$RUNNER_TEMP/artifacts-awscli/bin/python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+          fi
+          # The second pass discovers hash-bound stderr attachments from the
+          # records hydrated by the first. Never pull the whole research tree.
+          for replay_pass in core attachments; do
+            bash scripts/ic_audit/check_plan_coverage.sh --list-inputs > "$RUNNER_TEMP/replay-$replay_pass-inputs.txt"
+            mapfile -t replay_inputs < "$RUNNER_TEMP/replay-$replay_pass-inputs.txt"
+            test "${#replay_inputs[@]}" -gt 0
+            python3 tools/artifacts/artifacts.py pull --jobs 16 "${replay_inputs[@]}"
+          done
       - run: cargo build --release --bin ecbench
       - name: The plan covers every complete session the board cites
         run: bash scripts/ic_audit/check_plan_coverage.sh
