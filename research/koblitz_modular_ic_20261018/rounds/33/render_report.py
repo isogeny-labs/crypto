@@ -70,6 +70,7 @@ independent scientific replay, unknown-scalar recovery, full saturation or
 proper polarized factor embedding. Native4GiB/1200s each; pinned
 Lean4.34.1/mathlibd13f23b, one job/4096MiB/1200s. Full root suite not passed.
 
+#pagebreak()
 == Attempt inventory
 '''+rows+'\n'
 (h/'report.typ').write_text(source);typst.compile(str(h/'report.typ'),output=str(h/'report.pdf'),root=str(h))
