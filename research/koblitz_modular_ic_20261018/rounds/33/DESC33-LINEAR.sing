@@ -5,7 +5,8 @@ proc solve33(poly value,list piv,list coords){
  while(value!=0){j=deg(value)+1;if(piv[j]==0){break;}lc=leadcoef(value);value=value+lc*piv[j];co=co+lc*coords[j];}
  return(list(value,co));
 }
-matrix S33[68][68];matrix I33=unitmat(68);int i33;int j33;int t33;int row33;
+matrix S33[68][68];matrix I33[68][68];int i33;int j33;int t33;int row33;
+for(i33=1;i33<=68;i33++){I33[i33,i33]=1;}
 for(i33=1;i33<=68;i33++){
  for(t33=1;t33<=size(sigmaColumns[i33]);t33++){
   if(leadcoef(sigmaColumns[i33][t33])!=1){ERROR("DESC33_NONBINARY_SIGMA");}

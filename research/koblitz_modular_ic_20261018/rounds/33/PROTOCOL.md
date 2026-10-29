@@ -79,3 +79,13 @@ statistical inference or coefficient-box searches. Prospective amendments
 are required before additional jets or proper-model computations. Generic
 experiment_protocol.py is unavailable; Markdown freezes are normative and
 a later machine index must record its post-data creation explicitly.
+
+## DESC33 retained type-error correction
+
+desc33-01 produced68 explicit descended functions, then Singular rejected
+unitmat(68) as a matrix initializer. Later matrix checks were undefined;
+regardless of any downstream product marker this attempt is not accepted.
+Preserve its full source/log and exit. Replace only the initializer by an
+explicit68x68zero matrix with diagonal entries1. Reassemble/commit before
+fresh desc33-02, after observing desc33-01 terminal. No cap, mathematical
+input, Gaussian routine or acceptance condition changes.
