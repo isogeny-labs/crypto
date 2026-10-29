@@ -45,6 +45,15 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
+records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
+and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
+and retained-assignment replay. Its timing wrapper exited 1 on a denied
+macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
+SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
+It has no matched rho or cold total-runtime row and remains outside the
+admitted table under the validation gate.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-ic-stride-renew-prime`](20261029-ic-stride-renew-prime/) ([PDF](20261029-ic-stride-renew-prime/REPORT.pdf); [validation](20261029-ic-stride-renew-prime/VALIDATION.json)) | Prime-field index calculus (`ic.pipeline`, incumbent factor base and oracle `mitm:negation_folded=1` per size): relation targets `stride-renew` (R ← R+S, S renewed per relation, 4 scalar multiplications of set-up) against the `walk` baseline (16 jumps + restart offsets, each a charged scalar multiplication), decided per size on 2 fresh curves × 24 targets × 6 rounds (backlog XP-20261029-stride-renew-prime, frozen protocol; A/A arms and a same-session negation-map rho on the same targets); S = GAE/√r with native work priced at w = 0, 0.1, 1 | 20 bits (N 45): paired S ratio 0.842 [0.807, 0.878] / 0.858 [0.821, 0.897] / 0.926 [0.879, 0.975] at w = 0 / 0.1 / 1 (288 pairs, all verified; A/A 1.000); distance to rho 7.92 → 6.67 (w = 0), 9.51 → 8.80 (w = 1). 28 bits (N 407): 0.977 [0.961, 0.992] / 0.975 [0.958, 0.993] / 0.968 [0.941, 0.995] (two thirds of it from fewer relations, mechanism unstated). 24 and 32 bits: null (intervals contain 1; band split). Rho cheaper at every size and weight. Validated (VAL-20261029-4aed57: P20 pass, P28 pass with caveats; cross-binary replay 1,440/1,440 per session; [d]G = Q on 2,880 records) | EKS Spot c8a.2xlarge (AMD EPYC), 4 exclusive CPUs, L2; deterministic counts | [`research/ic_stride_renew_prime_20261029`](../research/ic_stride_renew_prime_20261029/) ([report](../research/ic_stride_renew_prime_20261029/README.pdf)) |
