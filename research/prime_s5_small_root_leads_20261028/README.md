@@ -662,6 +662,13 @@ Each probe has a hashed `PROTOCOL.md`, registered before its measured run
 (`BINARY.sha256`). Raw outputs are under `*/data/`. Derived tables and
 figures come from `*/derive.mjs`, which reads only those outputs.
 
+After the runs, CI's clippy (`-D warnings`) required five lint-only edits
+to `semaev_prime_poly.rs` and two to `examples/semaev_gap_census.rs`:
+`is_multiple_of`, `div_ceil`, `repeat_n`, and `2·d < len` for
+`2·d ≤ len − 1`. Each edit computes the same values, and the 6 unit tests
+still pass. The source hashes in the probes' `BINARY.sha256` refer to the
+sources as run, at commit f91405e.
+
 ### 7b.1 The GP checks, ported (L4-B step 1, native)
 
 `semaev_prime_poly` builds `S_{m+1}(x₁…x_m; z)` as

@@ -84,7 +84,7 @@ impl Fp {
     }
     /// Inverse of a nonzero element (Fermat).
     pub fn inv(self, a: u64) -> u64 {
-        assert!(a % self.p != 0, "inverse of zero");
+        assert!(!a.is_multiple_of(self.p), "inverse of zero");
         self.pow(a, self.p - 2)
     }
     pub fn reduce_i64(self, v: i64) -> u64 {
@@ -465,9 +465,9 @@ fn prime_factors(mut n: usize) -> Vec<usize> {
     let mut out = Vec::new();
     let mut q = 2;
     while q * q <= n {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             out.push(q);
-            while n % q == 0 {
+            while n.is_multiple_of(q) {
                 n /= q;
             }
         }
@@ -559,7 +559,7 @@ pub fn factor_degrees(f: Fp, g: &[u64]) -> Option<Vec<usize>> {
     let mut out = Vec::new();
     let mut h = poly_rem(f, &[0, 1], &g);
     let mut d = 1;
-    while 2 * d <= g.len() - 1 {
+    while 2 * d < g.len() {
         h = poly_powmod(f, &h, f.p, &g);
         let mut hx = h.clone();
         if hx.len() < 2 {
@@ -569,7 +569,7 @@ pub fn factor_degrees(f: Fp, g: &[u64]) -> Option<Vec<usize>> {
         let gd = poly_gcd(f, &trim(hx), &g);
         let k = gd.len() - 1;
         if k > 0 {
-            out.extend(std::iter::repeat(d).take(k / d));
+            out.extend(std::iter::repeat_n(d, k / d));
             g = poly_div_exact(f, &g, &gd);
             h = poly_rem(f, &h, &g);
         }

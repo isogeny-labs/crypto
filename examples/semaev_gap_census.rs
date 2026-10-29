@@ -122,7 +122,7 @@ fn sqrt(f: Fp, a: u64) -> Option<u64> {
     while f.pow(z, (f.p - 1) / 2) != f.p - 1 {
         z += 1;
     }
-    let (mut m, mut c, mut t, mut r) = (s, f.pow(z, q), f.pow(a, q), f.pow(a, (q + 1) / 2));
+    let (mut m, mut c, mut t, mut r) = (s, f.pow(z, q), f.pow(a, q), f.pow(a, q.div_ceil(2)));
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -144,7 +144,7 @@ fn is_prime(n: u64) -> bool {
         return false;
     }
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             return n == q;
         }
     }
