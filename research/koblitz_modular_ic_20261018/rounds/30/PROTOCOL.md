@@ -112,3 +112,21 @@ nonseparable gap; do not declare full source-fiber completeness from a rational
 search. This check does not repeat kernel factorization or full transport.
 The original-incidence/source moduli identification and signed-divisor bridge
 remain separate even if finite ordinary candidate enumeration is exhausted.
+
+## DESCENT30 prospective constant-extension check
+
+Inputs: accepted COLOR30 rawlogs, exact pairs(3,4),(4,3) atd12 and(3,3) atd436.
+Read/bind those native outputs, check determinant color(a+b)%5=d%5. For each
+of six nonzero kernel colors k, model the degree5d finite field by a Frobenius
+cycle of length5d. Doubling deck shift=d*k^-1 modulo5d. Check F^d=D^k at every
+coordinate, all F^5 components (exactly5,eachlengthd), deck permutation and
+regularity on those components, planted monodromy corruption rejection.
+Individual component augmentation must be nonzero as an integer vector,
+while the sum of all components has zero deck difference. Neither implies
+nonzero/zero Jacobian class without a class evaluator. This explicitly checks
+the F32 constant-extension issue before treating an F2 closed orbit as the
+collector divisor. No timing or relation-rank inference.
+
+Two additional Lean claims: a nontrivial component difference in Z^5 is a
+nonzero vector; the full five-term cyclic difference telescopes to0. These
+are algebra only, not a formal finite-field base-change or Picard theorem.
