@@ -47,13 +47,32 @@ fn dense(v: &Value) -> Reading {
     }
 }
 
+/// The record's embedded identity matches the file it was loaded as: arm,
+/// cell `n-ℓ`, draw, and whether the committed draw is satisfiable.
+fn identity_ok(v: &Value, arm: &str, cell: &str, draw: u64, sat: bool) -> bool {
+    v["arm"].as_str().unwrap_or("B") == arm
+        && format!("{}-{}", v["n"], v["ell"]) == cell
+        && v["draw"].as_u64() == Some(draw)
+        && (v["committed_outcome"]["kind"] == "satisfiable") == sat
+}
+
 /// Q or R on one draw: the dense degree-3 run, extended by its sparse
-/// degree-4 run where one exists and was not capped.
-fn arm_reading(dir: &Path, arm: &str, cell: &str, draw: &str) -> Option<Reading> {
-    let mut r = dense(&load(dir, &format!("{arm}.{cell}.{draw}"))?);
+/// degree-4 run where one exists and was not capped. A sparse record whose
+/// identity or construction check fails is reported in `errors`, not used.
+fn arm_reading(
+    dir: &Path,
+    arm: &str,
+    cell: &str,
+    draw: u64,
+    errors: &mut Vec<String>,
+) -> Option<Reading> {
+    let mut r = dense(&load(dir, &format!("{arm}.{cell}.d{draw}"))?);
     if r.degree.is_none() {
-        if let Some(s) = load(dir, &format!("{arm}.{cell}.{draw}.sparse4")) {
-            if s["capped"] == false {
+        let name = format!("{arm}.{cell}.d{draw}.sparse4");
+        if let Some(s) = load(dir, &name) {
+            if !identity_ok(&s, arm, cell, draw, false) || s["identity_check"] != true {
+                errors.push(format!("{name}: identity or construction check fails"));
+            } else if s["capped"] == false {
                 r.measured = 4;
                 if s["closure_refuted"] == true {
                     r.degree = Some(4);
@@ -102,12 +121,17 @@ fn main() {
     let mut verdicts = Vec::new();
     for (cell, unsat, sat) in CELLS {
         let (mut lower, mut q_lt_r, mut r_le_q, mut unresolved) = (0, 0, 0, 0);
+        // Draws where one arm refutes and the other has no reading there.
+        let mut mechanism_open = 0;
         for d in unsat {
             let draw = format!("d{d}");
             let Some(b) = load(dir, &format!("B.{cell}.{draw}")) else {
                 fail(format!("B.{cell}.{draw} missing"));
                 continue;
             };
+            if !identity_ok(&b, "B", cell, d, false) {
+                fail(format!("B.{cell}.{draw}: embedded identity does not match"));
+            }
             let br = dense(&b);
             // V2: the committed B outcome.
             let b3 = entry(&b, 3).map(|e| e["closure_refuted"] == true);
@@ -128,13 +152,20 @@ fn main() {
                     fail(format!("{name} missing"));
                     continue;
                 };
+                if !identity_ok(&v, arm, cell, d, false) {
+                    fail(format!("{name}: embedded identity does not match"));
+                }
                 if v["identity_check"] != true {
                     fail(format!("V1: {name} identity check not true"));
                 }
                 if !measured_at_3(&v) {
                     fail(format!("{name}: no saturated degree-3 measurement"));
                 }
-                let r = arm_reading(dir, arm, cell, &draw).expect("loaded");
+                let mut errors = Vec::new();
+                let r = arm_reading(dir, arm, cell, d, &mut errors).expect("loaded");
+                for e in errors {
+                    fail(format!("V1: {e}"));
+                }
                 let e3 = entry(&v, 3);
                 rows.push(format!(
                     r#"{{"cell":"{cell}","draw":{d},"arm":"{arm}","n_vars":{},"degree":"{}","rank3":{},"cols3":{},"cols4_needed":{}}}"#,
@@ -170,12 +201,23 @@ fn main() {
                 if q.degree.is_none() && br.degree.is_none_or(|db| db > q.measured + 1) {
                     unresolved += 1;
                 }
-                let key = |x: &Reading| x.degree.unwrap_or(u64::MAX);
-                if q.degree.is_some() && key(q) < key(r) {
-                    q_lt_r += 1;
+                // Compare on measured bounds: an arm with no refutation is
+                // known only to refute above its measured degree.
+                if let Some(dq) = q.degree {
+                    match r.degree {
+                        Some(dr) if dq < dr => q_lt_r += 1,
+                        None if r.measured >= dq => q_lt_r += 1,
+                        None => mechanism_open += 1,
+                        _ => {}
+                    }
                 }
-                if r.degree.is_some() && key(r) <= key(q) {
-                    r_le_q += 1;
+                if let Some(dr) = r.degree {
+                    match q.degree {
+                        Some(dq) if dr <= dq => r_le_q += 1,
+                        None if q.measured >= dr => r_le_q += 1,
+                        None => mechanism_open += 1,
+                        _ => {}
+                    }
                 }
                 eprintln!(
                     "{cell} {draw}: B {} | Q {} | R {}",
@@ -192,12 +234,23 @@ fn main() {
                 match load(dir, &name) {
                     None => fail(format!("{name} missing")),
                     Some(v) => {
+                        if !identity_ok(&v, arm, cell, *d, true) {
+                            fail(format!("{name}: embedded identity does not match"));
+                        }
                         let refuted = v["scan"].as_array().is_some_and(|s| {
                             s.iter()
                                 .any(|e| e["closure_refuted"] == true || e["xl_refuted"] == true)
                         });
-                        let sparse = load(dir, &format!("{name}.sparse4"))
-                            .is_some_and(|s| s["closure_refuted"] == true);
+                        let sparse_name = format!("{name}.sparse4");
+                        let sparse_record = load(dir, &sparse_name);
+                        if sparse_record.as_ref().is_some_and(|s| {
+                            !identity_ok(s, arm, cell, *d, true) || s["identity_check"] != true
+                        }) {
+                            fail(format!(
+                                "V1: {sparse_name}: identity or construction check fails"
+                            ));
+                        }
+                        let sparse = sparse_record.is_some_and(|s| s["closure_refuted"] == true);
                         if refuted || sparse {
                             fail(format!("V3: {name} refutes a satisfiable draw"));
                         }
@@ -218,6 +271,8 @@ fn main() {
         };
         let mechanism = if lower == 0 {
             "not read (H_none)".to_string()
+        } else if mechanism_open > 0 {
+            "unresolved".to_string()
         } else if q_lt_r >= 3 {
             "invariant-specific".to_string()
         } else if r_le_q >= 3 {
@@ -246,5 +301,9 @@ fn main() {
             "validity (V1 identity, V2 positive control, V3 soundness, degree-3 measured): {}",
             if valid { "valid" } else { "INVALID" }
         );
+    }
+    // Fail closed for automation too: an invalid study is a failed run.
+    if !valid {
+        std::process::exit(1);
     }
 }

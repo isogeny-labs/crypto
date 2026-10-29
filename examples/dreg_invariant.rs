@@ -43,7 +43,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     build_decomposition_system, sym_semaev_s3, FieldStructure, SymElement, MAX_VARS,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{bit, F2BoolPoly, Mask};
 use num_bigint::BigUint;
 use serde_json::Value;
 
@@ -82,7 +82,7 @@ fn product_span(x1x2: &SymElement, ell: usize, n: u32) -> Vec<F2mElement> {
     let mut vectors = Vec::new();
     for i in 0..ell {
         for j in i..ell {
-            let mono = (1u64 << i) | (1u64 << (ell + j));
+            let mono = bit(i as u32) | bit((ell + j) as u32);
             let mut v = 0u64;
             for (k, c) in x1x2.coords.iter().enumerate() {
                 if c.terms.iter().any(|t| t.mask == mono) {
@@ -280,7 +280,7 @@ fn main() {
                 .equations
                 .iter()
                 .flat_map(|p| p.terms.iter())
-                .fold(0u64, |acc, t| acc | t.mask)
+                .fold(0 as Mask, |acc, t| acc | t.mask)
                 .count_ones() as u64;
             let max_deg = a
                 .equations
