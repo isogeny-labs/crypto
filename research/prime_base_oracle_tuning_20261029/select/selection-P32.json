@@ -1,0 +1,23 @@
+{
+  "schema": "xp-pbo.selection/v1",
+  "bits": 32,
+  "selected": {
+    "arm": "mitm2-n1024",
+    "fam": "mitm2",
+    "n": 1024,
+    "s0": 31.85004785060943,
+    "s1": 34.524654057056864,
+    "s2": 58.596109915083765,
+    "oracle": "mitm:negation_folded=1"
+  },
+  "size_only": {
+    "arm": "mitm2-n1024",
+    "fam": "mitm2",
+    "n": 1024,
+    "s0": 31.85004785060943,
+    "s1": 34.524654057056864,
+    "s2": 58.596109915083765
+  },
+  "rule": "min mean S at w=0.1 over cells verified 8/8 with no uncounted counter; ties: incumbent oracle, then smaller N",
+  "band_train_sha256": "b8a725f2962037a1267a309f6140b726e7460641b4efdff9c9f83d0d884c63a9"
+}
