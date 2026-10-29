@@ -51,3 +51,43 @@ owned by another task; its existing entries are not changed here.
   runner's exit127 after both exact tests passed: its narrowed PATH lacked rg.
   Only metadata hashing/readback and Clippy resumed; native tests were not
   repeated. No evidence was overwritten or promoted into a scientific result.
+
+## 05:23 UTC — regular stacked PR and source checkpoint
+
+### What was done (commands, files, features)
+
+- Pushed documentation head `aca42cc2aaa908e7fa62e1dfc8ebf86911955230` and
+  opened regular [PR #2825](https://github.com/isogeny-labs/crypto/pull/2825)
+  at 05:22:55 UTC, based on `codex/ml-pmu-collector-20261028` at
+  `843a31522de11e4d12f9a38990c1e2ec4a585fdf`. The parent app attachment
+  succeeded at 05:23:08 UTC. No automatic merge or retarget was performed.
+- Standard checkpoint `20261029T051857Z-aca42cc2aaa9` was freshly downloaded
+  and verified: 97511 bytes, SHA256
+  `0c8f92456fc881c46dc9484777afd6c055657741eb777c3b1cc86abaaafd403a`.
+  Restored metadata/HEAD, bundle prerequisites, RESUME and specification bytes
+  match. The utility removed its original temporary tarball, so the receipt
+  explicitly records the fresh-download hash without claiming original-tar
+  byte comparison.
+
+### Decisions made (and why)
+
+- The complete diff from tested b7c11 to the delivery head touches only reserved
+  documentation/receipt paths; all recorded source/dependency/build-input hashes
+  match. No tests or binaries are rebuilt for these documentation updates.
+- Keep the initial creation response's mergeability uncertain until GitHub has
+  computed it. A PR being open or attached does not establish current-head CI,
+  independent hardware admission or main delivery.
+
+### Open threads (unfinished, pick up next time)
+
+- Preserve and freshly read back this publication-handoff checkpoint, then push
+  the final documentation head and report its exact identity. The parent owns
+  subsequent CI cadence, review reconciliation and stack integration. No source
+  ownership is retained for that read-only follow-up.
+
+### Errors (what went wrong, how it was handled)
+
+- The Git remote reports the repository moved from aburan28/crypto to
+  isogeny-labs/crypto and accepted the normal fast-forward/new-branch push.
+  No force push or remote configuration change was needed. Earlier failures and
+  interrupted validation remain preserved in their original evidence packets.

@@ -27,6 +27,13 @@ This handoff does not amend the frozen policy or scientific protocols.
 
 ## State
 
+Regular [PR #2825](https://github.com/isogeny-labs/crypto/pull/2825) was opened at
+2026-10-29 05:22:55 UTC on the original parent branch and attached by the parent
+coordinator at 05:23:08 UTC. Its initial documentation head was
+`aca42cc2aaa908e7fa62e1dfc8ebf86911955230`. The current PR metadata and final
+checkpoint identify subsequent documentation-only handoff commits; hosted
+checks remain separate from local validation and no automatic merge is enabled.
+
 The full unfiltered serial library gate passed 5231/0/123 with 0 filtered and
 exit 0 on immutable executable `1e7496533221060ea6202ff4fc78c80b0d5a11cb1bdabf1bfb68c430551eec8b`.
 The final two exact mock retention tests and strict release Clippy passed.
@@ -56,14 +63,16 @@ a fix and an available reservation. Do not restart the old released heartbeat.
 
 ## Next steps
 
-Publish or reconcile the regular PR on codex/ml-pmu-collector-20261028, preserving
-the exact delivered head and original parent lineage. A new session first checks
+Reconcile PR #2825 on codex/ml-pmu-collector-20261028, preserving the exact
+delivered head and original parent lineage. A new session first checks
 GitHub, the Git checkpoint, VALIDATION_RECEIPTS.json and the immutable archived
 logs before repeating any command. Hosted CI/review and later stack integration
 belong to the parent coordinator. Pending checks are not passes; no automatic
 merge into the feature parent or a TEMP review branch is authorized.
 
-After publication, preserve the final source/delivery checkpoint and freshly
+The initial documentation checkpoint is verified in SOURCE_CHECKPOINT_RECEIPTS.json.
+The final documentation checkpoint is recorded with the final PR-head handoff.
+For any later update, preserve its source/delivery checkpoint and freshly
 download it to verify its declared hash/length, exact source HEAD and RESUME
 bytes. If only delivery documentation changed, demonstrate all other Git paths
 unchanged from the validated source rather than rebuilding or relabeling the
