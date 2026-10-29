@@ -2499,6 +2499,12 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     verify_capture_context(dir, &manifest.artifacts)?;
     execution::verify(dir, &manifest.artifacts)?;
+    solvers::verify_prime_f4_wide(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     for required in [
         "config.json",
         "run.json",
@@ -4310,6 +4316,223 @@ mod tests {
         assert!(!dir.join("witness.json").exists());
         verify_cell(&dir, true).unwrap();
         dir
+    }
+
+    fn wide_prime_f4_cell_fixture(fixture: &TempRun, twist: bool) -> PathBuf {
+        let m = 2;
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![61];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 8;
+        plan.work_limit = 50_000;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(512);
+        binding["trace_mib"] = json!(64);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..m {
+            let summand = if i < 2 || i % 2 == 1 {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture.0.join(format!("cell-wide-f4-twist{twist}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_context(&config, &case, Some(&context)).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"], true,
+            "{}",
+            solved.outcome
+        );
+        assert_eq!(
+            solved.outcome["native_backend_invoked"], true,
+            "{}",
+            solved.outcome
+        );
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    #[test]
+    fn wide_prime_f4_central_replay_and_rehashed_tamper_both_twists() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = wide_prime_f4_cell_fixture(&fixture, twist);
+            verify_cell(&dir, true).unwrap();
+            let partial = altered_cell(
+                &dir,
+                &fixture.0.join("partial-censored"),
+                |path, manifest| {
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                    for artifact in &mut manifest.artifacts {
+                        if [
+                            "prime-f4-input.json",
+                            "prime-f4-wide-result.json",
+                            "prime-f4-wide-events.jsonl",
+                            "prime-f4-root-extraction.json",
+                        ]
+                        .contains(&artifact.path.as_str())
+                        {
+                            artifact.role = "unregistered-partial-artifact".into();
+                            artifact.encoding = "native".into();
+                        }
+                    }
+                    fs::write(path.join("prime-f4-wide-result.json"), b"{incomplete").unwrap();
+                },
+            );
+            verify_cell(&partial, true).unwrap();
+            for mutation in [
+                "equation", "limit", "basis", "counter", "outcome", "deadline", "unknown", "omit",
+                "relocate", "encoding",
+            ] {
+                let bad =
+                    altered_cell(
+                        &dir,
+                        &fixture.0.join(mutation),
+                        |path, manifest| match mutation {
+                            "equation" => alter_json(&path.join("prime-f4-input.json"), |v| {
+                                v["polynomials"][0][0]["coefficient"] = json!("2305843009213693951")
+                            }),
+                            "limit" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["limits"]["work"] = json!(1)
+                            }),
+                            "basis" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["native_basis_derivation_verified"] = json!(true)
+                            }),
+                            "counter" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["acknowledged_events"] = json!(999999)
+                            }),
+                            "outcome" => {
+                                manifest.outcome["total_operation_count_verified"] = json!(true)
+                            }
+                            "deadline" => alter_json(&path.join(execution::PATH), |v| {
+                                v["deadline_monotonic_ns"] = json!(0)
+                            }),
+                            "unknown" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["extra"] = json!(true)
+                            }),
+                            "omit" => manifest
+                                .artifacts
+                                .retain(|a| a.path != "prime-f4-wide-result.json"),
+                            "relocate" => {
+                                let a = manifest
+                                    .artifacts
+                                    .iter_mut()
+                                    .find(|a| a.path == "prime-f4-wide-result.json")
+                                    .unwrap();
+                                fs::rename(path.join(&a.path), path.join("relocated.json"))
+                                    .unwrap();
+                                a.path = "relocated.json".into();
+                            }
+                            "encoding" => {
+                                manifest
+                                    .artifacts
+                                    .iter_mut()
+                                    .find(|a| a.path == "prime-f4-wide-result.json")
+                                    .unwrap()
+                                    .encoding = "native".into()
+                            }
+                            _ => unreachable!(),
+                        },
+                    );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {mutation}");
+            }
+        }
     }
 
     #[test]

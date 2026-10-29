@@ -84,3 +84,47 @@ same-host system-wide and excludes suspend; historical replay does not compare
 saved times to the current clock. No clock precision or performance claim.
 Shared session log is absent from this sparse worktree and reserved elsewhere;
 this owned handoff records decisions and outcomes instead. No tests run yet.
+
+## Implemented handoff (not built or tested)
+
+Context commits: 5b331ba7c48 plus independent-review correction 8d88ce4d5da.
+The correction rejects simultaneous checked-duration overflow/reversed deadline,
+and censors exits first observed at/after the original deadline. Linux generation
+writes the restricted prelaunch record and required-context run marker. Other
+platforms preserve legacy generation, without claiming the supervised profile.
+
+Adapter resides as a child module of solvers.rs in prime_f4_wide.rs, preserving
+Group/Element privacy. Actual supervised wide m2 input enters Fp64 native F4;
+legacy no-context calls retain their previous unsupported wide behavior. The
+normalizer, independent original-domain replay, bounded native boundaries, decoded
+basis, scalar native counters and available native step summaries are retained.
+Native statistics remain producer reports and their timings remain diagnostic.
+Bounded native failure does not prevent independent budgeted domain checking,
+except persistence failure or the original deadline. No native unit is treated
+as an independent negative PDP proof.
+
+Trace allocation is conservatively min(4MiB, original trace bytes/32), requiring
+more than256KiB, with separate eighths for boundaries, basis and extraction and
+protected64KiB metadata. Native basis output may be explicitly omitted if it
+cannot fit; basis_retained reports that fact. Canonical equations remain staged.
+This is a narrower software resource profile, not a reduction of requested corpus
+scope. Larger profiles remain future work. Checked native work/storage permits
+retain their documented cumulative reservation semantics.
+
+Central replay checks exact original equations, profile/attempt/run binding,
+reserved roles/paths/encoding, acknowledged event prefix, canonical basis shape,
+outcome counters, original-domain/group prefix and witness identity. It does not
+prove arbitrary native basis derivations. Censored worker files without a final
+registry remain unregistered partial bytes, not promoted records; registered
+complete producer records are checked separately from outer timeout censorship.
+
+Authored tests cover setup-consumed and historical deadlines, simultaneous
+arithmetic overflow, exact/one-less group replay budget, expired native admission,
+initial event/payload refusal retaining equations, both fixed61-bit twist fixtures,
+central rehashed equation/limit/counter/outcome/deadline/unknown-field/path/encoding
+tamper, and interrupted partial bytes. The fixed controls reuse existing seed42,
+curve_seed7/generator1/key1 public doubling recipes; no seeds were searched.
+Only scoped rustfmt and git diff --check were run. Parent-owned independent source
+review, compilation, focused/full checks and source-bound CLI/S3 replay are still
+required. No cloud jobs, IAM changes, exporter edits, builds or tests were run by
+this implementation lane. All broader solver/arity/policy/corpus goals remain open.
