@@ -163,6 +163,12 @@ fn sealed_generic_filter_panel_and_rehashed_tampering() -> Result<()> {
                             first = Some((run.clone(), row["index"].as_u64().unwrap()));
                         }
                     } else if config["family"] == "koblitz"
+                        && row["outcome"]["status"] == "verified"
+                        && row["artifact_roles"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .any(|r| r == "large-prime-elimination-transcript")
                         && cell.join("large-prime-transcript.json").is_file()
                     {
                         legacy += 1;

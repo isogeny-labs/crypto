@@ -21,6 +21,9 @@ memory is bounded separately by the software supervisor.
 
 Rank allocation accounting includes up to64bytes per dense coefficient for
 numeric rows and newly produced canonical decimal strings, plus row metadata.
+The correction also reserves128bytes per row and64bytes per column for RHS,
+outer-row, pivot, determination and value vectors; an empty-row matrix still
+requires its column storage before allocation.
 Native sparse accounting additionally reserves completed rows, source maps,
 active row copies, pivot snapshots and source-combination accumulators before
 cloning them. Model rejection remains consumer_resource_limit, never producer
@@ -32,3 +35,22 @@ The saved-fixture summary also counted a stray unsealed legacy transcript file
 as route coverage. The corrected summary will require the manifest-admitted
 role and a verified outcome; historical report5 includes that unsealed file,
 while the primary manifest evidence has4 verified legacy Koblitz cells.
+
+Classifier string scratch remains bounded by the existing64MiB legacy raw cap
+so an ordinary legacy large string retains its former admission. The classified
+new-v2 loader uses a1MiB raw-string ceiling before serde parses it; both stages
+bound raw nesting to128. Schema keys are streamed without retaining key strings,
+duplicate/escaped duplicate schema keys and nonstring schemas fail before routing,
+and strict EOF plus a complete streaming SHA256 binds classification to the later
+read. The preflight visitor returns unit and keeps no array/map/value containers.
+Existing public/base/config/positive-certificate parsing outside this new module
+retains its separate legacy limits and is not claimed as covered by its512MiB
+modeled-storage ceiling.
+
+The resumed implementation checked the official Serde
+[DeserializeSeed documentation](https://docs.rs/serde/latest/serde/de/trait.DeserializeSeed.html)
+and serde_json [reader and EOF documentation](https://docs.rs/serde_json/latest/serde_json/struct.Deserializer.html)
+on2026-10-29. The stateful unit-returning visitor admits structure without
+retaining containers; reader classification uses explicit buffering and calls
+end() to reject trailing data. These are parser mechanics, not cryptographic
+novelty claims or an RSS measurement.

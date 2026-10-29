@@ -3,6 +3,7 @@
 //! explicitly excluded. Legacy v1 remains integrity-only in this module.
 mod budget;
 mod filter;
+mod json;
 mod rank;
 pub mod schema;
 #[cfg(test)]
@@ -19,7 +20,6 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    io::Read,
     path::Path,
 };
 pub const ROLE: &str = "large-prime-filter-certificates/v1";
@@ -27,7 +27,7 @@ const PATH: &str = "generic-large-prime-transcript.json";
 const TRANSCRIPT_ROLE: &str = "large-prime-elimination-transcript";
 const SCHEMA: &str = "ml-ecdlp-generic-large-prime-transcript/v2";
 const POLICY: &str = "aggregate-native-filter-admission/v1";
-const FILE_MAX: u64 = 32 * 1024 * 1024;
+use json::FILE_MAX;
 fn sorted(value: Value) -> Value {
     match value {
         Value::Object(m) => Value::Object(
@@ -50,39 +50,6 @@ fn number(v: &Value, name: &str) -> Result<u64> {
     v.as_u64()
         .with_context(|| format!("invalid unsigned {name}"))
 }
-fn load_v2(root: &Path, artifact: &Value) -> Result<Value> {
-    ensure!(
-        artifact["encoding"] == "json" && number(&artifact["bytes"], "artifact size")? <= FILE_MAX,
-        "v2 artifact admission"
-    );
-    let path = contained(root, artifact["path"].as_str().context("v2 artifact path")?)?;
-    let file = open_regular(&path)?;
-    ensure!(file.metadata()?.len() <= FILE_MAX, "v2 actual file size");
-    let mut raw = Vec::new();
-    file.take(FILE_MAX + 1).read_to_end(&mut raw)?;
-    ensure!(
-        raw.len() as u64 <= FILE_MAX
-            && Some(raw.len() as u64) == artifact["bytes"].as_u64()
-            && artifact["sha256"] == digest(&raw),
-        "v2 actual bytes/hash"
-    );
-    read_json_bytes(&raw)
-}
-fn budget_for(v: &Value, raw: u64) -> Result<Budget> {
-    let retained = budget::decoded(v)?
-        .checked_mul(2)
-        .and_then(|n| n.checked_add(raw as usize))
-        .context("consumer_resource_limit: typed JSON")?;
-    ensure!(
-        retained <= budget::MEMORY,
-        "consumer_resource_limit: typed JSON"
-    );
-    Ok(Budget {
-        retained,
-        ..Budget::default()
-    })
-}
-
 /// Returns no field for legacy evidence, preserving its historical export shape.
 pub fn audit(
     root: &Path,
@@ -108,9 +75,9 @@ pub fn audit(
         .iter()
         .filter(|(p, a)| a["role"] == TRANSCRIPT_ROLE && p.as_str() != PATH)
     {
-        let other = load_artifact_json(root, candidate)?;
+        let other = json::classify(root, candidate)?;
         ensure!(
-            other["schema"] != SCHEMA,
+            other.as_deref() != Some(SCHEMA),
             "generic v2 transcript under wrong path: {path}"
         );
     }
@@ -121,16 +88,17 @@ pub fn audit(
         );
         return Ok(None);
     };
-    let saved = load_artifact_json(root, artifact)?;
-    if saved["schema"] != SCHEMA {
+    let classification = json::classify(root, artifact)?;
+    if classification.as_deref() != Some(SCHEMA) {
         ensure!(
             batch_members.is_empty() && !has_claim,
             "new filter claims without v2"
         );
         ensure!(
-            saved["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1",
+            classification.as_deref() == Some("ml-ecdlp-generic-large-prime-transcript/v1"),
             "unknown generic transcript schema"
         );
+        load_artifact_json(root, artifact)?; // Legacy duplicate-key and Value behavior is unchanged.
         return Ok(None);
     }
     ensure!(
@@ -147,7 +115,11 @@ pub fn audit(
             == 1,
         "duplicate generic transcript"
     );
-    let mut budget = budget_for(&saved, number(&artifact["bytes"], "bytes")?)?;
+    let (saved, retained) = json::load(root, artifact, budget::MEMORY)?;
+    let mut budget = Budget {
+        retained,
+        ..Budget::default()
+    };
     shape_admission(&saved)?;
     let t: Transcript = serde_json::from_value(saved).context("strict generic v2 schema")?;
     let auxiliary = |name: &str, role: &str| -> Result<Value> {
@@ -155,13 +127,7 @@ pub fn audit(
             .get(name)
             .context("missing generic domain/pair payload")?;
         ensure!(member["role"] == role, "generic auxiliary role");
-        let value = load_v2(root, member)?;
-        budget.scratch(
-            budget::decoded(&value)?
-                .checked_mul(2)
-                .and_then(|n| n.checked_add(member["bytes"].as_u64()? as usize))
-                .context("consumer_resource_limit: auxiliary payload")?,
-        )?;
+        let (value, _) = json::load(root, member, budget::MEMORY - budget.retained)?;
         Ok(value)
     };
     {
@@ -207,13 +173,7 @@ pub fn audit(
         let name = format!("generic-large-prime-filter-batch-{i:04}.json");
         let a = members.get(&name).context("missing indexed native batch")?;
         ensure!(a["role"] == ROLE, "wrong native batch role");
-        let payload = load_v2(root, a)?;
-        budget.scratch(
-            budget::decoded(&payload)?
-                .checked_mul(2)
-                .and_then(|n| n.checked_add(number(&a["bytes"], "batch bytes").ok()? as usize))
-                .context("consumer_resource_limit: comparison payload")?,
-        )?;
+        let (payload, _) = json::load(root, a, budget::MEMORY - budget.retained)?;
         let decoded: TracedBatch = serde_json::from_value(payload)?;
         ensure!(decoded == *b, "batch payload/transcript differs");
         hashes.push(a["sha256"].clone());

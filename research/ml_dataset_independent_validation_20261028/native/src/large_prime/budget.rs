@@ -1,5 +1,4 @@
 use anyhow::{ensure, Context, Result};
-use serde_json::Value;
 
 pub const MEMORY: usize = 512 * 1024 * 1024;
 #[derive(Default)]
@@ -53,45 +52,26 @@ impl Budget {
         );
         self.scratch(
             cells
-                .checked_mul(16)
-                .and_then(|n| n.checked_add(rows * 64))
+                .checked_mul(64)
+                .and_then(|n| rows.checked_mul(128).and_then(|r| n.checked_add(r)))
+                .and_then(|n| columns.checked_mul(64).and_then(|c| n.checked_add(c)))
                 .context("consumer_resource_limit: matrix bytes")?,
         )
     }
 }
-/// Conservative decoded-storage admission, not allocator/RSS measurement.
-pub fn decoded(value: &Value) -> Result<usize> {
-    let mut n = 64usize;
-    match value {
-        Value::String(s) => {
-            n = n
-                .checked_add(s.capacity())
-                .context("consumer_resource_limit: string")?
-        }
-        Value::Array(a) => {
-            n = n
-                .checked_add(
-                    a.capacity()
-                        .checked_mul(64)
-                        .context("consumer_resource_limit: array")?,
-                )
-                .context("consumer_resource_limit: array")?;
-            for v in a {
-                n = n
-                    .checked_add(decoded(v)?)
-                    .context("consumer_resource_limit: array")?;
-            }
-        }
-        Value::Object(o) => {
-            for (k, v) in o {
-                n = n
-                    .checked_add(128 + k.capacity())
-                    .and_then(|n| n.checked_add(decoded(v).ok()?))
-                    .context("consumer_resource_limit: object")?;
-            }
-        }
-        _ => {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_matrix_still_reserves_column_vectors_before_allocation() {
+        let mut budget = Budget {
+            retained: MEMORY - 63,
+            ..Budget::default()
+        };
+        assert!(budget.matrix(0, 1).is_err());
+        budget.retained = MEMORY - 64;
+        assert!(budget.matrix(0, 1).is_ok());
     }
-    ensure!(n <= MEMORY, "consumer_resource_limit: decoded JSON");
-    Ok(n)
 }

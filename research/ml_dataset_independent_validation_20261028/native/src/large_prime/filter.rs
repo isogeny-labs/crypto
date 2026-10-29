@@ -71,6 +71,7 @@ struct Cursor<'a> {
     refused: u64,
     report: Report,
     rows: Vec<Complete>,
+    completed_terms: usize,
     stopped: bool,
 }
 impl<'a> Cursor<'a> {
@@ -89,6 +90,7 @@ impl<'a> Cursor<'a> {
                 ..Report::default()
             },
             rows: vec![],
+            completed_terms: 0,
             stopped: false,
         }
     }
@@ -180,6 +182,7 @@ impl<'a> Cursor<'a> {
         self.ack_inv = self.inv;
         self.report = expected.report_after;
         if let Transition::CompleteRow { row, .. } = expected.transition {
+            self.completed_terms += row.terms();
             self.rows.push(row.complete());
         }
         self.index += 1;
@@ -439,6 +442,9 @@ pub fn verify(inputs: &[Partial], options: &Options, run: &Run, b: &mut Budget) 
         }
     );
     for raw in smooth {
+        b.scratch(
+            (terms * 4 + c.completed_terms * 3 + raw.small.len() * 3) * 128 + inputs.len() * 1024,
+        )?;
         let p = Reservation::new(Phase::Complete, 0, raw.small.len() + 2);
         admit!(p);
         report.complete_relations += 1;
@@ -471,7 +477,10 @@ pub fn verify(inputs: &[Partial], options: &Options, run: &Run, b: &mut Budget) 
             }
         );
         loop {
-            b.scratch((terms * 4 + pivot_terms + row.terms() * 3) * 128 + inputs.len() * 1024)?;
+            b.scratch(
+                (terms * 4 + pivot_terms * 2 + c.completed_terms * 3 + row.terms() * 4) * 128
+                    + inputs.len() * 1024,
+            )?;
             if row.large.is_empty() {
                 let p = Reservation::new(Phase::Complete, 0, row.terms());
                 admit!(p);
@@ -573,6 +582,7 @@ pub fn verify(inputs: &[Partial], options: &Options, run: &Run, b: &mut Budget) 
     }
     let p = Reservation::new(Phase::Finish, 0, 0);
     admit!(p);
+    b.scratch((terms * 4 + pivot_terms * 2 + c.completed_terms * 3) * 128 + inputs.len() * 1024)?;
     let rows = c.rows.clone();
     event!(p, Transition::Finish { rows });
     c.finish(true)

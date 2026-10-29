@@ -658,12 +658,17 @@ fn exact_v2_file_boundary_and_known_query_stream() {
     bytes.resize(FILE_MAX as usize, b' ');
     std::fs::write(temp.path().join("bounded.json"), &bytes).unwrap();
     let mut artifact = json!({"path":"bounded.json","role":ROLE,"encoding":"json","bytes":bytes.len(),"sha256":digest(&bytes)});
-    assert_eq!(load_v2(temp.path(), &artifact).unwrap(), json!({}));
+    assert_eq!(
+        json::load(temp.path(), &artifact, budget::MEMORY)
+            .unwrap()
+            .0,
+        json!({})
+    );
     bytes.push(b' ');
     std::fs::write(temp.path().join("bounded.json"), &bytes).unwrap();
     artifact["bytes"] = json!(bytes.len());
     artifact["sha256"] = json!(digest(&bytes));
-    assert!(load_v2(temp.path(), &artifact).is_err());
+    assert!(json::load(temp.path(), &artifact, budget::MEMORY).is_err());
     // Pinned58bd first n12/m3 software fixture, seed42/gen1/key2, scalar modulus397.
     let mut rng = StdRng::seed_from_u64(
         42 ^ 1u64.rotate_left(17) ^ 2u64.rotate_left(31) ^ 0x8a01_731f_94b0_d6c3,
