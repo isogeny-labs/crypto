@@ -1,9 +1,9 @@
 # Root-finding decomposition engine in ecbench: results
 
-For the Bochum v0.2 paper's separate hashed-factor-base reduction, see the
-[native Rust reference](docs/hashed-ecdl.md). Its compact tensor encoder and
-fast contraction backend remain unimplemented; no subexponential speedup is
-claimed by that reference.
+For the Bochum v0.2 hashed-factor-base algorithm, see the
+[native Rust tensor implementation](docs/hashed-ecdl.md): compact encodings,
+exact contraction, relation collection and certificate replay. Correctness
+controls do not establish the conditional asymptotic bound or a speedup.
 
 **Decision: engineering.** The new oracles verify, replay identically, and
 match the query stream of the existing table/subtract arms; they do not

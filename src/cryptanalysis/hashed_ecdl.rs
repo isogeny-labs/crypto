@@ -1,8 +1,8 @@
 //! Executable reference for §3 of Bochum's *Subexponential ECDL*, v0.2.
 //!
 //! This implements affine-hashed factor bases and the index-calculus reduction,
-//! **not** the compact Boolean tensor encoding or the assumed fast contraction
-//! algorithm. The default oracle enumerates group decompositions (generic
+//! with a separate complete tensor implementation exported as [`tensor`].
+//! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
 //! performance claim is made. Only small, cofactor-one prime-field curves are
 //! supported. All returned answers carry a replayable algebraic certificate.
@@ -11,6 +11,9 @@
 //! `1ee44e562b1b9a50ea339f3b8f81112b5a24b96f`, §3.2–3.5, Figure 2.
 //! The default CPU reduction matches cryptanalysis's Rust binding. Crypto also
 //! exposes an optional base-construction hook for its standalone GPU adapter.
+
+/// Arbitrary-precision compact encodings, recursive contraction and reduction.
+pub use hashed_ecdl_tensor as tensor;
 
 use std::collections::BTreeMap;
 
@@ -35,6 +38,7 @@ impl std::fmt::Display for Error {
 }
 impl std::error::Error for Error {}
 
+#[clippy::msrv = "1.78"]
 fn prime(n: u64) -> bool {
     n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0)
 }
@@ -68,6 +72,7 @@ pub struct Curve {
 
 impl Curve {
     /// Check primality, nonsingularity, and the exact prime group order.
+    #[clippy::msrv = "1.78"]
     pub fn new(p: u64, a: u64, b: u64, r: u64) -> Result<Self, Error> {
         if !(5..=65521).contains(&p) || !(3..=131044).contains(&r) || !prime(p) || !prime(r) {
             return Err(Error::Invalid(
