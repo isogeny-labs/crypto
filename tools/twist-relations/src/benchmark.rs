@@ -260,6 +260,7 @@ fn relations(
         };
         hits += 1;
         live.progress.relation_hits = hits;
+        live.progress.phase = "joint_linear_algebra".into();
         let clock = Instant::now();
         let mut row = vec![0; size + 2];
         row[i] += 1;
@@ -295,7 +296,10 @@ fn relations(
             assert_eq!(row[size + 1], 0, "Inconsistent relation");
         }
         linear.ns += clock.elapsed().as_nanos() as u64;
+        live.progress.phase = "relation_search".into();
     }
+    live.progress.phase = "joint_linear_algebra".into();
+    live.publish(e, observer)?;
     let clock = Instant::now();
     let mut logs = vec![0; size + 1];
     for col in (0..=size).rev() {
