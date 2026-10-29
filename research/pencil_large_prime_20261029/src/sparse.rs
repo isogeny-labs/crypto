@@ -6,8 +6,8 @@ use std::cmp::Ordering;
 use std::collections::{btree_map, BTreeMap};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
-#[cfg_attr(feature = "producer", serde(transparent))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", serde(transparent))]
 struct Key(usize);
 impl Ord for Key {
     fn cmp(&self, rhs: &Self) -> Ordering {
@@ -22,8 +22,8 @@ impl PartialOrd for Key {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
-#[cfg_attr(feature = "producer", serde(transparent))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", serde(transparent))]
 pub struct TrackedMap<V>(BTreeMap<Key, V>);
 
 impl<V> Default for TrackedMap<V> {
@@ -163,7 +163,7 @@ mod tests {
         assert!(m.is_empty());
     }
     #[test]
-    #[cfg(feature = "producer")]
+    #[cfg(feature = "reporting")]
     fn serialization_keeps_schema_without_counting_output() {
         let m: TrackedMap<u64> = [(17, 91), (2, 5)].into();
         meter::reset();
