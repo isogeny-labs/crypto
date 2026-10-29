@@ -38,3 +38,34 @@ No global quotient saturation, proper polarized factor embedding, complete
 padding divisor, Picard operation or nonzero order11factor image follows.
 Both padding points are outside this particular quotient-basis coefficient
 domain, so no padding local-dimension claim is supplied by this calculation.
+
+## Both padding supports after one parameter-module colon step
+
+qpoly34-01 computes q=u5+u3+1 and checks all17 old columns vanish at bothQ.
+qcolon34-01 computes20 new integral columns G with qG=SH, exact division and
+J*G=0 verified before specialization. The q is not inverted at the points.
+qcolonpoint34-01 reloads all37columns, rechecks their generic source identity,
+and evaluates all148unit products. Both Q give exact unit-ideal witnesses;
+the old17columns remain a zero negative control. Thus the same three-equation
+presentation argument applies at bothQ, including F2 twist descent. u-u(Q)
+is a uniformizer after residue-field extension and supports actual jets.
+
+For binding to the proper carrier, use the retained R27 function-field bridge:
+the source field has degree16 over E11 and E11 has degree2 over F2(u), hence
+degree32 over F2(u). R33's generic four-generator source algebra has native
+vdim32 and exact two-way Groebner lifts. Its surjection onto the generated
+source function field is therefore an isomorphism. There is one dominating
+component. A local standard-etale point is flat over u and belongs to that
+component, and its regular local ring is unchanged by normalization. The
+unique proper normal model of the function field supplies the corresponding
+proper point, with the same residue degree. This uses the earlier written
+function-field/proper bridge; it is not a new global normalization algorithm
+or a Lean proof of that bridge.
+
+Consequently the two padding supports are actual degree5 points on that
+carrier under this bridge. They are disjoint from D0's A/B pole support,
+since u,u+1 are units. The fixed divisor9Q is effective rational degree45.
+This justifies the prospective full nine-jet calculation, including every
+coefficient-descent conjugate; finite scalar jets alone were not used as a
+substitute for the source-bound local presentation. Global quotient
+saturation, proper polarized factor embedding and target action stay open.
