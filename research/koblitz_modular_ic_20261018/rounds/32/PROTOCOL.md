@@ -38,3 +38,7 @@ the condensed .resume/RESUME.md lacked seven required handoff sections.
 Restore the complete handoff, not the gate/helper, and retry the unchanged
 frozen input with fresh jac83-02. Preserve jac83-01/gate.log. No failed
 scientific trial or altered mathematical acceptance criterion is inferred.
+The sequential shell also reached jac284-01's checkpoint gate and was refused
+for the same missing sections, again before CAS. Preserve both refusal logs;
+the corrected field284 invocation must use fresh jac284-02. No source/math
+retry was needed because neither original invocation reached the native CAS.
