@@ -40,10 +40,14 @@ valid outer hashes. No global serde numeric behavior changed.
 
 The corrected serial standalone release suite passed136library tests,
 12checked-phase integration tests and7existing integration tests (155total),
-with four opt-in retained-fixture tests ignored by the ordinary suite. A final
-rerun after the last fixed-envelope ordering correction is recorded separately
-in the delivery receipt. Release all-target strict Clippy and formatting are
-required on that final source. The execution logs and executable/source hashes
+with four opt-in retained-fixture tests ignored by that ordinary-suite invocation.
+The final rerun after the fixed-envelope ordering correction passed the same155.
+Two opt-in tests subsequently passed: exact legacy differential over40retained
+cells, and final producer interoperability over2retained mocked cells with8
+rehashed semantic tamper rejections. The new interop test brings the available
+opt-in tests to five; three older opt-in suites were not repeated in this increment.
+Release all-target strict Clippy and formatting pass on the delivery source.
+The execution logs and executable/source hashes
 are retained in the delivery archive rather than inferred from this test plan.
 
 The new tests execute these concrete cases:
@@ -96,11 +100,33 @@ legacy marker test exposed loss of recognition through later duplicate-key parse
 errors; recognition is now sticky and the regression passes.
 
 The producer initially retained logs but removed its temporary sealed worker and
-registryless-prefix fixtures. Those logs alone are not interoperability evidence.
-The parent subsequently authorized the producer owner to retain only the two
-already-required mocked test outputs; consumer interoperability remains pending
-until their terminal source-bound packet is received and audited. No generator
-rerun is authorized by this consumer document.
+registryless-prefix fixtures. Those logs alone were not used as interoperability
+evidence. The parent subsequently authorized the producer owner to retain only the
+two already-required mocked test outputs. All49retained files passed hash checks,
+and the independent consumer's actual audit/export and retained assertions passed:
+
+| Retained cell | Starts / ends | Consumer state | Modeled reserved bytes |
+| --- | --- | --- | --- |
+| sealed-worker | 4 / 4 | completed_recorded_prefix | 2268068 |
+| sealed-registryless-prefix | 1 / 0 | interrupted_or_unfinished | 282824 |
+
+Producing test source is b7c11d1b5f8a1f37b769453d3ce0413696b9fc83, whose only
+change from27679c4e is test-only retention. Its library executable is
+1e7496533221060ea6202ff4fc78c80b0d5a11cb1bdabf1bfb68c430551eec8b.
+Fixture source/binary binding fields intentionally retain their established
+synthetic a*40/b*64 values; actual producing identities are separate provenance,
+not substituted into the fixtures. All counter acquisition was mocked. Original
+records and false/null claims are preserved, including the unfinished prefix.
+No producer was invoked by the consumer and no campaign was regenerated.
+
+The producer fixture packet is independently persisted at
+`s3://setec-astronomy-artifacts/ml-dataset/20261028/software/checked-phase-telemetry/7beedbd6f194f41c275f10facdb92bae5100ff6a388d44aed33dcb38b5aab975/fixtures.tar.gz`.
+The consumer delivery archive also retains its exact inputs, outputs, eight
+tampered copies/errors, source and executable identities. Runtime source is
+0ceec70eb18d0b0c8642e09b68879f527cd23bdf; copied CLI SHA256 is
+2512b52b8d4061febd068746b0e15fffb72cc5c1bfb8e4f54f45469236d8523c.
+All40retained legacy software cells produce exact byte-identical audits and
+exports versus the source-bound prior consumer086b4cd/CLI31ac84b125fc.
 
 A progress checkpoint was conditionally uploaded and freshly read/hash-verified
 at `s3://setec-astronomy-artifacts/ml-dataset/20261029/consumer-checked-phase/progress/a8576ad6d03ac0ebb01d5d0d30e1dfaab12590be58b9946c2155ef8723adea99/checkpoint.tar.gz`
