@@ -829,7 +829,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
 
 fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
     let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
-        read_json(dir.join("worker-artifacts.json"))?
+        read_json(&dir.join("worker-artifacts.json"))?
     } else {
         Vec::new()
     };

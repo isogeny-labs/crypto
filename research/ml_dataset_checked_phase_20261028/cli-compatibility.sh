@@ -21,6 +21,9 @@ SENTINEL
 chmod +x "$evidence/sentinel/aws"
 export PATH="$evidence/sentinel:$PATH"
 export CRYPTO_CHECKED_AWS_SENTINEL="$evidence/aws-was-called"
+export CRYPTO_STORE_AWS="$evidence/sentinel/aws"
+export CRYPTO_STORE_CACHE="$evidence/cache"
+export CRYPTO_STORE_INDEX="$evidence/index.json"
 unset ISOLAB_RESULTS_URI
 printf '%s' '{"purpose":"checked phase CLI compatibility metadata fixture","schema":"experiment.protocol/v1"}' > "$evidence/protocol-body.json"
 body_sha=$(sha256sum "$evidence/protocol-body.json" | cut -d' ' -f1)

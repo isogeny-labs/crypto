@@ -1092,7 +1092,30 @@ mod tests {
             opens, 4,
             "all four real worker phases must use the mock factory"
         );
-        assert_eq!(checked::validate_directory(&dir).unwrap().len(), 9);
+        let expected_roles = checked::validate_directory(&dir).unwrap();
+        assert_eq!(expected_roles.len(), 9);
+        let registry: Vec<Artifact> =
+            super::super::read_json(&dir.join("worker-artifacts.json")).unwrap();
+        // Check the worker's own output before supervisor recovery could fill
+        // omitted entries and hide a regression at the registry boundary.
+        for (path, role) in expected_roles {
+            let registered: Vec<_> = registry.iter().filter(|a| a.path == path).collect();
+            assert_eq!(registered.len(), 1, "missing or duplicate {path}");
+            let artifact = registered[0];
+            let bytes = fs::read(dir.join(&path)).unwrap();
+            assert_eq!(artifact.role, role);
+            assert_eq!(artifact.encoding, "json");
+            assert_eq!(artifact.sha256, super::super::digest(&bytes));
+            assert_eq!(artifact.bytes, bytes.len() as u64);
+        }
+        assert_eq!(
+            registry
+                .iter()
+                .filter(|a| checked::role(&a.path).is_some())
+                .count(),
+            9
+        );
+        storage::verify_manifest(&dir, &registry).unwrap();
         let outcome: Value = super::super::read_json(&dir.join("result.json")).unwrap();
         assert_eq!(outcome["known_answer_verified"], true);
         assert_eq!(outcome["factor_base_verified"], true);
