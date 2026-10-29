@@ -34,6 +34,8 @@ const TRACE_EVENT_CAP: u64 = 100_000;
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
 pub(super) const PRIME_ROOT_CERTIFICATE_SCOPE: &str =
     "distinct roots per completed prime S3 call; incomplete calls prove no root absence";
+const PRIME_ROOT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
+const PRIME_ROOT_BYTE_CAP_REASON: &str = "prime root event byte cap reached";
 
 const SAT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
 const SAT_EVENT_CAP_REASON: &str = "native SAT event trace budget exhausted";
@@ -2515,6 +2517,93 @@ fn prime_root_coefficients(p: u64, a: u64, b: u64, u: u64, r: u64) -> Vec<u64> {
     vec![c0, c1, mul(d, d)]
 }
 
+fn prime_root_event_envelope(index: usize, fixed_x: &str, event: &RootEvent) -> Value {
+    json!({"schema":"ml-dataset.prime-root-event/v1","call_index":index,
+        "fixed_x":fixed_x,"native":event})
+}
+
+// Count only acknowledged envelopes. A byte refusal is the only native sink
+// failure that the adapter can seal: real I/O errors return Err before sealing.
+// The rejected event was computed and charged by the native engine, but is not
+// an acknowledged envelope or a separately saved intermediate state.
+fn verify_prime_root_event_budget(
+    report: &RootReport,
+    index: usize,
+    fixed_x: &str,
+    byte_cap_reached: bool,
+    byte_cap: usize,
+    totals: &mut (u64, usize),
+) -> Result<(), String> {
+    let event_bytes = |event: &RootEvent| -> Result<usize, String> {
+        Ok(
+            serde_json::to_vec(&prime_root_event_envelope(index, fixed_x, event))
+                .map_err(|e| e.to_string())?
+                .len(),
+        )
+    };
+    for event in &report.events {
+        totals.0 = totals.0.checked_add(1).ok_or("root event count overflow")?;
+        totals.1 = totals
+            .1
+            .checked_add(event_bytes(event)?)
+            .ok_or("root event bytes overflow")?;
+        if totals.0 > TRACE_EVENT_CAP || totals.1 > byte_cap {
+            return Err("prime root acknowledged event cap exceeded".into());
+        }
+    }
+    if report.stop == RootStop::SinkFailure {
+        let rejected = report
+            .unacknowledged
+            .as_ref()
+            .ok_or("root byte refusal lacks rejected event")?;
+        if !byte_cap_reached
+            || report.sink_error.as_deref() != Some(PRIME_ROOT_BYTE_CAP_REASON)
+            || totals.0 >= TRACE_EVENT_CAP
+            || totals
+                .1
+                .checked_add(event_bytes(rejected)?)
+                .ok_or("root event bytes overflow")?
+                <= byte_cap
+        {
+            return Err("prime root byte-cap refusal is not justified".into());
+        }
+    } else if byte_cap_reached || report.unacknowledged.is_some() || report.sink_error.is_some() {
+        return Err("prime root byte-cap flag or failed-sink state differs".into());
+    }
+    Ok(())
+}
+
+/// Validate the adapter's aggregate event envelope cap and the exact recorded
+/// refusal. This verifies the supplied records, not a complete execution trace.
+pub(super) fn prime_root_trace_totals(certificate: &Value) -> Result<(u64, u64), String> {
+    let queries = certificate["queries"]
+        .as_array()
+        .ok_or("missing root queries")?;
+    let mut totals = (0, 0);
+    for (index, query) in queries.iter().enumerate() {
+        let report: RootReport =
+            serde_json::from_value(query["report"].clone()).map_err(|e| e.to_string())?;
+        let fixed_x = query["fixed_x"]
+            .as_str()
+            .ok_or("root query lacks fixed x")?;
+        let byte_cap = query["trace_byte_cap_reached"]
+            .as_bool()
+            .ok_or("root query lacks byte-cap flag")?;
+        verify_prime_root_event_budget(
+            &report,
+            index,
+            fixed_x,
+            byte_cap,
+            PRIME_ROOT_EVENT_BYTE_CAP,
+            &mut totals,
+        )?;
+        if byte_cap && index + 1 != queries.len() {
+            return Err("root queries continue after byte-cap refusal".into());
+        }
+    }
+    Ok((totals.0, totals.1 as u64))
+}
+
 fn prime_root_solve(
     config: &CaseConfig,
     group: &Group,
@@ -2572,12 +2661,11 @@ fn prime_root_solve(
                 degree: 2,
             },
             &mut |event| {
-                let row = json!({"schema":"ml-dataset.prime-root-event/v1","call_index":call_index,
-                    "fixed_x":x.to_string(),"native":event});
+                let row = prime_root_event_envelope(call_index, &x.to_string(), event);
                 let size = serde_json::to_vec(&row).map_err(|e| e.to_string())?.len();
-                if event_bytes.saturating_add(size) > TRACE_BYTE_CAP / 4 {
+                if event_bytes.saturating_add(size) > PRIME_ROOT_EVENT_BYTE_CAP {
                     byte_cap = true;
-                    return Err("prime root event byte cap reached".into());
+                    return Err(PRIME_ROOT_BYTE_CAP_REASON.into());
                 }
                 if let Err(error) = live_event(&row) {
                     io_error = Some(error.clone());
@@ -2771,6 +2859,7 @@ pub(super) fn verify_prime_root_artifact(
     if queries.len() > codes.len() {
         return Err("too many root queries".into());
     }
+    prime_root_trace_totals(artifact)?;
     let mut used = 0u64;
     let mut events = 0u64;
     let mut found = false;
@@ -3079,6 +3168,125 @@ mod tests {
             )
             .unwrap();
         }
+    }
+
+    #[test]
+    fn prime_root_envelope_byte_admission_checks_exact_boundary_and_failed_finish() {
+        let limits = RootLimits {
+            field_work: 10_000,
+            split_attempts: 1000,
+            events: 10_000,
+            degree: 2,
+        };
+        let full =
+            prime_root_trace::solve(&[1, 0, 1], 13, 42, limits.clone(), &mut |_| Ok(())).unwrap();
+        prime_root_trace::verify(&full).unwrap();
+        assert_eq!(full.stop, RootStop::Complete);
+        assert_eq!(full.roots, vec![5, 8]);
+        assert!(matches!(full.events.last(), Some(RootEvent::Finish { .. })));
+        let bytes = |index, event: &RootEvent| {
+            serde_json::to_vec(&prime_root_event_envelope(index, "7", event))
+                .unwrap()
+                .len()
+        };
+        let full_bytes = full.events.iter().map(|e| bytes(0, e)).sum::<usize>();
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&full, 0, "7", false, full_bytes, &mut totals).unwrap();
+        assert_eq!(totals, (full.events.len() as u64, full_bytes));
+        assert!(
+            verify_prime_root_event_budget(&full, 0, "7", false, full_bytes - 1, &mut (0, 0),)
+                .unwrap_err()
+                .contains("acknowledged event cap")
+        );
+
+        // Reject the actual last callback at one byte below its exact envelope
+        // boundary. Native work is charged, but Finish remains unacknowledged.
+        let cap = full_bytes - 1;
+        let mut acknowledged_bytes = 0;
+        let refused = prime_root_trace::solve(&[1, 0, 1], 13, 42, limits, &mut |event| {
+            let size = bytes(0, event);
+            if acknowledged_bytes + size > cap {
+                return Err(PRIME_ROOT_BYTE_CAP_REASON.into());
+            }
+            acknowledged_bytes += size;
+            Ok(())
+        })
+        .unwrap();
+        prime_root_trace::verify(&refused).unwrap();
+        assert_eq!(refused.stop, RootStop::SinkFailure);
+        assert!(matches!(
+            refused.unacknowledged.as_ref(),
+            Some(RootEvent::Finish { .. })
+        ));
+        assert!(refused.roots.is_empty());
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&refused, 0, "7", true, cap, &mut totals).unwrap();
+        assert_eq!(totals, (refused.events.len() as u64, acknowledged_bytes));
+        assert_eq!(refused.events.len() + 1, full.events.len());
+        for (flag, allowed) in [(false, cap), (true, full_bytes)] {
+            assert!(
+                verify_prime_root_event_budget(&refused, 0, "7", flag, allowed, &mut (0, 0),)
+                    .unwrap_err()
+                    .contains("refusal is not justified")
+            );
+        }
+        let mut io_failure = refused.clone();
+        io_failure.sink_error = Some("selected payload I/O failure".into());
+        prime_root_trace::verify(&io_failure).unwrap();
+        assert!(
+            verify_prime_root_event_budget(&io_failure, 0, "7", true, cap, &mut (0, 0),)
+                .unwrap_err()
+                .contains("refusal is not justified")
+        );
+        assert!(
+            verify_prime_root_event_budget(&full, 0, "7", true, full_bytes, &mut (0, 0))
+                .unwrap_err()
+                .contains("byte-cap flag")
+        );
+    }
+
+    #[test]
+    fn prime_root_envelope_byte_admission_accumulates_across_queries() {
+        let report = prime_root_trace::solve(
+            &[1, 0, 1],
+            13,
+            42,
+            RootLimits {
+                field_work: 10_000,
+                split_attempts: 1000,
+                events: 10_000,
+                degree: 2,
+            },
+            &mut |_| Ok(()),
+        )
+        .unwrap();
+        prime_root_trace::verify(&report).unwrap();
+        assert!(report.complete());
+        let query =
+            |fixed_x| json!({"fixed_x":fixed_x,"trace_byte_cap_reached":false,"report":report});
+        let certificate = json!({"queries":[query("7"), query("8")]});
+        let (events, bytes) = prime_root_trace_totals(&certificate).unwrap();
+        assert_eq!(events, 2 * report.events.len() as u64);
+        let mut first = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, usize::MAX, &mut first).unwrap();
+        let mut second = (0, 0);
+        verify_prime_root_event_budget(&report, 1, "8", false, usize::MAX, &mut second).unwrap();
+        assert_eq!(bytes as usize, first.1 + second.1);
+        let exact_cap = first.1 + second.1;
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, exact_cap, &mut totals).unwrap();
+        verify_prime_root_event_budget(&report, 1, "8", false, exact_cap, &mut totals).unwrap();
+        assert_eq!(totals, (events, exact_cap));
+        // Each query alone fits this cap. Reusing the aggregate instead of
+        // resetting it is what rejects the second query's final envelope.
+        verify_prime_root_event_budget(&report, 1, "8", false, exact_cap - 1, &mut (0, 0)).unwrap();
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, exact_cap - 1, &mut totals).unwrap();
+        assert!(
+            verify_prime_root_event_budget(&report, 1, "8", false, exact_cap - 1, &mut totals,)
+                .unwrap_err()
+                .contains("acknowledged event cap")
+        );
     }
 
     #[test]

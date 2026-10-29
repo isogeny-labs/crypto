@@ -2176,25 +2176,7 @@ fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(),
     let work = certificate["charged_work"]
         .as_u64()
         .ok_or("prime-root certificate lacks aggregate work")?;
-    let mut events = 0u64;
-    let mut bytes = 0u64;
-    for (index, query) in queries.iter().enumerate() {
-        let fixed_x = query["fixed_x"]
-            .as_str()
-            .ok_or("prime-root query lacks fixed x")?;
-        for event in query["report"]["events"]
-            .as_array()
-            .ok_or("prime-root report lacks acknowledged events")?
-        {
-            let envelope = json!({"schema":"ml-dataset.prime-root-event/v1",
-                "call_index":index,"fixed_x":fixed_x,"native":event});
-            let size = serde_json::to_vec(&envelope)
-                .map_err(|e| e.to_string())?
-                .len() as u64;
-            events = events.checked_add(1).ok_or("root event count overflow")?;
-            bytes = bytes.checked_add(size).ok_or("root event bytes overflow")?;
-        }
-    }
+    let (events, bytes) = solvers::prime_root_trace_totals(certificate)?;
     for (key, expected) in [
         ("aggregate_root_field_and_group_work", work),
         ("root_solver_calls", queries.len() as u64),
@@ -2206,6 +2188,81 @@ fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(),
                 "prime-root outcome aggregate counter differs: {key}"
             ));
         }
+    }
+    Ok(())
+}
+
+fn is_prime_root_auxiliary(artifact: &Artifact) -> bool {
+    matches!(
+        artifact.role.as_str(),
+        "native-prime-root-call" | "native-prime-root-intermediate-state"
+    ) || artifact.path.starts_with("root-call-")
+        || artifact.path.starts_with("root-state-")
+}
+
+/// Bind the duplicated call/state files to the certificate's supplied events.
+/// This does not assert that the native execution emitted every possible event.
+fn verify_prime_root_auxiliary_artifacts(
+    dir: &Path,
+    artifacts: &[Artifact],
+    certificate: &Value,
+    replay: bool,
+) -> Result<(), String> {
+    let mut supplied = BTreeMap::new();
+    for artifact in artifacts.iter().filter(|a| is_prime_root_auxiliary(a)) {
+        if supplied.insert(artifact.path.as_str(), artifact).is_some() {
+            return Err("duplicate prime root auxiliary path".into());
+        }
+    }
+    let mut check = |name: String, role: &str, expected: &Value| -> Result<(), String> {
+        let artifact = supplied
+            .remove(name.as_str())
+            .ok_or_else(|| format!("missing prime root auxiliary artifact: {name}"))?;
+        if artifact.role != role || artifact.encoding != "json" {
+            return Err(format!(
+                "prime root auxiliary role or encoding differs: {name}"
+            ));
+        }
+        if replay && read_json::<Value>(&dir.join(&artifact.path))? != *expected {
+            return Err(format!("prime root auxiliary payload differs: {name}"));
+        }
+        Ok(())
+    };
+    let mut event_sequence = 0u64;
+    for (index, query) in certificate["queries"]
+        .as_array()
+        .ok_or("missing root queries")?
+        .iter()
+        .enumerate()
+    {
+        check(
+            format!("root-call-{index:04}.json"),
+            "native-prime-root-call",
+            query,
+        )?;
+        let fixed_x = query["fixed_x"]
+            .as_str()
+            .ok_or("root query lacks fixed x")?;
+        for event in query["report"]["events"]
+            .as_array()
+            .ok_or("root report lacks acknowledged events")?
+        {
+            event_sequence = event_sequence
+                .checked_add(1)
+                .ok_or("root event sequence overflow")?;
+            if matches!(event["kind"].as_str(), Some("power_end" | "gcd_end")) {
+                let expected = json!({"schema":"ml-dataset.prime-root-event/v1", "call_index":index,
+                    "fixed_x":fixed_x, "native":event});
+                check(
+                    format!("root-state-{index:04}-{event_sequence:06}.json"),
+                    "native-prime-root-intermediate-state",
+                    &expected,
+                )?;
+            }
+        }
+    }
+    if !supplied.is_empty() {
+        return Err("unexpected or duplicate prime root auxiliary artifact".into());
     }
     Ok(())
 }
@@ -2295,13 +2352,10 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     }) {
         return Err("prime-root certificate lacks its reserved JSON role".into());
     }
-    let native_prime_root_artifacts = manifest.artifacts.iter().any(|a| {
-        a.path == "prime-root-certificates.json"
-            || matches!(
-                a.role.as_str(),
-                "native-prime-root-call" | "native-prime-root-intermediate-state"
-            )
-    });
+    let native_prime_root_artifacts = manifest
+        .artifacts
+        .iter()
+        .any(|a| a.path == "prime-root-certificates.json" || is_prime_root_auxiliary(a));
     let root_certificates: Vec<_> = manifest
         .artifacts
         .iter()
@@ -2337,6 +2391,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         .transpose()?;
     if let Some(certificate) = &root_certificate {
         verify_prime_root_outcome(&manifest.outcome, certificate)?;
+        verify_prime_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, false)?;
     }
     let prime_chain_declared =
         manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
@@ -2430,6 +2485,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                     root_certificate
                         .as_ref()
                         .ok_or("missing parsed root certificate")?,
+                )?;
+                verify_prime_root_auxiliary_artifacts(
+                    dir,
+                    &manifest.artifacts,
+                    root_certificate
+                        .as_ref()
+                        .ok_or("missing parsed root certificate")?,
+                    true,
                 )?;
             }
             if artifact.role == "restricted-large-prime-membership-provenance" {
@@ -3684,6 +3747,161 @@ mod tests {
     }
 
     #[test]
+    fn stored_prime_root_auxiliary_payloads_match_certificate_calls_and_states() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture_at_size(&fixture, twist, 100_000, 11);
+            let manifest = verify_cell(&dir, true).unwrap();
+            for role in [
+                "native-prime-root-call",
+                "native-prime-root-intermediate-state",
+            ] {
+                let artifact = manifest.artifacts.iter().find(|a| a.role == role).unwrap();
+                for mutation in ["identity", "native_payload"] {
+                    let bad = altered_cell(
+                        &dir,
+                        &fixture.0.join(format!("{role}-{mutation}")),
+                        |path, _| {
+                            alter_json(&path.join(&artifact.path), |payload| {
+                                if mutation == "identity" {
+                                    payload["call_index"] = json!(999);
+                                } else if role == "native-prime-root-call" {
+                                    payload["report"]["polynomial"] = json!([0]);
+                                } else {
+                                    assert!(matches!(
+                                        payload["native"]["kind"].as_str(),
+                                        Some("power_end" | "gcd_end")
+                                    ));
+                                    payload["native"]["value"] = json!([999_999]);
+                                }
+                            });
+                        },
+                    );
+                    // These are rehashed, independently saved payloads; the
+                    // aggregate certificate and its arithmetic are unchanged.
+                    verify_cell(&bad, false).unwrap();
+                    assert!(verify_cell(&bad, true)
+                        .unwrap_err()
+                        .contains("prime root auxiliary payload differs"));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_auxiliaries_require_unique_expected_paths_roles_and_encodings() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture_at_size(&fixture, twist, 100_000, 11);
+            for role in [
+                "native-prime-root-call",
+                "native-prime-root-intermediate-state",
+            ] {
+                for mutation in [
+                    "missing",
+                    "duplicate",
+                    "wrong_role",
+                    "wrong_encoding",
+                    "wrong_path",
+                ] {
+                    let bad = altered_cell(
+                        &dir,
+                        &fixture.0.join(format!("{role}-{mutation}")),
+                        |path, manifest| {
+                            let index = manifest
+                                .artifacts
+                                .iter()
+                                .position(|a| a.role == role)
+                                .unwrap();
+                            match mutation {
+                                "missing" => {
+                                    manifest.artifacts.remove(index);
+                                }
+                                "duplicate" => {
+                                    let mut extra = manifest.artifacts[index].clone();
+                                    extra.path = "duplicate-root-auxiliary.json".into();
+                                    fs::copy(
+                                        path.join(&manifest.artifacts[index].path),
+                                        path.join(&extra.path),
+                                    )
+                                    .unwrap();
+                                    manifest.artifacts.push(extra);
+                                }
+                                "wrong_role" => {
+                                    manifest.artifacts[index].role =
+                                        "unregistered-partial-artifact".into();
+                                }
+                                "wrong_encoding" => {
+                                    manifest.artifacts[index].encoding = "jsonl".into()
+                                }
+                                "wrong_path" => {
+                                    let old = path.join(&manifest.artifacts[index].path);
+                                    manifest.artifacts[index].path =
+                                        "renamed-root-auxiliary.json".into();
+                                    fs::rename(old, path.join(&manifest.artifacts[index].path))
+                                        .unwrap();
+                                }
+                                _ => unreachable!(),
+                            }
+                        },
+                    );
+                    for replay in [false, true] {
+                        let error = verify_cell(&bad, replay).unwrap_err();
+                        assert!(
+                            error.contains("prime root auxiliary"),
+                            "{role}/{mutation}/{replay}: {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_completed_queries_reject_byte_flag_and_extra_event_tampering() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 100_000);
+            for mutation in [
+                "flag_true",
+                "flag_missing",
+                "flag_nonboolean",
+                "extra_event_field",
+            ] {
+                let bad = altered_cell(&dir, &fixture.0.join(mutation), |path, _| {
+                    alter_json(&path.join("prime-root-certificates.json"), |certificate| {
+                        let query = &mut certificate["queries"][0];
+                        assert_eq!(query["report"]["stop"], "complete");
+                        assert_eq!(query["trace_byte_cap_reached"], false);
+                        match mutation {
+                            "flag_true" => query["trace_byte_cap_reached"] = json!(true),
+                            "flag_missing" => {
+                                query
+                                    .as_object_mut()
+                                    .unwrap()
+                                    .remove("trace_byte_cap_reached");
+                            }
+                            "flag_nonboolean" => query["trace_byte_cap_reached"] = json!("false"),
+                            "extra_event_field" => {
+                                query["report"]["events"][0]["unaccounted_payload"] =
+                                    json!("unexpected");
+                            }
+                            _ => unreachable!(),
+                        }
+                    });
+                });
+                for replay in [false, true] {
+                    let error = verify_cell(&bad, replay).unwrap_err();
+                    assert!(
+                        error.contains("byte-cap flag") || error.contains("unknown field"),
+                        "{mutation}/{replay}: {error}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
     fn legacy_prime_root_summary_remains_compatible_without_native_claims() {
         let fixture = TempRun::new();
         let dir = prime_root_cell_fixture(&fixture, false, 100_000);
@@ -3872,9 +4090,18 @@ mod tests {
     /// A real constructed curve/base and native solver certificate. Plant only
     /// a public sum; neither a construction scalar nor a witness reaches solve.
     fn prime_root_cell_fixture(fixture: &TempRun, twist: bool, work_limit: u64) -> PathBuf {
+        prime_root_cell_fixture_at_size(fixture, twist, work_limit, 7)
+    }
+
+    fn prime_root_cell_fixture_at_size(
+        fixture: &TempRun,
+        twist: bool,
+        work_limit: u64,
+        field_size: u32,
+    ) -> PathBuf {
         let m = 2;
         let (mut plan, mut binding, protocol) = fixture.bound();
-        plan.field_sizes = vec![7];
+        plan.field_sizes = vec![field_size];
         plan.arities = vec![m];
         plan.solvers = vec!["root".into()];
         plan.curve_seeds = 8;
