@@ -5969,9 +5969,9 @@ pub struct LinearHarvest {
 /// root basis rank `>= 331` alone (round 3 item 02's size gate), as
 /// `parse_linear_harvest("root,gpv=0,rank=331")` stores it.
 ///
-/// **Repair R8 (2026-10-26).** Round 3 item 02 shipped `gpv < 0.9607 OR rank
-/// >= 331` ([`LINEAR_HARVEST_R3`]). Against harvest off, the gpv half
-/// regresses at (17,9) m2 and (19,10) m2 (rank < 331), in two paired data
+/// **Repair R8 (2026-10-26).** Round 3 item 02 shipped
+/// `gpv < 0.9607 OR rank >= 331` ([`LINEAR_HARVEST_R3`]). Against harvest
+/// off, the gpv half regresses at (17,9) m2 and (19,10) m2 (rank < 331), in two paired data
 /// sets: `research/ic_improve3_20261015/02-harvest-gate/runs/fit_test.jsonl`
 /// line 78 (production CPU off/default 0.873 [0.783, 0.974]) and
 /// `research/ic_r8_harvest_default_20261026/` (production word operations
