@@ -66,7 +66,9 @@ not re-read this session.
      x-variable lattice built from `(p, S)^t` on a convex monomial set
      reaches at most δ = 1/21.8 for S₄ and 1/70.8 for S₅. Those are 5.5× and
      14.2× short of the milestone and the goal, whatever the shift strategy,
-     the LP included.
+     the LP included. This is conditional on that study's written proof,
+     which has no Lean formalization. Only the arithmetic step is
+     Lean-checked (§7c, "Formalization status").
 
 ## 1. Question
 
@@ -873,9 +875,26 @@ factors, which favours the attack.
   an upper bound should. The P3 fallback's best values, 0.0306 at m = 3 and
   0.0048 at m = 4 (x-box), sit below them.
 
-**What this closes.** The "real P3 LP" left open in §0 and §7a cannot reach
-either target with x-variable lattices on convex monomial sets. That holds
-for every shift strategy, not only the triangular families searched in §7b.4.
+**What this closes, conditionally.** Assume the cited theorem holds. Then the
+"real P3 LP" left open in §0 and §7a cannot reach either target with
+x-variable lattices on convex monomial sets. That holds for every shift
+strategy, not only the triangular families searched in §7b.4. The closure
+rests on the cited study's written proof, which is not machine-checked
+(next paragraph).
+
+**Formalization status (AGENTS.md "Mathematical results should include Lean
+proofs").** The only new mathematics in §7c is a corollary: the cited theorem
+applied to measured volumes, followed by arithmetic. Proof map:
+
+| step | statement | Lean declaration | status |
+|:--|:--|:--|:--|
+| T (cited) | `n·δ ≤ (n!·vol Newt f)^{−1/n}` for `(p, f)^t` lattices on convex monomial sets, equal bounds | none | **not formalized**. Missing: Newton polytopes, lattice determinants of `(p, f)^t`, Howgrave-Graham and Brunn–Minkowski, none of which is in core Lean (the `crypto-lean` library was not surveyed for them). The cited study ships no Lean either. |
+| P (measured) | `Newt(S₄(·; z)) = [0,4]³` and `Newt(S₅(·; z)) = [0,8]⁴` on the 20/20 seeded `z` | none | computational evidence (L4-B), not a theorem for all `z` |
+| R (bridge) | for positive reals, `(n!V)^{−1/n}/n ≤ 1/k ⟺ k^n ≤ n^n·n!V` | none | not formalized (real n-th roots need Mathlib); elementary |
+| A (arithmetic) | `21³ ≤ 3³·3!·64`, `70⁴ ≤ 4⁴·4!·4096`, `(5·4)³ ≤ 3³·3!·64`, `(14·5)⁴ ≤ 4⁴·4!·4096`; not `22³ ≤ …`, not `71⁴ ≤ …` | `PrimeS5SmallRoot.s4_reach_le_1_21`, `s4_misses_quarter_by_5x`, `s5_reach_le_1_70`, `s5_misses_fifth_by_14x`, `s4_not_le_1_22`, `s5_not_le_1_71` in [`lean/ReachArithmetic.lean`](lean/ReachArithmetic.lean) | **checked**. Lean 4.34.1 core, `by decide`; `#print axioms` reports no axioms for all six |
+
+This is partial formalization. T stays a written proof, and the closure is
+reported as conditional on it.
 
 **What it does not close.**
 
