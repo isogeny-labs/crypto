@@ -16,3 +16,10 @@ A generic Groebner calculation records vdim and exact source-to-basis and
 basis-to-source lifts, with both identities verified. This is diagnostic,
 not a flatness proof or local presentation. 4GiB/1200s per invocation, no
 comparative timing, randomization, coefficient search or statistical claim.
+
+Add a Lean algebra bridge for the presentation criterion: in a commutative
+ring, a unit coefficient in a relation makes that relation's generator belong
+to the ideal of the other terms. Compile/audit with the same pinned Lean,
+mathlib, single job,4096MiB,1200seconds. This is a universal implication,
+not evidence that the rejected native unit witness exists. No geometry or
+native coefficient arrays are imported into Lean.
