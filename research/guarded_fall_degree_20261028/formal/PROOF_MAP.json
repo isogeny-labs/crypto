@@ -1,7 +1,7 @@
 {
   "schema": "fall-degree-proof-map/v1",
   "verification_date": "2026-10-29",
-  "formalization_status": "partial: algebraic identities and local conditional dependencies only; no complete degree theorem",
+  "formalization_status": "partial: complete uniform degree-four obstruction, ordinary filtered closure, and first-fall dependencies; universal upper bound and exact pair remain open",
   "toolchain": "leanprover/lean4:v4.34.1",
   "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
   "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
@@ -192,20 +192,218 @@
         "Quot.sound"
       ],
       "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "FilteredClosure.least",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary variable type σ, input set F and degree d; V is a coefficient submodule containing eligible inputs and closed under all products of actual total degree <=d; p is Derivable F d",
+      "claim": "Every derivable p belongs to V.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.lastFallBound_iff_refutation",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary F,d; 1 belongs to Ideal.span F",
+      "claim": "LastFallBound F d iff 1 is Derivable F d, with the ordinary max(d,totalDegree p) convention.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.closed_at_four_of_low_part",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; ideal I, coefficient submodule W; every member of W of degree <=3 lies in I; every member of I of degree <=4 lies in W; p in W and degree(q*p)<=4",
+      "claim": "q*p belongs to W, for arbitrary polynomial q, including zero and constants.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quadratic_leading_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K; three distinct a,b,c; A*t^2+B*t+C vanishes at each",
+      "claim": "A=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quartic_weights_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; all guarded-grid scalar equalities displayed in the source hold for arbitrary r,c1,c2,l0,lx,ly,lz,lv",
+      "claim": "Both quartic weights c1,c2 vanish.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.affine_expansion",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; finite variable type σ; totalDegree p<=1",
+      "claim": "p equals its explicitly given constant-plus-linear coefficient expansion.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.square_coefficient_degree",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; p in MvPolynomial (Fin 5) K with totalDegree p<=3",
+      "claim": "The coefficient of u^2 under finSuccEquiv has total degree <=1 in the remaining four variables.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.coefficient_affine",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K; five-variable p with totalDegree p<=3; u left formal and x,y,z,v specialized to x,y,z,1/(x-y)",
+      "claim": "One fixed affine expression in x,y,z,1/(x-y) gives the specialized u^2 coefficient for every x,y,z.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.low_part",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; i vanishes on guarded grid; p=i+c1*f1+c2*f2 with degree p<=3; f1,f2 have specialized u^2 coefficients (x-y)^2,(z-r)^2",
+      "claim": "p vanishes on the guarded grid with u left formal.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.not_refutable_four",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; f1,f2 have the displayed u^2 coefficients; each input is f1, f2, or vanishes on the guarded grid",
+      "claim": "1 is not derivable at degree four.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_degree_four_refutation",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Every field K with 6!=0; pairwise distinct a,b,c; arbitrary alpha,beta,r; exactly GuardedModel.inputs (the six original polynomials), variable order u,x,y,z,v",
+      "claim": "1 is not in ordinary V(F,4); no curve or satisfiability assumption is used.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_refutation_below_five",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; natural d<5",
+      "claim": "1 is not in ordinary V(F,d).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.lastFall_lower",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; additionally 1 in Ideal.span F; natural d<5",
+      "claim": "LastFallBound F d is false. The rational-unsatisfiability-to-unit-ideal bridge is not assumed proved.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.pairDifference_derivable",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the six original inputs",
+      "claim": "The explicit quadratic divided difference belongs to V(F,4), by degree-checked derivation rules.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.guardTop_ne_zero",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; five-variable polynomial ring",
+      "claim": "v*(x-y) is a nonzero polynomial.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.cubic_guard_top_injective",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; scalar a,b,c, polynomial L; a*x^3+b*y^3+c*z^3+L*v*(x-y)=0",
+      "claim": "a=b=c=0 and L=0; no weighted syzygy/Koszul definition is claimed.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.degree_four_top_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; the explicit x,y,v top forms",
+      "claim": "v*x^3-v*y^3-(x^2+x*y+y^2)*v*(x-y)=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.lifted_guard_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; any monic cubic coefficients; g and Q exactly as defined in the statement",
+      "claim": "v*(g(x)-g(y))-Q*(v*(x-y)-1)=Q.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     }
   ],
   "not_formalized": [
-    "The V_(F,D) definition and the filtered-closure derivation rules.",
     "Degree-preserving monic division, staged normalization, and every intermediate total-degree bound.",
     "The bridge from the explicit scalar expression to Mathlib.Polynomial.resultant.",
     "The converse zero-resultant-to-common-root implication over an algebraic closure.",
     "The scalar-grid quotient, interpolation, and invertibility argument.",
     "The elliptic-curve rational-lift and compatible-sign interpretation.",
-    "The uniform degree-four obstruction and the exact last-fall/first-fall theorems.",
     "Growing-factor-base and characteristic-two last-fall upper bounds.",
     "The fully Boolean one-auxiliary upper bound: support-aware assignment localization, affine-system inconsistency certificates, and the 3*ell+1 cap.",
     "Standard large-curve parameter provenance, affine group arithmetic, and the public small-multiple UNSAT witnesses.",
-    "The complete prime-field bit-restricted upper theorem: support-aware localization, rational roots, auxiliary encoding, and the 3*ell+2 cap."
+    "The complete prime-field bit-restricted upper theorem: support-aware localization, rational roots, auxiliary encoding, and the 3*ell+2 cap.",
+    "The weighted homogeneous-top syzygy/Koszul first-fall definition and complete equality theorem.",
+    "The universal degree-five upper derivation and its rational-point/unit-ideal bridge; the complete exact pair (4,5) remains open."
   ],
   "forbidden_proof_shortcuts": "No sorry, admit, custom axiom, native_decide, or kernel bypass is used.",
   "logs": {
@@ -223,6 +421,41 @@
       "sha256": "d93729a96a0e92c5ad381980ff6ed0d0ba1219f14e13beb24e9addb61a7bfb01",
       "receipt": "prime-bit-verification.json",
       "checked_theorems": 8
+    },
+    {
+      "source": "FilteredClosure.lean",
+      "sha256": "f77b185b4115b1ba46d6edd17dbfe39bc4e8330fa9617a2c8e20024c70ff607e",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "ThreePointRigidity.lean",
+      "sha256": "2a06366b68ba946d024b32ead944cafc0e85b176caff0ac19ad05811fae6a04b",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "AffineCoefficient.lean",
+      "sha256": "cb9b113d9b49c53121c62f1d157aebf765051c42d5b9e435159a75e57c322747",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GridLower.lean",
+      "sha256": "017c24637ea02a3b2910c9f704d51a9abc06bbf68904f31d2b162b23203bd72c",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedModel.lean",
+      "sha256": "ebf8b4982c5d14aa117c9eb641ad36b04449e4cbd653741797f3b4807780f73d",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "FirstFallCore.lean",
+      "sha256": "286a398fc8dacb1079e62d978b11fca7b67440cac2b90d7ee8b4f77ba9dfc191",
+      "receipt": "exact-pair-validation/verification.json"
     }
-  ]
+  ],
+  "current_progress": {
+    "report": "exact-pair-progress.md",
+    "claims": "exact-pair-claims.json",
+    "receipt": "exact-pair-validation/verification.json"
+  }
 }
