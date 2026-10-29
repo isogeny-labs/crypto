@@ -42,3 +42,10 @@
 - Target remains codex/ml-binary-root-trace-20261028 at c14d4552e513f6e28bda0e0e045f5e64beb492db, parent PR2782. Independent checker is PR2800. The PR is open; hosted exact-current-head CI/review and main integration are pending, and feature-base auto-merge is unavailable.
 - The child app attachment request hung without a result and its cell was terminated. Parent will reconcile attachments before retrying; no successful attachment or duplicate request is claimed here.
 - Final delivery/source checkpoint and exact post-push head are retained externally under /home/ec2-user/ml-dataset-resume-20261028/f4-trace-delivery. Check CI about 50 minutes after the final push/activity, later unchanged checks about four hours apart; do not busy poll or merge into a temporary review base.
+
+## 2026-10-29 migration reconciliation
+
+- Reconciled remote PR2802 and branch at ad417a7988042c2ae474a3afa41861810734b86d. All six checks pass at that exact head, with no unresolved review threads. Parent PR2782 remains open; this is not main integration. The app attachment is now confirmed.
+- The preceding source-checkpoint sentence was premature: the local delivery directory contains only journal coordination records, and the canonical F4 source-checkpoint prefix has no objects. The accepted source and terminal validation archives remain separate completed evidence. Finish only the missing source checkpoint; do not rebuild, regenerate fixtures or repeat the full suite.
+- The independent checker PR2800 has a later review finding for input-digest validation on censored prefixes. Its owner is correcting the checker and replaying retained fixtures. Earlier interoperation results remain historical and do not establish that correction.
+- T756 was reclaimed for documentation and the missing checkpoint only. Existing budget, worker IAM and durable-admission restrictions remain unchanged; no experiment or generator was launched.
