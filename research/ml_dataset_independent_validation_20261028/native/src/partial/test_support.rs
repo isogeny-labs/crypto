@@ -200,19 +200,29 @@ impl Published {
         };
         let destination = Path::new(&root).join(label);
         fs::create_dir(&destination).unwrap();
-        fn copy(from: &Path, to: &Path) {
+        fn copy(from: &Path, to: &Path, links: &mut BTreeMap<(u64, u64), PathBuf>) {
+            use std::os::unix::fs::MetadataExt;
             for entry in fs::read_dir(from).unwrap() {
                 let e = entry.unwrap();
                 let d = to.join(e.file_name());
                 if e.file_type().unwrap().is_dir() {
                     fs::create_dir(&d).unwrap();
-                    copy(&e.path(), &d)
+                    copy(&e.path(), &d, links)
+                } else if e.file_type().unwrap().is_symlink() {
+                    std::os::unix::fs::symlink(fs::read_link(e.path()).unwrap(), d).unwrap();
                 } else {
-                    fs::copy(e.path(), d).unwrap();
+                    let metadata = e.metadata().unwrap();
+                    let identity = (metadata.dev(), metadata.ino());
+                    if let Some(original) = links.get(&identity) {
+                        fs::hard_link(original, d).unwrap();
+                    } else {
+                        fs::copy(e.path(), &d).unwrap();
+                        links.insert(identity, d);
+                    }
                 }
             }
         }
-        copy(self.temp.path(), &destination);
+        copy(self.temp.path(), &destination, &mut BTreeMap::new());
         let counts = if outcome.get("schema").and_then(Value::as_str)
             == Some("ml-dataset.independent-partial-audit/v1")
         {
