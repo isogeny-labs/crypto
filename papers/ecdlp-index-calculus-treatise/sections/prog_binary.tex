@@ -118,20 +118,38 @@ analogue over prime fields (\S\ref{sec:prime}) is in the same state.
 
 \paragraph{The pair-table floor.} On the non-Koblitz curve
 $y^2+xy=x^3+zx+1$ the meet-in-the-middle pair table is the floor every
-oracle is measured against. Over Gaudry's pairs-and-solve it is
-$94$--$277\times$ at $\ell=8$, $2{,}474\times$ and $4{,}244\times$ at
-$\ell=9,10$, and $928\times$ and $2{,}321\times$ at $\ell=11,12$, with no
-disagreement on 128 targets per rung
-(\art{research/binary_mitm_oracle_l8_20261015/},
-\art{research/binary_mitm_oracle_l9_l10_20261015/},
-\art{research/binary_mitm_oracle_l11_l12_20261016/}; the $\ell=12$ figure is
-the validation sweep's recomputation from the committed per-target medians,
-the study quotes $2{,}187\times$). These are wall times on a shared host and
+oracle is measured against. Table~\ref{tab:prog_binary-floor} gives its
+speed-up over Gaudry's pairs-and-solve, with no disagreement on 128
+targets per rung. These are wall times on a shared host and
 unvalidated; the counted evidence---8{,}068 and 16{,}092 point additions
 against 2.1 and 8.4 million quartic solves---carries the result. An earlier
 pairs-and-root-find oracle was $926\times$ faster than triple enumeration at
 $\ell=8$ and decided $\ell=12$ (11.5 billion triples) in 15\,s
 (\art{research/notes/index-calculus/RESEARCH_SEMAEV_DECOMPOSITION.md}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rr@{}}
+\toprule
+$\ell$ & Speed-up \\
+\midrule
+8 & $94$--$277\times$ \\
+9 & $2{,}474\times$ \\
+10 & $4{,}244\times$ \\
+11 & $928\times$ \\
+12 & $2{,}321\times^a$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The meet-in-the-middle pair table over Gaudry's pairs-and-solve
+on $y^2+xy=x^3+zx+1$, by rung $\ell$: wall-time speed-up on a shared host,
+unvalidated; 128 targets per rung, no disagreement. $^a$The validation
+sweep's recomputation from the committed per-target medians; the study
+quotes $2{,}187\times$. Sources:
+\art{research/binary_mitm_oracle_l8_20261015/},
+\art{research/binary_mitm_oracle_l9_l10_20261015/},
+\art{research/binary_mitm_oracle_l11_l12_20261016/}.}
+\label{tab:prog_binary-floor}
+\end{table}
 
 \paragraph{Algebraic oracles against the floor.} No algebraic arm beats the
 pair table: the cheapest is $303\times$ the floor at $n=13$ and

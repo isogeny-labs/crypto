@@ -57,3 +57,16 @@ for r in sorted(D["chain_m3"], key=lambda r: (r["basis"] != "poly", r["n"], r["n
 out += [r"\bottomrule", r"\end{tabular}"]
 open(os.path.join(H, "tab-fd-chain.tex"), "w").write("\n".join(out) + "\n")
 print("ok")
+
+# Prime-field Kummer towers, m=2 (values from data-new.json).
+K = json.load(open(os.path.join(H, "data-new.json")))["prime_kummer_m2"]
+out = [r"\begin{tabular}{@{}rrrr@{}}", r"\toprule",
+       r"$t$ (PKM: $n_1$) & $D_{\rm ff}$ (proved) & $d_F$ (session median) & PKM $D_{\rm reg}^{\rm corr}$ \\", r"\midrule"]
+for i, n1 in enumerate(K["pkm_n1"]):
+    t = n1
+    j = K["t"].index(t) if t in K["t"] else None
+    ffd = "" if j is None or K["ffd_proved"][j] is None else str(K["ffd_proved"][j])
+    dF = "" if j is None else str(K["dF_session_reported"][j])
+    out.append(f"{t} & {ffd} & {dF} & {int(K['pkm_Dcorr'][i])} \\\\")
+out += [r"\bottomrule", r"\end{tabular}"]
+open(os.path.join(H, "tab-fd-pkm.tex"), "w").write("\n".join(out) + "\n")

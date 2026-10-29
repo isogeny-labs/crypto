@@ -34,12 +34,6 @@ Sources: \art{research/ic_frontier_campaign_20261015/analysis/band-*.json}
 
 \begin{table}[t]
 \centering\small
-\caption[]{Index calculus over the cheapest constant-memory generic arm on
-the same curve (signed-Frobenius rho on Koblitz curves, rho with negation
-on prime curves), mean $S$ ratio at three band weights. Every run verified
-(32/32 per cell). Source:
-\art{research/ic_frontier_campaign_20261015/analysis/ratios_to_rho.tsv}.}
-\label{tab:campaign}
 \begin{tabular}{@{}lrlrrr@{}}
 \toprule
 Curve & $\log_2 r$ & Arm & $w=0$ & $w=0.1$ & $w=1$ \\
@@ -66,6 +60,12 @@ PKM 20 bit & 18.9 & Kummer tower & 30.3 & 30.4 & 31.0 \\
 PKM 28 bit & 26.2 & Kummer tower & 141.3 & 158.7 & 238.7 \\
 \bottomrule
 \end{tabular}
+\caption[]{Index calculus over the cheapest constant-memory generic arm on
+the same curve (signed-Frobenius rho on Koblitz curves, rho with negation
+on prime curves), mean $S$ ratio at three band weights. Every run verified
+(32/32 per cell). Source:
+\art{research/ic_frontier_campaign_20261015/analysis/ratios_to_rho.tsv}.}
+\label{tab:campaign}
 \end{table}
 
 \paragraph{What the campaign shows.}
@@ -99,26 +99,46 @@ PKM 28 bit & 26.2 & Kummer tower & 141.3 & 158.7 & 238.7 \\
   ranked against constant-memory methods.
 \end{itemize}
 
-\paragraph{Cost exponents.} Fitting total cost $\propto r^{\alpha}$ per
-arm over each size tier with \texttt{ecbench bound fit --weight}
-(two-stage bootstrap, 95\% intervals; a tier needs at least four sizes for
-an exponent):
-\begin{itemize}
-\item prime pair table $\alpha=0.620$ $[0.557,0.663]$ at $w=0$ against
-  rho with negation $0.435$ $[0.331,0.501]$; separated at $w=0$ and
-  $w=0.1$, overlapping at $w=1$ ($0.594$ $[0.482,0.665]$ against $0.444$
-  $[0.334,0.517]$). Index calculus grows faster than rho (the predicted
-  $2/3$ against $1/2$), but under the band rule the difference is not
-  established at every weight;
-\item Koblitz compact orbit, $n=37$--$47$: $0.589$ $[0.518,0.743]$ against
-  signed-Frobenius rho $0.436$ $[0.358,0.508]$ at $w=0$, overlapping at
-  $w=0.1$ and $w=1$; on $n=13$--$23$ the two overlap at every weight
-  ($0.25$ against $0.29$ at $w=0$, both with wide intervals because the
-  automorphism count $2n$ changes with the size);
-\item Kummer tower $0.717$ $[0.358,0.940]$ against $0.438$
-  $[0.332,0.599]$, overlapping.
-\end{itemize}
-No index-calculus arm has a fitted exponent below rho's at any weight, so
+\paragraph{Cost exponents.} Table~\ref{tab:prog_frontier-exponents} fits
+total cost $\propto r^{\alpha}$ per arm over each size tier with
+\texttt{ecbench bound fit --weight} (two-stage bootstrap, 95\% intervals; a
+tier needs at least four sizes for an exponent). For the prime pair table,
+index calculus grows faster than rho (the predicted $2/3$ against $1/2$),
+but under the band rule the difference is not established at every
+weight. On $n=13$--$23$ both Koblitz intervals are wide because the
+automorphism count $2n$ changes with the size.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Arm & Tier & $w$ & IC $\alpha$ & Rho $\alpha$ & Intervals \\
+\midrule
+Prime pair table & & 0 & $0.620$ $[0.557,0.663]$ & $0.435$ $[0.331,0.501]$ & separated \\
+ & & 0.1 & & & separated \\
+ & & 1 & $0.594$ $[0.482,0.665]$ & $0.444$ $[0.334,0.517]$ & overlap \\
+\addlinespace
+Koblitz compact orbit & $n=37$--$47$ & 0 & $0.589$ $[0.518,0.743]$ & $0.436$ $[0.358,0.508]$ & \\
+ & & 0.1, 1 & & & overlap \\
+ & $n=13$--$23$ & 0 & $0.25$ & $0.29$ & overlap \\
+ & & 0.1, 1 & & & overlap \\
+\addlinespace
+Kummer tower & & & $0.717$ $[0.358,0.940]$ & $0.438$ $[0.332,0.599]$ & overlap \\
+\bottomrule
+\end{tabular}
+\caption[]{Fitted cost exponents $\alpha$ (total cost $\propto r^\alpha$)
+of each index-calculus arm and the cheapest constant-memory rho on the same
+curves, by size tier and band weight $w$; 95\% intervals from a two-stage
+bootstrap. Intervals: whether the IC and rho intervals are separated or
+overlap at that weight. Rows without exponent values report only the
+interval comparison; no tier or weight is stated for the Kummer-tower
+row. Source:
+\art{research/ic_frontier_campaign_20261015/analysis/bounds/}.}
+\label{tab:prog_frontier-exponents}
+\end{table}
+
+\noindent The rho arms are rho with negation (prime) and signed-Frobenius
+rho (Koblitz). No index-calculus arm has a fitted exponent below rho's at any weight, so
 no crossover with rho is supported by these data, extrapolated or
 otherwise. The fitted rho exponents ($0.435$--$0.444$) lie below the
 theoretical $1/2$, which reads as a toy-size effect (fixed per-run overheads
@@ -144,11 +164,6 @@ baseline/candidate; ``stage'' means one oracle call or one solver run;
 
 \begin{table}[p]
 \centering\small
-\caption[]{Measured improvements, July--October 2026. Class: E =
-\cls{engineering}, A = \cls{accounting}. Boundary: St = stage,
-Cx = complete solve outside ecbench, Cold = ecbench cold one-target $S$,
-On = online window after retained set-up. Sources: Appendix~\ref{app:artefacts}.}
-\label{tab:improvements}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}Xllr>{\raggedright\arraybackslash}p{3.0cm}@{}}
 \toprule
 Change & Bnd. & Cl. & Ratio & Scope \\
@@ -190,6 +205,11 @@ F4 word XORs priced & Cold & A & $1/25.2$ & $16.75\to421.4$, K13 \\
 F6-IC batched geometry priced & Cold & A & $1/64.6$--$1/1{,}353$ & $m=13,19$; F4 unpriced (about $1/2.5$ priced) \\
 \bottomrule
 \end{tabularx}
+\caption[]{Measured improvements, July--October 2026. Class: E =
+\cls{engineering}, A = \cls{accounting}. Boundary: St = stage,
+Cx = complete solve outside ecbench, Cold = ecbench cold one-target $S$,
+On = online window after retained set-up. Sources: Appendix~\ref{app:artefacts}.}
+\label{tab:improvements}
 \end{table}
 
 \noindent Derived entries: $53.0=1/0.018861$; $17.5=1/0.057047$;
@@ -228,18 +248,6 @@ Table~\ref{tab:ladder}.}
 
 \begin{table}[p]
 \centering\small
-\caption[]{Changes measured 14--15 October 2026 against their own
-incumbents. Ratio: candidate/incumbent, $<1$ better. Class, against the
-index-calculus incumbent (not the paper's \cls{advance}, which is against
-rho): Ie = improves the exponent, Ic = improves the constant, E =
-\cls{engineering} on one stage, R = regresses, T = trades, A =
-\cls{accounting}. ``To rho'':
-the distance left to the matched rho on the study's own boundary; ``d'' marks
-a derived or extrapolated value. Sources under \art{research/}:
-\texttt{ic\_next10\_20261014/}, \texttt{ic\_improve\_20261014/},
-\texttt{ic\_improve\_20261015/}, \texttt{ic\_improve3\_20261015/} and the
-named study directories.}
-\label{tab:ladder}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
 \toprule
 Change & Cl. & Ratio [95\%] & To rho \\
@@ -272,6 +280,18 @@ Binary MITM pair-table oracle, $\ell=8$ & E & $1/277$--$1/94$ per target & no ex
 Filter + Wiedemann LA, $D=2^{18}$ & E & $1/10.40$; $1/1.93$ vs CADO-NFS & LA is 0.1--1.9\% of runs \\
 \bottomrule
 \end{tabularx}
+\caption[]{Changes measured 14--15 October 2026 against their own
+incumbents. Ratio: candidate/incumbent, $<1$ better. Class, against the
+index-calculus incumbent (not the paper's \cls{advance}, which is against
+rho): Ie = improves the exponent, Ic = improves the constant, E =
+\cls{engineering} on one stage, R = regresses, T = trades, A =
+\cls{accounting}. ``To rho'':
+the distance left to the matched rho on the study's own boundary; ``d'' marks
+a derived or extrapolated value. Sources under \art{research/}:
+\texttt{ic\_next10\_20261014/}, \texttt{ic\_improve\_20261014/},
+\texttt{ic\_improve\_20261015/}, \texttt{ic\_improve3\_20261015/} and the
+named study directories.}
+\label{tab:ladder}
 \end{table}
 
 \paragraph{Genus three: an exponent below rho's.} The cubic GHS
@@ -386,19 +406,6 @@ Table~\ref{tab:ladder2}.}
 
 \begin{table}[p]
 \centering\small
-\caption[]{Changes that landed 16--20 October 2026, against their own
-incumbents; columns and classes as in Table~\ref{tab:ladder}. Sources under
-\art{research/}: \texttt{ic\_improve4\_20261015/},
-\texttt{ic\_improve\_20261014/04b-genus3-2lp-rebalance/},
-\texttt{gaudry\_quartic\_d4\_cost\_20261014/},
-\texttt{gaudry\_quartic\_d4\_char2\_20261015/},
-\texttt{joux\_vitse\_n1\_20261015/}, \texttt{binary\_mitm\_oracle\_l9\_l10\_20261015/},
-\texttt{binary\_mitm\_oracle\_l11\_l12\_20261016/},
-\texttt{ic\_m3\_algebraic\_vs\_mitm\_20261014/}, \texttt{secg\_small\_x\_20261014/},
-\texttt{greedy\_factor\_base\_yield\_20261014/}, \texttt{f6\_gate\_first\_x86\_20261016/},
-\texttt{pdp\_shape\_replay\_20261015/}, \texttt{f4\_fp\_blocked\_pairs\_20261016/},
-\texttt{ic\_linalg\_pipeline\_20261019/}, \texttt{k\_conversion\_20261018/}.}
-\label{tab:ladder2}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
 \toprule
 Change & Cl. & Ratio [95\%] & To rho \\
@@ -428,6 +435,19 @@ $S_3$ solve on SECG small-$x$ bases & --- & table $2{,}600$--$313{,}000\times$ c
 Column-touch conversion $K$ (ECC2K-130 $m=4$) & A & $+7.62/+10.32\to+9.78/+12.48$ bits ($w=1$ floor; $+45.71$ at $w=2$, unconverted) & accounting \\
 \bottomrule
 \end{tabularx}
+\caption[]{Changes that landed 16--20 October 2026, against their own
+incumbents; columns and classes as in Table~\ref{tab:ladder}. Sources under
+\art{research/}: \texttt{ic\_improve4\_20261015/},
+\texttt{ic\_improve\_20261014/04b-genus3-2lp-rebalance/},
+\texttt{gaudry\_quartic\_d4\_cost\_20261014/},
+\texttt{gaudry\_quartic\_d4\_char2\_20261015/},
+\texttt{joux\_vitse\_n1\_20261015/}, \texttt{binary\_mitm\_oracle\_l9\_l10\_20261015/},
+\texttt{binary\_mitm\_oracle\_l11\_l12\_20261016/},
+\texttt{ic\_m3\_algebraic\_vs\_mitm\_20261014/}, \texttt{secg\_small\_x\_20261014/},
+\texttt{greedy\_factor\_base\_yield\_20261014/}, \texttt{f6\_gate\_first\_x86\_20261016/},
+\texttt{pdp\_shape\_replay\_20261015/}, \texttt{f4\_fp\_blocked\_pairs\_20261016/},
+\texttt{ic\_linalg\_pipeline\_20261019/}, \texttt{k\_conversion\_20261018/}.}
+\label{tab:ladder2}
 \end{table}
 
 \paragraph{Genus three, round four.} A field-level splitting test (a Lucas
@@ -544,17 +564,6 @@ the frontier or corrects it.
 
 \begin{table}[p]
 \centering\small
-\caption[]{Changes that landed 21--24 October 2026, against their own
-incumbents; columns and classes as in Table~\ref{tab:ladder} (N = null or
-diagnostic, no cost row). Sources under \art{research/}:
-\texttt{ic\_improve\_20261023/} (\texttt{README.md},
-\texttt{PRIME\_README.md}, \texttt{BINARY\_README.md}),
-\texttt{lead19\_projected\_base/}, \texttt{ic\_tool\_program/rule/v4/},
-\texttt{dreg\_hybrid\_guess\_20261024/}, \texttt{jv\_cover\_p\_scaling\_20261024/},
-\texttt{hcdlp\_trial\_cost\_20261024/}, \texttt{ghs\_cover\_census\_n4\_20261024/},
-\texttt{coppersmith\_s3\_theta2\_20261023/}; and
-\art{docs/ic/CERTICOM131_IC_PROGRAM.md}.}
-\label{tab:ladder3}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
 \toprule
 Change & Cl. & Ratio [95\%] & To rho \\
@@ -583,6 +592,17 @@ Measured trial cost, genus-255 binary Jacobian & A & $103$ curve additions per t
 GHS covers of $E/\FF_{q^4}$, odd $q$, census & N & genus floor 13 on odd-order curves & model exponent gap $0.154$ \\
 \bottomrule
 \end{tabularx}
+\caption[]{Changes that landed 21--24 October 2026, against their own
+incumbents; columns and classes as in Table~\ref{tab:ladder} (N = null or
+diagnostic, no cost row). Sources under \art{research/}:
+\texttt{ic\_improve\_20261023/} (\texttt{README.md},
+\texttt{PRIME\_README.md}, \texttt{BINARY\_README.md}),
+\texttt{lead19\_projected\_base/}, \texttt{ic\_tool\_program/rule/v4/},
+\texttt{dreg\_hybrid\_guess\_20261024/}, \texttt{jv\_cover\_p\_scaling\_20261024/},
+\texttt{hcdlp\_trial\_cost\_20261024/}, \texttt{ghs\_cover\_census\_n4\_20261024/},
+\texttt{coppersmith\_s3\_theta2\_20261023/}; and
+\art{docs/ic/CERTICOM131_IC_PROGRAM.md}.}
+\label{tab:ladder3}
 \end{table}
 
 \paragraph{One mechanism, four factor bases.} The week's measured gains on

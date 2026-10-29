@@ -245,9 +245,45 @@ The certified binary refutations of Chapter~\ref{ch:falldegree} begin here:
 $W_4$ refutes 62/62 at $n=17$ and 400/400 at $n=19$
 (\texttt{DEC-20260924-e61f3b}, \texttt{DEC-20260926-901ea1}).
 
+\begin{table}[p]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllp{4.6cm}@{}}
+\toprule
+month & theme & decision & verdict & recorded result \\
+\midrule
+Jul & IC beats enumeration & \texttt{DEC-20260727-008} & weaken & relation cost $2287\times$ the group order at 36 bits \\
+    & structured factor base & \texttt{DEC-20260727-009} & weaken & $\alpha=27,52,197,386$ vs.\ random $27,52,199,387$ \\
+    & subresultant degree & \texttt{DEC-20260728-003} & weaken & $\beta_{\rm deg}=0.5985$ vs.\ gate $0.3$ \\
+    & xedni lifting & \texttt{DEC-20260724-021} & reject\_scoped & $\alpha=3$ \\
+\addlinespace
+Aug & Semaev yield, $m=2$ & \texttt{DEC-20260804-9da614} & weaken & $0.80$, $0.98$, $1.00$ of heuristic at $p=1009,4001,9001$ \\
+    & BKK speedup & \texttt{DEC-20260806-26c0e8} & supersede claim & $1.0$--$1.8\times$, not $(m+1)/2$ \\
+    & degree-split claw & \texttt{DEC-20260801-005} & weaken & $R=0.0472$ (null) vs.\ $0.0311$ \\
+    & monodromy, $m=4,5$ & \texttt{DEC-20260830-0f8def} & support & 0 exceptions in 2{,}915{,}514 triples at $p=103$ \\
+    & Elkies augmentation & \texttt{DEC-20260804-d0c452} & reject\_scoped & within $0.004$ of null, 8 cells, 20--28 bits \\
+    & boolean $d_{\rm reg}$, $n=21$ & \texttt{DEC-20260815-6b806c} & supersede & rank $265{,}950$ of $268{,}674$; not evidence \\
+\addlinespace
+Sep & re-selected DP table & \texttt{DEC-20260906-1f5b71} & weaken & $0.65$--$0.69\,T$ at $a=1/4$ \\
+    & canonical lift $D_1$ & \texttt{DEC-20260903-256c7c} & support & values exactly $\{0,8\}$ on 1{,}035 pairs; no attack \\
+    & natural-statistic bias & \texttt{DEC-20260921-4516a0} & weaken & $\lambda=0.0806\pm0.0020$ vs.\ $\le0.05$ \\
+    & Semaev degree loophole & \texttt{DEC-20260929-780751} & reject\_scoped & $\beta_{\rm work}=0.797$, 36 cells \\
+    & Frobenius-stable bases & \texttt{DEC-20260922-5796b8} & support & loss of $57.0$--$96.0$ bits at $n=131$ \\
+    & ICPERF costing & \texttt{DEC-20260922-925da8} & support & $+6.3$ ($n=233$) to $+40.8$ ($n=131$) bits over rho \\
+\bottomrule
+\end{tabular}
+\caption[]{The summer record at a glance: one outcome decision per theme,
+July--September 2026, with the number it recorded. Every row is
+discussed above. Verdicts are the ledger's, shortened: ``weaken'' includes
+\texttt{weaken\_h\_yield}, and ``supersede claim'' replaced the earlier
+BKK support. Index: \art{research/ecdlp_jul_sep_index_20261029/INDEX.json}.}
+\label{tab:summer}
+\end{table}
+
 \section{What the summer established}
 
-Four patterns run through the 1{,}402 decisions:
+Table~\ref{tab:summer} collects one outcome per theme. Four patterns run
+through the 1{,}402 decisions:
 \begin{enumerate}
 \item \emph{No measured improvement over rho survived review.} Every
   July and August support that claimed a gain was weakened or revoked

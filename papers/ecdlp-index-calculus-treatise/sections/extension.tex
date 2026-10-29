@@ -16,34 +16,66 @@ symmetry moves the measured gap to rho. Chapter~\ref{sec:prime}
 On $E$ with rational 2-torsion point $T$, the coordinate
 $Y=(x-x_0-c)/(x-x_0+c)$ satisfies $Y(P+T)=-Y(P)$. In $Y$, $\Sem5$ is
 invariant under $D_4$, of order 192. Written in the invariants
-$\sigma_k=e_k(Y_i^2)$ and $\pi=\prod Y_i$, the system shrinks:
-\begin{itemize}
-\item the Bézout number falls from 4{,}096 to 512;
-\item the Macaulay degree falls from 29 to 14;
-\item the matrix falls from $41{,}780\times40{,}920$ to $13{,}412\times11{,}628$.
-\end{itemize}
-The engineering ladder, each step against the previous incumbent, was:
-\begin{enumerate}
-\item \emph{$D_4$ invariants.} One decomposition costs $C_4=2.54\cdot10^{10}$
-  $\FF_p$ multiplications instead of $1.21\cdot10^{12}$ at $p=269$, a
-  factor of $47.5$--$48.4$. All 19 solved targets agree with an independent
-  meet-in-the-middle enumeration
-  (\art{research/gaudry_quartic_d4_20261013/}).
-\item \emph{The $Y$-line on a complete ladder.} On $p=101$--$1033$ (21
-  curves) the cost is $0.0548$ $[0.048,0.061]$ of plain $\Sem4$, at the same
-  exponent.
-\item \emph{Sparsest pivots, the weighted grading $\sigma_4=\pi^2$, and shape
-  replay.} $C_4$ falls to $6.89\cdot10^7$, by $369.8\times$
-  $[367.9,371.6]$; all 648 of 648 solves are exact. Ecbench $S$ falls
-  $398$--$406\times$ (\art{research/gaudry_quartic_d4_cost_20261014/}).
-\item \emph{First-dependency stop.} The cost is $0.979$ $[0.973,0.986]$ of the
-  previous step. Double large primes cut the linear algebra to $0.827\times$
-  but regress the whole solve, to $1.025\times$.
-\item \emph{A Frobenius-reduced form in characteristic two.} Weights
-  $(2,2,1,1)$ give Macaulay degree 11 and a $384\times448$ matrix. One
-  decomposition is $481\times$ $[479,483]$ below the plain form at $m=8$
-  (\art{research/gaudry_quartic_d4_char2_20261015/}).
-\end{enumerate}
+$\sigma_k=e_k(Y_i^2)$ and $\pi=\prod Y_i$, the system shrinks
+(Table~\ref{tab:extension-system}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+System & Bézout number & Macaulay degree & Matrix \\
+\midrule
+before invariants & 4{,}096 & 29 & $41{,}780\times40{,}920$ \\
+$D_4$ invariants & 512 & 14 & $13{,}412\times11{,}628$ \\
+\addlinespace
+Frobenius-reduced, char.~2 & & 11 & $384\times448$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Size of the $\Sem5$ decomposition system at $k=4$: before and
+after rewriting it in the $D_4$ invariants $\sigma_k,\pi$, and in the
+Frobenius-reduced form with weights $(2,2,1,1)$ in characteristic two
+(ladder step~5 of Table~\ref{tab:extension-ladder}; the source gives no
+Bézout number for it). Matrix: rows $\times$ columns of the Macaulay
+matrix. Sources: \art{research/gaudry_quartic_d4_20261013/},
+\art{research/gaudry_quartic_d4_char2_20261015/}.}
+\label{tab:extension-system}
+\end{table}
+
+Table~\ref{tab:extension-ladder} gives the engineering ladder, each step
+against the previous incumbent. At step~1 all 19 solved targets agree with
+an independent meet-in-the-middle enumeration; at step~3 all 648 of 648
+solves are exact. At step~4, double large primes cut the linear algebra to
+$0.827\times$ but regress the whole solve, to $1.025\times$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright}p{3.0cm}>{\raggedright\arraybackslash}p{5.2cm}@{}}
+\toprule
+& Step & Scope & Result \\
+\midrule
+1 & $D_4$ invariants & $p=269$ & $C_4=2.54\cdot10^{10}$ instead of
+  $1.21\cdot10^{12}$, a factor of $47.5$--$48.4$ \\
+2 & The $Y$-line on a complete ladder & $p=101$--$1033$ (21 curves) &
+  $0.0548$ $[0.048,0.061]$ of plain $\Sem4$, at the same exponent \\
+3 & Sparsest pivots, the weighted grading $\sigma_4=\pi^2$, and shape
+  replay & & $C_4$ falls to $6.89\cdot10^7$, by $369.8\times$
+  $[367.9,371.6]$; ecbench $S$ falls $398$--$406\times$ \\
+4 & First-dependency stop & & $0.979$ $[0.973,0.986]$ of the previous
+  step \\
+\addlinespace
+5 & A Frobenius-reduced form in characteristic two & $m=8$ & one
+  decomposition $481\times$ $[479,483]$ below the plain form \\
+\bottomrule
+\end{tabularx}
+\caption[]{The $k=4$ engineering ladder, each step against the previous
+incumbent. $C_4$: $\FF_p$ multiplications per decomposition. Result: the
+step's cost as the source states it, either a factor below the previous
+incumbent or a fraction of it. Sources:
+\art{research/gaudry_quartic_d4_20261013/} (step~1),
+\art{research/gaudry_quartic_d4_cost_20261014/} (step~3),
+\art{research/gaudry_quartic_d4_char2_20261015/} (step~5).}
+\label{tab:extension-ladder}
+\end{table}
 The $D_n$ symmetry is FGHR's~\cite{fghr2014}. Invariant rings in
 characteristic two, including even-power substitutions, were studied by
 Galbraith and Gebregiyorgis~\cite{galbraith2014}. Whether the
@@ -79,26 +111,45 @@ steps, so it could be tested directly.
 \paragraph{The red-team verdict.} An adversarial review tested that
 crossover (\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}). Its
 verdict: \textbf{not survived (unsupported), not refuted}.
-\begin{itemize}
-\item \emph{Data.} The only clean point is at $m=15$, with two targets per
-  arm. The recorded IC/rho there is $6.30$. After the corrections that
-  favour index calculus it is $5.2$, with range $2.4$--$15.0$ over
-  unit-price variants. The $m=17$ ratio of $0.72$ came from a killed run
-  and is not evidence. No interval is possible with $n=2$.
-\item \emph{Rho reference survives.} These are generic ordinary curves with
-  $\operatorname{Aut}=\{\pm1\}$, and the floor $0.886$ is about 3.5\%
-  generous to rho.
-\item \emph{Pricing partly survives.} The unit price moves the ratio by
-  $0.64$--$0.89$, with a plausible range of $0.31$--$3.1$. Unpriced rho
-  work moves it by about $0.93$.
-\item \emph{Fitted exponents} (cost in $q=2^m$): IC relations $1.07$
-  $[1.01,1.13]$, IC linear algebra $2.03$, rho $2.00$ $[1.71,2.29]$. A
-  prime-field cross-check agrees.
-\item \emph{Corrected crossover.} The IC/rho ratio falls by about
-  $2^{-0.93}$ per unit of $m$, which puts the crossover at
-  $m^*\approx17.6$, with range $16.3$--$19.2$: at or above the edge of what
-  was measured.
-\end{itemize}
+Table~\ref{tab:extension-redteam} lists its estimates. The only clean point
+is at $m=15$, with two targets per arm, so no interval is possible with
+$n=2$; the $m=17$ ratio came from a killed run and is not evidence. The rho
+reference survives: these are generic ordinary curves with
+$\operatorname{Aut}=\{\pm1\}$. Pricing partly survives. A prime-field
+cross-check agrees with the fitted exponents. The corrected crossover is
+at or above the edge of what was measured.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.3cm}>{\raggedright}X>{\raggedright}p{2.2cm}>{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+Part & Quantity & Estimate & Range or note \\
+\midrule
+Data & IC/rho at $m=15$, recorded & $6.30$ & two targets per arm \\
+ & IC/rho at $m=15$, corrected & $5.2$ & $2.4$--$15.0$ over unit-price variants \\
+ & IC/rho at $m=17$ & $0.72$ & killed run; not evidence \\
+\addlinespace
+Rho reference (survives) & floor & $0.886$ & about 3.5\% generous to rho \\
+\addlinespace
+Pricing (partly survives) & ratio moved by the unit price & $0.64$--$0.89$ & plausible range $0.31$--$3.1$ \\
+ & ratio moved by unpriced rho work & about $0.93$ & \\
+\addlinespace
+Fitted exponents & IC relations & $1.07$ & $[1.01,1.13]$ \\
+ & IC linear algebra & $2.03$ & \\
+ & rho & $2.00$ & $[1.71,2.29]$ \\
+\addlinespace
+Corrected crossover & fall of IC/rho per unit of $m$ & about $2^{-0.93}$ & \\
+ & crossover $m^*$ & $\approx17.6$ & range $16.3$--$19.2$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{The red team's estimates for $k=4$ over $\FF_{(2^m)^4}$, grouped
+by the part of the verdict they bear on. Estimate: the point value; Range:
+the interval or range the review gives, with what it runs over. The
+corrected IC/rho applies the corrections that favour index calculus.
+Exponents are of cost in $q=2^m$. Source:
+\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}.}
+\label{tab:extension-redteam}
+\end{table}
 Linear algebra is 0.4\% of the cost at $m=15$. Basic Gaudry linear
 algebra grows as $q^2$, like rho, so the $n^{-1/4}$ trend lasts only while
 the relation phase dominates. Beyond that point double large primes are

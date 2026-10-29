@@ -150,35 +150,48 @@ multiplications and 44 inversions, flat in $q$ up to $2^{31}-1$
 On that arithmetic, a pipeline with relations on lines, a reduced factor base
 with one large prime, Lanczos modulo $\ell$ and canonical descent solved and
 verified 51 of 51 units. It ran on the GHS-weak family $E_0/\FF_{q^3}$ with
-$4\mid\#E_0$, for $q=223$ to $262{,}111$ (\art{research/quartic_n4_20261019/}).
-\begin{itemize}
-  \item Its reference is a matched \emph{plain} rho, without the negation
-    map, on the same subgroup.
-  \item At $q=262{,}111$, index calculus costs $0.122$ $[0.10,0.16]$ of that
-    rho in $\FF_q$-multiplication equivalents. The order holds across the
-    pricing band for every $q\ge4051$.
-  \item The fitted exponents on $q\ge4051$ are $1.083$ $[1.040,1.129]$ for
-    index calculus and $1.485$ $[1.437,1.525]$ for rho.
-  \item In wall time, index calculus is cheaper only above $q\approx3\times10^4$.
-\end{itemize}
+$4\mid\#E_0$, for $q=223$ to $262{,}111$ (\art{research/quartic_n4_20261019/};
+Table~\ref{tab:prog_transfer-quartic}). Its reference is a matched
+\emph{plain} rho, without the negation map, on the same subgroup, and the
+order holds across the pricing band for every $q\ge4051$.
 This was a preregistered decision of index calculus below a matched
 \emph{plain} rho. Its successor, N4~v2
 (\art{research/quartic_n4v2_20261020/}, 20--25 October), took the same
 family and instances from $q=2^8$ to $2^{22}$ (63 instances, 501 index-calculus
 units and 2{,}442 rho runs, all verified) and added three changes: double
 large primes (D), structured Gaussian elimination with Lanczos (L), and a
-negation-map rho. Against the frozen pipeline B0 at $q=2{,}097{,}091$:
-\begin{itemize}
-  \item D costs $0.081$ of B0 and the combined arm DL $0.042$ $[0.042,0.042]$;
-    a post-hoc arm DL1 reaches $0.022$.
-  \item DL's fitted exponent is $0.983$ $[0.975,0.993]$ over the full range
-    and $0.988$ on $k=17..22$, which is the $\tilde O(q)$ of Diem's
-    analysis~\cite{diem2006,dt2008}; negation rho fits $1.543$ $[1.494,1.583]$.
-  \item DL over negation rho is $0.005$ $[0.004,0.008]$ at the top size,
-    with an interpolated crossover at $q^*=555$ $[389,752]$ in counted
-    units ($q^*\approx1{,}889$ in CPU time). At $q=4{,}194{,}271$ one solve
-    took $12.3$ CPU-seconds against 616 for negation rho.
-\end{itemize}
+negation-map rho. DL's exponent is the $\tilde O(q)$ of Diem's
+analysis~\cite{diem2006,dt2008}. At $q=4{,}194{,}271$ one DL solve took
+$12.3$ CPU-seconds against 616 for negation rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}ll>{\raggedright}p{1.9cm}>{\raggedright}p{2.0cm}>{\raggedright}p{2.3cm}>{\raggedright}p{2.2cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Study & Arm & Over B0 & IC/rho & IC exponent & Rho exponent & Crossover \\
+\midrule
+N4 & & & $0.122$ $[0.10,0.16]$ & $1.083$ $[1.040,1.129]$ &
+  $1.485$ $[1.437,1.525]$ & wall time: only above $q\approx3\times10^4$ \\
+\addlinespace
+N4~v2 & D & $0.081$ & & & & \\
+ & DL & $0.042$ $[0.042,0.042]$ & $0.005$ $[0.004,0.008]$ &
+  $0.983$ $[0.975,0.993]$; $0.988$ on $k=17..22$ & $1.543$ $[1.494,1.583]$ &
+  $q^*=555$ $[389,752]$ (interpolated); $q^*\approx1{,}889$ in CPU time \\
+ & DL1 & $0.022$ & & & & \\
+\bottomrule
+\end{tabularx}
+\caption[]{Plane-quartic index calculus on the GHS-weak family
+$E_0/\FF_{q^3}$, $4\mid\#E_0$. N4 against a matched plain rho at
+$q=262{,}111$, exponents fitted on $q\ge4051$; N4~v2 against the frozen
+pipeline B0 and against negation rho at $q=2{,}097{,}091$ (the top size).
+IC/rho in $\FF_q$-multiplication equivalents. Exponents: fitted cost
+exponent in $q$, over the full range unless stated. Crossover: in counted
+units unless stated (the N4 crossover is in wall time).
+D: double large primes; DL: D with structured Gaussian elimination and
+Lanczos; DL1 is post hoc. Sources: \art{research/quartic_n4_20261019/},
+\art{research/quartic_n4v2_20261020/}.}
+\label{tab:prog_transfer-quartic}
+\end{table}
 The qualifications are substantial. The host was L0 (load average 22--60);
 the intervals resample only three units per size at $k\ge17$; the
 conversion constants move D's high-range exponent from $1.009$ to $1.048$;
@@ -194,20 +207,35 @@ curve or a standard curve.
 census is hyperelliptic. Smith's $(2,2,2)$-isogeny takes it to a plane quartic
 when his Propositions~2 and~4 pass. The walk study looked for curves on which
 Smith's construction succeeds by walking 2-isogenies on the elliptic side
-(\art{research/smith_elliptic_walk_20261018/}).
-\begin{itemize}
-  \item Exhaustively at $p=7$ to $31$, $0.53$--$0.61$ of the descended curves
-    pass Smith's full test, against $0.1857$ for random curves. The
-    preregistered expectation of about $0.186$ is falsified, upward.
-  \item A failing curve has a passing one in its 2-isogeny component in
-    $0.74$--$0.98$ of cases, at a mean distance of $1.5$--$3.6$ steps.
-  \item On sampled walks at $p=2^{10}$ to $2^{20}$, the frozen fit labels the
-    walk cost $o(p)$, with exponent $-0.14$ $[-0.80,0.95]$.
-  \item A labelled post hoc analysis attributes that label to censored walks
-    at the small primes. Successful walks at $p\equiv3\pmod4$ scale as
-    $p^{1.13}$ $[1.00,1.26]$ in cost, which reads as $\tilde\Theta(p)$.
-  \item At $p\equiv1\pmod4$ most walks stay inside small trapped sets.
-\end{itemize}
+(\art{research/smith_elliptic_walk_20261018/}; Table~\ref{tab:prog_transfer-smith}).
+The preregistered expectation of about $0.186$ for the pass fraction is
+falsified, upward. A labelled post hoc analysis attributes the frozen fit's
+$o(p)$ label to censored walks at the small primes, and reads the
+$p\equiv3\pmod4$ exponent as $\tilde\Theta(p)$. At $p\equiv1\pmod4$ most
+walks stay inside small trapped sets.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Primes & Walks & Quantity & Value \\
+\midrule
+$p=7$ to $31$ & exhaustive & pass fraction & $0.53$--$0.61$ (random curves: $0.1857$) \\
+ & & neighbour & $0.74$--$0.98$, at $1.5$--$3.6$ steps \\
+\addlinespace
+$p=2^{10}$ to $2^{20}$ & sampled & walk-cost exponent & $-0.14$ $[-0.80,0.95]$ \\
+$p\equiv3\pmod4$ & successful & walk-cost exponent & $1.13$ $[1.00,1.26]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The 2-isogeny walk to curves on which Smith's construction
+succeeds. Pass fraction: share of descended curves passing Smith's full
+test. Neighbour: share of failing curves with a passing curve in their
+2-isogeny component, and the mean distance to it. Walk-cost exponent: in
+$p$; the first is the frozen fit, which labels the walk cost $o(p)$; the
+second is post hoc, over successful walks only. Source:
+\art{research/smith_elliptic_walk_20261018/}.}
+\label{tab:prog_transfer-smith}
+\end{table}
 A second study, also open and not yet merged, maps divisor classes through
 Smith's isogeny and runs the whole route at toy sizes. The program's closing
 note lists what stays open (\art{research/plane_quartic_program_20261018/CLOSING.md}).

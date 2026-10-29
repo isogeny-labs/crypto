@@ -561,13 +561,26 @@ apply to it.
 \end{enumerate}
 \end{theorem}
 
-\paragraph{Measured, and prior.} The study's session reported a median
-last fall degree of 3,4,4,4,4,5,5,5,5,6 for $t=1..10$ at
-$p=2{,}013{,}265{,}921$. The raw records were never committed (the study's
-\texttt{RESTART.md}), so these values are session-reported, not
-re-derivable. They coincide with the corrected degree of regularity in
-PKM's own Table~4, which reads 4,4,4,4,4,5,5,5,5,6,6 for $n_1=1..11$
-(Figure~\ref{fig:fd}, right). So the \emph{growth} is prior art. What
+\paragraph{Measured, and prior.} Table~\ref{tab:fd-pkm} sets the study's
+session-reported median last fall degree for $t=1..10$ at
+$p=2{,}013{,}265{,}921$ beside the corrected degree of regularity in PKM's
+own Table~4 for $n_1=1..11$ (also Figure~\ref{fig:fd}, right). The raw
+records were never committed (the study's \texttt{RESTART.md}), so the
+$d_F$ column is session-reported, not re-derivable. From $t=2$ on the two
+columns coincide.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-pkm}
+\caption[]{Prime-field Kummer tower, $m=2$, factor base $\mu_{2^t}$:
+the proved first fall degree (Theorem~\ref{thm:pkm}(3); it needs $t\ge2$),
+the session-reported median last fall degree at $p=2{,}013{,}265{,}921$
+(raw data not committed), and the corrected degree of regularity
+$D_{\rm reg}^{\rm corr}$ of Petit, Kosters and Messeng, Table~4
+(prime case)~\cite{pkm2016}. Source: \art{figures/data-new.json}, from
+\art{research/prime_fall_degree_20261027/}.}
+\label{tab:fd-pkm}
+\end{table} So the \emph{growth} is prior art. What
 Theorem~\ref{thm:pkm} adds is the proved constant first fall degree beside
 it, and the presentation dependence. A prediction,
 $d_F=4+\lfloor(t-2)/4\rfloor$, was registered before any $t\ge11$ row and
@@ -577,13 +590,34 @@ is untested.
 
 The binary programme measured refutation and closure degrees on many
 presentations; the full record is in~\cite[\S6]{icprogram2026}.
+Table~\ref{tab:fd-other} lists the last fall degree by base-subspace
+dimension $\ell$. It is flat in $n$ at fixed $(m,\ell)$ and rises with
+$\ell$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrcc@{}}
+\toprule
+$m$ & $\ell$ & $n$ & $d_F$ \\
+\midrule
+3 & 5 & 10--15 & 4 \\
+  & 6 & 16--24 & 4 \\
+  & 7 &        & $\ge5$ (every draw) \\
+\addlinespace
+4 & 3 & 9--14  & 4 \\
+\addlinespace
+5 & 3 & 11--15 & 4 \\
+\bottomrule
+\end{tabular}
+\caption[]{Binary decomposition systems in other presentations: last fall
+degree $d_F$ by $m$ and base-subspace dimension $\ell$, over the measured
+range of $n$. At $(m,\ell)=(3,7)$ every draw is refuted only at degree
+$\ge5$. Source:~\cite[\S6]{icprogram2026}.}
+\label{tab:fd-other}
+\end{table}
+
+Three further measurements bear on the solver rather than the system:
 \begin{itemize}
-\item \emph{Last fall degree is flat in $n$ at fixed $(m,\ell)$.} With
-  $\ell$ the dimension of the base subspace, $d_F=4$ for $m=3$, $\ell=6$
-  at $n=16$--$24$; for $m=3$, $\ell=5$ at $n=10$--$15$; for $m=4$, $\ell=3$
-  at $n=9$--$14$; and for $m=5$, $\ell=3$ at $n=11$--$15$.
-\item \emph{It rises with $\ell$.} At $m=3$, $\ell=7$ every draw is
-  refuted only at degree $\ge5$.
 \item \emph{Plain refutation tracks the semi-regular degree.} The plain
   Macaulay refutation degree stays within one of the semi-regular
   prediction in all 14 exact cells.

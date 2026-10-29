@@ -33,77 +33,106 @@ tests in the touched modules), and found one soundness bug
 holes, all fixed with regression tests.
 
 \paragraph{Engineering results.} Figure~\ref{fig:engine} collects the
-headline ratios; all are \cls{engineering} with identical outputs.
-\begin{itemize}
-\item \emph{Inherited versus matrix F4}: matrix work $198.6\times$ (K13)
-  and $222.1\times$ (random-13) the inherited engine's on the same targets (the two can return
-  different decompositions, so their splitting trees may differ; only
-  matrix F4 and F5 share a tree by construction);
-  at $m=19$ every matrix F4/F5 run timed out at 1{,}800\,s while
-  inherited F4 finished in about 6\,s
-  (\art{research/f4_f5_f6_cross_family_20261011/}).
-\item \emph{F5 versus F4}: word-XOR ratios $0.6465$ / $0.6414$ (K13 /
-  random-13), wall $0.79$--$0.86$.
-\item \emph{F6-IC versus inherited F4}: word XORs about $0.82$ at $m=13$
-  and $0.77$--$0.78$ at $m=19$, relation wall $1.7$--$1.9\times$ faster.
-  But once its batched group additions are charged, F6-IC's $S$ was
-  $64.6$--$68.8\times$ inherited F4's at $m=13$ and
-  $1{,}303$--$1{,}353\times$ at $m=19$: an accounting loss, not a frontier
-  move. Those ratios used inherited F4 before its word XORs were priced
-  (\#1774); priced, at K13, F6-IC's $S$ is $1{,}572.1/634.12\approx2.5\times$
-  inherited F4's, still a loss, while the R13 and $m=19$ cells remain lower
-  bounds (\art{research/f4_pricing_jump_20261018/}). At $m=31$ both engines hit the 3{,}600\,s cap on the first target.
-\item \emph{Kernel routing and rewrite}: routing every echelon call to the
-  Four-Russians kernel gave $1.75$--$3.22\times$ on the oracle's own
-  Macaulay matrices; a word-level \texttt{pext}/\texttt{pdep} rewrite plan
-  made F4 and F6-IC 10--14\% faster at $n=23$; eager rewrite of kept rows
-  beat lazy rows by $1.40$--$1.62\times$
-  (\art{research/inherited_f4_eager_rewrite_20261011/}).
-\item \emph{Instruction and allocation work}, measured by paired A/B/A$'$
-  instruction counts on a frozen eleven-system suite: fused construction
-  and readback, $-5.28\%$ (F4) and $-11.02\%$ (F5) instructions; native
-  hashing, $-3.715\%$ F5 $[3.714,3.726]$ and $-45.1\%$ for the standalone
-  criterion; bounded direct indexing in the F5 packer, $-3.947\%$; row
-  allocation, $42$--$50\%$ fewer requested bytes. Elapsed time was not
-  claimed for these.
-\item \emph{Quotient-curve model}: solving the $m=2$ system directly on
-  the quotient curve instead of a symmetrised control cut F4 word
-  operations by $1.340$--$1.642\times$ with identical root digests in five
-  interleaved cells (\art{research/lit2026_w8_summation_models_20261011/}).
-\item \emph{The $\FF_2$ engine campaigns} (about 90 directories,
-  22 September--17 October; the programme record~\cite{icprogram2026}, clusters
-  ``boolean'', ``gf2-elim'', ``f5-kernel'', ``f5-support-cut'',
-  ``f4-f5-shared''). Each micro-change was gated against the strongest
-  reference, and most failed. Kept as defaults: a branchless AVX2 strip
-  ($1.210\times$ one thread; \art{research/gf2_branchless_strip_20260929/}),
-  a bitmap seen-set in Boolean F4 ($1.199\times$ the full F4;
-  \art{research/boolean_f4_bitmap_20260926/}), batched pair inserts,
-  five-column tables, and direct packing in F5 (default since 17 October).
-  The combined F5 options reached $1.530\times$
-  (\art{research/f5_combined_2x_20260928/}) and a fixed support cut
-  $3.02$--$3.07\times$ on one complete call
-  (\art{research/f5_support_cut19_confirm_20261003/}); about thirty unpack,
-  pivot, layout and packing variants were refuted, and graded reuse in F5
-  reached $1.78$--$1.84\times$, short of the campaign's $2\times$ goal
-  (\art{research/boolean_f5_graded_batch_20261002/}). These are stage
-  speed-ups of the decision engine; none changes an index-calculus
-  distance to rho.
-\item \emph{$\FF_p$ F4 to msolve parity}
-  (\art{research/f4_fp_msolve_parity_20261011/}): Gebauer--M\"oller
-  criteria, packed monomials, interned symbolic preprocessing and a
-  parallel symbolic pass made \texttt{f4\_fp} $29.8$--$54.1\times$ faster
-  than its predecessor on square generic systems, with msolve/ours at
-  $0.96$--$1.22$ single-threaded; a later blocked pair reduction made ours
-  $0.75$--$0.78\times$ msolve's time on the two largest square systems but
-  $1.11$--$1.49\times$ on four others
-  (\art{research/f4_fp_blocked_pairs_20261016/}). A day earlier msolve had been
-  $12$--$24\times$ faster (\art{research/gb_cas_comparison_20261011/});
-  every reduced basis agrees with Singular or msolve. On Boolean
-  decomposition systems ($n=17$, 8 targets) our oracle decides in
-  7--24\,ms per target, while msolve and PolyBoRi spend 40--52\,s computing
-  a full basis and Singular exceeds 120\,s---a difference of task (decide
-  versus compute the basis), not of engine quality.
-\end{itemize}
+headline ratios and Table~\ref{tab:prog_groebner-engineering} lists them
+all; all are \cls{engineering} with identical outputs.
+
+\begin{table}[p]
+\centering\footnotesize
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedleft\arraybackslash}p{0.2\linewidth}@{}}
+\toprule
+Change & Case & Measure & Ratio or value \\
+\midrule
+Matrix / inherited F4 & K13 & counted matrix work & $198.6\times$ \\
+ & random-13 & & $222.1\times$ \\
+ & $m=19$ & wall, matrix F4/F5 vs inherited F4 & timed out at 1{,}800\,s vs about 6\,s \\
+\addlinespace
+F5 / F4 & K13 & word XORs & $0.6465$ \\
+ & random-13 & & $0.6414$ \\
+ & K13, random-13 & wall & $0.79$--$0.86$ \\
+\addlinespace
+F6-IC / inherited F4 & $m=13$ & word XORs & about $0.82$ \\
+ & $m=19$ & & $0.77$--$0.78$ \\
+ & --- & relation wall & $1.7$--$1.9\times$ faster \\
+ & $m=13$ & $S$, group additions charged & $64.6$--$68.8\times$ \\
+ & $m=19$ & & $1{,}303$--$1{,}353\times$ \\
+ & K13 & $S$, word XORs priced (\#1774) & $1{,}572.1/634.12\approx2.5\times$ \\
+ & R13, $m=19$ & & lower bounds \\
+ & $m=31$ & first target & both hit 3{,}600\,s cap \\
+\addlinespace
+Every echelon call to the Four-Russians kernel & oracle's own Macaulay matrices & speed-up & $1.75$--$3.22\times$ \\
+Word-level \texttt{pext}/\texttt{pdep} rewrite plan & $n=23$ & F4 and F6-IC faster & 10--14\% \\
+Eager / lazy rewrite of kept rows & & speed-up & $1.40$--$1.62\times$ \\
+\addlinespace
+Fused construction and readback & F4 & instructions & $-5.28\%$ \\
+ & F5 & & $-11.02\%$ \\
+Native hashing & F5 & & $-3.715\%$ $[3.714,3.726]$ \\
+ & standalone criterion & & $-45.1\%$ \\
+Bounded direct indexing in the F5 packer & F5 & & $-3.947\%$ \\
+Row allocation & & requested bytes & $42$--$50\%$ fewer \\
+\addlinespace
+Quotient-curve model / symmetrised control & $m=2$, five interleaved cells & F4 word operations cut & $1.340$--$1.642\times$ \\
+\addlinespace
+Branchless AVX2 strip & one thread & speed-up & $1.210\times$ \\
+Bitmap seen-set in Boolean F4 & full F4 & & $1.199\times$ \\
+Combined F5 options & & & $1.530\times$ \\
+Fixed support cut & one complete call & & $3.02$--$3.07\times$ \\
+Graded reuse in F5 & & & $1.78$--$1.84\times$ \\
+\addlinespace
+\texttt{f4\_fp} / its predecessor & square generic systems & speed-up & $29.8$--$54.1\times$ \\
+msolve / ours & single-threaded & ratio & $0.96$--$1.22$ \\
+Ours / msolve, blocked pair reduction & two largest square systems & time & $0.75$--$0.78\times$ \\
+ & four others & & $1.11$--$1.49\times$ \\
+msolve faster, a day earlier & & time & $12$--$24\times$ \\
+Boolean decomposition systems, $n=17$, 8 targets & our oracle (decides) & time per target & 7--24\,ms \\
+ & msolve, PolyBoRi (full basis) & & 40--52\,s \\
+ & Singular & & exceeds 120\,s \\
+\bottomrule
+\end{tabular}
+\caption[]{Gr\"obner-engine engineering results, all \cls{engineering}
+with identical outputs. \emph{Change}: candidate / baseline where a slash
+is shown; \emph{Case}: target set or size (K13, random-13 and R13 as named
+in the sources; $m$ the number of summands; ``---'': no
+case given); \emph{Measure}: the counted or timed quantity; \emph{Ratio or
+value}: as recorded. Groups, top to bottom, with sources: inherited versus
+matrix F4 (\art{research/f4_f5_f6_cross_family_20261011/}); F5 versus F4;
+F6-IC versus inherited F4 (priced and lower-bound cells:
+\art{research/f4_pricing_jump_20261018/}); kernel routing and rewrite
+(\art{research/inherited_f4_eager_rewrite_20261011/}); instruction and
+allocation work, by paired A/B/A$'$ instruction counts on a frozen
+eleven-system suite, elapsed time not claimed; the quotient-curve model
+(\art{research/lit2026_w8_summation_models_20261011/}); $\FF_2$ campaign
+results (strip: \art{research/gf2_branchless_strip_20260929/}; seen-set:
+\art{research/boolean_f4_bitmap_20260926/}; combined options:
+\art{research/f5_combined_2x_20260928/}; support cut:
+\art{research/f5_support_cut19_confirm_20261003/}; graded reuse:
+\art{research/boolean_f5_graded_batch_20261002/}); $\FF_p$ F4 to msolve
+parity (\art{research/f4_fp_msolve_parity_20261011/}; blocked pairs:
+\art{research/f4_fp_blocked_pairs_20261016/}; the day-earlier msolve
+reading: \art{research/gb_cas_comparison_20261011/}).}
+\label{tab:prog_groebner-engineering}
+\end{table}
+
+Matrix and inherited F4 can return different decompositions, so their
+splitting trees may differ; only matrix F4 and F5 share a tree by
+construction. F6-IC's $S$ ratios, once its batched group additions are
+charged, are an accounting loss, not a frontier move. Those ratios used
+inherited F4 before its word XORs were priced (\#1774); priced, F6-IC is
+still a loss at K13, while the R13 and $m=19$ cells remain lower bounds.
+
+The $\FF_2$ engine campaigns (about 90 directories, 22 September--17
+October; the programme record~\cite{icprogram2026}, clusters ``boolean'',
+``gf2-elim'', ``f5-kernel'', ``f5-support-cut'', ``f4-f5-shared'') gated
+each micro-change against the strongest reference, and most failed. Kept as
+defaults: the branchless strip, the bitmap seen-set, batched pair inserts,
+five-column tables, and direct packing in F5 (default since 17 October).
+About thirty unpack, pivot, layout and packing variants were refuted, and
+graded reuse in F5 fell short of the campaign's $2\times$ goal. These are
+stage speed-ups of the decision engine; none changes an index-calculus
+distance to rho. Every reduced basis of \texttt{f4\_fp}, after
+Gebauer--M\"oller criteria, packed monomials, interned symbolic
+preprocessing and a parallel symbolic pass, agrees with Singular or msolve.
+The Boolean comparison is a difference of task (decide versus compute the
+basis), not of engine quality.
 
 \begin{figure}[t]
 \centering

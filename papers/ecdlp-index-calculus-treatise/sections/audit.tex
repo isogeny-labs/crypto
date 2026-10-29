@@ -20,13 +20,25 @@ claimed IC ahead of rho. Sources: \art{figures/data-ledger.json}.}
 \section{Claims that did not survive}
 
 \paragraph{1. Every online win is retired.} The one-target online ladder
-compared IC \emph{with} a retained table against rho \emph{without} one:
-\begin{itemize}
-\item $13.94\times$ $[9.81,19.13]$ over strong rho at $n=61$, on 64 targets;
-\item $18.53\times$ at $n=83$ with a dense root index;
-\item $7.29\times$ and $12.29\times$ on hosted single targets at $n=71$
-  and $n=83$.
-\end{itemize}
+compared IC \emph{with} a retained table against rho \emph{without} one
+(Table~\ref{tab:audit-online}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rlr@{}}
+\toprule
+$n$ & Reading & IC online over rho \\
+\midrule
+61 & strong rho, 64 targets & $13.94\times$ $[9.81,19.13]$ \\
+83 & dense root index & $18.53\times$ \\
+71 & hosted single target & $7.29\times$ \\
+83 & hosted single target & $12.29\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The retired online wins: IC's online speed-up over rho with no
+table, IC keeping its retained table.}
+\label{tab:audit-online}
+\end{table}
 Given a distinguished-point table no larger than IC's pair table,
 Bernstein--Lange preprocessing rho~\cite{bl2012} is $53$--$317\times$ faster
 online at $n=41,53,61$ on the same 64 targets (benchmarks row
@@ -40,36 +52,58 @@ and generic rho buys more per byte. The within-IC result survives: K1798's
 probe reduction over K1500 at $n=83$ (from $300{,}021.9$ to $169{,}069.8$
 probes per relation).
 
-\paragraph{2. Pricing native work moved two arms.}
-\begin{itemize}
-\item \emph{Inherited F4 at $n=13$.} Its $S=16.7$, close to rho's $14.4$,
-  left its Boolean word XORs unpriced. Priced, $S=421.4$
-  (\art{research/ecbench_rootfind_faster_20261014/}).
-\item \emph{F4 pricing change.} The pricing change (\#1774, $0.002304$ GAE
-  per word XOR) made every earlier F4 $S$ a lower bound. A separate
-  algorithmic change (\#1862) raised counted work
-  (\art{research/f4_pricing_jump_20261018/README.md}).
-\item \emph{Compact orbit at $n=13$.} Earlier quoted at $1.08\times$ rho as a
-  lower bound, it reads $0.93$, $1.53$ and $5.7\times$ the strong rho at
-  $w=0,0.1,1$, so the pair is unresolved inside the band
-  (\art{research/ic_frontier_campaign_20261015/select/SELECTION.md}).
-\end{itemize}
+\paragraph{2. Pricing native work moved two arms.} Table~\ref{tab:audit-pricing}
+gives both before and after.
 
-\paragraph{3. Matching the rho reference.}
-\begin{itemize}
-\item \emph{Rule v8.} Matching the rho reference raised the Koblitz gap by
-  $1.30$--$1.58\times$ at every size (Chapter~\ref{ch:distance}).
-\item \emph{The standing rho improved.} Ecbench's standing
-  \texttt{rho.signed\_frobenius\_strong} now runs at $0.802\times$ its
-  former instruction count with identical GAE, and the strong Koblitz rho
-  executes 718 instructions per step instead of 1{,}196. Counted-unit
-  comparisons are unaffected. Wall-time comparisons against the older rho
-  overstate IC by up to that factor.
-\item \emph{Two rho studies on the prime side.} Choosing the better of
-  $P\pm R$ cuts steps by $1.129\times$. Signed $\sigma$ steps on
-  ECC2K-130 cut GPU time to $0.961$--$0.970$. Neither is yet in a campaign
-  arm.
-\end{itemize}
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllr@{}}
+\toprule
+Arm & Reading & Rho & IC \\
+\midrule
+Inherited F4, $n=13$ & Boolean word XORs unpriced & $S=14.4$ & $S=16.7$ \\
+ & priced & & $S=421.4$ \\
+\addlinespace
+Compact orbit, $n=13$ & earlier, lower bound & & $1.08\times$ rho \\
+ & strong rho, $w=0$ & & $0.93$ \\
+ & strong rho, $w=0.1$ & & $1.53$ \\
+ & strong rho, $w=1$ & & $5.7\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The two arms moved by pricing native work. Inherited F4, whose unpriced $S$ was close to rho's:
+\art{research/ecbench_rootfind_faster_20261014/}. Compact orbit at the
+three band weights $w$; the pair is unresolved inside the band
+(\art{research/ic_frontier_campaign_20261015/select/SELECTION.md}).}
+\label{tab:audit-pricing}
+\end{table}
+
+The pricing change itself (\#1774, $0.002304$ GAE per word XOR) made every
+earlier F4 $S$ a lower bound. A separate algorithmic change (\#1862) raised
+counted work (\art{research/f4_pricing_jump_20261018/README.md}).
+
+\paragraph{3. Matching the rho reference.} Table~\ref{tab:audit-rho} lists
+the changes to the rho side.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllr@{}}
+\toprule
+Change & Quantity & Scope & Factor \\
+\midrule
+Rule v8, matched rho & Koblitz gap raised & every size & $1.30$--$1.58\times$ \\
+Standing rho improved & instruction count & \texttt{rho.signed\_frobenius\_strong} & $0.802\times$ \\
+ & instructions per step & strong Koblitz rho & 718 instead of 1{,}196 \\
+Better of $P\pm R$ & steps cut & prime side & $1.129\times$ \\
+Signed $\sigma$ steps & GPU time cut to & ECC2K-130 & $0.961$--$0.970$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Changes to the rho reference and their factors. Rule v8:
+Chapter~\ref{ch:distance}. The improved ecbench standing rho keeps
+identical GAE, so counted-unit comparisons are unaffected; wall-time
+comparisons against the older rho overstate IC by up to that factor. The
+last two are rho studies, neither yet in a campaign arm.}
+\label{tab:audit-rho}
+\end{table}
 
 \paragraph{4. A replay regression, and its root cause.} The root-finder
 ecbench session was recorded with a replay certificate of 120 of 168
@@ -139,33 +173,40 @@ evidence directory's \texttt{VALIDATION.json}
 On 29 October, \textbf{19 of the 28 leaderboard rows are validated}
 (\art{docs/ic/leaderboard.json}, \texttt{validation\_gate.status\_counts}).
 
-\begin{itemize}
-\item \emph{Table~B, all 13 rows (prime and random binary, one target).}
-  These validated on 24 October
-  (\art{research/ic_validation_gate_20261024/}):
-  \begin{itemize}
-  \item 1{,}257 runs replay identically in a fresh process;
-  \item 1{,}578 of 1{,}578 negative controls are rejected by an
-    independent verifier;
-  \item 52 headline numbers recompute to relative $10^{-9}$;
-  \item index calculus stays above rho at every band weight.
-  \end{itemize}
-  Its distance is $5.47$--$38.21\times$ the matched negation-map rho, or
-  $4.05$--$54.76\times$ across the band.
-\item \emph{Table~A, all 6 rows (Koblitz descent, one target, 64 targets per
-  size).} These validated at baseline v7
-  (\art{research/ic_tool_program/rule/v7/}): IC is $3.43$--$11.5\times$ the
-  as-built rho in the same process. The sweep flags the reference as only
-  partly adequate. Against the matched rho of rule v8, the same rows read
-  $4.67$--$18.07\times$ (Chapter~\ref{ch:distance}).
-\item \emph{Table~C, all 9 rows (32-target batch).} These stay pre-gate.
-  Their replays and recomputations pass, but no matched rho with a band
-  exists for them.
-\item \emph{Components outside Tables A--C.} Two are validated: the
-  prime-field base-size tuning and the post-Gröbner linear stage
-  (\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
-  \art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).
-\end{itemize}
+Table~\ref{tab:audit-validation} gives the status by leaderboard table.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.2\linewidth}r>{\raggedright\arraybackslash}p{0.16\linewidth}lr@{}}
+\toprule
+Table & Scope & Rows & Status & Rho reference & IC/rho \\
+\midrule
+B & prime and random binary, one target & 13 & validated 24 October & matched negation-map & $5.47$--$38.21\times$ \\
+ & & & & across the band & $4.05$--$54.76\times$ \\
+\addlinespace
+A & Koblitz descent, one target & 6 & validated at baseline v7 & as-built, same process & $3.43$--$11.5\times$ \\
+ & & & & matched, rule v8 & $4.67$--$18.07\times$ \\
+\addlinespace
+C & 32-target batch & 9 & pre-gate & none matched, no band & \\
+\addlinespace
+--- & components outside A--C & 2 & validated & & \\
+\bottomrule
+\end{tabular}
+\caption[]{Validation status of the leaderboard on 29 October. Table~B
+validated on 24 October (\art{research/ic_validation_gate_20261024/}):
+1{,}257 runs replay identically in a fresh process; 1{,}578 of 1{,}578
+negative controls are rejected by an independent verifier; 52 headline
+numbers recompute to relative $10^{-9}$; index calculus stays above rho at
+every band weight. Table~A (64 targets per size) validated at baseline v7
+(\art{research/ic_tool_program/rule/v7/}); the sweep flags the reference as
+only partly adequate, and the rule~v8 row is from
+Chapter~\ref{ch:distance}. Table~C's replays and recomputations pass, but
+no matched rho with a band exists for them. The two components are the
+prime-field base-size tuning and the post-Gröbner linear stage
+(\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
+\art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).}
+\label{tab:audit-validation}
+\end{table}
 Validation says the numbers are what the archive says, and that the
 reference is fair. \textbf{No validated row is below its reference.}
 

@@ -73,40 +73,66 @@ $n=19$ (intraclass correlation $\le0.006$;
 Three September results that put Koblitz index calculus at or below rho
 were reversed when rho was strengthened, which is why every later row is
 quoted against the strongest available rho
-(\S\ref{sec:corrections}).
-\begin{itemize}
-\item \emph{Candidate tournament.} The 15 September tournament's best
-  candidate used $0.5347$ of a worker rho's retired instructions and a
-  triple table $0.409$ at $n=43$, $a=1$. Giving rho the index calculus's own
-  canonical form made rho win all five cells, IC at $1.19$--$2.88\times$
-  (\art{research/ic_triple_counted_20260923/}; the tournament README,
-  \art{research/ic_candidate_tournament_20260915/}, carries no correction
-  note).
-\item \emph{Matched rho for the orbit DLP.} An IC/rho of $0.2403$ in
-  retired instructions ($n=53$, 1{,}024 targets) used a rho with software
-  carry-less multiplication on x86-64. Strengthening rho in four rungs moved
-  the ratio $0.240\to0.317\to1.294\to1.923$, and the preregistered sweep
-  then read $0.794$, $1.520$, $1.923$, $2.297$ at $n=37,41,53,61$, rising
-  with $n$ (\art{research/notes/index-calculus/RESEARCH_STRONG_RHO_LADDER_20260929.md}).
-  Against a strong single-target rho the direct arm costs $44.0\times$
-  $[39.4,45.4]$, which withdrew a selected-panel crossover of $0.8392$
-  (\art{research/notes/index-calculus/RESEARCH_SINGLE_TARGET_STRONG_RHO_N53_20260930.md}).
-\item \emph{Compact-orbit batch lead.} A point panel had compact orbit at
-  $0.309\times$ a corrected rho at $n=41$, $L=1{,}024$ targets. A 32-walk
-  batched-inversion normal-basis rho reversed it ($2.081$ at $n=37$,
-  $3.086$ at $n=53$ for $L=1{,}024$;
-  \art{research/notes/ecc2k130/compact_orbit_strong_rho_20260929/RESULT.md}),
-  and the orbit-disjoint cold confirmation ended with six eligible no-gos,
-  compact/rho CPU $1.314$ ($n=41$, $L=1{,}024$) to $22.675$ ($n=53$, $L=1$)
-  (\art{research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/RESULT.md}).
-  Batched compact IC does use fewer instructions than rho
-  ($0.5165\times$ at $n=37$, $0.6221\times$ at $n=41$, $L=1{,}024$) while
-  its cold CPU stays above rho, a gap traced to memory behaviour
-  (\art{research/notes/ecc2k130/compact_ir_ledger_20260930/RESULT.md}).
-  Some sixty notes on S3 batch inversion, swap quotients, Bloom
-  prefilters, window screens and $K$ grids each moved a constant and none
-  crossed rho (cluster ``compact-orbit-cold'').
-\end{itemize}
+(\S\ref{sec:corrections}). Table~\ref{tab:prog_koblitz-reversals} gives
+each result as recorded and against the stronger rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllr@{}}
+\toprule
+Result & Case & Measure & Recorded & Stronger rho \\
+\midrule
+Tournament & $n=43$, $a=1$, best & retired instr. & $0.5347$ & \\
+ & $n=43$, $a=1$, triple table & & $0.409$ & \\
+ & five cells$^{e}$ & & & $1.19$--$2.88\times$ \\
+\addlinespace
+Orbit DLP & $n=53$, 1{,}024 targets & retired instr. & $0.2403$ & \\
+ & four rungs & & & $0.240\to0.317\to1.294\to1.923$ \\
+ & sweep, $n=37$ & & & $0.794$ \\
+ & sweep, $n=41$ & & & $1.520$ \\
+ & sweep, $n=53$ & & & $1.923$ \\
+ & sweep, $n=61$ & & & $2.297$ \\
+ & single target & & $0.8392$$^{a}$ & $44.0\times$ $[39.4,45.4]$ \\
+\addlinespace
+Compact orbit & $n=41$, $L=1{,}024$ & corrected rho & $0.309\times$ & \\
+ & $n=37$, $L=1{,}024$ & 32-walk rho$^{b}$ & & $2.081$ \\
+ & $n=53$, $L=1{,}024$ & & & $3.086$ \\
+ & $n=41$, $L=1{,}024$ & cold CPU$^{c}$ & & $1.314$ \\
+ & $n=53$, $L=1$ & & & $22.675$ \\
+ & $n=37$, $L=1{,}024$ & instructions$^{d}$ & & $0.5165\times$ \\
+ & $n=41$, $L=1{,}024$ & & & $0.6221\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{IC/rho of the three September results as first recorded and
+against a strengthened rho. Tournament (15 September): IC against a worker
+rho's retired instructions; giving rho the index calculus's own canonical
+form made rho win all five cells
+(\art{research/ic_triple_counted_20260923/}; the tournament README,
+\art{research/ic_candidate_tournament_20260915/}, carries no correction
+note). Orbit DLP: the recorded rho used software carry-less multiplication
+on x86-64; rho was strengthened in four rungs, then the preregistered sweep
+read rising with $n$
+(\art{research/notes/index-calculus/RESEARCH_STRONG_RHO_LADDER_20260929.md});
+$^{a}$the selected-panel crossover withdrawn by the direct arm's cost
+against a strong single-target rho
+(\art{research/notes/index-calculus/RESEARCH_SINGLE_TARGET_STRONG_RHO_N53_20260930.md}).
+Compact orbit: the recorded value is a point panel;
+$^{b}$a 32-walk batched-inversion normal-basis rho
+(\art{research/notes/ecc2k130/compact_orbit_strong_rho_20260929/RESULT.md});
+$^{c}$compact/rho CPU of the orbit-disjoint cold confirmation, which ended
+with six eligible no-gos
+(\art{research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/RESULT.md});
+$^{d}$batched compact IC
+(\art{research/notes/ecc2k130/compact_ir_ledger_20260930/RESULT.md}).
+$^{e}$Rho given the index calculus's own canonical form.}
+\label{tab:prog_koblitz-reversals}
+\end{table}
+
+Batched compact IC does use fewer instructions than rho while its cold CPU
+stays above rho, a gap traced to memory behaviour. Some sixty notes on S3
+batch inversion, swap quotients, Bloom prefilters, window screens and $K$
+grids each moved a constant and none crossed rho (cluster
+``compact-orbit-cold'').
 The boundary ledger of the same weeks reached the same place from the other
 side. Re-pricing every row against a matched negation rho raised the vs-rho
 ratios $2.1$--$6.5\times$ (\art{research/ic_rho_reference_20260923/}); the
@@ -154,34 +180,46 @@ beat the shipping distinguished-point walk
 The ledger's primary \texttt{vs\_rho} question is: with reusable IC
 preparation already done, how long does one unseen public target take,
 against rho with the automorphism discount on the same point? The ladder
-(Figure~\ref{fig:online}):
+(Figure~\ref{fig:online}) is in Table~\ref{tab:prog_koblitz-ladder}.
 
-\begin{itemize}
-\item $n=53$: guided shared-log precompute with an explicit pair table
-  (9.34\,GB peak RSS); earlier, a 1{,}024-target shared-log batch beat
-  batched rho in all 15 paired blocks (secondary, multi-target).
-\item $n=61$: compact orbit, 600 columns, 73{,}200 points, 2.73\,GB; fresh
-  reproduction $124.85\times$ (exploratory).
-\item $n=71$: first rung past 64-bit packing (u128 words), 85{,}200
-  points, $2{,}864.1\times$ median of three repeats of one point
-  (exploratory).
-\item $n=73$: 87{,}600 points, $1{,}189.7\times$; the guided-rank
-  precompute took 5.1\,h at 57--70 million probes per relation
-  (exploratory).
-\item $n=83$, $a=1$: IC online 5.6--7.9\,s against rho 43--71\,s,
-  $8.2\times$ (exploratory). Re-measured on 12 October against a default
-  strong rho on five repeats of the same target, IC was \emph{slower}
-  online, $1.382\times$ $[1.036,1.882]$, and $218.0\times$ rho in
-  fresh-process wall time (\art{research/n83_evaluation_20261012/}). The
-  later dense-root reading of $18.5\times$ is in \S\ref{sec:n83}.
-\item \textbf{$n=61$, admitted} (12 October): $a=0$, $K=500$ orbit
-  columns, $61{,}000$ points, 64 fresh public one-target workloads per
-  host, identical candidate manifest on two hosts. Pinned x86\_64:
-  median online speed-up $13.94\times$, 95\% $[9.81,19.13]$, claim-check
-  64/64; unpinned arm64: $12.87\times$ $[7.30,19.08]$. Set-up of about
-  28\,s is outside the window; with it charged, IC costs a median
-  $83.4\times$ rho.
-\end{itemize}
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rlrrlrl@{}}
+\toprule
+$n$ & Base & Columns & Points & Memory & Rho/IC online & Status \\
+\midrule
+53 & shared-log$^{a}$ & & & 9.34\,GB & & \\
+61 & compact orbit & 600 & 73{,}200 & 2.73\,GB & $124.85\times$ & exploratory$^{b}$ \\
+71 & & & 85{,}200 & & $2{,}864.1\times$ & exploratory$^{c}$ \\
+73 & & & 87{,}600 & & $1{,}189.7\times$ & exploratory$^{d}$ \\
+83 & $a=1$ & & & & $8.2\times$ & exploratory$^{e}$ \\
+\addlinespace
+\textbf{61} & orbit, $a=0$ & $K=500$ & $61{,}000$ & & $13.94\times$ $[9.81,19.13]$ & admitted$^{f}$ \\
+ & & & & & $12.87\times$ $[7.30,19.08]$ & admitted$^{g}$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The one-target online ladder: rho online time over IC online
+time on the same point, reusable IC preparation excluded; peak memory where
+recorded (peak RSS at $n=53$). $^{a}$Guided shared-log precompute with an
+explicit pair table; earlier, a 1{,}024-target shared-log batch beat batched rho
+in all 15 paired blocks (secondary, multi-target). $^{b}$Fresh
+reproduction. $^{c}$First rung past 64-bit packing (u128 words); median of three
+repeats of one point. $^{d}$The guided-rank precompute took 5.1\,h at
+57--70 million probes per relation. $^{e}$IC online 5.6--7.9\,s against
+rho 43--71\,s; re-measured below. $^{f}$Admitted 12 October: 64 fresh
+public one-target workloads per host, identical candidate manifest on two
+hosts; median online speed-up with 95\% interval; pinned x86\_64,
+claim-check 64/64. $^{g}$The same, unpinned arm64.}
+\label{tab:prog_koblitz-ladder}
+\end{table}
+
+Re-measured on 12 October against a default strong rho on five repeats of
+the same target, the $n=83$, $a=1$ IC was \emph{slower} online,
+$1.382\times$ $[1.036,1.882]$, and $218.0\times$ rho in fresh-process wall
+time (\art{research/n83_evaluation_20261012/}); the later dense-root
+reading of $18.5\times$ is in \S\ref{sec:n83}. For the admitted $n=61$
+point, set-up of about 28\,s is outside the window; with it charged, IC
+costs a median $83.4\times$ rho.
 
 \begin{figure}[t]
 \centering
@@ -295,32 +333,55 @@ panels); none is on \texttt{main} (the programme record~\cite{icprogram2026}).
 Table~A of \art{docs/ic/LEADERBOARD.md} prices one unseen public target on
 Koblitz curves at $n=41$--$61$ ($\log_2r=36.6$--$47.2$), cold, against rho on
 the same point. Its history is a sequence of rules, each a pipeline baseline
-plus a rho reference (\art{research/ic_tool_program/}):
-\begin{itemize}
-\item \emph{Rule v3}: IC/rho $5.23$--$21\times$, the figure still printed
-  in Table~A, which remains unvalidated (pre-gate).
-\item \emph{Baselines v4--v8} (16--17 October): head-of-main, scan-key
-  (v5, $1.20$--$1.24\times$ cold), scan-fold (v6, $1.33$--$1.40\times$),
-  build streams (v7, $1.07$--$1.13\times$) and admitted prefetch (v8,
-  $1.06\times$), together $1.90$--$1.98\times$ cheaper cold than v4
-  (\art{benchmarks/20261017-ic-r12-admitted-prefetch/}). Seven further
-  candidates (prefetch gates, filter slots, huge pages, a wider base) did
-  not clear their rounds.
-\item \emph{Rules v6, v7}: cold rho still faster at every size,
-  $3.78$--$12.06\times$ and then $3.43$--$11.51\times$; but their rho
-  references ran at $0.57$--$0.85$ of the strong walk per step, so the
-  distance was understated (\art{benchmarks/20261016-ic-rule-v7/}).
-\item \emph{Rule v8} (19 October): with a matched GFNI rho the cold distance
-  is $4.67$ $[4.34,5.07]$ to $18.07$ $[15.98,20.58]\times$, $1.30$--$1.58\times$
-  the v7 control, with a fitted slope of $0.168$ per $\ln r$
-  (\art{benchmarks/20261019-ic-matched-rho-v8/}). The run is archived as
-  incomplete although its row is listed.
-\item \emph{Rule v4 recipe} (24 October; \S\ref{sec:ladder3}): a paired
-  retuning improved one size of six; with rho priced in the same process at
-  the canonical batched step the distance is $9.9$--$43\times$. Its
-  validation file is withheld because its rho reference may not be the
-  strongest, so it is not an admitted row either.
-\end{itemize}
+plus a rho reference (\art{research/ic_tool_program/}).
+Table~\ref{tab:prog_koblitz-tablea} lists the rules and the pipeline
+baselines.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llr>{\raggedright\arraybackslash}p{0.3\linewidth}@{}}
+\toprule
+\multicolumn{4}{@{}l}{(a) Rules: cold IC/rho on one unseen public target} \\
+\midrule
+Rule & Date & IC/rho, cold & Status \\
+\midrule
+v3 & & $5.23$--$21\times$ & printed in Table~A; unvalidated (pre-gate) \\
+v6 & & $3.78$--$12.06\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$ \\
+v7 & & $3.43$--$11.51\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$ \\
+v8 & 19 October & $4.67$ $[4.34,5.07]$ to $18.07$ $[15.98,20.58]\times$ & matched GFNI rho; archived as incomplete$^{b}$ \\
+v4 recipe & 24 October & $9.9$--$43\times$ & validation file withheld$^{c}$ \\
+\bottomrule
+\addlinespace
+\multicolumn{4}{@{}l}{(b) Pipeline baselines, 16--17 October: cold speed-up} \\
+\midrule
+Baseline & Change & Cheaper cold & \\
+\midrule
+v4 & head-of-main & & \\
+v5 & scan-key & $1.20$--$1.24\times$ & \\
+v6 & scan-fold & $1.33$--$1.40\times$ & \\
+v7 & build streams & $1.07$--$1.13\times$ & \\
+v8 & admitted prefetch & $1.06\times$ & \\
+v4$\to$v8 & together & $1.90$--$1.98\times$ & \\
+\bottomrule
+\end{tabular}
+\caption[]{Leaderboard Table~A, Koblitz $n=41$--$61$. (a)~Each rule's
+cold IC/rho range over its sizes, against rho on the same point (rules v6
+and v7: \art{benchmarks/20261016-ic-rule-v7/}; v8:
+\art{benchmarks/20261019-ic-matched-rho-v8/}; v4 recipe:
+\S\ref{sec:ladder3}). $^{a}$Per step, so the distance was understated.
+$^{b}$$1.30$--$1.58\times$ the v7 control, fitted slope $0.168$ per $\ln r$;
+its row is listed although the run is archived as incomplete. $^{c}$A paired
+retuning improved one size of six; rho is priced in the same process at the
+canonical batched step, and the validation file is withheld because that
+reference may not be the strongest, so it is not an admitted row either.
+(b)~Each baseline's recorded speed-up, and the combined cold factor over
+v4 (\art{benchmarks/20261017-ic-r12-admitted-prefetch/}).}
+\label{tab:prog_koblitz-tablea}
+\end{table}
+
+Under rules v6 and v7 cold rho was still faster at every size
+(Table~\ref{tab:prog_koblitz-tablea}(a)). Seven further baseline candidates (prefetch gates,
+filter slots, huge pages, a wider base) did not clear their rounds.
 Table~C prices a 32-target batch on nine Koblitz curves ($\log_2 r=18$--$47.2$)
 against batch rho on the same targets: $3.62$--$14.9\times$, a historical
 diagnostic under the one-target rule. All nine failed the 24 October
@@ -339,6 +400,50 @@ prime subgroup and rho at about $2^{60.81}$ group operations. The compact
 producer already solves $n=41,53,61,71,73$ of the family; about 300 notes
 under \art{research/notes/ecc2k130/} price the routes to $n=131$ itself. No
 route prices below rho.
+Table~\ref{tab:prog_koblitz-ecc2k130} lists the priced algebraic routes.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Route & Setting & Cost & Above rho \\
+\midrule
+Decomposition oracle & family bottom & $2^{132.58}$ & \\
+ & Frobenius-orbit unions, $m=3$ & $2^{124.99}$ & $2^{64.18}$ times \\
+\addlinespace
+Relation sweep & best single relation, $m=4$ & & $+4.98$ bits \\
+ & best honest $m=8$, Frobenius quotient & & $+13.59$ bits \\
+\addlinespace
+Linearisation & plain & & $70.19-b_{\max}$ bits \\
+ & best bilinear XL, $\omega=2$ & & $71.82$ bits \\
+ & same, $\omega=2.81$ & & $78.15$ bits \\
+ & trilinear & & $87.16$ bits \\
+\addlinespace
+Weil descent & $m=3$, free oracle & $2^{68.58}$ & \\
+ & $m=4$, degree 4 & $2^{68.43}$ & $+7.62$ bits$^{a}$ \\
+ & $m=4$, degree 5, $w=1$ & $2^{71.13}$ & $+10.32$ bits \\
+ & $m=4$, degree 5, $w=2$ & $2^{106.52}$ & $+45.71$ bits \\
+ & $m=4$, hybrid guess & & $+8.43$ to $+58.27$ bits \\
+\bottomrule
+\end{tabular}
+\caption[]{Priced algebraic routes to ECC2K-130. \emph{Setting}: the
+variant priced ($m$ summands, $w$ as in the source, $\omega$ the
+linear-algebra exponent); \emph{Cost}: the route's cost as recorded;
+\emph{Above rho}: its distance to rho, as a factor or in bits. The
+decomposition bottom needs a materialised base of $2^{44.53}$ points at
+$m=3$; the $m=4$ single relation needs $2^{70.79}$ bytes; linearisation
+gaps charge each Macaulay solve; the descent rows are in unconverted column
+touches. $^{a}$Now contradicted. Sources:
+\art{research/notes/ecc2k130/RESEARCH_ECC2K130_DECOMPOSITION_TARGETS.md},
+\art{research/notes/ecc2k130/RESEARCH_ECC2K130_RELATION_SWEEPS.md},
+\art{research/linearization_reach_20260930/},
+\art{research/xl_bilinear_core_20261006/},
+\art{research/xl_trilinear_t_unknown_20261006/},
+\art{research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md}; the
+hybrid guess is in \S\ref{sec:binary-descent}.}
+\label{tab:prog_koblitz-ecc2k130}
+\end{table}
+
 \begin{itemize}
 \item \emph{Extrapolating the producer.} The fitted probes-per-relation law
   $C\,r/(n^2K^2)$ with $C=1$ gives $1.1\cdot10^{18}$ core-years at $K=600$
@@ -346,32 +451,15 @@ route prices below rho.
   (\art{RESEARCH_ECC2K130_IC_FEASIBILITY.md}, with the unexplained
   factor-of-5 gap in $C$ of \S\ref{sec:corrections}).
 \item \emph{Decomposition oracles.} Decompositions exist, but no oracle
-  finds one for less than $2^{131}$ per family; using unions of Frobenius
-  orbits lowers the family's bottom from $2^{132.58}$ to $2^{124.99}$, still
-  $2^{64.18}$ times rho, and needs a materialised base of $2^{44.53}$ points
-  at $m=3$
-  (\art{research/notes/ecc2k130/RESEARCH_ECC2K130_DECOMPOSITION_TARGETS.md}).
-  Relation sweeps over $m$ give a best single-relation row of $+4.98$ bits
-  at $m=4$ (with $2^{70.79}$ bytes) and a best honest $m=8$ row of $+13.59$
-  bits with the Frobenius quotient
-  (\art{research/notes/ecc2k130/RESEARCH_ECC2K130_RELATION_SWEEPS.md}).
-  Crossbred, RR-solver and WDSat oracles are engineering only: Crossbred is
-  $0.023$ of F4's bit operations at $m=3$ but slower end to end, and the RR
-  solvers' advantage over Semaev at $d=6$ is worthless against brute force.
-\item \emph{Linearisation.} Plain linearisation leaves a gap of $70.19-b_{\max}$
-  bits to rho; the best bilinear XL setting, with each Macaulay solve
-  charged, is $71.82$ bits at $\omega=2$ ($78.15$ at $\omega=2.81$), and a
-  trilinear variant is worse ($87.16$ bits)
-  (\art{research/linearization_reach_20260930/},
-  \art{research/xl_bilinear_core_20261006/},
-  \art{research/xl_trilinear_t_unknown_20261006/}).
-\item \emph{Weil descent.} The descent-degree note's rows are $m=3$ with a
-  free oracle at $2^{68.58}$; $m=4$ at degree 4, $2^{68.43}$ ($+7.62$ bits,
-  now contradicted); and $m=4$ at degree 5, $2^{71.13}$ ($+10.32$) at $w=1$ and
-  $2^{106.52}$ ($+45.71$) at $w=2$, in unconverted column touches
-  (\art{research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md}).
-  The studies behind these rows, and the hybrid guess that puts the $m=4$
-  row at $+8.43$ to $+58.27$ bits, are in \S\ref{sec:binary-descent}.
+  finds one for less than $2^{131}$ per family; unions of Frobenius orbits
+  lower the family's bottom but not to rho. Crossbred, RR-solver and WDSat
+  oracles are engineering only: Crossbred is $0.023$ of F4's bit operations
+  at $m=3$ but slower end to end, and the RR solvers' advantage over Semaev
+  at $d=6$ is worthless against brute force.
+\item \emph{Linearisation and Weil descent.} Neither reaches rho
+  (Table~\ref{tab:prog_koblitz-ecc2k130}). The studies behind the descent
+  rows, and the hybrid guess for the $m=4$ row, are in
+  \S\ref{sec:binary-descent}.
 \item \emph{Covers.} Over $\FF_{2^{131}}$ every ordinary curve has GHS
   magic number 1 or 131, so GHS descends ECC2K-130 to genus 1 (a zero map on
   the subgroup) or to genus about $2^{130}$, and the Hess--Menezes--Teske walk
