@@ -4,8 +4,8 @@
  "independent": true,
  "date": "2026-10-29",
  "validator": "Validator role (crypto-autoresearcher agents/validator.md), Claude Opus 5.5 subagent. Not the producer of the runs, but launched from the producing Claude Code session (finding F11).",
- "method": "Every headline number was recomputed in Python (standard library) from the 126 raw ic price outputs and isolation.jsonl, without summary.json's values, summarise.sh or jq. Per process: the median over its 3 repetitions of phases_ns.collect and of total_ns. Per round: a/c (A/B) and a/q (A/A). A round is kept only if all three isolation records (last per label) have contended false and exit_status 0. Statistic: the median of the per-round ratios, with a percentile bootstrap over rounds implemented from PROTOCOL.md and ../summarise.sh's definition: 2000 resamples of 42 indices drawn consecutively from s <- (1103515245 s + 12345) mod 2^31, seed 20261029, index s mod 42, in ascending round order, sorted resample medians [50] and [1949]. The generator is evaluated in two ways: as jq executes it (IEEE-754 double multiply and add, truncation before mod), which reproduces every claim bit for bit, and as an exact integer LCG, which does not (findings F1-F3). A large Mersenne-Twister bootstrap gives an unbiased reference. Decision rule: A/B lo > 1 and A/B lo > A/A hi, per metric.",
- "status_basis": "'pass' means every headline number below recomputes exactly from the repository raw data under the protocol's bootstrap as summarise.sh executes it, every control holds, the counters replay identically and the recovered logarithm is verified independently. It does NOT certify the stated intervals as 95% bootstrap intervals over the 42 rounds: the declared generator resamples only the 21 odd rounds (F1). The collect-phase 'established' survives a correct bootstrap (F3). The whole-set-up 'not established' does not, and the intervals as published should be relabelled or corrected before they are shown as validated (F5).",
+ "method": "Every headline number was recomputed in Python (standard library) from the 126 raw ic price outputs and isolation.jsonl, without summary.json's values, summarise.sh or jq. Per process: the median over its 3 repetitions of phases_ns.collect and of total_ns. Per round: a/c (A/B) and a/q (A/A). A round is kept only if all three isolation records (last per label) have contended false and exit_status 0. Statistic: the median of the per-round ratios, with a percentile bootstrap over rounds implemented from PROTOCOL.md and ../summarise.sh's definition: 2000 resamples of 42 indices drawn consecutively from s <- (1103515245 s + 12345) mod 2^31, seed 20261029, index s mod 42, in ascending round order, sorted resample medians [50] and [1949]. The generator is evaluated in two ways: as jq executes it (IEEE-754 double multiply and add, truncation before mod), which reproduces every claim bit for bit, and as an exact integer LCG, which does not (findings F1-F3). A large Mersenne-Twister bootstrap gives an unbiased reference. Decision rule: A/B lo > 1 and A/B lo > A/A hi, per metric. Second pass: the corrected intervals of summary-corrected.json were recomputed for both sessions with the validator's own Python. The definitions are those of correct_bootstrap.sh and ../summarise.sh (2026-10-23: A/B = baseline-rN / candidate-rN of runs/time/ab for N = 1..30 in that order; A/A = runs/time/aa baseline-r(2k-1) / baseline-r(2k), k = 1..5; seed 20261023. 2026-10-29: A/B = a/c, A/A = a/q per round, rounds 1..42; seed 20261029. Per process: the median of the 3 repetitions. 2000 resamples of n consecutive draws, index s mod n, sorted medians [50] and [1949].). The corrected intervals come from an exact integer LCG; the as-run ones come from the double-rounded step. All 76 published values, including medians, counts, the odd-round shares, margins and flags, agree bit for bit. correct_bootstrap.sh was read but not executed.",
+ "status_basis": "Second pass. 'pass' means: every as-run number in summary.json (34 entries) and every value in summary-corrected.json for both sessions (76 entries) recomputes exactly from the repository raw data with the validator's own code; every control holds; the counters replay identically and the recovered logarithm is verified (replay-certificate.json, unchanged). The corrected publications read accurately: the aa2 README, CORRECTION.md, report.typ/pdf, the plots and the leaderboard builder (F1-F4 and F9 resolved). That includes the 'marginal (+0.005), not claimed' handling of the whole set-up. Still open, neither changing a number or verdict: the committed board renders predate the corrected builder and must be regenerated before the section is shown (F14), and the first session's README and report should point to the correction (F15). A pass does not admit an ECDLP or rho-gap change: no counted cost moves (F12).",
  "subject": {
   "change": "per-unit gather of aimed-subset coordinates in IC relation collection (src/cryptanalysis/koblitz_index_calculus.rs: Targets::Subset doubled_x/doubled_y, Scan::Gathered)",
   "baseline_commit": "d34b9b3908df5d3feafe6189f83b2ce3244d63c3",
@@ -13,9 +13,10 @@
   "merge_commit_pr_2448": "7cdfbf615bf754fb567a161a190f05731a4160a0",
   "protocol_commit": "5d726412b86d76eee4cad8968565def4045d552f",
   "records_commit": "334d3c78acd558e08113cd3d98ab8f8208a0dafc",
-  "head_at_certification": "5190fd62d4a510df31c6b632b546b25dd797dc9a",
+  "head_at_certification": "2f8676a7ce7cc6eee5afd3b1553a49d61ded874a",
   "research_dir": "research/ic_aimed_gather_20261023",
-  "followup_dir": "research/ic_aimed_gather_20261023/aa2_20261029"
+  "followup_dir": "research/ic_aimed_gather_20261023/aa2_20261029",
+  "correction_commit": "7a1b8112e6d74be57aee854f24d9c14ed490b9fd"
  },
  "raw_data": [
   {
@@ -827,18 +828,494 @@
    "repo_path": "docs/curves/registry.json",
    "sha256": "53fe929b9b971fa2c74ee29fcd5cea7fca969d411ae28e8cbf413c9550f3032e",
    "role": "curve registry: modulus, #E, trace, r, cofactor, G"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "sha256": "b2f6bdfa5e88a61e7cd7c24d232d2041678a7fe08c0d4d6348edfb53a18d8b8d",
+   "role": "corrected intervals under test (claims; recomputed independently)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/correct_bootstrap.sh",
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/correct_bootstrap.sh",
+   "sha256": "f2e337bc0e92636e5a71f9576ea23b88f38e376a67ec9e26e48bd61f8ac0ddb4",
+   "role": "the correction's reduction script (read, not executed)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+   "sha256": "663ad5034325af36c1f80062d5340b80611deddc0c811c7a5c4fd7cc773831c8",
+   "role": "the correction's statement (claims reviewed)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r1.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r1.json",
+   "sha256": "6baa26bcdf10226a7b70ef9a2597b45263df878920db9f4d9757797aa6d0e654",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r2.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r2.json",
+   "sha256": "638f2ce60b6a8d4cd594a5fd12b11991c0fb09555ef9aeeee46ce086e2d56f0e",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r3.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r3.json",
+   "sha256": "5785e0476dd688bedd349c9f4ca94a8d449985104f12ef3fef0e56fd9fad0422",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r4.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r4.json",
+   "sha256": "ddbda53a571af0096d336e2aac91e0b5b18344ad6f09e21c098e046d3eb3b7c9",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r5.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r5.json",
+   "sha256": "82b80f41fc15165745968c859d4bdbaf15fcc85c0710ff0011f32ea0b8111ee9",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r6.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r6.json",
+   "sha256": "9be90d5d6154a1e5cf5a841fe0033541da0bd1cee17ff5cb97293e9424ecd04d",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r7.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r7.json",
+   "sha256": "1b954a08de748aa16f46036bec024864ca7ca3bd9dfc568c956bf8a9aa4080dd",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r8.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r8.json",
+   "sha256": "823532c40c1566b62acc45e70e033deac55cf4e608965e13f0eb5b29a862d2e9",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r9.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r9.json",
+   "sha256": "fe5e85ab056c44fbc4f96baff75b6f111234a421579e5042cd3e465dbc9c7e68",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/baseline-r10.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/baseline-r10.json",
+   "sha256": "85e15b5d2be16c478c7eb300f7456d37a8066d65508f37a27e4aa1124bf04493",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r1.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r1.json",
+   "sha256": "99c9ae3dc88d2ffa11b72a1243a87050550232cbfd53783a9923818d1888125a",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r2.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r2.json",
+   "sha256": "fb1ae94ab049401a009c869361a31f8ef12387f2ce68b4b3ac642cd4a94df05c",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r3.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r3.json",
+   "sha256": "31b8340f6b3ba84fb10a47107d8999ab76472141295d556870130bf858af3b44",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r4.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r4.json",
+   "sha256": "31f92a79bc962f95e4f21c95b39635225b8c7a81991829c3c32948728256e5ee",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r5.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r5.json",
+   "sha256": "97913e0fb1b7f59a6c4f0418df8bebc6a113cc1d9d7c4f6238835a9ef2c74f83",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r6.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r6.json",
+   "sha256": "2adb94ca4ebdf7f7c423e5556b46a06f951f624b892707044efc8df773313dcf",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r7.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r7.json",
+   "sha256": "fd7e5ad9289fdb3b80a4aa183f2cc8dba9826c400dcdefd717807361309376bf",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r8.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r8.json",
+   "sha256": "95a8431a8fb31004837ce16e2f35b1b0648e7da67af62632a4085741b5513cc2",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r9.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r9.json",
+   "sha256": "2a8207c80f42b55ad46d594cb3b19b80f78feedc65eff2f76538a10c0f3eafd7",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r10.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r10.json",
+   "sha256": "cd7528e5784f561aad97d8eb21957592e5a26ab0d05d005a26741d6df7691737",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r11.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r11.json",
+   "sha256": "5a34d86cd66f91665491c350dab39c4fc2f400a6cdf7b3917b584bd49c7ec4de",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r12.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r12.json",
+   "sha256": "7541e2dfd41ec43674aee0d4b4938b2aa8be0765e89e46fc08f01129f05cb65f",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r13.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r13.json",
+   "sha256": "052695d28505ae85c1228b1cb2ce6dbe23dba46c46e4682585218e29cf598a68",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r14.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r14.json",
+   "sha256": "f3a308aff3f713c044cb61ae0a452b23392c00b847bb7dc7c94909f1dcef4e1d",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r15.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r15.json",
+   "sha256": "d424726cc09d2cc21ea7b0f8cc2dd6d98e78891d442ea960fbd9848e53c2e079",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r16.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r16.json",
+   "sha256": "9115db2ad3b6838206409e0a4eaaa40a444eba40a09f20509da1a0b69c86c781",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r17.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r17.json",
+   "sha256": "9b3ab3a98f5d47235f441f19e54532e4db15541b22dd8b06771ee2924862c58b",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r18.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r18.json",
+   "sha256": "a7dd1d8bb35228ee2e6faaea4e827adc1e3db5ded641e02f681a9ff29a4b8851",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r19.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r19.json",
+   "sha256": "71299002bb1dd3d9cfb38ecc00dd4655a30753009d910d4f828cff3233b9ad2c",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r20.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r20.json",
+   "sha256": "24acc429a17294bfb413d0e461ec314dea46bb9bd866a9582094723cbe035c4e",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r21.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r21.json",
+   "sha256": "2fb69d1d12a4feb8869afbeeec3eb5cbb949c2126a0f8246f05a47b606238058",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r22.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r22.json",
+   "sha256": "7107f172c500ce346370f03e33efa77d73f8a053d64caefdc0ad11ef4e45aa75",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r23.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r23.json",
+   "sha256": "eb094476e73d7f9e6f2b6f4d20789408a7c65f47f250a48a55b03750a409009f",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r24.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r24.json",
+   "sha256": "b99d9f7aae7ab5befd72c41f90cf0d62b0a720fabb0d1c4b721d1d78f7218204",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r25.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r25.json",
+   "sha256": "5e004d5b1a4028b45dc5826749233d8bf270df7e344703fc43abfeb4e8ce2608",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r26.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r26.json",
+   "sha256": "0b3fc2656d20a004a8d50b57a56c714f259a3c076163c9b740f0c1cc97e48337",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r27.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r27.json",
+   "sha256": "3eff99ca9edb3d32451fef6f988f03d406ba29745f8d436b29fa028e251f827c",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r28.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r28.json",
+   "sha256": "c6d523b263e81df9e6ef6c6a1ba694ba93db73f453a43e2e5fb031a0bbaf0265",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r29.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r29.json",
+   "sha256": "623ed97ffd6fff28384e613bb39960801b92d4c38b7dc6b9be04dfe5026172cc",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/baseline-r30.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/baseline-r30.json",
+   "sha256": "883905c25563207360b19635168b67c959583b513d19767930bde270b5c3b346",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r1.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r1.json",
+   "sha256": "93052b3bb66a224882347df76ebe24bb91cc79714bf5ee74e1e097decda59d60",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r2.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r2.json",
+   "sha256": "1824cf9b951a641577d68558345fabc8e2a100c6a7c7a05b115d32b33ac3a8dc",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r3.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r3.json",
+   "sha256": "85f61826a79428f8e30024d24a70b634740cf5c6d4afc411a79734ffdcba5c83",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r4.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r4.json",
+   "sha256": "e8c707fe6c96af6bd96d4555af9a6f1047240fa9192353d0db94bbba9fe1ff07",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r5.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r5.json",
+   "sha256": "53bc0cc822b7cebf944862151de3b339e8c98eaebec014acbfc95ca3975bee9a",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r6.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r6.json",
+   "sha256": "99c8f3d01d6895d3c9854cee4106510ea16ca585ca08bf197517616d6076bc8e",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r7.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r7.json",
+   "sha256": "8b0a3eee0e2d3527750b97546b8e62ed244af4beaf5833de9ad6fe4bedd9edce",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r8.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r8.json",
+   "sha256": "abca6399a5a67d2a294faedfcbd6866b2b5ba5b323d7987b5b2e7ce54e14d5a4",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r9.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r9.json",
+   "sha256": "a3140ad32d8e5814c8bafb445709f22c5bf18a2877a3cda04151c354c3443d63",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r10.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r10.json",
+   "sha256": "ae9e18f712760f46bab70fb8b98d8eac90563f2faf630cadbc2e7871f471e8d2",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r11.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r11.json",
+   "sha256": "cfa4878cdcf6b8a7dee09c903254321a5a92d988dc2c9b6986bb1550463ad760",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r12.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r12.json",
+   "sha256": "e17cf8671769b41033e81f9297fa6fbc909d9c4af16907fcf09609d1db07ea38",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r13.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r13.json",
+   "sha256": "cf37b20234992cf99e17b5aea338316ac70a9eb3fc9e6be925845a9967ce2d96",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r14.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r14.json",
+   "sha256": "fcea74d5aa871fcca0546c2a6d003068ca8e171320db624d4661ce5a40116e13",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r15.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r15.json",
+   "sha256": "eed618b2bac358a35f8abc1e31e272a7798003b3cd314da6cec1c1b594e541fb",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r16.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r16.json",
+   "sha256": "c95a652a08c6e2855c9d93f8ec9784592975b71da9618bbf65a51a7508c32fb9",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r17.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r17.json",
+   "sha256": "3eb321988ffca40e72339a8ab0c641453f7987fb3dfea545cf4dc0d28f5a70ec",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r18.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r18.json",
+   "sha256": "a2e152e06d0e4bce3787b579b542def0d18d93d201e78855e08977fc42517e89",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r19.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r19.json",
+   "sha256": "3f4098ab640de4f59d877c4f7f5ce1e5f10ab5a3efe975f6771f49db3d5ecf12",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r20.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r20.json",
+   "sha256": "2212f5a291e42f3d1508d1c30f7f90fa6e8a9e5157ed360946d25c733b013e08",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r21.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r21.json",
+   "sha256": "b9c075000a213d1d1100c471662663deadbb482092bf1d969b953c573e70a629",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r22.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r22.json",
+   "sha256": "4f87e11550bdc4911a7672e55426a6f225c81eb49ebed8ca12d0dd5580ca69c0",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r23.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r23.json",
+   "sha256": "5d2823f7f783064f153b306d0dadb7a974848650221ce57eead38a2ea41ac276",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r24.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r24.json",
+   "sha256": "da13d5c5fdcf271a04bb9c7cf25d82aeb3bf20738a3c13062b329948bd143100",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r25.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r25.json",
+   "sha256": "a83f32c994dad4b5777aa9f5056baef7136e743519678d57560a84180972b79b",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r26.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r26.json",
+   "sha256": "bd217aa6be40a8890813e47c16785d088dde18ef8b4fba4fee94ffcdf5726172",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r27.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r27.json",
+   "sha256": "e76568894310949b8f059fa0a24f86fb4e6ad8b763e001565cc19130b8dad0b1",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r28.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r28.json",
+   "sha256": "c176820f861fa9fc9226253ea8722e966b8615250e019fc601af433ddaffcba7",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r29.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r29.json",
+   "sha256": "7fa41e46a075171782cd6e6eae058e8841cf21d9dca269731371fac5427898e1",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/candidate-r30.json",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/candidate-r30.json",
+   "sha256": "31833b952a6540aeee18efdea9ef35498723bcd3756dc675e6b9cb0468163258",
+   "role": "first session (2026-10-23) ic price --json output (one process)"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/aa/isolation.jsonl",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/aa/isolation.jsonl",
+   "sha256": "547859d8b702b3616954926be6318f24e73d3b17cfd085e42fc818af1454c6f3",
+   "role": "first session isolated_bench records, A/A"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/ab/isolation.jsonl",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/ab/isolation.jsonl",
+   "sha256": "00358cbce428c108b61c536e77aed5e859d87292d71a2d4914c5797ac5dc177a",
+   "role": "first session isolated_bench records, A/B"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/runs/time/refusals.count",
+   "repo_path": "research/ic_aimed_gather_20261023/runs/time/refusals.count",
+   "sha256": "a2c6c14110a317833ac8f2fbae7080ee844af7469b2aa702876548dcf4c58077",
+   "role": "first session refusal count"
   }
  ],
  "claims_from": [
   {
    "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
    "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
-   "sha256": "4be9dd4755ad6bb2024e85505b89b5000851707ef69746deaec4631729c740ee"
+   "sha256": "4be9dd4755ad6bb2024e85505b89b5000851707ef69746deaec4631729c740ee",
+   "note": "as-run claims, 2026-10-29 (unchanged since f072a62bb)"
   },
   {
    "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/README.md",
    "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/README.md",
-   "sha256": "081499dfe93836c7e745f5b0cad7f40678c302ed79291dd9106020c867354669"
+   "sha256": "801b675b1a60a294af6828bd6a1628762b4da5ded450a17c41b5c365da91d89f",
+   "note": "corrected in 7a1b8112e; the first pass checked the version with sha256 081499dfe93836c7e745f5b0cad7f40678c302ed79291dd9106020c867354669"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "sha256": "b2f6bdfa5e88a61e7cd7c24d232d2041678a7fe08c0d4d6348edfb53a18d8b8d",
+   "note": "corrected claims, both sessions"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+   "sha256": "663ad5034325af36c1f80062d5340b80611deddc0c811c7a5c4fd7cc773831c8",
+   "note": "corrected claims, both sessions"
+  },
+  {
+   "path": "../../research/ic_aimed_gather_20261023/summary.json",
+   "repo_path": "research/ic_aimed_gather_20261023/summary.json",
+   "sha256": "a3e06802bada65df50d0e5fc8d05fa76c37b756c5a07ba94c9fd082947c8b338",
+   "note": "as-run claims, 2026-10-23 (unchanged)"
   }
  ],
  "headline": [
@@ -1161,6 +1638,690 @@
    "rel_tol": 1e-09,
    "method": "median over the 42 'c' processes of the per-process median total time, /1e6 (README quotes 230.3/235.2/212.5 ms collect)",
    "rel_diff": 0.0
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.median",
+   "claimed": 1.1113287936761795,
+   "recomputed": 1.1113287936761795,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.n",
+   "claimed": 30,
+   "recomputed": 30,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.above_one",
+   "claimed": 28,
+   "recomputed": 28,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.ci95.lo",
+   "claimed": 1.0820591396318928,
+   "recomputed": 1.0820591396318928,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.ci95.hi",
+   "claimed": 1.1465597428375427,
+   "recomputed": 1.1465597428375427,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.ci95_as_run.lo",
+   "claimed": 1.0647831016579432,
+   "recomputed": 1.0647831016579432,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.ci95_as_run.hi",
+   "claimed": 1.1603953138001177,
+   "recomputed": 1.1603953138001177,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_collect.as_run_odd_round_share",
+   "claimed": 0.9957666666666667,
+   "recomputed": 0.9957666666666667,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.median",
+   "claimed": 0.9976659804558075,
+   "recomputed": 0.9976659804558075,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.n",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.above_one",
+   "claimed": 2,
+   "recomputed": 2,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.ci95.lo",
+   "claimed": 0.9444588298520109,
+   "recomputed": 0.9444588298520109,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.ci95.hi",
+   "claimed": 1.0873582038536536,
+   "recomputed": 1.0873582038536536,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.ci95_as_run.lo",
+   "claimed": 0.9444588298520109,
+   "recomputed": 0.9444588298520109,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.ci95_as_run.hi",
+   "claimed": 1.0873582038536536,
+   "recomputed": 1.0873582038536536,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_collect.as_run_odd_round_share",
+   "claimed": 0.604,
+   "recomputed": 0.604,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.median",
+   "claimed": 1.0372200949688133,
+   "recomputed": 1.0372200949688133,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.n",
+   "claimed": 30,
+   "recomputed": 30,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.above_one",
+   "claimed": 26,
+   "recomputed": 26,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.ci95.lo",
+   "claimed": 1.0179062487910673,
+   "recomputed": 1.0179062487910673,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.ci95.hi",
+   "claimed": 1.0797665853623717,
+   "recomputed": 1.0797665853623717,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.ci95_as_run.lo",
+   "claimed": 1.0179062487910673,
+   "recomputed": 1.0179062487910673,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.ci95_as_run.hi",
+   "claimed": 1.0684941771115628,
+   "recomputed": 1.0684941771115628,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.ab_total.as_run_odd_round_share",
+   "claimed": 0.9957666666666667,
+   "recomputed": 0.9957666666666667,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.median",
+   "claimed": 0.9927136917805259,
+   "recomputed": 0.9927136917805259,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.n",
+   "claimed": 5,
+   "recomputed": 5,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.above_one",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.ci95.lo",
+   "claimed": 0.9525616744947626,
+   "recomputed": 0.9525616744947626,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.ci95.hi",
+   "claimed": 1.1209627232568113,
+   "recomputed": 1.1209627232568113,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.ci95_as_run.lo",
+   "claimed": 0.9525616744947626,
+   "recomputed": 0.9525616744947626,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.ci95_as_run.hi",
+   "claimed": 1.1209627232568113,
+   "recomputed": 1.1209627232568113,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-23.aa_total.as_run_odd_round_share",
+   "claimed": 0.604,
+   "recomputed": 0.604,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-23.established_collect",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-23.established_total",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-23.established_collect_as_run",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-23.established_total_as_run",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-23.margin_collect",
+   "claimed": -0.005299064221760741,
+   "recomputed": -0.005299064221760741,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi"
+  },
+  {
+   "name": "corrected.2026-10-23.margin_total",
+   "claimed": -0.10305647446574406,
+   "recomputed": -0.10305647446574406,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.median",
+   "claimed": 1.0930878076239279,
+   "recomputed": 1.0930878076239279,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.n",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.above_one",
+   "claimed": 38,
+   "recomputed": 38,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.ci95.lo",
+   "claimed": 1.0677202965483465,
+   "recomputed": 1.0677202965483465,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.ci95.hi",
+   "claimed": 1.1358003284871343,
+   "recomputed": 1.1358003284871343,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.ci95_as_run.lo",
+   "claimed": 1.08982882862411,
+   "recomputed": 1.08982882862411,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.ci95_as_run.hi",
+   "claimed": 1.159729344106197,
+   "recomputed": 1.159729344106197,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_collect.as_run_odd_round_share",
+   "claimed": 0.9958571428571429,
+   "recomputed": 0.9958571428571429,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.median",
+   "claimed": 0.9994237085117715,
+   "recomputed": 0.9994237085117715,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.n",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.above_one",
+   "claimed": 20,
+   "recomputed": 20,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.ci95.lo",
+   "claimed": 0.9768797674101188,
+   "recomputed": 0.9768797674101188,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.ci95.hi",
+   "claimed": 1.0254125781305254,
+   "recomputed": 1.0254125781305254,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.ci95_as_run.lo",
+   "claimed": 0.977119451944687,
+   "recomputed": 0.977119451944687,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.ci95_as_run.hi",
+   "claimed": 1.029653172613389,
+   "recomputed": 1.029653172613389,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_collect.as_run_odd_round_share",
+   "claimed": 0.9958571428571429,
+   "recomputed": 0.9958571428571429,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.median",
+   "claimed": 1.0416402202042518,
+   "recomputed": 1.0416402202042518,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.n",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.above_one",
+   "claimed": 29,
+   "recomputed": 29,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.ci95.lo",
+   "claimed": 1.0203546825625656,
+   "recomputed": 1.0203546825625656,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.ci95.hi",
+   "claimed": 1.0824004507031781,
+   "recomputed": 1.0824004507031781,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.ci95_as_run.lo",
+   "claimed": 1.0205226011426607,
+   "recomputed": 1.0205226011426607,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.ci95_as_run.hi",
+   "claimed": 1.1158916983778722,
+   "recomputed": 1.1158916983778722,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.ab_total.as_run_odd_round_share",
+   "claimed": 0.9958571428571429,
+   "recomputed": 0.9958571428571429,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.median",
+   "claimed": 0.9845863968143238,
+   "recomputed": 0.9845863968143238,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.n",
+   "claimed": 42,
+   "recomputed": 42,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.above_one",
+   "claimed": 20,
+   "recomputed": 20,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "per-round ratios from the raw records"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.ci95.lo",
+   "claimed": 0.945934974308728,
+   "recomputed": 0.945934974308728,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.ci95.hi",
+   "claimed": 1.0156315954002633,
+   "recomputed": 1.0156315954002633,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected generator: exact integer LCG s <- (1103515245 s + 12345) mod 2^31 (Python integers)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.ci95_as_run.lo",
+   "claimed": 0.9409078755594028,
+   "recomputed": 0.9409078755594028,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.ci95_as_run.hi",
+   "claimed": 1.0354154980568127,
+   "recomputed": 1.0354154980568127,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "as-run generator: the LCG step as jq executed it (IEEE-754 double product and sum, truncation, mod 2^31)"
+  },
+  {
+   "name": "corrected.2026-10-29.aa_total.as_run_odd_round_share",
+   "claimed": 0.9958571428571429,
+   "recomputed": 0.9958571428571429,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "share of the 2000n as-run draws whose index is even (an odd-numbered round)"
+  },
+  {
+   "name": "corrected.2026-10-29.established_collect",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-29.established_total",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-29.established_collect_as_run",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-29.established_total_as_run",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "1 = A/B lo > 1 and A/B lo > A/A hi (corrected, or as run for *_as_run)"
+  },
+  {
+   "name": "corrected.2026-10-29.margin_collect",
+   "claimed": 0.042307718417821105,
+   "recomputed": 0.042307718417821105,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi"
+  },
+  {
+   "name": "corrected.2026-10-29.margin_total",
+   "claimed": 0.004723087162302297,
+   "recomputed": 0.004723087162302297,
+   "rel_tol": 1e-09,
+   "rel_diff": 0.0,
+   "claimed_in": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "method": "corrected A/B ci95.lo minus corrected A/A ci95.hi"
   }
  ],
  "controls": [
@@ -1282,6 +2443,49 @@
    "expected": 71,
    "observed": 71,
    "ok": true
+  },
+  {
+   "name": "first_session_contended_or_failed",
+   "expected": 0,
+   "observed": 0,
+   "ok": true,
+   "detail": "70 isolation records in runs/time/{aa,ab}"
+  },
+  {
+   "name": "first_session_identity",
+   "expected": "complete, true, [518509155375]",
+   "observed": [
+    "[\"complete\", true, [\"518509155375\"]]"
+   ],
+   "ok": true,
+   "detail": "all 70 first-session run files"
+  },
+  {
+   "name": "summary_corrected_all_leaves_bitwise",
+   "expected": 76,
+   "observed": 76,
+   "ok": true
+  },
+  {
+   "name": "first_session_summary_json_as_run_bitwise",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "../summary.json native medians, ci95, n and above_one equal this recompute's as-run values"
+  },
+  {
+   "name": "benchmarks_renders_equal_study_report",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "report.pdf, per-round-collect.{svg,png}, sessions-intervals.{svg,png} byte-identical to aa2_20261029/report/"
+  },
+  {
+   "name": "records_unchanged_since_first_pass",
+   "expected": true,
+   "observed": true,
+   "ok": true,
+   "detail": "git diff --quiet f072a62bb HEAD over both sessions' runs/, summary.json, summarise.sh and PROTOCOL.md"
   }
  ],
  "sensitivity": {
@@ -1458,6 +2662,55 @@
      1.0797665853623717
     ]
    }
+  },
+  "exact_lcg_parity_stratification": {
+   "even_index_draws_per_resample": {
+    "n42": "exactly 21 in all 2000 resamples",
+    "n30": "exactly 15 in all 2000 resamples"
+   },
+   "why": "mod 2^31 with odd increment and odd multiplier, the LCG's lowest bit alternates, so s mod n (n even) alternates parity",
+   "iid_reference_bounds_vs_corrected": {
+    "ab_collect": {
+     "corrected": [
+      1.0677202965483465,
+      1.1358003284871343
+     ],
+     "iid_mt_400k": [
+      1.0677202965483465,
+      1.136470650831469
+     ]
+    },
+    "aa_collect": {
+     "corrected": [
+      0.9768797674101188,
+      1.0254125781305254
+     ],
+     "iid_mt_400k": [
+      0.9768797674101188,
+      1.0254125781305254
+     ]
+    },
+    "ab_total": {
+     "corrected": [
+      1.0203546825625656,
+      1.0824004507031781
+     ],
+     "iid_mt_400k": [
+      1.0203546825625656,
+      1.0824004507031781
+     ]
+    },
+    "aa_total": {
+     "corrected": [
+      0.945934974308728,
+      1.0156315954002633
+     ],
+     "iid_mt_400k": [
+      0.945934974308728,
+      1.014948939884482
+     ]
+    }
+   }
   }
  },
  "findings": [
@@ -1473,13 +2726,108 @@
   "F10 (timeline and schedule). PROTOCOL.md, run.sh and arms.sha256 were committed at 14:25:49 UTC (5d726412b). The first process started at 14:26:31 UTC, and none of those files changed afterwards. summarise.sh was committed at 14:28:46 UTC (57b9de782), after the first process and before the last (15:00:07). It implements what PROTOCOL.md declared, so this is an ordering note only. All 126 processes started in the declared order: rounds 1 to 42, each in permutation (r-1) mod 6. Every isolation record's command names the declared binary for its label, RAYON_NUM_THREADS=1, the declared params path and its own --out file.",
   "F11 (independence disclosure). This validator is a subagent launched from the Claude Code session whose URL appears in the trailers of the change commit (6bc18857b) and of every aa2 commit. It wrote its own reduction in Python, did not execute summarise.sh, and imports no repository code. It read the study's files, the params, the registry and the hash-to-curve definition in src/bin/ic/workflow.rs, which it re-implemented with its own BLAKE3, and it did not see the producer's transcript. The independence is in code and context, not organisational; a validator from another session would be stronger.",
   "F12 (claim class). The change is correctly classed as engineering. It moves no counted cost: S and every IC row's gap to the matched rho are unchanged, and the board's rule v7 row for this curve is not re-priced. The established effect is about 8.5% less collect-phase time (1/1.093) on one host. The gate's matched-rho reference with the §5a band, required in VALIDATION.json, is outside this report.",
-  "F13 (HEAD moved during validation). The worktree was at f072a62bb when validation began and is at 5190fd62d4 now (5190fd62d: leaderboard files and scripts/build_ic_leaderboard.py only). research/ic_aimed_gather_20261023 is byte-identical between the two commits (git diff --quiet), so the validated snapshot is the committed study at either commit."
+  "F13 (HEAD moved during validation). The worktree was at f072a62bb when validation began and is at 5190fd62d4 now (5190fd62d: leaderboard files and scripts/build_ic_leaderboard.py only). research/ic_aimed_gather_20261023 is byte-identical between the two commits (git diff --quiet), so the validated snapshot is the committed study at either commit.",
+  "F14 (the rendered board is stale). scripts/build_ic_leaderboard.py was changed in 7a1b8112e, but docs/ic/LEADERBOARD.md, docs/ic-leaderboard.html and docs/ic/leaderboard.json were not regenerated. As committed, they show the as-run intervals under the label 'median [95% bootstrap]', and the verdict 'not established' for the whole set-up without the 'marginal' marking. They also show the section as not validated, so no validated display of the wrong intervals exists. Regenerating them is needed before or with VALIDATION.json; the builder derives the standing from that file in any case.",
+  "F15 (the first session's publications are not annotated). research/ic_aimed_gather_20261023/README.md and report/report.typ (and its PDF) still give the as-run 30-round intervals as the result: collect [1.065, 1.160], whole set-up [1.018, 1.068], and '1.065 against 1.087'. The verdict does not change (corrected collect lower end 1.082 < A/A upper end 1.087, margin -0.005), but those intervals are wrong in the same way. A one-line pointer to aa2_20261029/CORRECTION.md would close it. The first session's records and summary.json should stay as they are.",
+  "F16 (what the corrected generator is). Modulo 2^31, the LCG's lowest bit alternates. With n even, every resample of n consecutive draws therefore contains exactly n/2 odd-numbered and n/2 even-numbered rounds: 21/21 in all 2000 resamples at n = 42, and 15/15 at n = 30. The corrected interval is thus a parity-stratified percentile bootstrap, not an iid one. In aa2 the parity strata are the two halves of the schedule. Against an iid Mersenne-Twister reference (400,000 resamples), each bound moves by at most 0.0007 (collect A/B hi 1.1358 vs 1.1365; whole set-up A/A hi 1.0156 vs 1.0149) and no verdict changes. Labelling the corrected intervals '95% bootstrap' is accurate to that precision; this is a note, not a defect.",
+  "F17 (correct_bootstrap.sh does not re-apply the drop rule). It takes every round as kept instead of dropping rounds with a contended or failed process, as PROTOCOL.md and ../PROTOCOL.md require. This is harmless here: 0 of 126 (aa2) and 0 of 70 (first session) isolation records are contended or nonzero-exit. It would matter only if the script were reused.",
+  "F18 (leaderboard text, minor). The section text in both renderers says 'Every arm counts the same operations and recovers the same logarithm'; adding 'on the measured params' would match the corrected README. The verdict logic itself is right: 'established' only when both generators agree, 'marginal (+m), not claimed' when only the corrected one does, otherwise 'not established'.",
+  "F19 (wording checked and accurate). Checked against the recompute and accurate: CORRECTION.md ('confirmed before any result was shown as validated'; the board showed the section as not validated); 'Medians, counts, identity and isolation figures are unaffected: only the intervals are' (and the established flags that follow from them); README 'clears the A/A's 1.016 by 0.005' (+0.0047, rounded); report.typ 'an independent replay matched every non-timing field in both arms'. Also accurate: the 'not claimed' framing of the whole set-up in all three documents."
  ],
  "limitations": [
   "No rebuild of the binaries from d34b9b390 and 6bc18857b (disk and CPU limits); provenance as in F8.",
   "No timing replication: the replays are sequential and unisolated, and their times are informational only.",
   "The matched rho reference and the §5a band required by VALIDATION.json are not assessed here.",
-  "The scalar check depends on the registry's G and modulus and on the target derivation documented in src/bin/ic/workflow.rs (re-implemented, not imported); the derived Q equals the independently recorded Q."
+  "The scalar check depends on the registry's G and modulus and on the target derivation documented in src/bin/ic/workflow.rs (re-implemented, not imported); the derived Q equals the independently recorded Q.",
+  "correct_bootstrap.sh and the leaderboard builder were read, not executed; the builder's renders were not regenerated here (writing them is outside this task's write scope)."
  ],
- "verdict": "pass: all 34 headline numbers recompute exactly from the 126 raw records under summarise.sh's bootstrap as executed, the counters replay identically and d = 518509155375 satisfies d*G = Q. But that bootstrap resamples only the 21 odd rounds (F1), so the stated intervals are not 95% intervals over 42 rounds. The collect-phase 'established' survives a correct bootstrap; the whole-set-up 'not established' does not (F3)."
+ "verdict": "pass (second pass): all 110 headline numbers recompute exactly. These are the as-run summary.json values and both sessions' corrected intervals, margins and flags in summary-corrected.json. The collect-phase speed-up (median 1.093, corrected 95% [1.068, 1.136] against A/A upper end 1.025) is established. The whole set-up (+0.005) is correctly reported as marginal and not claimed. Regenerate the stale board renders before display (F14), and annotate the first session's README and report (F15).",
+ "publications_reviewed": [
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/README.md",
+   "sha256": "801b675b1a60a294af6828bd6a1628762b4da5ded450a17c41b5c365da91d89f"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md",
+   "sha256": "663ad5034325af36c1f80062d5340b80611deddc0c811c7a5c4fd7cc773831c8"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.typ",
+   "sha256": "860a8348e51c8c30b15d9f3fa8d20eb28182c537f0a86f7f40fb0e68f659aceb"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+   "sha256": "08f7051029ad0f79ed0e60d47512d776de5ff97d3c3327baeb627c422399f7bb"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/plots.py",
+   "sha256": "5efcc41107cc5238346c6ba8807e75908d0581c0c66f17a0a8197fdb1c532739"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/per-round-collect.svg",
+   "sha256": "ce9b243294c857a946f880005335deda7f47c76a0d94e88cb334babbfe2e3e19"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/aa2_20261029/report/sessions-intervals.svg",
+   "sha256": "d689404fae54253424414afe4d0c6b318e8de014adef38cfcbeb6660a9268f22"
+  },
+  {
+   "repo_path": "scripts/build_ic_leaderboard.py",
+   "sha256": "f61425e065fd34a0d0fba68f6d372f4c864c5f53d8dfd8d87d464dc2771a936f"
+  },
+  {
+   "repo_path": "docs/ic/LEADERBOARD.md",
+   "sha256": "d96dcbea582803127e87594332cba39f6196f4b0182c204d1b7b3da242a12afa"
+  },
+  {
+   "repo_path": "docs/ic-leaderboard.html",
+   "sha256": "593ee34e260251ffbd195e3a3febcbfb8a17c0881dfc725bcbed98aa12cbf1f3"
+  },
+  {
+   "repo_path": "docs/ic/leaderboard.json",
+   "sha256": "097a5e33ec7ffd2ee5289cb8d657355eb5641b19e59dd37732150436c0499d1e"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/README.md",
+   "sha256": "45a424a3e2274ce1548c6d6ba1cac723c4480a348c3422feae0645b11dab14f6"
+  },
+  {
+   "repo_path": "research/ic_aimed_gather_20261023/report/report.typ",
+   "sha256": "75e78786cb145a7c5564802db3ddbec78e8c46be83296f3497a350c4afc50511"
+  },
+  {
+   "repo_path": "benchmarks/20261029-ic-aimed-gather/report.pdf",
+   "sha256": "08f7051029ad0f79ed0e60d47512d776de5ff97d3c3327baeb627c422399f7bb"
+  },
+  {
+   "repo_path": "benchmarks/20261029-ic-aimed-gather/per-round-collect.svg",
+   "sha256": "ce9b243294c857a946f880005335deda7f47c76a0d94e88cb334babbfe2e3e19"
+  },
+  {
+   "repo_path": "benchmarks/20261029-ic-aimed-gather/sessions-intervals.svg",
+   "sha256": "d689404fae54253424414afe4d0c6b318e8de014adef38cfcbeb6660a9268f22"
+  }
+ ],
+ "revision": {
+  "pass": 2,
+  "date": "2026-10-29",
+  "first_pass_sha256": "0235bced1913a180df8cc1cd46c1f951861d9502e348b501e9b38b80f3aa29db",
+  "first_pass_committed_in": "2f8676a7ce7cc6eee5afd3b1553a49d61ded874a",
+  "reason": "re-validation after the correction commit 7a1b8112e (summary-corrected.json, CORRECTION.md, corrected README, report and leaderboard builder)"
+ },
+ "findings_reassessment_after_7a1b8112e": [
+  "F1 resolved. The generator defect is stated correctly in CORRECTION.md, the aa2 report and the commit message, including the 99.6% odd-round share (0.99577 and 0.99586 recomputed) and the three-of-six permutations. The as-run summaries stay as records, which is right.",
+  "F2 resolved. The corrected intervals for both sessions equal the validator's exact-integer recompute bit for bit (76 of 76 values), and each bound lies within 0.0007 of an iid Mersenne-Twister reference. Every rounded figure in the CORRECTION.md table, the README, report.typ and report.pdf matches.",
+  "F3 resolved, and the handling is accurate. The collect phase is claimed as established: margin +0.042 under the corrected generator, also established as run, and in 500 of 500 iid seeds. The whole set-up is 'marginal (+0.005), not claimed'. That is right: the margin is +0.0047 under the corrected generator and +0.0054 under the iid reference (98.4% of seeds), the verdict flips with the generator, and the generator was fixed after the data were seen. Nit: the CORRECTION.md table cell 'established by 0.005 (not established)' reads as a whole-set-up verdict of 'established'. 'rule met by 0.005 only after the fix; not claimed' would match the text below it.",
+  "F4 resolved. The wrong 'ratios cluster just above the median' explanation and the '0.06' margin are gone from the README and report.typ. CORRECTION.md gives the right cause (odd-round median 1.137, even-round median 1.072).",
+  "F5 partly resolved. The aa2 README, report.typ and report.pdf, the plots, the benchmarks renders (byte-identical to the report) and the leaderboard builder (aimed_gather_component reads summary-corrected.json; the Markdown and HTML renderers print 'Intervals are corrected …' and mark a corrected-only verdict 'marginal (+m), not claimed') are corrected. Not yet: (a) the rendered board files at HEAD, docs/ic/LEADERBOARD.md, docs/ic-leaderboard.html and docs/ic/leaderboard.json, still show the as-run intervals as 'median [95% bootstrap]' (collect 1.093 [1.090, 1.160]; leaderboard.json has no ci95_as_run). They predate the builder change and need regenerating (F14). (b) The first session's README.md and report (research/ic_aimed_gather_20261023/README.md and report/report.typ) still print 1.111 [1.065, 1.160] and 1.037 [1.018, 1.068] with no pointer to the correction (F15).",
+  "F6 unchanged. This is a design note, not a defect.",
+  "F7 unchanged. The route and its limits are stated in PROTOCOL.md and the README.",
+  "F8 unchanged. It remains a limitation: no rebuild.",
+  "F9 resolved in the README ('On the measured params every counted operation is identical between arms …; identity was checked here on these params only') and in report.typ. Residual nit: the leaderboard builder's section text and docstring still say 'Every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged' without the 'on the measured params' qualifier. The 'every row above is unchanged' half is true because those rows are not re-priced (F18).",
+  "F10 unchanged. The timeline note stands; correct_bootstrap.sh is a post-hoc reduction and is labelled as one.",
+  "F11 unchanged. The correction was also written in the producing session. Its numbers were re-derived here with separate code, which did not run correct_bootstrap.sh.",
+  "F12 unchanged.",
+  "F13 superseded. HEAD is now 2f8676a7ce: 7a1b8112e is the correction, 72dc8a6da the benchmarks renders, 2f8676a7c the first-pass gate files. git diff --quiet f072a62bb HEAD shows the raw records of both sessions, both summary.json files, both summarise.sh scripts and PROTOCOL.md unchanged."
+ ]
 }

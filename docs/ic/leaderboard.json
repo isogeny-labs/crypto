@@ -134,6 +134,10 @@
    "path": "research/ic_aimed_gather_20261023/summary.json",
    "sha256": "a3e06802bada65df50d0e5fc8d05fa76c37b756c5a07ba94c9fd082947c8b338"
   },
+  "aimed_gather_corrected": {
+   "path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "sha256": "b2f6bdfa5e88a61e7cd7c24d232d2041678a7fe08c0d4d6348edfb53a18d8b8d"
+  },
   "quartic_tagged_p13": {
    "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
    "sha256": "02427944511bd86f99e291309e889c76276bc14becc38c695c3c775796de2c46"
@@ -308290,31 +308294,46 @@
      "ab": {
       "median": 1.09308780762,
       "ci95": [
+       1.06772029655,
+       1.13580032849
+      ],
+      "n": 42,
+      "above_one": 38,
+      "ci95_as_run": [
        1.08982882862,
        1.15972934411
-      ],
-      "above_one": 38,
-      "n": 42
+      ]
      },
      "aa": {
       "median": 0.999423708512,
       "ci95": [
+       0.97687976741,
+       1.02541257813
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
        0.977119451945,
        1.02965317261
-      ],
-      "n": 42
+      ]
      },
-     "established": true
+     "margin": 0.0423077184178,
+     "established": true,
+     "established_as_run": true
     },
     "before": {
      "ab": {
       "median": 1.11132879368,
       "ci95": [
+       1.08205913963,
+       1.14655974284
+      ],
+      "n": 30,
+      "above_one": 28,
+      "ci95_as_run": [
        1.06478310166,
        1.1603953138
-      ],
-      "above_one": 28,
-      "n": 30
+      ]
      },
      "aa": {
       "median": 0.997665980456,
@@ -308322,9 +308341,16 @@
        0.944458829852,
        1.08735820385
       ],
-      "n": 5
+      "n": 5,
+      "above_one": 2,
+      "ci95_as_run": [
+       0.944458829852,
+       1.08735820385
+      ]
      },
-     "established": false
+     "margin": -0.00529906422176,
+     "established": false,
+     "established_as_run": false
     }
    },
    {
@@ -308333,31 +308359,46 @@
      "ab": {
       "median": 1.0416402202,
       "ci95": [
+       1.02035468256,
+       1.0824004507
+      ],
+      "n": 42,
+      "above_one": 29,
+      "ci95_as_run": [
        1.02052260114,
        1.11589169838
-      ],
-      "above_one": 29,
-      "n": 42
+      ]
      },
      "aa": {
       "median": 0.984586396814,
       "ci95": [
+       0.945934974309,
+       1.0156315954
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
        0.940907875559,
        1.03541549806
-      ],
-      "n": 42
+      ]
      },
-     "established": false
+     "margin": 0.0047230871623,
+     "established": true,
+     "established_as_run": false
     },
     "before": {
      "ab": {
       "median": 1.03722009497,
       "ci95": [
        1.01790624879,
-       1.06849417711
+       1.07976658536
       ],
+      "n": 30,
       "above_one": 26,
-      "n": 30
+      "ci95_as_run": [
+       1.01790624879,
+       1.06849417711
+      ]
      },
      "aa": {
       "median": 0.992713691781,
@@ -308365,9 +308406,16 @@
        0.952561674495,
        1.12096272326
       ],
-      "n": 5
+      "n": 5,
+      "above_one": 1,
+      "ci95_as_run": [
+       0.952561674495,
+       1.12096272326
+      ]
      },
-     "established": false
+     "margin": -0.103056474466,
+     "established": false,
+     "established_as_run": false
     }
    }
   ],
@@ -308396,8 +308444,8 @@
   "study": "research/ic_aimed_gather_20261023/",
   "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
   "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json)",
+  "validated": true
  },
  "quartic_twist_pair_component": {
   "rows": [

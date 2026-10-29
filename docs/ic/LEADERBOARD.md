@@ -322,12 +322,12 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 
 ## Aimed-subset gather in relation collection, outside tables A–C
 
-`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). Every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. 126 processes, none contended. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
+`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under the correction is marked marginal and not claimed. 126 processes, none contended. validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json). Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
 
 | metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |
 |:--|:--|--:|:--|:--|:--|:--|:--|
-| collect phase | 1.093 [1.090, 1.160] | 38 / 42 | 0.999 [0.977, 1.030] | **established** | 1.111 [1.065, 1.160] | 0.998 [0.944, 1.087] | not established |
-| whole set-up | 1.042 [1.021, 1.116] | 29 / 42 | 0.985 [0.941, 1.035] | not established | 1.037 [1.018, 1.068] | 0.993 [0.953, 1.121] | not established |
+| collect phase | 1.093 [1.068, 1.136] | 38 / 42 | 0.999 [0.977, 1.025] | **established** | 1.111 [1.082, 1.147] | 0.998 [0.944, 1.087] | not established |
+| whole set-up | 1.042 [1.020, 1.082] | 29 / 42 | 0.985 [0.946, 1.016] | marginal (+0.005), not claimed | 1.037 [1.018, 1.080] | 0.993 [0.953, 1.121] | not established |
 
 ## Quartic-twist pair index, outside tables A–C
 
@@ -740,6 +740,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_aimed_gather_20261023/aa2_20261029/summary.json` — sha256 `4be9dd4755ad6bb2…`
 - `research/ic_aimed_gather_20261023/summary.json` — sha256 `a3e06802bada65df…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json` — sha256 `b2f6bdfa5e88a61e…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`

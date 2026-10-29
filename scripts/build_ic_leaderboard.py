@@ -2584,7 +2584,7 @@ def markdown(doc: dict) -> str:
     L += ["## Aimed-subset gather in relation collection, outside tables A–C", "",
           f"`ic price` on {ag['curve']} (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the "
           "change that gathers the aimed subset's coordinates once per unit instead of on every trial "
-          "(class: engineering, #2448). Every arm counts the same operations and recovers the same logarithm, "
+          "(class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, "
           "so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the "
           f"change and is not re-priced. Callgrind instructions per process, main / candidate: "
           f"{ag['callgrind_ratio']['k0n53']:.3f} at n53, {ag['callgrind_ratio']['k0n61']:.3f} at n61. "
@@ -3411,7 +3411,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('<section class="card" id="aimed-gather-component"><h2>Aimed-subset gather in relation collection, outside the priced tables</h2>'
              f'<p><code>ic price</code> on <code>{esc(ag["curve"])}</code> (rule v3 <code>k0n53/T01</code>, aimed m = 3 '
              'collection): main against the change that gathers the aimed subset&#x27;s coordinates once per unit '
-             'instead of on every trial (class: engineering, #2448). Every arm counts the same operations and recovers '
+             'instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers '
              'the same logarithm, so S and every row above are unchanged; the rule v7 row for this curve was timed '
              f'before the change and is not re-priced. Callgrind instructions per process, main / candidate: '
              f'{ag["callgrind_ratio"]["k0n53"]:.3f} at n53, {ag["callgrind_ratio"]["k0n61"]:.3f} at n61. '
