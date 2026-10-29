@@ -55,6 +55,17 @@ jobs:
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
           python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
+      - name: Retain the hydrated frozen report for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-frozen-report-${{ github.sha }}
+          path: |
+            docs/backend-leaderboard/leaderboard.json
+            docs/backend-leaderboard/.artifacts.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
       - name: Materialize the manifest's sealed inputs
         run: |
           jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
@@ -83,6 +94,17 @@ jobs:
           mapfile -t session_dirs < <(jq -r '.sessions[].dir' docs/backend-leaderboard/manifest.json)
           mapfile -t frozen_files < <(jq -r '.files | keys[]' docs/backend-leaderboard/reproduction.lock.json)
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${session_dirs[@]}" "${frozen_files[@]}"
+      - name: Retain the verified replay fixture for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rootfind-frozen-records-${{ github.sha }}
+          path: |
+            research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/records.jsonl
+            research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/.artifacts.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.99.1'
