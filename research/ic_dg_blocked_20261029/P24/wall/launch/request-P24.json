@@ -1,0 +1,103 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "ic-dgb-p24-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "XP-20261029-dg-blocked P24 wall session: wall time per operation, prime-blocked pair table against the folded pair table at N 162",
+      "description": "Frozen protocol (backlog/XP-20261029-dg-blocked/PROTOCOL.md and APPROVAL.md): ns per GAE of ic.pipeline targets stride-renew-deferred-guard with oracle mitm-prime-blocked:m=2 (dgb) against the same with oracle mitm:negation_folded=1 (dg), same factor base prime-abscissa:size=162 (identical charged work), A/A-corrected by dg-aa, on two fresh 24-bit prime-order curves. Arm order dg, dg-aa, dgb, dgb-edge puts dgb and dg-aa at the same middle positions of the alternate order; dgb-edge (a copy of dgb; structural reference role for native A/A admission) and dg share the edge positions and give a descriptive position control. No rho arm: the matched rho is in spec-P24-rho.json. Public synthetic curves and targets; no security claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 24,
+            "seed": 202610295243
+          },
+          {
+            "kind": "prime_search",
+            "bits": 24,
+            "seed": 202610295244
+          }
+        ],
+        "targets_per_curve": 24,
+        "target_seed": 202610295246,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "dg",
+          "role": "baseline",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "dg-aa",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "dgb",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm-prime-blocked:m=2",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        },
+        {
+          "name": "dgb-edge",
+          "role": "reference",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=162",
+              "oracle": "mitm-prime-blocked:m=2",
+              "max_trials": "4243777",
+              "targets": "stride-renew-deferred-guard"
+            }
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 202610295248,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:cf0dcc8ba2f6e399f3c16aec8dda0eaccb65dd0f8b75a2f90daf2b543ffb620c",
+      "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+      "ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c"
+    }
+  },
+  "provenance": {
+    "harness": "claude-code-local",
+    "source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "workflow_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+    "run_url": "https://github.com/isogeny-labs/crypto/blob/cd04cfd2d1df985e34f59b6a19bb8354e0f9a5ae/backlog/XP-20261029-dg-blocked/PROTOCOL.md"
+  }
+}

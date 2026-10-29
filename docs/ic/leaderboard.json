@@ -308004,6 +308004,112 @@
   "validation": "validated (24 and 32 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_wall_20261029/VALIDATION.json)",
   "validated": true
  },
+ "dg_blocked_component": {
+  "rows": [
+   {
+    "bits": 28,
+    "n": 407,
+    "reading": "component speed-up (wall per GAE); counted S identical",
+    "pairs": 288,
+    "ns_dg": 73.8256049029,
+    "ns_dgb": 68.6646079964,
+    "aa_ratio": 1.0001492477,
+    "aa_ci95": [
+     0.999113326817,
+     1.00118624267
+    ],
+    "corrected": 0.929953253764,
+    "corrected_ci95": [
+     0.926605401879,
+     0.933313201534
+    ],
+    "counted": [
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 288
+     }
+    ],
+    "dg_over_rho": [
+     {
+      "ratio": 21.7888749002,
+      "ci95": [
+       20.1174581863,
+       23.6853539892
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 20.6564302088,
+      "ci95": [
+       19.0679395009,
+       22.4604366285
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 15.4808505215,
+      "ci95": [
+       14.2471443293,
+       16.8834349253
+      ],
+      "pairs": 288
+     }
+    ],
+    "dgb_over_rho": [
+     {
+      "ratio": 21.7888749002,
+      "ci95": [
+       20.1174581863,
+       23.6853539892
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 20.6564302088,
+      "ci95": [
+       19.0679395009,
+       22.4604366285
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 15.4808505215,
+      "ci95": [
+       14.2471443293,
+       16.8834349253
+      ],
+      "pairs": 288
+     }
+    ]
+   }
+  ],
+  "class": "engineering",
+  "study": "research/ic_dg_blocked_20261029/",
+  "report": "research/ic_dg_blocked_20261029/README.pdf",
+  "unit": "ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation",
+  "validation": "validated (28 bits): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_blocked_20261029/VALIDATION.json)",
+  "validated": true
+ },
  "lazy_members_component": {
   "rows": [
    {
