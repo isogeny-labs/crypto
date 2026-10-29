@@ -21,6 +21,8 @@ func+='list uCacheQ33;number uRunningQ33=1;int uIndexQ33;for(uIndexQ33=0;uIndexQ
 for line in body:
  cached=re.sub(r'\bu\^([0-9]+)\b',lambda m:'number(uCacheQ33[('+m[1]+')+1])',line)
  func+=re.sub(r'\b(u|n|l|v)\b',lambda m:rename[m[0]],cached)+'\n'
+ if line.startswith('rationalDenominator33='):
+  func+='if(rationalDenominator33==0){ERROR("QUOTIENT33_ORIGINAL_COEFFICIENT_DOMAIN");}\n'
  if line.startswith('quotientDenominators33['):
   label=line.split('=')[0];func+=f'if(number({label})==0){{ERROR("QUOTIENT33_SPECIALIZATION_DENOMINATOR");}}\n'
 func+='return(list(rationalSource33,rationalJacobian33,rationalH33,rationalDenominator33,list(quotientGenerators133,quotientGenerators233,quotientGenerators333,quotientGenerators433),quotientDenominators33));}\n'
