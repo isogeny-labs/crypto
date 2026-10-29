@@ -14,15 +14,15 @@
       ]
     },
     {
-      "id": "metadata-date-format-v3",
-      "filed": "2026-10-29",
-      "filed_before_affected_data": true,
-      "reason": "The v2 metadata-only attempt failed full JSON Schema validation because amendments.filed requires YYYY-MM-DD, not a timestamp. Preserve that failed attempt; no primary data was produced.",
       "changes": [
         "Correct the amendment filing date format and increment version to3.",
         "Preserve v2 invalid attempt at versions/protocol-v2-invalid-attempt.json.txt; raw SHA256 03749c4eba3121bed2869b2a8dde940d1ea0ff5f64a8e9a855c95b9a489be57c.",
         "Add pinned full JSON Schema validation to the preflight alongside native hash/scope checks. No algorithm, input, budget, accounting or decision change."
       ],
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "id": "metadata-date-format-v3",
+      "reason": "The v2 metadata-only attempt failed full JSON Schema validation because amendments.filed requires YYYY-MM-DD, not a timestamp. Preserve that failed attempt; no primary data was produced.",
       "supersedes_fields": [
         "amendments[0].filed"
       ]
@@ -675,11 +675,11 @@
     "track": "generic decomposition (bounded by sqrt(r); cannot beat rho)"
   },
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "commit": "f270363df37a17b30210a4671cd31c03d3c20b3a",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T23:15:13Z",
+    "protocol_sha256": "a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce",
+    "status": "frozen"
   },
   "inadmissible": [
     "Calling p^8 subset-state DP elapsed time the runtime of a selector, or memoized relation-audit elapsed time the cold relation finder.",

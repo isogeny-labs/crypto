@@ -7,10 +7,12 @@
 
 The user requested four steps: a bounded twist-guided selector, matched
 ordinary controls, an identical public original-curve relation finder, and
-paid work to independent relation rank. The contract in `protocol.json` and
-`PROTOCOL.md` was frozen at 2026-10-29 22:18:02 UTC against code `445d84bf7`,
-before primary comparison data. Root-library validation and publication are
-pending; no primary census has started.
+paid work to independent relation rank. Active protocol version3 was frozen
+at 2026-10-29T23:15:13Z, code f270363df, before primary data.
+Earlier filings and the metadata-only correction are retained; numerical
+inputs, algorithms, budgets, accounting and decisions are identical to v1.
+Development validation is recorded separately in DEVELOPMENT.md. No primary
+census had started at filing.
 
 == Declared finite scope
 

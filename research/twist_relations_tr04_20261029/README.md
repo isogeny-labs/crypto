@@ -1,14 +1,14 @@
 # TR-04 exhaustive bounded relation finding
 
-**State: protocol frozen; primary research execution not yet started.**
-The machine-readable [protocol](protocol.json) was frozen on 2026-10-29 at
-22:18:02 UTC against code commit `445d84bf7`, before primary comparison data.
-Its canonical SHA-256 is
-`bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea`.
-Development inputs and the heuristic runtime estimate are in
-[PREFLIGHT.md](PREFLIGHT.md).
-[PROTOCOL.md](PROTOCOL.md) defines the exact
-finite universe and all four requested parts.
+**State: protocol version3 frozen; primary research execution not yet started.**
+The active [protocol](protocol.json) was frozen at 2026-10-29T23:15:13Z against
+code commit `f270363df37a17b30210a4671cd31c03d3c20b3a`. Its canonical SHA-256 is
+`a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce`.
+[Earlier filings](versions/README.md) are retained: v1 is unchanged, and the
+failed v2 metadata attempt is labelled invalid. Version3 corrects informational
+wording/date metadata and adds full schema validation; the numerical experiment
+is identical to v1. See [PREFLIGHT.md](PREFLIGHT.md) for development inputs and
+planning estimates, and [PROTOCOL.md](PROTOCOL.md) for the finite contract.
 
 [Development validation](DEVELOPMENT.md) records 40 passing native tests,
 strict Clippy/formatting and the preserved incomplete root-library attempts.

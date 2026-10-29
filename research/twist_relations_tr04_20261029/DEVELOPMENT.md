@@ -9,7 +9,7 @@ is established.** This record covers development checks only.
 | Standalone native tests | 40 passed: 35 library, 2 legacy binary, 3 CLI; zero failed/ignored/filtered |
 | Strict all-target Clippy and formatting | Both exit 0 |
 | Fixed known-answer preflight and artifact-directory replay | Both exit 0; development M=3 calibration, separate from primary M=8 |
-| Frozen protocol JSON Schema and native metadata/hash | Both pass; frozen at 22:18:02 UTC, code `445d84bf7` |
+| Frozen protocol JSON Schema and native metadata/hash | Version3: both pass; code `f270363df`; earlier attempts retained |
 | Workflow | Actionlint, ShellCheck, Bash syntax, six wrapper and six checkpoint lifecycle stubs pass; actual remote transport/runner readiness unverified |
 | Partial report/export | Synthetic inputs only: one failed logical attempt, 26 absent rows, expected CLI exit 1; canonical export schema valid |
 | PDF inspection | Both pages of the draft plan and both pages of the synthetic report visually inspected; no clipping observed |
