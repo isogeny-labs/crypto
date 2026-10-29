@@ -25,3 +25,14 @@ Broader prime/FFD/LFD/elite-base goal remains active.
 ## Errors
 Expected shared-log scope conflict retained. No control failure so far. The local
 lead-atlas helper was unavailable at the expected sibling path. No novelty claim.
+
+## Production and restored verification complete
+All84 producer certificates,84 fresh replays and84 S3-restored replays passed.
+All original input hashes and point manifests unchanged. New original-top exact
+degrees m3..9:111,194,277,360,443,526,609 for all retained bases/targets.
+All raw manifest entries match before and after replay; all84 partial summaries
+retained. Full Lean algebraic proof and independent review pending. No FFD/LFD,
+affine solving-degree or elite-base gain. Protocol helper absent at root was
+replaced by the existing pinned recovery helper; unavailable checkpoint profile
+replaced by the existing config with byte-identical STS identity. Both failures
+retained before successful production. Data commit/push precedes report.

@@ -226,7 +226,7 @@
     },
     {
       "id": "binary-m3-to-m9-regularity",
-      "contains": "84 retained identities with certified intervals; all full-chain exact values remain unknown",
+      "contains": "Historical84 disjoint-component intervals preserved; later chain-exact certificates determine these degrees",
       "files": [
         {
           "kind": "summary_or_index",
@@ -301,6 +301,36 @@
           "sha256": "cd6275929f39def0f63314737fb76c5dad54380d19adcca8fbe648f34c2a10d6"
         }
       ]
+    },
+    {
+      "id": "binary-chain-exact",
+      "contains": "84 unchanged binary/Koblitz m3..9 inputs: exact original-top degrees via overlap proof; independent scientific review pending",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/chain-exact/verified-summary.json",
+          "bytes": 61009,
+          "sha256": "8a51341c1522652c74df5c9c0ac1dedc66b654777ba153c7d61fdab718174423"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "CHAIN_EXACT_FORMAT.json",
+          "bytes": 3923,
+          "sha256": "ecbf33d403d66512e6e4b79885de637c65d9bf73c08332b1c04223d5993e5140"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/chain-exact-storage.json",
+          "bytes": 834,
+          "sha256": "c9486b74eab598e25d6dd75b2dcee10d81da4ba855a70274dfef6209250203c4"
+        },
+        {
+          "kind": "proof",
+          "path": "CHAIN_EXACT_DESIGN.md",
+          "bytes": 8578,
+          "sha256": "70d1f9eadc5c50db48c0ab69877000fca3081d28c2057cd9ba8327bd3aa14924"
+        }
+      ]
     }
   ],
   "semantics": [
@@ -310,7 +340,7 @@
     "All earlier datasets and failed attempts remain; later bounds do not overwrite earlier evidence",
     "No universal FFD/LFD or elite-base conclusion; independent scientific review remains pending"
   ],
-  "latest_dataset": "binary-m3-lfd-continuation",
+  "latest_dataset": "binary-chain-exact",
   "views": [
     {
       "path": "FIXED_BASE_REGULARITY.json",
@@ -324,5 +354,22 @@
       "sha256": "b7fbd3439f15020ab94d09adb30683e4dfdf187fdacd6c6b856caf8b4a2803d8",
       "contains": "Source-joined view of the 48 original fixed-base systems; exact values, intervals and positive-dimensional quotients remain distinct"
     }
-  ]
+  ],
+  "latest_fixed_base_regularity_view": {
+    "json": "FIXED_BASE_REGULARITY_V2.json",
+    "csv": "FIXED_BASE_REGULARITY_V2.csv",
+    "prior_view_retained": "FIXED_BASE_REGULARITY.json",
+    "files": [
+      {
+        "path": "FIXED_BASE_REGULARITY_V2.json",
+        "bytes": 35809,
+        "sha256": "5d3a747d2b8d90652676b0b9a80e76fce7ab766a4864246af6c9dc1574d1f37e"
+      },
+      {
+        "path": "FIXED_BASE_REGULARITY_V2.csv",
+        "bytes": 14124,
+        "sha256": "ae52848b740f9daa93620a6f6737a628bf78ad8ec1b5dac6233924b909bbd0f2"
+      }
+    ]
+  }
 }

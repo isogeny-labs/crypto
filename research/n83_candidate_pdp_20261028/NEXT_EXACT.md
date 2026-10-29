@@ -139,3 +139,26 @@ fall witnesses. Any such extension needs a new frozen method/protocol and
 must preserve parent and suffix traces. Exact higher-m regularity, prime LFD,
 held-out matched target sampling and elite-base selection remain unresolved.
 No regularity change or factor-base quality ranking follows from closure rank.
+
+
+## 2026-10-29: overlapping binary-chain regularity certificates
+
+The unchanged84 binary/Koblitz original/baseline/spike40 m3..9 systems now have
+matching native-checked lower and written-proof upper certificates:111,194,277,
+360,443,526,609. All84 producer/fresh/S3-restored replays pass. Prior disjoint
+intervals remain preserved. See CHAIN_EXACT_DESIGN.md, CHAIN_EXACT_FORMAT.json,
+evidence/chain-exact/verified-summary.json and experiment-chain-exact.export.json.
+Full algebraic Lean formalization and independent scientific review remain open.
+
+The support-rank argument includes the terminal quadratic's possible product
+defect; it does not infer equality merely by adding a missing relation. The
+formula applies under identical independent F2-linear selector weights and
+n>=2ell,n>=ell+2, with source shapes checked. All44 small controls passed,
+including8 outside-hypothesis cases that disprove naive formula extrapolation.
+
+This closes the tested original-top intervals, not FFD/LFD or solving degree.
+The currently tested base change does not lower this invariant. Next pursue
+strict degree4 fall witnesses against the saved complete m3 V3 spaces, or a
+separately specified selector/presentation change with exact matched targets.
+Prime presentations, global LFD bounds, held-out selection and elite-base
+performance remain unresolved. Do not rerun this completed certificate panel.

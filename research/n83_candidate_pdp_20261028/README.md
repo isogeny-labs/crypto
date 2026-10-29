@@ -1,9 +1,49 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Data navigation and latest m3 continuation
+## Latest: exact original-top degrees for binary chains
 
-[DATA_INDEX.json](DATA_INDEX.json) maps all thirteen datasets to exact summary,
+All84 unchanged original/baseline/spike40 Koblitz/binary m3–9 inputs passed
+producer, fresh-process and S3-restored replay. The written overlap proof,
+with native source/hypothesis checks, closes their earlier intervals:
+
+| m | Exact original-top degree, all retained binary/Koblitz cases |
+|---:|---:|
+| 3 | 111 |
+| 4 | 194 |
+| 5 | 277 |
+| 6 | 360 |
+| 7 | 443 |
+| 8 | 526 |
+| 9 | 609 |
+
+The m2 values remain Koblitz28, binary28 and prime42. Prime m3–9 original top
+quotients remain positive-dimensional, with no finite first graded vanishing
+degree in the saved presentation. Full algebraic Lean formalization and
+independent scientific review remain pending. These exact degrees do not
+establish affine solving degree, FFD/LFD or an elite-base improvement.
+
+Use [FIXED_BASE_REGULARITY_V2.json](FIXED_BASE_REGULARITY_V2.json) or
+[the CSV](FIXED_BASE_REGULARITY_V2.csv) for all48 original fixed-base cases:
+34 exact entries and14 prime entries with no finite top vanishing degree.
+Every new entry matches the original source hash and actual point manifest.
+The [prior view](FIXED_BASE_REGULARITY.json) and every previous interval remain.
+
+Read the [native summary](evidence/chain-exact/verified-summary.json),
+[full written proof](CHAIN_EXACT_DESIGN.md), [file formats](CHAIN_EXACT_FORMAT.json),
+[partial Lean proof map](CHAIN_EXACT_PROOF_MAP.json),
+[unified export](experiment-chain-exact.export.json),
+[storage](evidence/chain-exact-storage.json) and
+[verification coverage](evidence/chain-exact-publication.json).
+The report is [run-20261029T1607Z](reports/run-20261029T1607Z/report.pdf).
+[DATA_INDEX.json](DATA_INDEX.json) now indexes fourteen datasets, including all
+actual point bases and every retained failed/capped run. The same per-curve base
+is reused across m; this phase generated no new points or targets.
+
+
+## Earlier m3 continuation data
+
+[DATA_INDEX.json](DATA_INDEX.json) maps all retained datasets to exact summary,
 format and storage hashes. The actual original points remain in
 [the fixed-base directory](../n83_fixed_factor_base_20261028/README.md).
 [BASE_BINDINGS.json](BASE_BINDINGS.json) records the unchanged factor-base
@@ -35,11 +75,11 @@ The prior [capped parent run](evidence/degree3-m3/summary.json) and its
 suffix archives are required for replay. All original points, systems,
 partial traces, failed attempts and prior reports remain preserved.
 
-## Latest m3–9 binary chain bounds
+## Historical m3–9 binary chain interval certificates
 
 All84 retained original/baseline/spike40 Koblitz/binary systems passed producer,
-fresh replay and S3-restored replay. These bounds replace the earlier binary
-intervals below; all earlier certificates remain historical evidence.
+fresh replay and S3-restored replay. These historical bounds are superseded by the exact overlap certificates above;
+all earlier certificates remain evidence.
 
 | m | New binary/Koblitz interval, all retained bases and targets |
 |---|---|

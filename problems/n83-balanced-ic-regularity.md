@@ -8,7 +8,7 @@
 
 ## Problem
 
-For the current fixed-base n83 request, m2 highest-form regularities are certified exactly, while m3..9 binary/Koblitz values remain intervals and the prime top-form presentation is positive-dimensional for m>=3. Intermediate solving degree and an elite-base improvement remain unestablished.
+For the current fixed-base n83 request, m2 highest-form regularities are certified exactly, while m3..9 binary/Koblitz values now have matching original-top certificates under the written overlap proof (full Lean algebraic formalization and independent review pending) and the prime top-form presentation is positive-dimensional for m>=3. Intermediate solving degree and an elite-base improvement remain unestablished.
 
 The current scope is all Koblitz, general binary and prime cells at m=2..9 with one fixed ell27 factor base per curve, one planted and one natural full-curve target per cell. The earlier ell=floor(83/m) sweep below remains historical evidence. Top-form regularity and affine final-basis degree are different computations; maximum intermediate solving degree is not instrumented. Retain the original requested measurements as unresolved where no finite result is certified.
 
@@ -93,3 +93,22 @@ work needs a new frozen protocol and preserved parent/suffix data. A global
 upper certificate is still a separate obligation. Neither the equal m2
 regularities nor the higher-m bounds establish an elite base; held-out matched
 targets and unchanged preprocessing remain required. This problem stays open.
+
+
+## Fixed ell27 overlap certificates, 2026-10-29
+
+All84 retained original/baseline/spike40 Koblitz/binary m3..9 systems passed
+producer, fresh-process and S3-restored replay. Exact original-top degrees are
+111,194,277,360,443,526,609. The new source-bound overlap proof and full small
+Hilbert controls are in [CHAIN_EXACT_DESIGN.md](../research/n83_candidate_pdp_20261028/CHAIN_EXACT_DESIGN.md);
+[publication checks](../research/n83_candidate_pdp_20261028/evidence/chain-exact-publication.json)
+and [the48-row fixed-base view](../research/n83_candidate_pdp_20261028/FIXED_BASE_REGULARITY_V2.json)
+retain sources and manifests. Prior interval and failed solver records remain.
+
+The binary regularity interval gap is closed in the written/native certificate
+method; independent scientific review and the full Lean bridge remain open.
+Prime positive-dimensional presentations, intermediate solving degree, global
+FFD/LFD and elite-base improvement are still unresolved. A change only between
+the tested linear selector bases does not reduce original-top regularity. Next
+use the saved completeV3 for strict higher-fall tests, or freeze a genuinely
+different selector/presentation arm with explicit semantics and matched inputs.
