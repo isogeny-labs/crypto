@@ -1,3 +1,4 @@
+#![recursion_limit = "256"]
 //! Exact elimination of at most two large variables per homogeneous row.
 //!
 //! Small columns are arbitrary symbolic variables, not known scalar values.
@@ -491,3 +492,10 @@ mod tests {
         );
     }
 }
+
+#[cfg(feature = "producer")]
+pub use crate as kernel;
+#[cfg(feature = "producer")]
+pub use five_leads_study::three_leads as engine;
+#[cfg(feature = "producer")]
+pub mod native_solver;

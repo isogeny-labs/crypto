@@ -9,6 +9,32 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Reusable per-target solver (T-802)
+
+`native_solver::solve_one` accepts a source instance, public target, algorithm
+seed, explicit denominator/coefficient cap, and an optional installed allocator
+observer. It does not read an archive, environment variables or a planted
+answer, print output, or invoke rho. The shared source imports caller-provided
+`engine` and `kernel` aliases for later ecbench integration without crossing
+incompatible engine types. The standalone binary owns input selection, known
+answer checks, matched rho, and the global allocator.
+
+Output is now `pencil-symbolic-cohort-target/v2`, with nested per-target cold
+setup. Setup is physically repeated for each target and includes target
+validity checking. The exact 16-walk rule and signed relation processing are
+unchanged; archived trial_cap remains rho's cap. Result storage retains graph
+and solver allocations, but setup temporaries drop before rho. This is a new
+live-memory baseline, not an identical v1 allocation boundary. No v2 cohort
+has been run. Missing observer fields are null, not zero. Panics are terminal
+for a measured execution even though a guard restores the observation flag.
+
+New development checks reject unsupported configuration/source metadata,
+check unavailable-observer serialization and flag cleanup. There are 14 default
+library tests and 21 producer-feature library tests (including six extracted
+solver tests); binary tests now live with the shared implementation. Root
+method registration, serialization-only kernel feature, and full cohort
+execution remain open. Costs remain incomplete and ratios null.
+
 ## Execution-route reconciliation (T-801)
 
 The earlier access diagnosis incorrectly treated the phrase "research EKS"
@@ -80,7 +106,7 @@ The implementation follows the official
 ordered traversal and consistent lookup ordering. A read-only peer review
 identified lost iterator size hints; forwarding and regression assertions
 were added before delivery. Current validation is 14 default library tests,
-15 producer-feature library tests and five producer adapter tests. Cohort
+21 producer-feature library tests, including six shared-solver tests. Cohort
 execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs

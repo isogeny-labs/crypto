@@ -278,3 +278,26 @@ valuation and cohort upper gate remain. Historical task EKS IDs were not found.
 Earlier turns tested namespace research and overgeneralized launcher AssumeRole
 denial to all approved EKS access. Corrected using live documented connection;
 other namespaces and unrelated historical experiment outcomes remain unclaimed.
+
+## 2026-10-29 T-802: reusable solver extraction
+
+### What was done
+Moved exact arithmetic and six solver tests to native_solver.rs; solve_one
+accepts instance/target/seed/config/optional observer. Driver retains archive,
+known-answer checks, rho and allocator installation. Default 14 and producer
+21 library tests and both Clippy configurations pass.
+
+### Decisions made
+Version 2 repeats cold setup per target, includes target-validity work, and
+has a changed live-memory baseline before rho. Preserve 16 walks and rho cap
+semantics. No hidden environment node ordering. Source aliases permit later
+root-engine inclusion without passing duplicate backend types. No cohort run.
+
+### Open threads
+Root ecbench registration, serialization-only kernel feature, executable
+protocol, complete prices, qualified recovery and 717 missing completions.
+
+### Errors
+Independent review identified hidden environment ordering, insufficient source
+metadata checks and overbroad allocation-parity wording. Corrected all three.
+Guard restores the arithmetic flag on unwind; panic still invalidates a run.
