@@ -6050,8 +6050,27 @@ impl PackedPairTable {
         fb: &FactorBase<PrimePoint>,
         ops: &mut GroupOps,
     ) -> Result<Self, String> {
+        Self::build_regions(g, fb, ops, PACKED_PART_ENTRIES)
+    }
+
+    /// The same table as one region: every key's home slot is a single
+    /// hash, with no region choice or per-region base in front of it.
+    fn build_flat(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+    ) -> Result<Self, String> {
+        Self::build_regions(g, fb, ops, usize::MAX)
+    }
+
+    fn build_regions(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        part_entries: usize,
+    ) -> Result<Self, String> {
         let expected = fb.abscissa_list.len().pow(2) + 1;
-        let bits = (expected / PACKED_PART_ENTRIES)
+        let bits = (expected / part_entries)
             .max(1)
             .next_power_of_two()
             .trailing_zeros();
@@ -6105,6 +6124,17 @@ impl PackedPairTable {
         })
     }
 
+    /// Start fetching the cache line [`Self::get`] reads first for `key`.
+    #[inline(always)]
+    fn prefetch(&self, key: u64) {
+        if key == 0 || key > u64::from(u32::MAX) {
+            return;
+        }
+        let k = table_part(key, self.shift);
+        let home = self.base[k] + slot_of(key, self.mask[k]);
+        prefetch_word(self.slots.as_ptr().wrapping_add(home));
+    }
+
     #[inline]
     fn get(&self, key: u64) -> Option<(u32, u32)> {
         if key == 0 || key > u64::from(u32::MAX) {
@@ -6131,6 +6161,98 @@ impl PackedPairTable {
 #[inline]
 fn slot_of(key: u64, mask: usize) -> usize {
     (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
+}
+
+/// Ask the processor to start fetching this address.  A prefetch changes
+/// nothing a program can observe beyond the cache, so any address is
+/// allowed; other targets do nothing.
+#[inline(always)]
+fn prefetch_word(address: *const u64) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: a prefetch has no architectural effect beyond the cache;
+    // any address is allowed, valid or not.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch::<{ std::arch::x86_64::_MM_HINT_T0 }>(address as *const i8);
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    let _ = address;
+}
+
+/// **The target guard's set of keys, open-addressed.**  One word per key,
+/// linear probing, at most half full: a lookup reads one cache line where
+/// the std map reads a control group and then a bucket, and a prefetch has
+/// a slot address to aim at.  `0` marks an empty slot, so the key `0` is
+/// kept in a flag.  `insert` answers what `HashMap::insert(key, ())`
+/// answers (was the key already present), so the guard's decisions are
+/// the map's.
+struct FlatSet {
+    slots: Vec<u64>,
+    mask: usize,
+    shift: u32,
+    len: usize,
+    has_zero: bool,
+}
+
+impl FlatSet {
+    fn with_capacity(entries: usize) -> Self {
+        let size = (entries.max(8) * 2).next_power_of_two();
+        Self {
+            slots: vec![0; size],
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+            len: 0,
+            has_zero: false,
+        }
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> self.shift) as usize
+    }
+
+    /// Prefetch the slot `key` starts its probe at.
+    #[inline(always)]
+    fn prefetch(&self, key: u64) {
+        prefetch_word(self.slots.as_ptr().wrapping_add(self.home(key)));
+    }
+
+    /// Add `key`; `true` when it was already there.
+    #[inline]
+    fn insert(&mut self, key: u64) -> bool {
+        if key == 0 {
+            return std::mem::replace(&mut self.has_zero, true);
+        }
+        if (self.len + 1) * 2 > self.slots.len() {
+            self.grow();
+        }
+        let mut s = self.home(key);
+        loop {
+            let held = self.slots[s];
+            if held == 0 {
+                self.slots[s] = key;
+                self.len += 1;
+                return false;
+            }
+            if held == key {
+                return true;
+            }
+            s = (s + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let size = self.slots.len() * 2;
+        let old = std::mem::replace(&mut self.slots, vec![0; size]);
+        self.mask = size - 1;
+        self.shift = 64 - size.trailing_zeros();
+        for key in old.into_iter().filter(|&k| k != 0) {
+            let mut s = self.home(key);
+            while self.slots[s] != 0 {
+                s = (s + 1) & self.mask;
+            }
+            self.slots[s] = key;
+        }
+    }
 }
 
 /// A table of all pair sums of a base, keyed by the sum's abscissa so
@@ -6252,6 +6374,38 @@ impl PairTable {
     /// pair uses the same inverse. Only the sum's x coordinate is needed
     /// for the key. The exact point is re-added by `probe` on a hit.
     pub fn build_negation_folded_prime_batch(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+    ) -> Result<Self, String> {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let a = fb.abscissa_list.len();
+        if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
+            // One word per entry in one open-addressed region: the same
+            // keys, the same first witness per key and the same counted
+            // operations as the map below, in half the memory.
+            let packed = PackedPairTable::build_flat(g, fb, &mut ops)?;
+            let insert_attempts = packed.insert_attempts;
+            return Ok(Self {
+                kind: "negation_folded_prime_batch",
+                entries: packed.entries,
+                map: fast_map(0),
+                parts: Vec::new(),
+                part_shift: 0,
+                packed: Some(packed),
+                build_ops: ops,
+                build_wall_ns: start.elapsed().as_nanos() as u64,
+                insert_attempts,
+                index_lookups: a as u64,
+            });
+        }
+        Self::build_negation_folded_prime_batch_map(g, fb)
+    }
+
+    /// The batched prime table in a std map: the form for fields or bases
+    /// too wide for the packed word, and the reference the packed form is
+    /// tested against.
+    pub(crate) fn build_negation_folded_prime_batch_map(
         g: &PrimeCurve,
         fb: &FactorBase<PrimePoint>,
     ) -> Result<Self, String> {
@@ -6416,7 +6570,12 @@ impl PairTable {
     /// Read the slot [`Self::probe`] would read for `target`, uncounted:
     /// a prefetch for a caller that knows its next targets.
     pub fn touch<G: CountedGroup>(&self, g: &G, target: &G::Elt) {
-        std::hint::black_box(self.get(g.key(target) >> 1));
+        let key = g.key(target) >> 1;
+        if let Some(packed) = &self.packed {
+            packed.prefetch(key);
+        } else {
+            std::hint::black_box(self.get(key));
+        }
     }
 
     pub fn probe<G: CountedGroup>(
@@ -7710,7 +7869,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let mut walk_fresh = true;
     let segment_cap = ((r as f64).sqrt() * 4.0) as u64 + 65_536;
     let mut segment_steps = 0u64;
-    let mut seen: FastMap<()> = fast_map(if guarded { 1 << 12 } else { 0 });
+    let mut seen = FlatSet::with_capacity(if guarded { 1 << 12 } else { 0 });
     let (mut walk_steps, mut walk_restarts, mut repeats_skipped, mut guard_probes, mut walk_jumps) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
     let lane_config = match targets {
@@ -7891,7 +8050,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             // trial.  Uncounted reads; everything below decides as before.
             for &(_, point, _, _) in &lane_queue {
                 if guarded {
-                    std::hint::black_box(seen.contains_key(&g.key(&point)));
+                    seen.prefetch(g.key(&point));
                 }
                 touch(&point);
             }
@@ -8023,7 +8182,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // pin the logarithm by collision rather than by relation.
         if guarded {
             guard_probes += 1;
-            if seen.insert(g.key(&point), ()).is_some() {
+            if seen.insert(g.key(&point)) {
                 repeats_skipped += 1;
                 if let Some(index) = lane_id {
                     lanes[index].fresh = true;
@@ -12282,12 +12441,92 @@ mod tests {
         let fb = prime_factor_base(&inst, 24);
         let scalar = PairTable::build_negation_folded(curve, &fb);
         let batch = PairTable::build_negation_folded_prime_batch(curve, &fb).unwrap();
-        assert_eq!(batch.map, scalar.map, "every x key keeps the same witness");
+        assert_eq!(
+            batch.entries as usize,
+            scalar.map.len(),
+            "the same keys"
+        );
+        for (key, witness) in &scalar.map {
+            assert_eq!(batch.get(*key), Some(*witness), "every x key keeps its witness: {key}");
+        }
         assert_eq!(batch.entries, scalar.entries);
         assert_eq!(batch.build_ops.adds, scalar.build_ops.adds);
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    #[test]
+    fn flat_batch_table_equals_the_map_form_in_every_answer() {
+        for (bits, size) in [(14, 24), (20, 300)] {
+            let inst = if bits == 20 {
+                prime_instance_for(20, 59297)
+            } else {
+                roster_prime_instance(bits).unwrap()
+            };
+            let fb = prime_factor_base(&inst, size);
+            let flat = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+            let map = PairTable::build_negation_folded_prime_batch_map(&inst.curve, &fb).unwrap();
+            assert!(flat.packed.is_some() && map.packed.is_none());
+            assert_eq!(flat.packed.as_ref().unwrap().base.len(), 1);
+            assert_eq!(flat.kind, map.kind);
+            assert_eq!(flat.entries, map.entries);
+            assert_eq!(flat.insert_attempts, map.insert_attempts);
+            assert_eq!(flat.index_lookups, map.index_lookups);
+            assert_eq!(flat.build_ops.adds, map.build_ops.adds);
+            assert_eq!(flat.build_ops.doubles, map.build_ops.doubles);
+            assert_eq!(flat.build_ops.field_ops.muls, map.build_ops.field_ops.muls);
+            assert_eq!(flat.build_ops.field_ops.sqrs, map.build_ops.field_ops.sqrs);
+            assert_eq!(flat.build_ops.field_ops.invs, map.build_ops.field_ops.invs);
+            // Every stored key keeps its first witness, and keys that are
+            // not stored (random ones, zero, wide ones) are absent in both.
+            for (key, witness) in &map.map {
+                assert_eq!(flat.get(*key), Some(*witness), "key {key}");
+            }
+            let mut rng = StdRng::seed_from_u64(11);
+            for _ in 0..20_000 {
+                let key = rng.gen::<u64>() >> rng.gen_range(0..64);
+                assert_eq!(flat.get(key), map.get(key), "probe {key}");
+            }
+            for key in [0u64, 1, u64::from(u32::MAX), u64::MAX] {
+                assert_eq!(flat.get(key), map.get(key));
+            }
+            // The probe, with its negation fold, answers the same on every
+            // stored sum of the base.
+            let mut ops = GroupOps::default();
+            for i in 0..fb.points.len().min(40) {
+                for j in i..fb.points.len().min(40) {
+                    let s = inst.curve.add(&mut ops, fb.points[i], fb.points[j]);
+                    if s.infinity {
+                        continue;
+                    }
+                    for target in [s, inst.curve.neg(s)] {
+                        let (mut l1, mut l2) = (0, 0);
+                        let a = flat.probe(&inst.curve, &fb, &mut ops, &mut l1, target);
+                        let b = map.probe(&inst.curve, &fb, &mut ops, &mut l2, target);
+                        assert_eq!(a, b);
+                        flat.touch(&inst.curve, &target);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn flat_set_answers_like_a_hash_map_through_growth() {
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut flat = FlatSet::with_capacity(0);
+        let mut map: FastMap<()> = fast_map(0);
+        for step in 0..200_000u64 {
+            // Small keys collide often; zero and wide keys are included.
+            let key = match step % 7 {
+                0 => rng.gen_range(0..64u64),
+                1 => rng.gen::<u64>(),
+                _ => rng.gen_range(0..40_000u64),
+            };
+            flat.prefetch(key);
+            assert_eq!(flat.insert(key), map.insert(key, ()).is_some(), "step {step} key {key}");
+        }
     }
 
     #[test]
@@ -12305,8 +12544,12 @@ mod tests {
             .expect("a 20-bit curve takes the packed layout");
         assert!(packed.base.len() > 1);
         assert_eq!(blocked.entries, batch.entries);
-        for (key, witness) in &batch.map {
+        let reference =
+            PairTable::build_negation_folded_prime_batch_map(&inst.curve, &fb).unwrap();
+        assert_eq!(batch.entries, reference.entries);
+        for (key, witness) in &reference.map {
             assert_eq!(blocked.get(*key), Some(*witness), "key {key}");
+            assert_eq!(batch.get(*key), Some(*witness), "flat key {key}");
         }
         assert_eq!(blocked.build_ops.adds, batch.build_ops.adds);
         assert_eq!(blocked.build_ops.doubles, batch.build_ops.doubles);
@@ -12332,7 +12575,7 @@ mod tests {
         .unwrap();
         assert!(maps.packed.is_none() && maps.parts.len() > 1);
         assert_eq!(maps.entries, batch.entries);
-        for (key, witness) in &batch.map {
+        for (key, witness) in &reference.map {
             assert_eq!(maps.get(*key), Some(*witness), "key {key}");
         }
         assert_eq!(maps.build_ops.adds, batch.build_ops.adds);
@@ -12342,7 +12585,7 @@ mod tests {
         );
         // Misses agree too: every key below the field, held or not.
         for key in 0..=inst.curve.p + 1 {
-            let want = batch.map.get(&key).copied();
+            let want = reference.map.get(&key).copied();
             assert_eq!(blocked.get(key), want, "packed, key {key}");
             assert_eq!(maps.get(key), want, "maps, key {key}");
         }
