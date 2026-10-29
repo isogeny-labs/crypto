@@ -85,7 +85,8 @@ jobs:
           git restore --source=HEAD --worktree -- \
             research/postgb_linear_stage_20261026 \
             research/ic_m2_linear_ladder_20261024 \
-            research/s5_plain_c4_options_20261019
+            research/s5_plain_c4_options_20261019 \
+            research/icb_large_prime_n53_n61_20261029
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings

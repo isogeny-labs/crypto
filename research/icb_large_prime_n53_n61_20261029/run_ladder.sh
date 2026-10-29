@@ -6,6 +6,6 @@ n=$1; shift
 for i in "$@"; do
   d="sessions/n$n-s$i"
   [ -d "$d" ] && continue
-  flock -s /dev/shm/cpu.lock "$BIN" run --spec "specs/n$n-s$i.json" --out "$d" --allow-busy > "sessions/n$n-s$i.log" 2>&1
+  flock -s /dev/shm/cpu.lock "$BIN" run --spec "specs/n$n-s$i.json" --out "$d" --allow-busy --wait > "sessions/n$n-s$i.log" 2>&1
   tail -1 "sessions/n$n-s$i.log"
 done
