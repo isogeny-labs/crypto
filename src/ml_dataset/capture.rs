@@ -136,7 +136,6 @@ impl AttemptBinding {
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-#[serde(deny_unknown_fields)]
 pub struct CaptureLimits {
     pub max_event_bytes: u64,
     pub max_stream_bytes: u64,
