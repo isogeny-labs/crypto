@@ -16,6 +16,17 @@ has run. Refresh current official checkpoint tooling and bind a complete
 RESUME to the approved branch before any future launch. Approval persists
 within that exact scope; do not repeat the permission question.
 
+2026-10-29 [workflow wiring repair](validation/artifact-wiring-20261029/README.md):
+the normal main merge `ade900ef9` exposes eight stale artifact hydration blocks;
+unchanged generator reproduction exits1, regeneration/check exits0,28 existing
+artifact and4 workflow metadata tests pass. No science/proof runs or uploads.
+Exact input-head CI confirms the still-missing1,921 study models against a
+20,787-row registry (SHA842a2835); the primary native job correctly fails its
+zero-new-row assertion after42 backend tests. Its later replay steps are skipped.
+Seven separate native replay jobs pass. Preserve both strict registration
+assertions and all catalog/source/proof/completion gates. These input-head
+results do not validate a later repair head or resolve uniform useful yield.
+
 The same check detects a new active-registry regression after the main merges:
 1921 previously registered study models are missing (958 fp/963 fpk), alongside
 18020 new and150 changed shared records. The exact slug/hash receipt is in the

@@ -114,6 +114,15 @@ and the approved secure-token route before launch; do not ask again for the
 same checkpoint permission. This update supersedes the approval-pending status
 in the dated historical notes below, without rewriting their evidence.
 
+2026-10-29 maintenance: [artifact wiring repair](validation/artifact-wiring-20261029/README.md)
+reproduces and regenerates eight stale workflow pull blocks with the unchanged
+official tool;28 artifact/bootstrap and4 workflow metadata tests pass. It changes
+no native command, trigger, arithmetic, proof, registry or frozen result. Exact
+`ade900ef9` CI retains the1,921-model registration failure against20,787 current
+records; seven separate native replays pass, but the later primary-job replays
+are skipped. Scientific/proof activation still needs the approved checkpoint
+token and successful current gate. No uniform result or new theorem is claimed.
+
 An unresolved mathematical claim is not by itself an access blocker. Actual
 missing runtime, credentials, unavailable required tools, coordination access,
 resource caps or approval requirements are recorded separately, with an

@@ -4,7 +4,7 @@
 - **Kind:** remaining formal implementation gap; coordination tool/access limit
 - **Affected work:** [quadratic-twist study](../research/quadratic_twist_evidence_20261021/README.md)
 - **Next action owner:** authoring session for PR #2381; shared coordination unassigned
-- **Last updated:** 2026-10-28
+- **Last updated:** 2026-10-29
 
 Current launch status: the user approved the previously reviewed checkpoint-only
 scope for this same branch. Secure token access is still absent. The new
@@ -15,6 +15,17 @@ the actual-state/iid probability bridge, registry reconciliation and full-librar
 completion remain open. Use current official checkpoint tooling and a fresh
 branch-bound RESUME before launch; the older dated approval-pending notes below
 are historical, not a request to ask for the same permission again.
+
+The [2026-10-29 workflow repair](../research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/README.md)
+updates eight generated read-only artifact pull blocks after normal main merge
+`ade900ef9`; unchanged wiring check and28 artifact/4 workflow tests pass locally.
+The same exact-head CI independently confirms the active registration loss:
+1,921 newly emitted rows/3,842 aliases against20,787 stored records, registry
+SHA842a2835. The primary audit correctly rejects this after42 backend tests;
+seven separate replay jobs pass, later primary steps are skipped. Preserve
+strict assertions, combined-catalog checks and the approved-but-inaccessible
+checkpoint gate. This software maintenance establishes no uniform-yield,
+intrinsic-regularity or complete-cost gain and changes no scientific source.
 
 ## Problem
 
