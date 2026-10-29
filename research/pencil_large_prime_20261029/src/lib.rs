@@ -5,12 +5,13 @@
 //! Input modulus must be prime. All input coefficients are canonicalized,
 //! including duplicate columns, before changing graph state.
 
-use std::collections::BTreeMap;
+pub type Sparse = sparse::TrackedMap<u64>;
 
-pub type Sparse = BTreeMap<usize, u64>;
-
+pub mod allocation;
 pub mod collector;
+pub mod meter;
 pub mod residual;
+pub mod sparse;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
@@ -29,12 +30,15 @@ pub enum Outcome {
 }
 
 fn add(a: u64, b: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_adds += 1);
     ((a as u128 + b as u128) % p as u128) as u64
 }
 fn mul(a: u64, b: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_muls += 1);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 fn neg(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_negations += 1);
     if a == 0 {
         0
     } else {
@@ -53,23 +57,33 @@ fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
     v
 }
 
+fn reduce(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.modular_reductions += 1);
+    a % p
+}
+fn inverse(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_inversions += 1);
+    pow(a, p - 2, p)
+}
+
 // Deterministic Miller--Rabin base set for the complete u64 range.
 fn is_prime(p: u64) -> bool {
+    meter::charge(|c| c.primality_checks += 1);
     if p < 2 {
         return false;
     }
     for d in [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if p.is_multiple_of(d) {
+        if reduce(p, d) == 0 {
             return p == d;
         }
     }
     let s = (p - 1).trailing_zeros();
     let d = (p - 1) >> s;
     for a in [2, 325, 9375, 28178, 450775, 9780504, 1795265022] {
-        if a % p == 0 {
+        if reduce(a, p) == 0 {
             continue;
         }
-        let mut x = pow(a % p, d, p);
+        let mut x = pow(reduce(a, p), d, p);
         if x == 1 || x == p - 1 {
             continue;
         }
@@ -89,6 +103,7 @@ fn is_prime(p: u64) -> bool {
 }
 
 fn accumulate(out: &mut Sparse, column: usize, value: u64, p: u64) {
+    meter::charge(|c| c.sparse_accumulations += 1);
     let v = add(out.get(&column).copied().unwrap_or(0), value, p);
     if v == 0 {
         out.remove(&column);
@@ -98,6 +113,7 @@ fn accumulate(out: &mut Sparse, column: usize, value: u64, p: u64) {
 }
 fn axpy(out: &mut Sparse, a: u64, input: &Sparse, p: u64) {
     for (&column, &v) in input {
+        meter::charge(|c| c.payload_terms += 1);
         accumulate(out, column, mul(a, v, p), p);
     }
 }
@@ -142,6 +158,7 @@ impl SymbolicGraph {
         let mut a = 1;
         let mut b = Sparse::new();
         while self.parent[node] != node {
+            meter::charge(|c| c.parent_hops += 1);
             axpy(&mut b, a, &self.offset[node], self.p);
             a = mul(a, self.scale[node], self.p);
             node = self.parent[node];
@@ -170,14 +187,14 @@ impl SymbolicGraph {
         }
         let mut canonical = Sparse::new();
         for &(i, v) in large {
-            accumulate(&mut canonical, i, v % self.p, self.p);
+            accumulate(&mut canonical, i, reduce(v, self.p), self.p);
         }
         if canonical.len() > 2 {
             return Err(Error::MoreThanTwoLargeVariables);
         }
         let mut payload = Sparse::new();
         for &(i, v) in small {
-            accumulate(&mut payload, i, v % self.p, self.p);
+            accumulate(&mut payload, i, reduce(v, self.p), self.p);
         }
         let mut roots = Sparse::new();
         for (i, v) in canonical {
@@ -189,7 +206,7 @@ impl SymbolicGraph {
             0 => Ok(Outcome::Constraint(payload)),
             1 => {
                 let (&root, &a) = roots.first_key_value().unwrap();
-                let factor = neg(pow(a, self.p - 2, self.p), self.p);
+                let factor = neg(inverse(a, self.p), self.p);
                 self.anchor[root] = Some(scaled(&payload, factor, self.p));
                 Ok(Outcome::Anchored)
             }
@@ -201,7 +218,7 @@ impl SymbolicGraph {
                     std::mem::swap(&mut u, &mut v);
                     std::mem::swap(&mut a, &mut b);
                 }
-                let factor = neg(pow(a, self.p - 2, self.p), self.p);
+                let factor = neg(inverse(a, self.p), self.p);
                 self.parent[u] = v;
                 self.scale[u] = mul(factor, b, self.p);
                 self.offset[u] = scaled(&payload, factor, self.p);
@@ -216,6 +233,34 @@ impl SymbolicGraph {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn semantic_counters_separate_primality_and_inverse_work() {
+        meter::reset();
+        assert_eq!(inverse(3, 7), 5);
+        let c = meter::snapshot();
+        // Exponent 5 has three loop squares and two selected multiplies.
+        assert_eq!(c.scalar_muls, 5);
+        assert_eq!(c.scalar_inversions, 1);
+        meter::reset();
+        assert!(is_prime(101));
+        let c = meter::snapshot();
+        assert_eq!(c.primality_checks, 1);
+        assert_eq!(c.scalar_inversions, 0);
+        assert!(c.scalar_muls > 0);
+        assert!(c.modular_reductions > 0);
+        let mut g = SymbolicGraph::new(7, 3, 1).unwrap();
+        meter::reset();
+        assert_eq!(
+            g.insert(&[(0, 1), (1, 1), (2, 1)], &[]),
+            Err(Error::MoreThanTwoLargeVariables)
+        );
+        let c = meter::snapshot();
+        assert_eq!(c.modular_reductions, 3);
+        assert_eq!(c.sparse_accumulations, 3);
+        assert_eq!(c.scalar_adds, 3);
+        assert_eq!(c.scalar_inversions, 0);
+    }
 
     // Independent small-field reference: dense rows, exhaustive inverse
     // search, and ordinary RREF. No graph arithmetic helper is used.
