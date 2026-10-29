@@ -263,6 +263,41 @@ explicit trace hooks. Capability records name those gaps. Exact first-fall and
 last-fall degrees remain null until a checker establishes their stated algebraic
 definition and all required closure/rank conditions.
 
+The current prime F4 increment is implemented but awaits centralized software
+validation. `f4` keeps its existing m=2 reference path and selects
+`prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
+leaf membership equations and unrestricted auxiliary-variable roles before
+solving. Native elimination requires p<2^32. For larger moduli, including
+2^61-1, the adapter retains exact equations computed with wide intermediates
+and reports an unsupported native modulus; it does not substitute a smaller
+field or invoke the narrow reducer.
+
+The new lane writes `prime-f4-input.json`, a bounded
+`prime-f4-chain-events.jsonl` prefix, and `prime-f4-chain-result.json` termination
+metadata. Events expose recursive systems and fixed-variable bindings, native
+bases/useful-row schedules, branches, candidate validation and independent
+point-sign lifts. Event/byte caps and sink errors stop traversal explicitly;
+root work, elimination observations and group additions retain separate units.
+A native F4 call materializes its own rows before serializing a bounded event.
+These event limits therefore do not bound native matrix memory; retain the
+worker memory/time supervisor. Useful-row traces omit private pivots, zero rows
+and internal univariate factorization/GCD states.
+
+Read `encoding_search_completed`, `algebra_completed`, `termination` and the
+trace/lift limits together. An encoding traversal may complete after truncated
+native elimination without establishing a complete Groebner basis. Infinity
+exceptions are not all encoded, so completion without a verified lift never
+establishes PDP impossibility: `exhaustive_no_decomposition` remains false.
+A verified positive witness can coexist with a censored trace. Neither state
+establishes scalar recovery or an exact first/last fall degree.
+
+Generation invokes the new public equation/domain reconstruction verifier.
+Central `verify_cell` registration for this artifact remains pending; do not
+claim that restore plus `dataset verify` already reconstructs these new chain
+equations. Parent validation must cover that integration separately. The frozen
+[prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md) records required checks and
+mathematical limits; no new cloud-generation evidence follows from this code.
+
 Create a coverage snapshot in a directory outside the source run:
 
 ```sh
@@ -332,6 +367,12 @@ Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
 policy is `strict-structural-allowlist-v3`; its domain-aware feature identities
 must not be mixed with earlier export identities without regeneration.
+
+Prime-chain recursive events and termination records stay in restricted
+artifacts/provenance. Implementing their writer does not add a public equation
+graph to `features.jsonl`; that requires a separately reviewed structural
+projection. A future decision-prefix view must remove future bases, branches,
+lift results and other information unavailable at its declared decision time.
 
 The current export is a structural routing view. Sequential equation or solver
 policy views still need a separate projection of admissible prefix states.
