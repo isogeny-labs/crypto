@@ -351,6 +351,21 @@ def koblitz_modular_geometry(ref, since):
                  source=f"{path}@{commit}")
 
 
+    path = f"{base}33/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("descended_sections", "koblitz_modular.twist_rr_sections", "sections",
+             "Explicit descended complete RR sections; inherited written pole bridge"),
+            ("evaluated_degree83_points", "koblitz_modular.twist_rr_evaluated_degree83_points", "closed points",
+             "Complete section evaluation at actual degree83 twist points; not IC relation rank"),
+            ("padding_closed_points", "koblitz_modular.twist_rational_padding_closed_points", "closed points",
+             "Native closed degree5 twist points; proper local binding remains separate")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
