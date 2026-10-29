@@ -29,6 +29,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
+use crate::cryptanalysis::ecbench::legacy;
 use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, SolveReport};
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, f4_accounting_note, floor_s, grade_for_version,
@@ -186,6 +187,259 @@ pub fn pre_class_setup_record(r: &Record) -> bool {
 pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
     let d = rep.detail.pointer("/class_setup/gae")?.as_f64()?;
     (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
+}
+
+/// The measured child's input that replays record `r` of plan `p`.
+pub fn replay_input_json(
+    p: &crate::cryptanalysis::ecbench::spec::Plan,
+    r: &Record,
+) -> Result<String, String> {
+    let ex = &p.executions[r.seq as usize];
+    let w = &p.workloads[ex.workload];
+    let input = ChildInput {
+        schema: CHILD_INPUT_SCHEMA.into(),
+        curve: w.curve_spec.for_child(p.instance(ex.workload)),
+        target_seed: w.target_seed,
+        target_index: w.target_index,
+        target_kind: w.kind(),
+        expected_workload_id: w.workload_id.clone(),
+        method: MethodSpec {
+            id: r.method.id.clone(),
+            params: r.method.params.clone(),
+        },
+        expected_method_id: r.method.method_id.clone(),
+        algorithm_seed: ex.algorithm_seed,
+    };
+    serde_json::to_string(&input).map_err(|e| e.to_string())
+}
+
+/// Replay record `seq` of the session in `dir` alone, as the audit would,
+/// and say whether it reproduced and how.
+pub fn replay_record(dir: &Path, seq: u64) -> Result<(bool, String), String> {
+    let spec_text = std::fs::read_to_string(dir.join("spec.json")).map_err(|e| e.to_string())?;
+    let p = plan(Spec::from_json(&spec_text)?)?;
+    let records = crate::cryptanalysis::ecbench::runner::read_records(dir)?;
+    let r = records
+        .iter()
+        .find(|r| r.seq == seq)
+        .ok_or_else(|| format!("{}: no record with seq {seq}", dir.display()))?;
+    let session = read_session(dir)?;
+    let host: HostCapsule = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("host.json")).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| format!("host.json: {e}"))?;
+    Ok(replay_with_accounting(
+        &replay_input_json(&p, r)?,
+        r,
+        &host,
+        &session,
+    ))
+}
+
+/// Replay one record's input and compare, under the current accounting
+/// and, if that does not reproduce it, under each [`legacy::PROFILES`]
+/// accounting of the past in turn.  The first that reproduces **every**
+/// compared field wins and is named in the detail; if none does, the detail
+/// is the current accounting's.
+pub fn replay_with_accounting(
+    input_json: &str,
+    r: &Record,
+    host: &HostCapsule,
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+) -> (bool, String) {
+    let out = child_main(input_json);
+    let rep = match out.report {
+        None => {
+            return (
+                false,
+                format!("replay failed: {}", out.error.unwrap_or_default()),
+            )
+        }
+        Some(rep) => rep,
+    };
+    let (ok, detail) = compare_replay(&rep, r, host, session);
+    if ok {
+        return (ok, detail);
+    }
+    if let Some(view) = legacy::admits_pre_endomorphism_a1(r)
+        .then(|| legacy::pre_endomorphism_a1(&rep, r))
+        .flatten()
+    {
+        let (ok, d) = compare_replay(&view, r, host, session);
+        if ok {
+            return (
+                true,
+                format!(
+                    "{d} (accounting of the code before the later changes: {})",
+                    legacy::PRE_ENDOMORPHISM_A1
+                ),
+            );
+        }
+    }
+    for profile in legacy::PROFILES {
+        if !legacy::admits(&profile, r) {
+            continue;
+        }
+        let again = {
+            let _in_force = profile.enter();
+            child_main(input_json)
+        };
+        if let Some(rep) = again.report {
+            let (ok, d) = compare_replay(&rep, r, host, session);
+            if ok {
+                return (
+                    true,
+                    format!(
+                        "{d} (accounting of the code before the later changes: {})",
+                        profile.name
+                    ),
+                );
+            }
+        }
+    }
+    (false, detail)
+}
+
+/// What a replay must reproduce of `r`: `(reproduced, detail)`.
+fn compare_replay(
+    rep: &SolveReport,
+    r: &Record,
+    host: &HostCapsule,
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+) -> (bool, String) {
+    // A set-up descriptor the record predates is compared without it.
+    let mut rep = rep.clone();
+    if legacy::admits_setup_descriptors(r) {
+        for (ph, rec) in rep.phases.iter_mut().zip(&r.phases) {
+            ph.native
+                .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
+        }
+    }
+    let rep = &rep;
+    let mut diffs = Vec::new();
+    if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
+        diffs.push("recovered");
+    }
+    // Integer counts compare exactly; a float compares after
+    // the same serialise-parse round trip the record's took.
+    let same_gae = |phases: &[f64], total: f64| {
+        (
+            Some(json_roundtrip(total).to_bits()) == r.cost.total_gae.map(f64::to_bits),
+            phases
+                .iter()
+                .map(|g| json_roundtrip(*g).to_bits())
+                .eq(r.phases.iter().map(|p| p.gae.to_bits())),
+        )
+    };
+    let exact: Vec<f64> = rep.phases.iter().map(|p| p.gae).collect();
+    let (mut total_ok, mut phases_ok) = same_gae(&exact, rep.total_gae);
+    let mut legacy = false;
+    if !(total_ok && phases_ok) {
+        if let Some((ph, tot)) = legacy_solver_rounding(&exact, &r.detail) {
+            if same_gae(&ph, tot) == (true, true) {
+                (total_ok, phases_ok, legacy) = (true, true, true);
+            }
+        }
+    }
+    let ints = |ps: &[crate::cryptanalysis::ecbench::methods::PhaseRecord]| {
+        ps.iter()
+            .map(|p| {
+                (
+                    p.name.clone(),
+                    p.adds,
+                    p.doubles,
+                    p.scalar_mults,
+                    p.native.clone(),
+                )
+            })
+            .collect::<Vec<_>>()
+    };
+    let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
+    let mut accounting = false;
+    if !(total_ok && phases_ok && counts_ok) && pre_class_setup_record(r) {
+        if let Some((ph, tot)) = legacy_class_setup(rep) {
+            let g: Vec<f64> = ph.iter().map(|p| p.gae).collect();
+            if same_gae(&g, tot) == (true, true) && ints(&ph) == ints(&r.phases) {
+                (total_ok, phases_ok, counts_ok, accounting) = (true, true, true, true);
+            }
+        }
+    }
+    if !total_ok {
+        diffs.push("total_gae");
+    }
+    if !counts_ok {
+        diffs.push("phase counts");
+    }
+    // bitop/v1 counters compare only when the committed
+    // record has them: one written before they existed
+    // carries none, and unknown is not a disagreement.
+    if r.phases.iter().any(|p| !p.work_native.is_empty())
+        && rep
+            .phases
+            .iter()
+            .map(|p| &p.work_native)
+            .ne(r.phases.iter().map(|p| &p.work_native))
+    {
+        diffs.push("work counters");
+    }
+    if !phases_ok {
+        diffs.push("phase gae");
+    }
+    if rep.counters != r.counters {
+        diffs.push("counters");
+    }
+    if rep.factor_base != r.factor_base {
+        diffs.push("factor_base");
+    }
+    // Field operations compare only when both sides carry
+    // them: a committed record written before they were
+    // counted has none, and unknown is not a disagreement.
+    if let (Some(a), Some(b)) = (rep.field_ops, r.field_ops) {
+        if a != b {
+            diffs.push("field_ops");
+        }
+    }
+    if rep.unpriced != r.cost.unpriced
+        || rep.deterministic != r.cost.deterministic
+        || Some(rep.automorphisms_used) != r.boundaries.automorphisms_used
+    {
+        diffs.push("unpriced, determinism or automorphisms");
+    }
+    (
+        diffs.is_empty(),
+        if diffs.is_empty() && accounting {
+            LEGACY_ACCOUNTING_IDENTICAL.into()
+        } else if diffs.is_empty() && legacy {
+            LEGACY_IDENTICAL.into()
+        } else if diffs.is_empty() {
+            "identical".into()
+        } else {
+            // A word-XOR solver record whose replay differs in
+            // counts is named by the accounting it was made
+            // under, when that can be the reason; the failure
+            // itself is unchanged.  A difference in pricing
+            // alone (gae, unpriced) is not an accounting
+            // difference and gets no note.
+            let has_bmi2 =
+                host.stable.arch == "x86_64" && host.stable.features.iter().any(|f| f == "bmi2");
+            let note = r
+                .solver
+                .as_ref()
+                .filter(|s| s.op_unit.contains("word XOR"))
+                .filter(|_| diffs.contains(&"phase counts"))
+                .and_then(|_| {
+                    f4_accounting_note(
+                        &session.accounting_versions,
+                        session.started_unix_ms,
+                        has_bmi2,
+                    )
+                });
+            match note {
+                Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
+                None => format!("differs in {}", diffs.join(", ")),
+            }
+        },
+    )
 }
 
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
@@ -578,157 +832,8 @@ pub fn audit_with(
         let n = replay.min(candidates.len());
         for j in 0..n {
             let r = candidates[j * candidates.len() / n];
-            let ex = &p.executions[r.seq as usize];
-            let w = &p.workloads[ex.workload];
-            let input = ChildInput {
-                schema: CHILD_INPUT_SCHEMA.into(),
-                curve: w.curve_spec.for_child(p.instance(ex.workload)),
-                target_seed: w.target_seed,
-                target_index: w.target_index,
-                target_kind: w.kind(),
-                expected_workload_id: w.workload_id.clone(),
-                method: MethodSpec {
-                    id: r.method.id.clone(),
-                    params: r.method.params.clone(),
-                },
-                expected_method_id: r.method.method_id.clone(),
-                algorithm_seed: ex.algorithm_seed,
-            };
-            let out = child_main(&serde_json::to_string(&input).map_err(|e| e.to_string())?);
-            let (ok, detail) = match out.report {
-                None => (
-                    false,
-                    format!("replay failed: {}", out.error.unwrap_or_default()),
-                ),
-                Some(rep) => {
-                    let mut diffs = Vec::new();
-                    if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
-                        diffs.push("recovered");
-                    }
-                    // Integer counts compare exactly; a float compares after
-                    // the same serialise-parse round trip the record's took.
-                    let same_gae = |phases: &[f64], total: f64| {
-                        (
-                            Some(json_roundtrip(total).to_bits())
-                                == r.cost.total_gae.map(f64::to_bits),
-                            phases
-                                .iter()
-                                .map(|g| json_roundtrip(*g).to_bits())
-                                .eq(r.phases.iter().map(|p| p.gae.to_bits())),
-                        )
-                    };
-                    let exact: Vec<f64> = rep.phases.iter().map(|p| p.gae).collect();
-                    let (mut total_ok, mut phases_ok) = same_gae(&exact, rep.total_gae);
-                    let mut legacy = false;
-                    if !(total_ok && phases_ok) {
-                        if let Some((ph, tot)) = legacy_solver_rounding(&exact, &r.detail) {
-                            if same_gae(&ph, tot) == (true, true) {
-                                (total_ok, phases_ok, legacy) = (true, true, true);
-                            }
-                        }
-                    }
-                    let ints = |ps: &[crate::cryptanalysis::ecbench::methods::PhaseRecord]| {
-                        ps.iter()
-                            .map(|p| {
-                                (
-                                    p.name.clone(),
-                                    p.adds,
-                                    p.doubles,
-                                    p.scalar_mults,
-                                    p.native.clone(),
-                                )
-                            })
-                            .collect::<Vec<_>>()
-                    };
-                    let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
-                    let mut accounting = false;
-                    if !(total_ok && phases_ok && counts_ok) && pre_class_setup_record(r) {
-                        if let Some((ph, tot)) = legacy_class_setup(&rep) {
-                            let g: Vec<f64> = ph.iter().map(|p| p.gae).collect();
-                            if same_gae(&g, tot) == (true, true) && ints(&ph) == ints(&r.phases) {
-                                (total_ok, phases_ok, counts_ok, accounting) =
-                                    (true, true, true, true);
-                            }
-                        }
-                    }
-                    if !total_ok {
-                        diffs.push("total_gae");
-                    }
-                    if !counts_ok {
-                        diffs.push("phase counts");
-                    }
-                    // bitop/v1 counters compare only when the committed
-                    // record has them: one written before they existed
-                    // carries none, and unknown is not a disagreement.
-                    if r.phases.iter().any(|p| !p.work_native.is_empty())
-                        && rep
-                            .phases
-                            .iter()
-                            .map(|p| &p.work_native)
-                            .ne(r.phases.iter().map(|p| &p.work_native))
-                    {
-                        diffs.push("work counters");
-                    }
-                    if !phases_ok {
-                        diffs.push("phase gae");
-                    }
-                    if rep.counters != r.counters {
-                        diffs.push("counters");
-                    }
-                    if rep.factor_base != r.factor_base {
-                        diffs.push("factor_base");
-                    }
-                    // Field operations compare only when both sides carry
-                    // them: a committed record written before they were
-                    // counted has none, and unknown is not a disagreement.
-                    if let (Some(a), Some(b)) = (rep.field_ops, r.field_ops) {
-                        if a != b {
-                            diffs.push("field_ops");
-                        }
-                    }
-                    if rep.unpriced != r.cost.unpriced
-                        || rep.deterministic != r.cost.deterministic
-                        || Some(rep.automorphisms_used) != r.boundaries.automorphisms_used
-                    {
-                        diffs.push("unpriced, determinism or automorphisms");
-                    }
-                    (
-                        diffs.is_empty(),
-                        if diffs.is_empty() && accounting {
-                            LEGACY_ACCOUNTING_IDENTICAL.into()
-                        } else if diffs.is_empty() && legacy {
-                            LEGACY_IDENTICAL.into()
-                        } else if diffs.is_empty() {
-                            "identical".into()
-                        } else {
-                            // A word-XOR solver record whose replay differs in
-                            // counts is named by the accounting it was made
-                            // under, when that can be the reason; the failure
-                            // itself is unchanged.  A difference in pricing
-                            // alone (gae, unpriced) is not an accounting
-                            // difference and gets no note.
-                            let has_bmi2 = host.stable.arch == "x86_64"
-                                && host.stable.features.iter().any(|f| f == "bmi2");
-                            let note = r
-                                .solver
-                                .as_ref()
-                                .filter(|s| s.op_unit.contains("word XOR"))
-                                .filter(|_| diffs.contains(&"phase counts"))
-                                .and_then(|_| {
-                                    f4_accounting_note(
-                                        &session.accounting_versions,
-                                        session.started_unix_ms,
-                                        has_bmi2,
-                                    )
-                                });
-                            match note {
-                                Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
-                                None => format!("differs in {}", diffs.join(", ")),
-                            }
-                        },
-                    )
-                }
-            };
+            let input_json = replay_input_json(&p, r)?;
+            let (ok, detail) = replay_with_accounting(&input_json, r, &host, &session);
             if !ok {
                 problems.push(format!("replay of seq {}: {detail}", r.seq));
             }
@@ -1051,5 +1156,83 @@ mod tests {
         // Pinned solver work was never subtracted.
         assert!(legacy_solver_rounding(&exact, &detail(w, before, "pinned")).is_none());
         assert!(legacy_solver_rounding(&exact, &json!({})).is_none());
+    }
+}
+
+/// Committed sessions recorded before amendment A1 of
+/// `research/ext_endo_rho_20261023` changed the endomorphism classes' uncharged
+/// counters in place (`legacy::pre_endomorphism_a1`).  The methods are in the
+/// library, so these replays are too; the pdp3 ones are in the binary.
+#[cfg(test)]
+mod committed_replays {
+    use super::*;
+
+    fn replay(rel: &str, seq: u64) -> Option<(bool, String)> {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(rel);
+        dir.join("session.json")
+            .exists()
+            .then(|| replay_record(&dir, seq).unwrap())
+    }
+
+    #[test]
+    fn gls_record_from_before_amendment_a1_replays() {
+        if let Some((ok, detail)) = replay("research/ext_endo_rho_20261023/sessions/gls-fp2", 0) {
+            assert!(
+                ok && detail.contains(legacy::PRE_ENDOMORPHISM_A1),
+                "{detail}"
+            );
+        }
+    }
+
+    #[test]
+    fn subfield_record_from_before_amendment_a1_replays() {
+        if let Some((ok, detail)) =
+            replay("research/ext_endo_rho_20261023/sessions/subfield-fp3", 2)
+        {
+            assert!(
+                ok && detail.contains(legacy::PRE_ENDOMORPHISM_A1),
+                "{detail}"
+            );
+        }
+    }
+
+    /// Recorded 2026-10-04: the qualified `word XORs (elimination only)` unit
+    /// was a wall-priced, unpriced lower bound (632 GAE), not the pinned 1832.
+    #[test]
+    fn descent_algebraic_f4_record_replays_with_its_solver_term_unpriced() {
+        if let Some((ok, detail)) =
+            replay("research/ecbench_yield_sweep_20261004/sessions/koblitz", 5)
+        {
+            assert!(ok && detail.contains("pre-"), "{detail}");
+        }
+    }
+
+    /// A record from a binary the A1 list does not name is replayed exactly.
+    #[test]
+    fn a_record_from_an_unlisted_binary_is_not_excused_from_amendment_a1() {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ext_endo_rho_20261023/sessions/gls-fp2");
+        if !dir.join("session.json").exists() {
+            return;
+        }
+        let spec_text = std::fs::read_to_string(dir.join("spec.json")).unwrap();
+        let p = plan(Spec::from_json(&spec_text).unwrap()).unwrap();
+        let mut records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let r = records.iter_mut().find(|r| r.seq == 0).unwrap();
+        r.binary_sha256 = Some("0".repeat(64));
+        let session = read_session(&dir).unwrap();
+        let host: HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        let (ok, detail) =
+            replay_with_accounting(&replay_input_json(&p, r).unwrap(), r, &host, &session);
+        assert!(!ok, "{detail}");
+    }
+
+    #[test]
+    fn amended_session_replays_under_the_current_counters() {
+        if let Some((ok, detail)) = replay("research/ext_endo_rho_20261023/sessions-a1/gls-fp2", 0)
+        {
+            assert!(ok && detail == "identical", "{detail}");
+        }
     }
 }
