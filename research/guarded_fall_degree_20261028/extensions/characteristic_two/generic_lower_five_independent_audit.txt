@@ -1,0 +1,148 @@
+Independent audit: characteristic-two generic degree-four obstruction
+Date: 2026-10-28
+
+Conclusion
+----------
+For the ordinary characteristic-two inverse-guarded B=3 model in
+extension_proof.txt, assume sigma1 and sigma2 are not both zero. Every
+unsatisfiable instance has last fall degree exactly five. The separate
+uniform upper-five proof supplies the upper bound; the argument below
+supplies the lower bound. The first fall under the explicit ordinary
+top-syzygy/Koszul convention is four, as in the earlier proof.
+
+When sigma1=sigma2=0 this lower argument does not apply. It proves no
+exact degree for that exceptional family. In GF(2^n) with n odd, the
+exceptional family cannot occur, so the exact pair (4,5) holds for every
+unsatisfiable B=3 instance over those coefficient fields.
+
+Notation and state equations
+----------------------------
+Let g(T)=T^3+sigma1*T^2+sigma2*T+sigma3 have three distinct roots S.
+Set w=sigma1+x+y, d=w+sigma1=x+y, v=d^(-1), and
+ kappa=sigma1*sigma2+sigma3=g(sigma1).
+The scalar sigma1 cannot be in S: that would force the other two roots
+to be equal in characteristic two. Hence kappa is nonzero.
+
+The three unordered pair states are the points
+ (w,v)=(s,1/(s+sigma1)), s in S.
+They are noncollinear. Indeed an affine relation a*w+b*v+c=0 at all
+three points, multiplied by w+sigma1, is a polynomial of degree at most
+two vanishing at three distinct w values. Its coefficients force
+a=b=c=0. Thus 1,w,v form a basis of their three-dimensional function
+algebra; every function on these states has an affine representative.
+
+Let h=wv+sigma1*v+1. The following equations are available within V_4:
+ Rw=w^2+kappa*v+sigma2,
+ h=wv+sigma1*v+1,
+ Rv=v^2+((sigma1^2+sigma2)/kappa)*v+(w+sigma1)/kappa.
+For explicit derivations,
+ Rw=v*g(w)+(w^2+sigma2)*h,
+ kappa*Rv=v*Rw+w*h+sigma1*h.
+The first identity uses products of degree at most four. The second uses
+products of degree at most three, after Rw has become available in V_4.
+The previously established degree-four derivation of g(w) is used here.
+
+In graded lexicographic order w>v their leading monomials are w^2,wv,v^2,
+and their tails are affine. They form a Groebner basis. One proof avoids
+any computation: those leading monomials leave at most the three standard
+monomials 1,w,v, while evaluation on the three noncollinear state points
+shows that these three remain independent. Therefore no further initial
+relation is possible, and the displayed generating set is a Groebner basis.
+Its division preserves ordinary total degree.
+
+Orientation, original base ideal, and the monic first quadratic
+--------------------------------------------------------------
+Keep x as orientation coordinate; y=w+sigma1+x is a linear substitution.
+The divided difference Q, together with Rw, gives the available quadratic
+ Tx=x^2+(w+sigma1)*x+kappa*v+sigma1*w.
+Its leading monomial is x^2 in graded lexicographic order x>w>v. Its
+leading monomial is coprime to each state leading monomial, so adjoining
+Tx preserves the Groebner-basis property. Adjoin g(z), with leading z^3.
+The full order may be taken as graded lexicographic x>w>v>z.
+
+These equations generate exactly
+ I0=(g(x),g(y),g(z),v*(x+y)+1).
+For precision, every displayed equation was derived from I0, giving one
+ideal inclusion. The state quotient has dimension three. At each state,
+Tx is the quadratic whose two distinct roots are S excluding w, so the
+orientation quotient gives exactly six ordered distinct pairs. Adjoining
+g(z) gives 18 reduced points. The original I0 also has exactly those 18
+reduced points: its split, squarefree membership algebra is localized by
+the inverse guard. Equal finite colength and the ideal inclusion prove
+equality. The free u variable does not affect this reasoning.
+
+Reduce the first binary S3 input using this degree-preserving basis. Its
+normal form is q1=alpha(w,v)*u^2+beta(w,v)*u+gamma(w,v), with each
+coefficient affine in w,v. Hence q1 has total degree at most three and
+is available in V_4. Alpha=d^2 is nonzero at all three pair states.
+Its inverse therefore has an affine representative. Multiplying q1 by
+that affine inverse costs at most four; reduction stays within degree
+four and yields
+ H1=u^2+A(w,v)*u+B(w,v),
+with A and B affine, of total degree at most two. In particular H1 is
+available in V_4. Conversely the original first S3 input lies in
+G=I0+(H1), since normalization multiplies by a unit modulo I0.
+
+A degree-preserving basis for G
+-------------------------------
+Adjoin H1 and use graded lexicographic order u>x>w>v>z. Its leading
+monomial u^2 is coprime to the previous leading monomials, so the result
+is a Groebner basis of G. All quadratic tails have total degree at most
+two, and the cubic g(z) has lower-degree tails. Division therefore never
+increases total degree. The standard monomials show the quotient has
+dimension 36 and is nonzero; no radicality assumption about H1 is needed.
+
+Normal form of the second S3 and its top term
+--------------------------------------------
+The second binary S3 input is
+ f2=(z+r)^2*u^2+zr*u+(zr)^2+a6.
+Replacing u^2 by A*u+B gives its G-normal form P. It uses no orientation
+x. Since A and B are affine state functions, the only possible terms of
+total degree four are
+ z^2*u*(A_w*w+A_v*v).
+These are standard monomials. Consequently P has nonzero degree-four
+part exactly when A is nonconstant on the three pair states.
+
+The constant-A criterion is exact. On a state w,
+ A=M/d^2,
+ M=w^2+sigma1*w+sigma2,
+ d^2=(w+sigma1)^2.
+If A=lambda is constant, then M+lambda*d^2 is a degree-at-most-two
+polynomial vanishing at all three roots of g, hence is identically zero.
+Its quadratic, linear, and constant coefficients give lambda=1,
+sigma1=0, sigma2=0. Conversely these conditions make A=1.
+
+The closed separating space
+---------------------------
+Assume now that A is nonconstant, equivalently (sigma1,sigma2)!=(0,0).
+Define
+ W=(G intersect R_(<=4))+k*P.
+Every original input belongs to W: the base inputs and f1 lie in G,
+and f2-P lies in G. Suppose t in W has degree at most three. Its normal
+form has degree at most three because G-division preserves degree.
+But NF_G(t)=c*P for a scalar c, and P has a nonzero standard degree-four
+part. Therefore c=0 and t lies in G.
+
+It follows that W is closed under every multiplication permitted at
+degree four: a nonconstant multiplier forces the multiplicand degree to
+be at most three, hence to lie in G. The product then belongs to
+G intersect R_(<=4). Constant multipliers are covered by linearity.
+Also 1 is not in W: its normal form is 1, which cannot equal a scalar
+multiple of a degree-four P, and G is proper. Thus V_4 is contained in
+W and excludes 1. An unsatisfiable system consequently has d_F>=5.
+Combined with the separately established upper bound, d_F=5.
+
+Odd extension degree excludes the exceptional family
+---------------------------------------------------
+If sigma1=sigma2=0, the three roots are the roots of T^3+sigma3, all
+nonzero. Distinct roots require a nontrivial cube root of unity in k.
+For k=GF(2^n), such a root exists if and only if 3 divides 2^n-1,
+equivalently n is even. For odd n the exception is impossible.
+
+Scope and verification status
+-----------------------------
+This audit is mathematical degree accounting, not a Lean formalization
+or a numerical experiment. It concerns three coefficient-field abscissas
+and the raw inverse-guarded binary S3 presentation, not a Boolean Weil
+descent or a growing factor base. The exceptional even-degree cube-orbit
+family remains outside the lower-bound conclusion.
