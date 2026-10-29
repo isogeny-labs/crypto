@@ -25,3 +25,22 @@ def valid_native($binary):
     "replay of seq \(.seq): \(.detail)"];
 
 def replay_keys: map({seq, record_id}) | sort_by(.seq);
+
+# Historical counter debt cannot excuse a different failed record or scalar error.
+def valid_drift_expectations:
+  . as $plan | all(.sessions[];
+    if has("expected_drift") then
+      (.expected_drift | type == "array") and
+      (if .expect == "identical" then .expected_drift == [] else
+        (.expected_drift | length > 0 and
+          all(.[]; (.seq | type == "number" and . >= 0 and . == floor) and
+            (.record_id | type == "string" and length > 0) and
+            (.detail | type == "string" and length > 0)) and
+          ([.[].seq] | length == (unique | length))) end)
+    else ($plan.require_pinned_drift != true or .expect != "drift") end);
+
+def same_pinned_drifts($entry):
+  if $entry | has("expected_drift") then
+    ([.replays[] | select(.reproduced | not) | {seq,record_id,detail}] | sort_by(.seq)) ==
+      ($entry.expected_drift | sort_by(.seq))
+  else true end;

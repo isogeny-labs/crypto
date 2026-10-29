@@ -6,6 +6,7 @@ EB=${1:?native ecbench}; ROOT=${2:?receipt root}; parts=${3:?partition count}
 [[ $parts =~ ^[1-9][0-9]*$ ]] || exit 2
 here=$(cd "$(dirname "$0")" && pwd)
 plan=${REPLAY_PLAN:-docs/ic/validation/replay-plan.json}
+jq -e -L "$here" 'include "replay_native"; valid_drift_expectations' "$plan" >/dev/null
 jq -e '.schema == "ic-replay-plan/v1" and
   (.sessions | type == "array" and length > 0) and
   ([.sessions[].dir] | length == (unique | length)) and
@@ -27,7 +28,7 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
       .schema == "ic-replay-partition/v1" and .dir == $dir and .binary == $binary and
       .roster_sha256 == $roster and .index == $i and .partition == $p and .partitions == $n and
       (.plan_sha256|test("^[0-9a-f]{64}$")) and
-      (.mode == "explicit" or .mode == "cached-explicit" or .mode == "cached-full" or .mode == "empty")' "$base.partition.json" >/dev/null
+      (.mode == "explicit" or .mode == "cached-explicit" or .mode == "cached-full" or .mode == "empty" or .mode == "chunked")' "$base.partition.json" >/dev/null
     cmp "$candidates" "$base.candidates.json"
     jq -e --argjson p "$p" --argjson n "$parts" --slurpfile selected "$base.selected.json" \
       '[to_entries[] | select(.key % $n == $p) | .value] == $selected[0]' "$candidates" >/dev/null
@@ -44,7 +45,27 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
         .replay_candidates == ($candidates[0]|length) and .replay_selection == "sample" and
         (.replays|length) == 1 and ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0' \
         "$base.probe.json" >/dev/null
-      if [[ $mode == empty ]]; then
+      if [[ $mode == chunked ]]; then
+        [[ $(sha256sum "$base.chunks.json" | cut -d' ' -f1) == "$(jq -r .chunks_sha256 "$base.partition.json")" ]]
+        jq -e --arg tag "$tag" 'type == "array" and length > 0 and
+          all(.[]; (.file | type == "string" and test("^"+$tag+"\\.chunk[0-9]{4,}\\.json$")) and
+            (.sha256 | type == "string" and test("^[0-9a-f]{64}$")) and
+            (.exit_code == 0 or .exit_code == 1)) and
+          ([.[].file] | length == (unique|length))' "$base.chunks.json" >/dev/null
+        chunks=()
+        while IFS=$'\t' read -r name digest status; do
+          receipt="$ROOT/$p/$name"
+          [[ $(sha256sum "$receipt" | cut -d' ' -f1) == "$digest" ]]
+          [[ $(cat "$receipt.exit") == "$status" ]]
+          [[ $(jq -r 'if .ok then 0 else 1 end' "$receipt") == "$status" ]]
+          jq -e -L "$here" --arg binary "$binary" '
+            include "replay_native"; valid_native($binary) and .replay_selection == "explicit"' "$receipt" >/dev/null
+          chunks+=("$receipt")
+        done < <(jq -r '.[]|[.file,.sha256,.exit_code]|@tsv' "$base.chunks.json")
+        jq -se -L "$here" --slurpfile selected "$base.selected.json" '
+          include "replay_native"; ([.[].replays[]]|replay_keys) == $selected[0]' "${chunks[@]}" >/dev/null
+        receipts+=("${chunks[@]}")
+      elif [[ $mode == empty ]]; then
         jq -e 'length==0' "$base.selected.json" >/dev/null
         [[ ! -e $base.receipt.json ]]
       else
@@ -83,7 +104,12 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
   ok=$(jq '[.replays[]|select(.reproduced)]|length' "$ROOT/checked/$tag.union.json")
   got=drift; [[ $ok != "$total" ]] || got=identical
   expected=$(jq -r ".sessions[$i].expect" "$plan")
-  if [[ $got == "$expected" ]]; then
+  entry=$(jq -c ".sessions[$i]" "$plan")
+  if ! jq -e -L "$here" --argjson entry "$entry" \
+      'include "replay_native"; same_pinned_drifts($entry)' "$ROOT/checked/$tag.union.json" >/dev/null; then
+    echo "$dir: native drift identities/details differ from the evidence-backed pin"
+    bad=1
+  elif [[ $got == "$expected" ]]; then
     echo "$dir: $got ($ok/$total), complete native coverage as planned"
   else
     echo "$dir: expected $expected, observed $got ($ok/$total); plan requires evidence-backed correction"

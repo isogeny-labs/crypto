@@ -16,6 +16,10 @@ binary=$(sha256sum "$EB" | cut -d' ' -f1)
 plan_hash=$(sha256sum "$plan" | cut -d' ' -f1)
 roster_hash=$(jq -c '[.sessions[]|{dir,replay}]' "$plan" | sha256sum | cut -d' ' -f1)
 check_native() { jq -e -L "$here" --arg binary "$binary" 'include "replay_native"; valid_native($binary)' "$1" >/dev/null; }
+check_status() {
+  [[ -s $1.exit ]] &&
+    [[ $(cat "$1.exit") == "$(jq -r 'if .ok then 0 else 1 end' "$1")" ]]
+}
 check_files() {
   local receipt=$1 dir=$2 name expected actual
   while IFS=$'\t' read -r name expected; do
@@ -57,11 +61,27 @@ check_partition_cache() {
     [[ $(cat "$cached.$kind.json.exit") == "$(jq -r 'if .ok then 0 else 1 end' "$cached.$kind.json")" ]] || return 1
   done
 }
+check_probe() {
+  check_native "$1" && check_files "$1" "$dir" && check_status "$1" || return 1
+  jq -e --slurpfile candidates "$base.candidates.json" '
+    .replay_selection == "sample" and .replay_candidates == ($candidates[0]|length) and
+    (.replays|length) == 1 and
+    ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0' "$1" >/dev/null
+}
+check_chunk() {
+  check_native "$1" && check_files "$1" "$dir" && check_status "$1" || return 1
+  jq -e -L "$here" --slurpfile selected "$2" --slurpfile probe "$base.probe.json" '
+    include "replay_native"; .replay_selection == "explicit" and
+    (.replays|replay_keys) == $selected[0] and .files == $probe[0].files and
+    .session_id == $probe[0].session_id' "$1" >/dev/null
+}
 n=$(jq '.sessions|length' "$plan")
 start=${REPLAY_START_INDEX:-0}
 [[ $start =~ ^[0-9]+$ ]] && ((start < n)) || exit 2
 group=${REPLAY_GROUP_INDEX:-0}; groups=${REPLAY_GROUP_COUNT:-1}
 [[ $group =~ ^[0-9]+$ && $groups =~ ^[1-9][0-9]*$ ]] && ((group < groups && groups <= n)) || exit 2
+chunk_size=${REPLAY_CHUNK_SIZE:-0}
+[[ $chunk_size =~ ^[0-9]+$ ]] || exit 2
 for ((offset=0; offset<n; offset++)); do
   i=$(((offset+start)%n))
   ((i % groups == group)) || continue
@@ -108,13 +128,46 @@ for ((offset=0; offset<n; offset++)); do
     cp "$cache" "$base.receipt.json"
     mode="cached-full"
   else
-    audit "$base.probe.json" --replay 1 --replay-seed 0
+    chunk_cache=${REPLAY_CHUNK_CACHE:-}/$tag
+    if [[ -n ${REPLAY_CHUNK_CACHE:-} && -s $chunk_cache.probe.json.exit ]] &&
+        [[ $(cat "$chunk_cache.probe.json.exit") =~ ^[01]$ ]]; then
+      check_probe "$chunk_cache.probe.json" || { echo "$dir: invalid cached native probe"; exit 1; }
+      for suffix in json json.exit json.stderr; do cp "$chunk_cache.probe.$suffix" "$base.probe.$suffix"; done
+    else
+      audit "$base.probe.json" --replay 1 --replay-seed 0
+    fi
     jq -e --slurpfile candidates "$base.candidates.json" '
       .replay_selection == "sample" and .replay_candidates == ($candidates[0]|length) and
       (.replays|length) == 1 and
       ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0' "$base.probe.json" >/dev/null
     mapfile -t seqs < <(jq -r '.[].seq' "$base.selected.json")
-    if ((${#seqs[@]})); then
+    if ((${#seqs[@]} && chunk_size)); then
+      mode=chunked
+      printf '[]\n' > "$base.chunks.json"
+      for ((first=0, chunk=0; first<${#seqs[@]}; first+=chunk_size, chunk++)); do
+        name="$tag.chunk$(printf '%04d' "$chunk").json"
+        receipt="$OUT/$name"
+        jq --argjson first "$first" --argjson size "$chunk_size" '.[$first:$first+$size]' \
+          "$base.selected.json" > "$receipt.selected"
+        cached_chunk=${REPLAY_CHUNK_CACHE:-}/$name
+        if [[ -n ${REPLAY_CHUNK_CACHE:-} && -s $cached_chunk.exit ]] &&
+            [[ $(cat "$cached_chunk.exit") =~ ^[01]$ ]]; then
+          check_chunk "$cached_chunk" "$receipt.selected" || { echo "$dir: invalid cached native chunk"; exit 1; }
+          for suffix in '' .exit .stderr; do cp "$cached_chunk$suffix" "$receipt$suffix"; done
+        else
+          args=(--replay 0)
+          for seq in "${seqs[@]:first:chunk_size}"; do args+=(--replay-seq "$seq"); done
+          audit "$receipt" "${args[@]}"
+          check_chunk "$receipt" "$receipt.selected"
+        fi
+        jq --arg file "$name" --arg sha256 "$(sha256sum "$receipt" | cut -d' ' -f1)" \
+          --argjson exit_code "$(cat "$receipt.exit")" \
+          '. + [{file:$file,sha256:$sha256,exit_code:$exit_code}]' "$base.chunks.json" > "$base.chunks.tmp"
+        mv "$base.chunks.tmp" "$base.chunks.json"
+        echo "$dir: partition $part/$parts completed native chunk $chunk (${#seqs[@]} selected records)"
+      done
+      chunks_hash=$(sha256sum "$base.chunks.json" | cut -d' ' -f1)
+    elif ((${#seqs[@]})); then
       args=(--replay 0)
       for seq in "${seqs[@]}"; do args+=(--replay-seq "$seq"); done
       audit "$base.receipt.json" "${args[@]}"
@@ -130,10 +183,12 @@ for ((offset=0; offset<n; offset++)); do
   jq -n --arg schema ic-replay-partition/v1 --arg dir "$dir" --arg binary "$binary" \
     --arg plan_sha256 "$plan_hash" --arg roster_sha256 "$roster_hash" --arg mode "$mode" \
     --arg cache_binding_sha256 "$cache_binding" --argjson index "$i" \
+    --arg chunks_sha256 "${chunks_hash:-}" \
     --argjson partition "$part" --argjson partitions "$parts" \
     '{schema:$schema,dir:$dir,binary:$binary,plan_sha256:$plan_sha256,
       roster_sha256:$roster_sha256,mode:$mode,index:$index,
       partition:$partition,partitions:$partitions} +
-      (if $mode == "cached-explicit" then {cache_binding_sha256:$cache_binding_sha256} else {} end)' > "$base.partition.json"
+      (if $mode == "cached-explicit" then {cache_binding_sha256:$cache_binding_sha256} else {} end) +
+      (if $mode == "chunked" then {chunks_sha256:$chunks_sha256} else {} end)' > "$base.partition.json"
   echo "$dir: partition $part/$parts $mode ($(jq length "$base.selected.json") records)"
 done

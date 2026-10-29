@@ -5,6 +5,8 @@
 set -uo pipefail
 EB="${1:?usage: replay_plan.sh ecbench outdir}"; OUT="${2:?usage: replay_plan.sh ecbench outdir}"; mkdir -p "$OUT"
 plan=${REPLAY_PLAN:-docs/ic/validation/replay-plan.json}
+here=$(cd "$(dirname "$0")" && pwd)
+jq -e -L "$here" 'include "replay_native"; valid_drift_expectations' "$plan" >/dev/null || { echo 'invalid drift expectation pins'; exit 1; }
 jq -e '.schema == "ic-replay-plan/v1" and
   (.sessions | type == "array" and length > 0) and
   ([.sessions[].dir] | length == (unique | length)) and
@@ -33,6 +35,11 @@ for i in $(seq 0 $((n - 1))); do
     echo "$dir: malformed or empty replay receipt (exit $status)"; bad=1; continue
   fi
   total=$(jq '.replays | length' "$OUT/$tag.receipt.json"); ok=$(jq '[.replays[] | select(.reproduced)] | length' "$OUT/$tag.receipt.json")
+  entry=$(jq -c ".sessions[$i]" "$plan")
+  if ! jq -e -L "$here" --argjson entry "$entry" \
+      'include "replay_native"; same_pinned_drifts($entry)' "$OUT/$tag.receipt.json" >/dev/null; then
+    echo "$dir: native drift identities/details differ from the evidence-backed pin"; bad=1; continue
+  fi
   if [ "$ok" = "$total" ]; then got=identical; else got=drift; fi
   if [ "$got" = identical ] && [ "$status" != 0 ]; then
     echo "$dir: auditor failed with exit $status despite identical replays; inspect the receipt's other checks"; bad=1

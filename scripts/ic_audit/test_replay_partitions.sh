@@ -135,4 +135,84 @@ for p in 0 1 2 3; do
   REPLAY_GROUP_INDEX=1 pass bash "$here/replay_partition.sh" ./fake-native "$tmp/grouped/$p" "$p" 4
 done
 pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/grouped" 4
+# A session can checkpoint native receipts without inventing a combined native receipt.
+unset REPLAY_GROUP_COUNT
+export REPLAY_PLAN="$tmp/plan.json" REPLAY_CHUNK_SIZE=1
+pass bash "$here/replay_partition.sh" ./fake-native "$tmp/chunked/0" 0 1
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunked" 1
+jq -e 'length == 3' "$tmp/chunked/0/0000.chunks.json" >/dev/null
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" METADATA_STUB_EXIT=7 \
+  pass bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunk-resumed" 1
+cp -a "$tmp/chunked" "$tmp/chunk-good"
+for mutation in '.auditor_binary_sha256=("0"*64)' '.replays[0].record_id="wrong"' \
+  '.checks.records_hash=false' '.files["records.jsonl"]=("0"*64)'; do
+  jq "$mutation" "$tmp/chunk-good/0/0000.chunk0000.json" > "$tmp/chunked/0/0000.chunk0000.json"
+  REPLAY_CHUNK_CACHE="$tmp/chunked/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunked" 1
+done
+cp "$tmp/chunk-good/0/0000.chunk0000.json" "$tmp/chunked/0/0000.chunk0000.json"
+printf '1\n' > "$tmp/chunked/0/0000.chunk0000.json.exit"
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunked" 1
+printf '0\n' > "$tmp/chunked/0/0000.chunk0000.json.exit"
+# Rebind intentionally malformed manifests, so these exercise coverage/name checks.
+for mutation in '.[0].file="../borrowed.json"' '. += [.[0]]' '.[1:]'; do
+  jq "$mutation" "$tmp/chunk-good/0/0000.chunks.json" > "$tmp/chunked/0/0000.chunks.json"
+  jq --arg digest "$(sha256sum "$tmp/chunked/0/0000.chunks.json" | cut -d' ' -f1)" \
+    '.chunks_sha256=$digest' "$tmp/chunk-good/0/0000.partition.json" > "$tmp/chunked/0/0000.partition.json"
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunked" 1
+done
+cp "$tmp/chunk-good/0/0000.chunks.json" "$tmp/chunked/0/0000.chunks.json"
+cp "$tmp/chunk-good/0/0000.partition.json" "$tmp/chunked/0/0000.partition.json"
+rm "$tmp/chunked/0/0000.chunk0002.json"
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunked" 1
+# An interrupted session has no final binding; its completed native chunks survive.
+rm "$tmp/chunked/0/0000.partition.json" "$tmp/chunked/0/0000.chunks.json"
+rm "$tmp/chunked/0/0000.chunk0002.json.exit"
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" pass bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-partial/0" 0 1
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunk-partial" 1
+printf '137\n' > "$tmp/chunked/0/0000.chunk0002.json.exit"
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" pass bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-after-kill/0" 0 1
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/chunk-after-kill" 1
+jq '.replay_candidates=2' "$tmp/chunk-good/0/0000.probe.json" > "$tmp/chunked/0/0000.probe.json"
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+cp "$tmp/chunk-good/0/0000.probe.json" "$tmp/chunked/0/0000.probe.json"
+printf 'changed\n' >> research/study/session/spec.json
+REPLAY_CHUNK_CACHE="$tmp/chunked/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+printf '{}\n' > research/study/session/spec.json
+REPLAY_CHUNK_SIZE=invalid fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+# A precise historical counter drift cannot waive new scalar or coverage failures.
+cp -a "$tmp/good" "$tmp/pinned"
+jq '.require_pinned_drift=true | .sessions[0].expect="drift" |
+  .sessions[0].expected_drift=[{seq:0,record_id:"metadata-0",detail:"differs in phase counts"}]' \
+  "$REPLAY_PLAN" > "$tmp/pinned-plan.json"
+export REPLAY_PLAN="$tmp/pinned-plan.json"
+drift_receipt() {
+  jq --arg detail "$2" '.ok=false | .checks.replays=false |
+    .replays[0].reproduced=false | .replays[0].detail=$detail |
+    .problems=["replay of seq \(.replays[0].seq): \($detail)"]' \
+    "$tmp/good/$1/0000.receipt.json" > "$tmp/pinned/$1/0000.receipt.json"
+  printf '1\n' > "$tmp/pinned/$1/0000.receipt.json.exit"
+}
+drift_receipt 0 'differs in phase counts'
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+drift_receipt 0 'wrong recovered scalar'
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+drift_receipt 0 'differs in phase counts'
+drift_receipt 1 'differs in phase counts'
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+cp "$tmp/good/0/0000.receipt.json" "$tmp/pinned/0/0000.receipt.json"
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+cp "$tmp/good/1/0000.receipt.json" "$tmp/pinned/1/0000.receipt.json"
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+drift_receipt 0 'differs in phase counts'
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+cp "$REPLAY_PLAN" "$tmp/good-pinned-plan.json"
+for mutation in 'del(.sessions[0].expected_drift)' '.sessions[0].expected_drift=[]' \
+  '.sessions[0].expected_drift += .sessions[0].expected_drift' \
+  '.sessions[0].expected_drift[0].detail=""'; do
+  jq "$mutation" "$tmp/good-pinned-plan.json" > "$REPLAY_PLAN"
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
+done
 echo "partition metadata controls: $controls passed"

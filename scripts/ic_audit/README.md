@@ -22,6 +22,14 @@ drift with the plan; healed drift is a failure too. Its `ic-replay-union/v1`
 output is a derived coverage summary, never a native audit receipt. The
 original native receipts remain separate artifacts.
 
+A plan may pin `expected_drift` as the exact nonempty array of
+`{seq, record_id, detail}` for each known-drift session. Both serial and
+partitioned checkers reject an extra or healed failure, a different failed
+record, or a changed native error detail. `require_pinned_drift: true` requires
+these pins on every drift entry. Historical unpinned plans retain their old
+behavior; the completed roster's correction must be based on actual native
+receipts and preserve the prior evidence. An identical entry may pin only[].
+
 For an interrupted local verification, `REPLAY_RECEIPT_CACHE` may name a
 directory containing indexed **full native receipts**. Reuse requires exactly
 the same executable SHA-256, every current input SHA-256, the complete native
@@ -37,6 +45,24 @@ labeled `cached-explicit`, preserving the native receipts and a hash-bound copy
 of the prior partition binding. An interrupted or missing binding is rerun;
 an invalid completed binding is rejected. A partial cache never substitutes
 for the other partitions or for full coverage.
+
+For interruption-prone local audits, `REPLAY_CHUNK_SIZE=1` checkpoints each
+selected record as a separate, unchanged native audit. Larger positive sizes
+checkpoint that many selected records; the default0 preserves a single native
+receipt per partition. `REPLAY_CHUNK_CACHE` may point to an earlier, distinct
+output directory, including one interrupted before its final partition binding.
+Only completed native statuses0/1 with the exact executable, input map, native
+candidate probe and selected identities are reused. Failed statuses are rerun;
+an invalid completed receipt is rejected. All original failed attempts remain in
+their earlier directories.
+
+A completed `chunked` partition binds an ordered manifest of native receipt
+filenames, SHA-256 digests and actual exit statuses. The final checker validates
+every native receipt, its session/file map, and the exact union against the
+partition's selected identities before checking global coverage. It never
+manufactures a combined `ecbench.audit/v1` receipt. Missing, duplicate, borrowed,
+changed or unsuccessful chunks cannot complete the union. Chunking changes no
+record, native algorithm, candidate selection or inner resource budget.
 
 The workflow also divides the roster into eight disjoint session groups using
 `REPLAY_GROUP_INDEX/REPLAY_GROUP_COUNT`, with at most four matrix jobs active.
