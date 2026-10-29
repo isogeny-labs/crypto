@@ -51,6 +51,7 @@ impl Collector {
             .iter()
             .enumerate()
             .map(|(i, &small)| {
+                crate::meter::charge(|c| c.partition_terms += 1);
                 if small {
                     small_columns.push(i);
                     Column::Small(small_columns.len() - 1)
@@ -105,6 +106,7 @@ impl Collector {
         let mut small = Vec::new();
         let mut large = Vec::new();
         for &(i, coefficient) in terms {
+            crate::meter::charge(|c| c.partition_terms += 1);
             match self.columns[i] {
                 Column::Small(j) => small.push((j, coefficient)),
                 Column::Large(j) => large.push((j, coefficient)),

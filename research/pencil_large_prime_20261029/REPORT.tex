@@ -27,7 +27,7 @@ cycles and unbalanced cycles. Their direct compiler result and axiom report
 are retained separately. They do not formalize the full forest invariant or
 prove correspondence with Rust.
 The retained residual basis is now also compared with the independent reference
-at all 25,600 prefixes. Ten native tests pass. Explicit working and retained
+at all 25,600 prefixes. Eleven library tests pass. Explicit working and retained
 coefficient caps leave the basis unchanged on rejection; callers must stop or
 retain that rejected row. Logical counters include failed attempts but omit
 map comparisons, allocation, setup and exponentiation internals. These are
@@ -36,8 +36,13 @@ The composed adapter binds both stages to one field and fixed column
 partition, rejects three-large-variable rows explicitly, and retains an
 unincorporated constraint on terminal cap. Its row space is also checked
 at all 25,600 prefixes. The optional producer now connects this adapter to
-the existing geometric checks and matched control. Two producer tests check
-signed coefficient parity and rejection of constant-only inconsistencies.
+the existing geometric checks and matched control. Three producer tests check
+signed coefficient parity, rejection of constant-only inconsistencies and
+phase attribution of symbolic events. Setup is a separate recorded phase.
+Semantic arithmetic counts include inversion multiplications and distinguish
+primality powers from inversions. Direct pivot lookup replaces full basis
+scans; no performance measurement is inferred. Residual diagnostics overlap
+this ledger and must not be double-charged.
 The producer has not run a cohort. Its new schemas explicitly mark costs
 incomplete and ratios null; a frozen partition and full accounting remain open.
 \section*{Next integration gates}

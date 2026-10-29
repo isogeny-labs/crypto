@@ -1,5 +1,34 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-795 continuation
+
+### What was done
+
+Instrumented symbolic arithmetic and traversal semantic events. Added solver
+setup and symbolic phase deltas with an attribution invariant. Replaced full
+basis scans with exact pivot lookup. Eleven library and three producer tests
+pass; clippy passes. Independent review found no concrete counter or lookup
+bug and identified overlap boundaries documented in README.md.
+
+### Decisions made
+
+Preserve the original distinction between base-field price-band operations
+and scalar native work. Keep inversion multiplications and explicit events;
+do not classify Miller--Rabin powers as inversions. Residual diagnostics
+overlap these counters. Full accounting remains incomplete, not priced.
+
+### Open threads
+
+Finish native/index/allocation accounting and freeze the experiment contract.
+Job inventory remains unavailable: the configured spot-job-submitter context
+requests the existing remote-launcher role but its AssumeRole call is denied.
+No identity, permissions, infrastructure or job state was changed.
+
+### Errors
+
+The EKS read-only job-list request failed during credential acquisition.
+No experiment was submitted or restarted. Diem remains deadline-expired.
+
 ## 2026-10-29 T-793 continuation
 
 ### What was done
