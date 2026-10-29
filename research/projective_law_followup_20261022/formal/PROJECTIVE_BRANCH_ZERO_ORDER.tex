@@ -1,0 +1,41 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.68in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{Conditional zero order at an actual projective branch}
+\author{Formal proof packet}
+\date{27 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet records a conditional local-geometry proof, not a target experiment or cost comparison. The editable diagram, gate CSV, Lean source, and compiler log are beside this PDF.
+
+\section*{Checked statement}
+Let $a$ be a rational simple root of the quintic and $R$ the structure-sheaf stalk of the actual weighted-Proj curve at that branch. The previously checked local geometry makes $R$ a DVR, with $\operatorname{ord}(y)=1$ and $y^2=(x-a)q$ for a unit $q$. The new theorem proves that if $N=(x-a)t$ and $B$ is a unit in $R$, then
+\[
+\operatorname{ord}(N-By)=1.
+\]
+The proof transports the generic branch zero-order lemma into this actual projective stalk. The underlying DVR criterion is discussed in the \href{https://stacks.math.columbia.edu/tag/00PD}{Stacks Project, Lemma 10.119.7}.
+
+A second checked theorem composes the separate norm-factor transport with this result. If a polynomial norm identity holds at a rational support root and $B$ is a unit in this stalk, then the evaluated polynomial numerator satisfies $\operatorname{ord}(n(x)-By)=1$. A checked corollary replaces the unit premise with the source-style scalar guard $b\ne0$: its image $B$ is a unit. The norm polynomial and its link to the compiled runtime numerator remain explicit inputs.
+
+The source-style specialization uses the checked common 2+2 coefficient formulas. Under valid Mumford input congruences, a normalized quintic head, nonzero determinant, a rational simple branch, and a root of the norm support product, it proves the same local order for the proof-side polynomial numerator. Equality of the supplied quintic with the actual curve equation and compiled runtime semantics are still separate obligations.
+
+The actual-quintic specialization proves the weighted-Proj quintic evaluates to the affine branch polynomial and has the required normalized head. A further checked corollary derives the simple-root condition from separability of that quintic. Valid input congruences, nonzero determinant, rational branch root, and norm-support root remain explicit.
+
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\fbox{\begin{minipage}{0.88\linewidth}\centering
+Checked actual stalk: $R$ is a DVR and $\operatorname{ord}(y)=1$\par\vspace{5pt}
+Explicit input: $N=(x-a)t$ (or the checked norm route), $b\ne0$\par\vspace{5pt}
+$\Downarrow$ checked local valuation algebra\par\vspace{5pt}
+$\operatorname{ord}(N-By)=1$
+\end{minipage}}
+\end{center}
+
+\section*{Verification and remaining gates}
+Direct Lean 4.34.1 compilation with Mathlib \texttt{d13f23b} exited zero for all five sources. All thirteen theorem axiom audits list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; no \texttt{sorryAx}. Source SHA-256 hashes are in the companion CSV and Markdown report; the updated sources are:\par\smallskip\noindent Quintic head: {\scriptsize\texttt{668bd42e2f25d22dfa128cf910572f76190ec630a56665e8808b42bcf4d643f3}}.\par\smallskip\noindent Actual specialization: {\scriptsize\texttt{c7373682f8ce09e0c2243dfa44c92b9e6467f0b9188fa420aa1c23fbc4e6ca7d}}.
+
+The compiled Rust law has not been shown to equal the mapped polynomial on every branch. Nonbranch multiplicities, the global principal divisor, the $\mathrm{Pic}^0$ class equation, and universal runtime semantics remain open. No frozen 1,260-target row or matched-rho ratio changes.
+\end{document}
