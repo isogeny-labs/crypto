@@ -54,20 +54,27 @@
       "description": "Signed symbolic point-driven pencil collector, cold per-call construction/transfer charged. Actual prepared arm label is pencil.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
         "build": [
           [
             "cargo",
+            "+1.99.1",
             "build",
-            "--release",
             "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
             "--bin",
             "ecbench"
           ]
         ],
         "binary_sha256": null,
         "image_digest": null,
-        "flags": {},
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
         "env": {
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1"
@@ -87,20 +94,27 @@
       "description": "Matched source negation rho; also the unmodified reference baseline. Per-workload archived cap resolved by the prepared spec.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
         "build": [
           [
             "cargo",
+            "+1.99.1",
             "build",
-            "--release",
             "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
             "--bin",
             "ecbench"
           ]
         ],
         "binary_sha256": null,
         "image_digest": null,
-        "flags": {},
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
         "env": {
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1"
@@ -118,20 +132,27 @@
       "description": "Identical resolved rho method and algorithm seed, separate scheduled execution.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
         "build": [
           [
             "cargo",
+            "+1.99.1",
             "build",
-            "--release",
             "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
             "--bin",
             "ecbench"
           ]
         ],
         "binary_sha256": null,
         "image_digest": null,
-        "flags": {},
+        "flags": {
+          "RUSTFLAGS": "-C target-cpu=x86-64",
+          "CARGO_BUILD_JOBS": "2"
+        },
         "env": {
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1"
@@ -606,7 +627,7 @@
         "gate-p739.json": "a2c25a203ad4c39aaea57287e1705dd4b3db394cd10507fff009980ec8634c18"
       }
     },
-    "cold_contract_sha256": "f9b2c1a97246f952c6b6bb25092188fc1573d6ec743d5b360639f8ba290cf60a",
+    "cold_contract_sha256": "3719de558181e663192bfca9ea1fce05df535603f2acd187058de55e4a8b4585",
     "analysis_support_sha256": {
       "paired_export/src/lib.rs": "d8ef61a5db60874e3c9de2539c0f1201d75a2589c410687d3509b147b06288fe",
       "paired_export/src/plan.rs": "fb8f3dd4fbcc42119d2f3f435b32eadaf6a7beb3fd7f2abcc13c67dd8fba2720",
@@ -643,6 +664,13 @@
       "clock_valid": false,
       "purpose": "Durable computation and independent replay; never contributes to primary or secondary timed comparison, even without restore. Native controller starts distinct fresh benchmark epoch described by execution."
     },
-    "whole_run_resource_accounting": "Retain every computation, warmup, gate, benchmark, control, replay, checkpoint, restore and infrastructure attempt and its resource/time cost in export flow. Separate algorithm method-call metric from whole study cost; no erasure of computation/control or first-gate costs. Never sum overlapping child/process/phase clocks."
+    "whole_run_resource_accounting": "Retain every computation, warmup, gate, benchmark, control, replay, checkpoint, restore and infrastructure attempt and its resource/time cost in export flow. Separate algorithm method-call metric from whole study cost; no erasure of computation/control or first-gate costs. Never sum overlapping child/process/phase clocks.",
+    "instrument_build": {
+      "source_commit": "3d99a998514c81a4095105ac71eb6df335bc55a2",
+      "workflow_commit": "006f88e69fe7eb9a0afa4f90150daea2b372714d",
+      "workflow_run": 40919051188,
+      "status": "build_in_progress_no_binary_attestation_yet",
+      "plans": "The GNU development binary verified all9 plans; final static binary input parity remains to be checked."
+    }
   }
 }
