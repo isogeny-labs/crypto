@@ -45,6 +45,15 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
+records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
+and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
+and retained-assignment replay. Its timing wrapper exited 1 on a denied
+macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
+SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
+It has no matched rho or cold total-runtime row and remains outside the
+admitted table under the validation gate.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-prime-fb-size-20bit`](20261029-prime-fb-size-20bit/) ([PDF](20261029-prime-fb-size-20bit/REPORT.pdf); [validation](20261029-prime-fb-size-20bit/VALIDATION.json)) | Prime-field index calculus (`ic.pipeline`, oracle `mitm:negation_folded=1`): low-x factor-base size and exact oracle selected on train curves, decided per size on fresh holdout curves (backlog XP-20261016, frozen protocol; 48 targets × 2 rounds; incumbent `ic-pair`, A/A arms and a same-session negation-map rho on the same targets); deterministic counted cost S = GAE/√r with native work priced at w = 0, 0.1, 1 | 20 bits: N 32 → 45 gives paired S ratio 0.818 [0.773, 0.866] / 0.798 [0.752, 0.847] / 0.726 [0.677, 0.778] at w = 0 / 0.1 / 1 (96 pairs, all verified; A/A 1.000); distance to rho 9.47 → 7.75 (w = 0), 12.88 → 9.35 (w = 1). 24 and 28 bits: a smaller N falls at w = 0 and rises at w = 1, read as relabelling; 32 bits: selection = incumbent. Counted unit only, one holdout curve per size; validation is a same-host replay, and the second-host replay PROTOCOL §13 needs before a leaderboard promotion is outstanding | 4 vCPU Xeon 2.10 GHz cloud container, one core pinned (L0); deterministic counts | [`research/prime_base_oracle_tuning_20261029`](../research/prime_base_oracle_tuning_20261029/) ([report](../research/prime_base_oracle_tuning_20261029/README.pdf)) |
@@ -179,6 +188,9 @@ is preserved separately pending validation admission.
 The [Jacobian-cover cost breakdown and proposed leads](20261018-jv-cover-cost-breakdown-leads/README.md) retain component-count evidence and a corrected report. This study is not admitted to the results table: its component census has no matched end-to-end rho reference or complete validation-gate record.
 
 The [n = 2 real-model addition study](20261024-n2-real-model-addition/) (engineering on the validated H2 baseline VAL-20261024-wd4) keeps its report and graphs in that directory. New reduced real-model formulas, 30 M + I per addition against 41 M + I, are checked against the generic law on 175,000 pairs. They bring IC/rho at 40 bits, h = 1, from 1.78 / 1.80 / 1.88 to 1.39 / 1.48 / 1.75 at native 0 / 0.1 / 1 GAE, with all 1,200 answers verified. The 12-cell band remains unresolved, so the distance to rho is still 1.39x at measured cost. It is not admitted to the results table until it has its own `VALIDATION.json`. Source: [`research/n2_real_model_addition_20261024`](../research/n2_real_model_addition_20261024/REPORT.md).
+
+The [prime-field k-sum table study](20261028-prime-ksum-table/README.md) ([report](20261028-prime-ksum-table/report.pdf), [graph](20261028-prime-ksum-table/s_vs_bits.svg)) is not admitted to the results table until it has an independent-host replay and its own `VALIDATION.json`. On the frontier campaign's six `a = −3` prime curves (20–40 bits, 16 targets × 2 rounds, 2,016 verified runs, replay-all audited) a negation-folded table of every signed 4-sum of a smaller base lowers the prime index-calculus `S` from 83.7 to 11.6 at 40 bits (pair table → `ksum:m=4`), exponent 0.620 → 0.521; engineering, still 13.1× rho and above BSGS.
+
 
 The [n = 3 Tian route study](20261024-tian-n3-quartic-ic/) is not admitted to the results table until it has its own `VALIDATION.json`. It measures double-large-prime index calculus on generic plane-quartic Jacobians against Pollard rho, in the same process, at `q` = 127–8191, with 52/52 answers verified. With native work at 0 the index calculus needs 180–340 group additions against rho's 5,000–300,000. At 0.1 and 1 GAE its dense linear algebra, growing like `q^1.4`, makes it 0.7–32× rho, so the ranking is unresolved at every `q`. The study also finds plane-quartic Jacobians in the isogeny class of every Theorem-4-flagged prime-order `E/F_{q³}` at `q` ≤ 17 (26/26). This is not an end-to-end attack: no isogeny was computed. Source: [`research/tian_n3_quartic_route_20261024`](../research/tian_n3_quartic_route_20261024/REPORT.md).
 

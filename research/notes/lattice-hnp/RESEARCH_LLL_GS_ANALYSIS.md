@@ -257,23 +257,64 @@ follow-up is left as future work (see §7).
 
 ## 10. RESOLUTION (2026-05-22): Both failures were numerical artifacts
 
+> **Correction (2026-10-28, sheriff case SHF-20261028-0f3f64, PPN-2).**
+> The original §10.1–10.2 text below is kept as written and corrected here.
+>
+> 1. **§10.2 root cause withdrawn.** The "catastrophic cancellation"
+>    mechanism (residual `~2^446`) is unsupported, as the LLL note already
+>    says (`papers/lll-degeneracy-note/lll_degeneracy_note.tex`, correction
+>    of 2026-10-17, sheriff case SHF-20261017-e4d7f6, P-N1). With the
+>    scaling, the P-521 diagonal `n²/2^542` converts to exactly `2^500` in
+>    f64, so the subtraction in §10.2 is exact on the initial basis (zero
+>    residual). The residual-dominates condition also holds for P-256,
+>    brainpoolP256r1 and brainpoolP384r1, which recover. What stands is the
+>    measurement: scaled f64 GS fails at P-521, the 2048-bit fixed-point GS
+>    (`lll_reduce_hp`) recovers. Where the scaled f64 path loses precision
+>    at P-521 is **not isolated**. The §10.3 comparison "`2^{446}` in f64"
+>    and §10.4's "Was catastrophic cancellation" fall with it.
+> 2. **The zero residual depends on the conversion.** It holds only if the
+>    BigInt→f64 conversion is correctly rounded. With truncation the
+>    diagonal is `2^500·(1 − 2^-53)` and the residual is `2^447`, which is
+>    close to §10.2's figure. What was checked (2026-10-28): `Cargo.toml`
+>    requires `num-bigint = "0.4"`. `Cargo.lock` resolves the `crypto`
+>    crate to num-bigint **0.4.8** (`cargo tree -i num-bigint@0.4.8`; 0.5.1
+>    is also locked, for another dependency). In the 0.4.8 source,
+>    `BigUint::to_f64` (`src/biguint/convert.rs`, `high_bits_to_u64`) keeps
+>    the top 64 bits with a round-to-odd sticky bit and then casts
+>    `u64 as f64`, which rounds to nearest, ties to even. Together these give
+>    a correctly rounded conversion. In `big_to_f64_scaled`
+>    (`src/cryptanalysis/lattice.rs`), the 1042-bit `n²` is first shifted
+>    right by 22 bits, which truncates. Those 22 bits lie far below the
+>    53-bit significand, and the 1020-bit remainder is then rounded to
+>    nearest, so the result is still exactly `2^500`. This was established
+>    by reading the source, not by a committed run. The reader
+>    recomputation in the sheriff case (`p1_pn1_f64.out`) gets the same
+>    result under round-to-nearest.
+> 3. **§10.1 numbers.** `f64::MAX = (2^53 − 1)·2^971 ≈ 2^1024`, not `2^1023`.
+>    `n(secp256k1) − n(P-256) ≈ 2^224.0`, not `~2^192`. The overflow
+>    explanation is unchanged: secp256k1's `n^4` exceeds `f64::MAX` and
+>    P-256's `n^4` is below it, by a factor of about `1 − 2^-30`.
+
 ### 10.1 Failure A → Overflow (resolved 2026-05-21)
 
 The secp256k1 vs P-256 LLL discrepancy (§5, §7) was **not** a
 genuine lattice-theoretic phenomenon.  It was a floating-point
 overflow bug: `secp256k1.n ≈ 2^256`, so `n^4 ≈ 2^1024 > f64::MAX
-≈ 2^1023`.  The GS norm computation produced `Inf → NaN`,
+≈ 2^1023` [corrected 2026-10-28: `≈ 2^1024`].  The GS norm computation produced `Inf → NaN`,
 causing LLL to hit the iteration cap.  P-256 escaped only because
-its `n` is smaller by `~2^192`, putting `P-256.n^4` just under
+its `n` is smaller by `~2^192` [corrected 2026-10-28: `~2^224`], putting `P-256.n^4` just under
 `f64::MAX`.  Fix: global scaling by `2^(max_bits − 500)`.  All
 256-bit and 384-bit curves now recover 3/3 seeds.  The §5
 μ-oscillation hypothesis, §4 Gram-matrix eigenvalue analysis, and
 §7 r-distribution analysis are **refuted as root causes**.
 
-### 10.2 Failure B → Catastrophic cancellation (resolved 2026-05-22)
+### 10.2 Failure B → Catastrophic cancellation (resolved 2026-05-22) [root cause withdrawn 2026-10-28; see the correction at the top of §10]
 
 P-521 LLL still failed after the overflow fix.  Root cause:
 **catastrophic cancellation** in the f64 GS orthogonalization step.
+*[Withdrawn: unsupported. With the locked num-bigint 0.4.8 conversion, the
+subtraction below is exact on the initial basis. The residual `~2^446`
+appears only with a truncating conversion, which gives `2^447`.]*
 
 The P-521 HNP basis has entries spanning `2^384` to `2^1042`
 (658-bit dynamic range).  For the initial basis:

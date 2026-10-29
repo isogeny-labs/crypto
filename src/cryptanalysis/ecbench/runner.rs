@@ -51,7 +51,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::signals;
 use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::Workload;
+use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 
@@ -1015,6 +1015,7 @@ fn assemble(
             automorphisms_used: report.as_ref().map(|r| r.automorphisms_used),
             floor_s: floor,
             ratio_to_floor: s.map(|s| s / floor),
+            floor_rule: Some(FLOOR_RULE_V2.into()),
         },
         phases: report
             .as_ref()
@@ -1091,6 +1092,7 @@ pub fn read_record_lines_exact(dir: &Path) -> Result<Vec<(String, Record)>, Stri
 }
 
 fn from_str_exact_floats<T: serde::de::DeserializeOwned>(line: &str) -> Result<T, String> {
+    crate::cryptanalysis::ecbench::canonical::reject_duplicate_keys(line)?;
     // Validate the complete typed shape first. In particular, serde's derived
     // record visitors reject duplicate fields; Value alone would keep only the
     // last occurrence. Discard the legacy f64 values from this pass.
