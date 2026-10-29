@@ -1219,12 +1219,19 @@ mod tests {
             let fixture = Fixture::new();
             let binding = fixture.prepare();
             checked::install_policy(&fixture.cell()).unwrap();
+            storage::write_json(
+                &fixture.cell(),
+                "host.json",
+                "host-measurement-context",
+                &json!({"fixture":true}),
+            )
+            .unwrap();
             let initial = fixture.run(&checked_request(&fixture, binding.clone(), None));
             let request = checked_request(&fixture, binding, Some(initial));
             if delete {
-                fs::remove_file(fixture.cell().join("config.json")).unwrap();
+                fs::remove_file(fixture.cell().join("host.json")).unwrap();
             } else {
-                fs::write(fixture.cell().join("config.json"), b"{}").unwrap();
+                fs::write(fixture.cell().join("host.json"), b"{}").unwrap();
             }
             assert!(recheck_acknowledged(&request).is_err());
         }
@@ -1244,6 +1251,72 @@ mod tests {
         let value = serde_json::to_value(&request).unwrap();
         assert!(value.get("profile").is_none());
         assert!(value.get("acknowledged_context").is_none());
+    }
+
+    #[test]
+    fn checked_scan_cannot_adopt_policy_and_phases_after_missing_policy_probe() {
+        use super::super::telemetry::checked;
+        let fixture = Fixture::new();
+        let binding = fixture.prepare();
+        let request = checked_request(&fixture, binding.clone(), None);
+        fs::create_dir(&request.snapshot).unwrap();
+        let error =
+            prepare_checked_snapshot(&request, &serde_json::to_vec(&request).unwrap(), |name| {
+                if name == checked::POLICY_PATH {
+                    checked::install_policy(&fixture.cell()).unwrap();
+                    checked::tests::write_phase(
+                        &fixture.cell(),
+                        &binding,
+                        checked::types::Phase::CurveConstruction,
+                        false,
+                    );
+                }
+                Ok(())
+            })
+            .err()
+            .unwrap();
+        assert!(error.contains("required checked context absent"));
+        assert!(!request.snapshot.join("context").exists());
+        assert!(fixture
+            .cell()
+            .join("telemetry/curve-construction.json")
+            .exists());
+    }
+
+    #[test]
+    fn checked_snapshot_cannot_continue_a_legacy_chain() {
+        use super::super::telemetry::checked;
+        let fixture = Fixture::new();
+        let binding = fixture.prepare();
+        let legacy = fixture.run(&fixture.request(binding.clone(), None));
+        checked::install_policy(&fixture.cell()).unwrap();
+        let mut request = checked_request(&fixture, binding, Some(legacy));
+        // Even supplying self-consistent identities for the existing v1 files
+        // cannot change the remote manifest chain's profile to v2.
+        request.acknowledged_context = Some(
+            request
+                .copied_context
+                .iter()
+                .map(|name| {
+                    let (sha256, bytes) =
+                        crate::store::hash_file(&fixture.cell().join(name)).unwrap();
+                    Artifact {
+                        path: format!("context/{name}"),
+                        role: context_role(name).unwrap().into(),
+                        encoding: "json".into(),
+                        sha256,
+                        bytes,
+                    }
+                })
+                .collect(),
+        );
+        let directory = fixture.0.join("mixed-helper");
+        fs::create_dir(&directory).unwrap();
+        storage::write_json(&directory, "request.json", "request", &request).unwrap();
+        let error = snapshot_worker(&directory.join("request.json")).unwrap_err();
+        assert!(error.contains("partial manifest identity"), "{error}");
+        assert!(directory.join("prepared.json").is_file());
+        assert!(!directory.join("result.json").exists());
     }
 
     #[test]

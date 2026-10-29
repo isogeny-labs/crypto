@@ -66,18 +66,30 @@ pub(crate) fn byte_limit(path: &str) -> u64 {
 
 /// Reads one ordinary immutable file, checking bounds before and after reading.
 pub(crate) fn read(root: &Path, path: &str, max: u64) -> Result<Vec<u8>, String> {
+    read_before_open(root, path, max, |_| {})
+}
+
+fn read_before_open(
+    root: &Path,
+    path: &str,
+    max: u64,
+    before_open: impl FnOnce(&Path),
+) -> Result<Vec<u8>, String> {
     let root = storage::root_dir(root, false)?;
     let path = storage::contained_path(&root, path, false)?;
     let before = fs::symlink_metadata(&path).map_err(|e| e.to_string())?;
     if !before.is_file() || before.file_type().is_symlink() || before.len() > max {
         return Err("checked context is not an ordinary bounded file".into());
     }
+    before_open(&path);
     let mut options = OpenOptions::new();
     options.read(true);
     #[cfg(unix)]
     {
         use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW);
+        // A regular path may become a FIFO after the metadata check. Open it
+        // without waiting for a writer, then reject its descriptor type below.
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
     let file = options.open(&path).map_err(|e| e.to_string())?;
     let opened = file.metadata().map_err(|e| e.to_string())?;
@@ -331,6 +343,59 @@ pub(crate) fn validate_directory(root: &Path) -> Result<BTreeMap<String, &'stati
     validate_context(&binding, &context_files(root)?)
 }
 
+/// Legacy cells historically hash-checked opaque diagnostics, including torn or
+/// oversized JSON. This is only a bounded v2 discriminator, never v1 admission.
+/// Every valid v2 record fits the metrics bound. Larger/unparseable legacy bytes
+/// remain opaque unless a decoded top-level v2 schema was already encountered;
+/// restricted reporting performs its own schema/size validation.
+fn legacy_declares_checked(root: &Path, artifact: &Artifact) -> Result<bool, String> {
+    struct Discriminator<'a>(&'a mut bool);
+    impl<'de> serde::de::Visitor<'de> for Discriminator<'_> {
+        type Value = ();
+        fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("legacy diagnostic object")
+        }
+        fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<(), A::Error> {
+            while let Some(key) = map.next_key::<String>()? {
+                if key == "schema" {
+                    let schema = map.next_value::<String>()?;
+                    if matches!(
+                        schema.as_str(),
+                        "crypto.ml-dataset.phase-start/v2" | "crypto.ml-dataset.phase-metrics/v2"
+                    ) {
+                        *self.0 = true;
+                        return Ok(());
+                    }
+                } else {
+                    map.next_value::<serde::de::IgnoredAny>()?;
+                }
+            }
+            Ok(())
+        }
+    }
+    let path = storage::contained_path(root, &artifact.path, false)?;
+    let mut options = OpenOptions::new();
+    options.read(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+    }
+    let file = options.open(path).map_err(|e| e.to_string())?;
+    let metadata = file.metadata().map_err(|e| e.to_string())?;
+    if !metadata.is_file() || metadata.len() != artifact.bytes {
+        return Err("legacy diagnostic changed after hash verification".into());
+    }
+    // The reader limit also bounds string scratch allocation for schema/key
+    // decoding; arbitrary legacy returned_error strings use IgnoredAny.
+    let mut deserializer = serde_json::Deserializer::from_reader(std::io::BufReader::new(
+        file.take(METRICS_MAX as u64 + 1),
+    ));
+    let mut checked = false;
+    let _ = serde::Deserializer::deserialize_map(&mut deserializer, Discriminator(&mut checked));
+    Ok(checked)
+}
+
 /// Strict v2 dispatch without changing the legacy record representation.
 pub(crate) fn verify_artifacts(root: &Path, artifacts: &[Artifact]) -> Result<(), String> {
     let checked = policy_present(root)?;
@@ -357,20 +422,8 @@ pub(crate) fn verify_artifacts(root: &Path, artifacts: &[Artifact]) -> Result<()
                 {
                     return Err("unknown or invalid checked phase artifact".into());
                 }
-            } else {
-                let bytes = read(
-                    root,
-                    &artifact.path,
-                    crate::ml_dataset::JSON_INPUT_MAX_BYTES,
-                )?;
-                let value: serde_json::Value =
-                    serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
-                if !matches!(
-                    value["schema"].as_str(),
-                    Some("crypto.ml-dataset.phase-start/v1" | "crypto.ml-dataset.phase-metrics/v1")
-                ) {
-                    return Err("unknown telemetry schema or missing measurement policy".into());
-                }
+            } else if legacy_declares_checked(root, artifact)? {
+                return Err("checked telemetry is missing its measurement policy".into());
             }
         }
     }
@@ -428,6 +481,18 @@ pub(crate) fn measured<T>(
         .into_iter()
         .find(|p| p.name() == phase)
         .ok_or("unknown checked phase")?;
+    #[cfg(test)]
+    if tests::mock_factory_present() {
+        return measured_with(
+            out,
+            registry,
+            &binding,
+            phase,
+            || tests::open_mock(out, phase),
+            op,
+            |path, role, bytes| storage::write_bytes(out, path, role, "json", bytes),
+        );
+    }
     measured_with(
         out,
         registry,

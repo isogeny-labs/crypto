@@ -1,5 +1,5 @@
 use super::*;
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU64, Ordering};
 static NEXT: AtomicU64 = AtomicU64::new(0);
@@ -178,9 +178,156 @@ fn unsupported() -> Collection {
     }
     c
 }
-struct Mock {
+pub(super) struct Mock {
     record: Collection,
     dropped: Rc<Cell<u32>>,
+}
+
+thread_local! {
+    static FACTORY: RefCell<Option<Rc<Cell<usize>>>> = const { RefCell::new(None) };
+}
+
+pub(super) fn mock_factory_present() -> bool {
+    FACTORY.with(|factory| factory.borrow().is_some())
+}
+
+pub(super) fn open_mock(root: &Path, phase: Phase) -> Mock {
+    assert!(
+        root.join(phase.path(true)).is_file(),
+        "open preceded durable start"
+    );
+    FACTORY.with(|factory| {
+        let factory = factory.borrow();
+        let count = factory.as_ref().expect("test counter guard missing");
+        count.set(count.get() + 1);
+    });
+    Mock {
+        record: collection(),
+        dropped: Rc::new(Cell::new(0)),
+    }
+}
+
+/// Test-only, thread-local replacement at the real checked dispatch boundary.
+/// It cannot be enabled by a CLI/environment option in production builds.
+pub(crate) fn with_mock_counters<T>(op: impl FnOnce() -> T) -> (T, usize) {
+    struct Reset(Option<Rc<Cell<usize>>>);
+    impl Drop for Reset {
+        fn drop(&mut self) {
+            FACTORY.with(|factory| *factory.borrow_mut() = self.0.take());
+        }
+    }
+    let count = Rc::new(Cell::new(0));
+    let previous = FACTORY.with(|factory| factory.replace(Some(count.clone())));
+    let reset = Reset(previous);
+    let result = op();
+    drop(reset);
+    (result, count.get())
+}
+
+#[test]
+fn mock_factory_is_thread_local_and_restores_after_unwind() {
+    assert!(!mock_factory_present());
+    let _ = std::panic::catch_unwind(|| {
+        with_mock_counters(|| {
+            assert!(mock_factory_present());
+            assert!(!std::thread::spawn(mock_factory_present).join().unwrap());
+            panic!("test guard unwind");
+        })
+    });
+    assert!(!mock_factory_present());
+}
+
+#[test]
+fn legacy_opaque_tolerance_does_not_admit_declared_v2_without_policy() {
+    let temp = Temp::new();
+    fs::remove_file(temp.0.join(POLICY_PATH)).unwrap();
+    for bytes in [
+        br#"{torn legacy diagnostic"#.as_slice(),
+        br#"{"schema":"historically-opaque-schema","error":"diagnostic"}"#,
+        br#"{"schema":"crypto.ml-dataset.phase-metrics/v1"}"#,
+    ] {
+        let path = "telemetry/legacy.json";
+        if temp.0.join(path).exists() {
+            fs::remove_file(temp.0.join(path)).unwrap();
+        }
+        let artifact = storage::write_bytes(
+            &temp.0,
+            path,
+            "unregistered-partial-artifact",
+            "native",
+            bytes,
+        )
+        .unwrap();
+        verify_artifacts(&temp.0, &[artifact]).unwrap();
+    }
+    // A full legacy error above the prior 32MiB reader cap remains opaque.
+    let path = temp.0.join("telemetry/large.json");
+    let mut file = fs::File::create(&path).unwrap();
+    file.write_all(b"{\"returned_error\":\"").unwrap();
+    for _ in 0..529 {
+        file.write_all(&[b'x'; 65536]).unwrap();
+    }
+    file.write_all(b"\",\"schema\":\"crypto.ml-dataset.phase-metrics/v1\"}")
+        .unwrap();
+    drop(file);
+    let (sha256, bytes) = crate::store::hash_file(&path).unwrap();
+    verify_artifacts(
+        &temp.0,
+        &[Artifact {
+            path: "telemetry/large.json".into(),
+            role: "hardware-and-resource-telemetry".into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        }],
+    )
+    .unwrap();
+    for text in [
+        r#"{"schema":"crypto.ml-dataset.phase-metrics/v2","schema":"crypto.ml-dataset.phase-metrics/v1"}"#.to_owned(),
+        r#"{"schema":"crypto.ml-dataset.phase-start/v2"} trailing"#.into(),
+        r#"{"\u0073chema":"crypto.ml-dataset.phase-metrics\/v2"}"#.into(),
+        format!("{{\"padding\":\"{}\",\"schema\":\"crypto.ml-dataset.phase-metrics/v2\"}}", "x".repeat(500_000)),
+    ] {
+        let path = "telemetry/declared.json";
+        if temp.0.join(path).exists() { fs::remove_file(temp.0.join(path)).unwrap(); }
+        let artifact = storage::write_bytes(&temp.0, path, "unregistered-partial-artifact", "native", text.as_bytes()).unwrap();
+        assert!(verify_artifacts(&temp.0, &[artifact]).unwrap_err().contains("measurement policy"));
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn fifo_replacement_is_rejected_without_waiting_for_writer() {
+    const CHILD: &str = "CRYPTO_CHECKED_READ_FIFO_TEST_CHILD";
+    if std::env::var_os(CHILD).is_some() {
+        use std::os::unix::ffi::OsStrExt;
+        let temp = Temp::new();
+        let result = read_before_open(&temp.0, POLICY_PATH, 16384, |path| {
+            fs::remove_file(path).unwrap();
+            let name = std::ffi::CString::new(path.as_os_str().as_bytes()).unwrap();
+            // Deliberately no writer: without O_NONBLOCK, open cannot finish.
+            assert_eq!(unsafe { libc::mkfifo(name.as_ptr(), 0o600) }, 0);
+        });
+        assert!(result.unwrap_err().contains("changed before read"));
+        return;
+    }
+    let mut child = std::process::Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "ml_dataset::telemetry::checked::tests::fifo_replacement_is_rejected_without_waiting_for_writer", "--nocapture"])
+        .env(CHILD, "1")
+        .spawn().unwrap();
+    let deadline = Instant::now() + std::time::Duration::from_secs(10);
+    loop {
+        if let Some(status) = child.try_wait().unwrap() {
+            assert!(status.success());
+            break;
+        }
+        if Instant::now() >= deadline {
+            child.kill().unwrap();
+            child.wait().unwrap();
+            panic!("FIFO replacement blocked the bounded context reader");
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
 }
 impl Counter for Mock {
     fn start(&mut self) -> bool {
