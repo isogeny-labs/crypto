@@ -5,9 +5,22 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-29
-- **Latest search:** [29 October verified generator/coefficient census](../research/nist_skip_criterion_20261025/generator_b_execution_20261029/REPORT.md)
+- **Latest search:** [29 October verified strict-splitting separator](../research/nist_skip_criterion_20261025/strict_elkies_20261029/REPORT.md)
 
 ## Problem
+
+**Latest result, 29 October afternoon:** an externally reported empirical
+criterion reproduces exactly. Count odd primes ell≤691 with strictly positive
+Frobenius-discriminant character. Within each paired field, every publication
+has a smaller count than every omission. The published/omitted ranges are
+P-192 57–60/61–62, P-224 50/53–59, P-239 42–57/61–71 and P-256 57/58.
+All 21 curves remain, including unpaired P-384/P-521 controls. Separate
+native verification checks 6,342 characters, 303 cutoff positions,
+4,480 label assignments and all six output files. The restricted-family
+count 23/4,480 reproduces. This is not a new discovery
+or independent historical holdout. Including ramification makes cutoff691
+fail in P-192; the exact definition matters. See the current report/PDF above.
+The historical explanation and both vulnerability hypotheses remain unresolved.
 
 **Current status, 29 October:** the full declared generator/coefficient
 comparison has now run and passed separate native verification on all 21
@@ -260,3 +273,23 @@ recorded; do not ask for them again. New evidence or an independently
 predictive mathematical mechanism is needed for the historical claim.
 The prior six-basepoint FreeLIP RNG reconstruction remains relevant and is
 not refuted by zero matches in this different scalar-recipe family.
+
+2026-10-29 strict-count follow-up: the asanso17October authored post was read
+through a named mirror (direct X endpoint403) and its concrete claim was
+frozen before a new native replay. The full21replay and separate PARI
+verifier pass, including three deliberately corrupted-output refusals.
+Strict separating cutoffs are691,701,709,769;23of4480stream-count-preserving
+labelings admit some separator in the303-position family. The fixed691
+count1/4480cannot be presented as confirmatory because that cutoff was
+selected retrospectively in the earlier work. Other hypotheses examined
+are outside this calibration. The two singleton fields do not supply skip
+controls or independent predictions.
+
+This p,n-dependent profile does not change when the base point changes;
+the eleven original skipped generators are still unavailable. It matches
+the recorded paired labels but does not authenticate the original caller,
+acceptance rule or visit history. The user has no original records. Do not
+declare the historical objective complete or claim exhaustive measurement
+over all mathematical parameter functions. The exact finite inventories
+are complete; broader coverage and a supported historical mechanism remain
+open. No DLP, actual point-counting cost or attack was measured.

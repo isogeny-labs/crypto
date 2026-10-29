@@ -303,6 +303,18 @@ def nist_selection_generator_traits(ref, since):
              source=f"{path}@{commit}")
 
 
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -495,6 +507,7 @@ def main():
     nist_selection_freelip(a.ref, a.since)
     nist_selection_period_work(a.ref, a.since)
     nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)
