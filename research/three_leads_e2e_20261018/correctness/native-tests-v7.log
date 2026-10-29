@@ -1,0 +1,28 @@
+   Compiling three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+    Finished `release` profile [optimized] target(s) in 2.76s
+     Running unittests ../../../src/cryptanalysis/three_leads.rs (research/three_leads_e2e_20261018/native/target/release/deps/three_leads_engine-3f8fa87ffdf4b291)
+
+running 5 tests
+test tests::binary_linearized_oracle_and_all_solvers ... ok
+test tests::signed_graph_does_not_solve_a_negative_cycle ... ok
+test tests::prime_tower_s3_and_diagnostic_table_separation ... FAILED
+test tests::real_genus2_end_to_end ... ok
+test tests::quadratic_fields_and_transfer ... ok
+
+failures:
+
+---- tests::prime_tower_s3_and_diagnostic_table_separation stdout ----
+
+thread 'tests::prime_tower_s3_and_diagnostic_table_separation' (141) panicked at ../../../src/cryptanalysis/three_leads.rs:734:74:
+assertion `left == right` failed
+  left: None
+ right: Some(4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::prime_tower_s3_and_diagnostic_table_separation
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+error: test failed, to rerun pass `--lib`
