@@ -37,6 +37,7 @@ storage form. Each binary was built from a commit without
 | `d24c224771974018…f56ade6acf` | `7fa17f92e` | `research/drastic_prime_conductor_gap_round3_20261012/sessions/{d4-*-auto,d3-*-cubic}` |
 | `ac4bc5b26f858a4d…360735fb35` | `d13f5259c` | `research/volcano_ecdlp_census_20261017/sessions/V3-*.tar.xz`, `research/volcano_ecdlp_census_followup_20261023/sessions/V5-*.tar.xz` |
 | `7da27ec3f0dadbae…b4b1fa7a9f` | `3d191d806` | `research/isogeny-volcano-cost_20261017/sessions/{j0,j1728}/spec-crater-aut` |
+| `e265bbc00a91e874…52954d50b1` | `7ed39a752` | `research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}` (the accounting study's branch binary, built before that branch merged the fix: its 48 frozen `rho.cubic` records carry the set-up in the phases and not in the total) |
 
 The full digests are in `audit::PRE_CLASS_SETUP_BINARIES`. The list is
 closed. A pre-fix record found later, from another binary, fails its

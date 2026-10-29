@@ -51,7 +51,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::signals;
 use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::Workload;
+use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 
@@ -1015,6 +1015,7 @@ fn assemble(
             automorphisms_used: report.as_ref().map(|r| r.automorphisms_used),
             floor_s: floor,
             ratio_to_floor: s.map(|s| s / floor),
+            floor_rule: Some(FLOOR_RULE_V2.into()),
         },
         phases: report
             .as_ref()

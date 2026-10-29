@@ -57,8 +57,9 @@ use crate::cryptanalysis::ecbench::methods::{
     MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
 };
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, f4_accounting_note, floor_s, from_str_legacy_floats,
-    grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, floor_s,
+    from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
+    Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
@@ -464,19 +465,22 @@ pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
     "identical (pre-2026-10-18 phase accounting, reproduced from the replay)";
 
 /// The ecbench binaries that wrote `rho.quartic` / `rho.cubic` records
-/// before the class set-up was charged to the total (2026-10-18), with the
+/// before the class set-up was charged to the total (2026-10-18; the last
+/// one is the accounting study's binary, built before this branch merged
+/// that fix), with the
 /// commit each was built from (none of which has `charge_class_setup`) and
 /// where their records are.  This list is closed: these are the only
 /// producers whose undercharge is historical, found by scanning every
 /// session in this repository and its siblings, archived (`.tar.xz`) and
-/// compressed (`records.jsonl.gz`) ones included
+/// compressed (`records.jsonl.gz`) ones included, and the accounting
+/// study's two sessions
 /// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).
 /// The last two wrote `rho.gls` / `rho.frobenius_orbit` records before
 /// their eigenvalue check was charged to the total (2026-10-28); they were
 /// found by reading every `spec.json` added to this repository since the
 /// methods were registered.  A record from any other binary, including
 /// every record the current harness writes, must replay exactly.
-pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 7] = [
+pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 8] = [
     (
         "0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6",
         "c9db37d01bc776a1e8594ce5495e58ba2ccf5a1d",
@@ -502,6 +506,18 @@ pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 7] = [
         "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
         "3d191d8069b3acd3cd3e1f8535d41651560cc431",
         "research/isogeny-volcano-cost_20261017/sessions/{j0,j1728}/spec-crater-aut (gzip)",
+    ),
+    // The accounting study's branch binary: built at 7ed39a752 of the
+    // accounting branch, before it had merged the 2026-10-18 class set-up
+    // fix, so its frozen `rho.cubic` records carry the set-up in the phases
+    // and not in the total.  Its `rho.cubic_v2` and every other id replay
+    // exactly.  The two sessions with such records are
+    // `research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}`
+    // (48 `rho.cubic` records; PREREGISTRATION.md, "Run protocol").
+    (
+        "e265bbc00a91e8742e50421618c8bb9fe23347b4cba1f1d3dbf14d52954d50b1",
+        "7ed39a752b6cd9cd62f015ca9416a8af85e3dc5b",
+        "research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}",
     ),
     // `rho.gls` / `rho.frobenius_orbit`, whose eigenvalue check on `G` was
     // charged to the total from 2026-10-28 (`methods::solve_endo_orbit`).
@@ -1129,6 +1145,26 @@ fn counts_field_ops(r: &Record, started_unix_ms: u128) -> bool {
         && r.cost.total_gae.is_some()
 }
 
+/// The automorphisms a record may have used.  A record under the current
+/// floor rule (`automorphisms/v2`) is held to its own figure, which the
+/// derived-figure check ties to the spec.  A record written under the first
+/// rule (no `floor_rule`: 2 on every prime curve) carries 2 for a `j = 0` or
+/// `j = 1728` curve whose `rho.cubic` / `rho.quartic` used 6 or 4, whichever
+/// binary wrote it (the committed `research/prime_rho_automorphism_20261015`
+/// and every main-binary record since); its bound is the count rebuilt from
+/// the spec (`curve`, never read from the record), so a record cannot raise
+/// it.  [`prime_automorphism_group`] bounds it from the curve's identity
+/// as well, whichever rule the spec's workload was built under.
+fn automorphisms_bound(r: &Record, curve: &CurveFacts) -> u32 {
+    let own = r.boundaries.automorphisms_available;
+    if r.boundaries.floor_rule.is_none() {
+        own.max(curve.automorphisms_available)
+            .max(prime_automorphism_group(curve))
+    } else {
+        own
+    }
+}
+
 /// The order of a prime curve's automorphism group over `F_p`, read from its
 /// ICV1 identity (`ICV1:fp-<p>:<trace>:<order>:<j>:…`): 6 when `j = 0` and
 /// `p ≡ 1 (mod 3)`, 4 when `j = 1728` and `p ≡ 1 (mod 4)`, otherwise 2 (`±1`).
@@ -1166,6 +1202,7 @@ fn consistency_problems(
     host: &HostCapsule,
     timeout_seconds: u64,
     started_unix_ms: u128,
+    curve: &CurveFacts,
 ) -> Vec<String> {
     let mut out = Vec::new();
     let tag = format!("record seq {}", r.seq);
@@ -1202,10 +1239,7 @@ fn consistency_problems(
         "rho" | "bsgs" | "kangaroo" | "claw"
     );
     if let Some(used) = r.boundaries.automorphisms_used.filter(|_| walk) {
-        let has = r
-            .boundaries
-            .automorphisms_available
-            .max(prime_automorphism_group(&r.workload.curve));
+        let has = automorphisms_bound(r, curve);
         if used > has {
             out.push(format!(
                 "{tag}: used {used} automorphisms, the curve has {has}"
@@ -1564,7 +1598,11 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
         let sqrt_r = (w.curve.r as f64).sqrt();
-        let derived_ok = r.boundaries.automorphisms_available == w.curve.automorphisms_available
+        // The floor's `A` follows the rule the record names (none: the first
+        // rule), so a record written before `j = 0` and `j = 1728` curves got
+        // their own count still recomputes to the floor it was written with.
+        let derived_ok = Some(r.boundaries.automorphisms_available)
+            == expected_automorphisms(r.boundaries.floor_rule.as_deref(), &w.curve)
             && close(r.boundaries.floor_s, floor)
             && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),
@@ -1587,6 +1625,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
             &host,
             timeout_seconds,
             session.started_unix_ms,
+            &w.curve,
         ));
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
@@ -1915,6 +1954,39 @@ pub(crate) mod tests {
             assert!(b.len() == 64 && b.bytes().all(|x| x.is_ascii_hexdigit()));
             assert!(c.len() == 40 && c.bytes().all(|x| x.is_ascii_hexdigit()));
         }
+    }
+
+    /// A first-rule `rho.quartic` record used 4 automorphisms on a curve its
+    /// floor counted 2 for; the bound is the curve's own count, rebuilt from
+    /// the spec, whichever binary wrote the record.  A record under the
+    /// current rule keeps its own figure, and a curve that has only 2 allows
+    /// nothing more.
+    #[test]
+    fn a_first_rule_record_may_use_the_curves_own_count() {
+        use crate::cryptanalysis::ecbench::workload::FLOOR_RULE_V2;
+        let rec: Record = serde_json::from_str(PRE_FIX_QUARTIC_RECORD).unwrap();
+        assert_eq!(rec.boundaries.automorphisms_used, Some(4));
+        assert_eq!(rec.boundaries.automorphisms_available, 2);
+        let mut curve = rec.workload.curve.clone();
+        curve.automorphisms_available = 4;
+        assert_eq!(super::automorphisms_bound(&rec, &curve), 4);
+        // A curve with only 2 (generic j, so its identity allows 2 as well):
+        // nothing to allow.
+        let mut generic = rec.workload.curve.clone();
+        generic.icv1 = generic.icv1.replace(":1728:", ":17:");
+        assert_eq!(super::automorphisms_bound(&rec, &generic), 2);
+        // The record's own j = 1728 identity allows 4 even when the spec's
+        // figure is the first rule's 2.
+        assert_eq!(super::automorphisms_bound(&rec, &rec.workload.curve), 4);
+        let mut other_binary = rec.clone();
+        other_binary.binary_sha256 = Some("0".repeat(64));
+        assert_eq!(super::automorphisms_bound(&other_binary, &curve), 4);
+        let mut v2 = rec.clone();
+        v2.boundaries.floor_rule = Some(FLOOR_RULE_V2.into());
+        assert_eq!(super::automorphisms_bound(&v2, &curve), 2);
+        let mut other_method = rec.clone();
+        other_method.method.id = "rho.negation".into();
+        assert_eq!(super::automorphisms_bound(&other_method, &curve), 4);
     }
 
     /// A `rho.quartic` / `rho.cubic` replay's class set-up is subtracted
@@ -2538,7 +2610,7 @@ pub(crate) mod tests {
         let mut r = read_record_file(&dir).unwrap().lines[RHO_SEQ].1.clone();
         let arm = &p.arms[p.executions[RHO_SEQ].arm];
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.outcome.status = "timeout".into();
@@ -2549,19 +2621,25 @@ pub(crate) mod tests {
         r.boundaries.ratio_to_floor = None;
         r.time.process_wall_ns = 180_000_000_001;
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.time.process_wall_ns = 179_000_000_000;
-        assert_eq!(consistency_problems(&r, arm, &host, 180, started).len(), 1);
+        assert_eq!(
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve).len(),
+            1
+        );
         r.outcome.status = "crashed".into();
         r.outcome.exit = Some("signal 11".into());
         assert_eq!(
-            consistency_problems(&r, arm, &host, 180, started),
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve),
             Vec::<String>::new()
         );
         r.outcome.exit = Some("exit 0".into());
-        assert_eq!(consistency_problems(&r, arm, &host, 180, started).len(), 1);
+        assert_eq!(
+            consistency_problems(&r, arm, &host, 180, started, &r.workload.curve).len(),
+            1
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
