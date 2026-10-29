@@ -4,7 +4,7 @@
 - **Kind:** unknown selection cause; missing applicable attack construction and validation
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-27
+- **Last updated:** 2026-10-29
 - **Latest search:** [27 October current-source and historical-record recheck](../research/nist_skip_criterion_20261025/source_check_20261027/REPORT.md)
 
 ## Problem
@@ -196,3 +196,30 @@ Prior sibling FreeLIP prefix reconstruction was found and cited rather than
 repeated or claimed as new. Original-caller, point-count and visit records
 remain the missing bridge. The historical criterion and both weakness
 hypotheses remain unresolved.
+
+2026-10-29: the user confirmed that original generation/point-count/acceptance
+records are unavailable and expanded the requested comparison to a wider
+difference inventory, especially a possible base-point/coefficient relation.
+The [generator/b study](../research/nist_skip_criterion_20261025/generator_b_20261029/REPORT.md)
+separates the assigned smallest-x points from ten known standardized generators
+and eleven unknown historical skipped generators. Existing measurements show
+b is square for 9/10 published and 9/11 skipped curves. The x=0 and x=1
+relations follow from the equation; five conditional Lean proofs and their
+transitive audit pass. These facts supply no historical selector or attack.
+
+The finite extension implements 171 point/coefficient traits, model and
+generator controls, all same-field pairwise differences and public-scalar
+equality recipes. The native producer and separate GMP verifier pass a tiny
+synthetic integration and nine corruption controls. **The actual new cohort
+comparison has zero attempts.** The restored runtime reports no checkpoint
+identity, and the mandatory uploaded-checkpoint gate prevents launch. No paid
+resource or DLP campaign ran. This is an access dependency, not a proved
+mathematical obstruction, and tests do not satisfy the measurement request.
+
+To unblock that extension, restore the existing lab checkpoint identity through
+runtime credential settings, verify the complete preparation upload/readback,
+freeze the supported execution route and admit all 21 rows under the stated
+protocol with independent checking. Preserve all unknowns and failures.
+Completion would characterize the declared finite family; historical use would
+still require a decision trace or independent historical predictions.
+The current preparation/report/PDF is an additive partial deliverable.
