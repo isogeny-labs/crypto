@@ -295,7 +295,7 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 [Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
 
-validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/prime_base_oracle_tuning_20261029/VALIDATION.json)
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 ## Prime-field baseline: relation targets, stride-renew against the walk (2026-10-29, engineering)
 
@@ -329,6 +329,22 @@ Rho stays ahead at every size and weight; the IC ÷ rho column is the distance r
 [Report](../../research/ic_srenew_deferred_guard_20261029/README.pdf) · [study](../../research/ic_srenew_deferred_guard_20261029/).
 
 validated (24 and 32 bits): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_srenew_deferred_guard_20261029/VALIDATION.json)
+
+## Component speed-up: the deferred repeat guard in wall time (2026-10-29, engineering)
+
+Frozen protocol (backlog XP-20261029-dg-wall): `dg` (`targets = stride-renew-deferred-guard`, the repeat guard probed only on targets that decompose) against `srenew` (`targets = stride-renew`) at the same factor base N_inc and `mitm:negation_folded=1` oracle. Both charge the same GAE (to within 2e-6: `dg` charges one extra GAE per repeated target its guard catches), so this moves no row of tables A–C and no counted S at w = 0; the gain is native guard work `dg` no longer executes. Two curves × 24 targets × 6 rounds per size, L2 on isolab-eks with native A/A admission. ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation. The corrected ratio is dg ÷ srenew ns/GAE over the srenew-aa ÷ srenew A/A, from the `wall` block of `ecbench compare`.
+
+| bits | N | pairs | ns/GAE srenew → dg | A/A | corrected dg ÷ srenew (wall) | counted dg ÷ srenew (w = 0 / 0.1 / 1) | IC ÷ rho-neg srenew → dg (w = 0 / 0.1 / 1) | reading |
+|--:|--:|--:|:--|:--|:--|:--|:--|:--|
+| 24 | 162 | 288 | 86.10 → 78.58 | 0.9998 [0.9983, 1.0013] | **0.9128 [0.9099, 0.9157]** | 1.0000 / 0.9625 / 0.7802 | 12.53 → 12.53 / 12.48 → 12.01 / 12.23 → 9.55 | component speed-up (wall per GAE); counted S unchanged |
+| 28 | 407 | 288 | 81.93 → 72.60 | 0.9999 [0.9986, 1.0013] | **0.8862 [0.8837, 0.8887]** | 1.0000 / 0.9657 / 0.7897 | 21.20 → 21.20 / 20.79 → 20.07 / 18.87 → 14.90 | component speed-up (wall per GAE); E6 condition 2 fails, srenew stays the 28-bit baseline |
+| 32 | 1024 | 288 | 106.17 → 89.98 | 0.9987 [0.9970, 1.0005] | **0.8486 [0.8451, 0.8521]** | 1.0000 / 0.9607 / 0.7705 | 35.50 → 35.50 / 35.07 → 33.69 / 33.12 → 25.52 | component speed-up (wall per GAE); counted S unchanged |
+
+Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate. Wall time is host-specific (one host class) and cannot be replayed; the validator recomputed it from the records and bounded the run-order confound with the oracle set-up phase as a null.
+
+[Report](../../research/ic_dg_wall_20261029/README.pdf) · [study](../../research/ic_dg_wall_20261029/).
+
+validated (24 and 32 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_wall_20261029/VALIDATION.json)
 
 ## Linear-algebra engine, outside tables A–C
 

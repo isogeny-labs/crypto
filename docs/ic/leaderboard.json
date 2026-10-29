@@ -306670,8 +306670,8 @@
   "report": "research/prime_base_oracle_tuning_20261029/README.pdf",
   "second_host": "Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.",
   "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/prime_base_oracle_tuning_20261029/VALIDATION.json)",
-  "validated": true
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "stride_renew_component": {
   "rows": [
@@ -307292,6 +307292,304 @@
   "report": "research/ic_srenew_deferred_guard_20261029/README.pdf",
   "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
   "validation": "validated (24 and 32 bits): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_srenew_deferred_guard_20261029/VALIDATION.json)",
+  "validated": true
+ },
+ "dg_wall_component": {
+  "rows": [
+   {
+    "bits": 24,
+    "n": 162,
+    "reading": "component speed-up (wall per GAE); counted S unchanged",
+    "pairs": 288,
+    "ns_srenew": 86.0969576527,
+    "ns_dg": 78.5770675073,
+    "aa_ratio": 0.999813043311,
+    "aa_ci95": [
+     0.998307237355,
+     1.00132112056
+    ],
+    "corrected": 0.912828547087,
+    "corrected_ci95": [
+     0.909939325108,
+     0.915726942868
+    ],
+    "counted": [
+     {
+      "ratio": 1.0000016827,
+      "ci95": [
+       1.00000072799,
+       1.00000290472
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.962485546129,
+      "ci95": [
+       0.961059906602,
+       0.963891452557
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.780228840392,
+      "ci95": [
+       0.77524597628,
+       0.78533936966
+      ],
+      "pairs": 288
+     }
+    ],
+    "srenew_over_rho": [
+     {
+      "ratio": 12.5333574568,
+      "ci95": [
+       11.6890776944,
+       13.4809592635
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 12.4812973248,
+      "ci95": [
+       11.6300741111,
+       13.4315086473
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 12.2344169746,
+      "ci95": [
+       11.3320625358,
+       13.2335617777
+      ],
+      "pairs": 288
+     }
+    ],
+    "dg_over_rho": [
+     {
+      "ratio": 12.5333785466,
+      "ci95": [
+       11.6890889077,
+       13.4809839229
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 12.013068272,
+      "ci95": [
+       11.1984880824,
+       12.9309833702
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 9.54564496894,
+      "ci95": [
+       8.86455822386,
+       10.3170813967
+      ],
+      "pairs": 288
+     }
+    ]
+   },
+   {
+    "bits": 28,
+    "n": 407,
+    "reading": "component speed-up (wall per GAE); E6 condition 2 fails, srenew stays the 28-bit baseline",
+    "pairs": 288,
+    "ns_srenew": 81.9293757336,
+    "ns_dg": 72.6013403073,
+    "aa_ratio": 0.999940360051,
+    "aa_ci95": [
+     0.998565533073,
+     1.00131707989
+    ],
+    "corrected": 0.886198263513,
+    "corrected_ci95": [
+     0.883672157232,
+     0.88873159104
+    ],
+    "counted": [
+     {
+      "ratio": 1.00000031506,
+      "ci95": [
+       1.00000016426,
+       1.00000047818
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.965711106343,
+      "ci95": [
+       0.96498497773,
+       0.966492185443
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.789683123214,
+      "ci95": [
+       0.786957850588,
+       0.792656218302
+      ],
+      "pairs": 288
+     }
+    ],
+    "srenew_over_rho": [
+     {
+      "ratio": 21.2040084377,
+      "ci95": [
+       19.5863924887,
+       22.9860605604
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 20.7857799685,
+      "ci95": [
+       19.1847516481,
+       22.544122637
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 18.8746158016,
+      "ci95": [
+       17.374186985,
+       20.5166561036
+      ],
+      "pairs": 288
+     }
+    ],
+    "dg_over_rho": [
+     {
+      "ratio": 21.2040151182,
+      "ci95": [
+       19.5863989206,
+       22.9860669233
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 20.0730585695,
+      "ci95": [
+       18.533617018,
+       21.7728957483
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 14.9049655557,
+      "ci95": [
+       13.7295805822,
+       16.1982966922
+      ],
+      "pairs": 288
+     }
+    ]
+   },
+   {
+    "bits": 32,
+    "n": 1024,
+    "reading": "component speed-up (wall per GAE); counted S unchanged",
+    "pairs": 288,
+    "ns_srenew": 106.172523914,
+    "ns_dg": 89.9836246782,
+    "aa_ratio": 0.998748082651,
+    "aa_ci95": [
+     0.997016734223,
+     1.00048243762
+    ],
+    "corrected": 0.848585063494,
+    "corrected_ci95": [
+     0.845092297945,
+     0.85209226464
+    ],
+    "counted": [
+     {
+      "ratio": 1.00000003812,
+      "ci95": [
+       1.0000000173,
+       1.00000006318
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.960726119771,
+      "ci95": [
+       0.959759617017,
+       0.96177557987
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 0.770544132051,
+      "ci95": [
+       0.76725724893,
+       0.774185659499
+      ],
+      "pairs": 288
+     }
+    ],
+    "srenew_over_rho": [
+     {
+      "ratio": 35.5005753837,
+      "ci95": [
+       33.0826891695,
+       38.2378734526
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 35.0685521776,
+      "ci95": [
+       32.6802920122,
+       37.7821639714
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 33.1169675212,
+      "ci95": [
+       30.7246622168,
+       35.7613702771
+      ],
+      "pairs": 288
+     }
+    ],
+    "dg_over_rho": [
+     {
+      "ratio": 35.500576737,
+      "ci95": [
+       33.08268989,
+       38.2378757605
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 33.6912740596,
+      "ci95": [
+       31.3981852289,
+       36.290058055
+      ],
+      "pairs": 288
+     },
+     {
+      "ratio": 25.5180849948,
+      "ci95": [
+       23.7310954997,
+       27.5141109744
+      ],
+      "pairs": 288
+     }
+    ]
+   }
+  ],
+  "class": "engineering",
+  "study": "research/ic_dg_wall_20261029/",
+  "report": "research/ic_dg_wall_20261029/README.pdf",
+  "unit": "ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation",
+  "validation": "validated (24 and 32 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_wall_20261029/VALIDATION.json)",
   "validated": true
  },
  "lazy_members_component": {
