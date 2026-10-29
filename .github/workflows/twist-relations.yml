@@ -168,6 +168,18 @@ jobs:
           set -euo pipefail
           cargo build --release --locked --manifest-path tools/twist-relations/Cargo.toml --bin tr04-protocol > artifacts/tr04-preflight/protocol-build.log 2>&1
           tools/twist-relations/target/release/tr04-protocol validate research/twist_relations_tr04_20261029/protocol.json > artifacts/tr04-preflight/protocol-validation.log 2>&1
+      - name: Require the existing artifact-delivery credential bindings before primary execution
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]]; then
+            echo 'An existing artifact-store credential binding is unavailable; no field census has started.' > artifacts/tr04-preflight/artifact-delivery-readiness.txt
+            exit 1
+          fi
+          echo 'Existing artifact-store credential bindings are present; S3 authorization and byte readback remain unverified.' > artifacts/tr04-preflight/artifact-delivery-readiness.txt
       - name: Checkpoint the complete finite experiment before any shard starts
         shell: bash
         env:
@@ -359,9 +371,16 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             tools/twist-relations
+            tools/artifacts
+            .artifacts
             research/twist_relations_tr04_20261029
             scripts
       - uses: dtolnay/rust-toolchain@1.99.1
+      - name: Download this attempt's preflight evidence separately from the field inputs
+        uses: actions/download-artifact@v4
+        with:
+          name: tr04-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04-preflight-input
       - name: Download all field artifacts from this run and attempt
         uses: actions/download-artifact@v4
         with:
@@ -373,6 +392,7 @@ jobs:
         shell: bash
         run: bash tools/twist-relations/run-tr04-workflow.sh aggregate artifacts/tr04-inputs
       - name: Checkpoint aggregate results and failure evidence
+        id: aggregate_checkpoint
         if: always() && steps.aggregate_checkout.outcome == 'success'
         shell: bash
         env:
@@ -408,6 +428,30 @@ jobs:
           cp .resume/RESUME.md artifacts/tr04-summary/RESUME.md
           printf '%s\n' "$checkpoint_exit" > artifacts/tr04-summary/checkpoint.exit
           exit "$checkpoint_exit"
+      - name: Archive retained inputs and verify a fresh artifact-store byte download
+        if: always() && steps.aggregate_checkout.outcome == 'success'
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+          TR04_AGGREGATE_OUTCOME: ${{ steps.aggregate.outcome }}
+          TR04_CHECKPOINT_OUTCOME: ${{ steps.aggregate_checkpoint.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tr04-delivery
+          bash tools/twist-relations/run-tr04-delivery.sh > artifacts/tr04-delivery/driver.stdout.log 2> artifacts/tr04-delivery/driver.stderr.log
+      - name: Retain artifact-store pointers and delivery failures without duplicating the raw archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr04-delivery-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: |
+            artifacts/tr04-delivery
+            !artifacts/tr04-delivery/**/runs.tar.xz
+            !artifacts/tr04-delivery/**/runs.tar.xz.tmp
+          if-no-files-found: warn
       - name: Retain the complete or partial aggregate and its failure logs
         if: always()
         uses: actions/upload-artifact@v4

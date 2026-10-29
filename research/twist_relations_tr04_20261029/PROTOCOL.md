@@ -3,8 +3,10 @@
 This is the human-readable contract for [protocol.json](protocol.json).
 The record is **draft** until the source, analysis hash, measured development
 preflight estimate, canonical protocol hash and filing commit are filled and
-committed. No affected research data may precede that freeze. No result has
-been collected for this protocol at the time this document was prepared.
+committed. No affected primary comparison data may precede that freeze.
+The public-input census and fixed known-answer development timings are filed
+separately in [PREFLIGHT.md](PREFLIGHT.md); no primary selector/rank/work
+comparison result has been collected for this protocol.
 
 ## Requested work and evidence
 
@@ -157,6 +159,14 @@ no primary clock. Deterministic development tests/replay and the independent
 verifier must agree exactly. Development runtime calibration before freeze
 is labelled separately and does not compare selector quality or tune L.
 
+[PREFLIGHT.md](PREFLIGHT.md) records the native public-input census and the
+explicit heuristic estimate: 219 fixed planning seconds plus a maximum
+1,000-second field-work allowance for each of the three field instances,
+3,219 serial planning seconds in total. These are extrapolations from the
+known-answer development timing, not measured primary runtimes or guarantees.
+The existing 1,800-second field job deadline is unchanged. The helper, commands,
+raw observations, exact input/cache-size ceilings and assumptions are retained.
+
 ## Parallel execution, checkpoint and export
 
 Use the existing registered `twist-relations.yml` workflow, `suite=tr04`,
@@ -187,6 +197,25 @@ checkpoint after reporting, including partial failures. They are distinct from
 process-memory recovery. Execution has no
 CRIU or application-resume contract; interrupted prefixes are incomplete,
 not passes or final clocks. A later rerun is a new execution, not a resume.
+
+Before primary execution the workflow also checks that its existing artifact
+store credential bindings are present. This is a prerequisite check, not
+proof of remote authorization. After analysis and aggregate checkpointing,
+`tools/twist-relations/run-tr04-delivery.sh` deterministically archives actual
+preflight/field/aggregate records, protocol and fingerprints outside the raw
+input directories. It uses the maintained artifact-store tool and existing
+`s3://setec-astronomy-artifacts/store` configuration, then performs a fresh-cache
+store pull into an empty verification directory and compares the downloaded
+bytes. Source/evidence checkpoints do not replace this durable raw archive.
+
+The delivery receipt records the actual archive hash/bytes, store pointer,
+source/tool/policy hashes, stage exits and original failed outcomes. Its
+GitHub artifact retains hidden `.artifacts.json`/ignore rules and receipts
+while excluding the raw archive and verification temporary payloads. Original
+raw GitHub artifacts remain separate even on delivery failure. Actual remote
+upload, independent fresh readback and runner readiness remain unverified until
+that run succeeds; local transport stubs establish none of them. Failed store
+delivery leaves end-to-end completion open even if the finite census completed.
 
 The canonical `experiment.export/v1` has **27 logical rows**: nine arms
 (seven selectors plus two auxiliary fixture controls), three identical field

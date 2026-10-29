@@ -751,11 +751,11 @@
       "note": "Complete finite populations, not sampled statistical tests. Alpha is a schema-required placeholder and is unused. The single predeclared componentwise decision family has no p-values or sampling intervals; no power or generic-curve generalization is claimed."
     },
     "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
+      "fixed_seconds": 219,
+      "per_sample_seconds": 1000,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": null
+      "estimated_total_seconds": 3219,
+      "measured_on": "Development planning only: existing p7,a0,b3,B2,M3 selector timing plus known-control audit/replay13,430,371ns (preflight/calibration.json); observed fresh helper/native-dependency build36.88s and final native checks34s. Local clocks have no L2/physical-host admission. PREFLIGHT.md and preflight/estimate.json retain derivation. per_sample is the maximum1000s heuristic field-work envelope covering all9 logical arms, not a measured row or a guaranteed bound; fixed219 plus3*1000=3219 serial planning seconds. Actual field job cap remains1800s."
     }
   },
   "metrics": {
@@ -946,6 +946,11 @@
       "rule": "An invalid point/relation, cost/census overflow or reconciliation failure, missing mandatory control, independent-verifier mismatch, missing shard, source/protocol identity mismatch or checkpoint-gate failure invalidates the affected result.",
       "kind": "invalidation",
       "preregistered": true
+    },
+    {
+      "rule": "Complete durable delivery requires the deterministic raw archive, maintained store push, pointer manifest, fresh-cache store download and byte comparison. A delivery failure leaves end-to-end completion open even if a finite census completed; preserve raw records, missing inputs and original computation/checkpoint failures. Never count a local transport stub or cache read as actual remote readback.",
+      "kind": "invalidation",
+      "preregistered": true
     }
   ],
   "decision_rule": {
@@ -977,7 +982,7 @@
   "analysis_plan": {
     "script": {
       "path": "../../tools/twist-relations/src/tr04_report.rs",
-      "sha256": null
+      "sha256": "dbff251e6ede8244f1ff6f9519d88830be5c3076ed9ae8d906d4fb6abe37b923"
     },
     "inputs": [
       "three field shard records and manifests",
@@ -1100,7 +1105,52 @@
       "physical byte-level peak memory",
       "audit DP/trie memoization, independent verification and serialization/evidence-IO overhead excluded from the modeled algorithm count vector"
     ],
-    "execution_state": "Draft only. Source/binary/analysis hashes, measured preflight estimate, canonical protocol freeze and successful remote checkpoint precede affected research data."
+    "execution_state": "Draft pending source/analysis filing commit and canonical protocol freeze. Fixed development timing/public-input preflight and heuristic estimate are recorded before primary comparison data. Successful source/spec checkpoint gates and existing store-credential presence precede the primary census; actual artifact-store upload/fresh-readback acceptance occurs after analysis and remains unverified until its delivery receipt.",
+    "development_preflight": {
+      "scope": "Public input configuration and fixed known-answer development timing only; no primary M8 selector, relation-rank or paid-work comparison census ran before freeze.",
+      "documentation": "PREFLIGHT.md",
+      "helper": "preflight-helper/src/main.rs",
+      "receipt": "preflight/estimate.json",
+      "receipt_sha256": "40befdadff8a9df7d22fa3e466b307e1ca94aae5cebef127ffa01a9d3fd27dfa",
+      "calibration": "preflight/calibration.json",
+      "calibration_sha256": "12baec892f3fdfd5a4bfd1e86ca687631c4fa5f6065c336eafc872a2d2825cd1",
+      "public_eligible_models": {
+        "p7": 8,
+        "p11": 20,
+        "p19": 51
+      },
+      "total_eligible_models": 79,
+      "complete_primary_case_expectation": 1106,
+      "cache_count_ceilings": {
+        "p7": 222,
+        "p11": 1430,
+        "p19": 11352
+      },
+      "field_work_planning_envelopes_seconds": {
+        "p7": 100,
+        "p11": 100,
+        "p19": 1000
+      },
+      "estimation_type": "Heuristic schedule planning from one known-control timing, exact public cache-count ceilings, width-cubic scaling,2x cache/IO margin and8x selector margin. Not a runtime theorem, admitted clock or solving advantage.",
+      "fixed_seconds": 219,
+      "per_sample_seconds": 1000,
+      "estimated_total_seconds": 3219,
+      "hard_field_timeout_seconds": 1800,
+      "helper_source_sha256": "c8dee26696da8ddfa34e16ad2d7beaf717e7e123b8d7a023a48f281fda01062a",
+      "helper_lock_sha256": "8cd835f8317dc216d60075f8c1ba07af3de613de040dc6dd775b779f256b59bc"
+    },
+    "durable_evidence": {
+      "launcher": "tools/twist-relations/run-tr04-delivery.sh",
+      "preflight": "Require presence of existing ARTIFACTS_AWS_ACCESS_KEY_ID and ARTIFACTS_AWS_SECRET_ACCESS_KEY bindings before the primary census; presence does not prove authorization or store readiness.",
+      "archive": "artifacts/tr04-delivery/run-<run-id>-attempt-<attempt>/runs.tar.xz",
+      "archive_inputs": "Actual preflight, field and aggregate directories, frozen protocol and input/source fingerprints; missing inputs and original failed statuses remain explicit.",
+      "packing": "Deterministic GNU tar with sorted names, zero mtime, numeric uid/gid0 and normalized modes; xz single-thread.",
+      "transport": "Maintained tools/artifacts/artifacts.py explicit-file push to existing s3://setec-astronomy-artifacts/store; existing ARTIFACTS_* credentials only in post-analysis delivery step, with configured region/defaultus-west-2. No new identity, settings or bucket configuration.",
+      "readback": "Copy only the tracked-pointer manifest into an empty verification directory; use a fresh ARTIFACTS_CACHE and ARTIFACTS_NO_READ_URL=1 for an actual store pull, then compare downloaded bytes. A cache hit or upload receipt alone is insufficient.",
+      "receipt": "delivery.json plus delivery-source.sha256, .artifacts.json and managed .gitignore record actual stage exits, hashes, byte counts, tool/policy/source identities and original aggregate/checkpoint outcomes.",
+      "github_retention": "tr04-delivery-<run>-<attempt> uploads only the narrow delivery directory, including hidden manifests/ignore rules and explicitly excluding raw archive/readback/.tmp payloads. Original raw GitHub artifacts remain separate even if store delivery fails.",
+      "qualification": "Unverified until an actual authorized run completes upload and fresh store readback. Stub AWS/filesystem tests are development checks only. No successful store transfer, independent remote download or cloud runner readiness is claimed before that receipt."
+    }
   },
   "freeze": {
     "status": "draft",

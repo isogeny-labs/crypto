@@ -2,14 +2,20 @@
 
 **State: implementation/protocol preparation; research execution not yet
 reported.** The machine-readable [protocol](protocol.json) is draft until
-source/analysis identities, measured development preflight estimate and its
-canonical freeze are completed. [PROTOCOL.md](PROTOCOL.md) defines the exact
+source/analysis filing commit and canonical freeze are completed. The measured
+development inputs and heuristic runtime estimate are in [PREFLIGHT.md](PREFLIGHT.md).
+[PROTOCOL.md](PROTOCOL.md) defines the exact
 finite universe and all four requested parts.
 
 [Development validation](DEVELOPMENT.md) records 40 passing native tests,
 strict Clippy/formatting and the preserved incomplete root-library attempt.
 The fixed development preflight and synthetic report tests are separate from
 the primary research census, which has not run.
+
+Public-input preparation found 79 eligible models across the three fields;
+this does not substitute for their primary model/B/selector records. Planning
+uses the explicit 3,219-second conservative serial envelope in PREFLIGHT.md,
+with the existing 1,800-second hard field cap and no timing guarantee.
 
 The study asks whether a cheap public twist-run selector can improve the
 independent original-curve relation rank obtained for its paid work. It
@@ -45,6 +51,14 @@ ARC EKS Spot pool. Actual source/workflow/runner identities, checkpoint
 receipts, partial records, control results and export flow must be retained.
 Runner/secret readiness is unverified until that preflight succeeds. No new
 runner, credential, IAM policy, capacity or funding state is introduced.
+
+The existing store credential bindings are required before primary execution;
+their presence alone does not establish remote authorization. Post-analysis
+delivery creates a deterministic raw archive, pushes it through the maintained
+artifact tool, then downloads it with a fresh cache and compares bytes. Durable
+upload/readback receipts and pointer manifests are required for end-to-end
+completion, and remain unverified until an actual run performs them. Raw
+GitHub records and all failures remain retained separately.
 
 The experiment is complete only when all three fields, all declared model
 and stream populations, the six actual auxiliary controls and independent
