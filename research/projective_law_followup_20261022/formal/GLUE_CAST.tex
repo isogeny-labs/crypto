@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Off-diagonal transition in the constructed two-chart gluing datum}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+The pinned Lean file \texttt{Common22GlueCast.lean} proves three identities about
+the constructed genus-2 two-chart gluing datum. Its off-diagonal overlap
+objects equal the separately defined affine and infinity overlap schemes.
+After equality casts, the datum's transition from the affine chart to the
+infinity chart equals the previously checked overlap transition. This is a
+statement about the constructed \texttt{Scheme.GlueData}; it does not identify
+that datum with a chosen smooth projective completion.
+
+\begin{center}\begin{tabular}{p{0.66\linewidth}p{0.23\linewidth}}\toprule
+Gate & Status\\\midrule
+Two off-diagonal overlap-object equalities & Checked\\
+Affine-to-infinity transition with equality casts & Checked\\
+Chosen smooth projective completion & Open\\
+Infinity stalk and divisor/$\operatorname{Pic}^{0}$ transport & Open\\
+Production Rust-law semantics and rho cost & Open; unmeasured\\\bottomrule
+\end{tabular}\end{center}
+
+{\small The compiler receipt is in \texttt{glue-cast-build.log}; the machine-readable
+gate table is \texttt{glue-cast.csv}, and \texttt{glue-cast.svg} presents the
+same boundary. The source hash and pinned toolchain appear in
+\texttt{glue-cast-}\allowbreak\texttt{validation.json}. The new theorem's axiom
+audit reports only \texttt{propext}, \texttt{Classical.choice}, and
+\texttt{Quot.sound}.\par}
+\end{document}
