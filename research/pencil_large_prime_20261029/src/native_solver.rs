@@ -3,7 +3,7 @@
 //! Cohort mode does not perform an independent dual-norm check.
 //! Fork of frozen pencil_sparse producer blob e974121a123e13316ce3fcc820b4eca3f65a8a3a.
 //! Graph accounting is incomplete: outputs MUST NOT be priced by old analyzers.
-use super::{engine, kernel};
+use super::{engine, kernel, measurement};
 use engine::{Counts, Divisor, Point, Scholten, StudyInstance};
 use kernel::{
     allocation::{ObservedSystem, Region},
@@ -32,6 +32,72 @@ mod graph_adapter_tests {
     use super::*;
 
     #[test]
+    fn rho_boundary_hook_is_once_and_preserves_recorded_work() {
+        let inst = engine::scholten_instance(739, 23).expect("small synthetic fixture");
+        let target = inst.curve.mul(inst.generator, 7);
+        for (fold, transferred) in [(false, false), (true, false), (true, true)] {
+            let plain = engine::solve_rho(&inst, target, 19, 64, fold, transferred);
+            let mut calls = 0;
+            let hooked = engine::solve_rho_with_target_hook(
+                &inst,
+                target,
+                19,
+                64,
+                fold,
+                transferred,
+                || calls += 1,
+            );
+            assert_eq!(calls, 1);
+            assert_eq!(plain.recovered, hooked.recovered);
+            assert_eq!(plain.native, hooked.native);
+            assert_eq!(
+                serde_json::to_value(plain.counts).unwrap(),
+                serde_json::to_value(hooked.counts).unwrap()
+            );
+            assert_eq!(
+                serde_json::to_value(plain.phases).unwrap(),
+                serde_json::to_value(hooked.phases).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn online_scopes_exclude_setup_and_cover_all_candidate_stages() {
+        let s = Scholten::new(739);
+        let mut phases = BTreeMap::new();
+        let session = measurement::Session::begin().unwrap();
+        measured(None, &s, &mut phases, "solver_setup", || ());
+        measurement::begin_online(measurement::Phase::TargetQuery);
+        for name in [
+            "target_validation",
+            "walk_generation",
+            "sieve",
+            "candidate_verification",
+            "elimination",
+            "recovery_check",
+        ] {
+            measured(None, &s, &mut phases, name, || ());
+        }
+        measurement::end_online();
+        let snapshot = session.finish().unwrap();
+        assert!(!snapshot.online_phases_ns.contains_key("setup"));
+        assert!(snapshot.phases_ns["setup"].is_some());
+        for name in [
+            "target_query",
+            "target_pdp",
+            "target_relation_check",
+            "target_descent",
+            "recovery_check",
+        ] {
+            assert!(snapshot.online_phases_ns[name].is_some());
+        }
+        assert_eq!(
+            snapshot.online_wall_ns,
+            Some(snapshot.online_phases_ns.values().flatten().sum())
+        );
+    }
+
+    #[test]
     fn explicit_config_and_unavailable_observer() {
         assert!(Config {
             denominator: 3,
@@ -47,9 +113,9 @@ mod graph_adapter_tests {
         .is_err());
         let s = Scholten::new(739);
         let mut phases = BTreeMap::new();
-        measured(None, &s, &mut phases, "fixture", || vec![1u8; 17]);
-        assert!(phases["fixture"].allocation.is_none());
-        assert!(serde_json::to_value(&phases).unwrap()["fixture"]["allocation"].is_null());
+        measured(None, &s, &mut phases, "solver_setup", || vec![1u8; 17]);
+        assert!(phases["solver_setup"].allocation.is_none());
+        assert!(serde_json::to_value(&phases).unwrap()["solver_setup"]["allocation"].is_null());
         let input = StudyInstance {
             curve: engine::Elliptic {
                 f: engine::Field::new(739, 2, 1),
@@ -354,6 +420,19 @@ fn measured<T>(
     name: &'static str,
     f: impl FnOnce() -> T,
 ) -> T {
+    // The enclosing query scope owns loop/control work between these scopes.
+    // Begin/end are managed by solve_one; standalone callers without a session
+    // retain the existing diagnostic intervals and these hooks are inert.
+    use measurement::Phase;
+    let _online_phase = measurement::scope(match name {
+        "solver_setup" => Phase::Setup,
+        "sieve" => Phase::TargetPdp,
+        "candidate_verification" => Phase::TargetRelationCheck,
+        "elimination" => Phase::TargetDescent,
+        "recovery_check" => Phase::RecoveryCheck,
+        "target_validation" | "walk_generation" => Phase::TargetQuery,
+        _ => panic!("unmapped pencil phase"),
+    });
     let before_field = group_counts(s);
     let before_arithmetic = arithmetic_counts();
     let before_symbolic = meter::snapshot();
@@ -862,7 +941,6 @@ pub fn solve_one(
     let s = Scholten::new(p);
     let source = s.short_curve();
     assert_eq!(source.c, inst.curve.c, "source curve mismatch");
-    assert!(source.valid(target), "invalid target");
     assert!(source.valid(generator));
     assert_eq!(source.mul(generator, r), Point::O);
     let transferred = s.tau(s.from_short(generator));
@@ -902,6 +980,10 @@ pub fn solve_one(
         let solver = LinearSolver::new(p, r, &rational_y);
         let graph = GraphSolver::new(&solver, matrix_coefficient_cap, denominator);
         (solver, graph)
+    });
+    measurement::begin_online(measurement::Phase::TargetQuery);
+    measured(observer, &s, &mut phases, "target_validation", || {
+        assert!(source.valid(target), "invalid target");
     });
     let mut recovered = None;
     let mut failure = None;
@@ -976,6 +1058,7 @@ pub fn solve_one(
     } else {
         false
     };
+    measurement::end_online();
     let candidate_elapsed_ns = candidate_clock.elapsed().as_nanos();
     let candidate_allocation = observer
         .zip(candidate_envelope)
