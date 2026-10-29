@@ -12,7 +12,7 @@ proc componentJet33(ideal values,int index,int k){
  return(coeffJet33(value,k));
 }
 proc tr5Jet33(number value){number ans=0;int i;for(i=0;i<5;i++){ans=ans+value;value=value^2;}if(ans!=0 && ans!=1){ERROR("JETS33_TRACE_NOT_F2");}return(ans);}
-proc conjugateJet33(poly value){poly ans=0;int i;for(i=1;i<=size(value);i++){ans=ans+leadcoef(value[i])^2*z^deg(value[i]);}return(ans);}
+proc conjugateJet33(poly value){poly ans=0;int i;for(i=1;i<=size(value);i++){ans=ans+leadcoef(value[i])^2*leadmonom(value[i]);}return(ans);}
 list Q33=paddingRepresentatives33[1];number b033=Q33[1];number c033=Q33[2];number l033=Q33[3];number n033=Q33[4];
 number A033=1+c033;number u033=(b033+c033)/c033^2;number v033=((b033/c033)*u033^3+1)/(u033+1);
 if(u033==0 || u033==1 || v033^2+v033!=u033^3+u033){ERROR("JETS33_BASE_POINT");}
@@ -52,10 +52,16 @@ for(iJ33=1;iJ33<=8;iJ33++){sourceInversesJet33[iJ33]=inverseJet33(sourceUnitsJet
 map corruptJet33=r,nJet33+z^8+bJet33*T,lJet33+AJet33*T,bJet33,cJet33;
 if(size(reduce(corruptJet33(original),jetResidue33))==0){ERROR("JETS33_CORRUPTED_JET_ACCEPTED");}
 poly bcj33=bJet33;poly ccj33=cJet33;poly lcj33=lJet33;poly ncj33=nJet33;
+ideal inverseConjugatesJet33=sourceInversesJet33;ideal unitsConjugatesJet33;
 for(kJ33=1;kJ33<=5;kJ33++){
  bcj33=conjugateJet33(bcj33);ccj33=conjugateJet33(ccj33);lcj33=conjugateJet33(lcj33);ncj33=conjugateJet33(ncj33);
  map atConjJet33=r,ncj33+bcj33*T,lcj33+(1+ccj33)*T,bcj33,ccj33;
  if(size(reduce(atConjJet33(original),jetResidue33))!=0){ERROR("JETS33_CONJUGATE_SOURCE_RESIDUAL");}
+ unitsConjugatesJet33=reduce(atConjJet33(registered),jetResidue33);
+ for(iJ33=1;iJ33<=8;iJ33++){
+  inverseConjugatesJet33[iJ33]=conjugateJet33(inverseConjugatesJet33[iJ33]);
+  if(reduce(unitsConjugatesJet33[iJ33]*inverseConjugatesJet33[iJ33]+1,jetResidue33)!=0){ERROR("JETS33_CONJUGATE_SOURCE_UNIT");}
+ }
 }
 if(bcj33!=bJet33 || ccj33!=cJet33 || lcj33!=lJet33 || ncj33!=nJet33){ERROR("JETS33_CONJUGATE_CLOSURE");}
 map oldZeroJet33=rrBasis27,nJet33+bJet33*T,lJet33+AJet33*T,vJet33,uJet33;
