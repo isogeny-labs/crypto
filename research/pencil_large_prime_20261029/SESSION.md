@@ -884,3 +884,23 @@ Disabled PR #2869 auto-merge and posted the concrete findings before correction.
 The corrected adapter fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1 requires exact deterministic native reanalysis from the bound inputs. Public export and verification have no runtime bypass. It checks explicit planted-answer verification, nonnegative counters, warmups, retry/checkpoint limits, complete source/build/binary provenance and reconstructed export metadata. All 13 linked analysis source files are tied to compiled bytes; existing analysis sources were unchanged.
 
 Final release validation passed 37 private unit contracts, one CLI test, one historical-digest test and one production replay test. The production fixture covers 1,260 planned workloads and 22,680 missing slots with zero solver calls; its final test duration was 205.38 seconds. Formatting and strict Clippy passed. A separate reviewer verified exact source identity and ran six focused negative checks, all passing. This is same-source deterministic software replay, not independent mathematical verification or a measured cohort result. Original and corrected review records remain separate.
+
+## 2026-10-29 — Four-hour gate envelope and approved publisher trust correction
+
+The user supplied a four-hour first-gate budget. The normalized envelope is 14,400 cumulative worker-execution seconds, inclusive of controls, warmups, retries, recovery and fresh validation, with fixed deadline 2026-10-30T03:32:22Z from the observed 23:32:22Z clock. The separate authorization record and preservation checks retain all60 targets and per-execution caps; no legacy deadline was reset.
+
+After explicit separate user approval, updated only the publisher role's GitHub trust subject from repo:aburan28/crypto:ref:refs/heads/main to repo:isogeny-labs/crypto:ref:refs/heads/main. Immediate preapply state matched the reviewed policy, and live readback matched the proposal. Reversing only that field in a local comparison reproduced the original policy exactly. Receipt and policies are preserved under validation/publisher_trust_20261029/. No permissions policy, RBAC, controller/runtime publication or job changed. Successful publisher workflow execution remains unverified.
+
+## 2026-10-29 — Approved publication and narrow controller update
+
+### What was done
+Published the reviewed controller ZIP and runtime archive with conditional S3 writes, then downloaded their exact versions and compared bytes and SHA256. The canonical runtime key uses inputs/recovery-runtime/. The initial plural-prefix copy remains unused and is retained in the receipt. Published the digest-pinned instrument/runtime image from the reviewed existing binary; stopped-container extraction verified its bytes without executing the instrument. Durable evidence is in validation/controller_publication_20261029/.
+
+### Decisions made
+The reviewed CloudFormation change set also listed an IAM policy modification, so it remains unexecuted. Used the explicitly approved source-only CodeBuild UpdateProject route. Full before/after comparisons permit only source.location, sourceVersion and the API lastModified timestamp; the inline IAM policy is unchanged. Stack parameters intentionally remain old and a later stack update could revert this direct change. Infrastructure publication does not establish experiment or recovery qualification.
+
+### Open threads
+The 60-target gate's frozen protocol, native accounting validation and budget admission are being completed. Its unchanged deadline is 2026-10-30T03:32:22Z and cumulative worker-execution cap is 14,400 seconds. No pencil gate job has been submitted by these actions.
+
+### Errors
+The initial runtime S3 prefix was plural; the canonical singular-prefix object was published and independently read back. Both versions remain recorded. Initial stopped-container verification lacked a command, then encountered root-owned extracted files; corrected extraction verification passed without starting a container. No IAM/RBAC permissions were expanded.

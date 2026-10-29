@@ -121,6 +121,12 @@
       "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
       "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
       "authority": "explicit_user_approval"
+    },
+    {
+      "path": "first_gate_four_hour_authorization.json",
+      "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+      "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+      "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
     }
   ],
   "native_tools": {
@@ -188,5 +194,51 @@
       "software_tests": 8
     },
     "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+  },
+  "first_gate_execution_envelope": {
+    "authorization": {
+      "path": "first_gate_four_hour_authorization.json",
+      "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+      "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+      "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+    },
+    "cap_seconds": 14400,
+    "accounting": {
+      "aggregation": "Sum worker-execution elapsed seconds across all attempts; concurrent workers consume additive elapsed budget",
+      "includes": [
+        "candidate executions",
+        "reference and A/A controls",
+        "warmups",
+        "retries",
+        "recovery",
+        "fresh validation"
+      ],
+      "stop_rule": "Stop admission or work when cumulative14400worker-seconds or fixed UTCdeadline is reached, whichever comes first; enforce remaining budget on each admitted execution",
+      "missing_policy": "Retain the full60-target plan and record missing, capped or interrupted outcomes; do not replace the denominator with survivors"
+    },
+    "absolute_deadline_utc": "2026-10-30T03:32:22Z",
+    "per_execution_timeout_seconds": 3600,
+    "legacy_Diem_deadline_unchanged": true,
+    "remaining_later_stage_envelopes": "unresolved"
+  },
+  "infrastructure_authorization": {
+    "path": "infrastructure_authorization.json",
+    "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+    "authority": "explicit_user_approval",
+    "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+  },
+  "publisher_trust_readback": {
+    "question_item_id": [
+      "request_user_input_async",
+      "call_9923900bc777410b80b32ae8a2f7d55c",
+      0
+    ],
+    "action": "Correct the reviewed GitHub OIDC trust subject only",
+    "receipt": {
+      "path": "../../validation/publisher_trust_20261029/receipt.json",
+      "sha256": "b98edaa8ed29b23601fbbe6f6da35546d779f7480c5018b87552502938da814a"
+    },
+    "observed_status": "Applied and live readback verified; permissions policy and RBAC unchanged",
+    "oidc_workflow_execution_verified": false
   }
 }

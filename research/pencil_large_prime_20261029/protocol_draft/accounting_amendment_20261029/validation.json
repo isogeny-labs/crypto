@@ -17,7 +17,7 @@
     },
     "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1"
   },
-  "protocol_sha256_integrity_only": "c51026bf6c8379f07f3b25c66d071d25cebfb8e548f38461c2115fca7ee20d01",
+  "protocol_sha256_integrity_only": "bf4bc00435a1c0d9972a8e73889779d6b0f541f2e622c8665a812e8b1aa469fe",
   "preservation_checks": {
     "sample_size": true,
     "randomization": true,
@@ -34,13 +34,36 @@
   "expected_pending_bindings": {
     "image_digest": null,
     "independent_coverage_review": null,
-    "cumulative_authorized_budget": null,
-    "original_absolute_deadline": null,
+    "cumulative_authorized_budget": {
+      "status": "resolved_first_gate_only",
+      "worker_execution_elapsed_seconds": 14400,
+      "accounting": "additive across all attempts, controls, recovery and fresh validation",
+      "later_gates_and_full_cohort": "unresolved"
+    },
+    "original_absolute_deadline": {
+      "status": "resolved_first_gate_only",
+      "utc": "2026-10-30T03:32:22Z",
+      "basis_clock_utc": "2026-10-29T23:32:22Z",
+      "legacy_Diem_and_other_deadlines": "unchanged",
+      "later_gates_and_full_cohort": "unresolved"
+    },
     "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
     "launch_authorization": null,
-    "execution_time_envelope": "Explicit user approval first-gate-limits-20261029 permits3600seconds per execution for the first p739 gate, replacing its historical single external-command3600seconds envelope. Cumulative authorized budget and original absolute deadline remain pending; no total budget or later-stage authorization is inferred.",
+    "execution_time_envelope": "First p739 gate:3600seconds per execution, cumulative14400worker-execution seconds across all attempts/controls/recovery/fresh validation, fixed UTCdeadline2026-10-30T03:32:22Z. Stop at either cumulative cap or absolute deadline. Full60-target denominator retained; later-stage budgets and legacy deadlines are not changed.",
     "runtime_image_and_request_binding": null,
-    "iam_controller_authorization": null
+    "iam_controller_authorization": {
+      "status": "authorized_for_exact_reviewed_actions",
+      "authorization": {
+        "path": "infrastructure_authorization.json",
+        "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+        "authority": "explicit_user_approval",
+        "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+      },
+      "trust_subject_correction": "applied and readback verified",
+      "controller_and_runtime_execution_receipts": "pending",
+      "iam_permissions_or_rbac_expansion": false,
+      "additional_approval_for_exact_listed_actions_required": false
+    }
   },
   "initial_schema_or_semantic_defect": "Derived finite_algorithm_gae metric initially lacked formula; corrected before final validation. Raw first finding retained.",
   "freeze_or_authorization_performed": false,
@@ -174,5 +197,50 @@
       "software_tests": 8
     },
     "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+  },
+  "four_hour_authorization_preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "stopping_rules": true,
+    "invalidation_rules": true,
+    "arms": true,
+    "freeze": true,
+    "prepared_manifest": true,
+    "instrument_build": true,
+    "analysis_build": true,
+    "historical_first_gate_authorization": true,
+    "launch_still_pending": true,
+    "infra_still_pending": true,
+    "legacy_Diem_unchanged": true
+  },
+  "four_hour_authorization": {
+    "path": "first_gate_four_hour_authorization.json",
+    "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+    "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+    "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+  },
+  "infrastructure_authorization_preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "arms": true,
+    "stopping_rules": true,
+    "freeze": true,
+    "resource_authorizations": true,
+    "first_gate_execution_envelope": true,
+    "prepared_manifest": true,
+    "instrument_build": true,
+    "analysis_build": true,
+    "image_still_pending": true,
+    "no_iam_permissions_or_rbac_expansion": true
+  },
+  "infrastructure_authorization": {
+    "path": "infrastructure_authorization.json",
+    "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+    "authority": "explicit_user_approval",
+    "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
   }
 }

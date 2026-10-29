@@ -22,7 +22,7 @@ The design remains 1,260 prescribed targets, five measured streams, one warmup, 
 
 ## Pending boundaries
 
-Cumulative authorized resource budget, original absolute deadline, IAM/controller authorization, image/runtime/request bindings, independent review, freeze and launch remain pending. Canonical v1 cannot represent unattempted rows: missing slots remain explicit in sidecars/backend metadata, with shortfall findings preserved. Unknown attempts or restoration counts refuse canonical export rather than becoming default integers. Resource observations remain separate from the finite operation model and overlapping clocks are not summed.
+The first-gate cumulative worker-execution budget and deadline are now bound by the separate four-hour authorization below. Later-stage budgets/deadlines, IAM/controller authorization, image/runtime/request bindings, independent review, freeze and launch remain pending. Canonical v1 cannot represent unattempted rows: missing slots remain explicit in sidecars/backend metadata, with shortfall findings preserved. Unknown attempts or restoration counts refuse canonical export rather than becoming default integers. Resource observations remain separate from the finite operation model and overlapping clocks are not summed.
 
 ## Current validation
 
@@ -37,3 +37,23 @@ The prior 28-test plus supplemental-test scope did not establish the six exporte
 The corrected adapter requires `analysis_provenance.sources` to match every applicable protocol source pin, a hash-bound analysis build receipt and both analysis binaries, all 13 compiled native-analysis source pins, and an immutable packaging request. Public packaging/checking deterministically reruns the linked native aggregate and compares the complete output; only private unit tests can substitute a replay callback. These checks establish source-linked software consistency, not independent mathematical proof or attestation that the original analyzer binary executed.
 
 The final producer validation consists of 37 private unit contracts, one native protocol CLI test, one historical digest semantics test and one public full-denominator replay integration test. The latter uses 1,260 planned workloads and 22,680 slots but zero solver records; mock build/binary receipts are explicitly part of the software fixture. All empirical cost ratios remain null. The independent corrected-source recheck reports six selected negative checks passed and closures within software-packaging/source-linked-replay scope. Its timestamp-corrected review is hash-bound separately; no general independent coverage, empirical qualification, freeze or launch approval is inferred. Source543 empirical instrument and native analysis binary pins remain unchanged.
+
+## First-gate four-hour execution envelope
+
+`first_gate_four_hour_authorization.json` records the actual user reply and the coordinator-stated interpretation by question-item reference, without reproducing private transcript text. The first gate has a cumulative cap of **14,400 worker-execution elapsed seconds**, summed across candidate/reference/A-A executions, warmups, retries, recovery and fresh validation. Concurrent worker elapsed times consume this cap additively. The fixed first-gate deadline is **2026-10-30T03:32:22Z**, based on the recorded clock observation **2026-10-29T23:32:22Z**. Stop at whichever limit is reached first and account for remaining budget before admission.
+
+The existing 3,600-second per-execution limit and 25m coefficient cap remain unchanged. All 60 prescribed first-gate targets remain in the plan, with missing, capped or interrupted outcomes explicit; the full 1,260-target research objective and scientific controls are unchanged. This is not a dollar or vCPU-price ceiling, does not reset the legacy Diem deadline or other deadlines, and does not extend authorization to later stages. It grants no IAM/controller, runtime/image, freeze, independent review or launch approval.
+
+The earlier `first_gate_authorization.json` is unchanged. `pre-four-hour-authorization-*` preserves the prior bindings and checks. `four_hour_preservation_checks.json` records 15 passing preservation checks, and the native protocol validator still reports draft/no-launch. No source, empirical instrument or prepared-spec file was changed.
+
+Infrastructure authorization recorded separately: `infrastructure_authorization.json`
+binds the explicitly approved controller ZIP and replacement runtime, versioned
+publication with downloaded hash verification, a controller change limited to
+package key/version after change-set review, and pinned runtime image publication.
+The separate trust-subject correction is applied and verified by live readback;
+its receipt does not establish publisher-workflow success. No IAM permissions or
+RBAC expansion is approved. These exact actions require no further approval.
+Publication, deployment, image identity and experiment admission still require
+factual execution receipts; this document remains a draft. The four-hour additive
+worker-execution ceiling and fixed deadline are unchanged. Earlier bindings are
+preserved as `pre-infrastructure-authorization-*`.

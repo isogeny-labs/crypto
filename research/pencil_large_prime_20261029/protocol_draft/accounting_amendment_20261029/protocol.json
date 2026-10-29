@@ -716,6 +716,36 @@
         "extensions.canonical_packaging",
         "extensions.native_tools.canonical_export"
       ]
+    },
+    {
+      "id": "A-first-gate-four-hour-envelope-20261029",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "Record actual user four-hour approval and the coordinator-stated fixed first-gate execution interpretation, without changing historical authorization records.",
+      "changes": [
+        "Set cumulative first-gate worker-execution cap14400seconds across all attempts, controls, recovery and fresh validation.",
+        "Fix first-gate UTCdeadline2026-10-30T03:32:22Z from observed clock2026-10-29T23:32:22Z; retain3600seconds per execution.",
+        "Keep all60 planned first-gate targets and full1260 research scope; missing outcomes stay explicit; no infrastructure or launch approval inferred."
+      ],
+      "supersedes_fields": [
+        "extensions.pending_bindings.cumulative_authorized_budget",
+        "extensions.pending_bindings.original_absolute_deadline",
+        "extensions.pending_bindings.execution_time_envelope"
+      ]
+    },
+    {
+      "id": "A-reviewed-infrastructure-authorization-20261029",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "Record explicit authorization for reviewed infrastructure publication/update and separately verified narrow trust-subject correction.",
+      "changes": [
+        "Bind reviewed controller and runtime archive hashes and exact administrative action boundaries.",
+        "Bind factual trust-policy readback receipt; retain image, deployment and admission evidence pending.",
+        "Preserve all scientific controls, first-gate resource limits and the full research objective; remain an unfrozen draft."
+      ],
+      "supersedes_fields": [
+        "extensions.pending_bindings.iam_controller_authorization"
+      ]
     }
   ],
   "freeze": {
@@ -872,13 +902,36 @@
     "pending_bindings": {
       "image_digest": null,
       "independent_coverage_review": null,
-      "cumulative_authorized_budget": null,
-      "original_absolute_deadline": null,
+      "cumulative_authorized_budget": {
+        "status": "resolved_first_gate_only",
+        "worker_execution_elapsed_seconds": 14400,
+        "accounting": "additive across all attempts, controls, recovery and fresh validation",
+        "later_gates_and_full_cohort": "unresolved"
+      },
+      "original_absolute_deadline": {
+        "status": "resolved_first_gate_only",
+        "utc": "2026-10-30T03:32:22Z",
+        "basis_clock_utc": "2026-10-29T23:32:22Z",
+        "legacy_Diem_and_other_deadlines": "unchanged",
+        "later_gates_and_full_cohort": "unresolved"
+      },
       "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
       "launch_authorization": null,
-      "execution_time_envelope": "Explicit user approval first-gate-limits-20261029 permits3600seconds per execution for the first p739 gate, replacing its historical single external-command3600seconds envelope. Cumulative authorized budget and original absolute deadline remain pending; no total budget or later-stage authorization is inferred.",
+      "execution_time_envelope": "First p739 gate:3600seconds per execution, cumulative14400worker-execution seconds across all attempts/controls/recovery/fresh validation, fixed UTCdeadline2026-10-30T03:32:22Z. Stop at either cumulative cap or absolute deadline. Full60-target denominator retained; later-stage budgets and legacy deadlines are not changed.",
       "runtime_image_and_request_binding": null,
-      "iam_controller_authorization": null
+      "iam_controller_authorization": {
+        "status": "authorized_for_exact_reviewed_actions",
+        "authorization": {
+          "path": "infrastructure_authorization.json",
+          "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+          "authority": "explicit_user_approval",
+          "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+        },
+        "trust_subject_correction": "applied and readback verified",
+        "controller_and_runtime_execution_receipts": "pending",
+        "iam_permissions_or_rbac_expansion": false,
+        "additional_approval_for_exact_listed_actions_required": false
+      }
     },
     "predecessor": {
       "path": "/home/ec2-user/pencil-build-40919051188/protocol-with-binary.json",
@@ -959,6 +1012,12 @@
         "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
         "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
         "authority": "explicit_user_approval"
+      },
+      {
+        "path": "first_gate_four_hour_authorization.json",
+        "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+        "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+        "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
       }
     ],
     "native_tools": {
@@ -1026,6 +1085,52 @@
         "software_tests": 8
       },
       "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+    },
+    "first_gate_execution_envelope": {
+      "authorization": {
+        "path": "first_gate_four_hour_authorization.json",
+        "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+        "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+        "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+      },
+      "cap_seconds": 14400,
+      "accounting": {
+        "aggregation": "Sum worker-execution elapsed seconds across all attempts; concurrent workers consume additive elapsed budget",
+        "includes": [
+          "candidate executions",
+          "reference and A/A controls",
+          "warmups",
+          "retries",
+          "recovery",
+          "fresh validation"
+        ],
+        "stop_rule": "Stop admission or work when cumulative14400worker-seconds or fixed UTCdeadline is reached, whichever comes first; enforce remaining budget on each admitted execution",
+        "missing_policy": "Retain the full60-target plan and record missing, capped or interrupted outcomes; do not replace the denominator with survivors"
+      },
+      "absolute_deadline_utc": "2026-10-30T03:32:22Z",
+      "per_execution_timeout_seconds": 3600,
+      "legacy_Diem_deadline_unchanged": true,
+      "remaining_later_stage_envelopes": "unresolved"
+    },
+    "infrastructure_authorization": {
+      "path": "infrastructure_authorization.json",
+      "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+      "authority": "explicit_user_approval",
+      "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+    },
+    "publisher_trust_readback": {
+      "question_item_id": [
+        "request_user_input_async",
+        "call_9923900bc777410b80b32ae8a2f7d55c",
+        0
+      ],
+      "action": "Correct the reviewed GitHub OIDC trust subject only",
+      "receipt": {
+        "path": "../../validation/publisher_trust_20261029/receipt.json",
+        "sha256": "b98edaa8ed29b23601fbbe6f6da35546d779f7480c5018b87552502938da814a"
+      },
+      "observed_status": "Applied and live readback verified; permissions policy and RBAC unchanged",
+      "oidc_workflow_execution_verified": false
     }
   }
 }
