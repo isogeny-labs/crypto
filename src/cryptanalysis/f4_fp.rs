@@ -4840,6 +4840,13 @@ where
 ///
 /// Unlike [`solve`], this opt-in path uses rational-factor extraction for
 /// unrestricted univariates. The legacy exhaustive scan remains a control.
+///
+/// Returns `Err` before traversal, callbacks or native checkpoint I/O if any
+/// of `checkpoint`, `checkpoint_stop_after`, `checkpoint_in_step` or
+/// `checkpoint_stop_in_rref` is set, including hooks without a checkpoint
+/// path. A native checkpoint describes one polynomial system, not this
+/// recursive traversal: specialized systems cannot reuse its path. Direct
+/// native F4 checkpoint support is unaffected.
 pub fn solve_visit(
     input: &[Poly],
     n_vars: usize,
@@ -4865,6 +4872,9 @@ pub fn solve_visit(
 /// the callback. Native row traces are materialized once per recursive F4 call;
 /// external time/memory limits remain necessary. Hilbert stopping is rejected
 /// because the native recording path does not support that strategy.
+/// All four checkpoint options are also rejected with `Err` before traversal,
+/// either callback or native checkpoint I/O, as in [`solve_visit`]. There is
+/// no recursive traversal or trace-sink resume support.
 pub fn solve_visit_traced(
     input: &[Poly],
     n_vars: usize,
@@ -4893,6 +4903,13 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    if opts.checkpoint.is_some()
+        || opts.checkpoint_stop_after.is_some()
+        || opts.checkpoint_in_step.is_some()
+        || opts.checkpoint_stop_in_rref.is_some()
+    {
+        return Err("recursive visitor does not support checkpoint options".into());
+    }
     if p >= 1u64 << 32
         || !super::residual_walk::is_prime_u64(p)
         || domains.len() != n_vars
@@ -5190,6 +5207,73 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    #[test]
+    fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
+        let root = std::env::temp_dir().join(format!(
+            "f4-visitor-checkpoint-rejection-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let existing = root.join("existing.checkpoint");
+        let absent_parent = root.join("absent");
+        let absent = absent_parent.join("new.checkpoint");
+        let sentinel = b"not a native checkpoint; must remain untouched";
+        std::fs::write(&existing, sentinel).unwrap();
+        // The empty system would immediately visit a solution; the quadratic
+        // would invoke native F4. Reject before either traversal can begin.
+        for (input, n_vars, domains) in [
+            (vec![], 0, vec![]),
+            (vec![vec![(vec![2], 1), (vec![0], 6)]], 1, vec![None]),
+        ] {
+            for path in [&existing, &absent] {
+                // Each option alone, each hook with a checkpoint path, and all
+                // options together. Orphan hooks must not silently be ignored.
+                for case in 0..8 {
+                    let mut opts = F4Options::new(Ordering::Grevlex, 4);
+                    if case == 0 || case >= 4 {
+                        opts.checkpoint = Some((path.clone(), Duration::ZERO));
+                    }
+                    if matches!(case, 1 | 4 | 7) {
+                        opts.checkpoint_stop_after = Some(0);
+                    }
+                    if matches!(case, 2 | 5 | 7) {
+                        opts.checkpoint_in_step = Some(Duration::ZERO);
+                    }
+                    if matches!(case, 3 | 6 | 7) {
+                        opts.checkpoint_stop_in_rref = Some(0);
+                    }
+                    let plain = solve_visit(&input, n_vars, 7, &opts, &domains, |_| {
+                        panic!("checkpoint options reached the solution visitor")
+                    });
+                    let traced = solve_visit_traced(
+                        &input,
+                        n_vars,
+                        7,
+                        &opts,
+                        &domains,
+                        |_| panic!("checkpoint options reached the traced solution visitor"),
+                        |_| panic!("checkpoint options reached the trace sink"),
+                    );
+                    for result in [plain, traced] {
+                        assert_eq!(
+                            result.unwrap_err(),
+                            "recursive visitor does not support checkpoint options",
+                            "case {case}, path {path:?}, n_vars {n_vars}"
+                        );
+                    }
+                    assert_eq!(std::fs::read(&existing).unwrap(), sentinel);
+                    assert!(!absent_parent.exists());
+                    assert_eq!(std::fs::read_dir(&root).unwrap().count(), 1);
+                }
+            }
+        }
+        std::fs::remove_dir_all(root).unwrap();
+    }
 
     #[test]
     fn traced_visit_matches_plain_with_unrestricted_auxiliary_and_serializable_events() {
