@@ -1,5 +1,33 @@
 {
-  "amendments": [],
+  "amendments": [
+    {
+      "changes": [
+        "Increment protocol version to2 and replace extensions.execution_state with a time-independent description of filing and outcome records.",
+        "Retain frozen v1 at versions/protocol-v1.json; canonical SHA256 bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea; full-file SHA256 be9c8a62b273772e02c6085a2bdc725025be6fa1cc3c43b3437805ae85b2eb38."
+      ],
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "id": "metadata-wording-v2",
+      "reason": "Correct stale draft wording in an informational extension after v1 was frozen. No primary comparison data has been collected. Preserve v1 verbatim; no numerical inputs, algorithms, budgets, accounting or decisions change.",
+      "supersedes_fields": [
+        "extensions.execution_state"
+      ]
+    },
+    {
+      "id": "metadata-date-format-v3",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "The v2 metadata-only attempt failed full JSON Schema validation because amendments.filed requires YYYY-MM-DD, not a timestamp. Preserve that failed attempt; no primary data was produced.",
+      "changes": [
+        "Correct the amendment filing date format and increment version to3.",
+        "Preserve v2 invalid attempt at versions/protocol-v2-invalid-attempt.json.txt; raw SHA256 03749c4eba3121bed2869b2a8dde940d1ea0ff5f64a8e9a855c95b9a489be57c.",
+        "Add pinned full JSON Schema validation to the preflight alongside native hash/scope checks. No algorithm, input, budget, accounting or decision change."
+      ],
+      "supersedes_fields": [
+        "amendments[0].filed"
+      ]
+    }
+  ],
   "analysis_plan": {
     "blinded": false,
     "frozen_before_data": true,
@@ -602,7 +630,7 @@
       "receipt": "delivery.json plus delivery-source.sha256, .artifacts.json and managed .gitignore record actual stage exits, hashes, byte counts, tool/policy/source identities and original aggregate/checkpoint outcomes.",
       "transport": "Maintained tools/artifacts/artifacts.py explicit-file push to existing s3://setec-astronomy-artifacts/store; existing ARTIFACTS_* credentials only in post-analysis delivery step, with configured region/defaultus-west-2. No new identity, settings or bucket configuration."
     },
-    "execution_state": "Draft pending source/analysis filing commit and canonical protocol freeze. Fixed development timing/public-input preflight and heuristic estimate are recorded before primary comparison data. Successful source/spec checkpoint gates and existing store-credential presence precede the primary census; actual artifact-store upload/fresh-readback acceptance occurs after analysis and remains unverified until its delivery receipt.",
+    "execution_state": "Authoritative filing metadata is in freeze; execution outcomes are recorded only in run manifests and delivery receipts. Development timing/public-input preparation is separate from primary comparison data. Source/spec checkpoint gates and existing store-credential presence are required before the primary census; actual artifact-store upload and fresh-readback acceptance require the actual delivery receipt.",
     "export_layout": {
       "b_handling": "B2 and B3 retain separate metric/counter keys and raw model data within each selector field row; they are never averaged together.",
       "comparison_cells": 42,
@@ -647,11 +675,11 @@
     "track": "generic decomposition (bounded by sqrt(r); cannot beat rho)"
   },
   "freeze": {
-    "commit": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
-    "filed_before_affected_data": true,
-    "frozen_at": "2026-10-29T22:18:02Z",
-    "protocol_sha256": "bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea",
-    "status": "frozen"
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   },
   "inadmissible": [
     "Calling p^8 subset-state DP elapsed time the runtime of a selector, or memoized relation-audit elapsed time the cold relation finder.",
@@ -1158,5 +1186,5 @@
     ],
     "transfer_obligations": []
   },
-  "version": 1
+  "version": 3
 }

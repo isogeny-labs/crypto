@@ -155,6 +155,18 @@ jobs:
               fields:[7,11,19],base_sizes:[2,3],thresholds:[1,2,3,4],selector_budget:8,walk_length:8}' \
             > artifacts/tr04-preflight/execution.json
           printf 'source_revision=%s\n' "$TR04_SOURCE_REVISION" >> "$GITHUB_OUTPUT"
+      - name: Validate the complete protocol JSON Schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/twist_relations_tr04_20261029/schema/SOURCE.json artifacts/tr04-preflight/protocol-schema-source.json
+          schema=research/twist_relations_tr04_20261029/schema/experiment-protocol.v1.json
+          printf '%s  %s\n' "$(jq -er .sha256 research/twist_relations_tr04_20261029/schema/SOURCE.json)" "$schema" \
+            | sha256sum -c - > artifacts/tr04-preflight/protocol-schema-source-check.log 2>&1
+          npm exec --yes --package=ajv-cli@5.0.0 -- ajv validate --spec=draft2020 --strict=false \
+            -s "$schema" \
+            -d research/twist_relations_tr04_20261029/protocol.json \
+            > artifacts/tr04-preflight/protocol-schema.log 2>&1
       - name: Native development correctness and lint checks
         shell: bash
         run: |
