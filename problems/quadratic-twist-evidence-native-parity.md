@@ -21,7 +21,9 @@ Current0e88 source's existing extension test expects1371 and passes during the
 fresh library attempt; that test does not assert recovery of the1921 study
 models. Preserve the missing-study-population requirement and its strict native
 zero-new-row replay; no assertion was lowered by this round. Combined registry,
-cover, source/membership/byte validation and full suite outcome remain separate.
+cover, source/membership/byte validation remain separate. The fresh5140-case
+library suite reaches600s/exit124 without completion; no suite pass. Full naming
+is non-green, including five historical report IDs absent from the merged registry.
 
 The [2026-10-29 workflow repair](../research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/README.md)
 updates eight generated read-only artifact pull blocks after normal main merge

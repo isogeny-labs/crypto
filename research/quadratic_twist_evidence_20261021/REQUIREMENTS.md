@@ -139,11 +139,11 @@ iteration above has separate executed evidence, and later queue items remain pen
 The original request remains broader than the finite evidence. Closing a native
 implementation gap or passing CI does not settle general ECDLP hardness.
 
-The source-only [uniform collection draft](drafts/uniform-collection-20261026/README.md)
-prepares algebraic first-step/degree statements but is not elaborated or checked.
-It does not add to208public/269audited historical declarations or17identities.
-Actual-state binding, iid probability semantics and native uniform execution
-remain pending. The new runner is implemented but its native paths are
-unverified; the checkpoint gate still needs secure token access/current tooling.
+The original [uniform collection draft](drafts/uniform-collection-20261026/README.md)
+remains frozen; its first actual elaboration failure is retained. The new
+lean-uniform project now checks nine named/16audited conditional declarations
+separately from historical208/269receipts. Uniform native execution/replay/controls
+and scoped checkpoint access now succeed. Actual-state/iid probability semantics,
+complete work, active registration and full-library completion remain open.
 
 Storage/CI maintenance: [artifact migration review](validation/artifact-migration-review-20261026/README.md) verifies32frozen byte bindings, removes55unrelated newly added loose files while preserving their immutable Git history, and adds read-only input restoration without changing any old verification command. Physical S3 availability/new-head CI remain unverified; no new scientific/Lean result.
