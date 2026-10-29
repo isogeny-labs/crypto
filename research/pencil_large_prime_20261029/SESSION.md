@@ -596,3 +596,17 @@ Commit/source/image identity, complete frozen protocol, staged EKS gate, full co
 
 ### Errors
 The earlier full-library run had one GPU test-lock failure (5,154 passed, 1 failed, 123 ignored); its same-binary serial recheck passed. Preserve both logs.
+
+## 2026-10-29 launch contract reconciliation
+
+### What was done
+Published timing/input packet in PR2869 at3d99a998514c81a4095105ac71eb6df335bc55a2. Draft protocol passed canonical semantic validator with zero findings. Both gate native plans reproduce61 workload objects and all1098 scheduled stream seeds from the full cohort; planning executes no solvers.
+
+### Decisions made
+Preserve required8Gi memory envelope: deployed recovery controller currently hardcodes4Gi in both phases, so repair under separate T832 before launch. Retain computation and fresh measurement epochs separately.
+
+### Open threads
+Build-only GitHub dispatch for source3d99a998, exact controller memory propagation, scoped publication credentials, protocol freeze and staged cohort execution. No experiment job submitted.
+
+### Errors
+Local staticmusl build failed because x86_64-linux-musl-gcc is absent; raw log retained. No compiler substitution or experimental-result claim.
