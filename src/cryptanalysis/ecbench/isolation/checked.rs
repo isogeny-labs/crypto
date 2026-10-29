@@ -114,6 +114,7 @@ impl CallError {
     #[cfg(all(
         target_os = "linux",
         target_pointer_width = "64",
+        target_endian = "little",
         any(target_arch = "x86_64", target_arch = "aarch64")
     ))]
     fn last() -> Self {
@@ -127,12 +128,14 @@ impl CallError {
     #[cfg(not(all(
         target_os = "linux",
         target_pointer_width = "64",
+        target_endian = "little",
         any(target_arch = "x86_64", target_arch = "aarch64")
     )))]
     fn unsupported() -> Self {
         Self {
             errno: None,
-            message: "native perf ABI supported only on 64-bit Linux x86_64/aarch64".into(),
+            message: "native perf ABI supported only on little-endian 64-bit Linux x86_64/aarch64"
+                .into(),
         }
     }
 }
@@ -327,11 +330,14 @@ trait Calls {
 
 struct NativeCalls;
 
-// These architectures use the asm-generic ioctl encoding and 64-bit pointer
-// size for PERF_EVENT_IOC_ID. Other ABIs fail explicitly instead of guessing.
+// These little-endian architectures use the asm-generic ioctl encoding and
+// 64-bit pointer size for PERF_EVENT_IOC_ID. The perf_event_attr flags are a C
+// bitfield, so their low-bit masks cannot be encoded with to_ne_bytes on a
+// big-endian target. Other ABIs fail before any syscall instead of guessing.
 #[cfg(all(
     target_os = "linux",
     target_pointer_width = "64",
+    target_endian = "little",
     any(target_arch = "x86_64", target_arch = "aarch64")
 ))]
 impl Calls for NativeCalls {
@@ -416,6 +422,7 @@ impl Calls for NativeCalls {
 #[cfg(not(all(
     target_os = "linux",
     target_pointer_width = "64",
+    target_endian = "little",
     any(target_arch = "x86_64", target_arch = "aarch64")
 )))]
 impl Calls for NativeCalls {

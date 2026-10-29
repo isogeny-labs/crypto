@@ -208,6 +208,40 @@ fn unsupported_platform_makes_no_perf_calls() {
 }
 
 #[test]
+fn native_backend_support_requires_little_endian_linux_64_bit_abi() {
+    // Querying support never opens counters. On unsupported targets, exercise
+    // the real backend's early exit and require an entirely empty lifecycle.
+    let supported = NativeCalls.supported();
+    assert_eq!(
+        supported,
+        cfg!(all(
+            target_os = "linux",
+            target_pointer_width = "64",
+            target_endian = "little",
+            any(target_arch = "x86_64", target_arch = "aarch64")
+        ))
+    );
+    if !supported {
+        let collector = Collector::open(
+            NativeCalls,
+            CounterPolicy {
+                scope: TaskScope::CallingThread,
+                cycles: CyclesPolicy::OptionalWithStandaloneFallback,
+            },
+        );
+        let report = collector.finish();
+        assert_eq!(report.attempts.len(), 1);
+        assert_eq!(report.selected_attempt, None);
+        for event in &report.attempts[0].events {
+            assert_eq!(event.status, EventStatus::UnsupportedPlatform);
+            assert!(event.lifecycle.is_empty());
+            assert_eq!(event.kernel_event_id, None);
+            assert_eq!(event.raw, None);
+        }
+    }
+}
+
+#[test]
 fn open_failures_preserve_errno_and_never_broaden_scope() {
     for (errno, expected) in [
         (libc::EPERM, EventStatus::PermissionDenied),
