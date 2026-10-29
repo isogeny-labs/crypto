@@ -2058,8 +2058,8 @@ mod tests {
         for poly in input.iter().chain(&result.native.basis) {
             assert!(ring.field.is_zero(ring.eval(poly, &point)));
         }
-        assert_eq!(ring.field.to_u64(point[0]), p - 2);
-        assert_eq!(ring.field.to_u64(point[1]), p - 3);
+        assert_eq!(ring.field.to_u64(point[0]), Some(p - 2));
+        assert_eq!(ring.field.to_u64(point[1]), Some(p - 3));
     }
 
     #[test]
