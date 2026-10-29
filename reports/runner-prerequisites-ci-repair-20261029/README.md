@@ -40,3 +40,20 @@ workflow commands, artifact path selection and hydration implementation,
 `docs/reports-s3.md`, and official GitHub workflow syntax. The authenticated
 report upload is verified by the normal post-merge workflow, not this local
 package or Git fixture. Current-head checks and fresh review remain required.
+
+## Blocked-card verifier templates
+
+The same main backlog validation reported unresolved `{artifact}` templates
+in two blocked cards. Canonical `outputs.verify` uses shard variables such as
+`{out}`; `{artifact}` belongs to the separate cairn-checker interface. Match
+the existing run outputs exactly: the NIST ecbench session is `{out}` and the
+volcano runner writes `{out}/records.private.jsonl`. Both cards remain blocked,
+their frozen protocol bytes and all other card fields are unchanged, and the
+independent cairn checker keeps `{artifact}`. Native validation now accepts
+all 53 cards with the merged-source check, zero failures. The validator's
+binary digest, exact commands, protocol blob identities and output are saved.
+The former prime-base code-ancestry error is already fixed by its actual main
+merge; no source pin or historical receipt was rewritten. Initial local
+missing-problem-path errors were resolved by materializing the tracked problem
+records before acceptance. No experiment, private-journal upload or checkpoint
+action was performed.
