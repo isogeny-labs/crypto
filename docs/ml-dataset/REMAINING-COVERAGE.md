@@ -45,14 +45,31 @@ applied. The new conditional-write fallback has software tests but no actual
 worker S3 validation. Neither launch establishes a completed cloud cell or
 remote corpus. No performance comparison follows from these correctness tests.
 
-## Prime affine-chain implementation awaiting validation
+## Prime affine-chain software validation and pending integration
 
 The current implementation adds prime F4 strategy
 `prime-affine-s3-chain-f4-visitor/v1` for m=3..15 and a recursive native trace
-API. This increment has not yet passed the parent's centralized validation;
-previous source receipts do not cover it. The existing m=2 reference path is
-preserved. Native elimination remains limited to p<2^32; larger primes retain
-exact chain/membership equations without invoking the narrow backend.
+API. Source `69e4c9763bed508f0ab0d2f424873d2e748a7229` passed three native
+trace tests, eight focused prime-adapter tests, the full release library suite
+(5,153 passed, zero failures, 123 ignored), release CLI build and actual-binary
+capability/help checks. These include m3/m4 positive fixtures on both twists,
+m15 equation checks and wide-prime equation preservation; they do not establish
+successful native solves for every requested arity or field size. Receipts and
+failed checkout-materialization attempts are retained in
+`research/ml_dataset_20261028/validation-prime-chain-69e4c976/`.
+The separately invoked endpoint integration test also passed its 360 combinations
+(n=23/61, three families, both twists, m=2/4/15 and ten adapters). It checks
+structured outcomes and returned certificates; unsupported and capped outcomes
+are allowed. This is not a count of solved instances or generated cloud cells.
+Strict maintained Clippy remains blocked by three unused startup helpers whose
+module registration is pending T766's shared-file handoff; no warning was
+suppressed. The startup command remains unregistered. The earlier PR2756 merged
+at source head `2e09b77494d6744ee26b56e2fd68e694125ec076`; these later local
+changes require separate delivery after integration and validation.
+The existing m=2 reference path is preserved. Native elimination remains
+limited to p<2^32; larger primes retain exact chain/membership equations without
+invoking the narrow backend. The [wide-arithmetic inventory](PRIME-F4-WIDE-ARITHMETIC-INVENTORY.md)
+is planning only, with no new arithmetic support or performance claim.
 
 The new equation/domain reconstruction verifier is called during generation.
 Its registration in central `verify_cell` remains pending: restored artifacts
@@ -84,7 +101,7 @@ enormous corpus.
 | Sampling replay | Public algebra and independent scalar certificates are replayed; seeds and sampling indices are retained in restricted provenance | Reconstruct curve, generator, key and solver-query draws from the frozen configuration in a separate sampling audit; the current relation verifier checks the recorded coefficients and group equations but does not prove that they came from the declared RNG stream |
 | Binary SAT | Chained S3 finite-domain circuits with checked point-sign lifts and bounded native decision/assignment/reason/conflict/learning/deletion/backjump/restart/XOR streams; sticky sink failure returns Unknown | Add full encoder gate maps, clause-minimization derivations and independently checked UNSAT proofs; extend practical admitted coverage at m=2..15 without interpreting a cap as UNSAT |
 | Prime SAT | No prime-field SAT adapter is yet declared complete | Integrate an actual prime-field bit-vector/modular encoding with exact domain maps, verified models and proof-checkable outcomes |
-| F4/F5 | Boolean matrix engines remain scoped to m=2; prime F4 preserves the m=2 reference and now implements an unvalidated m=3..15 affine-S3-chain lane with exact leaf domains, unrestricted auxiliaries and bounded recursive useful-row traces; native elimination requires p<2^32, while larger primes retain equations with an unsupported outcome | Validate the new chain lane and register its equation/domain verifier in central verify_cell; handle exceptional infinity branches before general negative PDP claims; extend arithmetic for n=47..61 or p=2^61-1; export remaining matrices, private pivots, zero rows, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
+| F4/F5 | Boolean matrix engines remain scoped to m=2; prime F4 preserves the m=2 reference and now implements an m=3..15 affine-S3-chain lane with scoped software checks with exact leaf domains, unrestricted auxiliaries and bounded recursive useful-row traces; native elimination requires p<2^32, while larger primes retain equations with an unsupported outcome | Register and validate the equation/domain verifier in central verify_cell; validate broad actual curve/arity coverage; handle exceptional infinity branches before general negative PDP claims; extend arithmetic for n=47..61 or p=2^61-1; export remaining matrices, private pivots, zero rows, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
 | F6 | Native geometric four-sum index has its own declared m=4 lane | Expose each implemented F6 algebraic/geometric variant separately, document its exact operation, and integrate the remaining arities without changing what the F6 name denotes |
 | Root solvers | Native S3 univariate root routes are m=2 adapters | Export factorization/GCD/intermediate root states; integrate higher-m elimination/root extraction and certify completeness separately from finding one valid root |
 | Weil descent and PKM | Boolean exact selector restriction is scoped to m = 2; native prime Kummer-tower PKM supports m = 2/3 and p < 2^31, with exact alternative Kummer points, column/sign maps, prepared equations and bounded grid extraction retained | Preserve every tower/basis/modulus/quotient intermediate; extend legitimate native coverage to requested higher m and larger primes, including p = 2^61-1; retain separate cost for finite-grid fallback; rational Kummer points outside the target subgroup make this PDP evidence, not completed ECDLP recovery |

@@ -263,8 +263,14 @@ explicit trace hooks. Capability records name those gaps. Exact first-fall and
 last-fall degrees remain null until a checker establishes their stated algebraic
 definition and all required closure/rank conditions.
 
-The current prime F4 increment is implemented but awaits centralized software
-validation. `f4` keeps its existing m=2 reference path and selects
+The prime F4 increment at source `69e4c9763bed508f0ab0d2f424873d2e748a7229`
+passed 11 focused native/adapter tests, the full release library suite
+(5,153 passed, zero failures, 123 ignored), release build and actual CLI checks.
+The separate endpoint test passed all 360 adapter combinations, including
+structured unsupported and capped outcomes; it does not establish 360 solves.
+Strict lint remains blocked by the separately unregistered startup helpers;
+central stored-input verifier integration and cloud validation remain pending.
+`f4` keeps its existing m=2 reference path and selects
 `prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
 leaf membership equations and unrestricted auxiliary-variable roles before
 solving. Native elimination requires p<2^32. For larger moduli, including
@@ -288,7 +294,11 @@ trace/lift limits together. An encoding traversal may complete after truncated
 native elimination without establishing a complete Groebner basis. Infinity
 exceptions are not all encoded, so completion without a verified lift never
 establishes PDP impossibility: `exhaustive_no_decomposition` remains false.
-A verified positive witness can coexist with a censored trace. Neither state
+A verified positive witness can coexist with a censored trace. If live persistence
+fails after a positive, the chain stages its certificate and returns explicit
+`live_persistence_errors` for a separate canonical worker write. A true
+read-only-event-descriptor regression verifies this path; total storage failure
+still cannot establish durability. Neither state
 establishes scalar recovery or an exact first/last fall degree.
 
 Generation invokes the new public equation/domain reconstruction verifier.
