@@ -293,3 +293,17 @@ declare the historical objective complete or claim exhaustive measurement
 over all mathematical parameter functions. The exact finite inventories
 are complete; broader coverage and a supported historical mechanism remain
 open. No DLP, actual point-counting cost or attack was measured.
+
+2026-10-29 publication obstacle: result commit713202779 and normal main merge
+ce2cd12c8 are local; remote head was last confirmed as1238726d9. The PR title
+and body are updated, but these new commits are not yet pushed. Local canonical
+verification, bound evidence and size checks pass. The artifact check requires
+the85071-byte strict-count plot to move to the artifact store. The exact upload
+was stopped on three attempts before execution because automatic approval review reported
+its selected model at capacity. This is a review-service resource failure,
+not failed authentication or a determination that the upload is unsafe.
+The [publication note](../research/nist_skip_criterion_20261025/PUBLICATION-20261029-STRICT.md)
+tracks the concrete remaining steps. Unblock by restoring automatic review,
+executing the same authorized upload, verifying a full remote GET, passing
+artifact admission, and normally pushing the existing branch. Those steps
+publish the empirical result; they do not resolve historical attribution.
