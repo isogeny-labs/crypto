@@ -177,6 +177,15 @@ pub fn solve_with_event_sink(
     case: &CaseData,
     directory: &Path,
 ) -> Result<SolverData, String> {
+    solve_with_event_sink_context(config, case, directory, None)
+}
+
+pub(super) fn solve_with_event_sink_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
         return Err("nested live solver sink".into());
     }
@@ -205,7 +214,7 @@ pub fn solve_with_event_sink(
     live_event(
         &json!({"kind":"solver_begin","solver":config.solver,"family":config.family,"n":config.n,"m":config.m,"work_limit":config.work_limit,"degree_bound":config.degree_bound,"format":"ml-dataset.live-events/v1","sync_policy":"fsync every emitted event and complete payload"}),
     )?;
-    let mut result = solve(config, case);
+    let mut result = solve_with_context(config, case, context);
     match &mut result {
         Ok(data) if is_prime_chain(data) => {
             flush_prime_chain_payloads(data);
@@ -246,6 +255,17 @@ pub fn solve_with_bound_event_sink(
     binding: AttemptBinding,
     limits: CaptureLimits,
 ) -> Result<SolverData, String> {
+    solve_with_bound_event_sink_context(config, case, directory, binding, limits, None)
+}
+
+pub(super) fn solve_with_bound_event_sink_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
         return Err("nested live solver sink".into());
     }
@@ -258,7 +278,7 @@ pub fn solve_with_bound_event_sink(
         "format":"crypto.ml-dataset.live-event/v2",
         "sync_policy":"event fsync followed by atomic committed watermark",
         "solver_state_restorable":false}))?;
-    let mut result = solve(config, case);
+    let mut result = solve_with_context(config, case, context);
     if let Ok(data) = &mut result {
         if is_prime_chain(data) {
             flush_prime_chain_payloads(data);
@@ -499,6 +519,14 @@ fn set_witness_with_definition(
 }
 
 pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String> {
+    solve_with_context(config, case, None)
+}
+
+fn solve_with_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if !(2..=15).contains(&config.m) {
         return Err("decomposition arity must be 2..15".into());
     }
@@ -514,7 +542,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
         "f4" if matches!(group, Group::Prime(_)) => {
-            let result = prime_f4(config, &group, &points, &target)?;
+            let result = prime_f4(config, &group, &points, &target, context)?;
             if let Some(input) = result
                 .artifacts
                 .iter()
@@ -2195,6 +2223,7 @@ fn prime_f4(
     group: &Group,
     domain: &[Element],
     target: &Element,
+    _context: Option<&super::execution::SolverExecutionContext>,
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;

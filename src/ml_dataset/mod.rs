@@ -2,6 +2,7 @@
 pub mod budget;
 pub mod capture;
 pub mod curves;
+mod execution;
 pub mod export;
 pub mod relations;
 pub mod report;
@@ -1258,6 +1259,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
     let capture_context = admit_capture_context(&out)?;
+    let execution_context = execution::admit(&out)?;
     if telemetry::checked::policy_present(&out)? {
         capture::AttemptBinding::from_cell_files(&out)?;
         if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
@@ -1299,15 +1301,21 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
             if let Some((binding, limits)) = &capture_context {
-                solvers::solve_with_bound_event_sink(
+                solvers::solve_with_bound_event_sink_context(
                     config,
                     &case,
                     &out.join("live"),
                     binding.clone(),
                     limits.clone(),
+                    execution_context.as_ref(),
                 )
             } else {
-                solvers::solve_with_event_sink(config, &case, &out.join("live"))
+                solvers::solve_with_event_sink_context(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    execution_context.as_ref(),
+                )
             }
         })?;
         let mut names = BTreeSet::new();
@@ -1331,6 +1339,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "measurement-policy.json",
                 "capture-binding.json",
                 "capture-limits.json",
+                execution::PATH,
             ]
             .contains(&artifact.path.as_str())
                 || artifact.path.starts_with("publication/")
@@ -1416,6 +1425,7 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "worker-artifacts.json" => ("artifact-registry", "json"),
                 "capture-binding.json" => ("partial-capture-binding", "json"),
                 "capture-limits.json" => ("partial-capture-limits", "json"),
+                execution::PATH => (execution::ROLE, "json"),
                 "stdout.log" | "stderr.log" => ("process-log", "utf8"),
                 _ => ("unregistered-partial-artifact", "native"),
             }
@@ -1532,7 +1542,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
-        "trace_mib":a.trace_mib,"output_budget_scope":"all_cell_files_before_manifest_seal",
+        "trace_mib":a.trace_mib,"execution_context_required":true,"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
     let result = (|| {
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
@@ -1662,6 +1672,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 use std::os::unix::process::CommandExt;
                 command.process_group(0);
             }
+            let launch_context = execution::create(&dir)?;
             let start = Instant::now();
             let mut child = SupervisedChild {
                 child: command.spawn().map_err(|e| e.to_string())?,
@@ -1681,7 +1692,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                     break status;
                 }
                 let bytes = tree_bytes_while_running(&dir)?;
-                if start.elapsed() >= Duration::from_secs(a.seconds_per_case) {
+                if execution::monotonic_ns()? >= launch_context.deadline_monotonic_ns {
                     stop_reason = Some("timeout");
                 }
                 if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
@@ -2472,6 +2483,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     storage::verify_manifest(dir, &manifest.artifacts)?;
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     verify_capture_context(dir, &manifest.artifacts)?;
+    execution::verify(dir, &manifest.artifacts)?;
     for required in [
         "config.json",
         "run.json",
