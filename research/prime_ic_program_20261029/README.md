@@ -54,6 +54,7 @@ but not on the leaderboard: its protocol (§13) asks for a second-host replay fi
 | D1 | Is the small-abscissa base, with F_V = ∏(x − c), "algebraically defined"? | **Yes, tentatively.** So the Semaev-naive/msolve arm is the counted algebraic reference. |
 | D2 | May the Table B incumbent be ranked against the algebraic reference? | **Yes** (owner). R1 is amended to match: the two tracks may be ranked against each other on the same instances, in the same unit and across the §5a band, and each track ratchets only its own baseline (`DECISIONS.md`). The reference arm's rule C3 changes from "context only" to a ranked comparison at the freeze. |
 | D3 | Pinned, vendored msolve counter patch | **Allowed** (delegated); its sha256 joins the candidate identity. |
+| D-PREFETCH | The hash-table prefetch L2 run on isolab-eks | **Approved.** Sub-choices in O10 are still open; the draft protocol's defaults apply. |
 | D-EKS | About 49 CPU-hours (derived; range 15–150) on EKS Spot for the reference arm | **Approved.** This covers the reference arm only. |
 
 Until that PR merges, `AGENTS.md` and `docs/ic/SWEEPER.md` still carry the
@@ -377,7 +378,7 @@ Already answered, so not re-asked here:
 | O7 | **The Mac files.** Recover the Mac-only fall-degree files, or declare them lost. If lost, the t ≤ 10 check stays at median level. | `fall_degree_relaunch`, atlas | row-level reproduction check |
 | O8 | **The 20-bit second-host replay.** Authorise the replay of `ECBS1h685271327a8a` and choose its host: EKS `isolab_k8s_run`, or the owner's arm64 Mac. Replay only the holdout session, or the train-P20 selection sessions too? | `table_b_gate`, atlas | landing the 20-bit row |
 | O9 | **The Table B `pricing_ok` caveat.** P1: supersede the 2026-10-19 sweep line or render the per-row band (accounting only). P2: re-measure in one counted unit (new rows). P3: keep it permanently. | `table_b_gate` | removing the caveat |
-| O10 | **The prefetch run.** Authorise the L2 run, which D-EKS does not cover. Choose the incumbent oracle: `mitm-prime-batch` (the patch's target) or `mitm:negation_folded=1` (today's incumbent, which needs extra work). Stack on #2806/#2783, or wait? Make `layout=lines` the default if it wins? Add a cell on the ICV1 holdout curves? | `hashtable_prefetch` | the prefetch measurement |
+| O10 | **The prefetch run.** ~~Authorise the L2 run~~ **approved 2026-10-29 (D-PREFETCH).** Still open: Choose the incumbent oracle: `mitm-prime-batch` (the patch's target) or `mitm:negation_folded=1` (today's incumbent, which needs extra work). Stack on #2806/#2783, or wait? Make `layout=lines` the default if it wins? Add a cell on the ICV1 holdout curves? | `hashtable_prefetch` | the prefetch measurement |
 | O11 | **Atlas dispositions.** List the residual collector as its own labelled arm (generic track under C)? Confirm the scoped closure of the Coppersmith lead: its unequal-bound value 1/2 is numerical only. | atlas | atlas dispositions |
 | O12 | **Memory for m = 4 at N = 20.** Provide a large-memory host (256–512 GB, up for days), or rule on the 128 GiB pool cap. | `fall_degree_relaunch`, atlas | the decisive m = 4 cell |
 
