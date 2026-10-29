@@ -1,5 +1,16 @@
 # Independent Boolean matrix trace validation
 
+The current input-commitment correction is documented in
+[`INPUT-DIGEST-CORRECTION.md`](INPUT-DIGEST-CORRECTION.md), with executable
+validation in `input-digest-validation.json` and verified S3 receipt in
+`input-digest-validation-archive.json`. Source
+`35345db424ccf3217cb8d6a6f346aeee4e0f10a2` passes twelve standalone tests,
+strict lint and the retained native-fixture replay. The earlier records below
+remain historical evidence for their original source, rather than validation
+of the later correction.
+
+## Historical validation completed on 2026-10-28
+
 Final checker source `2ca93f74a00a5ff133aeaf5cab772f616a110791` passed ten
 release unit tests (zero failures, one explicitly ignored native-fixture
 integration helper), strict release all-target Clippy and the separately invoked
