@@ -301,3 +301,182 @@ protocol, complete prices, qualified recovery and 717 missing completions.
 Independent review identified hidden environment ordering, insufficient source
 metadata checks and overbroad allocation-parity wording. Corrected all three.
 Guard restores the arithmetic flag on unwind; panic still invalidates a run.
+
+## 2026-10-29 15:00 UTC: resumed adapter integration
+
+### What was done
+Verified PR 2843 merged and Diem remains deadline-expired with 50/52 records.
+Reclaimed T-807 for root manifests and T-808 for adapter/study files after
+Conductor cleared the scopes. Added reporting-only kernel dependency.
+Independent source review confirmed deterministic ledger digest coverage;
+narrowed excluded keys and added a future-field regression.
+
+### Decisions made
+Keep public synthetic mathematical workloads and all original cohort gates.
+Digest counter words are identifiers; group-only GAE remains a lower bound.
+No cohort, cloud job, or expired Diem generator was launched.
+
+### Open threads
+Root compile and replay regression pending sparse materialization. Producer
+feature test must be retried after its dependency is materialized. Existing
+full-cost protocol, qualified execution and missing cohort outcomes remain.
+
+### Errors
+A producer test started while sparse checkout was materializing dependencies
+and failed to find five-leads-study/Cargo.toml. It did not execute tests.
+The previous source lease had expired; the new claim replaced its scopes, so
+a separate task reserves the adapter files.
+
+## 2026-10-29 15:11 UTC: producer tests and online boundary audit
+
+### What was done
+The resumed producer-feature library test command passed all 21 tests.
+Independent read-only review identified the exact online-export dependency:
+source.valid(target) precedes target-blind base construction and candidate
+clock; current phase sums omit overhead; matched three-leads rho has no
+online phase hooks.
+
+### Decisions made
+Do not relabel existing elapsed sums as an eligible online window. Preserve
+all five exclusive IC phases and matched rho solve/check boundary.
+
+### Open threads
+Root build still needs isogeny_algos materialization after current sparse
+checkout completes. Full online integration must address target validation,
+setup ordering, solver setup, overhead and final fresh source verification.
+
+### Errors
+A concurrent git restore encountered the live sparse-checkout index lock.
+The lock was preserved and the owning process was left running.
+
+## 2026-10-29 15:25 UTC: continuous online clock and rho boundary
+
+### What was done
+Moved target validation after target-blind setup and connected the shared
+solver to the existing exclusive clock. Added five-phase export sum check
+and truthful cap/absence metadata. Added backward-compatible rho target hook:
+plain/negation begin at first target multiplication, Jacobian at target
+transfer after destination/generator setup. Producer tests: 28 pass, one
+pre-existing shared-clock test ignored. Producer library Clippy passes.
+
+### Decisions made
+Query/control owns between-scope bookkeeping. Extra adapter verification
+is outside pencil online, charged in cold group counts. Standalone clock
+hooks remain inert without an owning session. No timing comparison claim.
+
+### Open threads
+Root cargo check is live in tool session 84181, log /tmp/pencil-root-check.log.
+Root library tests, digest regression, report refresh and new PR remain.
+T-810 reserves src/cryptanalysis/three_leads.rs for the rho boundary.
+
+### Errors
+The new clock test initially indexed setup in the online-only map; corrected
+to check its absence and its presence in the whole-session map. The shared
+clock includes one root-only Callgrind entry, intentionally unused in the
+standalone crate; a scoped dead-code expectation records that fact.
+
+## 2026-10-29 15:29 UTC: root compile and zero-coefficient boundary
+
+### What was done
+Root release library check passed (2m23s). Full root library tests started
+in tool session 91415, log /tmp/pencil-root-tests.log, using the existing
+/home/ec2-user/crypto/target cache. Producer suite after hook correction:
+28 pass, one ignored; producer all-targets Clippy with denied warnings passes.
+
+### Decisions made
+Independent review found first rho target coefficient can be zero. The hook
+now defers until a nonzero target multiple, including start and restarts.
+Added root regression with a traced small group exercising leading zeros.
+No actual timing experiment, cohort, or cloud job was launched.
+
+### Open threads
+Root tests remain running; new zero-coefficient regression awaits that build.
+Update PDF/check table/checksums and prepare follow-up PR after validation.
+
+### Errors
+No new observed test failure after correcting the online-map test assertion.
+
+## 2026-10-29 15:34 UTC: review artifacts refreshed
+
+### What was done
+Updated checks.csv, timing-boundaries.csv and SVG/PDF diagram. Regenerated
+REPORT.pdf and visually inspected all three pages: graphs, labels and table
+are legible, pending root regressions and absent new cohort results explicit.
+
+### Decisions made
+Diagram widths are illustrative, not measured durations. Historical 543/1260
+coverage and unknown new candidate/rho cost remain unchanged.
+
+### Open threads
+Root library test build remains live (cargo PID 1271485, session 91415).
+Reconcile that process before any retry; do not launch duplicate tests.
+T-810 lease expired during read-only build waiting; reacquire before any
+further edits to src/cryptanalysis/three_leads.rs. T-807/T-808 heartbeat
+keeper session 35568 is bounded to 30 minutes from 15:10 UTC.
+
+### Errors
+Renderer warned about embedded PDF 1.7 versus output setting 1.5; rendered
+output opens and all pages were inspected. No clipping observed.
+
+## 2026-10-29 15:44 UTC: partial root outcomes and checkout repair
+
+### What was done
+Root replay-digest and zero-coefficient regressions passed; retained filtered
+output in root-regressions.log. Full suite still live with seven failures.
+Read-only audit traced five Certicom failures to missing gpu/certicom and
+one bounds failure to the absent prime-toy-reference-e1 source session.
+Materialization is live in session 78154; includes isogeny_algos preservation.
+GPU-stage failure remains unclassified pending final panic diagnostics.
+Updated and visually inspected all three PDF pages again.
+
+### Decisions made
+No duplicate full-suite or focused reruns while session 91415 is active.
+Do not infer a pre-existing GPU failure solely from unchanged source.
+
+### Open threads
+Await full test and materialization completion, inspect final failures,
+then focused prerequisite verification and publication checks.
+
+### Errors
+T-808 reclaim without explicit scopes produced no reservation; release
+transitioned it to cancelled and reopening was refused. T-812 now reserves
+the study directory explicitly. No source edits outside active scope follow.
+
+## 2026-10-29 15:47 UTC: completed root validation and focused recheck
+
+### What was done
+Full root suite completed: 5146 pass, 7 fail, 123 ignored. Final panics
+confirm five missing Certicom emulator-source failures, one missing bounds
+source-session failure, and one GPU-stage test-lock conflict. Materialized
+the tracked prerequisites. Same test binary serial recheck passed all 8
+selected tests, including all 7 original failures. Both complete logs retained.
+
+### Decisions made
+No production-source change for those failures. Do not relabel the initial
+full command as passing. Prepare reviewable follow-up PR with these limits.
+
+### Open threads
+Qualified full-cost protocol, execution admission and outstanding cohort
+remain. No new cohort or cloud run has occurred in this implementation work.
+
+### Errors
+A checksum check was initially invoked from repository root instead of the
+study directory; rerunning from the manifest directory verified all entries.
+
+## 2026-10-29 15:49 UTC: delivery preparation
+
+### What was done
+Conductor reports the root manifest and adapter/engine paths clear for
+publication. No open PR exists on this branch; PR 2843 previously merged.
+Prepared source-manifest.sha256 for exact current integration source bytes.
+Final PDF states initial full-run failures and passing same-binary rechecks.
+
+### Decisions made
+Publish a regular follow-up PR with complete validation limitations and
+unchanged unknown full-cost ratio; no hypothesis promotion or new cohort claim.
+
+### Open threads
+PR checks/review and the original qualified execution/cohort objective remain.
+
+### Errors
+None in the focused eight-test recheck; initial failures retained in full.
