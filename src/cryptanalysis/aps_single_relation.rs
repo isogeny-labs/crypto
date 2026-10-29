@@ -16,6 +16,9 @@ use super::f4_fp::{self, F4Options, Ordering, Poly, Verdict};
 use super::prime_fast::{FastCurve, Pt};
 use super::residual_walk::{inv_mod, is_prime_u64};
 
+/// Independent, bounded replay of the public fixture transcripts.
+pub mod replay;
+
 /// A deliberately bounded instrument: the substitution solver may enumerate F_p.
 pub const MAX_FIELD: u64 = 65_521;
 

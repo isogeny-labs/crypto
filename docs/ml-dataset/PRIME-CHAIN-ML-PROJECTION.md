@@ -1,11 +1,13 @@
 # Prime affine-chain ML projection proposal
 
 2026-10-29. Source inventory: parent-frozen `7a1bd350b26`.
-**Proposal only:** this document implements no export, prefix verifier, model,
-experiment or new solver coverage. It extends [DESIGN.md](DESIGN.md) and the
-[prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md), not their scientific claims.
-The existing `strict-structural-allowlist-v3` remains authoritative until a
-separately reviewed, versioned exporter implements and validates this proposal.
+**Static graph implemented and locally validated under T804.**
+Source `1565b1fecd7` and its [retained evidence](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md) bind the software checks.
+`export.rs` and `prime_chain_graph.rs` implement the static portion below as
+`strict-structural-allowlist-v4`. The prefix replayer, action examples, trained
+model and new solver coverage remain proposals. This extends [DESIGN.md](DESIGN.md)
+and the [prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md), not their scientific
+claims. Earlier v3 exports remain immutable and do not gain equation graphs.
 
 ## Existing inputs and eligibility
 
@@ -21,7 +23,8 @@ not permission to copy an entire source object into model input.
 
 `export.rs::feature_projection` currently rebuilds verified curve, field,
 generator, target, factor-base points and symmetry/orbit fields through explicit
-scalar-type allowlists. It does not export equations or native events. Its public
+scalar-type allowlists. The v4 prime-chain extension adds verified static equation graphs, but no native
+events. Its public
 features, restricted labels and restricted source index are separate files.
 `mod.rs::verify_cell(..., true)` binds recognized chains to frozen family/n/m/twist,
 checks artifacts and reconstructs their equations. This does not independently
@@ -37,7 +40,7 @@ unsupported native modulus alone does not invalidate a preserved static system.
 The p<2^32 native limit remains: equations at p=2^61-1 are structural inputs,
 not evidence of native solving or available action/cost labels.
 
-## Proposed static graph: `prime-chain-graph/v1`
+## Static graph contract: `prime-chain-graph/v1`
 
 Build a fresh allowlisted object from the verified inputs. Retain the existing
 projected public mathematics, with an explicit `cyclic-subgroup-factor-base` PDP
@@ -85,6 +88,25 @@ The hash is a join key, not a learned token. Source paths, seeds, IDs, solver,
 termination, run time and provenance never enter mathematical identity. Extra
 unknown source keys are ignored, never recursively copied. Resource caps must
 exclude oversized graphs with restricted reason records, not silently drop terms.
+
+The implementation uses mathematical encoding `odd-prime-affine-s3-chain/v1`.
+The inverse decoder reconstructs polynomial rows and domains from graph nodes
+and edges, checks signed-point incidence and prime-field action maps, and compares
+with the separately reconstructed chain input before publication. It permits
+m=3..15, primes below 2^62, at most 4096 terms/monomials, 128 signed points and
+8 MiB serialized graph bytes. Current chain construction further limits the
+finite leaf domain to 32 distinct abscissae. Limits exclude the complete graph
+with a restricted reason; they never truncate its equations. The enclosing
+export row retains its existing 64 MiB limit and materializes source-cell JSON;
+these bounds do not claim a total process RSS limit.
+
+The production route requires a sealed prime/F4/m3..15 cell and the exact
+`complete-prime-field-polynomial-system` JSON artifact role after central replay.
+A legitimate early attempt without chain input retains restricted provenance
+with no matched feature. Invalid equation/tag/role data fails export. The m=2
+legacy artifact keeps its existing generic feature projection. Native elimination
+need not have run for a verified static graph to be eligible; unsupported wide
+moduli retain their execution status only in restricted targets.
 
 ## Proposed decision-prefix view: `prime-chain-prefix/v1`
 
