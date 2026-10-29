@@ -797,6 +797,48 @@ NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. 
                  "benchmarks/README.md row is withheld until it validates.")
 
 
+def prime_base_size_component() -> dict:
+    """Prime-field factor-base size and oracle tuning, research/prime_base_oracle_tuning_20261029
+    (backlog XP-20261016, frozen protocol, holdout decided per size): the paired selected/incumbent
+    ratio of totals and the gap to the same-session rho.negation at w = 0, 0.1 and 1, copied from
+    the study's saved `ecbench compare --weight` outputs, and the holdout means from its
+    `ecbench band` table. Selected cells use the incumbent ic-pair oracle; only N changes. Its
+    standing comes from the study's VALIDATION.json."""
+    study = "research/prime_base_oracle_tuning_20261029"
+    means = {}
+    for r in load(f"{study}/analysis/band-holdout.json")["rows"]:
+        means[(int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"])] = r["mean_s"]
+    rows = []
+    for bits, n_inc, n_sel, reading in ((20, 32, 45, "improvement: new prime-field IC baseline"),
+                                        (24, 162, 115, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (28, 407, 288, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (32, 1024, 1024, "selection = incumbent; null")):
+        ratio, inc_rho, sel_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in (("inc__sel", ratio), ("rho-neg__inc", inc_rho), ("rho-neg__sel", sel_rho)):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n_inc": n_inc, "n_sel": n_sel, "reading": reading,
+                     "inc": means[(bits, "inc")], "sel": means[(bits, "sel")], "ratio": ratio,
+                     "inc_over_rho": inc_rho, "sel_over_rho": sel_rho})
+    m = load(f"{study}/second-host/analysis/match-original.json")
+    sh = {w: load(f"{study}/second-host/analysis/compare-inc__sel-w{w}.json")["ops"] for w in ("0", "0.1", "1")}
+    second_host = (f"Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another "
+                   f"host class and ecbench build); {m['matched_identical']} of {m['original_records']} original records "
+                   "identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent "
+                   + " / ".join(f"{sh[w]['ratio_b_over_a']:.3f}" for w in ("0", "0.1", "1"))
+                   + f" at w = 0 / 0.1 / 1 ({sh['0']['pairs']} pairs); report {study}/second-host/README.pdf.")
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "second_host": second_host,
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -1897,6 +1939,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2480,6 +2523,23 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    pb = doc["prime_base_size_component"]
+    L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
+          "decomposition oracle, selected on train curves, decided per size on a fresh holdout curve "
+          "(48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle "
+          "(`mitm:negation_folded=1`) at every size; only N changed. "
+          f"{pb['unit']}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.", "",
+          "| bits | N incumbent → selected | S incumbent → selected (w = 0 / 0.1 / 1) | selected ÷ incumbent (w = 0 / 0.1 / 1) | IC ÷ rho-neg incumbent → selected (w = 0 / 0.1 / 1) | reading |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n_inc']} → {r['n_sel']} | {s_txt} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          pb["second_host"], "",
+          f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -3276,6 +3336,28 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
 
+    pb = doc["prime_base_size_component"]
+    P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '
+             'tuning <span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact '
+             'decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets '
+             '× 2 rounds, every arm in one session). Train picked the incumbent <code>ic-pair</code> oracle '
+             '(<code>mitm:negation_folded=1</code>) at every size; only N changed. '
+             f'{esc(pb["unit"])}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>N</th><th>S incumbent → selected '
+             '(w = 0 / 0.1 / 1)</th><th>selected ÷ incumbent</th><th>IC ÷ rho-neg incumbent → selected</th>'
+             '<th>Reading</th></tr></thead><tbody>')
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{r["n_inc"]} → {r["n_sel"]}</td><td>{s_txt}</td>'
+                 f'<td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{esc(pb["second_host"])}</p>'
+             f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pb["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
