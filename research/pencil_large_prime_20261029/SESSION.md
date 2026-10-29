@@ -792,3 +792,31 @@ Static build, Rust1.98 maintained Clippy and required corrected-source release s
 
 ### Errors
 Canonical amendment initial check found a missing derived formula; corrected and retained the initial output. Historical protocol path guessed under current study did not exist; authoritative external Markowitz protocol supplied exact original limits. Migration receipt required read-only sudo access; inspected metadata successfully.
+
+## 2026-10-29T19:32:11.621081+00:00 — Native analysis binaries bound
+
+### What was done
+Built both native analysis executables with locked offline Rust1.99.1 release settings; source13files match543a54b4b. Actual prepared-plan-only CLI check reproduces1260workloads/6300pairs/22680slots with0observations and36null ratios. Independent check verified both executable hashes/sizes and bound the build receipt in the unfrozen accounting amendment; canonical validation exit0/zero findings.
+
+### Decisions made
+Analysis binary identity remains distinct from the still-running static empirical instrument40938439022. No cohort execution or approval inferred. Preserve old amendment/check receipts as pre-analysis-binding files.
+
+### Open threads
+Commit the new analysis binding after current Git sparse materialization completes; corrected-source Clippy and release tests; static instrument binary/parity; unanswered resource/infrastructure requirements and full prescribed cohort.
+
+### Errors
+Initial maintained Clippy found tracked fixture files missing from sparse checkout, not further introduced source errors. Existing materialization PID2082656 is live in an NFS wait; do not duplicate or classify it terminal. T839 attempt3 lease renewed through keeper37385.
+
+## 2026-10-29T19:36:31.667686+00:00 — Static instrument verified against archived cohort
+
+### What was done
+GitHub build40938439022 completed successfully; experiment job skipped. Downloaded artifact12926168934. Binary SHAa1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab matches build-info source543a54b4b/Rust1.99.1/musl. ELF has no interpreter or needed-library entries. Native plan-only check matched all1260 archived workload identities/coordinates/first streams and all9 prepared plans byte-for-byte. Receipts retained under validation/instrument_build_40938439022.
+
+### Decisions made
+Bind the actual new empirical instrument into the unfrozen amendment, separate from completed native analysis binaries. No solver execution, image publication, resource approval, or performance ratio follows from plan parity. Preserve old static build as historical evidence.
+
+### Open threads
+Final binding validation, existing EFS-blocked sparse materialization and CI correction validation, then scoped delivery; runtime/image/review/resource authorization and original full cohort requirements remain.
+
+### Errors
+file identifies the PIE as dynamically linked; direct readelf inspection shows no interpreter or NEEDED libraries. Retained full ELF headers rather than relying on file wording.

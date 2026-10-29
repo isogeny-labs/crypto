@@ -1,7 +1,7 @@
 {
   "schema": "pencil-protocol-field-changes/v1",
   "predecessor_sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
-  "amended_sha256": "c2effaf1e39fcbdcb37439706dba129b049ca2aaa41b81a284b86a6de8190ecf",
+  "amended_sha256": "88a779c3ed33514333dc92e243f9d7a4e5a020fae3afbaf2bd2b5cbd21b720ec",
   "changes": [
     {
       "path": "/amendments",
@@ -17,7 +17,9 @@
             "Bind source543a54b4b; static build40938439022 pending binary/image.",
             "Add finite atomic-scalar disjoint36cell mapper and exact complete-plan aggregator.",
             "Pin DefaultHasher collision table, preserving RNG streams while acknowledging changed table layout/runtime.",
-            "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved."
+            "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved.",
+            "Bind independently named analyze_pair and analyze_cohort release binaries and their completed build receipt; ecbench instrument binary/image remain pending.",
+            "Bind completed static ecbench binary a1c8ca89 and build40938439022 receipt to all three arms; 1260 archive targets and nine prepared plans match without solver execution. Image/runtime and authorization remain pending."
           ],
           "supersedes_fields": [
             "question",
@@ -235,7 +237,7 @@
                 "ecbench"
               ]
             ],
-            "binary_sha256": null,
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
             "image_digest": null,
             "flags": {
               "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -275,7 +277,7 @@
                 "ecbench"
               ]
             ],
-            "binary_sha256": null,
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
             "image_digest": null,
             "flags": {
               "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -313,7 +315,7 @@
                 "ecbench"
               ]
             ],
-            "binary_sha256": null,
+            "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
             "image_digest": null,
             "flags": {
               "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -424,6 +426,43 @@
       "after": "No significance or superiority verdict. After independent protocol/source/binary/record review, classify each metric/workload as qualified_observation only if all5 matched candidate/reference rows verify and its separate A/A admission passes. Otherwise retain raw observations and null qualified ratio. Report per-stream ratios and median/min/max descriptively. Do not infer one metric admission from the other. Finite-count admission is separate from timing admission: require independent nine-category source/mapping/instrument review and exact paired identities; every missing/ineligible pair nulls its complete aggregation scope. Report algorithm-only and explicit calibration-inclusive exact ratios of sums for each cell and predetermined stream; no ranking or significance verdict."
     },
     {
+      "path": "/extensions/analysis_build",
+      "operation": "add",
+      "after": {
+        "status": "built_and_hash_verified_analysis_only",
+        "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "receipt": "../../validation/native_analysis_build_20261029/receipt.json",
+        "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+        "build_command": "cargo +1.99.1 build --locked --offline --release --manifest-path research/pencil_large_prime_20261029/native_price/Cargo.toml",
+        "build_exit_code": 0,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+        "binaries": {
+          "analyze_pair": {
+            "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+            "bytes": 843944,
+            "sha256": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e"
+          },
+          "analyze_cohort": {
+            "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+            "bytes": 1388376,
+            "sha256": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+          }
+        },
+        "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+        "plan_only_check": {
+          "exit_code": 0,
+          "expected_workloads": 1260,
+          "expected_pairs": 6300,
+          "expected_slots": 22680,
+          "observed_slots": 0,
+          "all_36_ratios_null": true,
+          "output_sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+        },
+        "experiment_executions": 0,
+        "scope": "Analysis executables only; not ecbench, not an empirical instrument binding, independent review, protocol freeze or launch authorization."
+      }
+    },
+    {
       "path": "/extensions/analysis_support_sha256/TIMING_CONTRACT.json",
       "operation": "add",
       "after": "3719de558181e663192bfca9ea1fce05df535603f2acd187058de55e4a8b4585"
@@ -467,6 +506,11 @@
       "path": "/extensions/analysis_support_sha256/native_price~1src~1lib.rs",
       "operation": "add",
       "after": "71222c3e8c9c826d43eff82bb776a36cd53a5bf932488c343618b4138e7dd1a7"
+    },
+    {
+      "path": "/extensions/analysis_support_sha256/paired_export~1Cargo.toml",
+      "operation": "add",
+      "after": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f"
     },
     {
       "path": "/extensions/analysis_support_sha256/paired_export~1src~1main.rs",
@@ -523,8 +567,11 @@
         ],
         "cells": 36,
         "independent_coverage_review": null,
-        "analyzer_binary_sha256": null,
-        "qualified_ratios_available": false
+        "qualified_ratios_available": false,
+        "analyzer_binaries_sha256": {
+          "analyze_pair": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e",
+          "analyze_cohort": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+        }
       }
     },
     {
@@ -534,16 +581,56 @@
       "after": "Finite mapper implemented and software-validated; independent final source coverage review, pinned new instrument and protocol freeze still pending. This draft certifies no full coverage or experiment result."
     },
     {
+      "path": "/extensions/instrument_build/archive_targets_matched",
+      "operation": "add",
+      "after": 1260
+    },
+    {
       "path": "/extensions/instrument_build/artifact_id",
       "operation": "replace",
       "before": 12918062407,
-      "after": null
+      "after": 12926168934
+    },
+    {
+      "path": "/extensions/instrument_build/binary_bytes",
+      "operation": "add",
+      "after": 76970952
+    },
+    {
+      "path": "/extensions/instrument_build/binary_path",
+      "operation": "add",
+      "after": "/home/ec2-user/pencil-build-40938439022/ecbench"
     },
     {
       "path": "/extensions/instrument_build/binary_sha256",
       "operation": "replace",
       "before": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3",
-      "after": null
+      "after": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+    },
+    {
+      "path": "/extensions/instrument_build/build_info",
+      "operation": "add",
+      "after": {
+        "source_repository": "https://github.com/aburan28/crypto",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "built_at": "2026-10-29T19:31:18Z",
+        "architecture": "linux/amd64",
+        "target": "x86_64-unknown-linux-musl",
+        "default_features": false,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+        "rustflags": "-C target-cpu=x86-64"
+      }
+    },
+    {
+      "path": "/extensions/instrument_build/evidence_sha256",
+      "operation": "add",
+      "after": {
+        "build-info.json": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5",
+        "archive-parity.json": "a78b31214c136f82d5dc4ed6454b59df7abea471a7d1d5d8d970f763a70016d3",
+        "prepared-plan-parity.json": "06bce13aa3c5ed866238173ed5edd64365a92f589371df2b17b7653af6f877d6",
+        "elf-headers.txt": "611d9351cc4b69fd0bb2758b5b16a23cbeb0432ab9ba66c0eeadf30ef2199c2a"
+      }
     },
     {
       "path": "/extensions/instrument_build/image_digest",
@@ -553,12 +640,17 @@
     {
       "path": "/extensions/instrument_build/note",
       "operation": "add",
-      "after": "Mutable build reconciliation receipt must be verified and immutably bound after completion; no historical receipt reused."
+      "after": "Completed static ecbench build and plan-only parity bound; container image/runtime, independent review and resource/launch authorization remain pending."
     },
     {
       "path": "/extensions/instrument_build/plans",
       "operation": "remove",
       "before": "Static binary reproduces all1260 archived inputs and all9 prepared plans exactly; zero solver executions."
+    },
+    {
+      "path": "/extensions/instrument_build/prepared_plans_exactly_equal",
+      "operation": "add",
+      "after": 9
     },
     {
       "path": "/extensions/instrument_build/receipt",
@@ -570,7 +662,12 @@
       "path": "/extensions/instrument_build/receipt_sha256",
       "operation": "replace",
       "before": "f966ce22aec150c6e292285d6440830887a6a50c247984e5bd7f147702826b3e",
-      "after": null
+      "after": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1"
+    },
+    {
+      "path": "/extensions/instrument_build/solver_executions_performed",
+      "operation": "add",
+      "after": 0
     },
     {
       "path": "/extensions/instrument_build/source_commit",
@@ -582,7 +679,7 @@
       "path": "/extensions/instrument_build/status",
       "operation": "replace",
       "before": "static_build_verified_native_plan_parity_passed",
-      "after": "in_progress_pending_binary_and_image_bindings"
+      "after": "completed_verified_binary_and_plan_parity_image_pending"
     },
     {
       "path": "/extensions/instrument_build/workflow_commit",
@@ -600,16 +697,14 @@
       "path": "/extensions/pending_bindings",
       "operation": "add",
       "after": {
-        "binary_sha256": null,
         "image_digest": null,
-        "immutable_build_receipt_sha256": null,
-        "new_binary_plan_parity_receipt": null,
         "independent_coverage_review": null,
         "cumulative_authorized_budget": null,
         "original_absolute_deadline": null,
         "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
         "launch_authorization": null,
-        "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze."
+        "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze.",
+        "runtime_image_and_request_binding": null
       }
     },
     {

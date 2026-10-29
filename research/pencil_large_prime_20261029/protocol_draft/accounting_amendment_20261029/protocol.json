@@ -79,7 +79,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
         "image_digest": null,
         "flags": {
           "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -119,7 +119,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
         "image_digest": null,
         "flags": {
           "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -157,7 +157,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
         "image_digest": null,
         "flags": {
           "RUSTFLAGS": "-C target-cpu=x86-64",
@@ -652,7 +652,9 @@
         "Bind source543a54b4b; static build40938439022 pending binary/image.",
         "Add finite atomic-scalar disjoint36cell mapper and exact complete-plan aggregator.",
         "Pin DefaultHasher collision table, preserving RNG streams while acknowledging changed table layout/runtime.",
-        "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved."
+        "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved.",
+        "Bind independently named analyze_pair and analyze_cohort release binaries and their completed build receipt; ecbench instrument binary/image remain pending.",
+        "Bind completed static ecbench binary a1c8ca89 and build40938439022 receipt to all three arms; 1260 archive targets and nine prepared plans match without solver execution. Image/runtime and authorization remain pending."
       ],
       "supersedes_fields": [
         "question",
@@ -723,7 +725,8 @@
       "validation/accounting/kernel-primitive-registry.json": "a973bf6222125f37a5d37fa25dbaac434ea3c418fae7bbf8abbda67036c15e2f",
       "TIMING_CONTRACT.json": "3719de558181e663192bfca9ea1fce05df535603f2acd187058de55e4a8b4585",
       "prepared_specs/manifest.json": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179",
-      "prepared_native_plans/result.json": "1892db0ad5937bba74894c5be9f3b6f1e48dcf20ddb0284f043686a2f822ef1e"
+      "prepared_native_plans/result.json": "1892db0ad5937bba74894c5be9f3b6f1e48dcf20ddb0284f043686a2f822ef1e",
+      "paired_export/Cargo.toml": "0a198bb240dee5fe2900d3e6323951e75a246459161c16046a6ed857c464e67f"
     },
     "prerequisites": [
       "Immutable source commit, final native binary SHA256, build toolchain/flags and container image digest for all arms.",
@@ -762,13 +765,35 @@
       "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
       "workflow_commit": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
       "workflow_run": 40938439022,
-      "status": "in_progress_pending_binary_and_image_bindings",
-      "binary_sha256": null,
+      "status": "completed_verified_binary_and_plan_parity_image_pending",
+      "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
       "image_digest": null,
-      "artifact_id": null,
+      "artifact_id": 12926168934,
       "receipt": "../../validation/instrument_build_40938439022/receipt.json",
-      "receipt_sha256": null,
-      "note": "Mutable build reconciliation receipt must be verified and immutably bound after completion; no historical receipt reused."
+      "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
+      "note": "Completed static ecbench build and plan-only parity bound; container image/runtime, independent review and resource/launch authorization remain pending.",
+      "binary_path": "/home/ec2-user/pencil-build-40938439022/ecbench",
+      "binary_bytes": 76970952,
+      "build_info": {
+        "source_repository": "https://github.com/aburan28/crypto",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "built_at": "2026-10-29T19:31:18Z",
+        "architecture": "linux/amd64",
+        "target": "x86_64-unknown-linux-musl",
+        "default_features": false,
+        "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+        "rustflags": "-C target-cpu=x86-64"
+      },
+      "evidence_sha256": {
+        "build-info.json": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5",
+        "archive-parity.json": "a78b31214c136f82d5dc4ed6454b59df7abea471a7d1d5d8d970f763a70016d3",
+        "prepared-plan-parity.json": "06bce13aa3c5ed866238173ed5edd64365a92f589371df2b17b7653af6f877d6",
+        "elf-headers.txt": "611d9351cc4b69fd0bb2758b5b16a23cbeb0432ab9ba66c0eeadf30ef2199c2a"
+      },
+      "archive_targets_matched": 1260,
+      "prepared_plans_exactly_equal": 9,
+      "solver_executions_performed": 0
     },
     "finite_cost_model": {
       "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
@@ -791,20 +816,21 @@
       ],
       "cells": 36,
       "independent_coverage_review": null,
-      "analyzer_binary_sha256": null,
-      "qualified_ratios_available": false
+      "qualified_ratios_available": false,
+      "analyzer_binaries_sha256": {
+        "analyze_pair": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e",
+        "analyze_cohort": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+      }
     },
     "pending_bindings": {
-      "binary_sha256": null,
       "image_digest": null,
-      "immutable_build_receipt_sha256": null,
-      "new_binary_plan_parity_receipt": null,
       "independent_coverage_review": null,
       "cumulative_authorized_budget": null,
       "original_absolute_deadline": null,
       "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
       "launch_authorization": null,
-      "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze."
+      "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze.",
+      "runtime_image_and_request_binding": null
     },
     "predecessor": {
       "path": "/home/ec2-user/pencil-build-40919051188/protocol-with-binary.json",
@@ -822,6 +848,39 @@
       "warmup_executions": 3780,
       "new_instrument_solver_executions": 0,
       "status": "design_arithmetic_not_run_result"
+    },
+    "analysis_build": {
+      "status": "built_and_hash_verified_analysis_only",
+      "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "receipt": "../../validation/native_analysis_build_20261029/receipt.json",
+      "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+      "build_command": "cargo +1.99.1 build --locked --offline --release --manifest-path research/pencil_large_prime_20261029/native_price/Cargo.toml",
+      "build_exit_code": 0,
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "binaries": {
+        "analyze_pair": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_pair",
+          "bytes": 843944,
+          "sha256": "eb2b2ce773c7300edcfd4e0bb0804251d4cca604379d94be40964cd4b278871e"
+        },
+        "analyze_cohort": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_price/target/release/analyze_cohort",
+          "bytes": 1388376,
+          "sha256": "337e089f74426caa1d67c08d411b5034c67b50706738d399a41d79ac93a5c160"
+        }
+      },
+      "mapping_sha256": "eb5348c894516e9ba163740861dd1f0e58865c08a930500662e6b060f7a571d8",
+      "plan_only_check": {
+        "exit_code": 0,
+        "expected_workloads": 1260,
+        "expected_pairs": 6300,
+        "expected_slots": 22680,
+        "observed_slots": 0,
+        "all_36_ratios_null": true,
+        "output_sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+      },
+      "experiment_executions": 0,
+      "scope": "Analysis executables only; not ecbench, not an empirical instrument binding, independent review, protocol freeze or launch authorization."
     }
   }
 }
