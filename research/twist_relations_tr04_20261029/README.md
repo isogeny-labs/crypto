@@ -1,14 +1,19 @@
 # TR-04 exhaustive bounded relation finding
 
-**State: implementation/protocol preparation; research execution not yet
-reported.** The machine-readable [protocol](protocol.json) is draft until
-source/analysis filing commit and canonical freeze are completed. The measured
-development inputs and heuristic runtime estimate are in [PREFLIGHT.md](PREFLIGHT.md).
+**State: protocol frozen; primary research execution not yet started.**
+The machine-readable [protocol](protocol.json) was frozen on 2026-10-29 at
+22:18:02 UTC against code commit `445d84bf7`, before primary comparison data.
+Its canonical SHA-256 is
+`bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea`.
+Development inputs and the heuristic runtime estimate are in
+[PREFLIGHT.md](PREFLIGHT.md).
 [PROTOCOL.md](PROTOCOL.md) defines the exact
 finite universe and all four requested parts.
 
 [Development validation](DEVELOPMENT.md) records 40 passing native tests,
-strict Clippy/formatting and the preserved incomplete root-library attempt.
+strict Clippy/formatting and the preserved incomplete root-library attempts.
+Final root-library validation is running separately on code `445d84bf7`;
+no completion is inferred before its terminal summary and exit receipt.
 The fixed development preflight and synthetic report tests are separate from
 the primary research census, which has not run.
 

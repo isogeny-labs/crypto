@@ -1,7 +1,7 @@
 # TR-04 development validation, 2026-10-29
 
 The requested four-part finite experiment is implemented locally. **The primary
-research census has not run, the protocol is draft, and no solving advantage
+research census has not run, the protocol is now frozen, and no solving advantage
 is established.** This record covers development checks only.
 
 | Check | Observed status |
@@ -9,7 +9,7 @@ is established.** This record covers development checks only.
 | Standalone native tests | 40 passed: 35 library, 2 legacy binary, 3 CLI; zero failed/ignored/filtered |
 | Strict all-target Clippy and formatting | Both exit 0 |
 | Fixed known-answer preflight and artifact-directory replay | Both exit 0; development M=3 calibration, separate from primary M=8 |
-| Draft protocol JSON Schema | Valid under the canonical v1 schema using maintained Ajv |
+| Frozen protocol JSON Schema and native metadata/hash | Both pass; frozen at 22:18:02 UTC, code `445d84bf7` |
 | Workflow | Actionlint, ShellCheck, Bash syntax, six wrapper and six checkpoint lifecycle stubs pass; actual remote transport/runner readiness unverified |
 | Partial report/export | Synthetic inputs only: one failed logical attempt, 26 absent rows, expected CLI exit 1; canonical export schema valid |
 | PDF inspection | Both pages of the draft plan and both pages of the synthetic report visually inspected; no clipping observed |
@@ -19,11 +19,14 @@ The root-library attempt first failed on a tracked sparse path dependency. That
 failure is retained. The subsequent tool session disappeared at the environment
 handoff; its log ends while compiling `isogeny_algos`. No matching process remains.
 The interruption receipt records a null exit code and signal because neither
-was observed. No clean pass or ongoing run is claimed. The PR #2857 check-in
-explicitly excludes a repeat broad-library run, so none was started here.
-Clarification is pending on whether that restriction also pauses the separately
-requested TR-04 work. Repository validation required before pushing remains
-unsatisfied for this new branch.
+was observed. No clean pass or ongoing run is claimed for that old attempt.
+The PR #2857 check-in excludes a repeat broad-library run for that evidence/docs
+PR; the later clarification preserves the independently requested TR-04 work.
+A separate final root run on `445d84bf7` is now active in an isolated worktree
+after synchronization with current main. No pass is claimed before its terminal
+full-suite summary and captured exit status. A superseded `fe0e1dac6` compilation
+was intentionally stopped before tests with compiler SIGTERM 15 and Cargo exit
+101 to select the intended source. Every attempt remains distinct.
 
 The earlier completed 5,143/0/123 run on source `0044aaf9` belongs to PR #2857's
 separate immutable evidence. It does not validate this later base or TR-04.
@@ -47,8 +50,13 @@ The archive passed `xz -t`. It contains no primary research results. The synthet
 PDF predates the final receipt-crossbinding hardening; its old analysis source
 is intentionally retained, while final native tests cover the current code.
 
-Remaining prerequisites are completed root-library validation, final review,
-source publication, measured runtime estimation and source/analysis protocol
-freeze, then the authorized supported checkpoint-gated execution and collection.
+The later [transport development archive](development-transport-evidence.tar.xz)
+retains seven synthetic transport cases, deterministic repacking, updated static
+checks, native-source reuse proof and the intentional superseded compilation.
+It establishes no actual remote upload or download.
+
+Runtime planning and protocol freeze are now complete. Remaining prerequisites
+are completed root-library validation, final review and source publication,
+then the authorized supported checkpoint-gated execution and collection.
 Nothing in these development checks establishes all 531 primary dispositions,
 27 completed export rows, a new scalar-preserving map, or a runtime gain.

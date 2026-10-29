@@ -1,9 +1,11 @@
 # TR-04: exhaustive bounded relation-finding protocol
 
 This is the human-readable contract for [protocol.json](protocol.json).
-The record is **draft** until the source, analysis hash, measured development
-preflight estimate, canonical protocol hash and filing commit are filled and
-committed. No affected primary comparison data may precede that freeze.
+Version 1 was frozen at **2026-10-29 22:18:02 UTC** against code commit
+`445d84bf7f57750e0e34bd7a65992c36c0da92ec`, before affected primary comparison
+data. Its canonical hash is
+`bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea`.
+Native metadata/hash validation and the complete canonical JSON Schema pass.
 The public-input census and fixed known-answer development timings are filed
 separately in [PREFLIGHT.md](PREFLIGHT.md); no primary selector/rank/work
 comparison result has been collected for this protocol.

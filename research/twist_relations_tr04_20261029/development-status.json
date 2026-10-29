@@ -1,8 +1,8 @@
 {
   "schema": "tr04.development-status/v1",
   "base_revision": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
-  "implementation": "local; not published",
-  "protocol": "draft",
+  "implementation": "locally committed; source publication pending final root validation",
+  "protocol": "frozen",
   "primary_research_execution": "not_attempted",
   "native_development": {
     "schema": "tr04.development-validation/v1",
@@ -23,10 +23,15 @@
     "cli": 3
   },
   "root_library": {
-    "status": "incomplete",
+    "status": "running",
+    "source": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
+    "started_at": "2026-10-29T22:11:17Z",
+    "log": "/workspace/tr04-root-445d84bf7-validation.log",
+    "expected_exit_receipt": "/workspace/tr04-root-445d84bf7-exit.json",
     "exit_code": null,
     "signal": null,
-    "ongoing": false
+    "ongoing": true,
+    "scope": "Separate TR04 development validation; no terminal summary observed"
   },
   "archive": {
     "path": "development-evidence.tar.xz",
@@ -36,17 +41,29 @@
   },
   "plan_pdf": {
     "path": "report.pdf",
-    "sha256": "0363655950106c35e15272d90486f613f5f1499d607357a8ff70cb56ce6c6741",
+    "sha256": "533ab615c2d80d12f061426b3abe71d3599cbefc999a7be5218d4b5ae3b07bac",
     "pages": 2,
     "visually_inspected": true
   },
   "physical_runtime_admitted": false,
   "primitive_work_counters_independently_recomputed": false,
   "remaining": [
-    "complete required root-library validation before push",
+    "complete final root-library validation",
     "source publication",
-    "runtime estimate and protocol freeze",
-    "checkpoint and runner readiness",
-    "actual authorized research census and collection"
-  ]
+    "checkpoint, store and runner readiness",
+    "actual authorized primary census and collection"
+  ],
+  "protocol_freeze": {
+    "commit": "445d84bf7f57750e0e34bd7a65992c36c0da92ec",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T22:18:02Z",
+    "protocol_sha256": "bbfdd9109f37523198ced6ff25f7d50d28b373ee36249e7c8b9a01a0171aadea",
+    "status": "frozen"
+  },
+  "native_source_bytes_unchanged_by_main_integration": true,
+  "transport_development": {
+    "receipt": "development-transport-evidence.tar.xz",
+    "synthetic_cases": 7,
+    "actual_remote_download": false
+  }
 }

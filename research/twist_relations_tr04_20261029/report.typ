@@ -7,8 +7,10 @@
 
 The user requested four steps: a bounded twist-guided selector, matched
 ordinary controls, an identical public original-curve relation finder, and
-paid work to independent relation rank. The draft contract is `protocol.json`
-and `PROTOCOL.md` beside this source; it has not yet been frozen.
+paid work to independent relation rank. The contract in `protocol.json` and
+`PROTOCOL.md` was frozen at 2026-10-29 22:18:02 UTC against code `445d84bf7`,
+before primary comparison data. Root-library validation and publication are
+pending; no primary census has started.
 
 == Declared finite scope
 
