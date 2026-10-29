@@ -178,5 +178,90 @@
     "full_plan_finished": false,
     "restart_interrupted_running_audits": true,
     "expectations_not_relaxed": true
+  },
+  "main8eb_full_library": {
+    "source_head": "49b92189c98e2339f6293318b9cd15291fda4c9a",
+    "cargo_exit_code": 0,
+    "seconds": 2595,
+    "previous_attempt_interrupted": true,
+    "passed": 5323,
+    "failed": 0,
+    "ignored_existing": 123,
+    "test_seconds": 2594.51,
+    "logs": [
+      {
+        "name": "main8eb-full-library",
+        "file": "main8eb-full-library.log.gz",
+        "raw_sha256": "4bfac0b638013f90e4d94fe13de529c5df7fb47d375618a885171f9c38ff0fd4",
+        "gzip_sha256": "f21dac43296f0798c54d1346ff76a6f64f82da0ccf9de2e60053f5632e45c8af",
+        "retention": "Existing trusted artifact-autofix uploads and replays data, then commits pointers; final artifact check remains required."
+      },
+      {
+        "name": "main8eb-interrupted-library",
+        "file": "main8eb-interrupted-library.log.gz",
+        "raw_sha256": "37967423c9d56c90170aa21fc1906552fdd88618e6ea3ee86f6a7f275f6fe389",
+        "gzip_sha256": "2eec50fc2e173cecaa4d03e062482cab433925cc83f0f75acde60b6bd063cf61",
+        "retention": "Existing trusted artifact-autofix uploads and replays data, then commits pointers; final artifact check remains required."
+      }
+    ],
+    "later_changes": "Only orchestration, metadata and one dynamic fingerprint; no Rust library source change since actual tested49b."
+  },
+  "main8eb_complete_registry": {
+    "head": "91a933c9838729b517e00c0344f2d9e9d8f036d9",
+    "seconds": 145.29081100899202,
+    "read_paths": 92644,
+    "bytes_read_including_repeats": 4455844353,
+    "unavailable": [],
+    "curves": 20811,
+    "changed": 0,
+    "added": 0,
+    "removed": 0,
+    "registry_sha256": "71f25635fd07878cc216a8b24521c45d32ccf7366220192fcc627ef9f91ef35c",
+    "native_catalog_inputs_unchanged": true,
+    "original_existing_notes": 463,
+    "initial_missing_object_attempt_retained": true,
+    "curve_aliases_sha256": "642e0e11b412177849b6d489bfe81771830373b42f91b179e9293b32173e6220",
+    "curve_aliases_byte_identical": true
+  },
+  "main8eb_final_views": {
+    "ic_currentness_exit": 0,
+    "browser_currentness_exit": 0,
+    "site_tests": 51,
+    "site_failed": 0,
+    "assessment_only_source_fingerprint_delta": [
+      {
+        "path": "src/cryptanalysis/mod.rs",
+        "old": "65e4b931b2e79d538deaa9ffa78eb90767120444daeb4fa59381e96556472236",
+        "new": "ca1ca397de670ec94f1a44fbe5002172b2f1b81387dfc82fcb76d75cee87fc43"
+      }
+    ]
+  },
+  "partition_controls": {
+    "passed": 56,
+    "failed": 0,
+    "existing_serial_controls": 30,
+    "peak_matrix_concurrency": 4,
+    "session_groups": 8,
+    "record_partitions": 4,
+    "full_replay_finished": false
+  },
+  "later_main_observed_not_integrated": "57bb19c4847a5d331f5fa04268f20abffd42c7aa; final ordinary main integration and affected validation remain pending.",
+  "main8eb_scoped_native_tests": {
+    "source_head": "91a933c9838729b517e00c0344f2d9e9d8f036d9",
+    "exit_code": 0,
+    "seconds": 13,
+    "restored_exact_tracked_aps_fixtures": true,
+    "passed": 155,
+    "failed": 0,
+    "ignored_existing": 1,
+    "suites": {
+      "ecdlp_audit": 45,
+      "ic_with_original_cli_integration_assertions": 92,
+      "aps_single_relation_check": 10,
+      "hecke_target_router": 4,
+      "pkm_symmetric_complete": 4
+    },
+    "log_sha256": "e80b677a6cacb551f576d874e3b48f973439f691d333809f9bfc752c609b3bae",
+    "earlier_sparse_setup_errors_retained": true
   }
 }
