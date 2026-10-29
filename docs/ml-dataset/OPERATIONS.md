@@ -398,17 +398,23 @@ Use a separate destination outside the source tree. Export refuses the source
 root, its ancestors and paths inside `cells/`, and rejects symlink ancestors.
 Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
-policy is `strict-structural-allowlist-v3`; its domain-aware feature identities
+policy is `strict-structural-allowlist-v4`; its domain-aware feature identities
 must not be mixed with earlier export identities without regeneration.
 
 Prime-chain recursive events and termination records stay in restricted
-artifacts/provenance. Implementing their writer does not add a public equation
-graph to `features.jsonl`; that requires a separately reviewed structural
-projection. A future decision-prefix view must remove future bases, branches,
+artifacts/provenance. The v4 exporter adds a `prime-chain-graph/v1` static equation
+graph for eligible replayed prime/F4/m3..15 cells, with lossless decimal values,
+shared finite/symbolic domains and signed-point incidence. Its inverse decoder
+must recover the exact reconstructed input before publication. Missing input or
+a graph-size refusal retains restricted provenance with no generic feature
+fallback; malformed input fails export. Earlier v3 snapshots stay unchanged.
+Source implementation is present; source-bound validation is pending under T804.
+A future decision-prefix view must remove future bases, branches,
 lift results and other information unavailable at its declared decision time.
 
-The current export is a structural routing view. Sequential equation or solver
-policy views still need a separate projection of admissible prefix states.
+The current export contains structural routing inputs and static prime-chain
+equations. Sequential solver policy views still need a separate projection of
+admissible prefix states.
 Keep answers, future pivots, recovered logs, construction seeds and
 future conflict clauses in the target/restricted partition. Group equivalent
 presentations, signs, Frobenius orbits, generators, twists and related cases in
