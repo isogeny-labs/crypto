@@ -326,8 +326,8 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 
 | metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |
 |:--|:--|--:|:--|:--|:--|:--|:--|
-| collect phase | 1.093 [1.068, 1.136] | 38 / 42 | 0.999 [0.977, 1.025] | **established** | 1.111 [1.082, 1.147] | 0.998 [0.944, 1.087] | not established |
-| whole set-up | 1.042 [1.020, 1.082] | 29 / 42 | 0.985 [0.946, 1.016] | marginal (+0.005), not claimed | 1.037 [1.018, 1.080] | 0.993 [0.953, 1.121] | not established |
+| collect phase | 1.093 [1.068, 1.136] | 38 / 42 | 0.999 [0.977, 1.026] | **established** | 1.111 [1.082, 1.149] | 0.998 [0.944, 1.087] | not established |
+| whole set-up | 1.042 [1.020, 1.082] | 29 / 42 | 0.985 [0.946, 1.015] | marginal (+0.005), not claimed | 1.037 [1.018, 1.080] | 0.993 [0.953, 1.121] | not established |
 
 ## Quartic-twist pair index, outside tables A–C
 
@@ -740,7 +740,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_aimed_gather_20261023/aa2_20261029/summary.json` — sha256 `4be9dd4755ad6bb2…`
 - `research/ic_aimed_gather_20261023/summary.json` — sha256 `a3e06802bada65df…`
-- `research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json` — sha256 `b2f6bdfa5e88a61e…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json` — sha256 `6df1dfcc98784b7b…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`

@@ -926,7 +926,7 @@ def aimed_gather_component() -> dict:
     d = load(SOURCES["aimed_gather"])
     first = load(SOURCES["aimed_gather_first"])
     corr = load(SOURCES["aimed_gather_corrected"])
-    if corr.get("schema") != "ic_aimed_gather.bootstrap_correction/v1":
+    if corr.get("schema") != "ic_aimed_gather.bootstrap_correction/v2":
         raise SystemExit(f"{SOURCES['aimed_gather_corrected']}: unexpected schema")
     if not d.get("identity_ok") or d.get("rounds_kept") != 42:
         raise SystemExit(f"{SOURCES['aimed_gather']}: an identity failure or an incomplete session")
