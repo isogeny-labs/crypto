@@ -1,0 +1,19 @@
+{
+  "status": "checked_partial_formalization",
+  "date": "2026-10-28",
+  "source_sha256": "7aa8afec68e132b490bb256e168df6e62dbdb5bf2ac3118aa66e92cd55fce661",
+  "lean_version": "4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "checked_theorems": 12,
+  "allowed_axioms_observed": ["propext", "Quot.sound"],
+  "sorry_or_custom_axioms": false,
+  "native_decide_or_unverified_native_evaluation": false,
+  "commands": [
+    {"command": "lake build", "exit_code": 0, "log": "build.log", "build_jobs": 768},
+    {"command": "lake env leanchecker --fresh --verbose FallDegreeIdentities", "exit_code": 0, "status": "passed for the updated integer-lift source", "log": "fresh-check.log", "meaning": "Lean's built-in fresh kernel replay of the module and its imported constants; not an independent external kernel implementation"}
+  ],
+  "scope": "Polynomial cancellation identities, binary S3 quadratic form, inverse-guard and missing-root identities, and common-root-implies-zero scalar expression.",
+  "full_last_fall_theorem_formalized": false,
+  "remaining_obligations": "See PROOF_MAP.json; filtered closure, normal-form degree bounds, scalar grid inversion and elliptic-curve bridges remain unformalized."
+}
