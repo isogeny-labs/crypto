@@ -7,7 +7,7 @@ fn nullable<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Opti
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(super) struct Binding {
+pub(crate) struct Binding {
     pub schema: String,
     pub run_sha256: String,
     pub plan_sha256: String,

@@ -1,6 +1,7 @@
 //! Independent bounded validation of sealed, recorded checked-phase evidence.
 mod binding;
 mod budget;
+mod context;
 mod io;
 mod native;
 mod protocol;
@@ -9,7 +10,10 @@ mod schema;
 mod tests;
 
 use anyhow::{ensure, Context, Result};
+pub(crate) use budget::Budget as PhaseBudget;
 use budget::{Budget, LIMIT};
+pub(crate) use context::{audit_admitted, reconstruct_admitted, ContextArtifact, ContextReader};
+pub(crate) use schema::Binding;
 use schema::*;
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, fs, path::Path};
@@ -188,7 +192,9 @@ pub(crate) fn audit_sealed(
             records.push((phase, start, start_value, start_hash, end));
         }
     }
-    validate_context(bound, records, identities, budget)
+    Ok(Some(
+        validate_context(bound, records, identities, &budget)?.sealed(),
+    ))
 }
 
 type Recorded = (
@@ -227,8 +233,8 @@ fn validate_context(
     bound: Binding,
     records: Vec<Recorded>,
     identities: Vec<Value>,
-    budget: Budget,
-) -> Result<Option<CheckedPhaseAudit>> {
+    budget: &Budget,
+) -> Result<ValidatedContext> {
     let mut allow_next = true;
     let mut phases = Vec::with_capacity(4);
     let mut measurements = Vec::with_capacity(4);
@@ -314,13 +320,47 @@ fn validate_context(
         phases.push(summary);
         measurements.push(measure);
     }
-    let summary = json!({"schema":"ml-dataset.checked-phase-contract/v1","validator":"independent-sealed-phase-v2/v1",
-        "policy_sha256":POLICY_HASH,"binding":bound,"input_artifacts":identities,"supplied_starts":phases.len(),"supplied_ends":ends,
-        "prefix_state":state,"phases":phases,"authoritative_binding_checked":true,"modeled_storage_limit":LIMIT,"modeled_storage_reserved":budget.used(),
-        "independently_verified":false,"hardware_independently_verified":false,"platform_admitted":false,"training_cost_eligible":false,
-        "complete_execution_verified":false,"clock_valid_for_comparison":false,"whole_worker_instruction_count":null,"partial_snapshot_chain_verified":false});
-    Ok(Some(CheckedPhaseAudit {
-        measurements: Value::Array(measurements),
-        summary,
-    }))
+    Ok(ValidatedContext {
+        bound,
+        identities,
+        phases,
+        measurements,
+        ends,
+        state,
+        reserved: budget.used(),
+    })
+}
+
+/// Semantic result has no sealed/partial transport claim. Presentations own it.
+struct ValidatedContext {
+    bound: Binding,
+    identities: Vec<Value>,
+    phases: Vec<Value>,
+    measurements: Vec<Value>,
+    ends: usize,
+    state: &'static str,
+    reserved: usize,
+}
+impl ValidatedContext {
+    fn sealed(self) -> CheckedPhaseAudit {
+        let summary = json!({"schema":"ml-dataset.checked-phase-contract/v1","validator":"independent-sealed-phase-v2/v1",
+            "policy_sha256":POLICY_HASH,"binding":self.bound,"input_artifacts":self.identities,"supplied_starts":self.phases.len(),"supplied_ends":self.ends,
+            "prefix_state":self.state,"phases":self.phases,"authoritative_binding_checked":true,"modeled_storage_limit":LIMIT,"modeled_storage_reserved":self.reserved,
+            "independently_verified":false,"hardware_independently_verified":false,"platform_admitted":false,"training_cost_eligible":false,
+            "complete_execution_verified":false,"clock_valid_for_comparison":false,"whole_worker_instruction_count":null,"partial_snapshot_chain_verified":false});
+        CheckedPhaseAudit {
+            measurements: Value::Array(self.measurements),
+            summary,
+        }
+    }
+    fn partial(self) -> CheckedPhaseAudit {
+        let mut projection = self.sealed();
+        projection.summary["validator"] = json!("independent-partial-phase-v2/v1");
+        projection
+            .summary
+            .as_object_mut()
+            .expect("summary object")
+            .remove("partial_snapshot_chain_verified");
+        projection
+    }
 }

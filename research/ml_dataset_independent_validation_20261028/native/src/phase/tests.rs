@@ -349,7 +349,8 @@ fn record(p: Phase, end: bool) -> Recorded {
     (p, start, value, sha, metrics)
 }
 fn context(records: Vec<Recorded>) -> Result<Option<CheckedPhaseAudit>> {
-    validate_context(binding(), records, vec![], Budget::new(LIMIT))
+    validate_context(binding(), records, vec![], &Budget::new(LIMIT))
+        .map(|context| Some(context.sealed()))
 }
 
 #[test]

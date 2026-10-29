@@ -25,6 +25,29 @@ pub(super) fn reconstruct(
         let raw = io::bytes(root, a, crate::common::MAX_JSON, budget)?;
         inputs.insert(name, raw);
     }
+    from_bytes(&inputs, index, Some(plan_sha), budget)
+}
+
+/// Same semantic constructor for sealed and admitted partial context. The
+/// raw inputs are supplied by the appropriate hash-bound descriptor reader.
+pub(super) fn from_bytes(
+    inputs: &BTreeMap<&str, Vec<u8>>,
+    index: u64,
+    expected_plan_sha: Option<&str>,
+    budget: &mut Budget,
+) -> Result<Binding> {
+    ensure!(
+        [
+            "run.json",
+            "plan.json",
+            "protocol.json",
+            "config.json",
+            "attempt.json"
+        ]
+        .iter()
+        .all(|name| inputs.contains_key(name)),
+        "phase missing raw authoritative context"
+    );
     let run = io::value(&inputs["run.json"], budget)?;
     let plan = io::value(&inputs["plan.json"], budget)?;
     let config = io::value(&inputs["config.json"], budget)?;
@@ -37,7 +60,7 @@ pub(super) fn reconstruct(
     let canonical = crate::audit::canonical_plan(&plan)?;
     let computed_plan = crate::common::digest(&serde_json::to_vec(&canonical)?);
     ensure!(
-        computed_plan == plan_sha
+        expected_plan_sha.is_none_or(|plan_sha| computed_plan == plan_sha)
             && run["plan_sha256"] == computed_plan
             && attempt["plan_sha256"] == computed_plan,
         "phase binding canonical plan disagreement"
