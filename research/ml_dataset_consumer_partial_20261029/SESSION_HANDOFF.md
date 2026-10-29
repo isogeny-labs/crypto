@@ -40,3 +40,30 @@ at s3://setec-astronomy-artifacts/ml-dataset/20261029/validation/partial-consume
 No producer, PMU or real remote operation was started. Final source-bound gates
 and delivery remain active work; daily journal scope is owned elsewhere, so this
 owned handoff preserves the entry without cross-chat contact or contention.
+
+2026-10-29 final local validation: runtime/test source
+`9e1d8e3817bb69285462957de72c7fac2f6983c6` passed239/0/9 release, strict
+all-target Clippy and eight actual local restore/fresh-audit pairs on migrated
+NFS. The preceding e430 freeze's unsupported-rename CLI failure remains retained;
+both independent reviewers cleared the narrow exclusive-link correction before
+new execution. All twelve executables were copied/hash-bound before testing.
+No producer, PMU, cloud worker or real remote consumer operation was invoked.
+The complete evidence archive retains previous failures and current raw fixtures,
+including symlink targets/hardlink topology for the new deterministic fault cases.
+
+PR2824 app attachment was completed by the parent after the earlier unresponsive
+call was terminated and absence reconciled. The PR was subsequently merged by
+the repository owner into `codex/ml-consumer-generic-filter-20261028`; its old
+head branch was removed. The new delivery targets that existing merged parent,
+whose merge-base with this implementation is still exact ee936. No duplicate
+PR2824 or additional validation campaign was started. T783 remains owned through
+durable delivery; the shared daily log is still excluded from this scope.
+
+2026-10-29 06:48 UTC — primary delivery readback complete. Conditional S3 PUT,
+HEAD/ETag GET and archive/contained hashes passed for archive9e511cc2 (29,000,657
+bytes). The fresh filesystem manifest verified15,431 entries, five regular-file
+hardlink groups and two literal symlink targets. The downloaded CLI and test
+executable passed all eight downloaded restore/audit cases; sixteen stdout byte
+sequences match the pre-upload evidence. Detailed source/receipt/claim boundaries
+are in DURABILITY.md. Final documentation/PR receipt archival and T783 release
+remain delivery steps, without new source builds or experiments.

@@ -13,8 +13,10 @@ dataset-consumer partial-fetch --anchor anchor.json --expected-sha256 HEX --out 
 
 Local restore follows the explicitly selected mirror. The anchor's original
 absolute file URI remains an identity and is never followed. A destination must
-be new. Failure retains an incomplete destination; invoking the command again
-does not adopt or repair it. A fresh audit reopens the original metadata and
+be new. Errors return failure; invoking the command again does not adopt or
+repair an existing destination. Tested failures before marker removal retain
+that marker, while a late sync error can leave it absent without returning
+success. A fresh audit reopens the original metadata and
 recomputes the proof, ignoring any saved report claims. All reads, semantics and
 inventory for one audit share the same pinned directory descriptor.
 

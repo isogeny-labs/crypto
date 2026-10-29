@@ -1,9 +1,9 @@
-# Acceptance ledger — source freeze, final gates pending
+# Acceptance ledger — final local software gates
 
 This ledger distinguishes authored contract targets, development execution, and
-final immutable execution. Final source/binary/fixture receipts will be added in
-a delivery-only commit after the frozen source gates. No blanket completeness
-claim follows from test-function counts.
+final immutable execution. Runtime/test source is
+`9e1d8e3817bb69285462957de72c7fac2f6983c6`; the delivery documentation does not
+change that native tree. No blanket completeness claim follows from test counts.
 
 ## Positive coverage
 
@@ -30,7 +30,7 @@ counter control. This is fixture arithmetic, not a validator-derived oracle.
 
 ## Negative coverage and scope
 
-The30 named N01–N30 functions each contain one or more contract-authored cases.
+The 30 named N01–N30 functions each contain one or more contract-authored cases.
 Each case records its new anchor pin, intended semantic error, actual error,
 fixed/rebuilt/stale-event/tree-mutation hash mode, and artifact-open count.
 Promised preflight cases assert zero source artifact opens before the error.
@@ -70,7 +70,7 @@ counterexample. R11 mock failures cover length,412, command timeout, corrupt and
 overlong GET, with no retry/fallback; conflicting inherited AWS settings are
 overridden in a subprocess. R12 checks exact namespace, missing member and extra
 empty-directory/tail/helper files. R13/R14 inject file/intermediate-directory
-sync, pre/post rename and marker-removal failures: nonzero result, incomplete
+sync, pre/post rename and pre-marker-removal failures: nonzero result, incomplete
 marker, and refusal of subsequent adoption. They are deterministic software
 failure tests, not power-loss or filesystem crash certification.
 
@@ -85,9 +85,36 @@ reported an overwide report function and temporarily unused counter API;
 clippy-dev02 passed after the function-interface correction and test integration.
 These are uncommitted development executions, not immutable release acceptance.
 
-Final gates: frozen source and copied executable, full standalone release suite,
-strict all-target Clippy, retained original/synthetic local CLI restore+fresh
-audit,42 sealed legacy/checked byte comparisons, mocked legacy fetch byte
-comparison, exact fixture hashes and independent source reviews. These remain
-pending at this source-freeze commit. Actual remote invocation remains explicitly
-unperformed, with no generation, solver-resumption or worker-publication claim.
+## Final source-bound execution
+
+The final release suite passed **239 tests, 0 failures, 9 opt-in tests ignored**.
+Strict release all-target Clippy with `-D warnings` passed. Twelve executables
+were copied and hashed before execution; both original and copied binaries were
+rehashed after the suite. The final CLI SHA256 is
+`04ea30dacf6f2755239874b7e1b66107348d67c349aae6845694c1a7895ba591`.
+
+The separately invoked actual CLI test passed eight local restore/fresh-audit
+pairs on NFS: P01, P03/P10, P04, P05, P06, P07, P08 and P13. Each checked report
+retains the restricted partial claims. All other positive/negative/resource
+representatives above execute in the mandatory release suite, including the
+positive source-open counter control.
+
+The prior freeze `e430ad68789191ec81b58cd4cc9b8bc70c3db540` passed its 236-test
+suite, strict Clippy, 42 exact sealed legacy/checked audit and export comparisons
+against the retained baseline, and the mocked legacy fetch CLI byte comparison.
+Its actual partial CLI failed with EINVAL on the migration NFS mount. That failed
+run, source identity, binaries and all fixtures remain unchanged in the evidence.
+The reviewed correction adds exclusive link installation for unsupported rename
+flags, preserving occupied destinations and returning failure without automatic
+adoption on errors. Tested pre-removal faults retain the marker; a late sync
+error after marker removal may leave it absent, without returning success. Three
+additional tests exercise positive, occupied-name, source-replacement/topology
+and intermediate-failure cases. See `NFS_INSTALL_AMENDMENT.md`.
+
+The only production path changed after e430 is `partial/io.rs`; other changes
+are test retention/cases and documentation. The 42 sealed comparisons and mock
+legacy fetch remain labeled **e430 evidence for unchanged code paths**, not
+new-binary executions. The final source underwent the full release and lint
+gates plus the new NFS CLI replay. Actual remote invocation remains unperformed,
+with no generation, solver-resumption or worker-publication claim. The separate
+durability record identifies controller S3 archival and fresh restored replay.

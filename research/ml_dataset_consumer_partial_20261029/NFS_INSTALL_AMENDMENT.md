@@ -16,8 +16,10 @@ flushes its containing directory, then unlinks the owned staged name and flushes
 both containing directories. Existing destination names always fail; an ordinary
 overwriting rename is never used. [link(2)](https://man7.org/linux/man-pages/man2/link.2.html)
 specifies no replacement and warns that NFS may perform a link before reporting
-an error. Therefore any error is retained as incomplete, never inferred rollback
-or automatic adoption.
+an error. Therefore any error returns failure, without inferred rollback or
+automatic adoption. The tested pre-removal failures retain the incomplete marker;
+a late directory-sync error after marker removal can leave it absent without
+returning success.
 
 The source stage must be one regular, non-symlink file with exactly one link. Its
 opened descriptor remains live. After linking, both old and new names must still
