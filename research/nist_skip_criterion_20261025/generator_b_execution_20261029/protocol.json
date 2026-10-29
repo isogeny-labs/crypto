@@ -33,6 +33,12 @@
       "class": "out_of_scope",
       "text": "No attack, DLP recovery or security proof follows from this trait inventory.",
       "decided_by": []
+    },
+    {
+      "id": "runtime-planning",
+      "class": "heuristic_estimate",
+      "text": "The synthetic-preflight scaling model is a planning estimate only, tested by the fixed watchdog; not a performance conclusion.",
+      "decided_by": []
     }
   ],
   "arms": [
@@ -254,11 +260,11 @@
       "note": "No p-value or rejection claim. Retain all19152 exact envelopes and every failure; any exact label fit is exploratory."
     },
     "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
+      "fixed_seconds": 0.04,
+      "per_sample_seconds": 321.536,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "No runtime metric. The full synthetic integration already passes. Fixed30/300/300-second phase watchdogs bound this exact computation; no unmeasured time estimate is invented."
+      "estimated_total_seconds": 321.576,
+      "measured_on": "evidence/preflight-runtime.json: one synthetic call per arm, six tiny fields repeated into21 parser rows. Planning model scales the two synthetic census phases by512. This is an explicit heuristic; no cryptographic-size cost or performance result is claimed."
     }
   },
   "metrics": {
@@ -458,6 +464,16 @@
         "Use existing authorized temporary client; no new key or identity.",
         "Admit full S3 preparation and checkpoint before local execution.",
         "Preserve earlier prepared/unrun and failed-checkpoint records as history."
+      ]
+    },
+    {
+      "id": "preflight-estimate",
+      "filed": "2026-10-29",
+      "filed_before_affected_data": true,
+      "reason": "Canonical freeze requires a recorded non-null runtime estimate. Time synthetic controls without reading the real cohort, then record an explicit scaling assumption and fixed watchdog.",
+      "changes": [
+        "Three synthetic timings recorded under a successful S3 checkpoint.",
+        "Trait family, all21 inputs, decision rules and30/300/300-second limits unchanged."
       ]
     }
   ],
