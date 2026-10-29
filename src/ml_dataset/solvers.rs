@@ -17,20 +17,28 @@ use num_traits::ToPrimitive;
 use serde_json::{json, Value};
 
 use crate::binary_ecc::{curve as binary, BinaryCurve, BinaryPoint, F2mElement};
-use crate::cryptanalysis::binary_semaev::{binary_semaev_s3_in_x3, solve_quadratic_f2m};
 use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crate::cryptanalysis::f6_wide_geometry::F6WidePairIndex;
 use crate::cryptanalysis::koblitz_groebner::{self as boolean, FieldStructure, SymElement};
 use crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2;
 use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
+use crate::cryptanalysis::prime_root_trace::{self, RootEvent, RootLimits, RootReport, RootStop};
 use crate::cryptanalysis::sat::{self, SolveResult};
-use crate::ecc::{CurveParams, Point};
+use crate::ecc::Point;
 
 use super::curves;
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
+#[path = "binary_roots.rs"]
+mod binary_roots;
+pub(super) const BINARY_ROOT_CERTIFICATE_SCOPE: &str = binary_roots::CERTIFICATE_SCOPE;
+
 const TRACE_EVENT_CAP: u64 = 100_000;
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
+pub(super) const PRIME_ROOT_CERTIFICATE_SCOPE: &str =
+    "distinct roots per completed prime S3 call; incomplete calls prove no root absence";
+const PRIME_ROOT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
+const PRIME_ROOT_BYTE_CAP_REASON: &str = "prime root event byte cap reached";
 
 const SAT_EVENT_BYTE_CAP: usize = TRACE_BYTE_CAP / 4;
 const SAT_EVENT_CAP_REASON: &str = "native SAT event trace budget exhausted";
@@ -218,7 +226,7 @@ pub fn capabilities() -> Value {
             {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["prime-field elimination at p>=2^32","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
-            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"each polynomial, returned roots, lift checks","gaps":["internal factorization and gcd states"]},
+            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
             {"id":"double-large-prime","families":["koblitz","binary","prime"],"m":[2,15],"kind":"native verified two-residual elimination with signed Frobenius for admitted Koblitz models or identity/sign action with generic sparse filtering; recovery of determined target columns","trace":"residual discovery, exact domains, partial candidates, source coefficients, native sparse filtering and modular rank/recovery certificates","gaps":["internal pivot-selection events","complete private filter mutation stream"]}
         ],
@@ -234,7 +242,7 @@ pub fn capabilities() -> Value {
 #[derive(Clone)]
 enum Group {
     Binary(Box<BinaryCurve>),
-    Prime(CurveParams),
+    Prime(curves::ExactPrimeCurve),
 }
 #[derive(Clone, Debug, PartialEq)]
 enum Element {
@@ -444,7 +452,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         }
         "weil" | "weil-descent" | "f4" | "f5" => boolean_solve(config, &group, &points, &target)?,
         "f6" => f6_solve(config, &group, &points, &target)?,
-        "root" => root_solve(config, &group, &points, &target)?,
+        "root" => root_solve(config, case, &group, &points, &target)?,
         "pkm" => pkm_solve(config, case, &group, &points, &target)?,
         "double-large-prime" => super::relations::solve(config, case)?,
         other => return Err(format!("unknown solver {other}")),
@@ -2364,6 +2372,7 @@ fn f6_solve(
 
 fn root_solve(
     config: &CaseConfig,
+    case: &CaseData,
     group: &Group,
     domain: &[Element],
     target: &Element,
@@ -2373,156 +2382,495 @@ fn root_solve(
             "Native S3 univariate root adapter currently supports m=2",
         ));
     }
-    let Some(xr) = target.x() else {
+    if matches!(group, Group::Prime(_)) {
+        return prime_root_solve(config, group, domain, target);
+    }
+    binary_roots::solve(config, case, group, domain, target)
+}
+
+pub(super) fn verify_binary_root_artifact(
+    public: &Value,
+    base: &Value,
+    config: &CaseConfig,
+    artifact: &Value,
+) -> Result<(), String> {
+    binary_roots::verify(public, base, config, artifact)
+}
+
+pub(super) fn binary_root_trace_totals(artifact: &Value) -> Result<(u64, u64), String> {
+    binary_roots::trace_totals(artifact)
+}
+
+// This fixed recipe performs exactly 15 field operations: 3 additions,
+// 4 subtractions and 8 multiplications. Integer encoding/validation is separate.
+const PRIME_S3_SETUP_WORK: u64 = 15;
+fn prime_root_coefficients(p: u64, a: u64, b: u64, u: u64, r: u64) -> Vec<u64> {
+    let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
+    let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
+    let sub = |x: u64, y: u64| ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
+    let product = mul(u, r);
+    let sum = add(u, r);
+    let t = sub(product, a);
+    let c0 = sub(mul(t, t), mul(4 % p, mul(b, sum)));
+    let c1 = sub(0, add(mul(2 % p, mul(sum, add(product, a))), mul(4 % p, b)));
+    let d = sub(u, r);
+    vec![c0, c1, mul(d, d)]
+}
+
+fn prime_root_event_envelope(index: usize, fixed_x: &str, event: &RootEvent) -> Value {
+    json!({"schema":"ml-dataset.prime-root-event/v1","call_index":index,
+        "fixed_x":fixed_x,"native":event})
+}
+
+// Count only acknowledged envelopes. A byte refusal is the only native sink
+// failure that the adapter can seal: real I/O errors return Err before sealing.
+// The rejected event was computed and charged by the native engine, but is not
+// an acknowledged envelope or a separately saved intermediate state.
+fn verify_prime_root_event_budget(
+    report: &RootReport,
+    index: usize,
+    fixed_x: &str,
+    byte_cap_reached: bool,
+    byte_cap: usize,
+    totals: &mut (u64, usize),
+) -> Result<(), String> {
+    let event_bytes = |event: &RootEvent| -> Result<usize, String> {
+        Ok(
+            serde_json::to_vec(&prime_root_event_envelope(index, fixed_x, event))
+                .map_err(|e| e.to_string())?
+                .len(),
+        )
+    };
+    for event in &report.events {
+        totals.0 = totals.0.checked_add(1).ok_or("root event count overflow")?;
+        totals.1 = totals
+            .1
+            .checked_add(event_bytes(event)?)
+            .ok_or("root event bytes overflow")?;
+        if totals.0 > TRACE_EVENT_CAP || totals.1 > byte_cap {
+            return Err("prime root acknowledged event cap exceeded".into());
+        }
+    }
+    if report.stop == RootStop::SinkFailure {
+        let rejected = report
+            .unacknowledged
+            .as_ref()
+            .ok_or("root byte refusal lacks rejected event")?;
+        if !byte_cap_reached
+            || report.sink_error.as_deref() != Some(PRIME_ROOT_BYTE_CAP_REASON)
+            || totals.0 >= TRACE_EVENT_CAP
+            || totals
+                .1
+                .checked_add(event_bytes(rejected)?)
+                .ok_or("root event bytes overflow")?
+                <= byte_cap
+        {
+            return Err("prime root byte-cap refusal is not justified".into());
+        }
+    } else if byte_cap_reached || report.unacknowledged.is_some() || report.sink_error.is_some() {
+        return Err("prime root byte-cap flag or failed-sink state differs".into());
+    }
+    Ok(())
+}
+
+/// Validate the adapter's aggregate event envelope cap and the exact recorded
+/// refusal. This verifies the supplied records, not a complete execution trace.
+pub(super) fn prime_root_trace_totals(certificate: &Value) -> Result<(u64, u64), String> {
+    let queries = certificate["queries"]
+        .as_array()
+        .ok_or("missing root queries")?;
+    let mut totals = (0, 0);
+    for (index, query) in queries.iter().enumerate() {
+        let report: RootReport =
+            serde_json::from_value(query["report"].clone()).map_err(|e| e.to_string())?;
+        let fixed_x = query["fixed_x"]
+            .as_str()
+            .ok_or("root query lacks fixed x")?;
+        let byte_cap = query["trace_byte_cap_reached"]
+            .as_bool()
+            .ok_or("root query lacks byte-cap flag")?;
+        verify_prime_root_event_budget(
+            &report,
+            index,
+            fixed_x,
+            byte_cap,
+            PRIME_ROOT_EVENT_BYTE_CAP,
+            &mut totals,
+        )?;
+        if byte_cap && index + 1 != queries.len() {
+            return Err("root queries continue after byte-cap refusal".into());
+        }
+    }
+    Ok((totals.0, totals.1 as u64))
+}
+
+fn prime_root_solve(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<SolverData, String> {
+    let Group::Prime(curve) = group else {
+        return Err("prime root group mismatch".into());
+    };
+    let p = curve.p.to_u64().ok_or("prime root modulus exceeds u64")?;
+    let a = curve.a.to_u64().ok_or("prime coefficient exceeds u64")?;
+    let b = curve.b.to_u64().ok_or("prime coefficient exceeds u64")?;
+    let Some(xr) = target.x().and_then(|v| v.to_u64()) else {
         return Ok(unsupported("S3 root adapter requires affine target"));
     };
-    let mut codes: Vec<BigUint> = domain.iter().filter_map(Element::x).collect();
-    codes.sort();
+    let mut codes: Vec<u64> = domain
+        .iter()
+        .filter_map(Element::x)
+        .map(|x| x.to_u64().ok_or("factor-base x exceeds u64"))
+        .collect::<Result<_, _>>()?;
+    codes.sort_unstable();
     codes.dedup();
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let mut used = 0u64;
+    let mut events = 0u64;
+    let mut event_bytes = 0usize;
+    let mut queries = vec![];
+    let mut found = None;
+    let mut censored = false;
     let mut data = SolverData {
         outcome: outcome(
             "partial",
-            "Native univariate S3 roots checked against the finite domain and curve group",
+            "Bounded native prime roots with independently replayable distinct-root certificates",
         ),
         artifacts: vec![],
     };
-    let mut rows = vec![];
-    let mut calls = 0;
-    let mut lift_ops = 0;
-    let mut prime_muls = 0;
-    let limit = config.work_limit.min(TRACE_EVENT_CAP);
-    let mut found = None;
-    for x1 in &codes {
-        if calls >= limit || lift_ops >= limit {
+    for (call_index, &x) in codes.iter().enumerate() {
+        if limit.saturating_sub(used) < PRIME_S3_SETUP_WORK {
+            censored = true;
             break;
         }
-        let (coefficients, roots) = match group {
-            Group::Binary(c) => {
-                let a = F2mElement::from_biguint(x1, c.m);
-                let r = F2mElement::from_biguint(&xr, c.m);
-                let (a, b, z) = binary_semaev_s3_in_x3(&a, &r, &c.b, &c.irreducible);
-                live_event(
-                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":[z.to_biguint().to_string(),b.to_biguint().to_string(),a.to_biguint().to_string()]}),
-                )?;
-                let roots = solve_quadratic_f2m(&a, &b, &z, c.m, &c.irreducible)
-                    .iter()
-                    .map(F2mElement::to_biguint)
-                    .collect::<Vec<_>>();
-                (
-                    vec![
-                        z.to_biguint().to_string(),
-                        b.to_biguint().to_string(),
-                        a.to_biguint().to_string(),
-                    ],
-                    roots,
-                )
-            }
-            Group::Prime(c) => {
-                let p = c.p.to_u64().ok_or("prime root lane modulus exceeds u64")?;
-                let u = x1.to_u64().ok_or("x exceeds u64")?;
-                let r = xr.to_u64().ok_or("target x exceeds u64")?;
-                let a = c.a.to_u64().ok_or("a exceeds u64")?;
-                let b = c.b.to_u64().ok_or("b exceeds u64")?;
-                let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
-                let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
-                let sub = |x: u64, y: u64| ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
-                let product = mul(u, r);
-                let sum = add(u, r);
-                let coeffs = vec![
-                    sub(
-                        mul(sub(product, a), sub(product, a)),
-                        mul(4 % p, mul(b, sum)),
-                    ),
-                    sub(0, add(mul(2 % p, mul(sum, add(product, a))), mul(4 % p, b))),
-                    mul(sub(u, r), sub(u, r)),
-                ];
-                live_event(
-                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":coeffs.iter().map(ToString::to_string).collect::<Vec<_>>()}),
-                )?;
-                let roots = crate::cryptanalysis::glv_invariant_base::poly_roots_fp_counted(
-                    &coeffs,
-                    p,
-                    config.seed ^ calls,
-                    &mut prime_muls,
-                )
-                .into_iter()
-                .map(BigUint::from)
-                .collect::<Vec<_>>();
-                (coeffs.iter().map(ToString::to_string).collect(), roots)
-            }
-        };
-        calls += 1;
-        let mut checks = vec![];
-        for x2 in &roots {
-            let verified = match group {
-                Group::Binary(c) => {
-                    let x = F2mElement::from_biguint(x2, c.m);
-                    let mut value = F2mElement::zero(c.m);
-                    for coefficient in coefficients.iter().rev() {
-                        let value_big = BigUint::parse_bytes(coefficient.as_bytes(), 10)
-                            .ok_or("invalid root polynomial coefficient")?;
-                        value = value
-                            .mul(&x, &c.irreducible)
-                            .add(&F2mElement::from_biguint(&value_big, c.m));
-                    }
-                    value.is_zero()
+        let before = used;
+        let coefficients = prime_root_coefficients(p, a, b, x, xr);
+        used += PRIME_S3_SETUP_WORK;
+        let mut io_error = None;
+        let mut byte_cap = false;
+        let report = prime_root_trace::solve(
+            &coefficients,
+            p,
+            config.seed ^ call_index as u64,
+            RootLimits {
+                field_work: limit - used,
+                split_attempts: 1000,
+                events: TRACE_EVENT_CAP.saturating_sub(events),
+                degree: 2,
+            },
+            &mut |event| {
+                let row = prime_root_event_envelope(call_index, &x.to_string(), event);
+                let size = serde_json::to_vec(&row).map_err(|e| e.to_string())?.len();
+                if event_bytes.saturating_add(size) > PRIME_ROOT_EVENT_BYTE_CAP {
+                    byte_cap = true;
+                    return Err(PRIME_ROOT_BYTE_CAP_REASON.into());
                 }
-                Group::Prime(c) => {
-                    let p = c.p.to_u64().unwrap();
-                    let x = x2.to_u64().ok_or("root exceeds u64")?;
-                    let mut value = 0u64;
-                    for coefficient in coefficients.iter().rev() {
-                        let coefficient = coefficient.parse::<u64>().map_err(|e| e.to_string())?;
-                        value =
-                            ((value as u128 * x as u128 + coefficient as u128) % p as u128) as u64;
-                    }
-                    value == 0
+                if let Err(error) = live_event(&row) {
+                    io_error = Some(error.clone());
+                    return Err(error);
                 }
-            };
-            if !verified {
-                return Err("native root solver returned a non-root".into());
-            }
-            let (w, adds, exhausted) = lift(
-                group,
-                domain,
-                &[x1.clone(), x2.clone()],
-                target,
-                limit.saturating_sub(lift_ops),
-            );
-            lift_ops += adds;
-            checks.push(json!({"x":x2.to_string(),"in_factor_base":codes.contains(x2),"group_lift_verified":w.is_some(),"lift_budget_exhausted":exhausted}));
-            if w.is_some() {
-                found = w;
-                break;
-            }
+                events += 1;
+                event_bytes += size;
+                if matches!(event, RootEvent::PowerEnd { .. } | RootEvent::GcdEnd { .. }) {
+                    let path = format!("root-state-{call_index:04}-{events:06}.json");
+                    if let Err(error) = save(
+                        &mut data,
+                        &path,
+                        "native-prime-root-intermediate-state",
+                        &row,
+                    ) {
+                        io_error = Some(error.clone());
+                        return Err(error);
+                    }
+                }
+                Ok(())
+            },
+        )?;
+        used += report.counters.field_work();
+        if let Some(error) = io_error {
+            return Err(error);
         }
-        let event = json!({"kind":"root_result","fixed_x":x1.to_string(),"coefficients_constant_first":coefficients,"all_returned_roots":roots.iter().map(ToString::to_string).collect::<Vec<_>>(),"checks":checks});
-        live_event(&event)?;
-        rows.push(event);
-        if found.is_some() {
+        // Replay is an integrity check, excluded from the solver-work counters.
+        prime_root_trace::verify(&report)?;
+        let mut checks = vec![];
+        let roots = if report.stop == RootStop::AllFieldElements {
+            codes.clone()
+        } else {
+            report.roots.clone()
+        };
+        if report.complete() {
+            for root in roots {
+                let evaluation_work = 2 * coefficients.len() as u64;
+                if limit.saturating_sub(used) < evaluation_work {
+                    censored = true;
+                    break;
+                }
+                used += evaluation_work;
+                let value = coefficients.iter().rev().fold(0u64, |acc, &c| {
+                    ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
+                });
+                if value != 0 {
+                    return Err("native prime root failed original polynomial evaluation".into());
+                }
+                let (witness, adds, exhausted) = lift(
+                    group,
+                    domain,
+                    &[BigUint::from(x), BigUint::from(root)],
+                    target,
+                    limit - used,
+                );
+                used += adds;
+                checks.push(
+                    json!({"x":root.to_string(),"evaluation_work":evaluation_work,
+                    "group_lift_add_calls":adds,"in_factor_base":codes.contains(&root),
+                    "group_lift_verified":witness.is_some(),"lift_budget_exhausted":exhausted}),
+                );
+                if witness.is_some() {
+                    found = witness;
+                    break;
+                }
+                if exhausted {
+                    censored = true;
+                    break;
+                }
+            }
+        } else {
+            censored = true;
+        }
+        let row = json!({"call_index":call_index,"fixed_x":x.to_string(),
+            "coefficients_constant_first":coefficients,"work_before":before,
+            "coefficient_setup_work":PRIME_S3_SETUP_WORK,"work_after":used,
+            "trace_byte_cap_reached":byte_cap,"report":report,"checks":checks});
+        save(
+            &mut data,
+            &format!("root-call-{call_index:04}.json"),
+            "native-prime-root-call",
+            &row,
+        )?;
+        queries.push(row);
+        if found.is_some() || censored {
             break;
         }
     }
-    data.outcome["counters"] = json!({"root_solver_calls":calls,"prime_field_multiplications_native_root_only":prime_muls,"group_lift_add_calls":lift_ops});
-    data.outcome["trace_gaps"] = json!([
-        "Native root solver gcd/factorization states and internal root counter are not exported",
-        "Root completeness is not independently certified"
-    ]);
+    let certificate = json!({"schema":"ml-dataset.prime-root-certificates/v1",
+        "target":target.json(),"p":p.to_string(),"requested_work_limit":config.work_limit,
+        "effective_work_limit":limit,"charged_work":used,"queries":queries,
+        "root_queries_completed":!censored && queries.len()==codes.len(),
+        "censored":censored,"found_pdp":found.is_some(),
+        "distinct_root_certificates_verified":true,"execution_trace_complete_verified":false,
+        "total_operation_count_verified":false,
+        "counter_scope":"coefficient recipe field operations + native field add/sub/mul/square including inverse exponentiation + original-root evaluation + group lift additions; excludes validation, serialization and replay",
+        "all_field_polynomial_policy":"explicit all-field certificate, then bounded actual factor-base x enumeration"});
     save(
         &mut data,
-        "root-polynomials.json",
-        "native-univariate-inputs-roots-and-group-lifts",
-        &json!(rows),
+        "prime-root-certificates.json",
+        "prime-root-certificates/v1",
+        &certificate,
     )?;
-    if let Some(w) = found {
-        set_witness(&mut data, group, &w, target)?;
-    } else if calls < codes.len() as u64 || lift_ops >= limit {
+    data.outcome["counters"] = json!({"aggregate_root_field_and_group_work":used,
+        "root_solver_calls":queries.len(),"acknowledged_native_events":events,
+        "acknowledged_native_event_bytes":event_bytes});
+    data.outcome["root_certificate_scope"] = json!(PRIME_ROOT_CERTIFICATE_SCOPE);
+    data.outcome["root_execution_trace_complete_verified"] = json!(false);
+    data.outcome["root_total_operation_count_verified"] = json!(false);
+    data.outcome["trace_gaps"] = json!([
+        "No higher-m elimination or binary root internals",
+        "Event records are retained solver artifacts, not a restorable process checkpoint"
+    ]);
+    if let Some(witness) = found {
+        set_witness(&mut data, group, &witness, target)?;
+    } else if censored {
         data.outcome["status"] = json!("budget_exhausted");
-        data.outcome["reason"] = json!("Root/lift work cap reached");
+        data.outcome["reason"] =
+            json!("Aggregate prime-root/lift work, split or trace cap reached");
     } else {
         data.outcome["solver_completed"] = json!(true);
     }
     Ok(data)
+}
+
+/// Bind per-call root certificates to the exact public S3 instances and finite
+/// domain. No private scalar is read; completed root sets are not ECDLP labels.
+pub(super) fn verify_prime_root_artifact(
+    public: &Value,
+    base: &Value,
+    config: &CaseConfig,
+    artifact: &Value,
+) -> Result<(), String> {
+    if base["schema"] == "ml-ecdlp-factor-base/v2" && base["construction_status"] == "unsupported" {
+        return Err("root certificate uses an unsupported factor-base policy".into());
+    }
+    if config.solver != "root"
+        || config.family != "prime"
+        || config.m != 2
+        || public["family"] != "prime"
+        || public["m"] != 2
+        || public["n"] != config.n
+        || public["twist"] != config.twist
+        || artifact["schema"] != "ml-dataset.prime-root-certificates/v1"
+        || artifact["target"] != public["target"]
+        || artifact["requested_work_limit"] != config.work_limit
+        || artifact["distinct_root_certificates_verified"] != true
+        || artifact["execution_trace_complete_verified"] != false
+        || artifact["total_operation_count_verified"] != false
+    {
+        return Err("prime root artifact public/config binding differs".into());
+    }
+    let case = CaseData {
+        public_instance: public.clone(),
+        private_witness: Value::Null,
+        factor_base: base.clone(),
+    };
+    let group = Group::read(&case)?;
+    let Group::Prime(curve) = &group else {
+        return Err("prime root curve required".into());
+    };
+    let target = group.point(&public["target"])?;
+    if !group.on_curve(&target) {
+        return Err("root certificate target is off curve".into());
+    }
+    let p = curve.p.to_u64().ok_or("prime root modulus exceeds u64")?;
+    let a = curve.a.to_u64().ok_or("prime root a exceeds u64")?;
+    let b = curve.b.to_u64().ok_or("prime root b exceeds u64")?;
+    let xr = target
+        .x()
+        .and_then(|x| x.to_u64())
+        .ok_or("affine target required")?;
+    let domain = domain(&group, &case)?;
+    let mut codes: Vec<u64> = domain
+        .iter()
+        .filter_map(Element::x)
+        .map(|x| x.to_u64().ok_or("x exceeds u64"))
+        .collect::<Result<_, _>>()?;
+    codes.sort_unstable();
+    codes.dedup();
+    let limit = config.work_limit.min(TRACE_EVENT_CAP);
+    let modulus_decimal = p.to_string();
+    if artifact["p"].as_str() != Some(modulus_decimal.as_str())
+        || artifact["effective_work_limit"] != limit
+    {
+        return Err("prime root modulus or budget binding differs".into());
+    }
+    let queries = artifact["queries"]
+        .as_array()
+        .ok_or("missing root queries")?;
+    if queries.len() > codes.len() {
+        return Err("too many root queries".into());
+    }
+    prime_root_trace_totals(artifact)?;
+    let mut used = 0u64;
+    let mut events = 0u64;
+    let mut found = false;
+    let mut censored = false;
+    for (index, row) in queries.iter().enumerate() {
+        if found || censored {
+            return Err("root queries continue past terminal state".into());
+        }
+        let x = codes[index];
+        let fixed_x_decimal = x.to_string();
+        let coeff = prime_root_coefficients(p, a, b, x, xr);
+        if row["call_index"] != index
+            || row["fixed_x"].as_str() != Some(fixed_x_decimal.as_str())
+            || row["work_before"] != used
+            || row["coefficient_setup_work"] != PRIME_S3_SETUP_WORK
+            || row["coefficients_constant_first"] != json!(coeff)
+            || limit.saturating_sub(used) < PRIME_S3_SETUP_WORK
+        {
+            return Err("root query identity or work prefix differs".into());
+        }
+        used += PRIME_S3_SETUP_WORK;
+        let report: RootReport =
+            serde_json::from_value(row["report"].clone()).map_err(|e| e.to_string())?;
+        let mut canonical_coeff = coeff.clone();
+        while canonical_coeff.last() == Some(&0) {
+            canonical_coeff.pop();
+        }
+        if report.p != p
+            || report.polynomial != canonical_coeff
+            || report.seed != config.seed ^ index as u64
+            || report.limits
+                != (RootLimits {
+                    field_work: limit - used,
+                    split_attempts: 1000,
+                    events: TRACE_EVENT_CAP - events,
+                    degree: 2,
+                })
+        {
+            return Err("root report differs from frozen call".into());
+        }
+        prime_root_trace::verify(&report)?;
+        used += report.counters.field_work();
+        events += report.events.len() as u64;
+        let checks = row["checks"].as_array().ok_or("missing root lift checks")?;
+        let roots = if report.stop == RootStop::AllFieldElements {
+            codes.clone()
+        } else {
+            report.roots.clone()
+        };
+        if checks.len() > roots.len() || (!report.complete() && !checks.is_empty()) {
+            return Err("invalid censored root lifts".into());
+        }
+        for (j, check) in checks.iter().enumerate() {
+            if found || censored {
+                return Err("root lifts continue after terminal state".into());
+            }
+            let root = roots[j];
+            let root_decimal = root.to_string();
+            let eval = 2 * coeff.len() as u64;
+            if check["x"].as_str() != Some(root_decimal.as_str())
+                || check["evaluation_work"] != eval
+                || limit.saturating_sub(used) < eval
+            {
+                return Err("root evaluation identity/work differs".into());
+            }
+            used += eval;
+            let (w, adds, exhausted) = lift(
+                &group,
+                &domain,
+                &[BigUint::from(x), BigUint::from(root)],
+                &target,
+                limit - used,
+            );
+            if check["group_lift_add_calls"] != adds
+                || check["in_factor_base"] != codes.contains(&root)
+                || check["group_lift_verified"] != w.is_some()
+                || check["lift_budget_exhausted"] != exhausted
+            {
+                return Err("root group lift replay differs".into());
+            }
+            used += adds;
+            found = w.is_some();
+            censored = exhausted && !found;
+        }
+        if report.complete() && !found && checks.len() < roots.len() {
+            if !censored && limit.saturating_sub(used) >= 2 * coeff.len() as u64 {
+                return Err("unjustified omitted root lift".into());
+            }
+            censored = true;
+        }
+        if !report.complete() {
+            censored = true;
+        }
+        if row["work_after"] != used || used > limit {
+            return Err("aggregate root work differs".into());
+        }
+    }
+    if !found && !censored && queries.len() < codes.len() {
+        if limit.saturating_sub(used) >= PRIME_S3_SETUP_WORK {
+            return Err("unjustified omitted root query".into());
+        }
+        censored = true;
+    }
+    if artifact["charged_work"] != used
+        || artifact["found_pdp"] != found
+        || artifact["censored"] != censored
+        || artifact["root_queries_completed"] != (!censored && queries.len() == codes.len())
+    {
+        return Err("prime root aggregate completion differs".into());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -2602,6 +2950,327 @@ mod tests {
         );
         assert_eq!(search.trace.len(), 3);
         assert!(!search.exhausted);
+    }
+
+    #[test]
+    fn prime_root_certificates_bind_public_target_and_domain_on_both_twists() {
+        for twist in [false, true] {
+            let mut cfg = config("prime", "root");
+            cfg.twist = twist;
+            cfg.work_limit = TRACE_EVENT_CAP;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            let point = points.iter().min_by_key(|p| p.x()).unwrap();
+            let target = group.add(point, point);
+            assert_ne!(target, group.zero());
+            case.public_instance["target"] = target.json();
+            case.public_instance["population"] =
+                json!("software-public-planted-prime-root-fixture");
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{}",
+                result.outcome
+            );
+            let artifact = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "prime-root-certificates/v1")
+                .unwrap();
+            let certificate: Value = serde_json::from_slice(&artifact.bytes).unwrap();
+            verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &certificate,
+            )
+            .unwrap();
+            assert_eq!(certificate["total_operation_count_verified"], false);
+            let mut tampered = certificate.clone();
+            tampered["queries"][0]["fixed_x"] = json!("0");
+            assert!(verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &tampered
+            )
+            .is_err());
+            let mut tampered = certificate.clone();
+            tampered["charged_work"] = json!(0);
+            assert!(verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &tampered
+            )
+            .is_err());
+            let mut wrong_public = case.public_instance.clone();
+            wrong_public["twist"] = json!(!twist);
+            assert!(verify_prime_root_artifact(
+                &wrong_public,
+                &case.factor_base,
+                &cfg,
+                &certificate
+            )
+            .is_err());
+            let mut wrong_base = case.factor_base.clone();
+            wrong_base["points"] = json!([]);
+            assert!(verify_prime_root_artifact(
+                &case.public_instance,
+                &wrong_base,
+                &cfg,
+                &certificate
+            )
+            .is_err());
+            let witness = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "independently-verified-pdp")
+                .unwrap();
+            verify_solution_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &witness.role,
+                &serde_json::from_slice(&witness.bytes).unwrap(),
+            )
+            .unwrap();
+        }
+    }
+
+    #[test]
+    fn prime_root_aggregate_caps_preserve_replayable_censoring() {
+        let mut cfg = config("prime", "root");
+        let mut case = curves::generate(&cfg).unwrap();
+        case.private_witness = Value::Null;
+        for limit in [
+            0,
+            PRIME_S3_SETUP_WORK - 1,
+            PRIME_S3_SETUP_WORK,
+            PRIME_S3_SETUP_WORK + 20,
+        ] {
+            cfg.work_limit = limit;
+            let result = solve(&cfg, &case).unwrap();
+            assert_eq!(result.outcome["status"], "budget_exhausted");
+            assert_eq!(result.outcome["solver_completed"], false);
+            let artifact = result
+                .artifacts
+                .iter()
+                .find(|a| a.role == "prime-root-certificates/v1")
+                .unwrap();
+            let certificate = serde_json::from_slice(&artifact.bytes).unwrap();
+            verify_prime_root_artifact(
+                &case.public_instance,
+                &case.factor_base,
+                &cfg,
+                &certificate,
+            )
+            .unwrap();
+        }
+    }
+
+    #[test]
+    fn prime_root_envelope_byte_admission_checks_exact_boundary_and_failed_finish() {
+        let limits = RootLimits {
+            field_work: 10_000,
+            split_attempts: 1000,
+            events: 10_000,
+            degree: 2,
+        };
+        let full =
+            prime_root_trace::solve(&[1, 0, 1], 13, 42, limits.clone(), &mut |_| Ok(())).unwrap();
+        prime_root_trace::verify(&full).unwrap();
+        assert_eq!(full.stop, RootStop::Complete);
+        assert_eq!(full.roots, vec![5, 8]);
+        assert!(matches!(full.events.last(), Some(RootEvent::Finish { .. })));
+        let bytes = |index, event: &RootEvent| {
+            serde_json::to_vec(&prime_root_event_envelope(index, "7", event))
+                .unwrap()
+                .len()
+        };
+        let full_bytes = full.events.iter().map(|e| bytes(0, e)).sum::<usize>();
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&full, 0, "7", false, full_bytes, &mut totals).unwrap();
+        assert_eq!(totals, (full.events.len() as u64, full_bytes));
+        assert!(
+            verify_prime_root_event_budget(&full, 0, "7", false, full_bytes - 1, &mut (0, 0),)
+                .unwrap_err()
+                .contains("acknowledged event cap")
+        );
+
+        // Reject the actual last callback at one byte below its exact envelope
+        // boundary. Native work is charged, but Finish remains unacknowledged.
+        let cap = full_bytes - 1;
+        let mut acknowledged_bytes = 0;
+        let refused = prime_root_trace::solve(&[1, 0, 1], 13, 42, limits, &mut |event| {
+            let size = bytes(0, event);
+            if acknowledged_bytes + size > cap {
+                return Err(PRIME_ROOT_BYTE_CAP_REASON.into());
+            }
+            acknowledged_bytes += size;
+            Ok(())
+        })
+        .unwrap();
+        prime_root_trace::verify(&refused).unwrap();
+        assert_eq!(refused.stop, RootStop::SinkFailure);
+        assert!(matches!(
+            refused.unacknowledged.as_ref(),
+            Some(RootEvent::Finish { .. })
+        ));
+        assert!(refused.roots.is_empty());
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&refused, 0, "7", true, cap, &mut totals).unwrap();
+        assert_eq!(totals, (refused.events.len() as u64, acknowledged_bytes));
+        assert_eq!(refused.events.len() + 1, full.events.len());
+        for (flag, allowed) in [(false, cap), (true, full_bytes)] {
+            assert!(
+                verify_prime_root_event_budget(&refused, 0, "7", flag, allowed, &mut (0, 0),)
+                    .unwrap_err()
+                    .contains("refusal is not justified")
+            );
+        }
+        let mut io_failure = refused.clone();
+        io_failure.sink_error = Some("selected payload I/O failure".into());
+        prime_root_trace::verify(&io_failure).unwrap();
+        assert!(
+            verify_prime_root_event_budget(&io_failure, 0, "7", true, cap, &mut (0, 0),)
+                .unwrap_err()
+                .contains("refusal is not justified")
+        );
+        assert!(
+            verify_prime_root_event_budget(&full, 0, "7", true, full_bytes, &mut (0, 0))
+                .unwrap_err()
+                .contains("byte-cap flag")
+        );
+    }
+
+    #[test]
+    fn prime_root_envelope_byte_admission_accumulates_across_queries() {
+        let report = prime_root_trace::solve(
+            &[1, 0, 1],
+            13,
+            42,
+            RootLimits {
+                field_work: 10_000,
+                split_attempts: 1000,
+                events: 10_000,
+                degree: 2,
+            },
+            &mut |_| Ok(()),
+        )
+        .unwrap();
+        prime_root_trace::verify(&report).unwrap();
+        assert!(report.complete());
+        let query =
+            |fixed_x| json!({"fixed_x":fixed_x,"trace_byte_cap_reached":false,"report":report});
+        let certificate = json!({"queries":[query("7"), query("8")]});
+        let (events, bytes) = prime_root_trace_totals(&certificate).unwrap();
+        assert_eq!(events, 2 * report.events.len() as u64);
+        let mut first = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, usize::MAX, &mut first).unwrap();
+        let mut second = (0, 0);
+        verify_prime_root_event_budget(&report, 1, "8", false, usize::MAX, &mut second).unwrap();
+        assert_eq!(bytes as usize, first.1 + second.1);
+        let exact_cap = first.1 + second.1;
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, exact_cap, &mut totals).unwrap();
+        verify_prime_root_event_budget(&report, 1, "8", false, exact_cap, &mut totals).unwrap();
+        assert_eq!(totals, (events, exact_cap));
+        // Each query alone fits this cap. Reusing the aggregate instead of
+        // resetting it is what rejects the second query's final envelope.
+        verify_prime_root_event_budget(&report, 1, "8", false, exact_cap - 1, &mut (0, 0)).unwrap();
+        let mut totals = (0, 0);
+        verify_prime_root_event_budget(&report, 0, "7", false, exact_cap - 1, &mut totals).unwrap();
+        assert!(
+            verify_prime_root_event_budget(&report, 1, "8", false, exact_cap - 1, &mut totals,)
+                .unwrap_err()
+                .contains("acknowledged event cap")
+        );
+    }
+
+    #[test]
+    fn prime_root_payload_failure_preserves_live_prefix_without_completed_certificate() {
+        let mut cfg = config("prime", "root");
+        // The n=7 fixture has a subgroup of order three: doubling preserves x
+        // and makes the first S3 query linear. Use a larger fixed software
+        // fixture so this control actually reaches a selected power/GCD state.
+        cfg.n = 11;
+        cfg.work_limit = TRACE_EVENT_CAP;
+        let mut case = curves::generate(&cfg).unwrap();
+        case.private_witness = Value::Null;
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let first = points.iter().min_by_key(|p| p.x()).unwrap();
+        let target = group.add(first, first);
+        assert_ne!(target, group.zero());
+        assert_ne!(first.x(), target.x());
+        case.public_instance["target"] = target.json();
+        let expected = solve(&cfg, &case).unwrap();
+        let state = expected
+            .artifacts
+            .iter()
+            .find(|a| a.role == "native-prime-root-intermediate-state")
+            .unwrap();
+        let expected_row: Value = serde_json::from_slice(&state.bytes).unwrap();
+        let directory = std::env::temp_dir().join(format!(
+            "prime-root-payload-failure-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        struct Cleanup(PathBuf);
+        impl Drop for Cleanup {
+            fn drop(&mut self) {
+                let _ = fs::remove_dir_all(&self.0);
+            }
+        }
+        let _cleanup = Cleanup(directory.clone());
+        // The live native event is fsynced first. Conflicting sentinel bytes at
+        // the selected artifact's exact filename make its payload write fail.
+        // The live stream may therefore contain one native event beyond the
+        // callback-acknowledged prefix; no equality between them is claimed.
+        fs::create_dir_all(directory.join("payloads")).unwrap();
+        let sentinel = b"preexisting unrelated payload bytes";
+        fs::write(directory.join("payloads").join(&state.path), sentinel).unwrap();
+        assert!(solve_with_event_sink(&cfg, &case, &directory).is_err());
+        let rows: Vec<Value> = fs::read_to_string(directory.join("events.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert!(!rows.is_empty());
+        let last_native = rows
+            .iter()
+            .map(|row| &row["event"])
+            .rfind(|event| event["schema"] == "ml-dataset.prime-root-event/v1")
+            .unwrap();
+        assert_eq!(*last_native, expected_row);
+        let terminal = &rows.last().unwrap()["event"];
+        assert_eq!(terminal["kind"], "solver_return");
+        assert!(terminal["error"].as_str().is_some_and(|error| {
+            error.contains("live payload path collision with different bytes")
+        }));
+        assert!(terminal["outcome"].is_null());
+        assert!(matches!(
+            expected_row["native"]["kind"].as_str(),
+            Some("power_end" | "gcd_end")
+        ));
+        assert_eq!(
+            fs::read(directory.join("payloads").join(&state.path)).unwrap(),
+            sentinel
+        );
+        assert!(rows
+            .iter()
+            .all(|row| row["event"]["native"]["kind"] != "finish"));
+        assert!(!directory
+            .join("payloads/prime-root-certificates.json")
+            .exists());
+        assert!(!directory.join("payloads/root-call-0000.json").exists());
+        assert!(!directory.join("payloads/pdp-witness.json").exists());
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
     }
 
     fn config(family: &str, solver: &str) -> CaseConfig {
