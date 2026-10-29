@@ -810,6 +810,70 @@ fn artifact<'a>(
     }
     Ok(Some(matches[0]))
 }
+fn admitted_file_cap(path: &str, limits: Option<&Limits>) -> usize {
+    match path {
+        INPUT | "pdp-witness.json" => RESERVE,
+        RESULT => limits.map_or(RESERVE, |l| l.encoded_bytes),
+        EVENTS => limits.map_or(0, |l| (l.encoded_bytes / 8).min(256 * 1024)),
+        EXTRACT => limits.map_or(0, |l| l.encoded_bytes / 8 + RESERVE),
+        _ => 0,
+    }
+}
+fn verify_byte_admission(
+    dir: &Path,
+    artifacts: &[super::super::types::Artifact],
+    limits: Option<&Limits>,
+) -> Result<(), String> {
+    let mut total = 0u64;
+    for a in artifacts
+        .iter()
+        .filter(|a| [INPUT, RESULT, EVENTS, EXTRACT, "pdp-witness.json"].contains(&a.path.as_str()))
+    {
+        let cap = admitted_file_cap(&a.path, limits) as u64;
+        let metadata = fs::symlink_metadata(dir.join(&a.path)).map_err(|e| e.to_string())?;
+        if !metadata.is_file()
+            || metadata.file_type().is_symlink()
+            || metadata.len() != a.bytes
+            || a.bytes > cap
+        {
+            return Err(format!(
+                "wide artifact exceeds admitted serialized bytes: {}",
+                a.path
+            ));
+        }
+        total = total.checked_add(a.bytes).ok_or("wide byte sum overflow")?;
+    }
+    if total > limits.map_or(2 * RESERVE, |l| l.encoded_bytes) as u64 {
+        return Err("wide aggregate serialized byte allowance exceeded".into());
+    }
+    Ok(())
+}
+fn read_bounded(dir: &Path, path: &str, cap: usize) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    let path = dir.join(path);
+    let m = fs::symlink_metadata(&path).map_err(|e| e.to_string())?;
+    if !m.is_file() || m.file_type().is_symlink() || m.len() > cap as u64 {
+        return Err("wide file is not regular/admitted".into());
+    }
+    let mut bytes = Vec::new();
+    File::open(path)
+        .map_err(|e| e.to_string())?
+        .take(cap as u64 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
+    if bytes.len() > cap {
+        return Err("wide file grew past serialized cap".into());
+    }
+    Ok(bytes)
+}
+fn read_typed<T: for<'de> Deserialize<'de>>(
+    dir: &Path,
+    path: &str,
+    limits: Option<&Limits>,
+) -> Result<T, String> {
+    serde_json::from_slice(&read_bounded(dir, path, admitted_file_cap(path, limits))?)
+        .map_err(|e| e.to_string())
+}
 /// Checks canonical mathematical claims, not native basis derivation or runtime timing.
 pub(super) fn verify(
     dir: &Path,
@@ -817,6 +881,35 @@ pub(super) fn verify(
     outcome: &Value,
     artifacts: &[super::super::types::Artifact],
 ) -> Result<(), String> {
+    if config.family == "prime" && config.solver == "f4" && config.m == 2 && config.n >= 33
+        || outcome["strategy"] == STRATEGY
+        || artifacts
+            .iter()
+            .any(|a| a.path == RESULT || a.role == RESULT_ROLE)
+    {
+        for key in [
+            "trace_complete",
+            "execution_trace_complete_verified",
+            "total_operation_count_verified",
+            "native_basis_derivation_verified",
+            "scalar_recovered_without_witness",
+            "scalar_replay_verified",
+            "ecdlp_pipeline_completed",
+        ] {
+            if !outcome[key].is_null() && outcome[key] != false {
+                return Err(format!("wide F4 cannot certify {key}"));
+            }
+        }
+        for key in [
+            "first_fall_degree",
+            "last_fall_degree",
+            "retired_hardware_instructions",
+        ] {
+            if !outcome[key].is_null() {
+                return Err(format!("wide F4 has no verified {key}"));
+            }
+        }
+    }
     let supervisor_censored = matches!(
         outcome["status"].as_str(),
         Some("timeout" | "trace_budget_exhausted" | "worker_failed")
@@ -855,8 +948,26 @@ pub(super) fn verify(
         [RESULT, EVENTS].contains(&a.path.as_str())
             || [RESULT_ROLE, EVENTS_ROLE, EXTRACT_ROLE].contains(&a.role.as_str())
     });
+    let context = super::super::execution::load(dir)?;
+    let admitted_limits = context
+        .as_ref()
+        .and_then(|launch| Limits::derive(config, launch).ok());
+    let bounded_profile = reserved
+        || outcome["strategy"] == STRATEGY
+        || context.is_some()
+            && config.family == "prime"
+            && config.solver == "f4"
+            && config.m == 2
+            && config.n >= 33;
+    if bounded_profile {
+        verify_byte_admission(dir, artifacts, admitted_limits.as_ref())?;
+    }
     let input_value: Option<Value> = if artifacts.iter().any(|a| a.path == INPUT) {
-        Some(super::super::read_json(&dir.join(INPUT))?)
+        Some(if bounded_profile {
+            read_typed(dir, INPUT, admitted_limits.as_ref())?
+        } else {
+            super::super::read_json(&dir.join(INPUT))?
+        })
     } else {
         None
     };
@@ -864,7 +975,6 @@ pub(super) fn verify(
         || input_value.as_ref().is_some_and(|v| {
             v["strategy"] == STRATEGY || v["schema"] == "crypto.ml-dataset.wide-prime-f4-input/v1"
         });
-    let context = super::super::execution::load(dir)?;
     let public: Option<Value> = if dir.join("public.json").exists() {
         Some(super::super::read_json(&dir.join("public.json"))?)
     } else {
@@ -909,13 +1019,25 @@ pub(super) fn verify(
         private_witness: Value::Null,
         factor_base: super::super::read_json(&dir.join("factor-base.json"))?,
     };
+    artifact(artifacts, "public.json", "public-instance", "json", true)?;
+    artifact(artifacts, "factor-base.json", "factor-base", "json", true)?;
+    if case.public_instance["family"] != config.family
+        || case.public_instance["n"] != json!(config.n)
+        || case.public_instance["m"] != json!(config.m)
+        || case.public_instance["twist"] != json!(config.twist)
+    {
+        return Err("wide public instance differs from frozen config".into());
+    }
+    curves::verify_public(&case.public_instance)?;
+    curves::verify_factor_base(&case.public_instance, &case.factor_base)?;
     let group = Group::read(&case)?;
     let target = group.point(&case.public_instance["target"])?;
     let domain = domain(&group, &case)?;
     if original != input(config, &group, &domain, &target)? {
         return Err("wide F4 original equations/config/domain mismatch".into());
     }
-    let result: ResultRecord = super::super::read_json(&dir.join(RESULT))?;
+    verify_byte_admission(dir, artifacts, admitted_limits.as_ref())?;
+    let result: ResultRecord = read_typed(dir, RESULT, admitted_limits.as_ref())?;
     if result.schema != "crypto.ml-dataset.wide-prime-f4-result/v1"
         || result.strategy != STRATEGY
         || result.native_basis_derivation_verified
@@ -1033,9 +1155,24 @@ pub(super) fn verify(
     )?;
     let mut events = Vec::new();
     if event_descriptor.is_some() {
-        let bytes = super::super::read_json_bytes(&dir.join(EVENTS))?;
-        for line in bytes.split(|b| *b == b'\n').filter(|b| !b.is_empty()) {
-            events.push(serde_json::from_slice::<Event>(line).map_err(|e| e.to_string())?);
+        let bytes = read_bounded(
+            dir,
+            EVENTS,
+            admitted_file_cap(EVENTS, admitted_limits.as_ref()),
+        )?;
+        if !bytes.is_empty() && bytes.last() != Some(&b'\n') {
+            return Err("wide boundary stream lacks final newline".into());
+        }
+        let content = bytes.strip_suffix(b"\n").unwrap_or(&bytes);
+        if !content.is_empty() {
+            for line in content.split(|b| *b == b'\n') {
+                if line.is_empty() || line.len() > 64 * 1024 {
+                    return Err("wide boundary line exceeds admission or is empty".into());
+                }
+                events.push(serde_json::from_slice::<Event>(line).map_err(|e| e.to_string())?);
+            }
+        } else if !bytes.is_empty() {
+            return Err("wide boundary stream contains only empty lines".into());
         }
     }
     if events.len() != result.acknowledged_events {
@@ -1077,7 +1214,7 @@ pub(super) fn verify(
         return Err("wide F4 undeclared extraction artifact".into());
     }
     if result.extraction_retained {
-        let extraction: Extraction = super::super::read_json(&dir.join(EXTRACT))?;
+        let extraction: Extraction = read_typed(dir, EXTRACT, admitted_limits.as_ref())?;
         let limits = result.limits.as_ref().ok_or("extraction without limits")?;
         verify_extraction(
             &original,
@@ -1088,12 +1225,7 @@ pub(super) fn verify(
             limits,
             &result,
         )?;
-        if result
-            .native_statistics
-            .as_ref()
-            .is_some_and(|s| s.inconsistent)
-            && extraction.pairs.iter().any(|p| p.original_system_root)
-        {
+        if native_claim_contradicts_domain(&result, &extraction) {
             return Err("native refutation contradicts original-domain root".into());
         }
         if result.pdp_witness_verified {
@@ -1188,6 +1320,14 @@ pub(super) fn verify(
         )?;
     }
     Ok(())
+}
+fn native_claim_contradicts_domain(result: &ResultRecord, extraction: &Extraction) -> bool {
+    (result.stop == "unit_derived"
+        || result
+            .native_statistics
+            .as_ref()
+            .is_some_and(|s| s.inconsistent))
+        && extraction.pairs.iter().any(|p| p.original_system_root)
 }
 fn verify_extraction(
     input: &Input,
@@ -1331,10 +1471,13 @@ pub(super) fn begin_failure(
 mod tests {
     use super::*;
     fn fixture(twist: bool) -> (CaseConfig, CaseData, SolverExecutionContext) {
+        fixture_at(twist, 61)
+    }
+    fn fixture_at(twist: bool, n: u32) -> (CaseConfig, CaseData, SolverExecutionContext) {
         let cfg = CaseConfig {
             family: "prime".into(),
             solver: "f4".into(),
-            n: 61,
+            n,
             m: 2,
             twist,
             curve_seed: 7,
@@ -1391,6 +1534,55 @@ mod tests {
                 .bytes,
         )
         .unwrap()
+    }
+    #[test]
+    fn wide_prime_fixed47_53_controls_invoke_backend_for_both_twists() {
+        for n in [47, 53] {
+            for twist in [false, true] {
+                let (cfg, case, context) = fixture_at(twist, n);
+                let data = super::super::solve_with_context(&cfg, &case, Some(&context)).unwrap();
+                assert_eq!(
+                    data.outcome["native_backend_invoked"], true,
+                    "n={n},twist={twist}: {}",
+                    data.outcome
+                );
+                assert_eq!(data.outcome["pdp_witness_verified"], true);
+            }
+        }
+    }
+    #[test]
+    fn wide_prime_fixed_no_lift_completes_original_domain() {
+        for twist in [false, true] {
+            let (cfg, mut case, context) = fixture(twist);
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            // Fixed factor-base-size2 recipe retains exactly P,-P. Ordered sums
+            // are 0,+2P,-2P; 3P is absent in the declared large prime subgroup.
+            assert_eq!(points.len(), 2);
+            assert_eq!(points[1], group.neg(&points[0]));
+            assert!(group.order().unwrap() > 5);
+            let target = group.mul(&points[0], 3);
+            assert_ne!(target, group.zero());
+            case.public_instance["target"] = target.json();
+            let data = super::super::solve_with_context(&cfg, &case, Some(&context)).unwrap();
+            assert_eq!(data.outcome["native_backend_invoked"], true);
+            assert_eq!(data.outcome["extraction_complete"], true);
+            assert_eq!(data.outcome["exhaustive_no_decomposition"], true);
+            assert_eq!(data.outcome["pdp_witness_verified"], false);
+            let original: Input = record(&data, INPUT);
+            let extraction: Extraction = record(&data, EXTRACT);
+            let result: ResultRecord = record(&data, RESULT);
+            verify_extraction(
+                &original,
+                &extraction,
+                &group,
+                &points,
+                &target,
+                result.limits.as_ref().unwrap(),
+                &result,
+            )
+            .unwrap();
+        }
     }
     #[test]
     fn wide_prime_group_replay_budget_exact_boundary_and_one_less() {
@@ -1484,6 +1676,59 @@ mod tests {
             assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
             fs::remove_dir_all(path).unwrap();
         }
+    }
+    #[test]
+    fn unit_stop_contradiction_does_not_depend_on_optional_statistics() {
+        let mut result = base_result();
+        result.stop = "unit_derived".into();
+        assert!(result.native_statistics.is_none());
+        let mut extraction = Extraction {
+            schema: "crypto.ml-dataset.wide-prime-f4-extraction/v1".into(),
+            pairs: vec![PairCheck {
+                x: ["0".into(), "0".into()],
+                original_system_root: true,
+                lifts: vec![],
+                lifts_complete: true,
+            }],
+            domain_complete: false,
+            group_adds: 0,
+            witness_replay_adds: 0,
+            stop: "domain_budget".into(),
+        };
+        assert!(native_claim_contradicts_domain(&result, &extraction));
+        extraction.pairs[0].original_system_root = false;
+        assert!(!native_claim_contradicts_domain(&result, &extraction));
+    }
+    #[test]
+    fn serialized_native_event_allowance_exact_and_one_over() {
+        let (cfg, _, context) = fixture(false);
+        let limits = Limits::derive(&cfg, &context.launch).unwrap();
+        let cap = admitted_file_cap(EVENTS, Some(&limits));
+        let dir = std::env::temp_dir().join(format!(
+            "wide-byte-boundary-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&dir).unwrap();
+        for extra in [0, 1] {
+            fs::write(dir.join(EVENTS), vec![b' '; cap + extra]).unwrap();
+            let a = super::super::super::types::Artifact {
+                path: EVENTS.into(),
+                role: EVENTS_ROLE.into(),
+                encoding: "jsonl".into(),
+                sha256: "0".repeat(64),
+                bytes: (cap + extra) as u64,
+            };
+            assert_eq!(
+                verify_byte_admission(&dir, &[a], Some(&limits)).is_ok(),
+                extra == 0
+            );
+            assert_eq!(read_bounded(&dir, EVENTS, cap).is_ok(), extra == 0);
+        }
+        fs::remove_dir_all(dir).unwrap();
     }
     #[test]
     fn wide_prime_limits_and_typed_records_reject_overflow_and_false_derivation() {

@@ -4517,6 +4517,108 @@ mod tests {
                 },
             );
             verify_cell(&presolver, true).unwrap();
+            for forbidden in [
+                "trace_complete",
+                "first_fall_degree",
+                "last_fall_degree",
+                "retired_hardware_instructions",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("forbidden-{forbidden}")),
+                    |_, manifest| {
+                        manifest.outcome[forbidden] = if [
+                            "first_fall_degree",
+                            "last_fall_degree",
+                            "retired_hardware_instructions",
+                        ]
+                        .contains(&forbidden)
+                        {
+                            json!(5)
+                        } else {
+                            json!(true)
+                        }
+                    },
+                );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {forbidden}");
+                let bad_partial = altered_cell(
+                    &partial,
+                    &fixture.0.join(format!("partial-forbidden-{forbidden}")),
+                    |_, manifest| manifest.outcome[forbidden] = json!(true),
+                );
+                assert!(verify_cell(&bad_partial, true).is_err());
+            }
+            for mutation in ["public-m", "omit-public", "omit-base"] {
+                let bad =
+                    altered_cell(
+                        &dir,
+                        &fixture.0.join(mutation),
+                        |path, manifest| match mutation {
+                            "public-m" => {
+                                alter_json(&path.join("public.json"), |v| v["m"] = json!(3))
+                            }
+                            "omit-public" => manifest.artifacts.retain(|a| a.path != "public.json"),
+                            "omit-base" => {
+                                manifest.artifacts.retain(|a| a.path != "factor-base.json")
+                            }
+                            _ => unreachable!(),
+                        },
+                    );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {mutation}");
+            }
+            for extra in [0usize, 1] {
+                let padded = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("aggregate-pad-{extra}")),
+                    |path, manifest| {
+                        let record: Value =
+                            read_json(&path.join("prime-f4-wide-result.json")).unwrap();
+                        let cap = record["limits"]["encoded_bytes"].as_u64().unwrap() as usize;
+                        let total: usize = manifest
+                            .artifacts
+                            .iter()
+                            .filter(|a| {
+                                [
+                                    "prime-f4-input.json",
+                                    "prime-f4-wide-result.json",
+                                    "prime-f4-wide-events.jsonl",
+                                    "prime-f4-root-extraction.json",
+                                    "pdp-witness.json",
+                                ]
+                                .contains(&a.path.as_str())
+                            })
+                            .map(|a| a.bytes as usize)
+                            .sum();
+                        let mut bytes = fs::read(path.join("prime-f4-wide-result.json")).unwrap();
+                        bytes.extend(std::iter::repeat_n(b' ', cap - total + extra));
+                        fs::write(path.join("prime-f4-wide-result.json"), bytes).unwrap();
+                    },
+                );
+                assert_eq!(
+                    verify_cell(&padded, true).is_ok(),
+                    extra == 0,
+                    "aggregate boundary{extra}"
+                );
+            }
+            for excess in [false, true] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("event-padding-{excess}")),
+                    |path, _| {
+                        let record: Value =
+                            read_json(&path.join("prime-f4-wide-result.json")).unwrap();
+                        let cap = (record["limits"]["encoded_bytes"].as_u64().unwrap() / 8)
+                            .min(256 * 1024) as usize;
+                        let mut bytes = fs::read(path.join("prime-f4-wide-events.jsonl")).unwrap();
+                        let count = if excess { cap + 1 - bytes.len() } else { 1 };
+                        bytes.extend(std::iter::repeat_n(b'\n', count));
+                        fs::write(path.join("prime-f4-wide-events.jsonl"), bytes).unwrap();
+                    },
+                );
+                assert!(verify_cell(&bad, true).is_err());
+            }
             for mutation in [
                 "equation", "limit", "basis", "counter", "outcome", "deadline", "unknown", "omit",
                 "relocate", "encoding",

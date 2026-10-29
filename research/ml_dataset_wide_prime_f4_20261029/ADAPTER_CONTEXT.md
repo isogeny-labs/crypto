@@ -128,3 +128,30 @@ Only scoped rustfmt and git diff --check were run. Parent-owned independent sour
 review, compilation, focused/full checks and source-bound CLI/S3 replay are still
 required. No cloud jobs, IAM changes, exporter edits, builds or tests were run by
 this implementation lane. All broader solver/arity/policy/corpus goals remain open.
+
+## Independent adapter review corrections
+
+The actual context artifact is execution-context.json with role
+restricted-original-worker-execution-context/v1 and schema
+crypto.ml-dataset.execution-context/v1. It contains the original AttemptBinding,
+boot ID, monotonic start/deadline, seconds_per_case, memory_bytes and trace_bytes.
+The wide result embeds this LaunchContext and effective Limits; there is no
+separate prime-f4-wide-admission.json in the implementation. Native observer
+records, basis and extraction each use separate fractions of the trace_bytes/32
+adapter allowance; the verifier checks their serialized per-file and aggregate
+bounds before parsing, including whitespace, and rejects blank event records.
+The fallback without admitted limits permits only RESERVE-sized input/result.
+
+Review identified and corrected combined artifact omission/stripped strategy,
+unbound public/base descriptors and public arity, unverified result labels,
+optional-statistics unit contradiction and serialized padding bypasses. Added
+controls retain genuine pre-solver censorship and unregistered partial bytes.
+The scalar field's legacy2^32 capability remains explicit, with a separate
+supervised-wide m2 profile through2^61-1; higher arities are not advertised as wide.
+
+Additional fixed controls: n47/n53 both twists using the same seed42,
+curve_seed7/generator1/key1 recipe, and a complete no-lift domain control at61bits.
+For that negative control the retained size2 signed base is asserted to be P,-P;
+its possible two-summand sums are 0,+2P,-2P, while the fixed target3P differs in
+the declared subgroup of order>5. No target/seed search or filtering is used.
+All controls remain authored but unexecuted pending parent validation.
