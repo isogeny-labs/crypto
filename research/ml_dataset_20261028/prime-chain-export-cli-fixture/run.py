@@ -118,7 +118,8 @@ def check_graph(source, destination, twist):
         recovered[edge["equation"]][exponent] = field(edge["coefficient"])
     expected = [{tuple(term["exponents"]): int(term["coefficient"]) for term in polynomial} for polynomial in original["polynomials"]]
     assert recovered == expected
-    for node, point in zip(graph["points"], original["signed_factor_base"], strict=True):
+    assert len(graph["points"]) == len(original["signed_factor_base"])
+    for node, point in zip(graph["points"], original["signed_factor_base"]):
         assert {"x": str(field(node["x"])), "y": str(field(node["y"]))} == point
     public_bytes = (destination / "features.jsonl").read_text()
     for forbidden in ["known_answer_scalar", "private_witness", "solver_completed", "native_backend_invoked", "source_commit", "curve_seed"]:

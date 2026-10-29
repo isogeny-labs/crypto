@@ -1,4 +1,12 @@
 {
+  "amendments": [
+    {
+      "date": "2026-10-29T15:28:42.715934+00:00",
+      "failed_output": "graph-export-cli-fixture-run",
+      "prior_runner_sha256": "1c57ceb4faca585c4ecd24bbd0137d8198da7f022778701b4e42646e707f63ac",
+      "reason": "Host Python3.9 lacks zip(strict=True); first export command passed but consumer raised TypeError. Require explicit equal lengths then zip. Same semantic acceptance criteria; retain failed output and use a fresh output path."
+    }
+  ],
   "checks": [
     "artifact lengths and SHA256",
     "independent Python polynomial reconstruction",
@@ -24,7 +32,7 @@
   ],
   "purpose": "Validate native prime-chain static graph export against retained curve and twist cells",
   "repeat_controls": "identical immutable export retry for both cells",
-  "runner_sha256": "1c57ceb4faca585c4ecd24bbd0137d8198da7f022778701b4e42646e707f63ac",
+  "runner_sha256": "9dc9d4bcb17ba0817e849e412bf009c8d40087223d171668a3347ef5166af1ae",
   "schema": "ml-dataset.software-fixture-protocol/v1",
   "source_commit_binding": "Separate immutable build receipt required; supplied commit alone is not attestation",
   "source_fixture_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
