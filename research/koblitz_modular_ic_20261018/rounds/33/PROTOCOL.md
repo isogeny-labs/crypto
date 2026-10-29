@@ -102,3 +102,10 @@ C_t²=I, (I+N)C_(t+1)=C_t and bijectivity, assuming N²=0. These give the
 operator algebra for completeness/descent. They do not import actual native
 matrices, point tables, global pole bounds or the proper-model bridge.
 Pinned compile and transitive standard-foundations-only audit as above.
+
+Lean33-01 compile failed: the scalar field K was omitted from the first
+lemma's elaborated statement because it appeared only in its proof. No
+formal result was accepted. Make K and its module assumptions explicit in
+that lemma, pass K at call sites, preserve the failed source/log, and use
+fresh lean33-02 after the first runner is terminal. Mathematical statements
+and compile/audit caps are unchanged.
