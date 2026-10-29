@@ -25,7 +25,7 @@ Figure. Paired ratios with cluster-bootstrap 95% intervals. Blue is the original
 
 ## What ran
 
-- **Spec:** the frozen `specs/holdout-P20.json` of this study, with exactly two fields changed for EKS admission: `measurement.rounds` 2 → 5 (the lab requires at least 5) and `measurement.isolation_required` L0 → L2. Curve, targets, arms, warm-up, order and seed are unchanged. `src/cryptanalysis/ecbench/spec.rs` derives the algorithm seed of a round from (seed, workload, round) only, so measured rounds 1–2 equal the original executions.
+- **Spec:** the frozen `specs/holdout-P20.json` of this study, with three fields changed: `label` (descriptive; it feeds only the spec id), and for EKS admission `measurement.rounds` 2 → 5 (the lab requires at least 5) and `measurement.isolation_required` L0 → L2. Curve, targets, arms, warm-up, order and seed are unchanged. `src/cryptanalysis/ecbench/spec.rs` derives the algorithm seed of a round from (seed, workload, round) only, so measured rounds 1–2 equal the original executions.
 - **Request:** [`launch/request.json`](launch/request.json), sha256 `4cf9306c…c7cd6e`. The launcher stored it as [`launch/validated-request.json`](launch/validated-request.json), request sha256 `cc72e6be…8944ff`.
 - **Route:** isolab-eks, using the AWS launcher (`taskq/deploy/eks-karpenter/remote/launch-remote`).
   - Frozen task card [`launch/card.md`](launch/card.md) (CARD-…-xhost-02), written by the experiment director and run by the mechanical executor.
@@ -46,7 +46,14 @@ Figure. Paired ratios with cluster-bootstrap 95% intervals. Blue is the original
 
 The second host's binary is an older build, and it does not emit the newer bitop/v1 `work` or phase `work_native` fields. The match therefore excludes them, and they are named in `match-original.json`. No counted or band-priced field is excluded.
 
+## Independent validation
+
+An independent validator re-checked this directory and passed it (`../validation/second-host/`, certificate `replay-certificate.json`; recorded in `../VALIDATION.json` under `second_host_replay`). Its own record comparison, seed-law reimplementation, `[d]G = Q` checks on 3,024 records, and a local `ecbench verify --replay-all` of both sessions (1,680/1,680 and 672/672 replays identical) agree with the outcome above.
+
 ## Limits
+
+- **Form of the replay:** a new session from the frozen spec, matched record by record, not an `ecbench verify --replay-all` of the original session's bytes run on the second host; a `vs_rho` claim through `ecbench claim build --independent-receipt` would need that form.
+- **Rounds 3–5 are post-freeze data** on the same curve: consistent with the frozen result, they do not replace it; the decision rests on the frozen 96-pair holdout.
 
 - **One curve:** this is one 20-bit holdout curve. The replay establishes that the recorded counts reproduce on another host class and build. It adds no curve and makes no claim at other sizes.
 - **Counted unit only:** wall times in `eks-results/` are L2 records but are not analysed here.
