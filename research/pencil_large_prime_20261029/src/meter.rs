@@ -15,6 +15,10 @@ pub struct Snapshot {
     pub parent_hops: u128,
     pub partition_terms: u128,
     pub primality_checks: u128,
+    pub map_calls: u128,
+    pub map_key_comparisons: u128,
+    pub map_entry_visits: u128,
+    pub map_cloned_entries: u128,
 }
 thread_local! { static COUNTS: Cell<Snapshot> = Cell::new(Snapshot::default()); }
 pub(crate) fn charge(f: impl FnOnce(&mut Snapshot)) {
@@ -44,6 +48,10 @@ impl std::ops::Sub for Snapshot {
             parent_hops: self.parent_hops - rhs.parent_hops,
             partition_terms: self.partition_terms - rhs.partition_terms,
             primality_checks: self.primality_checks - rhs.primality_checks,
+            map_calls: self.map_calls - rhs.map_calls,
+            map_key_comparisons: self.map_key_comparisons - rhs.map_key_comparisons,
+            map_entry_visits: self.map_entry_visits - rhs.map_entry_visits,
+            map_cloned_entries: self.map_cloned_entries - rhs.map_cloned_entries,
         }
     }
 }
@@ -59,5 +67,9 @@ impl std::ops::AddAssign for Snapshot {
         self.parent_hops += rhs.parent_hops;
         self.partition_terms += rhs.partition_terms;
         self.primality_checks += rhs.primality_checks;
+        self.map_calls += rhs.map_calls;
+        self.map_key_comparisons += rhs.map_key_comparisons;
+        self.map_entry_visits += rhs.map_entry_visits;
+        self.map_cloned_entries += rhs.map_cloned_entries;
     }
 }

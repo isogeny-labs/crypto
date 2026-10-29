@@ -27,10 +27,10 @@ cycles and unbalanced cycles. Their direct compiler result and axiom report
 are retained separately. They do not formalize the full forest invariant or
 prove correspondence with Rust.
 The retained residual basis is now also compared with the independent reference
-at all 25,600 prefixes. Twelve library tests pass. Explicit working and retained
+at all 25,600 prefixes. Thirteen default library tests pass. Explicit working and retained
 coefficient caps leave the basis unchanged on rejection; callers must stop or
-retain that rejected row. Logical counters include failed attempts but omit
-map comparisons, allocation, setup and exponentiation internals. These are
+retain that rejected row. Original residual diagnostics count failed attempts; the separate semantic
+and allocation observations described below extend their coverage. These are
 coefficient limits, not process-memory guarantees or a complete cost model.
 The composed adapter binds both stages to one field and fixed column
 partition, rejects three-large-variable rows explicitly, and retains an
@@ -51,6 +51,11 @@ requested-layout accounting. These bytes are not RSS or internal copying;
 rho's absolute peak includes still-live candidate and shared input state.
 The outer envelope includes between-phase work without losing peaks when
 inner phases reset. No runtime or memory comparison has been measured.
+Sparse maps now record API calls, ordered comparisons, yielded entries and
+cloned entries. Exact iterator size hints and numeric ordering are preserved;
+JSON serialization is unmetered. These are semantic events, not all CPU work.
+Counts depend on the recorded standard-library version. The current suite has
+13 default library tests, 14 with the producer feature and three adapter tests.
 \section*{Next integration gates}
 \begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
 Requirement & Status\\\midrule

@@ -5,14 +5,13 @@
 //! Input modulus must be prime. All input coefficients are canonicalized,
 //! including duplicate columns, before changing graph state.
 
-use std::collections::BTreeMap;
-
-pub type Sparse = BTreeMap<usize, u64>;
+pub type Sparse = sparse::TrackedMap<u64>;
 
 pub mod allocation;
 pub mod collector;
 pub mod meter;
 pub mod residual;
+pub mod sparse;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
