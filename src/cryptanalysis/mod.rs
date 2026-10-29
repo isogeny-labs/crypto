@@ -199,6 +199,7 @@ pub mod ghs_transport;
 pub mod gls_fp2;
 pub mod glv_gaudry;
 pub mod glv_invariant_base;
+pub mod prime_root_trace;
 pub mod glv_invariant_experiments;
 pub mod gpu_rootfind;
 pub mod groebner_cache;

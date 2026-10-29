@@ -3,6 +3,7 @@ pub mod budget;
 pub mod capture;
 pub mod curves;
 pub mod export;
+pub mod factor_bases;
 pub mod live;
 pub mod relations;
 pub mod report;
@@ -21,7 +22,7 @@ use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::time::{Duration, Instant};
-use types::{Artifact, CaseConfig};
+use types::{Artifact, CaseConfig, FactorBasePolicy};
 
 #[derive(Args)]
 pub struct DatasetArgs {
@@ -146,6 +147,9 @@ pub struct PlanArgs {
     pub seed: u64,
     #[arg(long, default_value_t = 8)]
     pub factor_base_size: usize,
+    /// JSON array of explicit factor-base recipes; selects plan/v2. Omit for exact legacy plan/v1.
+    #[arg(long)]
+    pub factor_base_policies: Option<PathBuf>,
     #[arg(long, default_value_t = 3)]
     pub degree_bound: u32,
     #[arg(long, default_value_t = 100000)]
@@ -211,12 +215,40 @@ pub struct DatasetPlan {
     pub twists: bool,
     pub protocol_sha256: Option<String>,
     pub split_rule: String,
+    /// Empty and absent for frozen plan/v1. Explicit nonempty policy axis for plan/v2.
+    #[serde(
+        default,
+        deserialize_with = "nonempty_policy_axis",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub factor_base_policies: Vec<FactorBasePolicy>,
+}
+
+fn nonempty_policy_axis<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Vec<FactorBasePolicy>, D::Error> {
+    let policies = Vec::<FactorBasePolicy>::deserialize(deserializer)?;
+    if policies.is_empty() || policies.len() > 32 {
+        return Err(serde::de::Error::custom(
+            "a present policy axis must contain 1..32 recipes",
+        ));
+    }
+    Ok(policies)
 }
 
 impl DatasetPlan {
     pub fn validate(&self) -> Result<(), String> {
-        if self.schema != "crypto.ml-dataset.plan/v1" || !self.twists {
-            return Err("expected plan/v1 with paired twists".into());
+        let policy_plan = match self.schema.as_str() {
+            "crypto.ml-dataset.plan/v1" if self.factor_base_policies.is_empty() => false,
+            "crypto.ml-dataset.plan/v2" if !self.factor_base_policies.is_empty() => true,
+            _ => {
+                return Err(
+                    "expected plan/v1 without policies or plan/v2 with explicit policies".into(),
+                )
+            }
+        };
+        if !self.twists {
+            return Err("expected paired twists".into());
         }
         if self.field_sizes.is_empty()
             || self.field_sizes.iter().any(|n| !(3..=61).contains(n))
@@ -268,6 +300,20 @@ impl DatasetPlan {
         if self.split_rule != "curve-twist-component-sha256-v1" {
             return Err("unknown split rule".into());
         }
+        if policy_plan {
+            if self.factor_base_policies.len() > 32 {
+                return Err("at most 32 factor-base policies are supported per plan".into());
+            }
+            let mut recipes = BTreeSet::new();
+            for policy in &self.factor_base_policies {
+                for &n in &self.field_sizes {
+                    policy.validate(n)?;
+                }
+                if !recipes.insert(serde_json::to_vec(policy).map_err(|e| e.to_string())?) {
+                    return Err("duplicate factor-base policy recipe".into());
+                }
+            }
+        }
         if let Some(hash) = &self.protocol_sha256 {
             crate::store::index::validate_sha256(hash)?;
         }
@@ -285,6 +331,7 @@ impl DatasetPlan {
             self.generators,
             self.keys,
             2,
+            self.factor_base_policies.len().max(1) as u64,
         ]
         .into_iter()
         .try_fold(1u64, |a, b| {
@@ -303,6 +350,14 @@ impl DatasetPlan {
             d
         };
         let solver = self.solvers[digit(self.solvers.len() as u64) as usize].clone();
+        let factor_base_policy = if self.factor_base_policies.is_empty() {
+            None
+        } else {
+            Some(
+                self.factor_base_policies[digit(self.factor_base_policies.len() as u64) as usize]
+                    .clone(),
+            )
+        };
         let twist = digit(2) == 1;
         let m = self.arities[digit(self.arities.len() as u64) as usize];
         let key_index = digit(self.keys);
@@ -320,6 +375,7 @@ impl DatasetPlan {
             key_index,
             seed: self.seed,
             factor_base_size: self.factor_base_size,
+            factor_base_policy,
             degree_bound: self.degree_bound,
             work_limit: self.work_limit,
             solver,
@@ -383,8 +439,22 @@ pub fn digest(bytes: &[u8]) -> String {
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
         DatasetCommand::Plan(a) => {
+            let factor_base_policies: Vec<FactorBasePolicy> = a
+                .factor_base_policies
+                .as_ref()
+                .map(|path| read_json(path))
+                .transpose()?
+                .unwrap_or_default();
+            if a.factor_base_policies.is_some() && factor_base_policies.is_empty() {
+                return Err("explicit factor-base policy array must not be empty".into());
+            }
             let plan = DatasetPlan {
-                schema: "crypto.ml-dataset.plan/v1".into(),
+                schema: if factor_base_policies.is_empty() {
+                    "crypto.ml-dataset.plan/v1"
+                } else {
+                    "crypto.ml-dataset.plan/v2"
+                }
+                .into(),
                 field_sizes: numbers(&a.n)?,
                 arities: numbers(&a.m)?.into_iter().map(|m| m as usize).collect(),
                 families: a.families.split(',').map(str::to_owned).collect(),
@@ -399,6 +469,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 twists: true,
                 protocol_sha256: a.protocol_sha256.clone(),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies,
             };
             plan.validate()?;
             let parent = a
@@ -653,7 +724,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
             curves::verify(&case.public_instance, &case.private_witness)
         })?;
         telemetry::measured(&out, &mut registry, "factor-base-replay", || {
-            curves::verify_factor_base(&case.public_instance, &case.factor_base)
+            curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)
         })?;
         registry.push(storage::write_json(
             &out,
@@ -1684,6 +1755,51 @@ fn cell_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
     Ok(result)
 }
 
+/// A replayed root-set certificate does not certify the native operation stream.
+/// Keep the exported outcome labels no stronger than the certificate's terminal
+/// state. This also runs during hash-only verification as a consistency check;
+/// mathematical replay remains the separate `replay` gate below.
+fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
+    let found = certificate["found_pdp"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean PDP result")?;
+    let censored = certificate["censored"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean censoring result")?;
+    let all_queries = certificate["root_queries_completed"]
+        .as_bool()
+        .ok_or("prime-root certificate lacks a boolean query completion result")?;
+    if (found && censored) || (censored && all_queries) || (!found && !censored && !all_queries) {
+        return Err("inconsistent prime-root aggregate termination".into());
+    }
+    let expected_status = if found {
+        "verified"
+    } else if censored {
+        "budget_exhausted"
+    } else {
+        "partial"
+    };
+    if outcome["root_execution_trace_complete_verified"] != false
+        || outcome["root_total_operation_count_verified"] != false
+        || outcome["trace_complete"] != false
+        || certificate["execution_trace_complete_verified"] != false
+        || certificate["total_operation_count_verified"] != false
+        || outcome["scalar_recovered_without_witness"] != false
+        || outcome["scalar_replay_verified"] != false
+        || outcome["ecdlp_pipeline_completed"] != false
+        || outcome["pdp_witness_verified"].as_bool() != Some(found)
+        || outcome["solver_completed"].as_bool() != Some(found || !censored)
+        || outcome["status"] != expected_status
+        || outcome["root_certificate_scope"] != solvers::PRIME_ROOT_CERTIFICATE_SCOPE
+    {
+        return Err(
+            "prime-root outcome labels differ from verified certificate scope or termination"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
 fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     checked_directory(dir, false)?;
     let metadata = fs::symlink_metadata(dir.join("manifest.json")).map_err(|e| e.to_string())?;
@@ -1719,6 +1835,39 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
+    let root_certificates: Vec<_> = manifest
+        .artifacts
+        .iter()
+        .filter(|a| a.role == "prime-root-certificates/v1")
+        .collect();
+    if [
+        "root_certificate_scope",
+        "root_execution_trace_complete_verified",
+        "root_total_operation_count_verified",
+    ]
+    .iter()
+    .any(|name| manifest.outcome.get(*name).is_some())
+        && root_certificates.is_empty()
+    {
+        return Err("prime-root outcome lacks its distinct-root certificate artifact".into());
+    }
+    if !root_certificates.is_empty()
+        && (!complete_factor_base
+            || manifest.config.solver != "root"
+            || manifest.config.family != "prime"
+            || manifest.config.m != 2
+            || root_certificates.len() != 1
+            || root_certificates[0].encoding != "json")
+    {
+        return Err("prime-root certificate lacks its unique public prime/root/m2 domain".into());
+    }
+    let root_certificate: Option<Value> = root_certificates
+        .first()
+        .map(|artifact| read_json(&dir.join(&artifact.path)))
+        .transpose()?;
+    if let Some(certificate) = &root_certificate {
+        verify_prime_root_outcome(&manifest.outcome, certificate)?;
+    }
     if manifest.outcome["known_answer_verified"] == true && !complete_known_answer {
         return Err("known-answer label lacks required artifacts".into());
     }
@@ -1750,8 +1899,18 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if replay && complete_factor_base {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
-        curves::verify_factor_base(&public, &base)?;
+        curves::verify_factor_base_config(&manifest.config, &public, &base)?;
         for artifact in &manifest.artifacts {
+            if artifact.role == "prime-root-certificates/v1" {
+                solvers::verify_prime_root_artifact(
+                    &public,
+                    &base,
+                    &manifest.config,
+                    root_certificate
+                        .as_ref()
+                        .ok_or("missing parsed root certificate")?,
+                )?;
+            }
             if artifact.role == "restricted-large-prime-membership-provenance" {
                 relations::verify_membership_provenance(
                     &public,
@@ -2194,6 +2353,7 @@ mod tests {
             twists: true,
             protocol_sha256: None,
             split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
         }
     }
     #[test]
@@ -2234,6 +2394,110 @@ mod tests {
         assert_eq!(a, b);
     }
 
+    #[test]
+    fn frozen_720_cell_pilot_keeps_bytes_and_legacy_mapping() {
+        let bytes = include_bytes!("../../research/ml_dataset_20261028/pilot-plan.json");
+        assert_eq!(
+            digest(bytes),
+            "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a"
+        );
+        let plan: DatasetPlan = serde_json::from_slice(bytes).unwrap();
+        plan.validate().unwrap();
+        assert_eq!(plan.cell_count().unwrap(), 720);
+        assert_eq!(
+            digest(&serde_json::to_vec(&plan).unwrap()),
+            "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21"
+        );
+        let mut with_empty_axis = serde_json::to_value(&plan).unwrap();
+        with_empty_axis["factor_base_policies"] = json!([]);
+        assert!(serde_json::from_value::<DatasetPlan>(with_empty_axis).is_err());
+        let solvers = [
+            "bsgs",
+            "enumerate",
+            "root",
+            "sat",
+            "f4",
+            "f5",
+            "f6",
+            "weil",
+            "pkm",
+            "double-large-prime",
+        ];
+        for i in 0..720 {
+            let c = plan.cell(i).unwrap();
+            assert_eq!(c.solver, solvers[(i % 10) as usize]);
+            assert_eq!(c.twist, (i / 10) % 2 == 1);
+            assert_eq!(c.m, [2, 4, 15][((i / 20) % 3) as usize]);
+            assert_eq!(c.key_index, (i / 60) % 2);
+            assert_eq!(c.generator_index, (i / 120) % 2);
+            assert_eq!(c.curve_seed, 0);
+            assert_eq!(c.family, ["koblitz", "binary", "prime"][(i / 240) as usize]);
+            assert!(c.factor_base_policy.is_none());
+            assert!(!serde_json::to_string(&c)
+                .unwrap()
+                .contains("factor_base_policy"));
+        }
+        assert_eq!(
+            serde_json::to_string(&plan.cell(0).unwrap()).unwrap(),
+            r#"{"family":"koblitz","n":23,"m":2,"twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"bsgs"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&plan.cell(719).unwrap()).unwrap(),
+            r#"{"family":"prime","n":23,"m":15,"twist":true,"curve_seed":0,"generator_index":1,"key_index":1,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"double-large-prime"}"#
+        );
+    }
+
+    #[test]
+    fn policy_axis_preserves_every_matched_problem_and_rejects_ambiguous_versions() {
+        let legacy = plan();
+        let mut explicit = legacy.clone();
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![
+            FactorBasePolicy::Legacy {},
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 256,
+            },
+            FactorBasePolicy::BinarySubspaceIntersection {
+                basis: vec![1, 2, 4],
+                candidate_limit: 8,
+            },
+        ];
+        explicit.validate().unwrap();
+        assert_eq!(
+            explicit.cell_count().unwrap(),
+            3 * legacy.cell_count().unwrap()
+        );
+        let solvers = legacy.solvers.len() as u64;
+        for index in 0..legacy.cell_count().unwrap() {
+            for policy_index in 0..3 {
+                let new_index =
+                    (index / solvers) * (solvers * 3) + policy_index * solvers + index % solvers;
+                let mut cell = explicit.cell(new_index).unwrap();
+                assert_eq!(
+                    cell.factor_base_policy.take().unwrap(),
+                    explicit.factor_base_policies[policy_index as usize]
+                );
+                assert_eq!(
+                    serde_json::to_vec(&cell).unwrap(),
+                    serde_json::to_vec(&legacy.cell(index).unwrap()).unwrap()
+                );
+            }
+        }
+        explicit.schema = legacy.schema.clone();
+        assert!(explicit.validate().is_err());
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        explicit
+            .factor_base_policies
+            .push(FactorBasePolicy::Legacy {});
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![FactorBasePolicy::BinarySubspaceIntersection {
+            basis: vec![1, 2, 3],
+            candidate_limit: 8,
+        }];
+        assert!(explicit.validate().is_err());
+    }
+
     struct TempRun(PathBuf);
     impl TempRun {
         fn new() -> Self {
@@ -2268,9 +2532,18 @@ mod tests {
             (p, binding, protocol)
         }
         fn failed_cell(&self, p: &DatasetPlan, binding: &Value, protocol: &[u8]) -> PathBuf {
-            let dir = self.0.join("cells/000000000001");
+            self.failed_cell_at(p, binding, protocol, 1)
+        }
+        fn failed_cell_at(
+            &self,
+            p: &DatasetPlan,
+            binding: &Value,
+            protocol: &[u8],
+            index: u64,
+        ) -> PathBuf {
+            let dir = self.0.join(format!("cells/{index:012}"));
             fs::create_dir_all(&dir).unwrap();
-            let config = p.cell(1).unwrap();
+            let config = p.cell(index).unwrap();
             let mut artifacts = vec![
                 storage::write_json(&dir, "plan.json", "plan", p).unwrap(),
                 storage::write_json(&dir, "run.json", "run", binding).unwrap(),
@@ -2284,7 +2557,7 @@ mod tests {
                 artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
             }
             storage::write_json(&dir,"manifest.json","manifest",&CellManifest {
-                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:1,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
+                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:index,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
                 config,outcome:json!({"status":"worker_failed","known_answer_verified":false,"solver_completed":false}),artifacts,
             }).unwrap();
             dir
@@ -2308,6 +2581,194 @@ mod tests {
             .contains("SHA-256"));
         fs::write(f.0.join("protocol.json"), changed).unwrap();
         assert!(bound_run(&f.0).is_err());
+    }
+
+    #[test]
+    fn orphan_root_certificate_is_rejected_even_after_valid_rehash() {
+        let fixture = TempRun::new();
+        let (plan, binding, protocol) = fixture.bound();
+        let dir = fixture.failed_cell(&plan, &binding, &protocol);
+        let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
+        manifest.artifacts.push(
+            storage::write_json(
+                &dir,
+                "root-certificates.json",
+                "prime-root-certificates/v1",
+                &json!({"forged":true}),
+            )
+            .unwrap(),
+        );
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        for replay in [false, true] {
+            assert!(verify_cell(&dir, replay)
+                .unwrap_err()
+                .contains("prime-root certificate lacks"));
+        }
+        assert!(export::export(&fixture.0, &fixture.0.join("export"))
+            .unwrap_err()
+            .contains("prime-root certificate lacks"));
+    }
+
+    #[test]
+    fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
+        for (found, censored, all_queries, status, completed) in [
+            (true, false, false, "verified", true),
+            (true, false, true, "verified", true),
+            (false, false, true, "partial", true),
+            (false, true, false, "budget_exhausted", false),
+        ] {
+            let certificate = json!({"found_pdp":found,"censored":censored,
+                "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
+                "total_operation_count_verified":false});
+            let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+                "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+                "trace_complete":false,"scalar_recovered_without_witness":false,
+                "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+                "pdp_witness_verified":found,"solver_completed":completed,"status":status});
+            verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            for field in [
+                "root_execution_trace_complete_verified",
+                "root_total_operation_count_verified",
+                "trace_complete",
+                "scalar_recovered_without_witness",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = json!(true);
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+            for (field, value) in [
+                ("pdp_witness_verified", json!(!found)),
+                ("solver_completed", json!(!completed)),
+                ("status", json!("unsupported")),
+                (
+                    "root_certificate_scope",
+                    json!("full execution trace verified"),
+                ),
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = value;
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn sealed_prime_root_censoring_cannot_be_promoted_by_manifest_tampering() {
+        let fixture = TempRun::new();
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        // This chooses the same public n=11, seed=7, generator/key=1 fixture
+        // already used by the curve and root adapter tests; no experimental
+        // campaign cell is generated. Work=1 stops before S3 setup.
+        plan.field_sizes = vec![11];
+        plan.solvers = vec!["root".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 8;
+        plan.work_limit = 1;
+        plan.validate().unwrap();
+        binding["plan_sha256"] = json!(digest(&serde_json::to_vec(&plan).unwrap()));
+        fs::write(
+            fixture.0.join("plan.json"),
+            serde_json::to_vec(&plan).unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            fixture.0.join("run.json"),
+            serde_json::to_vec(&binding).unwrap(),
+        )
+        .unwrap();
+        let dir = fixture.failed_cell_at(&plan, &binding, &protocol, 63);
+        let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
+        assert_eq!(manifest.config.curve_seed, 7);
+        assert_eq!(manifest.config.generator_index, 1);
+        assert_eq!(manifest.config.key_index, 1);
+        let case = curves::generate(&manifest.config).unwrap();
+        let solved = solvers::solve(&manifest.config, &case).unwrap();
+        assert_eq!(solved.outcome["status"], "budget_exhausted");
+        manifest.artifacts.push(
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+        );
+        manifest.artifacts.push(
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        );
+        for artifact in solved.artifacts {
+            manifest.artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &artifact.path,
+                    &artifact.role,
+                    &artifact.encoding,
+                    &artifact.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        manifest.outcome = solved.outcome;
+        manifest.outcome["known_answer_verified"] = json!(false);
+        manifest.outcome["factor_base_verified"] = json!(true);
+        let original = manifest.outcome.clone();
+        let save_manifest = |manifest: &CellManifest| {
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec(manifest).unwrap(),
+            )
+            .unwrap();
+        };
+        save_manifest(&manifest);
+        verify_cell(&dir, false).unwrap();
+        verify_cell(&dir, true).unwrap();
+        for (field, value) in [
+            ("root_execution_trace_complete_verified", json!(true)),
+            ("root_total_operation_count_verified", json!(true)),
+            ("trace_complete", json!(true)),
+            ("solver_completed", json!(true)),
+            ("pdp_witness_verified", json!(true)),
+            (
+                "root_certificate_scope",
+                json!("full execution trace verified"),
+            ),
+            ("status", json!("verified")),
+            ("status", json!("partial")),
+        ] {
+            manifest.outcome = original.clone();
+            manifest.outcome[field] = value;
+            save_manifest(&manifest);
+            for replay in [false, true] {
+                assert!(
+                    verify_cell(&dir, replay)
+                        .unwrap_err()
+                        .contains("prime-root outcome labels"),
+                    "{field}/{replay}"
+                );
+            }
+        }
+        assert!(export::export(&fixture.0, &fixture.0.join("export"))
+            .unwrap_err()
+            .contains("prime-root outcome labels"));
+        manifest.outcome = original;
+        save_manifest(&manifest);
+        verify_cell(&dir, true).unwrap();
     }
 
     #[test]

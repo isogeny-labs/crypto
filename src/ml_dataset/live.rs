@@ -673,6 +673,7 @@ mod tests {
                 twists: true,
                 protocol_sha256: Some(super::super::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies: Vec::new(),
             };
             let canonical_plan = super::super::digest(&serde_json::to_vec(&plan).unwrap());
             storage::write_json(&cell, "plan.json", "plan", &plan).unwrap();
