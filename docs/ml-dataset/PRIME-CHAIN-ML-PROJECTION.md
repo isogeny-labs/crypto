@@ -1,7 +1,8 @@
 # Prime affine-chain ML projection proposal
 
 2026-10-29. Source inventory: parent-frozen `7a1bd350b26`.
-**Static graph implementation added under T804; validation pending.**
+**Static graph implemented and locally validated under T804.**
+Source `1565b1fecd7` and its [retained evidence](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md) bind the software checks.
 `export.rs` and `prime_chain_graph.rs` implement the static portion below as
 `strict-structural-allowlist-v4`. The prefix replayer, action examples, trained
 model and new solver coverage remain proposals. This extends [DESIGN.md](DESIGN.md)

@@ -408,7 +408,8 @@ shared finite/symbolic domains and signed-point incidence. Its inverse decoder
 must recover the exact reconstructed input before publication. Missing input or
 a graph-size refusal retains restricted provenance with no generic feature
 fallback; malformed input fails export. Earlier v3 snapshots stay unchanged.
-Source implementation is present; source-bound validation is pending under T804.
+Source `1565b1fecd7` passed full-library, strict-lint and actual-CLI checks; see
+[retained software evidence](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md).
 A future decision-prefix view must remove future bases, branches,
 lift results and other information unavailable at its declared decision time.
 
