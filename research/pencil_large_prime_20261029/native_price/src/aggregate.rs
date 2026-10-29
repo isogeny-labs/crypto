@@ -134,7 +134,29 @@ fn expected(plan: &Value, e: &Value, entry: &Value, binary: &str) -> Result<Valu
 /// Reads the actual prepared-plan validation schema and ecbench plans. This does
 /// not freeze a protocol or authenticate a caller-provided digest.
 pub fn aggregate(manifest: &Value) -> Result<Value, String> {
+    if !manifest["analysis_scope"].is_null() {
+        return Err("full1260 route does not accept a gate scope".into());
+    }
     aggregate_scope(manifest, 1260)
+}
+/// Exact prepared preflight membership, not a caller-selected denominator.
+pub fn p739_gate60_scope() -> Value {
+    json!({"kind":"p739-gate60","expected_workloads":60,"prepared_plan_sha256":"bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776"})
+}
+pub fn aggregate_p739_gate60(manifest: &Value) -> Result<Value, String> {
+    if manifest["analysis_scope"] != p739_gate60_scope() {
+        return Err("exact p739 gate60 scope required".into());
+    }
+    let entries = a(manifest, "/plans")?;
+    if entries.len() != 1
+        || entries[0]["name"] != "gate-p739.json"
+        || entries[0]["sha256"] != p739_gate60_scope()["prepared_plan_sha256"]
+    {
+        return Err("exact prepared p739 gate60 plan required".into());
+    }
+    // read_bound checks actual bytes, so editing or omitting a target is refused.
+    read_bound(&entries[0])?;
+    aggregate_scope(manifest, 60)
 }
 fn aggregate_scope(manifest: &Value, target_count: usize) -> Result<Value, String> {
     if s(manifest, "/schema")? != "pencil-price-cohort-input/v1" {
@@ -382,6 +404,40 @@ mod tests {
         fs::write(&rp, &rb).unwrap();
         let manifest = json!({"schema":"pencil-price-cohort-input/v1","prepared_plan_validation":{"path":rp,"sha256":sha(&rb)},"binary_sha256":"b".repeat(64),"protocol_sha256":"a".repeat(64),"coverage_review":null,"plans":[{"name":"plan.json","path":path,"sha256":hash,"session_id":"synthetic-software-session","records":null}]});
         (dir, manifest)
+    }
+    #[test]
+    fn exact_p739_gate_preserves_all_sixty_targets_and_rejects_edits() {
+        let (dir, mut manifest) = fixture();
+        let bytes = include_bytes!("../tests/fixtures/gate-p739.json");
+        let path = dir.join("gate-p739.json");
+        fs::write(&path, bytes).unwrap();
+        assert_eq!(sha(bytes), p739_gate60_scope()["prepared_plan_sha256"]);
+        let receipt = json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"targets":60,"planned_executions":1080,"measured_executions":900,"warmup_executions":180,"solver_executions_performed":0,"binary_sha256":"b".repeat(64),"files":{"gate-p739.json":sha(bytes)}});
+        let rb = serde_json::to_vec(&receipt).unwrap();
+        let rp = dir.join("gate-receipt.json");
+        fs::write(&rp, &rb).unwrap();
+        manifest["prepared_plan_validation"] = json!({"path":rp,"sha256":sha(&rb)});
+        manifest["plans"] = json!([{"name":"gate-p739.json","path":path,"sha256":sha(bytes),"session_id":"software-gate-not-executed","records":null}]);
+        manifest["analysis_scope"] = p739_gate60_scope();
+        let out = aggregate_p739_gate60(&manifest).unwrap();
+        assert_eq!(out["expected_workloads"], 60);
+        assert_eq!(out["expected_measured_pairs"], 300);
+        assert_eq!(out["expected_executions"], 1080);
+        assert_eq!(out["missing_executions"].as_array().unwrap().len(), 1080);
+        assert_eq!(out["observed_executions"], 0);
+        assert!(out["aggregate_cells"][0]["algorithm_ratio_of_sums"].is_null());
+        assert!(aggregate(&manifest).is_err());
+        let mut wrong = manifest.clone();
+        wrong["analysis_scope"]["expected_workloads"] = json!(59);
+        assert!(aggregate_p739_gate60(&wrong).is_err());
+        let mut plan: Value = serde_json::from_slice(bytes).unwrap();
+        plan["workloads"].as_array_mut().unwrap().pop();
+        let edited = serde_json::to_vec(&plan).unwrap();
+        fs::write(&path, &edited).unwrap();
+        assert!(aggregate_p739_gate60(&manifest).is_err());
+        manifest["plans"][0]["sha256"] = json!(sha(&edited));
+        assert!(aggregate_p739_gate60(&manifest).is_err());
+        fs::remove_dir_all(dir).unwrap();
     }
     #[test]
     fn absent_whole_target_stays_in_plan_denominator() {

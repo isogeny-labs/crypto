@@ -5,13 +5,23 @@ fn main() {
     }
 }
 fn run() -> Result<(), String> {
-    let path = std::env::args()
-        .nth(1)
-        .ok_or("usage: analyze_cohort MANIFEST.json")?;
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    let path = args.first().ok_or("usage: analyze_cohort MANIFEST.json")?;
     let bytes = std::fs::read(path).map_err(|e| e.to_string())?;
     let input = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
-    let mut output = pencil_accounting_price_draft::aggregate::aggregate(&input)?;
-    if std::env::args().nth(2).as_deref() == Some("--summary") {
+    if args
+        .iter()
+        .skip(1)
+        .any(|a| a != "--summary" && a != "--p739-gate60")
+    {
+        return Err("unsupported analyze_cohort option".into());
+    }
+    let mut output = if args.iter().any(|a| a == "--p739-gate60") {
+        pencil_accounting_price_draft::aggregate::aggregate_p739_gate60(&input)?
+    } else {
+        pencil_accounting_price_draft::aggregate::aggregate(&input)?
+    };
+    if args.iter().any(|a| a == "--summary") {
         for key in ["pair_rows", "missing_executions", "target_controls"] {
             let count = output[key]
                 .as_array()

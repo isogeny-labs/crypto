@@ -142,3 +142,21 @@ Reviewers must use the repository's existing freeze/export/review evidence to
 qualify them. Resource observations are retained separately and missing ones
 are null. Software fixtures and plan-only validation with zero records are not
 cohort evidence.
+
+### Exact p739 first-gate scope
+
+The default `analyze_cohort MANIFEST.json` remains the 1,260-workload cohort.
+`analyze_cohort MANIFEST.json --p739-gate60` selects only the existing prepared
+60-target p739 gate. Its manifest must contain `analysis_scope` equal to:
+
+```json
+{"kind":"p739-gate60","expected_workloads":60,"prepared_plan_sha256":"bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776"}
+```
+
+Exactly one `gate-p739.json` plan with these verified bytes is required. This
+fixes membership, arms, seeds and execution order; arbitrary smaller cohorts are
+rejected. The same aggregation arithmetic produces 300 measured pair slots,
+1,080 execution slots including 180 warmups, and retains missing rows/null ratios.
+The gate route is analysis support, not launch permission or cohort completion.
+The canonical exporter additionally requires a frozen protocol with
+`sample_size.instances:60` and identical `extensions.analysis_scope`.

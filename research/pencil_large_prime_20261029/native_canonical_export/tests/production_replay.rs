@@ -10,6 +10,13 @@ fn binding(p: &Path) -> V {
 }
 #[test]
 fn production_full_denominator_replay_and_mutation_rejection() {
+    production_scope(false);
+}
+#[test]
+fn production_exact_gate60_replay_and_wrong_scope_rejection() {
+    production_scope(true);
+}
+fn production_scope(gate: bool) {
     let d = tempfile::tempdir().unwrap();
     let dir = d.path();
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -18,6 +25,11 @@ fn production_full_denominator_replay_and_mutation_rejection() {
     p["protocol_id"] = json!("software-full-denominator-fixture");
     p["sample_size"]["preflight_runtime"]["estimated_total_seconds"] = json!(1);
     p["analysis_plan"]["frozen_before_data"] = json!(true);
+    if gate {
+        p["sample_size"]["instances"] = json!(60);
+        p["extensions"]["analysis_scope"] =
+            pencil_accounting_price_draft::aggregate::p739_gate60_scope();
+    }
     let mut sources = serde_json::Map::new();
     let mut pins = serde_json::Map::new();
     let mut build_sources = vec![];
@@ -71,13 +83,28 @@ fn production_full_denominator_replay_and_mutation_rejection() {
         .collect();
     let executions:Vec<_>=(0..1260).flat_map(|wi|(0..6).flat_map(move|round|(0..3).map(move|arm|json!({"seq":wi*18+round*3+arm,"round":round,"warmup":round==0,"arm":arm,"workload":wi,"algorithm_seed":round+10})))).collect();
     let plan = json!({"schema":"ecbench.plan/v1","spec_id":"software-plan-not-executed","arms":arms,"workloads":workloads,"executions":executions});
-    let plp = dir.join("plan.json");
-    write(&plp, &plan);
-    let receipt = json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"targets":1260,"planned_executions":22680,"measured_executions":18900,"warmup_executions":3780,"solver_executions_performed":0,"binary_sha256":p["arms"][0]["instrument"]["binary_sha256"],"files":{"plan.json":digest(&plp).unwrap()}});
+    let name = if gate { "gate-p739.json" } else { "plan.json" };
+    let count = if gate { 60 } else { 1260 };
+    let plp = dir.join(name);
+    if gate {
+        fs::copy(
+            study.join("native_price/tests/fixtures/gate-p739.json"),
+            &plp,
+        )
+        .unwrap();
+    } else {
+        write(&plp, &plan);
+    }
+    let receipt = json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"targets":count,"planned_executions":count*18,"measured_executions":count*15,"warmup_executions":count*3,"solver_executions_performed":0,"binary_sha256":p["arms"][0]["instrument"]["binary_sha256"],"files":{name:digest(&plp).unwrap()}});
     let rp = dir.join("receipt.json");
     write(&rp, &receipt);
-    let manifest = json!({"schema":"pencil-price-cohort-input/v1","prepared_plan_validation":binding(&rp),"binary_sha256":p["arms"][0]["instrument"]["binary_sha256"],"protocol_sha256":p["freeze"]["protocol_sha256"],"coverage_review":null,"plans":[{"name":"plan.json","path":plp,"sha256":digest(&plp).unwrap(),"session_id":"software-session-not-executed","records":null}]});
-    let native = pencil_accounting_price_draft::aggregate::aggregate(&manifest).unwrap();
+    let mut manifest = json!({"schema":"pencil-price-cohort-input/v1","prepared_plan_validation":binding(&rp),"binary_sha256":p["arms"][0]["instrument"]["binary_sha256"],"protocol_sha256":p["freeze"]["protocol_sha256"],"coverage_review":null,"plans":[{"name":name,"path":plp,"sha256":digest(&plp).unwrap(),"session_id":"software-session-not-executed","records":null}]});
+    let native = if gate {
+        manifest["analysis_scope"] = pencil_accounting_price_draft::aggregate::p739_gate60_scope();
+        pencil_accounting_price_draft::aggregate::aggregate_p739_gate60(&manifest).unwrap()
+    } else {
+        pencil_accounting_price_draft::aggregate::aggregate(&manifest).unwrap()
+    };
     let np = dir.join("native.json");
     write(&np, &native);
     let hp = dir.join("history.json");
@@ -98,9 +125,42 @@ fn production_full_denominator_replay_and_mutation_rejection() {
             .as_array()
             .unwrap()
             .len(),
-        22680
+        count * 18
     );
     assert!(check_export(&export, &p).is_ok());
+    if gate {
+        let mut wrong_protocol = p.clone();
+        wrong_protocol["sample_size"]["instances"] = json!(59);
+        wrong_protocol["freeze"]["protocol_sha256"] =
+            json!(protocol_hash(&wrong_protocol).unwrap());
+        write(&pp, &wrong_protocol);
+        let mut wrong_manifest = manifest.clone();
+        wrong_manifest["protocol_sha256"] = wrong_protocol["freeze"]["protocol_sha256"].clone();
+        let wrong_native =
+            pencil_accounting_price_draft::aggregate::aggregate_p739_gate60(&wrong_manifest)
+                .unwrap();
+        write(&np, &wrong_native);
+        write(
+            &hp,
+            &json!({"schema":"pencil-execution-history/v1","protocol_sha256":wrong_manifest["protocol_sha256"],"binary_sha256":wrong_manifest["binary_sha256"],"records":[]}),
+        );
+        let mut wrong_core = core.clone();
+        wrong_core["protocol"] = binding(&pp);
+        wrong_core["native_analysis"] = binding(&np);
+        wrong_core["execution_history"] = binding(&hp);
+        write(&request_path, &wrong_core);
+        wrong_core["_request_binding"] = binding(&request_path);
+        let error = package(&wrong_core).unwrap_err();
+        assert!(
+            error.contains("full1260 or exact frozen p739 gate60"),
+            "{error}"
+        );
+        write(&pp, &p);
+        write(
+            &hp,
+            &json!({"schema":"pencil-execution-history/v1","protocol_sha256":manifest["protocol_sha256"],"binary_sha256":manifest["binary_sha256"],"records":[]}),
+        );
+    }
     let mut changed = native.clone();
     changed["all_target_cold_AA_passed"] = json!(true);
     changed["target_controls"] = json!([]);

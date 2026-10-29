@@ -262,7 +262,29 @@ fn replay_analysis(native: &V, protocol: &V) -> Result<()> {
     linked_source!("paired_export/src/lib.rs");
     linked_source!("paired_export/src/plan.rs");
     linked_source!("paired_export/src/main.rs");
-    let rebuilt = pencil_accounting_price_draft::aggregate::aggregate(&native["input_manifest"])?;
+    let manifest = &native["input_manifest"];
+    let gate_scope = pencil_accounting_price_draft::aggregate::p739_gate60_scope();
+    let rebuilt = match protocol["sample_size"]["instances"].as_u64() {
+        Some(60)
+            if protocol["freeze"]["status"] == "frozen"
+                && protocol["extensions"]["analysis_scope"] == gate_scope
+                && manifest["analysis_scope"] == gate_scope =>
+        {
+            pencil_accounting_price_draft::aggregate::aggregate_p739_gate60(manifest)?
+        }
+        Some(1260)
+            if protocol["freeze"]["status"] == "frozen"
+                && protocol["extensions"]["analysis_scope"].is_null()
+                && manifest["analysis_scope"].is_null() =>
+        {
+            pencil_accounting_price_draft::aggregate::aggregate(manifest)?
+        }
+        _ => {
+            return Err(
+                "protocol and manifest must bind full1260 or exact frozen p739 gate60".into(),
+            )
+        }
+    };
     check(
         rebuilt == *native,
         "native analysis differs from deterministic source-linked replay",

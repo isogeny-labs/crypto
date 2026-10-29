@@ -79,3 +79,10 @@ semantic rules without changing or freezing the input. A null preflight estimate
 is allowed on a draft, matching the canonical helper; it is refused on a frozen
 protocol. Existing analysis script bytes are checked against their declared hash.
 The success receipt explicitly retains `launch_authorized:false`.
+
+The narrowly scoped p739 first gate is also supported: a frozen protocol with
+60 instances and `extensions.analysis_scope` identical to the native analyzer's
+`p739_gate60_scope()` selects exact prepared-plan replay. The plan hash fixes all
+60 existing targets; arbitrary smaller denominator values are rejected. The
+full 1,260-workload route requires no gate scope marker and remains the default.
+Both routes use the same cost aggregation implementation and retain missing rows.
