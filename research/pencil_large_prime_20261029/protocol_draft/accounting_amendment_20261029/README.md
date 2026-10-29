@@ -42,3 +42,11 @@ The separate release analysis executables `analyze_pair` and `analyze_cohort` ar
 All three arms now bind ecbench SHA256 `a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab`, from artifact 12926168934 of workflow run 40938439022. The binary size/hash and all four build evidence hashes were independently checked. All nine generated prepared-plan files match the recorded parity digests; the seven cohort plan digests also match the retained original plan manifest. The receipt records exact equality for both gate plans as well. Archive parity reports 1,260 matched workloads; plan parity and build preparation perform no solver executions. The completed receipt and toolchain/build-info are bound separately from the analysis executable receipt.
 
 `pre-instrument-binding-*` preserves the preceding analysis-bound draft and canonical validation. Image/runtime publication, independent review, cap conflict, cumulative budget, original deadline, freeze and launch authorization remain pending; none is granted by a successful build or schema check.
+
+## Canonical packaging adapter
+
+The separately bound `canonical_export/package.py` passed 14 software tests including actual canonical `check-export --verify-files`. It projects the common method-call clock, retains raw counts/calibration/resources, checks exact online phase names and hashes source/plan/record bindings. It grants no clock qualification, and retains missing-slot shortfall findings plus separate resource/retry history. See its README for canonical v1 representation limits. `pre-packaging-binding-*` preserves the preceding draft and validation; this addition does not freeze or authorize the study.
+
+## Canonical packaging explicit-history correction
+
+The separately bound `canonical_export/package.py` passed 17 software tests including actual canonical `check-export --verify-files`. It projects the common method-call clock, retains raw counts/calibration/resources, checks exact online phase names and hashes source/plan/record bindings. It grants no clock qualification, and retains missing-slot shortfall findings plus separate resource/retry history. See its README for canonical v1 representation limits. `pre-history-binding-*` preserves the preceding draft and validation; this addition does not freeze or authorize the study.

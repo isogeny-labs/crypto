@@ -1,7 +1,7 @@
 {
   "schema": "pencil-protocol-field-changes/v1",
   "predecessor_sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
-  "amended_sha256": "88a779c3ed33514333dc92e243f9d7a4e5a020fae3afbaf2bd2b5cbd21b720ec",
+  "amended_sha256": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
   "changes": [
     {
       "path": "/amendments",
@@ -19,7 +19,9 @@
             "Pin DefaultHasher collision table, preserving RNG streams while acknowledging changed table layout/runtime.",
             "Preserve original cohort, stream/control/AA design, prepared spec bytes and stated resource limits; expose cap provenance and cumulative budget/deadline as unresolved.",
             "Bind independently named analyze_pair and analyze_cohort release binaries and their completed build receipt; ecbench instrument binary/image remain pending.",
-            "Bind completed static ecbench binary a1c8ca89 and build40938439022 receipt to all three arms; 1260 archive targets and nine prepared plans match without solver execution. Image/runtime and authorization remain pending."
+            "Bind completed static ecbench binary a1c8ca89 and build40938439022 receipt to all three arms; 1260 archive targets and nine prepared plans match without solver execution. Image/runtime and authorization remain pending.",
+            "Bind software-validated canonical observation packaging adapter; retain incomplete-flow findings and independent-qualification boundary.",
+            "Require explicit hash-bound per-record attempts and restore history; unknown values refuse canonical export, preserving raw sidecars."
           ],
           "supersedes_fields": [
             "question",
@@ -55,7 +57,9 @@
         "independent verification/replay and isolation records",
         "all9 unchanged prepared specs and newly verified emitted plans, preparation receipt and digest manifest",
         "source-bound nine-category independent coverage review and report, mapping digest and analyzer binary identity",
-        "separate resource observations covering warmup/computation/replay/checkpoint/retry/harness costs"
+        "separate resource observations covering warmup/computation/replay/checkpoint/retry/harness costs",
+        "Hash-bound canonical packaging request, canonical schema/helper, raw native analysis and optional resource/session/host/replay sidecars; packaging grants no clock qualification.",
+        "Hash-bound canonical packaging request, canonical schema/helper, raw native analysis and optional resource/session/host/replay sidecars; packaging grants no clock qualification."
       ]
     },
     {
@@ -542,6 +546,27 @@
       "operation": "replace",
       "before": "rho serves reference and unmodified baseline; historical online/peel/Markowitz data are context only, not fresh matched baseline arms.",
       "after": "rho/rho_AA use identical pinned DefaultHasher instrumentation. Historical RandomState and earlier peeling/Markowitz results are context only. No new fourth baseline arm or experimental work is authorized here."
+    },
+    {
+      "path": "/extensions/canonical_packaging",
+      "operation": "add",
+      "after": {
+        "status": "software_validated_packaging_only_not_qualification",
+        "adapter": "research/pencil_large_prime_20261029/canonical_export/package.py",
+        "adapter_sha256": "02b80a3c2f8960d9c0dbeb4be215c1cfc88044e9ebefed14f1a5cef883a65f6d",
+        "canonical_tool": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+        "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+        "export_schema_sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+        "protocol_schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+        "software_tests": 17,
+        "test_log_sha256": "ca0b496550c65b730498d04fe663736f03bdabc6185f26172c703e2802862acc",
+        "limitations": [
+          "wall_valid false until independent clock admission; no qualification from producer flags",
+          "canonical rows cannot represent unattempted slots; missing slots remain in backend ledger/native output and shortfall findings",
+          "explicit attempts/resumed history and hashed evidence required for every observed row; unknown history refuses canonical export"
+        ],
+        "experiment_executions": 0
+      }
     },
     {
       "path": "/extensions/finite_cost_model",

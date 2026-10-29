@@ -19,7 +19,7 @@
       "research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json"
     ]
   },
-  "protocol_sha256_integrity_only": "88a779c3ed33514333dc92e243f9d7a4e5a020fae3afbaf2bd2b5cbd21b720ec",
+  "protocol_sha256_integrity_only": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
   "preservation_checks": {
     "sample_size": true,
     "randomization": true,
@@ -64,5 +64,22 @@
     "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
     "earlier_validation_preserved": "pre-instrument-binding-validation.json",
     "no_solver_executions_or_approval": true
+  },
+  "packaging_binding_checks": {
+    "status": "software_validated_packaging_only_not_qualification",
+    "adapter": "research/pencil_large_prime_20261029/canonical_export/package.py",
+    "adapter_sha256": "02b80a3c2f8960d9c0dbeb4be215c1cfc88044e9ebefed14f1a5cef883a65f6d",
+    "canonical_tool": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+    "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "export_schema_sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+    "protocol_schema_sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "software_tests": 17,
+    "test_log_sha256": "ca0b496550c65b730498d04fe663736f03bdabc6185f26172c703e2802862acc",
+    "limitations": [
+      "wall_valid false until independent clock admission; no qualification from producer flags",
+      "canonical rows cannot represent unattempted slots; missing slots remain in backend ledger/native output and shortfall findings",
+      "explicit attempts/resumed history and hashed evidence required for every observed row; unknown history refuses canonical export"
+    ],
+    "experiment_executions": 0
   }
 }

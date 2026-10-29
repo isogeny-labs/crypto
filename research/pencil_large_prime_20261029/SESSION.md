@@ -820,3 +820,16 @@ Final binding validation, existing EFS-blocked sparse materialization and CI cor
 
 ### Errors
 file identifies the PIE as dynamically linked; direct readelf inspection shows no interpreter or NEEDED libraries. Retained full ELF headers rather than relying on file wording.
+
+## 2026-10-29 — Canonical packaging and explicit execution history
+
+### What was done
+Added study-local canonical_export/package.py to package existing native outputs, raw records, plans and resource sidecars into the canonical export schema. It binds hashes and source/protocol/binary identities, projects the actual common method-call clock, preserves failures/warmups/A/A and missing-slot evidence, and checks the exact five online phase names. Software fixtures passed the canonical schema and check-export --verify-files. No solver runs or mathematical pricing were added.
+
+A review identified that canonical default resumed=0 would falsely imply known restore history. Corrected the adapter to require explicit hash-bound attempts/resumed history for every observed record, with record/session/sequence identities and evidence receipts. Unknown/missing history now refuses canonical export; unchanged raw/native sidecars remain available. Restored rows require checkpoint generation information. Clocks remain unqualified; no producer flag or packaging success grants independent admission.
+
+### Validation and retained errors
+Final explicit-history suite passed 17 tests, including known retries/restores, missing/unknown history, missing whole workloads, hash/identity rejection and actual canonical check-export --verify-files. Raw passing log: canonical_export/tests-history-final.log. Retained development failure: canonical_export/tests-history.log (duplicate history was rejected earlier than the test expected duplicate record; corrected the assertion without weakening rejection). Earlier 12- and 14-test logs remain retained. Updated draft bindings and reran canonical protocol validation; prior draft/check receipts retained as pre-history-binding-*.
+
+### Scope and open work
+The user clarified that this is mathematical research on public synthetic known-answer fixtures, not key recovery. This clarification changes no sample size, controls, resource caps, budget, deadline or authorization. No Rust instrument source, cohort execution, cloud job, freeze, independent review or resource approval was changed by this packaging work. Canonical v1 cannot directly represent unattempted rows: missing slots remain explicit in sidecars/backend metadata and canonical shortfall findings are retained. Independent admission, runtime/image/resource bindings and the full authorized research cohort remain outstanding.
