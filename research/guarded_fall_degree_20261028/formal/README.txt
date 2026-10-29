@@ -1,3 +1,13 @@
+Current update, 2026-10-29: exact-pair-progress.md records a checked ordinary
+filtered-closure definition, complete uniform degree-four obstruction for the
+actual six inputs, degree-four divided-difference derivation, and first-fall
+dependencies. The full exact pair (4,5), including the degree-five upper
+construction and weighted syzygy/Koszul definition, remains open. Current
+source hashes, build, axiom audit and fresh module replays are in
+exact-pair-validation/. PROOF_MAP.json is the current proof map.
+
+The remainder of this file is the historical identity-only scope record.
+
 Partial Lean formalization of fall-degree proof identities
 Date: 2026-10-28
 

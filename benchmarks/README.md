@@ -50,6 +50,16 @@ has documentary browsing copies (0.040s / 0.170s / 0.458s; n=1 per phase,
 shared host, no admitted performance comparison). It remains outside the
 admitted table because no matched rho reference or timing validation exists.
 
+
+The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
+records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
+and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
+and retained-assignment replay. Its timing wrapper exited 1 on a denied
+macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
+SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
+It has no matched rho or cold total-runtime row and remains outside the
+admitted table under the validation gate.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-prime-fb-size-20bit`](20261029-prime-fb-size-20bit/) ([PDF](20261029-prime-fb-size-20bit/REPORT.pdf); [validation](20261029-prime-fb-size-20bit/VALIDATION.json)) | Prime-field index calculus (`ic.pipeline`, oracle `mitm:negation_folded=1`): low-x factor-base size and exact oracle selected on train curves, decided per size on fresh holdout curves (backlog XP-20261016, frozen protocol; 48 targets × 2 rounds; incumbent `ic-pair`, A/A arms and a same-session negation-map rho on the same targets); deterministic counted cost S = GAE/√r with native work priced at w = 0, 0.1, 1 | 20 bits: N 32 → 45 gives paired S ratio 0.818 [0.773, 0.866] / 0.798 [0.752, 0.847] / 0.726 [0.677, 0.778] at w = 0 / 0.1 / 1 (96 pairs, all verified; A/A 1.000); distance to rho 9.47 → 7.75 (w = 0), 12.88 → 9.35 (w = 1). 24 and 28 bits: a smaller N falls at w = 0 and rises at w = 1, read as relabelling; 32 bits: selection = incumbent. Counted unit only, one holdout curve per size; validation is a same-host replay, and the second-host replay PROTOCOL §13 needs before a leaderboard promotion is outstanding | 4 vCPU Xeon 2.10 GHz cloud container, one core pinned (L0); deterministic counts | [`research/prime_base_oracle_tuning_20261029`](../research/prime_base_oracle_tuning_20261029/) ([report](../research/prime_base_oracle_tuning_20261029/README.pdf)) |
