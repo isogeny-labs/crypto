@@ -9,7 +9,7 @@ with tarfile.open(download)as tar:
  for m in tar.getmembers():
   p=Path(m.name);assert not p.is_absolute() and '..'not in p.parts
   assert not m.issym() and not m.islnk()
- tar.extractall(work,filter='data')
+subprocess.run(['tar','--extract','--xz','--file',str(download),'--directory',str(work),'--no-same-owner','--same-permissions'],check=True)
 expected={}
 for line in(here/'runs.sha256').read_text().splitlines():
  h,name=line.split(maxsplit=1);expected[name]=h
