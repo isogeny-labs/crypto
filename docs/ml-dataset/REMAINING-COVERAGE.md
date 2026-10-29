@@ -88,8 +88,9 @@ CLI checks and the ten-command two-twist fixture. Independent audit verified
 158 inventory files and 159 archive members. Evidence is retained separately in
 `research/ml_dataset_20261028/validation-startup-main-20261029/`; earlier-source
 records remain unchanged. PR [#2836](https://github.com/isogeny-labs/crypto/pull/2836)
-carries this increment; exact-head remote checks and merge status are separate
-from these local results. This adds no research corpus rows or verified cloud
+merged on 2026-10-29 at `117c9c4f3ee85d4dc32f275893f6e50b591e4a47`;
+its local results remain bound to the sources above. Subsequent graph changes
+require their own combined-source checks and follow-up PR. This adds no research corpus rows or verified cloud
 cells.
 
 The existing m=2 reference path is preserved. Native elimination remains
@@ -102,10 +103,12 @@ It is now registered in central `verify_cell`; the four central replay tests
 exercise generated m2/m3/m4 fixtures on both twists and reject rehashed equation,
 domain, schema, configuration, certificate and artifact-omission tampering.
 These software fixtures do not establish cloud restore or every requested size.
-Raw recursive events remain restricted artifacts, not a public ML equation
-or decision-prefix graph. The reviewed [ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md)
-specifies a future lossless graph and causal prefix view; no exporter, prefix
-transition verifier or model is implemented by that document. See the frozen
+Raw recursive events remain restricted artifacts. The static portion of the
+[ML projection contract](PRIME-CHAIN-ML-PROJECTION.md) is now implemented under
+T804 in `export.rs` and `prime_chain_graph.rs`, with [combined-source software validation](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md)
+retained for `1565b1fecd7`. It reconstructs exact equations/domains from graph edges and preserves
+wide-prime values as decimal strings. The causal prefix transition verifier,
+action examples and model remain unimplemented. See the frozen
 [chain contract](PRIME-F4-CHAIN-CONTRACT.md) for scope and required checks.
 
 ## Preserve the whole campaign
@@ -139,7 +142,7 @@ enormous corpus.
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
 | Complete intermediate artifacts | Curve construction and several adapters still export summaries; the locally validated prime chain lane adds bounded input/native-result/useful-row/branch/candidate/lift events, with sticky sink failure; native F4 rows still materialize before event serialization | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
 | Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; historical-source software checks passed; native cumulative accounting and local startup grant/identity gating are implemented, but deployed grant delivery, EKS role access and finite resource lifetime remain unverified; retained GenerationStarted returns GenerationOutcomeUnknown without rerunning generation | Demonstrate deployed actual-UID grant delivery/identity validation and finite resource-lifetime admission, resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
-| ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; implement separately projected admissible solver-prefix views beyond current structural routing features; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
+| ML consumer | Static prime-chain graph projection passed source1565b1fecd7 software checks; strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; implement separately projected admissible solver-prefix views beyond current structural routing features; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
 
 ## Next discriminating validation
