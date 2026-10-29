@@ -135,3 +135,48 @@ repository's pinned protocol encoding remains normative rather than generic JCS.
 The approved acceptance matrix, retained producer fixtures, parent source review,
 fresh S3 restore/hash verification and regular PR stacked on2816 remain required.
 No runtime validation or completed implementation is asserted by this freeze.
+
+## Implementation clarifications after the initial freeze
+
+The absent-policy adapter preserves legacy opaque diagnostics. It hashes the full
+same file while inspecting only a bounded512KiB-plus-one prefix, recognizing a
+decoded top-level checked-v2 schema regardless of role or encoding. Recognition is
+sticky through later duplicate/trailing parse errors. Malformed prefixes and
+oversized opaque diagnostics are not checked-v2 admissions and remain legacy
+diagnostics. The per-file probe releases its bounded scratch and has no retained
+output; the cumulative32MiB ledger applies to the checked-cell component.
+
+Raw checked input uses exact-size allocation plus read_exact and a one-byte EOF
+probe. Native array cardinality is enforced in the structural admission pass as
+well as bounded typed deserialization. The protocol shortest-number primitive is
+the pinned serde_json binary64 writer into a64-byte fixed stack buffer, followed
+by independent Python-compatible layout normalization. This resolves the root
+review's decimal tie counterexample; additive tie vectors supplement, without
+altering, the original frozen14positive/11negative vectors. Protocol parser and
+all canonical scratch still reserve against the same checked-cell ledger.
+
+The producer native checker explicitly caps syscall-error message bytes at4096;
+this implementation preserves that final wire constraint. The original proposal's
+statement about not inventing a smaller diagnostic-string cap does not override
+that inspected producer check. Producer27679c4e59bc38e8c18e34dbc9687f9a2d5eb317 has
+byte-identical reviewed native/schema files to the9f1d inventory. Final retained
+interop remains a separately reported gate.
+
+The integration review further required an explicit reservation before canonical
+plan cloning/serialization and repeated config validation:32times(raw plan bytes
+plus one). It covers geometric encoded buffers, canonical-tree/config copies and
+validation deduplication state, in addition to structural node/string charges.
+The ledger may therefore refuse a large arbitrary v1 solver string earlier.
+The legacy hash-bound reread also caps the reader at declared size plus one, so
+an appended stream cannot extend the identity check indefinitely.
+
+The original upstream protocol Value/schema preflight cannot represent integers
+beyond binary64 range. Its previously accepted path is preserved exactly. Only a
+serde_json number-range error can enter the strict frozen-protocol fallback;
+IO, hash, duplicate, syntax and other failures cannot. The fallback uses the
+independent token-preserving validator and returns its reservation in PlanInfo.
+The checked-cell entrypoint receives this additional reservation argument and
+charges it before its own allocations. A fresh cell hash must equal the already
+verified root protocol digest, and the full binding verifier runs again under
+the same cumulative ledger. This accepts bounded1000-digit integers without
+weakening nonfinite-float rejection or changing global JSON numeric semantics.
