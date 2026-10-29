@@ -7,10 +7,11 @@ use std::{
     process::Command,
     time::{SystemTime, UNIX_EPOCH},
 };
-use twist_relations::{benchmark, exhaustive, valid_prime};
+use twist_relations::{benchmark, evidence, exhaustive, valid_prime};
 
 const HELP: &str = "twist-relations --suite smoke|benchmark|exhaustive|all --output-dir DIR\n\
   [--seeds N] [--seed-start N] [--primes P ...] [--exhaustive-primes P ...]\n\
+  [--max-attempts-per-solve N] (tightens the 1000*n relation limit)\n\
 twist-relations verify FILE.json\n\
 Benchmark fields: prime, 7 <= p <= 1000003, p = 3 mod 4.\n\
 Exhaustive fields: same conditions with p <= 127.\n\
@@ -24,11 +25,13 @@ struct Config {
     primes: Vec<u64>,
     exhaustive_primes: Vec<u64>,
     output_dir: PathBuf,
+    max_attempts_per_solve: Option<u64>,
 }
 fn parse(args: &[String]) -> Result<Config, String> {
     let (mut suite, mut seeds, mut seed_start, mut primes, mut ex_primes, mut out) =
         ("smoke".to_string(), None, 0, None, None, None);
     let mut i = 0;
+    let mut max_attempts_per_solve = None;
     while i < args.len() {
         let flag = &args[i];
         i += 1;
@@ -51,6 +54,14 @@ fn parse(args: &[String]) -> Result<Config, String> {
             }
             "--seed-start" => {
                 seed_start = value.parse::<u64>().map_err(|_| "Invalid seed start")?;
+                i += 1;
+            }
+            "--max-attempts-per-solve" => {
+                let limit = value.parse::<u64>().map_err(|_| "Invalid attempt limit")?;
+                if limit == 0 {
+                    return Err("Attempt limit must be positive".into());
+                }
+                max_attempts_per_solve = Some(limit);
                 i += 1;
             }
             "--primes" | "--exhaustive-primes" => {
@@ -90,6 +101,7 @@ fn parse(args: &[String]) -> Result<Config, String> {
             vec![7, 11, 19, 31, 43]
         }),
         output_dir: out.ok_or("--output-dir is required")?,
+        max_attempts_per_solve,
     };
     if config.seeds == 0
         || config.seeds > 10000
@@ -131,19 +143,14 @@ fn timestamp() -> u64 {
         .as_secs()
 }
 fn write_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
-    let temporary = path.with_extension("json.tmp");
-    fs::write(
-        &temporary,
-        serde_json::to_vec_pretty(value).map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    fs::rename(temporary, path).map_err(|e| e.to_string())
+    evidence::write_json_atomic(path, value)
 }
 fn source() -> serde_json::Value {
     let mut files = serde_json::Map::new();
     for (name, text) in [
         ("core.rs", include_str!("core.rs")),
         ("benchmark.rs", include_str!("benchmark.rs")),
+        ("evidence.rs", include_str!("evidence.rs")),
         ("exhaustive.rs", include_str!("exhaustive.rs")),
         ("lib.rs", include_str!("lib.rs")),
         ("main.rs", include_str!("main.rs")),
@@ -185,7 +192,24 @@ fn execute(config: Config) -> Result<(), String> {
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(
         || -> Result<(), String> {
             if ["smoke", "benchmark", "all"].contains(&config.suite.as_str()) {
-                let records = benchmark::run(&config.primes, config.seeds, config.seed_start);
+                let mut evidence = evidence::Writer::new(out)?;
+                let records = benchmark::run_observed(
+                    &config.primes,
+                    config.seeds,
+                    config.seed_start,
+                    benchmark::Options {
+                        max_attempts: config.max_attempts_per_solve,
+                    },
+                    |event| evidence.record(event),
+                )
+                .map_err(|failure| {
+                    let detail =
+                        serde_json::to_string(&failure).unwrap_or_else(|_| failure.error.clone());
+                    if let Err(error) = write_json(&out.join("benchmark-failure.json"), &failure) {
+                        return format!("{detail}; cannot publish failure file: {error}");
+                    }
+                    detail
+                })?;
                 let mut report = String::from("# Native toy-curve diagnostics\n\nThese are instrumented diagnostics, not an admitted performance comparison.\nNo matched rho, A/A, L2 host admission, or external-tool comparison is supplied.\n\n| p | n | seed | method | total ns | group-add calls | character tests | table entries |\n|---:|---:|---:|:---|---:|---:|---:|---:|\n");
                 for r in &records {
                     report.push_str(&format!(
@@ -200,7 +224,7 @@ fn execute(config: Config) -> Result<(), String> {
                         r.table_entries
                     ));
                 }
-                report.push_str("\nPublic curve discovery and input-target generation are excluded equally. All method-specific setup, joint base-log recovery, and verification are charged. See JSON for exact points, recovered scalars, and phase counts. Timings are native; historical Python timings are not comparable.\n");
+                report.push_str("\nPublic curve discovery and input-target generation are excluded equally. All method-specific setup, joint base-log recovery, and verification are charged. In-solve evidence publication is included in total_ns and separated as evidence_io_ns; final-record and aggregate exports are outside that interval. See JSON for exact points, recovered scalars, and phase counts. Timings are native; historical Python timings are not comparable.\n");
                 write_json(
                     &out.join("benchmark.json"),
                     &BenchmarkFile {
@@ -231,9 +255,24 @@ fn execute(config: Config) -> Result<(), String> {
         "BENCHMARK.md",
         "exhaustive.json",
         "EXHAUSTIVE.md",
+        "benchmark-cases.jsonl",
+        "active-case.json",
+        "benchmark-failure.json",
     ] {
         if let Ok(bytes) = fs::read(out.join(name)) {
             artifacts.push(json!({"path":name,"sha256":sha(&bytes)}));
+        }
+    }
+    if let Ok(entries) = fs::read_dir(out.join("cases")) {
+        let mut paths: Vec<_> = entries
+            .filter_map(Result::ok)
+            .map(|e| e.path())
+            .filter(|p| p.extension().is_some_and(|e| e == "json"))
+            .collect();
+        paths.sort();
+        for path in paths {
+            let bytes = fs::read(&path).map_err(|e| e.to_string())?;
+            artifacts.push(json!({"path":format!("cases/{}",path.file_name().unwrap().to_string_lossy()),"sha256":sha(&bytes)}));
         }
     }
     manifest["artifacts"] = json!(artifacts);

@@ -1,6 +1,7 @@
 //! Toy-curve experiment contracts, with complete phase accounting.
 pub mod benchmark;
 pub mod core;
+pub mod evidence;
 pub mod exhaustive;
 
 pub fn valid_prime(p: u64, maximum: u64) -> bool {
@@ -84,5 +85,29 @@ mod tests {
             4590
         );
         benchmark::verify(&rows).unwrap();
+    }
+
+    #[test]
+    fn evidence_sink_error_stops_before_the_next_case() {
+        let mut started = 0;
+        let mut failed = 0;
+        let failure =
+            benchmark::run_observed(&[43], 1, 0, benchmark::Options::default(), |event| {
+                match event {
+                    benchmark::Event::Started { .. } => started += 1,
+                    benchmark::Event::Completed { .. } => {
+                        return Err("deliberate evidence sink failure".into())
+                    }
+                    benchmark::Event::Failed { .. } => failed += 1,
+                    _ => {}
+                }
+                Ok(())
+            })
+            .unwrap_err();
+        assert_eq!((started, failed), (1, 1));
+        assert_eq!(failure.case.unwrap().method, "bsgs");
+        assert_eq!(failure.progress.phase, "evidence_publication");
+        assert!(failure.progress.counts.group_add_calls > 0);
+        assert!(failure.error.contains("deliberate evidence sink failure"));
     }
 }

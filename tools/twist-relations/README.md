@@ -79,6 +79,35 @@ resume support; use bounded shards and retain interrupted runs. The backlog
 card therefore remains draft until its source pin, recovery contract, and
 independent verification/admission requirements are satisfied.
 
+### Incremental benchmark evidence
+
+Each successful solve is synced to `cases/00000000.json`, then the next ordinal,
+before the driver starts another case. Every case file uses the benchmark schema
+and can be checked directly with `twist-relations verify FILE.json`. The final
+`benchmark.json` remains the complete-panel export; its absence does not erase
+the completed case files.
+
+`benchmark-cases.jsonl` is a synced event journal. `active-case.json` is an atomic
+snapshot of the latest discovery/start/progress/completion/failure event. It
+records the exact parameters, seed, method, phase, search attempts, rank and
+counters. Search snapshots are published at most 256 trials apart and at phase
+boundaries. A caught budget error or unwinding invariant failure records actual
+in-memory counters in `benchmark-failure.json` and a failed event. Evidence sink
+errors fail the run; they cannot turn into a pass.
+
+A hard timeout, SIGKILL or abort cannot write a final failure event or final
+manifest. Such a run stays incomplete (`status=running` with no finish time),
+and its active snapshot/journal is a last-known prefix, not a final clock or
+final count. A kill can truncate the final journal line; preceding complete
+newline records and atomically published case files remain readable. This is
+evidence retention, not process-memory checkpoint/restore or automatic retry.
+
+`--max-attempts-per-solve N` may tighten the existing `1000*n` cap, and is useful
+for bounded failure checks; it never increases the cap. In-solve publication
+time is part of `total_ns` and exposed as `evidence_io_ns`. Final-record and
+aggregate exports occur after that interval. These instrumented elapsed values
+remain diagnostics and are not admitted performance comparisons.
+
 ## Implemented experiment contracts
 
 **TR-01: charged relation solver.** For each benchmark field choose the first
@@ -153,3 +182,7 @@ executed algorithms.
 * [Existing quartic-twist image-base study](../../backlog/XP-20261023-quartic-twist-image-base/README.md): preserves its separate frozen instances,
   image factors and rank/cost evidence. This quadratic-character selection
   diagnostic neither repeats nor supersedes that study.
+* Rust's [`File` synchronization](https://doc.rust-lang.org/std/fs/struct.File.html#method.sync_all)
+  and [`catch_unwind`](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
+  contracts: explicit synchronization detects write failures; unwinding handlers
+  cannot claim to capture SIGKILL, aborts or physical-host recovery.

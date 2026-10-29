@@ -44,6 +44,8 @@ pub struct Record {
     pub factor_base_logs: Vec<PointLog>,
     pub factor_base_size: usize,
     pub total_ns: u64,
+    #[serde(default)]
+    pub evidence_io_ns: u64,
     pub discovery_ns_shared_excluded: u64,
     pub phases: BTreeMap<String, Phase>,
     pub counts: Counts,
@@ -51,6 +53,77 @@ pub struct Record {
     pub relation_hits: u64,
     pub rank: usize,
     pub table_entries: usize,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Case {
+    pub ordinal: usize,
+    pub parameters: Parameters,
+    pub group_order: u64,
+    pub g: Point,
+    pub q: Point,
+    pub seed: u64,
+    pub method: String,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct Progress {
+    pub phase: String,
+    pub attempts: u64,
+    pub relation_hits: u64,
+    pub rank: usize,
+    pub table_entries: usize,
+    pub counts: Counts,
+    pub elapsed_ns: u64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Failure {
+    pub case: Option<Case>,
+    pub progress: Progress,
+    pub error: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(tag = "event", rename_all = "snake_case")]
+pub enum Event {
+    Discovery { p: u64 },
+    Started { case: Case, progress: Progress },
+    Progress { case: Case, progress: Progress },
+    Completed { case: Case, record: Box<Record> },
+    Failed { failure: Box<Failure> },
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Options {
+    /// May tighten, but never increase, the existing 1000*n cap.
+    pub max_attempts: Option<u64>,
+}
+
+type Observer<'a> = dyn FnMut(Event) -> Result<(), String> + 'a;
+struct Live {
+    case: Case,
+    progress: Progress,
+    linear_counts: Counts,
+    clock: Instant,
+    io_ns: u64,
+}
+impl Live {
+    fn snapshot(&mut self, e: &Curve) {
+        self.progress.counts = e.counts;
+        self.progress.counts.accumulate(self.linear_counts);
+        self.progress.elapsed_ns = self.clock.elapsed().as_nanos() as u64;
+    }
+    fn publish(&mut self, e: &Curve, observer: &mut Observer<'_>) -> Result<(), String> {
+        self.snapshot(e);
+        let clock = Instant::now();
+        let result = observer(Event::Progress {
+            case: self.case.clone(),
+            progress: self.progress.clone(),
+        });
+        self.io_ns += clock.elapsed().as_nanos() as u64;
+        result
+    }
 }
 
 fn make_base(e: &mut Curve, size: usize, method: &str, rng: &mut Rng) -> Vec<Point> {
@@ -125,13 +198,16 @@ struct RelationResult {
 }
 fn relations(
     e: &mut Curve,
-    g: Point,
-    q: Point,
-    n: u64,
     base: &[Point],
     rng: &mut Rng,
-) -> RelationResult {
+    live: &mut Live,
+    observer: &mut Observer<'_>,
+    limit: u64,
+) -> Result<RelationResult, String> {
+    let (g, q, n) = (live.case.g, live.case.q, live.case.group_order);
     let size = base.len();
+    live.progress.phase = "pair_setup".into();
+    live.publish(e, observer)?;
     let (pairs, setup) = measured(e, |e| {
         let mut pairs = HashMap::new();
         for i in 0..size {
@@ -143,6 +219,9 @@ fn relations(
         }
         pairs
     });
+    live.progress.table_entries = pairs.len();
+    live.progress.phase = "relation_search".into();
+    live.publish(e, observer)?;
     let (mut a, mut b) = (rng.below(n), rng.below(n));
     let (mut current, mut search) = measured(e, |e| {
         let left = e.mul(a, Some(g));
@@ -153,11 +232,13 @@ fn relations(
     let mut linear = Phase::default();
     let (mut attempts, mut hits, mut rank) = (0, 0, 0);
     while rank < size + 1 {
+        if attempts >= limit {
+            return Err(format!(
+                "Relation attempt budget exhausted at {attempts} of {limit} trials"
+            ));
+        }
         attempts += 1;
-        assert!(
-            attempts <= 1000 * n,
-            "Relation rank exceeded its declared attempt budget"
-        );
+        live.progress.attempts = attempts;
         let step = if rng.below(2) == 1 {
             a = (a + 1) % n;
             g
@@ -171,10 +252,14 @@ fn relations(
             pairs.get(&current).copied()
         });
         search.add(phase);
+        if attempts.is_multiple_of(256) {
+            live.publish(e, observer)?;
+        }
         let Some((i, j)) = pair else {
             continue;
         };
         hits += 1;
+        live.progress.relation_hits = hits;
         let clock = Instant::now();
         let mut row = vec![0; size + 2];
         row[i] += 1;
@@ -190,17 +275,18 @@ fn relations(
                 let scale = row[col];
                 for k in col..size + 2 {
                     row[k] = norm(row[k] as i128 - scale as i128 * old[k] as i128, n);
-                    linear.counts.linear_cells += 1;
+                    live.linear_counts.linear_cells += 1;
                 }
             } else {
                 let inverse = power(row[col], n - 2, n);
-                linear.counts.linear_inversions += 1;
+                live.linear_counts.linear_inversions += 1;
                 for value in &mut row[col..] {
                     *value = *value * inverse % n;
-                    linear.counts.linear_cells += 1;
+                    live.linear_counts.linear_cells += 1;
                 }
                 pivots[col] = Some(row.clone());
                 rank += 1;
+                live.progress.rank = rank;
                 inserted = true;
                 break;
             }
@@ -216,16 +302,19 @@ fn relations(
         let row = pivots[col].as_ref().unwrap();
         let sum: u64 = (col + 1..=size).map(|j| row[j] * logs[j] % n).sum();
         logs[col] = norm(row[size + 1] as i128 - sum as i128, n);
-        linear.counts.linear_cells += (size - col) as u64;
+        live.linear_counts.linear_cells += (size - col) as u64;
     }
     linear.ns += clock.elapsed().as_nanos() as u64;
+    linear.counts = live.linear_counts;
+    live.progress.phase = "verification".into();
+    live.publish(e, observer)?;
     let (_, verification) = measured(e, |e| {
         assert_eq!(e.mul(logs[size], Some(g)), Some(q));
         for (point, &k) in base.iter().zip(&logs) {
             assert_eq!(e.mul(k, Some(g)), Some(*point));
         }
     });
-    RelationResult {
+    Ok(RelationResult {
         logs,
         phases: BTreeMap::from([
             ("pair_setup".into(), setup),
@@ -237,12 +326,35 @@ fn relations(
         hits,
         rank,
         entries: pairs.len(),
-    }
+    })
 }
 
 pub fn run(primes: &[u64], seeds: u64, seed_start: u64) -> Vec<Record> {
+    run_observed(primes, seeds, seed_start, Options::default(), |_| Ok(()))
+        .unwrap_or_else(|failure| panic!("Benchmark case failed: {}", failure.error))
+}
+
+/// Publish each start, bounded progress prefix, completion and failure before
+/// advancing to the next case. Sink failures are fatal, never a successful run.
+pub fn run_observed(
+    primes: &[u64],
+    seeds: u64,
+    seed_start: u64,
+    options: Options,
+    mut observer: impl FnMut(Event) -> Result<(), String>,
+) -> Result<Vec<Record>, Box<Failure>> {
     let mut records = Vec::new();
     for &p in primes {
+        observer(Event::Discovery { p }).map_err(|error| {
+            Box::new(Failure {
+                case: None,
+                progress: Progress {
+                    phase: format!("discovery_p_{p}"),
+                    ..Progress::default()
+                },
+                error,
+            })
+        })?;
         let discovery = Instant::now();
         let (params, n, g) = discover(p);
         let discovery_ns = discovery.elapsed().as_nanos() as u64;
@@ -252,74 +364,150 @@ pub fn run(primes: &[u64], seeds: u64, seed_start: u64) -> Vec<Record> {
             let q = Curve::new(p, params.a, params.b).mul(k, Some(g)).unwrap();
             for method in ["bsgs", "random", "progression", "twist_runs"] {
                 let mut e = Curve::new(p, params.a, params.b);
-                let clock = Instant::now();
-                let (recovered, logs, phases, attempts, hits, rank, entries) = if method == "bsgs" {
-                    let ((scalar, entries), phase) = measured(&mut e, |e| bsgs(e, g, q, n));
-                    (
-                        scalar,
-                        Vec::new(),
-                        BTreeMap::from([("direct_solve".into(), phase)]),
-                        0,
-                        0,
-                        0,
-                        entries,
-                    )
-                } else {
-                    let (base, selection) = measured(&mut e, |e| {
-                        make_base(e, size, method, &mut Rng(seed.wrapping_add(20000)))
-                    });
-                    let mut result =
-                        relations(&mut e, g, q, n, &base, &mut Rng(seed.wrapping_add(30000)));
-                    result.phases.insert("base_selection".into(), selection);
-                    let logs = base
-                        .iter()
-                        .zip(&result.logs)
-                        .map(|(&point, &scalar)| PointLog { point, scalar })
-                        .collect();
-                    (
-                        result.logs[size],
-                        logs,
-                        result.phases,
-                        result.attempts,
-                        result.hits,
-                        result.rank,
-                        result.entries,
-                    )
-                };
-                assert_eq!(recovered, k);
-                let counts = phases.values().fold(Counts::default(), |mut c, phase| {
-                    c.accumulate(phase.counts);
-                    c
-                });
-                // Linear algebra works over Z/n separately from the curve counter.
-                let mut expected = e.counts;
-                expected.linear_cells = counts.linear_cells;
-                expected.linear_inversions = counts.linear_inversions;
-                assert_eq!(counts, expected);
-                records.push(Record {
+                let case = Case {
+                    ordinal: records.len(),
                     parameters: params,
                     group_order: n,
                     g,
                     q,
                     seed,
                     method: method.into(),
-                    recovered_scalar: recovered,
-                    factor_base_logs: logs,
-                    factor_base_size: if method == "bsgs" { 0 } else { size },
-                    total_ns: clock.elapsed().as_nanos() as u64,
-                    discovery_ns_shared_excluded: discovery_ns,
-                    phases,
-                    counts,
-                    attempts,
-                    relation_hits: hits,
-                    rank,
-                    table_entries: entries,
+                };
+                let mut live = Live {
+                    case: case.clone(),
+                    progress: Progress {
+                        phase: if method == "bsgs" {
+                            "direct_solve"
+                        } else {
+                            "base_selection"
+                        }
+                        .into(),
+                        ..Progress::default()
+                    },
+                    linear_counts: Counts::default(),
+                    clock: Instant::now(),
+                    io_ns: 0,
+                };
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+                    || -> Result<Record, String> {
+                        let io_clock = Instant::now();
+                        observer(Event::Started {
+                            case: case.clone(),
+                            progress: live.progress.clone(),
+                        })?;
+                        live.io_ns += io_clock.elapsed().as_nanos() as u64;
+                        let (recovered, logs, phases, attempts, hits, rank, entries) = if method
+                            == "bsgs"
+                        {
+                            let ((scalar, entries), phase) = measured(&mut e, |e| bsgs(e, g, q, n));
+                            (
+                                scalar,
+                                Vec::new(),
+                                BTreeMap::from([("direct_solve".into(), phase)]),
+                                0,
+                                0,
+                                0,
+                                entries,
+                            )
+                        } else {
+                            let (base, selection) = measured(&mut e, |e| {
+                                make_base(e, size, method, &mut Rng(seed.wrapping_add(20000)))
+                            });
+                            let mut result = relations(
+                                &mut e,
+                                &base,
+                                &mut Rng(seed.wrapping_add(30000)),
+                                &mut live,
+                                &mut observer,
+                                options.max_attempts.unwrap_or(1000 * n).min(1000 * n),
+                            )?;
+                            result.phases.insert("base_selection".into(), selection);
+                            let logs = base
+                                .iter()
+                                .zip(&result.logs)
+                                .map(|(&point, &scalar)| PointLog { point, scalar })
+                                .collect();
+                            (
+                                result.logs[size],
+                                logs,
+                                result.phases,
+                                result.attempts,
+                                result.hits,
+                                result.rank,
+                                result.entries,
+                            )
+                        };
+                        assert_eq!(recovered, k);
+                        let counts = phases.values().fold(Counts::default(), |mut c, phase| {
+                            c.accumulate(phase.counts);
+                            c
+                        });
+                        let mut expected = e.counts;
+                        expected.linear_cells = counts.linear_cells;
+                        expected.linear_inversions = counts.linear_inversions;
+                        assert_eq!(counts, expected);
+                        Ok(Record {
+                            parameters: params,
+                            group_order: n,
+                            g,
+                            q,
+                            seed,
+                            method: method.into(),
+                            recovered_scalar: recovered,
+                            factor_base_logs: logs,
+                            factor_base_size: if method == "bsgs" { 0 } else { size },
+                            total_ns: live.clock.elapsed().as_nanos() as u64,
+                            evidence_io_ns: live.io_ns,
+                            discovery_ns_shared_excluded: discovery_ns,
+                            phases,
+                            counts,
+                            attempts,
+                            relation_hits: hits,
+                            rank,
+                            table_entries: entries,
+                        })
+                    },
+                ));
+                let result = match result {
+                    Ok(result) => result,
+                    Err(payload) => Err(payload
+                        .downcast_ref::<String>()
+                        .cloned()
+                        .or_else(|| payload.downcast_ref::<&str>().map(|s| s.to_string()))
+                        .unwrap_or_else(|| "Non-string unwinding panic".into())),
+                };
+                let result = result.and_then(|record| {
+                    live.progress.phase = "evidence_publication".into();
+                    observer(Event::Completed {
+                        case: case.clone(),
+                        record: Box::new(record.clone()),
+                    })?;
+                    Ok(record)
                 });
+                match result {
+                    Ok(record) => records.push(record),
+                    Err(error) => {
+                        live.snapshot(&e);
+                        let mut failure = Box::new(Failure {
+                            case: Some(case),
+                            progress: live.progress.clone(),
+                            error,
+                        });
+                        if let Err(error) = observer(Event::Failed {
+                            failure: failure.clone(),
+                        }) {
+                            failure.error.push_str(&format!(
+                                "; failure evidence publication also failed: {error}"
+                            ));
+                        }
+                        return Err(failure);
+                    }
+                }
             }
         }
         eprintln!("Completed benchmark correctness checks for p={p}, n={n}");
     }
-    records
+    Ok(records)
 }
 
 pub fn verify(records: &[Record]) -> Result<(), String> {

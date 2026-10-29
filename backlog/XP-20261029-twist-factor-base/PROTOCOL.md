@@ -51,6 +51,17 @@ failure, or the runner's 1800-second deadline. A failure exits nonzero and keeps
 available artifacts; an interrupted running manifest is incomplete, not a pass.
 There is no automatic retry or mid-search resume. Do not discard seeds.
 
+Pre-run evidence-retention amendment: each completed benchmark case is published
+individually before the next starts, with synced lifecycle/progress events and
+an atomic active-case snapshot. Search progress is sampled at most 256 trials
+apart. Caught failures retain the exact case and current counters; hard kills
+retain only the last published prefix and cannot produce a pass or final clock.
+The optional per-solve limit only tightens the original attempt cap. In-solve
+evidence I/O is included in `total_ns` and separated as `evidence_io_ns`; final
+record/panel exports remain outside that interval. This amendment changes the
+diagnostic instrumentation, not the hypothesis, target/RNG streams, relation
+equations or finite audit scope. No performance result is promoted.
+
 An exact finite coverage benefit is reported as such. A native solver improvement
 requires lower complete cost on identical fresh public instances against the
 frozen ordinary IC baseline, with every answer verified. A fastest or vs-rho
