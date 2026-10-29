@@ -94,3 +94,26 @@ The current base-independent interval proof cannot rank baseline/spike40.
 Prime larger-m original top quotients remain positive-dimensional; a different
 presentation needs explicit separate arms. No elite base or universal FFD/LFD
 conclusion is established. Independent scientific review remains pending.
+
+
+## 2026-10-29 update: retained m3 systems certify LFD at least3
+
+Run n83-degree3-m3-20261029-r1 attempted12 retained original/baseline/spike40
+Koblitz/binary planted/natural m3 inputs. All12 producers,12 fresh replays and
+12 S3-restored replays passed. All230 raw manifest entries match before/after.
+Every case has a replayed quadratic row in admitted V3 but outside complete V2,
+so LFD>=3. All stop at the frozen32768-row cap, with linear rank1; exact LFD and
+upper bounds remain null. No complete V3 closure or regularity change is claimed.
+Source6a2c028999634a4ddf9791dc3082180086b6c2ff;
+protocole4d9a88ecf15df5dd837e713d1cfaf936c02fae9b9b9359d6803d20214fbb438.
+All12 immutable cumulative summaries, dense rows, operations and V2 source
+traces remain. See DEGREE3_M3_FORMAT.json and experiment-degree3-m3.export.json.
+
+A next closure phase should reconstruct the saved queue and continue from these
+certified prefixes under a new frozen protocol, preserving the original rows
+and all prior traces. Do not repeat this completed bounded batch. Pending queues
+are3442 in10 cases,13353 in baseline Koblitz planted and13451 in spike40 Koblitz
+planted; these are recorded queue sizes, not estimates of work to completion.
+Even full V3 closure alone would not prove an LFD upper bound. A global unit,
+affine-completion or another independently justified stabilization certificate
+remains necessary. Higher-m/prime LFD and elite-base selection remain open.
