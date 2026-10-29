@@ -811,6 +811,9 @@ pub fn main() -> Result<()> {
             plan(&a[1], Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
         }
         Some("run") if a.len() == 3 => run(Path::new(&a[1]), Path::new(&a[2])),
+        Some("audit") if a.len() == 4 => {
+            crate::audit::audit(Path::new(&a[1]), Path::new(&a[2]), Path::new(&a[3]))
+        }
         _ => Err("plan KIND FIXTURES SOURCE_PINS FRESH_PLAN | run PLAN FRESH_OUT".into()),
     }
 }

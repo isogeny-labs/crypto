@@ -1,0 +1,415 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-cold-sizing-v1",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v16",
+  "question": "Validate complete per-phase native/backend instruction counting and size the cold cost/compression driver on disjoint control curves.",
+  "claims": [
+    {
+      "id": "profile",
+      "text": "Every admitted pilot cell has a checked one-target outcome and all ROI instructions assigned exactly once, with independent counter and finite-output replay.",
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-audit"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "Sizing only: no comparison on unequal queries, held-out, whole-IC, calibrated GAE, timing, novelty or NIST claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "profiled",
+      "role": "baseline",
+      "description": "One frozen native worker containing IC and DLP references, with actual resident GP backend charged.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "42b7a311c3bffe21d5081d8f0b5ec7730d41c49e",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-cold-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "replay",
+      "role": "reference",
+      "description": "Independent GP group/Velu/matrix/kernel/point verification and native raw-counter audit.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "42b7a311c3bffe21d5081d8f0b5ec7730d41c49e",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    },
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "First six Q=2G known-answer and identical fresh-process nuisance controls, same worker.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "42b7a311c3bffe21d5081d8f0b5ec7730d41c49e",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-cold-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "All six first Q=2G controls recover2 and emit positive native/backend phase counts with exact trace coverage.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No comparative population or performance verdict in this sizing pilot. Matched ordinary bases, ambiguity/cycle synthetic controls and zero/unassigned-counter negative tests are present."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "collector",
+        "levels": [
+          "group MITM",
+          "native F3 full roots",
+          "GP full roots"
+        ]
+      },
+      {
+        "name": "known constraints representation",
+        "levels": [
+          "full",
+          "affine-compressed"
+        ]
+      },
+      {
+        "name": "base construction",
+        "levels": [
+          "ordinary low-x",
+          "maximal twist progression"
+        ]
+      },
+      {
+        "name": "endomorphism evaluation",
+        "levels": [
+          "rational map",
+          "known scalar multiplication"
+        ]
+      },
+      {
+        "name": "reference",
+        "levels": [
+          "rho",
+          "negation rho",
+          "BSGS",
+          "negation BSGS",
+          "GP elllog"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Single pinned worker/ROI library/GP and native runner/auditor.",
+        "how": "Exact source/binary/runtime hashes and single-event raw Ir profiles."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Local L0 CPU0, no admitted clock.",
+        "how": "Actual host receipt and per-cell process/resource records."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Six distinct sizing curves plus public p59/p827, Q=2G controls first.",
+        "how": "Frozen174-cell plan, no heldout DLP access."
+      },
+      {
+        "name": "order",
+        "treatment": "randomized",
+        "value": "Hash interleaving after required controls.",
+        "how": "Exact source-derived plan."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unmasked deterministic audit before data, no performance/statistical inference.",
+        "how": "Frozen independent parser/GP script generator."
+      },
+      {
+        "name": "fresh process nuisance",
+        "treatment": "measured",
+        "value": "Three identical new processes per native/GP positive configuration.",
+        "how": "Observed Ir range within each identical-input method, not population variance."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "absolute-audit",
+        "arms": [
+          "profiled",
+          "replay"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All expected source-point/counter/finite checks pass or explicit failure retained."
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "positive",
+          "positive"
+        ],
+        "differs_in": [
+          "fresh process nuisance"
+        ],
+        "design": "aa",
+        "threshold": "Report exact Ir range of three identical native and three identical GP-backend positive cases; do not treat layout draws as population samples."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Six controls first, fixed hashed order afterwards; no output ordering choice.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Frozen source-derived Task seeds and deterministic SHA256 plan permutation."
+    },
+    "instance_sampling": {
+      "rule": "Frozen disjoint sizing fixtures and old public controls only; larger heldout DLP targets unused.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unmasked exact resource pilot; no performance ordering or statistical claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 174,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Finite resource/instrument checks only, no significance or population inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "First size-class instrument pilot; prospective174*120s cell envelope,3600s global cap. Actual setup/online resource times reported only for sizing."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold-Ir",
+        "name": "Cold one-target guest instructions",
+        "unit": "Ir",
+        "kind": "counted",
+        "definition": "Sum all exclusive native and actual resident-GP ROI intervals from setup to source verification; no launch/input/fixture/result-file work.",
+        "source": "ROWS.jsonl cost.total_ir",
+        "aggregation": "per_row",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "peak-rss",
+        "name": "Sampled aggregate process-tree RSS",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "Exact maximum of the25ms RSS samples for resource guard, with unmeasured between-sample peaks; not an exact process high-water mark.",
+        "source": "ROWS.jsonl max_sampled_tree_rss_bytes",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "randomized",
+    "clock": "none",
+    "counters": [
+      "native/backend exclusive Ir",
+      "all raw phase totals",
+      "source scalar or ambiguity outcome",
+      "sampled process-tree RSS",
+      "all failures/caps/underfills/unsupported cases"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 4200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly174 planned profiles, six positive/AA controls first.120s per cell,3600s global,4GiB sampled RSS,1.5GB compressed raw tree. Counter/control failure stops; all unattempted cases remain explicit, no silent retry.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Admit only fully bound valid counters and checked finite results; use elapsed/resource data solely to size later runs, no speed ranking.",
+    "comparison_ids": [
+      "absolute-audit"
+    ],
+    "statistic": "All ROI assignments exact, independent raw sums and finite group/matrix checks.",
+    "interval": "A/A observed range only; not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "None; resource/counter pilot.",
+    "verdict_vocabulary": [
+      "verified sizing record",
+      "invalid counter",
+      "failed control",
+      "capped",
+      "not attempted"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/cold_audit_20261029.rs",
+      "sha256": "cd4776df59641f4af95bcb1e2273b4e412b39e3e464c33cd5c0286f69b301879"
+    },
+    "inputs": [
+      "frozen PLAN.json",
+      "all raw profiles and worker payloads",
+      "v15 admitted immutable fixture data"
+    ],
+    "outputs": [
+      "ROWS.jsonl",
+      "AUDIT.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded per-phase instruction/resource counts, explicit statuses and fixed query differences."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/cold-sizing-20261029"
+  },
+  "inadmissible": [
+    "Ranking unequal query counts",
+    "Dropping failed or unsupported cases",
+    "Counting reused mathematical payloads as independent targets",
+    "Allowing zero/unassigned ROI counts",
+    "Using heldout DLP outcomes to size/select",
+    "Calling Ir calibrated field ops/GAE, cycles or wall time"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v15/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Prior exact/cost records, primary Valgrind/Brent/PARI docs and parent accounting contract reviewed before implementation; Semaev primary PDF403 disclosed.",
+      "verified_by": "Installed help, primary manual/PDF reads and exact Git contract snapshot on2026-10-29."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "planned_profiles": 174,
+    "input_admission": "research/twist_routes_1_3_20261021/execution-v15/reference-v2/ADMISSION.json",
+    "backend_authority": "Standing authorized local L0 fallback after fresh ECR denial; no paid allocation."
+  }
+}

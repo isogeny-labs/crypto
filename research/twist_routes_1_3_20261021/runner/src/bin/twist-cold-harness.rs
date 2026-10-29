@@ -7,6 +7,8 @@ mod source_sha256;
 mod toy_field {
     pub use crate::arithmetic::inv;
 }
+#[path = "../cold_audit_20261029.rs"]
+mod audit;
 #[path = "../cold_20261029/driver.rs"]
 mod driver;
 #[path = "../cold_20261029/engine.rs"]
