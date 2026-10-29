@@ -1,5 +1,64 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-792 continuation
+
+### What was done
+
+Added a composed relation adapter with fixed partition, shared field identity,
+explicit three-large admission rejection and terminal residual caps retaining
+the unincorporated constraint. Ten release tests pass, including 25,600
+independent composed row-space checks. Clippy passes with warnings denied.
+
+### Decisions made
+
+Keep geometric verification in the existing producer. The adapter consumes
+checked equations only. No partition is chosen based on observed results;
+freeze it before measurements. The prior source and primary large-prime
+paper remain the mathematical basis recorded in README.md.
+
+### Open threads
+
+The current saved four-lead review summary records complete frozen cohorts
+for factor-base, projective-law and uncached Kummer, with the stated proof
+limitations. Pencil remains 543/1260, with 717 open. Producer integration,
+full cost instrumentation and a frozen upper-gate amendment remain required.
+No cloud job or experimental cohort was launched.
+
+### Errors
+
+None in native tests or clippy. Existing shared daily-log reservation is
+preserved; this scoped session record carries the update.
+
+## 2026-10-29 T-791 continuation
+
+### What was done
+
+Added native residual row-space retention with explicit coefficient caps.
+Extended all 25,600 prefix comparisons to the retained basis and added two
+cap regression tests. Seven tests and clippy with warnings denied passed.
+Refreshed the PDF, diagram, standardized table and checksums.
+A separate read-only agent found no concrete algebra or cap bug. It identified
+the missing formal composition proof and the requirement that the eventual
+adapter bind identical moduli and small-column definitions. The shared daily
+log remains exclusively held by T-785, so this scoped record retains the update.
+
+### Decisions made
+
+Caps report rejected inputs explicitly; no dropped equation counts as retained.
+Counters are partial logical accounting, not full cost evidence. Rechecked
+the primary double-large-prime paper, sections 2.3 and 3.1, and retained its
+genus and relation-model scope boundaries. No experiment was launched.
+
+### Open threads
+
+Collector integration, full accounting, frozen admission and cohort execution
+remain outstanding. This module has no new Lean proof.
+
+### Errors
+
+The migration handoff receipt is unreadable with current filesystem access;
+no migration-dependent jobs were restarted. Diem is deadline-expired and idle.
+
 ## What was done
 
 - Reconciled the existing Markowitz primary and replay receipts. Both completed
