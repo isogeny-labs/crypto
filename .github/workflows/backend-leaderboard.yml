@@ -94,7 +94,21 @@ jobs:
           mapfile -t session_dirs < <(jq -r '.sessions[].dir' docs/backend-leaderboard/manifest.json)
           mapfile -t frozen_files < <(jq -r '.files | keys[]' docs/backend-leaderboard/reproduction.lock.json)
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${session_dirs[@]}" "${frozen_files[@]}"
-      - name: Retain the verified replay fixture for manual diagnosis
+      - name: Pull the exact frozen replay fixture for manual diagnosis
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          printf '%s\n' '/research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/' | git sparse-checkout add --stdin
+          if ! command -v aws >/dev/null; then
+            export ARTIFACTS_AWS="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            test -x "$ARTIFACTS_AWS"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 1 research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2/records.jsonl
+      - name: Retain the manifest-verified replay fixture for manual diagnosis
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
