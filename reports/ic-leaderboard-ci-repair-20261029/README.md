@@ -31,3 +31,11 @@ GitHub's official workflow-syntax documentation:
 https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
 No experiment or timing comparison was run. Current-head hosted merge checks
 and fresh review remain required.
+
+The workflow's final lab-browser check independently exposed an index still
+at 20,592 catalog curves. Regeneration uses the existing Git-aware builder
+and adds exactly the same 47 catalog curves. All 20,592 existing curve
+objects are byte-semantic identical, and every non-curve scientific section
+is unchanged. Only counts and input-source bindings change beside those
+additions. Browser currentness and the existing browser/leaderboard parser
+suites pass. No browser UI or generator algorithm changes.
