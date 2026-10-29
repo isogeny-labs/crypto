@@ -8,7 +8,7 @@
 
 == Question
 
-The first session (2026-10-23) measured the collect phase 1.111× faster over 30 paired rounds ([1.082, 1.147] with the corrected bootstrap below; published as [1.065, 1.160]), but its A/A had 5 pairs, with an upper end of 1.087. The rule declared before measuring needs the A/B interval's lower end above 1 and above the A/A interval's upper end, so the verdict was *not established*. This session measures the noise floor with as many rounds as the effect, in the same session.
+The first session (2026-10-23) measured the collect phase 1.111× faster over 30 paired rounds ([1.082, 1.149] with the corrected bootstrap below; published as [1.065, 1.160]), but its A/A had 5 pairs, with an upper end of 1.087. The rule declared before measuring needs the A/B interval's lower end above 1 and above the A/A interval's upper end, so the verdict was *not established*. This session measures the noise floor with as many rounds as the effect, in the same session.
 
 == Design
 
@@ -18,16 +18,16 @@ The first session (2026-10-23) measured the collect phase 1.111× faster over 30
 
 #table(columns: 6, align: (left, right, left, right, left, left),
   [*metric*], [*A/B median*], [*A/B 95%*], [*rounds > 1*], [*A/A 95%*], [*verdict*],
-  [collect phase], [1.093], [1.068 – 1.136], [38 / 42], [0.977 – 1.025], [*established*],
-  [whole set-up], [1.042], [1.020 – 1.082], [29 / 42], [0.946 – 1.016], [marginal (+0.005), not claimed],
+  [collect phase], [1.093], [1.068 – 1.136], [38 / 42], [0.977 – 1.026], [*established*],
+  [whole set-up], [1.042], [1.020 – 1.082], [29 / 42], [0.946 – 1.015], [marginal (+0.005), not claimed],
 )
 
-#block(stroke: 0.6pt + rgb("#c44e52"), inset: 6pt, radius: 3pt)[*Correction.* The bootstrap as first run (in `summarise.sh` and the first session's `../summarise.sh`) stepped its LCG in jq's floating point; the rounded states are almost always even, so 99.6% of resample draws fell on odd-numbered rounds. The independent validator found it. The intervals above use the same constants, seed and resample count with the step done exactly (`correct_bootstrap.sh`, `summary-corrected.json`); `CORRECTION.md` lists the as-run intervals beside them. As run, the collect interval was 1.090 – 1.160 against an A/A upper end of 1.030, and the whole set-up was not established.]
+#block(stroke: 0.6pt + rgb("#c44e52"), inset: 6pt, radius: 3pt)[*Correction.* The bootstrap as first run (in `summarise.sh` and the first session's `../summarise.sh`) stepped its LCG in jq's floating point; the rounded states are almost always even, so 99.6% of resample draws fell on odd-numbered rounds. The independent validator found it. The intervals above use the same constants, seed and resample count with the step done exactly and each resample index taken from the generator's high bits; a first correction (exact step, index `s mod n`) still drew every resample half odd and half even rounds, a defect found in review (`correct_bootstrap.sh`, `summary-corrected.json`, where both are kept); `CORRECTION.md` lists the as-run intervals beside them. As run, the collect interval was 1.090 – 1.160 against an A/A upper end of 1.030, and the whole set-up was not established.]
 
 #figure(image("per-round-collect.svg", width: 100%), caption: [Per-round collect-phase ratios, A/B (green) and A/A (blue), with each median and its corrected 95% interval (`runs/`, `summary.json`, `summary-corrected.json`).])
 
-- *Collect phase: established.* The A/B lower end, 1.068, clears 1 and the A/A upper end, 1.025, by 0.042. It also held under the as-run generator, and under 500 of 500 independent seeds (validator). Median collect time: 230.3 ms (main `a`) and 235.2 ms (main `q`) against 212.5 ms (candidate).
-- *Whole set-up: marginal, not claimed.* Corrected, 1.020 clears the A/A's 1.016 by 0.005; as run, it did not. The generator was fixed after the data were seen, so this verdict is not claimed. The set-up includes phases the change does not touch.
+- *Collect phase: established.* The A/B lower end, 1.068, clears 1 and the A/A upper end, 1.026, by 0.042. It also held under the as-run generator, and under 500 of 500 independent seeds (validator). Median collect time: 230.3 ms (main `a`) and 235.2 ms (main `q`) against 212.5 ms (candidate).
+- *Whole set-up: marginal, not claimed.* Corrected, 1.020 clears the A/A's 1.015 by 0.005; as run, it did not. The generator was fixed after the data were seen, so this verdict is not claimed. The set-up includes phases the change does not touch.
 - *Isolation:* 126 processes, none contended, none failed, no round dropped. 71 launches were refused for CPU pressure and retried; a refusal measures nothing.
 - *Identity:* all 126 recovered `518509155375` with `all_verified: true`; an independent replay matched every non-timing field in both arms.
 

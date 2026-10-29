@@ -19,19 +19,20 @@ launches refused for CPU pressure and retried).
 
 | metric | A/B median (main / candidate) | A/B 95% | rounds > 1 | A/A 95% | verdict |
 |:--|--:|:--|--:|:--|:--|
-| collect phase | 1.093 | 1.068 – 1.136 | 38 / 42 | 0.977 – 1.025 | **established** |
-| whole set-up | 1.042 | 1.020 – 1.082 | 29 / 42 | 0.946 – 1.016 | marginal (+0.005), not claimed |
+| collect phase | 1.093 | 1.068 – 1.136 | 38 / 42 | 0.977 – 1.026 | **established** |
+| whole set-up | 1.042 | 1.020 – 1.082 | 29 / 42 | 0.946 – 1.015 | marginal (+0.005), not claimed |
 
 Intervals are from [`summary-corrected.json`](summary-corrected.json):
 the bootstrap `summarise.sh` ran drew only odd-numbered rounds, a defect the
-independent validator found; [`CORRECTION.md`](CORRECTION.md) gives the
+independent validator found, and the first correction still drew every
+resample half odd and half even rounds (found in review); [`CORRECTION.md`](CORRECTION.md) gives the
 as-run intervals beside these and how each verdict is read.
 
 - **Collect phase:** median 230.3 ms and 235.2 ms (main, `a` and `q`)
   against 212.5 ms (candidate). The rule declared on 2026-10-23 holds: the
   A/B lower end clears 1 and the A/A upper end, by 0.042.
 - **Whole set-up:** marginal, not claimed. With the corrected bootstrap the
-  A/B lower end, 1.020, clears the A/A's 1.016 by 0.005; with the as-run
+  A/B lower end, 1.020, clears the A/A's 1.015 by 0.005; with the as-run
   one it did not. The generator was fixed after the data were seen, so this
   is reported and not claimed. The set-up includes phases the change does
   not touch.

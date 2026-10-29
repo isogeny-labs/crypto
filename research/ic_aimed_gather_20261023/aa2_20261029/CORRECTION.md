@@ -26,22 +26,36 @@ intervals are.
 
 `correct_bootstrap.sh` recomputes both sessions from the raw records with
 the same constants, seed, resample count and percentile indices, the step
-done exactly (the multiplier split as 16838·65536 + 20077 so every product
+done exactly and (since the second correction below) the index taken from
+the high bits (the step splits the multiplier as 16838·65536 + 20077 so every product
 stays below 2^53; the first states match an integer reference). It writes
 `summary-corrected.json` with the as-run intervals beside the corrected
 ones. No record and no earlier summary is changed.
 
 | session | metric | A/B 95% as run | A/B 95% corrected | A/A 95% corrected | margin | verdict corrected (as run) |
 |:--|:--|:--|:--|:--|--:|:--|
-| 2026-10-29 | collect | 1.090 – 1.160 | **1.068 – 1.136** | 0.977 – 1.025 | +0.042 | **established** (established) |
-| 2026-10-29 | whole set-up | 1.021 – 1.116 | 1.020 – 1.082 | 0.946 – 1.016 | +0.005 | established by 0.005 (not established) |
-| 2026-10-23 | collect | 1.065 – 1.160 | 1.082 – 1.147 | 0.944 – 1.087 | −0.005 | not established (not established) |
+| 2026-10-29 | collect | 1.090 – 1.160 | **1.068 – 1.136** | 0.977 – 1.026 | +0.042 | **established** (established) |
+| 2026-10-29 | whole set-up | 1.021 – 1.116 | 1.020 – 1.082 | 0.946 – 1.015 | +0.005 | rule met only after the fix; not claimed (not established) |
+| 2026-10-23 | collect | 1.065 – 1.160 | 1.082 – 1.149 | 0.944 – 1.087 | −0.005 | not established (not established) |
 | 2026-10-23 | whole set-up | 1.018 – 1.068 | 1.018 – 1.080 | 0.953 – 1.121 | −0.103 | not established (not established) |
+
+## Second correction: the first correction was parity-stratified
+
+Found in review of #2858 (and as finding F16 of the validator's second
+pass). With the step done exactly, `s mod 2^31` alternates parity, so
+`s mod n` for an even `n` made every resample draw exactly `n/2` odd and
+`n/2` even rounds: a bootstrap stratified by round parity, not independent
+draws with replacement. `correct_bootstrap.sh` now takes the index from the
+generator's high bits, `floor(s·n / 2^31)`; the per-resample count of odd
+rounds then ranges 11–32 at `n = 42`, as independent draws do. The table
+above uses it. The first correction's intervals stay in
+`summary-corrected.json` as `ci95_stratified`; no bound moved by more than
+0.003 between the two, and no verdict changed.
 
 ## How the result is read
 
-- **Collect phase, 2026-10-29: established.** It holds under the as-run and
-  the corrected generator, by 0.042 under the corrected one, and the
+- **Collect phase, 2026-10-29: established.** It holds under the as-run,
+  the stratified and the corrected generator, by 0.042 under the corrected one, and the
   validator found it under 500 of 500 independent seeds.
 - **Whole set-up, 2026-10-29: marginal, not claimed.** The verdict flips
   with the generator, the margin is 0.005, and the generator was fixed after
