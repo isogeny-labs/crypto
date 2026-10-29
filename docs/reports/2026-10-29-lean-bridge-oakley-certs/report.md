@@ -14,7 +14,7 @@ is still not formalized.
 **Task 2** (`research/weak_curve_leaderboard_20261012/lean/OakleyPrimality.lean`):
 `oakley3Prime_prime`, `oakley4Prime_prime` via Pratt certificates checked by
 `decide +kernel` (no `native_decide`). Independent stdlib checker
-`validation/check_pratt_certificates.py` passed locally (18 certificates).
+the Rust checker `src/bin/check_pratt_certificates.rs` passed locally (18 certificates).
 It proves primality of the integers only, not that they are RFC point orders.
 
 **Status:** the Lean builds, fresh-kernel replay and axiom audits have not been

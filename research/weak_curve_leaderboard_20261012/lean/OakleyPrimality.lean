@@ -21,7 +21,7 @@ import OakleyOrders
   extension; larger ones by their own certificate in this file.
 
 The certificate data is also in `../validation/oakley_pratt_certificates.json`
-and is re-checked by `../validation/check_pratt_certificates.py`, which shares
+and is re-checked by the Rust binary `check_pratt_certificates` (`../src/bin/`), which shares
 no code with this file.
 -/
 

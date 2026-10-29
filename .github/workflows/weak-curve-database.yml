@@ -72,6 +72,7 @@ jobs:
           cargo test --release --locked
           cargo run --release --locked -- check snapshot.json
           cargo run --release --locked --bin ghs_genus128_cost_audit -- --check
+          cargo run --release --locked --bin check_pratt_certificates
           python3 validate_attack_map.py
           python3 validate_decomposition_properties.py
       - name: Verify WeakCurves artifact hashes

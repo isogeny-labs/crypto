@@ -27,7 +27,7 @@ Axiom audit: the four theorems are added to `AxiomAudit.lean` and the CI count i
 [`Pratt.powModAux_cast`], [`powModAux` computes `acc·b^e` in `ZMod m` for `e < 2^fuel`], [none], [],
 [`oakley3Prime_prime`, `oakley4Prime_prime`], [`Nat.Prime` of the two integers via 18 certificates (factors below `2^20` by `norm_num`)], [None beyond the numerals in `OakleyOrders.lean`.], [That they are RFC point orders; that the curves are as described.]
 )
-The same data is in `validation/oakley_pratt_certificates.json`; `validation/check_pratt_certificates.py` (stdlib only) passed locally: 18 certificates, 49 primes. Certificates were produced with sympy factorisation of `p-1` (an untrusted producer: only the checks matter). `decide +kernel` uses kernel evaluation, not `native_decide`.
+The same data is in `validation/oakley_pratt_certificates.json`; the Rust checker `src/bin/check_pratt_certificates.rs` (`num-bigint`) passed locally: 18 certificates, 49 primes. Certificates were produced with sympy factorisation of `p-1` (an untrusted producer: only the checks matter). `decide +kernel` uses kernel evaluation, not `native_decide`.
 
 == Open
 Lean builds, `leanchecker --fresh` and axiom output pending CI; if `decide +kernel` is too slow or a tactic fails, the certificate JSON and Python checker remain the fallback evidence.
