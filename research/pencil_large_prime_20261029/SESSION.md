@@ -624,3 +624,143 @@ PR2869 merge conflict, pending scoped infrastructure authorization, immutable im
 
 ### Errors
 An initial fetch command used the artifact directory and correctly failed because it is not a Git repository; retried in the source worktree.
+
+## 2026-10-29 counted-cost integration
+
+### What was done
+Integrated candidate outer validation, tracked sets, native collection/polynomial and kernel observations, matched rho collection counters, and draft exact Rust price/importer module. Initial combined producer suite failed one replay check (38 passed,1 failed,1 ignored): independent RandomState hash seeds produced94 vs82 key comparisons. Structured failure receipt is retained. Pinned synthetic collision hashing explicitly before cohort data; integrated suite then43 passed,0 failed,1 ignored, and its process-exclusive test separately passed1/1. Original-versus-observed mathematical trace and all legacy native counters matched across five seeds and caps0,1,200 in the development parity harness. First parity command selected zero tests; both that log and corrected exact-test log are retained.
+
+### Decisions made
+Preserve original36-cell grid and old results. Name atomic-scalar/disjoint-logical model amendment; scalar inverse price is the native logical coefficient, not base-field inversion price. Allocation/RSS remain separate observations. New hash policy changes table layout/runtime and requires source/toolchain/binary pinning. Static binary3d99 remains historical for this accounting batch; do not relabel it.
+
+### Open threads
+Engine geometry/adapter semantic coverage, full source validation, importer/export identity and independent review, new binary/image, frozen amended protocol, pending scoped infrastructure authorizations, full cohort and measured reports. No new cohort execution or qualified ratio.
+
+### Errors
+Randomized hash-table comparison counts broke exact counter replay; fixed by explicit pinned instrument policy. A broad parity test-name filter selected zero tests; corrected exact test ran and passed. Conductor scope expansion rejected a malformed scopes request without mutation; separate nonoverlapping T838/T839 reservations were obtained. T826 bounded keeper expired and was reconciled/reclaimed once; current keeper renews the new fence.
+
+## 2026-10-29T18:22Z — Importer integration validation
+
+### What was done
+The current integrated native-price importer passed11 unit tests with exit0; doc tests selected0. The receipt identifies the exact command and honestly records structured transcription rather than a saved full stdout log. The separate root release suite remains live with5397 tests selected; no terminal result claimed.
+
+### Decisions made
+Continue mathematical research on public synthetic known-answer fixtures only. The finite algorithm accounting grid excludes no work silently: reporting and infrastructure remain separate measured resources. The missing walk-label generation event is delegated as an isolated software correction while the release suite finishes.
+
+### Open threads
+Executable analyzer integration and independent review, direct label-generation observations, final source validation and delivery, instrument/protocol pinning, existing pending infrastructure authorization, full pencil cohort and neutral reports remain.
+
+### Errors
+No importer test failure. No new experiment, duplicate generator, or infrastructure mutation.
+
+## 2026-10-29T18:25Z — Executable analyzer integrated; review corrections open
+
+### What was done
+Integrated native analyze_pair executable and current mapping contract into the independent native_price crate. Root validation passed16 tests with exit0; the actual --mapping CLI emitted its source-bound JSON contract. Preserved isolated passing logs and initial corrected lint failure. Independent review identified weak cross-arm session/binary/seed binding, early error on missing failed-record modulus fields, and unchecked calibration component totals. Corrections are delegated before price admission.
+
+### Decisions made
+Retain all36 price cells with unknown values for missing/censored evidence. Do not treat software fixture ratios as observations. Root release invocation remains live; its compiled source has not been changed by nested independent analyzer integration. The walk-label instrumentation patch remains isolated pending its terminal receipt.
+
+### Open threads
+Integrate reviewed fixes and label counter; validate final source; commit/update PR; pin final binary/protocol; complete authorized cohort and independent reports. Existing infrastructure authorization questions remain pending.
+
+### Errors
+Initial analyzer software tests did not cover the three independent-review findings; their passing result does not discharge those findings. No cohort, cloud job, or administrator operation occurred.
+
+## 2026-10-29T18:28Z — Root release validation passed before label-counter increment
+
+### What was done
+Existing full-root release invocation exited0:5274 passed,0 failed,123 ignored of5397 selected; outer test time537.33s. Retained stdout/stderr/command/start/finish/exit receipts under validation/accounting/full-root-release-lib-20261029T1800Z. Applied isolated reviewed walk_label_calls patch afterward; integrated producer suite is now running.
+
+### Decisions made
+The full-root pass describes the prior instrument source; it does not automatically validate the later label-counter increment. Keep exact source boundaries and validate final source before delivery.
+
+### Open threads
+Producer test result, analyzer independent-review fixes, final validation and PR delivery; original cohort and reports remain required.
+
+### Errors
+No failure in full-root release invocation. No experiment launched.
+
+## 2026-10-29T18:30Z — Review corrections verified and final release run started
+
+### What was done
+Integrated analyzer corrections: root19 tests passed,0 failed. Independent targeted rereview confirmed the three reported findings closed. Label-counter producer suite passed44,0failed,1ignored. Final root release invocation82954 started once on final dependency sources; no terminal result yet.
+
+### Decisions made
+Do not promote targeted rereview into full semantic-coverage certification. Preserve earlier analyzer findings and corrected expected-error wording test failure. The initial final-source manifest omitted untracked source modules; a supplemental complete manifest is being prepared with end-of-run hash verification, without changing source or restarting the test.
+
+### Open threads
+Final release result, whole coverage/analysis completeness, standardized cohort aggregation, PR delivery, final instrument/protocol pins, authorized cohort and independent reports.
+
+### Errors
+Initial source manifest relied on tracked differences and omitted untracked modules; explicitly correct its coverage before claiming source binding.
+
+## 2026-10-29T18:35Z — Finite source audit and remote artifact check
+
+### What was done
+Independent nine-category source audit found three remaining groups: scalar Ring primality validation, successful associative-entry visits/fresh initialization, and selected length/empty predicates. Retained full report in validation/accounting/finite-coverage-audit.md and delegated consolidated isolated corrections. Current PR2869 headad958 has an artifacts CI failure: isolab-experiment.yml lacks generated store-pull wiring for three directories; minimal fix is being investigated. Other remote checks remain successful or pending, not all passed.
+
+### Decisions made
+Do not admit measured prices before the concrete asymmetries are fixed and independently rechecked. Preserve base and scalar primality domains. Reuse actual paired_export plan validator/A-A policy for aggregate analysis, with per-target five-stream acceptance, rather than the draft outline's looser aggregate reading.
+
+### Open threads
+Consolidated source fixes, native aggregator, running release-suite receipt, minimal workflow repair, final validation/delivery and remaining original cohort/report requirements.
+
+### Errors
+Broader independent audit found missing work after focused tests passed; tests alone did not establish complete semantic coverage. Current-head artifact workflow failed its store wiring check. No experiment or duplicate job launched.
+
+## 2026-10-29T18:42Z — Consolidated corrections staged; workflow repair applied
+
+### What was done
+Consolidated isolated producer patch addresses the three audit groups;48 tests passed with1 ignored, plus2 focused engine regressions passed. Retained source manifest, exact site mapping, passing raw logs and initial corrected compile failure under validation/accounting/consolidated-fixes. Scalar-domain analyzer increment is integrated; producer patch awaits running root-suite terminal receipt. Applied T844 workflow repair: generated pull lists expanded and named source checkout hydrates through trusted control tooling, with secrets confined to the pull step. Parse/idempotence checks passed; exact full wiring check still live.
+
+### Decisions made
+Preserve existing test/source boundaries. Do not claim isolated producer fixes integrated or complete. Reconciled expired T839 lease and reclaimed attempt2; existing T841 lease remains the root-owned geometry reservation. T844 renewed by bounded keeper.
+
+### Open threads
+Root82954 terminal/hash receipt; integrate consolidated source; finish native aggregate and review; final validation/PR update; pending original instrument/protocol/cloud/cohort/report requirements.
+
+### Errors
+Source correction's initial generated struct literal had duplicate fields; isolated build failure retained and fixed. No new experiment or infrastructure mutation.
+
+## 2026-10-29T18:48:46.400458+00:00 — Consolidated integration and cohort analyzer validation
+
+### What was done
+Prior root suite exited0 with5275passed/0failed/123ignored; all20 bound source files unchanged. Then integrated consolidated producer corrections. Root producer48passed/0failed/1ignored, separately strict isolation1passed. Native pair/cohort analyzer root28passed; actual prepared-plan parser check retains1260workloads/6300pairs/22680slots/3780warmups with0observed records and null ratios. Independent aggregator source review found no new concrete blocker.
+
+### Decisions made
+Operation-count aggregation remains separate from timing qualification and provided digests do not authenticate or freeze a protocol. Keep all prior software failures and source boundaries. Pipeline coverage correction recheck is assigned to an agent who did not implement those corrections.
+
+### Open threads
+Root Clippy10122 and independent producer correction review pending; final consolidated-source release validation, scoped commit/PR update, final image/protocol bindings, pending infrastructure authorization and complete original cohort/report requirements.
+
+### Errors
+Rustfmt found only native_price module order; corrected, retained failure output and passing recheck. Workflow exact wiring and pinned actionlint checks now pass. No experiment execution or measured ratio.
+
+## 2026-10-29T19:05:26.234789+00:00 — Mathematical scope and finite source audit
+
+### What was done
+Reconciled the existing release test (session15062), active study keeper and Diem receipt. Diem remains deadline-expired with50/52 durable records and no pending launcher. Independent nine-category source audit reports no remaining concrete omission within the declared finite model. Updated current implementation state.
+
+### Decisions made
+User clarified mathematical research, not key recovery. Use public synthetic known-answer fixtures and neutral correctness/cost reports. Preserve source-review versus binary/protocol admission distinction; no new execution or cloud mutation.
+
+### Open threads
+Final release run, PDF/graph/standardized review packet, scoped PR update, final binary/protocol binding and original approved cohort requirements. Daily shared log remains reserved by another task; pending entry stays in study scope.
+
+### Errors
+A status read used the wrong stdout suffix; corrected to .stdout.log. No source or evidence was changed by that failed read.
+
+## 2026-10-29T19:09:49.028795+00:00 — Final source validation completed
+
+### What was done
+Existing release run15062 finished with5277passed/0failed/123ignored, exit0; all20 bound source files unchanged. Final producer strict-isolation test separately passed1/0. Independent finite source audit now includes the final source-hash assertion.
+
+### Decisions made
+Publish these as software/accounting validation of public synthetic mathematical workloads. Fresh cohort measurements remain0 and cost ratios remain null. Historical failed attempts and prior source-specific runs stay retained.
+
+### Open threads
+Finish report packet and scoped commit/PR update; exact-head remote checks; final binary/protocol bindings and original cohort requirements.
+
+### Errors
+No final validation failure. Prior failures remain in the validation directory.
