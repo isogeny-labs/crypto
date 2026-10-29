@@ -1,8 +1,10 @@
 check_id,class,status,count,unit,evidence,scope
-producer_tests,development_test,pass,2,tests,producer-tests.log,signed coefficient parity and constant-only inconsistency rejection
+producer_tests,development_test,pass,6,tests,producer-tests.log,signed parity and inconsistency rejection and phase attribution
 producer_lint,software_check,pass,0,warnings,producer-clippy.log,producer feature and all targets
 producer_execution,cohort_result,not_run,0,targets,README.md,geometric producer wired but not executed
-rust_suite,development_test,pass,10,tests,rust-tests.log,symbolic graph plus residual basis and composed adapter
+rust_suite,development_test,pass,14,tests,rust-tests.log,symbolic reduction and semantic and allocation instrumentation
+allocation_contract,development_test,pass,1,test,src/allocation.rs,zeroed grow shrink payload and layout-byte accounting and independent envelope peak
+semantic_accounting,development_test,pass,1,test,src/lib.rs,inverse versus primality work and rejected-row accounting
 composed_row_space,development_test,pass,25600,prefixes,src/lib.rs,fixed partition collector versus independent dense RREF
 composed_admission,development_test,pass,3,tests,src/collector.rs,cancellation and terminal caps and signed cycle
 residual_row_space,development_test,pass,25600,prefixes,src/lib.rs,retained residual basis compared with independent dense RREF
@@ -16,3 +18,7 @@ rust_correspondence,proof_gap,open,,,README.md,implementation to field model
 collector_integration,implementation_gap,open,,,README.md,pencil adapter and exact accounting
 new_cohort_targets,cohort_result,not_run,0,targets,README.md,no new cohort execution
 candidate_over_rho,comparative,unmeasured,,,README.md,no new end to end price
+sparse_map_contract,development_test,pass,2,tests,src/sparse.rs,numeric ordering and exact size hints and unmetered JSON serialization
+phase_attribution,development_test,pass,1,test,src/native_solver.rs,reject missing field native symbolic work and negative interval remainder
+scalar_normalization,development_test,pass,2,tests,src/scalar_ledger.rs,loop-count identity and actual Ring inverse parity and invalid-ledger rejection
+solver_api_contract,development_test,pass,1,test,src/native_solver.rs,explicit config and source rejection and unavailable observer and flag cleanup

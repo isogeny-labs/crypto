@@ -1,5 +1,64 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-796 continuation
+
+### What was done
+
+Added an observed System allocator with nonallocating atomic hooks. Recorded
+per-phase, cold-setup, whole-candidate and rho allocation observations and
+timing envelopes. Twelve library and three producer tests pass; producer
+clippy passes. Independent review checked unsafe forwarding and identified
+the phase-only coverage gap; the separate outer envelope addresses it.
+
+### Decisions made
+
+Requested layout bytes are not RSS or allocator internal copying. Preserve
+baseline live-state and optimizer limitations explicitly. Do not assign an
+unfrozen price to allocations or call the remaining accounting complete.
+Read the official Rust GlobalAlloc contract before implementation.
+
+### Open threads
+
+Native index accounting, frozen protocol/export, and the upper gate remain.
+EKS job-list access still fails on the configured AssumeRole call. No identity,
+permissions or external workload changed; no experiment was submitted.
+
+### Errors
+
+Expanded JSON metadata exceeded the default compile-time macro recursion
+limit; increased it to 256. An initial envelope declaration matched a test
+instead of the producer loop; compilation exposed it and placement was fixed.
+The final feature suite and clippy passed.
+
+## 2026-10-29 T-795 continuation
+
+### What was done
+
+Instrumented symbolic arithmetic and traversal semantic events. Added solver
+setup and symbolic phase deltas with an attribution invariant. Replaced full
+basis scans with exact pivot lookup. Eleven library and three producer tests
+pass; clippy passes. Independent review found no concrete counter or lookup
+bug and identified overlap boundaries documented in README.md.
+
+### Decisions made
+
+Preserve the original distinction between base-field price-band operations
+and scalar native work. Keep inversion multiplications and explicit events;
+do not classify Miller--Rabin powers as inversions. Residual diagnostics
+overlap these counters. Full accounting remains incomplete, not priced.
+
+### Open threads
+
+Finish native/index/allocation accounting and freeze the experiment contract.
+Job inventory remains unavailable: the configured spot-job-submitter context
+requests the existing remote-launcher role but its AssumeRole call is denied.
+No identity, permissions, infrastructure or job state was changed.
+
+### Errors
+
+The EKS read-only job-list request failed during credential acquisition.
+No experiment was submitted or restarted. Diem remains deadline-expired.
+
 ## 2026-10-29 T-793 continuation
 
 ### What was done
@@ -140,3 +199,105 @@ no migration-dependent jobs were restarted. Diem is deadline-expired and idle.
   successful run. Native test behavior remained unchanged.
 - T-789's first CLI lease expired; checked for conflicting owners and reclaimed
   the same task. A bounded lease keeper maintains the second claim until handoff.
+
+## 2026-10-29 T-797: sparse map observations
+
+### What was done
+Added transparent tracked sparse maps and four semantic counters, preserving
+numeric key order and coefficient JSON. Reviewed against official BTreeMap
+documentation. Independent read-only review found lost iterator size hints;
+forwarding and regression checks now preserve collection allocation sizing.
+
+### Decisions made
+This is mathematical implementation and instrumentation, not a real-world
+key-recovery result. No new cohort or comparative result is asserted. Map
+comparison counts are implementation-dependent; equality and tree internals
+are not fully counted. Output serialization remains outside the meter.
+
+### Open threads
+Frozen pricing contract, experimental admission and EKS ownership reconciliation
+remain open. The pencil cohort still has 717 missing candidate completions.
+Shared dated session log remains reserved to another task; record kept here.
+
+### Errors
+Initial wrapper omitted iterator size hints; corrected following peer review.
+Diem remains deadline-expired at 50/52 records and was not restarted.
+
+An overlapping local build produced a missing-object linker diagnostic; all
+builds were allowed to finish and default tests were rerun sequentially.
+
+## 2026-10-29 T-798: phase and scalar ledger reconciliation
+
+### What was done
+Added field/native/symbolic phase sum checks and explicit interval remainder.
+Moved walk-label generation into generation timing. Independent source review
+found candidate expanded inversion versus reference atomic inversion counters.
+Added a checked native scalar normalization and tests against both actual
+inverse implementations; recorded formulas and open gates in COST_MODEL_DRAFT.json.
+
+### Decisions made
+Retain raw counts and immutable old evidence. Do not apply historical prices
+unchanged to this producer. Atomic scalar inverse weights remain unfrozen;
+no new ratio or full-cost claim follows from the normalization. Sources reviewed:
+Ring/modpow in three_leads.rs, frozen price_sparse.rs, and producer/library pow.
+
+### Open threads
+EKS retained-job listing again failed AssumeRole authorization on the existing
+job-submitter connection. No role changes or cohort submission. Full protocol,
+logical/setup coverage, valuation and remaining 717 candidate completions remain.
+
+### Errors
+Historical scalar event sums use asymmetric inversion internals. Recorded the
+specific discrepancy without changing saved results or claiming a revised ratio.
+
+Independent read-only review found no formula/path/phase-ordering defect.
+Prime validity remains a caller obligation. Future analyzer aggregation must
+use checked sums; existing producer phase aggregation is not overflow-checked.
+
+## 2026-10-29 T-801: execution route reconciliation
+
+### What was done
+Read isolab-eks skill, ACCESS.md, HARNESS.md, recovery reference and live MCP
+schema. Installed overview succeeded. Existing documented host connection
+confirmed create Jobs permission and listed 9 terminal isolab Jobs, 7 succeeded
+and 2 failed. Read-only agent audited migration and saved Diem/freeze receipts.
+
+### Decisions made
+Correct prior interpretation: research in migration prose is not a namespace
+assignment. The documented namespace is isolab; retained access audit maps the
+existing host role to isolab:submitters. No credentials, permissions or configs
+changed. Preserve Diem deadline and unmet freeze prerequisites. No Job submitted.
+
+### Open threads
+Standalone pencil CLI needs native ecbench per-target integration for the
+qualified resumable contract. Source paths are src/cryptanalysis/ecbench/
+three_leads.rs and methods.rs. Full protocol, image/binary identity, complete
+valuation and cohort upper gate remain. Historical task EKS IDs were not found.
+
+### Errors
+Earlier turns tested namespace research and overgeneralized launcher AssumeRole
+denial to all approved EKS access. Corrected using live documented connection;
+other namespaces and unrelated historical experiment outcomes remain unclaimed.
+
+## 2026-10-29 T-802: reusable solver extraction
+
+### What was done
+Moved exact arithmetic and six solver tests to native_solver.rs; solve_one
+accepts instance/target/seed/config/optional observer. Driver retains archive,
+known-answer checks, rho and allocator installation. Default 14 and producer
+21 library tests and both Clippy configurations pass.
+
+### Decisions made
+Version 2 repeats cold setup per target, includes target-validity work, and
+has a changed live-memory baseline before rho. Preserve 16 walks and rho cap
+semantics. No hidden environment node ordering. Source aliases permit later
+root-engine inclusion without passing duplicate backend types. No cohort run.
+
+### Open threads
+Root ecbench registration, serialization-only kernel feature, executable
+protocol, complete prices, qualified recovery and 717 missing completions.
+
+### Errors
+Independent review identified hidden environment ordering, insufficient source
+metadata checks and overbroad allocation-parity wording. Corrected all three.
+Guard restores the arithmetic flag on unwind; panic still invalidates a run.
