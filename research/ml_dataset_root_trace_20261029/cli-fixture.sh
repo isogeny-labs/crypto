@@ -42,7 +42,7 @@ run() {
 protocol_sha=$(sha256sum "$output/protocol.json" | cut -d ' ' -f1)
 run plan dataset plan --out "$output/plan.json" --n 7 --m 2 --families prime --solvers root --curve-seeds 8 --generators 2 --keys 2 --seed 42 --factor-base-size 2 --degree-bound 4 --work-limit 50000 --protocol-sha256 "$protocol_sha"
 run preflight dataset preflight --plan "$output/plan.json" --protocol "$output/protocol.json"
-jq -e --arg source "$source_commit" '.source_commit == $source and .source_dirty == false' "$output/preflight.stdout" > "$output/preflight-binding-check.txt"
+jq -e --arg source "$source_commit" --arg binary "$expected_sha" '.source_commit == $source and .binary_sha256 == $binary and .source_dirty == false' "$output/preflight.stdout" > "$output/preflight-binding-check.txt"
 for shard in 62 63; do
   run "generate-$shard" dataset generate --plan "$output/plan.json" --protocol "$output/protocol.json" --out "$output/shard-$shard" --max-cases 1 --shard-index "$shard" --shard-count 64 --seconds-per-case 20 --memory-mib 512 --trace-mib 16
   run "verify-$shard" dataset verify --out "$output/shard-$shard"
@@ -53,4 +53,7 @@ for shard in 62 63; do
     "$output/shard-$shard/cells/$cell/manifest.json" > "$output/certificate-$shard.check"
   jq -s -e 'length == 1 and ([.[0].source_artifacts[] | select(.role == "prime-root-certificates/v1")] | length) == 1' \
     "$output/export-$shard/restricted/index.jsonl" > "$output/export-retention-$shard.check"
+  # Representative leakage assertions supplement unchanged allowlisted exporter source.
+  jq -s -e 'all(.[]; ([.. | objects | keys[] | select(. == "root_certificate_scope" or . == "queries" or . == "events" or . == "known_answer_scalar" or . == "found_pdp")] | length) == 0)' \
+    "$output/export-$shard/features.jsonl" > "$output/public-root-exclusion-$shard.check"
 done
