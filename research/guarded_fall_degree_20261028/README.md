@@ -55,6 +55,14 @@ assignment indicators give the degree bound. Proof size may be exponential.
 It establishes an upper bound for this exact encoding, with no first-fall
 equality or growing lower bound.
 
+A separate prime-field result uses Boolean-constrained variables with
+coefficients still in `F_p`. For normalized lookup inputs whose base images
+have rational point lifts, surjective auxiliary bit encodings give
+`d_F <= 3*ell+2`. Raw inputs instead give
+`d_F <= max(3*ell+2,d_raw)`. This is not a `GF(2)` carry-circuit model;
+lookup size and proof size can be exponential. See the
+[exact prime-field bit-restricted theorem](extensions/large_curves/prime_bit_restricted_upper.txt).
+
 ## Proofs and executable checks
 
 - [Degree-five proof and matching lower bound](proofs/universal_five_symmetric_audit.txt).
@@ -62,6 +70,8 @@ equality or growing lower bound.
   [binary bridge](extensions/growing_b/binary_bridge.txt).
 - [Characteristic-two proof and classification](extensions/characteristic_two/extension_proof.txt).
 - [Fully Boolean binary upper bound](extensions/characteristic_two/boolean_upper_bound.txt).
+- [Large standard-curve applications and exact replay](extensions/large_curves/README.md):
+  four public known-answer fixtures over 256-, 384-, and 521-bit prime fields.
 - [Native prime-modulus DAG replay](native/README.txt): exact sparse polynomial
   arithmetic with strict input binding; no search and no Python execution.
 - [Native binary-field checker](extensions/char2_compute/native/README.txt):
@@ -82,6 +92,22 @@ cargo test --locked --manifest-path research/guarded_fall_degree_20261028/extens
 The binary crate includes one pinned, already-proved cube-orbit regression.
 It is a development correctness test, not a new research sweep. No EKS
 experiment or performance measurement was run for these extension proofs.
+
+## Larger curves
+
+The ordinary-ring theorem already quantifies over every prime `p>3`.
+The native implementation now also supports arbitrary-precision coefficients.
+Fixed public fixtures on secp256k1, secp256r1 (P-256), secp384r1 (P-384), and
+secp521r1 (P-521) have separately rechecked curve witnesses and independently
+replayed degree-five refutations. Their first/last pair `(4,5)` follows from
+the stated theorem; no new degree-four closure computation is claimed.
+
+The ordinary binary theorem likewise allows arbitrary `n`. In particular,
+the standard odd binary field sizes 163, 233, 239, 283, 409, and 571 exclude
+the cube-orbit exception. This extension supplies numerical certificates for
+the four prime-field fixtures, not those large binary curves. Increasing the
+field size preserves the fixed five-variable, three-abscissa presentation;
+the fully Boolean and growing-cardinality models retain their separate bounds.
 
 ## Connection to the existing fall-degree work
 

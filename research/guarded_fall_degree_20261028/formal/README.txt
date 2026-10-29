@@ -1,6 +1,12 @@
 Partial Lean formalization of fall-degree proof identities
 Date: 2026-10-28
 
+Addition, 2026-10-29: PrimeBitLocal.lean is a second default Lake target with
+eight checked local dependency lemmas. Its separate receipt is
+prime-bit-verification.json and its scope is in prime-bit-readme.txt. The
+original twelve-theorem source and four existing ProofRefs are unchanged.
+The complete prime-field bit-restricted degree bound is not formalized.
+
 Status
 ------
 The module FallDegreeIdentities.lean has twelve checked theorems. It proves

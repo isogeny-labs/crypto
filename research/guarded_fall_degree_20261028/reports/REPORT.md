@@ -1,4 +1,4 @@
-# Guarded fall-degree proof and extensions — 2026-10-28
+# Guarded fall-degree proof and extensions — 2026-10-28–29
 
 This is a mathematical result report and development-verification record.
 It is not an experiment timing report or a claimed ECDLP improvement.
@@ -60,7 +60,10 @@ was run in this integration. The full library test and native/Lean checks are
 recorded in `../validation/` and the PR.
 
 The partial Lean project checks resultant, guard, missing-root, and related
-identities and a common-root implication. The complete filtered-closure,
+identities and a common-root implication. The original twelve lemmas are
+unchanged; eight new local lemmas check quadratic cancellation and explicit
+discriminant/diagonal consequences. Both targets build, and the new module
+passes fresh kernel replay. The complete filtered-closure,
 finite-grid, and curve bridges remain unformalized. See
 [proof map](../formal/PROOF_MAP.json).
 
@@ -91,3 +94,34 @@ degree result, together with an encoding audit before applying the new upper
 theorem to any existing ledger.
 Partial Lean identity verification does not discharge it. Larger-cardinality
 exact last-fall values also remain open between the proved bounds.
+
+## Large standard-curve applications
+
+The native checker now includes arbitrary-precision replay, alongside the
+unchanged machine-word rules. Four public prime-field fixtures use secp256k1,
+secp256r1, secp384r1, and secp521r1. Their field sizes are 256, 256, 384,
+and 521 bits; separate sparse replay accepts 413, 415, 415, and 415 proof
+nodes, each with maximum degree five. Pair `(4,5)` follows from the uniform
+theorem, not a new large-field degree-four closure computation.
+
+The public membership set is `{x(G),x(2G),x(4G)}` and the target is `16G`.
+The curve checker rechecks all nonzero multiples through `28G`, exact
+parameters, all six inputs, and the serialized binding. Both target signs
+are excluded by the public scalar bound. These are known-answer correctness
+fixtures; no new scientific sweep or timing comparison was run. See
+[records, commands, and scope](../extensions/large_curves/README.md).
+
+OpenSSL 3.5.7 independently matches all 112 public points and all four sets
+of curve parameters; its native helper and exact comparison receipts are
+retained with the fixtures.
+
+A separate prime-field bit-restricted presentation has upper bound
+`d_F<=3*ell+2` for supplied multilinear normal forms, with all lookup images
+rational point abscissas and surjective auxiliary bit encodings. The
+coefficient field stays `F_p`. For raw inputs the bound becomes
+`max(3*ell+2,d_raw)`. The proof localizes to coprime univariate quadratics,
+which have a degree-two refutation. It is not a bound for `GF(2)` carry
+circuits, and lookup/proof size can be exponential. See
+[the exact theorem and degree audit](../extensions/large_curves/prime_bit_restricted_upper.txt).
+
+![Executed prime-field checks and theorem-only binary coverage](../extensions/large_curves/coverage.svg)

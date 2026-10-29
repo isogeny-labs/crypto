@@ -7,7 +7,7 @@
 \begin{document}
 \begin{center}
 {\Large Guarded summation-polynomial fall degrees}\par
-{\small Study report, 28 October 2026. Derived bounds and development checks; no performance claim.}
+{\small Study report, 28--29 October 2026. Derived bounds and development checks; no performance claim.}
 \end{center}
 
 Let $S$ be $B$ distinct rational affine-point abscissas, $g(T)=\prod_{s\in S}(T-s)$,
@@ -88,4 +88,96 @@ audit before application to that ledger. No performance or security claim follow
 \texttt{native/validation/}, \texttt{identities/}, and \texttt{formal/}.
 The editable diagram source is \texttt{reports/proof-dependencies.dot}.
 Historical Python sources are preserved as provenance, not as an execution path.
+
+\newpage
+\begin{center}
+{\Large Large standard-curve applications}\par
+{\small Fixed public correctness fixtures; exact integer arithmetic, no timing comparison.}
+
+\begin{tabular}{lrrrl}
+\toprule
+Standard curve & Field bits & Replayed DAG nodes & Maximum degree & Point/input recheck \\
+\midrule
+secp256k1 & 256 & 413 & 5 & accepted \\
+secp256r1 / P-256 & 256 & 415 & 5 & accepted \\
+secp384r1 / P-384 & 384 & 415 & 5 & accepted \\
+secp521r1 / P-521 & 521 & 415 & 5 & accepted \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Every fixture uses $S=\{x(G),x(2G),x(4G)\}$ and $R=16G$. Rechecking the
+nonzero public multiples $G,\ldots,28G$ excludes both target signs by an
+integer scalar bound. OpenSSL 3.5.7 independently matches all 112 public points
+and the curve parameters. Producer and sparse replay use separate polynomial
+implementations; numeric JSON never passes through floating point.
+
+\begin{center}
+\includegraphics[width=0.99\linewidth,height=0.44\textheight,keepaspectratio]{../extensions/large_curves/coverage.pdf}
+\end{center}
+
+Degree-five refutations are replayed computations. Exact pair $(4,5)$ also
+uses the uniform lower/first-fall proofs, not a new degree-four closure.
+The five-variable, three-abscissa model is fixed; no full-DLP cost is measured.
+The large binary curves have theorem coverage only in this extension.
+
+\textbf{Sources and records.} \href{https://www.secg.org/sec2-v2.pdf}{SEC2 v2.0},
+Sections 2.4--2.6; \texttt{extensions/large\_curves/README.md}, the pinned
+parameter snapshot, and per-curve input/witness/DAG/replay records.
+Prime-field interpretation assumes the standard field primes. Full degree,
+curve-provenance and group-order arguments remain outside the Lean claim.
+
+\newpage
+\begin{center}
+{\Large Prime-field bit restrictions: a size-independent upper bound}
+\end{center}
+
+Let $p>3$, let the curve be nonsingular, and use three blocks of $\ell\ge1$
+Boolean-constrained base variables. Each coordinate lookup has degree at most
+$\ell$ and takes every Boolean assignment to a rational point abscissa.
+Encode $u$ and optional $v$ by independent $n$-bit integer maps onto
+$\mathbb F_p$, with $2^n\ge p$. The coefficient field remains $\mathbb F_p$.
+Include every bit equation $W^2-W$ and supply the multilinear normal forms of
+the two summation equations and optional inverse guard.
+
+\[
+\boxed{\text{UNSAT}\quad\Longrightarrow\quad d_F\le3\ell+2.}
+\]
+
+The cap is independent of the modulus size and of $n$. It depends on the
+exact generating presentation; it is not a theorem for a $\mathbb F_2$
+carry-circuit implementation of prime-field arithmetic.
+
+\textbf{Degree accounting.} Put $L=3\ell$. Each normalized equation has
+base support $s_i\le2\ell$ and auxiliary degree at most two. Multiply by
+assignment-indicator factors on its support, reducing Boolean powers after
+each step. Every reduced row has degree at most $s_i+2$; a next factor costs
+at most $s_i+3\le L+2$. The complementary factors then give the fully
+localized equation within $L+2$.
+
+After fixing the base assignment, rational point lifts make the first
+quadratic's roots rational. The equal-abscissa case is linear or a nonzero
+constant; an active inverse guard excludes it directly. Unsatisfiability
+therefore gives coprime univariate polynomials of degree at most two.
+Their constant refutation needs degree at most two: a monic difference gives
+$u-\alpha$, and subtracting its linear multiples from the quadratic leaves
+its nonzero value at $\alpha$. Carrying the assignment indicator throughout
+costs at most $L+2$. Summing all indicators gives the exact identity $1$.
+
+\textbf{Raw inputs.} If the supplied substitutions have maximum degree
+$d_{\rm raw}$, normalizing them first gives
+\[
+d_F\le\max(3\ell+2,d_{\rm raw}).
+\]
+Arbitrary multilinear lookups have $d_{\rm raw}\le4\ell$; affine lookups
+have $d_{\rm raw}\le4$ and retain the $3\ell+2$ bound.
+
+\textbf{Limits.} Lookup tables and the proof may have exponentially many
+terms or rows. No first-fall equality, growing lower bound, exact degree,
+runtime gain, general ceiling five, or E12 certification follows.
+Eight local algebraic dependencies pass Lean build and fresh kernel replay,
+including the explicit discriminant/diagonal branch and quadratic cancellation.
+The complete filtered-closure theorem is not Lean formalized.
+The full statement and all edge cases are in
+\texttt{extensions/large\_curves/prime\_bit\_restricted\_upper.txt}.
 \end{document}
