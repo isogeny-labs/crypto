@@ -42,11 +42,12 @@ for(mpI=1;mpI<=35;mpI++){
 if(mpCount!=34 || mpH[1]!=1){ERROR("map invariant basis constant framing failed");}
 list mapConstraints;for(mpI=1;mpI<=385;mpI++){mapConstraints=insert(mapConstraints,"0",size(mapConstraints));}
 mapConstraints[1]="1";
-proc mpAdd(poly coefficients,string monomial){
+int mpTermCount=0;
+proc mpAdd(poly coefficients,string symbolText27){
  int term;int index;coefficients=jet(coefficients,384);
  for(term=1;term<=size(coefficients);term++){
   if(leadcoef(coefficients[term])!=1){ERROR("map coefficient not binary");}
-  index=deg(coefficients[term])+1;mapConstraints[index]=mapConstraints[index]+"+"+monomial;
+  mpTermCount=mpTermCount+1;index=deg(coefficients[term])+1;mapConstraints[index]=mapConstraints[index]+"+"+symbolText27;
  }
 }
 string mpAI;string mpAJ;string mpBI;string mpBJ;
@@ -60,6 +61,8 @@ for(mpI=1;mpI<=34;mpI++){
   mpAdd(mpH[mpI]^2*mpH[mpJ],mpAI+"^2*"+mpAJ);
  }
 }
+print("MAPBUILD27_BINARY_COEFFICIENT_TERM_COUNT");mpTermCount;
+if(mpTermCount<1000){ERROR("map equation term construction unexpectedly empty");}
 link mpOut="ASCII:w map-equations.sing";open(mpOut);
 write(mpOut,"ring mapTarget27=(2,beta32),(a(1..34),b(1..34),c0,v(1..33)),dp;minpoly=beta32^5+beta32^2+1;ideal mapEquations;");
 for(mpI=1;mpI<=385;mpI++){write(mpOut,"mapEquations["+string(mpI)+"]="+mapConstraints[mpI]+";");}

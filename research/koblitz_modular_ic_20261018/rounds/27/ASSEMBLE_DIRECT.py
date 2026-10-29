@@ -64,7 +64,7 @@ for(factorIndex=1;factorIndex<=size(imageFactors[1]);factorIndex++){{
  totalDegree=totalDegree+deg(imageFactors[1][factorIndex])*imageFactors[2][factorIndex];
  print("CUBIC_FACTOR degree="+string(deg(imageFactors[1][factorIndex]))+" multiplicity="+string(imageFactors[2][factorIndex]));
  if(deg(imageFactors[1][factorIndex])==1){{
-  linearCount=linearCount+1;imageRoot=subst(imageFactors[1][factorIndex],X,0)/leadcoef(imageFactors[1][factorIndex]);
+  linearCount=linearCount+1;imageRoot=leadcoef(subst(imageFactors[1][factorIndex],X,0))/leadcoef(imageFactors[1][factorIndex]);
   if(secondY^2+imageRoot*secondY+imageRoot^3+imageRoot^2+1!=0){{ERROR("second image root fails target curve");}}
   print("SECOND_IMAGE_LINEAR_ROOT");imageRoot;
  }}
