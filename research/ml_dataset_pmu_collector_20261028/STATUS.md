@@ -1,6 +1,22 @@
 # Collector implementation status
 
-## Current validation: full library, focused tests and strict lint passed
+## Current correction: little-endian native ABI guard validated
+
+PR2801 review comment4404274309 is addressed by tested source
+`4a57e45ec74ad878a4ed0ce7ccd68abb4f4d7647`. Native support now requires
+little-endian 64-bit Linux x86_64 or AArch64; other targets return unsupported
+before opening counters. All four complementary cfg gates use that condition.
+The new backend-eligibility regression joins the existing mock tests.
+
+The correction passed26 focused tests, strict release Clippy, and the full
+library suite: **5209 passed,0 failed,123 ignored**, exit0. Original failed
+host-migration validation and its repair are retained, as described in
+[ENDIAN_REVIEW.md](ENDIAN_REVIEW.md). Current source, executable and terminal
+logs have verified canonical S3 receipts in
+[ENDIAN_VALIDATION_RECEIPTS.json](ENDIAN_VALIDATION_RECEIPTS.json).
+The following earlier validation is historical and remains unchanged.
+
+## Earlier validation: full library, focused tests and strict lint passed
 
 Compiled runtime source: `9ab6260a2aa57ca4df3729d6d17f10fefea312f5`.
 Toolchain 1.98.0, release profile, clean/full-commit build metadata. All 25 checked
