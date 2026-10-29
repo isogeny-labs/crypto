@@ -99,3 +99,16 @@ incidence/pairing bridge. No class/rank claim solely from a base coincidence.
 References: Sutherland ClassicalModPolys.html and phi_j_11.txt; Kilford–McMurdy
 arXiv1110.6801 section2 (actual7 triples, already checked in the native sources).
 No new generic kernel/factoring algorithm is claimed; reuse R13 machinery.
+
+## ENUM30 prospective completeness amendment
+
+After COLOR30 results12(twoactualcandidates) and436(oneactualcandidate),
+separately certify all common-j and X0(7) parameter polynomials split completely
+and simply over the retained fields: exact degree must equal distinct rational
+root count, checked after native factor-product reconstruction. Enumerate all
+compatible triples, reject exceptional denominator branches and compare counts
+2/1 with the full-transport runs. Failure leaves a specified nonrational or
+nonseparable gap; do not declare full source-fiber completeness from a rational
+search. This check does not repeat kernel factorization or full transport.
+The original-incidence/source moduli identification and signed-divisor bridge
+remain separate even if finite ordinary candidate enumeration is exhausted.
