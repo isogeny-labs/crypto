@@ -65,6 +65,10 @@ tools/lean/proof-gate.sh --out receipts          # keep build and audit logs
 (a transitive `sorry`, a user axiom, an unlisted `native_decide`, a file with
 no theorems, a build error). The `project-omitted/` fixture registers a module
 outside its Lake default targets and requires the gate to catch its `sorryAx`.
+The same control runs with canonical, leading `./`, and trailing `/` project
+paths. Targets are normalized against the repository root with Python 3 before
+module names or archived-control exclusions are derived; paths outside the
+checkout are refused. Python 3 is therefore required alongside Git and Lean.
 CI runs it on every trigger, so the gate stays
 exercised even in a repository with no Lean proofs yet. The CI matrix covers
 the repository's pinned toolchain and Lean 4.19, used by the SEA project.

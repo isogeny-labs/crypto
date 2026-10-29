@@ -69,6 +69,7 @@ if [ ${#targets[@]} -eq 0 ]; then mapfile -t targets < <(discover); fi
 if [ $list -eq 1 ]; then printf '%s\n' "${targets[@]}"; exit 0; fi
 [ ${#targets[@]} -gt 0 ] || { echo "no Lean targets found" >&2; exit 3; }
 command -v lake > /dev/null || { echo "lake not on PATH (install elan)" >&2; exit 3; }
+command -v python3 > /dev/null || { echo "python3 not on PATH (target path normalization)" >&2; exit 3; }
 
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
@@ -76,7 +77,21 @@ fail=0
 summary=()
 
 run_target() {
-  local t=$1 slug log status
+  local t slug log status
+  if ! t=$(python3 - "$root" "$1" <<'PY'
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1]).resolve()
+target = (root / sys.argv[2]).resolve(strict=True)
+if not target.is_relative_to(root):
+    raise SystemExit("proof target escapes the repository")
+print(target.relative_to(root).as_posix())
+PY
+  ); then
+    echo "FAIL_target_path $1" >&2
+    return 1
+  fi
   slug=$(echo "$t" | tr '/.' '__')
   log="$scratch/$slug"
   mkdir -p "$log"
@@ -145,10 +160,11 @@ run_target() {
           *.lean) ;;
           *) continue ;;
         esac
-        case "$f" in
-          "$t/lakefile.lean"|*/AxiomAudit.lean) continue ;;
+        module=$f
+        [ "$t" = . ] || module=${f#"$t"/}
+        case "$module" in
+          lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
         esac
-        module=${f#"$t"/}
         module=${module%.lean}
         sources+=("+${module//\//.}")
       done < <(cd "$root" && git ls-files -z -- "$t")

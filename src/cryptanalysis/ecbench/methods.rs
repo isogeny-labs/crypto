@@ -146,6 +146,39 @@ const K4_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
+    name: "trial_cap",
+    default: None,
+    help: "deterministic maximum collision-search iterations; exhaustion is retained",
+}];
+const THREE_LEADS_GENUS2_PARAMS:&[ParamDecl]=&[
+    ParamDecl{name:"trial_cap",default:None,help:"deterministic maximum processed divisors"},
+    ParamDecl{name:"independent",default:None,help:"0: Jacobian walk; 1: independent source scalar combinations followed by tau"},
+    ParamDecl{name:"unique_relations",default:None,help:"1 discards repeated divisors up to sign and charges walk restarts; 0 is the duplicate-permitting diagnostic"},
+];
+const THREE_LEADS_DECOMPOSITION_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "trial_cap",
+        default: None,
+        help: "maximum relation trials",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: None,
+        help: "linearized (binary subfield only), semaev (odd short models) or subtract",
+    },
+    ParamDecl {
+        name: "random_base",
+        default: None,
+        help: "0 structured base; 1 same-size random sign-orbit control",
+    },
+    ParamDecl {
+        name: "base_seed",
+        default: None,
+        help: "fixed factor-base seed independent of target and algorithm seed",
+    },
+];
+
 const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
@@ -326,6 +359,16 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: "rho.plus_model_v1",
             family: "rho",
@@ -566,6 +609,25 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
+            id: "transfer.quartic_cover_v2",
+            family: "rho",
+            summary: "transfer.quartic_cover with its accounting completed (frozen id `transfer.quartic_cover` keeps its counts): the F_p multiplications of the square roots and f(x) evaluations that search for the cover's rational points and the base point B run outside the plane-quartic counter and are tallied as `root_search_field_muls_uncharged`, listed unpriced, so the record is a lower bound; otherwise pull the instance back along the double cover C : V⁴ = x³ + ax + b → E into the Jacobian of a smooth plane quartic (non-hyperelliptic genus 3), solve it there with a generic inner method, check [k]G = Q on E; Jacobian work counted in F_p multiplications and charged at c_E, the multiplications of one affine addition on E measured in the run; prime-field curves, 29 ≤ p < 2^31",
+            entry: "ecbench::cover_quartic::{QuarticCover, transfer}",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "inner",
+                    default: Some("rho.plain"),
+                    help: "the generic method run in J(C): rho.plain, bsgs.textbook, bsgs.interleaved or kangaroo.vow (negation is not free on the quartic, so rho.negation and bsgs.negation are refused)",
+                },
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "the inner rho or kangaroo's step cap, in multiples of √r",
+                },
+            ],
+        },
+        MethodDecl {
             id: "transfer.ghs_cover",
             family: "rho",
             summary: "carry the instance by the GHS conorm–norm map Φ : E(F_{q³}) → Jac_H(F_q), q = p², into the Jacobian of the genus-3 hyperelliptic cover (Joux–Vitse curves), solve it there with a generic inner method, check [k]G = Q on E; cover, transfers and solve counted in F_p multiplications and charged at c_E, one affine addition on E measured in the run; ghs_fp6 curves only",
@@ -589,6 +651,35 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "ic",
             summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
             entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "fb_size",
+                    default: Some("0"),
+                    help: "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
+                },
+                ParamDecl {
+                    name: "extra_relations",
+                    default: Some("8"),
+                    help: "relations collected beyond the factor-base size",
+                },
+                ParamDecl {
+                    name: "max_trials",
+                    default: Some("2000000"),
+                    help: "relation-search trials before giving up",
+                },
+                ParamDecl {
+                    name: "large_primes",
+                    default: Some("0"),
+                    help: "1 keeps one-large-prime partials and combines pairs",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "ic.hyperelliptic_v2",
+            family: "ic",
+            summary: "ic.hyperelliptic with its accounting completed (frozen id `ic.hyperelliptic` keeps its counts): the verification [k]D₁ = D₂ is charged as Jacobian operations (phase `verification`, in the total; the frozen id ran it twice, uncharged) and the factor-base scan's F_p multiplications are tallied (`factor_base_fp_muls_uncharged`, phase `factor_base`, listed unpriced); otherwise Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
+            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp + ecbench::hyper_ic::factor_base_scan_muls",
             applies: Applies::Any,
             params: &[
                 ParamDecl {
@@ -671,6 +762,51 @@ pub fn registry() -> &'static [MethodDecl] {
             id: "ic.cm_folded_native_d43_v1",
             family: "ic",
             summary: "D=-43 degree-11 CM scalar-orbit signed MITM2, native backend with independent Rust point/relation replay; unpriced native work retained",
+            entry: "ecbench::cm_folded::solve",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "backend", default: None, help: "compiled native/folded.cpp executable" },
+                ParamDecl { name: "backend_sha256", default: None, help: "required content hash of native backend" },
+                ParamDecl { name: "mode", default: Some("scalar"), help: "scalar or velu (crater only)" },
+                ParamDecl { name: "size", default: Some("8192"), help: "abscissae, four seed columns" },
+                ParamDecl { name: "query_limit", default: Some("1000000000"), help: "injective point query cap below r" },
+                ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
+            ],
+        },
+        MethodDecl {
+            id: "ic.cm_folded_native_v2",
+            family: "ic",
+            summary: "CM scalar-orbit signed MITM2, native backend with independent Rust point/relation replay; unpriced native work retained; _v2 of the frozen `_v1` id: the replay's counted operations are charged (total_gae, S) and the unpriced native counters are named",
+            entry: "ecbench::cm_folded::solve",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "backend", default: None, help: "compiled native/folded.cpp executable" },
+                ParamDecl { name: "backend_sha256", default: None, help: "required content hash of native backend" },
+                ParamDecl { name: "mode", default: Some("scalar"), help: "scalar or velu (crater only)" },
+                ParamDecl { name: "size", default: Some("8192"), help: "abscissae, four seed columns" },
+                ParamDecl { name: "query_limit", default: Some("1000000000"), help: "injective point query cap below r" },
+                ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
+            ],
+        },
+        MethodDecl {
+            id: "ic.cm_folded_recurrence_v2",
+            family: "ic",
+            summary: "Generic quadratic-recurrence scalar-orbit signed MITM2, native backend with independent Rust point/relation replay; unpriced native work retained; _v2 of the frozen `_v1` id: the replay's counted operations are charged (total_gae, S) and the unpriced native counters are named",
+            entry: "ecbench::cm_folded::solve",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "backend", default: None, help: "compiled native/folded.cpp executable" },
+                ParamDecl { name: "backend_sha256", default: None, help: "required content hash of native backend" },
+                ParamDecl { name: "mode", default: Some("scalar"), help: "scalar or velu (crater only)" },
+                ParamDecl { name: "size", default: Some("8192"), help: "abscissae, four seed columns" },
+                ParamDecl { name: "query_limit", default: Some("1000000000"), help: "injective point query cap below r" },
+                ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
+            ],
+        },
+        MethodDecl {
+            id: "ic.cm_folded_native_d43_v2",
+            family: "ic",
+            summary: "D=-43 degree-11 CM scalar-orbit signed MITM2, native backend with independent Rust point/relation replay; unpriced native work retained; _v2 of the frozen `_v1` id: the replay's counted operations are charged (total_gae, S) and the unpriced native counters are named",
             entry: "ecbench::cm_folded::solve",
             applies: Applies::Any,
             params: &[
@@ -992,10 +1128,28 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
 const HYPER_GENUS2_ID: &str = "ic.hyperelliptic";
 const HYPER_THREAD_ENTRY: &str = "ecbench::hyper_ic::solve";
 const HYPER_GENUS2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_calculus_dlp";
+/// `ic.hyperelliptic` with the verification charged and the factor-base
+/// scan tallied; the frozen id above keeps its exact counts.
+const HYPER_GENUS2_V2_ID: &str = "ic.hyperelliptic_v2";
+const HYPER_GENUS2_V2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_calculus_dlp + ecbench::hyper_ic::factor_base_scan_muls";
 
 /// Fill defaults, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
-    let d = decl(&spec.id).ok_or_else(|| {
+    // The genus-2 and thread Jacobian implementations retain one historical
+    // method name, but have different parameter contracts. Choose the thread
+    // declaration when its distinguishing parameters are present.
+    let thread_hyper = spec.id == "ic.hyperelliptic"
+        && (spec.params.contains_key("branches")
+            || spec.params.contains_key("d_step_in")
+            || spec.params.get("fb_size").is_some_and(|s| s == "all"));
+    let d = (if thread_hyper {
+        registry()
+            .iter()
+            .find(|m| m.id == spec.id && m.entry == "ecbench::hyper_ic::solve")
+    } else {
+        decl(&spec.id)
+    })
+    .ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
@@ -1261,7 +1415,7 @@ fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
     }
 }
 
-fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
+pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
     counters
         .iter()
         .filter(|(k, v)| k.ends_with("_uncharged") && **v > 0)
@@ -1659,8 +1813,16 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// non-prime instance. An arm that cannot run is a spec error, not a session of `error`
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
-    let id = full_price::base_of(&m.id).unwrap_or(m.id.as_str());
+    let id = full_price::base_of(&m.id)
+        .or(wordram_price::base_of(&m.id))
+        .unwrap_or(m.id.as_str());
     hyper_ic_variant_guard(m, inst, curve)?;
+    if id == "rho.multitarget_pooled" {
+        let batch = param_u64(m, "batch")?;
+        if !(1..=65_536).contains(&batch) {
+            return Err(format!("`batch` must be in 1..=65536, not {batch}"));
+        }
+    }
     if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -1690,6 +1852,11 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             }
         }
         _ if id == HYPER_IC => Err(hyper_ic_refusal(curve)),
+        Instance::Ext(e) => ext_applicable(id, e, curve),
+        _ if id == "rho.gls" || id == "rho.frobenius_orbit" => Err(format!(
+            "`{id}` runs on subfield_fp3 / gls_fp2 curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1700,6 +1867,9 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
                 wi.kc.n
             )),
         },
+        Instance::Prime(i) if id.starts_with("ic.cm_folded_") => {
+            super::cm_folded::applicable(m, i)
+        }
         Instance::Prime(i) if id == "rho.quartic" => {
             let mut scratch = GroupOps::default();
             QuarticClasses::new(&i.curve, i.generator_point(), i.r, &mut scratch)
@@ -1719,21 +1889,31 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
                 ))
         }
         Instance::Prime(i) if id == "transfer.isogeny" => {
+            let inner = m.params.get("inner").map_or("rho.negation", String::as_str);
+            if !JACOBIAN_GENERIC.contains(&inner) || inner == "rho.frozen_reference" {
+                return Err(format!("`inner` must be a generic method, not `{inner}`"));
+            }
             let ell: u64 = m.params.get("ell").and_then(|v| v.parse().ok()).unwrap_or(3);
+            if !matches!(ell, 2 | 3) {
+                return Err(format!("`ell` must be 2 or 3, not {ell}"));
+            }
+            if ell == i.r {
+                return Err("ℓ equals the subgroup order; the isogeny would not preserve it".into());
+            }
             let mut t = crate::cryptanalysis::ecbench::isogeny::FieldTally::default();
             crate::cryptanalysis::ecbench::isogeny::find_isogeny(&i.curve, ell, &mut t)
                 .map(|_| ())
                 .ok_or_else(|| format!("{} has no rational {ell}-isogeny", curve.slug))
         }
-        Instance::Prime(i) if id == "transfer.quartic_cover" => {
+        Instance::Prime(i) if is_quartic_cover(id) => {
             quartic_cover_applicable(m, i).map(|_| ())
         }
         _ if id == "transfer.ghs_cover" => Err(format!(
             "`transfer.ghs_cover` runs on ghs_fp6 curves only; {} is {}",
             curve.slug, curve.family
         )),
-        _ if id == "transfer.quartic_cover" => Err(format!(
-            "`transfer.quartic_cover` runs on prime-field curves only; {} is {}",
+        _ if is_quartic_cover(id) => Err(format!(
+            "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
         )),
         _ if id == "transfer.isogeny" => Err(format!(
@@ -1750,6 +1930,35 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             curve.slug, curve.family
         )),
         _ => Ok(()),
+    }
+}
+
+/// What `solve_ext` runs on a GLS or subfield curve: the generic methods,
+/// and the endomorphism-orbit rho of the instance's own family.  Anything
+/// else is the refusal `solve_ext` raises on every execution.
+fn ext_applicable(id: &str, inst: &ExtInstance, curve: &CurveFacts) -> Result<(), String> {
+    let generic = id.starts_with("rho.plain")
+        || id == "rho.negation"
+        || id == "rho.frozen_reference"
+        || id.starts_with("bsgs.")
+        || id == "kangaroo.vow";
+    match (inst, id) {
+        _ if generic => Ok(()),
+        (ExtInstance::Gls(_), "rho.gls") | (ExtInstance::Subfield(_), "rho.frobenius_orbit") => {
+            Ok(())
+        }
+        _ if id == "rho.gls" || id == "rho.frobenius_orbit" => Err(format!(
+            "`{id}` runs on {} curves only; {} is {}",
+            if id == "rho.gls" {
+                "gls_fp2"
+            } else {
+                "subfield_fp3"
+            },
+            curve.slug,
+            curve.family
+        )),
+        (ExtInstance::Gls(_), _) => Err(format!("`{id}` has no gls_fp2 implementation")),
+        (ExtInstance::Subfield(_), _) => Err(format!("`{id}` has no subfield_fp3 implementation")),
     }
 }
 
@@ -1789,6 +1998,9 @@ pub fn solve(
 ) -> Result<SolveReport, String> {
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
+    if m.id.contains(".three_leads_") && !matches!(inst, Instance::ThreeLeads(_)) {
+        return Err("three-leads methods require a frozen three_leads curve fixture".into());
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -1863,6 +2075,14 @@ fn solve_inner(
     ty: u64,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if let Instance::ThreeLeads(i) = inst {
+        return super::three_leads::solve(
+            m,
+            i,
+            crate::cryptanalysis::three_leads::Point::affine(tx, ty),
+            seed,
+        );
+    }
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
@@ -1919,9 +2139,15 @@ fn solve_inner(
             solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
-            if m.id == "ic.cm_folded_native_v1"
-                || m.id == "ic.cm_folded_native_d43_v1"
-                || m.id == "ic.cm_folded_recurrence_v1" =>
+            if matches!(
+                m.id.as_str(),
+                "ic.cm_folded_native_v1"
+                    | "ic.cm_folded_native_d43_v1"
+                    | "ic.cm_folded_recurrence_v1"
+                    | "ic.cm_folded_native_v2"
+                    | "ic.cm_folded_native_d43_v2"
+                    | "ic.cm_folded_recurrence_v2"
+            ) =>
         {
             super::cm_folded::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
@@ -2035,12 +2261,12 @@ fn solve_inner(
         (Instance::Prime(i), _) if m.id == "transfer.isogeny" => {
             solve_isogeny_transfer(m, i, PrimePoint::affine(tx, ty), seed)
         }
-        (Instance::Prime(i), _) if m.id == "transfer.quartic_cover" => {
+        (Instance::Prime(i), _) if is_quartic_cover(&m.id) => {
             solve_quartic_cover(m, i, PrimePoint::affine(tx, ty), seed)
         }
-        (_, _) if m.id == "transfer.quartic_cover" => Err(format!(
-            "`transfer.quartic_cover` runs on prime-field curves only; {} is {}",
-            curve.slug, curve.family
+        (_, _) if is_quartic_cover(&m.id) => Err(format!(
+            "`{}` runs on prime-field curves only; {} is {}",
+            m.id, curve.slug, curve.family
         )),
         (_, _) if m.id == "transfer.isogeny" => Err(format!(
             "`transfer.isogeny` runs on prime-field curves only; {} is {}",
@@ -2081,6 +2307,7 @@ fn solve_inner(
         }
         (Instance::Wide(_), _)
         | (Instance::Fp4(_), _)
+        | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
         | (Instance::Quartic(_), _)
@@ -2124,7 +2351,7 @@ fn jacobian_applicable(
     if JACOBIAN_GENERIC.contains(&id) {
         return Ok(());
     }
-    if id == "ic.hyperelliptic" && matches!(inst, Instance::Genus2(_)) {
+    if (id == HYPER_GENUS2_ID || id == HYPER_GENUS2_V2_ID) && matches!(inst, Instance::Genus2(_)) {
         return Ok(());
     }
     if id == "transfer.ghs_cover" && matches!(inst, Instance::Ghs(_)) {
@@ -2165,7 +2392,7 @@ fn solve_jacobian(
     match inst {
         Instance::Genus2(i) => {
             let t = i.decode(target)?;
-            if m.id == "ic.hyperelliptic" {
+            if m.id == HYPER_GENUS2_ID || m.id == HYPER_GENUS2_V2_ID {
                 return solve_ic_hyperelliptic(m, i, t, seed);
             }
             solve_generic(m, &i.group(), i.generator, t, i.r, seed)
@@ -2289,6 +2516,11 @@ fn solve_isogeny_transfer(
     Ok(rep)
 }
 
+/// `transfer.quartic_cover` and its `_v2` (root-search tally).
+fn is_quartic_cover(id: &str) -> bool {
+    id == "transfer.quartic_cover" || id == "transfer.quartic_cover_v2"
+}
+
 /// The checks `transfer.quartic_cover` makes before it runs: the inner
 /// method, the field size and an odd subgroup order, and a certified
 /// smooth model of the cover.
@@ -2330,8 +2562,11 @@ fn solve_quartic_cover(
     target: PrimePoint,
     seed: u64,
 ) -> Result<SolveReport, String> {
-    use crate::cryptanalysis::ecbench::cover_quartic::{affine_add_cost, transfer};
+    use crate::cryptanalysis::ecbench::cover_quartic::{
+        affine_add_cost, root_search_field_muls, transfer,
+    };
     use crate::cryptanalysis::ecbench::plane_quartic::{field_muls, QuarticGroup};
+    let v2 = m.id == "transfer.quartic_cover_v2";
     let t = Instant::now();
     let g = inst.generator_point();
     // c_E first: it prices everything after it.
@@ -2342,12 +2577,16 @@ fn solve_quartic_cover(
         return Err("c_E could not be measured".into());
     }
     let m0 = field_muls();
+    let r0 = root_search_field_muls();
     let cover = quartic_cover_applicable(m, inst)?;
     let setup_muls = field_muls() - m0;
+    let setup_roots = root_search_field_muls() - r0;
     let m1 = field_muls();
+    let r1 = root_search_field_muls();
     let mut e_ops = GroupOps::default();
     let (pg, pq, b) = transfer(&cover, &inst.curve, g, target, &mut e_ops)?;
     let transfer_muls = field_muls() - m1;
+    let transfer_roots = root_search_field_muls() - r1;
     let inner_id = m.params["inner"].clone();
     let mut inner_params = BTreeMap::new();
     if inner_id.starts_with("rho.") || inner_id == "kangaroo.vow" {
@@ -2383,10 +2622,25 @@ fn solve_quartic_cover(
     solve.gae = converted(solve_muls);
     solve.native.insert("field_muls".into(), solve_muls);
     solve.native.insert("jacobian_ops".into(), jac_ops as u64);
+    if v2 {
+        setup
+            .native
+            .insert("root_search_field_muls_uncharged".into(), setup_roots);
+        tr.native
+            .insert("root_search_field_muls_uncharged".into(), transfer_roots);
+    }
     let verify_phase = ops_phase("verify", verify);
     rep.phases = vec![setup, tr, solve, verify_phase];
     rep.total_gae = rep.phases.iter().map(|p| p.gae).sum();
     rep.automorphisms_used = 1;
+    if v2 {
+        // The square roots and f(x) evaluations of the point searches, run
+        // outside the plane-quartic counter: counted, not priced.
+        rep.counters.insert(
+            "root_search_field_muls_uncharged".into(),
+            setup_roots + transfer_roots,
+        );
+    }
     rep.counters.insert("cover_model_c".into(), cover.c);
     rep.counters.insert("jacobian_ops".into(), jac_ops as u64);
     rep.counters.insert(
@@ -2542,6 +2796,7 @@ fn solve_ic_hyperelliptic(
     measurement::end_online();
     let wall = t.elapsed().as_nanos() as u64;
     let recovered = k.and_then(|k| u128::try_from(k).ok());
+    let v2 = m.id == HYPER_GENUS2_V2_ID;
     let setup = GroupOps {
         adds: rep.precompute_ops as u64,
         ..GroupOps::default()
@@ -2569,11 +2824,48 @@ fn solve_ic_hyperelliptic(
         rep.smoothness_field_ops as u64,
     );
     counters.insert("row_ops_uncharged".into(), rep.solve_row_ops as u64);
-    let total = setup.gae() + search.gae();
+    let mut phases = vec![ops_phase("setup", setup), relations, la];
+    if v2 {
+        // The verification [k]D₁ = D₂ the frozen id ran (twice on a
+        // success) without charging it: every Cantor doubling and
+        // addition it executed, one GAE each.
+        let verification = ops_phase(
+            "verification",
+            GroupOps {
+                adds: rep.verification_adds as u64,
+                doubles: rep.verification_doubles as u64,
+                ..GroupOps::default()
+            },
+        );
+        // The factor-base scan's F_p multiplications, tallied by the
+        // thread arm's counted field over the same x's (the frozen id's
+        // `build_factor_base` does the work and counts none of it).
+        let fb_size = if fb == 0 { usize::MAX } else { fb as usize };
+        let (fb_muls, places) =
+            hyper_ic::factor_base_scan_muls(inst.p(), &inst.curve.f(), fb_size)?;
+        if places != rep.factor_base_size {
+            return Err(format!(
+                "factor-base tally found {places} places, the run {}",
+                rep.factor_base_size
+            ));
+        }
+        let mut fb_phase = ops_phase("factor_base", GroupOps::default());
+        fb_phase
+            .native
+            .insert("factor_base_fp_muls_uncharged".into(), fb_muls);
+        counters.insert("factor_base_fp_muls_uncharged".into(), fb_muls);
+        counters.insert(
+            "verification_jacobian_ops".into(),
+            (rep.verification_adds + rep.verification_doubles) as u64,
+        );
+        phases.insert(0, fb_phase);
+        phases.push(verification);
+    }
+    let total: f64 = phases.iter().map(|p| p.gae).sum();
     Ok(SolveReport {
         recovered,
         exhausted: recovered.is_none(),
-        phases: vec![ops_phase("setup", setup), relations, la],
+        phases,
         total_gae: total,
         automorphisms_used: 2,
         unpriced: unpriced_of(&counters),
@@ -2629,6 +2921,7 @@ fn hyper_ic_variant_guard(
 ) -> Result<(), String> {
     let (expected, workload_matches) = match m.id.as_str() {
         HYPER_GENUS2_ID => (HYPER_GENUS2_ENTRY, matches!(inst, Instance::Genus2(_))),
+        HYPER_GENUS2_V2_ID => (HYPER_GENUS2_V2_ENTRY, matches!(inst, Instance::Genus2(_))),
         HYPER_IC => (HYPER_THREAD_ENTRY, matches!(inst, Instance::Hyper(_))),
         _ => return Ok(()),
     };
@@ -4946,6 +5239,7 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
         | Instance::Ext(_)
         | Instance::Genus2(_)
         | Instance::Quartic(_)
@@ -5628,5 +5922,320 @@ mod tests {
             params: BTreeMap::new()
         })
         .is_err());
+    }
+}
+
+/// Accounting fixes of 2026-10-28: the `_v2` ids against their frozen ids,
+/// and the plan-time refusals of arms `solve` would raise on every run.
+#[cfg(test)]
+mod accounting_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::spec::{plan, Spec, SPEC_SCHEMA};
+    use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    /// Plan one arm on one curve; `Err` is the planner's message.
+    fn plan_arm(curve: Value, id: &str, params: Value) -> Result<(), String> {
+        let spec = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "accounting",
+                "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
+                "arms": [{"name": "a", "role": "candidate", "method": {"id": id, "params": params}}],
+                "measurement": {"rounds": 1, "seed": 9},
+            })
+            .to_string(),
+        )?;
+        plan(spec).map(|_| ())
+    }
+
+    fn strip_wall(mut r: SolveReport) -> SolveReport {
+        r.solve_wall_ns = 0;
+        for p in &mut r.phases {
+            p.wall_ns = None;
+        }
+        r
+    }
+
+    fn phase<'a>(r: &'a SolveReport, name: &str) -> &'a PhaseRecord {
+        r.phases
+            .iter()
+            .find(|p| p.name == name)
+            .unwrap_or_else(|| panic!("no phase {name}"))
+    }
+
+    #[test]
+    fn v2_ids_are_registered_beside_the_frozen_ones() {
+        for (v2, frozen) in [
+            ("ic.hyperelliptic_v2", "ic.hyperelliptic"),
+            ("transfer.quartic_cover_v2", "transfer.quartic_cover"),
+            ("ic.cm_folded_native_v2", "ic.cm_folded_native_v1"),
+            ("ic.cm_folded_recurrence_v2", "ic.cm_folded_recurrence_v1"),
+            ("ic.cm_folded_native_d43_v2", "ic.cm_folded_native_d43_v1"),
+        ] {
+            let (a, b) = (decl(v2).expect(v2), decl(frozen).expect(frozen));
+            assert_eq!(a.family, b.family);
+            assert_eq!(
+                a.params.iter().map(|p| p.name).collect::<Vec<_>>(),
+                b.params.iter().map(|p| p.name).collect::<Vec<_>>()
+            );
+            assert_ne!(a.summary, b.summary, "{v2} says what it adds");
+            // Neither id has a closed-form expected S.
+            assert_eq!(expected_s(v2, 2), expected_s(frozen, 2));
+        }
+        // The frozen genus-2 identity still hashes to the committed one.
+        assert_eq!(method(HYPER_GENUS2_ID, &[]).method_id, "ECM1ha6ff9c61b9eb");
+    }
+
+    /// `ic.hyperelliptic_v2` minus `ic.hyperelliptic` is exactly the charged
+    /// verification and the tallied factor-base scan; the frozen id keeps
+    /// its counts.
+    #[test]
+    fn hyperelliptic_v2_adds_exactly_the_verification_and_the_scan_tally() {
+        let spec = CurveSpec::Genus2Search {
+            p_bits: 8,
+            seed: 3,
+            max_cofactor: 16,
+        };
+        for index in 0..3 {
+            let (w, inst) = Workload::build(&spec, 11, index, TargetKind::Planted).unwrap();
+            let frozen = method(HYPER_GENUS2_ID, &[]);
+            let v2 = method(HYPER_GENUS2_V2_ID, &[]);
+            applicable(&v2, &inst, &w.curve).unwrap();
+            let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 5).unwrap());
+            let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 5).unwrap());
+            assert_eq!(a.recovered, w.planted);
+            assert_eq!(b.recovered, a.recovered);
+            // The frozen record keeps its three phases, its counters and its
+            // `unpriced`, with no verification and no factor-base tally.
+            let names =
+                |r: &SolveReport| r.phases.iter().map(|p| p.name.clone()).collect::<Vec<_>>();
+            assert_eq!(names(&a), ["setup", "relations", "linear_algebra"]);
+            assert!(!a.counters.contains_key("factor_base_fp_muls_uncharged"));
+            assert_eq!(
+                a.unpriced,
+                ["row_ops_uncharged", "smoothness_field_muls_uncharged"]
+            );
+            assert_eq!(
+                names(&b),
+                [
+                    "factor_base",
+                    "setup",
+                    "relations",
+                    "linear_algebra",
+                    "verification"
+                ]
+            );
+            // Every frozen phase and counter is unchanged in v2.
+            for p in &a.phases {
+                assert_eq!(phase(&b, &p.name), p);
+            }
+            for (k, v) in &a.counters {
+                assert_eq!(b.counters[k], *v, "{k}");
+            }
+            let extra: Vec<_> = b
+                .counters
+                .keys()
+                .filter(|k| !a.counters.contains_key(*k))
+                .collect();
+            assert_eq!(
+                extra,
+                ["factor_base_fp_muls_uncharged", "verification_jacobian_ops"]
+            );
+            assert!(b
+                .unpriced
+                .contains(&"factor_base_fp_muls_uncharged".to_string()));
+            assert_eq!(b.unpriced.len(), a.unpriced.len() + 1);
+            // The verification: [k]D₁ = D₂ twice on a success, each one
+            // doubling per bit and one addition per set bit of k.
+            let k = a.recovered.unwrap() as u64;
+            let one = u64::from(64 - k.leading_zeros()) + u64::from(k.count_ones());
+            let v = phase(&b, "verification");
+            assert_eq!(v.adds + v.doubles, 2 * one, "k {k}");
+            assert_eq!(b.counters["verification_jacobian_ops"], 2 * one);
+            assert_eq!(v.gae, (2 * one) as f64);
+            assert!(b.counters["factor_base_fp_muls_uncharged"] > 0);
+            let fbp = phase(&b, "factor_base");
+            assert_eq!(fbp.gae, 0.0);
+            assert_eq!(
+                fbp.native["factor_base_fp_muls_uncharged"],
+                b.counters["factor_base_fp_muls_uncharged"]
+            );
+            // v2 minus frozen is the verification, nothing else.
+            assert_eq!(b.total_gae - a.total_gae, v.gae);
+            // The phases sum to the total.
+            assert_eq!(b.total_gae, b.phases.iter().map(|p| p.gae).sum::<f64>());
+            assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
+        }
+    }
+
+    /// `transfer.quartic_cover_v2` minus `transfer.quartic_cover` is one
+    /// counter, the root-search tally; every figure of the frozen id is
+    /// unchanged and the record stops claiming nothing is unpriced.
+    #[test]
+    fn quartic_cover_v2_adds_exactly_the_root_search_tally() {
+        let spec = CurveSpec::PrimeSearch { bits: 12, seed: 5 };
+        let (w, inst) = Workload::build(&spec, 11, 0, TargetKind::Planted).unwrap();
+        let frozen = method("transfer.quartic_cover", &[]);
+        let v2 = method("transfer.quartic_cover_v2", &[]);
+        applicable(&v2, &inst, &w.curve).unwrap();
+        let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 7).unwrap());
+        let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 7).unwrap());
+        assert_eq!(a.recovered, w.planted);
+        assert_eq!(b.recovered, a.recovered);
+        assert!(a.unpriced.is_empty(), "frozen: {:?}", a.unpriced);
+        assert!(!a.counters.contains_key("root_search_field_muls_uncharged"));
+        let tally = b.counters["root_search_field_muls_uncharged"];
+        assert!(tally > 0);
+        assert_eq!(b.unpriced, ["root_search_field_muls_uncharged"]);
+        // The charged work is identical, phase by phase.
+        assert_eq!(a.total_gae, b.total_gae);
+        assert_eq!(a.phases.len(), b.phases.len());
+        for (pa, pb) in a.phases.iter().zip(&b.phases) {
+            assert_eq!(
+                (&pa.name, pa.adds, pa.doubles, pa.gae),
+                (&pb.name, pb.adds, pb.doubles, pb.gae)
+            );
+            for (k, v) in &pa.native {
+                assert_eq!(pb.native[k], *v, "{}: {k}", pa.name);
+            }
+        }
+        // The only difference in counters is the tally, and it is the sum of
+        // the two phases that search for points.
+        let mut stripped = b.counters.clone();
+        stripped.remove("root_search_field_muls_uncharged");
+        assert_eq!(stripped, a.counters);
+        let by_phase: u64 = b
+            .phases
+            .iter()
+            .filter_map(|p| p.native.get("root_search_field_muls_uncharged"))
+            .sum();
+        assert_eq!(by_phase, tally);
+        assert_eq!(b.total_gae, b.phases.iter().map(|p| p.gae).sum::<f64>());
+    }
+
+    #[test]
+    fn plan_refuses_endomorphism_rhos_on_the_wrong_curve() {
+        let gls = json!({"kind": "gls_fp2", "p_bits": 14, "seed": 1, "max_cofactor": 64});
+        let sub =
+            json!({"kind": "subfield_fp3", "p_bits": 14, "seed": 1, "max_cofactor_ratio": 64});
+        let prime = json!({"kind": "prime_search", "bits": 14, "seed": 59297});
+        let kob = json!({"kind": "koblitz", "a": 1, "n": 17});
+        // Controls: each runs on its own family.
+        plan_arm(gls.clone(), "rho.gls", json!({})).unwrap();
+        plan_arm(sub.clone(), "rho.frobenius_orbit", json!({})).unwrap();
+        plan_arm(gls.clone(), "rho.negation", json!({})).unwrap();
+        for (curve, id) in [
+            (prime.clone(), "rho.gls"),
+            (kob.clone(), "rho.gls"),
+            (sub.clone(), "rho.gls"),
+            (prime.clone(), "rho.frobenius_orbit"),
+            (gls.clone(), "rho.frobenius_orbit"),
+        ] {
+            let err = plan_arm(curve.clone(), id, json!({})).unwrap_err();
+            assert!(
+                err.contains(id) && err.contains("curves only"),
+                "{id} on {curve}: {err}"
+            );
+        }
+        // An arm with no GLS or subfield implementation at all.
+        let err = plan_arm(
+            gls,
+            "ic.pipeline",
+            json!({"factor_base": "prime-abscissa:size=8", "oracle": "subtract:m=2"}),
+        )
+        .unwrap_err();
+        assert!(err.contains("no gls_fp2 implementation"), "{err}");
+    }
+
+    #[test]
+    fn plan_refuses_an_isogeny_inner_that_is_not_generic() {
+        let prime = json!({"kind": "prime_search", "bits": 14, "seed": 59297});
+        for inner in ["ic.pipeline", "rho.frozen_reference", "rho.gls"] {
+            let err =
+                plan_arm(prime.clone(), "transfer.isogeny", json!({"inner": inner})).unwrap_err();
+            assert!(
+                err.contains("`inner` must be a generic method") && err.contains(inner),
+                "{inner}: {err}"
+            );
+        }
+        let err = plan_arm(prime, "transfer.isogeny", json!({"ell": "5"})).unwrap_err();
+        assert!(err.contains("`ell` must be 2 or 3"), "{err}");
+    }
+
+    #[test]
+    fn plan_refuses_a_pooled_batch_outside_its_range() {
+        let prime = json!({"kind": "prime_search", "bits": 24, "seed": 3});
+        plan_arm(
+            prime.clone(),
+            "rho.multitarget_pooled",
+            json!({"batch": "4"}),
+        )
+        .unwrap();
+        plan_arm(
+            prime.clone(),
+            "rho.multitarget_pooled",
+            json!({"batch": "65536"}),
+        )
+        .unwrap();
+        for batch in ["0", "65537", "1000000"] {
+            let err = plan_arm(
+                prime.clone(),
+                "rho.multitarget_pooled",
+                json!({"batch": batch}),
+            )
+            .unwrap_err();
+            assert!(
+                err.contains("`batch` must be in 1..=65536"),
+                "{batch}: {err}"
+            );
+        }
+        let err = plan_arm(prime, "rho.multitarget_pooled", json!({"batch": "many"})).unwrap_err();
+        assert!(err.contains("not an integer"), "{err}");
+    }
+
+    #[test]
+    fn plan_refuses_cm_folded_where_the_adapter_would_fail() {
+        // A random prime-order curve has no CM orbit action.
+        let prime = json!({"kind": "prime_search", "bits": 20, "seed": 3});
+        for id in [
+            "ic.cm_folded_native_v1",
+            "ic.cm_folded_native_v2",
+            "ic.cm_folded_native_d43_v2",
+            "ic.cm_folded_recurrence_v2",
+        ] {
+            let err = plan_arm(
+                prime.clone(),
+                id,
+                json!({"backend": "/nonexistent/folded", "backend_sha256": "00", "query_limit": "1000"}),
+            )
+            .unwrap_err();
+            assert!(
+                err.contains("cofactor-one") || err.contains("no CM orbit action"),
+                "{id}: {err}"
+            );
+        }
+    }
+
+    /// `rho.signed_frobenius_strong_wordram` is priced after running its
+    /// base, so the planner must look through `wordram_price::base_of` as it
+    /// does through `full_price::base_of`.
+    #[test]
+    fn plan_accepts_the_wordram_strong_rho_on_a_wide_koblitz_curve() {
+        let kob = json!({"kind": "koblitz", "a": 0, "n": 83});
+        let strong = plan_arm(kob.clone(), "rho.signed_frobenius_strong", json!({}));
+        assert!(strong.is_ok(), "{strong:?}");
+        let wordram = plan_arm(kob, "rho.signed_frobenius_strong_wordram", json!({}));
+        assert!(wordram.is_ok(), "{wordram:?}");
     }
 }

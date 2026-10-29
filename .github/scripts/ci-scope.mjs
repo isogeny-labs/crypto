@@ -72,8 +72,10 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       // ecbench.yml audits every committed session by schema, wherever it
-      // lives; a session directory always holds these two files.
-      || /(^|\/)(session\.json|records\.jsonl)$/.test(file) && /^research\//.test(file);
+      // lives (research/, taskq/deploy/, ...), so its files select the audit
+      // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
+      // sessions commit their records gzip-compressed.
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -112,11 +114,10 @@ function sourceText(cwd, file) {
 
 // Cargo paths are literal TOML strings. Read the manifest from HEAD when a
 // scope-only sparse checkout hasn't materialized it, without loading archives.
-export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
-  if (!tracked.includes('Cargo.toml')) return new Set();
-  const manifest = existsSync(path.join(cwd, 'Cargo.toml'))
-    ? readFileSync(path.join(cwd, 'Cargo.toml'), 'utf8')
-    : git(['show', 'HEAD:Cargo.toml'], cwd);
+export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd), manifestPath = 'Cargo.toml') {
+  if (!tracked.includes(manifestPath)) return new Set();
+  const manifest = sourceText(cwd, manifestPath);
+  const crateDir = path.posix.dirname(manifestPath);
   const targets = new Set();
   for (const block of manifest.split(/^\s*(?:\[\[(?:example|bin|bench|test)\]\]|\[lib\])\s*$/m).slice(1)) {
     const table = block.split(/^\s*\[/m)[0];
@@ -125,7 +126,8 @@ export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
     const literal = line.match(/^("(?:[^"\\]|\\.)*"|'[^']*')\s*(?:#.*)?$/);
     if (!literal) throw new Error('unsupported Cargo target path syntax');
     const value = literal[1][0] === '"' ? JSON.parse(literal[1]) : literal[1].slice(1, -1);
-    const target = path.posix.normalize(value);
+    if (path.posix.isAbsolute(value)) throw new Error('Cargo target escapes the checkout');
+    const target = path.posix.normalize(path.posix.join(crateDir, value));
     if (target.startsWith('../') || path.posix.isAbsolute(target)) throw new Error('Cargo target escapes the checkout');
     targets.add(target);
   }
@@ -150,9 +152,11 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
-      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
+    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
+  for (const source of pathDependencyFiles(cwd, tracked)) {
+    if (!source.endsWith('/Cargo.toml')) sources.add(source);
+  }
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
@@ -208,10 +212,51 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   return inputs;
 }
 
+// Directories of the path dependencies Cargo needs to resolve the root
+// package (`name = { path = "..." }`), followed through each dependency's own
+// manifest.  A scope-only sparse checkout has none of them, and Cargo refuses
+// to resolve the workspace without every one.
+export function pathDependencyDirs(cwd) {
+  const dirs = new Set();
+  const queue = ['.'];
+  for (let index = 0; index < queue.length; index++) {
+    const dir = queue[index];
+    const manifestPath = dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`;
+    let manifest;
+    try { manifest = sourceText(cwd, manifestPath); } catch { continue; }
+    for (const match of manifest.matchAll(/=\s*\{[^}\n]*\bpath\s*=\s*"([^"\n]+)"/g)) {
+      const dependency = path.posix.normalize(path.posix.join(dir, match[1]));
+      if (dependency.startsWith('../') || path.posix.isAbsolute(dependency)) {
+        throw new Error(`path dependency escapes the checkout: ${manifestPath}: ${match[1]}`);
+      }
+      if (!dirs.has(dependency)) {
+        dirs.add(dependency);
+        queue.push(dependency);
+      }
+    }
+  }
+  return dirs;
+}
+
+function pathDependencyFiles(cwd, tracked = trackedFiles(cwd)) {
+  const files = new Set();
+  for (const dir of pathDependencyDirs(cwd)) {
+    const manifest = `${dir}/Cargo.toml`;
+    if (!tracked.includes(manifest)) throw new Error(`missing tracked path-dependency manifest: ${manifest}`);
+    files.add(manifest);
+    for (const file of tracked) {
+      if (!file.startsWith(`${dir}/`)) continue;
+      const relative = file.slice(dir.length + 1);
+      if (relative === 'build.rs' || /^(src|tests|examples|benches)\/.*\.rs$/.test(relative)) files.add(file);
+    }
+    for (const target of cargoSourceFiles(cwd, tracked, manifest)) files.add(target);
+  }
+  return files;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
   const sources = sourceFiles(cwd);
-  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
-    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
+  const manifests = [...pathDependencyFiles(cwd)].filter(file => file.endsWith('/Cargo.toml'));
   materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
