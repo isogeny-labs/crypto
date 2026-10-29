@@ -25,6 +25,11 @@ enum Command {
         #[arg(long)]
         output: PathBuf,
     },
+    /// Issue/check the standard line-intersection coefficient identity.
+    LineCertificate {
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Solve a public known-answer fixture and retain all attempted bases.
     Solve {
         #[arg(long, value_enum, default_value = "toy101")]
@@ -41,6 +46,9 @@ enum Command {
         attempts: u8,
         #[arg(long, default_value_t = 10000, value_parser = clap::value_parser!(u64).range(1..=60000))]
         budget_ms: u64,
+        /// Stop only after a verified informative relation; enumeration is partial.
+        #[arg(long)]
+        first_informative: bool,
         #[arg(long)]
         output: PathBuf,
     },
@@ -59,6 +67,7 @@ enum Fixture {
 enum Arm {
     Partitioned3,
     Unordered3,
+    Line3,
     Expanded4,
     Split4,
     BlockSymmetric4,
@@ -66,6 +75,8 @@ enum Arm {
     Hybrid4,
     Cover3,
     Orbit3,
+    OrbitLine3,
+    OrbitPrunedLine3,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, ValueEnum)]
@@ -116,6 +127,7 @@ fn encoding(arm: Arm) -> Encoding {
     match arm {
         Arm::Partitioned3 | Arm::Hybrid3 | Arm::Cover3 | Arm::Orbit3 => Encoding::Partitioned3,
         Arm::Unordered3 => Encoding::Unordered3,
+        Arm::Line3 | Arm::OrbitLine3 | Arm::OrbitPrunedLine3 => Encoding::Line3,
         Arm::Expanded4 | Arm::Hybrid4 => Encoding::Expanded4,
         Arm::Split4 => Encoding::Split4,
         Arm::BlockSymmetric4 => Encoding::BlockSymmetric4,
@@ -132,6 +144,7 @@ struct Transcript {
     seed: u64,
     attempt_cap: u8,
     solver_budget_ms_per_attempt: u64,
+    first_informative: bool,
     curve_icv1: String,
     curve_model: serde_json::Value,
     generator: (u64, u64),
@@ -152,6 +165,27 @@ fn execute(args: Args) -> Result<(), String> {
             )
             .map_err(|e| e.to_string())?;
         }
+        Command::LineCertificate { output } => {
+            let cert = ic::issue(
+                aps::line_intersection_identity(),
+                20261028,
+                32,
+                "Standard coefficient expansion; checked using an independent seed",
+                None,
+            )
+            .map_err(|e| format!("{e:?}"))?;
+            if !matches!(
+                ic::check_with_extra(&cert, Some((9101, 32))).map_err(|e| format!("{e:?}"))?,
+                ic::Verdict::Accept { .. }
+            ) {
+                return Err("line identity check rejected".into());
+            }
+            fs::write(
+                output,
+                serde_json::to_vec_pretty(&cert).map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+        }
         Command::Solve {
             fixture: which,
             arm,
@@ -160,17 +194,19 @@ fn execute(args: Args) -> Result<(), String> {
             seed,
             attempts,
             budget_ms,
+            first_informative,
             output,
         } => {
-            if arm == Arm::Orbit3 && (which != Fixture::Toy103J0 || subset_size != 1) {
-                return Err("orbit3 requires --fixture toy103-j0 --subset-size 1".into());
+            let orbit = matches!(arm, Arm::Orbit3 | Arm::OrbitLine3 | Arm::OrbitPrunedLine3);
+            if orbit && (which != Fixture::Toy103J0 || subset_size != 1) {
+                return Err("orbit arms require --fixture toy103-j0 --subset-size 1".into());
             }
             let (curve, g, q, expected) = fixture(which);
             aps::validate_instance(&curve, g, q)?;
             let labels = Labels::from(labels);
             let budget = Duration::from_millis(budget_ms);
             let enc = encoding(arm);
-            let runs = if matches!(arm, Arm::Hybrid3 | Arm::Hybrid4 | Arm::Cover3 | Arm::Orbit3) {
+            let runs = if orbit || matches!(arm, Arm::Hybrid3 | Arm::Hybrid4 | Arm::Cover3) {
                 let arity = if arm == Arm::Hybrid4 { 4 } else { 3 };
                 let mut runs = Vec::new();
                 for i in 0..attempts {
@@ -183,21 +219,44 @@ fn execute(args: Args) -> Result<(), String> {
                         seed.wrapping_add(u64::from(i)),
                         10_000,
                     )?;
-                    let base = if arm == Arm::Orbit3 {
+                    let base = if orbit {
                         aps::orbit_base(&curve, g, q, &sampled, 56, 35)?
                     } else {
                         sampled
                     };
-                    let algebra = if arm == Arm::Cover3 {
-                        let values: Vec<_> = base.points.keys().copied().collect();
-                        aps::solve_cover(&curve, &values, 24, budget)?
-                    } else if matches!(arm, Arm::Hybrid3 | Arm::Hybrid4) {
-                        aps::solve_hybrid(&curve, &base.parts, enc, 24, budget)?
+                    let (algebra, recovery) = if first_informative {
+                        let search = match arm {
+                            Arm::Cover3 => aps::RelationSearch::Cover3,
+                            Arm::Hybrid3 | Arm::Hybrid4 => aps::RelationSearch::Hybrid(enc),
+                            Arm::OrbitPrunedLine3 => aps::RelationSearch::PrunedLine3 {
+                                beta: 56,
+                                lambda: 35,
+                            },
+                            _ => aps::RelationSearch::System(enc),
+                        };
+                        aps::find_relation(&curve, g, q, &base, search, 24, budget)?
                     } else {
-                        let system = aps::build_system(&curve, &base.parts, enc)?;
-                        aps::solve_system(&system, curve.f.p, 24, budget)?
+                        let algebra = if arm == Arm::Cover3 {
+                            let values: Vec<_> = base.points.keys().copied().collect();
+                            aps::solve_cover(&curve, &values, 24, budget)?
+                        } else if matches!(arm, Arm::Hybrid3 | Arm::Hybrid4) {
+                            aps::solve_hybrid(&curve, &base.parts, enc, 24, budget)?
+                        } else if arm == Arm::OrbitPrunedLine3 {
+                            let system =
+                                aps::build_pruned_line_system(&curve, g, q, &base, 56, 35)?;
+                            aps::solve_system(&system, curve.f.p, 24, budget)?
+                        } else {
+                            let parts = if arm == Arm::OrbitLine3 {
+                                vec![base.points.keys().copied().collect()]
+                            } else {
+                                base.parts.clone()
+                            };
+                            let system = aps::build_system(&curve, &parts, enc)?;
+                            aps::solve_system(&system, curve.f.p, 24, budget)?
+                        };
+                        let recovery = aps::recover(&curve, g, q, &base, &algebra.coordinate_sets)?;
+                        (algebra, recovery)
                     };
-                    let recovery = aps::recover(&curve, g, q, &base, &algebra.coordinate_sets)?;
                     let stop = recovery.is_some();
                     runs.push(Attempt {
                         base,
@@ -210,7 +269,7 @@ fn execute(args: Args) -> Result<(), String> {
                 }
                 runs
             } else {
-                aps::solve_dlp(
+                aps::solve_dlp_with_mode(
                     &curve,
                     g,
                     q,
@@ -220,6 +279,7 @@ fn execute(args: Args) -> Result<(), String> {
                     seed,
                     usize::from(attempts),
                     budget,
+                    first_informative,
                 )?
             };
             let recovered = runs.iter().find_map(|r| r.recovery.as_ref());
@@ -243,7 +303,7 @@ fn execute(args: Args) -> Result<(), String> {
             let transcript = Transcript {
                 schema: "aps.single-relation.correctness/v1", fixture: which,
                 arm, labels, subset_size, seed, attempt_cap: attempts,
-                solver_budget_ms_per_attempt: budget_ms, curve_icv1: id.icv1,
+                solver_budget_ms_per_attempt: budget_ms, first_informative, curve_icv1: id.icv1,
                 curve_model: serde_json::from_str(&id.model_json).map_err(|e| e.to_string())?, generator: curve.canonical(g), target: curve.canonical(q),
                 expected_public_logarithm: expected, status, attempts: runs,
                 limits: "Tiny fixed fixtures only. No target scalar is passed to relation solving. F4 counters exclude setup and are not a complete cost model. Even-arity weights require one point per original partition; orbit expansion and regrouping still check B != 0. No performance, scaling, or general-security conclusion.",
@@ -322,5 +382,82 @@ mod tests {
                 Some(expected),
             );
         }
+    }
+
+    #[test]
+    fn streaming_cli_retains_partial_enumeration_and_the_verified_witness() {
+        let output =
+            std::env::temp_dir().join(format!("aps-streaming-{}.json", std::process::id()));
+        let args = Args::try_parse_from([
+            "aps",
+            "solve",
+            "--arm",
+            "line3",
+            "--first-informative",
+            "--output",
+            output.to_str().unwrap(),
+        ])
+        .unwrap();
+        execute(args).unwrap();
+        let transcript: serde_json::Value =
+            serde_json::from_slice(&fs::read(&output).unwrap()).unwrap();
+        fs::remove_file(output).unwrap();
+        assert_eq!(transcript["status"], "verified");
+        assert_eq!(transcript["first_informative"], true);
+        let last = transcript["attempts"].as_array().unwrap().last().unwrap();
+        assert_eq!(last["algebra"]["complete"], false);
+        assert_eq!(last["algebra"]["stopped_early"], true);
+        assert_eq!(last["algebra"]["timed_out"], false);
+        assert_eq!(last["recovery"]["logarithm"], 37);
+    }
+
+    #[test]
+    fn line_identity_has_a_second_seed_check_and_cli_entry() {
+        let cert = ic::issue(
+            aps::line_intersection_identity(),
+            20261028,
+            32,
+            "Correctness test of the standard identity",
+            None,
+        )
+        .unwrap();
+        assert!(matches!(
+            ic::check_with_extra(&cert, Some((9101, 32))).unwrap(),
+            ic::Verdict::Accept { .. }
+        ));
+        assert!(
+            Args::try_parse_from(["aps", "line-certificate", "--output", "identity.json"]).is_ok()
+        );
+        let bad = Args::try_parse_from([
+            "aps",
+            "solve",
+            "--arm",
+            "orbit-pruned-line3",
+            "--output",
+            "unused.json",
+        ])
+        .unwrap();
+        assert!(execute(bad).is_err());
+    }
+
+    #[test]
+    fn shipped_line_certificate_matches_the_statement_and_checks_with_a_second_seed() {
+        let cert: ic::IdentityCertificate = serde_json::from_str(include_str!(
+            "../research/aps_followup_20261028/line-identity.json"
+        ))
+        .unwrap();
+        let expected = ic::issue(
+            aps::line_intersection_identity(),
+            20261028,
+            32,
+            "Statement fingerprint control",
+            None,
+        )
+        .unwrap();
+        assert_eq!(cert.id, expected.id);
+        assert!(matches!(
+            ic::check_with_extra(&cert, Some((9101, 32))).unwrap(),
+            ic::Verdict::Accept { .. }
+        ));
     }
 }

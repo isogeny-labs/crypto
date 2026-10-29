@@ -1,7 +1,14 @@
 {
-  "checked_utc_date": "2026-10-27",
-  "claim_boundary": "Published even-characteristic degree-three cover classifications prevent a global new-family claim; exact equations in two catalog-unknown isogeny classes are potential new catalog witnesses only.",
+  "checked_utc_date": "2026-10-28",
+  "claim_boundary": "Published even-characteristic cubic cover classifications, including a reported roughly three-quarter weak density for even base-field degree, prevent a global new-family claim. The two-common-pole product gate is Hess's known double-trace-zero branch and its exact count was already proved in this repository. The exact all-q overlap formula with the triangle gate and the q16 evaluated witness are new evidence in this audit, with publication novelty unresolved. Two catalog-unknown isogeny classes have explicit positive Jacobian witnesses, with equation-level publication novelty unresolved. The two-pole 4132 class is already catalog-positive.",
   "family_sources": [
+    {
+      "title": "Generalising the GHS Attack on the Elliptic Curve Discrete Logarithm Problem",
+      "authors": "Florian Hess",
+      "year": 2004,
+      "url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf",
+      "finding": "Section 6 explicitly discusses the branch with both Artin-Schreier factors of relative trace zero. The local research/ghs_hess_c_parameter_audit_20261026/EXACT_CUBIC_FAMILY.md already proves the same product criterion and exact all-q count used for the two-common-pole gate here."
+    },
     {
       "title": "Classification of Weil Restrictions Obtained by (2,...,2) Coverings of P^1",
       "authors": "Fumiyuki Momose and Jinhui Chao",
@@ -29,6 +36,27 @@
       "year": "2010-2011",
       "url": "https://eprint.iacr.org/2013/487.pdf",
       "finding": "The primary 2013 paper's reference list identifies two earlier SCIS papers directly on even-characteristic cubic weak elliptic covers; their full texts were not obtained, so exact overlap with this trace gate is unresolved."
+    },
+    {
+      "title": "Classification of covering curves for hyperelliptic curves over finite-field extensions and cryptographic applications",
+      "authors": "Mahoro Shimura with Fumiyuki Momose and Jinhui Chao",
+      "year": 2012,
+      "url": "https://sem-wnt.w.waseda.jp/kako/2012.html",
+      "finding": "The Waseda seminar abstract reports that for characteristic two and cubic elliptic sources, weak-curve density is about three-quarters when the base field has even degree over F2 and about one-half when it has odd degree. This exceeds the present exact one-half construction at q=16."
+    },
+    {
+      "title": "Classification of ordinary elliptic curves over even-characteristic finite fields subject to cover attacks without the isogeny condition",
+      "authors": "Yusuke Uesato, Mahoro Shimura, and Jinhui Chao",
+      "year": 2024,
+      "url": "https://www.iwsec.org/scis/2024/program.html",
+      "finding": "SCIS program abstract 3A1-4 reports a classification of all ordinary even-characteristic elliptic curves with non-isogeny-condition covers for extension degrees at most nine; exact case tables were not obtained."
+    },
+    {
+      "title": "Classification of Elliptic and Hyperelliptic Curves over Finite Fields of Even Characteristics Subject to Cover Attack",
+      "authors": "Yusuke Uesato",
+      "year": 2025,
+      "url": "https://iss.iisec.ac.jp/sympo24/posters/M2_212poster24.pdf",
+      "finding": "Poster states a broader genus-evaluation classification; its listed domain includes genus-one sources with g(x) in the base-field polynomial ring and coprime base-field and extension degrees. The q=16 cubic normalized source meets those conditions, but exact overlap with its case list is unverified."
     },
     {
       "title": "A Classification of Elliptic and Hyperelliptic Curves over Finite Fields of Even Characteristic Subjected to the Cover Attack",
@@ -65,6 +93,7 @@
     {"source_order":3972,"source_b":51,"label":"3.16.a_a_aev","poly":[1,0,0,-125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"verified positive Jacobian witness absent from current LMFDB curve list; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_aev"},
     {"source_order":4006,"source_b":198,"label":"3.16.a_a_adn","poly":[1,0,0,-91,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_adn"},
     {"source_order":4198,"source_b":116,"label":"3.16.a_a_dx","poly":[1,0,0,101,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"rediscovery at isogeny-class level","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_dx"},
-    {"source_order":4222,"source_b":853,"label":"3.16.a_a_ev","poly":[1,0,0,125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"verified positive Jacobian witness absent from current LMFDB curve list; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev"}
+    {"source_order":4222,"source_b":853,"label":"3.16.a_a_ev","poly":[1,0,0,125,0,0,4096],"catalog_has_jacobian":0,"prior_work_status":"verified positive Jacobian witness absent from current LMFDB curve list; equivalent published equation not ruled out","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev"},
+    {"source_order":4132,"source_b":3399,"label":"3.16.a_a_bj","poly":[1,0,0,35,0,0,4096],"catalog_has_jacobian":1,"prior_work_status":"Hess double-trace-zero branch already analyzed in this repository; q16 exact quartic and evaluated map extend the witness set, while the isogeny class was already catalog-positive; equation-level publication novelty unverified","lmfdb_url":"https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_bj"}
   ]
 }

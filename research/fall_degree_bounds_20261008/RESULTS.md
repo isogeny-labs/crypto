@@ -498,8 +498,10 @@ are unknown. The prior 282-row Lean table excludes these four new rows. No new
 Lean proof or independent implementation validation is claimed.
 
 The [PDF](e12/completed-20261028/report.pdf) and censoring-aware
-[graph](e12/completed-20261028/draws.svg) describe this completed attempt. E12a
-and E12c remain separate ongoing attempts; this section adds no results for them.
+[graph](e12/completed-20261028/draws.svg) describe this completed attempt. At the
+time of that report, E12a and E12c were separate ongoing attempts. Both have now
+ended after Spot reclaim; their terminal records follow below. This E12b section
+adds no results for them.
 
 ## E12c interrupted additional attempt, 2026-10-28
 
@@ -531,3 +533,22 @@ experiment review or Lean proof was performed. Earlier reports remain historical
 records. Existing degree plots and unrestricted `fall_degree.*` metrics exclude
 this null window result because it is not a censored unrestricted degree. E12a
 and the general first-/last-fall-degree questions remain separate unfinished work.
+
+## E12a interrupted additional attempt, 2026-10-28
+
+The Amendment-13/14 attempt at `(m,n,ell)=(3,21,7)`, `N=42`, degree cap 5,
+ended after Spot reclaim with **zero of two requested completed target records**.
+Job `20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f` records a Spot notice at
+12:03:18 UTC, command exit **143**, and terminal status `interrupted` at
+12:04:22 UTC. The saved target JSONL and error file are empty; output status
+remains `gate_passed`. The attempt supplies **no registered degree-5 reading**
+and establishes neither an exact degree nor a lower bound.
+
+The [terminal preservation packet](e12/terminal-a-20261028/README.md) retains
+the receipts, final output snapshot, producer gate records, hashes and canonical
+S3 PUT/GET evidence. Its 14,706-byte canonical bundle has SHA-256
+`3030d78c8e0a21bbd9c774294b338586cb58a136565e4fd35c5da4678bd09ba9`.
+These are verified output files, not a solver-memory checkpoint. No closure
+replay, independent algorithm validation, retry or deadline extension accompanies
+this preservation. Earlier still-running records are historical; the requested
+E12a degree determination and the general first-/last-fall questions remain open.
