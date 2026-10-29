@@ -1,0 +1,24 @@
+| (n, ℓ) | basis | twists | target-free solving (≥ = unfinished) | target-free top deficiency | target solving | target top deficiency | target-free value | target median | registered reading | bounded reading |
+|---|---|---|---|---|---|---|--:|--:|---|---|
+| (13, 3) | gp | [0,0,0,0] | 7 | 1 | 6, 6, 6, 6 | 4, 4, 4, 4 | 7 | 6 | higher | not lower |
+| (13, 3) | gp | [0,1,2,3] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (13, 3) | random | [0,0,0,0] | 8, 8, 8, 8 | 0, 0, 0, 0 | 6, 6, 6, 6 | 3, 3, 3, 3 | 8 | 6 | higher | not lower |
+| (16, 4) | gp | [0,0,0,0] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (16, 4) | gp | [0,1,2,3] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (16, 4) | random | [0,0,0,0] | 8, 8, 8, 8 | 0, 0, 0, 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (17, 4) | gp | [0,0,0,0] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (17, 4) | gp | [0,1,2,3] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (17, 4) | random | [0,0,0,0] | 8, 8, 8, 8 | 0, 0, 0, 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (18, 4) | gp | [0,0,0,0] | 8 | 0 | 7, 7, 7, 7 | 1, 1, 1, 1 | 8 | 7 | higher | not lower |
+| (18, 4) | gp | [0,1,2,3] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (18, 4) | random | [0,0,0,0] | 8, 8, 8, 8 | 0, 0, 0, 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (19, 4) | gp | [0,0,0,0] | 8 | 0 | 7, 7, 7, 7 | 1, 1, 1, 1 | 8 | 7 | higher | not lower |
+| (19, 4) | gp | [0,1,2,3] | 8 | 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+| (19, 4) | random | [0,0,0,0] | 8, 8, 8, 8 | 0, 0, 0, 0 | 7, 7, 7, 7 | 0, 0, 0, 0 | 8 | 7 | higher | not lower |
+
+Registered verdict (primary): killed. gp (cell, twists) reading lower: []; random reading lower: []; gp readings measured: 10.
+Secondary (shape inside target-free): fewer than 2 cells — (13,3)[0000]: gp 7 vs random 8 → shape lower; (16,4)[0000]: gp 8 vs random 8 → equal; (17,4)[0000]: gp 8 vs random 8 → equal; (18,4)[0000]: gp 8 vs random 8 → equal; (19,4)[0000]: gp 8 vs random 8 → equal
+P1 (target-free reads higher than target at every measured (cell, basis, twists)): holds — 15 of 15 higher
+P2 (gp target-free top deficiency above the random median at every cell with both): fails — 1 of 5 above, 4 equal
+P3 (secondary shape effect at ≥ 2 cells): fails
+P4 (twisting [0,1,2,3] brings the gp deficiency to the random level or below): holds — (13,3): gp twisted deficiency 0 vs random plain median 0 → at or below random; (16,4): gp twisted deficiency 0 vs random plain median 0 → at or below random; (17,4): gp twisted deficiency 0 vs random plain median 0 → at or below random; (18,4): gp twisted deficiency 0 vs random plain median 0 → at or below random; (19,4): gp twisted deficiency 0 vs random plain median 0 → at or below random

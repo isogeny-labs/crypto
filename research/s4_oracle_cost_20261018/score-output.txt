@@ -1,0 +1,19 @@
+| (n,l) | arm | draws run | measured | verified | solving degree | median word_xors | median rows x cols (max) | median f4 s (note) |
+|---|---|--:|--:|--:|---|--:|---|--:|
+| (12,3) | chained | 4 | 4 | 4 | 3,4,4,4 | 1.9761e6 | 3249 x 3088 | 0.03 |
+| (12,3) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 3.6171e5 | 240 x 478 | 0.01 |
+| (13,4) | chained | 4 | 3 | 3 | 4,4,4 | 2.5856e8 | 14994 x 14833 | 1.43 |
+| (13,4) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 5.4011e7 | 3104 x 2426 | 0.16 |
+| (16,5) | chained | 4 | 2 | 2 | 4,4 | 2.4635e10 | 42644 x 35501 | 35.25 |
+| (16,5) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 2.3193e10 | 39487 x 16382 | 12.98 |
+| (18,6) | chained | 2 | 0 | 0 |  | unmeasured | - | - |
+| (18,6) | eliminated | 2 | 0 | 0 |  | unmeasured | - | - |
+
+Verdict (12,3): STAGE IMPROVEMENT on 4 paired draws. w=0: chained 1.976e6 / elim 3.617e5 = 5.5x; w=0.1: chained 2.013e6 / elim 3.737e5 = 5.4x; w=1: chained 2.342e6 / elim 4.818e5 = 4.9x
+Verdict (13,4): STAGE IMPROVEMENT on 3 paired draws. w=0: chained 2.586e8 / elim 4.048e7 = 6.4x; w=0.1: chained 2.597e8 / elim 4.074e7 = 6.4x; w=1: chained 2.697e8 / elim 4.306e7 = 6.3x
+Verdict (16,5): no verdict, 2 paired verified draws (< 3)
+Verdict (18,6): no verdict, 0 paired verified draws (< 3)
+A/A chained (13,4) draw 0: word_xors [258557090.0, 258557090.0] (spread 0), f4 secs [1.43, 1.711]
+A/A eliminated (13,4) draw 0: word_xors [40479777.0, 40479777.0] (spread 0), f4 secs [0.093, 0.105]
+Records where E > E_rat (eliminated returns non-rational-u zeros): 1; finished-but-unverified records: 0
+Trend: not determined (2 cells with a verdict)
