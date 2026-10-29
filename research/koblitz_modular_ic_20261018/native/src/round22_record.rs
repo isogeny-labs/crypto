@@ -199,8 +199,12 @@ fn test_counts(text: &str) -> serde_json::Value {
     let line = text
         .lines()
         .rev()
-        .find(|l| l.starts_with("test result: ok."))
-        .unwrap();
+        .find(|l| l.starts_with("test result:"))
+        .expect("missing final Cargo test summary");
+    assert!(
+        line.starts_with("test result: ok."),
+        "final Cargo test summary did not succeed: {line}"
+    );
     let fields = line.split_whitespace().collect::<Vec<_>>();
     let count = |unit: &str| {
         let i = fields
@@ -237,9 +241,7 @@ pub fn record(round: &Path) {
     let build = std::fs::read_to_string(raw.join("lean-full-build-final.log")).unwrap();
     assert!(build.contains("Build completed successfully"));
     let root = std::fs::read_to_string(raw.join("root-tests-integrated.log")).unwrap();
-    assert!(root.contains("test result: ok.") && root.contains("0 failed;"));
     let native = std::fs::read_to_string(raw.join("native-tests-final.log")).unwrap();
-    assert!(native.contains("test result: ok.") && native.contains("0 failed;"));
     let mut sources = BTreeMap::new();
     walk(repo, &study.join("native/src"), &mut sources);
     walk(repo, &repo.join("src/binary_ecc"), &mut sources);
@@ -448,6 +450,23 @@ pub fn record(round: &Path) {
 
 #[cfg(test)]
 mod seal_tests {
+    #[test]
+    #[should_panic(expected = "final Cargo test summary did not succeed")]
+    fn failing_final_summary_rejects_successful_nested_process() {
+        super::test_counts("test result: ok. 1 passed; 0 failed; 0 ignored;\ntest result: FAILED. 4895 passed; 1 failed; 121 ignored;\n");
+    }
+
+    #[test]
+    #[should_panic(expected = "missing final Cargo test summary")]
+    fn missing_final_summary_is_rejected() {
+        super::test_counts("running 5017 tests\ninterrupted\n");
+    }
+
+    #[test]
+    #[should_panic]
+    fn success_label_with_nonzero_failures_is_rejected() {
+        super::test_counts("test result: ok. 1 passed; 1 failed; 0 ignored;\n");
+    }
     #[test]
     fn final_cargo_summary_excludes_spawned_test_processes() {
         let log = "running 5017 tests\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5016 filtered out;\nchild complete\ntest result: ok. 4896 passed; 0 failed; 121 ignored; 0 measured; 0 filtered out;\n";
