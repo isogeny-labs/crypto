@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Guarded fall-degree exact-pair Lean proof](guarded-fall-degree-lean-exact-pair.md) | open | a complete formal proof of the ordinary guarded three-abscissa pair `(4,5)` | checked degree-five normalization/resultant/grid/point bridges and the weighted syzygy/Koszul definition; the uniform degree-four obstruction is now formalized |
 | [E12b On-Demand launch denied](fall-degree-e12b-on-demand-launch.md) | open | completion of registered fall-degree cell 3:24:7 after two Spot interruptions | administrator-authorized On-Demand execution environment, successful launch preflight, then unchanged Amendment 12 gates and four draws |
 | [NIST BEST2 DP bias and GPU validation](nist-best2-dp-bias-and-gpu-validation.md) | investigating | seeded DP diagnosis and effective GPU cost per verified collision | matched seed panels, native ecbench session, independent replay and complete collision accounting |
 | [Known-log arbitrary-target recovery cost and validation](known-log-recovery-cost-and-validation.md) | open | calibrated and independently validated known-log/IC recovery comparison | complete native pricing, independent replay and recomputation, isolated measurements and strongest matched comparators |
