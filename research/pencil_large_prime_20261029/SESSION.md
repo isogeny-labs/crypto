@@ -872,3 +872,15 @@ Replaced the active Python preparation, canonical export and report paths with t
 Bound the native source identities and receipts into the still-draft protocol (integrity SHA256 1ccd66480b7fb0a94c14cc85a09a115c1f79eb6f862b511b12a7d58ed467f342). Native protocol validation passed without modification or launch authorization. The approved 60-target p739 gate limits remain 25 million coefficients and 3,600 seconds per execution. Campaign budget/deadline and infrastructure authorization remain pending.
 
 The final report packet is validation/accounting/reports/review-20261029T224935Z-native. All three PDF pages were visually inspected with no clipped content; report manifest hashes passed. The earlier clipped development packet is retained separately. Reports state zero observed cohort executions and null measured ratios, and retain the prior full-suite failures separately from focused passing checks. The new native-tool CI workflow follows repository policy: main push, merge group and explicit dispatch, without a pull_request trigger.
+
+## 2026-10-29 — Independent exporter review and delivery hold
+
+A separate reviewer reproduced validation gaps at delivered source 08e8ab38d: missing planted-answer checks could become verified; incomplete native cost summaries were accepted; prescribed warmups could disappear; backend metadata could be altered undetected; malformed counter strings were accepted; and impossible checkpoint histories passed. Original review and reproducer evidence are retained in validation/native_export_review_08e8ab38d/. Prior successful software test receipts are preserved as their actual test scope, not evidence that these gaps were covered.
+
+Disabled PR #2869 auto-merge and posted the concrete findings before correction. GitHub confirmed OPEN, mergedAt null and auto-merge false at the delivered head. Native exporter correction and independent regression review are in progress under T826. No cohort, cloud job, protocol freeze or resource authorization occurred.
+
+### Correction validation
+
+The corrected adapter fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1 requires exact deterministic native reanalysis from the bound inputs. Public export and verification have no runtime bypass. It checks explicit planted-answer verification, nonnegative counters, warmups, retry/checkpoint limits, complete source/build/binary provenance and reconstructed export metadata. All 13 linked analysis source files are tied to compiled bytes; existing analysis sources were unchanged.
+
+Final release validation passed 37 private unit contracts, one CLI test, one historical-digest test and one production replay test. The production fixture covers 1,260 planned workloads and 22,680 missing slots with zero solver calls; its final test duration was 205.38 seconds. Formatting and strict Clippy passed. A separate reviewer verified exact source identity and ran six focused negative checks, all passing. This is same-source deterministic software replay, not independent mathematical verification or a measured cohort result. Original and corrected review records remain separate.

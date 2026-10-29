@@ -9,7 +9,11 @@ The supported preparation, export and report paths are Rust:
   native plans against the archived workload identities and prepared bytes.
 - [Native canonical export](native_canonical_export/README.md) packages
   hash-bound observations with explicit execution history and canonical
-  validation. Packaging does not qualify a clock or infer missing counts.
+  validation. It recomputes the complete native analysis from the bound inputs
+  and reconstructs exports from immutable requests. Packaging does not qualify
+  a clock or infer missing counts. The [original review](validation/native_export_review_08e8ab38d/review.json)
+  and [correction review](validation/native_export_correction_fc96a3d1/review.json)
+  preserve the findings and their scoped software checks separately.
 - [Native review reports](native_review_report/README.md) renders the
   preparation evidence as JSON, SVG and PDF using Rust and native LaTeX.
   Its current contract is a zero-observation preparation report, not an

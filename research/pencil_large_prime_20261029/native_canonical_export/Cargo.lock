@@ -617,14 +617,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "pencil-accounting-price-draft"
+version = "0.1.0"
+dependencies = [
+ "pencil-paired-export",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "pencil-native-canonical-export"
 version = "0.1.0"
 dependencies = [
  "chrono",
  "jsonschema",
+ "pencil-accounting-price-draft",
  "serde_json",
  "sha2",
  "tempfile",
+]
+
+[[package]]
+name = "pencil-paired-export"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]

@@ -39,6 +39,19 @@ Reference: vendored `tools/experiment_protocol.reference.txt`, functions
 | History attempts/restores and resources | Known integer fields/evidence required, exact resource sidecar equality checked |
 | Counters | Arbitrary-width nonnegative integer tokens retained exactly, large values as decimal strings |
 | Output overwrite | Exclusive create; tested |
+| Explicit public known-answer verification | `matches_planted` must be true; absent or false cannot become verified |
+| Warmup plan completeness | Per-workload/per-arm counts and round identities checked against frozen protocol |
+| Restore admission | Retry bound, epoch-specific checkpoint policy, restore bound and committed generation consistency checked independently |
+| Entire backend metadata | Immutable request attached and hash-bound; checking reconstructs the complete export |
+| Native cost/AA/control/pair-slot consistency | Production always replays source-linked native aggregate and requires exact full-output equality |
+| Analysis source/build/binary provenance | Every pinned source, build receipt and both binary byte bindings checked; all 13 compiled linked source hashes checked |
+
+The production analysis replay reuses the existing mathematical accounting
+implementation. It does not independently prove that implementation or attest
+that the supplied binary originally emitted an output. All qualification flags
+remain false and qualified ratios remain null. No runtime option bypasses replay.
+Private unit tests substitute a callback only to isolate packaging predicates;
+the separate full-denominator production integration exercises the real replay.
 
 The first 17 contract tests correspond to the historical packager's 17 software
 contracts. Additional tests cover real schema rejection, native CLI positive and

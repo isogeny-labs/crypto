@@ -41,7 +41,13 @@ fn run() -> Result<(), String> {
             "usage: pencil-native-canonical-export REQUEST --out NEW_OUTPUT | adapter-hash".into(),
         );
     }
-    let (e, f) = package(&load(Path::new(&a[1]))?)?;
+    let request_path = std::fs::canonicalize(&a[1]).map_err(|e| e.to_string())?;
+    let mut request = load(&request_path)?;
+    if request.get("_request_binding").is_some() {
+        return Err("CLI request must not contain internal _request_binding".into());
+    }
+    request["_request_binding"] = serde_json::json!({"path":request_path,"sha256":pencil_native_canonical_export::digest(&request_path)?});
+    let (e, f) = package(&request)?;
     write_exclusive(Path::new(&a[3]), &e)?;
     println!(
         "{}",

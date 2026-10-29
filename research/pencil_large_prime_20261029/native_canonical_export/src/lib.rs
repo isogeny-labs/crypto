@@ -1,5 +1,9 @@
 //! Native packaging of existing observations. This module never executes experiments.
+mod output_contract;
 mod protocol_lint;
+#[cfg(test)]
+#[path = "../tests/unit_contracts/mod.rs"]
+mod unit_contracts;
 use serde_json::{json, Value as V};
 use sha2::{Digest, Sha256};
 use std::{
@@ -69,6 +73,7 @@ pub fn adapter_hash() -> String {
             include_str!("lib.rs"),
             include_str!("main.rs"),
             include_str!("protocol_lint.rs"),
+            include_str!("output_contract.rs"),
             include_str!("../Cargo.lock"),
             include_str!("../Cargo.toml"),
             include_str!("../schemas/experiment-protocol.v1.json"),
@@ -232,6 +237,43 @@ pub fn check_files(e: &V) -> Result<()> {
     Ok(())
 }
 pub fn package(req: &V) -> Result<(V, Vec<String>)> {
+    package_with(req, replay_analysis)
+}
+fn replay_analysis(native: &V, protocol: &V) -> Result<()> {
+    macro_rules! linked_source {
+        ($path:literal) => {
+            check(
+                protocol["extensions"]["analysis_support_sha256"][$path]
+                    == hash(include_bytes!(concat!("../../", $path))),
+                concat!("linked analyzer source differs from protocol: ", $path),
+            )?;
+        };
+    }
+    linked_source!("native_price/Cargo.toml");
+    linked_source!("native_price/Cargo.lock");
+    linked_source!("native_price/src/lib.rs");
+    linked_source!("native_price/src/analyzer.rs");
+    linked_source!("native_price/src/aggregate.rs");
+    linked_source!("native_price/src/importer.rs");
+    linked_source!("native_price/src/bin/analyze_pair.rs");
+    linked_source!("native_price/src/bin/analyze_cohort.rs");
+    linked_source!("paired_export/Cargo.toml");
+    linked_source!("paired_export/Cargo.lock");
+    linked_source!("paired_export/src/lib.rs");
+    linked_source!("paired_export/src/plan.rs");
+    linked_source!("paired_export/src/main.rs");
+    let rebuilt = pencil_accounting_price_draft::aggregate::aggregate(&native["input_manifest"])?;
+    check(
+        rebuilt == *native,
+        "native analysis differs from deterministic source-linked replay",
+    )
+}
+fn package_with(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<String>)> {
+    // Core performs schema, semantic, attachment and exact analysis replay checks.
+    // The independent check-export entry point additionally reconstructs an export.
+    package_core(req, replay)
+}
+fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<String>)> {
     check(
         req["schema"] == "pencil-canonical-package-input/v1",
         "unsupported packaging request",
@@ -276,11 +318,25 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
         "analysis script identity mismatch",
     )?;
     let mut files = BTreeMap::new();
+    let request_path = attach_bound(&mut files, &req["_request_binding"], "receipt")?;
+    let mut request_body = req.clone();
+    request_body
+        .as_object_mut()
+        .ok_or("request object absent")?
+        .remove("_request_binding");
+    check(
+        load(&request_path)? == request_body,
+        "packaging request sidecar differs",
+    )?;
     attach(&mut files, &pp, "protocol")?;
     attach(&mut files, &helper, "analysis")?;
     for (name, bytes) in [
         ("src/lib.rs", include_bytes!("lib.rs").as_slice()),
         ("src/main.rs", include_bytes!("main.rs").as_slice()),
+        (
+            "src/output_contract.rs",
+            include_bytes!("output_contract.rs").as_slice(),
+        ),
         (
             "src/protocol_lint.rs",
             include_bytes!("protocol_lint.rs").as_slice(),
@@ -295,6 +351,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
         )?;
         attach(&mut files, &path, "analysis")?;
     }
+    output_contract::provenance(req, &p, &mut files)?;
     let schema_dir = helper
         .parent()
         .and_then(Path::parent)
@@ -368,6 +425,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
         for b in evidence {
             attach_bound(&mut files, b, "receipt")?;
         }
+        output_contract::history(ev, &p)?;
         if n(&ev["resumed"])? > 0 {
             check(
                 ev["checkpoint"].is_object()
@@ -385,6 +443,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
         BTreeSet::new(),
     );
     let mut expected = 0u64;
+    let mut all_slots = vec![];
     let (mut runs, mut missing, mut diagnostics) = (vec![], vec![], vec![]);
     let roles: BTreeSet<_> = arr(&p["arms"])?
         .iter()
@@ -397,6 +456,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
             "plan set/digest differs from receipt",
         )?;
         let plan = load(&attach_bound(&mut files, entry, "protocol")?)?;
+        output_contract::plan(&plan, &p)?;
         check(plan["schema"] == "ecbench.plan/v1", "invalid plan schema")?;
         let sid = s(&entry["session_id"])?;
         check(sessions.insert(sid.to_owned()), "duplicate session")?;
@@ -445,6 +505,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
                 .as_str()
                 .map(str::to_owned)
                 .unwrap_or_else(|| ex["algorithm_seed"].to_string());
+            all_slots.push(json!({"plan":name,"session_id":sid,"seq":seq,"arm":arm["name"],"workload_id":w["workload_id"],"round":ex["round"],"warmup":ex["warmup"],"algorithm_seed":seed}));
             let Some(r) = records.remove(&seq) else {
                 missing.push(json!({"session_id":sid,"seq":seq,"arm":arm["name"],"workload_id":w["workload_id"],"round":ex["round"],"warmup":ex["warmup"],"algorithm_seed":seed}));
                 continue;
@@ -473,7 +534,7 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
             let outcome = &r["outcome"];
             let verified = outcome["status"] == "verified"
                 && outcome["matches_target"] == true
-                && outcome["matches_planted"] != false
+                && outcome["matches_planted"] == true
                 && outcome.get("error") == Some(&V::Null);
             let status = match outcome["status"].as_str() {
                 Some("verified") if verified => "succeeded",
@@ -501,10 +562,15 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
                     counters.insert(format!("online.phases_ns.{k}"), exact_counter(v));
                 }
             }
-            for (k, v) in r["counters"].as_object().into_iter().flatten() {
-                if unsigned_integer(v) || v.is_string() {
-                    counters.insert(format!("native.{k}"), exact_counter(v));
-                }
+            for (k, v) in r["counters"]
+                .as_object()
+                .ok_or("native counters object required")?
+            {
+                check(
+                    unsigned_integer(v) || v.as_str().is_some_and(output_contract::decimal),
+                    "native counter must be a nonnegative integer",
+                )?;
+                counters.insert(format!("native.{k}"), exact_counter(v));
             }
             let rss = if t["max_rss_kib"].is_null() {
                 V::Null
@@ -535,15 +601,17 @@ pub fn package(req: &V) -> Result<(V, Vec<String>)> {
             && missing.len() == arr(&native["missing_executions"])?.len(),
         "native flow differs from actual records/plans",
     )?;
+    output_contract::analysis(&native, &p, &all_slots, &runs, &diagnostics, &receipt)?;
+    replay(&native, &p)?;
     let commit = &p["arms"][0]["instrument"]["commit"];
     let arms: Vec<_> = arr(&p["arms"])?
         .iter()
         .map(|a| json!({"id":a["id"],"role":a["role"],"binary_sha256":binary,"commit":commit}))
         .collect();
-    let e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?}});
+    let e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"request_binding":req["_request_binding"],"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?}});
     validate_schema(&e, false)?;
     check_files(&e)?;
-    let findings = check_export(&e, &p)?;
+    let findings = lint_rows(&e, &p)?;
     Ok((e, findings))
 }
 pub fn lint_rows(e: &V, p: &V) -> Result<Vec<String>> {
@@ -570,6 +638,17 @@ pub fn lint_rows(e: &V, p: &V) -> Result<Vec<String>> {
         .checked_mul(instances)
         .and_then(|v| v.checked_mul(reps))
         .ok_or("sample count overflow")?;
+    let warmups = n(&p["sample_size"]["warmups"])?;
+    let observed_warmups = runs.iter().filter(|r| r["warmup"] == true).count() as u64;
+    let expected_warmups = (arr(&p["arms"])?.len() as u64)
+        .checked_mul(instances)
+        .and_then(|n| n.checked_mul(warmups))
+        .ok_or("warmup count overflow")?;
+    if observed_warmups != expected_warmups {
+        findings.push(format!(
+            "export has {observed_warmups} warmup rows; protocol plans {expected_warmups}"
+        ));
+    }
     if measured.len() as u64 != expected {
         findings.push(format!(
             "export has {} measured rows; protocol plans {expected}",
@@ -591,6 +670,16 @@ pub fn lint_rows(e: &V, p: &V) -> Result<Vec<String>> {
             {
                 findings.push(format!("arm {} replicate shortfall", arm["id"]));
             }
+            if runs
+                .iter()
+                .filter(|r| {
+                    r["arm"] == arm["id"] && r["instance_id"].as_str() == w && r["warmup"] == true
+                })
+                .count() as u64
+                != warmups
+            {
+                findings.push(format!("arm {} workload warmup shortfall", arm["id"]));
+            }
         }
     }
     Ok(findings)
@@ -608,6 +697,9 @@ pub fn write_exclusive(path: &Path, v: &V) -> Result<()> {
 }
 /// Validate canonical export semantics and all attached files in native Rust.
 pub fn check_export(e: &V, p: &V) -> Result<Vec<String>> {
+    check_export_with(e, p, replay_analysis)
+}
+fn check_export_with(e: &V, p: &V, replay: fn(&V, &V) -> Result<()>) -> Result<Vec<String>> {
     validate_schema(e, false)?;
     protocol_admission(p)?;
     check(
@@ -686,6 +778,22 @@ pub fn check_export(e: &V, p: &V) -> Result<Vec<String>> {
         bound(&e["host"])?;
     }
     check_files(e)?;
+    let request_binding = &e["backend_record"]["request_binding"];
+    let request_path = bound(request_binding)?;
+    check(
+        arr(&e["files"])?.iter().any(|f| {
+            f["path"] == request_binding["path"] && f["sha256"] == request_binding["sha256"]
+        }),
+        "request sidecar not attached",
+    )?;
+    let mut request = load(&request_path)?;
+    request["_request_binding"] = request_binding.clone();
+    let (mut rebuilt, _) = package_core(&request, replay)?;
+    rebuilt["created"] = e["created"].clone();
+    check(
+        rebuilt == *e,
+        "canonical export differs from bound source reconstruction",
+    )?;
     let mut findings = lint_rows(e, p)?;
     let mut sets = vec![];
     for a in arr(&p["arms"])? {

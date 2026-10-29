@@ -1,15 +1,17 @@
 //! Public software fixtures only; no experimental cohort or approval.
-use pencil_native_canonical_export::*;
+use crate::*;
 use serde_json::{json, Value as V};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
+mod support;
 struct Fixture {
     d: tempfile::TempDir,
     p: V,
     rows: Vec<V>,
     req: V,
+    provenance: V,
 }
 fn binding(p: &Path) -> V {
     json!({"path":p,"sha256":digest(p).unwrap()})
@@ -33,6 +35,7 @@ impl Fixture {
         p["sample_size"]["instances"] = json!(1);
         p["sample_size"]["preflight_runtime"]["estimated_total_seconds"] = json!(1);
         p["analysis_plan"]["frozen_before_data"] = json!(true);
+        let provenance = support::provenance(&mut p, d.path(), study);
         p["freeze"]["status"] = json!("frozen");
         p["freeze"]["frozen_at"] = json!("2026-10-29T00:00:00Z");
         p["freeze"]["protocol_sha256"] = json!(protocol_hash(&p).unwrap());
@@ -51,9 +54,10 @@ impl Fixture {
             p,
             rows,
             req: V::Null,
+            provenance,
         };
         f.write("plan.json", &plan);
-        f.write("receipt.json",&json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"files":{"plan.json":digest(&f.path("plan.json")).unwrap()}}));
+        f.write("receipt.json",&json!({"schema":"pencil-prepared-plan-validation/v1","passed":true,"targets":1,"planned_executions":18,"measured_executions":15,"warmup_executions":3,"files":{"plan.json":digest(&f.path("plan.json")).unwrap()}}));
         f.write("resources.json",&json!({"schema":"software-resource-fixture/v1","attempts":[{"status":"interrupted","restored":true}],"not_cohort":true}));
         f.refresh();
         f
@@ -71,12 +75,22 @@ impl Fixture {
         let m = json!({"schema":"pencil-price-cohort-input/v1","protocol_sha256":self.p["freeze"]["protocol_sha256"],"binary_sha256":self.p["arms"][0]["instrument"]["binary_sha256"],"prepared_plan_validation":binding(&self.path("receipt.json")),"plans":[{"path":self.path("plan.json"),"sha256":digest(&self.path("plan.json")).unwrap(),"name":"plan.json","session_id":"software-session","records":binding(&self.path("records.jsonl"))}],"separate_resources":binding(&self.path("resources.json"))});
         let pins = &self.p["extensions"]["analysis_support_sha256"];
         self.write("native.json",&json!({"schema":"pencil-price-cohort-output/v1","input_manifest":m,"input_manifest_integrity_sha256":hash(&canonical(&m).unwrap()),"expected_executions":18,"observed_executions":self.rows.len(),"missing_executions":vec![json!({});18-self.rows.len()],"separate_resource_observations":load(&self.path("resources.json")).unwrap(),"aggregate_source_sha256":pins["native_price/src/aggregate.rs"],"paired_export_source_sha256":pins["paired_export/src/lib.rs"],"paired_export_plan_source_sha256":pins["paired_export/src/plan.rs"],"mapping":{"mapping_sha256":self.p["extensions"]["finite_cost_model"]["mapping_sha256"]}}));
+        let mut native = load(&self.path("native.json")).unwrap();
+        support::complete_native(
+            &mut native,
+            &load(&self.path("plan.json")).unwrap(),
+            &self.rows,
+        );
+        self.write("native.json", &native);
         self.write("history.json",&json!({"schema":"pencil-execution-history/v1","protocol_sha256":self.p["freeze"]["protocol_sha256"],"binary_sha256":m["binary_sha256"],"records":self.rows.iter().map(|r|json!({"record_id":r["record_id"],"session_id":r["session_id"],"seq":r["seq"],"attempts":1,"resumed":0,"checkpoint":null,"evidence":[binding(&self.path("resources.json"))]})).collect::<Vec<_>>()}));
         let study = Path::new(env!("CARGO_MANIFEST_DIR"));
-        self.req = json!({"schema":"pencil-canonical-package-input/v1","canonical_tool":binding(&study.join("tools/experiment_protocol.reference.txt")),"protocol":binding(&self.path("protocol.json")),"native_analysis":binding(&self.path("native.json")),"analysis_script":binding(&study.join("fixtures/analyze_cohort.reference.txt")),"execution_history":binding(&self.path("history.json")),"export_id":"software-fixture-export","created":"2026-10-29T00:00:00Z"});
+        self.req = json!({"schema":"pencil-canonical-package-input/v1","canonical_tool":binding(&study.join("tools/experiment_protocol.reference.txt")),"protocol":binding(&self.path("protocol.json")),"native_analysis":binding(&self.path("native.json")),"analysis_script":self.p["analysis_plan"]["script"],"analysis_provenance":self.provenance,"execution_history":binding(&self.path("history.json")),"export_id":"software-fixture-export","created":"2026-10-29T00:00:00Z"});
     }
     fn run(&self) -> Result<(V, Vec<String>)> {
-        package(&self.req)
+        self.write("packaging-request.json", &self.req);
+        let mut req = self.req.clone();
+        req["_request_binding"] = binding(&self.path("packaging-request.json"));
+        package(&req)
     }
     fn edit(&mut self, name: &str, field: &str, change: impl FnOnce(&mut V)) {
         let mut v = load(&self.path(name)).unwrap();
@@ -243,15 +257,16 @@ fn missing_history() {
 #[test]
 fn restore_history() {
     let mut f = Fixture::new();
+    permit_computation_restore(&mut f);
     f.edit("history.json", "execution_history", |h| {
-        h["records"][4]["attempts"] = json!(3);
+        h["records"][4]["attempts"] = json!(2);
         h["records"][4]["resumed"] = json!(1);
         h["records"][4]["checkpoint"] =
             json!({"policy":"criu","generations_written":2,"restored_from_generation":1});
     });
     let (e, x) = f.run().unwrap();
     assert!(x.is_empty());
-    assert_eq!(e["runs"][4]["attempts"], 3);
+    assert_eq!(e["runs"][4]["attempts"], 2);
     assert_eq!(e["runs"][4]["resumed"], 1);
 }
 #[test]
@@ -340,78 +355,179 @@ fn restore_generation_required() {
     f.edit("history.json", "execution_history", |h| {
         h["records"][0]["resumed"] = json!(1)
     });
-    assert!(f.run().unwrap_err().contains("checkpoint generation"));
+    assert!(f.run().unwrap_err().contains("checkpoint policy"));
+}
+// Private unit scope only: output replay is separately exercised through the
+// unconditional public production API on the complete 1,260-workload plan.
+fn package(req: &V) -> Result<(V, Vec<String>)> {
+    crate::package_with(req, |_, _| Ok(()))
+}
+fn check_export(e: &V, p: &V) -> Result<Vec<String>> {
+    crate::check_export_with(e, p, |_, _| Ok(()))
+}
+fn permit_computation_restore(f: &mut Fixture) {
+    f.p["execution"]["measurement_class"] = json!("search");
+    f.p["extensions"]["active_execution_epoch"] = json!("computation");
+    f.p["execution"]["checkpoint"] = json!({"policy":"criu","interval_seconds":300,"grace_seconds":120,"restore_validation":"criu_selfcheck","after_restore":{"wall_time":"invalid","counted_units":"valid"}});
+    f.p["extensions"]["computation_epoch"]["max_restores"] = json!(1);
+    f.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&f.p).unwrap());
+    f.refresh();
 }
 #[test]
-fn native_cli_positive_and_negative_checker() {
-    let f = Fixture::new();
-    f.write("request.json", &f.req);
-    let bin = env!("CARGO_BIN_EXE_pencil-native-canonical-export");
-    let run = std::process::Command::new(bin)
-        .arg(f.path("request.json"))
-        .arg("--out")
-        .arg(f.path("export.json"))
-        .output()
-        .unwrap();
-    assert!(
-        run.status.success(),
-        "{}",
-        String::from_utf8_lossy(&run.stderr)
-    );
-    let positive = std::process::Command::new(bin)
-        .arg("check-export")
-        .arg(f.path("export.json"))
-        .arg("--protocol")
-        .arg(f.path("protocol.json"))
-        .output()
-        .unwrap();
-    assert!(
-        positive.status.success(),
-        "{}",
-        String::from_utf8_lossy(&positive.stderr)
-    );
-    fs::write(f.path("resources.json"), "{}").unwrap();
-    let negative = std::process::Command::new(bin)
-        .arg("check-export")
-        .arg(f.path("export.json"))
-        .arg("--protocol")
-        .arg(f.path("protocol.json"))
-        .output()
-        .unwrap();
-    assert!(!negative.status.success());
-    assert!(String::from_utf8_lossy(&negative.stderr).contains("hash mismatch"));
+fn missing_planted_stays_failed() {
+    let mut f = Fixture::new();
+    f.rows[0]["outcome"]
+        .as_object_mut()
+        .unwrap()
+        .remove("matches_planted");
+    f.refresh();
+    let (e, _) = f.run().unwrap();
+    assert_eq!(e["runs"][0]["status"], "failed");
+    assert_eq!(e["runs"][0]["verification"]["status"], "no_claim");
 }
 #[test]
-fn native_cli_validates_draft_without_freezing_and_rejects_invalid_draft() {
-    let f = Fixture::new();
-    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/protocol-draft.json");
-    let mut draft = load(&fixture).unwrap();
-    // Draft references are allowed to be unresolved; no execution or freeze follows validation.
-    draft["analysis_plan"]["script"] = V::Null;
-    f.write("draft.json", &draft);
-    let before = digest(&f.path("draft.json")).unwrap();
-    let bin = env!("CARGO_BIN_EXE_pencil-native-canonical-export");
-    let positive = std::process::Command::new(bin)
-        .arg("validate-protocol")
-        .arg(f.path("draft.json"))
-        .output()
-        .unwrap();
-    assert!(
-        positive.status.success(),
-        "{}",
-        String::from_utf8_lossy(&positive.stderr)
+fn malformed_counters_rejected() {
+    for v in [
+        json!("not-an-integer"),
+        json!("-1"),
+        json!(""),
+        json!(1.5),
+        json!(true),
+    ] {
+        let mut f = Fixture::new();
+        f.rows[0]["counters"]["actual"] = v;
+        f.refresh();
+        assert!(f.run().unwrap_err().contains("nonnegative integer"));
+    }
+    let mut f = Fixture::new();
+    f.rows[0]["counters"] = V::Null;
+    f.refresh();
+    assert!(f.run().unwrap_err().contains("counters object"));
+}
+#[test]
+fn omitted_planned_warmups_rejected() {
+    let mut f = Fixture::new();
+    let mut plan = load(&f.path("plan.json")).unwrap();
+    plan["executions"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|e| e["warmup"] == false);
+    f.write("plan.json", &plan);
+    let mut receipt = load(&f.path("receipt.json")).unwrap();
+    receipt["files"]["plan.json"] = json!(digest(&f.path("plan.json")).unwrap());
+    f.write("receipt.json", &receipt);
+    f.rows.retain(|r| r["warmup"] == false);
+    f.refresh();
+    assert!(f.run().unwrap_err().contains("prescribed measured/warmup"));
+}
+#[test]
+fn missing_warmup_records_preserved_as_shortfall() {
+    let mut f = Fixture::new();
+    f.rows.retain(|r| r["warmup"] == false);
+    f.refresh();
+    let (e, findings) = f.run().unwrap();
+    assert_eq!(
+        e["backend_record"]["missing_slots"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3
     );
-    let out: V = serde_json::from_slice(&positive.stdout).unwrap();
-    assert_eq!(out["freeze_status"], "draft");
-    assert_eq!(out["launch_authorized"], false);
-    assert_eq!(before, digest(&f.path("draft.json")).unwrap());
-    draft["claims"][1]["decided_by"] = json!(["absent-comparison"]);
-    f.write("draft.json", &draft);
-    let negative = std::process::Command::new(bin)
-        .arg("validate-protocol")
-        .arg(f.path("draft.json"))
-        .output()
+    assert!(findings.iter().any(|s| s.contains("warmup")));
+}
+#[test]
+fn retry_and_generation_bounds() {
+    let mut f = Fixture::new();
+    f.edit("history.json", "execution_history", |h| {
+        h["records"][0]["attempts"] = json!(3)
+    });
+    assert!(f.run().unwrap_err().contains("retry admission"));
+    let mut f = Fixture::new();
+    permit_computation_restore(&mut f);
+    f.edit("history.json", "execution_history", |h| {
+        h["records"][0]["resumed"] = json!(1);
+        h["records"][0]["checkpoint"] =
+            json!({"policy":"criu","generations_written":0,"restored_from_generation":99});
+    });
+    assert!(f.run().unwrap_err().contains("committed generations"));
+}
+#[test]
+fn none_epoch_cannot_use_computation_restore() {
+    let mut f = Fixture::new();
+    f.edit("history.json", "execution_history", |h| {
+        h["records"][0]["resumed"] = json!(1);
+        h["records"][0]["checkpoint"] =
+            json!({"policy":"criu","generations_written":1,"restored_from_generation":1});
+    });
+    assert!(f
+        .run()
+        .unwrap_err()
+        .contains("measurement checkpoint policy"));
+}
+#[test]
+fn backend_mutations_individually_rejected() {
+    let f = Fixture::new();
+    let (e, _) = f.run().unwrap();
+    for (k, v) in [
+        ("qualified", json!(true)),
+        ("expected_execution_slots", json!(0)),
+        ("missing_slots", json!([{"fabricated":true}])),
+        ("diagnostics", json!([])),
+        ("native_analysis_sha256", json!("0".repeat(64))),
+    ] {
+        let mut changed = e.clone();
+        changed["backend_record"][k] = v;
+        assert!(
+            check_export(&changed, &f.p)
+                .unwrap_err()
+                .contains("reconstruction"),
+            "{k}"
+        );
+    }
+}
+#[test]
+fn native_required_inventory_cannot_be_omitted() {
+    for field in [
+        "aggregate_cells",
+        "streams",
+        "pair_rows",
+        "outcome_counts",
+        "qualified_ratios",
+    ] {
+        let mut f = Fixture::new();
+        f.edit("native.json", "native_analysis", |v| {
+            v.as_object_mut().unwrap().remove(field);
+        });
+        assert!(f.run().is_err(), "{field}");
+    }
+}
+#[test]
+fn source_provenance_bytes_required() {
+    let f = Fixture::new();
+    let path = f.provenance["sources"]["native_price/src/importer.rs"]["path"]
+        .as_str()
         .unwrap();
-    assert!(!negative.status.success());
-    assert!(String::from_utf8_lossy(&negative.stderr).contains("unknown comparison"));
+    fs::write(path, "mutated").unwrap();
+    assert!(f.run().unwrap_err().contains("hash mismatch"));
+}
+#[test]
+fn altered_analyzer_binary_rejected() {
+    let f = Fixture::new();
+    fs::write(
+        f.provenance["binaries"]["analyze_cohort"]["path"]
+            .as_str()
+            .unwrap(),
+        "mutated",
+    )
+    .unwrap();
+    assert!(f.run().unwrap_err().contains("hash mismatch"));
+}
+#[test]
+fn no_restore_with_generation_rejected() {
+    let mut f = Fixture::new();
+    f.edit("history.json", "execution_history", |h| {
+        h["records"][0]["checkpoint"] =
+            json!({"policy":"none","generations_written":1,"restored_from_generation":1})
+    });
+    assert!(f.run().unwrap_err().contains("zero restores"));
 }

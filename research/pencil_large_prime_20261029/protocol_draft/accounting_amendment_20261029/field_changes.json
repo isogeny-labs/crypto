@@ -1,7 +1,7 @@
 {
   "schema": "pencil-protocol-field-changes/v1",
   "predecessor_sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
-  "amended_sha256": "1ccd66480b7fb0a94c14cc85a09a115c1f79eb6f862b511b12a7d58ed467f342",
+  "amended_sha256": "c51026bf6c8379f07f3b25c66d071d25cebfb8e548f38461c2115fca7ee20d01",
   "changes": [
     {
       "path": "/amendments",
@@ -63,6 +63,21 @@
           ],
           "supersedes_fields": [
             "extensions.canonical_packaging"
+          ]
+        },
+        {
+          "id": "A-native-export-review-correction-20261029",
+          "filed": "2026-10-29",
+          "filed_before_affected_data": true,
+          "reason": "Bind correction of six independently reviewed exporter defects; earlier test scope did not establish these contracts and remains historical.",
+          "changes": [
+            "Require exact known-answer checks, warmup cells, counters and explicit attempt/restore bounds.",
+            "Require complete analysis provenance, immutable request reconstruction and mandatory deterministic source-linked native analysis replay.",
+            "Record40 software tests in four distinct scopes plus independent corrected-source recheck; retain zero solver records and null empirical ratios."
+          ],
+          "supersedes_fields": [
+            "extensions.canonical_packaging",
+            "extensions.native_tools.canonical_export"
           ]
         }
       ]
@@ -582,17 +597,24 @@
         "status": "native_software_validated_packaging_only_not_qualification",
         "language": "Rust",
         "adapter": "research/pencil_large_prime_20261029/native_canonical_export",
-        "adapter_sha256": "026b7c5ef9f263ae0c4a942225100f25e6d280fb79ce5376ebdb69ec95564bb5",
+        "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
         "canonical_tool": "research/pencil_large_prime_20261029/native_canonical_export/tools/experiment_protocol.reference.txt",
         "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
         "canonical_reference_execution": false,
         "export_schema": "research/pencil_large_prime_20261029/native_canonical_export/schemas/experiment-export.v1.json",
-        "software_tests": 28,
-        "receipt": "../../native_canonical_export/validation/receipt.json",
-        "receipt_sha256": "aeef1f2bc1984f248121a786996cfb6ed5008750a825d47712e53092ad4ea0f6",
+        "software_tests": 40,
+        "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+        "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
         "explicit_execution_history_required": true,
         "wall_valid": false,
-        "experiment_executions": 0
+        "experiment_executions": 0,
+        "required_contract": {
+          "analysis_provenance": "sources exact protocol analysis_support_sha256 map; hash-bound build_receipt and both analyze_pair/analyze_cohort binaries",
+          "compiled_source_pins": "all13 linked native analysis sources must match declared protocol pins",
+          "request_binding": "CLI attaches hash-bound _request_binding; check_export reconstructs complete export from immutable request",
+          "deterministic_replay": "public package/check_export execute linked native aggregate over bound records/plans and require exact output equality; private unit test callbacks are not runtime bypasses",
+          "limits": "Source-linked software consistency, not independent mathematical implementation, original analyzer binary execution attestation, clock qualification or cost-ratio qualification"
+        }
       }
     },
     {
@@ -750,24 +772,31 @@
       "operation": "add",
       "after": {
         "canonical_export": {
-          "receipt": "../../native_canonical_export/validation/receipt.json",
-          "receipt_sha256": "aeef1f2bc1984f248121a786996cfb6ed5008750a825d47712e53092ad4ea0f6",
-          "adapter_sha256": "026b7c5ef9f263ae0c4a942225100f25e6d280fb79ce5376ebdb69ec95564bb5",
+          "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+          "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+          "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
           "source_manifest": {
-            "path": "validation/SOURCE_SHA256SUMS",
-            "sha256": "329498db3ab72ab33b2cf0d12078ce5b17ec971f7852091a62e17c3d9d3b408a"
+            "path": "validation/review-fixes-source-files.sha256",
+            "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
           },
-          "software_tests": 28,
-          "supplemental_historical_hash_test": {
-            "passed": 1,
+          "software_tests": 40,
+          "test_scopes": {
+            "command": "cargo +1.99.1 test --release --locked",
+            "passed": 40,
             "failed": 0,
-            "receipt": "validation/historical-hash-receipt.json",
-            "sha256": "6fe3e515c1c2a5ba81116d4c93ea95e16313fc2781e9fbf19c8c0180a94dc6c2",
-            "log": "validation/historical-canonical-hash.log",
-            "raw_file_sha256": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
-            "canonical_without_freeze_sha256": "e00941ff8f17bb41091fcc11fcef11ff5137325da3127e7c85b1a461b56bd036",
-            "independent_reference": "native jq sorted compact JSON without freeze; no Python executed",
-            "semantics": "historical integrity digest binds raw file bytes; canonical hash excludes freeze and compactly sorts body"
+            "ignored": 0,
+            "private_unit_contracts": 37,
+            "native_protocol_cli": 1,
+            "historical_digest_semantics": 1,
+            "production_full_denominator_replay": 1,
+            "production_seconds": 205.38,
+            "log": "validation/review-fixes-final-tests.log",
+            "sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83"
+          },
+          "independent_corrected_source_review": {
+            "path": "../../validation/native_export_correction_fc96a3d1/review.json",
+            "sha256": "ed436aef0cbe8ea7f380767bcade130ded56c54de875950bf6c80a081ad65927",
+            "scope": "Software packaging and deterministic source-linked replay only; not independent mathematical implementation or empirical qualification"
           }
         },
         "preparation": {

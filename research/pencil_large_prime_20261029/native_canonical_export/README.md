@@ -17,7 +17,9 @@ cargo +1.99.1 run --release --locked --manifest-path Cargo.toml -- check-export 
 
 The request retains `pencil-canonical-package-input/v1`: hash-bound `protocol`,
 `canonical_tool` (reference text, never executed), `native_analysis`,
-`analysis_script`, `execution_history`, optional `additional_sidecars`, and
+`analysis_script`, `execution_history`, mandatory `analysis_provenance` (all
+protocol-pinned analysis sources, build receipt and both analyzer binaries),
+optional `additional_sidecars`, and
 `export_id`. Paths are resolved from the process working directory. All attached
 paths in output are absolute; relocation requires preserving or repackaging the
 bindings, not silently modifying the write-once export. The retained source files
@@ -27,7 +29,7 @@ The helper's sibling `../schemas/` must match the embedded schema bytes.
 Before freezing new data, `extensions.canonical_packaging.adapter_sha256` must
 bind the **native** `adapter-hash`, replacing the historical Python file hash.
 This SHA-256 covers the concatenation, in order, of `src/lib.rs`, `src/main.rs`,
-`src/protocol_lint.rs`, `Cargo.lock`, `Cargo.toml`, protocol schema and export
+`src/protocol_lint.rs`, `src/output_contract.rs`, `Cargo.lock`, `Cargo.toml`, protocol schema and export
 schema. The separate `canonical_tool_sha256` binds the reference helper.
 This change is an explicit implementation identity amendment, not approval of a
 protocol or an inference that any recorded experiment is qualified.
@@ -47,10 +49,24 @@ outcomes remain attached. Incomplete cohorts produce a valid observation export
 with semantic shortfall findings and a nonzero CLI exit. Output creation is
 exclusive. A schema/identity/history failure emits no export.
 
-Tests are self-contained within this crate: `fixtures/protocol-draft.json` is a
+The CLI attaches the immutable packaging request. `check-export` revalidates all
+attachments and reconstructs the entire export, including backend diagnostics,
+missing slots and native analysis identity. Public packaging and checking always
+recompute the native analysis using the source-linked `native_price` aggregate
+implementation, requiring exact output equality. Its input manifest is bound to
+the same plans, protocol, instrument binary and record corpus being exported.
+All 13 linked analyzer and paired-export source files must match protocol pins.
+This is deterministic software replay, not a second mathematical implementation
+or proof that the attached binary originally produced the supplied output.
+
+Tests require this crate and sibling `../native_price` and `../paired_export`:
+`fixtures/protocol-draft.json` is a
 retained draft donor whose only test copies are labeled software fixtures and
-frozen in temporary directories. The analysis source fixture is reference text;
-it is never executed. No test is an empirical target, timing observation,
+frozen in temporary directories. Private unit contracts use a test-only callback
+to isolate admission rules. Production integration uses unconditional public
+replay with 1,260 planned workloads, 22,680 missing execution slots and zero
+solver calls; it rejects mutated controls and cost summaries. Mock build/binary
+receipts are explicitly software fixtures. No test is an empirical target, timing observation,
 protocol approval or measured candidate/rho result.
 
 See `CONTRACT_COVERAGE.md` for canonical semantic obligations and explicit
