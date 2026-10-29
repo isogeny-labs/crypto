@@ -764,3 +764,31 @@ Finish report packet and scoped commit/PR update; exact-head remote checks; fina
 
 ### Errors
 No final validation failure. Prior failures remain in the validation directory.
+
+## 2026-10-29T19:16:33.495968+00:00 — Validated source delivered; static instrument build started
+
+### What was done
+Pushed source/accounting/report commit543a54b4b to PR2869 and updated its description. Auto-merge remains enabled. Reconciled bot child7d7f5495c: only three root stdout logs moved into the artifact store, with manifest/ignore additions. Fast-forwarded the local branch. After checking existing terminal dispatches, dispatched exactly one static build40938439022 on the feature branch with source543a54b4b.
+
+### Decisions made
+Keep source, workflow and binary identities distinct. The main-only experiment job is ineligible on this feature branch; no cohort or image publication authorized by this build. Preserve every prior failed attempt.
+
+### Open threads
+Build40938439022, exact-child CI, artifact readback, protocol accounting amendment and actual prior gate-cap authorization; final image/runtime/budget bindings and original cohort requirements remain.
+
+### Errors
+Explicit branch fetch populated FETCH_HEAD without a remote-tracking ref; initial origin/branch lookup failed. Inspected the exact downloaded commit and API file list, then fast-forwarded by immutable SHA. No duplicate dispatch.
+
+## 2026-10-29T19:23:36.209698+00:00 — Pre-data accounting amendment and CI correction
+
+### What was done
+Created separate accounting_amendment_20261029 draft: canonical checker exit0/zero findings and10 preservation checks pass. All3 artifact-store stdout logs freshly hydrated and match manifest hashes/sizes. Rust1.98 remote Clippy found manual_hash_one in a new hash-equivalence test; replaced manual hash construction with equivalent hash_one assertion. Non-test prefix is byte-identical; correction validation is running separately.
+
+### Decisions made
+Keep static build40938439022 source543a54b4b intact; its runtime source is unchanged by the test-only correction. Historical p739 gate is10m coefficients and3600seconds for the gate command; current unfrozen draft25m/per-execution envelope is not established authorization. Requested the missing resource-envelope choice, cumulative budget and absolute deadline; no experiment admitted.
+
+### Open threads
+Static build, Rust1.98 maintained Clippy and required corrected-source release suite; commit/push corrected test after validation. Final binary/image/review binding and resource/infrastructure answers remain prerequisites for the original full cohort.
+
+### Errors
+Canonical amendment initial check found a missing derived formula; corrected and retained the initial output. Historical protocol path guessed under current study did not exist; authoritative external Markowitz protocol supplied exact original limits. Migration receipt required read-only sudo access; inspected metadata successfully.
