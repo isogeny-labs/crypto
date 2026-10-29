@@ -325,8 +325,9 @@ establishes scalar recovery or an exact first/last fall degree.
 
 Generation and central `verify_cell` invoke the public equation/domain
 reconstruction verifier. Semantic replay tests on source `7a1bd350b26` cover
-rehashed corruption and omitted inputs with stripped strategy tags. The frozen actual-CLI fixture also passed replay and rehashed-corruption
-rejection on both twists; cloud restore remains a separate validation step. The frozen
+rehashed corruption and omitted inputs with stripped strategy tags. The frozen actual-CLI fixture passed replay on both twists and rejected
+rehashed corruption in a copied twist=false cell; cloud restore remains a
+separate validation step. The frozen
 [prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md) records required checks and
 mathematical limits; no new cloud-generation evidence follows from this code.
 
