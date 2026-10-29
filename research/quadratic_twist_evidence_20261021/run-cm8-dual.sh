@@ -49,7 +49,7 @@ mkdir "$out/controls"
 for kind in false-dual false-multiplier false-composition false-kernel missing-point false-count false-subgroup false-scalar false-source; do
   cp -a "$out/cases" "$out/controls/$kind"
   run "$kind-mutate" "$newa" corrupt "$kind" "$out/controls/$kind"
-  ! cmp -s "$out/cases/dual.json" "$out/controls/$kind/dual.json"
+  if cmp -s "$out/cases/dual.json" "$out/controls/$kind/dual.json"; then echo "no-op control: $kind" >&2; exit 2; fi
   set +e
   RUST_BACKTRACE=0 timeout 600 "$newa" audit "$root" "$out/controls/$kind" "$out/controls/$kind-receipt.json" > "$out/$kind-reject.log" 2>&1
   result=$?
