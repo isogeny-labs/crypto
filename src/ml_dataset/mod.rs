@@ -1542,7 +1542,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
-        "trace_mib":a.trace_mib,"execution_context_required":true,"output_budget_scope":"all_cell_files_before_manifest_seal",
+        "trace_mib":a.trace_mib,"execution_context_required":cfg!(target_os = "linux"),"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
     let result = (|| {
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
@@ -1672,7 +1672,11 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 use std::os::unix::process::CommandExt;
                 command.process_group(0);
             }
-            let launch_context = execution::create(&dir)?;
+            let launch_context = if cfg!(target_os = "linux") {
+                Some(execution::create(&dir)?)
+            } else {
+                None
+            };
             let start = Instant::now();
             let mut child = SupervisedChild {
                 child: command.spawn().map_err(|e| e.to_string())?,
@@ -1688,13 +1692,24 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             )?;
             let mut stop_reason = None;
             let exit = loop {
-                if let Some(status) = child.poll()? {
+                let polled = child.poll()?;
+                // A successful exit observed at/after the original deadline is
+                // conservatively censored, even if it occurred between polls.
+                let expired = if let Some(launch) = &launch_context {
+                    execution::deadline_expired(
+                        launch.deadline_monotonic_ns,
+                        execution::monotonic_ns()?,
+                    )
+                } else {
+                    start.elapsed() >= Duration::from_secs(a.seconds_per_case)
+                };
+                if expired {
+                    stop_reason = Some("timeout");
+                }
+                if let Some(status) = polled {
                     break status;
                 }
                 let bytes = tree_bytes_while_running(&dir)?;
-                if execution::monotonic_ns()? >= launch_context.deadline_monotonic_ns {
-                    stop_reason = Some("timeout");
-                }
                 if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                     stop_reason = Some("trace_budget_exhausted");
                 }

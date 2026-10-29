@@ -66,6 +66,14 @@ impl LaunchContext {
     }
     /// Static replay: no dependence on current clock, boot, or elapsed lifetime.
     pub fn validate(&self, run: &Value, binding: &AttemptBinding) -> Result<(), String> {
+        let interval = self
+            .deadline_monotonic_ns
+            .checked_sub(self.start_monotonic_ns)
+            .ok_or("reversed worker deadline")?;
+        let duration = self
+            .seconds_per_case
+            .checked_mul(1_000_000_000)
+            .ok_or("worker duration overflow")?;
         if self.schema != SCHEMA
             || &self.binding != binding
             || self.boot_id.len() != 36
@@ -79,10 +87,7 @@ impl LaunchContext {
             || self.seconds_per_case != positive(run, "seconds_per_case")?
             || self.memory_bytes != bytes(run, "memory_mib")?
             || self.trace_bytes != bytes(run, "trace_mib")?
-            || self
-                .deadline_monotonic_ns
-                .checked_sub(self.start_monotonic_ns)
-                != self.seconds_per_case.checked_mul(1_000_000_000)
+            || interval != duration
         {
             return Err("execution context differs from original run/attempt".into());
         }
@@ -139,6 +144,10 @@ fn boot_id() -> Result<String, String> {
         .map(|s| s.trim().to_owned())
         .map_err(|e| e.to_string())
 }
+pub(super) fn deadline_expired(deadline: u64, observed: u64) -> bool {
+    observed >= deadline
+}
+
 pub(super) fn create(dir: &Path) -> Result<LaunchContext, String> {
     let run: Value = super::read_json(&dir.join("run.json"))?;
     let context = LaunchContext::new_at(
@@ -230,6 +239,21 @@ mod tests {
             .unwrap(),
             run,
         )
+    }
+    #[test]
+    fn replay_rejects_simultaneous_duration_overflow_and_reversed_deadline() {
+        let (mut c, mut run) = fixture();
+        c.seconds_per_case = u64::MAX;
+        run["seconds_per_case"] = serde_json::json!(u64::MAX);
+        c.start_monotonic_ns = 10;
+        c.deadline_monotonic_ns = 9;
+        assert!(c.validate(&run, &c.binding).is_err());
+    }
+    #[test]
+    fn successful_exit_observation_at_deadline_is_censored() {
+        assert!(!deadline_expired(100, 99));
+        assert!(deadline_expired(100, 100));
+        assert!(deadline_expired(100, 101));
     }
     #[test]
     fn original_deadline_survives_setup_and_historical_replay() {
