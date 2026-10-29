@@ -833,3 +833,23 @@ Final explicit-history suite passed 17 tests, including known retries/restores, 
 
 ### Scope and open work
 The user clarified that this is mathematical research on public synthetic known-answer fixtures, not key recovery. This clarification changes no sample size, controls, resource caps, budget, deadline or authorization. No Rust instrument source, cohort execution, cloud job, freeze, independent review or resource approval was changed by this packaging work. Canonical v1 cannot directly represent unattempted rows: missing slots remain explicit in sidecars/backend metadata and canonical shortfall findings are retained. Independent admission, runtime/image/resource bindings and the full authorized research cohort remain outstanding.
+
+## 2026-10-29 — Test-only CI correction and retained validation outcomes
+
+### What was done
+
+- Replaced the manual hasher construction in `exact_hash_and_table_semantics` with `BuildHasher::hash_one`; the non-test source remains byte-identical to instrument source `543a54b4b`.
+- Maintained Rust 1.98 Clippy passed. The default-parallel release library suite finished with 5,275 passed, 2 failed and 123 ignored. Both failing tests passed serially on the same compiled binary; all outcomes and commands are retained in `validation/hash_one_ci_20261029/`.
+- The 2,244-file source manifests before and after validation are byte-identical. The compiled test binary SHA256 is `12867c9d42920e7981cc8f82a404ad6b39e0a3a1ed1d7afa920258ae47dc8eb2`.
+
+### Decisions made
+
+- Preserve the failed full-run configuration and distinguish its CPU-stability/GPU-lock assertions from the passing focused confirmations. Do not describe the corrected-source full suite as passing. No unrelated source edit or further full-suite rerun was made.
+
+### Open threads
+
+- Publish the scoped correction and existing adapter/binding commits to PR #2869; exact-head remote checks remain required. Pencil cohort execution and pending resource/infrastructure authorizations remain outstanding.
+
+### Errors
+
+- The failed full suite asserted `obs.cpu.is_some()` and failed to reacquire a GPU capsule test lock. Exact serial confirmations passed in 0.12 seconds and 61.27 seconds respectively. The initial maintained-Clippy attempt also encountered missing tracked sparse fixtures; these were materialized before its successful recheck.

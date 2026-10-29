@@ -158,11 +158,7 @@ mod tests {
     fn exact_hash_and_table_semantics() {
         let state = RandomState::new();
         for x in [(0u64, 1u64), (u64::MAX, 123)] {
-            let mut a = state.build_hasher();
-            let mut b = state.build_hasher();
-            x.hash(&mut a);
-            Key(x).hash(&mut b);
-            assert_eq!(a.finish(), b.finish());
+            assert_eq!(state.hash_one(x), state.hash_one(Key(x)));
         }
         let mut plain = HashMap::with_hasher(state.clone());
         let mut observed = HashMap::with_hasher(state);
