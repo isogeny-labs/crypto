@@ -99,3 +99,13 @@ additional targeted dynamic-fill/representation-limit tests if review requires;
 dataset adapter/profile serialization, exact input/outcome bindings and replay,
 separate extraction/lift budgets, canonical persistence and source-bound CLI checks.
 Do not mark requested m2..15/n47..61 corpus complete from this native increment.
+
+## Pre-build review correction
+
+Parent/independent review caught missing canonical reconstruction of packed Mono:
+require m==mono(0,free_of(m)) in addition to empty mask/free2/degree checks. Added
+forged-degree/exponent255 rejection before observer/backend. Restore selected
+pairs on pre-symbolic/pre-kernel/insertion admission stops; count selected-but-not
+finished pairs against insertion cap. New native_statistics_complete is false
+on every noncomplete outer stop, including observer refusal; legacy partial
+statistics must not be interpreted as completed pair accounting. Eight tests now.

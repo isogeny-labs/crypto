@@ -1199,6 +1199,8 @@ pub struct BoundedF4Report {
     pub bytes_peak_reserved: u64,
     pub acknowledged_events: usize,
     pub native_backend_invoked: bool,
+    /// Legacy partial statistics do not certify completed pair processing.
+    pub native_statistics_complete: bool,
 }
 struct Admission<'a> {
     limits: &'a BoundedF4Limits,
@@ -1208,6 +1210,7 @@ struct Admission<'a> {
     peak: u64,
     events: usize,
     invoked: bool,
+    selected_pending: usize,
 }
 impl Admission<'_> {
     fn reject(&mut self, stop: BoundedF4Stop) -> bool {
@@ -1279,7 +1282,14 @@ impl Admission<'_> {
     }
     fn insertion<E: Copy + PartialEq>(&mut self, state: &State<E>, value: &Elem<E>) -> bool {
         let h = state.polys.len();
-        if h >= self.limits.basis || state.pairs.len().saturating_add(h) > self.limits.pairs {
+        if h >= self.limits.basis
+            || state
+                .pairs
+                .len()
+                .saturating_add(h)
+                .saturating_add(self.selected_pending)
+                > self.limits.pairs
+        {
             return self.reject(BoundedF4Stop::StorageAdmission);
         }
         let slots = state
@@ -1370,6 +1380,7 @@ pub fn f4_tower_generic_bounded(
         peak: 0,
         events: 0,
         invoked: false,
+        selected_pending: 0,
     };
     let hard = BoundedF4Limits::default();
     let valid_limits = limits.work > 0
@@ -1412,7 +1423,10 @@ pub fn f4_tower_generic_bounded(
                     .iter()
                     .all(|&v| v < ring.field.modulus().to_u64().unwrap() && !ring.field.is_zero(v))
                 && p.monos.iter().all(|&m| {
-                    mask_of(m) == 0 && degree_of(m) <= 32 && free_of(m)[2..].iter().all(|&e| e == 0)
+                    mask_of(m) == 0
+                        && m == mono(0, free_of(m))
+                        && degree_of(m) <= 32
+                        && free_of(m)[2..].iter().all(|&e| e == 0)
                 })
         });
     let native = if !valid {
@@ -1446,8 +1460,12 @@ pub fn f4_tower_generic_bounded(
     if gate.stop.is_none() {
         gate.event("terminal");
     }
+    let stop = gate.stop.unwrap_or(normal_stop);
+    let native_statistics_complete =
+        matches!(stop, BoundedF4Stop::Complete | BoundedF4Stop::UnitDerived);
     BoundedF4Report {
-        stop: gate.stop.unwrap_or(normal_stop),
+        stop,
+        native_statistics_complete,
         native,
         work_reserved: gate.work,
         bytes_peak_reserved: gate.peak,
@@ -1617,6 +1635,9 @@ fn f4_generic_inner<F: PrimeField>(
         let step_started = Instant::now();
         let (selected, rest): (Vec<Pair>, Vec<Pair>) = s.pairs.drain(..).partition(|p| p.deg == d);
         s.pairs = rest;
+        if let Some(gate) = admission.as_mut() {
+            gate.selected_pending = selected.len();
+        }
         rep.steps += 1;
         rep.degree_reached = rep.degree_reached.max(d);
         let mut tr = StepTrace {
@@ -1656,6 +1677,7 @@ fn f4_generic_inner<F: PrimeField>(
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
         if let Some(gate) = admission.as_mut() {
             if !gate.products(&s, &jobs, 0, examined.len(), 0) {
+                s.pairs.extend(selected);
                 break;
             }
         }
@@ -1744,6 +1766,7 @@ fn f4_generic_inner<F: PrimeField>(
                 slots,
                 s.pairs.len(),
             ) {
+                s.pairs.extend(selected);
                 break;
             }
         }
@@ -1897,6 +1920,7 @@ fn f4_generic_inner<F: PrimeField>(
             debug_assert!(f.is_one(p.vals[0]), "an echelon row is monic");
             if let Some(gate) = admission.as_mut() {
                 if !gate.insertion(&s, &p) {
+                    s.pairs.extend(selected);
                     return finish(rep, active_basis(&s));
                 }
             }
@@ -1914,6 +1938,9 @@ fn f4_generic_inner<F: PrimeField>(
             cb(rep.steps, &tr);
         }
         rep.trace.push(tr);
+        if let Some(gate) = admission.as_mut() {
+            gate.selected_pending = 0;
+        }
 
         if let Some(bound) = opts.stop_staircase {
             if !s.pairs.is_empty() {
@@ -2150,6 +2177,34 @@ mod tests {
         assert_eq!(short.stop, BoundedF4Stop::WorkLimit);
         assert!(short.work_reserved <= limits.work);
         assert!(!short.native.stats.timed_out);
+    }
+
+    #[test]
+    fn bounded_rejects_forged_packed_degree_before_any_observer() {
+        let (ring, mut input, opts) = bounded_fixture(17, 1);
+        // Preserve exponent 255 but replace the high packed degree with zero.
+        let legitimate = mono(0, [255, 0, 0, 0]);
+        let forged = legitimate & ((1u128 << 96) - 1);
+        assert_ne!(forged, mono(mask_of(forged), free_of(forged)));
+        input[0] = GPoly {
+            monos: vec![forged],
+            coefs: vec![ring.field.one()],
+        };
+        let mut calls = 0;
+        let report = f4_tower_generic_bounded(
+            &input,
+            &ring,
+            &opts,
+            &BoundedF4Limits::default(),
+            &mut |_| {
+                calls += 1;
+                Ok(())
+            },
+        );
+        assert_eq!(report.stop, BoundedF4Stop::InvalidInput);
+        assert!(!report.native_backend_invoked);
+        assert!(!report.native_statistics_complete);
+        assert_eq!(calls, 0);
     }
 
     #[test]
