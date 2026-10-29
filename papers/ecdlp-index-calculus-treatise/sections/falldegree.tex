@@ -438,8 +438,16 @@ fixtures:
 \end{itemize}
 Twenty polynomial identities used in the proofs are checked in Lean
 (\texttt{FallDegreeIdentities.lean}, \texttt{PrimeBitLocal.lean}; axioms
-\texttt{propext} and \texttt{Quot.sound} only). The closure theorem, the
-lower bounds and the curve semantics are \emph{not} formalised. A
+\texttt{propext} and \texttt{Quot.sound} only). The degree-4 lower bound
+is now machine-checked: \texttt{GuardedModel.no\_degree\_four\_refutation}
+proves that 1 is not derivable at degree four from the six generators, over
+every field with $6\ne0$ and three distinct base abscissae, and
+\texttt{lastFall\_lower} states the last-fall consequence under an explicit
+unit-ideal hypothesis (\art{research/guarded_fall_degree_20261028/formal/GuardedModel.lean};
+six modules, fresh \texttt{leanchecker} replays and a transitive axiom audit,
+merged in \#2814). The degree-5 upper construction, the bridge from rational
+unsatisfiability to the unit ideal, and the first-fall syzygy statement are
+\emph{not} formalised, so the exact pair $(4,5)$ is not yet a Lean theorem. A
 \texttt{lastFallDegree} definition and Caminata--Gorla's Theorem~2.8 in
 \art{crypto-autoresearcher:formal/CryptoResearch/FallDegree/LastFall.lean}
 are the bridge a complete formalisation would build on.
@@ -464,7 +472,10 @@ from the first fall degree. Source for this section:
 \art{research/prime_fall_degree_20261027/DERIVED.md}, written proofs D1--D8.
 
 \begin{theorem}[Kummer towers, $m=2$]\label{thm:pkm}
-Let $R=\FF_p[y]/T$ be the tower quotient.
+Let $R=\FF_p[y]/T$ be the tower quotient. Items (3)--(5) concern
+\emph{inconsistent} systems, those whose reduced $\Sem3$ is a unit of $R$; a
+satisfiable target has no inverse in $R$, and the refutation bounds do not
+apply to it.
 \begin{enumerate}
 \item $T$ is a Gröbner basis, and $R\cong\FF_p^{V^m}$. So every ideal
   over $R$ is radical, and an $m=2$ system is inconsistent if and only if
@@ -472,14 +483,14 @@ Let $R=\FF_p[y]/T$ be the tower quotient.
 \item $R=\FF_p[z]/(z^K-1)$ with $K=2^t$. The degree of a monomial $z^k$ is
   $\operatorname{popcount}(k)$, and degree falls are exactly binary
   carries.
-\item If $t\ge2$, $g\ne0$ and $3x_R^2+a\ne0$, then $d_{\rm ff}=4$
+\item If $t\ge2$, $g\ne0$, $3x_R^2+a\ne0$ and the system is inconsistent, then $d_{\rm ff}=4$
   (operational convention), for every $t$. The degree-2 part of $f$ is a
   bilinear form with $\det M=-2g^6(3x_R^2+a)\ne0$, so nothing falls at 3;
   the monomial $q=y_{10}y_{11}$ gives a fall at 4.
-\item The no-fall certificate has degree
+\item For an inconsistent system, the no-fall certificate has degree
   $d_F\le2+\operatorname{popdeg}(f^{-1})\le2t+2$.
-\item For the naive presentation $\{\Sem3,\ x_i^K-g^K\}$ of the \emph{same}
-  set, $d_F\ge2^t$. So $d_F$ is not an invariant of the ideal; it depends
+\item For an inconsistent system in the naive presentation
+  $\{\Sem3,\ x_i^K-g^K\}$ of the \emph{same} set, $d_F\ge2^t$. So $d_F$ is not an invariant of the ideal; it depends
   on the presentation.
 \item A single summand has $d_F=2$ for every $t$. Growth at $m=2$ must
   therefore come from the genus-one curve $f(z_1,z_2)=0$; no

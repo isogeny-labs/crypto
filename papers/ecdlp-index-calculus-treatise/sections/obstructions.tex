@@ -115,10 +115,15 @@ theorems, standard axioms only).
   lifts, giving $2^n$ relations per Gaudry--Diem trial. This applies to
   c2pnb208w1 and c2pnb368w1, but the modelled gain is $+0.50$ bits, a
   model output, not a measurement.
-\item \emph{Prime degree (ECC2K-130): no.} There is no subfield, and lift
-  sets repel linear structure: exact all-lift 4-subspace counts are
-  $0.921\pm0.018$ of a density-paired null at $N=11$
-  (permutation $p=2\cdot10^{-5}$).
+\item \emph{Prime degree (ECC2K-130): this construction does not exist.}
+  A prime-degree field has no proper intermediate subfield, so there are no
+  $\FF_{2^d}$-lines to use. This does not rule out other twist-avoiding
+  subspaces. At the small prime degrees tested, all-lift subspaces of
+  dimension 4--5 exist, though fewer than for density-paired random sets
+  (exact all-lift 4-subspace counts $0.921\pm0.018$ of the null at $N=11$,
+  permutation $p=2\cdot10^{-5}$). This is toy evidence. Whether useful
+  twist-avoiding subspaces exist at cryptographic prime degree is
+  unresolved.
 \end{itemize}
 
 \section{What the obstructions leave open}
