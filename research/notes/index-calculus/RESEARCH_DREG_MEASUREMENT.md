@@ -1057,3 +1057,11 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   `research/dreg_invariant_guess_20261029/RESULTS.md`).
 - Branches that hold a solution cannot refute, and at this size they ran
   past 16 GB.
+
+## Invariant guesses on fresh draws (2026-10-29)
+
+- On 8 fresh (22, 8) draws, a guess on `a₇ + b₇` lets degree 4 refute on every
+  branch of 5 draws, and a guess on `a₇` on none (p = 0.031, pre-registered;
+  `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
+- `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
+  replay of the committed draws before scoring.
