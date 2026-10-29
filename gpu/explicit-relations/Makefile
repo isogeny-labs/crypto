@@ -1,7 +1,7 @@
 CXX ?= c++
 NVCC ?= nvcc
 ARCH ?= sm_80
-RUSTC ?= rustc
+CARGO ?= cargo
 CXXFLAGS ?= -O3 -std=c++17 -Wall -Wextra
 OUT := build
 .PHONY: all cuda host test test-cuda syntax clean
@@ -14,11 +14,13 @@ $(OUT)/explicit-relations-host: service.cpp host.hpp curve.cuh ../rootfind/fp64.
 	$(CXX) $(CXXFLAGS) -Wno-unknown-pragmas service.cpp -o $@
 $(OUT)/explicit-relations-cuda: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -x cu service.cpp -o $@
-$(OUT)/paper-driver: paper_driver.rs ../../src/cryptanalysis/hashed_ecdl.rs | $(OUT)
-	$(RUSTC) --edition 2021 -O paper_driver.rs -o $@
+$(OUT)/paper-driver: paper_driver.rs Cargo.toml Cargo.lock ../../src/cryptanalysis/hashed_ecdl.rs $(wildcard ../../crates/hashed-ecdl-tensor/src/*.rs ../../crates/hashed-ecdl-tensor/src/contraction/*.rs) | $(OUT)
+	$(CARGO) build --locked --release --manifest-path Cargo.toml --target-dir $(OUT)/cargo
+	cp $(OUT)/cargo/release/paper-driver $@
 syntax:
 	$(CXX) -std=c++17 -Wall -Wextra -Werror -Wno-unknown-pragmas -fsyntax-only service.cpp
 test: host
+	$(CARGO) test --locked --release --manifest-path Cargo.toml --target-dir $(OUT)/cargo
 	$(OUT)/explicit-relations-host --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-host --self-test
 test-cuda: all

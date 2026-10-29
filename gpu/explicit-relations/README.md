@@ -156,9 +156,11 @@ and CPU cost ledger do not silently invoke this external CUDA service.
 
 ## Delivery and evidence boundary
 
-Keep this as source until the approved builder compiles and tests it. Record
+Use the validation record to distinguish source checks from device tests. Record
 the commit, source/binary hashes, CUDA/driver/compiler versions and actual GPU.
 For EKS, build an image from the resulting `crypto/main` commit, retaining its
-digest. No image or job was launched here. No benchmark protocol was frozen
-and no performance comparison was run. The compact tensor encoder and fast
-contraction theorem backend remain open implementation work.
+digest. No benchmark protocol was frozen and no performance comparison was
+run. The separate `crates/hashed-ecdl-tensor` implementation on main remains
+CPU code; this GPU service accelerates the bounded meet-in-the-middle path.
+The standalone Cargo manifest resolves that crate because the included
+reference module re-exports it, without building the root crypto package.
