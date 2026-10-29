@@ -1,5 +1,6 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
 pub mod budget;
+pub mod capture;
 pub mod curves;
 pub mod export;
 pub mod relations;
@@ -1197,9 +1198,73 @@ struct CellManifest {
     artifacts: Vec<Artifact>,
 }
 
+const CAPTURE_CONTEXT: [(&str, &str); 2] = [
+    ("capture-binding.json", "partial-capture-binding"),
+    ("capture-limits.json", "partial-capture-limits"),
+];
+
+fn admit_capture_context(
+    dir: &Path,
+) -> Result<Option<(capture::AttemptBinding, capture::CaptureLimits)>, String> {
+    let present = CAPTURE_CONTEXT
+        .iter()
+        .any(|(path, _)| fs::symlink_metadata(dir.join(path)).is_ok());
+    if !present {
+        return Ok(None);
+    }
+    if !telemetry::checked::policy_present(dir)? {
+        return Err("bound capture requires the frozen checked measurement policy".into());
+    }
+    let binding: capture::AttemptBinding =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[0].0, false)?)?;
+    let limits: capture::CaptureLimits =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[1].0, false)?)?;
+    if binding != capture::AttemptBinding::from_cell_files(dir)? {
+        return Err("capture binding differs from original attempt".into());
+    }
+    let run: Value = read_json(&dir.join("run.json"))?;
+    let trace_mib = run["trace_mib"]
+        .as_u64()
+        .ok_or("capture run lacks frozen trace_mib")?;
+    if limits != capture::capture_limits(trace_mib)? {
+        return Err("capture limits differ from frozen run allowance".into());
+    }
+    Ok(Some((binding, limits)))
+}
+
+fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), String> {
+    let admitted = admit_capture_context(dir)?.is_some();
+    for (path, role) in CAPTURE_CONTEXT {
+        let matching: Vec<_> = artifacts
+            .iter()
+            .filter(|a| a.path == path || a.role == role)
+            .collect();
+        if admitted {
+            if matching.len() != 1
+                || matching[0].path != path
+                || matching[0].role != role
+                || matching[0].encoding != "json"
+            {
+                return Err("capture context manifest identity/role/encoding mismatch".into());
+            }
+        } else if !matching.is_empty() {
+            return Err("capture context manifest has no admitted original files".into());
+        }
+    }
+    Ok(())
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
+    let capture_context = admit_capture_context(&out)?;
+    if telemetry::checked::policy_present(&out)? {
+        capture::AttemptBinding::from_cell_files(&out)?;
+        if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
+            return Err("checked worker configuration differs from attempt binding".into());
+        }
+        registry.push(telemetry::checked::install_policy(&out)?);
+    }
     let mut known_answer = false;
     let mut factor_base_verified = false;
     let result = (|| {
@@ -1233,7 +1298,17 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         known_answer = true;
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            if let Some((binding, limits)) = &capture_context {
+                solvers::solve_with_bound_event_sink(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    binding.clone(),
+                    limits.clone(),
+                )
+            } else {
+                solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            }
         })?;
         let mut names = BTreeSet::new();
         for artifact in solved.artifacts {
@@ -1253,6 +1328,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "worker-process.json",
                 "host.json",
                 "worker-artifacts.json",
+                "measurement-policy.json",
+                "capture-binding.json",
+                "capture-limits.json",
             ]
             .contains(&artifact.path.as_str())
                 || artifact.path.starts_with("publication/")
@@ -1291,6 +1369,67 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         &registry,
     )?;
     Ok(())
+}
+
+fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
+    let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
+        read_json(&dir.join("worker-artifacts.json"))?
+    } else {
+        Vec::new()
+    };
+    storage::verify_manifest(dir, &registry)?;
+    let registered: BTreeMap<_, _> = registry.iter().map(|a| (a.path.as_str(), a)).collect();
+    // A killed worker may never write its registry. Promote only an exact,
+    // fully validated finite phase prefix; malformed bytes remain partial.
+    let recovered_phase_roles = if dir.join(telemetry::checked::POLICY_PATH).exists() {
+        telemetry::checked::validate_directory(dir).unwrap_or_default()
+    } else {
+        BTreeMap::new()
+    };
+    let mut artifacts = Vec::new();
+    for path in tree_files(dir)? {
+        let relative = path
+            .strip_prefix(dir)
+            .map_err(|e| e.to_string())?
+            .to_str()
+            .ok_or("non-UTF8 output")?
+            .to_string();
+        File::open(&path)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| format!("sync {}: {e}", path.display()))?;
+        if let Some(artifact) = registered.get(relative.as_str()) {
+            artifacts.push((**artifact).clone());
+            continue;
+        }
+        let (sha256, bytes) = crate::store::hash_file(&path)?;
+        let (role, encoding) = if let Some(role) = recovered_phase_roles.get(&relative) {
+            (*role, "json")
+        } else {
+            match relative.as_str() {
+                "witness.json" => ("restricted-known-answer", "json"),
+                "config.json" => ("restricted-provenance", "json"),
+                "plan.json" => ("restricted-frozen-plan", "json"),
+                "run.json" => ("restricted-run-binding", "json"),
+                "protocol.json" => ("restricted-frozen-protocol", "json"),
+                "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
+                "host.json" => ("host-measurement-context", "json"),
+                "worker-artifacts.json" => ("artifact-registry", "json"),
+                "capture-binding.json" => ("partial-capture-binding", "json"),
+                "capture-limits.json" => ("partial-capture-limits", "json"),
+                "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                _ => ("unregistered-partial-artifact", "native"),
+            }
+        };
+        artifacts.push(Artifact {
+            role: role.into(),
+            path: relative,
+            sha256,
+            bytes,
+            encoding: encoding.into(),
+        });
+    }
+    sync_dir(dir)?;
+    Ok(artifacts)
 }
 
 fn verify_resumed_cell(
@@ -1454,6 +1593,20 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
             "status":"attempt_started"}),
             )?;
+            telemetry::checked::install_policy(&dir)?;
+            let capture_binding = capture::AttemptBinding::from_cell_files(&dir)?;
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &capture_binding,
+            )?;
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &capture::capture_limits(a.trace_mib)?,
+            )?;
             let stdout = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -1560,54 +1713,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
             "output_budget_scope":"all_cell_files_before_manifest_seal",
             "checkpoint_mid_call":false,"interrupted_trace_loss_possible":true});
-            let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
-                read_json(&dir.join("worker-artifacts.json"))?
-            } else {
-                Vec::new()
-            };
-            storage::verify_manifest(&dir, &registry)?;
-            let registered: BTreeMap<_, _> =
-                registry.iter().map(|a| (a.path.as_str(), a)).collect();
-            let mut artifacts = Vec::new();
-            for path in tree_files(&dir)? {
-                let relative = path
-                    .strip_prefix(&dir)
-                    .map_err(|e| e.to_string())?
-                    .to_str()
-                    .ok_or("non-UTF8 output")?
-                    .to_string();
-                File::open(&path)
-                    .and_then(|f| f.sync_all())
-                    .map_err(|e| format!("sync {}: {e}", path.display()))?;
-                if let Some(artifact) = registered.get(relative.as_str()) {
-                    artifacts.push((**artifact).clone());
-                    continue;
-                }
-                let (sha256, bytes) = crate::store::hash_file(&path)?;
-                let (role, encoding) = match relative.as_str() {
-                    "witness.json" => ("restricted-known-answer", "json"),
-                    "config.json" => ("restricted-provenance", "json"),
-                    "plan.json" => ("restricted-frozen-plan", "json"),
-                    "run.json" => ("restricted-run-binding", "json"),
-                    "protocol.json" => ("restricted-frozen-protocol", "json"),
-                    "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
-                    "host.json" => ("host-measurement-context", "json"),
-                    "worker-artifacts.json" => ("artifact-registry", "json"),
-                    "stdout.log" | "stderr.log" => ("process-log", "utf8"),
-                    _ => ("unregistered-partial-artifact", "native"),
-                };
-                artifacts.push(Artifact {
-                    role: role.into(),
-                    path: relative,
-                    sha256,
-                    bytes,
-                    encoding: encoding.into(),
-                });
-            }
-            sync_dir(&dir)?;
-            let has = |path: &str| artifacts.iter().any(|a| a.path == path);
-            outcome["known_answer_verified"] = json!(has("public.json") && has("witness.json"));
-            outcome["factor_base_verified"] = json!(has("public.json") && has("factor-base.json"));
+            let artifacts = collect_cell_artifacts(&dir)?;
             let manifest = CellManifest {
                 schema: "crypto.ml-dataset.cell/v1".into(),
                 cell_index: index,
@@ -2364,6 +2470,8 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         return Err("unknown cell schema".into());
     }
     storage::verify_manifest(dir, &manifest.artifacts)?;
+    telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
+    verify_capture_context(dir, &manifest.artifacts)?;
     for required in [
         "config.json",
         "run.json",
