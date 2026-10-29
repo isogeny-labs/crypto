@@ -4472,6 +4472,51 @@ mod tests {
                 },
             );
             verify_cell(&partial, true).unwrap();
+            for claim in [
+                "native_backend_invoked",
+                "extraction_complete",
+                "exhaustive_no_decomposition",
+                "solver_completed",
+            ] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("all-omitted-{claim}")),
+                    |path, manifest| {
+                        for name in [
+                            "prime-f4-input.json",
+                            "prime-f4-wide-result.json",
+                            "prime-f4-wide-events.jsonl",
+                            "prime-f4-root-extraction.json",
+                        ] {
+                            fs::remove_file(path.join(name)).unwrap();
+                            manifest.artifacts.retain(|a| a.path != name);
+                        }
+                        manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                        manifest.outcome[claim] = json!(true);
+                    },
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "stripped artifacts accepted {claim}"
+                );
+            }
+            let presolver = altered_cell(
+                &dir,
+                &fixture.0.join("presolver-censored"),
+                |path, manifest| {
+                    for name in [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-result.json",
+                        "prime-f4-wide-events.jsonl",
+                        "prime-f4-root-extraction.json",
+                    ] {
+                        fs::remove_file(path.join(name)).unwrap();
+                        manifest.artifacts.retain(|a| a.path != name);
+                    }
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            verify_cell(&presolver, true).unwrap();
             for mutation in [
                 "equation", "limit", "basis", "counter", "outcome", "deadline", "unknown", "omit",
                 "relocate", "encoding",

@@ -841,6 +841,8 @@ pub(super) fn verify(
                 "exhaustive_no_decomposition",
                 "native_backend_invoked",
                 "algebra_completed",
+                "native_statistics_complete",
+                "extraction_complete",
             ]
             .iter()
             .any(|key| outcome[*key] == true)
@@ -868,17 +870,31 @@ pub(super) fn verify(
     } else {
         None
     };
-    let expected = context.is_some()
-        && config.family == "prime"
+    let wide_config = config.family == "prime"
         && config.solver == "f4"
         && config.m == 2
-        && input_value.is_some()
-        && public
-            .as_ref()
-            .and_then(|v| v["field"]["modulus"].as_str())
-            .and_then(|p| p.parse::<u64>().ok())
-            .is_some_and(|p| p >= 1u64 << 32);
-    if !reserved && !declared && !expected {
+        && (config.n >= 33
+            || public
+                .as_ref()
+                .and_then(|v| v["field"]["modulus"].as_str())
+                .and_then(|p| p.parse::<u64>().ok())
+                .is_some_and(|p| p >= 1u64 << 32));
+    let claimed = [
+        "native_backend_invoked",
+        "native_statistics_complete",
+        "algebra_completed",
+        "extraction_complete",
+        "exhaustive_no_decomposition",
+        "solver_completed",
+        "pdp_witness_verified",
+    ]
+    .iter()
+    .any(|key| outcome[*key] == true);
+    let expected = wide_config && (context.is_some() || claimed);
+    if !reserved
+        && !declared
+        && (!expected || supervisor_censored && !claimed && partial.is_empty())
+    {
         return Ok(());
     }
     if config.family != "prime" || config.solver != "f4" || config.m != 2 {
