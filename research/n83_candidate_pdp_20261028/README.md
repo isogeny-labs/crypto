@@ -34,7 +34,8 @@ Read the [native summary](evidence/chain-exact/verified-summary.json),
 [partial Lean proof map](CHAIN_EXACT_PROOF_MAP.json),
 [unified export](experiment-chain-exact.export.json),
 [storage](evidence/chain-exact-storage.json) and
-[verification coverage](evidence/chain-exact-publication.json).
+[verification coverage](evidence/chain-exact-publication.json), and
+[report/support delivery record](evidence/chain-exact-delivery.json).
 The report is [run-20261029T1607Z](reports/run-20261029T1607Z/report.pdf).
 [DATA_INDEX.json](DATA_INDEX.json) now indexes fourteen datasets, including all
 actual point bases and every retained failed/capped run. The same per-curve base

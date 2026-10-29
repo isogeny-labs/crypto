@@ -36,3 +36,14 @@ affine solving-degree or elite-base gain. Protocol helper absent at root was
 replaced by the existing pinned recovery helper; unavailable checkpoint profile
 replaced by the existing config with byte-identical STS identity. Both failures
 retained before successful production. Data commit/push precedes report.
+
+## Publication checks and report
+Data committed/pushed at1a993666cb5a; a separate7ea0bcc977e3 metadata correction
+binds export host summary to the unchanged raw host record. Both exports retained
+in Git/support. New report has2 inspected pages, final SHA
+9191ec4de3acc9e804d71678fea3d07a43bce939289f5199b9ebe5260ca4da2a; S3 readback
+byte-equal. All336 new metrics match committed native records. Initial helper
+used Git --since with a date interpreted at current time and returned no new
+rows; explicit UTC midnight corrected that query, with failure/helper preserved.
+Initial artifact push selected an untracked directory; explicit files succeeded.
+No production or replay was repeated for any publication correction.
