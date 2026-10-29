@@ -36,6 +36,6 @@ RefreshexactPRhead/CI/artifactownerbeforefurtherpublication. Activegoalcontinues
 
 No failed math attempt in R30. One checkpointprobe withoutcredentialexport
 failedbeforetrial; explicit temporaryambientexportworked. Initialreport
-rendering */plaintext parsedascomment; retainedsource/log, correctedwording,
+rendering */plaintext parsedascomment; retainedsource/log in publication-attempts, correctedwording,
 final2pagesinspected. Priorrootsoftware/nativecratefailuresnotrelabeledpass.
 Dated sharedlogreservationT785 respected; checkreleasebeforecanonicalappend.

@@ -24,5 +24,5 @@ A standalone checkpoint gate probe lacked exported ambient credentials and
 failed before a trial. Explicit scoped temporary credential export allowed
 all durable gates. No duplicate native trial, external job or fifth claim.
 The initial PDF renderer parsed the plaintext sequence */ as a closing block
-comment; its source/log are retained in the final checkpoint. Wording was
+comment; its source/log are retained in publication-attempts in the raw bundle. Wording was
 corrected; no mathematical input changed. Both final PDF pages were inspected.
