@@ -16,6 +16,58 @@
     "old_roster": 20787,
     "new_roster": 20809
   },
-  "runtime_files_reserved_before_materialization": 1925,
-  "full_library": "Fresh integrated-source run pending; earlier5206 remains pinned to3a7831d."
+  "runtime_files_reserved_before_materialization": 2920,
+  "full_library": [
+    {
+      "stage": "initial_missing_runtime_inputs",
+      "tested_source": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+      "status": {
+        "source_head": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+        "cargo_exit_code": 101,
+        "seconds": 1622,
+        "log": "/workspace/integration-current-main-full-library-20261029.log"
+      },
+      "raw_log_sha256": "367d4b877c509092902105e50df9c206c1b826a59ab9af258d4e23c14daa1583",
+      "log": "initial_missing_runtime_inputs-library.log.gz",
+      "compressed_bytes": 89065,
+      "compressed_sha256": "2df39eaaf784d24d6c047ab00227b6c2457dab0091f713cb204026649e608ef0"
+    },
+    {
+      "stage": "complete_runtime_inputs",
+      "tested_source": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+      "status": {
+        "source_head": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+        "cargo_exit_code": 0,
+        "seconds": 1920,
+        "log": "/workspace/integration-complete-input-full-library-20261029.log",
+        "complete_runtime_inventory": "/workspace/integration-complete-runtime-restoration-20261029.json"
+      },
+      "raw_log_sha256": "0c5f50386b7835e5cf30246bf55a5b7d474dec4310b507874f1d5dd98fff955a",
+      "log": "complete_runtime_inputs-library.log.gz",
+      "compressed_bytes": 89013,
+      "compressed_sha256": "6f044132c72644674ed04c3f20c079ff977c985658d0dd11e00def37c9acc215"
+    }
+  ],
+  "subsequent_main_integration": {
+    "main": "992c2579e2891c1c58ee70183888d3a9ce1d32e4",
+    "merge": "159d69ecbb3637b18c9c52983106b535da014625",
+    "validation": "Fresh final combined-source validation pending; earlier successful run is retained under its actual source."
+  },
+  "backend_fixture_recovery": {
+    "run": 40916008080,
+    "artifact": 12915602619,
+    "source": "ee600ba1d5011ae0a544aca7af8363cfbfe5db44",
+    "sha256": "cf1ca93d708e020ca89257bd883002849c4b878185545cfa29c1f9ea09f3db9b",
+    "bytes": 8451778,
+    "exact_canonical_bytes_restored": true
+  },
+  "site_repairs": {
+    "tests": 51,
+    "exit_code": 0,
+    "log_sha256": "1e21de5ceb5769c147d0e43818d583cd6605f552f266f023de038b6d9f693285",
+    "canonical_timeline_points": 89,
+    "indexed_panels": 310,
+    "historical_three_leads_sha256": "23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084",
+    "frozen_inputs_recovered_exactly": true
+  }
 }
