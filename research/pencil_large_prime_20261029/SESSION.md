@@ -1,5 +1,34 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-792 continuation
+
+### What was done
+
+Added a composed relation adapter with fixed partition, shared field identity,
+explicit three-large admission rejection and terminal residual caps retaining
+the unincorporated constraint. Ten release tests pass, including 25,600
+independent composed row-space checks. Clippy passes with warnings denied.
+
+### Decisions made
+
+Keep geometric verification in the existing producer. The adapter consumes
+checked equations only. No partition is chosen based on observed results;
+freeze it before measurements. The prior source and primary large-prime
+paper remain the mathematical basis recorded in README.md.
+
+### Open threads
+
+The current saved four-lead review summary records complete frozen cohorts
+for factor-base, projective-law and uncached Kummer, with the stated proof
+limitations. Pencil remains 543/1260, with 717 open. Producer integration,
+full cost instrumentation and a frozen upper-gate amendment remain required.
+No cloud job or experimental cohort was launched.
+
+### Errors
+
+None in native tests or clippy. Existing shared daily-log reservation is
+preserved; this scoped session record carries the update.
+
 ## 2026-10-29 T-791 continuation
 
 ### What was done

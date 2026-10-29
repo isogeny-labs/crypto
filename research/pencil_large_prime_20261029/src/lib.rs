@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 
 pub type Sparse = BTreeMap<usize, u64>;
 
+pub mod collector;
 pub mod residual;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -274,6 +275,17 @@ mod tests {
                     state
                 };
                 let mut g = SymbolicGraph::new(p, nl, ns).unwrap();
+                let mut composed = collector::Collector::new(
+                    p,
+                    &[
+                        false, false, false, false, false, false, true, true, true, true,
+                    ],
+                    residual::Limits {
+                        retained_coefficients: ns * ns,
+                        working_coefficients: ns,
+                    },
+                )
+                .unwrap();
                 let mut basis = residual::Basis::new(
                     p,
                     ns,
@@ -300,6 +312,16 @@ mod tests {
                         dense[nl + i] = (dense[nl + i] + v) % p;
                     }
                     original.push(dense);
+                    let mut global = large.clone();
+                    global.extend(small.iter().map(|&(i, v)| (nl + i, v)));
+                    let admission = composed.insert(&global).unwrap();
+                    assert!(matches!(
+                        admission,
+                        collector::Admission::Joined
+                            | collector::Admission::Anchored
+                            | collector::Admission::Independent
+                            | collector::Admission::Dependent
+                    ));
                     if let Outcome::Constraint(row) = g.insert(&large, &small).unwrap() {
                         let terms: Vec<_> = row.iter().map(|(&i, &v)| (i, v)).collect();
                         assert!(matches!(
@@ -324,6 +346,18 @@ mod tests {
                         original.len()
                     );
                     let retained: Vec<_> = basis
+                        .rows()
+                        .map(|row| {
+                            let mut dense = vec![0; ns];
+                            for (&i, &v) in row {
+                                dense[i] = v;
+                            }
+                            dense
+                        })
+                        .collect();
+                    assert_eq!(rref(retained, p, ns), expected);
+                    let retained: Vec<_> = composed
+                        .basis()
                         .rows()
                         .map(|row| {
                             let mut dense = vec![0; ns];

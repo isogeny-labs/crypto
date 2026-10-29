@@ -1,17 +1,20 @@
    Compiling pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029)
-    Finished `release` profile [optimized] target(s) in 1.62s
+    Finished `release` profile [optimized] target(s) in 1.76s
      Running unittests src/lib.rs (target/release/deps/pencil_symbolic_graph-6c42ed6e8455e246)
 
-running 7 tests
-test tests::malformed_input_is_atomic_and_duplicates_are_combined ... ok
+running 10 tests
+test collector::tests::cancellation_precedes_admission_and_caps_are_terminal ... ok
+test collector::tests::working_cap_retains_original_constraint_and_stops ... ok
+test collector::tests::interleaved_partition_and_negative_cycle ... ok
 test residual::tests::zero_budget_and_duplicate_cancellation ... ok
-test tests::wide_moduli_and_composites ... ok
-test residual::tests::caps_preserve_basis_and_charge_attempts ... ok
-test tests::signed_cycle_anchors_before_it_produces_a_constraint ... ok
+test tests::malformed_input_is_atomic_and_duplicates_are_combined ... ok
 test tests::nonsaturated_long_components_keep_independent_small_variables ... ok
+test tests::wide_moduli_and_composites ... ok
+test tests::signed_cycle_anchors_before_it_produces_a_constraint ... ok
+test residual::tests::caps_preserve_basis_and_charge_attempts ... ok
 test tests::every_prefix_matches_independent_elimination_space ... ok
 
-test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
 
    Doc-tests pencil_symbolic_graph
 

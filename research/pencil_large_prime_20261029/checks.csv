@@ -1,5 +1,7 @@
 check_id,class,status,count,unit,evidence,scope
-rust_suite,development_test,pass,7,tests,rust-tests.log,standalone symbolic row kernel and residual basis
+rust_suite,development_test,pass,10,tests,rust-tests.log,symbolic graph plus residual basis and composed adapter
+composed_row_space,development_test,pass,25600,prefixes,src/lib.rs,fixed partition collector versus independent dense RREF
+composed_admission,development_test,pass,3,tests,src/collector.rs,cancellation and terminal caps and signed cycle
 residual_row_space,development_test,pass,25600,prefixes,src/lib.rs,retained residual basis compared with independent dense RREF
 residual_caps,development_test,pass,2,tests,src/residual.rs,cap atomicity and zero budget behavior
 prefix_row_space,development_test,pass,25600,prefixes,src/lib.rs,independent dense RREF over five small prime fields

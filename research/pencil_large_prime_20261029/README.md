@@ -100,6 +100,31 @@ environment from the existing projective-law proof checkout.
 
 ## Remaining integration work
 
+### Composed relation adapter (T-792)
+
+`collector::Collector` now owns both stages and one immutable global-column
+partition. Its constructor binds their field and small-column numbering.
+It accepts already checked homogeneous coefficient rows; it does not verify
+points or generate pencil geometry. The caller supplies which columns are
+small, including any symbolic labels. There is no adaptive partition or
+performance-selected default.
+
+Duplicate terms cancel before the graph decides whether a row has more than
+two large variables. Such rows return `RejectedThreeLarge` and are counted
+without entering either stage. Residual cap outcomes stop the collector
+permanently and preserve the unincorporated constraint for inspection. Further
+calls return `AlreadyStopped` without processing. The pending constraint and
+graph payload remain outside the residual basis limit; this is still not a
+whole-process memory cap.
+
+The independent prefix test now also checks the composed collector's row
+space at all 25,600 prefixes. Three adapter regressions cover duplicate-driven
+admission, terminal rejection, interleaved partitions and a negative cycle.
+Ten tests pass. These fixtures are development checks, not additional
+cohort outcomes. The next producer integration must preserve the existing
+Jacobian relation checks, freeze a partition on the original workload IDs,
+charge rejected geometry and all symbolic work, and respect the upper gate.
+
 ### Retained residual basis (T-791)
 
 `residual::Basis` retains the emitted small-row space as a normalized sparse
