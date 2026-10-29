@@ -432,3 +432,11 @@ block must be1/0, allfield constraints0. No fixed vectors are solutions or
 map claims. Solver can start ONLY after both complete controls pass.
 
 MAPSOLVE01 rejected after SIGTERM request (Singular caught it and returned native0) after cross-ring indexing errors. No GB conclusion accepted. Whole polynomial ideals must first be evaluated while mapTarget iscurrent, then transfer ONLYconstant results to validation ring. Freeze910 explicit successful checks and0failures with nativequit-before-solver on mismatch; independent mcAllowed admission guard in solver. Native ERROR alone is not a control-flow stop. Retain exactfailedinput/log/exit; sameequationsandcaps inretry02.
+
+MAPSOLVE02 completed admission910checks/0failures, then hit original4GiB
+virtualmemory cap: Singular no-more-memory,halt14,nativeexit14. No map,
+nonexistence,orGBunitcertificate. Keep full455-equation input andboth actual
+jet controls for a future better elimination strategy; do not raise thiscap.
+R28proof accepted3named/4audited including generatedcofactor congr_simp;
+0fail/0trustednative. R28ordinaryimageevaluation accepts436,284,83selected
+pointpairs, same seconddegrees;degree12bothfirstadjugates0,R29extensionfrozen.
