@@ -6,6 +6,18 @@ The existing PR automation uses this policy; no second writer or duplicate PR
 check is created. Its first bounded adaptive-S3 iteration is now executed and
 linked below. The policy alone does not promise a positive future result.
 
+2026-10-29: [uniform full-census result](reports/uniform-20261029/README.md)
+now executes all96arms/896source recoveries/210policy comparisons with independent
+Rust arithmetic,536reachable states,172failed queries,13rehashed rejection controls
+and22backend tests. Strict joint mean-rank/lower-degree gains are0/210 in both
+input forms; all policies/losses remain. The new lean-uniform scoped gate passes
+nine named/16audited declarations,0extra trusted. This is conditional recurrence
+algebra; actual-state/iid probability and complete-cost bridges remain open.
+Checkpoint scope was approved and secure access is now configured: official gate
+uploads succeeded. Old pending-access/preflight entries below are historical.
+No raw AWS key or token value is in repository evidence. Keep PR2381 open and
+auto-merge off; registry/coordination/CI/review/integration holds remain.
+
 ## Objective and current evidence
 
 Preserve the requested objective: establish better **useful** relation yield
@@ -83,7 +95,7 @@ keeps both old arms and adds uncached direct signs. That comparison is now
 identical ordered operand/lift/certificate behavior; direct has two fewer cold
 additions than cache in all400 records, while cache has fewer negations. No
 overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
-is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and now a [compiled native pair](reports/uniform-audit-preflight-20261026/README.md), but zero scientific executions. Its new checkpoint launch gate lacks upload authorization/token. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
+is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and now a [compiled native pair](reports/uniform-audit-preflight-20261026/README.md), now [executed with independent full replay](reports/uniform-20261029/README.md):96arms/896targets/210comparisons,0joint gains in both modes,536states,13rejections and a separate9named/16audited conditional recurrence proof. Approved narrow checkpoint access now works; actual-state/probability/full-cost obligations remain. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.

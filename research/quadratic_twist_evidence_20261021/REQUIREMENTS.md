@@ -1,5 +1,18 @@
 # Requirement-to-evidence map
 
+2026-10-29: [uniform full-census result](reports/uniform-20261029/README.md)
+now executes all96arms/896source recoveries/210policy comparisons with independent
+Rust arithmetic,536reachable states,172failed queries,13rehashed rejection controls
+and22backend tests. Strict joint mean-rank/lower-degree gains are0/210 in both
+input forms; all policies/losses remain. The new lean-uniform scoped gate passes
+nine named/16audited declarations,0extra trusted. This is conditional recurrence
+algebra; actual-state/iid probability and complete-cost bridges remain open.
+Checkpoint scope was approved and secure access is now configured: official gate
+uploads succeeded. Old pending-access/preflight entries below are historical.
+No raw AWS key or token value is in repository evidence. Keep PR2381 open and
+auto-merge off; registry/coordination/CI/review/integration holds remain.
+
+
 2026-10-27 integration update: [standalone backend build repair](validation/backend-build-20261027/README.md)
 reproduces current-head compiler failures and restores real module/fixture inputs.
 42 metadata and22 unchanged F13 backend tests pass; this is ordinary software
@@ -63,11 +76,11 @@ failures are not ruled out. The1921-model reconciliation hold is unchanged.
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; historical finite results retained, no new gate run | CM8 receipt208 public named theorems/269 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller, useful-relation/rank, S3 ideal/witness-degree, F43 recovery and finite F13 scalar-transport results checked within their hypotheses; general geometry, iid expectation and complete-work bridges remain open |
+| Checked Lean implications and proof map | partial overall; historical finite results plus new conditional recurrence gate | Historical CM8 receipt208 public named/269 audited; fresh separate uniform gate9 named/16 audited, zero extra trusted; actual point/group/eigenspace, finite Miller, useful-relation/rank, S3 ideal/witness-degree, F43 recovery and finite F13 scalar-transport results checked within their hypotheses; general geometry, iid expectation and complete-work bridges remain open |
 | Algebraic identity certificates | historical native checks for17 study identity records | all previous16 retained; F13 polynomial-only IDC1h45f7f67f60c827c3 adds32+16 replay and false controls; source-bound record checks do not replace the separate Lean implications or prove general geometry |
 | Exact curve/model/subgroup identities | historically verified within stated representations; active registry integration regressed after main merge | frozen1,921-model/27 EC1 evidence retained, but all1,921 models are absent from the merged registry; reconcile both inputs and revalidate without lowering strict coverage; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
-| Repository `cargo test --release --lib --locked` | historical passes; full merged-tree attempt remains incomplete/non-green | earlier4,479/119-ignore and4,474 receipts retained;5057-test build succeeds; targeted20-case triage now19 pass/1 strict registry failure1324 versus2287 after tracked-input materialization;5037 cases outside this completed subset, no full-suite pass inferred; see library-fixture-triage-20261028 |
+| Repository `cargo test --release --lib --locked` | latest fresh5140-case attempt incomplete at600s (exit124); no suite pass | Fresh0e88 build and partial test execution reach the600s cap; exact observed lines in validation/uniform-20261029/library-result.json, no completed summary. Current extension assertion1371 passes without restoring study models. Earlier4,479/119-ignore and4,474 receipts retained; historical5057-test build succeeds; targeted20-case triage now19 pass/1 strict registry failure1324 versus2287 after tracked-input materialization;5037 cases outside this completed subset, no full-suite pass inferred; see library-fixture-triage-20261028 |
 | Native metadata/backend tests | current build inputs repaired, focused tests pass |42 metadata and22 shared F13 backend tests pass on merged source dependencies; earlier39/40 receipts and frozen exact registry/certificate replay retained, not substituted for current integration |
 | Source-linked report, graph and inspected PDF | supplied | `reports/native-20261021T150125Z/` |
 | General GHS implementation / asymptotic or hardness claim | unresolved, not established | finite examples and conditional algebra do not establish either |
@@ -110,7 +123,7 @@ failures are not ruled out. The1921-model reconciliation hold is unchanged.
 | Direct uncached sign reference | executed and independently replayed |120 setups/1200 source checks, equal ordered operand/lift traces/certificates; direct saves2 cold adds in all400 comparisons, cache saves negations; no total ranking |
 | Registered F13 degree-two twist route | executed finite reduction and actual systems |12arms/72source scalars/196addition pairs;17new public proofs,208public/269audit;3of54 reduced joint gains/0original; matched rows conserved,4degree changes favor source; general classification/geometry still explicit |
 | Explicit dual and subgroup inverse | next unexecuted draft | `backlog/XP-20261025-cm8-explicit-dual`; doubling composition and odd-annihilator inverse before replacing public-base enumeration |
-| Uniform sampler useful yield / state collection | preregistered, native pair compiled, runner syntax checked, launch blocked |96arms/896targets/210policy comparisons planned;0scientific execution; C++v2/Rust audit and backend harness compile only; checkpoint scope approved, secure token absent; native replay/controls and Lean proof remain pending |
+| Uniform sampler useful yield / state collection | executed finite census; conditional recurrence proof checked |96arms/896targets/210comparisons,536states,172failed queries;0joint gains in both modes;13altered controls reject101/no receipt;22backend tests;9new named/16audited; actual-state/iid stopping-time bridge and complete costs remain open |
 
 The fresh library suite for the F13 continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four

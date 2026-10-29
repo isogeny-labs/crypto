@@ -21,3 +21,6 @@ asset upload. Keep all prior frozen science and broader completion holds.
 [October26 compile-only implementation/validation](../../research/quadratic_twist_evidence_20261021/reports/uniform-audit-preflight-20261026/README.md) preserves the October25 source/report and adds exact fraction/state/frontier and strict membership checks as unexecuted code. Active required checks gate/size/artifacts are now known, not assumed optional.
 
 The [collection recurrence draft](../../research/quadratic_twist_evidence_20261021/drafts/uniform-collection-20261026/README.md) is now handwritten source only, outside the proof gate. No new checked theorem or probability/actual-state bridge is claimed; checkpoint launch authorization/token and the exact runner remain pending.
+
+
+2026-10-29: [executed local result](../../research/quadratic_twist_evidence_20261021/reports/uniform-20261029/README.md): all96/896/210,0joint gains,536states,13rejection controls,22backend tests,9new named/16audited conditional Lean declarations. Approved official checkpoint access succeeded. Draft status retains main-ancestry/Cairn gates; no shared task/lease/publication claimed.

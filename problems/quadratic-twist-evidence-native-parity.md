@@ -6,15 +6,22 @@
 - **Next action owner:** authoring session for PR #2381; shared coordination unassigned
 - **Last updated:** 2026-10-29
 
-Current launch status: the user approved the previously reviewed checkpoint-only
-scope for this same branch. Secure token access is still absent. The new
-[uniform native runner](../research/quadratic_twist_evidence_20261021/UNIFORM_YIELD_20261028_RUNNER.md)
-passes shell syntax/safe CLI checks only; no gate, upload, producer, audit,
-corruption control or Lean elaboration ran in this update. Its native behavior,
-the actual-state/iid probability bridge, registry reconciliation and full-library
-completion remain open. Use current official checkpoint tooling and a fresh
-branch-bound RESUME before launch; the older dated approval-pending notes below
-are historical, not a request to ask for the same permission again.
+Current executed status: [uniform full census](../research/quadratic_twist_evidence_20261021/reports/uniform-20261029/README.md)
+passes96arms/896main-source recoveries/210policy comparisons,536states,172failed
+queries,13genuinely altered/rehashed rejection controls and22backend tests.
+Both strict joint mean-useful-rank/lower-degree counts are0/210. A new scoped
+Lean gate checks9named/16audited conditional recurrence declarations,0extra
+trusted. Actual-state/iid stopping-time/absorption/integrability and calibrated
+complete work remain open; a scalar first-step hypothesis is not that bridge.
+Checkpoint permission and access are now resolved within the approved branch
+scope; unmodified official gate uploads succeeded. No broad credential is saved
+or included in evidence. Older pending-access sections below are historical.
+
+Current0e88 source's existing extension test expects1371 and passes during the
+fresh library attempt; that test does not assert recovery of the1921 study
+models. Preserve the missing-study-population requirement and its strict native
+zero-new-row replay; no assertion was lowered by this round. Combined registry,
+cover, source/membership/byte validation and full suite outcome remain separate.
 
 The [2026-10-29 workflow repair](../research/quadratic_twist_evidence_20261021/validation/artifact-wiring-20261029/README.md)
 updates eight generated read-only artifact pull blocks after normal main merge
@@ -23,8 +30,7 @@ The same exact-head CI independently confirms the active registration loss:
 1,921 newly emitted rows/3,842 aliases against20,787 stored records, registry
 SHA842a2835. The primary audit correctly rejects this after42 backend tests;
 seven separate replay jobs pass, later primary steps are skipped. Preserve
-strict assertions, combined-catalog checks and the approved-but-inaccessible
-checkpoint gate. This software maintenance establishes no uniform-yield,
+strict assertions, combined-catalog checks and the approved checkpoint gate and its branch scope. This software maintenance establishes no uniform-yield,
 intrinsic-regularity or complete-cost gain and changes no scientific source.
 
 ## Problem

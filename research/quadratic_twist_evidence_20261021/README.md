@@ -1,12 +1,33 @@
+# Quadratic twists: executed uniform S3 census and conditional collection laws
+
+2026-10-29: [uniform full-census result](reports/uniform-20261029/README.md)
+now executes all96arms/896source recoveries/210policy comparisons with independent
+Rust arithmetic,536reachable states,172failed queries,13rehashed rejection controls
+and22backend tests. Strict joint mean-rank/lower-degree gains are0/210 in both
+input forms; all policies/losses remain. The new lean-uniform scoped gate passes
+nine named/16audited declarations,0extra trusted. This is conditional recurrence
+algebra; actual-state/iid probability and complete-cost bridges remain open.
+Checkpoint scope was approved and secure access is now configured: official gate
+uploads succeeded. Old pending-access/preflight entries below are historical.
+No raw AWS key or token value is in repository evidence. Keep PR2381 open and
+auto-merge off; registry/coordination/CI/review/integration holds remain.
+
+[Three-page inspected PDF](reports/uniform-20261029/report.pdf) ·
+[all-arm graph](reports/uniform-20261029/profiles.svg) ·
+[full raw/failure restore](validation/uniform-20261029/README.md).
+
+The following dated summaries retain their historical execution status; the
+October29 uniform result above supersedes their launch/preflight holds.
+
 [Artifact migration and CI-input maintenance](validation/artifact-migration-review-20261026/README.md): frozen byte bindings preserved; read-only hydration prepared; no new scientific run.
 
 [Unexecuted collection-recurrence source draft](reports/uniform-collection-draft-20261026/README.md): handwritten Lean source only; no new proof or scientific run.
 
-# Quadratic twists: native experiments and checked point/pairing transfers
+# Earlier point/pairing transfer evidence
 
 [October26 compile-only auditor update](reports/uniform-audit-preflight-20261026/README.md): versioned C++ producer plus independent Rust auditor and backend harness compile, **zero scientific execution**. Checkpoint authorization/access still pending; required merge contexts gate/size/artifacts are now known. Earlier frozen preflight and all scientific evidence stay unchanged.
 
-New [uniform-yield preflight](reports/uniform-yield-preflight-20261025/README.md): protocol/compiled producer prepared, **zero scientific executions**. Current-main's mandatory S3 resume-checkpoint gate lacks new upload authorization and token access; [review scope](reports/uniform-yield-preflight-20261025/CHECKPOINT_UPLOAD_REVIEW.md). The F13 result below remains the latest executed science.
+New [uniform-yield preflight](reports/uniform-yield-preflight-20261025/README.md): protocol/compiled producer prepared, **zero scientific executions**. Current-main's mandatory S3 resume-checkpoint gate lacks new upload authorization and token access; [review scope](reports/uniform-yield-preflight-20261025/CHECKPOINT_UPLOAD_REVIEW.md). The F13 result below was the latest executed science at that preflight; the October29 uniform result now supersedes it.
 
 Latest executed round: [registered F13 twist transfer and useful S3 comparison](reports/cm8-transfer-20261025/README.md). Native independent replay verifies12arms/72main-source scalar recoveries and196addition pairs;17new Lean theorems check actual subgroup transport and finite lift/log implications. All54canonical target comparisons are retained:3reduced joint useful-rank/degree gains,0original; matched relation conservation and4matched degree changes favoring the source remain explicit. Full scoped gate208public/269audited,0extra trusted. [Explicit dual](../../backlog/XP-20261025-cm8-explicit-dual/README.md) is next, unexecuted. No general regularity/speedup claim or merge-gate discharge.
 
