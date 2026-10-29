@@ -1,4 +1,4 @@
-# Checked phase integration validation — in progress
+# Checked phase integration validation
 
 Runtime and CLI source: `c59a5dd8a8a81c4749540b92ebcdf7fb24da4a59`.
 CLI SHA256: `74b23756aa776d85085bbfeef03400b68a354994bc3a8a2bea6c1d19735414d1`.
@@ -13,8 +13,10 @@ one equation-persistence test; its failure remains archived. The correction stag
 canonical equations before trying the bounded live sink and does not invoke native
 elimination when that initial persistence fails.
 
-The full unfiltered library suite is still running on the immutable c59a5dd test
-executable. No full-suite pass or current-head CI/merge claim is made here.
+The full unfiltered library suite passed on the immutable c59a5dd test executable:
+5366 passed, 0 failed, 123 ignored, 0 filtered out, in 1713.37 seconds; exit 0.
+The executable hash remained unchanged. This is a source-pinned local pass,
+not a claim that current-head hosted CI or merge has completed.
 
 ## Actual CLI and independent consumer
 
@@ -48,8 +50,20 @@ SHA256: `55ad175c4ea290301f4297c2746ae39ba2f4eb63f3ed4dac332dad3b445ffa37`; byte
 Conditional PUT, HEAD, fresh ETag-bound GET, byte comparison and all contained
 hash checks passed. Packet includes source bundle, producer/consumer binaries,
 all three fixture versions' outputs, independent audits, CLI/lint logs and
-precise source identities. Additional restored-native replay is recorded separately
-when complete. These are software fixtures, not scientific cloud cells.
+precise source identities. A fresh S3 download of the producer binary and inputs replayed all ten cells
+successfully; all ten outputs matched the original replay outputs byte for byte.
+These are software fixtures, not scientific cloud cells.
 
 No new cloud worker, IAM change, budget increase or deadline extension. Original
 USD200 total cap and the incomplete broad corpus objective remain unchanged.
+
+## Full-suite and restored-replay receipts
+
+Full-suite logs and immutable executable reference: s3://setec-astronomy-artifacts/ml-dataset/20261029/validation/checked-phase-full/03c9563dd12364afe2e3eda847d9858f0745e41c5cfdd8d79d9fbdc02c5bc847/full.tar.gz
+
+Restored-native replay attestation: s3://setec-astronomy-artifacts/ml-dataset/20261029/validation/checked-phase-restored-replay/014e0fb30e0b26ea0442d26df3e41a874493c71881b3e00fba95342e7a114739/attestation.tar.gz
+
+Both packets passed conditional PUT, HEAD, ETag-bound fresh GET, byte comparison,
+SHA256 and contained-file verification. The separate focused-test archive retains
+the immutable test executable. See FULL_ARCHIVE_RECEIPT.json and
+RESTORED_REPLAY_RECEIPT.json for exact hashes, lengths and verification times.
