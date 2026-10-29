@@ -18,9 +18,9 @@ committed artefact (Appendix A); plotted values and their sources are in
 | [`ecdlp-ic-improvement-ledger/`](../ecdlp-ic-improvement-ledger/) | ratchet of incumbents and distance to rho (to 23 Oct) |
 | **this treatise** | theory, then algorithms, then frontier, then outlook; adds the theory chapters and the 25–29 October work |
 
-Chapters 1, 3, 4, 8–12, 14, 15 and 18 reuse the programme record's chapters as
+Chapters 1, 3, 4, 8–12, 14, 16 and 19 reuse the programme record's chapters as
 of 26 October (`sections/prog_*.tex`), with headings promoted one level and
-numbers updated where later evidence changed them. Chapters 2 and 17 adapt
+numbers updated where later evidence changed them. Chapters 2 and 18 adapt
 the ledger.
 
 **New chapters:**
@@ -28,7 +28,8 @@ the ledger.
 - **6. Fall degrees:** binary Weil descent of $S_3$ (first fall degree 2, last fall degree at most $k+2$, certified $\ge5$ at $n=33$–$45$, Semaev's Assumption 1 fails as stated); the guarded chain, $(4,5)$ exactly; PKM Kummer towers; definitional pitfalls, including Nagao's Lemma 4.
 - **7. Obstructions:** transport conservation, generic-oracle closures, xedni $\alpha=3$, and the twist obstruction.
 - **13. Extension fields:** $k=4$ with $D_4$, and the red-team verdict.
-- **16. Distance by family:** includes the $k$-sum oracle, the validated 20-bit baseline, N4 v2, and the $n=83$ precomputed-rho reproduction.
+- **15. The summer record (July–September 2026):** 1,402 ledger decisions indexed by date, verdict and run-data path ([`research/ecdlp_jul_sep_index_20261029/`](../../research/ecdlp_jul_sep_index_20261029/)); the retracted July wins, August yield/monodromy/oracle/transfer closures, September tables, lifts, Semaev 2015 and Nagao audits, Frobenius bases and the first ICPERF costing against rho.
+- **17. Distance by family:** includes the $k$-sum oracle, the validated 20-bit baseline, N4 v2, and the $n=83$ precomputed-rho reproduction.
 
 ## What it does not say
 
