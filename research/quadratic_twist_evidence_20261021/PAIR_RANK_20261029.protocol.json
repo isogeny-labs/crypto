@@ -10,7 +10,8 @@
   ],
   "links": {
     "spec": "PAIR_RANK_20261029_PROTOCOL.md",
-    "prior": "reports/uniform-20261029/README.md"
+    "prior": "reports/uniform-20261029/README.md",
+    "pilot": "Declared single-call calibration before freeze; logs contain rank1 in each arm. Main census/96bindings not yet executed. No criterion/input changed in response."
   },
   "question": "Do complete signed two-summand coefficient rows have rank equal to unordered decomposition count in the stated cyclic-prime census, and can an explicit symmetric-weight dependency kernel be checked in Lean?",
   "claims": [
@@ -184,7 +185,8 @@
         "differs_in": [
           "implementation"
         ],
-        "design": "absolute"
+        "design": "absolute",
+        "threshold": "all exact native profiles/source/row bindings equal, zero verifier discrepancies"
       }
     ],
     "aa_not_applicable": "Exact deterministic census; no timing/noise claim.",
@@ -226,11 +228,11 @@
       "note": "Exhaustive fixed population, no p-value/test/power; rank losses retained rather than inferred absent from a sample."
     },
     "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
+      "fixed_seconds": 0,
+      "per_sample_seconds": 0.004,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "No prior launch/new time measurement;600sec hard cap and one-hour iteration limit."
+      "estimated_total_seconds": 600,
+      "measured_on": "Current local host; one declared r3/base1/query1 call per binary; bash time diagnostics {'cpp': 0.004, 'rust': 0.002}, millisecond report resolution.600s is hard upper budget, not inferred speed."
     }
   },
   "metrics": {
@@ -374,10 +376,10 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
+    "status": "frozen",
+    "protocol_sha256": "a89bfebc5982a78eea6c0fef40eb4a4b328206849bff69d4cf28e39787c82787",
+    "commit": "e9ccfc80a92a2142b4c1463c643b126b036cee2b",
+    "frozen_at": "2026-10-29T23:37:42Z",
     "filed_before_affected_data": true
   }
 }
