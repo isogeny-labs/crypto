@@ -84,7 +84,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
+    collect_and_solve_relations_touching, price_phase, Calibration, CompletionRule, CountedGroup,
     FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
     TargetSource,
 };
@@ -516,6 +516,50 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 16,
             batched: true,
         },
+        Targets::WalkPrimeSerial64 => TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: false,
+        },
+        Targets::WalkPrimeBatch64 => TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch24 => TargetSource::WalkPrimeLanes {
+            lanes: 24,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch32 => TargetSource::WalkPrimeLanes {
+            lanes: 32,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch48 => TargetSource::WalkPrimeLanes {
+            lanes: 48,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch128 => TargetSource::WalkPrimeLanes {
+            lanes: 128,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch512 => TargetSource::WalkPrimeLanes {
+            lanes: 512,
+            batched: true,
+        },
     };
     if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
         return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
@@ -560,7 +604,10 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // large primes (the trait default), so this is the loop every
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
-        collect_and_solve_relations(
+        // The touch reads while no decomposition runs, so one RefCell
+        // lends the oracle to both closures in turn.
+        let oracle_cell = std::cell::RefCell::new(&mut *oracle);
+        collect_and_solve_relations_touching(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -574,8 +621,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             matrix,
             completion,
             |ops, counters, point, a, b| {
-                oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
+                oracle_cell
+                    .borrow_mut()
+                    .decompose_relations(ctx, &fb, ops, counters, point, a, b)
             },
+            |point| oracle_cell.borrow().touch(ctx, point),
         )
     };
     for (name, value) in oracle.relation_counters() {

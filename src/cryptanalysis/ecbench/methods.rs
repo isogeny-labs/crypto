@@ -49,10 +49,10 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned,
-    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
-    NegationClasses, PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses,
-    RhoBatchResult, RhoResult, RhoWalk,
+    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_negation_lanes, rho_walk_with,
+    signed_frobenius_rho_tuned, BinaryGroup, BinaryInstance, Calibration, CountedGroup,
+    CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses, PrimeInstance,
+    PrimePoint, QuarticClasses, RhoBatchResult, RhoResult, RhoWalk,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -241,6 +241,18 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
 
+const RHO_LANES_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "lanes",
+        default: None,
+        help: "walks run in lockstep, sharing one field inversion per round (1–4096)",
+    },
+];
 const POOLED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "cap_multiple",
@@ -408,6 +420,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.negation_lanes",
+            family: "rho",
+            summary: "rho.negation's step rule run as `lanes` walks in lockstep on a prime curve, each round's additions sharing one field inversion (Montgomery's trick); S ≈ rho.negation's plus the lanes' unfinished walks, field operations ≈ 5M + 1S + 1/lanes I per step; prime curves only",
+            entry: "ic_boundary::rho_walk_negation_lanes(RhoWalk::negation(), lanes)",
+            applies: Applies::Any,
+            params: RHO_LANES_PARAMS,
         },
         MethodDecl {
             id: "rho.multitarget_pooled",
@@ -1076,7 +1096,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" => Some((PI / 4.0).sqrt()),
+        "rho.negation" | "rho.negation_lanes" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" | "rho.gls" => Some((PI / 8.0).sqrt()),
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
@@ -2202,6 +2222,30 @@ fn solve_inner(
             measurement::end_online();
             // A Koblitz walk does not count its field operations: unknown.
             Ok(rho_report(res, t.elapsed().as_nanos() as u64, None))
+        }
+        (Instance::Prime(i), _) if m.id == "rho.negation_lanes" => {
+            let lanes = param_u64(m, "lanes")?;
+            if !(1..=4096).contains(&lanes) {
+                return Err(format!("`lanes` must be 1–4096, not {lanes}"));
+            }
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let res = rho_walk_negation_lanes(
+                &i.curve,
+                i.generator_point(),
+                PrimePoint::affine(tx, ty),
+                i.r,
+                seed,
+                rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
+                RhoWalk::negation(),
+                lanes as usize,
+            );
+            measurement::end_online();
+            let f = FieldOps::total(&[res.group_ops]);
+            Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
+        }
+        (_, _) if m.id == "rho.negation_lanes" => {
+            Err("`rho.negation_lanes` runs on prime curves only".into())
         }
         (Instance::Prime(i), _) if m.id == "rho.quartic" => {
             let t = Instant::now();
@@ -4162,6 +4206,8 @@ fn solve_ic_prime(
     let mut ksum = KSumOracle::new(ms);
     let mut prime_batch = PrimeBatchMitmOracle::new();
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
+    let mut residual_sweep =
+        crate::cryptanalysis::ic_framework::plugins::ResidualSweepOracle::new();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
@@ -4193,6 +4239,7 @@ fn solve_ic_prime(
         "ksum" => &mut ksum,
         "mitm-prime-batch" => &mut prime_batch,
         "mitm-prime-blocked" => &mut prime_blocked,
+        "residual-sweep" => &mut residual_sweep,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,

@@ -44,7 +44,7 @@
 //! `negation_folded` parameter halves the additions that build it.
 
 use crate::cryptanalysis::pq_groebner_f2::mask_low64;
-use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::time::{Duration, Instant};
 
 use num_traits::ToPrimitive;
@@ -2118,6 +2118,14 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         let table = self.table.as_ref()?;
         decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
     }
+
+    fn touch(&self, ctx: &InstanceCtx<G>, point: &G::Elt) {
+        if self.m == 2 {
+            if let Some(table) = &self.table {
+                table.touch(ctx.group, point);
+            }
+        }
+    }
 }
 
 /// One probe per target into a table of every signed `k`-sum of the base
@@ -2291,6 +2299,188 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
         decompose_mitm(ctx.group, fb, self.table.as_ref()?, 2, ops, counters, point)
+    }
+
+    fn touch(&self, ctx: &InstanceCtx<PrimeCurve>, point: &PrimePoint) {
+        if let Some(table) = &self.table {
+            table.touch(ctx.group, point);
+        }
+    }
+}
+
+/// **Single-large-prime residual sweep** (lead `ICP-residual-partial-relations`).
+///
+/// For a target `R = [a]G + [b]Q` it forms every residual `Z_i = R − P_i`
+/// over the base's `2|F_x|` signed points, one group addition each (charged
+/// exactly as `subtract` charges its candidates), and stores `Z_i` under its
+/// abscissa together with `(a, b, i)`.  Two stored residuals with equal
+/// abscissa are equal up to sign, `R − P_i = t (R' − P_i')`, which is the
+/// base-only relation
+///
+/// ```text
+///   (a − t a') + (b − t b') d = log P_i − t log P_i' .
+/// ```
+///
+/// No pair table is built and no residual is required to land in the base:
+/// the unknown point `Z` is the "large prime" and a collision is its
+/// pairing.  A residual that is the identity is `R = P_i`, a one-column row.
+///
+/// What it costs is the point of the lead: the number of stored residuals
+/// needed for `|F_x|` collisions is about `sqrt(2 r |F_x|)`, so the relation
+/// phase is a birthday search whose price falls as the base shrinks, and
+/// the table it needs grows with the same square root (reported as
+/// `residuals_stored`).  It is a different search from the pair table's,
+/// not a faster one.
+pub struct ResidualSweepOracle {
+    /// Residuals kept at most; later ones are still looked up.
+    cap: usize,
+    negs: Vec<PrimePoint>,
+    store: HashMap<u64, (u64, u64, u32, bool)>,
+    stored: u64,
+    sweeps: u64,
+    collisions: u64,
+    identity_hits: u64,
+    cap_misses: u64,
+}
+
+impl ResidualSweepOracle {
+    pub fn new() -> Self {
+        Self {
+            cap: 1 << 24,
+            negs: Vec::new(),
+            store: HashMap::new(),
+            stored: 0,
+            sweeps: 0,
+            collisions: 0,
+            identity_hits: 0,
+            cap_misses: 0,
+        }
+    }
+}
+
+impl Default for ResidualSweepOracle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DecompositionOracle<PrimeCurve> for ResidualSweepOracle {
+    fn name(&self) -> &str {
+        "residual-sweep"
+    }
+
+    fn summands(&self) -> u32 {
+        2
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        "every residual R − P_i of a target stored by abscissa; a collision of two residuals is a \
+         base-only relation (single large prime, no pair table)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "must be 2"),
+            ("cap", "most residuals kept (default 16777216)"),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m" && key != "cap") {
+            return Err("residual-sweep accepts only m=2 and cap".into());
+        }
+        self.cap = params.u64_or("cap", 1 << 24)? as usize;
+        self.negs = fb.points.iter().map(|p| ctx.group.neg(*p)).collect();
+        self.store.clear();
+        Ok(())
+    }
+
+    fn decompose(
+        &mut self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        _fb: &FactorBase<PrimePoint>,
+        _ops: &mut GroupOps,
+        _counters: &mut OracleCounters,
+        _point: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        None
+    }
+
+    fn decompose_relations(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        a: u64,
+        b: u64,
+    ) -> Vec<Relation> {
+        let r = ctx.r;
+        let g = ctx.group;
+        let mut out = Vec::new();
+        self.sweeps += 1;
+        for (i, neg) in self.negs.iter().enumerate() {
+            let z = g.add(ops, point, *neg);
+            if g.is_identity(&z) {
+                self.identity_hits += 1;
+                out.push(Relation::Row {
+                    columns: vec![(fb.col_of[i], fb.coef_of[i] % r)],
+                    a,
+                    b,
+                });
+                continue;
+            }
+            counters.lookups += 1;
+            let ybit = z.y > g.neg(z).y;
+            match self.store.get(&z.x) {
+                Some(&(a2, b2, i2, ybit2)) => {
+                    let i2 = i2 as usize;
+                    let t_plus = ybit == ybit2;
+                    self.collisions += 1;
+                    let (ra, rb, second) = if t_plus {
+                        (
+                            (a + r - a2) % r,
+                            (b + r - b2) % r,
+                            (r - fb.coef_of[i2] % r) % r,
+                        )
+                    } else {
+                        ((a + a2) % r, (b + b2) % r, fb.coef_of[i2] % r)
+                    };
+                    out.push(Relation::Row {
+                        columns: vec![(fb.col_of[i], fb.coef_of[i] % r), (fb.col_of[i2], second)],
+                        a: ra,
+                        b: rb,
+                    });
+                }
+                None => {
+                    if self.store.len() < self.cap {
+                        self.store.insert(z.x, (a, b, i as u32, ybit));
+                        self.stored += 1;
+                    } else {
+                        self.cap_misses += 1;
+                    }
+                }
+            }
+        }
+        out
+    }
+
+    fn relation_counters(&self) -> BTreeMap<String, u64> {
+        BTreeMap::from([
+            ("residuals_stored".to_string(), self.stored),
+            ("sweeps".to_string(), self.sweeps),
+            ("collisions".to_string(), self.collisions),
+            ("identity_hits".to_string(), self.identity_hits),
+            ("cap_misses".to_string(), self.cap_misses),
+        ])
     }
 }
 

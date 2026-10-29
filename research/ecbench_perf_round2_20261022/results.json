@@ -1,0 +1,396 @@
+{
+ "ecbench": [
+  {
+   "arm": "rho-frozen",
+   "method": "rho.frozen_reference",
+   "new_ms": 14.406659,
+   "old_ms": 14.31638,
+   "paired_geomean": 0.9998408184379731,
+   "pairs": 120,
+   "sessions": [
+    4,
+    4
+   ],
+   "solve_ratio": 1.0063059935542364,
+   "spec": "rho-32"
+  },
+  {
+   "arm": "rho-neg",
+   "method": "rho.negation",
+   "new_ms": 9.3419355,
+   "old_ms": 9.9837035,
+   "paired_geomean": 0.9309048274651041,
+   "pairs": 120,
+   "sessions": [
+    4,
+    4
+   ],
+   "solve_ratio": 0.9357184435615501,
+   "spec": "rho-32"
+  },
+  {
+   "arm": "rho-neg-aa",
+   "method": "rho.negation",
+   "new_ms": 9.4571375,
+   "old_ms": 10.2062255,
+   "paired_geomean": 0.896210941991007,
+   "pairs": 120,
+   "sessions": [
+    4,
+    4
+   ],
+   "solve_ratio": 0.9266047962589108,
+   "spec": "rho-32"
+  },
+  {
+   "arm": "rho-plain",
+   "method": "rho.plain",
+   "new_ms": 12.7900725,
+   "old_ms": 13.4904665,
+   "paired_geomean": 0.9372728036661351,
+   "pairs": 120,
+   "sessions": [
+    4,
+    4
+   ],
+   "solve_ratio": 0.9480822994519871,
+   "spec": "rho-32"
+  },
+  {
+   "arm": "bsgs",
+   "method": "bsgs.textbook",
+   "new_ms": 14.8112225,
+   "old_ms": 14.9552625,
+   "paired_geomean": 1.0382265583007135,
+   "pairs": 36,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 0.9903686077058159,
+   "spec": "generic-32"
+  },
+  {
+   "arm": "bsgs-il",
+   "method": "bsgs.interleaved",
+   "new_ms": 15.832743,
+   "old_ms": 15.6688825,
+   "paired_geomean": 1.0233676514701309,
+   "pairs": 36,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 1.0104577017537786,
+   "spec": "generic-32"
+  },
+  {
+   "arm": "bsgs-neg",
+   "method": "bsgs.negation",
+   "new_ms": 8.988151,
+   "old_ms": 9.3388115,
+   "paired_geomean": 0.97767223750207,
+   "pairs": 36,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 0.9624512712351031,
+   "spec": "generic-32"
+  },
+  {
+   "arm": "kangaroo",
+   "method": "kangaroo.vow",
+   "new_ms": 15.483489,
+   "old_ms": 15.547081,
+   "paired_geomean": 1.016867812341887,
+   "pairs": 36,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 0.9959097144988182,
+   "spec": "generic-32"
+  },
+  {
+   "arm": "rho-neg",
+   "method": "rho.negation",
+   "new_ms": 10.228657,
+   "old_ms": 10.847224,
+   "paired_geomean": 0.9489742180164492,
+   "pairs": 36,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 0.9429746265035183,
+   "spec": "generic-32"
+  },
+  {
+   "arm": "ic-batch",
+   "method": "ic.pipeline",
+   "new_ms": 62.0254395,
+   "old_ms": 61.967052,
+   "paired_geomean": 1.009115276062322,
+   "pairs": 18,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 1.000942234592667,
+   "spec": "prime-ic-28"
+  },
+  {
+   "arm": "ic-mitm",
+   "method": "ic.pipeline",
+   "new_ms": 72.617544,
+   "old_ms": 72.25852,
+   "paired_geomean": 1.0098804677017446,
+   "pairs": 18,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 1.004968604394333,
+   "spec": "prime-ic-28"
+  },
+  {
+   "arm": "rho-neg",
+   "method": "rho.negation",
+   "new_ms": 3.2141695,
+   "old_ms": 3.6028055,
+   "paired_geomean": 0.9028931319165976,
+   "pairs": 18,
+   "sessions": [
+    3,
+    3
+   ],
+   "solve_ratio": 0.8921296195423261,
+   "spec": "prime-ic-28"
+  }
+ ],
+ "headline": [
+  {
+   "claimed": 1.0063059935542364,
+   "name": "rho-32/rho-frozen/solve_ratio"
+  },
+  {
+   "claimed": 0.9357184435615501,
+   "name": "rho-32/rho-neg/solve_ratio"
+  },
+  {
+   "claimed": 0.9266047962589108,
+   "name": "rho-32/rho-neg-aa/solve_ratio"
+  },
+  {
+   "claimed": 0.9480822994519871,
+   "name": "rho-32/rho-plain/solve_ratio"
+  },
+  {
+   "claimed": 0.9903686077058159,
+   "name": "generic-32/bsgs/solve_ratio"
+  },
+  {
+   "claimed": 1.0104577017537786,
+   "name": "generic-32/bsgs-il/solve_ratio"
+  },
+  {
+   "claimed": 0.9624512712351031,
+   "name": "generic-32/bsgs-neg/solve_ratio"
+  },
+  {
+   "claimed": 0.9959097144988182,
+   "name": "generic-32/kangaroo/solve_ratio"
+  },
+  {
+   "claimed": 0.9429746265035183,
+   "name": "generic-32/rho-neg/solve_ratio"
+  },
+  {
+   "claimed": 1.000942234592667,
+   "name": "prime-ic-28/ic-batch/solve_ratio"
+  },
+  {
+   "claimed": 1.004968604394333,
+   "name": "prime-ic-28/ic-mitm/solve_ratio"
+  },
+  {
+   "claimed": 0.8921296195423261,
+   "name": "prime-ic-28/rho-neg/solve_ratio"
+  },
+  {
+   "claimed": 0.8028118475769288,
+   "name": "koblitz/k0n41/setup_ratio"
+  },
+  {
+   "claimed": 0.9239773991358522,
+   "name": "koblitz/k0n53/setup_ratio"
+  },
+  {
+   "claimed": 0.8954361348693979,
+   "name": "koblitz/k0n61/setup_ratio"
+  }
+ ],
+ "identical_records": 1776,
+ "koblitz": [
+  {
+   "curve": "k0n41",
+   "new_online_ms": 1.188804,
+   "new_setup_ms": 45.930636,
+   "old_online_ms": 1.20956,
+   "old_setup_ms": 57.212205,
+   "phases_ms": {
+    "build": [
+     8.075827,
+     7.585539
+    ],
+    "collect": [
+     36.276132,
+     27.524482
+    ],
+    "collect_setup": [
+     2.114578,
+     0.692146
+    ],
+    "la": [
+     0.67908,
+     0.682857
+    ],
+    "select": [
+     4.948636,
+     4.468114
+    ],
+    "select_projection": [
+     1.333714,
+     0.887468
+    ],
+    "setup": [
+     0.606443,
+     0.597391
+    ],
+    "verify": [
+     2.515236,
+     2.489765
+    ]
+   },
+   "repetitions": [
+    15,
+    15
+   ],
+   "rho_online_ms": 2.993916,
+   "setup_ratio": 0.8028118475769288
+  },
+  {
+   "curve": "k0n53",
+   "new_online_ms": 0.150081,
+   "new_setup_ms": 403.503327,
+   "old_online_ms": 0.14496,
+   "old_setup_ms": 436.702594,
+   "phases_ms": {
+    "build": [
+     134.525034,
+     132.334922
+    ],
+    "collect": [
+     234.796961,
+     211.542921
+    ],
+    "collect_setup": [
+     11.543386,
+     4.209701
+    ],
+    "descent_setup": [
+     1.790708,
+     0.972081
+    ],
+    "la": [
+     1.644432,
+     1.634188
+    ],
+    "logs_setup": [
+     0.676031,
+     0.762095
+    ],
+    "select": [
+     23.553621,
+     23.223813
+    ],
+    "select_projection": [
+     7.148824,
+     5.324747
+    ],
+    "setup": [
+     1.565351,
+     1.562982
+    ],
+    "verify": [
+     9.848514,
+     10.385989
+    ]
+   },
+   "repetitions": [
+    15,
+    15
+   ],
+   "rho_online_ms": 49.363318,
+   "setup_ratio": 0.9239773991358522
+  },
+  {
+   "curve": "k0n61",
+   "new_online_ms": 7.802531,
+   "new_setup_ms": 1519.569301,
+   "old_online_ms": 7.67537,
+   "old_setup_ms": 1697.015836,
+   "phases_ms": {
+    "build": [
+     228.703562,
+     248.27345
+    ],
+    "collect": [
+     1386.789981,
+     1197.995859
+    ],
+    "collect_setup": [
+     17.895044,
+     5.965
+    ],
+    "descent_setup": [
+     2.528055,
+     1.355241
+    ],
+    "la": [
+     2.129676,
+     2.103855
+    ],
+    "logs_setup": [
+     1.202043,
+     1.175727
+    ],
+    "select": [
+     40.090401,
+     38.469242
+    ],
+    "select_projection": [
+     11.111596,
+     9.776989
+    ],
+    "setup": [
+     1.939067,
+     2.170027
+    ],
+    "verify": [
+     13.803714,
+     14.287286
+    ]
+   },
+   "repetitions": [
+    15,
+    15
+   ],
+   "rho_online_ms": 28.454357,
+   "setup_ratio": 0.8954361348693979
+  }
+ ],
+ "koblitz_outputs_differing": 0,
+ "records": 1776
+}
