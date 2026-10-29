@@ -35,8 +35,9 @@ proc rankEval33(list values,string label,int expected){
  for(p=1;p<=83;p++){
   if(piv[p]!=0){co=coords[p];rebuilt=0;for(j=1;j<=size(co);j++){rebuilt=rebuilt+original[deg(co[j])+1];}if(rebuilt!=piv[p]){ERROR("EVAL33_PIVOT_RECOMBINATION");}}
  }
- link out="ASCII:w "+label+".sing";open(out);write(out,"ideal evaluationValues;ideal evaluationKernel;");
+ link out="ASCII:w "+label+".sing";open(out);write(out,"ideal evaluationValues;ideal evaluationBits;ideal evaluationKernel;");
  for(i=1;i<=count;i++){write(out,"evaluationValues["+string(i)+"]="+string(values[i])+";");}
+ for(i=1;i<=count;i++){write(out,"evaluationBits["+string(i)+"]="+string(original[i])+";");}
  for(i=1;i<=size(kernels);i++){write(out,"evaluationKernel["+string(i)+"]="+string(kernels[i])+";");}
  close(out);print("EVAL33_RESULT "+label+" columns="+string(count)+" rank="+string(rankE)+" kernel="+string(size(kernels))+" recombination=all");
  return(rankE);
