@@ -1,0 +1,64 @@
+{
+  "schema": "koblitz.exact-computation-export/v1",
+  "round": 26,
+  "source_revision": "49c854129138a14005484dc22c8216e3a4c86464",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "sha256": "d4976d6af4545da369a02ca98c1bc11a1e6d979e32035aae158eefe2f476db9b",
+    "machine_index": "protocol.json",
+    "generic_checker_available": false
+  },
+  "flow": {
+    "native_original_planned": 3,
+    "native_attempted": 6,
+    "native_accepted": 3,
+    "native_implementation_rejections": 1,
+    "native_failed_coordinate_ansatz": 1,
+    "native_expected_rejections": 1,
+    "native_timeouts": 0,
+    "conditional_CD_series_not_launched": true,
+    "lean_attempted": 2,
+    "lean_failed": 1,
+    "lean_passed": 1
+  },
+  "accepted": [
+    "char26-02",
+    "transport26-01",
+    "sourceorbit26-01"
+  ],
+  "implementation_rejections": [
+    "char26-01"
+  ],
+  "failed_coordinate_ansatz": [
+    "cd26-01"
+  ],
+  "negative_control": "char26-corrupt-01",
+  "proof": {
+    "named_theorems": 16,
+    "audited_declarations": 17,
+    "generated_equations": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "source_sha256": "962c2be137636fa886575f29581af0a826c7e822eb7a2c422384347e295786b7",
+    "lean": "4.34.1",
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+    "geometry_RR_formalized": false
+  },
+  "raw": {
+    "path": "runs.tar.xz",
+    "sha256": "102c357df65d24fff336f783b463c75f3409b456824159176543a1435a38ed47",
+    "bytes": 83476,
+    "members": 64,
+    "manifest": "runs.sha256",
+    "verification": "artifact-verification.json",
+    "fresh_download_verified": true,
+    "all_member_hashes_verified": true,
+    "deterministic_repack_verified": true
+  },
+  "source_pins": "source.sha256",
+  "written_bridge_scope": "CM.md and PROOF_MAP.md",
+  "software_validation": "VALIDATION.md and ../24/validation.json",
+  "new_relation_rank_claim": false,
+  "full_F2_factor_transfer": false,
+  "merge_authorized": false
+}
