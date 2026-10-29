@@ -45,3 +45,10 @@ budget escalation. Checkpoint all source/raw before eachcall. Any cap/error
 is an unresolved computation,not a nonexistence certificate. Retain attempts.
 
 Compiler01 exit101 before math: copied inner module doc comment appeared after the Field definition. Assembler changes comment prefix //! to // only; mathematical helpers unchanged. Keep exact failed main/Cargo/runner/log. Reference review: originalO13/M15 source reviewed before proposal; primary determinant/norm statements checked before native math in Sutherland18.782Lecture7 Definition7.1 (https://math.mit.edu/classes/18.782/2013fa/LectureNotes7.pdf) and Stacks0FJ9 (https://stacks.math.columbia.edu/tag/0FJ9). Adjugate ratio is the direct epsilon product expansion at a unique zero, not a claimed new norm algorithm.
+
+Before proof data: formalize the finite-factor weighted adjugate sum, its
+collapse at one zero, nonzero cofactor when allotherfactorsnonzero,and ratio
+recovering the weight. Three named Lean theorems, standard foundations only,
+no axioms/sorry/native_decide. Identification with actual Hecke multiplication
+norm,point specialization and source fiber is written,not assumed as an axiom.
+PinnedLean4.34.1/mathlibd13f23b, -j1-M4096/1200,CPU0 affinity, separateaudit.
