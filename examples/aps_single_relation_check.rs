@@ -20,6 +20,13 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Independently replay a tiny public-fixture transcript with BigUint EC arithmetic.
+    Replay {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Issue and independently recheck the established symmetric S3 identity.
     Certificate {
         #[arg(long)]
@@ -157,6 +164,17 @@ struct Transcript {
 
 fn execute(args: Args) -> Result<(), String> {
     match args.command {
+        Command::Replay { input, output } => {
+            if input == output {
+                return Err("replay input and output must differ".into());
+            }
+            let report = aps::replay::verify_file(&input)?;
+            fs::write(
+                output,
+                serde_json::to_vec_pretty(&report).map_err(|e| e.to_string())?,
+            )
+            .map_err(|e| e.to_string())?;
+        }
         Command::Certificate { output } => {
             let cert = identity_certificate()?;
             fs::write(
@@ -308,11 +326,12 @@ fn execute(args: Args) -> Result<(), String> {
                 expected_public_logarithm: expected, status, attempts: runs,
                 limits: "Tiny fixed fixtures only. No target scalar is passed to relation solving. F4 counters exclude setup and are not a complete cost model. Even-arity weights require one point per original partition; orbit expansion and regrouping still check B != 0. No performance, scaling, or general-security conclusion.",
             };
-            fs::write(
-                output,
-                serde_json::to_vec_pretty(&transcript).map_err(|e| e.to_string())?,
-            )
-            .map_err(|e| e.to_string())?;
+            let bytes = serde_json::to_vec_pretty(&transcript).map_err(|e| e.to_string())?;
+            fs::write(output, &bytes).map_err(|e| e.to_string())?;
+            // Keep the original producer output even when replay rejects it.
+            // Successful CLI completion now requires separate arithmetic checks.
+            aps::replay::verify_bytes(&bytes)
+                .map_err(|e| format!("independent transcript replay rejected output: {e}"))?;
             if status != "verified" {
                 return Err(format!("bounded search ended: {status}"));
             }
@@ -331,6 +350,151 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn shipped_transcripts_replay_to_their_hash_bound_receipts() {
+        for (input, receipt) in [
+            (
+                include_str!("../research/aps_replay_20261029/fixtures/toy101-complete.json"),
+                include_str!(
+                    "../research/aps_replay_20261029/fixtures/toy101-complete.replay.json"
+                ),
+            ),
+            (
+                include_str!("../research/aps_replay_20261029/fixtures/toy211-streaming.json"),
+                include_str!(
+                    "../research/aps_replay_20261029/fixtures/toy211-streaming.replay.json"
+                ),
+            ),
+            (
+                include_str!("../research/aps_replay_20261029/fixtures/toy103-pruned.json"),
+                include_str!("../research/aps_replay_20261029/fixtures/toy103-pruned.replay.json"),
+            ),
+            (
+                include_str!("../research/aps_replay_20261029/fixtures/toy101-no-relation.json"),
+                include_str!(
+                    "../research/aps_replay_20261029/fixtures/toy101-no-relation.replay.json"
+                ),
+            ),
+        ] {
+            let actual = aps::replay::verify_bytes(input.as_bytes()).unwrap();
+            let expected: serde_json::Value = serde_json::from_str(receipt).unwrap();
+            assert_eq!(serde_json::to_value(actual).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn every_cli_arm_replays_in_both_enumeration_modes() {
+        for arm in [
+            Arm::Partitioned3,
+            Arm::Unordered3,
+            Arm::Line3,
+            Arm::Expanded4,
+            Arm::Split4,
+            Arm::BlockSymmetric4,
+            Arm::Hybrid3,
+            Arm::Hybrid4,
+            Arm::Cover3,
+            Arm::Orbit3,
+            Arm::OrbitLine3,
+            Arm::OrbitPrunedLine3,
+        ] {
+            for early in [false, true] {
+                let output = std::env::temp_dir().join(format!(
+                    "aps-replay-all-{}-{arm:?}-{early}.json",
+                    std::process::id()
+                ));
+                let orbit = matches!(arm, Arm::Orbit3 | Arm::OrbitLine3 | Arm::OrbitPrunedLine3);
+                execute(Args {
+                    command: Command::Solve {
+                        fixture: if orbit {
+                            Fixture::Toy103J0
+                        } else {
+                            Fixture::Toy101
+                        },
+                        arm,
+                        labels: if orbit {
+                            LabelChoice::Random
+                        } else {
+                            LabelChoice::Guaranteed
+                        },
+                        subset_size: if orbit { 1 } else { 2 },
+                        seed: 20261026,
+                        attempts: 32,
+                        budget_ms: 10000,
+                        first_informative: early,
+                        output: output.clone(),
+                    },
+                })
+                .unwrap_or_else(|e| panic!("{arm:?}/{early}: {e}"));
+                let report = aps::replay::verify_file(&output).unwrap();
+                assert_eq!(report.outcome, aps::replay::Outcome::Verified);
+                assert_eq!(report.verified_logarithm, Some(if orbit { 17 } else { 37 }));
+                if early {
+                    assert!(report.complete_attempts_checked < report.attempts_checked);
+                }
+                fs::remove_file(output).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn standalone_replay_checks_written_bytes_and_rejects_corrupted_inputs() {
+        let input =
+            std::env::temp_dir().join(format!("aps-replay-input-{}.json", std::process::id()));
+        let output =
+            std::env::temp_dir().join(format!("aps-replay-receipt-{}.json", std::process::id()));
+        execute(Args {
+            command: Command::Solve {
+                fixture: Fixture::Toy211,
+                arm: Arm::Line3,
+                labels: LabelChoice::Guaranteed,
+                subset_size: 2,
+                seed: 20261026,
+                attempts: 32,
+                budget_ms: 10000,
+                first_informative: true,
+                output: input.clone(),
+            },
+        })
+        .unwrap();
+        let args = Args::try_parse_from([
+            "aps",
+            "replay",
+            "--input",
+            input.to_str().unwrap(),
+            "--output",
+            output.to_str().unwrap(),
+        ])
+        .unwrap();
+        execute(args).unwrap();
+        let receipt: serde_json::Value =
+            serde_json::from_slice(&fs::read(&output).unwrap()).unwrap();
+        assert_eq!(receipt["schema"], "aps.single-relation.replay/v1");
+        assert_eq!(receipt["verified_logarithm"], 73);
+        assert_eq!(receipt["costs_attested"], false);
+        fs::remove_file(&output).unwrap();
+        assert!(execute(Args {
+            command: Command::Replay {
+                input: input.clone(),
+                output: input.clone()
+            }
+        })
+        .is_err());
+        let mut transcript: serde_json::Value =
+            serde_json::from_slice(&fs::read(&input).unwrap()).unwrap();
+        transcript["expected_public_logarithm"] = serde_json::json!(74);
+        fs::write(&input, serde_json::to_vec(&transcript).unwrap()).unwrap();
+        assert!(execute(Args {
+            command: Command::Replay {
+                input: input.clone(),
+                output: output.clone()
+            }
+        })
+        .is_err());
+        assert!(!output.exists());
+        fs::remove_file(input).unwrap();
+    }
 
     #[test]
     fn every_public_fixture_has_the_declared_point_orders_and_answer() {
