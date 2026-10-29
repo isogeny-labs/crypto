@@ -65,8 +65,8 @@ $E cache                            # list the git and cargo cache entries
 | option | default | |
 |---|---|---|
 | `--type T` | `c7i.4xlarge` | GPU types (`g*`, `p*`) boot the NVIDIA Deep Learning Base AMI (AL2023); Graviton types boot arm64 AL2023 |
-| `--spot` | Spot | explicit spelling of the default one-time Spot request |
-| `--on-demand` | off | omit Spot market options and request On-Demand capacity for a command that cannot checkpoint; conflicts with `--spot` |
+| `--spot` | Spot | the default; launches request Spot and fail when it is unavailable |
+| `--on-demand` | | request On-Demand instead, for a job that a reclaim must not cut off; contradicts `--spot` |
 | `--resume ID` | none | restore the prior job's `out/` from S3 into `$EPHEMERAL_RESUME_DIR` before setup |
 | `--ttl SPAN` | `4h` | `90m`, `6h`, `2d`; 15 min to `max_ttl_hours` (48 h) |
 | `--disk GB` | 100 | encrypted gp3 root |
@@ -83,15 +83,9 @@ $E cache                            # list the git and cargo cache entries
 | `--keep` | | leave the box up after the job, until the TTL (debugging with `shell`) |
 | `--name`, `--out`, `--ami` | | job label, output dir, explicit AMI |
 
-By default, `ephemeral run` uses a one-time Spot request. If all configured
-zones lack Spot capacity, the launch fails and creates no On-Demand instance.
-For a command that cannot checkpoint or for a wall-clock measurement that
-must not be resumed, request `--on-demand` explicitly. The job still gets
-the same TTL timer, reaper, encrypted disk, output upload and self-termination.
-The job receipt records `spot: false`; the EC2 launch omits Spot market
-options. On-Demand capacity can cost more, so keep the existing TTL and
-smallest-fitting instance-type rules.
-For Spot jobs, the command should write a complete checkpoint periodically into
+Every `ephemeral run` uses a one-time Spot request unless `--on-demand` is given. If all configured
+zones lack Spot capacity, the launch fails and never falls back to On-Demand on its own.
+The command should write a complete checkpoint periodically into
 `$EPHEMERAL_OUT` and save one on SIGTERM. On a Spot interruption notice, the
 runner signals the command's process group, allows 60 seconds for its handler,
 then uploads `out/` to S3. To resume, rerun the same command with

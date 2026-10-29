@@ -85,11 +85,11 @@ struct RunArgs {
     /// Instance type. GPU types (g*, p*) get the NVIDIA Deep Learning AMI, Graviton types arm64
     #[arg(long = "type", default_value = "c7i.4xlarge")]
     instance_type: String,
-    /// Request Spot capacity (default)
+    /// Spot (the default)
     #[arg(long, conflicts_with = "on_demand")]
     spot: bool,
-    /// Request On-Demand capacity for a job without a checkpoint
-    #[arg(long, conflicts_with = "spot")]
+    /// On-Demand instead of Spot, for a job that a reclaim must not cut off
+    #[arg(long)]
     on_demand: bool,
     /// Restore a prior job's S3 out/ as EPHEMERAL_RESUME_DIR
     #[arg(long, value_name = "ID")]
@@ -667,7 +667,8 @@ impl Ctx {
         let Some(iid) = iid else {
             let market_label = if a.on_demand { "On-Demand" } else { "Spot" };
             let why = format!(
-                "no {market_label} capacity for {} in the configured zones; try another type or later",
+                "no {} capacity for {} in the configured zones; try another type or later",
+                if a.on_demand { "On-Demand" } else { "Spot" },
                 a.instance_type
             );
             return Err(self.launch_failed(&id, deadline, &why).await);
@@ -676,8 +677,9 @@ impl Ctx {
         eprintln!("ephemeral: job {id}");
         let market_label = if a.on_demand { "on-demand" } else { "spot" };
         eprintln!(
-            "ephemeral:   {} {market_label} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
+            "ephemeral:   {}{} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
             a.instance_type,
+            if a.on_demand { "" } else { " spot" },
             utc_of(deadline)
         );
         let source = if commit.is_empty() {
@@ -1179,8 +1181,11 @@ mod tests {
     #[test]
     fn run_args_need_the_separator() {
         let default_spot = RunArgs::try_parse_from_args(&["--", "echo", "hi"]).unwrap();
-        assert!(!default_spot.spot);
+        assert!(!default_spot.spot); // Spot is the default without the flag.
         assert!(!default_spot.on_demand);
+        let od = RunArgs::try_parse_from_args(&["--on-demand", "--", "echo", "hi"]).unwrap();
+        assert!(od.on_demand);
+        assert!(RunArgs::try_parse_from_args(&["--spot", "--on-demand", "--", "x"]).is_err());
         let resume =
             RunArgs::try_parse_from_args(&["--resume", "previous-job", "--", "echo", "hi"])
                 .unwrap();
