@@ -40,3 +40,10 @@ Python does only lexical metadata/renaming. Every field multiplication occurs
 in Singular, and the formal-argument native roundtrip checks the complete
 transformed result. This changes expression evaluation, not any witness or
 condition. No timing comparison/IC performance claim is made.
+
+Original local33-check83-01 reached the1200second native cap(exit124)
+without any completed point-presentation output. This is a censored
+specialization computation, not a failure of the local presentation itself.
+The sequential old field5 invocation was not reached. Preserve the complete
+old input/log/exit and use fresh compact83/5 checks only after the compact
+function's native formal-argument roundtrip passes. Bounds stay unchanged.
