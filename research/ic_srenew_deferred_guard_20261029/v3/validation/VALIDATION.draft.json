@@ -1,0 +1,171 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp24-tm241-91a7fdd0",
+  "icv1-fp24-tm2519-cce74591",
+  "icv1-fp32-tm103307-fa421912",
+  "icv1-fp32-tm24839-2a7bda13"
+ ],
+ "replay_certificate": {
+  "path": "v3/validation/replay-certificate.json",
+  "sha256": "fef4b049fe6f187aaace0a7406a8c8666ecce14b0cfaf64e20b974e35d92e610"
+ },
+ "validator_report": {
+  "path": "v3/validation/validator-report.json",
+  "sha256": "8b582d06e6306e397e2fbbdb4ed16ec1eb3df377794abe32ba69e7fc2d269b88"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "first-study PROTOCOL.md section 2 arm rho-neg (carried into v3 section 1): rho.negation in the same session per size (v3 P24 session of job ic-dg3-p24-20261029, P32 of ic-dg3-p32-20261029), same 48 targets, rounds and algorithm seeds as dg-small and walk",
+  "unit": "ecbench.gae / sqrt(r) (S), unpriced native operations priced at w GAE each (AGENTS.md section 5a); rho canonicalisations priced the same way",
+  "binary_or_process": "ecbench sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c (isolab image, source be2969ce), one session per size; replayed by the same binary on another host",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "All four curves are prime-order curves over prime fields with j not 0 or 1728 (validator check against the ICV1 strings), so Aut(E) = {+-1}: negation is the only automorphism fold and no Frobenius fold exists; rho records show automorphisms_used 2.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "icv1-fp24-tm241-91a7fdd0: ic = dg-small mean S over its 144 measured runs, rho = rho-neg mean S over the same 144 (target, round) pairs; every row in gae_band_by_row",
+  "gae_band": {
+   "0": {
+    "ic": 12.442428869357581,
+    "rho": 1.1199550447376843
+   },
+   "0.1": {
+    "ic": 13.259882217706352,
+    "rho": 1.222166359550883
+   },
+   "1": {
+    "ic": 20.616962352845267,
+    "rho": 2.142068192869672
+   }
+  },
+  "gae_band_by_row": {
+   "icv1-fp24-tm241-91a7fdd0": {
+    "0": {
+     "ic": 12.442428869357581,
+     "rho": 1.1199550447376843
+    },
+    "0.1": {
+     "ic": 13.259882217706352,
+     "rho": 1.222166359550883
+    },
+    "1": {
+     "ic": 20.616962352845267,
+     "rho": 2.142068192869672
+    }
+   },
+   "icv1-fp24-tm2519-cce74591": {
+    "0": {
+     "ic": 12.619827542843366,
+     "rho": 1.0853776700219053
+    },
+    "0.1": {
+     "ic": 13.44832548084612,
+     "rho": 1.183956215803815
+    },
+    "1": {
+     "ic": 20.904806922870836,
+     "rho": 2.071163127841
+    }
+   },
+   "icv1-fp32-tm103307-fa421912": {
+    "0": {
+     "ic": 29.830541265762754,
+     "rho": 1.0102805292355646
+    },
+    "0.1": {
+     "ic": 31.9500032243211,
+     "rho": 1.1106799660746887
+    },
+    "1": {
+     "ic": 51.02516085134645,
+     "rho": 2.014274897626803
+    }
+   },
+   "icv1-fp32-tm24839-2a7bda13": {
+    "0": {
+     "ic": 30.19258962235608,
+     "rho": 0.9799295737288998
+    },
+    "0.1": {
+     "ic": 32.37347208827504,
+     "rho": 1.0773108561842264
+    },
+    "1": {
+     "ic": 52.00141428154567,
+     "rho": 1.9537423982821696
+    }
+   }
+  },
+  "gae_band_baseline_by_row": {
+   "icv1-fp24-tm241-91a7fdd0": {
+    "0": {
+     "ic": 13.903303124846532,
+     "rho": 1.1199550447376843
+    },
+    "0.1": {
+     "ic": 15.210215831924721,
+     "rho": 1.222166359550883
+    },
+    "1": {
+     "ic": 26.97243019562838,
+     "rho": 2.142068192869672
+    }
+   },
+   "icv1-fp24-tm2519-cce74591": {
+    "0": {
+     "ic": 13.622100256047212,
+     "rho": 1.0853776700219053
+    },
+    "0.1": {
+     "ic": 14.853333634640778,
+     "rho": 1.183956215803815
+    },
+    "1": {
+     "ic": 25.934434041982993,
+     "rho": 2.071163127841
+    }
+   },
+   "icv1-fp32-tm103307-fa421912": {
+    "0": {
+     "ic": 32.04658429184766,
+     "rho": 1.0102805292355646
+    },
+    "0.1": {
+     "ic": 35.12544098089946,
+     "rho": 1.1106799660746887
+    },
+    "1": {
+     "ic": 62.835151182365976,
+     "rho": 2.014274897626803
+    }
+   },
+   "icv1-fp32-tm24839-2a7bda13": {
+    "0": {
+     "ic": 31.76950969784331,
+     "rho": 0.9799295737288998
+    },
+    "0.1": {
+     "ic": 34.89046569825913,
+     "rho": 1.0773108561842264
+    },
+    "1": {
+     "ic": 62.97906970200168,
+     "rho": 1.9537423982821696
+    }
+   }
+  },
+  "order_holds_across_band": true
+ },
+ "verdict": "passed",
+ "caveats": [
+  "P32 passes with caveats (VAL-20261029-e85dcc): the gain (0.941 / 0.919 / 0.819) is smaller than the section 7 model predicted; the w = 0 upper bound is 0.9681.",
+  "The candidate changes targets and N against walk; the stride-renew stream alone (srenew/walk) is not resolved at either size, the smaller N carries the w = 0 gain and the deferred guard the w > 0 gain.",
+  "Measured and replayed with the same binary 88070375 on different hosts (no older binary has the target source); the validator's stdlib recompute and [d]G = Q checks on 5,376 records are the implementation-independent checks.",
+  "Rho-reference executions below 1 ms are graded L1 under grading v3; v3 section 6.1 condition 5 admits their counts only. Counted unit only; no wall-clock figure.",
+  "Two fresh curves per size, 24 targets x 6 rounds; 24 and 32 bits decided separately at 95%. 28 bits is not an improvement and is not covered by this file."
+ ],
+ "promotion_blockers": [],
+ "promotion_note": "No evidence blocker known to the validator remains for the four rows. Promotion itself is the Coordinator decision; this file records evidence admissibility, not authorization.",
+ "draft_note": "Draft written by the validator outside the repository. Place it as research/ic_srenew_deferred_guard_20261029/VALIDATION.json with the validator files under research/ic_srenew_deferred_guard_20261029/v3/validation/; the two pinned sha256 values hold only if those files are copied byte for byte."
+}

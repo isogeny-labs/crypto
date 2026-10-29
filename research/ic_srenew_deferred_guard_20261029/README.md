@@ -42,8 +42,8 @@ The predictions are frozen in the first study's §7 and carried byte for byte in
 
 | # | prediction | v3 measured | held? |
 |:--|:--|:--|:--|
-| 1 | `dg / srenew` = 1.000 ± 0.002 at w = 0; ≈ 0.95–0.97 at w = 0.1; ≈ 0.75–0.79 at w = 1 | 1.0000 / 0.957–0.959 / 0.756–0.766 (24, 28, 32) | yes |
-| 2 | `srenew-small / srenew` < 1 at w = 0 (≈ 0.83–0.95), > 1 at w = 1 (≈ 1.10–1.12): relabelling | 0.927 / 0.940 / 0.951 at w = 0; 1.074 / 1.233 / 1.176 at w = 1 | in direction; magnitudes outside the modelled ranges at 32 bits (w = 0) and at all sizes (w = 1) |
+| 1 | `dg / srenew` = 1.000 ± 0.002 at w = 0; ≈ 0.95–0.97 at w = 0.1; ≈ 0.75–0.79 at w = 1 | 1.0000 / 0.956–0.959 / 0.756–0.766 (24, 28, 32) | yes |
+| 2 | `srenew-small / srenew` < 1 at w = 0 (≈ 0.83–0.95), > 1 at w = 1 (≈ 1.10–1.12): relabelling | 0.927 / 0.940 / 0.950 at w = 0; 1.074 / 1.233 / 1.176 at w = 1 | in direction; magnitudes outside the modelled ranges at 32 bits (w = 0) and at all sizes (w = 1) |
 | 3 | `dg-small` < baseline at every weight; vs `srenew`: 0.95/0.92/0.79 (24), 0.83/0.82/0.80 (28), 0.89/0.88/0.80 (32) | 28 bits: 0.940/0.927/0.866. Against `walk` (prediction × measured `srenew/walk`): 24 bits predicted ≈ 0.93/0.91/0.80, measured 0.911/0.888/0.785; 32 bits predicted ≈ 0.88/0.87/0.79, measured 0.941/0.919/0.819 | in direction everywhere; smaller than modelled at 28 and 32 bits |
 | 4 | Model risk: if the trial count does not scale as 1/N, prediction 3 fails first at w = 0 at 24 bits | 24 bits passed; the shortfall is at 28 and 32 bits | the stated failure mode did not occur where predicted |
 
@@ -105,7 +105,26 @@ Results were checked against each job's `SHA256SUMS`. Large result files are sto
 
 ## Validation
 
-See `validation/` and `VALIDATION.json`. Rows are gated on the independent validator's replay certificate and report.
+Independent validation **VAL-20261029-e85dcc: passed** (`v3/validation/`, `VALIDATION.json`; `scripts/validation_gate.py evidence` → valid). Rows: the four 24- and 32-bit curves. 28 bits is not covered.
+
+| b | verdict |
+|--:|:--|
+| 24 | pass |
+| 32 | pass with caveats: the gain is smaller than the §7 model, and the w = 0 upper bound is 0.9681 |
+| 28 | agrees: not an improvement (band unresolved on `tm7951`) |
+
+What the validator checked:
+- **Data integrity.** All 57 worker files match the S3 originals byte for byte, and the committed evidence matches S3. The protocol was pushed (07:56:20Z) before the first job (08:01:04Z).
+- **Replay.** `ecbench verify --replay-all` on another host reproduces 2,304/2,304 measured runs identically at 24 and at 32 bits. It used the same binary, because no older binary has the target source.
+- **[d]G = Q.** The validator's own arithmetic confirms it on all 2,688 records per size.
+- **Recompute.** A standard-library recompute of every compare file and the band table agrees with the analysis exactly. Over 11 more bootstrap seeds, every upper bound stays below 1.
+- **§6.1.** It was rechecked from `records.jsonl`, including the exit-42 clause and the waived sub-ms rho executions (672 at 24 bits, 14 at 32).
+- **Arms.** `walk` and `dg-small` differ only in `targets` and `factor_base`.
+- **Charging.** The deferred guard's confirming additions are charged.
+- **Mechanism.** At w = 0 the gain is the smaller set-up N(N+1), net of extra trials; the trials follow T ∝ 1/N. At w > 0 it is the guard probes no longer made. Charged GAE itself falls (0.910 at 24 bits, 0.941 at 32), so this is not an accounting shift.
+- **Not resolved.** The stride-renew stream alone is not resolved against `walk` at either size.
+
+Promotion of `dg-small` to the baseline at 24 and 32 bits follows the frozen §6 rule. The validator's report records evidence admissibility, not authorization.
 
 ## Limits
 
