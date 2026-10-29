@@ -168,6 +168,21 @@ secp256k1.
   `|Δ| < 2^80`; an open walk is lengthened to the next such order) (a floor this way needs no point over an extension
   at all), and a resolved level outside them stops the build.
 
+- on a prime-field curve with `p < 2^63`, a level still open at
+  `ℓ ≤ 19` is settled by **descending walks**
+  ([`walk.rs`](../../src/cryptanalysis/curve_traits/walk.rs),
+  `height_above_floor`; Kohel, Fouquet–Morain). With `ℓ | v`, every vertex
+  of the `ℓ`-volcano above the floor has `ℓ + 1` rational `ℓ`-isogenies
+  and a floor vertex exactly one. Below the crater one edge goes up and
+  `ℓ` go down, so a walk on `j`-invariants that never steps back along
+  the edge it arrived by keeps going down once it has. From each rational
+  neighbour of `j(E)` (roots of `Φ_ℓ(j, Y)` in `GF(p)`, `Φ_2` to `Φ_19`)
+  the walk runs until a vertex with a single rational `ℓ`-isogeny; the
+  shortest such walk has length exactly the height `h` above the floor,
+  and the level is `depth − h`. A level above the bound the other tests
+  reached stops the build. The test compares it with a breadth-first
+  search of the `Φ_ℓ` graph in PARI/GP on 40 random curves.
+
 - a **stored level certificate**
   ([`level-certificates.json`](level-certificates.json)), where one exists,
   before any search: the points the depth-1 point test would look for,
@@ -269,6 +284,8 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
+In the regenerated file (20,639 registry curves and 176 source curves: 175
+
 The 2026-10-21 [native quadratic-twist catalog](sources/quadratic-twist-native-20261021.json)
 adds 1,921 registered models, including 963 extension-field models and 27 selected
 EC1 subgroup representations. Those finite replay and identity records are linked
@@ -276,13 +293,13 @@ from the [study](../../research/quadratic_twist_evidence_20261021/README.md).
 The generated trait-classification panel below has not been rerun for these
 additions; its totals remain the earlier snapshot. Registration alone does not
 assign a new endomorphism-ring or volcano-level classification.
-
-In the regenerated file (15,791 registry curves and 176 source curves: 175
-walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is proved for 15,045 curves and probable
-for 907; 14 remain unknown and one record is not applicable. Of the 1,324
-curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
-1,310 by point orders: 493 proved, 826 probable); five are not evaluated.
+In the regenerated file (15,791 registry curves and 176 source curves: 175walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
+degree-263 descendant), `End(E)` is proved for 19,893 curves and probable
+for 915; none is bounded, 6 remain unknown because a 125- to 153-digit composite of `Δ`
+is unsplit, and one record is not applicable. Of the 1,371
+curves over `GF(p^k)`, `k > 1`, 1,365 have a certified order (9 by generator,
+1,356 by point orders: 530 proved, 826 probable); one is bounded (its point
+orders stay below `4√q`) and five are not evaluated.
 Per-prime level methods and bounds, and the individual `End(E)` statuses,
 remain recorded in `traits.json`. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so

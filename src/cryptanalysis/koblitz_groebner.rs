@@ -4365,6 +4365,24 @@ fn legacy_rref_kernel() -> bool {
     *LEGACY.get_or_init(|| std::env::var("KIC_F4_KERNEL").as_deref() == Ok("legacy"))
 }
 
+// Two defaults of #1646 (`e49afb98f`, 2026-10-11) changed what the inherited
+// engine counts: the row echelon form of a root went through the Four
+// Russians kernel of `gf2_elim` (before, the column-at-a-time kernel's word
+// XORs), and a child asked the node oracle before specialising its bases
+// (before, after).  Committed records made before then charge the old
+// accounting; the replay audit turns this on for them (`ecbench::legacy`).
+// Per thread.
+thread_local! {
+    static LEGACY_PRE_1646: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count as the inherited engine did before #1646: echelon forms on the
+/// column-at-a-time kernels, the node oracle asked after the specialisation.
+/// `false` restores the normal choice.
+pub fn set_legacy_pre_1646(on: bool) {
+    LEGACY_PRE_1646.with(|c| c.set(on));
+}
+
 /// Reduced row echelon form, which is unique: whichever kernel runs, the
 /// matrix comes back the same, and only the time and the word XORs
 /// charged differ.  Matrices of at least 128 rows and 256 columns go to
@@ -4416,7 +4434,12 @@ pub(crate) fn echelon_f2_counted(
     // themselves (`gf2_elim_bench`), and the legacy kernels below it.  The
     // inherited engine's root, the only echelon on the solving path,
     // previously never reached it.  `KIC_F4_KERNEL=legacy` is the control.
-    if !legacy_rref_kernel() && !suffix_kernel_forced() && matrix.len() >= 128 && n_cols >= 256 {
+    if !legacy_rref_kernel()
+        && !LEGACY_PRE_1646.with(|c| c.get())
+        && !suffix_kernel_forced()
+        && matrix.len() >= 128
+        && n_cols >= 256
+    {
         return crate::cryptanalysis::gf2_elim::echelon_counted(matrix, n_cols, word_ops);
     }
     if suffix_kernel_forced()
@@ -6056,6 +6079,9 @@ pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
 /// ([`LINEAR_HARVEST_GPV`]), anything else is [`parse_linear_harvest`]d.
 pub fn linear_harvest() -> Option<LinearHarvest> {
     static ENV: std::sync::OnceLock<Option<LinearHarvest>> = std::sync::OnceLock::new();
+    if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
+        return None;
+    }
     if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
         return v;
     }
@@ -6063,6 +6089,20 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
         Err(_) => Some(LINEAR_HARVEST_DEFAULT),
         Ok(s) => parse_linear_harvest(&s),
     })
+}
+
+// The replay audit's view of a record made before the harvest was on by
+// default (`ecbench::legacy`): no harvest at all, whatever a caller's
+// override says, since the oracle sets and clears that override around each
+// solve.  Per thread.
+thread_local! {
+    static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count as the engine did before the harvest was the default; `false`
+/// restores the normal choice.
+pub fn set_legacy_no_linear_harvest(on: bool) {
+    LEGACY_NO_LINEAR_HARVEST.with(|c| c.set(on));
 }
 
 /// Override `KIC_LINEAR_HARVEST` on this thread (`None` restores it;
@@ -6612,7 +6652,8 @@ fn solve_with_policy_and_oracle(
 /// the node oracle, as it did before; a same-binary control, read once.
 fn early_oracle_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ENABLED.get_or_init(|| std::env::var("KIC_F4_EARLY_ORACLE").as_deref() != Ok("0"))
+    !LEGACY_PRE_1646.with(|c| c.get())
+        && *ENABLED.get_or_init(|| std::env::var("KIC_F4_EARLY_ORACLE").as_deref() != Ok("0"))
 }
 
 #[allow(clippy::too_many_arguments)]

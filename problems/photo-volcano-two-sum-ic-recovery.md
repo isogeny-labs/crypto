@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap; no proved impossibility
 - **Affected work:** [frozen IC phase](../research/photo_volcano_restart_20261017/IC_PROTOCOL.md), [audited diagnostics](../research/photo_volcano_restart_20261017/reports/quantitative_1452/README.md), and full three-method completion of the photographed-volcano experiment
 - **Next action owner:** experiment maintainer
-- **Last updated:** 2026-10-17
+- **Last updated:** 2026-10-27
 
 ## Problem
 
@@ -46,4 +46,10 @@ These conditions would establish actual IC recovery on this workload. Qualified 
 All 4600 rho and 4600 BSGS solves, all 9200 matched native modular-operation replays, and the independent 9200-equation PARI audit are complete. Exact generator-homogenized ideal regularity is now certified for every one of the 14720 existing polynomial systems, with independent actual-field grid/identity checks and a separate genuine-small-field resolution regression. These completed diagnostics do not discharge successful random-corpus IC recovery: relation yield, setup rank and IC recoveries remain zero. No generic answer or planted control is relabeled as a main IC solve. The remaining algorithmic requirement is still open, with the original exit conditions unchanged.
 
 Current result/evidence: [completed graph tables](../research/photo_volcano_restart_20261017/reports/completion_20261025/README.md), [corrected counter definitions](../research/photo_volcano_restart_20261017/FIELD_COUNTER_SEMANTICS_CORRECTION.md), and [regularity protocol](../research/photo_volcano_restart_20261017/REGULARITY_CERT_PROTOCOL.md). Raw private records and failed attempts remain local; public numeric projections exclude scalar witnesses and raw randomness.
+
+## 2026-10-27 implementation step
+
+A separately specified [bounded-coefficient collector and descent](../research/volcano_ic_recovery_20261027/README.md) now implements generic six-plus-six MITM decomposition on the same original 12 unknown-log base points. It imports no generic-solver answers or original private scalar witnesses. The native collector, row-space recovery and separate affine/Euclidean replay pass small known-answer development controls, including full rank and target recovery. These controls are not original-workload recoveries.
+
+The unchanged source instance C0/G0/K0 is frozen for a one-point full-width pilot. Large-table allocation, useful rank and target recovery at that size have not been attempted. This is not a new algebraic PDP solver or a speed claim. Original exit conditions and all 4,600 requested instances remain open. Automatic approval review rejected the mandatory checkpoint upload before execution; authorized source-only checkpointing, a configured custom-command Iso Lab route and a tested-commit image are explicit launch prerequisites. See the protocol and blocked backlog card; no new background experiment exists.
 
