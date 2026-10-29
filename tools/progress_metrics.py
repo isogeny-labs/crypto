@@ -328,6 +328,29 @@ def koblitz_modular_geometry(ref, since):
                      better="neutral", label=label, source=f"{path}@{commit}")
 
 
+    path = f"{base}30/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("accepted_native") != 5 or record.get("native_failures") != 0:
+            continue
+        if not record.get("finite_middle_enumeration", {}).get("complete"):
+            continue
+        scale = record.get("scale", {}).get("records", [])
+        descent = record.get("constant_extension", {}).get("records", [])
+        if scale:
+            value = max((r["n"] for r in scale if r.get("d") == 1), default=None)
+            emit("koblitz_modular.formal_recovery_max_cyclic_length", value,
+                 date=date, problem=P_IC, unit="formal cyclic length", better="neutral",
+                 label="Certified generalized recovery family; larger-n geometric transfers not constructed",
+                 source=f"{path}@{commit}")
+        if descent:
+            value = max(r["absolute_algebra_degree"] for r in descent)
+            emit("koblitz_modular.ordinary_kernel_max_absolute_algebra_degree", value,
+                 date=date, problem=P_IC, unit="dimension over F2", better="neutral",
+                 label="Actual ordinary finite kernel algebra; no Jacobian image or IC-rank claim",
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
