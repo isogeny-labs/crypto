@@ -38,5 +38,5 @@ for(jPrimitive34=1;jPrimitive34<=primitiveCols34;jPrimitive34++){write(outPrimit
 close(outPrimitive34);
 execute(read("primitive-family.sing"));matrix roundS34=imap(rationalFamily33,primitiveS34);ideal roundJ34=imap(rationalFamily33,rationalSource33);
 if(roundS34!=rationalSyzygies33 || matrix(roundJ34)!=matrix(rationalSource33)){ERROR("PRIMITIVE34_SERIALIZATION_ROUNDTRIP");}
-if(matrix(rationalSource33)*rationalSyzygies33!=beforeZero34){ERROR("PRIMITIVE34_RELOADED_SYZYGY");}
+matrix primitiveReadZero34[1][primitiveCols34];if(matrix(rationalSource33)*rationalSyzygies33!=primitiveReadZero34){ERROR("PRIMITIVE34_RELOADED_SYZYGY");}
 print("PRIMITIVE34_RESULT columns="+string(primitiveCols34)+" coefficient_content=1 coefficient_denominators=1 scalar_proportionality=all identities=all");print("PRIMITIVE34_ALL_CHECKS_PASS");quit;
