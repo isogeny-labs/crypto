@@ -1,5 +1,5 @@
 use num_bigint::BigInt;
-use num_traits::{One,Zero};
+use num_traits::{One, Zero};
 fn p_mul(a: &[BigInt], b: &[BigInt]) -> Vec<BigInt> {
     let mut c = vec![BigInt::zero(); a.len() + b.len() - 1];
     for (i, x) in a.iter().enumerate() {
@@ -118,5 +118,9 @@ fn norm_euler(n: usize, i: usize, j: usize) -> Vec<BigInt> {
         .collect()
 }
 
-pub fn dense_norm(n:usize,i:usize,j:usize)->Vec<BigInt>{norm_euler(n,i,j)}
-pub fn trace_zero(n:usize,t:i64)->Vec<BigInt>{an(n,t)}
+pub fn dense_norm(n: usize, i: usize, j: usize) -> Vec<BigInt> {
+    norm_euler(n, i, j)
+}
+pub fn trace_zero(n: usize, t: i64) -> Vec<BigInt> {
+    an(n, t)
+}
