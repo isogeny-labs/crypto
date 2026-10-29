@@ -74,7 +74,8 @@ for status in 1 7; do
 done
 unset METADATA_STUB_EXIT
 # A native-count mismatch must reject the proposed candidate vector.
-head -1 research/study/session/records.jsonl | jq '.seq=3|.record_id="metadata-3"' >> research/study/session/records.jsonl
+jq -cs '.[0]|.seq=3|.record_id="metadata-3"' research/study/session/records.jsonl > extra-record.json
+cat extra-record.json >> research/study/session/records.jsonl
 fail bash "$here/replay_partition.sh" ./fake-native "$tmp/out/0" 0 4
 head -3 research/study/session/records.jsonl > records.tmp; mv records.tmp research/study/session/records.jsonl
 # Reusing a full receipt is permitted only for the same binary and every input.
@@ -89,4 +90,6 @@ for mutation in '.replay_candidates=2' '.auditor_binary_sha256=("0"*64)' '.repla
   jq "$mutation" cache/original.json > cache/0000.receipt.json
   fail bash "$here/replay_partition.sh" ./fake-native "$tmp/cached/0" 0 4
 done
+jq '.sessions=[]' "$REPLAY_PLAN" > empty-plan.json
+REPLAY_PLAN="$tmp/empty-plan.json" fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/cached" 4
 echo "partition metadata controls: $controls passed"
