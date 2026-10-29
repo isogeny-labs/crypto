@@ -104,3 +104,11 @@ R27 LAMBDA14.sing and R30 REPORT/LEADS/kernel code.
 No change to earlier failed sources or canonical archives, no EKS/Diem/freeze
 restart, no fifth Conductor claim, and no merge or auto-merge. The shared
 session log was reserved by another task; SESSION.md holds the scoped handoff.
+
+## Final local verification
+
+Seven native attempts accepted, zero native failures or timeouts. Lean compile
+and transitive axiom audit both exit0: ten named/audited theorems, zero failing,
+zero trusted-native. The unused trailing ring tactic is only a linter warning.
+Bash syntax, metadata-assembler byte compilation and final Rust formatting
+checks pass. Full root-library CI remains a separate, uncertified scope.

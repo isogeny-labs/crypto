@@ -36,3 +36,7 @@ Lean's first compilation reported an unused/unreachable trailing ring tactic,
 a linter warning rather than a failed proof. Generic experiment_protocol.py
 is absent; prospective Markdown is normative and the JSON index explicitly
 records its post-data creation. No comparative timing inference is made.
+
+Final local verification: seven native runs accepted; Lean compile/audit
+exit0, ten audited theorems, zero failing/trusted. Text-assembler byte compile,
+runner shell syntax and final Rust formatting pass. No root-suite promotion.
