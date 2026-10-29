@@ -4450,6 +4450,62 @@ mod tests {
             let fixture = TempRun::new();
             let dir = wide_prime_f4_cell_fixture(&fixture, twist);
             verify_cell(&dir, true).unwrap();
+            let retained = altered_cell(
+                &dir,
+                &fixture.0.join("retained-censored"),
+                |path, manifest| {
+                    let record = storage::write_json(
+                        path,
+                        "result.json",
+                        "solver-outcome",
+                        &manifest.outcome,
+                    )
+                    .unwrap();
+                    manifest.artifacts.push(record);
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            // First prove the unchanged registered producer result is valid
+            // beneath outer censorship; each following failure is nonvacuous.
+            verify_cell(&retained, true).unwrap();
+            for field in [
+                "trace_complete",
+                "first_fall_degree",
+                "last_fall_degree",
+                "retired_hardware_instructions",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let bad = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("retained-forbidden-{field}")),
+                    |path, _| {
+                        alter_json(&path.join("result.json"), |v| {
+                            v[field] = if [
+                                "first_fall_degree",
+                                "last_fall_degree",
+                                "retired_hardware_instructions",
+                            ]
+                            .contains(&field)
+                            {
+                                json!(5)
+                            } else {
+                                json!(true)
+                            }
+                        })
+                    },
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "retained result accepted {field}"
+                );
+            }
+            let unbound_retained = altered_cell(
+                &retained,
+                &fixture.0.join("retained-unbound"),
+                |_, manifest| manifest.artifacts.retain(|a| a.path != "result.json"),
+            );
+            assert!(verify_cell(&unbound_retained, true).is_err());
             let partial = altered_cell(
                 &dir,
                 &fixture.0.join("partial-censored"),

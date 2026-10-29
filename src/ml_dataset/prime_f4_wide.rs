@@ -874,6 +874,31 @@ fn read_typed<T: for<'de> Deserialize<'de>>(
     serde_json::from_slice(&read_bounded(dir, path, admitted_file_cap(path, limits))?)
         .map_err(|e| e.to_string())
 }
+fn verify_unproved_claims(outcome: &Value) -> Result<(), String> {
+    for key in [
+        "trace_complete",
+        "execution_trace_complete_verified",
+        "total_operation_count_verified",
+        "native_basis_derivation_verified",
+        "scalar_recovered_without_witness",
+        "scalar_replay_verified",
+        "ecdlp_pipeline_completed",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("wide F4 cannot certify {key}"));
+        }
+    }
+    for key in [
+        "first_fall_degree",
+        "last_fall_degree",
+        "retired_hardware_instructions",
+    ] {
+        if !outcome[key].is_null() {
+            return Err(format!("wide F4 has no verified {key}"));
+        }
+    }
+    Ok(())
+}
 /// Checks canonical mathematical claims, not native basis derivation or runtime timing.
 pub(super) fn verify(
     dir: &Path,
@@ -887,28 +912,7 @@ pub(super) fn verify(
             .iter()
             .any(|a| a.path == RESULT || a.role == RESULT_ROLE)
     {
-        for key in [
-            "trace_complete",
-            "execution_trace_complete_verified",
-            "total_operation_count_verified",
-            "native_basis_derivation_verified",
-            "scalar_recovered_without_witness",
-            "scalar_replay_verified",
-            "ecdlp_pipeline_completed",
-        ] {
-            if !outcome[key].is_null() && outcome[key] != false {
-                return Err(format!("wide F4 cannot certify {key}"));
-            }
-        }
-        for key in [
-            "first_fall_degree",
-            "last_fall_degree",
-            "retired_hardware_instructions",
-        ] {
-            if !outcome[key].is_null() {
-                return Err(format!("wide F4 has no verified {key}"));
-            }
-        }
+        verify_unproved_claims(outcome)?;
     }
     let supervisor_censored = matches!(
         outcome["status"].as_str(),
@@ -1061,7 +1065,7 @@ pub(super) fn verify(
             }
         }
         (None, None) => {
-            if result.stop != "missing_execution_context" {
+            if result.stop != "missing_execution_context" || context.is_some() {
                 return Err("wide F4 missing context is unexplained".into());
             }
         }
@@ -1263,7 +1267,10 @@ pub(super) fn verify(
         {
             return Err("censored supervisor promoted wide F4 completion".into());
         }
-        retained_outcome = super::super::read_json(&dir.join("result.json"))?;
+        artifact(artifacts, "result.json", "solver-outcome", "json", true)?;
+        retained_outcome = serde_json::from_slice(&read_bounded(dir, "result.json", RESERVE)?)
+            .map_err(|e| e.to_string())?;
+        verify_unproved_claims(&retained_outcome)?;
         &retained_outcome
     } else {
         outcome
