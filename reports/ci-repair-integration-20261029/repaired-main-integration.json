@@ -322,5 +322,24 @@
         "gzip_sha256": "1be9ebf7dbcbde7d9c5e0703ddd1885cb85aabe82fa413e0d498d1e1abdcf308"
       }
     }
+  },
+  "current_library_failure_under_investigation": {
+    "source": "de22d9b482cde663217c69bd411482b0ec35f9f6",
+    "test": "ml_dataset::restore::tests::cross_host_roundtrip_replays_solved_cells_and_preserves_binding",
+    "parent_run_status": "Still active; final failure diagnostics pending. No pass claimed.",
+    "isolated_original_test": "1 passed,0 failed",
+    "entire_dataset_suite": "212 passed,0 failed,1existing ignored",
+    "restore_with_isolation_suite": "46 passed,0 failed",
+    "source_edits": "No Rust source or fixture change; no failure waived."
+  },
+  "sparse_component_guard": {
+    "regression": "Missing transitive raw inputs previously silently demoted a validated engineering component",
+    "new_controls_passed": 4,
+    "existing_parser_controls_passed": 8,
+    "existing_path_controls_passed": 16,
+    "current_board_still_byte_current": true,
+    "actionlint_passed": true,
+    "actual_merged_study_verified": "aimed-gather-merged-source-verification.json",
+    "new_test_wired_to_workflow": true
   }
 }
