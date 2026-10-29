@@ -159,3 +159,86 @@ https://stacks.math.columbia.edu/tag/0BXX (proper normal curves/function fields)
 https://stacks.math.columbia.edu/tag/07S7 (free finite-group quotient torsor),
 https://stacks.math.columbia.edu/tag/0C1B (RH and different,including wild caveat),
 Sutherland18.782 lecture22 Cor22.23 (RR). No novelty or speed claim.
+
+## Completed RR space, actual class and proper projective equations
+
+The initial restricted coefficient families above are superseded by RR-O01
+and complete RR-export01: K16,1568candidate monomials, all20cusp constraints,
+68independent valid sections. Original-column129jet independence and full
+recombination certify a basis of L(7D_A+D_B), degree128. Each basis function
+is an explicit polynomial in nu,lambda,v,u divided by u16(u+1)16.
+ACTION01 reconstructs all68functions onall20charts, not only saved vectors.
+
+Singular's bulk list writer omitted the last element: IO01 isolates that
+serialization failure. The accepted replay writes each element separately:
+20charts,68basisvectors,1568constraints/jetcolumns. Earlier bulk exports are
+incomplete and are never used for completeness. Inputs and exports are pinned.
+
+For actual principal relation matrix M, z=(1,2,4,8,5) gives
+M z=11d, d=(-9,-11,-4,8,10). Let D0=sum d_i delta_i. Moving4D0 by actual
+principal relations and-div(lambda) gives D' with coefficientvector
+(1,-3,10,2,0) ondelta and-div(lambda). Its positive/negative parts have degree64
+and D'<=7D_A+D_B. The complete68dimensional membership system includes the
+simple closed degree14lambda zero; it has rank68/kernel0, all pivots checked.
+Thus L(D')=0,D' nonprincipal,11D' principal. D' has exactorder11;[D0]=3[D']
+andT[D0]=6[D0]. This supersedes the earlier possible-zero presentation caveat
+for the11primary cusp subgroup ONLY. Shared mod11 CM systems still prevent
+identifying the desired CM-sign projection from these data alone.
+
+ACTION01 computes the actual68x68involution,checks sigma2=I andrank(sigma+I)=34.
+Its34invariant sections form completeL(D_H) onH,degD_H64. QUADRICS03 computes
+all2346source and595quotient products, exactranks196/98,kernels2150/497;
+everykernel andpivot isindependently recombined from originalproducts. Source
+257Ojets force globalzero by poledegree256;quotient129Ojets vanish atboth O
+and sigmaO,forcingglobalzero. Actual(b+c)/u+c2=0 and its constant-square
+corruption give0/1controls.
+
+Finite-field quadratic-generation Proposition11 of Marquez-Corbella,
+Martinez-Moro andPellikaan applies since128>=2*61+2 and64>=2*31+2. Therefore
+these COMPLETE quadrics generate the prime saturated homogeneous ideals of
+the complete-linear-system closed embeddings ofC inP67 andH inP33. The
+recovered1,b,c,lambda generate the original source functionfield (nu recovery
+uses the registered rational identity); the H model is its fixed-field
+quotient. This is a proof using RR/normal-curve bridges and the cited theorem,
+not a giant Groebner saturation computation or equality with oldcoupled ideals.
+Reference checked in full, especially the finite-field hypothesis:
+https://ruudp.win.tue.nl/paper/65.pdf
+
+## Polarized carrier and reverse controls
+
+POLARIZATION.md gives the written propermixedPrym24 construction from the
+free cyclic10tower. Its induced polarization type is(1^18,5^6),overF2,with
+explicitintegralcorrespondenceE=(1-T5)(5-N5), E2=10E. Both properPicard and
+polarization arguments remain written; no theta-section basis is claimed.
+The actual order11class lies in this mixed carrier; its desired CM-sign
+projection remains unknown. This is distinct from the old determinant19
+polarizedquotient and does not close its embedding obligations.
+
+REVERSE02 supplies an integral matrix W with
+ M W=134292 I-d(1,6,36,216,1296).
+It evaluates arbitrary ramified-cusp divisor combinations after a prime-to11
+scalar; it is not restricted to forward images. The actual nonzero11class
+shows this cusp11primary quotient is exact. Ordinary collector classes,
+460/367sourceC5lifts and fullreverse divisor evaluation remain separate.
+
+NODE01 verifies80actual Miller functions acrossall4graphs/5conjugates, their
+proper-chart pole19units and exact group-law chart lifts forbothordinary
+curves. The explicitnilpotentunitcertificate strengthens the old valuative
+argument but still is not an h-power membership certificate in the original
+homogeneous source ring. Fullcoupled quotient saturation remains open.
+
+LOWGENUS01 confirms both A5Weil polynomials irreducibledegree8 and not even.
+Under retained level77modular decomposition, all genus7quotient constituents
+are too small; the extra4dimensional quadratic-character orbit in genus13
+has evenF2Euler polynomial because chi(2)=-1. Neither A5sign can occur in
+those particular quotientJacobians. Otherlow-genus carriers remain open.
+Sources: https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/77/2/a/ and
+https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/77/2/b/ .
+
+The simple trace-one coordinates have degrees34,80,110,which cannot equal
+3deg(phi) for elliptic y/x. MAPBUILD02 goes beyond those constant-shift
+exclusions: actual34invariants/tracepreimages produce455F32equations for
+ALL equivariantX,Y in the completedRRspace, includingnonconstant invariant
+adjustments,bothordinarysigns and a nonconstantXblock. Its independent
+source-jet controls and capped solve are recorded separately; no evaluated
+F2modular-factor map follows from constructing these equations.
