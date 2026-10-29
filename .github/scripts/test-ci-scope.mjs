@@ -288,7 +288,11 @@ test('path dependencies of the root crate are materialized, transitively', () =>
     write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nhelper = { path = "tools/helper" }\nserde = "1"\n');
     write('src/lib.rs', '// maintained\n');
     write('tools/helper/Cargo.toml', '[package]\nname="helper"\nversion="0.1.0"\n[dependencies]\ninner = { version = "0.1", path = "../../inner" }\n');
-    write('tools/helper/src/lib.rs', '// helper\n');
+    write('tools/helper/src/lib.rs', 'include!("body.inc");\n');
+    write('tools/helper/src/body.inc', '#[path = "support.rs"]\nmod support;\n');
+    write('tools/helper/src/support.rs', 'pub const DATA: &str = include_str!("nested.json");\n');
+    write('tools/helper/src/nested.json', '{}\n');
+    write('tools/helper/archive/raw.jsonl', '{"unrelated": true}\n');
     write('inner/Cargo.toml', '[package]\nname="inner"\nversion="0.1.0"\n');
     write('inner/src/lib.rs', '// inner\n');
     write('tools/other/Cargo.toml', '[package]\nname="other"\nversion="0.1.0"\n');
@@ -297,10 +301,12 @@ test('path dependencies of the root crate are materialized, transitively', () =>
     assert.equal(existsSync(path.join(cwd, 'tools/helper/Cargo.toml')), false);
     assert.deepEqual([...pathDependencyDirs(cwd)], ['tools/helper', 'inner']);
     materializeInputs(cwd);
-    for (const file of ['tools/helper/Cargo.toml', 'tools/helper/src/lib.rs', 'inner/Cargo.toml', 'inner/src/lib.rs']) {
+    for (const file of ['tools/helper/Cargo.toml', 'tools/helper/src/lib.rs', 'tools/helper/src/body.inc',
+      'tools/helper/src/support.rs', 'tools/helper/src/nested.json', 'inner/Cargo.toml', 'inner/src/lib.rs']) {
       assert.equal(existsSync(path.join(cwd, file)), true, file);
     }
     assert.equal(existsSync(path.join(cwd, 'tools/other/Cargo.toml')), false);
+    assert.equal(existsSync(path.join(cwd, 'tools/helper/archive/raw.jsonl')), false);
     write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nup = { path = "../up" }\n');
     assert.throws(() => pathDependencyDirs(cwd), /escapes the checkout/);
   } finally { rmSync(cwd, { recursive: true, force: true }); }

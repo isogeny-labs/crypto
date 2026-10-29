@@ -154,6 +154,15 @@ export function sourceFiles(cwd) {
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
     && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
       || isogenyAlgosInputs.test(file) || file === 'build.rs')));
+  // Seed the recursive source walk with the Rust files of every transitively
+  // discovered path crate. Their include!/#[path] dependencies are then
+  // followed by the same fail-closed traversal as maintained sources.
+  const dependencies = [...pathDependencyDirs(cwd)];
+  for (const file of tracked) {
+    if (!/\.rs$/.test(file)) continue;
+    if (dependencies.some(dir => file === `${dir}/build.rs`
+      || file.startsWith(`${dir}/src/`))) sources.add(file);
+  }
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -237,12 +246,16 @@ export function pathDependencyDirs(cwd) {
 }
 
 export function materializeInputs(cwd = process.cwd()) {
-  const crates = [...pathDependencyDirs(cwd)].filter(dir => !existsSync(path.join(cwd, dir, 'Cargo.toml')));
-  if (crates.length) git(['sparse-checkout', 'add', ...crates.map(dir => `/${dir}/`)], cwd);
-  const sources = sourceFiles(cwd);
+  // Every path crate's manifest, build script and sources, followed through
+  // their manifests; never the crate's other files (archives, fixtures that
+  // no source embeds).
+  const crates = [...pathDependencyDirs(cwd)];
+  const crateFiles = trackedFiles(cwd).filter(file => crates.some(dir => file === `${dir}/Cargo.toml`
+    || file === `${dir}/build.rs` || (file.startsWith(`${dir}/src/`) && file.endsWith('.rs'))));
+  const sources = new Set([...sourceFiles(cwd), ...crateFiles.filter(file => file.endsWith('.rs'))]);
   const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
     && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
-  materializeSources(cwd, new Set([...sources, ...manifests]));
+  materializeSources(cwd, new Set([...sources, ...manifests, ...crateFiles]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
