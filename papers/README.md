@@ -5,6 +5,7 @@ directory per paper.
 
 | directory | title | status |
 |---|---|---|
+| [nist-strict-splitting-20261029/](nist-strict-splitting-20261029/) | Strict Splitting Counts in Reconstructed Elliptic-Curve Candidate Streams: An Exact Reproduction and Its Limits | anonymous ePrint-style replication draft; previously reported empirical separator reproduced on 21 choices; historical use and weakness unproved; not submitted |
 | [norm-rootfinding/](norm-rootfinding/) | Exact Norm-Based Search for Constrained Roots over Finite Fields: Predicates, Circuit Representations, and Bounded Evidence | research draft, anonymized, not submitted or cleared; exact component proofs, native coordinate profile and UNKNOWN hard search; no qualified speedup |
 | [`ecdlp-six-month-portfolio/`](ecdlp-six-month-portfolio/) | A Six-Month ECDLP Research Programme: Implementations, Experiments, Structural Leads, and Evidence | research draft, anonymized, not submitted; 19-repository retrospective with pinned evidence and explicit coverage limits |
 | [`structural-completeness/`](structural-completeness/) | Structural Completeness of Prime-Field Elliptic Curves Against Isogeny-Graph Cryptanalysis | research draft, anonymized, not submitted; Markdown twin in `research/notes/cm-isogeny/PAPER_STRUCTURAL_COMPLETENESS.md` |
