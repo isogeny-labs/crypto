@@ -71,3 +71,11 @@ source and retain source revision, exact commands, hashes, outputs and every
 failed attempt in fresh run dirs. Durable checkpoint gate before execution.
 No ledger status or performance promotion. Add universal Lean algebra where
 relevant, with named claims and axiom audit, and separate geometry boundaries.
+
+## Prospective universal proof amendment
+
+Prove alternating-sum identity, odd-cycle sum, exact CM ramification
+(w-3)^2=7(1-w), coefficient decomposition, approximate inverse, integral
+correction and resulting recovery for all odd n in a commutative ring.
+This is stronger than the finite scale list but still concerns this formal
+map family. It does not assert any new geometric carrier or transfer.
