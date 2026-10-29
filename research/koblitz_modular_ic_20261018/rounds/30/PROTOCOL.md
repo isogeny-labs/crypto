@@ -79,3 +79,23 @@ Prove alternating-sum identity, odd-cycle sum, exact CM ramification
 correction and resulting recovery for all odd n in a commutative ring.
 This is stronger than the finite scale list but still concerns this formal
 map family. It does not assert any new geometric carrier or transfer.
+
+## COLOR30 prospective amendment
+
+Exact inputs: retained degree12 (multiplicity2) and degree436 selected pairs;
+assemble with ASSEMBLE_COLOR.py. Primary Sutherland Phi11 integer file 79rows,
+retained/hash-pinned; coefficient reduction occurs in native Singular only.
+First call degree12; degree436 next only if implementation passes its controls.
+Recover K-rational common j triples using Phi11 gcds, then actual X0(49)
+parameters and middle points. Factor degree24/60 7/11 division polynomials,
+check factor products, doubling-stable cyclic kernels, both full49 transported
+triples and the exact7/11 commuting squares. Compute Frobenius in each
+five-dimensional kernel algebra and compare against five doubling iterates.
+Check all controls including corrupt Frobenius polynomial rejection. Outputs:
+middle candidates, verified counts, actual kernel polynomials, scalar modsign
+colors/fiber orbit lengths. Rational common-root enumeration is not a proof
+that all source branches are K-rational; preserve that gap and the original
+incidence/pairing bridge. No class/rank claim solely from a base coincidence.
+References: Sutherland ClassicalModPolys.html and phi_j_11.txt; Kilford–McMurdy
+arXiv1110.6801 section2 (actual7 triples, already checked in the native sources).
+No new generic kernel/factoring algorithm is claimed; reuse R13 machinery.
