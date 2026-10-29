@@ -1028,3 +1028,17 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   **Superseded:** structured sparse elimination landed ("Sparse
   elimination" above). The frontier is now wall time. A degree-6 matrix at
   28 unknowns takes more than 4.5 hours on a four-core container (Result 4).
+
+## Pair-invariant arms (2026-10-28)
+
+- `examples/dreg_invariant.rs` builds two variants of the m = 3 chain, each
+  checked against the plain system by exact polynomial identity (`--check`):
+  - Q adds the summand-swap invariant `p = x₁x₂` as unknowns;
+  - R adds the non-invariant `r = x₁e₁`.
+- Both are quadratic. Neither refutes at degree 3 on the committed (22, 6)
+  and (21, 7) draws, and their degree-4 matrices are 5.1–5.5 times the plain
+  system's (`research/dreg_pair_invariant_20261028/RESULTS.md`).
+- At (22, 6), making the system quadratic with auxiliary unknowns does not
+  lower the MutantXL closure degree.
+- At (21, 7), degree 4 of the quadratic arms is unmeasured: a sparse run
+  capped at 10⁹ entries. A lower degree there is not excluded.
