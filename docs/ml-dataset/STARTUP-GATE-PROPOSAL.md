@@ -2,6 +2,18 @@
 
 **Status: implementation saved and independently source-reviewed on 2026-10-29; CLI registration applied under T785 after T766 released its reservation. Source `7a1bd350b26eaeccf51bf9078915649a7c4335fc` passed all 11 startup unit tests within 142 dataset tests, the full release library suite (5,170 passed, zero failed, 123 ignored), strict maintained Clippy, and actual CLI registration/rejection checks. These tests do not establish positive fixed-path production activation, real grant delivery, or cloud execution.** Written 2026-10-28 from [STARTUP-GRANT-DELIVERY.md](STARTUP-GRANT-DELIVERY.md) and the current native budget/generation APIs. The initial scratch proposal made no tracked edits, Cargo runs, cloud calls, resources, grants, or permission changes. This committed revision incorporates the independent recovery review on 2026-10-29; that documentation revision changed no runtime source. The earlier unregistered snapshot is retained in `research/ml_dataset_20261028/startup-implementation-status.json`; it is historical evidence, not the current registration state. Delivery permissions, actual resource lifetime, and worker IAM remain separate unresolved prerequisites.
 
+Combined runtime source `f4249f62df082b401717a03ae2cae1b7b1aeddd3` integrates
+main `5a250bd47f7674b1f8fbc8a5ca577805aa235ecc`. Fresh validation passed the full
+release library suite (5,170 passed, zero failed, 123 ignored), strict maintained
+Clippy, both changed hyperelliptic catalog tests, a rebuilt release CLI, eight
+CLI checks and the ten-command two-twist fixture. Independent audit verified
+158 inventory files and 159 archive members. Evidence is retained separately in
+`research/ml_dataset_20261028/validation-startup-main-20261029/`; earlier-source
+records remain unchanged. PR [#2836](https://github.com/isogeny-labs/crypto/pull/2836)
+carries this increment; exact-head remote checks and merge status are separate
+from these local results. This adds no research corpus rows or verified cloud
+cells.
+
 The gate accepts one frozen local launch configuration, waits for one locally projected grant bundle, checks its bindings, activates the existing budget session, and calls the existing finite generator. It does not create Jobs, issue grants, fetch startup files, choose hardware, implement recovery orchestration, or accept arbitrary executable arguments.
 
 ## Proposed CLI and native boundary

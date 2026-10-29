@@ -276,6 +276,19 @@ one native checkpoint integration test, the full release library suite
 build and eight actual CLI checks. A separately frozen two-twist CLI fixture
 passed ten commands, including rejection of rehashed equation/domain corruption.
 These are software checks; cloud validation remains open.
+
+Combined runtime source `f4249f62df082b401717a03ae2cae1b7b1aeddd3` integrates
+main `5a250bd47f7674b1f8fbc8a5ca577805aa235ecc`. Fresh validation passed the full
+release library suite (5,170 passed, zero failed, 123 ignored), strict maintained
+Clippy, both changed hyperelliptic catalog tests, a rebuilt release CLI, eight
+CLI checks and the ten-command two-twist fixture. Independent audit verified
+158 inventory files and 159 archive members. Evidence is retained separately in
+`research/ml_dataset_20261028/validation-startup-main-20261029/`; earlier-source
+records remain unchanged. PR [#2836](https://github.com/isogeny-labs/crypto/pull/2836)
+carries this increment; exact-head remote checks and merge status are separate
+from these local results. This adds no research corpus rows or verified cloud
+cells.
+
 `f4` keeps its existing m=2 reference path and selects
 `prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
 leaf membership equations and unrestricted auxiliary-variable roles before
