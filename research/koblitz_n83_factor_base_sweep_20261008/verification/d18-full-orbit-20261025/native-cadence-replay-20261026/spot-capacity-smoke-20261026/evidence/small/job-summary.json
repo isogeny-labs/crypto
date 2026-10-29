@@ -1,0 +1,15 @@
+{
+  "id": "20261026-222409-n83-spot-market-smoke-72bebc",
+  "created": "2026-10-26T22:24:11Z",
+  "instance_type": "t3.small",
+  "spot": true,
+  "ttl": "20m",
+  "deadline": 1793054651,
+  "disk_gb": 100,
+  "ami": "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64",
+  "toolchain": "none",
+  "repo_url": "",
+  "commit": "",
+  "patch": false,
+  "command_display": "printf \"spot-ok\\n\" > \"$EPHEMERAL_OUT/market.txt\""
+}

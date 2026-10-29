@@ -6813,6 +6813,16 @@ pub enum TargetSource {
     /// a new stride per relation makes equal step counts unequal
     /// differences.
     StrideRenew,
+    /// `StrideRenew` with the guard moved after the decomposition: only
+    /// a target that yields a relation is probed and remembered.  The
+    /// guard exists so that no decomposed target is decomposed again
+    /// (see [`TargetSource::is_guarded`]); a repeat that does not
+    /// decompose adds nothing either way, and a renewed stride steps past
+    /// a repeat rather than restarting, so the target stream, the rows
+    /// and the answer are those of `StrideRenew`.  What changes is one
+    /// probe per trial, now one per decomposing trial, and one oracle
+    /// lookup per non-decomposing repeat, which the eager guard skipped.
+    StrideRenewDeferredGuard,
 }
 
 impl TargetSource {
@@ -6827,6 +6837,7 @@ impl TargetSource {
             TargetSource::WalkSharedJumps => "walk_shared_jumps",
             TargetSource::Stride => "stride",
             TargetSource::StrideRenew => "stride_renew",
+            TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -6836,6 +6847,13 @@ impl TargetSource {
                 | TargetSource::WalkPrimeFast
                 | TargetSource::WalkPrimeLanes { .. }
                 | TargetSource::WalkSharedJumps
+        )
+    }
+    /// Whether `S` is renewed after every relation-bearing target.
+    pub fn renews_stride(&self) -> bool {
+        matches!(
+            self,
+            TargetSource::StrideRenew | TargetSource::StrideRenewDeferredGuard
         )
     }
     /// **Whether a target the run has already decomposed is skipped.**
@@ -6859,6 +6877,7 @@ impl TargetSource {
                 | TargetSource::WalkPrimeLanes { .. }
                 | TargetSource::Stride
                 | TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
         )
     }
 }
@@ -7231,6 +7250,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let pool_count = 16usize;
     let shared_jumps = targets == TargetSource::WalkSharedJumps;
     let guarded = targets.is_guarded();
+    let defer_guard = targets == TargetSource::StrideRenewDeferredGuard;
     let mut jumps: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool_rng = StdRng::seed_from_u64(seed ^ 0x504F_4F4C_5F4F_4646);
@@ -7282,7 +7302,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     // And the rows: the zeroed vector, the support count, the column-part
     // key's scan and mixes, the coefficient sums and the target column.
     let (mut row_build_words, mut row_key_mixes, mut row_build_modr_adds) = (0u64, 0u64, 0u64);
-    let striding = matches!(targets, TargetSource::Stride | TargetSource::StrideRenew);
+    let striding = matches!(targets, TargetSource::Stride) || targets.renews_stride();
     let (mut stride, mut stride_steps, mut stride_restarts, mut stride_renewals) =
         ((g.identity(), 0u64, 0u64), 0u64, 0u64, 0u64);
     let mut renew_by = (g.identity(), 0u64, 0u64);
@@ -7302,7 +7322,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             rng_draws += 2;
         }
     }
-    if targets == TargetSource::StrideRenew {
+    if targets.renews_stride() {
         while g.is_identity(&renew_by.0) {
             renew_by = draw_jumps(
                 g,
@@ -7515,7 +7535,9 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 }
                 (walk_point, wa, wb, None)
             }
-            TargetSource::Stride | TargetSource::StrideRenew => {
+            TargetSource::Stride
+            | TargetSource::StrideRenew
+            | TargetSource::StrideRenewDeferredGuard => {
                 if walk_fresh {
                     rng_draws += 2;
                     wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
@@ -7549,13 +7571,13 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // The guard: a target this run has already decomposed carries no
         // relation the matrix does not hold, and taking it again would
         // pin the logarithm by collision rather than by relation.
-        if guarded {
+        if guarded && !defer_guard {
             guard_probes += 1;
             if seen.insert(g.key(&point), ()).is_some() {
                 repeats_skipped += 1;
                 if let Some(index) = lane_id {
                     lanes[index].fresh = true;
-                } else if targets != TargetSource::StrideRenew {
+                } else if !targets.renews_stride() {
                     walk_fresh = true;
                 }
                 // A renewed stride crosses an earlier progression in at
@@ -7568,7 +7590,17 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         if relations.is_empty() {
             continue;
         }
-        if targets == TargetSource::StrideRenew {
+        // The deferred guard: the same skip as above, taken only by a
+        // target that decomposed, so `seen` holds exactly the decomposed
+        // targets and the skipped repeat neither renews nor enters a row.
+        if defer_guard {
+            guard_probes += 1;
+            if seen.insert(g.key(&point), ()).is_some() {
+                repeats_skipped += 1;
+                continue;
+            }
+        }
+        if targets.renews_stride() {
             loop {
                 stride = (
                     g.add(&mut rel.group_ops, stride.0, renew_by.0),
@@ -7702,7 +7734,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         rel.count("stride_steps", stride_steps);
         rel.count("stride_restarts", stride_restarts);
     }
-    if targets == TargetSource::StrideRenew {
+    if targets.renews_stride() {
         rel.count("stride_renewals", stride_renewals);
     }
     if targets.is_walk() {
@@ -12874,11 +12906,12 @@ mod generator_coupling_tests {
         lines
     }
 
-    const SOURCES: [TargetSource; 6] = [
+    const SOURCES: [TargetSource; 7] = [
         TargetSource::Random,
         TargetSource::Walk,
         TargetSource::Stride,
         TargetSource::StrideRenew,
+        TargetSource::StrideRenewDeferredGuard,
         TargetSource::WalkPrimeFast,
         TargetSource::WalkPrimeLanes {
             lanes: 4,
