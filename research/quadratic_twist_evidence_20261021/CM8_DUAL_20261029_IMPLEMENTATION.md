@@ -27,3 +27,9 @@ The unchanged existing universal construction identity/certificate17 applies
 to the same translated degree-two construction. New finite coordinate/group
 equalities and a general additive-map implication are checked in Lean; no new
 universal curve-polynomial/geometric-duality theorem is silently asserted.
+
+Post-first-run metadata correction: the successful receipt originally named its
+seven rejected valid points "nontorsion". Every finite elliptic group point is
+torsion; these are points not killed by7. Change only the JSON key to
+rejected_valid_non_r7_points, retain the old successful run/source, freeze this
+correction and replay the FULL contract. No arithmetic/predicate/count changes.

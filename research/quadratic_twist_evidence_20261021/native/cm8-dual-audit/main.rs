@@ -161,7 +161,7 @@ fn audit(root:&Path,out:&Path,receipt:&Path){
  assert_eq!(cb,fs::read(out.join("reference").join(format!("{name}.json"))).unwrap(),"false dual complete arm parity");}
  assert_eq!(recoveries,72);assert_eq!(n(&v["source_recoveries"]),recoveries,"false dual declared count");
  let expected_files:BTreeSet<_>=names.iter().map(|x|format!("{x}.json")).chain(std::iter::once("index.json".into())).collect();for d in["candidate","reference"]{let files=fs::read_dir(out.join(d)).unwrap().map(|x|x.unwrap().file_name().to_str().unwrap().to_owned()).collect::<BTreeSet<_>>();assert_eq!(files,expected_files,"false dual case membership");}assert_eq!(fs::read(out.join("candidate/index.json")).unwrap(),fs::read(out.join("reference/index.json")).unwrap());
- write(receipt,&json!({"status":"passed","independent_arithmetic":true,"source_points":14,"target_points":14,"addition_pairs":392,"subgroup_inverse_points":7,"rejected_valid_nontorsion_points":7,"pullbacks":6,"arms":12,"source_recoveries":72,"dual_sha256":sha(&bytes)}));
+ write(receipt,&json!({"status":"passed","independent_arithmetic":true,"source_points":14,"target_points":14,"addition_pairs":392,"subgroup_inverse_points":7,"rejected_valid_non_r7_points":7,"pullbacks":6,"arms":12,"source_recoveries":72,"dual_sha256":sha(&bytes)}));
 }
 fn corrupt(kind:&str,out:&Path){let path=out.join("dual.json");let mut v=load(&path);let old=v.clone();match kind{
  "false-dual"=>v["target_points"][1]["dual"]=pj(Some((0,2))),
