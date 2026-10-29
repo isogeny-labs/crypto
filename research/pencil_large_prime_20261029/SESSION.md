@@ -494,3 +494,12 @@ source-manifest entries verify. No algorithm or measured evidence changed.
 The local Node test command could not start because node is absent from PATH;
 this is not a passing workflow test. Remote CI remains authoritative for it.
 No experiments or generators were launched. Cohort completion remains open.
+
+Follow-up: `bun test ./.github/scripts/test-ci-scope.mjs` passed all 12
+tests. This checks the Node-compatible helper under Bun, not the hosted Node
+runtime. Commit 95cf825152 was pushed; fresh checks are pending.
+Read-only execution review identified common cold-call timing and separate
+parent audit overhead as the remaining accounting boundary work. Per-arm
+process RSS is already available. EXECUTION_NEXT_STEP.json preserves these
+findings and the unchanged upper gate; it is not an executable protocol.
+A fresh isolab Job listing had no active Jobs; no submission was made.
