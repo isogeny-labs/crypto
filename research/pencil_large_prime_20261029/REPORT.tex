@@ -55,13 +55,18 @@ Sparse maps now record API calls, ordered comparisons, yielded entries and
 cloned entries. Exact iterator size hints and numeric ordering are preserved;
 JSON serialization is unmetered. These are semantic events, not all CPU work.
 Counts depend on the recorded standard-library version. The current suite has
-14 default library tests, 15 with the producer feature and five adapter tests.
+14 default library tests and 21 producer-feature tests, including six solver tests.
 The producer now verifies field, native arithmetic and symbolic phase sums,
 and retains interval overhead separately. Scalar inverse instrumentation was
 asymmetric: pencil counts inner multiplications; the reference records one
 inverse. A native normalization removes pencil inverse multiplications for a
 common atomic scalar-I model, tested against both actual inverse implementations.
 The model remains a draft with unfrozen weights; no historical ratio is revised.
+The shared per-target API now separates arithmetic from archive input,
+known-answer checks and rho pairing. Version 2 repeats cold setup per target
+and charges target validity. Its allocation baseline changes because setup
+temporaries drop before rho. Missing allocation observers produce nulls.
+Root ecbench registration and cohort execution remain open.
 \section*{Next integration gates}
 \begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
 Requirement & Status\\\midrule
