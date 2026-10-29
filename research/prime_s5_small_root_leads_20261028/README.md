@@ -61,6 +61,12 @@ not re-read this session.
      global relations and was amended.
    - P3: the ePrint LP could not be retrieved. Our search over triangular
      shift lattices exceeds no JM asymptote.
+   - P3, addendum (2026-10-29, §7c): the strategy-independent bound of
+     `research/smallroot_optimal_reach_20261026` applies here. Any
+     x-variable lattice built from `(p, S)^t` on a convex monomial set
+     reaches at most δ = 1/21.8 for S₄ and 1/70.8 for S₅. Those are 5.5× and
+     14.2× short of the milestone and the goal, whatever the shift strategy,
+     the LP included.
 
 ## 1. Question
 
@@ -624,7 +630,8 @@ Setup: the frontier campaign's 40-bit `a = −3` curve
   corrected. Absolute irreducibility of summation polynomials is
   [recalled] a known result (Diem); it was not re-read here.
 - **P3 not run.** The automated-Coppersmith linear program of Ding et al.
-  (ePrint 2026/1027) has no implementation in this repository.
+  (ePrint 2026/1027) has no implementation in this repository. §7c bounds it
+  anyway for x-variable lattices.
 
 - **[measured] `m = 4` (`S₅`), the arity where beating rho is possible.**
   [`l4b_step1_s5.gp`](l4b_step1_s5.gp) ([`l4b_step1_s5.out`](l4b_step1_s5.out)):
@@ -703,6 +710,7 @@ resultants and tensor interpolation.
 ### 7b.2 L4-C: is there structure in the gap? (census, [`l4c/`](l4c/))
 
 The protocol changed the README record in three ways before any data:
+
 - an exact census over all `r − 1` targets replaces 10⁵ samples;
 - the counting unit is fixed: signed multisets summing to `R`;
 - null 2 is dropped, because its expected root count is below 10⁻² per
@@ -735,12 +743,14 @@ factor base.
 ### 7b.3 L4-A: measured S₄ lattice reach ([`l4a/`](l4a/))
 
 Symmetric JM lattices for `S₄`:
+
 - `g(e₁,e₂,e₃)` is found by a 35-unknown linear solve, checked on 6 extra
   points;
 - the lattice is triangular in `(β₃, β)`, with `g` monic in `e₃⁴`;
 - reduction uses main's `lattice::lll_reduce`.
 
 A timing pilot fixed the scope before registration:
+
 - dim 35 takes about 20 ms;
 - dim 165 takes 116 s, about 200 s under load;
 - no dim-455 reduction finished in 5 h 10 min ([`l4a/pilot/PILOT.md`](l4a/pilot/PILOT.md)).
@@ -748,10 +758,12 @@ A timing pilot fixed the scope before registration:
 So **ℓ ≥ 3 at m = 3, and all of m = 4, stay `[derived]` only.**
 
 Measured cells:
+
 - **ℓ = 1 (dim 35):** 32, 40 and 48 bits; B ∈ {1, 2, 3, 4, 6, 8, 12, 16}; 8 planted and 8 unplanted targets per cell.
 - **ℓ = 2 (dim 165):** 32 and 40 bits; B ∈ {1, 2, 3, 4, 6}; 4 planted and 4 unplanted per cell.
 
 **[measured] v1: the registered falsifier fired, on a planting defect.** At ℓ = 2 on 40 bits, B = 4 succeeded on 3 of 4 targets and B = 3 on 2 of 4, while the §3.2 bound is B ≈ 1.7.
+
 - PARI/GP shows that **all 8 distinct successful planted targets** in v1, across every cell, satisfy `S₄(x; z) = 0` over ℤ ([`l4a/succ.gp`](l4a/succ.gp), [`l4a/succ.out`](l4a/succ.out)).
 - They have `z ∈ {1, 2, 3, 25}`, and most are trivial `P − P + Q = Q` decompositions.
 - Cause: small x's repeat, and the planting rule accepted any root. Any lattice that contains S₄ finds such roots automatically, which is F6 global lifting, not modular reach.
@@ -783,6 +795,7 @@ pass, so that LP is **not implemented here**.
 
 **What was run instead.** An exact count over an explicit family of
 triangular shift lattices:
+
 - every leading vertex of the Newton polytope;
 - monomial sets made of rectangles with extended caps, cut by `|β| ≤ s` or
   by one `{0,1,2}` half-space;
@@ -827,6 +840,56 @@ Lead 4 stays **closed for lattice oracles on coordinate factor bases**,
 conditional only on P3. No measured cost changed, so this is not an
 improvement under the success criterion, and no dashboard point is added
 (AGENTS §7a).
+
+## 7c. Addendum (2026-10-29): a bound on every shift strategy, the P3 LP included
+
+`research/smallroot_optimal_reach_20261026` (merged 2026-10-26) proves this
+for one polynomial `f` modulo `p` in `n` unknowns with equal bounds
+`|x_i| < p^δ`. Every Coppersmith lattice whose rows lie in `(p, f)^t`, on
+the lattice points of a convex monomial set, satisfies Howgrave-Graham only
+if
+
+`ε = n·δ ≤ (n! · vol Newt(f))^{−1/n}`.
+
+Its §2 gives the argument: regular sequence, Ostrowski, Brunn–Minkowski. It
+covers Jochemsz–May, Ryan's optimal shifts and any LP-chosen shift set,
+because all of them are sublattices of `L(M)`. The proof drops dimension
+factors, which favours the attack.
+
+- **[derived] Both premises hold here.**
+  - The small-x factor base gives every `x_i` the same bound `B`.
+  - L4-B measured the Newton polytopes. `Newt(S₄(·; z))` is the full box
+    `[0,4]³` (volume 64), and `Newt(S₅(·; z))` is the full box `[0,8]⁴`
+    (volume 4096), on 20/20 values of `z` (§7a, §7b.1).
+- **[derived] The bound.** The formula reproduces the study's S₃ value of
+  0.3293 (`vol = 14/3`, `n = 3`). For this note's targets it gives:
+
+| polynomial | n | vol Newt | ε bound | per-variable δ bound | target δ | short by |
+|:--|--:|--:|--:|--:|--:|--:|
+| S₄ (m = 3) | 3 | 64 | 0.1376 | 0.0459 = 1/21.8 | 1/4 (milestone) | 5.5× |
+| S₅ (m = 4) | 4 | 4096 | 0.0565 | 0.0141 = 1/70.8 | 1/5 (goal) | 14.2× |
+
+  The bounds sit just above the Jochemsz–May asymptotes, 1/24 and 1/80, as
+  an upper bound should. The P3 fallback's best values, 0.0306 at m = 3 and
+  0.0048 at m = 4 (x-box), sit below them.
+
+**What this closes.** The "real P3 LP" left open in §0 and §7a cannot reach
+either target with x-variable lattices on convex monomial sets. That holds
+for every shift strategy, not only the triangular families searched in §7b.4.
+
+**What it does not close.**
+
+- **The symmetric e-form.** Its bounds `C(m,i)·B^i` are unequal, and for
+  unequal bounds the theorem bounds only `∏ δ_i`. The cited study's
+  numerical optimiser found nothing above 1/2 for S₃ there. §7b.4 found no
+  e-form family above the JM asymptote. A proof for the e-form is still
+  missing.
+- **Non-convex monomial sets.**
+- **Lattices that use more than the one ideal `(p, S_{m+1})^t`,** for
+  example several targets' polynomials at once.
+
+These are the remaining lattice items. They are listed in the cited study's
+§5 for S₃ and carry over here.
 
 ## 8. Sources
 
