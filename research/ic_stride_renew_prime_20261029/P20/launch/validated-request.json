@@ -1,0 +1,98 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "ic-srenew-p20-20261029",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "XP-20261029-stride-renew-prime P20: stride-renew targets against the walk, prime-field IC baseline N 45",
+      "description": "Frozen confirmatory test (PROTOCOL.md): ic.pipeline target source stride-renew against the incumbent walk, same factor base prime-abscissa:size=45 and oracle mitm:negation_folded=1, on two fresh 20-bit prime-order curves with matched rho and A/A arms. Public synthetic curves and targets; no security claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 202610292011
+          },
+          {
+            "kind": "prime_search",
+            "bits": 20,
+            "seed": 202610292012
+          }
+        ],
+        "targets_per_curve": 24,
+        "target_seed": 20261029205,
+        "target_kind": "public"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "walk",
+          "role": "baseline",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236",
+              "targets": "walk"
+            }
+          }
+        },
+        {
+          "name": "srenew",
+          "role": "candidate",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236",
+              "targets": "stride-renew"
+            }
+          }
+        },
+        {
+          "name": "walk-aa",
+          "role": "control",
+          "method": {
+            "id": "ic.pipeline",
+            "params": {
+              "factor_base": "prime-abscissa:size=45",
+              "oracle": "mitm:negation_folded=1",
+              "max_trials": "1410236",
+              "targets": "walk"
+            }
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 20261029209,
+        "isolation_required": "L2",
+        "timeout_seconds": 1800
+      }
+    },
+    "memory": "4Gi"
+  },
+  "provenance": {
+    "harness": "crypto XP-20261029 stride-renew vs walk, P20 (backlog/XP-20261029-stride-renew-prime/PROTOCOL.md, frozen at 4d4593aabda667a681fab4a67e351dc5bcb7c1f4)",
+    "source_revision": "4d4593aabda667a681fab4a67e351dc5bcb7c1f4"
+  }
+}
