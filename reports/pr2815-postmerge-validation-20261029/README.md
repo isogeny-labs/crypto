@@ -52,7 +52,11 @@ References reviewed before launch: `AGENTS.md`, the repository
 
 ## Evidence and unsuccessful attempts
 
-Extract and check the immutable raw records:
+The repository's artifact job moved the archive into the existing artifact
+store. Its tracked `.artifacts.json` retains the SHA-256 and 83,592-byte size;
+both match the locally verified archive. First hydrate this report directory
+using the [artifact-store pull instructions](../../docs/artifacts.md#quick-start)
+with configured read access. Then extract and check the immutable raw records:
 
 ```sh
 sha256sum -c runs.tar.xz.sha256
