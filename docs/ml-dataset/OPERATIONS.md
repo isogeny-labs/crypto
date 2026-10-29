@@ -263,6 +263,74 @@ explicit trace hooks. Capability records name those gaps. Exact first-fall and
 last-fall degrees remain null until a checker establishes their stated algebraic
 definition and all required closure/rank conditions.
 
+The prime F4 increment at source `69e4c9763bed508f0ab0d2f424873d2e748a7229`
+passed 11 focused native/adapter tests, the full release library suite
+(5,153 passed, zero failures, 123 ignored), release build and actual CLI checks.
+The separate endpoint test passed all 360 adapter combinations, including
+structured unsupported and capped outcomes; it does not establish 360 solves.
+The earlier strict-lint blocker was three unregistered startup helpers.
+Source `7a1bd350b26eaeccf51bf9078915649a7c4335fc` registers the startup CLI and
+central stored-input verifier. It passed 142 dataset tests, 26 F4 unit tests,
+one native checkpoint integration test, the full release library suite
+(5,170 passed, zero failed, 123 ignored), strict maintained Clippy, a release
+build and eight actual CLI checks. A separately frozen two-twist CLI fixture
+passed ten commands, including rejection of rehashed equation/domain corruption.
+These are software checks; cloud validation remains open.
+
+Combined runtime source `f4249f62df082b401717a03ae2cae1b7b1aeddd3` integrates
+main `5a250bd47f7674b1f8fbc8a5ca577805aa235ecc`. Fresh validation passed the full
+release library suite (5,170 passed, zero failed, 123 ignored), strict maintained
+Clippy, both changed hyperelliptic catalog tests, a rebuilt release CLI, eight
+CLI checks and the ten-command two-twist fixture. Independent audit verified
+158 inventory files and 159 archive members. Evidence is retained separately in
+`research/ml_dataset_20261028/validation-startup-main-20261029/`; earlier-source
+records remain unchanged. PR [#2836](https://github.com/isogeny-labs/crypto/pull/2836)
+carries this increment; exact-head remote checks and merge status are separate
+from these local results. This adds no research corpus rows or verified cloud
+cells.
+
+`f4` keeps its existing m=2 reference path and selects
+`prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
+leaf membership equations and unrestricted auxiliary-variable roles before
+solving. Native elimination requires p<2^32. For larger moduli, including
+2^61-1, the adapter retains exact equations computed with wide intermediates
+and reports an unsupported native modulus; it does not substitute a smaller
+field or invoke the narrow reducer.
+
+The new lane writes `prime-f4-input.json`, a bounded
+`prime-f4-chain-events.jsonl` prefix, and `prime-f4-chain-result.json` termination
+metadata. Events expose recursive systems and fixed-variable bindings, native
+bases/useful-row schedules, branches, candidate validation and independent
+point-sign lifts. Event/byte caps and sink errors stop traversal explicitly;
+root work, elimination observations and group additions retain separate units.
+A native F4 call materializes its own rows before serializing a bounded event.
+These event limits therefore do not bound native matrix memory; retain the
+worker memory/time supervisor. Useful-row traces omit private pivots, zero rows
+and internal univariate factorization/GCD states. The inherited top-level
+`checkpoint_mid_call` flag reports live exposed-prefix sink persistence; it
+does not certify native-call or process recovery. Read the separate supervisor
+checkpoint field and explicit trace gaps before interpreting recovery support.
+
+Read `encoding_search_completed`, `algebra_completed`, `termination` and the
+trace/lift limits together. An encoding traversal may complete after truncated
+native elimination without establishing a complete Groebner basis. Infinity
+exceptions are not all encoded, so completion without a verified lift never
+establishes PDP impossibility: `exhaustive_no_decomposition` remains false.
+A verified positive witness can coexist with a censored trace. If live persistence
+fails after a positive, the chain stages its certificate and returns explicit
+`live_persistence_errors` for a separate canonical worker write. A true
+read-only-event-descriptor regression verifies this path; total storage failure
+still cannot establish durability. Neither state
+establishes scalar recovery or an exact first/last fall degree.
+
+Generation and central `verify_cell` invoke the public equation/domain
+reconstruction verifier. Semantic replay tests on source `7a1bd350b26` cover
+rehashed corruption and omitted inputs with stripped strategy tags. The frozen actual-CLI fixture passed replay on both twists and rejected
+rehashed corruption in a copied twist=false cell; cloud restore remains a
+separate validation step. The frozen
+[prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md) records required checks and
+mathematical limits; no new cloud-generation evidence follows from this code.
+
 Create a coverage snapshot in a directory outside the source run:
 
 ```sh
@@ -332,6 +400,12 @@ Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
 policy is `strict-structural-allowlist-v3`; its domain-aware feature identities
 must not be mixed with earlier export identities without regeneration.
+
+Prime-chain recursive events and termination records stay in restricted
+artifacts/provenance. Implementing their writer does not add a public equation
+graph to `features.jsonl`; that requires a separately reviewed structural
+projection. A future decision-prefix view must remove future bases, branches,
+lift results and other information unavailable at its declared decision time.
 
 The current export is a structural routing view. Sequential equation or solver
 policy views still need a separate projection of admissible prefix states.

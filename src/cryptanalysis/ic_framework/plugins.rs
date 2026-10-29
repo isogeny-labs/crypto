@@ -2151,7 +2151,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "summands, 3 or 4")]
+        &[("m", "summands, 3, 4 or 5")]
     }
 
     fn prepare(
