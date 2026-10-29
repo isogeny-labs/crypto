@@ -368,6 +368,19 @@ def koblitz_modular_geometry(ref, since):
                  label=label, source=f"{path}@{commit}")
 
 
+    path = f"{base}34/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("local_source_presentations", "koblitz_modular.ordinary_source_local_presentations", "closed supports",
+             "Exact source-bound standard-etale witnesses; global quotient saturation remains separate"),
+            ("complete_coupled_divisors", "koblitz_modular.complete_coupled_degree128_divisors", "divisor representations",
+             "Complete ordinary P+9Q vanishing spaces; no projected factor image or IC-rank claim")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
