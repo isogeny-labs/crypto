@@ -1304,10 +1304,11 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
     // because it would change the search without changing the method's
     // identity.  `linear_harvest` puts it in the identity instead.  Omitted
     // it changes nothing; `default` spells out what omission means; `off`
-    // is the engine before #1862.  Same targets, same base: every arm
-    // verifies and finds the same relations, `off` and `default` differ in
-    // counted word XORs (the harvest changes the splitting tree), and the
-    // parameter is refused where it would be ignored or is not understood.
+    // is the engine before #1862. Same targets, same base: every arm verifies
+    // and finds the same relations. The narrowed default rank gate leaves this
+    // below-threshold workload unchanged; explicit `every` demonstrates that
+    // the method parameter changes the splitting tree. The parameter is
+    // refused where it would be ignored or is not understood.
     let dir = scratch("pdp3-harvest");
     let arm = |name: &str, oracle: &str| {
         format!(
@@ -1323,12 +1324,13 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
       "label": "pdp3-koblitz linear_harvest test",
       "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
                     "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
-      "arms": [{}, {}, {}, {}, {}, {}],
+      "arms": [{}, {}, {}, {}, {}, {}, {}],
       "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 600}}
     }}"#,
         arm("omitted", base),
         arm("default", &format!("{base},linear_harvest=default")),
         arm("off", &format!("{base},linear_harvest=off")),
+        arm("every", &format!("{base},linear_harvest=every")),
         arm(
             "bad-root",
             "pdp3-koblitz:m=2,engine=rootfind,linear_harvest=off"
@@ -1376,13 +1378,18 @@ fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch()
         ops["omitted"], ops["default"],
         "spelling out the default must not change a count"
     );
+    assert_eq!(
+        ops["default"], ops["off"],
+        "the default rank gate must leave this below-threshold workload unchanged"
+    );
     assert_eq!(found["omitted"], found["off"], "same relations either way");
     assert_ne!(
-        ops["off"], ops["default"],
-        "the harvest must change the splitting tree on this workload"
+        ops["off"], ops["every"],
+        "the explicit harvest parameter must change the splitting tree"
     );
     assert_ne!(method_ids["omitted"], method_ids["off"]);
     assert_ne!(method_ids["omitted"], method_ids["default"]);
+    assert_ne!(method_ids["off"], method_ids["every"]);
 }
 
 #[test]
