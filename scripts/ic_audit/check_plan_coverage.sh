@@ -15,18 +15,27 @@ test -s "$tmp/sources"
 # must never remove a cited session from the coverage check.
 while IFS= read -r source; do
   study=$(dirname "$source")
-  git ls-files -- "$study/sessions/*/session.json" >> "$tmp/descriptors"
-  for descriptor in "$study"/sessions/*/session.json; do
-    [ ! -f "$descriptor" ] || printf '%s\n' "$descriptor" >> "$tmp/descriptors"
+  # Figure/analysis files can live below the study root. Find the nearest
+  # containing sessions directory, stopping before a shared research namespace.
+  while [[ "$study" != . && "$study" != / && "$study" != research && "$study" != docs ]]; do
+    git ls-files -- "$study/sessions/*/session.json" > "$tmp/study-descriptors"
+    for descriptor in "$study"/sessions/*/session.json; do
+      [ ! -f "$descriptor" ] || printf '%s\n' "$descriptor" >> "$tmp/study-descriptors"
+    done
+    git ls-files -- "$study/.artifacts.json" "$study/sessions/**/.artifacts.json" > "$tmp/manifests"
+    while IFS= read -r manifest; do
+      directory=$(dirname "$manifest")
+      jq -r '.files | keys[] | select(endswith("/session.json") or . == "session.json")' "$manifest" > "$tmp/names"
+      while IFS= read -r name; do
+        printf '%s/%s\n' "$directory" "$name" >> "$tmp/study-descriptors"
+      done < "$tmp/names"
+    done < "$tmp/manifests"
+    if [ -s "$tmp/study-descriptors" ]; then
+      cat "$tmp/study-descriptors" >> "$tmp/descriptors"
+      break
+    fi
+    study=$(dirname "$study")
   done
-  git ls-files -- "$study/.artifacts.json" "$study/sessions/**/.artifacts.json" > "$tmp/manifests"
-  while IFS= read -r manifest; do
-    directory=$(dirname "$manifest")
-    jq -r '.files | keys[] | select(endswith("/session.json") or . == "session.json")' "$manifest" > "$tmp/names"
-    while IFS= read -r name; do
-      printf '%s/%s\n' "$directory" "$name" >> "$tmp/descriptors"
-    done < "$tmp/names"
-  done < "$tmp/manifests"
 done < "$tmp/sources"
 touch "$tmp/descriptors"
 sort -u "$tmp/descriptors" > "$tmp/cited"

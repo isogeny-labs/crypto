@@ -26,6 +26,9 @@ must_fail() {
   controls=$((controls + 1))
 }
 must_pass bash "$coverage"
+jq '.sources.study.path="research/study/analysis/summary.json"' "$IC_BOARD" > "$tmp/nested-board.json"
+mv "$tmp/nested-board.json" "$IC_BOARD"
+must_pass bash "$coverage"
 bash "$coverage" --list-inputs > "$tmp/inputs"
 for name in session.json spec.json host.json plan.json records.jsonl exec/000002.stderr; do
   grep -Fx "research/study/sessions/a/$name" "$tmp/inputs" > /dev/null
