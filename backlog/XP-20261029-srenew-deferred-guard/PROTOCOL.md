@@ -99,7 +99,8 @@ That gives 2,688 executions per size and 288 matched pairs per arm pair.
 
 The image's ecbench predates the new target source, so it cannot be used. The
 run uses `isolab-experiment.yml`, dispatched on `main` with `source_revision`
-set to the 40-character SHA of the first `main` commit that contains PR #2831.
+set to the 40-character SHA of the `main` merge commit of the PR that adds this
+protocol. That commit carries PR #2831's code.
 The workflow builds that commit, publishes a digest-pinned image and launches
 one EKS job per size on `c8a.2xlarge` with a 3,600 s deadline.
 
