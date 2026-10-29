@@ -123,3 +123,52 @@ remain open.
 ### Errors
 No restored replay, manifest or export failure. Source/library parity permits
 reuse of the documented prior root-library validation; no repeat full run.
+
+## 19:53 UTC — data pushed; report inspected; metric filter corrected
+
+### What was done
+Data commit7e0b9bd3303098a4d6fb9dee647f08bc762b5376 pushed before rendering.
+Rendered and visually inspected both report pages; PDF SHA256
+4043dc00919c086a3f35a336164e942f01dff18c237cff1f46c768daff0c8ea2.
+The first metadata metric check rejected missing values. Diagnosed Git's
+date-only --since=2026-10-29: it retained the current time of day and excluded
+the earlier data commit. Re-extraction uses2026-10-29T00:00:00Z explicitly.
+
+### Decisions made
+Preserve the failed checker output and original filtered metrics in support.
+This is an invocation/filter correction, not a native result or source change.
+No experiment or replay is repeated.
+
+### Open threads
+Finish committed-metric comparison, report/support S3 roundtrips, final
+delivery commit, PR refresh and checkpoint.
+
+### Errors
+Initial metric validation failed because its history date cutoff excluded all
+new measurements. The native data, three replay stages and export file
+validation remain unchanged. The failure and exact cutoff diagnosis are saved.
+
+## 19:56 UTC — report and support publication verified
+
+### What was done
+All72 new metrics match committed native values after the UTC-midnight cutoff
+correction. All7 report files round-tripped through S3 byte-for-byte. Both PDF
+pages were inspected. Support archive268372bytes, SHA256
+31357a1a50b2b3706cf7186b5eff69e15625aeb7914ee7c70c4ffbc9ed69cfce,
+contains751files; all750 manifest payloads passed after S3 download/extraction.
+The support directory is now sealed. Later delivery/checkpoint receipts are
+written only to degree4-propagation-final.
+
+### Decisions made
+Publish the scoped report/delivery metadata and session receipt on PR2706.
+Retain the initial metric-filter failure and original filtered output. Native
+data, frozen source and original fixed-base regularity views remain unchanged.
+
+### Open threads
+Final delivery push, current-head PR/check snapshots, recovery checkpoint and
+final S3 metadata receipts. Independent review, prime/higher-m global LFD and
+held-out elite-base selection remain open; the broad goal stays active.
+
+### Errors
+No report-rendering, S3 byte comparison or support-manifest failure. The only
+post-production metadata failure was the corrected date-only history cutoff.
