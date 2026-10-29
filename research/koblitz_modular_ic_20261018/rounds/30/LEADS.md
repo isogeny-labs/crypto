@@ -46,8 +46,9 @@ commuting7/11 squares, complete transported triples and corrupted Frobenius
 rejection. The degree436 input is retained as the larger native test under
 the same4GiB/1200s bounds. It is not a change to n in the CM transfer family.
 
-Next acceptance checks: every common-neighbor factor and compatible branch,
-not just rational candidates; relation to the original incidence/source;
+ENUM30 subsequently exhausts every common-neighbor/parameter root for the
+retained12/436 pairs. Remaining acceptance checks: relation to the original
+ordinary moduli/collector source;
 all signed multiplicities and exceptional fibers. A nontrivial scalar orbit
 can annihilate a complete deck-norm fiber in the augmentation module, but this
 must be bound to the actual collector divisor before claiming a zero column.
@@ -71,3 +72,15 @@ before using any computed matrix. Keep the prior455equation solve/4GiB failure.
 References: R22 RECOVERY.md; R27 CM.md (different/chart coverage); R29
 ACCEPTANCE.md; ordinary13_lift.rs; Stacks0AMF; Sutherland ClassicalModPolys;
 Kilford–McMurdy arXiv1110.6801, section2. No IC cost or relation-rank verdict.
+
+
+## Followup: preserve F32 component classes rather than the F2 orbit sum
+
+DESCENT30 checks all six actual kernel colors in a coupled Frobenius/deck
+permutation model. Over F32 the F2 orbit splits into five components; deck
+acts regularly on them. An individual component difference is nonzero as a
+formal integer vector, although the full orbit difference is0. Thus the
+original reverse evaluator must distinguish an individual colored component
+from the full F2 orbit sum. Neither vector statement decides the Picard class.
+This is a concrete next calculation with actual component divisors, not a
+claim of a nonzero transfer or new relation rank.
