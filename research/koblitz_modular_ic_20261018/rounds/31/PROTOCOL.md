@@ -67,3 +67,36 @@ local tangent eigenvalues and tame RH. This is conditional on the action
 extending to the entire principally polarized Jacobian/curve. It is not an
 obstruction to arbitrary nonequivariant carriers. Freeze exact genus/pointcount
 bounds and controls before running that screen. No official novelty claim.
+
+## CM31 prospective amendment
+
+Frozen targets n=[5,11,83,131,163,233,283,409,571]. Firstfour controls retain
+R15 winning(p,genus,E1multiplicity)=(11,61,1),(23,309,0),(499,54781,1),
+(263,45589,2). n7 is excluded from the generic coefficient-field argument
+because K intersects Q(zeta7); do not silently apply linear disjointness.
+Scan every odd k1..99 and conductor prime p=2nk+1<=100000, exactly R15's
+bounds; retain all composite,inert,nonprimitive and small-orbit exclusions.
+Choose first qualifying p in this frozen scan, not global-minimality claim.
+
+Certify finite-field primitive generator/log table, two CM roots, odd finite
+character, full2(n-1) a2 Galois orbit. Construct an explicit multiset bijection
+from all conjugate Euler ROOT LABELS to the two predicted trace-zero factors.
+Build those integer polynomials by exact quotient/reconstruction. Dense CM
+ring expansion controls n5/n11 and independent level77 polynomial remain;
+new large-n norm certificate is the full root-label bijection, not an a2-only
+match or an unperformed dense expansion. Check corrupted-root rejection and
+quadratic diamond sign exchange.
+
+Genus: store the actual base S,T permutations and cyclic phase cocycles over
+P1(F7)*P1(Fp). Verify S²=(ST)³=identity including every fiber shift. For each
+base cycle lengthL/totalshifts, count gcd(2n,s) lifted cycles of length
+L*2n/gcd(2n,s), checking the translation period exactly. Verify connectedness
+by a base spanning tree and loop-residue gcd with retained Bezout chain.
+Compare all S/ST/T cycle counts to full materialization whenever index<=10m;
+KEEP the old10million full-state cap unchanged. New representation has a
+frozen1million base-state cap; it is not a larger cap on the old algorithm.
+Compute genus from complete lifted cycle counts and independently compare
+R15's RH formula. Planted phase corruption must violate the group relation.
+No timing/efficiency assertion. Actual curve equations, modular projector,
+intended subgroup transfer and the written modular/good-reduction bridges
+remain separate requirements even on the five new cryptographic sizes.
