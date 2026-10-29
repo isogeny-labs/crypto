@@ -1,5 +1,11 @@
 # BTN index calculus over prime fields: encoding, solves and 131-bit extrapolation
 
+> **Status: historical Python evidence, on hold (PR #2888).** `AGENTS.md`
+> forbids Python for cryptographic research here; the native path is the
+> `hashed-ecdl-tensor` crate (#2878). All timings below are Python, unisolated,
+> and taken while other solves shared the same 4 cores, so they are not valid
+> measurements. Counts, widths and recovered secrets are exact and unaffected.
+
 Prime-field version of the binary prototype in `research/btn_ecdl_20261029/`.
 The paper (Akshima et al., "A Subexponential Time Algorithm for Elliptic Curve
 Discrete Logarithm", v0.2, 2026-10-29) targets prime-field curves such as
@@ -47,6 +53,8 @@ kernel of the relation matrix mod r gives ξ, checked as Q == [ξ]P.
 | 5 | 3 | 7 | 10 | 11 | 143 | 1.70 | 18 | 2 | 2 |
 | 5 (seed 2) | 3 | 7 | 10 | 11 | 143 | 1.75 | 18 | 1 | 1 |
 | 7 | 3 | 13 | 16 | 17 | 221 | 1.70 | 18 | 3 | 3 |
+| 11 | 4 | 11 | 20 | 21 | 357 | 8.15 | 27 | 3 | 3 |
+| 13 | 4 | 19 | 22 | 23 | 391 | 8.41 | 27 | 5 | 5 |
 
 Records: `runs/ic_*.json`. The s/count column includes compiling the
 elimination plan, which dominates at d = 3 (the contraction itself takes
