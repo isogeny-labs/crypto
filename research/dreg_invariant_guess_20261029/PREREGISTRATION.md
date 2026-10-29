@@ -136,3 +136,33 @@ m = 3, one cell, 4 unsatisfiable draws and 1 satisfiable draw, the 4-core
   no `aws` CLI and no credentials.
 - Closure outcomes are exact algebra; timings are indicative only.
 - Conductor is not installed, so no task was taken.
+
+## Amendment 1 (2026-10-29T12:10Z, AFTER the data; disclosed as post hoc)
+
+- **What happened.** Three of the eight soundness runs, S3 branches 1, 5 and
+  6 on satisfiable draw 1, were killed with exit 137 (SIGKILL, apparently the
+  container's memory limit) and left no output. The five that finished all
+  refute at degree 4.
+  - So V3 as registered ("at least one branch does not refute") cannot be
+    read: the branches that do not refute have no reading.
+- **What was then done.** `examples/dreg_chain_solutions.rs` lists every
+  solution of draw 1 with the same enumeration as
+  `chained_s3_solution_count_fast`.
+  - It found 6 solutions, which equals the committed count. Every one vanishes
+    on all 44 equations (`runs/solutions-d1.jsonl`).
+  - They lie in S3 branches 1, 5 and 6, exactly the three killed runs. The
+    five refuting branches contain no solution.
+- **The replacement rule (V3′), decided after seeing the outcome above:**
+  - every S3 branch on draw 1 that contains no solution has a record;
+  - no refuting branch contains a solution;
+  - the solution list matches the committed count and vanishes on the
+    system.
+  - V3′ is strictly stronger than V3 where both can be read: it requires every
+    refutation to be correct, not just one non-refutation. It is still a
+    post-hoc rule and is labelled as such in the results.
+- **Also disclosed.**
+  - S3 draw 0 branch 3 (an unsatisfiable draw) was killed with exit 137 twice.
+    The resumed queue re-ran it, and the second attempt overwrote the first
+    one's empty output and log.
+  - It is unmeasured. Draw 0's verdict rests on branch 4, which saturates
+    degree 4 without refuting.
