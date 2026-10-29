@@ -28,3 +28,9 @@ by multiplying(1+epsilon*x)(1+epsilon*y);no novelty claim. Nativehelpers copied
 andpinned,originalsourcesunchanged. Pythonassembly/hash/metadataonly.
 Eachbuildandnativecall4GiBvirtual/1200s,Cargo-j1offline. Checkpointbeforeeach;
 noEKS/Diem/waitingfreeze/fifthclaim/merge,budgetincrease orperformanceclaim.
+
+ProspectiveLean2namedtheorems: weightedsecondcoefficient ratio recovers pair
+sum overanyfield withnonzero scale;the polynomialwithgiven sum/product equals
+the product oflinearroot factors overanycommutativering. Characteristic2
+nativeformula usesplusfor minus. This formalizes the algebra only,not a
+sourcecover identification. SamepinnedLean/mathlib,-j1-M4096/1200,CPU0,audit.
