@@ -124,7 +124,7 @@ jobs:
             examples
       - name: Materialize native build inputs
         working-directory: source
-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates
+        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native
       - name: Install the pinned native toolchain
         run: |
           sudo apt-get update -qq
