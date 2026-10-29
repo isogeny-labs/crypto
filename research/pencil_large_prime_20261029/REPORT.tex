@@ -26,6 +26,12 @@ The four Lean declarations cover pivot equivalence, substitution, balanced
 cycles and unbalanced cycles. Their direct compiler result and axiom report
 are retained separately. They do not formalize the full forest invariant or
 prove correspondence with Rust.
+The retained residual basis is now also compared with the independent reference
+at all 25,600 prefixes. Seven native tests pass. Explicit working and retained
+coefficient caps leave the basis unchanged on rejection; callers must stop or
+retain that rejected row. Logical counters include failed attempts but omit
+map comparisons, allocation, setup and exponentiation internals. These are
+coefficient limits, not process-memory guarantees or a complete cost model.
 \section*{Next integration gates}
 \begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
 Requirement & Status\\\midrule

@@ -100,6 +100,34 @@ environment from the existing projective-law proof checkout.
 
 ## Remaining integration work
 
+### Retained residual basis (T-791)
+
+`residual::Basis` retains the emitted small-row space as a normalized sparse
+echelon basis. Feed every `Outcome::Constraint` to it; only `Independent` and
+`Dependent` mean the equation was incorporated. `WorkingCap` or `RetainedCap`
+leaves the basis unchanged and requires the caller to stop or preserve the
+unincorporated input. Continuing while discarding it would lose information.
+The graph is not rolled back by a residual rejection; an integrated collector
+must treat rejection as terminal unless it explicitly retains the row.
+
+Limits count coefficients, not bytes. The working limit applies after every
+map update, including input canonicalization; input order can therefore affect
+when a cap fires even when later terms would cancel. Caller-owned inputs,
+forest storage, tree-node overhead and allocator memory lie outside these
+limits. They are not a process memory guarantee.
+
+Logical counters retain attempted input terms, pivot lookups, coefficient
+updates, normalization multiplications and inversions, including failed
+attempts. They omit map comparisons, allocation costs, primality setup and
+the underlying multiplication work of exponentiation. They cannot establish
+a full cost ratio. All 25,600 prefix comparisons now also check the retained
+basis against the independent dense reference; two new tests check caps,
+duplicate cancellation and malformed-input behavior. Seven tests pass.
+
+This implements downstream symbolic elimination only. Collector wiring and
+complete cost accounting remain open; the existing four Lean lemmas do not
+prove this additional Rust module.
+
 1. Freeze the small-base partition and admission policy on the original
    1,260 public workload identities. Preserve Jacobian relation checks.
 2. Account for every vector traversal, coefficient operation, parent hop,

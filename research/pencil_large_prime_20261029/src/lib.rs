@@ -9,6 +9,8 @@ use std::collections::BTreeMap;
 
 pub type Sparse = BTreeMap<usize, u64>;
 
+pub mod residual;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     NonPrimeModulus,
@@ -272,6 +274,15 @@ mod tests {
                     state
                 };
                 let mut g = SymbolicGraph::new(p, nl, ns).unwrap();
+                let mut basis = residual::Basis::new(
+                    p,
+                    ns,
+                    residual::Limits {
+                        retained_coefficients: ns * ns,
+                        working_coefficients: ns,
+                    },
+                )
+                .unwrap();
                 let mut original = Vec::new();
                 let mut emitted = Vec::new();
                 for _ in 0..40 {
@@ -290,6 +301,11 @@ mod tests {
                     }
                     original.push(dense);
                     if let Outcome::Constraint(row) = g.insert(&large, &small).unwrap() {
+                        let terms: Vec<_> = row.iter().map(|(&i, &v)| (i, v)).collect();
+                        assert!(matches!(
+                            basis.insert(&terms).unwrap(),
+                            residual::Insert::Independent | residual::Insert::Dependent
+                        ));
                         let mut dense = vec![0; ns];
                         for (i, v) in row {
                             dense[i] = v;
@@ -307,6 +323,17 @@ mod tests {
                         "p={p} seed={seed} prefix={}",
                         original.len()
                     );
+                    let retained: Vec<_> = basis
+                        .rows()
+                        .map(|row| {
+                            let mut dense = vec![0; ns];
+                            for (&i, &v) in row {
+                                dense[i] = v;
+                            }
+                            dense
+                        })
+                        .collect();
+                    assert_eq!(rref(retained, p, ns), expected);
                     prefixes += 1;
                 }
             }
