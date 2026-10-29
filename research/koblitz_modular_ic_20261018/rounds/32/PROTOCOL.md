@@ -30,3 +30,11 @@ one-dimensional presented tangent space. The proper normalization, local
 dimension of the incidence scheme, nonprincipality and intended modular
 factor image remain separate. Lean may certify generic unit-witness
 specialization, but native matrices are not thereby imported into Lean.
+
+## Pretrial refusal and infrastructure correction
+
+jac83-01 stopped at checkpoint gate before any source copy/CAS invocation:
+the condensed .resume/RESUME.md lacked seven required handoff sections.
+Restore the complete handoff, not the gate/helper, and retry the unchanged
+frozen input with fresh jac83-02. Preserve jac83-01/gate.log. No failed
+scientific trial or altered mathematical acceptance criterion is inferred.
