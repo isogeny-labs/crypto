@@ -2,10 +2,112 @@
 
 This is a mathematical implementation step toward the still-incomplete
 1,260-target pencil cohort. It contains an exact finite-field row reducer,
-independent unit tests, and four field-identity Lean lemmas. It has no curve
-interface and returns symbolic linear constraints, not a target scalar.
+independent unit tests, and four field-identity Lean lemmas. Its library
+returns symbolic linear constraints. An optional producer integrates the
+library into the existing synthetic pencil cohort path; it is compile-tested,
+not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
+
+## Reusable per-target solver (T-802)
+
+`native_solver::solve_one` accepts a source instance, public target, algorithm
+seed, explicit denominator/coefficient cap, and an optional installed allocator
+observer. It does not read an archive, environment variables or a planted
+answer, print output, or invoke rho. The shared source imports caller-provided
+`engine` and `kernel` aliases for later ecbench integration without crossing
+incompatible engine types. The standalone binary owns input selection, known
+answer checks, matched rho, and the global allocator.
+
+Output is now `pencil-symbolic-cohort-target/v2`, with nested per-target cold
+setup. Setup is physically repeated for each target and includes target
+validity checking. The exact 16-walk rule and signed relation processing are
+unchanged; archived trial_cap remains rho's cap. Result storage retains graph
+and solver allocations, but setup temporaries drop before rho. This is a new
+live-memory baseline, not an identical v1 allocation boundary. No v2 cohort
+has been run. Missing observer fields are null, not zero. Panics are terminal
+for a measured execution even though a guard restores the observation flag.
+
+New development checks reject unsupported configuration/source metadata,
+check unavailable-observer serialization and flag cleanup. There are 14 default
+library tests and 21 producer-feature library tests (including six extracted
+solver tests); binary tests now live with the shared implementation. Root
+method registration, serialization-only kernel feature, and full cohort
+execution remain open. Costs remain incomplete and ratios null.
+
+## Execution-route reconciliation (T-801)
+
+The earlier access diagnosis incorrectly treated the phrase "research EKS"
+as namespace `research`. The repository access guide and retained October 24
+access audit specify namespace `isolab`, with the existing host identity in
+`isolab:submitters`. On October 29 the documented harness connection returned
+permission to create Jobs and listed nine terminal Jobs (seven succeeded,
+two failed, none active). The installed MCP overview agreed. No identity,
+permission, or client configuration changed. The default context's launcher
+AssumeRole denial persists, but it does not block the documented connection.
+
+`EXECUTION_RECONCILIATION.json` records this scope and the separate expired
+Diem/freeze lane. No historical task-owned EKS Job ID was found in the inspected
+four-lead records; absence is not a historical result. No Job was submitted.
+
+The next execution dependency is integration: the current producer is a
+standalone CLI. The maintained resumable contract accepts native ecbench
+workloads, not arbitrary commands. The existing `ecbench/three_leads.rs`
+adapter and method registry provide the integration point; reuse the exact
+producer arithmetic through a per-target API, retain source checks, and add
+an explicit method ID. Do not substitute a non-resumable command job for the
+required recovery path. Protocol, image/binary identity, controls, pricing
+and the existing upper gate must still be satisfied before a cohort starts.
+
+## Phase attribution and scalar pricing boundary (T-798)
+
+The producer now rejects exports when named phases do not sum to field,
+native arithmetic and symbolic totals. Cold setup is added only after that
+check. Deterministic walk-label generation is inside the generation phase.
+`candidate_phase_overhead_ns` retains the nonnegative difference between the
+whole candidate interval and its phase intervals, including bookkeeping and
+control flow. It does not make unisolated clocks eligible for a speed claim.
+
+A source audit found asymmetric inversion instrumentation: the pencil
+`pow` and symbolic inverse helpers count their internal multiplications,
+whereas the reference `Ring::inv` records an inverse and calls unmetered
+`modpow`. Thus the historical raw scalar event sum is not a common atomic
+inverse model. The native `scalar_ledger` module removes the pencil inverse
+multiplications before applying a common atomic scalar-I valuation. It retains
+non-inverse multiplications, including primality work where observed. Scalar-I
+weights are not automatically equated to base-field inversion weights.
+
+`COST_MODEL_DRAFT.json` gives exact formulas and unresolved admission gates;
+it is explicitly not a frozen experiment protocol. A regression compares the
+actual pencil inverse and actual reference Ring inverse, including their
+normalized ledgers. Another rejects mismatched field/native/symbolic phase
+sums and impossible elapsed-time sums. Historical artifacts are unchanged;
+no revised numerical ratio has been computed from them.
+
+Source references: `src/cryptanalysis/three_leads.rs` (`Ring`, `modpow`),
+the frozen `pencil_sparse_20261022/src/bin/price_sparse.rs` analyzer, this
+producer's `pow`, and the symbolic library's inverse implementation. No
+claim of complete logical accounting follows from normalized scalar counts.
+
+## Sparse map observations (T-797)
+
+The symbolic maps now record map API calls, ordered-key comparisons, yielded
+entries and cloned entries. Numeric key ordering and JSON coefficient maps
+are preserved. Iterators forward the underlying exact size hint so collecting
+rows does not add growth allocations merely because instrumentation was added.
+Serialization bypasses metering; equality, length queries, dropped iterator
+remainders and internal tree-node movement are not charged by these counters.
+These are separate semantic observations, not a count of all CPU instructions.
+Comparison counts depend on the Rust standard-library implementation; the
+recorded toolchain identity is part of the measurement contract.
+
+The implementation follows the official
+[BTreeMap API](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html):
+ordered traversal and consistent lookup ordering. A read-only peer review
+identified lost iterator size hints; forwarding and regression assertions
+were added before delivery. Current validation is 14 default library tests,
+21 producer-feature library tests, including six shared-solver tests. Cohort
+execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs
 
@@ -99,6 +201,97 @@ The Lean toolchain and mathlib revision are pinned in `lean-toolchain` and
 environment from the existing projective-law proof checkout.
 
 ## Remaining integration work
+
+### Allocation observations (T-796)
+
+The producer now forwards global allocation calls to Rust `System` through
+`allocation::ObservedSystem`. Hooks use only atomics, do not allocate or
+unwind, and preserve successful and failed reallocation ownership. The test
+uses an independent observer to check zero initialization, grow/shrink payload
+preservation, successful requested-layout replacement totals and peak reset.
+Twelve library tests and three producer tests pass.
+
+Each phase and the shared cold setup record allocation/deallocation/reallocation
+calls, failures, successful requested/released layout bytes, absolute peak live
+requested bytes, and growth over entry. An independent outer candidate envelope
+includes between-phase work and bookkeeping; inner phase resets do not erase
+its peak. Rho has a region spanning its computation and source check. Timing
+envelopes remain diagnostics until the protocol's execution/isolation gate.
+
+These observations are not RSS, physical memory, bytes copied, or allocator
+internal transient storage. The optimizer may remove calls. Rho's absolute
+peak includes still-live candidate state and shared inputs; growth-over-entry
+is net process-wide growth, not exclusive algorithm ownership. Reallocation
+counts replacement of the requested old layout by the successful new layout;
+failed requests change failure/call counts only. Phase aggregation sums events
+and takes maxima of phase peaks, whereas the candidate envelope is measured
+directly. Graph teardown after verification and output serialization are
+outside the computational envelope. Observation regions must be sequential
+and single-threaded; one outer envelope may contain the sequential phases.
+
+The implementation follows the [Rust GlobalAlloc contract](https://doc.rust-lang.org/std/alloc/trait.GlobalAlloc.html),
+including its reentrancy, non-unwinding and optimizer caveats. Independent
+read-only review checked the pointer/layout forwarding and interpretation.
+No prices are assigned to bytes or allocator events yet; native index work
+and the frozen price/export contract remain necessary. No cohort was run.
+
+### Symbolic arithmetic and phase accounting (T-795)
+
+`meter::Snapshot` records actual calls to scalar add, multiply, negate and
+explicit inverse helpers, standalone modular reductions, sparse accumulation,
+payload visits, parent hops, partition visits and primality checks. It is
+thread-local and includes rejected-row work. Multiplications inside inversion
+remain counted; Miller--Rabin powers never count as inversions. Standalone
+reduction events exclude the remainders already included in add/multiply.
+Residual diagnostic inversion/update counts overlap this ledger and must
+not be charged again as separate arithmetic.
+
+The producer now records `solver_setup` (node map, partition, both primality
+checks and graph/basis construction), plus symbolic deltas on every measured
+phase. It asserts that these phase deltas sum to the target's symbolic total.
+Direct pivot lookup replaces the two whole-basis scans. No performance gain
+has been measured. Once-per-curve geometry setup remains charged cold to
+each target under the existing convention.
+
+These are semantic events, not CPU instructions or complete allocation and
+index accounting. The attribution invariant covers metered events only.
+Full cost remains marked incomplete. Tests now include eleven library tests
+and three producer tests, with explicit inverse/primality/rejection and
+phase-attribution regressions. Independent read-only review found no concrete
+instrumentation or lookup-equivalence bug.
+
+### Optional geometric producer (T-793)
+
+Build with `cargo build --locked --release --features producer --bin
+pencil-symbolic`. The producer is a scoped fork of the frozen pencil source
+blob `e974121a123e13316ce3fcc820b4eca3f65a8a3a`; the original stays unchanged.
+It preserves the rational-point sieve, complement factor checks, Jacobian
+relation identity, source verification and same-process rho control. There
+is no independent dual-norm check in this cohort path. The source's 16-point
+subgroup projection diagnostic is retained; it is not a universal proof.
+
+The only execution mode is `--cohort BITS P`, run from the repository root.
+`PENCIL_SMALL_DENOMINATOR` must be explicit (2, 4, 8 or 16). The partition
+selects original identity-ordered columns divisible by that denominator;
+both symbolic label columns remain small. Node order must be identity. No
+value has been chosen by measurement or frozen for an experiment yet.
+
+Rows rejected for three large variables retain their collection and
+geometric-check work in the producer phases. New setup and target schema IDs
+are `pencil-symbolic-cohort-setup/v1` and `pencil-symbolic-cohort-target/v1`.
+Both explicitly report `incomplete_graph_and_allocation_accounting`; target
+cost ratios are null. Old price analyzers must not consume these records.
+Residual counters do not include graph work and are not total solver counts.
+
+At T-793 delivery the optional feature passed ten library tests and two producer tests.
+The latter compare signed coefficient encoding against the frozen eliminator
+and ensure a constant-only inconsistent equation fails. They use algebraic
+fixtures, not sampled curves or performance data. Clippy passes with warnings
+denied. Review caught the missing constant-only check and an inaccurate copied
+dual-norm comment; both were corrected. Legacy peeling allocation and dead
+execution modes were removed. No geometric cohort was run. Full graph
+accounting, process resource limits, protocol amendment and experiment
+admission still precede execution.
 
 ### Composed relation adapter (T-792)
 
