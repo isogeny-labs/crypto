@@ -842,6 +842,28 @@
      "class": "engineering",
      "anchor": "#n83-tier1-finalist-20261017",
      "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md"
+    },
+    {
+     "anchor": "#lab-ecbench-all",
+     "class": "accounting",
+     "date": "2026-10-26",
+     "detail": "ic-pair-rule over rho-neg per target in bitop/v1 gates, `ecbench amortize` over the committed bitop-ladder hold-out sessions (80 verified runs per arm and curve, both arms completely priced), re-read with the target-aware reusable/per-target split: rho-neg's set-up uses the target, so none of it is reusable and rho's per-target cost rises to its whole total; IC's reusable work is unchanged. Per-target ratio 4.406 at r = 2^16 (was 6.364 under the stored split), 4.41-58.92 across 16-40 bits (stored 5.81-58.94); the correction matters most at small r, where set-up is a larger share. The cold ratio (total/total) is unchanged, 6.23 at 16 bits to 78.3 at 40, and the break-even window is null on every curve under both splits: rho stays cheaper per target and cold. Class accounting: a re-priced split, not an IC improvement; the stored-split figure is kept in the detail as 'was'.",
+     "label": "ic_acct2: per-target IC/rho under the target-aware split, closest cell icv1-fp16-t73-6dc97f36 (r = 2^16)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct2_setup_20261021/README.md",
+     "unit": "bitop/v1 gates per target",
+     "value": 4.4057560478065305
+    },
+    {
+     "anchor": "#lab-ecbench-all",
+     "class": "accounting",
+     "date": "2026-10-26",
+     "detail": "ic-pair-rule over rho-neg per target in bitop/v1 gates, `ecbench amortize` over the committed bitop-ladder hold-out sessions (80 verified runs per arm and curve, both arms completely priced), re-read with the target-aware reusable/per-target split: rho-neg's set-up uses the target, so none of it is reusable and rho's per-target cost rises to its whole total; IC's reusable work is unchanged. Per-target ratio 58.916 at r = 2^40 (was 58.940 under the stored split): at the largest hold-out size set-up is a negligible share, so the correction barely moves the ratio and the gap to rho per target grows with r. Cold ratio 78.26, unchanged. Class accounting: a re-priced split, not an IC improvement.",
+     "label": "ic_acct2: per-target IC/rho under the target-aware split, largest cell icv1-fp40-tm924137-0ecaaeb9 (r = 2^40)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct2_setup_20261021/README.md",
+     "unit": "bitop/v1 gates per target",
+     "value": 58.91643100772734
     }
    ],
    "role": "context"

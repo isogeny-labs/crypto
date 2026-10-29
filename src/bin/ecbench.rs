@@ -181,6 +181,13 @@ enum Cmd {
         /// Search break-even up to 2^this many targets.
         #[arg(long, default_value_t = 40)]
         limit_log2: u32,
+        /// Read the reusable/per-target split each committed work block
+        /// carries instead of re-deriving it from its phases under the
+        /// current, target-aware rule (`work::target_split`): the
+        /// classification a block was committed with, for before/after
+        /// comparisons.
+        #[arg(long)]
+        stored_split: bool,
     },
     /// List every method with its parameters.
     Methods {
@@ -541,6 +548,13 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// What of each run to fit, with `--unit bitop/v1`: `total` (every
+        /// gate, the default), `per-target` (the gates a further target on
+        /// the same curve pays again) or `search` (the search phases only:
+        /// a generic walk's `search`, IC's `relations` + `linear_algebra`).
+        /// A partial basis enters the unit (`bitop/v1+per_target`).
+        #[arg(long, default_value = "total", value_parser = work_cost_basis)]
+        cost: crypto_lib::cryptanalysis::ecbench::work::CostBasis,
         /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
         /// re-derives records fitted before the version-2 refusals; new
         /// bounds are version 2.
@@ -820,6 +834,10 @@ fn report_problems(problems: &[String]) {
     }
 }
 
+fn work_cost_basis(s: &str) -> Result<crypto_lib::cryptanalysis::ecbench::work::CostBasis, String> {
+    crypto_lib::cryptanalysis::ecbench::work::CostBasis::parse(s)
+}
+
 fn print_json(v: &impl serde::Serialize) -> Result<(), String> {
     println!(
         "{}",
@@ -935,6 +953,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             arm,
             reference,
             limit_log2,
+            stored_split,
         } => {
             use crypto_lib::cryptanalysis::ecbench::work;
             // (curve, arm) -> (reusable, per-target) gates of each verified run.
@@ -953,13 +972,19 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         _ => work::price_record(&r)?,
                     };
                     let f = |s: &str| s.parse::<f64>().unwrap_or(f64::NAN);
+                    let (reusable, per_target) = if stored_split {
+                        (f(&w.reusable_bitops), f(&w.per_target_bitops))
+                    } else {
+                        let (a, b) = work::target_split(&r.method.id, &w)?;
+                        (a as f64, b as f64)
+                    };
                     log2_r.insert(
                         r.workload.curve.slug.clone(),
                         (r.workload.curve.r as f64).log2(),
                     );
                     by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
                         .or_default()
-                        .push((f(&w.reusable_bitops), f(&w.per_target_bitops), w.complete));
+                        .push((reusable, per_target, w.complete));
                 }
             }
             let mean = |v: &[(f64, f64, bool)]| {
@@ -1007,6 +1032,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 "unit": crypto_lib::cryptanalysis::bitops::UNIT,
                 "arm": arm,
                 "reference": reference,
+                "split": if stored_split { "stored" } else { "target_aware" },
                 "model": "arm: reusable once + per_target each; rho: reusable once + per_target * sum_{k<T} C(2k,k)/4^k (Kuhn-Struik, no detection lag)",
                 "curves": rows,
             }))?;
@@ -1773,6 +1799,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 unit,
                 weight,
                 param_rule,
+                cost,
                 fit_version,
                 out,
             } => {
@@ -1791,6 +1818,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         unit,
                         weight,
                         param_rule,
+                        cost,
                         fit_version,
                     },
                     audit_refs: &[],

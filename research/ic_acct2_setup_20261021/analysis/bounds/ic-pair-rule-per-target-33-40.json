@@ -1,0 +1,469 @@
+{
+  "admissibility": {
+    "bounded": false,
+    "deterministic": true,
+    "reasons": [],
+    "status": "admissible",
+    "unpriced": []
+  },
+  "bound_id": "ECBND1h051029e0234a",
+  "constant": {
+    "declared_ratio_to_floor": null,
+    "ratio_to_floor": {
+      "ci95": [
+        32.99908641319846,
+        51.88874389950664
+      ],
+      "ci_method": "cluster",
+      "value": 42.34103102145164
+    },
+    "s": {
+      "ci95": [
+        29.07762766628141,
+        45.454723869269515
+      ],
+      "ci_method": "cluster",
+      "value": 37.52376174264089
+    }
+  },
+  "dimensions": {
+    "memory": {
+      "ci95": null,
+      "known": false,
+      "lower_is_better": true,
+      "source": "first of counters.inserts_uncharged, counters.table_inserts_uncharged, counters.table_entries, counters.distinguished_points",
+      "statistic": "mean table entries / sqrt(r) over verified runs",
+      "value": null
+    },
+    "ops": {
+      "ci95": [
+        32.99908641319846,
+        51.88874389950664
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "cost.total_gae, workload.curve.r, automorphisms_available",
+      "statistic": "mean S / sqrt(pi / 2A) over verified runs",
+      "value": 42.34103102145164
+    },
+    "uncharged": {
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "counters.*_uncharged",
+      "statistic": "mean sum of *_uncharged counters / sqrt(r) over verified runs",
+      "value": 0.0
+    }
+  },
+  "domain": {
+    "envelope": {
+      "precomputation": "none",
+      "targets": 1,
+      "threads": 1
+    },
+    "family": "prime",
+    "problem": "ecdlp.single_target",
+    "target_kind": "public",
+    "tier": "medium",
+    "unit": "bitop/v1+per_target"
+  },
+  "domain_id": "ECDOM1he9498c36a6b5",
+  "fit": {
+    "alpha": 0.7705594841168942,
+    "alpha_agrees_with_declared": null,
+    "alpha_ci95": [
+      0.7155674966850929,
+      0.849348123438506
+    ],
+    "alpha_in_additions": 0.6927968953192266,
+    "alpha_in_additions_ci95": [
+      0.637421448916246,
+      0.7715271711183711
+    ],
+    "ci_method": "cluster",
+    "declared_alpha": null,
+    "log2_c": 11.606915662764173,
+    "model": "bitops = C * r^alpha",
+    "points": 640,
+    "r_squared": 0.9316598160655117,
+    "scaling_claim": true,
+    "size_parameter": "r",
+    "sizes": 8
+  },
+  "fit_options": {
+    "cost": "per-target",
+    "curves": [],
+    "param_rule": "research/bitop_ladder_20261019/PROTOCOL.md Phase A: base per size from params.json (train panel, bitop/v1)",
+    "resamples": 2000,
+    "seed": 20261005,
+    "tier": null,
+    "unit": "bitop/v1"
+  },
+  "improves_on": [],
+  "label": "ic_acct2 setup study: ic-pair-rule, per-target, 33-40 bits",
+  "level": "exponent",
+  "method": {
+    "entry": "ic_framework::run_pipeline",
+    "family": "ic",
+    "id": "ic.pipeline",
+    "method_id": "ic.pipeline under rule: research/bitop_ladder_20261019/PROTOCOL.md Phase A: base per size from params.json (train panel, bitop/v1)",
+    "params": {
+      "factor_base": "per size",
+      "linalg": "incremental-gauss",
+      "max_trials": "1000000000000",
+      "oracle": "mitm:negation_folded=1",
+      "solver": "",
+      "solver_budget_seconds": "0",
+      "targets": "walk"
+    }
+  },
+  "notes": "",
+  "provenance": {
+    "audits": [],
+    "records": 640,
+    "sessions": [
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P33",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "cea4799ac6489001a473fc5356f47e9e60a24dd9fbf0acde483d04e43289aa95",
+        "role": "candidate",
+        "session_id": "ECBS1hfddc6b1bf527",
+        "spec_id": "ECS1h69392d37f06a",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P34",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "d0c6be1d9c2caf5f2d44e8428a70a41e18fa76440dcdd446f7fa693e2714e0b2",
+        "role": "candidate",
+        "session_id": "ECBS1h6b88e2e0dcfc",
+        "spec_id": "ECS1hb8560b637385",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P35",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "cac0a528c30ce5202c7be7c5d42ffa29c04dc6b6dcd4d1db01725a2768ce912b",
+        "role": "candidate",
+        "session_id": "ECBS1h57c33cc8e787",
+        "spec_id": "ECS1h0199d02e8202",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P36",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "3f789c8101ab7d692f5f38484fe063c5158a2826f131ff32e074d6de85c67aa1",
+        "role": "candidate",
+        "session_id": "ECBS1hebd0986bdd37",
+        "spec_id": "ECS1hebafc4824c01",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P37",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "5dde707144448f05a5160521d3297edc2fdd4135e784590f0f5e9227797d6ba3",
+        "role": "candidate",
+        "session_id": "ECBS1hc29c92515083",
+        "spec_id": "ECS1hbd041f5b13bc",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P38",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "137e3be117fedf3ee136603ca3858d81f754b76a95f542c4de8ed8c4bcc8a9af",
+        "role": "candidate",
+        "session_id": "ECBS1ha35210a3a470",
+        "spec_id": "ECS1hd3256a4cdd06",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P39",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "84643486b43ff1610ba7e55960eb0f59b2e51bc909ef0ec4d6d35bb1e6ec55ac",
+        "role": "candidate",
+        "session_id": "ECBS1h002abafd20d4",
+        "spec_id": "ECS1h4400bac78434",
+        "status": "complete"
+      },
+      {
+        "arm": "ic-pair-rule",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P40",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "9bb27d4fdf3aecf1239a7339ba9cd26c0eb9ee0f",
+        "records_sha256": "a59fbcad248729aea2a52d2827202f557e9de9c9f32829468c3c28464305a28c",
+        "role": "candidate",
+        "session_id": "ECBS1hd0e3edf18f17",
+        "spec_id": "ECS1h119bbbea889e",
+        "status": "complete"
+      }
+    ],
+    "statuses": {
+      "verified": 640
+    },
+    "verified": 640
+  },
+  "schema": "ecbench.bound/v1",
+  "sizes": [
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 33,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 33.00001316148336,
+      "mean_gae": 176263179688.7375,
+      "mean_s": 27.01841670376954,
+      "memory_entries_per_sqrt_r": null,
+      "r": 8590012957,
+      "ratio_to_floor": 30.48701853643896,
+      "runs": 80,
+      "s_ci95": [
+        25.81920331117868,
+        28.111823108479154
+      ],
+      "slug": "icv1-fp33-tm78373-cca7741c",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 34,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 34.000008869423716,
+      "mean_gae": 206965990158.9625,
+      "mean_s": 21.157983916692793,
+      "memory_entries_per_sqrt_r": null,
+      "r": 17179974803,
+      "ratio_to_floor": 23.874228269338065,
+      "runs": 80,
+      "s_ci95": [
+        20.232688212744613,
+        22.030560261466086
+      ],
+      "slug": "icv1-fp34-tm105659-9a86130d",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 35,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 34.99999599782884,
+      "mean_gae": 346744529743.6125,
+      "mean_s": 23.68021783683769,
+      "memory_entries_per_sqrt_r": null,
+      "r": 34359643051,
+      "ratio_to_floor": 26.720264479371217,
+      "runs": 80,
+      "s_ci95": [
+        22.823579833475932,
+        24.47760589993576
+      ],
+      "slug": "icv1-fp35-t95269-01c9f49d",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 36,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 35.9999904645676,
+      "mean_gae": 811741092828.45,
+      "mean_s": 37.091619477651825,
+      "memory_entries_per_sqrt_r": null,
+      "r": 68719022539,
+      "ratio_to_floor": 41.85341069241646,
+      "runs": 80,
+      "s_ci95": [
+        35.49282629586494,
+        38.49028001770307
+      ],
+      "slug": "icv1-fp36-t454193-44a20818",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 37,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 36.99999550370267,
+      "mean_gae": 1284758578121.5125,
+      "mean_s": 39.3374463473731,
+      "memory_entries_per_sqrt_r": null,
+      "r": 137438525131,
+      "ratio_to_floor": 44.38755494511328,
+      "runs": 80,
+      "s_ci95": [
+        36.925363572160855,
+        41.726079789190344
+      ],
+      "slug": "icv1-fp37-t428317-60c650c8",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 38,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 37.99999514454181,
+      "mean_gae": 2212627016844.375,
+      "mean_s": 45.46026474389936,
+      "memory_entries_per_sqrt_r": null,
+      "r": 274876981831,
+      "ratio_to_floor": 51.29641566766266,
+      "runs": 80,
+      "s_ci95": [
+        43.43886066981553,
+        47.359869500165786
+      ],
+      "slug": "icv1-fp38-t925069-ef71b7ab",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 39,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 38.99999796079857,
+      "mean_gae": 3633374912430.0625,
+      "mean_s": 50.15950793578802,
+      "memory_entries_per_sqrt_r": null,
+      "r": 549755036827,
+      "ratio_to_floor": 56.598943786505245,
+      "runs": 80,
+      "s_ci95": [
+        47.48441827212884,
+        52.45051554141865
+      ],
+      "slug": "icv1-fp39-t776897-fef4eae4",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 40,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 40.00000121230319,
+      "mean_gae": 6060044664915.638,
+      "mean_s": 56.284636979114715,
+      "memory_entries_per_sqrt_r": null,
+      "r": 1099512551701,
+      "ratio_to_floor": 63.51041179476675,
+      "runs": 80,
+      "s_ci95": [
+        53.377914051788174,
+        58.85153978593965
+      ],
+      "slug": "icv1-fp40-tm924137-0ecaaeb9",
+      "uncharged_per_sqrt_r": 0.0,
+      "verified": 80,
+      "workloads": 80
+    }
+  ],
+  "stages": [
+    {
+      "alpha": 0.7709950612662597,
+      "alpha_ci95": [
+        0.7157813498119768,
+        0.8544563896109179
+      ],
+      "mean_gae": 1839928854711.711,
+      "name": "relations",
+      "share_of_gae": 0.9991115486645192,
+      "sizes_with_work": 8
+    },
+    {
+      "alpha": 0.48572073734205073,
+      "alpha_ci95": [
+        0.3295780254469401,
+        0.5802177327526852
+      ],
+      "mean_gae": 1631058538.3578124,
+      "name": "linear_algebra",
+      "share_of_gae": 0.0008856915407615021,
+      "sizes_with_work": 8
+    },
+    {
+      "alpha": 0.11926753047540177,
+      "alpha_ci95": [
+        0.11392104284977128,
+        0.12522912854755228
+      ],
+      "mean_gae": 5082341.35,
+      "name": "verify",
+      "share_of_gae": 2.759794719256056e-6,
+      "sizes_with_work": 8
+    }
+  ],
+  "verdict_id": null
+}

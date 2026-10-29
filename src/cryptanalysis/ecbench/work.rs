@@ -74,10 +74,15 @@ pub struct WorkBlock {
     pub known_uncounted: Vec<String>,
     /// `unpriced` and `known_uncounted` are both empty.
     pub complete: bool,
-    /// Gates a second target on the same curve would not repeat: the
-    /// factor base and the oracle's tables, a walk's jump table, a BSGS
-    /// baby-step table, a target-blind rank ([`is_reusable_phase`]).  Read by
-    /// `ecbench amortize`; absent from blocks written before it existed.
+    /// Gates a second target on the same curve would not repeat: work that
+    /// never touches the target, such as the factor base and the oracle's
+    /// tables, a BSGS baby-step table, a target-blind rank or a jump table
+    /// built from the generator alone ([`is_reusable_phase`]).  A walk whose
+    /// set-up uses the target (tuned rho's `[a]G + [b]Q` jumps, kangaroo's
+    /// wild start) has none.  Read by `ecbench amortize`; absent from
+    /// blocks written before it existed.  A block committed before the
+    /// classification depended on the target carries the old split; the
+    /// readers re-derive it from the phases ([`target_split`]).
     #[serde(default)]
     pub reusable_bitops: String,
     /// The rest: what every further target pays again.
@@ -85,20 +90,144 @@ pub struct WorkBlock {
     pub per_target_bitops: String,
 }
 
-/// Whether a phase is work a further target on the same curve reuses.
-/// For the single-target pipeline only the factor base and the oracle's
-/// tables are: its target rides in the relation stream, so its relations
-/// and elimination are per target (an amortised method that solved the
-/// base's logarithms once would do better, and must be measured as such,
-/// as `ic.shared_rank` is).
+/// Whether a phase is work a further target on the same curve reuses,
+/// which holds exactly when the phase's work does not use the target.
+/// The phase name alone does not say so: a phase named `setup` is
+/// target-free in BSGS (baby steps and the giant stride are multiples of
+/// `G`) and in the strong rho (its jumps are drawn before `Q` is read),
+/// but target-dependent in
+///
+/// - `rho.plain` and `rho.negation`, whose set-up builds `G + Q`, the jumps
+///   `M_j = [a_j]G + [b_j]Q` and the start stride
+///   (`ic_boundary::rho_walk_with`), and
+/// - `kangaroo.vow`, whose set-up holds the wild start `Q + [off]G` and
+///   every restart.  Its `jump_count − 1` jump-table doublings are
+///   target-free but share the phase with the starts and are not
+///   separable from the record, so the whole phase is counted per target
+///   (they are `O(log r)` of the `O(√r)` walk).
+///
+/// Phase names are part of the replay comparison, so the rule is
+/// method-aware rather than the phases renamed.  For the single-target IC
+/// pipeline only the factor base and the oracle's tables are reusable:
+/// its target rides in the relation stream, so its relations and
+/// elimination are per target (an amortised method that solved the base's
+/// logarithms once would do better, and must be measured as such, as
+/// `ic.shared_rank` is).
 pub fn is_reusable_phase(method: &str, phase: &str) -> bool {
     if method == "ic.shared_rank" {
         return !phase.starts_with("target_");
+    }
+    if matches!(method, "rho.plain" | "rho.negation" | "kangaroo.vow") {
+        return false;
     }
     matches!(
         phase,
         "factor_base" | "oracle_setup" | "setup" | "base" | "table"
     )
+}
+
+/// `(reusable, per_target)` gates of a work block, re-derived from its
+/// phases under [`is_reusable_phase`], so a block priced before the rule
+/// depended on the target reads with the current classification.
+pub fn target_split(method: &str, w: &WorkBlock) -> Result<(u128, u128), String> {
+    let total: u128 = w
+        .bitops
+        .parse()
+        .map_err(|_| "bitops is not an integer".to_string())?;
+    let mut reusable: u128 = 0;
+    for p in &w.phases {
+        if is_reusable_phase(method, &p.name) {
+            reusable += p
+                .bitops
+                .parse::<u128>()
+                .map_err(|_| format!("phase `{}`: bitops is not an integer", p.name))?;
+        }
+    }
+    Ok((reusable, total.saturating_sub(reusable)))
+}
+
+/// What a bound fit counts of each run (`bound fit --cost`).
+///
+/// - `total`: every gate of the work block (the default; a bound fitted
+///   before the option existed is a `total` bound).
+/// - `per-target`: the gates a further target on the same curve pays again
+///   ([`target_split`]).
+/// - `search`: the search phases only ([`is_search_phase`]): for the
+///   generic walks and tables (rho, BSGS, kangaroo, claw), the phase named
+///   `search`, leaving out set-up, internal verification, recovery and the
+///   `natives` phase (field additions and hash probes counted outside the
+///   group phases); for index calculus (method family `ic`), `relations`
+///   plus `linear_algebra`, leaving out the factor base, the oracle's
+///   set-up and verification.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum CostBasis {
+    #[default]
+    Total,
+    PerTarget,
+    Search,
+}
+
+impl CostBasis {
+    pub fn is_total(&self) -> bool {
+        *self == CostBasis::Total
+    }
+
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "total" => Ok(Self::Total),
+            "per-target" => Ok(Self::PerTarget),
+            "search" => Ok(Self::Search),
+            o => Err(format!(
+                "no cost basis `{o}`; one of total, per-target, search"
+            )),
+        }
+    }
+
+    /// The suffix the basis adds to the unit (`bitop/v1+per_target`), so a
+    /// bound on a partial cost never shares a domain or an id with a total.
+    pub fn unit_suffix(&self) -> Option<&'static str> {
+        match self {
+            Self::Total => None,
+            Self::PerTarget => Some("per_target"),
+            Self::Search => Some("search"),
+        }
+    }
+}
+
+/// Whether a phase is search work under [`CostBasis::Search`].
+pub fn is_search_phase(family: &str, phase: &str) -> bool {
+    if family == "ic" {
+        matches!(phase, "relations" | "linear_algebra")
+    } else {
+        phase == "search"
+    }
+}
+
+/// The gates of `w` under `basis` for a run of `method` in `family`.
+pub fn basis_bitops(
+    method: &str,
+    family: &str,
+    w: &WorkBlock,
+    basis: CostBasis,
+) -> Result<u128, String> {
+    match basis {
+        CostBasis::Total => w
+            .bitops
+            .parse()
+            .map_err(|_| "bitops is not an integer".to_string()),
+        CostBasis::PerTarget => Ok(target_split(method, w)?.1),
+        CostBasis::Search => {
+            let mut g: u128 = 0;
+            for p in w.phases.iter().filter(|p| is_search_phase(family, &p.name)) {
+                g += p
+                    .bitops
+                    .parse::<u128>()
+                    .map_err(|_| format!("phase `{}`: bitops is not an integer", p.name))?;
+            }
+            Ok(g)
+        }
+    }
 }
 
 /// The Kuhn–Struik series `Σ_{k<T} C(2k,k)/4^k`: the expected cost of
@@ -1005,10 +1134,15 @@ pub fn price_record(
 pub fn bitop_view(
     r: &crate::cryptanalysis::ecbench::record::Record,
 ) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
-    let w = match &r.work {
+    let mut w = match &r.work {
         Some(w) => w.clone(),
         None => price_record(r)?,
     };
+    // The split as the current rule reads it, whatever the block was
+    // committed with (`target_split`).
+    let (reusable, per_target) = target_split(&r.method.id, &w)?;
+    w.reusable_bitops = reusable.to_string();
+    w.per_target_bitops = per_target.to_string();
     let mut v = r.clone();
     let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
     let total: f64 = w.bitops.parse().map_err(|_| "bitops is not an integer")?;
@@ -1045,6 +1179,42 @@ pub fn bitop_view(
         }
     }
     v.work = Some(w);
+    Ok(v)
+}
+
+/// The bitop view of a record ([`bitop_view`]) with its cost read on
+/// `basis` ([`CostBasis`]): the total, `S` and the ratio to the floor
+/// count only that basis's gates, and the unit names the basis
+/// (`bitop/v1+per_target`, `bitop/v1+search`), so a fit on it is its own
+/// domain.  The phases are those the basis counts (the per-target phases,
+/// or the search phases), so a bound's stage table divides the basis's
+/// gates by the basis's total and its shares sum to one.  Counts,
+/// identities and timings are unchanged.  The total basis is the bitop
+/// view itself.
+pub fn basis_view(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+    basis: CostBasis,
+) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
+    let mut v = bitop_view(r)?;
+    let Some(suffix) = basis.unit_suffix() else {
+        return Ok(v);
+    };
+    let w = v.work.as_ref().expect("the bitop view carries its work");
+    let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
+    let g = basis_bitops(&r.method.id, &r.method.family, w, basis)? as f64;
+    v.cost.unit = format!("{}+{suffix}", bitops::UNIT);
+    let (method, family) = (r.method.id.as_str(), r.method.family.as_str());
+    v.phases.retain(|p| match basis {
+        CostBasis::Total => true,
+        CostBasis::PerTarget => !is_reusable_phase(method, &p.name),
+        CostBasis::Search => is_search_phase(family, &p.name),
+    });
+    if v.cost.total_gae.is_some() {
+        v.cost.total_gae = Some(g);
+        let s = g / ((r.workload.curve.r as f64).sqrt() * add);
+        v.cost.s = Some(s);
+        v.boundaries.ratio_to_floor = Some(s / v.boundaries.floor_s);
+    }
     Ok(v)
 }
 
@@ -1907,6 +2077,154 @@ mod tests {
         assert_eq!(w.phases.len(), 1);
     }
 
+    fn setup_and_search(method: &str) -> WorkBlock {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                adds: 10,
+                doubles: 5,
+                gae: 15.0,
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                adds: 100,
+                gae: 100.0,
+                ..Default::default()
+            },
+        ];
+        let params = BTreeMap::new();
+        price(&Priceable {
+            method_id: method,
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn reusable_work_is_work_that_never_touches_the_target() {
+        // Tuned rho's set-up builds G + Q and [a]G + [b]Q; kangaroo's holds
+        // the wild start Q + [off]G: nothing of either survives a new target.
+        for m in ["rho.negation", "rho.plain", "kangaroo.vow"] {
+            let w = setup_and_search(m);
+            assert_eq!(w.reusable_bitops, "0", "{m}");
+            assert_eq!(w.per_target_bitops, w.bitops, "{m}");
+            assert_eq!(target_split(m, &w).unwrap(), (0, w.bitops.parse().unwrap()));
+        }
+        // BSGS's baby steps and stride are multiples of G: reusable.
+        let w = setup_and_search("bsgs.negation");
+        assert_eq!(w.reusable_bitops, w.phases[0].bitops);
+        assert_ne!(w.reusable_bitops, "0");
+        let total: u128 = w.bitops.parse().unwrap();
+        let setup: u128 = w.phases[0].bitops.parse().unwrap();
+        assert_eq!(
+            target_split("bsgs.negation", &w).unwrap(),
+            (setup, total - setup)
+        );
+        // The strong rho draws its jumps before it reads Q.
+        assert!(is_reusable_phase("rho.signed_frobenius_strong", "setup"));
+        // IC: the factor base and the oracle's tables, not the relations.
+        assert!(is_reusable_phase("ic.pipeline", "factor_base"));
+        assert!(is_reusable_phase("ic.pipeline", "oracle_setup"));
+        assert!(!is_reusable_phase("ic.pipeline", "relations"));
+    }
+
+    #[test]
+    fn cost_bases_count_what_they_name() {
+        let w = setup_and_search("rho.negation");
+        let total: u128 = w.bitops.parse().unwrap();
+        let search: u128 = w.phases[1].bitops.parse().unwrap();
+        let b = |m: &str, f: &str, w: &WorkBlock, c| basis_bitops(m, f, w, c).unwrap();
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::Total), total);
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::PerTarget), total);
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::Search), search);
+        let w = setup_and_search("bsgs.negation");
+        let setup: u128 = w.phases[0].bitops.parse().unwrap();
+        assert_eq!(
+            b("bsgs.negation", "bsgs", &w, CostBasis::PerTarget),
+            w.bitops.parse::<u128>().unwrap() - setup
+        );
+        assert!(is_search_phase("ic", "relations") && is_search_phase("ic", "linear_algebra"));
+        assert!(!is_search_phase("ic", "search") && !is_search_phase("ic", "factor_base"));
+        assert!(is_search_phase("kangaroo", "search") && !is_search_phase("rho", "natives"));
+        for (s, c) in [
+            ("total", CostBasis::Total),
+            ("per-target", CostBasis::PerTarget),
+            ("search", CostBasis::Search),
+        ] {
+            assert_eq!(CostBasis::parse(s).unwrap(), c);
+            assert_eq!(serde_json::to_value(c).unwrap(), serde_json::json!(s));
+        }
+        assert!(CostBasis::parse("all").is_err());
+    }
+
+    /// The committed bitop ladder's blocks were priced when a walk's
+    /// `setup` counted as reusable; read through the view they carry the
+    /// target-aware split, and the per-target basis names itself.
+    #[test]
+    fn committed_blocks_read_with_the_target_aware_split() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/bitop_ladder_20261019/sessions/holdout-P24");
+        let recs = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let first = |arm: &str| recs.iter().find(|r| r.arm == arm && r.counts()).unwrap();
+        for arm in ["rho-neg", "kangaroo"] {
+            let r = first(arm);
+            let stored = r.work.as_ref().unwrap();
+            assert_ne!(
+                stored.reusable_bitops, "0",
+                "{arm}: committed with the old rule"
+            );
+            let v = bitop_view(r).unwrap();
+            let w = v.work.as_ref().unwrap();
+            assert_eq!(w.reusable_bitops, "0", "{arm}");
+            assert_eq!(w.per_target_bitops, w.bitops, "{arm}");
+            let p = basis_view(r, CostBasis::PerTarget).unwrap();
+            assert_eq!(p.cost.unit, "bitop/v1+per_target");
+            assert_eq!(p.cost.total_gae, v.cost.total_gae);
+            let s = basis_view(r, CostBasis::Search).unwrap();
+            assert_eq!(s.cost.unit, "bitop/v1+search");
+            let search: f64 = w
+                .phases
+                .iter()
+                .find(|p| p.name == "search")
+                .unwrap()
+                .bitops
+                .parse()
+                .unwrap();
+            assert_eq!(s.cost.total_gae, Some(search));
+        }
+        let r = first("bsgs-neg");
+        let stored = r.work.as_ref().unwrap();
+        let w = bitop_view(r).unwrap().work.unwrap();
+        assert_eq!(w.reusable_bitops, stored.reusable_bitops);
+        assert_ne!(w.reusable_bitops, "0");
+        let r = first("ic-pair-rule");
+        let s = basis_view(r, CostBasis::Search).unwrap();
+        let w = r.work.as_ref().unwrap();
+        let ph = |n: &str| -> f64 {
+            w.phases
+                .iter()
+                .find(|p| p.name == n)
+                .unwrap()
+                .bitops
+                .parse()
+                .unwrap()
+        };
+        assert_eq!(
+            s.cost.total_gae,
+            Some(ph("relations") + ph("linear_algebra"))
+        );
+        assert_eq!(
+            basis_view(r, CostBasis::Total).unwrap().cost.unit,
+            "bitop/v1"
+        );
+    }
+
     #[test]
     fn memory_of_a_baby_step_table_and_of_a_walk() {
         let c = curve("prime", 20, (1 << 19) + 21, 2);
@@ -2072,7 +2390,14 @@ mod tests {
             // one ulp off the written text for some values, so compare with
             // the line as written: under `arbitrary_precision` a `Value`
             // keeps each number's decimal token, and the comparison is exact.
-            let written: serde_json::Value = serde_json::from_str(line).unwrap();
+            let mut written: serde_json::Value = serde_json::from_str(line).unwrap();
+            // The fixture predates the target-aware split (a rho set-up that
+            // builds `[a]G + [b]Q` is per target); its stored split is read
+            // through `target_split`, as every reader does, and the rest of
+            // the block must match byte for byte.
+            let (reusable, per_target) = target_split(&r.method.id, committed).unwrap();
+            written["work"]["reusable_bitops"] = reusable.to_string().into();
+            written["work"]["per_target_bitops"] = per_target.to_string().into();
             assert_eq!(
                 serde_json::to_value(price_record(r).unwrap()).unwrap(),
                 written["work"],
