@@ -87,6 +87,14 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   assert.equal(classify(['research/pkm_example_ecbench_20261016/sessions/one/session.json']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/interrupted/run1/records.jsonl']).ecbench_replay, true);
   assert.equal(classify(['research/isogeny_example/README.md']).ecbench_replay, false);
+  // Sessions outside research/ (SHF-20261028-0f3f64, PPN-6).
+  for (const file of ['taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/session.json',
+    'taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/records.jsonl',
+    'experiments/example/session/records.jsonl.gz', 'experiments/example/session/ecbench_records.jsonl.gz']) {
+    assert.equal(classify([file]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['taskq/deploy/eks-karpenter/validation/README.md']).ecbench_replay, false);
+  assert.equal(classify(['taskq/deploy/example/session.json.bak']).ecbench_replay, false);
   for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
     'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
     assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
