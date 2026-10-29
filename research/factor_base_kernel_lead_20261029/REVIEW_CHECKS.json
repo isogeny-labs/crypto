@@ -72,5 +72,31 @@
     "First sparse-checkout add included unsupported --no-cone option; no paths changed, then normal add succeeded.",
     "Initial diagram line exceeded its box; shortened text and rebuilt PDF. Final pages2-4 render byte-identical to previously inspected pages; final page1 reinspected."
   ],
-  "scope_note": "No native/Cargo/fixture/old-study/card/registry/alias/store/benchmark/leaderboard edit. This file reports review/document validation only, not a measured result or a validation/v1 claim."
+  "scope_note": "No native/Cargo/fixture/old-study/card/registry/alias/store/benchmark/leaderboard edit. This file reports review/document validation only, not a measured result or a validation/v1 claim.",
+  "documentation_checks": {
+    "artifact_policy": {
+      "command": "python3 tools/artifacts/artifacts.py check 4c87143544eab488543cefacd59a3e86f59c6592",
+      "exit_code": 0,
+      "output": "artifacts check: no data files committed"
+    },
+    "large_files": {
+      "command": "bash scripts/check-large-files.sh 4c87143544eab488543cefacd59a3e86f59c6592",
+      "exit_code": 0,
+      "output": "no added or modified file over10485760bytes"
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    },
+    "canonical_graph_search": {
+      "paths": [
+        "docs/index-calculus-scoreboard.html",
+        "docs/ic/progress-timeline.json",
+        "docs/ic/LEADERBOARD.md"
+      ],
+      "query": "factor_base_excess_20261026|factor_base_chart_complements_20261019",
+      "matches": 0,
+      "changes": 0,
+      "rationale": "no new measured or admitted result in this source-audit review"
+    }
+  }
 }
