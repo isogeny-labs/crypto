@@ -575,6 +575,37 @@ draws (N = 43, 136,698 columns), 8 branches per draw.
 - **Units.** Oracle costs are in monomial-column touches and rho is in
   group operations, unconverted (§2).
 
+## Pair invariant `p = x₁x₂` inside the chain (2026-10-28): no lower degree at ℓ = 6, unresolved at ℓ = 7
+
+`research/dreg_pair_invariant_20261028/` (pre-registered; `RESULTS.md`,
+`results.pdf`) asks whether the summand-swap invariant lowers the m = 3
+closure degree.
+
+- **The construction.** At m = 3 every cubic monomial comes from `x₁x₂e₁`.
+  Adding `p = x₁x₂` as unknowns over `span{v_i v_j}` turns the first link
+  into the quadratic `s²e₁² + p e₁ + p² + b`, so every equation is
+  quadratic. A matched control adds the non-invariant `r = x₁e₁`.
+- **Draws.** The same committed draws at (22, 6) and (21, 7).
+- **Result.** Neither arm refutes at degree 3 on any of 8 unsatisfiable
+  draws (registered verdict: H_none in both cells).
+  - Degree 4 is unmeasured for the new arms: a sparse run capped at 10⁹
+    entries.
+  - Their degree-4 matrices have 5.1–5.5 times the columns of the plain
+    system's.
+  - So the invariant arm refutes no earlier than the plain chain (which
+    refutes at 4 at (22, 6)), at a larger matrix.
+- **Measured at (22, 6), open at (21, 7).**
+  - At (22, 6), where the plain chain refutes at 4, the invariant arm does
+    not help: no lower degree, and a larger matrix.
+  - At (21, 7) the plain chain does not refute at 4 (degree-5 matrix: 974,982
+    columns). Q's degree 4 (637,393 columns) is unmeasured, so a lower degree
+    there is not excluded. That measurement needs a large-memory host.
+  - At m = 4 the second cubic link has no summand symmetry.
+- **Untried.**
+  - The invariants as a *replacement* for the summand coordinates, so that N
+    falls.
+  - The orbit-aware split rule (`RESEARCH_EXOTIC_COORDINATES.md` §18).
+
 ## Reproducing
 
 ```sh
@@ -587,4 +618,5 @@ cargo run --release --example descent_degree_cost                        # §2's
 cargo run --release --example dreg_score -- closure research/dreg_closure_mutantxl_20261016/runs/*.jsonl  # §6
 cargo run --release --example dreg_score -- scale research/dreg_closure_scale_20261016/runs/*.d*.jsonl  # §7
 cargo run --release --example dreg_score -- scale research/dreg_closure_driver_20261016/runs/*.d*.jsonl  # §8
+cargo run --release --example dreg_invariant_score -- research/dreg_pair_invariant_20261028/runs  # pair invariant
 ```
