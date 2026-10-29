@@ -1,6 +1,6 @@
 # APS single-relation complete-cost validation
 
-**Status:** open implementation/accounting and access gap; updated 2026-10-28.
+**Status:** open implementation/accounting and access gap; updated 2026-10-29.
 
 The [bounded native study](../research/aps_extensions_20261026/README.md)
 checks the paper's relation path and several extension mechanisms on tiny
@@ -8,8 +8,10 @@ public fixtures. Its F4 counter does not include complete factor-base/label
 construction, symbolic polynomial construction, root decoding, sign search,
 deduplication or final verification. `prime_fast` and the new expression layer
 do not yet supply a complete common operation tally for this route. The JSON
-fixture runner is not an ecbench/unified experiment export or independent
-transcript replayer.
+fixture runner is not an ecbench/unified experiment export. The
+[2026-10-29 replay continuation](../research/aps_replay_20261029/README.md)
+now supplies independent EC/sampling/relation replay for its emitted fixed
+public-fixture transcripts; cost and execution-history attestation remain open.
 
 Consequently the current receipts establish bounded correctness only. They
 cannot decide whether a partition, unordered-divisor presentation, sparse
@@ -19,8 +21,10 @@ This is not a mathematical obstruction to an improvement.
 The [blocked backlog card](../backlog/XP-20261026-aps-complete-cost-panel/README.md)
 preserves the requested controlled comparison. To unblock it:
 
-1. Instrument all phases and retries, implement independent transcript replay,
-   and integrate native ecbench/export output. Verify that an intentionally
+1. Instrument all phases and retries and integrate native ecbench/export output.
+   Extend the fixed-fixture mathematical replayer to the completed panel's
+   records, including pre-transcript abort outcomes and metric validation.
+   Verify that an intentionally
    expensive setup changes total cost, and that invalid relations fail closed.
 2. Choose the exact curve/target/base populations, controls, effect threshold,
    sample size, seeds, runtime envelope and external solver comparison. Freeze
@@ -57,3 +61,20 @@ bases under the existing controls, retain exhausted and uninformative
 attempts, and price the complete route. The blocked card names the four
 additional comparisons. Its original exit criteria remain in force; neither
 this implementation nor the upload rejection proves a mathematical limit.
+
+## Independent arithmetic replay (2026-10-29)
+
+The new replayer uses separate existing BigUint point arithmetic, independently
+regenerates seeds/draws/labels, verifies all emitted signed relations and useful
+recoveries, and checks complete coordinate sets by finite point enumeration.
+The CLI cross-checks all twelve arms in both enumeration modes. Corrupt labels,
+omitted complete-set roots, invalid signs/status/retry counts and B=0 witnesses
+with the correct public answer are rejection controls.
+
+This closes the mathematical replay component for emitted transcripts on the
+three current fixtures. It does not price producer work or attest solver
+diagnostics: its receipts explicitly set `costs_attested=false` and
+`execution_history_attested=false`. A future timed driver needs a frozen,
+common verification interval and separately reported post-run completeness
+auditing. Full operation accounting, native export, supported parameter ladder,
+metric validation, protocol and source-checkpoint approval are still owed.
