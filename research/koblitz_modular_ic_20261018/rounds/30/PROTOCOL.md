@@ -1,0 +1,73 @@
+# R30 prospective exact computations and scale-up
+
+User objective: generate further leads, pursue the existing transfers, and
+scale to larger sizes. No speed, IC-rank or attack claim is in scope.
+Prior turn made progress: R27–R29 records, proofs and publication changed
+repository state. Reconciliation on the same replacement boot finds Diem
+terminal50/52, no pending owner, all visible EKS jobs terminal and unrelated,
+and PR2683 head de7fe9bf1 with review/migrate SUCCESS. No external job is repeated.
+
+## Literature and existing evidence
+
+Read R22 RECOVERY.md (actual n=5 augmentation maps), R27 CM.md (proper source
+and actual cusp class), R29 NEXT.md, ACCEPTANCE.md, and ordinary13_lift.rs
+(division polynomials, kernels and scalar fibers). The generic ideation/atlas
+allocator is not installed in this recovered crypto checkout; attempted atlas
+entry point in sibling checkout is also absent. New directions below are
+study-local hypotheses, without novelty or official ledger promotion.
+Underlying algebra: cyclic geometric sum and inversion across a square-zero
+ideal, in the elementary commutative-ring sense. Primary reference: Stacks
+Project, Lemma 10.32.4 (locally nilpotent ideals and units),
+https://stacks.math.columbia.edu/tag/0AMF . Section and lemma text checked on the primary site before source freeze.
+The mathematical claim is independently derived by displayed ring identities.
+No reliance on a bibliographic label substitutes for the certificate.
+
+## SCALE30: frozen first candidate family
+
+This is a generalization of the polynomial pattern, not a claim that the
+actual n=5 geometric maps exist for all n. Over O=Z[w], w^2+w+2=0, in
+O[r]/(r^n-1), set m=(2+w)+7r+(6+2w)r^3 and the second map7I.
+Restricting a certified identity to the augmentation lattice is legitimate;
+constructing corresponding geometric maps at larger n remains open.
+
+Prediction: least recoverable positive scalar is1 for odd n,7 for even n>=2.
+For odd n, alternating cyclic sum S=sum_{k=0}^{n-1}(-r^3)^k gives
+(1+r^3)S=2. Mod7, e=w-3 satisfies e^2=0 and
+m=5(1+r^3)+e(1+2r^3). Invert the first term and apply a square-zero inverse
+correction, lift both CM coefficient vectors to integers, and divide the
+residual1-B*m coefficientwise by7 to obtain an integral second map.
+For even n, evaluation r=-1,w=3 mod7 kills both maps and not1. The explicit
+map7I supplies scalar7. This also descends through the augmentation relation
+1+r+...+r^(n-1), since its value at-1 is0 for even n.
+
+Freeze odd n=[3,5,7,11,13,17,19,23,31,41,61,83,127,163,233,283,409,571,1021].
+Freeze even controls=[2,4,6,8,10,12,16,82,162,570].
+Each accepted case needs exact integral coefficient identities, explicit
+coefficients retained, independent multiplication order checks and a planted
+coefficient corruption rejected. Also retain n=5 comparison with actual
+R22 polynomial (not equality of a geometric map at new sizes).
+Counted outputs: n, augmentation rank n-1, least scalar, coefficients,
+nonzero coefficient counts, max absolute coefficients. No wall-clock metric.
+No coefficient search, sample selection, or statistical inference. No A/A
+needed because the claim is an exact identity; controls above are mandatory.
+
+## Colored lifts: next prospective amendment
+
+First recover the actual cyclic11 kernels/full-level coordinates for the
+selected R29 degree12 ordinary pair, then degree436 if the same bounded
+implementation admits it. This initial freeze does not authorize an
+unwritten kernel search: append exact inputs/algorithm/controls before it.
+Preserve degree12 multiplicity2/source-branch ambiguity. Base Frobenius
+coincidences alone are not colored deck offsets or trace-zero cancellation.
+
+## Execution and stopping
+
+Native Rust/Singular only for mathematics. Python/shell for assembly,
+provenance and archive checks. Each native call <=4GiB virtual/1200 seconds;
+Lean4.34.1/mathlib d13f23b, -j1 -M4096/1200seconds. No increase, no fifth
+Conductor claim, no EKS/Diem/waiting-freeze action, no PR merge/auto-merge.
+Local execution continues the prior authorized backend and bounds. Freeze
+source and retain source revision, exact commands, hashes, outputs and every
+failed attempt in fresh run dirs. Durable checkpoint gate before execution.
+No ledger status or performance promotion. Add universal Lean algebra where
+relevant, with named claims and axiom audit, and separate geometry boundaries.
