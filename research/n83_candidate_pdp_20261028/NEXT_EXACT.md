@@ -181,3 +181,18 @@ verified V4 nonmembership certificate, not merely nonmembership in a restricted
 V4 subspace. Exact LFD requires an additional global upper certificate. The
 prime positive-dimensional presentation and held-out matched elite-base search
 remain separate open obligations. Independent scientific review is pending.
+
+
+## 2026-10-29: propagation of verified V4 consequences
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. A restricted queue stall or cap gives no higher-fall bound and no global upper. Unrestricted V4 was not computed. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+All twelve retained m3 original/baseline/spike40 Koblitz/binary identities were
+attempted. See DEGREE4_PROPAGATION_DESIGN.md, DEGREE4_PROPAGATION_FORMAT.json,
+evidence/degree4-propagation/summary.json and experiment-degree4-propagation.export.json.
+Original fixed-base regularity values and all older datasets are preserved.
+Where no upper certificate exists, the next method must enlarge the admitted
+consequence family or supply a different global ideal certificate. Repeating
+the exhausted restricted queue alone cannot resolve that obligation.

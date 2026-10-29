@@ -1,7 +1,26 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: strict degree-four falls on the retained m3 systems
+## Latest: propagation of degree-four consequences
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. A restricted queue stall or cap gives no higher-fall bound and no global upper. Unrestricted V4 was not computed. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+Read the [native summary](evidence/degree4-propagation/summary.json),
+[certificate design](DEGREE4_PROPAGATION_DESIGN.md),
+[binary and JSON formats](DEGREE4_PROPAGATION_FORMAT.json),
+[unified export](experiment-degree4-propagation.export.json),
+[S3 objects](evidence/degree4-propagation-storage.json), and
+[restored verification](evidence/degree4-propagation-publication.json).
+The raw archive retains all attempted cases, rows, reductions, pending queues
+and affine checks. Replay requires the three immutable parent archives.
+
+Original point manifests, targets, equations and the 48-row fixed-base regularity
+view remain unchanged. Every base remains fixed across m2–9. The full n83
+three-family FFD/LFD characterization and held-out elite-base search remain open.
+
+## Earlier: strict degree-four falls on the retained m3 systems
 
 All twelve original/baseline/spike40 Koblitz/general-binary m3 cases passed
 production, fresh-process replay and replay after S3 restoration. Every case

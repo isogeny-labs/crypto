@@ -52,3 +52,74 @@ at18:54:30UTC, before affected data. All12 cases bind the unchanged witness case
 zero findings. Actual caller account104186811093 reverified. Binary remains
 fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2.
 Source bundle, checkpoint and production are next; no production outcome exists yet.
+
+## 19:07 UTC — production launched once
+
+### What was done
+Source bundle S3 roundtrip verified all five payloads. Checkpoint push and gate
+completed at checkpoint20261029T185835Z-f6aa1d68d3ed. Rechecked all six frozen
+source hashes and the native binary hash immediately before launch. Started
+the frozen shell runner once at2026-10-29T19:07:17Z, tool session34421,
+outer timeout48000s. Conductor scope recheck was clear.
+
+### Decisions made
+Observe the existing producer; retain every capped or failed case and never
+retry on an observation timeout. Original fixed-base regularity results remain
+separate from this global LFD upper-certificate attempt.
+
+### Open threads
+Production and fresh replay are active. Archive, S3-restored verification,
+unified export, data-first commit, report and final publication follow.
+
+### Errors
+No launch error. An initial read used an incorrect old summary path; corrected
+to evidence/degree4-witness/summary.json without changing any data.
+
+## 19:30 UTC — all producers and fresh replays complete
+
+### What was done
+The single runner exited0. Batch boundaries19:07:17Z–19:30:38Z. All12 producers
+and fresh replays passed. All12 stopped by restricted queue exhaustion, each
+adding249 independent cubic rows and no lower-degree row. Every global upper
+and exact LFD remains null; lower4 is inherited. The raw manifest inventories
+299 payloads. Final raw upload completed before archival began.
+
+### Decisions made
+Retain all2988 new rows and all operations despite the absent upper certificate.
+These counts give no elite-base ranking and no lower5. Archive and restore the
+new raw data before replay with all three immutable parent archives.
+
+### Open threads
+Data-publication helper launched once after terminal success. S3-restored replay,
+export validation, data-first commit, inspected report and final publication
+remain outstanding. Broader goal remains active.
+
+### Errors
+No producer/replay failure, timeout or resource cap. No native source, protocol,
+input point, target or equation changed during the run.
+
+## 19:49 UTC — S3-restored verification and export complete
+
+### What was done
+Archived328197064 raw bytes into59009744 bytes, SHA256
+7e6c97a8ef853f0f826b9660fabab4aff5043fc7306c24602180f916c2875918.
+Uploaded to the content-addressed store, downloaded, checked the archive hash
+and extracted fresh. All12 restored native replays passed. All299 raw,230
+prefix,270 suffix and370 witness manifest payloads matched before and after.
+The unified export passes file verification with zero findings. Navigation now
+indexes16datasets and verifies55file hashes; original fixed-base regularity
+JSON/CSV and BASE_BINDINGS are byte-identical to the preceding delivery.
+
+### Decisions made
+Publish all2988 independent new rows and operations. Exact/global upper remain
+unknown for all12 systems; this restricted procedure proves no lower5 and no
+elite-base advantage. Data is committed and pushed before report rendering.
+
+### Open threads
+Data commit/push, committed-metric check, inspected report, support archive,
+PR update and final checkpoint. Independent scientific review and broad goal
+remain open.
+
+### Errors
+No restored replay, manifest or export failure. Source/library parity permits
+reuse of the documented prior root-library validation; no repeat full run.

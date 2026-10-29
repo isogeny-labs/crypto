@@ -130,3 +130,17 @@ bound and complete V4 remain unknown. A proposed higher-fall witness must prove
 nonmembership in full V4 or furnish a valid separating certificate; failure of
 membership in a restricted V4 closure is insufficient. Prime presentations,
 held-out elite-base selection and independent scientific review remain open.
+
+
+## Fixed ell27 V4 consequence propagation, 2026-10-29
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. A restricted queue stall or cap gives no higher-fall bound and no global upper. Unrestricted V4 was not computed. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+See the [native results](../research/n83_candidate_pdp_20261028/evidence/degree4-propagation/summary.json),
+[upper-certificate argument](../research/n83_candidate_pdp_20261028/DEGREE4_PROPAGATION_DESIGN.md)
+and [restored checks](../research/n83_candidate_pdp_20261028/evidence/degree4-propagation-publication.json).
+Only a verified unit or exhaustive affine ideal equality can certify global
+upper4 under this protocol. Prime/higher-m global LFD, independent review and
+held-out matched elite-base selection remain separate unresolved requirements.
