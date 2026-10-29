@@ -1727,12 +1727,8 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             } else {
                 json!({"status":"worker_failed","solver_completed":false})
             };
-            if let Some(reason) = stop_reason {
-                outcome = json!({"status":reason,"solver_completed":false});
-            }
-            if !exit.success() && stop_reason.is_none() {
-                outcome = json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
-            }
+            outcome =
+                execution::terminal_outcome(outcome, stop_reason, exit.success(), exit.code());
             outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,

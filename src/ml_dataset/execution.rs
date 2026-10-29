@@ -144,6 +144,23 @@ fn boot_id() -> Result<String, String> {
         .map(|s| s.trim().to_owned())
         .map_err(|e| e.to_string())
 }
+/// Apply the supervisor's terminal decision. Retained worker result.json is
+/// separate evidence; a censored manifest never inherits its success labels.
+pub(super) fn terminal_outcome(
+    worker: Value,
+    stop: Option<&str>,
+    exit_success: bool,
+    exit_code: Option<i32>,
+) -> Value {
+    if let Some(reason) = stop {
+        return serde_json::json!({"status":reason,"solver_completed":false});
+    }
+    if !exit_success {
+        return serde_json::json!({"status":"worker_failed","exit_code":exit_code,"solver_completed":false});
+    }
+    worker
+}
+
 pub(super) fn deadline_expired(deadline: u64, observed: u64) -> bool {
     observed >= deadline
 }
@@ -251,9 +268,35 @@ mod tests {
     }
     #[test]
     fn successful_exit_observation_at_deadline_is_censored() {
-        assert!(!deadline_expired(100, 99));
-        assert!(deadline_expired(100, 100));
-        assert!(deadline_expired(100, 101));
+        // Same decision and terminal-outcome reducer as generate's observed
+        // successful child exit. No sleeps/process scheduling assumptions.
+        let worker = serde_json::json!({"status":"verified","solver_completed":true,"pdp_witness_verified":true,"exhaustive_no_decomposition":true});
+        for observed in [99, 100, 101] {
+            let stop = deadline_expired(100, observed).then_some("timeout");
+            let result = terminal_outcome(worker.clone(), stop, true, Some(0));
+            if observed < 100 {
+                assert_eq!(result, worker);
+            } else {
+                assert_eq!(
+                    result,
+                    serde_json::json!({"status":"timeout","solver_completed":false})
+                );
+                assert!(result.get("pdp_witness_verified").is_none());
+            }
+        }
+        assert_eq!(
+            terminal_outcome(
+                worker.clone(),
+                Some("trace_budget_exhausted"),
+                true,
+                Some(0)
+            )["solver_completed"],
+            false
+        );
+        assert_eq!(
+            terminal_outcome(worker, None, false, Some(137))["status"],
+            "worker_failed"
+        );
     }
     #[test]
     fn original_deadline_survives_setup_and_historical_replay() {
