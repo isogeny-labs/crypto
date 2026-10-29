@@ -39,3 +39,9 @@ Canonical `backlog validate` could not execute in the authoring runtime because
 Cargo/backlog were unavailable. The card is structurally inspected against
 `backlog/schema/card.v1.json`; canonical cross-field validation remains a gate,
 not a claimed pass.
+
+
+Canonical backlog verifier templates use `{out}`, the runner-chosen shard
+output directory. `outputs.verify` now addresses `{out}/records.private.jsonl`, the runner's existing private journal. The separate cairn checker retains its `{artifact}` interface.
+This template correction changes neither readiness nor the frozen protocol;
+no experiment, journal upload or checkpoint action is performed.
