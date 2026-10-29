@@ -45,6 +45,15 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
+records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
+and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
+and retained-assignment replay. Its timing wrapper exited 1 on a denied
+macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
+SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
+It has no matched rho or cold total-runtime row and remains outside the
+admitted table under the validation gate.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-icb-large-prime`](20261029-icb-large-prime/) | One- and two-large-prime partial relations (`mitm-frobenius-counted:m=3,large_primes={1,2},lp_domain_factor=c`, already on main) on the Koblitz compact-orbit pair-table pipeline at n = 53 and 61, against the plain table at equal envelope and at its optimum, and the strong signed-Frobenius rho; 2 + 2 sessions, planted logarithms, every arm verified | counted S at n = 53: best plain table 6.38 (440 columns), best two-large-prime arm 3.86 (paired 0.604 [0.599, 0.610]); n = 61: 7.62 (880 columns) vs 4.26 (0.559 [0.535, 0.578]); the order holds across the priced band for the best arms (0.604 / 0.635 / 0.730 at n = 53), other 2LP arms lose at weight 1; one large prime is worse than plain (1.47-1.73x); rho still ahead 30-35x (n = 53) and 47-64x (n = 61); a constant inside the classic pipeline, not Table A, not an exponent; 612 replays reproduced | Intel Xeon @ 2.10 GHz (family 6 model 207, AVX-512), 4 vCPU cloud container, `--allow-busy` (below L2) | [`research/icb_large_prime_n53_n61_20261029`](../research/icb_large_prime_n53_n61_20261029/report.html) ([PDF](20261029-icb-large-prime/REPORT.pdf)) |
