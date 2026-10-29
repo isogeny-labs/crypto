@@ -19,9 +19,11 @@ The root-library attempt first failed on a tracked sparse path dependency. That
 failure is retained. The subsequent tool session disappeared at the environment
 handoff; its log ends while compiling `isogeny_algos`. No matching process remains.
 The interruption receipt records a null exit code and signal because neither
-was observed. No clean pass or ongoing run is claimed. The check-in explicitly
-forbids a repeat broad-library run, so none was started. Repository validation
-required before pushing remains unsatisfied for this new branch.
+was observed. No clean pass or ongoing run is claimed. The PR #2857 check-in
+explicitly excludes a repeat broad-library run, so none was started here.
+Clarification is pending on whether that restriction also pauses the separately
+requested TR-04 work. Repository validation required before pushing remains
+unsatisfied for this new branch.
 
 The earlier completed 5,143/0/123 run on source `0044aaf9` belongs to PR #2857's
 separate immutable evidence. It does not validate this later base or TR-04.
