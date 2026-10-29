@@ -19,7 +19,7 @@
       "research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/protocol.json"
     ]
   },
-  "protocol_sha256_integrity_only": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
+  "protocol_sha256_integrity_only": "7fc75638c1922b3cf24ac17e1bece6c3e984e0fd16ae1bb92d27798deb7aa530",
   "preservation_checks": {
     "sample_size": true,
     "randomization": true,
@@ -38,10 +38,11 @@
     "independent_coverage_review": null,
     "cumulative_authorized_budget": null,
     "original_absolute_deadline": null,
-    "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
+    "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
     "launch_authorization": null,
-    "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze.",
-    "runtime_image_and_request_binding": null
+    "execution_time_envelope": "Explicit user approval first-gate-limits-20261029 permits3600seconds per execution for the first p739 gate, replacing its historical single external-command3600seconds envelope. Cumulative authorized budget and original absolute deadline remain pending; no total budget or later-stage authorization is inferred.",
+    "runtime_image_and_request_binding": null,
+    "iam_controller_authorization": null
   },
   "initial_schema_or_semantic_defect": "Derived finite_algorithm_gae metric initially lacked formula; corrected before final validation. Raw first finding retained.",
   "freeze_or_authorization_performed": false,
@@ -81,5 +82,27 @@
       "explicit attempts/resumed history and hashed evidence required for every observed row; unknown history refuses canonical export"
     ],
     "experiment_executions": 0
+  },
+  "first_gate_authorization_checks": {
+    "binding": {
+      "path": "first_gate_authorization.json",
+      "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
+      "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
+      "authority": "explicit_user_approval"
+    },
+    "preservation_checks": {
+      "sample_size": true,
+      "randomization": true,
+      "controls": true,
+      "execution": true,
+      "stopping_rules": true,
+      "invalidation_rules": true,
+      "arms": true,
+      "freeze": true,
+      "prepared_manifest_unchanged": true,
+      "budget_and_deadline_remain_pending": true,
+      "launch_authorization_remains_pending": true
+    },
+    "freeze_or_launch_performed": false
   }
 }

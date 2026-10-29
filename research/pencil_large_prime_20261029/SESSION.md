@@ -853,3 +853,14 @@ The user clarified that this is mathematical research on public synthetic known-
 ### Errors
 
 - The failed full suite asserted `obs.cpu.is_some()` and failed to reacquire a GPU capsule test lock. Exact serial confirmations passed in 0.12 seconds and 61.27 seconds respectively. The initial maintained-Clippy attempt also encountered missing tracked sparse fixtures; these were materialized before its successful recheck.
+
+## 2026-10-29 — Explicit approval of larger first-gate limits
+
+### What was done
+Recorded the user's explicit approval of the draft first-gate limits in protocol_draft/accounting_amendment_20261029/first_gate_authorization.json: all 60 prescribed p739 targets, a 25,000,000 coefficient cap, and 3,600 seconds per execution. The record references the originating question item without copying private transcript text. Bound the record by SHA256 in the unfrozen protocol and source ledger; updated the field-change ledger, README and validation receipt. Prior documents and checks are preserved as pre-first-gate-authorization-*.
+
+### Validation
+Canonical experiment.protocol/v1 validation passed with zero findings. Eleven preservation checks confirm unchanged sample size, randomization, controls, execution block, stopping/invalidation rules, instrument arms, draft freeze state, prepared manifest, pending cumulative budget/deadline and pending launch authorization. Protocol integrity SHA256: 7fc75638c1922b3cf24ac17e1bece6c3e984e0fd16ae1bb92d27798deb7aa530. Authorization-record SHA256: e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600.
+
+### Scope and pending items
+This narrowly resolves the historical 10m versus draft 25m coefficient conflict and single-command versus per-execution timeout conflict for the first gate only. It does not establish a cumulative budget, reset the original absolute deadline, approve IAM/controller changes, freeze a protocol, authorize launch or extend approval to later gates or the full cohort. Mathematical public synthetic known-answer scope and all scientific controls remain unchanged. No source-code change, experiment, cloud job, commit or push was performed by this documentation lane.

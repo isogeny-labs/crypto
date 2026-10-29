@@ -1,6 +1,6 @@
 # Unfrozen pre-data finite-accounting amendment
 
-This directory is a reviewable draft, not a protocol freeze, approved evidence review, resource authorization or experiment result. The historical clock-only draft and its instrument artifacts are preserved. No solver run, cloud submission or instrument build was started by this drafting lane.
+This directory is a reviewable draft, not a protocol freeze, approved evidence review, launch authorization or experiment result. A narrowly scoped user resource-limit approval is recorded below. The historical clock-only draft and its instrument artifacts are preserved. No solver run, cloud submission or instrument build was started by this drafting lane.
 
 `protocol.json` is version 2 of the existing draft. It binds instrument source `543a54b4b1c3be7052872af3ffe393a44c69a3c3`, records the completed static build 40938439022 under workflow commit `7d7f5495c5b85ae426efdbcb721b6faf72c1be14`, and binds its actual ecbench binary, artifact and completed receipt. Image/runtime bindings remain pending; historical binary `adb19f3e…` is not reused. Protocol integrity SHA256 is recorded in validation.json; this is not a frozen protocol hash.
 
@@ -12,8 +12,8 @@ The complete design remains 1,260 targets, five measured streams, one warmup, th
 
 ## Unresolved resource and admission bindings
 
-- Cap provenance: existing unfrozen signed-symbolic specs have 25m coefficients throughout, but the cited historical Markowitz p739 gate has 10m and upper gate 25m. Parent archaeology found T789 preserves historical caps and no explicit signed-symbolic 25m small gate authorization. The existing draft numbers are retained for review, not promoted to authorization or silently changed.
-- Time envelope: the original small gate's 3,600 seconds was one external gate-command limit. The existing expanded draft says 3,600 seconds per arm/execution. These are materially different cumulative envelopes. Preserve this as an unresolved amendment issue until the parent binds actual authorization.
+- First-gate cap: the user explicitly approved all 60 prescribed p739 targets with a 25m coefficient cap. This resolves the older 10m versus draft 25m conflict for this first gate only; the historical restriction remains preserved in prior records.
+- First-gate time: the user explicitly approved 3,600 seconds per execution for this first gate. This supersedes its historical single external-command 3,600-second envelope. It does not establish a cumulative resource budget, reset a deadline or authorize later stages.
 - Cumulative authorized resource budget and original absolute deadline remain null. Neither is inferred from a per-execution timeout or newly reset by migration/build activity.
 - Image/runtime identities, final independent nine-category source coverage review and launch authorization are pending.
 
@@ -35,13 +35,13 @@ Result: exit 0, 0 findings. `validation.json` records checker/schema hashes, exa
 
 The separate release analysis executables `analyze_pair` and `analyze_cohort` are now bound under `extensions.analysis_build`, with the completed build receipt, toolchain/command and individually verified binary hashes/sizes. All 13 build source files match commit 543a54b4b. These are analysis tools, distinct from the ecbench empirical instrument. The receipt records a plan-only, zero-observation check: 1,260 expected workloads, 6,300 expected pairs, 22,680 slots and all 36 aggregate ratios null. No solver executions or results were produced by this binding step.
 
-`pre-analysis-binding-*` files preserve the prior draft, field ledger, source bindings and successful canonical check before this update. The current validation log and JSON record the rerun against the amended document. Resource/cap/deadline issues, independent review, image/runtime bindings, freeze and launch authorization remain unresolved.
+`pre-analysis-binding-*` files preserve the prior draft, field ledger, source bindings and successful canonical check before this update. The current validation log and JSON record the rerun against the amended document. Remaining cumulative resource/deadline issues, independent review, image/runtime bindings, freeze and launch authorization remain unresolved.
 
 ## Completed static instrument binding
 
 All three arms now bind ecbench SHA256 `a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab`, from artifact 12926168934 of workflow run 40938439022. The binary size/hash and all four build evidence hashes were independently checked. All nine generated prepared-plan files match the recorded parity digests; the seven cohort plan digests also match the retained original plan manifest. The receipt records exact equality for both gate plans as well. Archive parity reports 1,260 matched workloads; plan parity and build preparation perform no solver executions. The completed receipt and toolchain/build-info are bound separately from the analysis executable receipt.
 
-`pre-instrument-binding-*` preserves the preceding analysis-bound draft and canonical validation. Image/runtime publication, independent review, cap conflict, cumulative budget, original deadline, freeze and launch authorization remain pending; none is granted by a successful build or schema check.
+`pre-instrument-binding-*` preserves the preceding analysis-bound draft and canonical validation. Image/runtime publication, independent review, cumulative budget, original deadline, freeze and launch authorization remain pending; none is granted by a successful build or schema check.
 
 ## Canonical packaging adapter
 
@@ -50,3 +50,7 @@ The separately bound `canonical_export/package.py` passed 14 software tests incl
 ## Canonical packaging explicit-history correction
 
 The separately bound `canonical_export/package.py` passed 17 software tests including actual canonical `check-export --verify-files`. It projects the common method-call clock, retains raw counts/calibration/resources, checks exact online phase names and hashes source/plan/record bindings. It grants no clock qualification, and retains missing-slot shortfall findings plus separate resource/retry history. See its README for canonical v1 representation limits. `pre-history-binding-*` preserves the preceding draft and validation; this addition does not freeze or authorize the study.
+
+## Narrow first-gate user approval
+
+`first_gate_authorization.json` records explicit user approval of the draft larger first gate: all 60 prescribed p739 targets, 25,000,000 coefficients and 3,600 seconds per execution. It references the question item without reproducing private transcript text. The protocol and source-binding ledger bind this record by SHA256. Historical documents and preceding checks remain in `pre-first-gate-authorization-*`. Prepared specs and scientific controls are unchanged. Cumulative budget, original absolute deadline, IAM/controller authorization, runtime/image bindings, independent review, freeze and launch remain pending. This approval is not extended to later gates or the full cohort.

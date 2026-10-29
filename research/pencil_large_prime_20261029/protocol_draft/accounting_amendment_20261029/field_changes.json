@@ -1,7 +1,7 @@
 {
   "schema": "pencil-protocol-field-changes/v1",
   "predecessor_sha256": "584545688b60b6134fdf28af0906da0d6ae0f0f37d6136dbb787884dd7328349",
-  "amended_sha256": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
+  "amended_sha256": "7fc75638c1922b3cf24ac17e1bece6c3e984e0fd16ae1bb92d27798deb7aa530",
   "changes": [
     {
       "path": "/amendments",
@@ -35,6 +35,20 @@
             "extensions.full_counted_cost_status",
             "extensions.instrument_build",
             "extensions.baseline_scope"
+          ]
+        },
+        {
+          "id": "A-first-gate-limits-20261029",
+          "filed": "2026-10-29",
+          "filed_before_affected_data": true,
+          "reason": "Record explicit user approval of the draft larger first-gate limits, narrowly and without freezing or launching.",
+          "changes": [
+            "Approve all60 prescribed p739 first-gate targets with25000000coefficient cap and3600seconds per execution.",
+            "Preserve prepared spec bytes, controls and all broader unresolved resource/admission requirements."
+          ],
+          "supersedes_fields": [
+            "extensions.pending_bindings.cap_provenance",
+            "extensions.pending_bindings.execution_time_envelope"
           ]
         }
       ]
@@ -726,10 +740,11 @@
         "independent_coverage_review": null,
         "cumulative_authorized_budget": null,
         "original_absolute_deadline": null,
-        "cap_provenance": "Current unfrozen prepared specs25m retained unchanged; older Markowitz p739 gate10m differs. Root archaeology found T789 preserves historical caps and no explicit signed-symbolic25m smallgate authorization. This conflicts with old10m smallgate and requires explicit resolution before freeze; prepared specs are not authorization.",
+        "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
         "launch_authorization": null,
-        "execution_time_envelope": "Original smallgate3600s was one external gate-command boundary; existing draft3600s per expanded arm/execution is materially different. Existing draft value retained for review only, not inferred authorization. Root must bind the approved whole-gate/cohort envelope before freeze.",
-        "runtime_image_and_request_binding": null
+        "execution_time_envelope": "Explicit user approval first-gate-limits-20261029 permits3600seconds per execution for the first p739 gate, replacing its historical single external-command3600seconds envelope. Cumulative authorized budget and original absolute deadline remain pending; no total budget or later-stage authorization is inferred.",
+        "runtime_image_and_request_binding": null,
+        "iam_controller_authorization": null
       }
     },
     {
@@ -779,7 +794,19 @@
         "Compose/pin tested runtime image with existing publish-runtime and validate CRIU+EBS request at300s checkpoint interval,max_restores1. Confirm120s interruption grace budget against controller; preserve immutable deadline, fence previous writer and verify coherent generation. Runtime build pending.",
         "Native full export/review adapter and independent review implementation; paired_export is diagnostic-only and never promotes qualified ratios itself.",
         "Pin all analysis sources/binary and schema/checker; freeze and commit before affected data.",
-        "Resolve signed-symbolic p739 coefficient-cap authorization separately from older Markowitz10m citation; preserve existing specs until resolved. No cumulative budget or original deadline is inferred from per-execution timeout."
+        "First p739 gate coefficient/time limits explicitly approved in first-gate-limits-20261029. Bind cumulative budget, original absolute deadline and remaining infrastructure/launch admission independently; no later-stage approval inferred."
+      ]
+    },
+    {
+      "path": "/extensions/resource_authorizations",
+      "operation": "add",
+      "after": [
+        {
+          "path": "first_gate_authorization.json",
+          "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
+          "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
+          "authority": "explicit_user_approval"
+        }
       ]
     },
     {
