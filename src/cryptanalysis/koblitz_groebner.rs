@@ -5970,14 +5970,14 @@ pub struct LinearHarvest {
 /// `parse_linear_harvest("root,gpv=0,rank=331")` stores it.
 ///
 /// **Repair R8 (2026-10-26).** Round 3 item 02 shipped `gpv < 0.9607 OR rank
-/// >= 331` ([`LINEAR_HARVEST_R3`]).  Against harvest off, the gpv half
+/// >= 331` ([`LINEAR_HARVEST_R3`]). Against harvest off, the gpv half
 /// regresses at (17,9) m2 and (19,10) m2 (rank < 331), in two paired data
 /// sets: `research/ic_improve3_20261015/02-harvest-gate/runs/fit_test.jsonl`
 /// line 78 (production CPU off/default 0.873 [0.783, 0.974]) and
 /// `research/ic_r8_harvest_default_20261026/` (production word operations
-/// 0.843 and 0.852, CIs excluding 1).  Every cell where the default wins
-/// has rank >= 331, so dropping the gpv half keeps the measured wins and
-/// makes the default counter-identical to off where it lost.
+/// 0.843 and 0.852, CIs excluding 1). Every cell where the default wins has
+/// rank >= 331, so dropping the gpv half keeps the measured wins and makes
+/// the default counter-identical to off where it lost.
 pub const LINEAR_HARVEST_DEFAULT: LinearHarvest = LinearHarvest {
     max_vars: u32::MAX,
     root_only: true,
