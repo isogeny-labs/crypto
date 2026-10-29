@@ -11,6 +11,7 @@ pub mod allocation;
 pub mod collector;
 pub mod meter;
 pub mod residual;
+pub mod scalar_ledger;
 pub mod sparse;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -38,6 +38,93 @@ mod graph_adapter_tests {
     use super::*;
 
     #[test]
+    fn atomic_scalar_ledger_matches_actual_inverse_instrumentation() {
+        use five_leads_study::three_leads::Ring;
+        use pencil_symbolic_graph::scalar_ledger::{pencil_atomic, rho_atomic};
+        let modulus = 101;
+        BASE_MODULUS.with(|v| v.set(739));
+        SCALAR_MODULUS.with(|v| v.set(modulus));
+        PRICE_ACTIVE.with(|v| v.set(true));
+        reset_arithmetic_counts();
+        let candidate = pow(7, modulus - 2, modulus);
+        let counts = arithmetic_counts();
+        PRICE_ACTIVE.with(|v| v.set(false));
+        let ring = Ring::new(modulus);
+        assert_eq!(candidate, ring.inv(7));
+        let reference = ring.counts.get();
+        assert_eq!(
+            pencil_atomic(
+                modulus,
+                counts.scalar_adds as u128,
+                0,
+                counts.scalar_muls as u128,
+                counts.scalar_inversions as u128
+            )
+            .unwrap(),
+            rho_atomic(
+                reference.add as u128,
+                reference.mul as u128,
+                reference.inv as u128
+            )
+        );
+    }
+
+    #[test]
+    fn phase_contract_rejects_missing_work_and_keeps_overhead() {
+        let field = Counts {
+            m: 3,
+            ..Counts::default()
+        };
+        let arithmetic = ArithmeticCounts {
+            base_muls: 7,
+            ..ArithmeticCounts::default()
+        };
+        let symbolic = meter::Snapshot {
+            map_calls: 11,
+            ..meter::Snapshot::default()
+        };
+        let phases = BTreeMap::from([(
+            "fixture",
+            PhaseTotals {
+                elapsed_ns: 20,
+                field,
+                arithmetic,
+                symbolic,
+                ..PhaseTotals::default()
+            },
+        )]);
+        assert_eq!(validate_phases(&phases, field, arithmetic, symbolic, 29), 9);
+        assert!(std::panic::catch_unwind(|| validate_phases(
+            &phases,
+            Counts::default(),
+            arithmetic,
+            symbolic,
+            29
+        ))
+        .is_err());
+        assert!(std::panic::catch_unwind(|| validate_phases(
+            &phases,
+            field,
+            ArithmeticCounts::default(),
+            symbolic,
+            29
+        ))
+        .is_err());
+        assert!(std::panic::catch_unwind(|| validate_phases(
+            &phases,
+            field,
+            arithmetic,
+            meter::Snapshot::default(),
+            29
+        ))
+        .is_err());
+        assert!(std::panic::catch_unwind(|| validate_phases(
+            &phases, field, arithmetic, symbolic, 19
+        ))
+        .is_err());
+    }
+
+    #[test]
     fn setup_and_elimination_partition_symbolic_events() {
         let s = Scholten::new(739);
         meter::reset();
@@ -174,7 +261,7 @@ impl GraphSolver {
     }
 }
 
-#[derive(Clone, Copy, Default, Serialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
 struct ArithmeticCounts {
     base_adds: u64,
     base_muls: u64,
@@ -237,6 +324,34 @@ fn measured<T>(
         .arithmetic
         .add_assign(arithmetic_counts().difference(before_arithmetic));
     result
+}
+// Reject an export if measured arithmetic escaped the named phases. The
+// envelope remainder includes bookkeeping and control flow, not missing field work.
+fn validate_phases(
+    phases: &BTreeMap<&'static str, PhaseTotals>,
+    field: Counts,
+    arithmetic: ArithmeticCounts,
+    symbolic: meter::Snapshot,
+    envelope_ns: u128,
+) -> u128 {
+    let mut field_sum = Counts::default();
+    let mut arithmetic_sum = ArithmeticCounts::default();
+    let mut symbolic_sum = meter::Snapshot::default();
+    let mut elapsed_sum = 0u128;
+    for phase in phases.values() {
+        field_sum = field_sum + phase.field;
+        arithmetic_sum.add_assign(phase.arithmetic);
+        symbolic_sum += phase.symbolic;
+        elapsed_sum = elapsed_sum
+            .checked_add(phase.elapsed_ns)
+            .expect("phase time overflow");
+    }
+    assert_eq!(field_sum, field, "unattributed field work");
+    assert_eq!(arithmetic_sum, arithmetic, "unattributed native arithmetic");
+    assert_eq!(symbolic_sum, symbolic, "unattributed symbolic work");
+    envelope_ns
+        .checked_sub(elapsed_sum)
+        .expect("phase time exceeds envelope")
 }
 thread_local! {
     static PRICE_ACTIVE: Cell<bool> = const { Cell::new(false) };
@@ -813,14 +928,14 @@ fn cohort_main(bits: u64, selected_p: u64) {
         let mut rejected_candidates = 0;
         let mut solution_key = None;
         'walks: for walk_index in 0..16u64 {
-            let a = walk_label(seed, walk_index, 0x4455, r);
-            let mut b = walk_label(seed, walk_index, 0x7788, r);
-            if b == 0 {
-                b = 1;
-            }
-            let d = measured(&s, &mut phases, "walk_generation", || {
+            let (a, b, d) = measured(&s, &mut phases, "walk_generation", || {
+                let a = walk_label(seed, walk_index, 0x4455, r);
+                let mut b = walk_label(seed, walk_index, 0x7788, r);
+                if b == 0 {
+                    b = 1;
+                }
                 let point = source.add(source.mul(generator, a), source.mul(target, b));
-                s.tau(s.from_short(point))
+                (a, b, s.tau(s.from_short(point)))
             });
             walks += 1;
             if d.degree != 2 {
@@ -881,14 +996,12 @@ fn cohort_main(bits: u64, selected_p: u64) {
         let candidate_elapsed_ns = candidate_clock.elapsed().as_nanos();
         let candidate_allocation = ALLOCATOR.finish_envelope(candidate_envelope);
         let mut pencil_arithmetic = arithmetic_counts();
-        let mut phase_symbolic = meter::Snapshot::default();
-        for phase in phases.values() {
-            phase_symbolic += phase.symbolic;
-        }
-        assert_eq!(
-            phase_symbolic,
+        let candidate_phase_overhead_ns = validate_phases(
+            &phases,
+            group_counts(&s),
+            pencil_arithmetic,
             meter::snapshot(),
-            "unattributed symbolic work"
+            candidate_elapsed_ns,
         );
         pencil_arithmetic.add_assign(setup_arithmetic);
         let pencil_field = group_counts(&s) + setup_field;
@@ -911,6 +1024,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
             "symbolic":graph.detail(),"cost_status":"incomplete_graph_and_allocation_accounting",
             "candidate_over_rho":Value::Null,
             "candidate_envelope_allocation":candidate_allocation,"candidate_elapsed_ns":candidate_elapsed_ns,
+            "candidate_phase_overhead_ns":candidate_phase_overhead_ns,
             "cold_setup_allocation":setup_allocation,"cold_setup_elapsed_ns":setup_elapsed_ns,
             "r":r,"workload_id":workload["workload_id"],"workload_sha256":workload["workload_sha256"],
             "target_index":workload["target_index"],"algorithm_seed":seed.to_string(),"cap":cap,

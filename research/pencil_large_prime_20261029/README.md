@@ -9,6 +9,36 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Phase attribution and scalar pricing boundary (T-798)
+
+The producer now rejects exports when named phases do not sum to field,
+native arithmetic and symbolic totals. Cold setup is added only after that
+check. Deterministic walk-label generation is inside the generation phase.
+`candidate_phase_overhead_ns` retains the nonnegative difference between the
+whole candidate interval and its phase intervals, including bookkeeping and
+control flow. It does not make unisolated clocks eligible for a speed claim.
+
+A source audit found asymmetric inversion instrumentation: the pencil
+`pow` and symbolic inverse helpers count their internal multiplications,
+whereas the reference `Ring::inv` records an inverse and calls unmetered
+`modpow`. Thus the historical raw scalar event sum is not a common atomic
+inverse model. The native `scalar_ledger` module removes the pencil inverse
+multiplications before applying a common atomic scalar-I valuation. It retains
+non-inverse multiplications, including primality work where observed. Scalar-I
+weights are not automatically equated to base-field inversion weights.
+
+`COST_MODEL_DRAFT.json` gives exact formulas and unresolved admission gates;
+it is explicitly not a frozen experiment protocol. A regression compares the
+actual pencil inverse and actual reference Ring inverse, including their
+normalized ledgers. Another rejects mismatched field/native/symbolic phase
+sums and impossible elapsed-time sums. Historical artifacts are unchanged;
+no revised numerical ratio has been computed from them.
+
+Source references: `src/cryptanalysis/three_leads.rs` (`Ring`, `modpow`),
+the frozen `pencil_sparse_20261022/src/bin/price_sparse.rs` analyzer, this
+producer's `pow`, and the symbolic library's inverse implementation. No
+claim of complete logical accounting follows from normalized scalar counts.
+
 ## Sparse map observations (T-797)
 
 The symbolic maps now record map API calls, ordered-key comparisons, yielded
@@ -25,8 +55,8 @@ The implementation follows the official
 [BTreeMap API](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html):
 ordered traversal and consistent lookup ordering. A read-only peer review
 identified lost iterator size hints; forwarding and regression assertions
-were added before delivery. Current validation is 13 default library tests,
-14 producer-feature library tests and three producer adapter tests. Cohort
+were added before delivery. Current validation is 14 default library tests,
+15 producer-feature library tests and five producer adapter tests. Cohort
 execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs
