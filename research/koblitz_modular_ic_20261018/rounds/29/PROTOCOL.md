@@ -68,3 +68,14 @@ rationalfunction identities notchecked. Nativegenuscontrolg(X1(77))181 and
 3*(2*61-2)=2*181-2 is arithmetic,not that bridge. Same4GiB/1200caps. This
 pursues the named independentmodelcheck withoutsubstituting genus equality
 for an explicitmodelisomorphism. Literature/context retained withnativebytes.
+
+JET01/EVAL01strictPASS: second image atdegree12 isONEROOTwithmultiplicity2,
+seconddegree12; pairquadraticX2+(beta11+beta8+beta5+beta3+beta). CUBIC01strict
+PASS: inertdegree3fiber,actualorder77inF2^42,CRT56/22anddiamond23checks.
+Before anydependencydata, testall4selected pointpairs throughfullFrobenius
+orbits foridentity,negation,rational2torsion translation,andnegatedtranslation.
+Verifytranslation/involutionalgebra,actualcorruptedordinate rejection,ordinary
+SS/cusp avoidance andfivecoefficient-descent curve/product residuals. Record
+alloffsets, includingnone. These are E49closed-image dependencies only; the
+scalarC5lift/coloredF32modularfactor columns are not replaced by these tests.
+No independence/rank promoted from noncoincident baseimages. Samecaps.
