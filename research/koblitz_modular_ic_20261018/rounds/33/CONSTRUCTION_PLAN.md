@@ -45,3 +45,17 @@ presentations), and Singular reference.doc quotient/lift. The manual PDF
 endpoint timed out; official source was read instead:
 https://raw.githubusercontent.com/Singular/Singular/spielwiese/doc/reference.doc
 The quotient identity is checked independently by native multiplication.
+
+## Picard space choice checked against the primary algorithm
+
+Read Khuri-Makdisi, math/0409209v3, definitions2.1/3.12 and algorithms3.10,
+3.14/3.16 (https://arxiv.org/pdf/math/0409209). Its large model chooses
+L=O(3D0), V=H0(3D0), V'=H0(6D0), and a checked multiplication map. With the
+retained genus61 and degD0=128, the proposed dimensions are324 and708.
+Existing R33 L(D0),L(2D0),L(3D0) therefore do NOT finish this algorithm's
+setup. Next space construction must supply L(6D0) and compatible products,
+with precision beyond pole degree768 (e.g.769 at a regular rational chart).
+These are derived requirements, not completed computations. The paper's
+small/medium variants would need a separate primary-source check before
+claiming that smaller spaces suffice. Its class-equality test requires actual
+vanishing subspaces; source evaluation rank alone is not that test.

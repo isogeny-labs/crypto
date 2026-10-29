@@ -30,3 +30,25 @@ Compact5 exit0 plus errors is rejected; trailing marker not acceptance.
 Diagnostic01 ideal(existingIdeal,existingIdeal) type error fixed to typed
 assignment; all failed sources/logs retained. Expanded83 native cap124 remains
 censored. Native math not repeated because observers or wrappers failed.
+
+## 2026-10-29T18:35Z
+
+### What was done
+Diagnostic02 passed: generic vdim32/basis6 with exact two-way lifts; both
+padding points have unit maximal minor ideal. At either point the nonzero
+minor values, in the registered F32 polynomial basis, are a^4+a^3 and a^4+a^2.
+Lean-local33-01 compiled and its transitive axiom audit passed: two theorems,
+0failing0trusted. Exact quotient producer has completed omissions1/2/3;
+omission4 is still live. No completed-producer acceptance asserted yet.
+
+### Decisions made
+Freeze denominator checks and source-bound point specialization prospectively.
+Do not use a partial live quotient export. Read the actual Khuri-Makdisi large
+model requirements; next full setup needs L(6D0), beyond the completed spaces.
+
+### Open threads
+Finish existing quotient producer under original cap, then denominator and
+point consumers if admissible. No jets until presentation certificate passes.
+
+### Errors
+No additional errors. Earlier rejected and capped attempts are unchanged.
