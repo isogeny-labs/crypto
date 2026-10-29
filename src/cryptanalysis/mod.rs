@@ -105,6 +105,7 @@ pub mod bielliptic_quartic;
 pub mod biext_k2;
 pub mod binary_field_basis;
 pub mod binary_isogeny;
+pub mod binary_root_trace;
 pub mod binary_semaev;
 pub mod binary_semaev_chain_sat;
 pub mod binary_semaev_s4;
