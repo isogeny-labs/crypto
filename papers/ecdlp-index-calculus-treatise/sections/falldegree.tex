@@ -309,6 +309,31 @@ On the diagonal $k=\lceil n/2\rceil$:
 \end{itemize}
 \end{theorem}
 
+Table~\ref{tab:fd-binary} gives every instance behind
+Theorems~\ref{thm:lfdexact} and~\ref{thm:lfd5}, one row per subspace family
+and $n$, in the layout of Kousidis and Wiemers' Table~1.
+
+\begin{table}[p]
+\centering\small
+\input{figures/tab-fd-binary}
+\caption[]{Binary Weil descent of $\Sem3$ ($m=2$, $k=\lceil n/2\rceil$): the
+first fall degree $D_{\rm ff}=2$ (Corollary~\ref{cor:ffd2}, proved for
+every $n$) beside the last fall degree $d_{\tilde F}$, the least $D$ with
+$1\in W_D$, for each instance. Subspace families: P, Semaev's polynomial
+subspace $\langle1,t,\ldots,t^{k-1}\rangle$; S, the same with uniform $z$
+(Semaev's own cell); R, random; U, random with uniform $z$; T, random inside
+$\ker\operatorname{Tr}$. ``$\ge5$'' means $1\notin W_4$; R35a is exactly 5
+(Theorem~\ref{thm:lfdexact}). Columns: instances; columns of the degree-4 closure
+matrix; median closure wall time at
+$D=4$ in seconds, over the instances run to that degree (host not
+recorded); certified codimension of $W_4$ where an independent certificate
+was checked. Source:
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/},
+laid out by \art{figures/make_tab_fall_degrees.py} from
+\art{figures/data-falldegree-instances.json}.}
+\label{tab:fd-binary}
+\end{table}
+
 \begin{theorem}[Certified $d_{\tilde F}\ge5$]\label{thm:lfd5}
 For each instance below, a certificate (Proposition~\ref{prop:cert}) for
 $1\notin W_4(F)$ was accepted by the independent checker. Hence
@@ -355,6 +380,21 @@ Theorem~\ref{thm:lfd5} contradicts it in three cells:
 \end{itemize}
 \end{corollary}
 
+Table~\ref{tab:fd-chain} lists the chain instances. With Semaev's
+polynomial subspace the closure refutes at degree~4 in every cell; with
+random subspaces it does not at $n=19,21$.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-chain}
+\caption[]{Chained system, $m=t=3$, $k=\lceil n/3\rceil$: closure at $D=4$
+per instance. ``$\le4$'' means $1\in W_4$; ``$\ge5$'' means $1\notin W_4$.
+Certified codimensions as in Table~\ref{tab:fd-binary}; C21a and C21b have
+no checked certificate: $1\notin W_4$ by implementation~A alone. Source:
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances_t3.json}.}
+\label{tab:fd-chain}
+\end{table}
+
 \paragraph{What is new, and what is not.} That the degree of regularity
 reaches 5 has been \emph{observed} before:
 \begin{itemize}
@@ -364,6 +404,29 @@ reaches 5 has been \emph{observed} before:
   and wrote that a lower bound on the degree of regularity ``can
   potentially answer an open question''~\cite{kousidis2019}.
 \end{itemize}
+Table~\ref{tab:fd-kw} sets their $m=2$ rows beside ours at the same
+$n$. The quantities differ: $D_{\rm reg}$ is the highest step degree of
+their F4 runs, while $d_{\tilde F}$ is the closure degree of the system,
+and no F4 run refutes below it. So their $5$ at $n=41,43$ against our $4$
+on polynomial subspaces is not a contradiction; F4 overshoots the closure
+there. At $n=35$ their $D_{\rm reg}=4$ agrees with our polynomial subspace
+and differs from every random subspace we drew, which are all $\ge5$:
+which subspace a table uses decides the degree it reports. At $n=45$ both
+reach 5.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fd-kw}
+\caption[]{The $m=2$ rows of Kousidis and Wiemers' Table~1~\cite{kousidis2019}
+(F4, averages over ten repetitions; $n'=\lceil n/2\rceil$; time in
+seconds, memory in GB), transcribed from the published table, beside the
+last fall degree of our instances at the same $n$
+(Table~\ref{tab:fd-binary}). Superscripts give the subspace family. Their
+$m=3,4$ rows ($D_{\rm ff}=D_{\rm reg}=7$ and $13$, $n\le21$) concern
+$\Sem4$ and $\Sem5$ and have no counterpart here.}
+\label{tab:fd-kw}
+\end{table}
+
 Those are properties of solver runs. Theorem~\ref{thm:lfd5} is a property
 of the systems, carried by a certificate any reader can check. With
 Corollary~\ref{cor:ffd2} it makes the separation between first and last
