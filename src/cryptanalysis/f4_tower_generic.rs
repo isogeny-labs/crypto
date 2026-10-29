@@ -1407,7 +1407,7 @@ pub fn f4_tower_generic_bounded(
         && limits.events <= hard.events;
     let valid_field =
         ring.field.modulus().to_u64().is_some_and(|p| {
-            p >= 5 && p <= (1u64 << 61) - 1 && super::residual_walk::is_prime_u64(p)
+            (5..(1u64 << 61)).contains(&p) && super::residual_walk::is_prime_u64(p)
         });
     let valid = valid_limits
         && valid_field
