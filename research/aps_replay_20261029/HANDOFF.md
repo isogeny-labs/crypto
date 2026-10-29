@@ -120,3 +120,27 @@
 ### Errors (what went wrong, how it was handled)
 
 - Conductor's expired self-held T-7 lease cannot be released or reclaimed through its CLI (expired lease / already claimed). It identifies this authoring task, with no competing writer; preserve its record and do not mark it done before merge. Earlier draft failures remain retained. No experiment or denied upload occurred.
+
+## 2026-10-29T18:44Z — main conflict resolved and validated
+
+### What was done (commands, files, features)
+
+- Observed completed Codex review with no findings on published head9d1dced; no formal review or inline thread. Required gate/size/artifacts had not run while conflicted.
+- Copilot had not responded after about55 minutes. Comment6504285793 withdrew that request and documented the AGENTS fallback before local resolution. Merged main78f84234 as0ecdb6c6, resolving only the live APS tracking note and preserving main's separate witness-replay section verbatim. No frozen evidence or assertions changed.
+- Fresh merged-tree APS/F4/example tests passed34/67/10, strict Rust1.98 lint passed, actionlint/YAML/CI-scope checks passed. Materialized186 tracked compile-time inputs for inherited main dependencies, without editing that code.
+- Included final main8171fb53; src/Cargo/config/APS-example/fixtures/workflow equality with the tested merge was checked. The three APS Rust hashes match the old head; the new source pin distinguishes inherited Cargo-lock changes.
+
+### Decisions made (and why)
+
+- Preserve both independent replay studies and keep accounting/export, ladder, metric validation, protocol, checkpoint and measurement requirements open. Keep workflow event types and gate conditions identical to main, with the intended APS source/study path filters. The older5220/0/123 full suite remains qualified to its initial compiled tree.
+- Publish a normal merge with an expected-head guard; no rebase, force-push, test weakening, measurement-work edit or denied upload.
+
+### Open threads (unfinished, pick up next time)
+
+- Publish the validated merge, then inspect current-head checks/reviews once and follow the required gates. Complete T-7 only after confirmed merge. T-8 and the complete-cost research panel remain open.
+
+### Errors (what went wrong, how it was handled)
+
+- Shallow metadata initially hid the common ancestor. Deepened commit metadata to verified992c2579 and performed an ordinary merge without an unrelated-history override.
+- Two restricted Node runner invocations failed before subtests; the unchanged CI-scope suite passed12/0 with network permission. A read-only Node/Git helper also reported spawnSync EPERM in the restricted context. These are retained local failures; no assertion or script was changed.
+- Conductor's stale self-held T-7 lease remains a metadata issue; no competing writer. No performance/EKS run or rejected upload occurred.

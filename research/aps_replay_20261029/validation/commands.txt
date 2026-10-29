@@ -16,3 +16,8 @@ cargo build --release --locked --example aps_single_relation_check
 Native fixture solve/replay commands and their inputs are described in ../README.md; no-relation solve exit 1 is expected.
 cargo test --release --locked --lib -- --test-threads=2 (initial compiled tree: 5220 passed, 0 failed, 123 ignored, exit 0)
 Post-integration main 992c2579: APS library 34, F4 library 67, example 10 tests passed; strict Rust 1.98 Clippy passed, all exit 0.
+
+Working merge with main 78f84234: cargo test --release --locked --lib aps_single_relation -- --test-threads=2; lib f4_fp; example aps_single_relation_check; strict Rust 1.98 Clippy, all exit 0.
+Actionlint and four YAML tests: exit 0.
+node --test --test-reporter=tap .github/scripts/test-ci-scope.mjs: 12/0 with Rust environment and network permission; two earlier network-denied runner failures retained.
+Source equality checked after final main 8171fb53 refresh: src, Cargo.toml/lock, .cargo, APS example/fixtures and .github.

@@ -150,6 +150,19 @@ const K4_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const THREE_LEADS_PENCIL_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "small_denominator",
+        default: None,
+        help: "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection",
+    },
+    ParamDecl {
+        name: "matrix_coefficient_cap",
+        default: None,
+        help:
+            "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks",
+    },
+];
 const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     name: "trial_cap",
     default: None,
@@ -439,6 +452,7 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v2",family:"ic",summary:"Point-driven pencil with signed symbolic elimination; cold setup per target; cost remains explicitly incomplete",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
@@ -2538,6 +2552,32 @@ pub fn solve_measured(
         Some(Ok(_)) => {} // A method with its own five-phase online clock supplied the window.
         Some(Err(e)) => rep.online_error = Some(e.to_string()),
         None => rep.online_error = Some("a measurement session was already active".into()),
+    }
+    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        if let Some(window) = &mut rep.online {
+            let sum = window
+                .phases_ns
+                .values()
+                .try_fold(0u64, |total, ns| total.checked_add(*ns));
+            if sum != Some(window.wall_ns) {
+                return Err("pencil online phase sum differs from window".into());
+            }
+            window.start_event = "source target validity check after target-blind curve, base and empty solver setup".into();
+            window.stop_event = if rep.recovered.is_some() {
+                "first source multiplication check completed inside pencil core"
+            } else {
+                "pencil coefficient cap or walk exhaustion; no verified solution"
+            }
+            .into();
+            window.mapping = "query: target validation, labels, source query and transfer, plus intervening control bookkeeping; PDP: point-driven sieve; relation check: polynomial, point and Jacobian checks; descent: signed graph and residual elimination; recovery check: first source multiplication. Additional adapter verification is outside online and charged in cold group counts.".into();
+            if let Some(reason) = window.zero_phases.get_mut("target_relation_check") {
+                *reason = "no sieve candidate reached the separate polynomial, point and Jacobian verification stage".into();
+            }
+        }
+    } else if m.id.starts_with("rho.three_leads_") && rep.recovered.is_none() {
+        if let Some(window) = &mut rep.online {
+            window.stop_event = "rho cap exhausted; no verified solution".into();
+        }
     }
     Ok(rep)
 }
@@ -5311,6 +5351,7 @@ fn solve_ic_f2m4(
         frobenius,
         sparsest: flag("sparsest")?,
         replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
     };
     let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
     oracle.charge_unsolved = flag("charge_unsolved")?;

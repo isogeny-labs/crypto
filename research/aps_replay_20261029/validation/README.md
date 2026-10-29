@@ -34,7 +34,9 @@ APS/F4/example checks passed **34/67/10** and strict Rust 1.98 lint passed.
 `integration-summary.txt` records those separate results. The full run used
 the earlier compiled binary and is not claimed as a new-main full suite.
 
-`source-sha256.txt` pins the final Rust and Cargo-lock bytes. Commands are in
+`source-sha256.txt` preserves the earlier validated Rust/Cargo-lock snapshot.
+`merge-source-sha256.txt` pins the current combination after inherited main
+lock changes; the three Rust hashes remain identical. Commands are in
 `commands.txt`. Published focused outputs omit build-directory metadata and
 elapsed durations. Original outputs, including draft failures, remain local;
 `original-log-sha256.txt` binds those unmodified files. These reduced receipts
@@ -61,3 +63,17 @@ while it attempted serial lazy hydration of off-disk manifests in this sparse
 checkout. It has no pass verdict; the hosted artifacts workflow remains
 required. Initial staging of the new study also needed Git's `--sparse`
 option. Neither issue required a source, workflow condition or assertion change.
+
+## Main-conflict follow-up
+
+`merge-validation-summary.txt` records fresh 34/67/10 APS/F4/example passes,
+strict Rust 1.98 lint, actionlint, four YAML checks and twelve CI-scope checks.
+These ran on the main `78f84234` working merge. The subsequent main `8171fb53`
+refresh changes other examples/study files; source/lock/APS-fixture/workflow
+equality was checked. The old full-library receipt keeps its original scope.
+
+Two local network-denied CI-scope invocations failed at the file-runner boundary
+before reporting subtests; the unchanged suite passed all twelve with network
+permission. Another read-only Node/Git metadata helper reported `spawnSync git
+EPERM` in that restricted context. No assertion or script changed, and no base
+code failure is claimed. Original outputs and hashes are retained.

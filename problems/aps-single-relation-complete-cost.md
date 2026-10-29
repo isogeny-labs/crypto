@@ -1,6 +1,7 @@
 # APS single-relation complete-cost validation
 
-**Status:** open implementation/accounting and access gap; updated 2026-10-29.
+**Status:** open accounting/export, parameter-ladder and access gaps;
+bounded independent replay added 2026-10-29.
 
 The [bounded native study](../research/aps_extensions_20261026/README.md)
 checks the paper's relation path and several extension mechanisms on tiny
@@ -21,10 +22,10 @@ This is not a mathematical obstruction to an improvement.
 The [blocked backlog card](../backlog/XP-20261026-aps-complete-cost-panel/README.md)
 preserves the requested controlled comparison. To unblock it:
 
-1. Instrument all phases and retries and integrate native ecbench/export output.
-   Extend the fixed-fixture mathematical replayer to the completed panel's
-   records, including pre-transcript abort outcomes and metric validation.
-   Verify that an intentionally
+1. Instrument all phases and retries, extend bounded independent replay to
+   the chosen panel/parameter ladder, and integrate native ecbench/export
+   output. Include pre-transcript abort outcomes and independent metric
+   validation. Verify that an intentionally
    expensive setup changes total cost, and that invalid relations fail closed.
 2. Choose the exact curve/target/base populations, controls, effect threshold,
    sample size, seeds, runtime envelope and external solver comparison. Freeze
@@ -45,6 +46,25 @@ Related existing gap:
 [`rootfinding-complete-cost-calibration.md`](rootfinding-complete-cost-calibration.md).
 That work informs the accounting contract but is not a completed APS result.
 
+## Independent bounded replay (2026-10-29)
+
+The [independent native replayer](../research/aps_independent_replay_20261029/README.md)
+checks the existing fixture JSON using separate ordinary-residue affine
+arithmetic, without the producer's curve, solver or recovery code. Fourteen
+native transcripts cover twelve arms and three fixed public curves. The same
+nine replay/corruption tests pass as a standalone package and repository example.
+It binds model/ICV1 identity, validates every labelled point and reported
+coordinate set, recomputes signed A/B coefficients and checks nonzero B and dG=Q.
+Pruned orbit inputs require independently checked label propagation.
+
+This supplies a bounded witness replayer, not a complete experiment exporter.
+It does not certify root enumeration completeness, sampling/draw history,
+deadlines, primitive costs or unsupported parameter ladders. A producer
+orbit-overlap refusal before JSON emission is retained in the new study's
+failure record; the future panel must also export such pre-transcript failures.
+All remaining accounting, protocol, checkpoint, reference and environment
+requirements above remain open. No performance run or cost reduction is claimed.
+
 ## Four-lead follow-up
 
 The [2026-10-28 implementation](../research/aps_followup_20261028/README.md)
@@ -64,7 +84,8 @@ this implementation nor the upload rejection proves a mathematical limit.
 
 ## Independent arithmetic replay (2026-10-29)
 
-The new replayer uses separate existing BigUint point arithmetic, independently
+The [BigUint replayer](../research/aps_replay_20261029/README.md) uses separate
+existing point arithmetic, independently
 regenerates seeds/draws/labels, verifies all emitted signed relations and useful
 recoveries, and checks complete coordinate sets by finite point enumeration.
 The CLI cross-checks all twelve arms in both enumeration modes. Corrupt labels,

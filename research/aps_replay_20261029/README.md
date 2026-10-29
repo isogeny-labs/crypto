@@ -5,7 +5,7 @@ based on `91902d0ca3ec365cf346e5b36aa0ece894c2af2f`.
 
 Integrated published main `992c2579e2891c1c58ee70183888d3a9ce1d32e4`
 cleanly as local merge `c07061958dcac0b0ffbe7228e2bbc69344cc5c1d`.
-The task's four pinned source/dependency-lock digests still match. Validation
+At that integration the task's four pinned source/lock digests matched. Validation
 below distinguishes the initial build from post-integration checks.
 
 This implements a native independent replay path for the existing tiny public
@@ -55,6 +55,20 @@ The full-set point oracle is audit work. A future timed driver needs a frozen,
 common online verification interval and separately reported post-run
 completeness auditing. This correctness CLI's total duration is not a solver
 speed measurement.
+
+## Current main integration
+
+Main `8171fb53733b43b3174abf66c839d43037a30fc2` is included. The tracking-note
+conflict preserves both replay studies and all remaining cost/scaling gates.
+The three APS Rust files are unchanged from the reviewed PR head; main supplied
+a newer dependency lock. On the main `78f84234` working merge, APS/F4/example
+checks passed **34/67/10**, strict Rust 1.98 lint passed, and workflow checks
+passed. The final main refresh changes unrelated examples and study artifacts;
+the relevant sources, lock, APS fixtures and workflows match that tested merge.
+See [merge validation](validation/merge-validation-summary.txt) and the current
+[merge source pin](validation/merge-source-sha256.txt). The earlier
+[source pin](validation/source-sha256.txt) retains its historical lock bytes.
+No new-head full-library result or performance measurement is claimed.
 
 ## Native use and checked records
 

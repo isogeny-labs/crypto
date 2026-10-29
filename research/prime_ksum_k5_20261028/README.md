@@ -5,7 +5,9 @@ date: 2026-10-29
 
 # Prime-field k-sum table: k = 5, and the law at 44 and 48 bits
 
-**Result (engineering).** A table of every signed 5-sum of a smaller base
+**Track: generic decomposition (bounded by √r; cannot beat rho).** Engineering in that track (AGENTS.md "Tracks of index calculus", 2026-10-29); not algebraic progress.
+
+**Result.** A table of every signed 5-sum of a smaller base
 lowers the prime-field index-calculus `S` below the k = 4 table of #2808.
 The registered success test holds: `ic-ksum5` is below `ic-ksum4` at 36 and
 40 bits at every band weight (w = 0, 0.1 and 1).
@@ -152,7 +154,13 @@ below its law.
   within 5 % of prediction, and `ic-ksum5 < ic-ksum4` holds across the band.
 
 **Under the owner's success criterion,** this is a verified, measured
-improvement over the index-calculus baseline. The distance remaining to rho
+improvement of the **generic-decomposition track's** baseline on these
+curves, labelled "generic decomposition (bounded by √r; cannot beat rho)". It does not ratchet the algebraic track, whose
+prime-field baseline is empty until the reference arm runs
+(`research/prime_ic_program_20261029/`). It runs on the frontier campaign's
+curves, not the leaderboard's Table B curves or the 20-bit holdout, so it is
+not ranked against the Table B incumbent; a same-session comparison is the
+next check. The distance remaining to rho
 is 9.7× at 40 bits (it was 13.1× with `ic-ksum4` in this panel, as in #2808), and 11.0×
 at 48 bits. The gain is a constant factor, because the exponent only moves
 from 4/7 to 5/9. Larger `k` converges to BSGS and never below it, so this

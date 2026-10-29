@@ -10,7 +10,7 @@ render (`s_vs_bits`, `ratio`), produced by that directory's `plot.mjs`.
 - At 40 bits: 8.51 against 11.56, which is 0.74× (0.71× at `w = 1`).
 - At 48 bits: 0.67×.
 - Medium-tier exponent: 0.547 [0.543, 0.554] against 0.565 [0.560, 0.571].
-- Class: engineering.
+- Track: generic decomposition (bounded by √r; cannot beat rho); class engineering within that track. Not ranked against the Table B incumbent (different curves).
 - Still 9.7× rho and 7.6× BSGS at 40 bits, and 11.0× rho at 48 bits. The method is generic and its limit is BSGS.
 
 **No row in the results table yet.** The validation gate
