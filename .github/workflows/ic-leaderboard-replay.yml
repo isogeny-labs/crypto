@@ -56,8 +56,10 @@ jobs:
     timeout-minutes: 150
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         partition: [0, 1, 2, 3]
+        session-group: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -74,11 +76,13 @@ jobs:
       - name: Replay one disjoint partition of every session
         env:
           REPLAY_PARTITION: ${{ matrix.partition }}
-        run: bash scripts/ic_audit/replay_partition.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay" "$REPLAY_PARTITION" 4
+          REPLAY_GROUP_INDEX: ${{ matrix.session-group }}
+          REPLAY_GROUP_COUNT: '8'
+        run: bash scripts/ic_audit/replay_partition.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay/$REPLAY_PARTITION" "$REPLAY_PARTITION" 4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ic-replay-partition-${{ matrix.partition }}
+          name: ic-replay-partition-${{ matrix.partition }}-group-${{ matrix.session-group }}
           path: ${{ runner.temp }}/ic-replay
           if-no-files-found: error
           retention-days: 7
@@ -98,6 +102,7 @@ jobs:
         with:
           pattern: ic-replay-partition-*
           path: ${{ runner.temp }}/ic-replay
+          merge-multiple: true
       - name: Pull the same frozen inputs for the final hash binding
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
@@ -105,11 +110,7 @@ jobs:
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: bash scripts/ic_audit/pull_replay_inputs.sh
       - name: Require every native sequence exactly once and enforce drift expectations
-        run: |
-          for partition in 0 1 2 3; do
-            mv "$RUNNER_TEMP/ic-replay/ic-replay-partition-$partition" "$RUNNER_TEMP/ic-replay/$partition"
-          done
-          bash scripts/ic_audit/check_replay_partitions.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay" 4
+        run: bash scripts/ic_audit/check_replay_partitions.sh "$RUNNER_TEMP/ic-native/ecbench" "$RUNNER_TEMP/ic-replay" 4
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -35,8 +35,11 @@ audit() {
 n=$(jq '.sessions|length' "$plan")
 start=${REPLAY_START_INDEX:-0}
 [[ $start =~ ^[0-9]+$ ]] && ((start < n)) || exit 2
+group=${REPLAY_GROUP_INDEX:-0}; groups=${REPLAY_GROUP_COUNT:-1}
+[[ $group =~ ^[0-9]+$ && $groups =~ ^[1-9][0-9]*$ ]] && ((group < groups && groups <= n)) || exit 2
 for ((offset=0; offset<n; offset++)); do
   i=$(((offset+start)%n))
+  ((i % groups == group)) || continue
   dir=$(jq -r ".sessions[$i].dir" "$plan")
   tag=$(printf '%04d' "$i"); base="$OUT/$tag"
   rm -f "$base.partition.json"

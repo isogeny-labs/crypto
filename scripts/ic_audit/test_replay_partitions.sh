@@ -92,4 +92,16 @@ for mutation in '.replay_candidates=2' '.auditor_binary_sha256=("0"*64)' '.repla
 done
 jq '.sessions=[]' "$REPLAY_PLAN" > empty-plan.json
 REPLAY_PLAN="$tmp/empty-plan.json" fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/cached" 4
+unset REPLAY_RECEIPT_CACHE
+cp -a research/study/session research/study/session-b
+jq '.sessions += .sessions | .sessions[1].dir="research/study/session-b"' "$REPLAY_PLAN" > grouped-plan.json
+export REPLAY_PLAN="$tmp/grouped-plan.json" REPLAY_GROUP_COUNT=2
+for p in 0 1 2 3; do
+  REPLAY_GROUP_INDEX=0 pass bash "$here/replay_partition.sh" ./fake-native "$tmp/grouped/$p" "$p" 4
+done
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/grouped" 4
+for p in 0 1 2 3; do
+  REPLAY_GROUP_INDEX=1 pass bash "$here/replay_partition.sh" ./fake-native "$tmp/grouped/$p" "$p" 4
+done
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/grouped" 4
 echo "partition metadata controls: $controls passed"

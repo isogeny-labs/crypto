@@ -29,6 +29,13 @@ candidate count, and every candidate identity. Reuse is labeled `cached-full`;
 neither a partial receipt nor a union summary can substitute. `REPLAY_START_INDEX`
 changes only execution order and still visits the entire roster once.
 
+The workflow also divides the roster into eight disjoint session groups using
+`REPLAY_GROUP_INDEX/REPLAY_GROUP_COUNT`, with at most four matrix jobs active.
+Each group retains the four record partitions and the original per-job timeout.
+Artifacts retain their partition directory and unique global session indices;
+the final checker still requires all four partitions of every session. A
+missing group cannot pass, and group splitting changes no replay selection.
+
 Receipt bindings retain the full source plan SHA-256. Coverage binds the ordered
 `dir/replay` roster separately, allowing evidence-backed expectation corrections
 after an audit without claiming that its original plan already predicted them.
