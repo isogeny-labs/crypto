@@ -1091,3 +1091,33 @@ must precede map search. Six native attempts and both Lean attempts are
 retained;16named proofs/17audited declarations pass0failing0trusted-native.
 Node187,full coupled quotient saturation/proper polarized embedding,arbitrary
 reverse and ordinary460/367 images remain open. No new IC cost/rank claim.
+
+## R27–R29 construction observations, 2026-10-29 UTC
+
+The manually authorized continuation has complete original pole divisors,
+20 actual cusp charts, 68/34 complete RR sections, new source/quotient curve
+ideals with 2,150/497 complete quadrics, and an actual source order-11 class
+with T=6. The new saturated-ideal result is for the complete-linear-system
+P67/P33 curve models under written RR/very-ampleness/quadratic-generation
+bridges. It does not close the older coupled quotient or det19 theta task.
+The written mixed Prym24 polarization has type(1^18,5^6). A source-bound
+proper-chart node187 separator is checked on all80function/conjugate instances;
+original-ring h-power membership is still missing.
+
+Actual first/second adjugate norms resolve all ordinary paired images of the
+460/367 pushed supports. Degree12 is one second point with multiplicity2.
+The436/12 pairs are Frobenius218/6 conjugates, so the ordinary460 difference
+vanishes as base E49 closed divisors. The284/83 pairs are distinct under the
+four tested base actions. Colored C5 deck offsets, actual source branches,
+complete signed reverse divisors and modular-factor projected columns remain
+required; no IC-rank conclusion follows. The admitted455-equation F32 map
+solve passes910controls then hits4GiB/exit14. No nonexistence is inferred.
+
+The actual degree14 QR cubic is irreducible and yields exact77torsion over
+F2^42 with CRT56/22anddiamond23. The independent X1(77) source is archived;
+its global function-field match is still unverified. The batch has40named
+Lean results/41current audited declarations,0failing/0trustednative. R22d=1
+recovery remains complete without rerun. Source/raw records,reports and
+remaining acceptance tests are in rounds/27–29,especially rounds/29/NEXT.md.
+These are construction observations, not an official hypothesis promotion or
+an IC efficiency assessment. No new cloud job, fifth claim or merge is made.

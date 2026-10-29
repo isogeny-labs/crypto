@@ -108,3 +108,26 @@ keeping nu and every registered unit:four degree20 closed points over F2,
 with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
 matrix. The full proper normalized branch table remains open;see the Round22
 CM and validation records. No relation-rank or IC cost claim follows.
+
+## R27–R29: proper source models and actual ordinary image recovery
+
+[R27](rounds/27/REPORT.md) completes the original pole geometry, constructs
+68/34-section RR bases and the new source P67/quotient P33 models, and proves
+an actual source class of exact order 11. The saturated-ideal conclusion is
+for these complete-linear-system curve models, with a written theorem bridge.
+A proper mixed Prym24 polarization is derived separately; the old det19 theta
+embedding is not constructed. The 455-equation F32 map solve passes all 910
+controls and then hits its fixed 4 GiB cap, with no mathematical verdict.
+
+[R28](rounds/28/REPORT.md) and [R29](rounds/29/REPORT.md) recover ordinary
+paired Hecke images using exact first/second adjugate norms. The degree-12
+image is one point with multiplicity two. The product-plus-one ordinary460
+base difference cancels by Frobenius offsets218/6; the colored C5 lift is
+still needed. The asymmetric284/83 supports do not coincide under the four
+tested base actions. A checked order77 cubic specialization opens the
+independent full-level model comparison, without claiming its global identity.
+
+The batch has 40 named Lean theorems and 41 current audited declarations,
+zero audit failures/trusted-native. Failures and caps are retained. The
+explicit remaining constructions are in [R29/NEXT.md](rounds/29/NEXT.md).
+No IC efficiency/rank verdict or complete modular-factor transfer is promoted.
