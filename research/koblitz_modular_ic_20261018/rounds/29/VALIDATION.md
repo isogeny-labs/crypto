@@ -28,3 +28,5 @@ scripts are unavailable in this checkout. The inherited custom exact-computation
 contract is used and labelled as such. No generic lint, independent science
 review, new IC rank, speed, subgroup injection or full F2 factor-transfer gate
 is asserted. The older quotient saturation and theta embedding remain separate.
+
+Completed publication prechecks: default exporter exit0 under timeout60; focused committed-head counters correct; oldR24/R25/R26 source pins allpass; retained checker accepted21native/40named/41audited; root src/Cargo files unchanged. SevenPDFpages inspected. Fresh artifact transport and scoped artifact-policy results are separate records, not assumed here.
