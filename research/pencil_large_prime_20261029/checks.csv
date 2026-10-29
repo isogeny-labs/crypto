@@ -1,0 +1,18 @@
+check_id,class,status,count,unit,evidence,scope
+producer_tests,development_test,pass,2,tests,producer-tests.log,signed coefficient parity and constant-only inconsistency rejection
+producer_lint,software_check,pass,0,warnings,producer-clippy.log,producer feature and all targets
+producer_execution,cohort_result,not_run,0,targets,README.md,geometric producer wired but not executed
+rust_suite,development_test,pass,10,tests,rust-tests.log,symbolic graph plus residual basis and composed adapter
+composed_row_space,development_test,pass,25600,prefixes,src/lib.rs,fixed partition collector versus independent dense RREF
+composed_admission,development_test,pass,3,tests,src/collector.rs,cancellation and terminal caps and signed cycle
+residual_row_space,development_test,pass,25600,prefixes,src/lib.rs,retained residual basis compared with independent dense RREF
+residual_caps,development_test,pass,2,tests,src/residual.rs,cap atomicity and zero budget behavior
+prefix_row_space,development_test,pass,25600,prefixes,src/lib.rs,independent dense RREF over five small prime fields
+nonsaturated_components,development_test,pass,6,fields,src/lib.rs,32 variable joins and anchors with independent small symbols
+lint,software_check,pass,0,warnings,clippy.log,all crate targets with warnings denied
+field_identities,formal_check,pass,4,lemmas,lean-check.log,pivot and cycle identities only
+forest_invariant,proof_gap,open,,,README.md,induction over stored forest and emitted constraints
+rust_correspondence,proof_gap,open,,,README.md,implementation to field model
+collector_integration,implementation_gap,open,,,README.md,pencil adapter and exact accounting
+new_cohort_targets,cohort_result,not_run,0,targets,README.md,no new cohort execution
+candidate_over_rho,comparative,unmeasured,,,README.md,no new end to end price
