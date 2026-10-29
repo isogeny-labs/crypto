@@ -1081,7 +1081,7 @@ mod ckpt {
 /// One step of a recorded run: the pair rows that did not reduce to zero
 /// by the reducers alone (as `(basis index, multiplier)`), and the leading
 /// monomials of the polynomials the step added.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
@@ -1093,7 +1093,7 @@ pub struct TraceStep {
 /// the pair selection and every row that reduced to zero).  A replay
 /// checks at every step that the leading monomials it finds are the
 /// recorded ones and gives up otherwise (`F4Report::trace_mismatch`).
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct F4Trace {
     /// Leading monomials of the normalised input, in order.
     pub input_lms: Vec<Vec<u32>>,
@@ -1277,7 +1277,7 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
     walk(0, &mut mono, &cap, lms, &mut count, bound).then_some(count)
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize)]
 pub struct F4Report {
     /// The (interreduced) degree-bounded basis, `[1]` when inconsistent.
     pub basis: Vec<Poly>,
@@ -1328,7 +1328,7 @@ pub struct F4Report {
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
 pub enum HilbertStop {
     /// Not requested.
     Off,
@@ -4515,6 +4515,10 @@ pub struct VisitReport {
     /// The visitor requested termination after an equation-checked witness.
     pub stopped_early: bool,
     pub timed_out: bool,
+    /// The fallible trace sink rejected an event; no later callback ran.
+    pub trace_stopped: bool,
+    /// At most 512 UTF-8 bytes of the first sink error.
+    pub trace_error: Option<String>,
     pub solutions_visited: usize,
     pub candidates_rejected: usize,
     pub solving_degree: u32,
@@ -4534,38 +4538,141 @@ enum VisitEnd {
     Complete,
     Stopped,
     TimedOut,
+    TraceStopped,
 }
 
-struct VisitState<'a, F> {
+/// Borrowed events for one depth-first traversal. `assignments` contains only
+/// fixed original variables; `active_variables` maps local exponent positions
+/// to original variables. Node IDs are monotonically assigned within the call.
+/// Native traces retain useful rows, not zero rows or private pivots. They are
+/// materialized per F4 call, so sink limits do not bound native matrix memory.
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum VisitEvent<'a> {
+    System {
+        node_id: usize,
+        parent_id: Option<usize>,
+        active_variables: &'a [usize],
+        assignments: &'a [(usize, u64)],
+        polynomials: &'a [Poly],
+    },
+    NativeResult {
+        node_id: usize,
+        report: &'a F4Report,
+        trace: &'a F4Trace,
+    },
+    Branch {
+        node_id: usize,
+        original_variable: usize,
+        value: u64,
+        source: &'static str,
+    },
+    Candidate {
+        node_id: usize,
+        assignment: &'a [u64],
+        residual_satisfied: bool,
+        original_satisfied: Option<bool>,
+    },
+}
+
+struct VisitState<'a, F, S> {
     original: &'a [Poly],
     domains: &'a [Option<Vec<u64>>],
     p: u64,
     opts: &'a F4Options,
     assignment: Vec<u64>,
     visitor: F,
+    sink: Option<S>,
+    next_node: usize,
     report: VisitReport,
 }
 
-impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
+impl<F, S> VisitState<'_, F, S>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    fn emit(&mut self, event: VisitEvent<'_>) -> bool {
+        if self.report.trace_stopped {
+            return false;
+        }
+        if let Some(sink) = &mut self.sink {
+            if let Err(mut error) = sink(event) {
+                let mut end = error.len().min(512);
+                while !error.is_char_boundary(end) {
+                    end -= 1;
+                }
+                error.truncate(end);
+                self.report.trace_stopped = true;
+                self.report.trace_error = Some(error);
+                return false;
+            }
+        }
+        true
+    }
     fn expired(&self) -> bool {
         self.opts.deadline.is_some_and(|d| Instant::now() >= d)
     }
 
-    fn walk(&mut self, input: &[Poly], active: &[usize]) -> VisitEnd {
+    fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
+        if self.report.trace_stopped {
+            return VisitEnd::TraceStopped;
+        }
         if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        let node_id = self.next_node;
+        self.next_node += 1;
+        if self.sink.is_some() {
+            let assignments: Vec<_> = self
+                .assignment
+                .iter()
+                .copied()
+                .enumerate()
+                .filter(|(i, _)| !active.contains(i))
+                .collect();
+            if !self.emit(VisitEvent::System {
+                node_id,
+                parent_id,
+                active_variables: active,
+                assignments: &assignments,
+                polynomials: input,
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+        }
+        // Sink persistence may itself consume the remaining deadline. It is
+        // cooperative (not interruptible), but must not admit later work.
+        if self.sink.is_some() && self.expired() {
             return VisitEnd::TimedOut;
         }
         if active.is_empty() {
             // A degree-truncated basis can describe a strict superset of
             // the original variety. Never expose those spurious roots.
-            if input.iter().any(|g| eval(g, &[], self.p) != 0) {
+            let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
+            let original_satisfied = residual_satisfied.then(|| {
+                self.original
+                    .iter()
+                    .all(|g| eval(g, &self.assignment, self.p) == 0)
+            });
+            if self.sink.is_some() {
+                let assignment = self.assignment.clone();
+                if !self.emit(VisitEvent::Candidate {
+                    node_id,
+                    assignment: &assignment,
+                    residual_satisfied,
+                    original_satisfied,
+                }) {
+                    return VisitEnd::TraceStopped;
+                }
+            }
+            if self.sink.is_some() && self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            if !residual_satisfied {
                 return VisitEnd::Complete;
             }
-            if !self
-                .original
-                .iter()
-                .all(|g| eval(g, &self.assignment, self.p) == 0)
-            {
+            if original_satisfied == Some(false) {
                 self.report.candidates_rejected += 1;
                 return VisitEnd::Complete;
             }
@@ -4582,7 +4689,12 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
         {
             return VisitEnd::Complete;
         }
-        let r = f4(input, active.len(), self.p, self.opts);
+        let (r, trace) = if self.sink.is_some() {
+            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+            (r, Some(trace))
+        } else {
+            (f4(input, active.len(), self.p, self.opts), None)
+        };
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
@@ -4590,6 +4702,15 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        if let Some(trace) = &trace {
+            if !self.emit(VisitEvent::NativeResult {
+                node_id,
+                report: &r,
+                trace,
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+        }
         if r.timed_out || self.expired() {
             return VisitEnd::TimedOut;
         }
@@ -4676,6 +4797,23 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
             if full_field {
                 self.report.full_field_branches += 1;
             }
+            if !self.emit(VisitEvent::Branch {
+                node_id,
+                original_variable: original,
+                value,
+                source: if has_univariate {
+                    "univariate_roots"
+                } else if full_field {
+                    "full_field"
+                } else {
+                    "finite_domain"
+                },
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+            if self.sink.is_some() && self.expired() {
+                return VisitEnd::TimedOut;
+            }
             self.assignment[original] = value;
             let sub: Vec<_> = r
                 .basis
@@ -4685,7 +4823,7 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
                 })
                 .filter(|g| !g.is_empty())
                 .collect();
-            let end = self.walk(&sub, &remaining);
+            let end = self.walk(&sub, &remaining, Some(node_id));
             if end != VisitEnd::Complete {
                 return end;
             }
@@ -4702,6 +4840,13 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
 ///
 /// Unlike [`solve`], this opt-in path uses rational-factor extraction for
 /// unrestricted univariates. The legacy exhaustive scan remains a control.
+///
+/// Returns `Err` before traversal, callbacks or native checkpoint I/O if any
+/// of `checkpoint`, `checkpoint_stop_after`, `checkpoint_in_step` or
+/// `checkpoint_stop_in_rref` is set, including hooks without a checkpoint
+/// path. A native checkpoint describes one polynomial system, not this
+/// recursive traversal: specialized systems cannot reuse its path. Direct
+/// native F4 checkpoint support is unaffected.
 pub fn solve_visit(
     input: &[Poly],
     n_vars: usize,
@@ -4710,6 +4855,61 @@ pub fn solve_visit(
     domains: &[Option<Vec<u64>>],
     visitor: impl FnMut(&[u64]) -> bool,
 ) -> Result<VisitReport, String> {
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+    )
+}
+
+/// Traced variant of [`solve_visit`]. Sink failure is sticky and returns an
+/// incomplete report with `trace_stopped`, distinct from positive visitor stop
+/// or timeout. Input errors remain `Err`. Events borrow native data only during
+/// the callback. Native row traces are materialized once per recursive F4 call;
+/// external time/memory limits remain necessary. Hilbert stopping is rejected
+/// because the native recording path does not support that strategy.
+/// All four checkpoint options are also rejected with `Err` before traversal,
+/// either callback or native checkpoint I/O, as in [`solve_visit`]. There is
+/// no recursive traversal or trace-sink resume support.
+pub fn solve_visit_traced(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    visitor: impl FnMut(&[u64]) -> bool,
+    sink: impl FnMut(VisitEvent<'_>) -> Result<(), String>,
+) -> Result<VisitReport, String> {
+    if opts.stop_hilbert.is_some() {
+        return Err("traced visitor does not support Hilbert stopping".into());
+    }
+    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink))
+}
+
+fn solve_visit_impl<F, S>(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    visitor: F,
+    sink: Option<S>,
+) -> Result<VisitReport, String>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    if opts.checkpoint.is_some()
+        || opts.checkpoint_stop_after.is_some()
+        || opts.checkpoint_in_step.is_some()
+        || opts.checkpoint_stop_in_rref.is_some()
+    {
+        return Err("recursive visitor does not support checkpoint options".into());
+    }
     if p >= 1u64 << 32
         || !super::residual_walk::is_prime_u64(p)
         || domains.len() != n_vars
@@ -4731,9 +4931,11 @@ pub fn solve_visit(
         opts,
         assignment: vec![0; n_vars],
         visitor,
+        sink,
+        next_node: 0,
         report: VisitReport::default(),
     };
-    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>());
+    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
@@ -5005,6 +5207,280 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    #[test]
+    fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
+        let root = std::env::temp_dir().join(format!(
+            "f4-visitor-checkpoint-rejection-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let existing = root.join("existing.checkpoint");
+        let absent_parent = root.join("absent");
+        let absent = absent_parent.join("new.checkpoint");
+        let sentinel = b"not a native checkpoint; must remain untouched";
+        std::fs::write(&existing, sentinel).unwrap();
+        // The empty system would immediately visit a solution; the quadratic
+        // would invoke native F4. Reject before either traversal can begin.
+        for (input, n_vars, domains) in [
+            (vec![], 0, vec![]),
+            (vec![vec![(vec![2], 1), (vec![0], 6)]], 1, vec![None]),
+        ] {
+            for path in [&existing, &absent] {
+                // Each option alone, each hook with a checkpoint path, and all
+                // options together. Orphan hooks must not silently be ignored.
+                for case in 0..8 {
+                    let mut opts = F4Options::new(Ordering::Grevlex, 4);
+                    if case == 0 || case >= 4 {
+                        opts.checkpoint = Some((path.clone(), Duration::ZERO));
+                    }
+                    if matches!(case, 1 | 4 | 7) {
+                        opts.checkpoint_stop_after = Some(0);
+                    }
+                    if matches!(case, 2 | 5 | 7) {
+                        opts.checkpoint_in_step = Some(Duration::ZERO);
+                    }
+                    if matches!(case, 3 | 6 | 7) {
+                        opts.checkpoint_stop_in_rref = Some(0);
+                    }
+                    let plain = solve_visit(&input, n_vars, 7, &opts, &domains, |_| {
+                        panic!("checkpoint options reached the solution visitor")
+                    });
+                    let traced = solve_visit_traced(
+                        &input,
+                        n_vars,
+                        7,
+                        &opts,
+                        &domains,
+                        |_| panic!("checkpoint options reached the traced solution visitor"),
+                        |_| panic!("checkpoint options reached the trace sink"),
+                    );
+                    for result in [plain, traced] {
+                        assert_eq!(
+                            result.unwrap_err(),
+                            "recursive visitor does not support checkpoint options",
+                            "case {case}, path {path:?}, n_vars {n_vars}"
+                        );
+                    }
+                    assert_eq!(std::fs::read(&existing).unwrap(), sentinel);
+                    assert!(!absent_parent.exists());
+                    assert_eq!(std::fs::read_dir(&root).unwrap().count(), 1);
+                }
+            }
+        }
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn traced_visit_matches_plain_with_unrestricted_auxiliary_and_serializable_events() {
+        // x in {4}, y unrestricted, y^2=x over F7. In particular the
+        // valid auxiliary y=2 must not inherit the singleton leaf domain {4}.
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        for order in [Ordering::Lex, Ordering::Grevlex] {
+            let opts = F4Options::new(order, 4);
+            let mut plain = Vec::new();
+            let a = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                plain.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            let mut traced = Vec::new();
+            let mut systems = 0;
+            let mut native = 0;
+            let mut candidates = 0;
+            let b = solve_visit_traced(
+                &input,
+                2,
+                7,
+                &opts,
+                &domains,
+                |s| {
+                    traced.push(s.to_vec());
+                    false
+                },
+                |event| {
+                    // The callback can durably encode without owning the native data.
+                    assert!(serde_json::to_vec(&event).is_ok());
+                    match event {
+                        VisitEvent::System {
+                            node_id,
+                            active_variables,
+                            assignments,
+                            ..
+                        } => {
+                            assert_eq!(node_id, systems);
+                            systems += 1;
+                            assert_eq!(active_variables.len() + assignments.len(), 2);
+                            for (original, _) in assignments {
+                                assert!(!active_variables.contains(original));
+                            }
+                        }
+                        VisitEvent::NativeResult { report, trace, .. } => {
+                            native += 1;
+                            assert!(!report.timed_out);
+                            assert!(!trace.input_lms.is_empty());
+                        }
+                        VisitEvent::Candidate {
+                            residual_satisfied,
+                            original_satisfied,
+                            ..
+                        } => {
+                            candidates += 1;
+                            assert!(residual_satisfied);
+                            assert_eq!(original_satisfied, Some(true));
+                        }
+                        _ => {}
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            plain.sort();
+            traced.sort();
+            assert_eq!(plain, vec![vec![4, 2], vec![4, 5]]);
+            assert_eq!(traced, plain);
+            assert!(a.complete && b.complete && !b.trace_stopped);
+            assert_eq!(native, b.f4_runs);
+            assert_eq!(candidates, b.solutions_visited);
+            assert!(b.factored_univariates > 0);
+            assert_eq!(b.full_field_branches, 0);
+        }
+    }
+
+    #[test]
+    fn traced_visit_sink_failure_is_sticky_and_distinct_from_other_stops() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut calls = 0;
+        let before = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &opts,
+            &[None],
+            |_| panic!("sink rejected before any witness"),
+            |_| {
+                calls += 1;
+                Err("é".repeat(400))
+            },
+        )
+        .unwrap();
+        assert_eq!(calls, 1);
+        assert_eq!(before.f4_runs, 0);
+        assert!(
+            before.trace_stopped && !before.complete && !before.stopped_early && !before.timed_out
+        );
+        assert_eq!(before.trace_error.unwrap().len(), 512);
+
+        let mut sequence = Vec::new();
+        let during = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &opts,
+            &[None],
+            |_| panic!("sink rejects before visiting candidate"),
+            |event| {
+                match event {
+                    VisitEvent::System { .. } => sequence.push("system"),
+                    VisitEvent::NativeResult { .. } => sequence.push("native"),
+                    VisitEvent::Branch { .. } => {
+                        sequence.push("branch");
+                        return Err("event limit".into());
+                    }
+                    VisitEvent::Candidate { .. } => panic!("after sink failure"),
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(sequence, ["system", "native", "branch"]);
+        assert_eq!(during.f4_runs, 1);
+        assert_eq!(during.solutions_visited, 0);
+        assert!(
+            during.trace_stopped && !during.complete && !during.stopped_early && !during.timed_out
+        );
+        assert_eq!(during.trace_error.as_deref(), Some("event limit"));
+
+        let positive =
+            solve_visit_traced(&input, 1, 7, &opts, &[None], |_| true, |_| Ok(())).unwrap();
+        assert!(positive.stopped_early && !positive.complete && !positive.trace_stopped);
+        let expired = F4Options::new(Ordering::Grevlex, 4).with_budget(Duration::ZERO);
+        let timeout = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &expired,
+            &[None],
+            |_| panic!("expired visitor"),
+            |_| panic!("expired sink"),
+        )
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete && !timeout.trace_stopped);
+    }
+
+    #[test]
+    fn traced_visit_checks_truncated_candidates_and_stops_lazy_full_field_branching() {
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 1], 6)],
+            vec![(vec![0, 2], 1), (vec![1, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 1);
+        let mut roots = Vec::new();
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |s| {
+                assert!(input.iter().all(|g| eval(g, s, 7) == 0));
+                roots.push(s.to_vec());
+                false
+            },
+            |_| Ok(()),
+        )
+        .unwrap();
+        let expected: Vec<_> = (0..7)
+            .flat_map(|x| (0..7).map(move |y| vec![x, y]))
+            .filter(|s| input.iter().all(|g| eval(g, s, 7) == 0))
+            .collect();
+        roots.sort();
+        assert_eq!(roots, expected);
+        assert!(report.complete);
+
+        // An unconstrained variable would have billions of values. Reject the
+        // first branch: no range collection, child F4 or candidate is allowed.
+        let p = 4_294_967_291;
+        let mut branches = 0;
+        let lazy = solve_visit_traced(
+            &[],
+            1,
+            p,
+            &opts,
+            &[None],
+            |_| panic!("branch rejected"),
+            |event| {
+                if let VisitEvent::Branch { value, source, .. } = event {
+                    branches += 1;
+                    assert_eq!(value, 0);
+                    assert_eq!(source, "full_field");
+                    return Err("branch cap".into());
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(branches, 1);
+        assert!(lazy.trace_stopped && !lazy.complete);
+        assert_eq!(lazy.f4_runs, 1);
+        assert_eq!(lazy.solutions_visited, 0);
+    }
 
     #[test]
     fn streaming_domains_follow_original_variables_and_match_the_legacy_solver() {

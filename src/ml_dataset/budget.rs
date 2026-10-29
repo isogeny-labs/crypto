@@ -376,6 +376,13 @@ pub struct BudgetSession {
     nonce: String,
 }
 
+/// Live worker state used by the local startup gate after an interrupted handoff.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum ActivationPhase {
+    Pending,
+    Active,
+}
+
 fn now() -> Result<u64, String> {
     #[cfg(all(test, target_os = "linux"))]
     if let Some(value) = tests::CLOCK.with(std::cell::Cell::get) {
@@ -843,6 +850,29 @@ fn worker_grant(policy: &CampaignPolicy, request: &GrantRequest) -> Result<Worke
             hash(&request.grant_id)?
         ),
     })
+}
+
+/// Check a delivered grant against the pinned reservation and observed local
+/// owner. This validates the relationship, not the truth of Kubernetes evidence.
+pub(super) fn validate_launch_delivery(
+    policy: &CampaignPolicy,
+    reservation: &LaunchReservation,
+    binding: &LaunchBinding,
+    grant: &WorkerGrant,
+    actual_owner: &OwnerIdentity,
+) -> Result<(), String> {
+    policy.validate()?;
+    reservation.validate(policy)?;
+    binding.validate(reservation)?;
+    grant.validate(policy)?;
+    if binding.owner != *actual_owner {
+        return Err("delivered launch owner differs from actual worker identity".into());
+    }
+    let expected = worker_grant(policy, &reservation.request.with_owner(actual_owner))?;
+    if *grant != expected {
+        return Err("delivered grant differs from the complete reserved allocation".into());
+    }
+    Ok(())
 }
 
 impl WorkerGrant {
@@ -1837,6 +1867,23 @@ impl BudgetSession {
         Ok(())
     }
 
+    /// Read the retained live phase without credentials, remote requests or
+    /// accounting changes. In particular, an already active worker must not
+    /// repeat activation merely because the gate's later transition was lost.
+    pub(super) fn activation_phase(&self) -> Result<ActivationPhase, String> {
+        let conn = self
+            .connection
+            .lock()
+            .map_err(|_| "poisoned budget session")?;
+        let state: WorkerState = read_state(&conn, "worker")?;
+        self.live(&state)?;
+        match state.phase.as_str() {
+            "activation_pending" => Ok(ActivationPhase::Pending),
+            "active" => Ok(ActivationPhase::Active),
+            _ => Err("worker activation phase is invalid for startup recovery".into()),
+        }
+    }
+
     fn operation_allowed(&self, state: &WorkerState, op: &HttpOperation) -> Result<(), String> {
         self.live(state)?;
         if op.method == HttpMethod::StsWebIdentity {
@@ -2587,6 +2634,55 @@ mod tests {
     }
 
     #[test]
+    fn startup_delivery_checks_complete_grant_owner_target_and_live_expiry() {
+        let temp = Temp::new();
+        let (policy, request) = test_policy_request(&temp.0);
+        let ledger =
+            CampaignLedger::create(Path::new(&policy.allocator_ledger_path), &policy).unwrap();
+        let reservation = ledger.reserve_launch(&launch_request(&request)).unwrap();
+        let binding = launch_binding(&reservation);
+        let grant = ledger.bind_launch(&binding).unwrap();
+        let validate = |r: &LaunchReservation, b: &LaunchBinding, g: &WorkerGrant| {
+            validate_launch_delivery(&policy, r, b, g, &binding.owner)
+        };
+        let before = events(&ledger);
+        validate(&reservation, &binding, &grant).unwrap();
+        assert_eq!(events(&ledger), before);
+
+        let mut changed = grant.clone();
+        changed.request.resources.put_attempts += 1;
+        // The new allowance is independently valid, but was never reserved.
+        changed.validate(&policy).unwrap();
+        assert!(validate(&reservation, &binding, &changed).is_err());
+        let mut changed = grant.clone();
+        changed.request.owner.pod_uid = "other-pod".into();
+        assert!(validate(&reservation, &binding, &changed).is_err());
+        let mut changed = grant.clone();
+        changed.activation_key.push_str("-other");
+        assert!(validate(&reservation, &binding, &changed).is_err());
+
+        let mut changed = binding.clone();
+        changed.observed_target.job_name = "other-job".into();
+        assert!(validate(&reservation, &changed, &grant).is_err());
+        let mut changed = binding.clone();
+        changed.owner.job_uid = "other-job-uid".into();
+        assert!(validate(&reservation, &changed, &grant).is_err());
+        let mut changed = binding.clone();
+        changed.observation_evidence_sha256 = "not-a-digest".into();
+        assert!(validate(&reservation, &changed, &grant).is_err());
+        let mut changed = reservation.clone();
+        changed.policy_sha256 = "f".repeat(64);
+        assert!(validate(&changed, &binding, &grant).is_err());
+        let other = OwnerIdentity {
+            job_uid: binding.owner.job_uid.clone(),
+            pod_uid: "different-observed-pod".into(),
+        };
+        assert!(validate_launch_delivery(&policy, &reservation, &binding, &grant, &other).is_err());
+        let _clock = ClockGuard::at(grant.request.expires_unix_seconds);
+        assert!(validate(&reservation, &binding, &grant).is_err());
+    }
+
+    #[test]
     fn launch_dry_admission_preserves_legacy_state_and_never_creates_files() {
         let temp = Temp::new();
         let (policy, direct) = test_policy_request(&temp.0);
@@ -3175,6 +3271,50 @@ mod tests {
         session
             .confirm_activation(&get, &sha, bytes.len() as u64)
             .unwrap();
+    }
+
+    #[test]
+    fn startup_activation_phase_recovery_is_live_and_does_not_spend_again() {
+        let temp = Temp::new();
+        let (policy, grant, session) = session(&temp.0);
+        assert_eq!(
+            session.activation_phase().unwrap(),
+            ActivationPhase::Pending
+        );
+        activate_mock(&session);
+        let before = {
+            let conn = session.connection.lock().unwrap();
+            encode(&read_state::<WorkerState>(&conn, "worker").unwrap()).unwrap()
+        };
+        drop(session);
+        let session = BudgetSession::open(
+            &temp.0.join("worker.sqlite"),
+            &policy,
+            &grant,
+            &grant.request.owner,
+        )
+        .unwrap();
+        assert_eq!(session.activation_phase().unwrap(), ActivationPhase::Active);
+        session.require_active().unwrap();
+        {
+            let conn = session.connection.lock().unwrap();
+            let state: WorkerState = read_state(&conn, "worker").unwrap();
+            assert_eq!(encode(&state).unwrap(), before);
+        }
+        {
+            let _clock = ClockGuard::at(grant.request.expires_unix_seconds);
+            assert!(session.activation_phase().is_err());
+        }
+        for phase in ["closed", "unrecognized-state"] {
+            let mut conn = session.connection.lock().unwrap();
+            let tx = conn.transaction().unwrap();
+            let mut state: WorkerState = read_state(&tx, "worker").unwrap();
+            state.phase = phase.into();
+            write_state(&tx, "worker", &state).unwrap();
+            tx.commit().unwrap();
+            drop(conn);
+            assert!(session.activation_phase().is_err());
+        }
     }
 
     fn head(scope: BudgetScope) -> HttpOperation {
