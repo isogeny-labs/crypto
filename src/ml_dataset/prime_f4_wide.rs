@@ -517,7 +517,7 @@ pub(super) fn solve(
                 work_reserved: event.work_reserved,
                 bytes_reserved: event.bytes_peak_reserved,
             };
-            let accepted = (|| {
+            let accepted: Result<(), String> = (|| {
                 let bytes = encoded(&record, 64 * 1024)?;
                 if bytes.len() + 1 > event_cap.saturating_sub(event_bytes.len()) {
                     return Err("wide native boundary byte cap".into());
