@@ -23,7 +23,8 @@ failed/missing attempts and hashes compact portable evidence. Primitive
 counter independence and physical runtime admission remain explicitly unset.
 
 **Current status:** protocol frozen before primary data; root-library validation
-and publication are pending. Native checks and the documented development
+completed on source `445d84bf7` with 5,389 passed, zero failed and Cargo exit 0.
+Publication is pending. Native checks and the documented development
 preflight pass. The workflow retains source, checkpoint and transport gates.
 No TR-04 scientific run, finite-census result or runtime gain
 is recorded. See the study README for remaining prerequisites. Existing

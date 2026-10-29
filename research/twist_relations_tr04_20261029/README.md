@@ -12,8 +12,11 @@ planning estimates, and [PROTOCOL.md](PROTOCOL.md) for the finite contract.
 
 [Development validation](DEVELOPMENT.md) records 40 passing native tests,
 strict Clippy/formatting and the preserved incomplete root-library attempts.
-Final root-library validation is running separately on code `445d84bf7`;
-no completion is inferred before its terminal summary and exit receipt.
+The final root-library run on code `445d84bf7` completed with **5,389 passed,
+zero failed, 123 ignored, zero filtered and Cargo exit 0**. Its
+[collected receipt](root-validation-445d84bf7.json) distinguishes the terminal
+full summary from two nested one-test summaries. Later filing commits leave
+the tested root/native runtime inputs unchanged; this validates no later main.
 The fixed development preflight and synthetic report tests are separate from
 the primary research census, which has not run.
 

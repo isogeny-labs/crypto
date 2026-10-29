@@ -14,6 +14,7 @@ is established.** This record covers development checks only.
 | Partial report/export | Synthetic inputs only: one failed logical attempt, 26 absent rows, expected CLI exit 1; canonical export schema valid |
 | PDF inspection | Both pages of the draft plan and both pages of the synthetic report visually inspected; no clipping observed |
 | Root-library validation on base `24def3ae4dfe94bbbee5f30245847b372d02fa70` | **Incomplete**, with no final summary or exit receipt |
+| Final root-library validation on `445d84bf7f57750e0e34bd7a65992c36c0da92ec` | **Completed: 5,389 passed, 0 failed, 123 ignored, 0 filtered; Cargo exit 0** |
 
 The root-library attempt first failed on a tracked sparse path dependency. That
 failure is retained. The subsequent tool session disappeared at the environment
@@ -22,15 +23,27 @@ The interruption receipt records a null exit code and signal because neither
 was observed. No clean pass or ongoing run is claimed for that old attempt.
 The PR #2857 check-in excludes a repeat broad-library run for that evidence/docs
 PR; the later clarification preserves the independently requested TR-04 work.
-A separate final root run on `445d84bf7` is now active in an isolated worktree
-after synchronization with current main. No pass is claimed before its terminal
-full-suite summary and captured exit status. A superseded `fe0e1dac6` compilation
+A separate final root run on `445d84bf7` completed in an isolated worktree
+after synchronization with the selected main snapshot. It ran from
+22:11:17 to 23:23:56 UTC with 5,389 passed, zero failed, 123 ignored and
+zero filtered; Cargo exit 0. The outer suite contained 5,512 tests. Two earlier
+one-test summaries are nested child runs, not the terminal full result.
+The [collected receipt](root-validation-445d84bf7.json) binds the exact source,
+tree, raw-log hash, exit receipt and terminal summary. A superseded `fe0e1dac6` compilation
 was intentionally stopped before tests with compiler SIGTERM 15 and Cargo exit
 101 to select the intended source. Every attempt remains distinct.
 
 The earlier completed 5,143/0/123 run on source `0044aaf9` belongs to PR #2857's
 separate immutable evidence. It does not validate this later base or TR-04.
 The old `4c871` SIGKILL and earlier new-compilation SIGKILL records remain separate.
+
+The complete root-development archive, including distinct earlier attempts,
+is preserved locally as `/workspace/tr04-root-validation-445d84bf7.tar.xz`.
+Its bytes/hash are in [development-status.json](development-status.json).
+At 80,316 bytes it exceeds the repository's 64 KiB policy, so it is not added
+to Git. Configured artifact-store publication and independent download remain
+pending; neither is implied by the local validation or small tracked receipt.
+No raw log was split or truncated to evade that policy.
 
 Independent development review found and corrected artifact relocation during
 analysis-source validation, primary source-pin verification, and report receipt
@@ -56,7 +69,7 @@ checks, native-source reuse proof and the intentional superseded compilation.
 It establishes no actual remote upload or download.
 
 Runtime planning and protocol freeze are now complete. Remaining prerequisites
-are completed root-library validation, final review and source publication,
+are final review and source publication,
 then the authorized supported checkpoint-gated execution and collection.
 Nothing in these development checks establishes all 531 primary dispositions,
 27 completed export rows, a new scalar-preserving map, or a runtime gain.
