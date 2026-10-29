@@ -24,7 +24,7 @@ use crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2;
 use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
 use crate::cryptanalysis::prime_root_trace::{self, RootEvent, RootLimits, RootReport, RootStop};
 use crate::cryptanalysis::sat::{self, SolveResult};
-use crate::ecc::{CurveParams, Point};
+use crate::ecc::Point;
 
 use super::curves;
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
@@ -242,7 +242,7 @@ pub fn capabilities() -> Value {
 #[derive(Clone)]
 enum Group {
     Binary(Box<BinaryCurve>),
-    Prime(CurveParams),
+    Prime(curves::ExactPrimeCurve),
 }
 #[derive(Clone, Debug, PartialEq)]
 enum Element {
