@@ -8,7 +8,7 @@
 | Larger binary curves | Theorems apply for arbitrary `n`; numerical replay not extended here | SEC2 odd binary sizes inherit the conditional `(4,5)` statement; the separate Boolean upper bound is independent of `n` |
 | Extend to growing factor bases | Derived for the explicit degree-`B` membership model | `extensions/growing_b/proof.txt`, `binary_bridge.txt` |
 | Extend to characteristic two | Derived for ordinary binary coefficient-field systems | `extensions/characteristic_two/extension_proof.txt` and independent audits |
-| Prove exact pair `(4,5)` in Lean | Partial, lower-bound theorem checked | [Progress](formal/exact-pair-progress.md): actual six-input `1 ∉ V(F,4)`, ordinary closure and last-fall bridge; degree-five upper construction and weighted syzygy/Koszul theorem remain open |
+| Prove exact pair `(4,5)` in Lean | Proved for the original prime-field model | [Complete proof](formal/complete-exact-pair.md): `GuardedExactPair.exact_pair_prime`; actual generator degrees/tops, graded Koszul first fall, constructed degree-five refutation and rationality/unit-ideal bridge |
 | Fully Boolean binary upper bound | Derived for the specified one-auxiliary two-S3 chain | `d_F<=3*ell+1`, independent of `n`, with explicit bit equations; `extensions/characteristic_two/boolean_upper_bound.txt` |
 | Prime-field bit-restricted upper bound | Derived for the stated `F_p`-coefficient lookup presentation | Normalized inputs: `d_F<=3*ell+2`; raw inputs: `d_F<=max(3*ell+2,d_raw)`; rational-lift and auxiliary-encoding hypotheses are essential |
 | Growing Boolean lower bounds and exact degrees | Unresolved | Cardinality lower bounds do not transfer; applying the direct upper theorem to E12 still requires an encoding audit |
@@ -16,9 +16,9 @@
 | Performance or security improvement | Not claimed | No complete-DLP, speed, or asymptotic security measurement |
 
 The characteristic-two classification uses true `GF(2^n)` coefficients and
-ordinary polynomial degree. The uniform odd-characteristic degree-four
-obstruction is now a Lean theorem. The degree-five upper construction, exact
-pair, triple-selector lifting,
-finite-grid inversion, Boolean assignment-localization bound, and curve/sign
-interpretation are not Lean theorems in this packet. Passing the identity checks must not be described as formal
-verification of those missing bridges.
+ordinary polynomial degree. The original odd-characteristic prime-field
+three-abscissa exact pair is now proved in Lean, including its degree-five
+construction and scalar-grid inverse. Triple-selector lifting, the binary
+classification, Boolean assignment-localization bounds, numerical large-curve
+witnesses and group-law/sign interpretation remain outside this formal claim.
+The central theorem assumes polynomial UNSAT, exactly as its source states.

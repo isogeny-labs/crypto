@@ -9,6 +9,38 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Benchmark adapter integration (T-807 / T-808)
+
+This work concerns mathematical algorithms on public synthetic instances.
+It does not assert recovery of deployed keys. The root method
+`ic.three_leads_genus2_pencil_symbolic_v2` requires explicit small-base
+selection and coefficient cap, repeats cold setup, and retains the full
+native and symbolic ledgers. Its group-only GAE is a lower bound; full costs,
+qualified online intervals and candidate/rho ratios remain unavailable.
+
+The root dependency enables only the `reporting` feature. The shared solver
+uses the root arithmetic engine and installs no allocator. Replay binds the
+deterministic JSON ledger to four exact SHA-256 words in audited counters;
+only explicitly named clock and allocation observations are excluded. These
+digest words are identifiers, not operation counts. Independent source review
+checked routing, replay coverage and the cost boundaries. The root release library check passed. The full root run recorded 5,146 passes, seven failures and 123 ignored
+tests. Six failures lacked tracked checkout fixtures; one reported a test-lock
+conflict. After materialization, all eight selected tests passed serially on
+the same compiled binary. Both logs are retained; the initial run is not
+relabelled as passing.
+The retained reporting-feature test log has 15 passing library tests.
+
+The root harness now uses the existing exclusive phase clock. Target-blind
+setup precedes target validation; query/control owns gaps between sieve,
+relation verification, elimination and the first source check. A checked
+export invariant requires the five phases to sum to the window. Additional
+adapter verification stays outside online and inside cold group counts.
+The matched rho hook opens at the first target multiplication or target
+transfer. A regression checks one hook call and identical recorded work in
+plain, negation and transferred modes. The standalone driver does not start
+a clock session, so these hooks do not yet export online times there.
+Instrumentation overhead is included; qualified runtime evidence is still absent.
+
 ## Reusable per-target solver (T-802)
 
 `native_solver::solve_one` accepts a source instance, public target, algorithm
@@ -20,8 +52,8 @@ incompatible engine types. The standalone binary owns input selection, known
 answer checks, matched rho, and the global allocator.
 
 Output is now `pencil-symbolic-cohort-target/v2`, with nested per-target cold
-setup. Setup is physically repeated for each target and includes target
-validity checking. The exact 16-walk rule and signed relation processing are
+setup. Setup is physically repeated for each target. Target validation now follows
+target-blind setup and is charged in the candidate query stage. The exact 16-walk rule and signed relation processing are
 unchanged; archived trial_cap remains rho's cap. Result storage retains graph
 and solver allocations, but setup temporaries drop before rho. This is a new
 live-memory baseline, not an identical v1 allocation boundary. No v2 cohort
@@ -30,10 +62,9 @@ for a measured execution even though a guard restores the observation flag.
 
 New development checks reject unsupported configuration/source metadata,
 check unavailable-observer serialization and flag cleanup. There are 14 default
-library tests and 21 producer-feature library tests (including six extracted
-solver tests); binary tests now live with the shared implementation. Root
-method registration, serialization-only kernel feature, and full cohort
-execution remain open. Costs remain incomplete and ratios null.
+library tests and 28 passing producer-feature library tests with one ignored
+shared-clock test (including eight solver tests); binary tests now live with the shared implementation. Root method registration and the serialization-only kernel feature are
+implemented, with root validation and prerequisite rechecks retained. Full cohort execution remains open. Costs remain incomplete and ratios null.
 
 ## Execution-route reconciliation (T-801)
 
@@ -106,7 +137,8 @@ The implementation follows the official
 ordered traversal and consistent lookup ordering. A read-only peer review
 identified lost iterator size hints; forwarding and regression assertions
 were added before delivery. Current validation is 14 default library tests,
-21 producer-feature library tests, including six shared-solver tests. Cohort
+28 passing producer-feature library tests with one ignored shared-clock test,
+including eight shared-solver tests. Cohort
 execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs

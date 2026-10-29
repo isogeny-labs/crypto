@@ -3,7 +3,7 @@
 use std::cell::Cell;
 
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
 pub struct Snapshot {
     pub scalar_adds: u128,
     pub scalar_muls: u128,

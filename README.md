@@ -1,5 +1,10 @@
 # Root-finding decomposition engine in ecbench: results
 
+For the Bochum v0.2 paper's separate hashed-factor-base reduction, see the
+[native Rust reference](docs/hashed-ecdl.md). Its compact tensor encoder and
+fast contraction backend remain unimplemented; no subexponential speedup is
+claimed by that reference.
+
 **Decision: engineering.** The new oracles verify, replay identically, and
 match the query stream of the existing table/subtract arms; they do not
 change the asymptotic group-operation count of the decomposition, so
