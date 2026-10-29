@@ -1499,7 +1499,8 @@ mod tests {
         let original: Value = super::super::read_json(&input_path).unwrap();
         for mutation in 0..4 {
             let mut input = original.clone();
-            let mut bad_manifest = manifest.clone();
+            let mut bad_manifest: CellManifest =
+                serde_json::from_value(serde_json::to_value(&manifest).unwrap()).unwrap();
             match mutation {
                 0 => input["polynomials"][0][0]["coefficient"] = json!("0"),
                 1 => input["domains"][3] = input["domains"][0].clone(),
