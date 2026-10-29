@@ -45,7 +45,7 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: dtolnay/rust-toolchain@1.98.0
       - run: cargo check --no-default-features --lib --bin ic
       - run: cargo test --release --features redis-cache --lib polynomial_reuse
       - run: cargo test --release --features redis-cache --lib algebra_cache

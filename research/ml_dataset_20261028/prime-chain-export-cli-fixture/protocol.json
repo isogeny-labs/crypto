@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "artifact lengths and SHA256",
+    "independent Python polynomial reconstruction",
+    "exact decimal coefficients and domains",
+    "public feature content hash",
+    "private label fields excluded",
+    "source inventory and binary unchanged"
+  ],
+  "classification": "software_correctness_fixture",
+  "clock_valid_for_comparison": false,
+  "commands": 5,
+  "corpus_rows_added": 0,
+  "limits": {
+    "address_space_bytes": 536870912,
+    "command_wall_seconds": 60,
+    "file_size_bytes": 16777216,
+    "polled_scratch_bytes": 67108864
+  },
+  "negative_control": "existing rehashed coefficient/domain corruption must exit 1 and publish no manifest",
+  "positive_controls": [
+    "shard-62 curve export",
+    "shard-63 twist export"
+  ],
+  "purpose": "Validate native prime-chain static graph export against retained curve and twist cells",
+  "repeat_controls": "identical immutable export retry for both cells",
+  "runner_sha256": "1c57ceb4faca585c4ecd24bbd0137d8198da7f022778701b4e42646e707f63ac",
+  "schema": "ml-dataset.software-fixture-protocol/v1",
+  "source_commit_binding": "Separate immutable build receipt required; supplied commit alone is not attestation",
+  "source_fixture_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "source_inventory_files": 158,
+  "verified_cloud_dataset_cells": 0
+}

@@ -9,6 +9,86 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Reusable per-target solver (T-802)
+
+`native_solver::solve_one` accepts a source instance, public target, algorithm
+seed, explicit denominator/coefficient cap, and an optional installed allocator
+observer. It does not read an archive, environment variables or a planted
+answer, print output, or invoke rho. The shared source imports caller-provided
+`engine` and `kernel` aliases for later ecbench integration without crossing
+incompatible engine types. The standalone binary owns input selection, known
+answer checks, matched rho, and the global allocator.
+
+Output is now `pencil-symbolic-cohort-target/v2`, with nested per-target cold
+setup. Setup is physically repeated for each target and includes target
+validity checking. The exact 16-walk rule and signed relation processing are
+unchanged; archived trial_cap remains rho's cap. Result storage retains graph
+and solver allocations, but setup temporaries drop before rho. This is a new
+live-memory baseline, not an identical v1 allocation boundary. No v2 cohort
+has been run. Missing observer fields are null, not zero. Panics are terminal
+for a measured execution even though a guard restores the observation flag.
+
+New development checks reject unsupported configuration/source metadata,
+check unavailable-observer serialization and flag cleanup. There are 14 default
+library tests and 21 producer-feature library tests (including six extracted
+solver tests); binary tests now live with the shared implementation. Root
+method registration, serialization-only kernel feature, and full cohort
+execution remain open. Costs remain incomplete and ratios null.
+
+## Execution-route reconciliation (T-801)
+
+The earlier access diagnosis incorrectly treated the phrase "research EKS"
+as namespace `research`. The repository access guide and retained October 24
+access audit specify namespace `isolab`, with the existing host identity in
+`isolab:submitters`. On October 29 the documented harness connection returned
+permission to create Jobs and listed nine terminal Jobs (seven succeeded,
+two failed, none active). The installed MCP overview agreed. No identity,
+permission, or client configuration changed. The default context's launcher
+AssumeRole denial persists, but it does not block the documented connection.
+
+`EXECUTION_RECONCILIATION.json` records this scope and the separate expired
+Diem/freeze lane. No historical task-owned EKS Job ID was found in the inspected
+four-lead records; absence is not a historical result. No Job was submitted.
+
+The next execution dependency is integration: the current producer is a
+standalone CLI. The maintained resumable contract accepts native ecbench
+workloads, not arbitrary commands. The existing `ecbench/three_leads.rs`
+adapter and method registry provide the integration point; reuse the exact
+producer arithmetic through a per-target API, retain source checks, and add
+an explicit method ID. Do not substitute a non-resumable command job for the
+required recovery path. Protocol, image/binary identity, controls, pricing
+and the existing upper gate must still be satisfied before a cohort starts.
+
+## Phase attribution and scalar pricing boundary (T-798)
+
+The producer now rejects exports when named phases do not sum to field,
+native arithmetic and symbolic totals. Cold setup is added only after that
+check. Deterministic walk-label generation is inside the generation phase.
+`candidate_phase_overhead_ns` retains the nonnegative difference between the
+whole candidate interval and its phase intervals, including bookkeeping and
+control flow. It does not make unisolated clocks eligible for a speed claim.
+
+A source audit found asymmetric inversion instrumentation: the pencil
+`pow` and symbolic inverse helpers count their internal multiplications,
+whereas the reference `Ring::inv` records an inverse and calls unmetered
+`modpow`. Thus the historical raw scalar event sum is not a common atomic
+inverse model. The native `scalar_ledger` module removes the pencil inverse
+multiplications before applying a common atomic scalar-I valuation. It retains
+non-inverse multiplications, including primality work where observed. Scalar-I
+weights are not automatically equated to base-field inversion weights.
+
+`COST_MODEL_DRAFT.json` gives exact formulas and unresolved admission gates;
+it is explicitly not a frozen experiment protocol. A regression compares the
+actual pencil inverse and actual reference Ring inverse, including their
+normalized ledgers. Another rejects mismatched field/native/symbolic phase
+sums and impossible elapsed-time sums. Historical artifacts are unchanged;
+no revised numerical ratio has been computed from them.
+
+Source references: `src/cryptanalysis/three_leads.rs` (`Ring`, `modpow`),
+the frozen `pencil_sparse_20261022/src/bin/price_sparse.rs` analyzer, this
+producer's `pow`, and the symbolic library's inverse implementation. No
+claim of complete logical accounting follows from normalized scalar counts.
+
 ## Sparse map observations (T-797)
 
 The symbolic maps now record map API calls, ordered-key comparisons, yielded
@@ -25,8 +105,8 @@ The implementation follows the official
 [BTreeMap API](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html):
 ordered traversal and consistent lookup ordering. A read-only peer review
 identified lost iterator size hints; forwarding and regression assertions
-were added before delivery. Current validation is 13 default library tests,
-14 producer-feature library tests and three producer adapter tests. Cohort
+were added before delivery. Current validation is 14 default library tests,
+21 producer-feature library tests, including six shared-solver tests. Cohort
 execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs
