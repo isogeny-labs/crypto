@@ -59,3 +59,28 @@ comparison was run. Full-library results and hosted current-head merge gates
 are recorded separately when completed. Shell syntax passes; optional
 ShellCheck reports the existing literal-backtick, unused-array and intentional
 module-list splitting diagnostics, retained in its raw log.
+
+## Completed full suite and latest accepted main
+
+The complete release-library suite at source 2e4b7801 passes 5,017 tests,
+zero failures, with 122 pre-existing ignored tests. Its initial 26 missing
+runtime-fixture failures and the complete passing rerun are both preserved.
+A subsequent normal merge incorporates main 161a5a93, retaining both dated
+shared-journal additions. Its accepted catalog contains 20,787 models.
+
+Rebuilt all three native producers with Rust 1.98.0, including main's updated
+Cargo dependency graph. All 13 constructor controls pass against those current
+inputs. Complete cover byte-currentness verifies 20,787 rows with zero invalid
+or unsupported results; standalone non-provenance data matches canonical data
+exactly. The Jacobian inventory adds 148 entries to the prior 20,639, with
+zero changed or removed existing entries, the same CostModel and factor budget
+200000. It is 95,002,491 bytes of ordinary pretty JSON, below 100 MiB, at
+SHA-256 6649cb2e3ce1131aef019fc277f0619bcf9055c00aa650dccc242c9c860b6ee4.
+
+Assessment regeneration, byte-currentness, schema validation and independent
+verification pass; the independent verifier reports zero problems. All 17
+scientific sections remain unchanged relative to the complete-suite source;
+only source_artifacts provenance differs. The dated PDF remains byte-exact.
+All 12 combined Cargo scope controls pass again. No new mathematical support,
+solver, performance, private-data or experiment claim is introduced. Hosted
+current-head merge checks and fresh review still determine landing.
