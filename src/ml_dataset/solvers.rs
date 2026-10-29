@@ -4285,7 +4285,10 @@ fn wide_begin_failure(
     context: Option<&super::execution::SolverExecutionContext>,
     error: String,
 ) -> Result<SolverData, String> {
-    if config.family != "prime" || config.solver != "f4" || config.m != 2 || context.is_none() {
+    let Some(context) = context else {
+        return Err(error);
+    };
+    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
         return Err(error);
     }
     let group = Group::read(case)?;
