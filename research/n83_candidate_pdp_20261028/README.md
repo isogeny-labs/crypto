@@ -18,6 +18,8 @@ Read the [native results](evidence/degree4-witness/summary.json),
 [unified export](experiment-degree4-witness.export.json),
 [S3 objects and parent archives](evidence/degree4-witness-storage.json), and
 [verification coverage](evidence/degree4-witness-publication.json).
+The [two-page report](reports/run-20261029T1726Z/report.pdf) and
+[delivery record](evidence/degree4-witness-delivery.json) bind publication checks.
 The archive README provides the exact replay command. Both immutable V3 parent
 archives are needed. Independent scientific review remains pending.
 

@@ -121,3 +121,36 @@ PR, retain session receipt and final checkpoint/publication metadata.
 No production, fresh replay, S3 replay, post-manifest or final export failure.
 The earlier logical backend reference was corrected only in derived metadata,
 with its original version retained. No scientific evidence was overwritten.
+
+## 18:22 UTC — Data, report and support published
+
+### What was done
+Data commit38611ee034d53409c028b5c7deabfb06b104d985 pushed before report rendering.
+All60 new metrics match committed native records. Inspected both final PDF pages;
+SHA2568697ecc185d550d1cb77a49e045268666c45f92b4d154ee4e1d338355708b063.
+All7 report files downloaded byte-identically from S3. Earlier layouts and page
+images retained. Support archivecce17f169db9f3f6e3117e309d749ce53b4e4c8e70cbd0a7011adcd1adb1e0da
+(570020bytes,914files) round-tripped; all913 manifest payloads verified.
+The new delivery record binds report, support, metrics and15-dataset navigation.
+
+### Decisions made
+Support directory is now sealed. Later receipts go to degree4-witness-final and
+its S3 publication bundle. Keep all earlier sources, parent data and report
+layouts. The current root-library source remains unchanged from prior validation;
+no unrelated full-suite rerun. No independent scientific-review claim.
+
+### Open threads
+Push report/delivery/receipt, refresh PR2706, checkpoint final state and verify
+remote head. Global LFD upper bounds, exact LFD, prime finite presentations,
+held-out elite-base improvement and independent scientific review remain open.
+A higher-fall test needs full V4 nonmembership or a valid separating certificate;
+a restricted V4 stall cannot provide that certificate. No production replay active.
+
+### Errors
+The first report layout placed the subtitle on the title line and crowded source
+identities; corrected layout and preserved both earlier versions. Final pages are
+legible. No native data, protocol, candidate result or scientific claim changed.
+
+The receipt helper wrote SR-20261029-1d7b84 under receipts/20261029. The first
+staging command used the dashed date directory and failed before committing;
+corrected staging to the exact existing receipt path without writing a duplicate.
