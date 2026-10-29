@@ -19,12 +19,21 @@ No speed-up, no ECC2K-130 discrete logarithm, no leaderboard or benchmark row.
 | `test_enc.py` | network count == brute-force count of decompositions |
 | `run_toy.py` | full m=2 index calculus on GF(2^5), r = 11 |
 | `ecc2k130_check.py` | the same encoding on the ECC2K-130 field and curve |
+| `width.py` | treewidth estimate (min-fill) of the relation network |
+| `test_enc7.py` | the n = 7 count check with cutset conditioning |
 
 ## Verified results (local, seeded)
 
 * `python3 test_enc.py 5`: for 3 random R on GF(2^5), the contraction count
   equals the brute-force number of ordered pairs (A1, A2), x1 != x2, with
   A1 + A2 = R (e.g. 42 = 42, 40 = 40).
+* `python3 test_enc7.py 1` (`test_enc7.log`): GF(2^7), R = (40, 59): network
+  count 112 equals brute-force count 112. Plain bucket elimination needs
+  tables of 2^34 entries here (min-fill width 34 vs 23 at n = 5), so the count
+  conditions on the 7 bits of x1 (128 contractions of width about 25); 336 s.
+  Dropping the P2 curve-membership predicate as redundant is wrong: it gives
+  237 solutions instead of 112 (P2 need not lie on the curve), so both points
+  are checked.
 * `python3 run_toy.py 1` (`toy_seed1.log`): GF(2^5), group order 44 = 4·11,
   subgroup r = 11, |F1| = |F2| = 8, N = 16. 17 relations, each checked with
   reference curve arithmetic; the kernel mod 11 recovered the secret
@@ -40,8 +49,9 @@ No speed-up, no ECC2K-130 discrete logarithm, no leaderboard or benchmark row.
 
 ## What this does not show
 
-* The contraction is exponential (treewidth ~23 at n = 5, ~34 at n = 7, where
-  the dense tensors no longer fit). Only a working Theorem D.1 algorithm would
+* The contraction is exponential (min-fill width 23 at n = 5, 34 at n = 7;
+  n = 7 only fits with cutset conditioning, 336 s per count, so a full n = 7
+  index-calculus run (about 25 relations) was not attempted). Only a working Theorem D.1 algorithm would
   change that, and the paper states it saves nothing below about 2^(2^17) edges.
 * The multiplier chain here has O(n^2) edges. The paper's O(n)-edge Fourier
   multiplier is not implemented, and its integer construction does not carry

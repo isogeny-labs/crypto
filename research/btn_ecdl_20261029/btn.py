@@ -153,17 +153,44 @@ class Net:
         return dict(variables=self.nv, constraints=len(self.cons), btn_edges=edges, max_arity=deg)
 
 
+def simplify(cons):
+    """Slice out variables pinned by a unary factor with one nonzero entry
+    (constants and interface prefixes); returns None if some factor vanishes."""
+    cons = [(tuple(s), t) for s, t in cons]
+    pinned = set()
+    while True:
+        pin = None
+        for s, t in cons:
+            if len(s) == 1 and t.sum() == 1:
+                pin = (s[0], int(t[1])); break
+            if t.sum() == 0: return None, pinned
+        if pin is None: return cons, pinned
+        v, b = pin
+        pinned.add(v)
+        out = []
+        for s, t in cons:
+            if v in s:
+                ax = s.index(v)
+                t = np.take(t, b, axis=ax); s = s[:ax] + s[ax + 1:]
+                if len(s) == 0:
+                    if int(t) == 0: return None, pinned
+                    continue
+            out.append((s, t))
+        cons = out
+
+
 def contract(nv, cons):
     """Number of satisfying assignments (all nv bit variables) by greedy
     min-degree bucket elimination."""
-    facs = [(tuple(s), t) for s, t in cons]
-    alive = set(range(nv))
+    facs, pinned = simplify(cons)
+    if facs is None: return 0
+    alive = set()
     for s, _ in facs:
         alive |= set(s)
+    scalar = 2 ** (nv - len(alive) - len(pinned))
     adj = {v: set() for v in alive}
     for s, _ in facs:
         for v in s: adj[v] |= set(s) - {v}
-    scalar = 1
     while alive:
         def fill(u):
             nb = list(adj[u])
@@ -193,3 +220,13 @@ def contract(nv, cons):
         if out: facs.append((tuple(out), res))
         else: scalar *= int(res)
     return scalar
+
+
+def contract_cut(nv, cons, cut):
+    """Cutset conditioning: sum of contract() over all assignments of the
+    variables in `cut` (cost 2^|cut| contractions of a narrower network)."""
+    total = 0
+    for m in range(1 << len(cut)):
+        extra = [((v,), np.array([1 - (m >> i & 1), m >> i & 1], dtype=np.int64)) for i, v in enumerate(cut)]
+        total += contract(nv, list(cons) + extra)
+    return total

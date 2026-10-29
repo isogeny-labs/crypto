@@ -42,14 +42,15 @@ def member(net, xw, table):
     net.add(xw, lambda *b: table[sum(v << i for i, v in enumerate(b))])
 
 
-def build(F, R, tabs):
+def build(F, R, tabs, full_check=True):
     """Interface = bits of (x1,y1,x2,y2) in this order."""
     net = Net()
     n = F.n
     P1 = (net.word(n), net.word(n)); P2 = (net.word(n), net.word(n))
     Rw = (net.word(n), net.word(n))
     net.fix(Rw[0], R[0]); net.fix(Rw[1], R[1])
-    on_curve(net, F, P1); on_curve(net, F, P2)
+    on_curve(net, F, P1)
+    if full_check: on_curve(net, F, P2)
     lam = add_gadget(net, F, P1, P2, Rw)
     member(net, P1[0], tabs[0]); member(net, P2[0], tabs[1])
     iface = P1[0] + P1[1] + P2[0] + P2[1]
