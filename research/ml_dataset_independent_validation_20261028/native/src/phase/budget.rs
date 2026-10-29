@@ -2,15 +2,15 @@
 use anyhow::{ensure, Context, Result};
 
 pub(super) const LIMIT: usize = 32 * 1024 * 1024;
-pub(super) struct Budget {
+pub(crate) struct Budget {
     limit: usize,
     used: usize,
 }
 impl Budget {
-    pub(super) fn new(limit: usize) -> Self {
+    pub(crate) fn new(limit: usize) -> Self {
         Self { limit, used: 0 }
     }
-    pub(super) fn charge(&mut self, bytes: usize, what: &str) -> Result<()> {
+    pub(crate) fn charge(&mut self, bytes: usize, what: &str) -> Result<()> {
         let next = self
             .used
             .checked_add(bytes)
@@ -19,7 +19,7 @@ impl Budget {
         self.used = next;
         Ok(())
     }
-    pub(super) fn used(&self) -> usize {
+    pub(crate) fn used(&self) -> usize {
         self.used
     }
 }

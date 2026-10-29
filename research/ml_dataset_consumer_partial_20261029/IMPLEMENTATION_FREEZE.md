@@ -48,6 +48,16 @@ opens a file. Remote grammar accepts canonical S3 or a nonempty original
 `file://` location for local-mirror identity; fetch separately requires S3.
 The schema module does not allocate a collection before caller admission.
 
+Source-backed clarification, 2026-10-29 before acceptance: `file://` requires
+a nonempty absolute remainder beginning with `/`, matching pinned producer
+`src/store/backend.rs:128–135`. Local mirror mode retains that original
+identity but never follows the declared location. This narrows the shorthand
+"nonempty" above to the producer's actual accepted grammar; no vector changes.
+The same source-backed canonical identity rule rejects trailing-slash S3
+aliases: the bare canonical bucket is valid, but neither `s3://bucket/` nor
+`s3://bucket/prefix/` equals the producer backend's displayed identity. Inputs
+are rejected rather than normalized. This is PC-02 from parent source review.
+
 The parent ledger API in `partial::budget` is:
 
 ```rust
@@ -175,3 +185,23 @@ consumer phase/binding/protocol/transport code; the parent-reviewed primary
 AWS GetObject/HeadObject and Linux open(2) references in `design/SOURCES.md`.
 The repository's referenced `docs/CONDUCTOR.md` is absent from the base tree;
 the live CLI help/check/claim and frozen task card supply coordination syntax.
+
+## Additive review corrections before final acceptance
+
+PC-CHAIN-01 binds metadata, artifacts, semantics and inventory to clones of one
+opened root descriptor, including the final fresh audit. PC-CHAIN-02 flushes
+each newly created intermediate directory and its containing directory before
+descending. PC03 forces a single AWS CLI attempt and deterministic JSON output
+on each partial HEAD/GET child; mock runners cannot claim actual remote reads.
+No real remote invocation accompanies these changes.
+
+Collection growth charges the entire newly requested logical capacity before
+`try_reserve_exact`, retaining all previous reservations. Bounded geometric
+growth avoids a fresh exact allocation for every appended member. This is an
+additive conservative clarification of the cumulative allocation-volume model;
+allocator metadata/rounding and RSS remain outside that explicitly named model.
+The restricted write counter is named `written_restore_bytes_before_report`:
+it counts accepted writes up to report construction, excluding the report's own
+serialization/write. The final directory/marker durability gate still precedes
+any successful command return. Test-only syscall fault points exercise refusal
+and retained incomplete state; they are absent from production builds.
