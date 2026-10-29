@@ -35,8 +35,8 @@ receipts are `consumer-partial-delivery/receipt.json` and
 evidence root. A separate delivery archive preserves these post-readback
 receipts, command logs/outputs and final documentation.
 
-The final standalone release suite passed239/0/9; strict release all-target
-Clippy passed. The earlier e430 freeze's42 sealed byte comparisons and mocked
+The final standalone release suite passed 239/0/9; strict release all-target
+Clippy passed. The earlier e430 freeze's 42 sealed byte comparisons and mocked
 legacy-fetch byte comparison remain e430 evidence for unchanged sealed/legacy
 paths. They are not relabeled as executions of the final binary. See
 [the acceptance ledger](ACCEPTANCE_EXECUTED.md) for exact coverage and limits.

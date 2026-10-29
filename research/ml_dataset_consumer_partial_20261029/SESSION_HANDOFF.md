@@ -42,7 +42,7 @@ and delivery remain active work; daily journal scope is owned elsewhere, so this
 owned handoff preserves the entry without cross-chat contact or contention.
 
 2026-10-29 final local validation: runtime/test source
-`9e1d8e3817bb69285462957de72c7fac2f6983c6` passed239/0/9 release, strict
+`9e1d8e3817bb69285462957de72c7fac2f6983c6` passed 239/0/9 release, strict
 all-target Clippy and eight actual local restore/fresh-audit pairs on migrated
 NFS. The preceding e430 freeze's unsupported-rename CLI failure remains retained;
 both independent reviewers cleared the narrow exclusive-link correction before
@@ -60,8 +60,8 @@ PR2824 or additional validation campaign was started. T783 remains owned through
 durable delivery; the shared daily log is still excluded from this scope.
 
 2026-10-29 06:48 UTC — primary delivery readback complete. Conditional S3 PUT,
-HEAD/ETag GET and archive/contained hashes passed for archive9e511cc2 (29,000,657
-bytes). The fresh filesystem manifest verified15,431 entries, five regular-file
+HEAD/ETag GET and archive/contained hashes passed for archive 9e511cc2 (29,000,657
+bytes). The fresh filesystem manifest verified 15,431 entries, five regular-file
 hardlink groups and two literal symlink targets. The downloaded CLI and test
 executable passed all eight downloaded restore/audit cases; sixteen stdout byte
 sequences match the pre-upload evidence. Detailed source/receipt/claim boundaries
