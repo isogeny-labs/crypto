@@ -4,6 +4,7 @@ from pathlib import Path
 import json,re
 h=Path(__file__).resolve().parent
 markers={'desc33-01':'DESC33_ALL_CHECKS_PASS','desc33-02':'DESC33_ALL_CHECKS_PASS','eval33-01':'EVAL33_ALL_CHECKS_PASS','pad33-01':'PAD33_ALL_CHECKS_PASS','local33-generate01':'LOCAL33_GENERATE_ALL_CHECKS_PASS','local33-check83-01':'LOCAL33_CHECK83_ALL_CHECKS_PASS','local33-compact-dump01':'LOCAL33_COMPACT_DUMP_ALL_CHECKS_PASS','local33-function01':'LOCAL33_FUNCTION_ALL_CHECKS_PASS','local33-compact-check5-01':'LOCAL33_COMPACT_CHECK5_ALL_CHECKS_PASS','padding-deck33-01':'PAD33_DECK_ALL_CHECKS_PASS','padding-deck33-02':'PAD33_DECK_ALL_CHECKS_PASS','local33-diagnostic01':'LOCAL33_DIAGNOSTIC_ALL_CHECKS_PASS','local33-diagnostic02':'LOCAL33_DIAGNOSTIC_ALL_CHECKS_PASS','local33-quotient01':'LOCAL33_QUOTIENT_ALL_CHECKS_PASS','quotient33-denominators01':'QUOTIENT33_DENOMINATORS_ALL_CHECKS_PASS','quotient33-function01':'QUOTIENT33_FUNCTION_ALL_CHECKS_PASS','quotient33-check5-01':'QUOTIENT33_CHECK5_ALL_CHECKS_PASS','quotient33-check83-01':'QUOTIENT33_CHECK83_ALL_CHECKS_PASS','quadrics33-01':'QUADRICS33_ALL_CHECKS_PASS'}
+markers.update({'quadrics33-02':'QUADRICS33_ALL_CHECKS_PASS','jets33-01':'JETS33_ALL_CHECKS_PASS'})
 rows=[]
 for p in sorted((h/'runs').iterdir()):
  if not p.is_dir():continue
