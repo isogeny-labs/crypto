@@ -4,7 +4,7 @@ All12attempts terminal. Ten native executions pass exit0, exact terminal marker
 and no Singular error lines. These include explicitly negative diagnostic
 outcomes. One native83consumer is rejected for a reserved identifier; its
 input/log is retained and the corrected fresh run uses identical data/criteria.
-No native cap increase or accepted mathematical calculation rerun.
+No native cap increase or restart of an accepted producer after observation loss.
 
 One Lean compile/audit passes:2new domain-cancellation theorems,0failing0trusted,
 pinned4.34.1/mathlibd13f23b,-j1-M4096/1200s. Audited R32/R33 universal lemmas
