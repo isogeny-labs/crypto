@@ -215,7 +215,7 @@ parallel kernel scheduling, but pre-admit the aggregate of ALL rows, not worker
 count or one block. Fixed numeric limits above remain ceilings, not promises that
 every combination is admissible under the conservative aggregate permit.
 
-For a kernel with R total rows and C columns reserve 64*(R+1)*(C+1)*(R+C+128)
+For a kernel with R total rows and C columns reserve 64*(R+1)*(C+1)*(R+C+130)
 logical work tokens before entry and 256*(basis_slots+16*(R+1)*(C+1)+pair_slots+1)
 accounted bytes. Terms cover initial input rows/pivots, dense B'/echelon plus
 parallel block accumulators and their collected copies, per-row descriptors,
@@ -240,3 +240,15 @@ work may finish between boundaries; existing native deadline checks remain, and
 this is not a hard asynchronous cancellation guarantee. Reserved tokens are upper
 admission tariffs, never independently verified executed operations. These
 conservative kernels may censor earlier than finer fallible primitive gates.
+
+## Diagnostic admission correction
+
+Reserve BOUNDED_F4_METADATA_BYTES=4096 before the first observer call. This includes
+the fixed2048-byte native diagnostic String capacity (up to512 Unicode scalars)
+and result/event metadata allowance. If unavailable, return StorageAdmission
+without invoking observer or allocating that diagnostic. Observer implementation
+and its returned original error String are caller-owned allocations, excluded
+from native accounting; the caller must independently bound its sink. Tests cover
+exact4096 and4095, with a four-byte Unicode begin-error control. The documented
+kernel expression is corrected to64*(R+1)*(C+1)*(R+C+130), matching code's
+r=R+1,c=C+1 and r+c+128; this correction changes no native arithmetic tariff.

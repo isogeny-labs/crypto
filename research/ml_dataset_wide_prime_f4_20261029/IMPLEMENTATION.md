@@ -29,7 +29,7 @@ allocator bytes. This is stricter than the initial design's live-budget idea.
 ## Gates and conservative formulas
 
 Initial input clone/monomial map/sparse rows/echelon: R=input.len(), C=sum(input
-term counts), pre-reserve K=64*(R+1)*(C+1)*(R+C+128) work and
+term counts), pre-reserve K=64*(R+1)*(C+1)*(R+C+130) work and
 B=256*(basis_slots+16*(R+1)*(C+1)+pair_slots+1) bytes. All arithmetic computing
 these permits is checked. Gate rejection returns no allocated input basis.
 Within echelon <=R pivots, each <=C coefficients; the initial accumulator C,
@@ -109,3 +109,15 @@ pairs on pre-symbolic/pre-kernel/insertion admission stops; count selected-but-n
 finished pairs against insertion cap. New native_statistics_complete is false
 on every noncomplete outer stop, including observer refusal; legacy partial
 statistics must not be interpreted as completed pair accounting. Eight tests now.
+
+## Diagnostic admission correction
+
+Reserve BOUNDED_F4_METADATA_BYTES=4096 before the first observer call. This includes
+the fixed2048-byte native diagnostic String capacity (up to512 Unicode scalars)
+and result/event metadata allowance. If unavailable, return StorageAdmission
+without invoking observer or allocating that diagnostic. Observer implementation
+and its returned original error String are caller-owned allocations, excluded
+from native accounting; the caller must independently bound its sink. Tests cover
+exact4096 and4095, with a four-byte Unicode begin-error control. The documented
+kernel expression is corrected to64*(R+1)*(C+1)*(R+C+130), matching code's
+r=R+1,c=C+1 and r+c+128; this correction changes no native arithmetic tariff.
