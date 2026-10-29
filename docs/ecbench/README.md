@@ -1571,6 +1571,12 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.
 
+Explicit binary linear bases already use
+`binary-subspace:dimension=D,basis=B0;B1;...`; no separate plug-in is needed.
+The same spec works in `ecbench fb` and an `ic.pipeline` arm. See
+[explicit bases](explicit-bases.md) for syntax, identity rules, validation,
+and the source-only handoff to a build from `crypto` `main`.
+
 ## 12. Limits
 
 Stated so that nothing here is read as more than it is:
