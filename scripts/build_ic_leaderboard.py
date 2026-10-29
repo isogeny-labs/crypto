@@ -835,6 +835,74 @@ def prime_base_size_component() -> dict:
             "validated": not errs}
 
 
+def stride_renew_component() -> dict:
+    """Prime-field relation targets, research/ic_stride_renew_prime_20261029 (backlog
+    XP-20261029-stride-renew-prime, frozen protocol, decided per size on two fresh curves):
+    `targets = stride-renew` against the `walk` baseline with the incumbent factor base and
+    oracle. The paired srenew/walk ratio of totals and the gap of each arm to the same-session
+    rho.negation at w = 0, 0.1 and 1, and each arm's mean S (unweighted), copied from the study's
+    saved `ecbench compare --weight` outputs. Its standing comes from the study's VALIDATION.json."""
+    study = "research/ic_stride_renew_prime_20261029"
+    rows = []
+    for bits, n, reading in ((20, 45, "improvement: stride-renew becomes the 20-bit target source"),
+                             (24, 162, "null at this sample size; walk kept"),
+                             (28, 407, "improvement (validated with caveats): stride-renew becomes the 28-bit target source"),
+                             (32, 1024, "null at this sample size; walk kept")):
+        ratio, walk_rho, sr_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in (("walk__srenew", ratio), ("rho-neg__walk", walk_rho), ("rho-neg__srenew", sr_rho)):
+                o = load(f"{study}/P{bits}/analysis/compare-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        c = load(f"{study}/P{bits}/analysis/compare-walk__srenew-w0.json")
+        rows.append({"bits": bits, "n": n, "reading": reading, "walk": c["a"]["mean_s"],
+                     "srenew": c["b"]["mean_s"], "ratio": ratio, "walk_over_rho": walk_rho,
+                     "srenew_over_rho": sr_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated (20 bits pass, 28 bits pass with caveats): replay certificate, validator "
+                           f"report and the matched rho reference with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def deferred_guard_component() -> dict:
+    """Prime-field deferred-guard stride-renew at a smaller factor base,
+    research/ic_srenew_deferred_guard_20261029 (backlog XP-20261029-srenew-deferred-guard-v3,
+    frozen follow-up protocol on fresh curves; the first study is descriptive only and is not
+    read here): `dg-small` (targets = stride-renew-deferred-guard, factor base N_b) against the
+    baseline at each size. The paired dg-small/baseline ratio of totals and the gap of each arm
+    to the same-session rho.negation at w = 0, 0.1 and 1, and each arm's mean S (unweighted),
+    copied from the study's saved `ecbench compare --weight` outputs. Its standing comes from the
+    study's VALIDATION.json."""
+    study = "research/ic_srenew_deferred_guard_20261029"
+    rows = []
+    for bits, base, n_inc, n_b, reading in (
+            (24, "walk", 162, 130, "improvement: dg-small becomes the 24-bit baseline (targets and N)"),
+            (28, "srenew", 407, 267, "pooled ratio below 1, band unresolved on one curve; srenew kept"),
+            (32, "walk", 1024, 741, "improvement: dg-small becomes the 32-bit baseline (targets and N)")):
+        ratio, base_rho, dg_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in ((f"{base}__dg-small", ratio), (f"rho-neg__{base}", base_rho), ("rho-neg__dg-small", dg_rho)):
+                o = load(f"{study}/v3/P{bits}/analysis/compare-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare v3 P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        c = load(f"{study}/v3/P{bits}/analysis/compare-{base}__dg-small-w0.json")
+        rows.append({"bits": bits, "base": base, "n_inc": n_inc, "n_b": n_b, "reading": reading,
+                     "base_s": c["a"]["mean_s"], "dg_s": c["b"]["mean_s"], "ratio": ratio,
+                     "base_over_rho": base_rho, "dg_over_rho": dg_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated (24 and 32 bits): replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -1896,6 +1964,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "stride_renew_component": stride_renew_component(),
+        "deferred_guard_component": deferred_guard_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2477,6 +2547,39 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    sr = doc["stride_renew_component"]
+    L += ["## Prime-field baseline: relation targets, stride-renew against the walk (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261029-stride-renew-prime): one parameter of the prime-field baseline, "
+          "the relation-target source, from `walk` (16 jumps plus restart offsets, each a charged scalar "
+          "multiplication) to `stride-renew` (R ← R + S, S renewed per relation, 4 scalar multiplications of "
+          "set-up); the factor base and the `mitm:negation_folded=1` oracle are the incumbents at each size. "
+          "Two fresh curves × 24 targets × 6 rounds per size, L2 on isolab-eks. "
+          f"{sr['unit']}. Ratios are paired Σ srenew ÷ Σ walk with cluster-bootstrap 95% intervals.", "",
+          "| bits | N | mean S walk → srenew (w = 0) | srenew ÷ walk (w = 0 / 0.1 / 1) | IC ÷ rho-neg walk → srenew (w = 0 / 0.1 / 1) | reading |",
+          "|--:|--:|:--|:--|:--|:--|"]
+    for r in sr["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["walk_over_rho"], r["srenew_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n']} | {r['walk']:.2f} → {r['srenew']:.2f} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + sr['report']}) · [study](../../{sr['study']}).", "", sr["validation"], ""]
+    dgc = doc["deferred_guard_component"]
+    L += ["## Prime-field baseline: deferred-guard stride-renew at a smaller factor base (2026-10-29, engineering)", "",
+          "Frozen follow-up protocol on fresh curves (backlog XP-20261029-srenew-deferred-guard-v3): `dg-small` "
+          "uses `targets = stride-renew-deferred-guard` (the repeat guard probed only on targets that decompose) "
+          "at a smaller factor base N_b, against the baseline at each size; the `mitm:negation_folded=1` oracle is "
+          "unchanged. Two fresh curves × 24 targets × 6 rounds per size, isolab-eks, counted units only (no wall "
+          f"time is claimed). {dgc['unit']}. Ratios are paired Σ dg-small ÷ Σ baseline with cluster-bootstrap 95% "
+          "intervals. An earlier study on other curves is undecidable (its L2 rule refused sub-millisecond rho "
+          "solves) and is reported descriptively in the study only.", "",
+          "| bits | baseline (N) → dg-small (N_b) | mean S baseline → dg-small (w = 0) | dg-small ÷ baseline (w = 0 / 0.1 / 1) | IC ÷ rho-neg baseline → dg-small (w = 0 / 0.1 / 1) | reading |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in dgc["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["base_over_rho"], r["dg_over_rho"]))
+        L.append(f"| {r['bits']} | {r['base']} ({r['n_inc']}) → {r['n_b']} | {r['base_s']:.2f} → {r['dg_s']:.2f} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + dgc['report']}) · [study](../../{dgc['study']}).", "", dgc["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -3273,6 +3376,48 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    sr = doc["stride_renew_component"]
+    P.append('<section class="card" id="stride-renew"><h2>Prime-field baseline · relation targets, stride-renew '
+             'against the walk <span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261029-stride-renew-prime): one parameter of the prime-field baseline, '
+             'the relation-target source, from <code>walk</code> (16 jumps plus restart offsets, each a charged scalar '
+             'multiplication) to <code>stride-renew</code> (R ← R + S, S renewed per relation, 4 scalar '
+             'multiplications of set-up); factor base and oracle are the incumbents at each size. Two fresh curves '
+             '× 24 targets × 6 rounds per size, L2 on isolab-eks. '
+             f'{esc(sr["unit"])}. Ratios are paired Σ srenew ÷ Σ walk with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th class="n">N</th><th>mean S walk → '
+             'srenew (w = 0)</th><th>srenew ÷ walk (w = 0 / 0.1 / 1)</th><th>IC ÷ rho-neg walk → srenew</th>'
+             '<th>Reading</th></tr></thead><tbody>')
+    for r in sr["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["walk_over_rho"], r["srenew_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["n"]}</td><td>{r["walk"]:.2f} → {r["srenew"]:.2f}</td>'
+                 f'<td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(sr["report"], "Report")} · {gh(sr["study"], "study")}.</p>'
+             f'<p class="muted">{esc(sr["validation"])}</p></section>')
+    dgc = doc["deferred_guard_component"]
+    P.append('<section class="card" id="deferred-guard"><h2>Prime-field baseline · deferred-guard stride-renew at '
+             'a smaller factor base <span class="chip">engineering</span></h2>'
+             '<p>Frozen follow-up protocol on fresh curves (backlog XP-20261029-srenew-deferred-guard-v3): '
+             '<code>dg-small</code> uses <code>targets = stride-renew-deferred-guard</code> (the repeat guard probed '
+             'only on targets that decompose) at a smaller factor base N_b, against the baseline at each size; the '
+             'oracle is unchanged. Two fresh curves × 24 targets × 6 rounds per size, isolab-eks, counted units only. '
+             f'{esc(dgc["unit"])}. Ratios are paired Σ dg-small ÷ Σ baseline with cluster-bootstrap 95% intervals. '
+             'An earlier study on other curves is undecidable and is reported descriptively in the study only.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>Baseline (N) → dg-small (N_b)</th>'
+             '<th>mean S baseline → dg-small (w = 0)</th><th>dg-small ÷ baseline (w = 0 / 0.1 / 1)</th>'
+             '<th>IC ÷ rho-neg baseline → dg-small</th><th>Reading</th></tr></thead><tbody>')
+    for r in dgc["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["base_over_rho"], r["dg_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{esc(r["base"])} ({r["n_inc"]}) → {r["n_b"]}</td>'
+                 f'<td>{r["base_s"]:.2f} → {r["dg_s"]:.2f}</td><td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(dgc["report"], "Report")} · {gh(dgc["study"], "study")}.</p>'
+             f'<p class="muted">{esc(dgc["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
