@@ -1,6 +1,36 @@
 # n83 spike40 factor bases and matched PDP work
 
 
+## Data navigation and latest m3 LFD results
+
+[DATA_INDEX.json](DATA_INDEX.json) maps the actual point datasets, saved PDP
+systems, fall-degree evidence and regularity certificates to their summaries,
+file formats, storage records and exact file hashes. The [base-binding check](BASE_BINDINGS.json) confirms the same per-curve manifest
+across m=2–9 in all 144 saved original/paired systems. The original point data
+remain in [the fixed-base directory](../n83_fixed_factor_base_20261028/README.md).
+
+The newest 12-case m=3 batch proves **LFD>=3** for original/baseline/spike40,
+Koblitz/binary, planted/natural presentations. Every producer, fresh replay and
+S3-restored replay passed. All 230 raw files match before/after restored replay.
+Every case reached 32,768 rows with an unfinished queue; exact LFD/global upper
+bounds remain unknown. A cap is not a complete V3 closure or a degree bound.
+The certificates preserve a quadratic V3 row outside the complete V2 space.
+
+Read the [native summary](evidence/degree3-m3/summary.json),
+[unified export](experiment-degree3-m3.export.json),
+[binary/JSON formats](DEGREE3_M3_FORMAT.json),
+[storage and restore](evidence/degree3-m3-storage.json),
+[publication checks](evidence/degree3-m3-publication.json), and
+[report](reports/run-20261029T0306Z/report.pdf).
+The archive retains 393,216 admitted rows, every operation, original inputs,
+complete V2 traces and 12 immutable progress summaries: 36.4 GB raw, 1.05 GB packed.
+All prior datasets and publication failures remain preserved. This batch adds
+LFD lower bounds; it does not change the regularity results below or establish
+an elite-base gain.
+The [publication-support archive](degree3-m3-publication/README.md) retains
+validation logs, failed metadata attempts, helpers and inspected report pages.
+
+
 ## Latest m3–9 binary chain bounds
 
 All84 retained original/baseline/spike40 Koblitz/binary systems passed producer,
