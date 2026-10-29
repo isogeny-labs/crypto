@@ -1,7 +1,7 @@
 # Dataset launch adapter contract
 
-Status: native two-stage allocation implemented, with centralized validation
-pending. Launcher inventory starts at source `23b3c0e527d621aebf6532db61744fab77867f48`,
+Status: native two-stage allocation implemented and validated at `9c3d14b0395`
+(5,119 full-library tests passed, zero failed, 123 ignored; exact-source exit 0). Launcher inventory starts at source `23b3c0e527d621aebf6532db61744fab77867f48`,
 2026-10-28. No new worker,
 resource allocation, IAM change or scientific generation follows from this
 record. The native budget CLI exists; the complete lab launch adapter described
@@ -35,7 +35,9 @@ and [Karpenter disruption semantics](https://karpenter.sh/docs/concepts/disrupti
 The [startup grant-delivery review](STARTUP-GRANT-DELIVERY.md) found no supported
 post-creation delivery route in the generic launcher permissions and mounts. It
 documents an unapplied exact-object ConfigMap proposal and its required issuer
-permission. A projected file alone does not grant the launcher write access.
+permission. A projected file alone does not grant the launcher write access. The
+[proposed native startup gate](STARTUP-GATE-PROPOSAL.md) specifies a local
+nonrenewable wait and activation/generation handoff; it remains unimplemented.
 
 The benchmark bridge and recovery controller are tied to ecbench. They do not
 provide a generic dataset startup gate or establish CRIU recovery for this CLI.
