@@ -3,6 +3,11 @@
 Observations only, without an IC, Picard or proper-model verdict. The persistent
 research goal continues. R31's completed raw archive is not rewritten.
 
+Parameter distinction: the ordinary support degrees83/284 belong to the
+existing level77, n=5 transfer lane. They are NOT new Koblitz extension
+degrees83/284. R31's larger CM character targets n83 through571 form a
+separate lane with explicit geometric maps still absent.
+
 ## Native results
 
 All20 accepted R31 quadratic point algebras pass the corrected local rank
