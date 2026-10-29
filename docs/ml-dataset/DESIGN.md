@@ -42,6 +42,11 @@ No manufactured `solved`, instruction-count, first-fall, or last-fall labels.
 | Double-large-prime selection | partial-relation graph and actual group identities | cycles with signed elimination witnesses, rank contribution and total graph cost |
 | Algebraic conjectures | exact systems and certified algebraic invariants | falsifiable formulas, independently checked witnesses/counterexamples, proof obligations |
 
+The [prime-chain ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md) specifies
+a concrete lossless equation graph and causal decision-prefix view, including
+exact wide integers and independent replay prerequisites. It is a design
+extension; the existing exporter does not implement that projection yet.
+
 Start with supervised cost/routing baselines, graph encoders, and sequence models
 of solver events. Train branching/reduction policies only after deterministic
 replay and action validity checks exist. A policy must still use an exact solver
