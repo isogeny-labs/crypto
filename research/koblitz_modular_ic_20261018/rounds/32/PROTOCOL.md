@@ -42,3 +42,15 @@ The sequential shell also reached jac284-01's checkpoint gate and was refused
 for the same missing sections, again before CAS. Preserve both refusal logs;
 the corrected field284 invocation must use fresh jac284-02. No source/math
 retry was needed because neither original invocation reached the native CAS.
+
+## Retained native recorder failure and exact correction
+
+jac83-02 reached CAS and failed the explicit unit-identity reconstruction for
+all ten algebras; the runner rejected it despite Singular exit0 and a later
+terminal marker. No accepted rank result is inferred. Its original input/log
+remain untouched. The scalar loop used size(ideal), which counts nonzero
+entries and can truncate generator coordinate slots when minors vanish.
+Replace only reconstruction by native matrix(generators)*witness, preserving
+zero slots. Require exact equality1 as before and record both dimensions.
+Fresh jac83-03 and jac284-02 use that correction; unchanged rank/source data,
+controls and caps. The second field had not run after the failed first field.

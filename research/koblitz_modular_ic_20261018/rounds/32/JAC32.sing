@@ -19,9 +19,12 @@ proc checkJac32(int root,int twist,poly L,number b,number c,poly l,poly n){
  if(count3!=40 || count4!=5){ERROR("JAC32_MINOR_ENUMERATION");}
  ideal generators=q,m3;
  if(std(generators)[1]!=1){ERROR("JAC32_RANK_BELOW3_ON_SOME_BRANCH");}
- matrix witness=lift(generators,ideal(1));poly identity;
- for(i=1;i<=size(generators);i++){identity=identity+generators[i]*witness[i,1];}
- if(identity!=1){ERROR("JAC32_UNIT_IDENTITY");}
+ matrix witness=lift(generators,ideal(1));
+ // Matrix multiplication preserves zero generator slots. size(ideal) counts
+ // only nonzero entries and must not truncate the coordinate reconstruction.
+ matrix reconstructed=matrix(generators)*witness;
+ if(reconstructed[1,1]!=1){ERROR("JAC32_UNIT_IDENTITY");}
+ print("JAC32_GENERATOR_DIMENSIONS nonzero="+string(size(generators))+" slots="+string(ncols(matrix(generators))));
  print("JAC32_RESULT root="+string(root)+" twist="+string(twist)+" rank=3 minors3=40 minors4=5 zero_control=proper");
  print("JAC32_EVALUATED_MATRIX");jm;
  print("JAC32_GENERATORS");generators;
