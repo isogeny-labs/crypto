@@ -100,3 +100,14 @@ R15's RH formula. Planted phase corruption must violate the group relation.
 No timing/efficiency assertion. Actual curve equations, modular projector,
 intended subgroup transfer and the written modular/good-reduction bridges
 remain separate requirements even on the five new cryptographic sizes.
+
+## Structural Lean amendment (before compilation)
+
+KoblitzCertificates31 proves the cyclic translation order/period used by the
+cocycle count, product invariance under an explicit root-label equivalence,
+the Tate normalization identities and the three QR coefficient changes under
+an Artin–Schreier diamond twist. It proves the sign involution universally.
+No native result table, modularity theorem, total cycle-count formula, geometry
+bridge or nonprincipal divisor class is asserted Lean-verified. Compile and
+transitive axiom audit under pinned Lean/mathlib, standard foundations only;
+retain failed compile attempts as failures and correct fresh attempts only.
