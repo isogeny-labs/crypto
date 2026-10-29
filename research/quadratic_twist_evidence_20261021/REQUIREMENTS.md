@@ -1,5 +1,12 @@
 # Requirement-to-evidence map
 
+2026-10-29: [explicit F13 rational dual](reports/cm8-dual-20261029/README.md) now
+checks14+14points,392addition pairs,both compositions=[2],all7subgroup inverses,
+all12S3arms/72source recoveries byte-identical,9controls/22backend tests. New
+21named/25audited actual-point/conditional-group declarations pass. It removes
+only enumerative public-base pullback; no new yield/degree/speed advantage.
+Original goal, full root/naming/registration/coordination/review holds remain.
+
 2026-10-29: [uniform full-census result](reports/uniform-20261029/README.md)
 now executes all96arms/896source recoveries/210policy comparisons with independent
 Rust arithmetic,536reachable states,172failed queries,13rehashed rejection controls
@@ -122,7 +129,7 @@ failures are not ruled out. The1921-model reconciliation hold is unchanged.
 | Cached-lift/source proof | kernel checked |9 new public theorems,191 public/249 audited total,0 extra trusted; actual F43 cache/logs and arbitrary/repeated column recovery |
 | Direct uncached sign reference | executed and independently replayed |120 setups/1200 source checks, equal ordered operand/lift traces/certificates; direct saves2 cold adds in all400 comparisons, cache saves negations; no total ranking |
 | Registered F13 degree-two twist route | executed finite reduction and actual systems |12arms/72source scalars/196addition pairs;17new public proofs,208public/269audit;3of54 reduced joint gains/0original; matched rows conserved,4degree changes favor source; general classification/geometry still explicit |
-| Explicit dual and subgroup inverse | next unexecuted draft | `backlog/XP-20261025-cm8-explicit-dual`; doubling composition and odd-annihilator inverse before replacing public-base enumeration |
+| Explicit dual and subgroup inverse | verified finite F13 rational-group inverse | `reports/cm8-dual-20261029/`: both finite F13 compositions/addition laws and explicit odd inverse checked;21named/25audited; all12S3arms72recoveries preserved, broader geometry/cost still open |
 | Uniform sampler useful yield / state collection | executed finite census; conditional recurrence proof checked |96arms/896targets/210comparisons,536states,172failed queries;0joint gains in both modes;13altered controls reject101/no receipt;22backend tests;9new named/16audited; actual-state/iid stopping-time bridge and complete costs remain open |
 
 The fresh library suite for the F13 continuation again passes 4,479

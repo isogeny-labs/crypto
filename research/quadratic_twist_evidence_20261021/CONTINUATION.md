@@ -1,5 +1,12 @@
 # Bounded research continuation
 
+2026-10-29: [explicit F13 rational dual](reports/cm8-dual-20261029/README.md) now
+checks14+14points,392addition pairs,both compositions=[2],all7subgroup inverses,
+all12S3arms/72source recoveries byte-identical,9controls/22backend tests. New
+21named/25audited actual-point/conditional-group declarations pass. It removes
+only enumerative public-base pullback; no new yield/degree/speed advantage.
+Original goal, full root/naming/registration/coordination/review holds remain.
+
 2026-10-25. The user asked how to keep this investigation pursuing the next
 experiment or proof without repeatedly needing a "keep going" message.
 The existing PR automation uses this policy; no second writer or duplicate PR
@@ -102,7 +109,7 @@ base-field rational points must not be silently transported by a generic twist.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance / actual transfer | Verify an explicit dual and odd-subgroup inverse of the now checked F13 forward map | Preregister exact coordinate/composition/kernel checks; replace only public-base pullback, preserve all checked useful ranks/degrees and source recoveries; complete transfer/cost/general geometry remains open |
+| Solver relevance / actual transfer | Finite F13 explicit dual/inverse now checked; next actual-state probability or a new relevant-degree encoding | See cm8-dual-20261029: enumeration removed only from public-base pullback;21named/25audited and independent full replay; new yield/degree/complete-cost evidence remains required |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |

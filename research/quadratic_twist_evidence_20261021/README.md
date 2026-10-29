@@ -1,5 +1,12 @@
 # Quadratic twists: executed uniform S3 census and conditional collection laws
 
+2026-10-29: [explicit F13 rational dual](reports/cm8-dual-20261029/README.md) now
+checks14+14points,392addition pairs,both compositions=[2],all7subgroup inverses,
+all12S3arms/72source recoveries byte-identical,9controls/22backend tests. New
+21named/25audited actual-point/conditional-group declarations pass. It removes
+only enumerative public-base pullback; no new yield/degree/speed advantage.
+Original goal, full root/naming/registration/coordination/review holds remain.
+
 2026-10-29: [uniform full-census result](reports/uniform-20261029/README.md)
 now executes all96arms/896source recoveries/210policy comparisons with independent
 Rust arithmetic,536reachable states,172failed queries,13rehashed rejection controls

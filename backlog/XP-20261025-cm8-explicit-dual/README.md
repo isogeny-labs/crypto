@@ -1,3 +1,5 @@
+2026-10-29 EXECUTED: [finite dual/inverse result](../../research/quadratic_twist_evidence_20261021/reports/cm8-dual-20261029/README.md),14+14points/392additionpairs,7inverse points,12arms/72source bytes preserved,21named/25audited and9controls/22backend tests pass. Draft status retains main-ancestry/Cairn gate; no generic geometry/speed claim. Historical proposal below is superseded within that finite scope.
+
 # Explicit F13 dual and subgroup inverse
 
 Validated draft, **not executed**. The preceding forward map, all72 scalar

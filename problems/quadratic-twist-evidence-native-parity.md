@@ -35,6 +35,16 @@ seven separate replay jobs pass, later primary steps are skipped. Preserve
 strict assertions, combined-catalog checks and the approved checkpoint gate and its branch scope. This software maintenance establishes no uniform-yield,
 intrinsic-regularity or complete-cost gain and changes no scientific source.
 
+## Explicit F13 inverse update (2026-10-29)
+
+The new finite rational-point dual and [4]D inverse pass14+14point/392addition
+checks and all72unchanged source recoveries;21named/25audited Lean declarations
+pass,0extra trusted. Both compositions and full rational-group addition are
+checked on F13; general geometric duality is not claimed. The verified inverse
+removes a specific enumeration dependency, not the still-unresolved useful-yield,
+relevant-degree or complete-cost comparison. Fresh root5140-case suite again
+caps600s/124 without completion. Naming/1921-model/Conductor/review holds remain.
+
 ## Problem
 
 The full historical finite workload now has a native replay, but the full
