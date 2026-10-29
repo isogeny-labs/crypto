@@ -28,6 +28,14 @@ on:
 
 permissions:
   contents: read
+env:
+  # Every tracked proof and Lake context, without unrelated research archives.
+  LEAN_CHECKOUT: |
+    *.lean
+    lakefile.toml
+    lake-manifest.json
+    lean-toolchain
+    /tools/lean/
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && '-hosted' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -44,6 +52,9 @@ jobs:
         toolchain: [pinned, 'leanprover/lean4:v4.19.0']
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - name: Install elan
         run: |
           toolchain='${{ matrix.toolchain }}'
@@ -60,9 +71,13 @@ jobs:
       indexes: ${{ steps.list.outputs.indexes }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - id: list
         run: |
           python3 tools/lean/test_ci_targets.py
+          python3 tools/lean/test_checkout_coverage.py
           indexes=$(python3 tools/lean/ci-targets.py matrix)
           echo "indexes=$indexes" >> "$GITHUB_OUTPUT"
           tools/lean/proof-gate.sh --list | grep . || echo "no Lean targets in this repository yet; only the self-test runs"
@@ -79,6 +94,9 @@ jobs:
     name: Lean target ${{ matrix.index }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - name: Install elan
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
