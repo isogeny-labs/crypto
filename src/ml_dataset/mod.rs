@@ -2192,39 +2192,74 @@ fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(),
     Ok(())
 }
 
-fn is_prime_root_auxiliary(artifact: &Artifact) -> bool {
+fn verify_binary_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
+    verify_root_outcome(outcome, certificate, solvers::BINARY_ROOT_CERTIFICATE_SCOPE)?;
+    let (events, bytes) = solvers::binary_root_trace_totals(certificate)?;
+    if certificate["schema"] != "ml-dataset.binary-root-certificates/v1"
+        || certificate["distinct_root_certificates_verified"] != true
+        || outcome["counters"]["aggregate_root_primitive_and_group_work"].as_u64()
+            != certificate["charged_work"].as_u64()
+        || certificate["charged_work"].as_u64().is_none()
+        || outcome["counters"]["root_solver_calls"].as_u64()
+            != certificate["queries"].as_array().map(|q| q.len() as u64)
+        || certificate["queries"].as_array().is_none()
+    {
+        return Err("binary-root outcome aggregate work/call labels differ".into());
+    }
+    for (key, expected) in [
+        ("acknowledged_native_events", events),
+        ("acknowledged_native_event_bytes", bytes),
+    ] {
+        if outcome["counters"][key].as_u64() != Some(expected) {
+            return Err("binary-root outcome aggregate event labels differ".into());
+        }
+    }
+    Ok(())
+}
+
+fn is_root_auxiliary(artifact: &Artifact) -> bool {
     matches!(
         artifact.role.as_str(),
-        "native-prime-root-call" | "native-prime-root-intermediate-state"
+        "native-prime-root-call"
+            | "native-prime-root-intermediate-state"
+            | "native-binary-root-call"
+            | "native-binary-root-intermediate-state"
     ) || artifact.path.starts_with("root-call-")
         || artifact.path.starts_with("root-state-")
+        || artifact.path.starts_with("binary-root-call-")
+        || artifact.path.starts_with("binary-root-state-")
 }
 
 /// Bind the duplicated call/state files to the certificate's supplied events.
 /// This does not assert that the native execution emitted every possible event.
-fn verify_prime_root_auxiliary_artifacts(
+fn verify_root_auxiliary_artifacts(
     dir: &Path,
     artifacts: &[Artifact],
     certificate: &Value,
+    binary: bool,
     replay: bool,
 ) -> Result<(), String> {
+    let family = if binary { "binary" } else { "prime" };
+    let file_prefix = if binary { "binary-root" } else { "root" };
+    let call_role = format!("native-{family}-root-call");
+    let state_role = format!("native-{family}-root-intermediate-state");
     let mut supplied = BTreeMap::new();
-    for artifact in artifacts.iter().filter(|a| is_prime_root_auxiliary(a)) {
+    for artifact in artifacts.iter().filter(|a| is_root_auxiliary(a)) {
         if supplied.insert(artifact.path.as_str(), artifact).is_some() {
-            return Err("duplicate prime root auxiliary path".into());
+            return Err(format!("duplicate {family} root auxiliary path"));
         }
     }
     let mut check = |name: String, role: &str, expected: &Value| -> Result<(), String> {
         let artifact = supplied
             .remove(name.as_str())
-            .ok_or_else(|| format!("missing prime root auxiliary artifact: {name}"))?;
+            .ok_or_else(|| format!("missing {family} root auxiliary artifact: {name}"))?;
         if artifact.role != role || artifact.encoding != "json" {
             return Err(format!(
-                "prime root auxiliary role or encoding differs: {name}"
+                "{family} root auxiliary role or encoding differs: {name}"
             ));
         }
         if replay && read_json::<Value>(&dir.join(&artifact.path))? != *expected {
-            return Err(format!("prime root auxiliary payload differs: {name}"));
+            return Err(format!("{family} root auxiliary payload differs: {name}"));
         }
         Ok(())
     };
@@ -2236,8 +2271,8 @@ fn verify_prime_root_auxiliary_artifacts(
         .enumerate()
     {
         check(
-            format!("root-call-{index:04}.json"),
-            "native-prime-root-call",
+            format!("{file_prefix}-call-{index:04}.json"),
+            &call_role,
             query,
         )?;
         let fixed_x = query["fixed_x"]
@@ -2250,19 +2285,29 @@ fn verify_prime_root_auxiliary_artifacts(
             event_sequence = event_sequence
                 .checked_add(1)
                 .ok_or("root event sequence overflow")?;
-            if matches!(event["kind"].as_str(), Some("power_end" | "gcd_end")) {
-                let expected = json!({"schema":"ml-dataset.prime-root-event/v1", "call_index":index,
+            let selected = if binary {
+                matches!(
+                    event["kind"].as_str(),
+                    Some("normalized" | "trace_end" | "half_trace_end" | "matrix_end")
+                )
+            } else {
+                matches!(event["kind"].as_str(), Some("power_end" | "gcd_end"))
+            };
+            if selected {
+                let expected = json!({"schema":format!("ml-dataset.{family}-root-event/v1"), "call_index":index,
                     "fixed_x":fixed_x, "native":event});
                 check(
-                    format!("root-state-{index:04}-{event_sequence:06}.json"),
-                    "native-prime-root-intermediate-state",
+                    format!("{file_prefix}-state-{index:04}-{event_sequence:06}.json"),
+                    &state_role,
                     &expected,
                 )?;
             }
         }
     }
     if !supplied.is_empty() {
-        return Err("unexpected or duplicate prime root auxiliary artifact".into());
+        return Err(format!(
+            "unexpected or duplicate {family} root auxiliary artifact"
+        ));
     }
     Ok(())
 }
@@ -2352,16 +2397,29 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     }) {
         return Err("prime-root certificate lacks its reserved JSON role".into());
     }
-    let native_prime_root_artifacts = manifest
-        .artifacts
-        .iter()
-        .any(|a| a.path == "prime-root-certificates.json" || is_prime_root_auxiliary(a));
+    if manifest.artifacts.iter().any(|a| {
+        a.path == "binary-root-certificates.json"
+            && (a.role != "binary-root-certificates/v1" || a.encoding != "json")
+    }) {
+        return Err("binary-root certificate lacks its reserved JSON role".into());
+    }
+    let native_root_artifacts = manifest.artifacts.iter().any(|a| {
+        matches!(
+            a.path.as_str(),
+            "prime-root-certificates.json" | "binary-root-certificates.json"
+        ) || is_root_auxiliary(a)
+    });
     let root_certificates: Vec<_> = manifest
         .artifacts
         .iter()
-        .filter(|a| a.role == "prime-root-certificates/v1")
+        .filter(|a| {
+            matches!(
+                a.role.as_str(),
+                "prime-root-certificates/v1" | "binary-root-certificates/v1"
+            )
+        })
         .collect();
-    if (native_prime_root_artifacts
+    if (native_root_artifacts
         || [
             "root_certificate_scope",
             "root_execution_trace_complete_verified",
@@ -2373,25 +2431,44 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("root outcome lacks its distinct-root certificate artifact".into());
     }
-    let expected_root_role = "prime-root-certificates/v1";
+    let binary_root = matches!(manifest.config.family.as_str(), "binary" | "koblitz");
+    let expected_root_role = if binary_root {
+        "binary-root-certificates/v1"
+    } else {
+        "prime-root-certificates/v1"
+    };
     if !root_certificates.is_empty()
         && (!complete_factor_base
             || manifest.config.solver != "root"
-            || manifest.config.family != "prime"
+            || !matches!(
+                manifest.config.family.as_str(),
+                "prime" | "binary" | "koblitz"
+            )
             || manifest.config.m != 2
             || root_certificates.len() != 1
             || root_certificates[0].role != expected_root_role
             || root_certificates[0].encoding != "json")
     {
-        return Err("prime-root certificate lacks its unique public prime/root/m2 domain".into());
+        let kind = if binary_root {
+            "binary-root"
+        } else {
+            "prime-root"
+        };
+        return Err(format!(
+            "{kind} certificate lacks its unique public family/root/m2 domain"
+        ));
     }
     let root_certificate: Option<Value> = root_certificates
         .first()
         .map(|artifact| read_json(&dir.join(&artifact.path)))
         .transpose()?;
     if let Some(certificate) = &root_certificate {
-        verify_prime_root_outcome(&manifest.outcome, certificate)?;
-        verify_prime_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, false)?;
+        if binary_root {
+            verify_binary_root_outcome(&manifest.outcome, certificate)?;
+        } else {
+            verify_prime_root_outcome(&manifest.outcome, certificate)?;
+        }
+        verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
     }
     let prime_chain_declared =
         manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
@@ -2486,14 +2563,27 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                         .as_ref()
                         .ok_or("missing parsed root certificate")?,
                 )?;
-                verify_prime_root_auxiliary_artifacts(
+                verify_root_auxiliary_artifacts(
                     dir,
                     &manifest.artifacts,
                     root_certificate
                         .as_ref()
                         .ok_or("missing parsed root certificate")?,
+                    false,
                     true,
                 )?;
+            }
+            if artifact.role == "binary-root-certificates/v1" {
+                let certificate = root_certificate
+                    .as_ref()
+                    .ok_or("missing parsed root certificate")?;
+                solvers::verify_binary_root_artifact(
+                    &public,
+                    &base,
+                    &manifest.config,
+                    certificate,
+                )?;
+                verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, true, true)?;
             }
             if artifact.role == "restricted-large-prime-membership-provenance" {
                 relations::verify_membership_provenance(
@@ -4087,6 +4177,389 @@ mod tests {
         dir
     }
 
+    #[test]
+    fn stored_binary_root_replays_odd_even_families_twists_and_rejects_rehashed_roots() {
+        for family in ["binary", "koblitz"] {
+            for n in [11, 12] {
+                for twist in [false, true] {
+                    let fixture = TempRun::new();
+                    let dir = root_cell_fixture(&fixture, family, twist, 100_000, n);
+                    let manifest = verify_cell(&dir, true).unwrap();
+                    assert_eq!(manifest.outcome["pdp_witness_verified"], true);
+                    assert!(manifest
+                        .artifacts
+                        .iter()
+                        .any(|a| a.role == "native-binary-root-intermediate-state"));
+                    let bad = altered_cell(&dir, &fixture.0.join("bad-roots"), |path, _| {
+                        alter_json(&path.join("binary-root-certificates.json"), |certificate| {
+                            let query = certificate["queries"]
+                                .as_array_mut()
+                                .unwrap()
+                                .iter_mut()
+                                .find(|q| !q["report"]["roots"].as_array().unwrap().is_empty())
+                                .unwrap();
+                            query["report"]["roots"].as_array_mut().unwrap().pop();
+                        });
+                    });
+                    verify_cell(&bad, false).unwrap();
+                    assert!(verify_cell(&bad, true).is_err());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_requires_unique_bound_certificate_even_when_labels_are_stripped() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let dir = root_cell_fixture(&fixture, family, twist, 100_000, 12);
+                for mutation in [
+                    "missing",
+                    "missing_and_stripped",
+                    "wrong_role_and_stripped",
+                    "wrong_encoding",
+                    "duplicate",
+                    "wrong_family_role",
+                    "wrong_solver",
+                ] {
+                    let bad = altered_cell(&dir, &fixture.0.join(mutation), |path, manifest| {
+                        let index = manifest
+                            .artifacts
+                            .iter()
+                            .position(|a| a.role == "binary-root-certificates/v1")
+                            .unwrap();
+                        match mutation {
+                            "missing" | "missing_and_stripped" => {
+                                manifest.artifacts.remove(index);
+                            }
+                            "wrong_role_and_stripped" => {
+                                manifest.artifacts[index].role =
+                                    "unregistered-partial-artifact".into()
+                            }
+                            "wrong_encoding" => manifest.artifacts[index].encoding = "jsonl".into(),
+                            "duplicate" => {
+                                let mut extra = manifest.artifacts[index].clone();
+                                extra.path = "duplicate-binary-root.json".into();
+                                fs::copy(
+                                    path.join(&manifest.artifacts[index].path),
+                                    path.join(&extra.path),
+                                )
+                                .unwrap();
+                                manifest.artifacts.push(extra);
+                            }
+                            "wrong_family_role" => {
+                                manifest.artifacts[index].role = "prime-root-certificates/v1".into()
+                            }
+                            "wrong_solver" => {
+                                let mut plan: DatasetPlan =
+                                    read_json(&path.join("plan.json")).unwrap();
+                                plan.solvers = vec!["enumerate".into()];
+                                manifest.config = plan.cell(manifest.cell_index).unwrap();
+                                manifest.plan_sha256 = plan.binding_sha256().unwrap();
+                                let mut binding: Value = read_json(&path.join("run.json")).unwrap();
+                                binding["plan_sha256"] = json!(manifest.plan_sha256);
+                                fs::write(
+                                    path.join("plan.json"),
+                                    serde_json::to_vec(&plan).unwrap(),
+                                )
+                                .unwrap();
+                                fs::write(
+                                    path.join("run.json"),
+                                    serde_json::to_vec(&binding).unwrap(),
+                                )
+                                .unwrap();
+                                fs::write(
+                                    path.join("config.json"),
+                                    serde_json::to_vec(&manifest.config).unwrap(),
+                                )
+                                .unwrap();
+                            }
+                            _ => unreachable!(),
+                        }
+                        if mutation.ends_with("_stripped") {
+                            for key in [
+                                "root_certificate_scope",
+                                "root_execution_trace_complete_verified",
+                                "root_total_operation_count_verified",
+                            ] {
+                                manifest.outcome.as_object_mut().unwrap().remove(key);
+                            }
+                        }
+                    });
+                    for replay in [false, true] {
+                        let error = verify_cell(&bad, replay).unwrap_err();
+                        assert!(
+                            error.contains("root outcome lacks")
+                                || error.contains("binary-root certificate lacks"),
+                            "{family}/{twist}/{mutation}/{replay}: {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_auxiliaries_bind_payloads_roles_encodings_and_inventory() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let dir = root_cell_fixture(&fixture, family, twist, 100_000, 12);
+                for role in [
+                    "native-binary-root-call",
+                    "native-binary-root-intermediate-state",
+                ] {
+                    for mutation in [
+                        "identity",
+                        "native_payload",
+                        "missing",
+                        "duplicate",
+                        "wrong_role",
+                        "wrong_encoding",
+                        "wrong_path",
+                    ] {
+                        let bad = altered_cell(
+                            &dir,
+                            &fixture.0.join(format!("{role}-{mutation}")),
+                            |path, manifest| {
+                                let index = manifest
+                                    .artifacts
+                                    .iter()
+                                    .position(|a| a.role == role)
+                                    .unwrap();
+                                match mutation {
+                                    "identity" | "native_payload" => {
+                                        alter_json(
+                                            &path.join(&manifest.artifacts[index].path),
+                                            |payload| {
+                                                if mutation == "identity" {
+                                                    payload["call_index"] = json!(999);
+                                                } else if role == "native-binary-root-call" {
+                                                    payload["report"]["polynomial"] =
+                                                        json!([999_999]);
+                                                } else {
+                                                    payload["native"] = json!({"kind":"normalized", "argument":999_999});
+                                                }
+                                            },
+                                        );
+                                    }
+                                    "missing" => {
+                                        manifest.artifacts.remove(index);
+                                    }
+                                    "duplicate" => {
+                                        let mut extra = manifest.artifacts[index].clone();
+                                        extra.path = "duplicate-binary-auxiliary.json".into();
+                                        fs::copy(
+                                            path.join(&manifest.artifacts[index].path),
+                                            path.join(&extra.path),
+                                        )
+                                        .unwrap();
+                                        manifest.artifacts.push(extra);
+                                    }
+                                    "wrong_role" => {
+                                        manifest.artifacts[index].role =
+                                            "unregistered-partial-artifact".into()
+                                    }
+                                    "wrong_encoding" => {
+                                        manifest.artifacts[index].encoding = "jsonl".into()
+                                    }
+                                    "wrong_path" => {
+                                        let old = path.join(&manifest.artifacts[index].path);
+                                        manifest.artifacts[index].path =
+                                            "renamed-binary-auxiliary.json".into();
+                                        fs::rename(old, path.join(&manifest.artifacts[index].path))
+                                            .unwrap();
+                                    }
+                                    _ => unreachable!(),
+                                }
+                            },
+                        );
+                        if matches!(mutation, "identity" | "native_payload") {
+                            verify_cell(&bad, false).unwrap();
+                        } else {
+                            assert!(verify_cell(&bad, false)
+                                .unwrap_err()
+                                .contains("binary root auxiliary"));
+                        }
+                        assert!(verify_cell(&bad, true)
+                            .unwrap_err()
+                            .contains("binary root auxiliary"));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_caps_censoring_and_outcome_labels_survive_rehashed_tampering() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let complete = root_cell_fixture(&fixture, family, twist, 100_000, 11);
+                for mutation in [
+                    "byte_flag",
+                    "missing_byte_flag",
+                    "extra_event_field",
+                    "event_cap",
+                    "byte_cap",
+                    "joint_event_count",
+                    "joint_event_bytes",
+                ] {
+                    let bad =
+                        altered_cell(&complete, &fixture.0.join(mutation), |path, manifest| {
+                            alter_json(
+                                &path.join("binary-root-certificates.json"),
+                                |certificate| {
+                                    assert_eq!(
+                                        certificate["queries"][0]["report"]["stop"],
+                                        "complete"
+                                    );
+                                    match mutation {
+                                        "byte_flag" => {
+                                            certificate["queries"][0]["trace_byte_cap_reached"] =
+                                                json!(true)
+                                        }
+                                        "missing_byte_flag" => {
+                                            certificate["queries"][0]
+                                                .as_object_mut()
+                                                .unwrap()
+                                                .remove("trace_byte_cap_reached");
+                                        }
+                                        "extra_event_field" => {
+                                            certificate["queries"][0]["report"]["events"][0]
+                                                ["unaccounted_payload"] = json!("extra")
+                                        }
+                                        "event_cap" | "byte_cap" => {
+                                            let key = if mutation == "event_cap" {
+                                                "event_cap"
+                                            } else {
+                                                "event_byte_cap"
+                                            };
+                                            certificate[key] =
+                                                json!(certificate[key].as_u64().unwrap() + 1);
+                                        }
+                                        "joint_event_count" | "joint_event_bytes" => {
+                                            let key = if mutation == "joint_event_count" {
+                                                "acknowledged_native_events"
+                                            } else {
+                                                "acknowledged_native_event_bytes"
+                                            };
+                                            certificate[key] =
+                                                json!(certificate[key].as_u64().unwrap() + 1);
+                                            manifest.outcome["counters"][key] =
+                                                certificate[key].clone();
+                                        }
+                                        _ => unreachable!(),
+                                    }
+                                },
+                            );
+                        });
+                    for replay in [false, true] {
+                        assert!(
+                            verify_cell(&bad, replay).is_err(),
+                            "{family}/{twist}/{mutation}/{replay}"
+                        );
+                    }
+                }
+                for key in [
+                    "aggregate_root_primitive_and_group_work",
+                    "root_solver_calls",
+                    "acknowledged_native_events",
+                    "acknowledged_native_event_bytes",
+                ] {
+                    let bad = altered_cell(&complete, &fixture.0.join(key), |_, manifest| {
+                        manifest.outcome["counters"][key] =
+                            json!(manifest.outcome["counters"][key].as_u64().unwrap() + 1);
+                    });
+                    for replay in [false, true] {
+                        assert!(verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("binary-root outcome aggregate"));
+                    }
+                }
+                let censored = root_cell_fixture(&fixture, family, twist, 1, 11);
+                assert_eq!(
+                    verify_cell(&censored, true).unwrap().outcome["status"],
+                    "budget_exhausted"
+                );
+                for (field, value) in [
+                    ("root_execution_trace_complete_verified", json!(true)),
+                    ("root_total_operation_count_verified", json!(true)),
+                    ("trace_complete", json!(true)),
+                    ("solver_completed", json!(true)),
+                    ("pdp_witness_verified", json!(true)),
+                    ("scalar_recovered_without_witness", json!(true)),
+                    ("scalar_replay_verified", json!(true)),
+                    ("ecdlp_pipeline_completed", json!(true)),
+                    ("status", json!("verified")),
+                ] {
+                    let bad = altered_cell(&censored, &fixture.0.join(field), |_, manifest| {
+                        manifest.outcome[field] = value;
+                    });
+                    for replay in [false, true] {
+                        assert!(verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("root outcome labels"));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn legacy_binary_root_summaries_remain_compatible_without_native_claims() {
+        for family in ["binary", "koblitz"] {
+            let fixture = TempRun::new();
+            let dir = root_cell_fixture(&fixture, family, false, 100_000, 11);
+            let legacy = altered_cell(
+                &dir,
+                &fixture.0.join("legacy-binary-root"),
+                |path, manifest| {
+                    let certificate: Value =
+                        read_json(&path.join("binary-root-certificates.json")).unwrap();
+                    manifest.artifacts.retain(|a| {
+                        !matches!(
+                            a.role.as_str(),
+                            "binary-root-certificates/v1"
+                                | "native-binary-root-call"
+                                | "native-binary-root-intermediate-state"
+                        )
+                    });
+                    for key in [
+                        "root_certificate_scope",
+                        "root_execution_trace_complete_verified",
+                        "root_total_operation_count_verified",
+                    ] {
+                        manifest.outcome.as_object_mut().unwrap().remove(key);
+                    }
+                    let rows: Vec<_> = certificate["queries"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|q| {
+                            json!({
+                    "kind":"root_result", "fixed_x":q["fixed_x"],
+                    "coefficients_constant_first":q["coefficients_constant_first"],
+                    "all_returned_roots":q["report"]["roots"], "checks":q["checks"]})
+                        })
+                        .collect();
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "root-polynomials.json",
+                            "native-univariate-inputs-roots-and-group-lifts",
+                            &json!(rows),
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            verify_cell(&legacy, false).unwrap();
+            verify_cell(&legacy, true).unwrap();
+        }
+    }
+
     /// A real constructed curve/base and native solver certificate. Plant only
     /// a public sum; neither a construction scalar nor a witness reaches solve.
     fn prime_root_cell_fixture(fixture: &TempRun, twist: bool, work_limit: u64) -> PathBuf {
@@ -4099,8 +4572,19 @@ mod tests {
         work_limit: u64,
         field_size: u32,
     ) -> PathBuf {
+        root_cell_fixture(fixture, "prime", twist, work_limit, field_size)
+    }
+
+    fn root_cell_fixture(
+        fixture: &TempRun,
+        family: &str,
+        twist: bool,
+        work_limit: u64,
+        field_size: u32,
+    ) -> PathBuf {
         let m = 2;
         let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.families = vec![family.into()];
         plan.field_sizes = vec![field_size];
         plan.arities = vec![m];
         plan.solvers = vec!["root".into()];
@@ -4108,7 +4592,7 @@ mod tests {
         plan.generators = 2;
         plan.keys = 2;
         plan.seed = 42;
-        plan.factor_base_size = 2;
+        plan.factor_base_size = if family == "prime" { 2 } else { 8 };
         plan.degree_bound = 8;
         plan.work_limit = work_limit;
         plan.validate().unwrap();
@@ -4125,7 +4609,17 @@ mod tests {
         let mut case = curves::generate(&config).unwrap();
         case.private_witness = Value::Null;
         let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
-        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let point = if family == "prime" {
+            curves::point_words(&case.factor_base["points"][0]).unwrap()
+        } else {
+            case.factor_base["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| curves::point_words(p).unwrap())
+                .min_by_key(|p| p.expect("affine factor-base point").0)
+                .unwrap()
+        };
         let mut sum = None;
         // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
         // This constructs a group witness independently of S3 equations.
@@ -4152,9 +4646,9 @@ mod tests {
             solved.outcome
         );
 
-        let dir = fixture
-            .0
-            .join(format!("cell-root-twist{twist}-work{work_limit}"));
+        let dir = fixture.0.join(format!(
+            "cell-root-{family}-n{field_size}-twist{twist}-work{work_limit}"
+        ));
         fs::create_dir(&dir).unwrap();
         let mut artifacts = vec![
             storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
