@@ -116,6 +116,7 @@ Paired ratios for every registered pair: [`analysis/ratios.md`](analysis/ratios.
 
 - `PROTOCOL.md`, `REGISTRATION.sha256`, `registered-at.txt`: the registration.
 - `specs/P<b>.json`: the four frozen specs.
+- `run.sh`: runs the four sessions and their `verify --replay-all` audits. `analyse.sh` produces the band, comparisons, ratio table and figures. Both are thin `ecbench` orchestration; `ECBENCH=` selects the binary.
 - `sessions/P<b>/`: native session records. The repository bot may move them to the artifact store.
 - `audits/P<b>.txt`: the `verify --replay-all` receipts.
 - `analysis/band.md`, `analysis/band.json`: `ecbench band --weights 0,0.1,1 --ranks`.
