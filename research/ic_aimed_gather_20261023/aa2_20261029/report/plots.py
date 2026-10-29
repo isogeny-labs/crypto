@@ -1,6 +1,7 @@
-"""Lay out recorded values from ../summary.json (this session) and
-../../summary.json (the first session) as SVG and 150 dpi PNG graphs.
-Plotting only: every number is read from a committed summary."""
+"""Lay out recorded values as SVG and 150 dpi PNG graphs: per-round ratios
+from ../summary.json, and both sessions' medians, corrected intervals and
+verdicts from ../summary-corrected.json (CORRECTION.md). Plotting only:
+every number is read from a committed summary."""
 import json
 import pathlib
 
@@ -10,8 +11,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 here = pathlib.Path(__file__).resolve().parent
-s2 = json.loads((here.parent / "summary.json").read_text())
-s1 = json.loads((here.parent.parent / "summary.json").read_text())["native"]
+rounds_src = json.loads((here.parent / "summary.json").read_text())
+corr = json.loads((here.parent / "summary-corrected.json").read_text())["sessions"]
+s1, s2 = corr["2026-10-23"], corr["2026-10-29"]
 AB, AA = "#55a868", "#4c72b0"
 
 
@@ -22,7 +24,7 @@ def save(fig, name):
 
 
 # 1. Per-round ratios of this session, collect phase.
-rounds = s2["per_round"]
+rounds = rounds_src["per_round"]
 fig, ax = plt.subplots(figsize=(7.4, 3.6))
 ax.axhline(1.0, color="#888", lw=1)
 x = [r["round"] for r in rounds]
@@ -35,7 +37,7 @@ for key, col in (("ab_collect", AB), ("aa_collect", AA)):
 ab, aa = s2["ab_collect"], s2["aa_collect"]
 ax.set_title(f"collect phase, 42 rounds: A/B {ab['median']:.3f} [{ab['ci95']['lo']:.3f}, {ab['ci95']['hi']:.3f}]"
              f" vs A/A {aa['median']:.3f} [{aa['ci95']['lo']:.3f}, {aa['ci95']['hi']:.3f}]", fontsize=9)
-ax.set_xlabel("round (shaded: 95% bootstrap interval of the median)")
+ax.set_xlabel("round (shaded: 95% bootstrap interval of the median, corrected)")
 ax.set_ylabel("paired collect-phase ratio")
 ax.legend(fontsize=7, loc="upper right")
 fig.tight_layout()
@@ -50,13 +52,15 @@ for ax, metric, title in ((axes[0], "collect", "collect phase"), (axes[1], "tota
             st = s[f"{kind}_{metric}"]
             ax.errorbar(i + dx, st["median"], yerr=[[st["median"] - st["ci95"]["lo"]], [st["ci95"]["hi"] - st["median"]]],
                         fmt=mk, color=col, capsize=4, label=("A/B" if kind == "ab" else "A/A") if i == 0 else None)
-        est = s.get(f"established_{metric}")
-        ax.text(i, 0.925, "established" if est else "not established", ha="center", fontsize=7)
+        est = s[f"established_{metric}"]
+        marginal = est and s[f"margin_{metric}"] < 0.01
+        ax.text(i, 0.925, "marginal, not claimed" if marginal else ("established" if est else "not established"),
+                ha="center", fontsize=6)
     ax.set_xticks([0, 1])
     ax.set_xticklabels(["2026-10-23\n30 A/B, 5 A/A", "2026-10-29\n42 A/B, 42 A/A"], fontsize=7)
     ax.set_title(title, fontsize=9)
     ax.set_ylim(0.91, 1.18)
-axes[0].set_ylabel("median paired ratio, 95% interval")
+axes[0].set_ylabel("median paired ratio, 95% interval (corrected)")
 axes[0].legend(fontsize=7, loc="upper left")
 fig.tight_layout()
 save(fig, "sessions-intervals")
