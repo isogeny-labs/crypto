@@ -72,8 +72,10 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       // ecbench.yml audits every committed session by schema, wherever it
-      // lives; a session directory always holds these two files.
-      || /(^|\/)(session\.json|records\.jsonl)$/.test(file) && /^research\//.test(file);
+      // lives (research/, taskq/deploy/, ...), so its files select the audit
+      // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
+      // sessions commit their records gzip-compressed.
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -150,7 +152,17 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
+    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
+      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
+  // Seed the recursive source walk with the Rust files of every transitively
+  // discovered path crate. Their include!/#[path] dependencies are then
+  // followed by the same fail-closed traversal as maintained sources.
+  const dependencies = [...pathDependencyDirs(cwd)];
+  for (const file of tracked) {
+    if (!/\.rs$/.test(file)) continue;
+    if (dependencies.some(dir => file === `${dir}/build.rs`
+      || file.startsWith(`${dir}/src/`))) sources.add(file);
+  }
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
@@ -207,9 +219,43 @@ export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   return inputs;
 }
 
+// Directories of the path dependencies Cargo needs to resolve the root
+// package (`name = { path = "..." }`), followed through each dependency's own
+// manifest.  A scope-only sparse checkout has none of them, and Cargo refuses
+// to resolve the workspace without every one.
+export function pathDependencyDirs(cwd) {
+  const dirs = new Set();
+  const queue = ['.'];
+  for (let index = 0; index < queue.length; index++) {
+    const dir = queue[index];
+    const manifestPath = dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`;
+    let manifest;
+    try { manifest = sourceText(cwd, manifestPath); } catch { continue; }
+    for (const match of manifest.matchAll(/=\s*\{[^}\n]*\bpath\s*=\s*"([^"\n]+)"/g)) {
+      const dependency = path.posix.normalize(path.posix.join(dir, match[1]));
+      if (dependency.startsWith('../') || path.posix.isAbsolute(dependency)) {
+        throw new Error(`path dependency escapes the checkout: ${manifestPath}: ${match[1]}`);
+      }
+      if (!dirs.has(dependency)) {
+        dirs.add(dependency);
+        queue.push(dependency);
+      }
+    }
+  }
+  return dirs;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
-  const sources = sourceFiles(cwd);
-  materializeSources(cwd, sources);
+  // Every path crate's manifest, build script and sources, followed through
+  // their manifests; never the crate's other files (archives, fixtures that
+  // no source embeds).
+  const crates = [...pathDependencyDirs(cwd)];
+  const crateFiles = trackedFiles(cwd).filter(file => crates.some(dir => file === `${dir}/Cargo.toml`
+    || file === `${dir}/build.rs` || (file.startsWith(`${dir}/src/`) && file.endsWith('.rs'))));
+  const sources = new Set([...sourceFiles(cwd), ...crateFiles.filter(file => file.endsWith('.rs'))]);
+  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
+    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
+  materializeSources(cwd, new Set([...sources, ...manifests, ...crateFiles]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');
