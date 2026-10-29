@@ -235,6 +235,28 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+def twist_kernel_connection(ref, since):
+    """Recorded exact toy checks; these counts are not cost or speed metrics."""
+    path = "research/twist_routes_1_3_20261021/execution-v8/ADMISSION.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("status") != "native-complete-replay-and-independent-PARI-passed":
+            continue
+        for key, unit in (("kernel_lines", "certified maps"),
+                          ("query_cases", "verified query cases")):
+            emit(f"twist.connection.{key}", data.get("summary", {}).get(key),
+                 date=date, problem="twist-relation-connection", unit=unit,
+                 better="neutral", label="Exact p827 toy checks; no performance inference",
+                 source=f"{path}@{commit}")
+    path = "research/twist_routes_1_3_20261021/execution-v10/ADMISSION.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("status") == "native-generic-and-independent-PARI-endomorphism-verified":
+            emit("twist.connection.endomorphism_degree", data.get("velu", {}).get("degree"),
+                 date=date, problem="twist-relation-connection", unit="isogeny degree",
+                 better="neutral", label="Exact public toy endomorphism; no performance inference",
+                 source=f"{path}@{commit}")
+
 
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
@@ -324,6 +346,8 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    twist_kernel_connection(a.ref, a.since)
+
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
     curve_traits(a.ref)

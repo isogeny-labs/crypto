@@ -1,0 +1,44 @@
+{
+  "schema": "twist.followup-run/v1",
+  "command": "adjudicate-cas",
+  "fixture_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "rows": [
+    {
+      "schema": "twist.native-cas-adjudication/v1",
+      "log_prefix": "research/twist_routes_1_3_20261021/execution-v2/receipts/three-transfer-icv1-fp8-tm21-71e3bcb7-20261023-v2-gp",
+      "transport_metadata": {
+        "schema": "twist.CAS-transport/v2",
+        "source_commit": "b6d1fca72060068072d5517d0b12b538a0363cea",
+        "tool": "PARI/GP 2.17.2",
+        "tool_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "argv": [
+          "/tmp/twist-cas/root/usr/bin/gp",
+          "-f",
+          "-q",
+          "research/twist_routes_1_3_20261021/execution-v2/runs/three-transfer-20261023-v2/icv1-fp8-tm21-71e3bcb7.gp"
+        ],
+        "script_sha256": "06b966a2c228c8c903d1656984210b1c117df8c203a92d57ba02e600af8d4481",
+        "started_utc": "2026-10-23T02:49:55Z",
+        "finished_utc": "2026-10-23T02:49:55.679Z",
+        "exit_code": 0,
+        "timeout_s": 3600,
+        "address_space_kib": 4194304,
+        "threads": 1,
+        "stdout_sha256": "c43e7edfdf53d7b7b8c99f55668f5a20cd39a31ed80d64f833f263115c04d215",
+        "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+        "scientific_acceptance": "requires-native-adjudication"
+      },
+      "completion_marker_present": true,
+      "raw_hashes_match": true,
+      "script_hash_matches": true,
+      "allowed_stack_warning_present": true,
+      "unaccepted_error_lines": [],
+      "accepted": true,
+      "status": "accepted-native-checked-CAS-replay",
+      "scope": "The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."
+    }
+  ],
+  "performance_claim": false,
+  "novelty_established": false,
+  "independent_host_replay": false
+}

@@ -1,0 +1,88 @@
+{
+  "root": "/workspace/crypto-twist-runs",
+  "problem_count": 25,
+  "problems": [
+    "unexpected registry row count",
+    "unexpected cover-report row count",
+    "unexpected graph curve-node count",
+    "unexpected CV1 map count",
+    "unexpected HC1 cover count",
+    "CV1 references are not bijective with curve nodes",
+    "unexpected HC1 sharing pattern",
+    "unexpected odd-construction count",
+    "unexpected prime-field arithmetic-replay count",
+    "unexpected extension-field arithmetic-replay count",
+    "assessment catalog commit changed",
+    "cannot resolve catalog_commit 4471be410e1f4152eb8767e9e99930edb76c5eab for docs/curves/registry.json: spawnSync git EPERM",
+    "cannot resolve catalog_commit 4471be410e1f4152eb8767e9e99930edb76c5eab for docs/curves/covers.json: spawnSync git EPERM",
+    "cannot resolve catalog_commit 4471be410e1f4152eb8767e9e99930edb76c5eab for docs/curves/cover-links.yaml: spawnSync git EPERM",
+    "authoritative semantic digest mismatch for controls",
+    "authoritative semantic digest mismatch for open_obligations",
+    "unexpected declared-field context count",
+    "declared-field labels are not bijective with field contexts",
+    "unexpected Jacobian-context count",
+    "unexpected typed-map binding count",
+    "closed profile predicate counts changed",
+    "map coverage is incomplete",
+    "markdown report lacks the exact v2 coverage marker: cover-transfer-assessments/v2; catalog_maps=2637; unique_cover_models=2635; geometry_verified_maps=2637; ec1_representations=977; assessed_maps=2637; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0",
+    "report PDF lacks the embedded exact v2 coverage marker",
+    "graph_source report lacks the exact v2 coverage marker: cover-transfer-assessments/v2; catalog_maps=2637; unique_cover_models=2635; geometry_verified_maps=2637; ec1_representations=977; assessed_maps=2637; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0"
+  ],
+  "counts": {
+    "registry_rows": 2637,
+    "cover_report_rows": 2637,
+    "graph_curve_nodes": 2637,
+    "maps": 2637,
+    "unique_covers": 2635,
+    "representations": 977,
+    "unique_ec1": 977,
+    "shared_covers": 2
+  },
+  "construction_counts": {
+    "binary_cubic_pullback_v1": 165,
+    "prime_quadratic_pullback_v1": 2472
+  },
+  "arithmetic_checks": {
+    "binary": 165,
+    "prime": 1114,
+    "extension": 1358,
+    "normalized_target": 30
+  },
+  "profile_counts": {
+    "map": 4,
+    "subgroup": 2,
+    "exact_overlays": 4
+  },
+  "typed_binding_counts": {
+    "fields": 552,
+    "jacobians": 2635,
+    "maps": 2637
+  },
+  "effective_status_counts": {
+    "map_claims": {
+      "unknown": 16520,
+      "supported": 8601,
+      "refuted": 2637,
+      "not_applicable": 3886
+    },
+    "map_full_transfer_pipeline": {
+      "unknown": 0,
+      "supported": 0,
+      "refuted": 2637,
+      "not_applicable": 0
+    },
+    "subgroup_claims": {
+      "unknown": 10882,
+      "supported": 2796,
+      "refuted": 0,
+      "not_applicable": 0
+    },
+    "all": {
+      "unknown": 27402,
+      "supported": 11397,
+      "refuted": 5274,
+      "not_applicable": 3886
+    }
+  },
+  "scope_note": "Checks the complete v2 membership ledger, explicit field/Jacobian/map bindings, graph/content joins, and cover formulas over every declared field. It does not independently prove odd p primality, extension-modulus irreducibility, EC1 subgroup orders, or transfer advantage."
+}

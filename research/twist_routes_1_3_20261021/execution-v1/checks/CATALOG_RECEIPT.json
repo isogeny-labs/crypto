@@ -1,0 +1,133 @@
+{
+  "schema": "twist.catalog-maintenance/v1",
+  "created_utc": "2026-10-22T02:35:13.533Z",
+  "catalog_snapshot_commit": "43fc8792be1e7e5917b99786fb7513b56be3ada3",
+  "final_native_source": "cb7e324df89e86c9b86ccb9bce16744f60541cdc",
+  "isolation": "L0",
+  "wall_time_admitted": false,
+  "curves": 2637,
+  "trait_rows": 2813,
+  "all_registered_models_screened": true,
+  "trait_inputs_hashes_match": true,
+  "scalar_frobenius_classification": "quadratic CM/conductor and volcano data not applicable",
+  "commands": [
+    [
+      "target/release/curve_cover_check"
+    ],
+    [
+      "target/release/curve_cover_check",
+      "--check"
+    ],
+    [
+      "target/release/jacobian_transfers",
+      "build"
+    ],
+    [
+      "target/release/jacobian_transfers",
+      "check"
+    ],
+    [
+      "target/release/jacobian_transfers",
+      "table",
+      "--write-doc",
+      "docs/curves/JACOBIAN_TRANSFERS.md"
+    ],
+    [
+      "target/release/curve_traits",
+      "build",
+      "--budget",
+      "262144"
+    ],
+    [
+      "research/twist_routes_1_3_20261021/runner/target/release/twist-browser-refresh",
+      "FROZEN_BROWSER.json",
+      ".",
+      "FRESH_BROWSER.json"
+    ],
+    [
+      "node",
+      "scripts/build_cover_transfer_assessments.mjs",
+      "--write"
+    ],
+    [
+      "node",
+      "scripts/build_cover_transfer_assessments.mjs",
+      "--check"
+    ],
+    [
+      "node",
+      "research/cover_transfer_assessment_20261013/verify_assessment.mjs"
+    ]
+  ],
+  "traits_generation": {
+    "exit_code": 0,
+    "source_commit": "cb7e324",
+    "threads": 2,
+    "budget": 262144,
+    "finished_utc": "2026-10-22T02:30:22.347Z",
+    "RAYON_NUM_THREADS": 2,
+    "full_second_trait_replay": false,
+    "note": "One successful full native generation; every recorded input digest and catalog-model membership checked. No second full trait execution is claimed."
+  },
+  "browser": {
+    "source": "8d171aec5276ba98884947d55625484289570133",
+    "base_git_path": "ac09baf:docs/browser/data.json",
+    "base_sha256": "c323c2c80b8c449beb01ad408d9e065e4ec80147d9b9836e0b16a6e740e27b01",
+    "output_sha256": "d5e5dead59c6041d788d57f186b89984959d18cf735e3bac581ee880debee531",
+    "added_curves": 65,
+    "added_records": 1920,
+    "counts": {
+      "curves": 2637,
+      "methods": 232,
+      "factor_bases": 733,
+      "candidates": 271,
+      "rounds": 30,
+      "sessions": 227,
+      "yields": 16328
+    },
+    "scientific_computations": "none; index of recorded metadata and counted-run diagnostics",
+    "legacy_generated_by": "retained for canonical site schema compatibility",
+    "independent_metadata_check": {
+      "all_old_curve_metadata_preserved": true,
+      "all_old_yields_preserved": true,
+      "other_views_preserved": true,
+      "new_curves": 65,
+      "new_session_records": 1920,
+      "verified": 1704,
+      "errors": 216
+    }
+  },
+  "validation": {
+    "root_library_passed": 4479,
+    "root_library_ignored": 119,
+    "standalone_supporting_passed": 128,
+    "cover_tests_passed": 11,
+    "standalone_constructor_tests_passed": 13,
+    "Node_assessment_problems": 0,
+    "backlog_cards_validated": 3
+  },
+  "native_binary_sha256": {
+    "curve_cover_check": "661e0dd27e5d14138b0a174ab85f1f8e6291249521d18af88cdf6d4fdfb652f2",
+    "jacobian_transfers": "80629361e59dc6c7092cd45d3e24c70ea5fbc1dd7abd3a4d9a051a4f20e44dbd",
+    "curve_traits": "1426b22ff858b8b9c9729e1522ea4870b8e248bcd56a322b2e92a4760659ff4a"
+  },
+  "outputs_sha256": {
+    "docs/curves/registry.json": "91a222d6b8a030d93db55a3d6210fe60443af401188f4c340893f8e8abe19ac5",
+    "docs/curves/covers.json": "1cb00311c4a914bfb27bc5130965f8ee44ab052f33a19bd62474ad3b6df46431",
+    "docs/curves/cover-links.yaml": "5fce501fc1fd487425a6c7aad4cab04e2eb66bf882c87a11d7064c754a9000e5",
+    "docs/curves/jacobian-transfers.json": "6ec508eaa84c1b6856aa52d836653d773a9f083ef7021d31b94985ebfb91a004",
+    "docs/curves/traits.json": "76161775a3fa0cb8ed1317bbdaef4b88e5a10662717906a92e829f84eeb6349e",
+    "docs/browser/data.json": "d5e5dead59c6041d788d57f186b89984959d18cf735e3bac581ee880debee531",
+    "docs/curves/cover-transfer-assessments.json": "729179466d450ce8a1878703421ae1fad91ec027afb1b61932602a4e3de08844"
+  },
+  "failures_preserved": [
+    "missing sparse runtime files",
+    "default float parsing altered historical values by one ULP; rejected and corrected with float_roundtrip",
+    "trait factor(0) panic; remaining old workers terminated before the fixed rebuild",
+    "outdated exact catalog roster assertion; updated without removing per-model checks",
+    "first assessment refresh used stale roster/document/commit pins; current strict verifier passes",
+    "backlog V2 used paths instead of card IDs; V3 passes"
+  ],
+  "Python_executed": false,
+  "canonical_leaderboard_or_benchmark_promotion": false
+}

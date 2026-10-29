@@ -1,5 +1,16 @@
 # Benchmarks
 
+**Unadmitted diagnostic, 2026-10-27:** [Twist-derived progression bases](20261027-twist-progression/README.md).
+The fixed 880-cell run has 751 accepted outputs, 105 cooperative caps and 24
+underfilled bases. Helper/direct median is 0.8937482746077081 Ir on 124 admitted
+pairs, but helper/group median is 2.3585326491871; companion/direct median is
+1.352375384073076 on 38 pairs. Intel Xeon Platinum 8573C, KVM, L0; no admitted
+time, GAE or full IC. [Study and inspected reports](../research/twist_routes_1_3_20261021/reports/progression-20261027/RESULTS.md).
+This indexes diagnostic artifacts only; full generic protocol binding remains
+rejected and no validated table row or leaderboard promotion is added.
+
+**Unadmitted diagnostic, 2026-10-26:** [Twist controls and full finite-worker probes](20261026-twist-controls/README.md). Ordinary group MITM is cheaper in every completed polynomial comparison; the B8 twenty-configuration control records median group/direct ratio 0.11239 in simulated guest instructions Ir. Given-map transfer BSGS loses all 24 targets. All 560 box-cost cells are retained, including 146 cooperative-budget failures. Intel Xeon Platinum 8573C, managed Linux x86_64, L0; no admitted time, GAE or full IC. [Study and inspected reports](../research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md). This paragraph indexes diagnostic artifacts only; it adds no validated row or leaderboard promotion.
+
 The visual record of every performance measurement and speedup: report PDFs,
 graphs (SVG) and PNG renders, one directory per entry
 (`<YYYYMMDD>-<slug>/`). The study directory linked from each row holds the
@@ -44,6 +55,8 @@ is preserved separately pending validation admission.
 
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
+
+**Unadmitted diagnostic, 2026-10-25:** [Twist E26 encoding pilot](20261025-twist-block-encoding/README.md) records 631 bounded solver cells and one fixed p=59 instruction comparison. Native one-process totals are direct 2,431,742, eight-branch helper 2,458,250 and pair invariants 1,847,549 simulated guest instructions Ir. These exclude construction and complete IC; stock-msolve results are separate and the invariant encoding exceeds direct there. Intel Xeon Platinum 8573C, managed Linux, L0. [Study report and inspected PDF](../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md). This paragraph indexes diagnostic artifacts only; it adds no validated benchmark row, matched-rho result or leaderboard promotion.
 
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|

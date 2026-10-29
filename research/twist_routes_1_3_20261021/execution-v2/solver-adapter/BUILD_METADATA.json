@@ -1,0 +1,408 @@
+{
+  "schema": "twist.external-adapter-build/v1",
+  "source_url": "https://deb.debian.org/debian/pool/main/m/msolve/msolve_0.7.5.orig.tar.gz",
+  "archive_sha256": "e88368abfd1e1918329ff9444164ca0e304835794fec68d192a63c845ae63128",
+  "patch_sha256": "7eec0528a13fe39a4c01cf67b834bbd94aee2e7540c80bdc151afdf573370ec0",
+  "compiler": "gcc (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "build_cwd": "/tmp/twist-cas/msolve-source",
+  "command": "From a fresh extraction of the pinned archive, apply msolve-signature-output.patch with patch -p1. Run from that source directory:\n\ngcc -O2 -fopenmp -DVERSION='\"0.7.5+twist-signature-output\"' -I/tmp/twist-cas/root/usr/include -I/tmp/twist-cas/root/usr/include/x86_64-linux-gnu src/msolve/main.c src/neogb/gb.c src/fglm/fglm_core.c src/usolve/usolve.c -L/tmp/twist-cas/root/usr/lib/x86_64-linux-gnu -Wl,-rpath,/tmp/twist-cas/root/usr/lib/x86_64-linux-gnu -lflint -lmpfr -lgmp -lm -o /tmp/twist-cas/msolve-signature-output\n",
+  "program": "/tmp/twist-cas/msolve-signature-output",
+  "program_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49",
+  "stock_program_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28",
+  "version": [
+    "",
+    "msolve library for polynomial system solving, version 0.7.5+twist-signature-output",
+    "implemented by J. Berthomieu, C. Eder, M. Safey El Din",
+    ""
+  ],
+  "source_files": [
+    {
+      "path": "src/crt/longlong.h",
+      "sha256": "86bace220754f3b2ddc59cf7912d0453b7b9d320db01ce8043f0b34f528c8a5d"
+    },
+    {
+      "path": "src/crt/mpq_reconstruct.c",
+      "sha256": "e79fb66dd630775c894c1e5abaf05098df04c833f39e763a2157419608ae0ea6"
+    },
+    {
+      "path": "src/crt/mpz_CRT_ui.c",
+      "sha256": "f19f12314c55387f4d5714be92a154e6f59a9ef3b75c386e9e6b7a2388cf2351"
+    },
+    {
+      "path": "src/crt/ulong_extras.h",
+      "sha256": "86f5bfadf84b86e1ee1f817dbcac3d457b4138cf8752391d43009dbb4fddcbdd"
+    },
+    {
+      "path": "src/fglm/berlekamp_massey.c",
+      "sha256": "949af27a8ae2427e8ad6725fc9064fe365275fa00505ab6a3e0118b14418affe"
+    },
+    {
+      "path": "src/fglm/data_fglm.c",
+      "sha256": "326ba064157b23b09733380d49e5f23630fae8c643f267e16af3224b9b69fa45"
+    },
+    {
+      "path": "src/fglm/fglm_core.c",
+      "sha256": "bc4fc9d51c455467583bbace14c874b744ef1db1fc3653d5c342505a02409b20"
+    },
+    {
+      "path": "src/fglm/fglm.h",
+      "sha256": "86644e207647abd998f76902a5a8540d942c9dddef1dd735d40936d74a9132b4"
+    },
+    {
+      "path": "src/fglm/inner-product.c",
+      "sha256": "c02abe92325780b58bfb1006a460821940de13b627d6f9c4f7990159c178ce6b"
+    },
+    {
+      "path": "src/fglm/libfglm.h",
+      "sha256": "6ddc8dab8cae64486b7401302a22dc3c2fd92ceba6e92c72768f7be733d284dc"
+    },
+    {
+      "path": "src/fglm/linalg-fglm.c",
+      "sha256": "4cc6b14961024a67df8e2302c4af3c28856c0424f5349f08b9a5622a63957e78"
+    },
+    {
+      "path": "src/fglm/matrix-mult.c",
+      "sha256": "9161d12235528d7d7380397e18c38577286f81519094751eff56a69714744a1f"
+    },
+    {
+      "path": "src/msolve/duplicate.c",
+      "sha256": "17fa68bb582e82494cab00b06a42f94fed18b0e556d28924bef91b1a2155e991"
+    },
+    {
+      "path": "src/msolve/hilbert.c",
+      "sha256": "630b9a5d7174ba1652a85794525ded16c2afe42339c8ee5ad35a22fbc7b0bbf8"
+    },
+    {
+      "path": "src/msolve/iofiles.c",
+      "sha256": "b27c72da8920656b2e6f5a578ae4b446b530f080dde3aba01249402513b71d10"
+    },
+    {
+      "path": "src/msolve/libmsolve.c",
+      "sha256": "eb1f843f3516c31e75ad92cac3736b21d132cdad2785f252865218f7ce5bc060"
+    },
+    {
+      "path": "src/msolve/lifting-gb.c",
+      "sha256": "3c43facf3afbee8ed68e9a2d1bb3964aef22192562b3e8496c21bf2390de60b5"
+    },
+    {
+      "path": "src/msolve/lifting.c",
+      "sha256": "3c6c72d0b83c6a8dc40fbc21bba36476e043693a316ef5071016cddfd3a3ab16"
+    },
+    {
+      "path": "src/msolve/linear.c",
+      "sha256": "1fc9592abb916dcdd07137b39e2e0dfaebd092369fd3aa914f22055d40f762bb"
+    },
+    {
+      "path": "src/msolve/main.c",
+      "sha256": "eaa88497f8db8e68f87da896a8a87c9b0398a6e0c25fffe468a06f786adf88c6"
+    },
+    {
+      "path": "src/msolve/msolve-data.c",
+      "sha256": "504f77ad30720f3a6736e007020265dfd4aa0fcbef3e046dac6861fe89a8eaf8"
+    },
+    {
+      "path": "src/msolve/msolve-data.h",
+      "sha256": "e516487d2d0ca123f2467d7dba350815ed61376ee87f3edb9289436b2c7b57c0"
+    },
+    {
+      "path": "src/msolve/msolve.c",
+      "sha256": "fb92fc30ebd73c8f4fbdc48b3c0f389014106120bc6d7e185ab073f33eb77271"
+    },
+    {
+      "path": "src/msolve/msolve.h",
+      "sha256": "4e2c61f7dc7d8c52381ff612b25c89aa338f5d9960529384f000943b97043da0"
+    },
+    {
+      "path": "src/msolve/primes.c",
+      "sha256": "6e3c52856a2f9ebd01ecd895ad083c53e5275886bb97a10758f3ede0713858a7"
+    },
+    {
+      "path": "src/neogb/basis.c",
+      "sha256": "23a732f9665ab6df27d9ce7dbe0b6a2c2c882345b600ca5f38a6aaf8a17a2099"
+    },
+    {
+      "path": "src/neogb/basis.h",
+      "sha256": "7781d6d5f97ecaabbc6c91a5bd3c7b371a8964e54a1e914c861c305b4a35c6af"
+    },
+    {
+      "path": "src/neogb/convert.c",
+      "sha256": "41c74dc570e026e98c78e652d3637e0ecd4a47b1d4d57b58fc7bea4dc7778327"
+    },
+    {
+      "path": "src/neogb/data.c",
+      "sha256": "edc925271f3c4db6ddeb7af2f7e399bfdeb7214834ab2c1a9058c2e28c8ad651"
+    },
+    {
+      "path": "src/neogb/data.h",
+      "sha256": "234ca10d4c7f80ac3266cbe9e45ad91233ff2a543f810811a7f5acb53e6066c6"
+    },
+    {
+      "path": "src/neogb/engine.c",
+      "sha256": "e38eadf53bd63e37d858cb3d78b8ced256128c43258ed7bb28bd23a2a3f196fe"
+    },
+    {
+      "path": "src/neogb/engine.h",
+      "sha256": "38bf939e4fb1d15cdbcf96919244ef4ad343d3fc2ab31ca60adf87fba291b643"
+    },
+    {
+      "path": "src/neogb/f4.c",
+      "sha256": "21196c83e1cd692b4135ac8bdfe71d9f0a50bce49220a67058df3e60b32726ba"
+    },
+    {
+      "path": "src/neogb/f4.h",
+      "sha256": "bb5a1adb357d59477c78839759f7b7270d50003493fe7b368f4b2cf04b06f6e7"
+    },
+    {
+      "path": "src/neogb/f4sat.c",
+      "sha256": "71d4b50ea27621727ed09403d74289b7d020b6e9abfdc4f93cbb603aef6ed89d"
+    },
+    {
+      "path": "src/neogb/f4sat.h",
+      "sha256": "51c9400565f90dd4d98dfd2ac1a19395f9780eead7d949a043b9134b27f76d01"
+    },
+    {
+      "path": "src/neogb/gb.c",
+      "sha256": "391e1aea8d5f7375fd38fffe4197b8270cf2cb035c0256ffe82a2491c9dcaa19"
+    },
+    {
+      "path": "src/neogb/hash.c",
+      "sha256": "21934bf4ac6c52ff9f14ce064b8e42a2a93e1788d49ae4276c62c9912f95b775"
+    },
+    {
+      "path": "src/neogb/hash.h",
+      "sha256": "b8e7299deb3fbfb061613c9428cbf2b591017b4f95b19cc42cdc725108c33567"
+    },
+    {
+      "path": "src/neogb/io.c",
+      "sha256": "751dbb1402a9bd7bc79d76c164980a3d58d66b751d27a66e952e10dc0e67a8df"
+    },
+    {
+      "path": "src/neogb/io.h",
+      "sha256": "6e3ab3f2fc4dde42d38fa48544a0dd18b93933f84bc0b5e542519cd87b498466"
+    },
+    {
+      "path": "src/neogb/la_ff_16.c",
+      "sha256": "2861a89e484a39f3f81ca6802bbf019bab50fcaef55b06a341681e2b90480527"
+    },
+    {
+      "path": "src/neogb/la_ff_32.c",
+      "sha256": "6a5570b0e9b961882dbe3b81a13f7d6df5fbad7e6694a7b433bbebe3082275eb"
+    },
+    {
+      "path": "src/neogb/la_ff_8.c",
+      "sha256": "1124df0a5ac1f956856c623d67459404e94e935382315fd70bdd07eb5a495296"
+    },
+    {
+      "path": "src/neogb/la_qq.c",
+      "sha256": "5d925a6e4c83f0436fd2857fda047d9ad718ddb197fe513451195bd4eb51fc25"
+    },
+    {
+      "path": "src/neogb/la.h",
+      "sha256": "dc6065f4a0cbd3dbfafa3205c8d25bc817690cc37e8450e4519f652dc91faeee"
+    },
+    {
+      "path": "src/neogb/libneogb.h",
+      "sha256": "65eadff24546954ffe28272b27a63547d22de35cc9a34b3ace3405a7438a704b"
+    },
+    {
+      "path": "src/neogb/meta_data.c",
+      "sha256": "f92f2c95726d29409c907e0fc6c761a61fd9d9537afd4fdb90dcdd2497ae3bcf"
+    },
+    {
+      "path": "src/neogb/meta_data.h",
+      "sha256": "7cd10b911a5dd98200bd2b23820d7cefd7b6f1f360999c13e0463b238cbb7e38"
+    },
+    {
+      "path": "src/neogb/modular.c",
+      "sha256": "3e7e43ffc0057f077ee7d3c7f065177d46fb66165338e36e4969cbfaf19ab701"
+    },
+    {
+      "path": "src/neogb/modular.h",
+      "sha256": "9747d877fbc864a5acfaf3e9a87dd87d2f8e4f0776e5a7592810814eb0f6f6eb"
+    },
+    {
+      "path": "src/neogb/nf.c",
+      "sha256": "0fa559a8904da5b6caaaa2ef6645c6812e262b542737bc8f406b6a2379985cd5"
+    },
+    {
+      "path": "src/neogb/nf.h",
+      "sha256": "dcc10d2efee360b0f047d420c4ee2bfa15b5d04386a71070e94d94d183d09264"
+    },
+    {
+      "path": "src/neogb/order.c",
+      "sha256": "a894f0d2a8db538526d4bec16131b085d2e5b41b7a9d16f40f256eea41f1c0de"
+    },
+    {
+      "path": "src/neogb/sba.c",
+      "sha256": "d617bcb45767a4802da7802694a67c9eb154fa274cc31527a03d2485dcb94272"
+    },
+    {
+      "path": "src/neogb/sba.h",
+      "sha256": "8f0ce500c1792c3f3a3a9e252a05021fa0438d037221d42e2058aca87af81435"
+    },
+    {
+      "path": "src/neogb/sort_r.h",
+      "sha256": "51fe6f2b71c8cb7f029964364f0e0addf2b413c4c19d613f2bd6d7737e02004e"
+    },
+    {
+      "path": "src/neogb/symbol.c",
+      "sha256": "33c5466bfada78d2bb8707312ee4864b944986637e136c9151b97de6baf24062"
+    },
+    {
+      "path": "src/neogb/tools.c",
+      "sha256": "238b39a5ef06642062436a3585d7750abefc321ab3cc47cc4178ffeb328d3502"
+    },
+    {
+      "path": "src/neogb/tools.h",
+      "sha256": "843a64907b169c6fc0b24eaf103d68a7e4a13b1334f266fd2638b24046f74daa"
+    },
+    {
+      "path": "src/neogb/update.c",
+      "sha256": "bdc646772d270f50dfda24421f227294964e38c059df60acbff4be6f257613ec"
+    },
+    {
+      "path": "src/neogb/update.h",
+      "sha256": "7cf311c978fa4596e9182ee3f7f83f25471e96c6eab3b3c98c39500debb3902f"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_extra.h",
+      "sha256": "92806b9bbaf6fb27c1d7c2ab4369bd5bcfafd827525aa572ae2de0d78f612de8"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_left_nullspace.c",
+      "sha256": "ccc7f3678d2892960f287956784ef2d160a2ec824494be3946a9e94e4a6c29f1"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_permute_rows.c",
+      "sha256": "0303a30e712157db449d94f0ee619b40a0d4932c6529a873d9909310408d983d"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_arith.c",
+      "sha256": "59e5912db6aeb4d3bb918b0928c2ed0c082f4e92d58f84a20f825e7a0a24bf47"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_io.c",
+      "sha256": "5c93fc786aebb068b8fc283f136bae3a0fae23037c3a6a9293a978e74faaee6b"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_mbasis.c",
+      "sha256": "c5a5b424b6b80efdcb6b2fc15c514fc00c2efa214aed680ba4b2a46cd1495170"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_mem.c",
+      "sha256": "414aae516029178935c7139d06f5a036dda60ba8d3a2437332f96c58bbe34926"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_set_from.c",
+      "sha256": "24ccbc88513e2deb55c09406c32af2e108465b0864b133e396a9afc6dc9bf962"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly_shift.c",
+      "sha256": "b94a47f84c09ab2c1056d8be19611d15a9f7e3fc916a3287f5b9f0b01ffb0f2c"
+    },
+    {
+      "path": "src/upolmat/nmod_mat_poly.h",
+      "sha256": "cae1691ffd13a48c722af083166d64e514c14c24296e495ce27112527e57e9aa"
+    },
+    {
+      "path": "src/upolmat/nmod_poly_mat_pmbasis.c",
+      "sha256": "605122cc2c6124d40a49800b598d51f2d4c2dfb6053f8f935507139ac63fc867"
+    },
+    {
+      "path": "src/upolmat/nmod_poly_mat_pmbasis.h",
+      "sha256": "8246ec64ab47efe76ac1f674a46c74ae93e7ccac1b8d06d0ef4251312effa01b"
+    },
+    {
+      "path": "src/upolmat/nmod_poly_mat_utils.c",
+      "sha256": "a3a04a7fc64f706430f20422f47abc0ed4e042b2a206682f338d0fd6d899050d"
+    },
+    {
+      "path": "src/upolmat/nmod_poly_mat_utils.h",
+      "sha256": "41f0ba9bd1a4df5fdf648c153bc11220a5a0e2afd2a2cf7d1bc606b4cedbc39d"
+    },
+    {
+      "path": "src/usolve/bisection.h",
+      "sha256": "ec89349fd698549fdf035182c92921622918d9ed24f75c5795e2484c85c0fd98"
+    },
+    {
+      "path": "src/usolve/data_usolve.c",
+      "sha256": "504ac2f1d2db94bb50f2fca6cf68c20acc4e560081a63b8716b16e0bda245e4d"
+    },
+    {
+      "path": "src/usolve/debug.c",
+      "sha256": "6fe3bcc830e99e8d2e0acfd233c6bf9bd003d05fae62ad6784f4911ea0c03711"
+    },
+    {
+      "path": "src/usolve/debug.h",
+      "sha256": "73eee23e0c9b0beeb0b284728b47fc6eb4afb0de6fcacaaddc8702b384b58d70"
+    },
+    {
+      "path": "src/usolve/descartes.c",
+      "sha256": "dea0b81800a81cd39a5a51d3ec8c185780c903edb286f9aa09b2e630d345c4e8"
+    },
+    {
+      "path": "src/usolve/descartes.h",
+      "sha256": "80f6ec861499d97619e5fe8f41aca762df9d8f7d8aeea081dd9c25ff11b4039d"
+    },
+    {
+      "path": "src/usolve/evaluate.c",
+      "sha256": "1826634f20bd74f62b107c55649b6ff9b26e883aaacd6501074d94ca8892d38e"
+    },
+    {
+      "path": "src/usolve/evaluate.h",
+      "sha256": "ac1ce2d962ca5d2d306e5e1d83357309b4bd7d72b96e8213ce4200410821ffc4"
+    },
+    {
+      "path": "src/usolve/libusolve.h",
+      "sha256": "0e5b113ca626f99bdaf295b6b76a0046d00d4f016d68b3871c14e5ebb11d32b9"
+    },
+    {
+      "path": "src/usolve/print_usolve.c",
+      "sha256": "deb7ada4d137be483e6bc91e2a19dd9507ba72eee67e253e5b72839e9ef84072"
+    },
+    {
+      "path": "src/usolve/print_usolve.h",
+      "sha256": "843a3672805c42ae8b5ef791f3cf35b4ef5183d3b19ba6b3cdfad43ce30ceb21"
+    },
+    {
+      "path": "src/usolve/refine.c",
+      "sha256": "691a1aceb01f384f4864351e40ded66edeeea7dda1626452e2cd6b3fa7b2114c"
+    },
+    {
+      "path": "src/usolve/refine.h",
+      "sha256": "f82c45afe13fe52469236cd8c8396c7c48cb52602dd82b862caba1eb31f65df7"
+    },
+    {
+      "path": "src/usolve/taylor_shift.c",
+      "sha256": "f783668fb249228a110b21d6e1a35e754147bf7b57b13e291fce4ae2d406423d"
+    },
+    {
+      "path": "src/usolve/taylor_shift.h",
+      "sha256": "8db8fd48d44f50bc9ea44b964d697475866e683646b92b52c10a5e0864c51278"
+    },
+    {
+      "path": "src/usolve/tests.c",
+      "sha256": "d0ee2f055b15995dd4397df0ad281e8276465506602eef61387968515c17dd38"
+    },
+    {
+      "path": "src/usolve/univmultiply.c",
+      "sha256": "bae453090edfa4c032aeaa6c686b4b827075f9448762f035df7689e270652629"
+    },
+    {
+      "path": "src/usolve/univmultiply.h",
+      "sha256": "5d287fb7daeb30d140cfe15c897ee4eb1f398457dfeb11b7cb056297eb7fce81"
+    },
+    {
+      "path": "src/usolve/usolve.c",
+      "sha256": "685594c51eb522edcb84f816489447eb9e7df20f5a9ce7e6e77b606af8d2a3f0"
+    },
+    {
+      "path": "src/usolve/utils.c",
+      "sha256": "bdd1190715451166fbc4fe833fc44bad19e51e97056910b49b835fa2fe47a7d3"
+    }
+  ],
+  "algorithm_changed": false,
+  "field_assignment_changed": false,
+  "signature_export_stub_bypassed_only_after_computation": true,
+  "performance_claim": false
+}

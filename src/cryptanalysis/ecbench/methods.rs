@@ -80,6 +80,7 @@ use crate::cryptanalysis::koblitz_strong_rho::{
     RawPoint as StrongPoint, RawPointG, RhoField, RhoScalar, StrongRho, StrongRhoCharges,
     StrongRhoG, StrongRhoParams,
 };
+use crate::cryptanalysis::twist_ic_pipeline::{TwistExperimentBase, TwistF4Oracle};
 use num_traits::ToPrimitive;
 use rand::{rngs::StdRng, SeedableRng};
 
@@ -4140,10 +4141,12 @@ fn solve_ic_prime(
     let orbit = GlvOrbitBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let twist = TwistExperimentBase;
     let cm_orbit = CmOrbitBase { instance: inst };
     let known_log = crate::cryptanalysis::ic_framework::plugins::KnownLogBase;
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
+        "prime-twist-experiment" => &twist,
         "known-log" => &known_log,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
@@ -4166,6 +4169,8 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut twist_product = TwistF4Oracle::new(false);
+    let mut twist_symmetric = TwistF4Oracle::new(true);
     // `pkm-semaev` writes its system on the base's own tower, so it reads
     // the tower from the `prime-kummer` spec and runs on no other base.
     let mut pkm = match or_name.as_str() {
@@ -4189,6 +4194,8 @@ fn solve_ic_prime(
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
         "pkm-semaev" => pkm.as_mut().expect("built above"),
         "subtract" => &mut subtract,
+        "twist-f4-product" => &mut twist_product,
+        "twist-f4-symmetric" => &mut twist_symmetric,
         "mitm" => &mut mitm,
         "ksum" => &mut ksum,
         "mitm-prime-batch" => &mut prime_batch,
@@ -5148,8 +5155,10 @@ pub fn dump_factor_base(
             let orbit = GlvOrbitBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let twist = TwistExperimentBase;
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "prime-abscissa" => &abscissa,
+                "prime-twist-experiment" => &twist,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
                 "prime-kummer" => &kummer,

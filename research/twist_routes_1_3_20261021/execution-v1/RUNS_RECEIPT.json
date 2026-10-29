@@ -1,0 +1,513 @@
+{
+  "schema": "twist.bounded-execution-receipt/v1",
+  "created_utc": "2026-10-22T02:35:14.384Z",
+  "phase1_receipt": {
+    "path": "research/twist_routes_1_3_20261021/execution-v1/PHASE1_RECEIPT.json",
+    "sha256": "1e5298e674c26eb09fdf59eb350749e31bcc94e5ca3ec5285127f8856efb18a9"
+  },
+  "fixtures_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "selected_covers_sha256": "22e00145ea5e014572c344f85f4f8b468ab1c84b41512b6264def2a5985a28b2",
+  "pairing_fixture_sha256": "8e6e63aa76e87f92bcaef70a8ad676778d1061aedd713f15590129adb690ac16",
+  "host": {
+    "hostname": "a81fcf6dc864",
+    "os": "Debian 13",
+    "arch": "x86_64",
+    "cpu_quota": 4,
+    "memory_limit_gib": 16,
+    "isolation": "L0",
+    "wall_time_admitted": false,
+    "independent_host_replay": false
+  },
+  "native_versions": {
+    "rust": "1.90.0",
+    "pari": "2.17.2",
+    "Singular": "4.4.1",
+    "msolve": "0.7.5",
+    "Lean": "4.34.1"
+  },
+  "runs": [
+    {
+      "run_id": "transfer-20261021T2300Z",
+      "source_freeze": "b8acaa16012e3b5009d22d46d3fe50fc87a59989",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/EXECUTION_PROTOCOL_V1.md",
+          "sha256": "5a99d1969d7396fbf53826ce281c72a73e4fce28cf1950334e178dfe5c0116b3"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "transfer",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/selected-covers.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/transfer-20261021T2300Z"
+      ],
+      "status": {
+        "exit_code": 0
+      },
+      "binary_sha256": null,
+      "binary_hash_note": "No separate run-specific binary hash captured; source/input revisions are recorded and the transfer code was unchanged from the preparation freeze.",
+      "outputs_sha256": {
+        "E12-transfers.json": "1facac859d9dc49e6f0da990874c6b8f7ea1cb13c334f5778f82da6c45c41ec2"
+      }
+    },
+    {
+      "run_id": "isogeny-20261021T2320Z",
+      "source_freeze": "411a254c0ac518e8462ecd6f07e4f315917a48b6",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/ISOGENY_PROTOCOL_V1.md",
+          "sha256": "d159299264991b636a661e166c90557f7af34f7df943b4422fd1c3b7921ee1c9"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "isogeny",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/isogeny-20261021T2320Z"
+      ],
+      "status": {
+        "exit_code": 0
+      },
+      "binary_sha256": "341350df6ce919a89f27b7daeae25afdf51b6b3d9b848c399d971108486cc238",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "E14-isogenies.json": "f5eb450e897986965c4dc3bba39c8060930514cd5cfb0a7c8dd6d310f33f0940",
+        "E14-registry-additions.json": "52672acaf0da2a9364c0f6359d7773d87b1cdd697b427cc97dd7bf28b8af99a2",
+        "SUMMARY.json": "29b540bd6cae22ab977d2dd8101cd4a4b748a8a5d0528b55c2f1ca2a7c48bfe1"
+      }
+    },
+    {
+      "run_id": "solver-20261021T2320Z",
+      "source_freeze": "411a254c0ac518e8462ecd6f07e4f315917a48b6",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V1.md",
+          "sha256": "f1d0be9faeb4146782c25a1275c49f77541fd62fbe90602734a5a67e0dd344db"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "solver",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/E02-E04-bases.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2320Z"
+      ],
+      "status": {
+        "exit_code": 0
+      },
+      "binary_sha256": "341350df6ce919a89f27b7daeae25afdf51b6b3d9b848c399d971108486cc238",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        ".gitignore": "6c4e6f97b53be7f28beb36ecd0f433c6833bc494656f071f70cfd8d13b189f2d",
+        "ARCHIVE.json": "eed391affdb6dea5a4fef63768dd7762f2f8d20688a03029ae8b331016b349e8",
+        "ARCHIVE.md": "7b66c7250a74466a27a178b05ead32347d9062ce9a711bb3fc0032c74cddb8ff",
+        "E07-projected-equivalence.json": "407616878be418c2d430c757a3f5ccd86fd047f8bf7f6afd2cb2ca471d178a24",
+        "E08-solver-panel.json": "7cd73bd79bc68e3b0d330101c71fd403cb55e4bb0edb8765344daff993b41748",
+        "PARTS.sha256": "bf971b2a0fc7b8b42f302b4c17efba05acf30de0f63872b7e05413119aba9d9e",
+        "REASSEMBLED.sha256": "1b332cedffd8d6cdb0a7eaf909d8378975587f62356c967d64c0c446e063d355",
+        "cases.tar.xz.part-aa": "1e670fa138f6673709cff993310615fdd5b3d6aea72e930647d664b5e9b35fdb",
+        "cases.tar.xz.part-ab": "74c45521bc7259d0849a9aa6d6ffba65b7aa6a46f092d9559eaa94e4df4f30c4",
+        "cases.tar.xz.part-ac": "86bdf996fc8a125f91352ee542a29d32a68fe6ade6eb797c294b010f2c4ce0c8",
+        "cases.tar.xz.part-ad": "9ea110713c8779b267c18a4ef746ead43d97e22adbe9c66ff93776843820a3e3",
+        "cases.tar.xz.part-ae": "7331e1793719625f718ed72cd33d1db58348f24584553b0ccc681f8b1f0a16d9",
+        "cases.tar.xz.sha256": "54ed907c8f7bcfc90de0d0e22825868090d22d1ee22ca0f0deb57b7be7a7e590"
+      }
+    },
+    {
+      "run_id": "solver-20261021T2349Z-v2",
+      "source_freeze": "5d6cd4dc595020077d189e999fcbbb6ca64e6ded",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V1.md",
+          "sha256": "f1d0be9faeb4146782c25a1275c49f77541fd62fbe90602734a5a67e0dd344db"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V2.md",
+          "sha256": "83f276a453dda03b03df00bfc6f03ef8867bf6ef31786440ef3680231f28935e"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "solver",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/E02-E04-bases.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261021T2349Z-v2"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-22T00:00:41.657Z",
+        "source_commit": "5d6cd4dc595020077d189e999fcbbb6ca64e6ded"
+      },
+      "binary_sha256": "ed516cd9c9df6f5fb965f581180a832441f54026b038b51935c32699e4620450",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        ".gitignore": "6c4e6f97b53be7f28beb36ecd0f433c6833bc494656f071f70cfd8d13b189f2d",
+        "ARCHIVE.json": "8cc4ec27e0feffa19f4f78ecc532c7b19b21656cafced9c2dfed223658e57878",
+        "ARCHIVE.md": "bd38711d9530dd32f87f3f3944b07ce57308f59bd3ed7bdea8c6914db08fbdd8",
+        "ARCHIVE.sha256": "537a40ede0764943f567d59d0ec196c1a36a71e90b3ed63e10d6e78894f5748f",
+        "E07-projected-equivalence.json": "407616878be418c2d430c757a3f5ccd86fd047f8bf7f6afd2cb2ca471d178a24",
+        "E08-solver-panel.json": "8ce6a73f8c33d2be00f5d54822495388f204908efea1536393cb4d6faf74a781",
+        "PARTS.sha256": "0a8af1bb36b9d43def0a4d072b66e4d45badc0313e0071c918c7053188c49fc9",
+        "REASSEMBLED.sha256": "76ca97ec65ddc0c4251efc97bc5ea884d3d654c79ea8bbabec2cc8c7ab14a380",
+        "cases.tar.xz.part-aa": "4ebf8c3aab9abb64bd1cd97d2708297a5bc011af26274fac60529e71bfa2d82d",
+        "cases.tar.xz.part-ab": "876500e158b54fa52e0a334814393b77ebd1608052df41759c45a850419eb086",
+        "cases.tar.xz.part-ac": "667f81391a02b31e266cd03e9744fe3901b83a0c48f00e2a608566cb888b7fcc"
+      }
+    },
+    {
+      "run_id": "solver-20261022T0004Z-v3",
+      "source_freeze": "2bd6cd2e95e139fa67b2b41bea59b43ca217165b",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V1.md",
+          "sha256": "f1d0be9faeb4146782c25a1275c49f77541fd62fbe90602734a5a67e0dd344db"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V2.md",
+          "sha256": "83f276a453dda03b03df00bfc6f03ef8867bf6ef31786440ef3680231f28935e"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V3.md",
+          "sha256": "b9a9a3b9fe67d2d1f22bb544ca1ff169fa46950ee10b095debf94c1aa36342a5"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "solver",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/trace-20261021T2256Z/E02-E04-bases.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/solver-20261022T0004Z-v3"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-22T00:20:56.859Z",
+        "source_commit": "2bd6cd2e95e139fa67b2b41bea59b43ca217165b"
+      },
+      "binary_sha256": "3b825434ae35a0708b73fc0aa9aa2905461339ad30e44f301374a3e6e28a0263",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        ".gitignore": "6c4e6f97b53be7f28beb36ecd0f433c6833bc494656f071f70cfd8d13b189f2d",
+        "ARCHIVE.json": "57818a1cf10f10b481739a28fd3235b03a97d1ddc3cb16b8b9b0f335919f77fb",
+        "ARCHIVE.md": "30e90dc8e15eb46f81bf7f4781f2333c9ee37aeea7eecf69972f224d2f2f026b",
+        "ARCHIVE.sha256": "1d50e701cdba08c2b6fe48bd639a1f54f869140842536746a95b8c1b1a28e941",
+        "E07-projected-equivalence.json": "407616878be418c2d430c757a3f5ccd86fd047f8bf7f6afd2cb2ca471d178a24",
+        "E08-solver-panel.json": "ca411b948cd7ce690f071dfcff3fd7923e10975f181c8e0a94479e03fd0d6987",
+        "PARTS.sha256": "58f2ca299d034d1408e1f39b1e89e448b69c801d4e1f891f68cbf815c54e28e0",
+        "REASSEMBLED.sha256": "0578be5b44427a694592b379ae5472e0eeb1bc4ac184472c1922b79843979498",
+        "cases.tar.xz.part-aa": "a67ccee32bd0d30f4b1332aa7b76985c5080e88418dc85ab75209778f3def53e",
+        "cases.tar.xz.part-ab": "89c6f22210da6278db3d2862afe7b5ea70d36963dfac79208dbab44aedcb0f3d",
+        "cases.tar.xz.part-ac": "3d027c273ce9397b9e2e62ea565a8cadfbc276473a49eced713271309d82847a"
+      }
+    },
+    {
+      "run_id": "pari-20261021T2349Z",
+      "source_freeze": "5d6cd4dc595020077d189e999fcbbb6ca64e6ded",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PARI_PROTOCOL_V1.md",
+          "sha256": "4c65f057b85b92ec85e630914ea5c3793daa157622758c22c429aeea6ee4e984"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "pari",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/selected-covers.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/pari-20261021T2349Z"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-21T23:49:20.115Z",
+        "source_commit": "5d6cd4dc595020077d189e999fcbbb6ca64e6ded"
+      },
+      "binary_sha256": "ed516cd9c9df6f5fb965f581180a832441f54026b038b51935c32699e4620450",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        ".gitignore": "fa7cadf041a79b6b93bb9853e479d62cf3e83f2e12a71939ba1dd2db9916aadc",
+        "E12-pari-independent-geometry.json": "345a2ade523a5c5c382daf50df2c5b86db1c2d39f51bf57f6faf7ccc7a95a50e",
+        "E17-rational-height-and-rank.json": "850a00c1fd25161d810a31596248ada6a5250a5692f8a4fdf56a0644bbef1603",
+        "RAW_ARCHIVE.md": "5c99fb86c947ef7eac04a9a63ed7b03209be32520025906d720b57cdcf5a537c",
+        "RAW_ARCHIVE.sha256": "73286c455fc998840a1dbc41650be12d47d8db981a0e5e1db308641eb44df3a9",
+        "RAW_ARCHIVE_VERIFY.stdout": "e0aa8263a43fc5135526fab0a395122417a182bed2a530c1b31dc7eb46942025",
+        "RAW_MEMBERS.sha256": "22d3929acc7a403aad88c5762d853e6a337cee9afc3eca19b39497ec5096edc8",
+        "RAW_MEMBERS_VERIFY.stdout": "589215c3a5886fddd8891cf76576dfb9311725c245c56c7db44aea8e58cf4036",
+        "raw.tar.xz": "56263a30e2c730a1b58b0381c7007c54c2fc2d0b01dac0d6345eec4c3fc1e086"
+      }
+    },
+    {
+      "run_id": "pari-20261022T0020Z-original-height",
+      "source_freeze": "0145df8ff32a104d186c31eca2f04c9ee256b21d",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PARI_PROTOCOL_V2.md",
+          "sha256": "fedfe8587c76520a54b38962d0fdca63102f2c079b49719644b11ad9ba2dbf68"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-supplement",
+        "equal-height",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/selected-covers.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/pari-20261022T0020Z-original-height"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-22T00:21:05.563Z",
+        "source_commit": "0145df8ff32a104d186c31eca2f04c9ee256b21d"
+      },
+      "binary_sha256": "bf8c6c8dbbaac95de0a25940be3cf5852eb5d5636047631520e396d8596d7c40",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        ".gitignore": "fa7cadf041a79b6b93bb9853e479d62cf3e83f2e12a71939ba1dd2db9916aadc",
+        "E12-pari-independent-geometry.json": "345a2ade523a5c5c382daf50df2c5b86db1c2d39f51bf57f6faf7ccc7a95a50e",
+        "E17-rational-height-and-rank.json": "e940921cb8c6f054bf4ea8cc404501438906780cba84050b0988a45f91fb4fd4",
+        "RAW_ARCHIVE.md": "5c99fb86c947ef7eac04a9a63ed7b03209be32520025906d720b57cdcf5a537c",
+        "RAW_ARCHIVE.sha256": "ba7fcad9d8d0e99ec085dc03c1f98e5151808f14ce408f89cc943ec50170d377",
+        "RAW_ARCHIVE_VERIFY.stdout": "e0aa8263a43fc5135526fab0a395122417a182bed2a530c1b31dc7eb46942025",
+        "RAW_MEMBERS.sha256": "126c914258341c45a579792e70617e9d0ad6d678f92717f723d809248701a3f2",
+        "RAW_MEMBERS_VERIFY.stdout": "589215c3a5886fddd8891cf76576dfb9311725c245c56c7db44aea8e58cf4036",
+        "raw.tar.xz": "f11c3abbc4d06b282fe532e53ef4c9831e3eefeb72fbe834085193a24d9f4652"
+      }
+    },
+    {
+      "run_id": "pairing-20261022T0020Z",
+      "source_freeze": "0145df8ff32a104d186c31eca2f04c9ee256b21d",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PAIRING_PROTOCOL_V1.md",
+          "sha256": "ac94ca247f98aeab497c1c346faacf206be28d0938ff70311171dc2accbc9eae"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-supplement",
+        "pairing",
+        "research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/pairing-fixture.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/pairing-20261022T0020Z"
+      ],
+      "status": {
+        "exit_code": 1,
+        "finished_utc": "2026-10-22T00:20:40.535Z",
+        "source_commit": "0145df8ff32a104d186c31eca2f04c9ee256b21d"
+      },
+      "binary_sha256": "bf8c6c8dbbaac95de0a25940be3cf5852eb5d5636047631520e396d8596d7c40",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "PROCESS.json": "c38c6c1ab3e9dcd61d5f5bc647e3a414af6ffa7b3bbe83c09f6ba4f3395d6310",
+        "pairing.gp": "53e972a2e27a9ba7b171745d2a584f88f8ed197a3dae2dd0c347cfd4bbc1a57f",
+        "pari.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pari.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "run_id": "pairing-20261022T0024Z-v2",
+      "source_freeze": "e517e80b1e77778d529f51ce5a900e00cb010761",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PAIRING_PROTOCOL_V1.md",
+          "sha256": "ac94ca247f98aeab497c1c346faacf206be28d0938ff70311171dc2accbc9eae"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/PAIRING_PROTOCOL_V2.md",
+          "sha256": "2d9559537178c7e033c3ede561ca61f18386d94f3c1fa2eb29f4c9c42a2bac87"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-supplement",
+        "pairing",
+        "research/twist_routes_1_3_20261021/execution-v1/pairing-fixture/pairing-fixture.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/pairing-20261022T0024Z-v2"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-22T00:24:59.100Z",
+        "source_commit": "e517e80b1e77778d529f51ce5a900e00cb010761"
+      },
+      "binary_sha256": "7309c024eef7aef5f42848adffa28908d8e299da390cbdc003017015881f106c",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "E16-pairing-positive-control.json": "54f54a82f664222ee016b7230a2891edc444b07821c7c7f6cb4fe9560510bfea",
+        "PROCESS.json": "d39bc11070f58b7dd3839370084f77cf5209082bce220e4434343e893026d722",
+        "pairing.gp": "47510b1e3237a2d23d6ba9de89c60add87a8c5db0db18354859fc61a05cb5a18",
+        "pari.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pari.stdout": "5d45312025ba95faa1d0195f81dcf9031a923a10151fbd25dab0c2be7767f8b7"
+      }
+    },
+    {
+      "run_id": "ecbench-20261022T0012Z",
+      "source_freeze": "2bd6cd2e95e139fa67b2b41bea59b43ca217165b",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PIPELINE_PROTOCOL_V1.md",
+          "sha256": "213b3bc6af2b6221d04f3949b35b107948a5c9087a618cff37c020bb764763e8"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/E15_SPEC_V1.json",
+          "sha256": "fb9da0e9a240ac2de5c86261e21da5bd566637a720eeb16204ab3ac53602c58a"
+        }
+      ],
+      "native_argv": [
+        "target/release/ecbench",
+        "run",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--spec",
+        "research/twist_routes_1_3_20261021/E15_SPEC_V1.json",
+        "--out",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/ecbench-20261022T0012Z"
+      ],
+      "status": {
+        "exit_code": 0,
+        "source_commit": "2bd6cd2e95e139fa67b2b41bea59b43ca217165b",
+        "finished_utc": "2026-10-22T00:15:04.413Z"
+      },
+      "binary_sha256": "ba2e6347f619988ed68075d7bacb242044221f67557ee18977ee9c4458d67b44",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "comparisons/same-base-t0c0__t0c0s0.json": "3cd83223a105961654892a693720770ef544c8fc1d8eb660805be9d9f831564a",
+        "host.json": "00af69b310f27065a399503a6b6d32c9c075625d86fe4bf8819bbe17a3e91280",
+        "plan.json": "0270124797e6dc03b18786a2fba417be5530ef83ec40742fb11322381af9cfda",
+        "records.jsonl": "79f1ee6b161d4d81e3ec2008f6b8a936d40e84a31d5c36ae12ef464afffeaed4",
+        "session.json": "656ae458355e55ed6e08567300dec9037fad720b4a22f5fc35a838230a5e5f56",
+        "spec.json": "fb9da0e9a240ac2de5c86261e21da5bd566637a720eeb16204ab3ac53602c58a"
+      }
+    },
+    {
+      "run_id": "isogeny-20261022T0054Z-v2",
+      "source_freeze": "1284090fd4db2f55e023afcb275d94f3ce691b10",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/ISOGENY_PROTOCOL_V1.md",
+          "sha256": "d159299264991b636a661e166c90557f7af34f7df943b4422fd1c3b7921ee1c9"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/ISOGENY_PROTOCOL_V2.md",
+          "sha256": "8dbfc26173e9ee7e2cfed66a1b360973ae399c8eaf8300f29b111a34a0813b3a"
+        }
+      ],
+      "native_argv": [
+        "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments",
+        "isogeny",
+        "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+        "research/twist_routes_1_3_20261021/execution-v1/runs/isogeny-20261022T0054Z-v2"
+      ],
+      "status": {
+        "exit_code": 0,
+        "finished_utc": "2026-10-22T00:55:16.825Z",
+        "source_commit": "1284090fd4db2f55e023afcb275d94f3ce691b10"
+      },
+      "binary_sha256": "899a6fed251af88a89085c746e86bf5ef781b340ce2d43ebddb45fdd458e7224",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "E14-isogenies.json": "8304d6746a027151252f67f036d6a081f19592001babcd9bc33f04c1f358389e",
+        "E14-registry-additions.json": "52672acaf0da2a9364c0f6359d7773d87b1cdd697b427cc97dd7bf28b8af99a2",
+        "SUMMARY.json": "a403f947df112839b5b07249947e6434395392b01d840b1d57a9c96ef8b11f45"
+      }
+    },
+    {
+      "run_id": "public3-20261022T0132Z",
+      "source_freeze": "36563882e86dacbbcea0d2e473aca236a116ec97",
+      "protocols": [
+        {
+          "path": "research/twist_routes_1_3_20261021/PUBLIC_3_MODULE_PROTOCOL_V1.md",
+          "sha256": "d31c6f0e310204fab2365c6799e4639fbeed542ce4305d72eff3900f40af727c"
+        },
+        {
+          "path": "research/twist_routes_1_3_20261021/public-three-gluing.gp",
+          "sha256": "5012041b7bc44715c4876e8d595d4ac11a43bc947ad063ccfd178e9bce79e1bb"
+        }
+      ],
+      "native_argv": [
+        "/tmp/twist-cas/usr/bin/gp",
+        "-f",
+        "-q",
+        "research/twist_routes_1_3_20261021/public-three-gluing.gp"
+      ],
+      "status": {
+        "exit_code": 0,
+        "source_commit": "36563882e86dacbbcea0d2e473aca236a116ec97",
+        "finished_utc": "2026-10-22T01:35:20.971Z"
+      },
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "binary_hash_note": "Historical executable identity; binary is not bundled and later builds may replace the local target path.",
+      "outputs_sha256": {
+        "pari.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pari.stdout": "751fd1d2bd3afbe58228bccc6eb9ce1b12ff0c3ea8ad39f83bc7ed0052c4c0d5"
+      }
+    }
+  ],
+  "validation": {
+    "root_library": {
+      "exit_code": 0,
+      "source_commit": "cb7e324",
+      "finished_utc": "2026-10-22T02:23:37.582Z",
+      "passed": 4479,
+      "failed": 0,
+      "ignored": 119,
+      "resolved_source_commit": "cb7e324df89e86c9b86ccb9bce16744f60541cdc"
+    },
+    "catalog_constructor": {
+      "cover_tests": 11,
+      "standalone_tests": 13,
+      "models_checked": 2637
+    },
+    "standalone_supporting_tests": {
+      "passed": 128,
+      "failed": 0,
+      "stdout": "research/twist_routes_1_3_20261021/execution-v1/checks/twist-runner-final-catalog-tests.stdout"
+    },
+    "ecbench_replay": {
+      "path": "research/twist_routes_1_3_20261021/execution-v1/logs/E15-audit-v1.json",
+      "sha256": "64da13d34c144d2a6d05d13d1a1208ca75684683608eecaa0f0d76fc9b3961cb",
+      "records": 1920,
+      "verified_and_identical": 1704,
+      "errors_retained": 216,
+      "problems": 0
+    },
+    "lean": {
+      "proof_map": "research/twist_routes_1_3_20261021/lean/README.md",
+      "explicit_theorems": 9,
+      "audited_including_generated_definitions": 13,
+      "nonstandard_axioms": 0,
+      "compiler_trusted": 0
+    },
+    "registry_check": {
+      "path": "research/twist_routes_1_3_20261021/execution-v1/logs/registry-check-v2.json",
+      "sha256": "5b1d6fb158a52203bcaad4d2af78f2fd9665f03ff9d50da731bb7f64cf47246b",
+      "manifest_models": 67,
+      "extension_models_in_manifests": 34,
+      "canonical_new_entries": 65
+    },
+    "backlog": {
+      "path": "research/twist_routes_1_3_20261021/execution-v1/checks/backlog-final-v3.stdout",
+      "sha256": "deb71b51450de89f07952f2accc3f4d3b9f6bb9ee20e8a9940e5cf130624ed5d",
+      "cards_validated": 3,
+      "status": "blocked for unmet original full-campaign criteria"
+    }
+  },
+  "analysis": {
+    "primary_aggregation_source": "8dea9daafdb2eeeacd7c72b8e1720b656ce95b61",
+    "path": "research/twist_routes_1_3_20261021/reports/execution-20261022T0032Z/ANALYSIS.json",
+    "sha256": "5ac94e6ee1e9ee5cb4ce1b0ae9c3c971e47d0993fac1eaf7fad35daa78c01088",
+    "supplemental_aggregation_source": "67ea933",
+    "catalog_maintenance_receipt": "research/twist_routes_1_3_20261021/execution-v1/checks/CATALOG_RECEIPT.json",
+    "public_three_module": "research/twist_routes_1_3_20261021/reports/execution-20261022T0032Z/PUBLIC_3_MODULE_ANALYSIS.json",
+    "isogeny_amendment_source": "1284090fd4db2f55e023afcb275d94f3ce691b10",
+    "isogeny_v2": "research/twist_routes_1_3_20261021/reports/execution-20261022T0032Z/ISOGENY_V2_ANALYSIS.json",
+    "discarded_aggregation": "execution-v1/analysis-attempts: exact uncommitted draft snapshot unavailable; no result accepted"
+  },
+  "claim_scope": {
+    "full_original_program_complete": false,
+    "calibrated_IC_speedup": false,
+    "novelty_established": false,
+    "NIST_DLP_executed": false,
+    "eligible_leaderboard_result": false
+  },
+  "provenance_notes": [
+    "Experiment drivers and primary aggregation are native Rust/GP/Singular/msolve. The existing Node catalog verifier additionally replays declared-field cover identities; other JavaScript handles metadata, hashing and rendering recorded values.",
+    "Legacy registry generated_by metadata is retained for format compatibility; Python was not executed.",
+    "Raw historical attempts and their failures are preserved; later revisions do not replace them.",
+    "No remote lease, funded campaign or follow-on scientific job remains running."
+  ]
+}

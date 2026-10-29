@@ -1,0 +1,272 @@
+# Twist-assisted index calculus: routes 1–3
+
+- **Updated:** 2026-10-23
+- **Status:** bounded native execution recorded; all three routes remain open for calibrated complete-cost improvement.
+- **Target family:** NIST prime-field P-curves, including P-256, P-384 and P-521; initial implementation checks must use registered public synthetic ordinary prime-field fixtures.
+- **Deliverable:** preserve the three routes, their prerequisites, controls and completion criteria. See the [current follow-up report](../../twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md), [raw publication status](../../twist_routes_1_3_20261021/execution-v2/README.md), and [original execution report](../../twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md). No novel algorithm, calibrated speedup or NIST security result is established.
+- **Shared blocker:** [missing constraint and solver comparison](../../../problems/twist-trace-constraint-and-solver-gap.md).
+- **Prior work:** [PR #2368](https://github.com/aburan28/crypto/pull/2368), the mixed-component twist experiment, was open when this tracker was prepared. Its findings and receipts are prior unmerged work, not a newly replayed or accepted baseline for these routes.
+
+## Requirement and status map
+
+| Route | Question | Actual status | Next deliverable | Execution card |
+| --- | --- | --- | --- | --- |
+| 1. Traces of extension points | Can a structured set in E(F_(p²)) make decomposition of its small trace image cheaper? | Coupled census, energy/random controls and matched helper rows checked; paired extension/rational rows agree | Full polynomial collector, complete costing and independent host | [trace factor base](../../../backlog/XP-20261021-twist-trace-factor-base/README.md) |
+| 2. Covers and Jacobians | Can a cover involving E and its twist produce cheaper projected divisor relations? | Actual torsion, explicit degree-three maps, three toy divisor transfers and all 5,855 old class replays checked | Polarized graph identification, higher-prime quotients, destination decomposition and full costs | [cover transfer](../../../backlog/XP-20261021-twist-cover-transfer/README.md) |
+| 3. Symmetry and elimination | Can keeping extension variables and exploiting Frobenius reduce actual solving cost? | Affine F4 completeness replay passes; signature backend fails; 270 incidence cells give no degree reduction | Four E26 block candidates, applicable signature reference and complete solver/pipeline costs | [symmetry solver](../../../backlog/XP-20261021-twist-symmetry-solver/README.md) |
+
+The cards are deliberately **blocked**, with zero proposed funding and a failing execution sentinel. They are not runnable future full-campaign jobs. Completed bounded local runs have separate receipts; no follow-on job is running.
+
+The separate public 3-torsion companion-module filter passes only P-521 among
+the five NIST P-curves (four det-minus-one anti-intertwiners); ten toy counts
+match E11. Actual torsion/Weil pairings and explicit degree-three curve maps
+now replay for P-521 and the three positive toys. Toy divisor transfer is
+verified; polarized graph identification, public-curve divisor/solver work
+and all costs remain open. This is not a NIST DLP speedup.
+
+## Mathematical setup and proof obligations
+
+Work in characteristic p > 3 with a nonsingular short Weierstrass model
+E: y² = x³ + A x + B over F_p. Fix a nonsquare d, write omega² = d, and use the x-preserving twist model d y² = x³ + A x + B. Its embedding sends (x,y) to (x,omega y). Record the coordinate conversion if another twist convention is used.
+
+Let pi be p-Frobenius and tau = 1 + pi on E(F_(p²)). Embedded twist-rational points satisfy pi(U) = -U. For a rational target, any relation R = A_sum + B_sum, with rational A_sum and anti-invariant B_sum, forces 2 B_sum = O. For the named NIST P-curves, the rational group has odd prime order, so B_sum = O.
+
+Five polynomial identities and four conditional statements on the actual Weierstrass point group now have checked Lean proofs; see the proof map. The concrete finite-field Frobenius/twist embedding, odd-subgroup, chart/Jacobian and complexity bridges remain open. Bounded finite checks and conditional group statements do not discharge those missing bridges.
+
+| Obligation | Exact scope to check | Status / required evidence |
+| --- | --- | --- |
+| M1. Frobenius separation | Rational and anti-invariant finite-field points; any 2-primary exception explicit | Native exhaustive controls and conditional point-group Lean lemma checked; concrete Frobenius/twist bridge open |
+| M2. Trace fibers | For odd rational group order r, tau^(-1)(T) = [2^(-1) mod r]T + ker(tau), and ker(tau) is the embedded twist group | Native exhaustive fixture replay and kernel-coset Lean lemma checked; concrete field bridge open |
+| M3. Coordinate identities | The affine v != 0 branch below; v = 0 and O handled separately | Five native polynomial certificates, five Lean identities and finite exceptional-branch checks; geometric bridges open |
+| M4. Cover image bound | Smooth projective geometrically irreducible C/F_p, genus g, nonconstant F_p-morphism C -> E of degree delta | Check hypotheses, finite-fiber bound and Weil-bound application; formalization status pending |
+| M5. Relation equivalence | Same projected point set, sign convention, multiplicities and target-row span | Exact finite-base census and 240 distinct polynomial/group projection checks passed; broader grids and complete solver costs open |
+
+No numerical toy outputs from an unarchived scratch calculation are imported as evidence.
+
+## Route 1: traces of general extension points
+
+For T in E(F_p), the trace fiber has the proposed contract
+
+$$
+\tau^{-1}(T)=[2^{-1}\bmod r]T+E^-,
+\qquad
+E^-=\{U\in E(\mathbb F_{p^2}):\pi(U)=-U\}.
+$$
+
+Consequently, an unrestricted m-term curve decomposition has (#E^-)^m extension lifts, all projecting to the same relation. Count distinct projected coefficient rows, their rank and the target-row span; do not count those lifts as additional relation information.
+
+The missing object is a specific subset S of E(F_(p²)), with an explicit membership condition coupling the two components, such that F = tau(S) is small and its decomposition problem is cheaper. A uniformly sampled extension set, pure twist points, or translating a fixed rational point by arbitrary twist points is a control, not that construction.
+
+- [ ] Choose and register exact toy curve, twist, field basis, subgroup and generator identities; retain the NIST prime-field scope separately.
+- [ ] Verify trace additivity, the full fiber census and projection, including O and the rational/anti-invariant branches.
+- [ ] Specify the membership restriction and compute the distinct image F, its duplicates, encoding size and construction cost.
+- [ ] Freeze the same-F rational-only control and an explicit-addition-witness baseline before measuring.
+- [ ] Census small instances completely; compare projected relation sets, coverage, row rank and target-row span.
+- [ ] Price construction, encoding, failed attempts, projection, deduplication and verification per independent projected relation.
+
+**Discriminating outcome:** more lifts with unchanged projected relations and unchanged or higher total cost is a null/negative outcome for that restriction. A verified reduction in relation-stage cost is a stage improvement; it is not an end-to-end DLP result.
+
+## Route 2: covers involving E and its twist
+
+A candidate may seek J(C) isogenous over F_p to E x E_twist. Existence of that product, matching Frobenius factors or an isogeny-class statement does not supply a smooth curve, explicit divisor maps or a faster solver.
+
+For a cover phi: C -> E of degree delta, check the induced pullback and norm, the composition phi_* phi^* = [delta], and the actual subgroup kernel. Coprimality of delta and r is an injectivity criterion once those maps and hypotheses have been established. Record the infinity model; unsupported two-infinity arithmetic is not interchangeable with a one-infinity backend.
+
+A fixed-genus, bounded-degree map also has the working image-size constraint
+
+$$
+|\phi(C(\mathbb F_p))|
+\ge \frac{p+1-2g\sqrt p}{\delta}.
+$$
+
+Thus using every rational point of a fixed cover does not by itself provide a sublinear-size factor base as p grows. Restrictions, growing degree/genus, construction cost and actual image size must be accounted for.
+
+- [ ] Select a construction family and freeze its search boundary; keep failed constructions and unsupported cases.
+- [ ] Construct a smooth C over the stated field with an explicit genus and infinity configuration.
+- [ ] Verify the maps on divisor classes, exceptional fibers, homomorphism law, image order, kernel and recovery.
+- [ ] Identify the complementary elliptic factor rather than assuming it is the required twist.
+- [ ] Supply supported divisor arithmetic and a destination solver for the actual subgroup image.
+- [ ] Compare against both a direct rational-only IC baseline and the strongest applicable source-group reference on the identical public target.
+
+Use the [higher-genus workflow](../../../.agents/skills/ecdlp-surfaces/references/higher-genus.md). Reuse existing [balanced-Jacobian/map](../../../problems/prime-cover-balanced-jacobian-and-induced-maps-missing.md) and [subgroup-certificate](../../../problems/catalog-cover-subgroup-certificates-incomplete.md) records when a chosen construction encounters those exact gaps.
+
+## Route 3: Frobenius symmetry and auxiliary equations
+
+Write a general extension point as
+
+$$
+S=(u+v\omega,\;w+z\omega).
+$$
+
+Its base-field coordinate equations are
+
+$$
+w^2+d z^2=u^3+3d u v^2+A u+B,\qquad
+2wz=v(3u^2+d v^2+A).
+$$
+
+For v != 0, set m = z/v and T = tau(S) = (X,Y). The candidate identities to certify are
+
+$$
+X=m^2-2u,\qquad Y=m(u-X)-w,
+$$
+
+$$
+4d v^2=m^4-6Xm^2-8Ym-3X^2-4A.
+$$
+
+Retain domain conditions, for example through a checked nonzero branch or saturation. The v = 0 and identity branches must not be lost by clearing denominators. For a fixed valid T, auxiliary solutions can merely describe its twist fiber.
+
+- [ ] Implement a native system builder for a chosen route-1 restriction and a rational control with the same projected factor base.
+- [ ] Compare full solution sets after projection, signs, multiplicities, exceptional branches and normalization.
+- [ ] Include an untwisted low-degree addition-witness chain; do not compare only with an expanded resultant.
+- [ ] Freeze variable orders, solver settings, fixture hashes, arities, resource envelopes, seeds and holdouts before timing.
+- [ ] Record solving degree, Macaulay rows/columns, nonzeros, reductions, native work, memory, failures and projected-row yield.
+- [ ] Compare with the fastest available applicable external solver on the same systems; name missing proprietary comparisons.
+- [ ] Attribute a gain to a change in encoding, representation, algorithm or accounting; lower displayed degree alone is insufficient.
+
+Route 3 can begin with a standalone equivalence verifier. A comparative solver claim waits for a specific restricted set from route 1, or a separately frozen explicit control construction.
+
+## Acceptance and accounting
+
+The immediate success criterion is a verified measured improvement over the strongest current IC baseline for the same workload. Beating rho is a separate long-term goal, not a prerequisite for reporting an IC improvement.
+
+Before execution, freeze a protocol with the actual baseline commit, candidate, exact fixtures, controls, thresholds and stop conditions. The bounded native panel now has its own frozen spec, ordinary IC controls and matched rho arms, linked in the execution report. A calibrated complete-cost winning IC baseline has not been established by these runs. PR #2368 remains prior work, not automatically the baseline.
+
+For a stage comparison, report baseline_cost / candidate_cost and require a ratio > 1 in the same counted unit with identical verified outputs. Record uncertainty and paired confidence intervals for any admitted wall-time claim. For a pipeline comparison, include setup, construction, encoding, every failed attempt, solving, lifting/projection, deduplication, verification, matrix work and target descent. Report cold one-target cost first, setup and online intervals separately, and the matched rho gap. Apply the 0, 0.1 and 1 GAE pricing band symmetrically.
+
+Full rank must not be assumed attainable. Verify target-row span and scalar recovery against the correct baseline rather than silently changing the stopping rule after a rank deficit.
+
+| Evidence level | What it permits | What remains open |
+| --- | --- | --- |
+| Working formula / literature pointer | A stated proof obligation and candidate design | Faithful formalization, identity certificate, implementation |
+| Exact toy replay | Correctness on the frozen finite population | General proof, growing-size behavior, NIST applicability |
+| Verified solver-stage improvement | A stage cost reduction on matched inputs | Complete IC pipeline cost |
+| Verified cold pipeline improvement | IC improvement on the measured family and sizes | Broader scaling and standard-curve conclusions |
+| Missing or inconsistent costs | An implementation gap or unresolved comparison | No unqualified speed or security claim |
+
+## Execution and closeout
+
+- [x] Routes 1–3, their dependency structure, source pointers and unresolved obligations recorded.
+- [x] Three blocked backlog cards and a shared problem record linked.
+- [x] Bounded native drivers, resource limits and independent order/solver checks implemented; unsupported cases retained.
+- [x] Route design protocols committed and hashed; E00 source/protocol frozen before its arithmetic run.
+- [ ] Route fixture/cost protocols admitted; actual executable route code pinned to a merged commit.
+- [ ] Backlog cards reviewed and promoted to ready; lab location and funding approved under the backlog protocol.
+- [x] Proof map, nine explicit Lean theorems and polynomial identity certificates attached; concrete map bridges remain open.
+- [ ] Matched native runs and independent replays completed; null results, failures and OOMs preserved.
+- [x] Experiment-program and E00 reports, editable dependency diagram and PDFs delivered.
+- [x] Bounded route reports and native/CAS comparisons delivered; broader grids, complete cost and applicable signature reference remain open.
+- [ ] Only verified results promoted through the repository validation gate; affected canonical views regenerated when required.
+
+Bounded curve, solver, transfer and native IC panels have now run in this PR.
+All 1,704 verified native records replay identically on the same host; the 216
+empty-base errors and failed earlier attempts remain recorded. Sixty-five new
+canonical models and their aliases were registered. No eligible calibrated
+result is supplied for leaderboard/frontier promotion. The full campaign is
+partial; no remote job or scheduled follow-up is running.
+
+## Sources and existing work
+
+- [Semaev, summation polynomials, ePrint 2004/031](https://eprint.iacr.org/2004/031).
+- [Faugere–Huot–Joux–Renault–Vitse, symmetrized summation polynomials, EUROCRYPT 2014](https://www.iacr.org/archive/eurocrypt2014/84410158/84410158.pdf). Torsion assumptions must be checked; this is not a NIST speedup.
+- [Joux–Vitse, cover and decomposition, ePrint 2011/020](https://eprint.iacr.org/2011/020). Its extension-field setting does not establish a prime-field result.
+- [Broker–Howe–Lauter–Stevenhagen, genus-2 constructions](https://arxiv.org/abs/1403.6911). Gluing is prior art, not novelty claimed here.
+- [NIST SP 800-186](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf), prime-field P-curve domain parameters.
+- [Prior mixed-twist PR #2368](https://github.com/aburan28/crypto/pull/2368), [report at its recorded head](https://github.com/aburan28/crypto/blob/f854eee7dde9f429d78590cd6e5ff015ac20d3f6/research/twist_index_calculus_20261020/MIXED_REPORT.md): unmerged prior work, not independently rerun here.
+- [Factor-base notes](RESEARCH_INDEX_CALCULUS_FACTOR_BASE.md), [symmetrized Semaev notes](RESEARCH_SYMMETRIZED_SEMAEV.md), [cover/decomposition ledger](RESEARCH_COVER_DECOMPOSITION_LEDGER.md).
+
+## 2026-10-21: expanded experimental program
+
+The follow-up request to pursue all angles is tracked in the [18-experiment program](../../twist_routes_1_3_20261021/EXPERIMENTS.md) and [machine matrix](../../twist_routes_1_3_20261021/experiments.json). The three cards now contain hashed design protocols. E00 has a native polynomial-preflight implementation; its receipts distinguish arithmetic checks from a group/cover/solver result. At the initial design/preflight date E01–E17 were unperformed. Their subsequent bounded native execution and conditional ingress checks are now recorded in the execution report below; full original criteria remain open. The dependency diagram and PDF accompany the program. Broader construction, equivalent-system, cost and independent-replay obligations remain open.
+
+The [E00 arithmetic result](../../twist_routes_1_3_20261021/reports/RESULTS.md) now records five matching coefficient expansions/evaluated certificates, rejection of five false variants and 22 supporting tests. This does not discharge M1/M2 group proofs, M3 exceptional charts, M4 cover hypotheses, M5 solver equivalence, or any measured improvement.
+
+## 2026-10-22 bounded execution
+
+The [result report](../../twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md) records 1,920 native IC/rho executions (1,704 verified and exactly replayed, 216 empty-base cells), ten class transfers, three explicit isogenies and all three algebraic duals, rational-height controls, and the retained invalid/resource-limited attempts. Three positive three-gluing module cases still lack quotient/polarization/maps. Full-cost accounting/calibration, broader solver grids and independent-host replay remain open. The original route acceptance criteria are retained.
+
+## 2026-10-22 follow-up proposals
+
+The request to keep proposing experiments is tracked in
+[E18–E29](../../twist_routes_1_3_20261021/proposals-20261022/README.md), its
+[machine matrix](../../twist_routes_1_3_20261021/proposals-20261022/experiments.json)
+and [diagram/PDF](../../twist_routes_1_3_20261021/proposals-20261022/REPORT.pdf).
+All twelve are proposed, blocked and unfunded, with separate backlog cards;
+none has run or been scheduled. Original E00–E17 requirements remain open
+where the bounded results did not satisfy them.
+
+The new scientific tests are actual torsion/pairing and indecomposable
+3-gluing certificates for the three positive toys and public P-521 (E18/E19),
+other small gluing primes (E20), predicates coupling the Frobenius components
+(E21), projected additive structure (E22), and general-helper partial-relation
+elimination (E23). E24/E29 close independent class-map and concrete proof
+bridges. E25/E27 close applicable signature-reference and complete-cost gaps;
+E26/E28 test block elimination and a frozen heldout selector. Every design
+states finite inputs, controls, outputs, resource caps and a decision rule.
+No novelty, new group relation or calibrated speedup is asserted.
+
+### 2026-10-27 — twist torsion supplies verified relation-preserving isogenies
+
+[Executed v8](../../twist_routes_1_3_20261021/reports/kernel-relations-20261027/RESULTS.md):
+all8 cyclic7-kernels from the public p827 twist's C7×C119 group define rational
+source degree7 isogenies. Maps, duals, infinity/poles, all rational points and
+16 generic compositions pass native and independent PARI checks. This is a
+concrete scalar-preserving connection through standard isogeny theory, not
+mixed rational curve/twist relation harvesting. All576 signed query sets and
+18 matrices preserve same-base information exactly.
+
+Ordinary base40 rows/rank9 recovers37; twist progression66 rows/rank8 does not
+fix the target. [Separate unchanged-matrix nullspace check](../../twist_routes_1_3_20261021/reports/relation-rank-20261027/RESULTS.md)
+verifies9 identifiable and9 ambiguous systems, preserving an initial failed
+GP attempt and its explicit field-preload correction. Four conditional Lean
+group implications pass; concrete curve/map bridges, charged solving advantage,
+NIST route and original full campaigns remain open. No performance row moves.
+
+### 2026-10-27 — degree17 source endomorphism verified
+
+[Executed v10](../../twist_routes_1_3_20261021/reports/endomorphism-20261027/RESULTS.md)
+constructs alpha=(pi+[1])/[7] from the twist17-kernel[7]H. Native/PARI generic
+identities verify both norm compositions with1-alpha and the Frobenius relation.
+The map acts as353 on all823 source points, inverse415; on all833 twist points
+it has kernel17/image49. Its source scalar-action order is274. This is an
+explicit twist-derived generator connection by known endomorphism theory,
+with no claimed unknown-log, cheap folding, novelty or IC/NIST speed advantage.
+Three conditional Lean lemmas pass; concrete formal bridges and costs stay open.
+
+### 2026-10-28 — exact action cycles through all eight kernels
+
+[Executed v11](../../twist_routes_1_3_20261021/reports/kernel-symmetry-20261028/RESULTS.md)
+independently recovers matrix[[3,1],[5,5]] overF7 from actual degree17 map
+evaluations on the unchanged archived twist seven-torsion basis. All49 images,
+2401 sums and eight direct kernel-root matches agree in native Rust/PARI.
+The48 nonzero points form one cycle; the eight lines form the cycle
+0→4→7→5→2→3→1→6→0. The eighth power is scalar3 on this module.
+Four finite companion-module Lean theorems pass fresh audit; concrete curve
+bridges remain open. This is exact finite symmetry; induced quotient maps
+and charged relation-solving benefit remain unmeasured. No performance row moves.
+
+### 2026-10-28 — explicit maps between the quotient models
+
+[Executed quotient cycle](../../twist_routes_1_3_20261021/reports/quotient-cycle-20261028/RESULTS.md)
+constructs all8 degree17 maps beta_i:E_i→E_M(i), with generic identities
+beta_i psi_i=psi_M(i) alpha and all6584 rational/136 kernel checks. Native and
+independent GP agree after a pre-data variable-name-only correction; the
+original reserved-Pi failure remains with its failed export. The successor
+reuses the single native run, giving3actual processes across both exports.
+Two abstract Lean quotient lemmas pass;83canonical model records/34extensions
+check, and24generator-bound EC1 records retain changed endpoints. Standard
+theory supplies executable routes; charged solving/novelty/NIST benefit remain open.
+
+### 2026-10-28 — matched endomorphism equations repair some target fibers
+
+[Executed v14](../../twist_routes_1_3_20261021/reports/rank-repair-20261028/RESULTS.md)
+retains all42 fixed base configurations and252 planned matrix cases.29 bases
+fill/13 underfill;174 matrices are analyzed and78 fill-rule exclusions remain
+explicit. All bases/map edges/witnesses/equations/ranks/complete kernels and
+target projections pass native Rust and independent GP.114 cells fix the one
+public toy target;60 are ambiguous. Known alpha equations newly fix14 cases,
+including ordinary bases; the archived B8 twist base remains ambiguous.
+Rank-deficient systems can still fix the target. Two generic affine-kernel
+Lean theorems pass fresh audit; concrete bridge open. Complete cold costs,
+larger heldouts and original campaigns remain open; no cost row changes.

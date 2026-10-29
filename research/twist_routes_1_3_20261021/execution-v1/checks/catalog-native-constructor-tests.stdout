@@ -1,0 +1,48 @@
+
+running 11 tests
+test tests::all_f8_models_and_cover_points ... ok
+test tests::all_small_prime_models_and_cover_points ... ok
+test tests::cover_graph_is_content_addressed_and_rejects_wrong_ec1_binding ... ok
+test tests::all_small_model_changes_have_rational_inverses ... ok
+test tests::rabin_counts_the_irreducible_polynomials ... ok
+test tests::rejects_invalid_fields_singular_models_and_noncanonical_coefficients ... ok
+test tests::rejects_tampered_certificates ... ok
+test tests::unknown_is_not_no_cover_and_identities_are_bound ... ok
+test tests::all_gf25_models_and_cover_points ... ok
+test tests::larger_extension_models_verify ... ok
+test tests::entire_catalog_replays_deterministically ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.26s
+
+
+running 13 tests
+test tests::construction_rejects_unknown_model_fields ... ok
+test tests::construction_has_separate_verified_claims ... ok
+test tests::catalog_producer_digest_covers_checker_models_and_wrapper ... ok
+test tests::exact_fixed_f8_receipt_marks_arbitrary_pushforward_as_library_only ... ok
+test tests::malformed_divisor_is_rejected_before_arithmetic ... ok
+test tests::extension_cover_reaches_verified_construction_and_structured_arithmetic_boundary ... ok
+test tests::non_fixture_binary_receipt_keeps_arbitrary_pushforward_unsupported ... ok
+test tests::normalized_montgomery_cover_reaches_verified_construction ... ok
+test tests::odd_one_infinity_branch_divisor_is_supported_separately ... ok
+test tests::prime_cover_arithmetic_is_structured_unsupported ... ok
+test tests::zero_prime_modulus_is_a_structured_error_not_a_panic ... ok
+test tests::every_current_catalog_model_reaches_the_standalone_constructor ... FAILED
+test tests::every_binary_ec1_generator_has_checked_typed_transfer_hypotheses ... ok
+
+failures:
+
+---- tests::every_current_catalog_model_reaches_the_standalone_constructor stdout ----
+
+thread 'tests::every_current_catalog_model_reaches_the_standalone_constructor' panicked at src/bin/hyperelliptic_cover.rs:985:9:
+assertion `left == right` failed
+  left: 2637
+ right: 2572
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::every_current_catalog_model_reaches_the_standalone_constructor
+
+test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.13s
+

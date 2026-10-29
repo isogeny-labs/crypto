@@ -1,0 +1,213 @@
+# Bounded execution of twist routes 1–3
+
+Runs: 2026-10-21–22. PR: [#2380](https://github.com/aburan28/crypto/pull/2380).
+
+The bounded panels produced executable trace, cover, divisor-class, equivalent-system,
+isogeny and rational-lift checks. The combined native IC panel recorded **1,920
+executions: 1,704 verified logarithms and 216 empty-base errors**. All 1,704
+verified records reproduced exactly in the native audit. **A calibrated IC
+speedup, a novel algorithm and a NIST-size benefit are not established.**
+
+The original eighteen-experiment program remains broader than these executions.
+Three-gluing construction, complete higher-degree divisor factorization, broader
+solver grids, full accounting/calibration and independent-host replay remain
+open. These are explicit partial results, not a completed full campaign.
+
+## Inputs and execution
+
+The [frozen manifest](../execution-v1/fixtures.json) contains two structural
+models, eight public-seeded A=-3 ordinary prime-order ladder models at field
+sizes 8, 10, 12 and 14 bits, and three even/composite controls. It records exact
+orders, generators, quadratic/cubic/sextic fields, tower conversions and rejected
+ladder candidates. Its SHA-256 is
+`8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed`.
+The canonical Rust identity constructor independently checked all 67 manifest
+models, including existing entries, against the registry and alias map. The
+registry gained 65 models; 34 of them are extension models.
+
+All experiments used native Rust or native PARI/GP, Singular and msolve on the
+same Debian 13 x86_64 managed host. The host has a four-CPU quota and 16 GiB
+memory limit. Individual CAS limits and source/input freezes are in the
+versioned protocols and [execution receipts](../execution-v1/). Runs are L0.
+No wall-clock comparison is admitted. NIST P-192/P-224/P-256/P-384/P-521 appear
+only in public-parameter applicability checks; no NIST DLP was executed.
+
+## Recorded results
+
+- **Trace and rational-only controls:** nine exhaustive quadratic-extension
+  censuses and 30 exact quartic/extension witness-set comparisons passed. For
+  `icv1-fp6-tm7-fc20da94`, the 3,551 extension points give 67 trace images,
+  with 53 lifts per trace. Repeated lifts do not become independent rows.
+  There are 1,179 configured relation-census rows: 678 verified and 501
+  unsupported empty/undersized bases; identical bases are explicitly reused.
+- **Covers and transfer:** exhaustive search of 27,140 translate parameters on
+  ten fixtures found 11 actual twist complements, with at least one per
+  fixture. Matching j or opposite trace alone was rejected. All ten selected
+  covers passed executable pullback/norm tests, including all 3,551 rational
+  classes on the smallest Jacobian and 256 sampled classes on each larger
+  fixture: 5,855 classes total, plus 1,280 additivity/associativity samples.
+  PARI independently reproduced all ten characteristic polynomials.
+- **Three-gluing module filter:** a separately frozen PARI calculation on the
+  public orders reproduces all ten toy E11 counts. Of the five NIST P-curves,
+  only P-521 passes, with four determinant-minus-one anti-intertwiners over F3.
+  P-192, P-224, P-256 and P-384 have zero. This necessary companion-module
+  test supplies a construction candidate; the actual torsion/pairing bridge,
+  polarized quotient, genus-two curve and divisor maps remain open. See the
+  [raw result](../execution-v1/runs/public3-20261022T0132Z/pari.stdout) and
+  [report](execution-20261022T0032Z/public3-20261022T0132Z/REPORT.pdf).
+- **Low-degree isogenies:** of 30 degree/fixture cells, three degree-seven maps
+  were constructed and 27 cells failed the stated applicability filters.
+  The first run supplied two algebraic duals. A separately frozen amendment
+  also samples independent torsion with a repeated eigenvalue and requires a
+  nonzero forward image. The new run supplies all three explicit duals;
+  composition [7] is checked on every rational source point, with 24 scalar
+  return controls. The finite lookup inverses remain separate toy controls.
+- **Rational lifts:** 254 standard-model-height searches found points in 25
+  cases and three-term relations in five. The separate equal-original-height
+  control found points in 76 cases and triples in seven. Square-parameter
+  reductions and every projected relation passed the identical-base ordinary
+  group census. No projected row lies outside that census. One rank interval
+  remains unresolved; these are not certified full Mordell-Weil bases.
+- **Conditional pairing control:** a separate registered supersingular model
+  with r=11 and embedding degree two passed ten native Miller/bilinearity and
+  independent PARI/source-log checks. This is a deliberately known-scalar
+  positive control, with no ordinary/NIST transfer or speed claim.
+
+These equivalence checks validate the implementations and remove duplicate or
+incorrect projection explanations. They do not measure whether an auxiliary
+family could find the same useful rational relations more cheaply.
+
+## Solver attempts and limits
+
+Each attempt contains the same 1,930 configured cells: ten fixtures, eight
+public target seeds, arities 2–4, product/chain/Boolean-index/first-pair-symmetric
+encodings, grevlex/lex and ten A/A cells. The 240 distinct projected-set tests
+pass in each attempt; repetitions are not additional independent instances.
+
+| Attempt | Native complete in joined records | Singular dimensions | msolve q0 bases | Interpretation |
+|:--|--:|--:|--:|:--|
+| V1 | 558 | 0 accepted | 0 | External input invalid: Unicode operators; 458 cell execution/parsing errors retained |
+| V2 | 731 | 970 | 0 | ASCII fixed; 768 MiB address cap crashes msolve on a tiny valid input |
+| V3 | 730 | 968 | 1,096 | Same cells at 4 GiB per engine; bounded native/q0/ideal checks only |
+
+V3 verifies 866 native and 940 msolve-q0 ideal equalities through independent
+Singular reductions. An ideal equality does not certify that a truncated basis
+is a complete Gröbner basis. Timeouts, missing outputs and unresolved calls
+remain incomplete. The one-second hard child limit and native 500 ms
+cooperative limit prevent interpreting completion-count differences as speed
+ratios across attempts.
+
+The installed msolve signature mode rejects these nonhomogeneous inputs; a
+retained diagnostic also reports its different working characteristic. It
+supplies no admissible same-field signature baseline. Magma is unavailable.
+Kernel multiplication counts do not price complete solver cost. B=12/16 and
+the other projected-base families remain outside this initial solver panel.
+
+## Combined native IC panel
+
+[Spec](../E15_SPEC_V1.json), [protocol](../PIPELINE_PROTOCOL_V1.md),
+[raw session](../execution-v1/runs/ecbench-20261022T0012Z/),
+[run report](execution-20261022T0032Z/ecbench-20261022T0012Z/REPORT.pdf).
+
+There are eight public one-target workloads per curve, 24 arms, one L0 round
+and zero warmup. The panel includes all eight trace/cover/symmetry combinations,
+four identical-base blocked-MITM controls, nine ordinary IC configurations
+(three sizes by three oracles), matched negation rho, frozen rho and an A/A
+rho control. Every supported cell returned the correct logarithm. The 216
+errors are the empty trace/cover intersection on nine curves, repeated across
+the two solver arms and their same-base control. They remain in the attempt
+ledger and are not zero-cost successful solves.
+
+The [native audit](../execution-v1/logs/E15-audit-v1.json) passed for all 1,920
+records, reproducing all 1,704 verified records with zero problems. Its SHA-256
+is `64da13d34c144d2a6d05d13d1a1208ca75684683608eecaa0f0d76fc9b3961cb`.
+This is same-host replay.
+
+The adapters rebuild the base and discover the cover for each cold target.
+Signed lifting and verification use the counted curve law. Construction,
+reference-arithmetic calls, F4 multiplications, symbolic terms and root
+extraction remain explicit unpriced units. Reference-arithmetic calls are
+high-level units, not complete primitive-field or instruction counts.
+
+The [boundary/pricing table](execution-20261022T0032Z/ecbench-20261022T0012Z/BOUNDARY_PRICING.csv)
+gives every curve/arm's S, generic negation floor, matched rho ratios and equal
+0/0.1/1 GAE sensitivity treatment. The following are candidate/control ratios
+over 80 paired workloads; their scope is a sensitivity model, not measured
+complete cost.
+
+| Trace | Cover | Symmetry | At 0 GAE/native unit | At 0.1 | At 1 |
+|--:|--:|--:|--:|--:|--:|
+| 0 | 0 | 0 | 0.917 | 83.741 | 505.962 |
+| 0 | 0 | 1 | 7.828 | 32.756 | 159.835 |
+| 0 | 1 | 0 | 0.987 | 19.828 | 35.753 |
+| 0 | 1 | 1 | 7.094 | 9.470 | 11.479 |
+| 1 | 0 | 0 | 0.918 | 61.211 | 170.195 |
+| 1 | 0 | 1 | 7.394 | 23.951 | 53.878 |
+
+The trace+cover rows have only eight supported workloads and cannot be ranked
+as complete 80-workload comparisons. Every arm's recorded unpriced counter has
+a count. The ordering changes within the pricing band for the apparent
+lower-bound reductions, so no IC advantage is admitted. The native tool's
+wall-admission label under a requested L0 minimum is excluded by the stricter
+experiment protocol; its wall output is diagnostic only.
+
+![Recorded-count sensitivity; no calibrated speed ranking.](execution-20261022T0032Z/SENSITIVITY.pdf)
+
+## Formal checks and validation
+
+The [proof map](../lean/README.md) pins Lean 4.34.1 and Mathlib. Five exact
+cleared polynomial identities and four conditional trace/eigenspace statements
+on Mathlib's actual Weierstrass point group build successfully. The repository
+auditor checks 13 declarations, including four generated defining equations:
+zero failures, zero compiler-trusted proofs, standard foundations only.
+
+The concrete finite-field Frobenius/twist embedding, odd subgroup,
+field/tower/chart/Jacobian maps and cost/complexity bridges remain formally
+open. The GP characteristic-polynomial check does not independently replay
+arbitrary-divisor norm code. None of these gaps is replaced with an axiom.
+
+The final root library suite passed **4,479 tests**, with zero failures and
+119 existing ignored tests, including the new scalar-Frobenius regression.
+The standalone suite passed 128 supporting tests;
+the repeated-eigenvalue amendment additionally executes every-point dual and
+scalar-return checks. Earlier sparse-fixture/socket failures, the stale
+1,324-model roster assertion and invalid CAS/printing attempts are retained.
+The roster now expects 1,358 extension models, preserving every per-model
+field/subgroup check. The three backlog cards validate and remain blocked for
+the full campaign's unmet criteria. Conductor was unavailable locally.
+
+## Requirement status
+
+| ID | Bounded execution | Remaining original requirement |
+|:--|:--|:--|
+| E00 | Five identities and false controls; five Lean polynomial proofs | Group/map bridges are separate |
+| E01 | Nine exhaustive trace/fiber controls | General formal Frobenius/twist bridge |
+| E02 | Coordinate/slope/norm restrictions executed | Full larger-field norm-y/power families |
+| E03 | 30 exact rational-quartic witness comparisons | Cost comparison beyond equivalence |
+| E04 | Norm controls and projected bases | Complete larger-field fibers and full costing |
+| E05 | Two sparse-function/divisor controls | Unsplit degree-three/four factors and broader divisors |
+| E06 | 1,179 configured finite-base census rows | Broad timed/count-priced decomposition comparison |
+| E07 | 240 distinct projection cells, exceptional branches retained | B=12/16 and other base families |
+| E08 | Three preserved 1,930-cell bounded attempts | Applicable signature/F5 reference, broader grid and full solver cost |
+| E09 | Three translated two-torsion controls per fixture | General proof bridge |
+| E10 | Exhaustive declared cover-family search on ten fixtures | No universal cover classification claimed |
+| E11 | Toy filters plus five NIST module filters; P-521 passes | Positive module cases still need torsion bridges, quotients and polarization/maps |
+| E12 | Ten class-transfer checks, 5,855 classes and independent orders | Faithful formal/CAS arbitrary-class bridge and independent host |
+| E13 | Declared low-height image controls | Jacobian decomposition solver and useful-row full cost |
+| E14 | Three explicit maps and three verified duals in V2 | Complete IC cost/representation comparison |
+| E15 | 1,920 records; 1,704 verified and exactly replayed | Calibrated complete cost, broader factorial and independent host |
+| E16 | Fifteen public-parameter checks; known positive pairing control | No applicable NIST transfer supplied |
+| E17 | Integral, standard-height and equal-original-height searches | One rank interval, general target lifting and full discovery cost |
+
+The [run reports](execution-20261022T0032Z/) include each failed attempt,
+editable quantitative figures and PDFs. Large raw solver trees are losslessly
+packaged as deterministic split archives; PARI scripts/stdout/stderr have raw
+archives and member hashes. Original committed evidence is preserved.
+
+Canonical leaderboard, frontier, progress plots and benchmark result rows were
+checked for impact and left unchanged: this PR supplies no eligible calibrated
+result for promotion. The curve registry, alias mirror, native catalog views
+and browser were refreshed. The supersingular pairing-control extension exposed
+a zero-discriminant trait bug; the fix marks quadratic CM/volcano data
+inapplicable and has a regression test. No
+remote lease, funded campaign or follow-on job remains running.

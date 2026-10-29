@@ -1,0 +1,328 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-endo-symmetry-v1",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v10",
+  "question": "Does full rational twist7-torsion yield the explicit degree17 source endomorphism (pi+1)/7, with generic identities and scalar action353?",
+  "claims": [
+    {
+      "id": "endomorphism",
+      "text": "Exact degree17 map, conjugate norm and Frobenius-plus-one identities are checked generically.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scalar",
+      "text": "All823 source points have action353/inverse415; all833 twist points map to7-torsion, with kernel17/image49.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "Known endomorphism theory and scalar action are not unknown-log recovery, orbit-folding speed, IC improvement, novelty or a NIST result.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Native exact rational-function construction, conjugate/norm/Frobenius composition identities and full source/twist finite census.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-endo-symmetry"
+          ]
+        ],
+        "binary_sha256": "7b418e9571f0a90ee87578e44d1053363c2efd486306361450c5088e2c6603ae",
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent GP ellisogeny map, generic group arithmetic and complete source/twist scalar/image replay.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact complete finite count, no performance or sampling inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded known source/dual norm identities and independent group checks; separate F101 generic[17] control."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Wrong scalar354 must fail on all822 nonidentity points; no separate measured control arm."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "finite input group",
+        "levels": [
+          "source823",
+          "rational twist833"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Frozen native exact field/rational-function/map core and GP engine; one public fixed curve.",
+        "how": "Record source/binary hashes before data; reopen raw hashes."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Kernel[7]H from fixed maximal-orderH=(2,386); fixed inverse7 scaling; no output-dependent sign or map selection.",
+        "how": "Exhaustive same-base signed witness equality and exact rank/recovery; all exceptional kernel/infinity cases checked."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Same local L0 managed host; no native clock or cost admitted.",
+        "how": "Record CPU/kernel/hypervisor; no time comparison."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Shared author and host, deterministic exact equality only.",
+        "how": "Shared author/host; independent CAS map/group/linear algebra, exact native replay and conditional Lean group implication."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "Exact map/curve identity, both generic norm compositions and Frobenius relation; all823+833 point checks and scalar order match, with every negative control rejected."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native producer then independent CAS exact verification; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic fixed input panel and exhaustive shifts; seed field zero is metadata only."
+    },
+    "instance_sampling": {
+      "rule": "One public p827 curve and fixed17-kernel; complete native and CAS point sets. Post-v8/v9 hypothesis motivation is disclosed.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact complete finite counts and necessary-factor checks, not statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1200,
+      "measured_on": "Unmeasured prospective caps:300s producer,300s CAS,300s native audit plus metadata allowance. Not an observed performance result."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "source-points",
+        "name": "Verified source scalar action",
+        "unit": "source rational points",
+        "kind": "exact",
+        "definition": "All823 points including identity;action353 and inverse415 checked.",
+        "source": "ADMISSION.json source_rational_checks",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "source points",
+      "twist points",
+      "generic composition identities",
+      "kernel/image counts",
+      "scalar multiplicative order"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 1200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "One fixed17-kernel; all generic identities and all finite checks required. Preserve errors or300s caps; never drop Frobenius identity.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Certify the concrete twist-derived source endomorphism and exact scalar action. No cost or unknown-log inference.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Generic rational-function equality and exhaustive finite point/counter equality.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact endomorphism and scalar-action identities, not speed.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/endo_experiment_20261027.rs",
+      "sha256": "c440677a3b8e9f1387b23d31a50fdb26fb6b087d88266724602ff55d4f5a7425"
+    },
+    "inputs": [
+      "fixed public p827 source/twist and maximal seed from verified v7",
+      "versioned v8 core snapshot",
+      "actual native/GP outputs and receipt hashes"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded degree,kernel,image and group-point counts; scalar-orbit order is descriptive, not an attack cost."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/endomorphism-20261027"
+  },
+  "inadmissible": [
+    "Calling standard isogeny theory novel",
+    "Calling same-base transported rows new independent information",
+    "Claiming a solver speedup without charged costs and strongest matched controls",
+    "Inferring a NIST route from this public p827 example",
+    "Closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v10/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Primary MIT18.783 Lecture5 and13, known-isogeny-loop report and GLV atlas lead read before implementation.",
+      "verified_by": "Successful primary PDF access and explicit standard-theory/scope review."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "1bfb4a24bf342ec370dfaa59b861449fd7b59c422effd85def05139f47df5523",
+    "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1",
+    "frozen_at": "2026-10-27T15:17:27Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorization and documented EKS access/image fallback; bounded local L0 only, no paid resource."
+  }
+}

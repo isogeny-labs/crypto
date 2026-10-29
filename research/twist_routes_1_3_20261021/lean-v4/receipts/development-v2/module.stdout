@@ -1,0 +1,15 @@
+TwistShiftOverlap.lean:38:21: error: Application type mismatch: The argument
+  χ
+has type
+  ι → ℤ
+but is expected to have type
+  Finset ι
+in the application
+  Equiv.Perm.sum_comp σ χ
+TwistShiftOverlap.lean:36:51: error: unsolved goals
+ι : Type u_1
+inst✝ : Fintype ι
+χ : ι → ℤ
+σ : Equiv.Perm ι
+hχ : ∀ (i : ι), χ i = 1 ∨ χ i = -1
+⊢ ∑ x, 1 - ∑ x, χ x + ∑ x, χ (σ x) - ∑ x, χ x * χ (σ x) = ↑(Fintype.card ι) - ∑ x, χ x * χ (σ x)

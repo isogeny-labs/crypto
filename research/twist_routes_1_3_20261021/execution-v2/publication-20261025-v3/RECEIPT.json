@@ -1,0 +1,51 @@
+{
+  "schema": "twist.store-publication/v1",
+  "started_utc": "2026-10-25T01:04:25.896Z",
+  "remote": "s3://crypto-autoresearcher/store",
+  "name": "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
+  "sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+  "bytes": 38156064,
+  "uploader_binary_sha256": "ba2e6347f619988ed68075d7bacb242044221f67557ee18977ee9c4458d67b44",
+  "aws_binary_sha256": "84958b12b8c1d794ba565acec08444cba19704e3e484d38eb45c60c51772460d",
+  "inherited_uploader_binary": true,
+  "script_sha256": "7c1859fc6e5cdeca63c717fb4be86e97cbb984beb3a08ee3db8429175370da2f",
+  "original_source_revision": "07fbf5a8fe586302908abcfbb395786de2f11b1f",
+  "credentials_persisted": false,
+  "credential_values_in_receipts": false,
+  "scientific_results_changed": false,
+  "performance_claim": false,
+  "steps": [
+    {
+      "label": "conditional-put",
+      "argv": [
+        "/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws",
+        "s3api",
+        "put-object",
+        "--bucket",
+        "crypto-autoresearcher",
+        "--key",
+        "store/sha256/6f/6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+        "--body",
+        "/workspace/shared/twist-artifacts-20261023/runs.tar.xz",
+        "--if-none-match",
+        "*",
+        "--checksum-algorithm",
+        "SHA256",
+        "--checksum-sha256",
+        "b7DeLPmtXCuazRcDNyVgVQQz2nwJX19CICEAq6Me8Wc=",
+        "--output",
+        "json"
+      ],
+      "started_utc": "2026-10-25T01:04:33.453Z",
+      "finished_utc": "2026-10-25T01:04:37.582Z",
+      "exit_code": 254,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "90f4ee4105320295c37ac3d1215d07e91beed5fd0ea7e1fac82e5cd60f72ad95",
+      "outputs_redacted_before_persistence": true
+    }
+  ],
+  "status": "publication-incomplete",
+  "error": "Error: conditional-put failed: aws: [ERROR]: An error occurred (AccessDenied) when calling the PutObject operation (reached max retries: 1): Access Denied",
+  "finished_utc": "2026-10-25T01:04:37.583Z"
+}

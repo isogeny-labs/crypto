@@ -1,0 +1,53 @@
+{
+  "schema": "twist.followup-run/v1",
+  "command": "adjudicate-cas",
+  "fixture_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "rows": [
+    {
+      "schema": "twist.native-cas-adjudication/v1",
+      "log_prefix": "research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-replay/gp",
+      "transport_metadata": {
+        "schema": "twist.cas-transport/v1",
+        "tool_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "argv": [
+          "/workspace/shared/twist-tools-20261023/cas/root/usr/bin/gp",
+          "-f",
+          "-q",
+          "research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-v1/extracted/runs/incidence-20261023-v1/verify.gp"
+        ],
+        "script_sha256": "212da9151cb020063034425c3bc58071c430fe666ef6292ac0301f3f3a0f8e86",
+        "started_utc": "2026-10-25T03:06:48Z",
+        "finished_utc": "2026-10-25T03:06:48Z",
+        "exit_code": 0,
+        "timeout_s": 600,
+        "address_space_kib": 4194304,
+        "threads": 1,
+        "isolation": "L0",
+        "wall_time_admitted": false,
+        "stdout_sha256": "50abfee8c78260df7a93b775d4b377e16d50d5a041fb8f39800feb794e8708b2",
+        "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+        "source_revision": "644f1dbef70c5935db211a7d3a70ec7bb0601336",
+        "native_adjudicator_binary_sha256": "00e9af12393c5dd6f82456e42ee3e7de822a3418a34fb7f69baed8f2c1155734",
+        "historical_input_byte_identity": true,
+        "historical_tool_byte_identity": true,
+        "frozen_protocol": "research/twist_routes_1_3_20261021/execution-v2/INCIDENCE_PROTOCOL_V1.md",
+        "replayer_sha256": "1a2dee9e3d5cb7cb7aa6b7cb5deaa6c3fa1d31c3c4790eb6f3996f4742d74be5",
+        "scientific_acceptance": "requires-native-adjudication",
+        "fresh_targets_generated": false,
+        "performance_claim": false,
+        "independent_host_replay": false
+      },
+      "completion_marker_present": true,
+      "raw_hashes_match": true,
+      "script_hash_matches": true,
+      "allowed_stack_warning_present": true,
+      "unaccepted_error_lines": [],
+      "accepted": true,
+      "status": "accepted-native-checked-CAS-replay",
+      "scope": "The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."
+    }
+  ],
+  "performance_claim": false,
+  "novelty_established": false,
+  "independent_host_replay": false
+}

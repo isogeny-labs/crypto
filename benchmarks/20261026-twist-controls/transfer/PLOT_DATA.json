@@ -1,0 +1,51 @@
+{
+  "schema": "twist.recorded-plot-data/v1",
+  "run": "transfer-cost-20261026-v1",
+  "audit_path": "research/twist_routes_1_3_20261021/execution-v3/transfer-cost-audit-20261026-v1/AUDIT.json",
+  "audit_sha256": "dd1f6fee0de4c9975436b8790c636f79fa3a9410326d7f0bae0d812d9564371f",
+  "counts": [
+    {
+      "arm": "source-aa",
+      "requested": 24,
+      "attempted": 24,
+      "accepted": 24
+    },
+    {
+      "arm": "source-bsgs",
+      "requested": 24,
+      "attempted": 24,
+      "accepted": 24
+    },
+    {
+      "arm": "transfer-aa",
+      "requested": 24,
+      "attempted": 24,
+      "accepted": 24
+    },
+    {
+      "arm": "transfer-bsgs",
+      "requested": 24,
+      "attempted": 24,
+      "accepted": 24
+    }
+  ],
+  "distributions": [
+    {
+      "candidate": "transfer-bsgs",
+      "requested_pairs": 24,
+      "accepted_pairs": 24,
+      "fewer_instruction_pairs": 0,
+      "ratio_min": 59.34139101214629,
+      "ratio_median": 111.8263555137982,
+      "ratio_max": 289.80547820363523,
+      "descriptive_only": true,
+      "control": "source-bsgs"
+    }
+  ],
+  "unit": "Callgrind simulated guest instructions Ir",
+  "uncertainty": "Descriptive min/median/max across correlated settings; no confidence intervals or independent-host replication.",
+  "graphs": [
+    "COUNTS",
+    "RATIOS"
+  ]
+}
