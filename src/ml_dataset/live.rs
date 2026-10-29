@@ -273,6 +273,32 @@ struct PreparedSnapshot {
     publish: bool,
 }
 
+fn prepared_identities(request: &HelperRequest, prepared: &PreparedSnapshot) -> Result<(), String> {
+    identity_set(
+        request.profile,
+        &prepared.copied_context,
+        &prepared.acknowledged_context,
+    )?;
+    if request.profile == SnapshotProfile::CheckedPhaseV2 {
+        let mut expected = request
+            .acknowledged_context
+            .clone()
+            .ok_or("missing prior identities")?;
+        expected.extend(prepared.snapshot.context.iter().cloned());
+        if prepared.acknowledged_context.as_ref() != Some(&expected) {
+            return Err(
+                "prepared identities do not match prior identities plus published delta".into(),
+            );
+        }
+        if !prepared.publish
+            && (!prepared.snapshot.context.is_empty() || prepared.snapshot.delta.is_some())
+        {
+            return Err("unpublished checked helper advances context or capture".into());
+        }
+    }
+    Ok(())
+}
+
 /// Executes only artifact copying, integrity checks and bounded store commands.
 pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
     if fs::metadata(request_path).map_err(|e| e.to_string())?.len() > 4 * 1024 * 1024 {
@@ -361,6 +387,7 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
         )?;
         prepared
     };
+    prepared_identities(&request, &prepared)?;
     let mut result = HelperResult {
         schema: helper_schema(request.profile, "snapshot-helper-result"),
         profile: request.profile,

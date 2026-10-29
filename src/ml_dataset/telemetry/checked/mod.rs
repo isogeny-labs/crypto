@@ -115,7 +115,11 @@ pub(crate) fn read(root: &Path, path: &str, max: u64) -> Result<Vec<u8>, String>
 pub(crate) fn policy_present(root: &Path) -> Result<bool, String> {
     match fs::symlink_metadata(root.join(POLICY_PATH)) {
         Ok(_) => {
-            if read(root, POLICY_PATH, 16384)? != POLICY_BYTES {
+            let bytes = read(root, POLICY_PATH, 16384)?;
+            let policy: FixedPolicy = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+            let expected: FixedPolicy =
+                serde_json::from_slice(POLICY_BYTES).map_err(|e| e.to_string())?;
+            if bytes != POLICY_BYTES || policy != expected {
                 return Err("measurement policy differs from fixed bytes".into());
             }
             Ok(true)

@@ -2,6 +2,32 @@
 use crate::ml_dataset::capture::AttemptBinding;
 use serde::{Deserialize, Deserializer, Serialize};
 
+#[derive(Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct FixedPolicy {
+    pub schema: String,
+    pub policy_id: String,
+    pub collector_version: String,
+    pub task_scope: String,
+    pub cycles: String,
+    pub counter_interval: String,
+    pub usage_scope: String,
+    pub estimate_rule: String,
+    pub max_policy_bytes: u64,
+    pub max_start_bytes: u64,
+    pub max_metrics_bytes: u64,
+    pub max_error_preview_bytes: u64,
+    pub max_attempts: u64,
+    pub max_events_per_attempt: u64,
+    pub max_calls_per_event: u64,
+    pub max_context_checks: u64,
+    pub training_cost_eligible: bool,
+    pub whole_worker_coverage_verified: bool,
+    pub hardware_independently_verified: bool,
+    pub platform_admitted: bool,
+    pub clock_valid_for_comparison: bool,
+}
+
 pub fn required_option<'de, D: Deserializer<'de>, T: Deserialize<'de>>(
     d: D,
 ) -> Result<Option<T>, D::Error> {
