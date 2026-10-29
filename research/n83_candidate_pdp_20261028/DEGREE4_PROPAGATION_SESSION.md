@@ -43,3 +43,12 @@ Before protocol freeze, adjusted the shell uploader to drain an active upload
 before the terminal manifest and final upload. The stop marker is retained and
 documented. This avoids overlapping final writers; native source and binary are
 unchanged. Shell syntax passed; no production data existed during the change.
+
+## Protocol frozen before production
+Source57e4f7a928f8a3d9a29c47e3c19c2e8d51d81807 pushed. Protocol identity
+bd04d5cc6828bb5211c701edddbf001f68f806a751e78d69fbfb32185835bee1 frozen
+at18:54:30UTC, before affected data. All12 cases bind the unchanged witness case,
+15 witness files and three immutable parent archives. Schema validation has
+zero findings. Actual caller account104186811093 reverified. Binary remains
+fb961b36271bbef8acce8d5f169eb712be6b4bd385b828dacfcdba9e388463a2.
+Source bundle, checkpoint and production are next; no production outcome exists yet.
