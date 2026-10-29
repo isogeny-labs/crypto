@@ -1,0 +1,120 @@
+=== G1 analysis: 41 (arm,b,inst) cells loaded; bootstrap B = 2000, setrand(31337), instance-level then trial-level, stratified by b ===
+--- 1. solve rates (verified solves / trials) per arm and b, pooled over instances; Wilson 95% on the pooled rate
+n1 b28: 3/3 = 1.000  Wilson [0.438, 1.000]  ( i1:3/3 )
+a0 b24: 160/160 = 1.000  Wilson [0.977, 1.000]  ( i1:80/80 i2:80/80 )
+a0 b28: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:60/60 i2:60/60 )
+a0 b32: 80/80 = 1.000  Wilson [0.954, 1.000]  ( i1:40/40 i2:40/40 )
+a0 b36: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:24/24 i2:24/24 )
+a0 b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+kpure b24: 160/160 = 1.000  Wilson [0.977, 1.000]  ( i1:80/80 i2:80/80 )
+kpure b28: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:60/60 i2:60/60 )
+kpure b32: 80/80 = 1.000  Wilson [0.954, 1.000]  ( i1:40/40 i2:40/40 )
+kpure b36: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:24/24 i2:24/24 )
+kpure b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+kmix b24: 160/160 = 1.000  Wilson [0.977, 1.000]  ( i1:80/80 i2:80/80 )
+kmix b28: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:60/60 i2:60/60 )
+kmix b32: 80/80 = 1.000  Wilson [0.954, 1.000]  ( i1:40/40 i2:40/40 )
+kmix b36: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:24/24 i2:24/24 )
+kmix b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+a1c b24: 160/160 = 1.000  Wilson [0.977, 1.000]  ( i1:80/80 i2:80/80 )
+a1c b28: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:60/60 i2:60/60 )
+a1c b32: 80/80 = 1.000  Wilson [0.954, 1.000]  ( i1:40/40 i2:40/40 )
+a1c b36: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:24/24 i2:24/24 )
+a1c b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+--- 2. positive control PC1 (N1 solves >= 95% pooled at every b = 24..40 and >= 90% on every instance) and PC2 (steps N1/A0 pooled b = 28..40 in [0.71, 0.80])
+PC1 b24: MISSING
+PC1 b28: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 b32: MISSING
+PC1 b36: MISSING
+PC1 b40: MISSING
+PC1 overall: FAIL
+PC2 steps N1/A0 pooled b28-40, all instances (E5+ext): 0.528 [0.338, 0.828]
+PC2 steps N1/A0 pooled b28-40, E5 instances only     : 0.528 [0.338, 0.828]
+PC2 verdict: FAIL
+steps N1/A0 b24: n/a (missing cells)
+steps N1/A0 b28: 0.528 [0.338, 0.828]
+steps N1/A0 b32: n/a (missing cells)
+steps N1/A0 b36: n/a (missing cells)
+steps N1/A0 b40: n/a (missing cells)
+--- 3. negative controls
+--- 4. ratios X/N1 pooled b = 28..40 (geometric mean over instances of per-instance mean-cost ratios; failures censored at the budget).
+     all = E5 instances 1,2 + extension 3,4 (headline); e5 = instances 1,2 only (co-primary).  95% percentile CI, instance-level then trial-level resampling.
+kmix/n1 steps  all: 1.414 [0.912, 2.220]   e5: 1.414 [0.912, 2.220]
+kmix/n1 I/M=3 w0  all: 8.130 [5.242, 12.756]   e5: 8.130 [5.242, 12.756]
+kmix/n1 I/M=3 w0.1(B)  all: 5.876 [3.789, 9.219]   e5: 5.876 [3.789, 9.219]
+kmix/n1 I/M=3 w1(B)  all: 2.436 [1.571, 3.822]   e5: 2.436 [1.571, 3.822]
+kmix/n1 I/M=3 w0.1(A)  all: 8.127 [5.241, 12.751]   e5: 8.127 [5.241, 12.751]
+kmix/n1 I/M=3 w1(A)  all: 8.104 [5.228, 12.707]   e5: 8.104 [5.228, 12.707]
+kmix/n1 I/M=3 w0,S=1.0  all: 8.409 [5.422, 13.194]   e5: 8.409 [5.422, 13.194]
+kmix/n1 I/M=10 w0  all: 4.453 [2.871, 6.987]   e5: 4.453 [2.871, 6.987]
+kmix/n1 I/M=10 w0.1(B)  all: 3.406 [2.196, 5.344]   e5: 3.406 [2.196, 5.344]
+kmix/n1 I/M=10 w1(B)  all: 1.811 [1.168, 2.841]   e5: 1.811 [1.168, 2.841]
+kmix/n1 I/M=10 w0.1(A)  all: 4.452 [2.871, 6.985]   e5: 4.452 [2.871, 6.985]
+kmix/n1 I/M=10 w1(A)  all: 4.441 [2.865, 6.964]   e5: 4.441 [2.865, 6.964]
+kmix/n1 I/M=10 w0,S=1.0  all: 4.640 [2.992, 7.280]   e5: 4.640 [2.992, 7.280]
+kmix/n1 I/M=30 w0  all: 2.587 [1.668, 4.060]   e5: 2.587 [1.668, 4.060]
+kmix/n1 I/M=30 w0.1(B)  all: 2.154 [1.389, 3.380]   e5: 2.154 [1.389, 3.380]
+kmix/n1 I/M=30 w1(B)  all: 1.495 [0.964, 2.346]   e5: 1.495 [0.964, 2.346]
+kmix/n1 I/M=30 w0.1(A)  all: 2.587 [1.668, 4.059]   e5: 2.587 [1.668, 4.059]
+kmix/n1 I/M=30 w1(A)  all: 2.583 [1.666, 4.050]   e5: 2.583 [1.666, 4.050]
+kmix/n1 I/M=30 w0,S=1.0  all: 2.673 [1.723, 4.193]   e5: 2.673 [1.723, 4.193]
+kmix/n1 I/M=100 w0  all: 1.773 [1.143, 2.782]   e5: 1.773 [1.143, 2.782]
+kmix/n1 I/M=100 w0.1(B)  all: 1.608 [1.037, 2.523]   e5: 1.608 [1.037, 2.523]
+kmix/n1 I/M=100 w1(B)  all: 1.357 [0.875, 2.129]   e5: 1.357 [0.875, 2.129]
+kmix/n1 I/M=100 w0.1(A)  all: 1.773 [1.143, 2.781]   e5: 1.773 [1.143, 2.781]
+kmix/n1 I/M=100 w1(A)  all: 1.771 [1.143, 2.778]   e5: 1.771 [1.143, 2.778]
+kmix/n1 I/M=100 w0,S=1.0  all: 1.802 [1.162, 2.827]   e5: 1.802 [1.162, 2.827]
+kpure/n1 steps  all: 1.934 [1.251, 3.053]   e5: 1.934 [1.251, 3.053]
+kpure/n1 I/M=3 w0  all: 11.112 [7.193, 17.573]   e5: 11.112 [7.193, 17.573]
+kpure/n1 I/M=3 w0.1(B)  all: 8.032 [5.199, 12.690]   e5: 8.032 [5.199, 12.690]
+kpure/n1 I/M=3 w1(B)  all: 3.329 [2.155, 5.255]   e5: 3.329 [2.155, 5.255]
+kpure/n1 I/M=3 w0.1(A)  all: 11.108 [7.191, 17.566]   e5: 11.108 [7.191, 17.566]
+kpure/n1 I/M=3 w1(A)  all: 11.075 [7.172, 17.505]   e5: 11.075 [7.172, 17.505]
+kpure/n1 I/M=3 w0,S=1.0  all: 11.493 [7.439, 18.176]   e5: 11.493 [7.439, 18.176]
+kpure/n1 I/M=10 w0  all: 6.087 [3.940, 9.623]   e5: 6.087 [3.940, 9.623]
+kpure/n1 I/M=10 w0.1(B)  all: 4.655 [3.014, 7.354]   e5: 4.655 [3.014, 7.354]
+kpure/n1 I/M=10 w1(B)  all: 2.475 [1.602, 3.907]   e5: 2.475 [1.602, 3.907]
+kpure/n1 I/M=10 w0.1(A)  all: 6.085 [3.939, 9.620]   e5: 6.085 [3.939, 9.620]
+kpure/n1 I/M=10 w1(A)  all: 6.070 [3.931, 9.591]   e5: 6.070 [3.931, 9.591]
+kpure/n1 I/M=10 w0,S=1.0  all: 6.341 [4.105, 10.026]   e5: 6.341 [4.105, 10.026]
+kpure/n1 I/M=30 w0  all: 3.537 [2.289, 5.591]   e5: 3.537 [2.289, 5.591]
+kpure/n1 I/M=30 w0.1(B)  all: 2.944 [1.906, 4.651]   e5: 2.944 [1.906, 4.651]
+kpure/n1 I/M=30 w1(B)  all: 2.043 [1.323, 3.225]   e5: 2.043 [1.323, 3.225]
+kpure/n1 I/M=30 w0.1(A)  all: 3.536 [2.289, 5.590]   e5: 3.536 [2.289, 5.590]
+kpure/n1 I/M=30 w1(A)  all: 3.530 [2.286, 5.577]   e5: 3.530 [2.286, 5.577]
+kpure/n1 I/M=30 w0,S=1.0  all: 3.653 [2.364, 5.775]   e5: 3.653 [2.364, 5.775]
+kpure/n1 I/M=100 w0  all: 2.423 [1.568, 3.831]   e5: 2.423 [1.568, 3.831]
+kpure/n1 I/M=100 w0.1(B)  all: 2.198 [1.423, 3.472]   e5: 2.198 [1.423, 3.472]
+kpure/n1 I/M=100 w1(B)  all: 1.855 [1.201, 2.928]   e5: 1.855 [1.201, 2.928]
+kpure/n1 I/M=100 w0.1(A)  all: 2.423 [1.568, 3.830]   e5: 2.423 [1.568, 3.830]
+kpure/n1 I/M=100 w1(A)  all: 2.421 [1.568, 3.825]   e5: 2.421 [1.568, 3.825]
+kpure/n1 I/M=100 w0,S=1.0  all: 2.463 [1.594, 3.893]   e5: 2.463 [1.594, 3.893]
+--- 4b. reference: steps X/A0 (the unmatched E5 baseline) and K-mix/N1 per b
+kmix/a0 steps all: 0.786 [0.705, 0.875]
+kpure/a0 steps all: 1.055 [0.937, 1.185]
+kmix/n1 b24 I/M=3 w0: n/a (missing cells)
+kmix/n1 b24 I/M=10 w0: n/a (missing cells)
+kmix/n1 b24 I/M=30 w0: n/a (missing cells)
+kmix/n1 b24 I/M=100 w0: n/a (missing cells)
+kmix/n1 b28 I/M=3 w0: 8.130 [5.242, 12.756]
+kmix/n1 b28 I/M=10 w0: 4.453 [2.871, 6.987]
+kmix/n1 b28 I/M=30 w0: 2.587 [1.668, 4.060]
+kmix/n1 b28 I/M=100 w0: 1.773 [1.143, 2.782]
+kmix/n1 b32 I/M=3 w0: n/a (missing cells)
+kmix/n1 b32 I/M=10 w0: n/a (missing cells)
+kmix/n1 b32 I/M=30 w0: n/a (missing cells)
+kmix/n1 b32 I/M=100 w0: n/a (missing cells)
+kmix/n1 b36 I/M=3 w0: n/a (missing cells)
+kmix/n1 b36 I/M=10 w0: n/a (missing cells)
+kmix/n1 b36 I/M=30 w0: n/a (missing cells)
+kmix/n1 b36 I/M=100 w0: n/a (missing cells)
+kmix/n1 b40 I/M=3 w0: n/a (missing cells)
+kmix/n1 b40 I/M=10 w0: n/a (missing cells)
+kmix/n1 b40 I/M=30 w0: n/a (missing cells)
+kmix/n1 b40 I/M=100 w0: n/a (missing cells)
+--- 4c. counted M, S, I per walk step (sum over all trials with b >= 28 divided by total steps; escapes and conversions included)
+n1: M/step 2.051  S/step 1.034  I/step 1.017  (total steps 31875)
+kmix: M/step 21.498  S/step 11.999  I/step 1.000  (total steps 41524481)
+kpure: M/step 21.505  S/step 12.003  I/step 1.000  (total steps 54570020)
+a0: M/step 2.000  S/step 1.000  I/step 1.000  (total steps 51576916)
+=== done ===
