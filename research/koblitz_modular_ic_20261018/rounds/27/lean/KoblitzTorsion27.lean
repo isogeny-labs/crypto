@@ -46,21 +46,21 @@ theorem eleven_kills (a : Fin 5 → A)
     (h0 : r0 a=0) (h1 : r1 a=0) (h2 : r2 a=0) (h3 : r3 a=0) (h4 : r4 a=0) :
     (11:ℤ) • torsion a = 0 := by
   rw [actual_eleven_identity,h0,h1,h2,h3,h4]
-  simp
+  simp only [zsmul_zero, add_zero, zero_add, neg_zero]
 
 theorem diamond_is_six (a : Fin 5 → A)
     (h0 : r0 a=0) (h1 : r1 a=0) (h2 : r2 a=0) (h3 : r3 a=0) (h4 : r4 a=0) :
     shifted a = (6:ℤ) • torsion a := by
   apply sub_eq_zero.mp
   rw [actual_diamond_identity,h0,h1,h2,h3,h4]
-  simp
+  simp only [zsmul_zero, add_zero, zero_add, neg_zero]
 
 theorem moved_is_four (a : Fin 5 → A)
     (h1 : r1 a=0) (h2 : r2 a=0) (h3 : r3 a=0) (h4 : r4 a=0) :
     moved a = (4:ℤ) • torsion a := by
   apply sub_eq_zero.mp
   rw [actual_moving_identity,h1,h2,h3,h4]
-  simp
+  simp only [zsmul_zero, add_zero, zero_add, neg_zero]
 
 theorem recover_from_moved (a : Fin 5 → A)
     (h0 : r0 a=0) (h1 : r1 a=0) (h2 : r2 a=0) (h3 : r3 a=0) (h4 : r4 a=0) :
@@ -107,7 +107,7 @@ theorem coprime_two_five_kernel (x : A)
     (h2 : (2:ℤ) • x = 0) (h5 : (5:ℤ) • x = 0) : x = 0 := by
   calc
     x = (3:ℤ) • ((2:ℤ) • x) - (5:ℤ) • x := by abel
-    _ = 0 := by rw [h2,h5]; simp
+    _ = 0 := by rw [h2,h5]; simp only [zsmul_zero, sub_self]
 
 theorem mixed_polarization_type_counts :
     (18+6 : ℕ)=24 ∧ 2*6=12 ∧ 30-6=24 ∧ 5^12=244140625 := by decide

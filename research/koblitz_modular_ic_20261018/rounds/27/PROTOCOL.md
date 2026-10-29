@@ -417,3 +417,5 @@ Nonunit/cap is unresolved, not an evaluated map or universal exclusion.
 Any successful point still needs function-field identities,descent and actual
 nonzero11 action; no CM inclusion is assumed. Checkpoint assembled producer
 and its output before each native call; retain every attempt.
+
+After next host replacement boot a578e16f, reconciliation found no native/proof processes, Diem deadline-expired, legacy complete, EKS one unrelated failed ML job and no active jobs. No launches duplicated. Lean08 completed exit1: broad simp converts integer scalar-zero to natural scalar-zero without closing it. Replace ONLY simplification by explicit zsmul_zero/add_zero/neg_zero list. Rebuild Collector object because host-local verified object was lost, not because prior proof evidence failed. REVERSE01 full integral witness passed but final control used polynomial remainder by11 inQ (always0), not integer remainder. Check exact evaluated integer14469 instead. Original failures/source retained; no mathematical rejection.

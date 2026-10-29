@@ -25,7 +25,7 @@ print("REVERSE27_EXACT_INTEGRAL_CUSP_CERTIFICATE");certificate;
 print("REVERSE27_ARBITRARY_CUSP_11PRIMARY_COORDINATE");phi*arbitrary;
 // Positive/negative controls: D maps to scalar*D; corrupt one witness.
 poly dAtSix=(phi*d)[1,1];
-if(dAtSix%11!=4){ERROR("actual nonzero11class coordinate failed");}
+if(dAtSix!=14469){ERROR("actual nonzero11class coordinate failed");}
 certificate[1,1]=certificate[1,1]+1;
 residual=principal*certificate-wanted;
 if(residual[1,1]==0){ERROR("corrupted recovery witness was not detected");}
