@@ -126,6 +126,10 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+  "residual_sweep_ext": {
+   "path": "research/ic_sweep_ext_20261028/results.json",
+   "sha256": "00ea9dfcea222709216a06aae5566366c1c0422d7d2cc77360355295bdde5c97"
+  },
   "quartic_tagged_p13": {
    "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
    "sha256": "02427944511bd86f99e291309e889c76276bc14becc38c695c3c775796de2c46"
@@ -305015,8 +305019,259 @@
   "study": "research/postgb_linear_stage_20261026/",
   "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
   "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "residual_sweep_component": {
+  "table": [
+   {
+    "bits": 32,
+    "label": "rho.negation",
+    "arm": "rho-neg",
+    "mean_s": 1.01890988599,
+    "distance_to_rho": 1.0,
+    "entries": 0,
+    "mib": 0.0,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "bsgs.negation",
+    "arm": "bsgs-neg",
+    "mean_s": 0.879619129782,
+    "distance_to_rho": 0.863294332384,
+    "entries": 29441,
+    "mib": 0.449234008789,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "kangaroo",
+    "arm": "kangaroo",
+    "mean_s": 1.70126248421,
+    "distance_to_rho": 1.66968885827,
+    "entries": 774.75,
+    "mib": 0.0177326202393,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "sweep B=2",
+    "arm": "sweep-b2",
+    "mean_s": 2.82375230203,
+    "distance_to_rho": 2.77134645651,
+    "entries": 131732,
+    "mib": 4.02014160156,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "sweep B=8",
+    "arm": "sweep-b8",
+    "mean_s": 4.24536326538,
+    "distance_to_rho": 4.16657382931,
+    "entries": 233762.166667,
+    "mib": 7.13385518392,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "sweep B=128",
+    "arm": "sweep-b128",
+    "mean_s": 11.5490838471,
+    "distance_to_rho": 11.3347451094,
+    "entries": 675641.666667,
+    "mib": 20.618947347,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 32,
+    "label": "pair-table incumbent (walk)",
+    "arm": "pair-walk-b1024",
+    "mean_s": 33.0099645226,
+    "distance_to_rho": 32.3973346187,
+    "entries": 1048576,
+    "mib": 16.0,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "rho.negation",
+    "arm": "rho-neg",
+    "mean_s": 1.29298298923,
+    "distance_to_rho": 1.0,
+    "entries": 0,
+    "mib": 0.0,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "bsgs.negation",
+    "arm": "bsgs-neg",
+    "mean_s": 1.29174785826,
+    "distance_to_rho": 0.999044743063,
+    "entries": 103364,
+    "mib": 1.57720947266,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "kangaroo",
+    "arm": "kangaroo",
+    "mean_s": 1.97080827311,
+    "distance_to_rho": 1.52423372119,
+    "entries": 1561.75,
+    "mib": 0.0357456207275,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "sweep B=2",
+    "arm": "sweep-b2",
+    "mean_s": 2.27819988089,
+    "distance_to_rho": 1.76197204439,
+    "entries": 375345.75,
+    "mib": 11.4546432495,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "sweep B=8",
+    "arm": "sweep-b8",
+    "mean_s": 3.85453134749,
+    "distance_to_rho": 2.98111528118,
+    "entries": 748281.5,
+    "mib": 22.8357391357,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "sweep B=128",
+    "arm": "sweep-b128",
+    "mean_s": 11.8929100312,
+    "distance_to_rho": 9.19804060091,
+    "entries": 2447111.41667,
+    "mib": 74.6799138387,
+    "verified": 36,
+    "runs": 36
+   },
+   {
+    "bits": 36,
+    "label": "pair-table incumbent (walk)",
+    "arm": "pair-walk-b2048",
+    "mean_s": 42.1715056278,
+    "distance_to_rho": 32.6156693315,
+    "entries": 4194304,
+    "mib": 64.0,
+    "verified": 36,
+    "runs": 36
+   }
+  ],
+  "slopes": [
+   {
+    "label": "bsgs.negation",
+    "slope": -0.00713266256485,
+    "lo": -0.0130767825673,
+    "hi": -0.00207134588343,
+    "sizes": 13
+   },
+   {
+    "label": "kangaroo",
+    "slope": -0.0232211251435,
+    "lo": -0.0307310331751,
+    "hi": -0.0161160113198,
+    "sizes": 13
+   },
+   {
+    "label": "pair-table incumbent (walk, base ~ r^(1/3))",
+    "slope": 0.0714066761079,
+    "lo": 0.0685909972338,
+    "hi": 0.0738862506544,
+    "sizes": 9
+   },
+   {
+    "label": "rho.negation",
+    "slope": -0.0101162442792,
+    "lo": -0.0219905164447,
+    "hi": 0.00145667504794,
+    "sizes": 13
+   },
+   {
+    "label": "rho.negation_lanes",
+    "slope": -0.0281795908754,
+    "lo": -0.0394441865938,
+    "hi": -0.0182373128928,
+    "sizes": 13
+   },
+   {
+    "label": "sweep B=128",
+    "slope": -0.0171051422271,
+    "lo": -0.0213361914331,
+    "hi": -0.0132565823964,
+    "sizes": 9
+   },
+   {
+    "label": "sweep B=2",
+    "slope": -0.0250871045263,
+    "lo": -0.0340884704991,
+    "hi": -0.0169150030896,
+    "sizes": 11
+   },
+   {
+    "label": "sweep B=32",
+    "slope": -0.0187272904822,
+    "lo": -0.0234549981811,
+    "hi": -0.0141983123784,
+    "sizes": 9
+   },
+   {
+    "label": "sweep B=8",
+    "slope": -0.0144631427777,
+    "lo": -0.0202139877988,
+    "hi": -0.0085244033393,
+    "sizes": 9
+   }
+  ],
+  "band": {
+   "0": {
+    "ic": 2.82375230203,
+    "rho": 1.01890988599,
+    "ratio": 2.77134645651
+   },
+   "0.1": {
+    "ic": 3.10347614753,
+    "rho": 1.1201316947,
+    "ratio": 2.77063506213
+   },
+   "1": {
+    "ic": 5.62099075709,
+    "rho": 2.03112797309,
+    "ratio": 2.76742324046
+   }
+  },
+  "band_held": true,
+  "band_source": "../../research/ic_sweep_ext_20261028/band/ext-32.json (ic.pipeline residual-sweep:m=2 with a base of 2 abscissae vs rho.negation, 32-bit prime-order curve, 3 sessions)",
+  "sessions": 39,
+  "runs": 7716,
+  "class": "structural: a birthday collision search through the IC pipeline, not an exponent improvement",
+  "study": "research/ic_sweep_ext_20261028/",
+  "report": "research/ic_sweep_ext_20261028/REPORT.pdf",
+  "benchmark": "benchmarks/20261028-ic-sweep-ext/",
+  "source": "research/ic_sweep_ext_20261028/results.json",
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261028-ic-sweep-ext/VALIDATION.json)",
+  "validated": true
  },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",

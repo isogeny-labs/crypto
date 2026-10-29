@@ -82,6 +82,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "residual_sweep_ext": "research/ic_sweep_ext_20261028/results.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
     "quartic_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
     "quartic_tagged_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
@@ -844,6 +845,48 @@ def postgb_linear_stage_component() -> dict:
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["postgb_linear_stage"],
             "validation": ("validated: replay certificate, validator report and the matched rho reference "
                            f"with the §5a band ({study}/validation/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def residual_sweep_component() -> dict:
+    """The single-large-prime residual sweep (`ic.pipeline` with the `residual-sweep:m=2`
+    oracle) from research/ic_sweep_ext_20261028/results.json (means, fits and bootstrap
+    intervals made there by summarize.py and recomputed by validator.py). Listed outside
+    tables A-C and outside the exponent ranking: it is a birthday collision search that
+    runs through the IC pipeline, its table grows like sqrt(r B), and its counted S is flat
+    in the curve size at a fixed base. Standing comes from benchmarks/20261028-ic-sweep-ext/
+    VALIDATION.json, whose band slot carries the sweep at B = 2 against rho.negation."""
+    res = load(SOURCES["residual_sweep_ext"])
+    rows = res["rows"]
+    arms = [("rho.negation", "rho-neg"), ("bsgs.negation", "bsgs-neg"), ("kangaroo", "kangaroo"),
+            ("sweep B=2", "sweep-b2"), ("sweep B=8", "sweep-b8"), ("sweep B=128", "sweep-b128")]
+    incumbent = {32: "pair-walk-b1024", 36: "pair-walk-b2048"}
+    table = []
+    for bits in (32, 36):
+        pick = arms + [("pair-table incumbent (walk)", incumbent[bits])]
+        for label, arm in pick:
+            r = next(x for x in rows if x["bits"] == bits and x["arm"] == arm)
+            table.append({"bits": bits, "label": label, "arm": arm, "mean_s": r["mean_s"],
+                          "distance_to_rho": r["distance_to_rho"], "entries": r["entries"],
+                          "mib": r["bytes"] / 2**20, "verified": r["verified"], "runs": r["runs"]})
+    fits = res["fits"]["s_vs_bits"]
+    slopes = [{"label": k, "slope": v["slope"], "lo": v["lo"], "hi": v["hi"], "sizes": v["sizes"]}
+              for k, v in fits.items()]
+    study = "research/ic_sweep_ext_20261028"
+    bench = "benchmarks/20261028-ic-sweep-ext"
+    errs = gate.check_evidence_dir(REPO / bench, REPO)
+    man = load(bench + "/VALIDATION.json")
+    band = man["rho_reference"]["gae_band"]
+    return {"table": table, "slopes": sorted(slopes, key=lambda x: x["label"]),
+            "band": {w: {"ic": b["ic"], "rho": b["rho"], "ratio": b["ic"] / b["rho"]} for w, b in band.items()},
+            "band_held": man["rho_reference"]["order_holds_across_band"],
+            "band_source": man["rho_reference"]["band_source"],
+            "sessions": 39, "runs": sum(x["runs"] for x in rows if x.get("runs")),
+            "class": "structural: a birthday collision search through the IC pipeline, not an exponent improvement",
+            "study": study + "/", "report": study + "/REPORT.pdf", "benchmark": bench + "/",
+            "source": SOURCES["residual_sweep_ext"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({bench}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1871,6 +1914,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
+        "residual_sweep_component": residual_sweep_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "koblitz_setup_component": koblitz_setup_component(),
@@ -2478,6 +2522,35 @@ def markdown(doc: dict) -> str:
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
     L.append("")
+    rs = doc["residual_sweep_component"]
+    L += ["## Residual sweep: a birthday collision search through the IC pipeline, outside tables A–C", "",
+          "`ic.pipeline` with the `residual-sweep:m=2` oracle: every residual R − P_i of a target is stored by "
+          "abscissa and each collision R − P_i = t (R′ − P_i′) becomes a base-only relation. Listed here, not in "
+          "tables A–C and not in the exponent ranking, because it is "
+          "**a birthday collision search that runs through the index-calculus pipeline, not an index calculus with a "
+          "better exponent**: at a fixed base its counted S does not grow with the curve, the rows found equal the "
+          "birthday count N²/(r 2^k), a strided pseudo-random base costs 1.03× of the smallest-abscissa base, and its "
+          "table grows like √(r B). **Memory is not in S**: read S beside the entries column. "
+          f"{rs['sessions']} sessions, {rs['runs']:,} measured runs, same binary, targets and rounds for every arm "
+          f"(`{rs['study']}`, [report]({rs['report']})). {rs['validation']}", "",
+          "Mean counted S (S = GAE/√r) and its distance to the same session's `rho.negation`, with the table the arm holds:", "",
+          "| bits | arm | mean S | S / rho.negation | table entries | table MiB |",
+          "|--:|:--|--:|--:|--:|--:|"]
+    for r in rs["table"]:
+        L.append(f"| {r['bits']} | {r['label']} | {r['mean_s']:.2f} | {r['distance_to_rho']:.2f} | "
+                 f"{r['entries']:,.0f} | {r['mib']:.1f} |")
+    L += ["", "Slope of log2 S against log2 r (95% bootstrap interval; the incumbent grows, the sweep and the generic "
+          "searches are flat, which is the signature of a collision search, not of a better exponent):", "",
+          "| arm | slope | 95% | sizes |", "|:--|--:|:--|--:|"]
+    for sl in rs["slopes"]:
+        L.append(f"| {sl['label']} | {sl['slope']:+.3f} | [{sl['lo']:+.3f}, {sl['hi']:+.3f}] | {sl['sizes']} |")
+    b = rs["band"]
+    L += ["", "Distance remaining to the matched rho (§5a band, sweep B = 2 against `rho.negation`, 32-bit prime-order "
+          "curve, unpriced native work priced at 0, 0.1 and 1 GAE per operation): "
+          + "; ".join(f"{w}: {b[w]['ic']:.2f} vs {b[w]['rho']:.2f} ({b[w]['ratio']:.2f}×)" for w in ("0", "0.1", "1"))
+          + f". The order {'holds' if rs['band_held'] else 'does not hold'} across the band: rho is ahead at every weight, "
+          "so the sweep does not beat rho; it is a verified, cheap arm of `ic.pipeline` and the lowest S measured of any "
+          "abscissa-base arm.", ""]
     ks = doc["koblitz_setup_component"]
     L += ["## Koblitz IC set-up, outside tables A–C", "",
           "`ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against "
@@ -3267,6 +3340,37 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
     P.append('</tbody></table></section>')
+
+    rs = doc["residual_sweep_component"]
+    P.append('<section class="card" id="residual-sweep-component"><h2>Residual sweep: a birthday collision search through the '
+             'IC pipeline, outside the priced tables</h2>'
+             '<p><code>ic.pipeline</code> with the <code>residual-sweep:m=2</code> oracle: every residual R − P<sub>i</sub> '
+             'of a target is stored by abscissa and each collision becomes a base-only relation. It is listed here, not in '
+             'tables A–C and not in the exponent ranking, because it is <b>a birthday collision search that runs through '
+             'the index-calculus pipeline, not an index calculus with a better exponent</b>: at a fixed base its counted S '
+             'does not grow with the curve, the rows found equal the birthday count, a strided pseudo-random base costs '
+             '1.03× of the smallest-abscissa base, and its table grows like √(r B). <b>Memory is not in S</b>: read S beside '
+             f'the entries column. {rs["sessions"]} sessions, {rs["runs"]:,} measured runs, same binary, targets and rounds '
+             f'for every arm. {esc(rs["validation"])} '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(rs["study"])}">Study</a>.</p>'
+             '<table><thead><tr><th class="n">bits</th><th>arm</th><th class="n">mean S</th>'
+             '<th class="n">S / rho.negation</th><th class="n">table entries</th><th class="n">table MiB</th></tr></thead><tbody>')
+    for r in rs["table"]:
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{esc(r["label"])}</td><td class="n">{r["mean_s"]:.2f}</td>'
+                 f'<td class="n">{r["distance_to_rho"]:.2f}</td><td class="n">{r["entries"]:,.0f}</td>'
+                 f'<td class="n">{r["mib"]:.1f}</td></tr>')
+    P.append('</tbody></table><p>Slope of log<sub>2</sub> S against log<sub>2</sub> r (95% bootstrap interval): the incumbent '
+             'grows, the sweep and the generic searches are flat, the signature of a collision search.</p>'
+             '<table><thead><tr><th>arm</th><th class="n">slope</th><th>95%</th><th class="n">sizes</th></tr></thead><tbody>')
+    for sl in rs["slopes"]:
+        P.append(f'<tr><td>{esc(sl["label"])}</td><td class="n">{sl["slope"]:+.3f}</td>'
+                 f'<td>[{sl["lo"]:+.3f}, {sl["hi"]:+.3f}]</td><td class="n">{sl["sizes"]}</td></tr>')
+    b = rs["band"]
+    P.append('</tbody></table><p>Distance remaining to the matched rho (§5a band, sweep B = 2 against '
+             '<code>rho.negation</code>, 32-bit prime-order curve; unpriced native work at 0, 0.1 and 1 GAE per operation): '
+             + "; ".join(f'{w}: {b[w]["ic"]:.2f} vs {b[w]["rho"]:.2f} ({b[w]["ratio"]:.2f}×)' for w in ("0", "0.1", "1"))
+             + f'. The order {"holds" if rs["band_held"] else "does not hold"} across the band: rho is ahead at every weight, '
+             'so the sweep does not beat rho.</p></section>')
 
     ks = doc["koblitz_setup_component"]
     P.append('<section class="card" id="koblitz-setup-component"><h2>Koblitz IC set-up, outside the priced tables</h2>'

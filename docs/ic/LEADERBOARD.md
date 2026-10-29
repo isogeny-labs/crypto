@@ -301,6 +301,45 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Residual sweep: a birthday collision search through the IC pipeline, outside tables A–C
+
+`ic.pipeline` with the `residual-sweep:m=2` oracle: every residual R − P_i of a target is stored by abscissa and each collision R − P_i = t (R′ − P_i′) becomes a base-only relation. Listed here, not in tables A–C and not in the exponent ranking, because it is **a birthday collision search that runs through the index-calculus pipeline, not an index calculus with a better exponent**: at a fixed base its counted S does not grow with the curve, the rows found equal the birthday count N²/(r 2^k), a strided pseudo-random base costs 1.03× of the smallest-abscissa base, and its table grows like √(r B). **Memory is not in S**: read S beside the entries column. 39 sessions, 7,716 measured runs, same binary, targets and rounds for every arm (`research/ic_sweep_ext_20261028/`, [report](research/ic_sweep_ext_20261028/REPORT.pdf)). validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261028-ic-sweep-ext/VALIDATION.json)
+
+Mean counted S (S = GAE/√r) and its distance to the same session's `rho.negation`, with the table the arm holds:
+
+| bits | arm | mean S | S / rho.negation | table entries | table MiB |
+|--:|:--|--:|--:|--:|--:|
+| 32 | rho.negation | 1.02 | 1.00 | 0 | 0.0 |
+| 32 | bsgs.negation | 0.88 | 0.86 | 29,441 | 0.4 |
+| 32 | kangaroo | 1.70 | 1.67 | 775 | 0.0 |
+| 32 | sweep B=2 | 2.82 | 2.77 | 131,732 | 4.0 |
+| 32 | sweep B=8 | 4.25 | 4.17 | 233,762 | 7.1 |
+| 32 | sweep B=128 | 11.55 | 11.33 | 675,642 | 20.6 |
+| 32 | pair-table incumbent (walk) | 33.01 | 32.40 | 1,048,576 | 16.0 |
+| 36 | rho.negation | 1.29 | 1.00 | 0 | 0.0 |
+| 36 | bsgs.negation | 1.29 | 1.00 | 103,364 | 1.6 |
+| 36 | kangaroo | 1.97 | 1.52 | 1,562 | 0.0 |
+| 36 | sweep B=2 | 2.28 | 1.76 | 375,346 | 11.5 |
+| 36 | sweep B=8 | 3.85 | 2.98 | 748,282 | 22.8 |
+| 36 | sweep B=128 | 11.89 | 9.20 | 2,447,111 | 74.7 |
+| 36 | pair-table incumbent (walk) | 42.17 | 32.62 | 4,194,304 | 64.0 |
+
+Slope of log2 S against log2 r (95% bootstrap interval; the incumbent grows, the sweep and the generic searches are flat, which is the signature of a collision search, not of a better exponent):
+
+| arm | slope | 95% | sizes |
+|:--|--:|:--|--:|
+| bsgs.negation | -0.007 | [-0.013, -0.002] | 13 |
+| kangaroo | -0.023 | [-0.031, -0.016] | 13 |
+| pair-table incumbent (walk, base ~ r^(1/3)) | +0.071 | [+0.069, +0.074] | 9 |
+| rho.negation | -0.010 | [-0.022, +0.001] | 13 |
+| rho.negation_lanes | -0.028 | [-0.039, -0.018] | 13 |
+| sweep B=128 | -0.017 | [-0.021, -0.013] | 9 |
+| sweep B=2 | -0.025 | [-0.034, -0.017] | 11 |
+| sweep B=32 | -0.019 | [-0.023, -0.014] | 9 |
+| sweep B=8 | -0.014 | [-0.020, -0.009] | 9 |
+
+Distance remaining to the matched rho (§5a band, sweep B = 2 against `rho.negation`, 32-bit prime-order curve, unpriced native work priced at 0, 0.1 and 1 GAE per operation): 0: 2.82 vs 1.02 (2.77×); 0.1: 3.10 vs 1.12 (2.77×); 1: 5.62 vs 2.03 (2.77×). The order holds across the band: rho is ahead at every weight, so the sweep does not beat rho; it is a verified, cheap arm of `ic.pipeline` and the lowest S measured of any abscissa-base arm.
+
 ## Koblitz IC set-up, outside tables A–C
 
 `ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against round 2's code changes (class: engineering): reused per-trial scan buffers, the collector's index map and field structure built once, Fx-hashed orbit and projection maps, aimed scans with pre-gathered coordinates. Every count, recovered logarithm and in-process rho reference is identical, so no row above moves; the set-up time saved lowers the cold ratio the next re-run of table A will measure. Medians over 15 repetitions per binary, one thread, pinned; build and verify vary ±10% on unchanged code. Study: [research/ecbench_perf_round2_20261022/](../../research/ecbench_perf_round2_20261022/).
@@ -450,7 +489,7 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 
 ## Linear stage after F4 across Gröbner-basis corpora
 
-Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+Component speed-up, class engineering, in median wall time, single thread (host B): from a monic grevlex F4 basis to every checked F_p point, on 253 systems in five families (`research/postgb_linear_stage_20261026/`, [report](research/postgb_linear_stage_20261026/REPORT.pdf)). Leader: `zero_dim_la::fast_stage` (transposed Krylov, Berlekamp–Massey, gcd(f, x^p − x) roots, rational univariate read-out, AVX-512/AVX2 kernels), now the default `JV_LIN`. Incumbent: sparse FGLM (the section above). Every arm returned the same solution set on every system; fast gave up (and fell back to dense) on 1. Counted multiplications (sparse ÷ fast 0.77–2.14×) are reported, not ranked. It moves no row of tables A–C. validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)
 
 | family | systems | δ | sparse ms | fast ms | **sparse ÷ fast** [95%] | dense ÷ fast | portable fast | host A | counted sparse ÷ fast |
 |:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|
@@ -720,6 +759,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/ic_sweep_ext_20261028/results.json` — sha256 `00ea9dfcea222709…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
