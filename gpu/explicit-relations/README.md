@@ -1,9 +1,10 @@
 # Explicit bases and signed relation finding on CUDA
 
-Source implementation; **not compiled or run on a GPU in this change**.
-The native host implementation passes a syntax-only compiler check. Rust
-formatting parses the driver and library additions. Executable correctness
-tests and performance checks remain pending.
+The service has been cross-compiled for Blackwell `sm_120` with CUDA 13.2.
+Host arithmetic, relation and bounded reduction/replay tests passed on a
+cloud CPU builder. **GPU device execution remains blocked by AWS quota.**
+See [the validation record](VALIDATION.md) for revisions, outcomes and limits;
+no measured performance improvement is claimed.
 
 `service.cpp` builds as either a CUDA service or a host reference. The service
 stays alive across queries. `paper_driver.rs` plugs it into the repository's
@@ -78,11 +79,14 @@ limits, CUDA failures and malformed inputs return `ERROR` and terminate.
 
 ## Build and correctness checks on the builder
 
+The standalone driver requires Rust 1.88 or later. For the RTX PRO 6000
+Blackwell, use CUDA with `sm_120` support:
+
 ```sh
 make host                  # small C++/Rust reference executables
 make test                  # host arithmetic, protocol driver and reduction
-make all ARCH=sm_80         # select the actual GPU architecture
-make test-cuda ARCH=sm_80
+make all ARCH=sm_120        # select the actual GPU architecture
+make test-cuda ARCH=sm_120
 compute-sanitizer --tool memcheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool racecheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool synccheck build/explicit-relations-cuda --self-test

@@ -158,3 +158,36 @@ the code was corrected and reformatted, then the check passed. An attempted
 The shared daily session log is reserved by another Conductor task, so this
 scoped handoff carries the entry. T-854 covers the main change, T-856 the
 paper hook and T-857 the candidate identity binding.
+
+## Publication and cloud validation follow-up — 2026-10-29
+
+### What was done
+
+Opened [PR #2889](https://github.com/isogeny-labs/crypto/pull/2889) and enabled
+auto-merge per repository policy. Merged main and added a standalone Cargo
+manifest for its new tensor re-export. Submitted an RTX PRO 6000 validation
+job through the managed ephemeral runner; AWS rejected it before launch.
+Submitted the owner's requested GPU quota increases. The exact requests and
+software validation outcomes are in
+[the validation record](../../gpu/explicit-relations/VALIDATION.md).
+
+### Decisions made
+
+Keep the existing CPU tensor implementation on main separate from the GPU
+meet-in-the-middle path. Use native cloud builds to respect the local disk
+constraint. Retain the requirement that any EKS deployment use an image from
+crypto main. Device execution requires actual RTX hardware and successful
+tests; a cloud build or a quota request does not establish that result.
+
+### Open threads
+
+AWS GPU quota approval and RTX device checks; root Cargo/ecbench checks and
+PR gates; performance validation under a frozen comparison protocol.
+
+### Errors
+
+The RTX Spot request failed with `MaxSpotInstanceCountExceeded`. Both GPU
+quotas were zero. No GPU instance was created. A CPU build submission with
+`--ref HEAD` initially stopped because this checkout tracks only main's
+remote ref; fetching the already-pushed feature ref resolved that admission
+check without changing the source.
