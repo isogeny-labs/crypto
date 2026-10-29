@@ -176,6 +176,15 @@ solver-reported or independently proof-checked.
 
 ## Measurement contract
 
+The current native F4 row-reduction multiplication counter is process-wide by
+default (`src/cryptanalysis/f4_fp.rs::FIELD_OPS`); each report takes a difference
+over its call. Concurrent calls can include one another's work. Preserve counter
+mode and process concurrency in restricted measurement provenance, and require
+one active solve per process or independently verified attribution before using
+these deltas as per-instance cost labels. Nested/inclusive counters cannot be
+summed into exclusive phase totals. These are counted row-reduction operations,
+not complete field-operation totals or retired CPU instructions.
+
 Use a typed counter vector: group additions/doublings, field add/mul/square/inv,
 polynomial operations, matrix rows/columns/nonzeros/rank/XOR-word operations,
 SAT decisions/propagations/conflicts, root tests, relation attempts/accepts,
