@@ -82,6 +82,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "residual_sweep_ext": "research/ic_sweep_ext_20261028/results.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
     "quartic_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
     "quartic_tagged_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
@@ -109,6 +110,7 @@ SOURCES = {
     "quartic_thin_validation": "research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json",
     "quartic_peeled_reuse": "research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
+    "koblitz_setup_round2": "research/ecbench_perf_round2_20261022/results.json",
     "bitop_ladder": "research/bitop_ladder_20261019/summary.json",
     "hec_bitop": "research/hec_bitop_20261020/analysis/analysis.json",
     "hec_round7_rows": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
@@ -846,6 +848,48 @@ def postgb_linear_stage_component() -> dict:
             "validated": not errs}
 
 
+def residual_sweep_component() -> dict:
+    """The single-large-prime residual sweep (`ic.pipeline` with the `residual-sweep:m=2`
+    oracle) from research/ic_sweep_ext_20261028/results.json (means, fits and bootstrap
+    intervals made there by summarize.py and recomputed by validator.py). Listed outside
+    tables A-C and outside the exponent ranking: it is a birthday collision search that
+    runs through the IC pipeline, its table grows like sqrt(r B), and its counted S is flat
+    in the curve size at a fixed base. Standing comes from benchmarks/20261028-ic-sweep-ext/
+    VALIDATION.json, whose band slot carries the sweep at B = 2 against rho.negation."""
+    res = load(SOURCES["residual_sweep_ext"])
+    rows = res["rows"]
+    arms = [("rho.negation", "rho-neg"), ("bsgs.negation", "bsgs-neg"), ("kangaroo", "kangaroo"),
+            ("sweep B=2", "sweep-b2"), ("sweep B=8", "sweep-b8"), ("sweep B=128", "sweep-b128")]
+    incumbent = {32: "pair-walk-b1024", 36: "pair-walk-b2048"}
+    table = []
+    for bits in (32, 36):
+        pick = arms + [("pair-table incumbent (walk)", incumbent[bits])]
+        for label, arm in pick:
+            r = next(x for x in rows if x["bits"] == bits and x["arm"] == arm)
+            table.append({"bits": bits, "label": label, "arm": arm, "mean_s": r["mean_s"],
+                          "distance_to_rho": r["distance_to_rho"], "entries": r["entries"],
+                          "mib": r["bytes"] / 2**20, "verified": r["verified"], "runs": r["runs"]})
+    fits = res["fits"]["s_vs_bits"]
+    slopes = [{"label": k, "slope": v["slope"], "lo": v["lo"], "hi": v["hi"], "sizes": v["sizes"]}
+              for k, v in fits.items()]
+    study = "research/ic_sweep_ext_20261028"
+    bench = "benchmarks/20261028-ic-sweep-ext"
+    errs = gate.check_evidence_dir(REPO / bench, REPO)
+    man = load(bench + "/VALIDATION.json")
+    band = man["rho_reference"]["gae_band"]
+    return {"table": table, "slopes": sorted(slopes, key=lambda x: x["label"]),
+            "band": {w: {"ic": b["ic"], "rho": b["rho"], "ratio": b["ic"] / b["rho"]} for w, b in band.items()},
+            "band_held": man["rho_reference"]["order_holds_across_band"],
+            "band_source": man["rho_reference"]["band_source"],
+            "sessions": 39, "runs": sum(x["runs"] for x in rows if x.get("runs")),
+            "class": "structural: a birthday collision search through the IC pipeline, not an exponent improvement",
+            "study": study + "/", "report": study + "/REPORT.pdf", "benchmark": bench + "/",
+            "source": SOURCES["residual_sweep_ext"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({bench}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def secs(x: float) -> str:
     """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
     return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
@@ -865,6 +909,18 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+def koblitz_setup_component() -> dict:
+    """The Koblitz `ic price` set-up on the rule-v3 T01 curves, previous
+    binary against the round-2 code changes: research/ecbench_perf_round2_20261022,
+    copied from its results.json (medians computed there by summarize.py and
+    recomputed by validator.py). A component speed-up: every count, recovered
+    logarithm and the in-process rho reference are identical, so no row of
+    tables A-C moves."""
+    res = load(SOURCES["koblitz_setup_round2"])
+    if res.get("koblitz_outputs_differing") != 0 or res.get("identical_records") != res.get("records"):
+        raise SystemExit("Koblitz set-up round 2: an output differs from the previous binary")
+    return {"rows": res["koblitz"], "study": "research/ecbench_perf_round2_20261022/",
+            "report": "research/ecbench_perf_round2_20261022/REPORT.pdf", "class": "engineering"}
 def quartic_twist_pair_component() -> dict:
     """Copy the frozen exact-oracle component results, outside priced IC rows."""
     rows = []
@@ -1858,8 +1914,10 @@ def build(allow_unvalidated: bool = False) -> dict:
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
+        "residual_sweep_component": residual_sweep_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
+        "koblitz_setup_component": koblitz_setup_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -2463,6 +2521,51 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    rs = doc["residual_sweep_component"]
+    L += ["## Residual sweep: a birthday collision search through the IC pipeline, outside tables A–C", "",
+          "`ic.pipeline` with the `residual-sweep:m=2` oracle: every residual R − P_i of a target is stored by "
+          "abscissa and each collision R − P_i = t (R′ − P_i′) becomes a base-only relation. Listed here, not in "
+          "tables A–C and not in the exponent ranking, because it is "
+          "**a birthday collision search that runs through the index-calculus pipeline, not an index calculus with a "
+          "better exponent**: at a fixed base its counted S does not grow with the curve, the rows found equal the "
+          "birthday count N²/(r 2^k), a strided pseudo-random base costs 1.03× of the smallest-abscissa base, and its "
+          "table grows like √(r B). **Memory is not in S**: read S beside the entries column. "
+          f"{rs['sessions']} sessions, {rs['runs']:,} measured runs, same binary, targets and rounds for every arm "
+          f"(`{rs['study']}`, [report]({rs['report']})). {rs['validation']}", "",
+          "Mean counted S (S = GAE/√r) and its distance to the same session's `rho.negation`, with the table the arm holds:", "",
+          "| bits | arm | mean S | S / rho.negation | table entries | table MiB |",
+          "|--:|:--|--:|--:|--:|--:|"]
+    for r in rs["table"]:
+        L.append(f"| {r['bits']} | {r['label']} | {r['mean_s']:.2f} | {r['distance_to_rho']:.2f} | "
+                 f"{r['entries']:,.0f} | {r['mib']:.1f} |")
+    L += ["", "Slope of log2 S against log2 r (95% bootstrap interval; the incumbent grows, the sweep and the generic "
+          "searches are flat, which is the signature of a collision search, not of a better exponent):", "",
+          "| arm | slope | 95% | sizes |", "|:--|--:|:--|--:|"]
+    for sl in rs["slopes"]:
+        L.append(f"| {sl['label']} | {sl['slope']:+.3f} | [{sl['lo']:+.3f}, {sl['hi']:+.3f}] | {sl['sizes']} |")
+    b = rs["band"]
+    L += ["", "Distance remaining to the matched rho (§5a band, sweep B = 2 against `rho.negation`, 32-bit prime-order "
+          "curve, unpriced native work priced at 0, 0.1 and 1 GAE per operation): "
+          + "; ".join(f"{w}: {b[w]['ic']:.2f} vs {b[w]['rho']:.2f} ({b[w]['ratio']:.2f}×)" for w in ("0", "0.1", "1"))
+          + f". The order {'holds' if rs['band_held'] else 'does not hold'} across the band: rho is ahead at every weight, "
+          "so the sweep does not beat rho; it is a verified, cheap arm of `ic.pipeline` and the lowest S measured of any "
+          "abscissa-base arm.", ""]
+    ks = doc["koblitz_setup_component"]
+    L += ["## Koblitz IC set-up, outside tables A–C", "",
+          "`ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against "
+          "round 2's code changes (class: engineering): reused per-trial scan buffers, the collector's index map "
+          "and field structure built once, Fx-hashed orbit and projection maps, aimed scans with pre-gathered "
+          "coordinates. Every count, recovered logarithm and in-process rho reference is identical, so no row "
+          "above moves; the set-up time saved lowers the cold ratio the next re-run of table A will measure. "
+          "Medians over 15 repetitions per binary, one thread, pinned; build and verify vary ±10% on unchanged "
+          f"code. Study: [{ks['study']}](../../{ks['study']}).", "",
+          "| curve | set-up old | set-up new | new / old | collect old → new | IC online | rho online |",
+          "|:--|--:|--:|--:|:--|--:|--:|"]
+    for r in ks["rows"]:
+        c = r["phases_ms"].get("collect", [0, 0])
+        L.append(f"| {r['curve']} | {r['old_setup_ms']:.1f} ms | {r['new_setup_ms']:.1f} ms | {r['setup_ratio']:.3f} | "
+                 f"{c[0]:.1f} → {c[1]:.1f} ms | {r['new_online_ms']:.2f} ms | {r['rho_online_ms']:.1f} ms |")
     L.append("")
     qt = doc["quartic_twist_pair_component"]
     L += ["## Quartic-twist pair index, outside tables A–C", "",
@@ -3236,6 +3339,56 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    rs = doc["residual_sweep_component"]
+    P.append('<section class="card" id="residual-sweep-component"><h2>Residual sweep: a birthday collision search through the '
+             'IC pipeline, outside the priced tables</h2>'
+             '<p><code>ic.pipeline</code> with the <code>residual-sweep:m=2</code> oracle: every residual R − P<sub>i</sub> '
+             'of a target is stored by abscissa and each collision becomes a base-only relation. It is listed here, not in '
+             'tables A–C and not in the exponent ranking, because it is <b>a birthday collision search that runs through '
+             'the index-calculus pipeline, not an index calculus with a better exponent</b>: at a fixed base its counted S '
+             'does not grow with the curve, the rows found equal the birthday count, a strided pseudo-random base costs '
+             '1.03× of the smallest-abscissa base, and its table grows like √(r B). <b>Memory is not in S</b>: read S beside '
+             f'the entries column. {rs["sessions"]} sessions, {rs["runs"]:,} measured runs, same binary, targets and rounds '
+             f'for every arm. {esc(rs["validation"])} '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(rs["study"])}">Study</a>.</p>'
+             '<table><thead><tr><th class="n">bits</th><th>arm</th><th class="n">mean S</th>'
+             '<th class="n">S / rho.negation</th><th class="n">table entries</th><th class="n">table MiB</th></tr></thead><tbody>')
+    for r in rs["table"]:
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{esc(r["label"])}</td><td class="n">{r["mean_s"]:.2f}</td>'
+                 f'<td class="n">{r["distance_to_rho"]:.2f}</td><td class="n">{r["entries"]:,.0f}</td>'
+                 f'<td class="n">{r["mib"]:.1f}</td></tr>')
+    P.append('</tbody></table><p>Slope of log<sub>2</sub> S against log<sub>2</sub> r (95% bootstrap interval): the incumbent '
+             'grows, the sweep and the generic searches are flat, the signature of a collision search.</p>'
+             '<table><thead><tr><th>arm</th><th class="n">slope</th><th>95%</th><th class="n">sizes</th></tr></thead><tbody>')
+    for sl in rs["slopes"]:
+        P.append(f'<tr><td>{esc(sl["label"])}</td><td class="n">{sl["slope"]:+.3f}</td>'
+                 f'<td>[{sl["lo"]:+.3f}, {sl["hi"]:+.3f}]</td><td class="n">{sl["sizes"]}</td></tr>')
+    b = rs["band"]
+    P.append('</tbody></table><p>Distance remaining to the matched rho (§5a band, sweep B = 2 against '
+             '<code>rho.negation</code>, 32-bit prime-order curve; unpriced native work at 0, 0.1 and 1 GAE per operation): '
+             + "; ".join(f'{w}: {b[w]["ic"]:.2f} vs {b[w]["rho"]:.2f} ({b[w]["ratio"]:.2f}×)' for w in ("0", "0.1", "1"))
+             + f'. The order {"holds" if rs["band_held"] else "does not hold"} across the band: rho is ahead at every weight, '
+             'so the sweep does not beat rho.</p></section>')
+
+    ks = doc["koblitz_setup_component"]
+    P.append('<section class="card" id="koblitz-setup-component"><h2>Koblitz IC set-up, outside the priced tables</h2>'
+             '<p><code>ic price --single-target</code> set-up on the rule-v3 T01 Koblitz curves, the previous binary '
+             'against round 2&#8217;s code changes (class: engineering). Every count, recovered logarithm and '
+             'in-process rho reference is identical, so no row above moves; the saved set-up time lowers the cold '
+             'ratio the next re-run of table A will measure. Medians over 15 repetitions per binary, one thread, '
+             'pinned; build and verify vary ±10% on unchanged code. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(ks["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>Curve</th><th class="n">set-up old</th><th class="n">set-up new</th>'
+             '<th class="n">new / old</th><th>collect old → new</th><th class="n">IC online</th>'
+             '<th class="n">rho online</th></tr></thead><tbody>')
+    for r in ks["rows"]:
+        c = r["phases_ms"].get("collect", [0, 0])
+        P.append(f'<tr><td>{esc(r["curve"])}</td><td class="n">{r["old_setup_ms"]:.1f} ms</td>'
+                 f'<td class="n">{r["new_setup_ms"]:.1f} ms</td><td class="n">{r["setup_ratio"]:.3f}</td>'
+                 f'<td>{c[0]:.1f} → {c[1]:.1f} ms</td><td class="n">{r["new_online_ms"]:.2f} ms</td>'
+                 f'<td class="n">{r["rho_online_ms"]:.1f} ms</td></tr>')
     P.append('</tbody></table></section>')
 
     qt = doc["quartic_twist_pair_component"]

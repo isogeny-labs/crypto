@@ -84,7 +84,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
+    collect_and_solve_relations_touching, price_phase, Calibration, CompletionRule, CountedGroup,
     FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
     TargetSource,
 };
@@ -516,6 +516,30 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             lanes: 16,
             batched: true,
         },
+        Targets::WalkPrimeSerial64 => TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: false,
+        },
+        Targets::WalkPrimeBatch64 => TargetSource::WalkPrimeLanes {
+            lanes: 64,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: true,
+        },
     };
     if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
         return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
@@ -560,7 +584,10 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // large primes (the trait default), so this is the loop every
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
-        collect_and_solve_relations(
+        // The touch reads while no decomposition runs, so one RefCell
+        // lends the oracle to both closures in turn.
+        let oracle_cell = std::cell::RefCell::new(&mut *oracle);
+        collect_and_solve_relations_touching(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -574,8 +601,11 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             matrix,
             completion,
             |ops, counters, point, a, b| {
-                oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
+                oracle_cell
+                    .borrow_mut()
+                    .decompose_relations(ctx, &fb, ops, counters, point, a, b)
             },
+            |point| oracle_cell.borrow().touch(ctx, point),
         )
     };
     for (name, value) in oracle.relation_counters() {
@@ -1315,6 +1345,137 @@ mod tests {
             a.decomposition.cost.group_ops, b.decomposition.cost.group_ops,
             "two different oracles should not cost exactly the same"
         );
+    }
+
+    /// **The residual sweep recovers the planted logarithm in every variant**
+    /// (signed-class fold on and off, distinguished-point filter, pair-table
+    /// hybrid): no pair table is needed, only collisions of stored residuals.
+    #[test]
+    fn residual_sweep_recovers_the_planted_log_in_every_variant() {
+        use super::plugins::ResidualSweepOracle;
+        let inst = roster_prime_instance(14).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let variants: [&[(&str, &str)]; 5] = [
+            &[],
+            &[("fold", "0")],
+            &[("dp", "2")],
+            &[("pairs", "1")],
+            &[("fold", "0"), ("dp", "1")],
+        ];
+        for variant in variants {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "residual-sweep".into(),
+                targets: Targets::Walk,
+                max_trials: 2_000_000,
+                seed: 3,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "4");
+            for (k, v) in variant {
+                spec.oracle_params.set(k, *v);
+            }
+            let mut oracle = ResidualSweepOracle::new();
+            let rep = run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .unwrap();
+            assert!(rep.verified, "variant {variant:?} must verify");
+            assert_eq!(rep.recovered, Some(planted), "variant {variant:?}");
+        }
+    }
+
+    /// **Every relation the residual sweep emits is a true group equation**:
+    /// `Σ coef · log(column point) = a + b·d (mod r)`, checked against
+    /// brute-force logarithms of the base points for the plain sweep, the
+    /// unfolded sweep, the distinguished-point filter and the hybrid.
+    #[test]
+    fn residual_sweep_rows_hold_as_group_equations() {
+        use super::plugins::ResidualSweepOracle;
+        use super::stages::{DecompositionOracle, FactorBaseBuilder};
+        use crate::cryptanalysis::ic_boundary::{CountedGroup, OracleCounters, Relation};
+        use rand::{Rng, SeedableRng};
+        let inst = roster_prime_instance(14).unwrap();
+        let (ctx, d) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut params = Params::default();
+        params.set("size", "6");
+        let mut ops = GroupOps::default();
+        let fb = base.build(&ctx, &params, &mut ops).unwrap();
+        let curve = &inst.curve;
+        let mut log_of = std::collections::HashMap::new();
+        let mut acc = curve.identity();
+        for k in 0..inst.r {
+            log_of.insert(curve.key(&acc), k);
+            acc = curve.add(&mut ops, acc, ctx.generator);
+        }
+        let r = inst.r as u128;
+        // x_col: the logarithm of the column's positive point.
+        let mut x_col = vec![0u64; fb.columns];
+        for i in 0..fb.points.len() {
+            if fb.coef_of[i] == 1 {
+                x_col[fb.col_of[i]] = log_of[&curve.key(&fb.points[i])];
+            }
+        }
+        let holds = |columns: &[(usize, u64)], a: u64, b: u64| {
+            let lhs: u128 = columns
+                .iter()
+                .map(|&(c, coef)| coef as u128 * x_col[c] as u128 % r)
+                .sum::<u128>()
+                % r;
+            lhs == (a as u128 + b as u128 * d as u128) % r
+        };
+        let variants: [&[(&str, &str)]; 4] =
+            [&[], &[("fold", "0")], &[("dp", "1")], &[("pairs", "1")]];
+        for variant in variants {
+            let mut oparams = Params::default();
+            for (k, v) in variant {
+                oparams.set(k, *v);
+            }
+            let mut oracle = ResidualSweepOracle::new();
+            let mut ops = GroupOps::default();
+            oracle.prepare(&ctx, &fb, &oparams, &mut ops).unwrap();
+            let mut rng = rand::rngs::StdRng::seed_from_u64(9);
+            let mut counters = OracleCounters::default();
+            let (mut rows, mut two_column) = (0usize, 0usize);
+            for _ in 0..400 {
+                let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+                let ag = curve.mul(&mut ops, ctx.generator, a);
+                let bq = curve.mul(&mut ops, ctx.target, b);
+                let point = curve.add(&mut ops, ag, bq);
+                for rel in
+                    oracle.decompose_relations(&ctx, &fb, &mut ops, &mut counters, point, a, b)
+                {
+                    rows += 1;
+                    match rel {
+                        Relation::Row { columns, a, b } => {
+                            two_column += usize::from(columns.len() == 2);
+                            assert!(
+                                holds(&columns, a, b),
+                                "variant {variant:?}: row {columns:?}"
+                            );
+                        }
+                        Relation::Summands(idx) => {
+                            let cols: Vec<_> =
+                                idx.iter().map(|&i| (fb.col_of[i], fb.coef_of[i])).collect();
+                            assert!(holds(&cols, a, b), "variant {variant:?}: summands {idx:?}");
+                        }
+                    }
+                }
+            }
+            assert!(rows > 20, "variant {variant:?} produced only {rows} rows");
+            assert!(
+                two_column > 0,
+                "variant {variant:?} produced no collision row"
+            );
+        }
     }
 
     /// The fold is the framework's headline lever, so it is checked:

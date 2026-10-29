@@ -23,7 +23,6 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-07 | [Rule v3: the Koblitz descent at baseline v3, one target cold, closest size 2^36.6](https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md) | 5.23× | matched | source-specific; see result |
 | 2026-10-15 | [Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md) | 1.57× | matched | S |
 | 2026-10-15 | [Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 68,183,174× | matched | F_p multiplications |
-| 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
 | 2026-10-16 | [n83 K1120 five-point cold factor-base holdout, selected ID null](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md) | 55.4× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
 | 2026-10-17 | [Volcano projected-base control/pilot; best bounded IC cell](https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json) | 19.2× | matched | quotient of incomplete cold GAE lower bounds; diagnostic |
 | 2026-10-18 | [Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)](https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) | 1.27× | matched | S |
@@ -31,6 +30,7 @@ The [canonical timeline](../index-calculus-scoreboard.html#lab-progress) shows t
 | 2026-10-21 | [Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md) | 14.4× | matched | source-specific; see result |
 | 2026-10-27 | [Residual collector res2 vs rho.negation, one target cold, best cell icv1-fp36-t454193-44a20818 (r = 2^36.0)](https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md) | 2.59× | matched | S |
 | 2026-10-17 | [n83 K1107/root11 sixteen-point cold factor-base frontier](https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md) | 47.1× | matched | Tier 1 cloud-instance cold IC / same-point rho online wall |
+| 2026-10-20 | [k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)](https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md) | 1,236,267× | matched | F_p multiplications |
 
 ## Frontier audit and subsequent corrections (implementation result 2026-10-14)
 
@@ -300,6 +300,55 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 4,096 | 8.40 s | 3.82 s | 1.04 s | 0.27 [0.23, 0.32] | 0.12 [0.10, 0.15] | 0.16 | 0.63 → 0.34 GiB |
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
+
+## Residual sweep: a birthday collision search through the IC pipeline, outside tables A–C
+
+`ic.pipeline` with the `residual-sweep:m=2` oracle: every residual R − P_i of a target is stored by abscissa and each collision R − P_i = t (R′ − P_i′) becomes a base-only relation. Listed here, not in tables A–C and not in the exponent ranking, because it is **a birthday collision search that runs through the index-calculus pipeline, not an index calculus with a better exponent**: at a fixed base its counted S does not grow with the curve, the rows found equal the birthday count N²/(r 2^k), a strided pseudo-random base costs 1.03× of the smallest-abscissa base, and its table grows like √(r B). **Memory is not in S**: read S beside the entries column. 39 sessions, 7,716 measured runs, same binary, targets and rounds for every arm (`research/ic_sweep_ext_20261028/`, [report](research/ic_sweep_ext_20261028/REPORT.pdf)). validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261028-ic-sweep-ext/VALIDATION.json)
+
+Mean counted S (S = GAE/√r) and its distance to the same session's `rho.negation`, with the table the arm holds:
+
+| bits | arm | mean S | S / rho.negation | table entries | table MiB |
+|--:|:--|--:|--:|--:|--:|
+| 32 | rho.negation | 1.02 | 1.00 | 0 | 0.0 |
+| 32 | bsgs.negation | 0.88 | 0.86 | 29,441 | 0.4 |
+| 32 | kangaroo | 1.70 | 1.67 | 775 | 0.0 |
+| 32 | sweep B=2 | 2.82 | 2.77 | 131,732 | 4.0 |
+| 32 | sweep B=8 | 4.25 | 4.17 | 233,762 | 7.1 |
+| 32 | sweep B=128 | 11.55 | 11.33 | 675,642 | 20.6 |
+| 32 | pair-table incumbent (walk) | 33.01 | 32.40 | 1,048,576 | 16.0 |
+| 36 | rho.negation | 1.29 | 1.00 | 0 | 0.0 |
+| 36 | bsgs.negation | 1.29 | 1.00 | 103,364 | 1.6 |
+| 36 | kangaroo | 1.97 | 1.52 | 1,562 | 0.0 |
+| 36 | sweep B=2 | 2.28 | 1.76 | 375,346 | 11.5 |
+| 36 | sweep B=8 | 3.85 | 2.98 | 748,282 | 22.8 |
+| 36 | sweep B=128 | 11.89 | 9.20 | 2,447,111 | 74.7 |
+| 36 | pair-table incumbent (walk) | 42.17 | 32.62 | 4,194,304 | 64.0 |
+
+Slope of log2 S against log2 r (95% bootstrap interval; the incumbent grows, the sweep and the generic searches are flat, which is the signature of a collision search, not of a better exponent):
+
+| arm | slope | 95% | sizes |
+|:--|--:|:--|--:|
+| bsgs.negation | -0.007 | [-0.013, -0.002] | 13 |
+| kangaroo | -0.023 | [-0.031, -0.016] | 13 |
+| pair-table incumbent (walk, base ~ r^(1/3)) | +0.071 | [+0.069, +0.074] | 9 |
+| rho.negation | -0.010 | [-0.022, +0.001] | 13 |
+| rho.negation_lanes | -0.028 | [-0.039, -0.018] | 13 |
+| sweep B=128 | -0.017 | [-0.021, -0.013] | 9 |
+| sweep B=2 | -0.025 | [-0.034, -0.017] | 11 |
+| sweep B=32 | -0.019 | [-0.023, -0.014] | 9 |
+| sweep B=8 | -0.014 | [-0.020, -0.009] | 9 |
+
+Distance remaining to the matched rho (§5a band, sweep B = 2 against `rho.negation`, 32-bit prime-order curve, unpriced native work priced at 0, 0.1 and 1 GAE per operation): 0: 2.82 vs 1.02 (2.77×); 0.1: 3.10 vs 1.12 (2.77×); 1: 5.62 vs 2.03 (2.77×). The order holds across the band: rho is ahead at every weight, so the sweep does not beat rho; it is a verified, cheap arm of `ic.pipeline` and the lowest S measured of any abscissa-base arm.
+
+## Koblitz IC set-up, outside tables A–C
+
+`ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against round 2's code changes (class: engineering): reused per-trial scan buffers, the collector's index map and field structure built once, Fx-hashed orbit and projection maps, aimed scans with pre-gathered coordinates. Every count, recovered logarithm and in-process rho reference is identical, so no row above moves; the set-up time saved lowers the cold ratio the next re-run of table A will measure. Medians over 15 repetitions per binary, one thread, pinned; build and verify vary ±10% on unchanged code. Study: [research/ecbench_perf_round2_20261022/](../../research/ecbench_perf_round2_20261022/).
+
+| curve | set-up old | set-up new | new / old | collect old → new | IC online | rho online |
+|:--|--:|--:|--:|:--|--:|--:|
+| k0n41 | 57.2 ms | 45.9 ms | 0.803 | 36.3 → 27.5 ms | 1.19 ms | 3.0 ms |
+| k0n53 | 436.7 ms | 403.5 ms | 0.924 | 234.8 → 211.5 ms | 0.15 ms | 49.4 ms |
+| k0n61 | 1697.0 ms | 1519.6 ms | 0.895 | 1386.8 → 1198.0 ms | 7.80 ms | 28.5 ms |
 
 ## Quartic-twist pair index, outside tables A–C
 
@@ -684,7 +733,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `56c31e8fafbad00a…`
+- `docs/ic/progress-timeline.json` — sha256 `4785113221559d9c…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
@@ -710,6 +759,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/ic_sweep_ext_20261028/results.json` — sha256 `00ea9dfcea222709…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
@@ -737,6 +787,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json` — sha256 `469dbe385da11a4d…`
 - `research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE_v1.json` — sha256 `0bb72ba5f0cc6862…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
+- `research/ecbench_perf_round2_20261022/results.json` — sha256 `f63553efc31c757a…`
 - `research/bitop_ladder_20261019/summary.json` — sha256 `c7f5dd2ed72c77d6…`
 - `research/hec_bitop_20261020/analysis/analysis.json` — sha256 `87615d6925b4ed8e…`
 - `experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json` — sha256 `4772cf301a459700…`
@@ -753,7 +804,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `e7e8cd2ce2570e6e…`
+- `docs/curves/registry.json` — sha256 `dd2e0fa237241c2f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
