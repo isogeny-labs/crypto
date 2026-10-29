@@ -328,6 +328,25 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
+
+Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
+
+| bits | N incumbent → selected | S incumbent → selected (w = 0 / 0.1 / 1) | selected ÷ incumbent (w = 0 / 0.1 / 1) | IC ÷ rho-neg incumbent → selected (w = 0 / 0.1 / 1) | reading |
+|--:|:--|:--|:--|:--|:--|
+| 20 | 32 → 45 | 12.85 → 10.51 / 14.83 → 11.83 / 32.58 → 23.65 | 0.818 [0.773, 0.866] / 0.798 [0.752, 0.847] / 0.726 [0.677, 0.778] | 9.47 → 7.75 / 10.06 → 8.02 / 12.88 → 9.35 | improvement: new prime-field IC baseline |
+| 24 | 162 → 115 | 13.98 → 12.61 / 15.17 → 14.26 / 25.89 → 29.15 | 0.902 [0.870, 0.933] / 0.940 [0.905, 0.975] / 1.126 [1.073, 1.179] | 13.79 → 12.44 / 13.74 → 12.92 / 13.49 → 15.19 | relabelling (falls at w = 0, rises at w = 1); incumbent kept |
+| 28 | 407 → 288 | 20.48 → 19.02 / 22.20 → 21.62 / 37.74 → 45.04 | 0.929 [0.894, 0.964] / 0.974 [0.935, 1.014] / 1.193 [1.134, 1.257] | 21.80 → 20.25 / 21.55 → 20.98 / 20.38 → 24.33 | relabelling (falls at w = 0, rises at w = 1); incumbent kept |
+| 32 | 1024 → 1024 | 32.24 → 32.24 / 35.31 → 35.31 / 62.93 → 62.93 | 1.000 [1.000, 1.000] / 1.000 [1.000, 1.000] / 1.000 [1.000, 1.000] | 33.30 → 33.30 / 33.18 → 33.18 / 32.61 → 32.61 | selection = incumbent; null |
+
+Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.
+
+Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.
+
+[Report](../../research/prime_base_oracle_tuning_20261029/README.pdf) · [study](../../research/prime_base_oracle_tuning_20261029/).
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
 ## Linear-algebra engine, outside tables A–C
 
 The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime (class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, and no row moves. Study: [research/la_engines_20261014/](../../research/la_engines_20261014/).
@@ -734,7 +753,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `e9b7c4bd525481e9…`
+- `docs/ic/progress-timeline.json` — sha256 `0c32c6cdc5e8cbc2…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -804,7 +823,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `dd2e0fa237241c2f…`
+- `docs/curves/registry.json` — sha256 `842a28358e7e3907…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
