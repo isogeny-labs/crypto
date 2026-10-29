@@ -2250,7 +2250,18 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "must be 2")]
+        if self.blocked {
+            &[
+                ("m", "must be 2"),
+                (
+                    "filter",
+                    "0 (default) or 1: a membership filter of about a byte per entry in front of \
+                     the packed table, so a missing key costs one bit read (packed layout only)",
+                ),
+            ]
+        } else {
+            &[("m", "must be 2")]
+        }
     }
 
     fn prepare(
@@ -2260,11 +2271,26 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
-            return Err(format!("{} accepts only m=2", self.name_str()));
+        let allowed = |key: &String| key == "m" || (self.blocked && key == "filter");
+        if params.u64_or("m", 2)? != 2 || !params.0.keys().all(allowed) {
+            return Err(if self.blocked {
+                format!("{} accepts only m=2 and filter=0|1", self.name_str())
+            } else {
+                format!("{} accepts only m=2", self.name_str())
+            });
         }
+        let filtered = match params.u64_or("filter", 0)? {
+            0 => false,
+            1 => true,
+            other => {
+                return Err(format!(
+                    "{}: filter must be 0 or 1, not {other}",
+                    self.name_str()
+                ))
+            }
+        };
         let table = if self.blocked {
-            PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+            PairTable::build_negation_folded_prime_blocked_with(ctx.group, fb, filtered)?
         } else {
             PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
         };
