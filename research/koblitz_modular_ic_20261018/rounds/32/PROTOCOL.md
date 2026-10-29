@@ -54,3 +54,11 @@ Replace only reconstruction by native matrix(generators)*witness, preserving
 zero slots. Require exact equality1 as before and record both dimensions.
 Fresh jac83-03 and jac284-02 use that correction; unchanged rank/source data,
 controls and caps. The second field had not run after the failed first field.
+
+## Prospective Lean witness specialization
+
+KoblitzMinorWitness32 proves that an exact finite unit identity survives any
+ring homomorphism into a nontrivial field and some minor remains nonzero on
+every such branch. It does not import native matrix entries, prove Jacobian
+rank or establish the incidence scheme's local dimension. Same pinned Lean,
+mathlib,-j1-M4096/1200seconds and transitive standard-foundations-only audit.
