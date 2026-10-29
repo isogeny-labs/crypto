@@ -52,3 +52,13 @@ recovering the weight. Three named Lean theorems, standard foundations only,
 no axioms/sorry/native_decide. Identification with actual Hecke multiplication
 norm,point specialization and source fiber is written,not assumed as an axiom.
 PinnedLean4.34.1/mathlibd13f23b, -j1-M4096/1200,CPU0 affinity, separateaudit.
+
+DUAL02 strictPASS: all4 exact derivatives, originalM15normA/B identical,1024
+RR coefficients andallcontrols. Freeze actual evaluation at4originalsupports
+before data: ratio weighted/unweighted only when denominatornonzero. Check
+curve,cubic,unique matchamong3candidate linearroots; outputexactF2algebra
+coordinates. Compute complete second-image Frobenius orbit length dividing
+first residue degree, retain its residue pushforward multiplicity. Export
+allselected pointpairs withfieldmodulus. A zero derivative denominator remains
+explicitunresolved. These are selected paired Heckeimages under the recorded
+norm/geometry bridge,not complete C5sourcefibers/CMmaps/reverseclasses/ranks.
