@@ -3,8 +3,8 @@
  "generated_by": "scripts/build_lab_browser.py",
  "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
  "counts": {
-  "curves": 20809,
-  "cover_assessed": 20809,
+  "curves": 20811,
+  "cover_assessed": 20811,
   "cover_unassessed": 0,
   "methods": 220,
   "factor_bases": 672,
@@ -15,11 +15,11 @@
   "store_objects": 29
  },
  "sources": {
-  "docs/curves/registry.json": "53fe929b9b971fa2c74ee29fcd5cea7fca969d411ae28e8cbf413c9550f3032e",
-  "docs/curves/covers.json": "b5e6f1c5b5cc1d45334af57ece75eea9fe6d61919feef9f0b09a4dbb77ff9038",
-  "docs/curves/cover-links.yaml": "7b6c8792d1fe51ef122391a4270e53044133eb396adee42895150ac5174069ce",
+  "docs/curves/registry.json": "71f25635fd07878cc216a8b24521c45d32ccf7366220192fcc627ef9f91ef35c",
+  "docs/curves/covers.json": "ee0e427a0033d502f68ef6263f1948c4a1dbb51cae427d8de8b3ccf58af26f51",
+  "docs/curves/cover-links.yaml": "4763daf76d6a5381237949d94bdf7f2eb8eb9df6bda73454c51e2809c3c3a458",
   "docs/curves/standards/coverage.json": "80cb0d6d5400904a34115be076d7463f5adf9ad0b40ffc2ce92f741a16985f56",
-  "docs/ic/leaderboard.json": "11c86a423b75201f821ee197f626f30263b2fa2e0efdd2e93754e96525879651",
+  "docs/ic/leaderboard.json": "f4d4f44d29d461858fd81709a8031abf0544da8054ad28920e10c63cc5f936ff",
   "store/index.json": "9eb88295b5cc8ad1d14c276aa9162ebe645b5b7575fb5e44d8399d5f767ef841",
   "store/config.json": "5038b35b298c7c3b88647719229586d3a3d4fb00c1d20bf09d0f95de272cc1c1",
   "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/records.jsonl": "961d18b9c05face1afcf8e96db9cec8f45a0326319b2c65baecb27b633d72881",
@@ -18565,7 +18565,7 @@
    ],
    "sources": [
     "research/nist_binary_skipped_20261020/census/registry_records.json",
-    "prose, by the constructor rule: src/cryptanalysis/curve_aliases.json"
+    "prose, by the constructor rule: docs/ic-leaderboard.html"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -63894,6 +63894,100 @@
      "map_uid": "urn:curve-cover-map:1:sha256:879b163de3aa41524b730eafb690f069757d4059426420940f102602cb088041",
      "cover_id": "HC1G2h07294d2809fa",
      "map_id": "CV1D2h879b163de3aa"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp23-tm110-8df20cbc",
+   "icv1": "ICV1:fp-4194397:-110:4194508:0:unk:unk:r:8df20cbc674c",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "4194397",
+    "bits": 23,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "0",
+   "b": "2",
+   "construction": null,
+   "trace": "-110",
+   "order": "4194508",
+   "order_bits": 22.0,
+   "r": null,
+   "r_bits": null,
+   "cofactor": null,
+   "generator": null,
+   "target_group": null,
+   "j": "0",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"0\",\"b\":\"2\",\"field\":\"fp-4194397\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"4194397\",\"v\":\"1\"}",
+   "ec1": [],
+   "curve_uid": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "retired_names": [],
+   "sources": [
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/sessions/j0-frozen-branch/plan.json",
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/sessions/j0-frozen-branch/spec.json",
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/sessions/j0-v2/plan.json",
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/sessions/j0-v2/spec.json",
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/specs/check-prime-j0-floor-v2.fp23.json",
+    "research/ecbench_accounting_v2_20261023/archives/fp23-first-run/specs/frozen-j0.fp23.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0x2",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "8df20cbc674caea89c1072464cc0f64473b50ae5f33a71aa5bdc34d2e66eaaf7",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp23-tm110-8df20cbc",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:4b28b70abc7c2e571163de604a64c573dc0eac914257dd5342bc3a221a2d87f6",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:23bc44600daa1b6d5d1bcb724dede2239c84494ec918b7ad5dabecc7b92cc5ff",
+     "cover_id": "HC1G2h4b28b70abc7c",
+     "map_id": "CV1D2h23bc44600daa"
     }
    ],
    "standards_provenance": [],
@@ -880504,11 +880598,11 @@
    ],
    "sources": [
     "docs/curves/sources/isogeny-conductor-gap-20261010.json",
-    "research/ic_acct6_archive_20261021/specs/p018-e2_glv_crater_floor.json",
-    "research/ic_acct6_archive_20261021/specs/p019-fiber_prime.json",
-    "research/ic_acct6_archive_20261021/specs/p020-prime_gap_22_fiber.json",
-    "research/isogeny_conductor_gap_ic_20261010/pairs/prime_pairs.json",
-    "research/isogeny_conductor_gap_ic_20261010/sessions/fiber_prime/plan.json"
+    "docs/ecbench/specs/check-prime-j0-floor-v2.json",
+    "research/ecbench_accounting_v2_20261023/sessions/j0-frozen-branch/plan.json",
+    "research/ecbench_accounting_v2_20261023/sessions/j0-frozen-branch/spec.json",
+    "research/ecbench_accounting_v2_20261023/sessions/j0-v2/plan.json",
+    "research/ecbench_accounting_v2_20261023/sessions/j0-v2/spec.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1666781,7 +1666875,11 @@
     "icv1-fp28-tm24531-24294e5d"
    ],
    "sources": [
-    "docs/curves/sources/ci-registration-20261029.json"
+    "docs/curves/sources/ci-registration-20261029.json",
+    "research/rho_negation_audit_20261020/curves.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/plan.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/spec.json",
+    "research/rho_negation_audit_20261020/specs/negation_vs_plain.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1673828,7 +1673926,11 @@
     "icv1-fp32-t93403-ef655380"
    ],
    "sources": [
-    "docs/curves/sources/ci-registration-20261029.json"
+    "docs/curves/sources/ci-registration-20261029.json",
+    "research/rho_negation_audit_20261020/curves.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/plan.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/spec.json",
+    "research/rho_negation_audit_20261020/specs/negation_vs_plain.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1674784,7 +1674886,11 @@
     "icv1-fp36-t360541-9f646956"
    ],
    "sources": [
-    "docs/curves/sources/ci-registration-20261029.json"
+    "docs/curves/sources/ci-registration-20261029.json",
+    "research/rho_negation_audit_20261020/curves.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/plan.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/spec.json",
+    "research/rho_negation_audit_20261020/specs/negation_vs_plain.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1675019,6 +1675125,96 @@
      "map_uid": "urn:curve-cover-map:1:sha256:ac457856fcafeb9f3d9503cdf7906bc7c7cd91cf4cdd97cd302050fcb4d33d7a",
      "cover_id": "HC1G2h7694f00070f1",
      "map_id": "CV1D2hac457856fcaf"
+    }
+   ],
+   "standards_provenance": [],
+   "store_objects": []
+  },
+  {
+   "slug": "icv1-fp36-tm35573-fd3a6c51",
+   "icv1": "ICV1:fp-64371108127:-35573:64371143701:53866872566:unk:unk:r:fd3a6c5163ca",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "64371108127",
+    "bits": 36,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "31814941216",
+   "b": "51800018374",
+   "construction": null,
+   "trace": "-35573",
+   "order": "64371143701",
+   "order_bits": 35.873,
+   "r": null,
+   "r_bits": null,
+   "cofactor": null,
+   "generator": null,
+   "target_group": null,
+   "j": "53866872566",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"31814941216\",\"b\":\"51800018374\",\"field\":\"fp-64371108127\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"64371108127\",\"v\":\"1\"}",
+   "ec1": [],
+   "curve_uid": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "retired_names": [],
+   "sources": [
+    "research/rho_negation_audit_20261020/volcano/instance-off/instance_study.json",
+    "research/rho_negation_audit_20261020/volcano/instance-on/instance_study.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": [],
+   "hyperelliptic_cover": {
+    "certificate": {
+     "construction": "prime_quadratic_pullback_v1",
+     "degree": 2,
+     "f": [
+      "0xc0f858dc6",
+      "0x0",
+      "0x768517a20",
+      "0x0",
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "genus": 2,
+     "h": [],
+     "x": [
+      "0x0",
+      "0x0",
+      "0x1"
+     ],
+     "y_0": [],
+     "y_v": [
+      "0x1"
+     ]
+    },
+    "dlp_advantage": null,
+    "exists": true,
+    "field_check": "20_fixed_base_probable_prime_screen; primality remains an input assumption",
+    "field_relation": "same_field",
+    "map_direction": "H -> E",
+    "minimal_degree": null,
+    "minimal_genus": null,
+    "model_sha256": "fd3a6c5163cacbe019cf46084ad7f0540683638ab7f6f0a312c93e306a126937",
+    "reason": "polynomial substitution and genus/degree conditions checked; smooth projective models understood",
+    "slug": "icv1-fp36-tm35573-fd3a6c51",
+    "status": "verified_over_declared_field",
+    "subfield_descent": "not_tested",
+    "subgroup_transfer": "not_tested"
+   },
+   "cover_links": [
+    {
+     "cover_uid": "urn:hc-model:1:sha256:9a5009cc522e326b308e6993c76b1eef30189f83230ad1b97c74eb055d486b94",
+     "direction": "H -> E",
+     "map_uid": "urn:curve-cover-map:1:sha256:9a6ddf157407925822bfd1016585f65f72d1051e88526a8900f02bde5da92c8f",
+     "cover_id": "HC1G2h9a5009cc522e",
+     "map_id": "CV1D2h9a6ddf157407"
     }
    ],
    "standards_provenance": [],
@@ -1676521,7 +1676717,11 @@
     "icv1-fp40-tm62443-8b49d5b3"
    ],
    "sources": [
-    "docs/curves/sources/ci-registration-20261029.json"
+    "docs/curves/sources/ci-registration-20261029.json",
+    "research/rho_negation_audit_20261020/curves.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/plan.json",
+    "research/rho_negation_audit_20261020/sessions/negation_vs_plain/spec.json",
+    "research/rho_negation_audit_20261020/specs/negation_vs_plain.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1678304,7 +1678504,12 @@
     "generic-dlp-20261017-rho-44"
    ],
    "sources": [
-    "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json"
+    "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json",
+    "research/prime_ksum_k5_20261028/base-specs/spec-P44.json",
+    "research/prime_ksum_k5_20261028/test/sessions/P44/plan.json",
+    "research/prime_ksum_k5_20261028/test/sessions/P44/spec.json",
+    "research/prime_ksum_k5_20261028/test/spec-P44.json",
+    "research/prime_ksum_k5_20261028/train/sessions/P44/plan.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],
@@ -1715629,7 +1715834,12 @@
     "generic-dlp-20261017-rho-48"
    ],
    "sources": [
-    "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json"
+    "research/generic_dlp_memory_parallelism_20261017/inputs/curves.json",
+    "research/prime_ksum_k5_20261028/base-specs/spec-P48.json",
+    "research/prime_ksum_k5_20261028/test/sessions/P48/plan.json",
+    "research/prime_ksum_k5_20261028/test/sessions/P48/spec.json",
+    "research/prime_ksum_k5_20261028/test/spec-P48.json",
+    "research/prime_ksum_k5_20261028/train/sessions/P48/plan.json"
    ],
    "on_leaderboard": false,
    "leaderboard": [],

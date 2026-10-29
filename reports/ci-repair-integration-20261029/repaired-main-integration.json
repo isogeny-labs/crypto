@@ -78,7 +78,105 @@
       "browser": 4,
       "builder_inputs_covered": 980
     },
-    "full_combined_library": "pending; earlier source-bound results retained",
-    "catalog_integration": "source359 native-validated branch ready for normal integration"
+    "full_combined_library": "5263 passed, 0 failed, 123 existing ignored on actual6a31be8; see final_combined_library",
+    "catalog_integration": "complete20811 canonical source5ffe branch merged; complete unchanged combined harvester yields byte-identical generation; fresh native checks pass"
+  },
+  "final_combined_library": {
+    "source_head": "6a31be8f971040f0b3824b421e67d358d64fcb0a",
+    "cargo_exit_code": 0,
+    "seconds": 1952,
+    "source_inventory": "integration-complete-cargo-source-restoration-20261029.json",
+    "runtime_inventory": "integration-main78-preserved-inputs-20261029.json",
+    "passed": 5263,
+    "failed": 0,
+    "ignored_existing": 123,
+    "test_seconds": 1482.76,
+    "log": "final-combined-source-library.log.gz",
+    "raw_log_sha256": "ae1488dc2927440fe7662b89595c9559a7a486ba2f44161d01b2f5ca9061dec1",
+    "compressed_log_sha256": "aa172cc3aa49c491b6af30b4a225c27b383cb483d512d0eb9ca531f8768c8c04"
+  },
+  "fresh_native_plan_tests": {
+    "passed": 45,
+    "failed": 0,
+    "log_sha256": "96972dfd4238c60eff4e6cc722d2345da2168d58d72fc3e8bd3b5c6bbf89a903"
+  },
+  "final_operational_controls": {
+    "library_source": "6a31be8f971040f0b3824b421e67d358d64fcb0a",
+    "cli": {
+      "passed": 92,
+      "failed": 0,
+      "ignored_existing": 1,
+      "same_original_integration_assertions": true,
+      "scope": "selected IC binary unit tests includes both original integration suites"
+    },
+    "site": {
+      "passed": 51,
+      "failed": 0,
+      "initial_sparse_missing_inputs_retained": true
+    },
+    "catalog_snapshot": {
+      "passed": 6,
+      "failed": 0
+    },
+    "assessment_delta": "Only dynamic SHA256 fingerprints for Cargo.toml, Cargo.lock and src/cryptanalysis/mod.rs; all dated catalog pins and scientific fields preserved",
+    "native_catalogs": {
+      "cover_check": 0,
+      "transfer_check": 0,
+      "traits_complete_input_check": 0,
+      "initial_traits_missing_provider_exit": 1,
+      "provider_input_hashes_verified": 7
+    },
+    "logs": {
+      "final-native-cli-contract-tests": {
+        "log": "final-native-cli-contract-tests.log.gz",
+        "raw_sha256": "bdbbb62e463c353d6a3c28e2702c3a9bf932eb4e131e73a932655f38355d8955",
+        "gzip_sha256": "53d2abbe338c27f76929394b31036351db42a02b7e35545c28eb4df02e421bcc"
+      },
+      "final-site-complete-input-controls": {
+        "log": "final-site-complete-input-controls.log.gz",
+        "raw_sha256": "803eb551f1a847512d18726be8a0f3280a3aab7be9cfbe32bcf34e6e410640ad",
+        "gzip_sha256": "60b58e1ede8bb39d76246fa86c283278447d83cecaf964eefbe4205a73c12b27"
+      },
+      "final-catalog-snapshot-controls": {
+        "log": "final-catalog-snapshot-controls.log.gz",
+        "raw_sha256": "4ae24a21cecb1fba5a2bd7dba4663f4a8bb2269759dbf66ae0008b5306cf3684",
+        "gzip_sha256": "0fed59af7cd6a6811cc191b0de8311aa3a00577778945ae2ee245d5baca34846"
+      },
+      "final-cover-assessment-check": {
+        "log": "final-cover-assessment-check.log.gz",
+        "raw_sha256": "1858c259715378bd52cb6c00dc8063409dd55d7dd41f36f3378ba45b9e949215",
+        "gzip_sha256": "d50a993447e42cf32b13d49e17e944eb0f8ce084744eb5c7fb0202781d0ff2c4"
+      },
+      "final-native-cover-check": {
+        "log": "final-native-cover-check.log.gz",
+        "raw_sha256": "650649c33139fb486dbfbf6ca323acac315f39b671dc41c94d38229a0888d390",
+        "gzip_sha256": "38b0e899bb0b6f907c3cefc9522c0c1a909067c4ea930e47e9f90d864fe1939d"
+      },
+      "final-native-transfer-check": {
+        "log": "final-native-transfer-check.log.gz",
+        "raw_sha256": "eacfe19df088eabd193b35e0a5572fd71d3f31de2e7d08011c8007654e0bc453",
+        "gzip_sha256": "676e2e27dbceafea13fdb766d0e7d199df7bf3d85ef3bc174060130bae7c4e2c"
+      },
+      "final-native-trait-complete-inputs-check": {
+        "log": "final-native-trait-complete-inputs-check.log.gz",
+        "raw_sha256": "c251808618c28099745046fc185eb2e55640cdadedb671586c6974fc53313114",
+        "gzip_sha256": "f7accbe2498caf57737a6f263a6bcbc30ddad73c88fa42429034331bfd5fa120"
+      }
+    }
+  },
+  "new_main_observed_not_yet_integrated": "8eb04d5e97a157072190892a29435c373b13ecc4",
+  "replay_remaining": {
+    "required_sessions": 115,
+    "saved_old_full_receipts": 9,
+    "saved_new_full_receipts": 21,
+    "recovered_rootfind_v2": {
+      "verified_records": 224,
+      "replays": 168,
+      "reproduced": 144,
+      "inherited_f4_counter_drifts": 24
+    },
+    "full_plan_finished": false,
+    "restart_interrupted_running_audits": true,
+    "expectations_not_relaxed": true
   }
 }

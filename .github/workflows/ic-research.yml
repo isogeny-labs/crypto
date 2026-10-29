@@ -45,7 +45,10 @@ jobs:
       - name: Build ic
         run: cargo build --release --bin ic
       - name: Parameter and synthetic pipeline checks
-        run: cargo test --release --test ic_framework --test ic_progress
+        env:
+          IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
+        # These include the same two suites without Cargo building every bin.
+        run: cargo test --release --bin ic
       - name: Inspect supplied example documents
         run: |
           target/release/ic inspect --file docs/ic/prime-example.json --json
