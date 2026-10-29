@@ -268,8 +268,10 @@ passed 11 focused native/adapter tests, the full release library suite
 (5,153 passed, zero failures, 123 ignored), release build and actual CLI checks.
 The separate endpoint test passed all 360 adapter combinations, including
 structured unsupported and capped outcomes; it does not establish 360 solves.
-Strict lint remains blocked by the separately unregistered startup helpers;
-central stored-input verifier integration and cloud validation remain pending.
+The earlier strict-lint blocker was three unregistered startup helpers.
+Source `7a1bd350b26eaeccf51bf9078915649a7c4335fc` registers the startup CLI and
+central stored-input verifier and passes 142 dataset tests plus 26 F4 tests.
+Final lint/full-library/CLI validation is pending; cloud validation remains open.
 `f4` keeps its existing m=2 reference path and selects
 `prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
 leaf membership equations and unrestricted auxiliary-variable roles before
@@ -301,10 +303,10 @@ read-only-event-descriptor regression verifies this path; total storage failure
 still cannot establish durability. Neither state
 establishes scalar recovery or an exact first/last fall degree.
 
-Generation invokes the new public equation/domain reconstruction verifier.
-Central `verify_cell` registration for this artifact remains pending; do not
-claim that restore plus `dataset verify` already reconstructs these new chain
-equations. Parent validation must cover that integration separately. The frozen
+Generation and central `verify_cell` invoke the public equation/domain
+reconstruction verifier. Semantic replay tests on source `7a1bd350b26` cover
+rehashed corruption and omitted inputs with stripped strategy tags. Actual CLI
+and cloud restore checks remain separate validation steps. The frozen
 [prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md) records required checks and
 mathematical limits; no new cloud-generation evidence follows from this code.
 

@@ -61,9 +61,13 @@ The separately invoked endpoint integration test also passed its 360 combination
 (n=23/61, three families, both twists, m=2/4/15 and ten adapters). It checks
 structured outcomes and returned certificates; unsupported and capped outcomes
 are allowed. This is not a count of solved instances or generated cloud cells.
-Strict maintained Clippy remains blocked by three unused startup helpers whose
-module registration is pending T766's shared-file handoff; no warning was
-suppressed. The startup command remains unregistered. The earlier PR2756 merged
+At that historical checkpoint, strict maintained Clippy failed on three unused
+startup helpers pending T766's shared-file handoff; no warning was suppressed.
+T766 subsequently released the scope. Integrated source
+`7a1bd350b26eaeccf51bf9078915649a7c4335fc` registers `dataset start` and central
+chain replay, and passes 142 dataset tests (including all 11 startup tests and
+four central semantic replay tests) plus 26 F4 unit tests. Final lint, full-library,
+release CLI and native-checkpoint checks are still pending for this integration. The earlier PR2756 merged
 at source head `2e09b77494d6744ee26b56e2fd68e694125ec076`; these later local
 changes require separate delivery after integration and validation.
 The existing m=2 reference path is preserved. Native elimination remains
@@ -72,10 +76,14 @@ invoking the narrow backend. The [wide-arithmetic inventory](PRIME-F4-WIDE-ARITH
 is planning only, with no new arithmetic support or performance claim.
 
 The new equation/domain reconstruction verifier is called during generation.
-Its registration in central `verify_cell` remains pending: restored artifacts
-must not yet be described as independently revalidated through that path.
+It is now registered in central `verify_cell`; the four central replay tests
+exercise generated m2/m3/m4 fixtures on both twists and reject rehashed equation,
+domain, schema, configuration, certificate and artifact-omission tampering.
+These software fixtures do not establish cloud restore or every requested size.
 Raw recursive events remain restricted artifacts, not a public ML equation
-or decision-prefix graph. See the frozen
+or decision-prefix graph. The reviewed [ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md)
+specifies a future lossless graph and causal prefix view; no exporter, prefix
+transition verifier or model is implemented by that document. See the frozen
 [chain contract](PRIME-F4-CHAIN-CONTRACT.md) for scope and required checks.
 
 ## Preserve the whole campaign
