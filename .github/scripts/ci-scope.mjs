@@ -154,6 +154,15 @@ export function sourceFiles(cwd) {
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
     && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
       || isogenyAlgosInputs.test(file) || file === 'build.rs')));
+  // Seed the recursive source walk with the Rust files of every transitively
+  // discovered path crate. Their include!/#[path] dependencies are then
+  // followed by the same fail-closed traversal as maintained sources.
+  const dependencies = [...pathDependencyDirs(cwd)];
+  for (const file of tracked) {
+    if (!/\.rs$/.test(file)) continue;
+    if (dependencies.some(dir => file === `${dir}/build.rs`
+      || file.startsWith(`${dir}/src/`))) sources.add(file);
+  }
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
