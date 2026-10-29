@@ -36,14 +36,20 @@ Their actual T² action is coefficient Frobenius, sigma exchanges the points,
 and the integer projector cancels their closed divisors. This supplies a
 proposed rational padding9Q, not a checked nonzero desired-factor class.
 
+The2150 independent F2 twist quadrics now serialize and round-trip to the
+certified kernel. The full four-variable padding Jacobian has rank3 and
+determinant0 at both points, still without a local-dimension proof.
+
 == Local geometry and failures
 The small4x3 Jacobian has unit maximal minors at both padding points; the
 generic source algebra has dimension32 over F2(u), with exact two-way lifts
 to its six-generator Groebner basis. The old51-product syzygy presentation
 failed at a padding branch. Rank is therefore kept separate from a valid
 local presentation. The expanded degree83 checker reached its original
-1200second cap without a completed point result. Direct ideal quotients and
-denominator-checked specialization are separate gated investigations.
+1200second cap without a completed point result. The direct quotient run also capped at1200seconds: three completed
+omissions retain10/10/7 generators with exact lifts, while omission4 is
+unfinished. This is partial evidence, not a successful full producer.
+Denominator-checked specialization remains separately gated.
 
 A failed native run with exit0 and a trailing marker is rejected whenever
 Singular reports errors. Failed identity initialization, reserved names,

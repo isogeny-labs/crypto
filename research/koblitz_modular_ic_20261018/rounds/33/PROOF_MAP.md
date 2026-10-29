@@ -8,8 +8,8 @@
 | Two closed degree5 padding points and actual deck/Frobenius actions | pad33-01,padding-deck33-02 | Proper normalized point binding remains a geometric obligation |
 | A unit relation coefficient eliminates an equation | KoblitzLocalPresentation33.lean, lean-local33-01 compile/audit | Native unit coefficient must exist and specialize; lemma does not assert it |
 | Padding Jacobian maximal minors generate unit ideal | local33-diagnostic02 | Rank alone does not prove the needed local presentation |
-| Generic exact redundant-equation lifts | local33-quotient01 receipts, if accepted | All coefficient denominators and point unit products must pass separately |
-| Explicit F2 quadratic kernel | quadrics33-01 receipts, if accepted | Proper curve interpretation uses pole/descent bridge; no abelian polarized-factor embedding |
+| Generic redundant-equation lift investigation | Three completed prefix identities in capped local33-quotient01; full run not accepted | Reload and verify retained identities and all denominators; fourth omission unfinished |
+| Explicit F2 quadratic kernel | accepted quadrics33-02, complete native readback | Proper curve interpretation uses pole/descent bridge; no abelian polarized-factor embedding |
 | Padded divisor and nonprincipal source class | No completed coupled-divisor/Picard certificate | Local presentations, complete jets and proper-model binding first |
 | Nonzero desired order11 modular-factor image or faster IC | No certificate or measurement | Actual integral/saturated factor map and full matched recovery accounting |
 

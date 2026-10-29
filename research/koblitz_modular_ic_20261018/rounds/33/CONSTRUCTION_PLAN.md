@@ -59,3 +59,15 @@ These are derived requirements, not completed computations. The paper's
 small/medium variants would need a separate primary-source check before
 claiming that smaller spaces suffice. Its class-equality test requires actual
 vanishing subspaces; source evaluation rank alone is not that test.
+
+## Terminal R33 quotient boundary
+
+local33-quotient01 capped124 while handling omission4. Omissions1/2/3
+retained10/10/7 generators and literal exact-lift checks in that partial run.
+The full producer is not accepted, and existing downstream assemblers correctly
+refuse it. Next use a fresh prospective partial-witness protocol: read the
+terminal saved prefix, verify its complete framing and every lift again, then
+collect ALL source/lift coefficient denominators before point specialization.
+This reuses useful candidate certificates without repeating quotient computation
+or silently changing the original four-omission success criterion. The full
+quotient/saturation question remains open even if a local cover succeeds.
