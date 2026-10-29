@@ -26,10 +26,7 @@ mkdir "$out/controls"
 for mode in false-rank false-base missing-case missing-query false-binding false-source;do
  step "corrupt-$mode" "$audit" corrupt "$mode" "$out/cases" "$out/controls/$mode"
  [[ $(sha256sum "$out/cases/summary.json"|cut -d' ' -f1) != $(sha256sum "$out/controls/$mode/summary.json"|cut -d' ' -f1) ]] || exit 2
- set +e
- step "reject-$mode" "$audit" audit "$root" "$out/controls/$mode" "$out/controls/$mode-receipt.json"
- rc=$?
- set -e
+ if step "reject-$mode" "$audit" audit "$root" "$out/controls/$mode" "$out/controls/$mode-receipt.json"; then rc=0; else rc=$?; fi
  [[ $rc == 101 && ! -e $out/controls/$mode-receipt.json ]] || { echo "bad rejection $mode/$rc" >&2;exit 2; }
 done
 step certificate "$cert" issue "$root" "$out/certificate"
