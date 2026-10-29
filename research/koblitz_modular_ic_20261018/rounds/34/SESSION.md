@@ -27,3 +27,33 @@ jets/coupled divisors, L6D0, target-factor action and larger supports remain.
 ### Errors
 No new native error. R33's capped full quotient and failed syzygy certificate
 remain immutable; no acceptance or global geometry inferred from their prefix.
+
+## Exact colon and local geometry
+
+### What was done
+primitive34-01 passed but all17scales1. qpoly34-01 passed diagnostic: actual
+minimal q=u5+u3+1, all17vectors/all68products zero at bothQ. One q-colon step
+qcolon34-01 passed:20new integral syzygies with exact qG=SH and JG=0 before
+specialization. qcolonpoint34-01 passed both fixedQ:148products unit with
+exact witnesses, old17zero negative control retained. All10P83 already pass
+source-bound standard-etale presentations. Lean34-01 compiled/audited both
+domain-cancellation theorems,0failing0trusted. Proper-normalization binding
+is written in LOCAL_GEOMETRY.md with explicit old function-field assumptions.
+
+### Decisions made
+The defect was in the specialized syzygy lattice; individual primitive
+rescaling was insufficient, while one integral module colon step supplies
+usable local relations. This is not full quotient-variety saturation. Actual
+padding DVRs now permit the frozen complete nine-jet protocol and coupled
+divisors. No repeated acceptedP83 calculations or expanded caps.
+
+### Open threads
+jets34-01, then complete coupled divisors. Full Picard L6D0 setup and intended
+factor action remain. A closed-point evaluation algebra may reduce needed
+jet precision for that larger setup; primary RepresentationB hypotheses must
+be checked before launch. New CM-fiber j observation is recorded by jet check.
+
+### Errors
+prefix34-check83-01 rejected reserved coeffs name, corrected02 passes all10.
+Global quotient-basis Qdomain exclusions remain explicit566/682zeros each;
+no native run or old source record was rewritten as a success.
