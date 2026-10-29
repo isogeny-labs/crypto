@@ -32,3 +32,11 @@ preserve both gate logs. jac83-02 rejected the witness reconstruction because
 size(ideal) counts26 nonzero generators but the vector has42 slots. Matrix
 multiplication fixes only recording/check reconstruction and verifies exact1;
 jac83-03/jac284-02 accepted without weakening controls. Preserve all sources.
+
+Final focused checks: native jac83-03/jac284-02 accepted,20 point algebras;
+Lean compile/audit exit0,2 audited theorems,0failing/0trusted. One-page PDF
+rendering inspected. The metadata assembler first refused a missing final
+audit.exit receipt; downstream rendering consequently lacked its inputs.
+Waited for the completed runner and reran metadata/rendering sequentially;
+no scientific calculation repeated. A truthful short operator-observed record
+is retained; original complete postprocessing stderr was not durably copied.
