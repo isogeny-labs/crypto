@@ -19,7 +19,7 @@ const f = (x, d = 1) => x.toFixed(d);
 const ci = (a) => `${f(a.alpha, 3)} [${f(a.alpha_ci95[0], 3)}, ${f(a.alpha_ci95[1], 3)}]`;
 const ANCHOR = "#prime-ksum-k5-20261028";
 const SOURCE = `https://github.com/isogeny-labs/crypto/blob/main/${DIR}/README.md`;
-const LABEL = "Prime-field IC, k = 5 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9";
+const LABEL = "Prime-field IC, generic decomposition track, k = 5 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9";
 
 const tlPath = "docs/ic/progress-timeline.json";
 const point = {
@@ -31,7 +31,7 @@ const point = {
   detail:
     `ic-ksum5 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): ` +
     `${f(ratio, 2)}x; ${f(k5[1] / rho[1], 2)}x at w = 0.1, ${f(k5[2] / rho[2], 2)}x at w = 1. Was ${f(was, 2)}x (ic-ksum4, same session, reproducing #2808 run for run). ` +
-    `Below ic-ksum4 across the band at 24-48 bits; fitted alpha ${ci(a5)} on 36-48 bits against ${ci(a4)}. ${f(r48, 1)}x rho at 48 bits. Generic: still ${f(k5[0] / bsgs[0], 1)}x BSGS, the family's limit. Lookups unpriced.`,
+    `Below ic-ksum4 across the band at 24-48 bits; fitted alpha ${ci(a5)} on 36-48 bits against ${ci(a4)}. ${f(r48, 1)}x rho at 48 bits. Track: generic decomposition (bounded by sqrt(r); cannot beat rho); not ranked against Table B (different curves). Still ${f(k5[0] / bsgs[0], 1)}x BSGS, the family's limit. Lookups unpriced.`,
   class: "engineering",
   anchor: ANCHOR,
   source: SOURCE,
@@ -67,14 +67,14 @@ const panel =
   `<p id="prime-ksum-k5-20261028">${DATE}: <a href="${SOURCE}">prime-field index calculus with a 5-sum table</a>. ` +
   `A table of every signed 5-sum of a smaller base lowers the prime IC baseline below the k = 4 table at every size from 24 to 48 bits and every band weight (registered test: 36 and 40 bits): ` +
   `at 40 bits <code>S</code> ${f(k5[0], 2)} against ${f(k4[0], 2)}, ${f(k5[2])} against ${f(k4[2])} at w = 1; fitted exponent ${ci(a5)} against ${ci(a4)} on 36&ndash;48 bits. ` +
-  `Class: engineering. The method is generic: it converges to baby-step giant-step and stays ${f(k5[0] / bsgs[0], 1)}&times; above it and ${f(ratio, 1)}&times; above rho at 40 bits (${f(r48, 1)}&times; at 48 bits).</p>`;
+  `Track: generic decomposition (bounded by &radic;r; cannot beat rho); class engineering within it. The method is generic: it converges to baby-step giant-step and stays ${f(k5[0] / bsgs[0], 1)}&times; above it and ${f(ratio, 1)}&times; above rho at 40 bits (${f(r48, 1)}&times; at 48 bits).</p>`;
 if (!page.includes('id="prime-ksum-k5-20261028"')) {
   page = page.replace(/(<p id="prime-ksum-table-20261028">[\s\S]*?<\/p>)/, (m) => m + "\n" + panel);
 }
 const best =
   `<tr><td>Prime field, generic table IC, one-target cold counted S (a = &minus;3, 20&ndash;48 bits)</td><td>k = 5 sum table (\`ksum:m=5\`, A = 33) on <code>icv1-fp40-tm924137-0ecaaeb9</code>, frontier campaign curves and test targets, 16 &times; 2 runs a size; the frontier-comparable cell (also measured at 44 and 48 bits: ${f(r48, 1)}&times; at 48)</td>` +
   `<td class="n"><strong>${f(ratio, 1)}&times;</strong> <small>S ${f(k5[0], 2)} against rho-neg ${f(rho[0], 2)}; was ${f(was, 1)}&times; (k = 4 table, S ${f(k4[0], 2)})</small></td><td><span class="chip">engineering</span></td>` +
-  `<td>Lowers the prime-field IC baseline at every size from 24 bits and every band weight (medium-tier exponent 0.565 &rarr; 0.547) but is generic: it converges to baby-step giant-step and stays ${f(k5[0] / bsgs[0], 1)}&times; above it. <a href="${ANCHOR}">Panel</a> &middot; <a href="${SOURCE}">report</a></td></tr>`;
+  `<td>Generic decomposition (bounded by &radic;r; cannot beat rho). Lowers the prime-field IC baseline at every size from 24 bits and every band weight (medium-tier exponent 0.565 &rarr; 0.547) but is generic: it converges to baby-step giant-step and stays ${f(k5[0] / bsgs[0], 1)}&times; above it. <a href="${ANCHOR}">Panel</a> &middot; <a href="${SOURCE}">report</a></td></tr>`;
 const bestRe = /<tr><td>Prime field, generic table IC[\s\S]*?<\/tr>/;
 if (!bestRe.test(page)) throw new Error("best row of #2808 not found");
 page = page.replace(bestRe, best);
