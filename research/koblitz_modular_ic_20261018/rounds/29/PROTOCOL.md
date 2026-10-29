@@ -44,3 +44,27 @@ KeepR28simple436/284/83imagechecks as regressions. A zero second denominator
 remainsunresolved. Finiteflatnorm andcommutingmultiplication operators give
 the same elementary symmetric multiset evenfornonreduced sourcefibers; do
 not infer that the fullC5lift or originalsourcepoint has been constructed.
+
+## Prospective independent full-level cubic bridge
+PrimarySutherlandoptimizedX1table/model77read/downloaded190029bytes:
+https://math.mit.edu/~drew/X1_optcurves.html
+https://math.mit.edu/~drew/X1/X1opt77new.txt
+It suppliesdeg(u)74/deg(v)60planeequation andr,s/E/P parametrization; do not
+assume a birational match fromsamelevel/genus or a finitepoint alone.
+
+The actual QRline y=lambda*x+nu cuts the original Tate cubic
+x3+(b+lambda2+A*lambda)x2+(A*nu+b*lambda)x+nu2+b*nu.
+At the accepted registered degree14lambda0point, factor thiscubic,check
+separability/product, andifirreducible execute allTategrouplaws via exact
+inverse/lift certificates inF2^14[x]/cubic. CheckP11=(0,0),Q7=(x,nu),both
+primeorders,QRdoublingorbit,Q+Pexactorder77,CRT P11=56R,Q7=22R anddiamond23
+R=P11+2Q7. An irreducible cubic at this regular point provesgenericcubic
+irreducible bythe monic/DVR specialization argument; not a randomfixture.
+
+This explains the generic degree3 cover adding a QRgenerator: diamond23
+hasorder3 andforgets thatgenerator. Moduli identification withX1(77) and
+properunramifiednormalization bridge remain written; independentMITglobal
+rationalfunction identities notchecked. Nativegenuscontrolg(X1(77))181 and
+3*(2*61-2)=2*181-2 is arithmetic,not that bridge. Same4GiB/1200caps. This
+pursues the named independentmodelcheck withoutsubstituting genus equality
+for an explicitmodelisomorphism. Literature/context retained withnativebytes.
