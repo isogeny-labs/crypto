@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,hyperref,booktabs,graphicx}
+\title{Symbolic signed-graph reduction for pencil relations}
+\author{Mathematical implementation and development checks}
+\date{28 October 2026 (America/Los\_Angeles)}
+\begin{document}\maketitle
+\noindent The existing pencil cohort has 543 verified candidate targets out of
+1,260. This packet adds a native algebraic component, with no new cohort or
+performance measurement. Its candidate/rho cost ratio is unknown.
+\section*{Algebraic interface}
+An input row is $\sum a_iX_i+\sum b_jS_j=0$ over a prime field. At most two
+large-variable terms survive canonicalization; the $S_j$ remain symbolic.
+The forest stores $X_i=s_iX_{\mathrm{parent}(i)}+u_i(S)$ and uses union by size.
+Root substitution leaves zero, one or two free roots. Zero emits a constraint,
+one anchors a root, and two join components by an invertible pivot.
+An unbalanced signed cycle anchors its root; it does not immediately yield
+an additional relation involving only small variables.
+\section*{Recorded development checks}
+The Rust suite compares the emitted small-row space with independent dense
+row reduction after every prefix: 40 prefixes, 128 deterministic streams and
+five prime fields (2, 3, 5, 7 and 101), totaling 25,600 checks.
+Additional cases cover signed cycles, duplicate terms, rejected inputs,
+composites and a prime near the 64-bit limit. The test log is retained.
+The four Lean declarations cover pivot equivalence, substitution, balanced
+cycles and unbalanced cycles. Their direct compiler result and axiom report
+are retained separately. They do not formalize the full forest invariant or
+prove correspondence with Rust.
+The retained residual basis is now also compared with the independent reference
+at all 25,600 prefixes. Thirteen default library tests pass. Explicit working and retained
+coefficient caps leave the basis unchanged on rejection; callers must stop or
+retain that rejected row. Original residual diagnostics count failed attempts; the separate semantic
+and allocation observations described below extend their coverage. These are
+coefficient limits, not process-memory guarantees or a complete cost model.
+The composed adapter binds both stages to one field and fixed column
+partition, rejects three-large-variable rows explicitly, and retains an
+unincorporated constraint on terminal cap. Its row space is also checked
+at all 25,600 prefixes. The optional producer now connects this adapter to
+the existing geometric checks and matched control. Three producer tests check
+signed coefficient parity, rejection of constant-only inconsistencies and
+phase attribution of symbolic events. Setup is a separate recorded phase.
+Semantic arithmetic counts include inversion multiplications and distinguish
+primality powers from inversions. Direct pivot lookup replaces full basis
+scans; no performance measurement is inferred. Residual diagnostics overlap
+this ledger and must not be double-charged.
+The producer has not run a cohort. Its new schemas explicitly mark costs
+incomplete and ratios null; a frozen partition and full accounting remain open.
+Allocation observations now cover cold setup, phases, the whole candidate
+envelope and rho. A grow/shrink regression checks payload preservation and
+requested-layout accounting. These bytes are not RSS or internal copying;
+rho's absolute peak includes still-live candidate and shared input state.
+The outer envelope includes between-phase work without losing peaks when
+inner phases reset. No runtime or memory comparison has been measured.
+Sparse maps now record API calls, ordered comparisons, yielded entries and
+cloned entries. Exact iterator size hints and numeric ordering are preserved;
+JSON serialization is unmetered. These are semantic events, not all CPU work.
+Counts depend on the recorded standard-library version. The current suite has
+13 default library tests, 14 with the producer feature and three adapter tests.
+\section*{Next integration gates}
+\begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
+Requirement & Status\\\midrule
+Prime-field row kernel and independent prefix tests & Implemented and tested\\
+Forest-state induction and Rust correspondence & Open\\
+Geometric producer wiring & Compile-tested only\\
+Fixed small-base selection and admission accounting & Open\\
+Full symbolic-vector, memory and residual elimination costs & Unmeasured\\
+Remaining 717 frozen candidate targets & No new results\\
+End-to-end cost against matched rho & Unknown\\\bottomrule
+\end{tabular}
+\section*{Sources and limitations}
+The graph construction follows the mathematical distinction between full
+relations and cycles leaving a large prime in Gaudry, Theriault and Thome,
+\href{https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf}{double large prime
+variation}, sections 2.3 and 3.1 (2005 version). Its genus-at-least-three
+complexity result is not asserted for this genus-2 pencil stream. Existing
+repository graph and large-prime eliminators informed the implementation.
+The editable graph is \texttt{reduction.svg}; the machine-readable check
+table is \texttt{checks.csv}. All results are development checks; no runtime,
+memory improvement or full-cohort completion is inferred from them.
+\begin{center}\includegraphics[width=\linewidth]{reduction.pdf}\end{center}
+\end{document}

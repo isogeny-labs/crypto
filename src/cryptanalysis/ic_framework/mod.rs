@@ -490,6 +490,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
         Targets::Walk | Targets::Residual => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
@@ -1242,6 +1243,36 @@ mod tests {
         let rn = &renew.decomposition.cost;
         assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
         assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        // The deferred guard presents the same targets, keeps the same rows
+        // and recovers the same logarithm.  It probes only the targets that
+        // decompose; each repeat the eager guard skipped costs it one table
+        // lookup instead, and at most one confirming addition.
+        let deferred = run(Targets::StrideRenewDeferredGuard);
+        assert!(deferred.verified);
+        assert_eq!(deferred.recovered, Some(planted));
+        assert_eq!(
+            deferred.decomposition.targets_tried,
+            renew.decomposition.targets_tried
+        );
+        let dn = &deferred.decomposition.cost;
+        let count = |c: &PhaseCost, key: &str| c.native.get(key).copied().unwrap_or(0);
+        for key in [
+            "relations",
+            "stride_steps",
+            "stride_restarts",
+            "stride_renewals",
+        ] {
+            assert_eq!(count(dn, key), count(rn, key), "{key}");
+        }
+        let eager_skips = count(rn, "repeated_targets_skipped");
+        assert_eq!(count(dn, "lookups"), count(rn, "lookups") + eager_skips);
+        assert_eq!(dn.group_ops.scalar_mults, rn.group_ops.scalar_mults);
+        assert_eq!(dn.group_ops.doubles, rn.group_ops.doubles);
+        assert!(dn.group_ops.adds >= rn.group_ops.adds);
+        assert!(dn.group_ops.adds <= rn.group_ops.adds + eager_skips);
+        let probes = count(dn, "target_guard_probes");
+        assert!(probes <= count(dn, "relations") + count(dn, "repeated_targets_skipped"));
+        assert!(probes < count(rn, "target_guard_probes"));
         assert_eq!(stride.recovered, Some(planted));
         let rel = &stride.decomposition.cost;
         assert_eq!(rel.native.get("stride_restarts"), Some(&1));
