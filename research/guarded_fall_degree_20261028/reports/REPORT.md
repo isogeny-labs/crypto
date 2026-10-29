@@ -6,8 +6,10 @@ It is not an experiment timing report or a claimed ECDLP improvement.
 ![Proof dependencies and the open encoding bridge](proof-dependencies.svg)
 
 The solid arrows are dependencies in the written derivations. The dashed
-bridge to growing Boolean lower bounds is unproved. The Lean box covers only
-the identity declarations in the proof map, not the complete degree theorem.
+bridge to growing Boolean lower bounds is unproved. The Lean box now covers
+ordinary filtered closure, the complete uniform degree-four obstruction for
+the six original inputs, and dependencies. The complete exact pair remains
+open in Lean.
 
 ## Result
 
@@ -59,13 +61,17 @@ four-degree case and serialized proof replay. No new field/base/target sweep
 was run in this integration. The full library test and native/Lean checks are
 recorded in `../validation/` and the PR.
 
-The partial Lean project checks resultant, guard, missing-root, and related
-identities and a common-root implication. The original twelve lemmas are
-unchanged; eight new local lemmas check quadratic cancellation and explicit
-discriminant/diagonal consequences. Both targets build, and the new module
-passes fresh kernel replay. The complete filtered-closure,
-finite-grid, and curve bridges remain unformalized. See
-[proof map](../formal/PROOF_MAP.json).
+The Lean project now proves the uniform obstruction `1 ∉ V(F,4)` for the
+actual six inputs, over any field with `6 != 0` and three distinct base
+abscissas. It defines ordinary filtered closure and proves its least-space
+property and last-fall/refutation equivalence for unit ideals. It also derives
+the quadratic divided difference inside degree four and checks top-map
+injectivity and the degree-four top relation. The weighted syzygy/Koszul
+definition and the degree-five normalization/resultant/grid/point proof remain
+open: the complete exact pair has not been formalized. The old twenty local
+lemmas and their frozen receipts remain unchanged. See the [dated proof
+progress](../formal/exact-pair-progress.md), [proof map](../formal/PROOF_MAP.json)
+and [named remaining obligations](../../../problems/guarded-fall-degree-lean-exact-pair.md).
 
 The repository identity records bind these four checked identities to the
 Lean source hash: odd resultant `IDC1h56e099b3201f45e4`, binary integer lift
