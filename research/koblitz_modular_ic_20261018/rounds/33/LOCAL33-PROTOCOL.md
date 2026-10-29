@@ -43,3 +43,9 @@ Generic unit-witness specialization is already formalized in R32; this native
 matrix/presentation and the standard-smooth theorem application are not Lean
 certificates. Proper global normalization and unrelated quotient saturation
 remain separate even if these local presentations succeed.
+
+Before any specialization data: the producer retained51 expanded products
+(60MB). The checker instead evaluates the retained syzygy matrix and source
+Jacobian first, then multiplies the same51 factor pairs in the residue
+algebra. This preserves the exact witness family and avoids loading expanded
+products for every point. The expanded producer record remains untouched.

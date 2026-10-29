@@ -5,7 +5,9 @@ import re,hashlib
 h=Path(__file__).resolve().parent;g=h/'runs/local33-generate01'
 log=(g/'native.log').read_text();assert 'LOCAL33_GENERATE_ALL_CHECKS_PASS' in log and not re.search(r'^\s*\?',log,re.M)
 assert (g/'exit.txt').read_text().strip()=='0'
-cert=(g/'local-certificate.sing').read_text()+'\n'+(g/'local-open-products.sing').read_text()+'\n'
+cert=(g/'local-certificate.sing').read_text()+'\n'
+cert+='matrix localJacobian33[4][3];int prepareRow33;int prepareCol33;\n'
+cert+='for(prepareRow33=1;prepareRow33<=4;prepareRow33++){for(prepareCol33=1;prepareCol33<=3;prepareCol33++){localJacobian33[prepareRow33,prepareCol33]=diff(localSource33[prepareRow33],var(prepareCol33));}}\n'
 body=(h/'LOCAL33-CHECK.sing').read_text()
 out=cert+(h/'source-data/paired-83.sing').read_text().replace('(X),lp;','(Z,T,w),lp;')+'\n'+body+'\n'
 lines=(h/'source-data/accepted-reverse83.log').read_text().splitlines();count=0
