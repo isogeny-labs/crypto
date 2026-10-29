@@ -66,3 +66,9 @@ Root suite is already incomplete at cap and unchanged; don't repeat unchanged
 full suite to manufacture validation. Run only appropriate new crate/backend,
 proof and metadata/file-policy checks; preserve all existing merge/completion
 holds. If full matrix-rank formal bridge remains open, state that exact gap.
+
+## Preflight before canonical freeze
+A single predeclared calibration call r3,base[1],query1 per implementation
+records runtime diagnostically before canonical freeze; not a performance result.
+All main census/actual-binding data remain unexecuted. This fixed pilot is
+disclosed in the canonical record; no threshold/population changes may follow it.
