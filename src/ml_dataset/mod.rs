@@ -1198,27 +1198,70 @@ struct CellManifest {
     artifacts: Vec<Artifact>,
 }
 
+const CAPTURE_CONTEXT: [(&str, &str); 2] = [
+    ("capture-binding.json", "partial-capture-binding"),
+    ("capture-limits.json", "partial-capture-limits"),
+];
+
+fn admit_capture_context(
+    dir: &Path,
+) -> Result<Option<(capture::AttemptBinding, capture::CaptureLimits)>, String> {
+    let present = CAPTURE_CONTEXT
+        .iter()
+        .any(|(path, _)| fs::symlink_metadata(dir.join(path)).is_ok());
+    if !present {
+        return Ok(None);
+    }
+    if !telemetry::checked::policy_present(dir)? {
+        return Err("bound capture requires the frozen checked measurement policy".into());
+    }
+    let binding: capture::AttemptBinding =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[0].0, false)?)?;
+    let limits: capture::CaptureLimits =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[1].0, false)?)?;
+    if binding != capture::AttemptBinding::from_cell_files(dir)? {
+        return Err("capture binding differs from original attempt".into());
+    }
+    let run: Value = read_json(&dir.join("run.json"))?;
+    let trace_mib = run["trace_mib"]
+        .as_u64()
+        .ok_or("capture run lacks frozen trace_mib")?;
+    if limits != capture::capture_limits(trace_mib)? {
+        return Err("capture limits differ from frozen run allowance".into());
+    }
+    Ok(Some((binding, limits)))
+}
+
+fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), String> {
+    let admitted = admit_capture_context(dir)?.is_some();
+    for (path, role) in CAPTURE_CONTEXT {
+        let matching: Vec<_> = artifacts
+            .iter()
+            .filter(|a| a.path == path || a.role == role)
+            .collect();
+        if admitted {
+            if matching.len() != 1
+                || matching[0].path != path
+                || matching[0].role != role
+                || matching[0].encoding != "json"
+            {
+                return Err("capture context manifest identity/role/encoding mismatch".into());
+            }
+        } else if !matching.is_empty() {
+            return Err("capture context manifest has no admitted original files".into());
+        }
+    }
+    Ok(())
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
-    let checked_policy = telemetry::checked::policy_present(&out)?;
-    if !checked_policy
-        && (out.join("capture-binding.json").exists() || out.join("capture-limits.json").exists())
-    {
-        return Err("bound capture requires the frozen checked measurement policy".into());
-    }
-    if checked_policy {
-        let expected = capture::AttemptBinding::from_cell_files(&out)?;
+    let capture_context = admit_capture_context(&out)?;
+    if telemetry::checked::policy_present(&out)? {
+        capture::AttemptBinding::from_cell_files(&out)?;
         if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
             return Err("checked worker configuration differs from attempt binding".into());
-        }
-        if out.join("capture-binding.json").exists() || out.join("capture-limits.json").exists() {
-            let actual: capture::AttemptBinding = read_json(&out.join("capture-binding.json"))?;
-            let limits: capture::CaptureLimits = read_json(&out.join("capture-limits.json"))?;
-            if actual != expected {
-                return Err("capture binding differs from original attempt".into());
-            }
-            limits.validate()?;
         }
         registry.push(telemetry::checked::install_policy(&out)?);
     }
@@ -1255,13 +1298,13 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         known_answer = true;
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            if out.join("capture-binding.json").exists() {
+            if let Some((binding, limits)) = &capture_context {
                 solvers::solve_with_bound_event_sink(
                     config,
                     &case,
                     &out.join("live"),
-                    read_json(&out.join("capture-binding.json"))?,
-                    read_json(&out.join("capture-limits.json"))?,
+                    binding.clone(),
+                    limits.clone(),
                 )
             } else {
                 solvers::solve_with_event_sink(config, &case, &out.join("live"))
@@ -1371,6 +1414,8 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
                 "host.json" => ("host-measurement-context", "json"),
                 "worker-artifacts.json" => ("artifact-registry", "json"),
+                "capture-binding.json" => ("partial-capture-binding", "json"),
+                "capture-limits.json" => ("partial-capture-limits", "json"),
                 "stdout.log" | "stderr.log" => ("process-log", "utf8"),
                 _ => ("unregistered-partial-artifact", "native"),
             }
@@ -2426,6 +2471,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     }
     storage::verify_manifest(dir, &manifest.artifacts)?;
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
+    verify_capture_context(dir, &manifest.artifacts)?;
     for required in [
         "config.json",
         "run.json",
