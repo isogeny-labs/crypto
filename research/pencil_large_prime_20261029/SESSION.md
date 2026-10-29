@@ -253,3 +253,28 @@ specific discrepancy without changing saved results or claiming a revised ratio.
 Independent read-only review found no formula/path/phase-ordering defect.
 Prime validity remains a caller obligation. Future analyzer aggregation must
 use checked sums; existing producer phase aggregation is not overflow-checked.
+
+## 2026-10-29 T-801: execution route reconciliation
+
+### What was done
+Read isolab-eks skill, ACCESS.md, HARNESS.md, recovery reference and live MCP
+schema. Installed overview succeeded. Existing documented host connection
+confirmed create Jobs permission and listed 9 terminal isolab Jobs, 7 succeeded
+and 2 failed. Read-only agent audited migration and saved Diem/freeze receipts.
+
+### Decisions made
+Correct prior interpretation: research in migration prose is not a namespace
+assignment. The documented namespace is isolab; retained access audit maps the
+existing host role to isolab:submitters. No credentials, permissions or configs
+changed. Preserve Diem deadline and unmet freeze prerequisites. No Job submitted.
+
+### Open threads
+Standalone pencil CLI needs native ecbench per-target integration for the
+qualified resumable contract. Source paths are src/cryptanalysis/ecbench/
+three_leads.rs and methods.rs. Full protocol, image/binary identity, complete
+valuation and cohort upper gate remain. Historical task EKS IDs were not found.
+
+### Errors
+Earlier turns tested namespace research and overgeneralized launcher AssumeRole
+denial to all approved EKS access. Corrected using live documented connection;
+other namespaces and unrelated historical experiment outcomes remain unclaimed.

@@ -9,6 +9,30 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Execution-route reconciliation (T-801)
+
+The earlier access diagnosis incorrectly treated the phrase "research EKS"
+as namespace `research`. The repository access guide and retained October 24
+access audit specify namespace `isolab`, with the existing host identity in
+`isolab:submitters`. On October 29 the documented harness connection returned
+permission to create Jobs and listed nine terminal Jobs (seven succeeded,
+two failed, none active). The installed MCP overview agreed. No identity,
+permission, or client configuration changed. The default context's launcher
+AssumeRole denial persists, but it does not block the documented connection.
+
+`EXECUTION_RECONCILIATION.json` records this scope and the separate expired
+Diem/freeze lane. No historical task-owned EKS Job ID was found in the inspected
+four-lead records; absence is not a historical result. No Job was submitted.
+
+The next execution dependency is integration: the current producer is a
+standalone CLI. The maintained resumable contract accepts native ecbench
+workloads, not arbitrary commands. The existing `ecbench/three_leads.rs`
+adapter and method registry provide the integration point; reuse the exact
+producer arithmetic through a per-target API, retain source checks, and add
+an explicit method ID. Do not substitute a non-resumable command job for the
+required recovery path. Protocol, image/binary identity, controls, pricing
+and the existing upper gate must still be satisfied before a cohort starts.
+
 ## Phase attribution and scalar pricing boundary (T-798)
 
 The producer now rejects exports when named phases do not sum to field,
