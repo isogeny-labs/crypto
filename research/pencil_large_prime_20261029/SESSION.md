@@ -1,5 +1,35 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-796 continuation
+
+### What was done
+
+Added an observed System allocator with nonallocating atomic hooks. Recorded
+per-phase, cold-setup, whole-candidate and rho allocation observations and
+timing envelopes. Twelve library and three producer tests pass; producer
+clippy passes. Independent review checked unsafe forwarding and identified
+the phase-only coverage gap; the separate outer envelope addresses it.
+
+### Decisions made
+
+Requested layout bytes are not RSS or allocator internal copying. Preserve
+baseline live-state and optimizer limitations explicitly. Do not assign an
+unfrozen price to allocations or call the remaining accounting complete.
+Read the official Rust GlobalAlloc contract before implementation.
+
+### Open threads
+
+Native index accounting, frozen protocol/export, and the upper gate remain.
+EKS job-list access still fails on the configured AssumeRole call. No identity,
+permissions or external workload changed; no experiment was submitted.
+
+### Errors
+
+Expanded JSON metadata exceeded the default compile-time macro recursion
+limit; increased it to 256. An initial envelope declaration matched a test
+instead of the producer loop; compilation exposed it and placement was fixed.
+The final feature suite and clippy passed.
+
 ## 2026-10-29 T-795 continuation
 
 ### What was done

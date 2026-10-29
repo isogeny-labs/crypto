@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 
 pub type Sparse = BTreeMap<usize, u64>;
 
+pub mod allocation;
 pub mod collector;
 pub mod meter;
 pub mod residual;

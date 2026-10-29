@@ -3,10 +3,12 @@
 //! Cohort mode does not perform an independent dual-norm check.
 //! Fork of frozen pencil_sparse producer blob e974121a123e13316ce3fcc820b4eca3f65a8a3a.
 //! Graph accounting is incomplete: outputs MUST NOT be priced by old analyzers.
+#![recursion_limit = "256"]
 use five_leads_study::three_leads::{
     solve_rho, Counts, Divisor, Elliptic, Field, Point, Scholten, StudyInstance,
 };
 use pencil_symbolic_graph::{
+    allocation::{ObservedSystem, Region},
     collector::{Admission, Collector},
     meter,
     residual::Limits,
@@ -17,6 +19,9 @@ use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::process::Command;
 use std::time::Instant;
+
+#[global_allocator]
+static ALLOCATOR: ObservedSystem = ObservedSystem::new();
 
 struct GraphSolver {
     collector: Collector,
@@ -204,6 +209,7 @@ struct PhaseTotals {
     field: Counts,
     arithmetic: ArithmeticCounts,
     symbolic: meter::Snapshot,
+    allocation: Region,
 }
 fn group_counts(s: &Scholten) -> Counts {
     s.e.f.counts() + s.j.f.counts()
@@ -217,13 +223,16 @@ fn measured<T>(
     let before_field = group_counts(s);
     let before_arithmetic = arithmetic_counts();
     let before_symbolic = meter::snapshot();
+    let before_allocation = ALLOCATOR.begin();
     let start = Instant::now();
     let result = f();
     let elapsed_ns = start.elapsed().as_nanos();
+    let allocation = ALLOCATOR.finish(before_allocation);
     let phase = phases.entry(name).or_default();
     phase.elapsed_ns += elapsed_ns;
     phase.field = phase.field + (group_counts(s) - before_field);
     phase.symbolic += meter::snapshot() - before_symbolic;
+    phase.allocation.add_assign(allocation);
     phase
         .arithmetic
         .add_assign(arithmetic_counts().difference(before_arithmetic));
@@ -685,6 +694,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
     let cofactor = order / r;
     let generator = Point::affine(spec["gx"].as_u64().unwrap(), spec["gy"].as_u64().unwrap());
     PRICE_ACTIVE.with(|active| active.set(true));
+    let setup_allocation_start = ALLOCATOR.begin();
+    let setup_clock = Instant::now();
     reset_arithmetic_counts();
     let s = Scholten::new(p);
     let source = s.short_curve();
@@ -721,10 +732,13 @@ fn cohort_main(bits: u64, selected_p: u64) {
     assert_eq!(projected_points_checked, 16);
     let setup_field = group_counts(&s);
     let setup_arithmetic = arithmetic_counts();
+    let setup_elapsed_ns = setup_clock.elapsed().as_nanos();
+    let setup_allocation = ALLOCATOR.finish(setup_allocation_start);
     println!(
         "{}",
         json!({"schema":"pencil-symbolic-cohort-setup/v1","bits":bits,"p":p,"r":r,
         "cost_status":"incomplete_graph_and_allocation_accounting",
+        "allocation":setup_allocation,"elapsed_ns":setup_elapsed_ns,
         "order":order,"cofactor":cofactor,"rational_curve_points":rational_curve_points,
         "projected_points_checked":projected_points_checked,
         "matrix_coefficient_cap":matrix_coefficient_cap,"field":setup_field,
@@ -783,6 +797,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
         s.j.f.reset();
         reset_arithmetic_counts();
         meter::reset();
+        let candidate_envelope = ALLOCATOR.begin_envelope();
+        let candidate_clock = Instant::now();
         let mut phases = BTreeMap::new();
         let (solver, mut graph) = measured(&s, &mut phases, "solver_setup", || {
             let solver = LinearSolver::new(p, r, &rational_y);
@@ -862,6 +878,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
         } else {
             false
         };
+        let candidate_elapsed_ns = candidate_clock.elapsed().as_nanos();
+        let candidate_allocation = ALLOCATOR.finish_envelope(candidate_envelope);
         let mut pencil_arithmetic = arithmetic_counts();
         let mut phase_symbolic = meter::Snapshot::default();
         for phase in phases.values() {
@@ -874,6 +892,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
         );
         pencil_arithmetic.add_assign(setup_arithmetic);
         let pencil_field = group_counts(&s) + setup_field;
+        let rho_allocation_start = ALLOCATOR.begin();
+        let rho_clock = Instant::now();
         let mut rho = solve_rho(&inst, target, seed, cap, true, false);
         let rho_verified = if let Some(k) = rho.recovered {
             let verifier = inst.fresh();
@@ -883,11 +903,15 @@ fn cohort_main(bits: u64, selected_p: u64) {
         } else {
             false
         };
+        let rho_elapsed_ns = rho_clock.elapsed().as_nanos();
+        let rho_allocation = ALLOCATOR.finish(rho_allocation_start);
         println!(
             "{}",
             json!({"schema":"pencil-symbolic-cohort-target/v1","bits":bits,"p":p,
             "symbolic":graph.detail(),"cost_status":"incomplete_graph_and_allocation_accounting",
             "candidate_over_rho":Value::Null,
+            "candidate_envelope_allocation":candidate_allocation,"candidate_elapsed_ns":candidate_elapsed_ns,
+            "cold_setup_allocation":setup_allocation,"cold_setup_elapsed_ns":setup_elapsed_ns,
             "r":r,"workload_id":workload["workload_id"],"workload_sha256":workload["workload_sha256"],
             "target_index":workload["target_index"],"algorithm_seed":seed.to_string(),"cap":cap,
             "planted":scalar,"recovered":recovered,"verified":verified,"failure":failure,
@@ -900,6 +924,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
             "solver_stored_nonzero_coefficients":graph.collector.basis().retained_coefficients(),
             "counts":pencil_field,"arithmetic":pencil_arithmetic,"phases":phases,"source_add":source_add,
             "rho":{"recovered":rho.recovered,"verified":rho_verified,"counts":rho.counts,
+                   "allocation":rho_allocation,"elapsed_ns":rho_elapsed_ns,
                    "native":rho.native,"phases":rho.phases,"detail":rho.detail}})
         );
     }

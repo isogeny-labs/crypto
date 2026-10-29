@@ -102,6 +102,39 @@ environment from the existing projective-law proof checkout.
 
 ## Remaining integration work
 
+### Allocation observations (T-796)
+
+The producer now forwards global allocation calls to Rust `System` through
+`allocation::ObservedSystem`. Hooks use only atomics, do not allocate or
+unwind, and preserve successful and failed reallocation ownership. The test
+uses an independent observer to check zero initialization, grow/shrink payload
+preservation, successful requested-layout replacement totals and peak reset.
+Twelve library tests and three producer tests pass.
+
+Each phase and the shared cold setup record allocation/deallocation/reallocation
+calls, failures, successful requested/released layout bytes, absolute peak live
+requested bytes, and growth over entry. An independent outer candidate envelope
+includes between-phase work and bookkeeping; inner phase resets do not erase
+its peak. Rho has a region spanning its computation and source check. Timing
+envelopes remain diagnostics until the protocol's execution/isolation gate.
+
+These observations are not RSS, physical memory, bytes copied, or allocator
+internal transient storage. The optimizer may remove calls. Rho's absolute
+peak includes still-live candidate state and shared inputs; growth-over-entry
+is net process-wide growth, not exclusive algorithm ownership. Reallocation
+counts replacement of the requested old layout by the successful new layout;
+failed requests change failure/call counts only. Phase aggregation sums events
+and takes maxima of phase peaks, whereas the candidate envelope is measured
+directly. Graph teardown after verification and output serialization are
+outside the computational envelope. Observation regions must be sequential
+and single-threaded; one outer envelope may contain the sequential phases.
+
+The implementation follows the [Rust GlobalAlloc contract](https://doc.rust-lang.org/std/alloc/trait.GlobalAlloc.html),
+including its reentrancy, non-unwinding and optimizer caveats. Independent
+read-only review checked the pointer/layout forwarding and interpretation.
+No prices are assigned to bytes or allocator events yet; native index work
+and the frozen price/export contract remain necessary. No cohort was run.
+
 ### Symbolic arithmetic and phase accounting (T-795)
 
 `meter::Snapshot` records actual calls to scalar add, multiply, negate and
