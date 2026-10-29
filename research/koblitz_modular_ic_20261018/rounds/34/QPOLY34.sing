@@ -29,7 +29,7 @@ for(qQP34=1;qQP34<=2;qQP34++){
   for(colQP34=1;colQP34<=3;colQP34++){write(outQP34,"evaluatedJacobian34["+string(rowQP34)+","+string(colQP34)+"]="+string(jacQP34[rowQP34,colQP34])+";");}
  }
  for(rowQP34=1;rowQP34<=68;rowQP34++){write(outQP34,"evaluatedProducts34["+string(rowQP34)+"]="+string(productsQP34[rowQP34])+";");}
- if(presentationQP34==1){write(outQP34,"matrix polynomialUnitWitness34="+string(witnessQP34)+";");}
+ if(presentationQP34==1){write(outQP34,"ideal polynomialUnitGenerators34;matrix polynomialUnitWitness34["+string(nrows(witnessQP34))+"][1];");for(rowQP34=1;rowQP34<=ncols(matrix(gensQP34));rowQP34++){write(outQP34,"polynomialUnitGenerators34["+string(rowQP34)+"]="+string(gensQP34[rowQP34])+";polynomialUnitWitness34["+string(rowQP34)+",1]="+string(witnessQP34[rowQP34,1])+";");}}
  close(outQP34);print("QPOLY34_POINT q="+string(qQP34)+" products=68 presentation="+string(presentationQP34)+" all_syzygy_values_zero="+string(allZeroQP34));
 }
 print("QPOLY34_ALL_CHECKS_PASS");quit;
