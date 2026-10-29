@@ -5,6 +5,8 @@ quadratic/cubic product spaces of dimensions196/324 under the retained R27
 proper pole/RR bridge. All ten retained degree83 twist points have checked
 68-section evaluation rank68 and196-section evaluation rank83 (kernel113).
 Two ordinary closed degree5 points supply proposed rational padding9Q.
+All2150 explicit F2 quadratic equations round-trip to the certified product
+kernel; the curve interpretation uses the inherited proper RR bridge.
 Actual diamond/Frobenius actions and projector cancellation on those closed
 points are checked. These are construction data, not IC relation rank.
 
@@ -17,7 +19,8 @@ The normative protocols were committed before their runs; protocol.json is
 an explicitly post-data machine index, not a retroactive preregistration.
 
 At both padding points the small Jacobian maximal-minor ideal is the unit
-ideal. The older51-product syzygy presentation failed, so jets remain gated.
+ideal. The full four-variable Jacobian has rank3 and determinant0 at both;
+this is still a tangent diagnostic, not a local-dimension proof. The older51-product syzygy presentation failed, so jets remain gated.
 Direct redundant-equation ideal quotients are investigated separately. A
 nonzero formal divisor or evaluation kernel does not prove nonprincipality
 or a nonzero desired modular-factor image. Global quotient saturation and a

@@ -355,6 +355,8 @@ def koblitz_modular_geometry(ref, since):
     for date, commit, text in file_history(ref, path, since):
         record = json.loads(text)
         for key, metric, unit, label in (
+            ("twist_projective_quadrics", "koblitz_modular.twist_projective_quadrics", "homogeneous equations",
+             "Exact twist I2 equations; proper curve interpretation uses written bridge, no polarized factor embedding"),
             ("descended_sections", "koblitz_modular.twist_rr_sections", "sections",
              "Explicit descended complete RR sections; inherited written pole bridge"),
             ("evaluated_degree83_points", "koblitz_modular.twist_rr_evaluated_degree83_points", "closed points",
