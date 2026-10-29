@@ -270,8 +270,12 @@ The separate endpoint test passed all 360 adapter combinations, including
 structured unsupported and capped outcomes; it does not establish 360 solves.
 The earlier strict-lint blocker was three unregistered startup helpers.
 Source `7a1bd350b26eaeccf51bf9078915649a7c4335fc` registers the startup CLI and
-central stored-input verifier and passes 142 dataset tests plus 26 F4 tests.
-Final lint/full-library/CLI validation is pending; cloud validation remains open.
+central stored-input verifier. It passed 142 dataset tests, 26 F4 unit tests,
+one native checkpoint integration test, the full release library suite
+(5,170 passed, zero failed, 123 ignored), strict maintained Clippy, a release
+build and eight actual CLI checks. A separately frozen two-twist CLI fixture
+passed ten commands, including rejection of rehashed equation/domain corruption.
+These are software checks; cloud validation remains open.
 `f4` keeps its existing m=2 reference path and selects
 `prime-affine-s3-chain-f4-visitor/v1` for prime m=3..15. This new strategy records
 leaf membership equations and unrestricted auxiliary-variable roles before
@@ -289,7 +293,10 @@ root work, elimination observations and group additions retain separate units.
 A native F4 call materializes its own rows before serializing a bounded event.
 These event limits therefore do not bound native matrix memory; retain the
 worker memory/time supervisor. Useful-row traces omit private pivots, zero rows
-and internal univariate factorization/GCD states.
+and internal univariate factorization/GCD states. The inherited top-level
+`checkpoint_mid_call` flag reports live exposed-prefix sink persistence; it
+does not certify native-call or process recovery. Read the separate supervisor
+checkpoint field and explicit trace gaps before interpreting recovery support.
 
 Read `encoding_search_completed`, `algebra_completed`, `termination` and the
 trace/lift limits together. An encoding traversal may complete after truncated
@@ -305,8 +312,8 @@ establishes scalar recovery or an exact first/last fall degree.
 
 Generation and central `verify_cell` invoke the public equation/domain
 reconstruction verifier. Semantic replay tests on source `7a1bd350b26` cover
-rehashed corruption and omitted inputs with stripped strategy tags. Actual CLI
-and cloud restore checks remain separate validation steps. The frozen
+rehashed corruption and omitted inputs with stripped strategy tags. The frozen actual-CLI fixture also passed replay and rehashed-corruption
+rejection on both twists; cloud restore remains a separate validation step. The frozen
 [prime-chain contract](PRIME-F4-CHAIN-CONTRACT.md) records required checks and
 mathematical limits; no new cloud-generation evidence follows from this code.
 

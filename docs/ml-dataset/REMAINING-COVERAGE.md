@@ -45,7 +45,7 @@ applied. The new conditional-write fallback has software tests but no actual
 worker S3 validation. Neither launch establishes a completed cloud cell or
 remote corpus. No performance comparison follows from these correctness tests.
 
-## Prime affine-chain software validation and pending integration
+## Prime affine-chain software validation and startup integration
 
 The current implementation adds prime F4 strategy
 `prime-affine-s3-chain-f4-visitor/v1` for m=3..15 and a recursive native trace
@@ -66,10 +66,19 @@ startup helpers pending T766's shared-file handoff; no warning was suppressed.
 T766 subsequently released the scope. Integrated source
 `7a1bd350b26eaeccf51bf9078915649a7c4335fc` registers `dataset start` and central
 chain replay, and passes 142 dataset tests (including all 11 startup tests and
-four central semantic replay tests) plus 26 F4 unit tests. Final lint, full-library,
-release CLI and native-checkpoint checks are still pending for this integration. The earlier PR2756 merged
-at source head `2e09b77494d6744ee26b56e2fd68e694125ec076`; these later local
-changes require separate delivery after integration and validation.
+four central semantic replay tests), 26 F4 unit tests and one native checkpoint
+integration test. The full release library suite passed 5,170 tests with zero
+failures and 123 ignored. Strict maintained Clippy, release build and eight
+actual CLI checks passed. The separately frozen n=7/m=3 CLI fixture passed ten
+commands across both twists, including semantic rejection of a corrupted copy
+with recomputed artifact hashes. An independent audit verified its 158
+inventoried files and 159 archive members. The two local fixtures are excluded
+from the research corpus. Their outcomes are a verified PDP lift and an
+encoding-relative completion without a lift; neither is independent scalar
+recovery. Evidence is retained in `validation-startup-integration-20261029/`.
+The earlier PR2756 merged at source head
+`2e09b77494d6744ee26b56e2fd68e694125ec076`; this increment requires a separate
+follow-up PR and exact-head remote checks.
 The existing m=2 reference path is preserved. Native elimination remains
 limited to p<2^32; larger primes retain exact chain/membership equations without
 invoking the narrow backend. The [wide-arithmetic inventory](PRIME-F4-WIDE-ARITHMETIC-INVENTORY.md)
@@ -109,13 +118,13 @@ enormous corpus.
 | Sampling replay | Public algebra and independent scalar certificates are replayed; seeds and sampling indices are retained in restricted provenance | Reconstruct curve, generator, key and solver-query draws from the frozen configuration in a separate sampling audit; the current relation verifier checks the recorded coefficients and group equations but does not prove that they came from the declared RNG stream |
 | Binary SAT | Chained S3 finite-domain circuits with checked point-sign lifts and bounded native decision/assignment/reason/conflict/learning/deletion/backjump/restart/XOR streams; sticky sink failure returns Unknown | Add full encoder gate maps, clause-minimization derivations and independently checked UNSAT proofs; extend practical admitted coverage at m=2..15 without interpreting a cap as UNSAT |
 | Prime SAT | No prime-field SAT adapter is yet declared complete | Integrate an actual prime-field bit-vector/modular encoding with exact domain maps, verified models and proof-checkable outcomes |
-| F4/F5 | Boolean matrix engines remain scoped to m=2; prime F4 preserves the m=2 reference and now implements an m=3..15 affine-S3-chain lane with scoped software checks with exact leaf domains, unrestricted auxiliaries and bounded recursive useful-row traces; native elimination requires p<2^32, while larger primes retain equations with an unsupported outcome | Register and validate the equation/domain verifier in central verify_cell; validate broad actual curve/arity coverage; handle exceptional infinity branches before general negative PDP claims; extend arithmetic for n=47..61 or p=2^61-1; export remaining matrices, private pivots, zero rows, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
+| F4/F5 | Boolean matrix engines remain scoped to m=2; prime F4 preserves the m=2 reference and now implements an m=3..15 affine-S3-chain lane with scoped software checks with exact leaf domains, unrestricted auxiliaries and bounded recursive useful-row traces; native elimination requires p<2^32, while larger primes retain equations with an unsupported outcome | Validate broad actual curve/arity coverage beyond the central equation/domain replay regressions; handle exceptional infinity branches before general negative PDP claims; extend arithmetic for n=47..61 or p=2^61-1; export remaining matrices, private pivots, zero rows, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
 | F6 | Native geometric four-sum index has its own declared m=4 lane | Expose each implemented F6 algebraic/geometric variant separately, document its exact operation, and integrate the remaining arities without changing what the F6 name denotes |
 | Root solvers | Native S3 univariate root routes are m=2 adapters | Export factorization/GCD/intermediate root states; integrate higher-m elimination/root extraction and certify completeness separately from finding one valid root |
 | Weil descent and PKM | Boolean exact selector restriction is scoped to m = 2; native prime Kummer-tower PKM supports m = 2/3 and p < 2^31, with exact alternative Kummer points, column/sign maps, prepared equations and bounded grid extraction retained | Preserve every tower/basis/modulus/quotient intermediate; extend legitimate native coverage to requested higher m and larger primes, including p = 2^61-1; retain separate cost for finite-grid fallback; rational Kummer points outside the target subgroup make this PDP evidence, not completed ECDLP recovery |
 | Fall degrees | Exact first and last fall degree remain null | Define each invariant for the actual ring and field equations; export degree-fall witnesses, complete lower-degree exclusion/closure evidence and independently checked counterexamples; formalize universal claims separately |
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
-| Complete intermediate artifacts | Curve construction and several adapters still export summaries; the unvalidated prime chain lane adds bounded input/native-result/useful-row/branch/candidate/lift events, with sticky sink failure; native F4 rows still materialize before event serialization | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
+| Complete intermediate artifacts | Curve construction and several adapters still export summaries; the locally validated prime chain lane adds bounded input/native-result/useful-row/branch/candidate/lift events, with sticky sink failure; native F4 rows still materialize before event serialization | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
 | Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; historical-source software checks passed; native cumulative accounting is implemented, but EKS role access and launch integration remain incomplete | Complete actual-UID grant gating and finite resource-lifetime admission, resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
 | ML consumer | Strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; implement separately projected admissible solver-prefix views beyond current structural routing features; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
@@ -133,11 +142,11 @@ enormous corpus.
    truncated unresolved Koblitz attempts and erased scalar recovery, prime F4
    equations retained at p = 2^61-1 without invoking the unsupported backend,
    forged or missing PKM and large-prime domains, mismatched PDP/relation-domain labels and mismatched
-   source/binary/resource bindings on resume. For the unvalidated prime chain
-   increment, check m3/4 positive lifts with private witnesses absent, m15
+   source/binary/resource bindings on resume. Extend the locally validated prime chain
+   increment beyond its current software checks for m3/4 positive lifts with private witnesses absent, m15
    equation/role construction, both twists, unrestricted auxiliary domains,
    sticky trace exhaustion, degree truncation and large-prime equation retention.
-   Register and exercise central restored-cell equation/domain verification;
+   Exercise central equation/domain verification after actual cloud restore;
    encoding-relative completion must never imply general PDP nonexistence.
 3. Preserve the frozen 720-cell correctness pilot and complete full requested
    campaign plan. Export actual outcomes by family,
