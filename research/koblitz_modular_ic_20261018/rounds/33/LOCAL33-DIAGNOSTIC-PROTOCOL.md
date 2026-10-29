@@ -23,3 +23,5 @@ to the ideal of the other terms. Compile/audit with the same pinned Lean,
 mathlib, single job,4096MiB,1200seconds. This is a universal implication,
 not evidence that the rejected native unit witness exists. No geometry or
 native coefficient arrays are imported into Lean.
+
+Diagnostic01 is rejected: Singular does not accept ideal(existingIdeal,existingIdeal). The generic Groebner/lift checks produced vdim32/basis6, but no point result is accepted. Use a typed ideal assignment for the same generator concatenation, preserve01, fresh02.
