@@ -112,3 +112,21 @@ FFD/LFD and elite-base improvement are still unresolved. A change only between
 the tested linear selector bases does not reduce original-top regularity. Next
 use the saved completeV3 for strict higher-fall tests, or freeze a genuinely
 different selector/presentation arm with explicit semantics and matched inputs.
+
+
+## Fixed ell27 strict degree-four falls, 2026-10-29
+
+The twelve retained m3 Koblitz/binary original/baseline/spike40 systems now
+have LFD>=4 certificates. All 249 candidates per case are degree<=3 consequences
+with degree<=4 derivations outside the complete saved V3. Production, fresh
+replay and S3-restored replay pass for all twelve cases. See the
+[construction](../research/n83_candidate_pdp_20261028/DEGREE4_WITNESS_DESIGN.md),
+[native results](../research/n83_candidate_pdp_20261028/evidence/degree4-witness/summary.json)
+and [publication checks](../research/n83_candidate_pdp_20261028/evidence/degree4-witness-publication.json).
+
+This strengthens the previous lower3 evidence without altering targets, points,
+input equations, parent traces or regularity values. Exact LFD, its global upper
+bound and complete V4 remain unknown. A proposed higher-fall witness must prove
+nonmembership in full V4 or furnish a valid separating certificate; failure of
+membership in a restricted V4 closure is insufficient. Prime presentations,
+held-out elite-base selection and independent scientific review remain open.

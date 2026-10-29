@@ -162,3 +162,22 @@ strict degree4 fall witnesses against the saved complete m3 V3 spaces, or a
 separately specified selector/presentation change with exact matched targets.
 Prime presentations, global LFD bounds, held-out selection and elite-base
 performance remain unresolved. Do not rerun this completed certificate panel.
+
+
+## 2026-10-29: strict degree-four witnesses after complete V3
+
+Run `n83-degree4-witness-20261029-r1` completed all twelve retained m3
+original/baseline/spike40 Koblitz/binary planted/natural identities. Every one
+of 249 coordinates per case has a degree<=4 derivation and a nonzero remainder
+against complete V3. All 2,988 witnesses passed fresh and S3-restored replay.
+This raises each saved system's LFD lower bound from 3 to 4. It does not determine
+exact LFD, a global upper bound or complete V4; no regularity or elite-base gain.
+
+See DEGREE4_WITNESS_DESIGN.md, DEGREE4_WITNESS_FORMAT.json,
+evidence/degree4-witness/summary.json and experiment-degree4-witness.export.json.
+All parent data and the original fixed-base regularity view remain unchanged.
+Do not repeat the completed candidate panel. A next higher-fall test requires a
+verified V4 nonmembership certificate, not merely nonmembership in a restricted
+V4 subspace. Exact LFD requires an additional global upper certificate. The
+prime positive-dimensional presentation and held-out matched elite-base search
+remain separate open obligations. Independent scientific review is pending.

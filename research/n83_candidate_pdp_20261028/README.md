@@ -1,7 +1,34 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: exact original-top degrees for binary chains
+## Latest: strict degree-four falls on the retained m3 systems
+
+All twelve original/baseline/spike40 Koblitz/general-binary m3 cases passed
+production, fresh-process replay and replay after S3 restoration. Every case
+has 249 strict degree-four coordinate witnesses: **2,988 total**, raising the
+certified **LFD lower bound from 3 to 4** for each exact saved system.
+Exact LFD and global upper bounds remain unknown; complete V4 was not computed.
+These counts are correlated witnesses, not independent samples or a base ranking.
+No point, target or original equation changed, and the same actual factor-base
+manifest remains bound across m2–9 within each family and dataset.
+
+Read the [native results](evidence/degree4-witness/summary.json),
+[certificate construction](DEGREE4_WITNESS_DESIGN.md),
+[byte formats and field semantics](DEGREE4_WITNESS_FORMAT.json),
+[unified export](experiment-degree4-witness.export.json),
+[S3 objects and parent archives](evidence/degree4-witness-storage.json), and
+[verification coverage](evidence/degree4-witness-publication.json).
+The archive README provides the exact replay command. Both immutable V3 parent
+archives are needed. Independent scientific review remains pending.
+
+The [data index](DATA_INDEX.json) now includes fifteen datasets and preserves all
+earlier attempts. This phase adds LFD evidence; the original fixed-base
+[regularity JSON](FIXED_BASE_REGULARITY_V2.json) and
+[CSV](FIXED_BASE_REGULARITY_V2.csv) remain unchanged: 48 rows, 34 exact original-top
+values and 14 prime positive-dimensional top quotients. No degree-of-regularity
+reduction or elite-base advantage is established.
+
+## Earlier: exact original-top degrees for binary chains
 
 All84 unchanged original/baseline/spike40 Koblitz/binary m3–9 inputs passed
 producer, fresh-process and S3-restored replay. The written overlap proof,

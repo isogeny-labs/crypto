@@ -129,7 +129,7 @@ def _prefetch_histories(ref, since):
     ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
         "data/index.json", "evidence/pdp/paired-summary.json",
         "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
-        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json")]
+        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json")]
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda path: _history_log(ref, path, since), paths))
 
@@ -575,6 +575,22 @@ def n83_candidate_datasets(ref, since):
                 emit(f"n83.m3_continue.{row['key']}.{field}", row.get(field),
                      date=date, problem="n83-m3-fall-degree", unit=unit,
                      label=f"Retained m3 continuation {row['key']}: {field}; complete={row.get('closure_complete')}; witness={row.get('witness_origin')}; review pending",
+                     source=f"{path}@{commit}")
+
+
+    path = f"{study}/evidence/degree4-witness/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("rows", []):
+            if (row.get("verified") is not True or row.get("run_exit_code") != 0
+                    or row.get("replay_exit_code") != 0):
+                continue
+            for field in ("candidates", "strict_candidates", "v3_rank",
+                          "last_fall_lower_bound", "strict_fall_found"):
+                unit = ("rank" if field == "v3_rank" else "degree" if field == "last_fall_lower_bound"
+                        else "flag" if field == "strict_fall_found" else "candidates")
+                emit(f"n83.m3_degree4.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-m3-fall-degree", unit=unit,
+                     label=f"Retained m3 degree4 witness family {row['key']}: {field}; finite family only; review pending",
                      source=f"{path}@{commit}")
 
 
