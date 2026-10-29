@@ -1,0 +1,232 @@
+{
+ "aa_ratios": [
+  {
+   "a_arm": "rho-neg",
+   "b_arm": "rho-neg-aa",
+   "file": "compare-rho-neg__rho-neg-aa-w0.json",
+   "ops_ci95": [
+    1.0,
+    1.0
+   ],
+   "ops_pairs": 288,
+   "ops_ratio_b_over_a_repr": "1.0",
+   "ops_ratio_equals_1_exactly": true,
+   "ops_ratio_formats_as_1.000": true,
+   "ops_status": "ok",
+   "pricing_weight": 0.0
+  },
+  {
+   "a_arm": "rho-neg",
+   "b_arm": "rho-neg-aa",
+   "file": "compare-rho-neg__rho-neg-aa-w0.1.json",
+   "ops_ci95": [
+    1.0,
+    1.0
+   ],
+   "ops_pairs": 288,
+   "ops_ratio_b_over_a_repr": "1.0",
+   "ops_ratio_equals_1_exactly": true,
+   "ops_ratio_formats_as_1.000": true,
+   "ops_status": "ok",
+   "pricing_weight": 0.1
+  },
+  {
+   "a_arm": "rho-neg",
+   "b_arm": "rho-neg-aa",
+   "file": "compare-rho-neg__rho-neg-aa-w1.json",
+   "ops_ci95": [
+    1.0,
+    1.0
+   ],
+   "ops_pairs": 288,
+   "ops_ratio_b_over_a_repr": "1.0",
+   "ops_ratio_equals_1_exactly": true,
+   "ops_ratio_formats_as_1.000": true,
+   "ops_status": "ok",
+   "pricing_weight": 1.0
+  }
+ ],
+ "agreement": {
+  "below_l2_entries_equal_arm_and_isolation": true,
+  "below_l2_seq_sets_equal": true,
+  "executions_equal": true,
+  "gate_and_records_agree": true,
+  "grade_counts_equal": true,
+  "record_seq_all_distinct": true
+ },
+ "cond1_facts": {
+  "audit_ok": true,
+  "problems_len": 0,
+  "replays_identical_and_reproduced": 1152,
+  "replays_total": 1152,
+  "session_status": "complete"
+ },
+ "cond3_facts": {
+  "build_info_ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+  "build_info_ecbench_sha256_equals_want": true,
+  "build_info_source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb",
+  "build_info_source_revision_equals_want": true,
+  "input_spec_equals_frozen_spec": true
+ },
+ "exit42_parts": {
+  "below_l2_nonempty": true,
+  "cond1": true,
+  "cond2": true,
+  "cond3": true,
+  "cond4": true,
+  "cond5": true,
+  "cond6": true,
+  "every_below_l2_entry_is_a_waived_rho_execution_gate": true,
+  "every_below_l2_entry_is_a_waived_rho_execution_records": true,
+  "exit_code_is_42": true,
+  "single_pod": true
+ },
+ "exit43_parts": {
+  "cond1_to_6": [
+   true,
+   true,
+   true,
+   true,
+   true,
+   true
+  ],
+  "control_comparison_present": false,
+  "control_comparison_wall_self_aa": null,
+  "exit_code_is_43": false,
+  "l2_gate_accepted_true": false,
+  "single_pod": true
+ },
+ "fact_counts": {
+  "each_arm_336_records": {
+   "dg": 336,
+   "rho-neg": 336,
+   "rho-neg-aa": 336,
+   "srenew": 336
+  },
+  "gate_executions_1344": true,
+  "records_1344": true
+ },
+ "gate": {
+  "accepted": false,
+  "below_l2_by_arm_and_level": {
+   "rho-neg": {
+    "L1": 8
+   },
+   "rho-neg-aa": {
+    "L1": 7
+   }
+  },
+  "below_l2_len": 15,
+  "entries_of_arms_in_neither_class": 0,
+  "executions": 1344,
+  "grades": [
+   {
+    "count": 15,
+    "level": "L1"
+   },
+   {
+    "count": 1329,
+    "level": "L2"
+   }
+  ],
+  "ic_entries_in_below_l2": 0,
+  "ic_entries_in_below_l2_first5": [],
+  "invalid_outcomes_key_present": true,
+  "invalid_outcomes_len": 0,
+  "per_arm_counts_at_L2_or_above_available_in_gate": false,
+  "required": "L2",
+  "rho_below_l1_count": 0,
+  "rho_below_l2_class_by_arm": {
+   "rho-neg": {
+    "waived": 8
+   },
+   "rho-neg-aa": {
+    "waived": 7
+   }
+  },
+  "rho_not_waived_count": 0,
+  "rho_waived_count": 15,
+  "waived_solve_time_from_blocker_us_max": 991.2,
+  "waived_solve_time_from_blocker_us_min": 219.4
+ },
+ "ic_arms": [
+  "srenew",
+  "dg"
+ ],
+ "job_exit": {
+  "exit_code": 42,
+  "exit_code_is_0_or_42": true,
+  "job_exit_pod_uid_equals_prefix": true,
+  "pod_uid_prefix_count": 1,
+  "single_pod": true
+ },
+ "lines": {
+  "EXIT42_CLAUSE": true,
+  "EXIT43_CLAUSE": false,
+  "GATE_COND1": true,
+  "GATE_COND2": true,
+  "GATE_COND2_ROUNDED3": true,
+  "GATE_COND3": true,
+  "GATE_COND4": true,
+  "GATE_COND5": true,
+  "GATE_COND6": true
+ },
+ "records": {
+  "count": 1344,
+  "distinct_seq": 1344,
+  "executions_by_arm_and_level": {
+   "dg": {
+    "L2": 336
+   },
+   "rho-neg": {
+    "L1": 8,
+    "L2": 328
+   },
+   "rho-neg-aa": {
+    "L1": 7,
+    "L2": 329
+   },
+   "srenew": {
+    "L2": 336
+   }
+  },
+  "first_not_waived_blockers": null,
+  "ic_executions_below_l2": 0,
+  "ic_executions_below_l2_first5": [],
+  "not_waived_l2_blocker_texts": {},
+  "records_of_arms_in_neither_class": 0,
+  "rho_below_l1_count": 0,
+  "rho_below_l1_seq_arm_level": [],
+  "rho_execution_class_by_arm": {
+   "rho-neg": {
+    "l2_or_l3": 328,
+    "waived": 8
+   },
+   "rho-neg-aa": {
+    "l2_or_l3": 329,
+    "waived": 7
+   }
+  },
+  "rho_not_waived_count": 0,
+  "rho_not_waived_seq_arm_level": [],
+  "rho_waived_count": 15,
+  "rho_waived_with_zero_l2_prefixed_blockers": 0,
+  "rho_waived_without_parsable_solve_time": 0,
+  "status_counts": {
+   "verified": 1344
+  },
+  "waived_solve_time_from_blocker_us_max": 991.2,
+  "waived_solve_time_from_blocker_us_min": 219.4,
+  "waived_solve_time_units_seen": {
+   "\u00b5s": 15
+  }
+ },
+ "rho_arms_in_spec": [
+  "rho-neg",
+  "rho-neg-aa"
+ ],
+ "rho_arms_rule": [
+  "rho-neg",
+  "rho-neg-aa"
+ ]
+}
