@@ -131,3 +131,18 @@ The batch has 40 named Lean theorems and 41 current audited declarations,
 zero audit failures/trusted-native. Failures and caps are retained. The
 explicit remaining constructions are in [R29/NEXT.md](rounds/29/NEXT.md).
 No IC efficiency/rank verdict or complete modular-factor transfer is promoted.
+
+[R30](rounds/30/REPORT.md) proves the odd generalized recovery family uniformly
+and checks19odd lengths through n1021 (augmentation rank1020), with10even
+obstruction controls. These are formal maps, not new larger-n geometric
+transfers. Actual ordinary kernel calculations exhaust the compatible middles
+for degree12/436 and certify colors(3,4),(4,3)/(3,3), including complete49-level
+transport. Their finite algebras have F2 dimensions60/2180.
+
+The coupled Frobenius/deck check distinguishes an F2 closed-orbit sum from an
+individual F32 component. The latter has a nonzero formal augmentation vector;
+its actual Picard/factor image remains unknown. R30 adds9named/13auditedLean
+claims,0failures/0trusted-native. See [R30/NEXT.md](rounds/30/NEXT.md) for component
+class evaluation,284/83kernels and larger-n construction leads. The raw bundle
+also repairs the durability gap for ignored R29 recorder scratch logs, without
+changing any earlier raw archive. No IC cost/rank conclusion is promoted.
