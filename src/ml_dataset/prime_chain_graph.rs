@@ -169,7 +169,7 @@ impl System {
             return Err("graph arity must be3..15".into());
         }
         let p = decimal(&input["modulus"], "modulus")?;
-        if p < 5 || p >= 1u64 << 62 || !is_prime_u64(p) {
+        if !(5..1u64 << 62).contains(&p) || !is_prime_u64(p) {
             return Err("graph modulus is not a supported odd prime".into());
         }
         let variables = 2 * m - 2;
@@ -392,8 +392,7 @@ fn decode(value: &Value) -> Result<System, String> {
         return Err("graph variable count differs".into());
     }
     let p = decimal(&value["field"]["modulus"], "modulus")?;
-    if p < 5
-        || p >= 1u64 << 62
+    if !(5..1u64 << 62).contains(&p)
         || !is_prime_u64(p)
         || decimal(&value["field"]["characteristic"], "characteristic")? != p
         || value["field"]["degree"] != 1
