@@ -52,9 +52,12 @@ producer censoring nor successful validation. It is not an RSS/allocator/time bo
 - Before new component allocations, reserve a fixed131,072-byte envelope for the
   finite binding/descriptor/summary bookkeeping, native replay cursors, stack and
   parser-control scratch. This is separate from variable input charges.
-- Each raw input reserves twice its declared size plus one, before allocating a
-  file buffer. This covers the exact raw buffer and the maximum JSON string/key
-  decoding scratch used by the subsequent slice parser. Ordinary contained file,
+- Each raw input reserves four times (declared size plus one), before allocating a
+  file buffer. Parent review clarified this before any new consumer execution:
+  logical decoded length alone does not bound geometric string/scratch capacity.
+  This covers the fixed raw Vec capacity plus bounded parser decoding scratch and
+  one temporary decoded key, including geometric capacity slack. Retained strings
+  and output copies remain separately charged. Ordinary contained file,
   descriptor length/hash, size-plus-one EOF and second-read binding remain required.
 - Before typed or general JSON construction, a nonmaterializing structural pass
   charges1,024 bytes for each scalar/container node and8 times decoded string
