@@ -1,0 +1,61 @@
+name: Pencil native study tools
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pencil-native-tools.yml'
+      - 'research/pencil_large_prime_20261029/native_preparation/**'
+      - 'research/pencil_large_prime_20261029/native_canonical_export/**'
+      - 'research/pencil_large_prime_20261029/native_review_report/**'
+      - 'research/pencil_large_prime_20261029/validation_inputs/**'
+      - 'research/pencil_large_prime_20261029/prepared_specs/**'
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pencil-native-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: native tools (${{ matrix.crate }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [native_preparation, native_canonical_export, native_review_report]
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/pencil_large_prime_20261029/native_preparation/
+            /research/pencil_large_prime_20261029/native_canonical_export/
+            /research/pencil_large_prime_20261029/native_review_report/
+            /research/pencil_large_prime_20261029/validation_inputs/
+            /research/pencil_large_prime_20261029/prepared_specs/
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/pencil_large_prime_20261029/${{ matrix.crate }}
+      - name: Install native PDF renderer
+        if: matrix.crate == 'native_review_report'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y texlive-latex-base texlive-latex-recommended texlive-pictures
+      - name: Test native tooling contracts
+        working-directory: research/pencil_large_prime_20261029/${{ matrix.crate }}
+        run: |
+          cargo fmt --all -- --check
+          cargo test --release --locked
+          cargo clippy --release --locked --all-targets -- -D warnings

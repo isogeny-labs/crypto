@@ -864,3 +864,11 @@ Canonical experiment.protocol/v1 validation passed with zero findings. Eleven pr
 
 ### Scope and pending items
 This narrowly resolves the historical 10m versus draft 25m coefficient conflict and single-command versus per-execution timeout conflict for the first gate only. It does not establish a cumulative budget, reset the original absolute deadline, approve IAM/controller changes, freeze a protocol, authorize launch or extend approval to later gates or the full cohort. Mathematical public synthetic known-answer scope and all scientific controls remain unchanged. No source-code change, experiment, cloud job, commit or push was performed by this documentation lane.
+
+## 2026-10-29 — Native preparation, export and neutral review report
+
+Replaced the active Python preparation, canonical export and report paths with three standalone native Rust crates. Historical code and validation records remain preserved and labelled. Native archive extraction reproduced all retained preparation files; the current source543 instrument reproduced all 1,260 workloads and nine plans without solver execution. Preparation tests: 3 passed. Canonical export: 28-test suite passed plus one separately recorded historical digest test. Renderer: 8 tests passed. Formatting and strict Clippy passed for each crate.
+
+Bound the native source identities and receipts into the still-draft protocol (integrity SHA256 1ccd66480b7fb0a94c14cc85a09a115c1f79eb6f862b511b12a7d58ed467f342). Native protocol validation passed without modification or launch authorization. The approved 60-target p739 gate limits remain 25 million coefficients and 3,600 seconds per execution. Campaign budget/deadline and infrastructure authorization remain pending.
+
+The final report packet is validation/accounting/reports/review-20261029T224935Z-native. All three PDF pages were visually inspected with no clipped content; report manifest hashes passed. The earlier clipped development packet is retained separately. Reports state zero observed cohort executions and null measured ratios, and retain the prior full-suite failures separately from focused passing checks. The new native-tool CI workflow follows repository policy: main push, merge group and explicit dispatch, without a pull_request trigger.

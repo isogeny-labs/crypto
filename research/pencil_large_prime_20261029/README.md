@@ -1,5 +1,35 @@
 # Symbolic signed-graph reduction for pencil relations
 
+## Current native preparation and review tools
+
+The supported preparation, export and report paths are Rust:
+
+- [Native preparation](native_preparation/README.md) extracts the retained
+  archive projection, generates the prescribed specifications, and checks
+  native plans against the archived workload identities and prepared bytes.
+- [Native canonical export](native_canonical_export/README.md) packages
+  hash-bound observations with explicit execution history and canonical
+  validation. Packaging does not qualify a clock or infer missing counts.
+- [Native review reports](native_review_report/README.md) renders the
+  preparation evidence as JSON, SVG and PDF using Rust and native LaTeX.
+  Its current contract is a zero-observation preparation report, not an
+  empirical cohort report.
+
+The earlier Python preparation scripts, canonical adapter and report generator
+are retained only as historical source and evidence. They are superseded
+execution paths, not alternatives to the native tools. The native replacements
+must retain their input, validation and accounting contracts; a software test
+result is never relabelled as a mathematical cohort measurement.
+
+The user approved the first gate's 25,000,000 coefficient cap and 3,600 seconds
+per execution for all 60 prescribed p739 targets on 29 October 2026. The
+[authorization record](protocol_draft/accounting_amendment_20261029/first_gate_authorization.json)
+limits that approval to the first gate. Cumulative campaign budget, absolute
+deadline and the separately pending infrastructure decisions remain unresolved.
+The amendment remains unfrozen and no fresh pencil cohort has been run.
+
+## Implementation and retained validation history
+
 This is a mathematical implementation step toward the still-incomplete
 1,260-target pencil cohort. It contains an exact finite-field row reducer,
 independent unit tests, and four field-identity Lean lemmas. Its library
