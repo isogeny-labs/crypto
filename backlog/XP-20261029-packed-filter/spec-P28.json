@@ -1,0 +1,84 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261029-packed-filter P28 wall session: wall time per operation, filtered packed pair table against the packed pair table at N 407",
+ "description": "Frozen protocol (backlog/XP-20261029-packed-filter/PROTOCOL.md and APPROVAL.md): ns per GAE of ic.pipeline targets=stride-renew-deferred-guard with oracle mitm-prime-blocked:m=2,filter=1 (dgbf) against mitm-prime-blocked:m=2 (dgb) at the incumbent factor base; identical charged GAE by construction.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 202610296283
+   },
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 202610296284
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 202610296286,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "dgb",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm-prime-blocked:m=2",
+     "max_trials": "26479085",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgb-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm-prime-blocked:m=2",
+     "max_trials": "26479085",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgbf",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm-prime-blocked:m=2,filter=1",
+     "max_trials": "26479085",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgbf-edge",
+   "role": "reference",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=407",
+     "oracle": "mitm-prime-blocked:m=2,filter=1",
+     "max_trials": "26479085",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 6,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 202610296288,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}
