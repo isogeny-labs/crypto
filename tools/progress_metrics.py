@@ -252,6 +252,81 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+def koblitz_modular_augmentation(ref, since):
+    """Export the recorded scalar for the fixed n=5 augmentation presentation."""
+    path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        value = record.get("native", {}).get("recovery", {}).get("augmentation_target_least_scalar")
+        emit("koblitz_modular.n5_augmentation_recovery_scalar", value, date=date,
+             problem=P_IC, unit="integer scalar", better="lower",
+             label="Exact equivariant recovery scalar on the n=5 augmentation targets; no cost claim",
+             source=f"{path}@{commit}")
+
+
+def koblitz_modular_geometry(ref, since):
+    """Export exact recorded certificate counts, never cost or subgroup rank."""
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    for round_id in (24, 25, 26):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            if round_id == 24:
+                geometry = record.get("written_geometric_consequences", {})
+                if not geometry.get("proper_infinity_fiber_complete"):
+                    continue
+                value = len(record.get("points", []))
+                metric = "koblitz_modular.infinity_source_points"
+                label = "Original infinity fiber points under the written normalization bridge; no cost claim"
+                unit = "closed points"
+            elif round_id == 25:
+                quotient = record.get("registered_quotient", {})
+                if not (quotient.get("accepted") and quotient.get("all_pullback_residuals_zero")):
+                    continue
+                value = quotient.get("pullback_certificates")
+                metric = "koblitz_modular.registered_quotient_pullbacks"
+                label = "Exact original-source pullback identities on the registered b-unit quotient; no rank claim"
+                unit = "identities"
+            else:
+                transport = record.get("normalization_transport", {})
+                if not (transport.get("accepted") and transport.get("source_fifth_iterate_residuals_zero")):
+                    continue
+                value = len(transport.get("rational_base_cusps", []))
+                metric = "koblitz_modular.rational_cusp_fibers_with_charts"
+                label = "Rational base cusp fibers with transported charts under the written normalization bridge"
+                unit = "base cusps"
+            emit(metric, value, date=date, problem=P_IC, unit=unit,
+                 better="neutral", label=label, source=f"{path}@{commit}")
+
+
+    # Exact construction counters in the later Koblitz batches. These are
+    # recorded certificate sizes, not attack rank or comparative cost.
+    for round_id in (27, 28, 29):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            counters = []
+            if round_id == 27:
+                rr = record.get("complete_RR", {})
+                models = record.get("projective_models", {})
+                if rr.get("accepted") and rr.get("complete_serialized_exports"):
+                    counters.append(("koblitz_modular.complete_rr_sections", rr.get("sections"),
+                                     "sections", "Complete prescribed source RR basis; written geometry bridge"))
+                if models.get("accepted") and models.get("all_kernel_vectors_and_pivots_recombined"):
+                    counters.append(("koblitz_modular.proper_source_quadrics", models.get("source_quadrics"),
+                                     "homogeneous equations", "Complete source I2 basis; no IC relation-rank claim"))
+                    counters.append(("koblitz_modular.proper_quotient_quadrics", models.get("quotient_quadrics"),
+                                     "homogeneous equations", "Complete invariant quotient I2 basis; old coupled saturation remains separate"))
+            else:
+                images = record.get("ordinary_images", {})
+                if images.get("accepted"):
+                    count = images.get("selected_supports_cumulative", images.get("selected_supports"))
+                    counters.append(("koblitz_modular.ordinary_supports_with_selected_hecke_images", count,
+                                     "closed first-image supports", "Selected ordinary Hecke images under written norm bridge; C5 lifts and IC rank separate"))
+            for metric, value, unit, label in counters:
+                emit(metric, value, date=date, problem=P_IC, unit=unit,
+                     better="neutral", label=label, source=f"{path}@{commit}")
+
 
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
@@ -346,6 +421,8 @@ def main():
     fall_degree(a.ref)
     curve_traits(a.ref)
 
+    koblitz_modular_augmentation(a.ref, a.since)
+    koblitz_modular_geometry(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
