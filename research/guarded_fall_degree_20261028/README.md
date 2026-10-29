@@ -76,10 +76,13 @@ lookup size and proof size can be exponential. See the
   arithmetic with strict input binding; no search and no Python execution.
 - [Native binary-field checker](extensions/char2_compute/native/README.txt):
   genuine polynomial-basis `GF(2^m)` arithmetic, not integers modulo `2^m`.
-- [Partial Lean proof map](formal/PROOF_MAP.json): the resultant, guard,
-  missing-root, and related identities are checked under pinned dependencies.
-  The complete filtered-closure and elliptic-curve theorems are **not** Lean
-  formalizations; the map identifies the missing bridges.
+- [Partial Lean proof map](formal/PROOF_MAP.json): the ordinary filtered
+  closure, complete uniform degree-four obstruction for the actual six
+  inputs, and algebraic dependencies are checked under pinned dependencies.
+  [Current exact-pair progress](formal/exact-pair-progress.md) records the
+  proved lower bound and degree-four divided-difference derivation. The
+  universal degree-five upper proof and the weighted syzygy/Koszul
+  first-fall theorem remain open in Lean; the exact pair is not yet formalized.
 
 From the repository root:
 
