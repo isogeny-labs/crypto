@@ -2345,8 +2345,8 @@ fn band_cmd(
 }
 
 fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
-    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |");
-    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|");
+    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |");
+    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|");
     for d in dirs {
         let s = runner::read_session(d)?;
         let recs = runner::read_records(d)?;
@@ -2465,8 +2465,26 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         _ => "",
                     }
                 );
+                // Fixed set-up above a tenth of S, or r below the calibrated
+                // range (README §7, "The strong reference"), over the
+                // verified runs the mean S is taken from.
+                let flags = any
+                    .map(|r| {
+                        let runs: Vec<(&[methods::PhaseRecord], f64)> = mine
+                            .iter()
+                            .filter(|r| r.counts())
+                            .filter_map(|r| Some((r.phases.as_slice(), r.cost.total_gae?)))
+                            .collect();
+                        methods::pooled_row_flags(
+                            &r.workload.curve.family,
+                            (r.workload.curve.r as f64).log2(),
+                            &arm.method.family,
+                            &runs,
+                        )
+                    })
+                    .unwrap_or_default();
                 println!(
-                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
                     arm.name,
                     arm.method.id,
@@ -2501,6 +2519,11 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         .map(|(k, v)| format!("{k}×{v}"))
                         .collect::<Vec<_>>()
                         .join(" "),
+                    if flags.is_empty() {
+                        "–".to_string()
+                    } else {
+                        flags.join("; ")
+                    },
                 );
             }
         }

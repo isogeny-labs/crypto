@@ -846,10 +846,10 @@ entries. Where `r` is too small for that (below about 2^31) the set-up share is
 not hidden by a worse walk: it is in each record's `detail.setup_share`.
 `methods::setup_share`, `row_flags` and `calibrated_log2_r` compute the
 flag a table row should carry (fixed set-up above 10 % of `S`, or `log₂ r`
-below the calibrated range: prime `r < 2^25`, Koblitz `r < 2^39`), but
-`ecbench table` does not print it yet: the table column is a follow-up, and
-until it lands the share is read from the records' `detail.setup_share` or
-from their `setup` and `automorphism_setup` phases. At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
+below the calibrated range: prime `r < 2^25`, Koblitz `r < 2^39`), and
+`ecbench table` prints it in its last column, `flags`. A row pools its verified
+runs: the share is the summed `setup` and `automorphism_setup` GAE over the
+summed totals (`methods::pooled_row_flags`). At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
 (n = 19) theory, almost all of it 32 full-size jump scalars; at n = 13, with
 about eleven expected steps, even eight jumps cost more than the search.
 
