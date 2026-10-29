@@ -102,7 +102,9 @@ theorem actual_source_reduction (Q : E.Point) (hQ : (7:ℕ) • Q=0) (n : ℕ) :
     phi Q=n • U ↔ Q=n • P := by
   have h := odd_source_scalar_reduction forwardHom dualHom dual_phi 7 4
     (by decide) P Q CM8Transfer.source_order.1 hQ n
-  simpa only [forwardHom,AddMonoidHom.coe_mk,ZeroHom.coe_mk,generator_image] using h
+  change phi Q=n • phi P ↔ Q=n • P at h
+  rw [generator_image] at h
+  exact h
 theorem two_torsion_exception : inverse7 TK=0 ∧ TK≠0 := by decide +kernel
 #print axioms dual_phi
 #print axioms phi_dual
