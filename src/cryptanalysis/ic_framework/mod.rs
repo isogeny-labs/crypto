@@ -285,7 +285,23 @@ pub struct RunReport {
 /// compare an F4 `S` from before that merge with one after it, or a priced
 /// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
+    if LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.get()) {
+        return op_unit == "word XORs";
+    }
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
+}
+
+// Pre-#1774 pricing for committed evidence, set by the replay audit only
+// (`ecbench::legacy`): only the bare `word XORs` unit is priced by count, so
+// a qualified inherited-F4 unit is priced at wall time and taken back out.
+thread_local! {
+    static LEGACY_EXACT_WORD_XOR_UNIT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Match the bare `word XORs` unit alone, as before #1774; `false` restores
+/// the normal prefix match.
+pub fn set_legacy_exact_word_xor_unit(on: bool) {
+    LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.set(on));
 }
 
 /// Certify the solved logarithm of one nonzero-coefficient point in each
@@ -899,6 +915,45 @@ mod tests {
         assert_eq!(la.cost.gae, 0.0);
         assert_eq!(la.rank, 1);
         assert_eq!(report.decomposition.relations_found, 1);
+    }
+
+    /// **The `k`-sum table oracle recovers the planted logarithm** on a
+    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
+    /// has `k` summands, and the table holds one entry per negation orbit
+    /// of the signed `k`-sums of the base.
+    #[test]
+    fn ksum_oracle_recovers_logs_with_three_and_four_summands() {
+        use super::plugins::{KSumOracle, PrimeAbscissaBase};
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        for (k, size) in [(3u32, 40u64), (4, 16)] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "ksum".into(),
+                targets: Targets::Walk,
+                linalg: "incremental-gauss".into(),
+                max_trials: 50_000_000,
+                seed: 11,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", size.to_string());
+            spec.oracle_params.set("m", k.to_string());
+            let mut oracle = KSumOracle::new(k);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "k = {k}: did not recover the log");
+            assert_eq!(report.recovered, Some(planted));
+            assert!(report.decomposition.relations_found > 0);
+        }
     }
 
     /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar

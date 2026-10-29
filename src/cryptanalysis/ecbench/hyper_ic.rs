@@ -42,7 +42,12 @@
 //!   projected places, which exist when the `r`-part is cyclic: the arm
 //!   refuses an instance with `r² | #J`.
 //!
-//! The arm returns its candidate unverified; the runner verifies it.
+//! - **Verification.**  A recovered `k` is checked by `[k]D₁ = D₂`, one
+//!   counted Cantor scalar multiplication ([`CountedGroup::mul`]), phase
+//!   `verification`, inside the total.  A candidate that fails the check is
+//!   still returned (the runner grades it); the check's work is charged
+//!   either way.  Before 2026-10-28 this check was left to the runner and
+//!   not charged; no committed record names this id, so it is fixed in place.
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -82,7 +87,7 @@ pub struct HyperIcOutcome {
     pub recovered: Option<u64>,
     pub exhausted: bool,
     /// Phases in order: `factor_base`, `walk_setup`, `relations`,
-    /// `linear_algebra`; each with its ledger, its native counters and its
+    /// `linear_algebra`, `verification`; each with its ledger, its native counters and its
     /// wall time.
     pub phases: Vec<(&'static str, GroupOps, BTreeMap<String, u64>, u64)>,
     /// Shape descriptors (no suffix) and every `*_uncharged` counter.
@@ -658,6 +663,39 @@ fn solve_relations(relations: &[Relation], m: usize, n: u64, t: &mut Tally) -> O
     sparse_solve_for_k(rows, rhs, m, n, t)
 }
 
+/// The `F_p` multiplications of a factor-base scan, counted the way this
+/// module counts them (`factor_base_fp_muls_uncharged`): for every `x` in
+/// increasing order, one Horner evaluation of `f` and one Euler test (with
+/// Tonelli–Shanks on a residue), until `fb_size` places are found, plus
+/// the non-residue search of the field set-up.  `f` is low degree first.
+/// Returns the multiplications and the number of places found.
+///
+/// `ic.hyperelliptic_v2` uses it to tally the scan of
+/// `hyperelliptic_index_calculus::build_factor_base`, which evaluates `f`
+/// and takes a square root at every `x` it visits but counts no `F_p`
+/// multiplication; the scan visits the same `x` and finds the same places,
+/// so the tally is the work an equivalent counted scan performs.
+pub fn factor_base_scan_muls(p: u64, f: &[u64], fb_size: usize) -> Result<(u64, usize), String> {
+    if !(3..1 << 32).contains(&p) || p.is_multiple_of(2) {
+        return Err(format!(
+            "the factor-base tally needs an odd p < 2^32, not {p}"
+        ));
+    }
+    let mut muls = 0u64;
+    let fp = Fp::new(p, &mut muls);
+    let mut places = 0usize;
+    for x in 0..p {
+        if places >= fb_size {
+            break;
+        }
+        let fx = fp.eval(f, x, &mut muls);
+        if fp.sqrt(fx, &mut muls).is_some() {
+            places += 1;
+        }
+    }
+    Ok((muls, places))
+}
+
 // ── The run ────────────────────────────────────────────────────────────
 
 /// Solve `target = k·gen` in the subgroup of prime order `r`, under the
@@ -855,6 +893,14 @@ pub fn solve(
     // The start's own wall time sits inside the first round's clock.
     rel_wall = rel_wall.saturating_sub(setup_wall - setup_wall_before_start);
 
+    // ── verification: [k]D₁ = D₂, one counted scalar multiplication ──
+    let t_ver = Instant::now();
+    let mut ver_ops = GroupOps::default();
+    if let Some(k) = recovered {
+        let _ = curve.mul(&mut ver_ops, gen, k);
+    }
+    let ver_wall = t_ver.elapsed().as_nanos() as u64;
+
     let named = |pairs: &[(&str, u64)]| -> BTreeMap<String, u64> {
         pairs.iter().map(|&(k, v)| (k.to_string(), v)).collect()
     };
@@ -910,6 +956,7 @@ pub fn solve(
             ("walk_setup", setup_ops, setup_native, setup_wall),
             ("relations", rel_ops, rel_native, rel_wall),
             ("linear_algebra", GroupOps::default(), la_native, la_wall),
+            ("verification", ver_ops, BTreeMap::new(), ver_wall),
         ],
         counters,
         columns,
@@ -1039,7 +1086,12 @@ mod tests {
                 )
                 .unwrap();
                 assert_eq!(out.recovered, Some(k % inst.r), "g {g} p {p} seed {seed}");
-                let ops: u64 = out.phases.iter().map(|ph| ph.1.adds + ph.1.doubles).sum();
+                let ops: u64 = out
+                    .phases
+                    .iter()
+                    .filter(|ph| ph.0 != "verification")
+                    .map(|ph| ph.1.adds + ph.1.doubles)
+                    .sum();
                 if out.counters["solve_rounds"] == 1 {
                     let tp = HecIndexCalculusParams {
                         fb_size: fb,
@@ -1145,14 +1197,27 @@ mod tests {
                     let names: Vec<&str> = rep.phases.iter().map(|ph| ph.name.as_str()).collect();
                     assert_eq!(
                         names,
-                        ["factor_base", "walk_setup", "relations", "linear_algebra"]
+                        [
+                            "factor_base",
+                            "walk_setup",
+                            "relations",
+                            "linear_algebra",
+                            "verification"
+                        ]
                     );
                     assert_eq!(rep.phases[0].gae + rep.phases[3].gae, 0.0);
                     assert_eq!(rep.phases[1].gae, 1.0);
                     let sum: f64 = rep.phases.iter().map(|ph| ph.gae).sum();
                     assert_eq!(rep.total_gae, sum);
-                    // One charged operation per trial.
-                    assert_eq!(rep.total_gae as u64, rep.counters["trials"]);
+                    // One charged operation per trial, plus the check
+                    // [planted]D₁ = D₂ as one counted scalar multiplication.
+                    let v = &rep.phases[4];
+                    assert_eq!(v.scalar_mults, 1);
+                    assert_eq!(v.doubles, u64::from(63 - (planted as u64).leading_zeros()));
+                    assert_eq!(v.adds, u64::from((planted as u64).count_ones() - 1));
+                    assert_eq!(v.gae, (v.adds + v.doubles) as f64);
+                    assert!(v.gae > 0.0);
+                    assert_eq!(rep.total_gae as u64, rep.counters["trials"] + v.gae as u64);
                     assert!(rep.unpriced.iter().all(|n| n.ends_with("_uncharged")));
                     for must in [
                         "oracle_fp_muls_uncharged",
