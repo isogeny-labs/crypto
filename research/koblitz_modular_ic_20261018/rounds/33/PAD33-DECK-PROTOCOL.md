@@ -25,3 +25,9 @@ an explicit negative control for target-image tests. R27 LOWGENUS already
 excludes both desired A5 factors from this particular genus13 quotient;
 do not relabel it a newly successful low-genus Koblitz carrier. Canonical
 theta-character matching and the desired order11 factor remain untested.
+
+padding-deck33-01 was rejected: 'test' is a Singular reserved name, so
+source-unit checking aborted before a complete orbit result. Native exit0
+and a later marker do not make it accepted. Preserve input/log. Rename that
+local identifier (and avoid the coefficient parameter a as a list argument)
+without changing any mathematical formula/control, then use fresh attempt02.

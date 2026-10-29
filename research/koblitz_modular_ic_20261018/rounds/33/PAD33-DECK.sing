@@ -1,6 +1,6 @@
 ideal padDeckResidue33=std(ideal(T^2+T+1));
-proc samePadDeck33(list a,list b){int i;for(i=1;i<=4;i++){if(a[i]!=b[i]){return(0);}}return(1);}
-proc frobPadDeck33(list a){list b;int i;for(i=1;i<=4;i++){b[i]=a[i]^2;}return(b);}
+proc samePadDeck33(list leftPad,list rightPad){int i;for(i=1;i<=4;i++){if(leftPad[i]!=rightPad[i]){return(0);}}return(1);}
+proc frobPadDeck33(list pointPad){list imagePad;int i;for(i=1;i<=4;i++){imagePad[i]=pointPad[i]^2;}return(imagePad);}
 proc stepPadDeck33(list p){
  number b=p[1];number c=p[2];number l=p[3];number n=p[4];number A=1+c;
  if(c==0){ERROR("PAD33_DECK_C_EXCEPTION");}number s=b/c+A;number v=s*(A+s);
@@ -11,8 +11,8 @@ proc sourcePadDeck33(list p){
  number b=p[1];number c=p[2];number l=p[3];number n=p[4];
  map ev=r,n+b*T,l+(1+c)*T,b,c;
  if(size(reduce(ev(original),padDeckResidue33))!=0){ERROR("PAD33_DECK_SOURCE_EQUATION");}
- ideal units=ev(registered);int i;ideal test;
- for(i=1;i<=8;i++){test=padDeckResidue33,units[i];if(std(test)[1]!=1){ERROR("PAD33_DECK_SOURCE_UNIT");}}
+ ideal units=ev(registered);int i;ideal unitIdealPadDeck33;
+ for(i=1;i<=8;i++){unitIdealPadDeck33=padDeckResidue33,units[i];if(std(unitIdealPadDeck33)[1]!=1){ERROR("PAD33_DECK_SOURCE_UNIT");}}
 }
 int qi33;int step33;int ri33;int fi33;int matches33;int foundClass33;int foundFrob33;
 intmat closedAction33[2][10];intmat closedOffsets33[2][10];intvec weightsPad33=4,1,-1,1,-1,-4,-1,1,-1,1;
