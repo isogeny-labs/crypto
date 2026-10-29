@@ -334,6 +334,7 @@ def fall_degree(ref):
     base = "research/fall_degree_bounds_20261008/"
     files = [f for f in ls(ref, base) if f.endswith(".jsonl") and (
         f.startswith(base + "e7/E7_") or f.startswith(base + "e8/E8_")
+        or f == base + "e12/completed-20261028/E_3-24-7.jsonl"
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
@@ -359,6 +360,34 @@ def fall_degree(ref):
     emit("fall_degree.min_n_vars_censored", min_censored_n, problem="fall-degree", unit="variables", label="Smallest N with a draw censored above its cap", source=src)
 
 
+def curve_traits(ref):
+    """End(E) and Frobenius-discriminant status counts in the committed curve-trait catalogue
+    (docs/curves/traits.json, built by curve_traits from the registry and the factor hints)."""
+    path = "docs/curves/traits.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    curves = json.loads(txt).get("curves", [])
+    end = {}
+    for r in curves:
+        st = (r.get("endomorphism") or {}).get("status")
+        end[st] = end.get(st, 0) + 1
+    unfactored = sum(1 for r in curves if (r.get("frobenius") or {}).get("status") == "bounded")
+    hints = sum(1 for l in (show(ref, "docs/curves/factor-hints.txt") or "").splitlines() if l.strip().isdigit())
+    emit("curve_traits.curves", len(curves), problem="curve-traits", unit="curves", label="Curves in the trait catalogue", source=path)
+    for st, better, label in (
+        ("proved", "neutral", "Curves with End(E) proved"),
+        ("probable", "neutral", "Curves with End(E) exact if every probable prime under it is prime"),
+        ("bounded", "lower", "Curves with End(E) only bounded (open volcano levels)"),
+        ("unknown", "lower", "Curves with End(E) unknown (Frobenius discriminant not factored)"),
+    ):
+        emit(f"curve_traits.end.{st}", end.get(st, 0), problem="curve-traits", unit="curves", better=better, label=label, source=path)
+    emit("curve_traits.disc_unfactored", unfactored, problem="curve-traits", unit="curves", better="lower",
+         label="Curves whose Frobenius discriminant has an unsplit composite", source=path)
+    emit("curve_traits.factor_hints", hints, problem="curve-traits", unit="primes", better="neutral",
+         label="Proved primes in docs/curves/factor-hints.txt", source="docs/curves/factor-hints.txt")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -372,6 +401,7 @@ def main():
     nist_selection_exact_embedding(a.ref, a.since)
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
+    curve_traits(a.ref)
 
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)

@@ -593,6 +593,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr class="best-row"><td><strong>Whole cold method, one target, matched rho &mdash; the repository&rsquo;s test for &ldquo;faster than rho&rdquo;</strong></td><td>Koblitz pair collector, 12 cells n = 13&ndash;61, against the lean rho (the matched walk in the IC arm&rsquo;s own arithmetic), tournament round 0025</td><td class="n"><strong>1.36&times;</strong> at best (<code>n19a0</code>); 1.36&ndash;2.56&times; across the eight small cells, 2.1&ndash;13.7&times; past the crossing</td><td><span class="chip">accounting</span></td><td><strong>No elliptic-curve row is below rho.</strong> The line was stopped on 2026-09-29. The six-cell lead against the matched rho of round 0024 (0.61&ndash;0.82&times;) was a reference artefact, and the small-cell wall-time lead vanished once rho&rsquo;s cache was sized. <a href="#ic-tournament-reference-history">Reference history</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/DECISION-20260929-stop.md">stop decision</a></td></tr>
 <tr><td>n37 shared-rank, one-target cold counted-GAE diagnostic</td><td>K8, 592 usable points and eight folded columns, 16 fresh public targets, five rounds each; was K16, 1,184 points and 16 columns on a different eight-target panel</td><td class="n"><strong>4.550&times;</strong> counted IC/rho lower-bound quotient <small>95%: 4.110&ndash;5.040; was 5.034&times; for K16 and 14.426&times; for K42 on the earlier panel</small></td><td><span class="chip">accounting</span> · no admitted speedup</td><td>The new same-point counted K16/K8 ratio is 1.0175 [0.973, 1.059], so its apparent improvement over the earlier K16 panel is not a paired speedup. Whole-solve Callgrind instructions select K8 for the cold implementation route, while K16 remains the online comparator. Both counted arms leave native costs unpriced; L0 wall is exploratory. All 320 new measured runs replayed on another host class. <a href="#n37-k8-k16-20261004">New panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md">decision</a> At n41 and n53 the same parameters do not transfer: K8 never reaches full rank, K16 solves 23 of 80 at n41 at 256&times; counted and none at n53 (<a href="#n41-n53-shared-rank-20261005">n41/n53 panel</a>).</td></tr>
 <tr><td>Whole cold method, multi-target (historical diagnostic)</td><td>Koblitz collection thread, 32 targets solved together, 39-bit subgroup, per target against batch rho</td><td class="n"><strong>3.6&times;</strong> <small>was 4.3&times;, was 4.9&times;</small></td><td><span class="chip">engineering</span></td><td>The closest any elliptic-curve pipeline gets end to end, and it is a batch figure: under the one-target rule it is a historical diagnostic, not the primary comparison. Prime-field best 13.5&times; (23-bit), random binary best 38.2&times; (24-bit). <a href="#plain-reading">Verdict</a> &middot; <a href="#koblitz-descent-20260930">ledger &sect;22</a></td></tr>
+<tr><td>Prime field, generic table IC, one-target cold counted S (a = &minus;3, 20&ndash;40 bits)</td><td>k = 4 sum table (`ksum:m=4`, A = 64) on <code>icv1-fp40-tm924137-0ecaaeb9</code>, frontier campaign curves and test targets, 16 &times; 2 runs a size; the largest size measured, chosen as the frontier-comparable cell (smallest ratio 5.3&times; at 20 bits)</td><td class="n"><strong>13.1&times;</strong> <small>S 11.6 against rho-neg 0.88; was 95.2&times; (pair table, S 83.7)</small></td><td><span class="chip">engineering</span></td><td>Lowers the prime-field IC baseline at every size and band weight (exponent 0.620 &rarr; 0.521) but is generic: it converges to baby-step giant-step and stays 10.4&times; above it. <a href="#prime-ksum-table-20261028">Panel</a> &middot; <a href="https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_table_20261028/README.md">report</a></td></tr>
 <tr><td>One target, online phase only (reusable preparation excluded)</td><td>n61 compact orbit (r = 2<sup>47.2</sup>) against strong rho rung 3 on 256 public one-target workloads, a pinned hosted core, 256/256 replayed (<a href="#n61-compact-orbit-hosted-20261003">panel</a>); was: bounded autolab round 3, pair-table incumbent, six toy Koblitz cells, 216/216 verified</td><td class="n"><strong>0.0682&times;</strong> <small>median per workload, isolated wall time; was 0.134&times; (95%: 0.125&ndash;0.144)</small>; Koblitz descent at 2<sup>36.6</sup>&ndash;2<sup>47.2</sup>: 8.8&ndash;17.5&times; faster online</td><td><span class="chip">engineering</span></td><td>The largest measured IC lead anywhere on this page, and the most qualified: it starts the clock after a reusable set-up that, charged, makes the same method 74.8&times; slower cold at n61 (4.9&ndash;31.6&times; for the Koblitz descent), and that set-up spent as a generic precomputation would speed rho up too. Not a cold result and not a size claim. <a href="#rho-results-title">Round 3</a> &middot; <a href="#koblitz-descent-20260930">ledger &sect;23</a></td></tr>
 <tr><td>One target, online simulated instructions (separate diagnostic unit)</td><td>n37 shared-rank K16, 1,184 usable points and 16 folded columns, against strong rho on 16 fresh public points; K8 retained as the comparison arm</td><td class="n"><strong>0.153&times;</strong> K16/rho target-only Callgrind Ir <small>95%: 0.092&ndash;0.240; K8/K16 2.886 [1.730, 4.602]</small></td><td><span class="chip">accounting</span> · no admitted wall speedup</td><td>All 64 profile scalars and 320 independent measured replays verified. This selects K16 for the next isolated n37 online wall test but cannot establish a native wall crossover or transfer to n41/n53. Complete-solve instructions still favor K8 on these points. <a href="#n37-online-ir-20261004">New panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">decision</a></td></tr>
 <tr><td>Not an elliptic curve: hyperelliptic Jacobian, genus 4, toy size</td><td>Index calculus on Jac(H), p &le; 251, N = 2<sup>24</sup>, conservative accounting against a distinguished-point rho</td><td class="n"><strong>0.24&times;</strong> <small>was 0.21&times;</small></td><td><span class="chip">engineering</span> with a fitted exponent</td><td><strong>The only end-to-end measurement below rho on the page.</strong> It is a statement about the shape of the cost curve at toy size, with the one fitted exponent that survived pricing the linear algebra; genus 3&rsquo;s exponent claim was withdrawn. No deployed system is hyperelliptic. <a href="#genus-crossover">Genus panel</a></td></tr>
@@ -940,11 +941,13 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-20</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>PKM Kummer tower (t=12) + rootfind-mitm, 30-bit prime curve icv1-fp30-t49927-d70f5de2</td><td class="n">158.9&times; <small>counted GAE lower-bound diagnostic; not a speed bound; 140.6&times; at 28 bits</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#lab-ecbench-all">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md">source</a></td></tr>
 <tr><td>2026-10-21</td><td>Elliptic curve, whole method, cold, one target</td><td>Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)</td><td class="n">14.39&times; <small>S; [11.63, 18.45]; rho cheaper on all six curves, 12.6&ndash;25.8&times;</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-planner-validation">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md">source</a></td></tr>
 <tr><td>2026-10-27</td><td>Elliptic curve, whole method, cold, one target</td><td>Residual collector res2 vs rho.negation, one target cold, best cell <code>icv1-fp36-t454193-44a20818</code> (r = 2<sup>36.0</sup>)</td><td class="n">2.592&times; <small>S; [2.234, 3.008]; 23.29&times; at w = 1; was 40.87&times; for the <code>ic plan</code> recipe on the same targets</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#ic-planner-exhaustive-20261026">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_planner_exhaustive_20261026/README.md">source</a></td></tr>
+<tr><td>2026-10-28</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Prime-field IC, k = 4 sum table (one probe a target), 40-bit <code>icv1-fp40-tm924137-0ecaaeb9</code></td><td class="n">13.14&times; <small>counted GAE lower-bound diagnostic; was 95.2&times; (pair table)</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#prime-ksum-table-20261028">panel</a> &middot; <a href="https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_table_20261028/README.md">source</a></td></tr>
 </tbody><tr><td>2026-10-16</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 vs 2,098,176 / 8,390,656 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0019&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..10)</td><td>MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 vs 134,912 / 525,312 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0080&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8)</td><td>First sub-2<sup>2&ell;</sup> oracle at &ell;=8: MITM pair table vs pairs-and-solve, 64 targets, 0 disagreements</td><td class="n">0.0325&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ">source</a></td></tr></table></div></details>
 <noscript><div class="dash-detail-body"><p>The chart needs JavaScript; the table above lists every plotted point.</p></div></noscript>
 <p class="dash-footnote">What would move the heavy series below the line for good: a cold, one-target, every-phase-priced <code>S</code> below a matched rho&rsquo;s at growing size (AGENTS.md &sect;2, &sect;8). The nearest measured approaches are 1.36&times; (round 0025) and 1.314&times; in CPU time (n41). The exponent story is in the <a href="#boundary-ledger">boundary ledger</a>: no fitted exponent on an elliptic curve sits below rho&rsquo;s one half; the cover route&rsquo;s ratio falls with size but on a weak class.</p>
 <p id="conductor-gap-unplotted">15 October: <a href="#conductor-gap-native-20261015">conductor-gap native controls</a> have no numerical IC/rho point while native costs remain incompletely priced. The canonical timeline retains this result in its non-numeric ledger.</p>
 <p id="m4-narrow-engines-wide-vars-20261020">20 October: the <a href="https://github.com/aburan28/crypto/blob/main/research/ic_m3_algebraic_vs_mitm_20261014/amendment-2/ANALYSIS.md">m = 4 narrow-engine rerun</a> (F4 and F6-IC finish n = 23 and n = 29, 70 and 90 unknowns; fitted slope 0.644 and 0.645 on n = 11&ndash;29 against 0.298 for the pair-table floor on the same cells) is a decomposition-phase stage result with no complete one-target IC/rho point, so it is not plotted. The floor stays 10<sup>3</sup>&ndash;10<sup>5</sup> times cheaper per relation on these cells: not an improvement over the baseline. The canonical timeline retains it in its non-numeric ledger.</p>
+<p id="prime-ksum-table-20261028">2026-10-28: <a href="https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_table_20261028/README.md">prime-field index calculus with a k-sum table</a>. Replacing the pair table with a table of every signed 3- or 4-sum of a smaller base (one probe a target) lowers the prime IC baseline on the frontier campaign's six curves and test targets at every size and every band weight: at 40 bits <code>S</code> 11.6 (k = 4) against 83.7 (pair table), 24.7 against 231.1 at w = 1; fitted exponent 0.521 [0.506, 0.538] against 0.620 [0.586, 0.650]. Class: engineering. The method is generic: it converges to baby-step giant-step and stays 10.4&times; above it and 13.1&times; above rho at 40 bits.</p>
 <script type="application/json" id="progress-data">{
  "non_numeric_results": [
   {
@@ -1112,17 +1115,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     },
     {
-     "date": "2026-10-20",
-     "value": 1236267.0,
-     "reference": "matched",
-     "unit": "F_p multiplications",
-     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
-     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
-     "class": "engineering",
-     "anchor": "#rho-parity-ledger",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
-    },
-    {
      "date": "2026-10-16",
      "value": 55.36777360324759,
      "reference": "matched",
@@ -1196,6 +1188,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "engineering",
      "anchor": "#n83-tier1-finalist-20261017",
      "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md"
+    },
+    {
+     "date": "2026-10-20",
+     "value": 1236267.0,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     }
    ],
    "role": "emphasis"
@@ -1425,6 +1428,61 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
     },
     {
+     "anchor": "#three-leads-e2e-0",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965\u20132.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Binary subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.0157697282272515
+    },
+    {
+     "anchor": "#three-leads-e2e-1",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079\u20132.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Odd subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.228297313380844
+    },
+    {
+     "anchor": "#three-leads-e2e-2",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304\u20138.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh PKM fixed fibers",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 7.711609480964212
+    },
+    {
+     "anchor": "#three-leads-e2e-3",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614\u20136.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, field cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.254596361178383
+    },
+    {
+     "anchor": "#three-leads-e2e-4",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295\u20137.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, subgroup cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.392179273237021
+    },
+    {
      "date": "2026-10-20",
      "value": 158.9,
      "reference": "matched",
@@ -1434,6 +1492,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "accounting",
      "anchor": "#lab-ecbench-all",
      "source": "https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md"
+    },
+    {
+     "date": "2026-10-28",
+     "value": 13.13874215708955,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC, k = 4 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9",
+     "detail": "ic-ksum4 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): 13.14x; 13.30x at w = 0.1, 14.02x at w = 1. Was 95.2x (ic-pair, same session). Fitted alpha 0.521 [0.506, 0.538] on 20-32 bits against ic-pair 0.620 [0.586, 0.650]. Generic: still 10.4x BSGS, the family's limit. Largest size measured; the ratio is smallest at 20 bits (5.29x). Lookups unpriced.",
+     "class": "engineering",
+     "anchor": "#prime-ksum-table-20261028",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_table_20261028/README.md"
     }
    ],
    "role": "context"
@@ -1453,7 +1522,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md",
      "unit": "Callgrind Ir diagnostic",
-     "value": 3.6445922113828733
+     "value": 3.6445922113828737
     },
     {
      "anchor": "#n37-online-ir-20261004",
@@ -1594,7 +1663,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n37_native_residual_rho_20261005/RESULT.md",
      "unit": "unisolated native batch CPU diagnostic",
-     "value": 10.766848430462483
+     "value": 10.766848430462485
     }
    ],
    "role": "context"
@@ -1678,7 +1747,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated online wall diagnostic",
-     "value": 0.19586704770931318
+     "value": 0.1958670477093132
     },
     {
      "anchor": "#n41-n53-base-size-cold-20261004",
@@ -1957,10 +2026,29 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
     }
    ]
+  },
+  {
+   "barrier_test": true,
+   "id": "genus2-kummer-matched-gae",
+   "label": "Elliptic curve over Fp\u00b2, genus-2 Kummer transfer, complete cold counted GAE",
+   "note": "The signed differential quotient collector and source-negation rho ran on the same 1,260 public targets in one process. Cold setup is charged per target. This is a modeled operation-cost comparison, not calibrated wall time.",
+   "points": [
+    {
+     "date": "2026-10-22",
+     "value": 14.356662,
+     "reference": "matched",
+     "label": "Uncached signed Kummer differential collector vs source-negation rho, 1,260 targets",
+     "detail": "Complete cold ratio at M + 0.5S + 10I and native logical operation = 0.1 GAE. Across 36 pooled price cells the ratio is 8.959687\u201355.935424; 0 cells below rho. All 1,260 scalar recoveries and same-process rho controls are independently source-verified. Every 45,360 target/cell comparison is a loss. The arbitrary-jump signed-label sidecar remains unimplemented.",
+     "class": "engineering",
+     "anchor": "#kummer-matched-20261022",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/MATCHED_REPORT.md"
+    }
+   ],
+   "role": "context"
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-27"
+ "updated": "2026-10-28"
 }
 </script>
 <script>
@@ -4913,7 +5001,7 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
   <div class="panel" id="ecc2k130-descent-degree-20260930">
     <div class="panel-head">
       <h2>ECC2K-130 descent route: XL's refutation degree grows with &ell;; the MutantXL closure refutes at 3&ndash;4 much longer, but rises past 4 at m&thinsp;=&thinsp;3, &ell;&thinsp;=&thinsp;7</h2>
-  <p class="panel-summary">Finds XL's refutation degree rises with &ell;; MutantXL closure refutes at 3&ndash;4 to &ell; = 6 (m = 3) and &ell; = 5 (m = 4) up to N = 44, exceeds 4 at m = 3, &ell; = 7, and N is not the driver (2026-10-16); no derived row beats rho; n = 131 prices derived not measured.</p>
+  <p class="panel-summary">Finds XL's refutation degree rises with &ell;; MutantXL closure refutes at 3&ndash;4 to &ell; = 6 (m = 3) and &ell; = 5 (m = 4) up to N = 44, exceeds 4 at m = 3, &ell; = 7, N is not the driver (2026-10-16), and four guessed variables restore degree 4 at &ell; = 8 (2026-10-22); no derived row beats rho; n = 131 prices derived not measured.</p>
       <p>Class <span class="chip">accounting</span>. There is no new <code>S</code> and no cost moves: the ECC2K-130
         verdict was already set by the product law and the oracle budget above. This panel adds what the
         refutation degree of the <code>m</code>&thinsp;=&thinsp;3 chained S<sub>3</sub> system does as &ell; grows,
@@ -5029,6 +5117,17 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         6 of 8, and both values of one guessed summand coordinate refute on 5 of 8 (<code>research/dreg_closure_specialise_20261017/</code>,
         pre-registered; its max-&ell; vs &Sigma;&ell; test was uninformative because the null control also refuted). The &ell;&thinsp;=&thinsp;7
         failure is marginal, and guess-then-degree-4 is a candidate oracle whose guess count at larger &ell; is unmeasured; no row moves.</p>
+      <p><b>Four guesses at &ell;&thinsp;=&thinsp;8 (2026-10-22).</b> Guessing four variables (one per summand, one intermediate coordinate) on four
+        unsatisfiable m&thinsp;=&thinsp;3, &ell;&thinsp;=&thinsp;8 draws (N&thinsp;=&thinsp;46) makes degree 4 refute on all 64 branches, with a valid positive control
+        (<code>research/dreg_closure_guess_20261022/</code>, pre-registered). The rule m&middot;(&ell;&minus;6), which predicted 6 guesses, is rejected
+        for this guess set; k&thinsp;=&thinsp;4 is an upper bound, the fewest measurable on this host. At the priced m&thinsp;=&thinsp;4, &ell;&thinsp;=&thinsp;33 cell the hybrid
+        beats degree 5 only if k&thinsp;&le;&thinsp;6, and its best case is the degree-4 row 2<sup>68.43</sup>; no row moves and none beats rho.</p>
+      <p><b>Three guesses at &ell;&thinsp;=&thinsp;8 (2026-10-23).</b> Guessing variables 7, 15 and 23 (the top coordinate of each summand) on the same four
+        draws (N&thinsp;=&thinsp;43) leaves a degree-4 saturating branch on draws 0, 3 and 5 and refutes all 8 branches on draw 6, with valid controls
+        (<code>research/dreg_closure_guess3_20261023/</code>, pre-registered). Three do not suffice for this set; four did. This 3-set leaves every summand at dimension 7 (N&thinsp;=&thinsp;43), structurally the &ell;&thinsp;=&thinsp;7 systems that did not
+        refute at degree 4, and the pattern fits m&middot;(&ell;&minus;7)+1 guesses (105 at the priced m&thinsp;=&thinsp;4, &ell;&thinsp;=&thinsp;33 cell against a break-even of 6): a reading from two values
+        of &ell;, not a result. Separately, m&thinsp;=&thinsp;4, &ell;&thinsp;=&thinsp;6 was measured by another session on a large host and refutes at degree 4
+        (<code>research/dreg_closure_m4l6_20261018/</code>), so the m&middot;&ell;&thinsp;&ge;&thinsp;21 explanation is refuted and &ell;&thinsp;=&thinsp;7 survives. No row moves and none beats rho.</p>
     </div>
   </div>
 

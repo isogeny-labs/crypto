@@ -1,0 +1,147 @@
+=== G1 analysis: 102 (arm,b,inst) cells loaded; bootstrap B = 2000, setrand(31337), instance-level then trial-level, stratified by b ===
+--- 1. solve rates (verified solves / trials) per arm and b, pooled over instances; Wilson 95% on the pooled rate
+n1 b24: 240/240 = 1.000  Wilson [0.984, 1.000]  ( i1:80/80 i2:80/80 i3:40/40 i4:40/40 )
+n1 b28: 240/240 = 1.000  Wilson [0.984, 1.000]  ( i1:80/80 i2:80/80 i3:40/40 i4:40/40 )
+n1 b32: 180/180 = 1.000  Wilson [0.979, 1.000]  ( i1:60/60 i2:60/60 i3:30/30 i4:30/30 )
+n1 b36: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:40/40 i2:40/40 i3:20/20 i4:20/20 )
+n1 b40: 104/104 = 1.000  Wilson [0.964, 1.000]  ( i1:40/40 i2:40/40 i3:12/12 i4:12/12 )
+n1r64 b36: 40/40 = 1.000  Wilson [0.912, 1.000]  ( i1:20/20 i2:20/20 )
+n1r64 b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+n1sab b24: 2/30 = 0.067  Wilson [0.018, 0.213]  ( i1:2/30 )
+n1sab b28: 1/30 = 0.033  Wilson [0.006, 0.167]  ( i1:1/30 )
+n1sab b32: 0/30 = 0.000  Wilson [0.000, 0.114]  ( i1:0/30 )
+n1sab b36: 0/12 = 0.000  Wilson [0.000, 0.243]  ( i1:0/12 )
+n1c2 b24: 30/30 = 1.000  Wilson [0.886, 1.000]  ( i1:30/30 )
+n1c2 b28: 30/30 = 1.000  Wilson [0.886, 1.000]  ( i1:30/30 )
+n1c2 b32: 29/30 = 0.967  Wilson [0.833, 0.994]  ( i1:29/30 )
+n1c2 b36: 1/10 = 0.100  Wilson [0.018, 0.404]  ( i1:1/10 )
+a0 b24: 240/240 = 1.000  Wilson [0.984, 1.000]  ( i1:80/80 i2:80/80 i3:40/40 i4:40/40 )
+a0 b28: 200/200 = 1.000  Wilson [0.981, 1.000]  ( i1:60/60 i2:60/60 i3:40/40 i4:40/40 )
+a0 b32: 140/140 = 1.000  Wilson [0.973, 1.000]  ( i1:40/40 i2:40/40 i3:30/30 i4:30/30 )
+a0 b36: 88/88 = 1.000  Wilson [0.958, 1.000]  ( i1:24/24 i2:24/24 i3:20/20 i4:20/20 )
+a0 b40: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:12/12 i2:12/12 i3:12/12 i4:12/12 )
+kpure b24: 240/240 = 1.000  Wilson [0.984, 1.000]  ( i1:80/80 i2:80/80 i3:40/40 i4:40/40 )
+kpure b28: 200/200 = 1.000  Wilson [0.981, 1.000]  ( i1:60/60 i2:60/60 i3:40/40 i4:40/40 )
+kpure b32: 140/140 = 1.000  Wilson [0.973, 1.000]  ( i1:40/40 i2:40/40 i3:30/30 i4:30/30 )
+kpure b36: 88/88 = 1.000  Wilson [0.958, 1.000]  ( i1:24/24 i2:24/24 i3:20/20 i4:20/20 )
+kpure b40: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:12/12 i2:12/12 i3:12/12 i4:12/12 )
+kmix b24: 240/240 = 1.000  Wilson [0.984, 1.000]  ( i1:80/80 i2:80/80 i3:40/40 i4:40/40 )
+kmix b28: 200/200 = 1.000  Wilson [0.981, 1.000]  ( i1:60/60 i2:60/60 i3:40/40 i4:40/40 )
+kmix b32: 140/140 = 1.000  Wilson [0.973, 1.000]  ( i1:40/40 i2:40/40 i3:30/30 i4:30/30 )
+kmix b36: 88/88 = 1.000  Wilson [0.958, 1.000]  ( i1:24/24 i2:24/24 i3:20/20 i4:20/20 )
+kmix b40: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:12/12 i2:12/12 i3:12/12 i4:12/12 )
+a1c b24: 160/160 = 1.000  Wilson [0.977, 1.000]  ( i1:80/80 i2:80/80 )
+a1c b28: 120/120 = 1.000  Wilson [0.969, 1.000]  ( i1:60/60 i2:60/60 )
+a1c b32: 80/80 = 1.000  Wilson [0.954, 1.000]  ( i1:40/40 i2:40/40 )
+a1c b36: 48/48 = 1.000  Wilson [0.926, 1.000]  ( i1:24/24 i2:24/24 )
+a1c b40: 24/24 = 1.000  Wilson [0.862, 1.000]  ( i1:12/12 i2:12/12 )
+--- 2. positive control PC1 (N1 solves >= 95% pooled at every b = 24..40 and >= 90% on every instance) and PC2 (steps N1/A0 pooled b = 28..40 in [0.71, 0.80])
+PC1 b24: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 b28: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 b32: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 b36: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 b40: pooled rate 1.000 (worst instance 1.000)  pass
+PC1 overall: PASS
+PC2 steps N1/A0 pooled b28-40, all instances (E5+ext): 0.748 [0.686, 0.814]
+PC2 steps N1/A0 pooled b28-40, E5 instances only     : 0.756 [0.693, 0.826]
+PC2 verdict: PASS (point in [0.71, 0.80])
+steps N1/A0 b24: 0.731 [0.653, 0.809]
+steps N1/A0 b28: 0.719 [0.650, 0.799]
+steps N1/A0 b32: 0.759 [0.627, 0.899]
+steps N1/A0 b36: 0.797 [0.686, 0.925]
+steps N1/A0 b40: 0.719 [0.569, 0.907]
+--- 3. negative controls
+NC1 n1sab b24: rate 0.067 (Wilson upper 0.213) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): SEES DROP
+NC1 n1sab b28: rate 0.033 (Wilson upper 0.167) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): SEES DROP
+NC1 n1sab b32: rate 0.000 (Wilson upper 0.114) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): SEES DROP
+NC1 n1sab b36: rate 0.000 (Wilson upper 0.243) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): SEES DROP
+NC1 n1c2 b24: rate 1.000 (Wilson upper 1.000) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): no drop seen
+NC1 n1c2 b28: rate 1.000 (Wilson upper 1.000) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): no drop seen
+NC1 n1c2 b32: rate 0.967 (Wilson upper 0.994) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): no drop seen
+NC1 n1c2 b36: rate 0.100 (Wilson upper 0.404) vs N1 1.000 on the same instances; detector (upper < 0.95 and drop >= 0.20): SEES DROP
+NC2 split-half null, N1 b24: geometric mean over 4 instances of (odd-trial mean steps)/(even-trial mean steps) = 0.965 (must be near 1)
+NC2 split-half null, N1 b28: geometric mean over 4 instances of (odd-trial mean steps)/(even-trial mean steps) = 0.972 (must be near 1)
+NC2 split-half null, N1 b32: geometric mean over 4 instances of (odd-trial mean steps)/(even-trial mean steps) = 0.968 (must be near 1)
+NC2 split-half null, N1 b36: geometric mean over 4 instances of (odd-trial mean steps)/(even-trial mean steps) = 0.989 (must be near 1)
+NC2 split-half null, N1 b40: geometric mean over 4 instances of (odd-trial mean steps)/(even-trial mean steps) = 0.872 (must be near 1)
+--- 4. ratios X/N1 pooled b = 28..40 (geometric mean over instances of per-instance mean-cost ratios; failures censored at the budget).
+     all = E5 instances 1,2 + extension 3,4 (headline); e5 = instances 1,2 only (co-primary).  95% percentile CI, instance-level then trial-level resampling.
+kmix/n1 steps  all: 1.025 [0.944, 1.118]   e5: 1.040 [0.936, 1.146]
+kmix/n1 I/M=3 w0  all: 5.907 [5.438, 6.438]   e5: 5.991 [5.392, 6.598]
+kmix/n1 I/M=3 w0.1(B)  all: 4.268 [3.929, 4.652]   e5: 4.328 [3.896, 4.767]
+kmix/n1 I/M=3 w1(B)  all: 1.768 [1.627, 1.927]   e5: 1.793 [1.613, 1.974]
+kmix/n1 I/M=3 w0.1(A)  all: 5.907 [5.437, 6.438]   e5: 5.990 [5.392, 6.597]
+kmix/n1 I/M=3 w1(A)  all: 5.902 [5.433, 6.432]   e5: 5.985 [5.387, 6.591]
+kmix/n1 I/M=3 w0,S=1.0  all: 6.110 [5.624, 6.659]   e5: 6.197 [5.578, 6.824]
+kmix/n1 I/M=10 w0  all: 3.235 [2.977, 3.525]   e5: 3.281 [2.953, 3.613]
+kmix/n1 I/M=10 w0.1(B)  all: 2.473 [2.276, 2.695]   e5: 2.508 [2.257, 2.762]
+kmix/n1 I/M=10 w1(B)  all: 1.314 [1.209, 1.432]   e5: 1.332 [1.199, 1.467]
+kmix/n1 I/M=10 w0.1(A)  all: 3.235 [2.977, 3.525]   e5: 3.280 [2.953, 3.613]
+kmix/n1 I/M=10 w1(A)  all: 3.232 [2.975, 3.523]   e5: 3.278 [2.951, 3.610]
+kmix/n1 I/M=10 w0,S=1.0  all: 3.370 [3.102, 3.673]   e5: 3.418 [3.077, 3.764]
+kmix/n1 I/M=30 w0  all: 1.879 [1.730, 2.048]   e5: 1.906 [1.715, 2.099]
+kmix/n1 I/M=30 w0.1(B)  all: 1.564 [1.439, 1.704]   e5: 1.586 [1.428, 1.747]
+kmix/n1 I/M=30 w1(B)  all: 1.084 [0.998, 1.182]   e5: 1.100 [0.990, 1.211]
+kmix/n1 I/M=30 w0.1(A)  all: 1.879 [1.730, 2.048]   e5: 1.906 [1.715, 2.099]
+kmix/n1 I/M=30 w1(A)  all: 1.878 [1.729, 2.047]   e5: 1.905 [1.715, 2.098]
+kmix/n1 I/M=30 w0,S=1.0  all: 1.941 [1.786, 2.115]   e5: 1.969 [1.772, 2.168]
+kmix/n1 I/M=100 w0  all: 1.287 [1.185, 1.403]   e5: 1.306 [1.175, 1.438]
+kmix/n1 I/M=100 w0.1(B)  all: 1.167 [1.074, 1.272]   e5: 1.184 [1.065, 1.304]
+kmix/n1 I/M=100 w1(B)  all: 0.984 [0.906, 1.073]   e5: 0.998 [0.899, 1.100]
+kmix/n1 I/M=100 w0.1(A)  all: 1.287 [1.185, 1.403]   e5: 1.306 [1.175, 1.438]
+kmix/n1 I/M=100 w1(A)  all: 1.287 [1.185, 1.403]   e5: 1.305 [1.175, 1.438]
+kmix/n1 I/M=100 w0,S=1.0  all: 1.308 [1.204, 1.426]   e5: 1.327 [1.194, 1.462]
+kpure/n1 steps  all: 1.422 [1.286, 1.568]   e5: 1.396 [1.254, 1.529]
+kpure/n1 I/M=3 w0  all: 8.193 [7.410, 9.035]   e5: 8.043 [7.225, 8.802]
+kpure/n1 I/M=3 w0.1(B)  all: 5.919 [5.354, 6.528]   e5: 5.811 [5.220, 6.360]
+kpure/n1 I/M=3 w1(B)  all: 2.451 [2.217, 2.703]   e5: 2.407 [2.162, 2.635]
+kpure/n1 I/M=3 w0.1(A)  all: 8.192 [7.409, 9.034]   e5: 8.042 [7.224, 8.801]
+kpure/n1 I/M=3 w1(A)  all: 8.185 [7.403, 9.026]   e5: 8.035 [7.217, 8.794]
+kpure/n1 I/M=3 w0,S=1.0  all: 8.474 [7.664, 9.345]   e5: 8.319 [7.473, 9.104]
+kpure/n1 I/M=10 w0  all: 4.486 [4.058, 4.947]   e5: 4.404 [3.956, 4.820]
+kpure/n1 I/M=10 w0.1(B)  all: 3.430 [3.102, 3.782]   e5: 3.367 [3.024, 3.686]
+kpure/n1 I/M=10 w1(B)  all: 1.822 [1.648, 2.009]   e5: 1.789 [1.607, 1.958]
+kpure/n1 I/M=10 w0.1(A)  all: 4.486 [4.057, 4.947]   e5: 4.404 [3.955, 4.820]
+kpure/n1 I/M=10 w1(A)  all: 4.482 [4.054, 4.943]   e5: 4.401 [3.953, 4.817]
+kpure/n1 I/M=10 w0,S=1.0  all: 4.674 [4.228, 5.154]   e5: 4.589 [4.122, 5.022]
+kpure/n1 I/M=30 w0  all: 2.606 [2.357, 2.873]   e5: 2.558 [2.298, 2.800]
+kpure/n1 I/M=30 w0.1(B)  all: 2.169 [1.962, 2.391]   e5: 2.129 [1.912, 2.331]
+kpure/n1 I/M=30 w1(B)  all: 1.504 [1.360, 1.658]   e5: 1.476 [1.326, 1.616]
+kpure/n1 I/M=30 w0.1(A)  all: 2.606 [2.357, 2.873]   e5: 2.558 [2.298, 2.800]
+kpure/n1 I/M=30 w1(A)  all: 2.605 [2.356, 2.872]   e5: 2.557 [2.297, 2.799]
+kpure/n1 I/M=30 w0,S=1.0  all: 2.692 [2.435, 2.968]   e5: 2.643 [2.373, 2.892]
+kpure/n1 I/M=100 w0  all: 1.785 [1.615, 1.968]   e5: 1.753 [1.574, 1.918]
+kpure/n1 I/M=100 w0.1(B)  all: 1.618 [1.464, 1.784]   e5: 1.589 [1.427, 1.739]
+kpure/n1 I/M=100 w1(B)  all: 1.365 [1.235, 1.505]   e5: 1.340 [1.204, 1.467]
+kpure/n1 I/M=100 w0.1(A)  all: 1.785 [1.615, 1.968]   e5: 1.752 [1.574, 1.918]
+kpure/n1 I/M=100 w1(A)  all: 1.785 [1.614, 1.968]   e5: 1.752 [1.574, 1.918]
+kpure/n1 I/M=100 w0,S=1.0  all: 1.814 [1.641, 2.000]   e5: 1.781 [1.600, 1.950]
+--- 4b. reference: steps X/A0 (the unmatched E5 baseline) and K-mix/N1 per b
+kmix/a0 steps all: 0.767 [0.702, 0.842]
+kpure/a0 steps all: 1.063 [0.973, 1.167]
+kmix/n1 b24 I/M=3 w0: 6.608 [5.839, 7.507]
+kmix/n1 b24 I/M=10 w0: 3.619 [3.197, 4.111]
+kmix/n1 b24 I/M=30 w0: 2.102 [1.857, 2.389]
+kmix/n1 b24 I/M=100 w0: 1.440 [1.272, 1.637]
+kmix/n1 b28 I/M=3 w0: 5.849 [5.138, 6.680]
+kmix/n1 b28 I/M=10 w0: 3.203 [2.814, 3.658]
+kmix/n1 b28 I/M=30 w0: 1.861 [1.635, 2.125]
+kmix/n1 b28 I/M=100 w0: 1.275 [1.120, 1.456]
+kmix/n1 b32 I/M=3 w0: 5.900 [5.173, 6.685]
+kmix/n1 b32 I/M=10 w0: 3.230 [2.832, 3.661]
+kmix/n1 b32 I/M=30 w0: 1.876 [1.645, 2.126]
+kmix/n1 b32 I/M=100 w0: 1.285 [1.126, 1.456]
+kmix/n1 b36 I/M=3 w0: 5.484 [4.642, 6.671]
+kmix/n1 b36 I/M=10 w0: 3.003 [2.542, 3.653]
+kmix/n1 b36 I/M=30 w0: 1.745 [1.477, 2.123]
+kmix/n1 b36 I/M=100 w0: 1.195 [1.012, 1.454]
+kmix/n1 b40 I/M=3 w0: 6.436 [5.127, 7.961]
+kmix/n1 b40 I/M=10 w0: 3.524 [2.807, 4.358]
+kmix/n1 b40 I/M=30 w0: 2.047 [1.630, 2.531]
+kmix/n1 b40 I/M=100 w0: 1.402 [1.117, 1.733]
+--- 4c. counted M, S, I per walk step (sum over all trials with b >= 28 divided by total steps; escapes and conversions included)
+n1: M/step 2.047  S/step 1.031  I/step 1.016  (total steps 131915962)
+kmix: M/step 21.499  S/step 11.999  I/step 1.000  (total steps 76188339)
+kpure: M/step 21.504  S/step 12.002  I/step 1.000  (total steps 103007317)
+a0: M/step 2.000  S/step 1.000  I/step 1.000  (total steps 96454351)
+=== done ===
