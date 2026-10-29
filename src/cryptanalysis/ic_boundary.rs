@@ -6050,8 +6050,19 @@ impl PackedPairTable {
         fb: &FactorBase<PrimePoint>,
         ops: &mut GroupOps,
     ) -> Result<Self, String> {
+        Self::build_regions(g, fb, ops, PACKED_PART_ENTRIES)
+    }
+
+    /// [`Self::build`] with the region size as a parameter; `usize::MAX`
+    /// gives the one-region table the layout study measured.
+    fn build_regions(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        part_entries: usize,
+    ) -> Result<Self, String> {
         let expected = fb.abscissa_list.len().pow(2) + 1;
-        let bits = (expected / PACKED_PART_ENTRIES)
+        let bits = (expected / part_entries)
             .max(1)
             .next_power_of_two()
             .trailing_zeros();
@@ -6131,6 +6142,115 @@ impl PackedPairTable {
 #[inline]
 fn slot_of(key: u64, mask: usize) -> usize {
     (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
+}
+
+/// Ask the processor to start fetching this address.  A prefetch changes
+/// nothing a program can observe beyond the cache, so any address is
+/// allowed; other targets do nothing.
+#[cfg(test)]
+#[inline(always)]
+fn prefetch_word(address: *const u64) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: a prefetch has no architectural effect beyond the cache;
+    // any address is allowed, valid or not.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch::<{ std::arch::x86_64::_MM_HINT_T0 }>(address as *const i8);
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    let _ = address;
+}
+
+/// **The target guard's set of keys, open-addressed.**  One word per key,
+/// linear probing, at most half full: a lookup reads one cache line where
+/// the std map reads a control group and then a bucket, and a prefetch has
+/// a slot address to aim at.  `0` marks an empty slot, so the key `0` is
+/// kept in a flag.  `insert` answers what `HashMap::insert(key, ())`
+/// answers (was the key already present), so the guard's decisions are
+/// the map's.
+#[cfg(test)]
+struct FlatSet {
+    slots: Vec<u64>,
+    mask: usize,
+    shift: u32,
+    len: usize,
+    has_zero: bool,
+}
+
+#[cfg(test)]
+impl FlatSet {
+    fn with_capacity(entries: usize) -> Self {
+        let size = (entries.max(8) * 2).next_power_of_two();
+        Self {
+            slots: vec![0; size],
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+            len: 0,
+            has_zero: false,
+        }
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> self.shift) as usize
+    }
+
+    /// Prefetch the slot `key` starts its probe at.
+    #[inline(always)]
+    fn prefetch(&self, key: u64) {
+        prefetch_word(self.slots.as_ptr().wrapping_add(self.home(key)));
+    }
+
+    /// Add `key`; `true` when it was already there.
+    #[inline]
+    fn insert(&mut self, key: u64) -> bool {
+        if key == 0 {
+            return std::mem::replace(&mut self.has_zero, true);
+        }
+        if (self.len + 1) * 2 > self.slots.len() {
+            self.grow();
+        }
+        let mut s = self.home(key);
+        loop {
+            let held = self.slots[s];
+            if held == 0 {
+                self.slots[s] = key;
+                self.len += 1;
+                return false;
+            }
+            if held == key {
+                return true;
+            }
+            s = (s + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let size = self.slots.len() * 2;
+        let old = std::mem::replace(&mut self.slots, vec![0; size]);
+        self.mask = size - 1;
+        self.shift = 64 - size.trailing_zeros();
+        for key in old.into_iter().filter(|&k| k != 0) {
+            let mut s = self.home(key);
+            while self.slots[s] != 0 {
+                s = (s + 1) & self.mask;
+            }
+            self.slots[s] = key;
+        }
+    }
+}
+
+#[cfg(test)]
+impl PackedPairTable {
+    /// Start fetching the cache line [`Self::get`] reads first for `key`.
+    #[inline(always)]
+    fn prefetch(&self, key: u64) {
+        if key == 0 || key > u64::from(u32::MAX) {
+            return;
+        }
+        let k = table_part(key, self.shift);
+        let home = self.base[k] + slot_of(key, self.mask[k]);
+        prefetch_word(self.slots.as_ptr().wrapping_add(home));
+    }
 }
 
 /// A table of all pair sums of a base, keyed by the sum's abscissa so
@@ -12419,6 +12539,206 @@ mod tests {
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    /// The batched prime table as one packed region, the layout the study measured (test only).
+    fn flat_prime_batch(g: &PrimeCurve, fb: &FactorBase<PrimePoint>) -> PairTable {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let packed = PackedPairTable::build_regions(g, fb, &mut ops, usize::MAX).unwrap();
+        PairTable {
+            kind: "negation_folded_prime_batch",
+            entries: packed.entries,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            insert_attempts: packed.insert_attempts,
+            index_lookups: fb.abscissa_list.len() as u64,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            packed: Some(packed),
+        }
+    }
+
+    #[test]
+    fn flat_batch_table_equals_the_map_form_in_every_answer() {
+        for (bits, size) in [(14, 24), (20, 300)] {
+            let inst = if bits == 20 {
+                prime_instance_for(20, 59297)
+            } else {
+                roster_prime_instance(bits).unwrap()
+            };
+            let fb = prime_factor_base(&inst, size);
+            let flat = flat_prime_batch(&inst.curve, &fb);
+            let map = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+            assert!(flat.packed.is_some() && map.packed.is_none());
+            assert_eq!(flat.packed.as_ref().unwrap().base.len(), 1);
+            assert_eq!(flat.kind, map.kind);
+            assert_eq!(flat.entries, map.entries);
+            assert_eq!(flat.insert_attempts, map.insert_attempts);
+            assert_eq!(flat.index_lookups, map.index_lookups);
+            assert_eq!(flat.build_ops.adds, map.build_ops.adds);
+            assert_eq!(flat.build_ops.doubles, map.build_ops.doubles);
+            assert_eq!(flat.build_ops.field_ops.muls, map.build_ops.field_ops.muls);
+            assert_eq!(flat.build_ops.field_ops.sqrs, map.build_ops.field_ops.sqrs);
+            assert_eq!(flat.build_ops.field_ops.invs, map.build_ops.field_ops.invs);
+            // Every stored key keeps its first witness, and keys that are
+            // not stored (random ones, zero, wide ones) are absent in both.
+            for (key, witness) in &map.map {
+                assert_eq!(flat.get(*key), Some(*witness), "key {key}");
+            }
+            let mut rng = StdRng::seed_from_u64(11);
+            for _ in 0..20_000 {
+                let key = rng.gen::<u64>() >> rng.gen_range(0..64);
+                assert_eq!(flat.get(key), map.get(key), "probe {key}");
+            }
+            for key in [0u64, 1, u64::from(u32::MAX), u64::MAX] {
+                assert_eq!(flat.get(key), map.get(key));
+            }
+            // The probe, with its negation fold, answers the same on every
+            // stored sum of the base.
+            let mut ops = GroupOps::default();
+            for i in 0..fb.points.len().min(40) {
+                for j in i..fb.points.len().min(40) {
+                    let s = inst.curve.add(&mut ops, fb.points[i], fb.points[j]);
+                    if s.infinity {
+                        continue;
+                    }
+                    for target in [s, inst.curve.neg(s)] {
+                        let (mut l1, mut l2) = (0, 0);
+                        let a = flat.probe(&inst.curve, &fb, &mut ops, &mut l1, target);
+                        let b = map.probe(&inst.curve, &fb, &mut ops, &mut l2, target);
+                        assert_eq!(a, b);
+                        flat.touch(&inst.curve, &target);
+                    }
+                }
+            }
+        }
+    }
+
+    /// Wall time of the pair table's probe and the target guard's insert, old layout against new,
+    /// on the tuned bases of the 24-, 28- and 32-bit curves.  Run with
+    /// `cargo test --release --lib micro_table_floor -- --ignored --nocapture`.  Probes are
+    /// uniformly random keys below the field, as a target's abscissa is, so almost all miss.
+    #[test]
+    #[ignore = "timing; prints"]
+    fn micro_table_floor() {
+        use std::hint::black_box;
+        fn median(mut v: Vec<f64>) -> f64 {
+            v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            v[v.len() / 2]
+        }
+        for (bits, base, seed) in [
+            (24u32, 256usize, 59293u64),
+            (28, 512, 59297),
+            (32, 1024, 59297),
+        ] {
+            let inst = prime_instance_for(bits, seed);
+            let fb = prime_factor_base(&inst, base);
+            let flat = flat_prime_batch(&inst.curve, &fb);
+            let map = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+            let p = inst.curve.p;
+            let mut rng = StdRng::seed_from_u64(99);
+            let n = 1 << 20;
+            let keys: Vec<u64> = (0..n).map(|_| rng.gen_range(1..p)).collect();
+            let hits: Vec<u64> = map.map.keys().copied().cycle().take(n).collect();
+            let mut res = vec![Vec::new(); 8];
+            for _ in 0..7 {
+                for (slot, (table, batched)) in
+                    [(&map, false), (&flat, false), (&map, true), (&flat, true)]
+                        .into_iter()
+                        .enumerate()
+                {
+                    for (which, set) in [(0usize, &keys), (1, &hits)] {
+                        let t = Instant::now();
+                        let mut acc = 0u64;
+                        for chunk in set.chunks(16) {
+                            if batched {
+                                for &k in chunk {
+                                    match &table.packed {
+                                        Some(pk) => pk.prefetch(k),
+                                        None => {
+                                            black_box(table.get(k));
+                                        }
+                                    }
+                                }
+                            }
+                            for &k in chunk {
+                                if let Some((i, j)) = table.get(black_box(k)) {
+                                    acc += u64::from(i) + u64::from(j);
+                                }
+                            }
+                        }
+                        black_box(acc);
+                        res[slot * 2 + which]
+                            .push(t.elapsed().as_nanos() as f64 / set.len() as f64);
+                    }
+                }
+            }
+            let m: Vec<f64> = res.into_iter().map(median).collect();
+            println!(
+                "{bits}-bit base {base} entries {}: probe ns/op  miss: map {:.1} flat {:.1} | map+touch16 {:.1} flat+prefetch16 {:.1}   hit: map {:.1} flat {:.1} | map+touch16 {:.1} flat+prefetch16 {:.1}",
+                map.entries, m[0], m[2], m[4], m[6], m[1], m[3], m[5], m[7]
+            );
+            // The guard: distinct keys in a lane-sized random order, 16 at a time.
+            let trials = 1 << 18;
+            let gk: Vec<u64> = (0..trials).map(|_| rng.gen_range(1..p)).collect();
+            let mut g = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
+            for _ in 0..7 {
+                let t = Instant::now();
+                let mut seen: FastMap<()> = fast_map(1 << 12);
+                let mut dup = 0u64;
+                for chunk in gk.chunks(16) {
+                    for &k in chunk {
+                        black_box(seen.contains_key(&k));
+                    }
+                    for &k in chunk {
+                        dup += u64::from(seen.insert(k, ()).is_some());
+                    }
+                }
+                black_box(dup);
+                g[0].push(t.elapsed().as_nanos() as f64 / trials as f64);
+                let t = Instant::now();
+                let mut seen = FlatSet::with_capacity(1 << 12);
+                let mut dup = 0u64;
+                for chunk in gk.chunks(16) {
+                    for &k in chunk {
+                        seen.prefetch(k);
+                    }
+                    for &k in chunk {
+                        dup += u64::from(seen.insert(k));
+                    }
+                }
+                black_box(dup);
+                g[1].push(t.elapsed().as_nanos() as f64 / trials as f64);
+            }
+            println!(
+                "{bits}-bit guard insert ns/op ({trials} keys, 16 per round): map+touch {:.1}  flat+prefetch {:.1}",
+                median(g[0].clone()),
+                median(g[1].clone())
+            );
+        }
+    }
+
+    #[test]
+    fn flat_set_answers_like_a_hash_map_through_growth() {
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut flat = FlatSet::with_capacity(0);
+        let mut map: FastMap<()> = fast_map(0);
+        for step in 0..200_000u64 {
+            // Small keys collide often; zero and wide keys are included.
+            let key = match step % 7 {
+                0 => rng.gen_range(0..64u64),
+                1 => rng.gen::<u64>(),
+                _ => rng.gen_range(0..40_000u64),
+            };
+            flat.prefetch(key);
+            assert_eq!(
+                flat.insert(key),
+                map.insert(key, ()).is_some(),
+                "step {step} key {key}"
+            );
+        }
     }
 
     #[test]

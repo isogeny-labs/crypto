@@ -1,0 +1,6 @@
+24-bit base 256 entries 65250: probe ns/op  miss: map 10.7 flat 24.7 | map+touch16 14.5 flat+prefetch16 22.0   hit: map 4.8 flat 14.6 | map+touch16 13.7 flat+prefetch16 14.8
+24-bit guard insert ns/op (262144 keys, 16 per round): map+touch 46.1  flat+prefetch 38.4
+28-bit base 512 entries 261846: probe ns/op  miss: map 13.4 flat 39.0 | map+touch16 17.2 flat+prefetch16 24.9   hit: map 5.9 flat 18.7 | map+touch16 13.7 flat+prefetch16 16.3
+28-bit guard insert ns/op (262144 keys, 16 per round): map+touch 33.8  flat+prefetch 29.1
+32-bit base 1024 entries 1048201: probe ns/op  miss: map 22.4 flat 60.7 | map+touch16 29.3 flat+prefetch16 36.9   hit: map 8.0 flat 34.6 | map+touch16 19.0 flat+prefetch16 21.9
+32-bit guard insert ns/op (262144 keys, 16 per round): map+touch 43.0  flat+prefetch 36.6
