@@ -46,7 +46,7 @@ paper was unavailable. No universal lower bound is inferred from that gap.
 ## Native development
 
 `examples/pkm_symmetric_complete.rs` is an additive successor, leaving the
-historical instruments unchanged. It accepts an actual point on the supplied
+historical instruments unchanged. It accepts an actual finite point on the supplied
 curve, builds the symmetric system, visits solutions with native F4 and rational
 univariate factoring, decodes the root polynomial, checks tower membership,
 lifts points, searches signs and verifies the sum on the original curve.
@@ -58,6 +58,7 @@ future measured panels also need an external process/memory cap.
 
 The domain is deliberately bounded: m=2..4, tower depth 1..8, small prime fields.
 Distinct abscissae only; repeated-abscissa relations remain outside this system.
+The PKM driver's affine target representation does not include the identity.
 It is a decomposition oracle, not a complete factor-base-log/target-descent
 pipeline. Native arithmetic counters remain partial. Diagnostic clocks do not
 earn L2 and do not provide a full GAE comparison.

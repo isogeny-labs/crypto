@@ -800,9 +800,6 @@ struct Recovery {
     cost_scope: &'static str,
 }
 
-/// Complete bounded extraction of distinct summands. No scan of the original
-/// V^m grid is used. The recursive F4 visitor may still branch on full-field
-/// values; its full_field_branches counter makes that cost visible.
 fn validate_parameters(inst: &Instance, m: usize) -> Result<(), String> {
     if !(2..=4).contains(&m)
         || inst.t == 0
@@ -827,6 +824,9 @@ fn validate_parameters(inst: &Instance, m: usize) -> Result<(), String> {
     Ok(())
 }
 
+/// Complete bounded extraction of distinct summands. No scan of the original
+/// V^m grid is used. The recursive F4 visitor may still branch on full-field
+/// values; its full_field_branches counter makes that cost visible.
 fn recover(inst: &Instance, m: usize, q: Pt, seconds: u64) -> Result<Recovery, String> {
     validate_parameters(inst, m)?;
     let c = FastCurve::new("development-pkm", inst.p, inst.a, inst.b, 1);

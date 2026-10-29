@@ -63,3 +63,16 @@ prove it exists or that its cost is small.
 
 Recheck these conditions at resume. Preserve their distinction from negative
 experimental evidence; do not report any blocked panel as a completed null.
+
+## Broader software-validation limit
+
+All eight new example tests, strict scoped lint and Lean checks pass. The full
+library run was capped at40minutes with5,232 unique passes, zero failures,
+123 ignored and one unchanged existing JV isogeny-walk case unfinished. Cargo
+exit101 reflects the explicit SIGTERM; no complete library pass is claimed.
+Two initial sparse-input problems were restored and their focused checks pass.
+The committed excerpts and raw-file digests are in `validation/`. Complete
+outputs are NOT_UPLOADED: their required artifact-store transport is unavailable.
+They remain local at the paths in `validation/unuploaded-artifacts.json`. This is a
+local software-validation limit, not negative experimental evidence about PKM,
+five-sum or Hecke, and the existing test was not modified or waived.

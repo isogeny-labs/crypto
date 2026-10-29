@@ -52,7 +52,7 @@ fn recover(input: &Input) -> Result<Output, String> {
         return Err("invalid bounded prime curve/subgroup parameters".into());
     }
     let p = input.p as u128;
-    if (4 * (input.a as u128).pow(3) + 27 * (input.b as u128).pow(2)) % p == 0 {
+    if (4 * (input.a as u128).pow(3) + 27 * (input.b as u128).pow(2)).is_multiple_of(p) {
         return Err("singular curve".into());
     }
     let curve = PrimeCurve {

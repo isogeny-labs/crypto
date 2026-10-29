@@ -10,7 +10,7 @@ No measured scientific panel or ECDLP speedup is established here.
 #image("status.svg", width: 100%)
 
 == Symmetric PKM
-The new native successor accepts actual curve targets, constructs the symmetric
+The new native successor accepts finite curve targets, constructs the symmetric
 system, visits F4 solutions, factors their root polynomials, lifts points and
 verifies signed sums. Construction and extraction are separate intervals.
 Unrestricted field branching is retained in the counters. Repeated abscissae
@@ -74,6 +74,10 @@ panel was silently replaced by local development tests.
 complete-cost PKM comparison with an external solver, and fresh arbitrary-target
 Hecke tests with matched generic controls. `PROBLEM.md` names each missing bridge
 and its exit condition. Development validation outcomes are retained separately.
+The eight focused native tests and strict lint pass. The full library check
+was capped at 40 minutes: 5,232 passed, zero failed, 123 ignored, one unchanged
+isogeny-walk case unfinished. This is not a full-suite pass. Large raw logs are
+not uploaded; committed excerpts and hashes identify them.
 
 = Sources
 PKM primary text: https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf .
