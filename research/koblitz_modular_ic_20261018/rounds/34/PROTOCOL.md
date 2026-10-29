@@ -45,3 +45,13 @@ The machine index will explicitly distinguish any accepted computation from
 whether a local presentation exists. Larger RR/Picard work remains in scope:
 L(6D0) proposed dimension708, complete padding jets/coupled divisors, actual
 integral modular-factor action, and broader normalization/saturation leads.
+
+## Reserved-name correction after first point consumers
+
+prefix34-check5-01 validly records both coefficient domains as inadmissible
+(566zero denominator entries each), returning before the later presentation
+block. Do not repeat those accepted domain diagnostics. check83-01 reached
+that block, where Singular rejected the local name coeffs as reserved. Native
+exit0/trailing marker do not pass; preserve the rejected input/log. Rename
+only that identifier, regenerate the same driver and use fresh check83-02.
+No point-presentation result is accepted from01; no cap or math input changes.
