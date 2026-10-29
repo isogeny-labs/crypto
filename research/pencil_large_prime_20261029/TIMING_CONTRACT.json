@@ -50,6 +50,6 @@
   ],
   "aggregation_rule": "No ratio is computed here. Freeze paired target identities, seeds, arm order, controls, admission and aggregation before cohort data.",
   "compatibility": "New fields default to absent when reading older JSON and are omitted when absent; historical records and legacy fields unchanged.",
-  "validation": "Shared cold-boundary regression passed (1 test); combined root suite, including watchdog and seed-policy regressions, running.",
-  "online_diagnostics": "time.online_clock_diagnostics absent means unknown; object with error:null explicitly records no producer error. Preserve producer errors; censoring omits object. Updated regression pending."
+  "validation": "Shared cold-boundary test passed; final ecbench module suite 287 passed,0 failed,1 ignored. Full-library suite5154 passed,1 GPU lock failure,123 ignored; same-binary serial lock recheck passed.",
+  "online_diagnostics": "time.online_clock_diagnostics absent means unknown; object with error:null explicitly records no producer error. Preserve producer errors; censoring omits object. Final ecbench regression suite passed."
 }
