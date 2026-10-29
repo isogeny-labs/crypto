@@ -133,7 +133,7 @@ presentation-dependence theorem.
 | candidate | why not now |
 |---|---|
 | Plane-quartic (Diem) IC on GHS-weak $E_0/\mathbb F_{q^3}$ (`research/quartic_n4v2_20261020`) | Exponent $\approx0.98$ against rho's $\approx1.5$, but this is known: Diem 2003/2006 and Diem–Thomé 2008 ("faster than rho even for small group sizes"). Joux–Vitse 2012 solved 149-bit $\mathbb F_{p^6}$ curves. Also L0 host, B0 records do not replay, 3 units per size. Publishable only at record scale. |
-| $k=4$ D₄ Frobenius-reduced form, char 2 (`gaudry_quartic_d4_char2_20261015`) | The red team (`gaudry_k4_char2_redteam_20261026`) rated the crossover "NOT SURVIVED (unsupported)": 1–2 targets per rung. Invariant-ring work in char 2 is Galbraith–Gebregiyorgis 2014. The cheapest headline experiment (about 30 h, frozen plan) is worth running, but the paper waits on it. |
+| $k=4$ $D_4$ Frobenius-reduced form, char 2 (`gaudry_quartic_d4_char2_20261015`) | The red team (`gaudry_k4_char2_redteam_20261026`) rated the crossover "NOT SURVIVED (unsupported)": 1–2 targets per rung. Invariant-ring work in char 2 is Galbraith–Gebregiyorgis 2014. The cheapest headline experiment (about 30 h, frozen plan) is worth running, but the paper waits on it. |
 | Genus-3 hyperelliptic GHS with double large primes | Gaudry–Thomé–Thériault–Diem 2007 already beat rho in genus 3; the slope against rho is not robust (`ghs3_vs_rho_20261023`). |
 | Root-finding decomposition (`papers/rootfinding-decomposition`) | Prop. 1 is the definition of $S_3$ (McGuire–Mueller; Amadori–Pintore–Sala). Engineering only. |
 | Semaev monodromy / conservation (`crypto-autoresearcher:papers/semaev-conservation-specialization`) | The Galois group $(\mathbb Z/2)^{m-2}$ is plausibly folklore (sign choices of $y_i$); the paper itself says novelty is not adjudicated. |
@@ -150,7 +150,22 @@ and checked it with the independent checker.
 - Host and isolation: this cloud container (4 vCPU, 15 GB), L0. Only the
   verdict matters here, not the timing.
 
-RESULT_PLACEHOLDER
+**Result.** The certificate reproduces **byte for byte**: SHA-256
+`cf9dcae81bf1843fa55aeb5f5d3745b69a50790818b7eb48b161930c343a22cf`, the value
+recorded in `results/certificates.txt`. The checker reports
+`VALID: 1 is not in W_4(F), and codim W_4(F) >= 4888`.
+
+| quantity | value |
+|---|---|
+| closure dimensions $\dim W_4\cap B_{\le d}$ | (0, 0, 64, 2968, 48068), the recorded values |
+| closure rounds | 3 |
+| certificate size | 33,044,576 bytes |
+| closure time | 4 min 40 s |
+| check time | 38.8 s |
+
+So gating item G1 is a matter of compute and hosting, not of lost code. The
+other certificates should regenerate the same way, at proportionally larger
+cost (P45a about 0.3 GB).
 
 ## 7. Method and limits
 
