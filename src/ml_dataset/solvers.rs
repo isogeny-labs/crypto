@@ -2016,12 +2016,19 @@ fn prime_f4_chain(
     data.outcome["native_backend_invoked"] = json!(false);
     data.outcome["algebra_completed"] = json!(false);
     data.outcome["encoding_search_completed"] = json!(false);
-    save(
-        &mut data,
+    // Retain the canonical equations before attempting the bounded live sink.
+    // A rejected first payload must not erase already constructed mathematics.
+    data.artifacts.push(ArtifactPayload::json(
         "prime-f4-input.json",
         "complete-prime-field-polynomial-system",
         &input.artifact,
-    )?;
+    )?);
+    flush_prime_chain_payloads(&mut data);
+    if data.outcome.get("live_persistence_errors").is_some() {
+        data.outcome["termination"] = json!("trace_sink_error");
+        data.outcome["reason"] = json!("Initial live equation persistence failed; equations retained for canonical worker write and native elimination not invoked");
+        return Ok(data);
+    }
     if input.modulus >= 1u64 << 32 {
         data.outcome["status"] = json!("unsupported");
         data.outcome["reason"]=json!("Native prime F4 requires p<2^32; exact affine-chain and leaf-membership equations retained using u128 arithmetic without invoking elimination");
@@ -3881,6 +3888,9 @@ mod tests {
         let value: Value = serde_json::from_slice(&input.bytes).unwrap();
         verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &value).unwrap();
         assert!(directory.join("committed.json").is_file());
+        assert_eq!(result.outcome["native_backend_invoked"], false);
+        assert_eq!(result.outcome["solver_completed"], false);
+        assert_eq!(result.outcome["termination"], "trace_sink_error");
         fs::remove_dir_all(directory).unwrap();
     }
 
