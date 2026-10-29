@@ -289,3 +289,115 @@ fn caller_pin_precedes_new_destination_and_file_io() {
     .contains("caller anchor pin mismatch"));
     assert!(!p.out.exists());
 }
+
+#[test]
+fn exclusive_link_install_preserves_complete_bytes_and_never_overwrites() {
+    use std::io::Write;
+    let _force = super::io::force_link_install();
+    let p = Fixture::new(true).publish();
+    let report = p.restore().unwrap();
+    assert_eq!(report["partial_snapshot_chain_verified"], true);
+    p.audit().unwrap();
+    p.retain(
+        "R14-link-install-positive",
+        "exclusive link installation and stage removal preserve complete proof",
+        &report,
+    );
+    let temp = tempfile::tempdir().unwrap();
+    let root = Root::open(temp.path()).unwrap();
+    root.create_file("stage")
+        .unwrap()
+        .write_all(b"new")
+        .unwrap();
+    root.create_file("exists")
+        .unwrap()
+        .write_all(b"old")
+        .unwrap();
+    assert!(
+        format!("{:#}", root.rename_new("stage", "exists").unwrap_err())
+            .contains("exclusive link installation")
+    );
+    assert_eq!(fs::read(temp.path().join("exists")).unwrap(), b"old");
+    assert_eq!(fs::read(temp.path().join("stage")).unwrap(), b"new");
+    std::os::unix::fs::symlink("exists", temp.path().join("symlink")).unwrap();
+    assert!(root.rename_new("stage", "symlink").is_err());
+    assert_eq!(
+        fs::read_link(temp.path().join("symlink")).unwrap(),
+        Path::new("exists")
+    );
+    assert_eq!(fs::read(temp.path().join("exists")).unwrap(), b"old");
+    assert_eq!(fs::read(temp.path().join("stage")).unwrap(), b"new");
+    fs::hard_link(temp.path().join("stage"), temp.path().join("extra-link")).unwrap();
+    assert!(
+        format!("{:#}", root.rename_new("stage", "new-name").unwrap_err())
+            .contains("one regular staged file")
+    );
+    fs::remove_file(temp.path().join("extra-link")).unwrap();
+    fs::create_dir(temp.path().join("directory-stage")).unwrap();
+    assert!(format!(
+        "{:#}",
+        root.rename_new("directory-stage", "new-name").unwrap_err()
+    )
+    .contains("one regular staged file"));
+    assert!(root.rename_new("symlink", "new-name").is_err());
+    assert!(!temp.path().join("new-name").exists());
+}
+
+#[test]
+fn link_install_rejects_replaced_multilink_and_symlink_sources() {
+    let _force = super::io::force_link_install();
+    for kind in ["replace", "multilink", "symlink"] {
+        let p = Fixture::new(false).publish();
+        let stage = p.out.join(".partial-stage-00000000");
+        let saved = p.out.join("saved-stage");
+        super::io::on_link_source_open(move || match kind {
+            "replace" => {
+                fs::rename(&stage, &saved).unwrap();
+                fs::write(&stage, b"replacement").unwrap();
+            }
+            "multilink" => fs::hard_link(&stage, &saved).unwrap(),
+            "symlink" => {
+                fs::rename(&stage, &saved).unwrap();
+                std::os::unix::fs::symlink("saved-stage", &stage).unwrap();
+            }
+            _ => unreachable!(),
+        });
+        let error = p.restore().unwrap_err();
+        if kind != "symlink" {
+            assert!(format!("{error:#}").contains("source identity changed"));
+        }
+        assert!(p.out.join(restore::MARKER).exists());
+        assert!(p.out.join("saved-stage").exists());
+        assert!(p
+            .out
+            .join(".partial-stage-00000000")
+            .symlink_metadata()
+            .is_ok());
+        assert!(format!("{:#}", p.restore().unwrap_err()).contains("destination must be new"));
+        p.retain(
+            &format!("R14-link-source-{kind}"),
+            "changed source inode or link topology rejects without cleanup or adoption",
+            &json!({"error":format!("{error:#}")}),
+        );
+    }
+}
+#[test]
+fn interrupted_link_install_keeps_both_names_and_incomplete_marker() {
+    for point in ["link-after", "link-directory-sync", "link-unlink-before"] {
+        let _force = super::io::force_link_install();
+        let guard = super::io::inject_fault(point);
+        let p = Fixture::new(false).publish();
+        let error = p.restore().unwrap_err();
+        drop(guard);
+        assert!(format!("{error:#}").contains(point));
+        assert!(p.out.join(restore::MARKER).exists());
+        assert!(p.out.join(".partial-stage-00000000").exists());
+        assert!(p.artifact_path("context/run.json").exists());
+        assert!(format!("{:#}", p.restore().unwrap_err()).contains("destination must be new"));
+        p.retain(
+            &format!("R14-{point}"),
+            "nonzero with both names and incomplete marker; no adoption",
+            &json!({"error":format!("{error:#}")}),
+        );
+    }
+}

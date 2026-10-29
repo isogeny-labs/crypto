@@ -315,21 +315,84 @@ impl Root {
         fault("rename-before")?;
         let (old_dir, old) = self.parent(from, false)?;
         let (new_dir, new) = self.parent(to, true)?;
-        let result = unsafe {
-            libc::syscall(
-                libc::SYS_renameat2,
-                old_dir.as_raw_fd(),
-                old.as_ptr(),
-                new_dir.as_raw_fd(),
-                new.as_ptr(),
-                libc::RENAME_NOREPLACE,
-            )
-        };
-        ensure!(
-            result == 0,
-            "partial exclusive rename: {}",
-            std::io::Error::last_os_error()
-        );
+        if let Err(error) = rename_noreplace(&old_dir, &old, &new_dir, &new) {
+            ensure!(
+                matches!(
+                    error.raw_os_error(),
+                    Some(libc::ENOSYS | libc::EINVAL | libc::EOPNOTSUPP)
+                ),
+                "partial exclusive rename: {error}"
+            );
+            // Some supported Linux mounts (including the migration NFS mount)
+            // lack RENAME_NOREPLACE. linkat atomically installs a new name and
+            // refuses any existing name. Never fall back to overwriting rename.
+            let stage = opened(unsafe {
+                libc::openat(
+                    old_dir.as_raw_fd(),
+                    old.as_ptr(),
+                    libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
+                )
+            })?;
+            let metadata = stage.metadata()?;
+            ensure!(
+                metadata.is_file() && metadata.nlink() == 1,
+                "partial link-install source must be one regular staged file"
+            );
+            #[cfg(test)]
+            LINK_HOOK.with(|hook| {
+                if let Some(run) = hook.borrow_mut().take() {
+                    run();
+                }
+            });
+            ensure!(
+                unsafe {
+                    libc::linkat(
+                        old_dir.as_raw_fd(),
+                        old.as_ptr(),
+                        new_dir.as_raw_fd(),
+                        new.as_ptr(),
+                        0,
+                    )
+                } == 0,
+                "partial exclusive link installation: {}",
+                std::io::Error::last_os_error()
+            );
+            // A retained stage FD binds the intended inode. The name used by
+            // linkat may have been replaced after open; reject that case before
+            // removing any staged name. Final audit separately binds all bytes.
+            for (directory, leaf) in [(&old_dir, &old), (&new_dir, &new)] {
+                let linked = opened(unsafe {
+                    libc::openat(
+                        directory.as_raw_fd(),
+                        leaf.as_ptr(),
+                        libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
+                    )
+                })?;
+                let current = linked.metadata()?;
+                ensure!(
+                    current.is_file()
+                        && current.dev() == metadata.dev()
+                        && current.ino() == metadata.ino()
+                        && current.nlink() == 2,
+                    "partial link-install source identity changed"
+                );
+            }
+            #[cfg(test)]
+            fault("link-after")?;
+            // Flush the new name before removing the old one. A failure at
+            // either boundary retains the incomplete marker and both names;
+            // no later command adopts that destination or infers rollback.
+            #[cfg(test)]
+            fault("link-directory-sync")?;
+            new_dir.sync_all()?;
+            #[cfg(test)]
+            fault("link-unlink-before")?;
+            ensure!(
+                unsafe { libc::unlinkat(old_dir.as_raw_fd(), old.as_ptr(), 0) } == 0,
+                "partial staged link cleanup: {}",
+                std::io::Error::last_os_error()
+            );
+        }
         #[cfg(test)]
         fault("rename-after")?;
         old_dir.sync_all()?;
@@ -460,6 +523,28 @@ impl Root {
             }
         }
         Ok(())
+    }
+}
+
+fn rename_noreplace(old_dir: &File, old: &CStr, new_dir: &File, new: &CStr) -> std::io::Result<()> {
+    #[cfg(test)]
+    if FORCE_LINK.with(std::cell::Cell::get) {
+        return Err(std::io::Error::from_raw_os_error(libc::EOPNOTSUPP));
+    }
+    let result = unsafe {
+        libc::syscall(
+            libc::SYS_renameat2,
+            old_dir.as_raw_fd(),
+            old.as_ptr(),
+            new_dir.as_raw_fd(),
+            new.as_ptr(),
+            libc::RENAME_NOREPLACE,
+        )
+    };
+    if result == 0 {
+        Ok(())
+    } else {
+        Err(std::io::Error::last_os_error())
     }
 }
 
@@ -641,6 +726,28 @@ mod tests {
 
 #[cfg(test)]
 thread_local! { static FAULT: std::cell::RefCell<Option<&'static str>> = const { std::cell::RefCell::new(None) }; }
+#[cfg(test)]
+thread_local! { static FORCE_LINK: std::cell::Cell<bool> = const { std::cell::Cell::new(false) }; }
+#[cfg(test)]
+thread_local! { static LINK_HOOK: std::cell::RefCell<Option<Box<dyn FnOnce()>>> = const { std::cell::RefCell::new(None) }; }
+#[cfg(test)]
+pub(crate) fn on_link_source_open(hook: impl FnOnce() + 'static) {
+    LINK_HOOK.with(|value| *value.borrow_mut() = Some(Box::new(hook)));
+}
+#[cfg(test)]
+pub(crate) struct LinkGuard;
+#[cfg(test)]
+impl Drop for LinkGuard {
+    fn drop(&mut self) {
+        FORCE_LINK.with(|v| v.set(false));
+        LINK_HOOK.with(|v| *v.borrow_mut() = None);
+    }
+}
+#[cfg(test)]
+pub(crate) fn force_link_install() -> LinkGuard {
+    FORCE_LINK.with(|v| v.set(true));
+    LinkGuard
+}
 #[cfg(test)]
 pub(crate) struct FaultGuard;
 #[cfg(test)]
