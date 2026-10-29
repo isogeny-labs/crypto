@@ -52,7 +52,8 @@ theorem symmetric_pair_weight_kernel {r : ℕ} [Fact r.Prime]
   have hr : ∀ x, f (m-x) = f x := by
     intro x
     simpa [f] using hs (m-x) x
-  have hf := prime_even_reflection_zero f m hm (hz m) he hr
+  have hf0 : f 0 = 0 := by simpa [f] using hz m
+  have hf := prime_even_reflection_zero f m hm hf0 he hr
   intro x y
   by_cases h : x+y = m
   · have hy : y = m-x := by linear_combination h
