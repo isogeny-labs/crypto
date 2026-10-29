@@ -10,7 +10,7 @@ of its §3.2–3.5 reduction and Figure 2, not copied upstream code.
 
 | Requested requirement | Status | Evidence / remaining gap |
 | --- | --- | --- |
-| Add code to `isogeny-labs/crypto` and `isogeny-labs/cryptanalysis` | implemented | Public `hashed_ecdl` modules in both Rust APIs; byte-identical algorithm source |
+| Add code to `isogeny-labs/crypto` and `isogeny-labs/cryptanalysis` | implemented | Public `hashed_ecdl` modules in both Rust APIs; crypto now has an additive base-construction hook for its standalone GPU adapter |
 | Replicate affine-hashed factor bases | implemented, unit-tested | `HashBase::enumerate`; inverse-hash enumeration cross-checked against every point in the fixture group |
 | Replicate randomized relations and scalar extraction | implemented, unit-tested | `solve`, `solve_with_oracle`, `verify`; slot-specific columns, N+1 rows, modular dependency, nonzero V, scalar replay |
 | Compact low-degree Boolean tensor encoding | not implemented | Requires the arithmetic networks of §2 and composition of §3.3 |
@@ -18,6 +18,14 @@ of its §3.2–3.5 reduction and Figure 2, not copied upstream code.
 | Reproduce the subexponential complexity | unresolved | Neither enumeration nor passing toy tests establishes the conditional asymptotic bound |
 
 ## Using the code
+
+Crypto's [CUDA relation service](../gpu/explicit-relations/README.md) adds
+source for GPU explicit-x lifting, signed inverse-hash enumeration and a
+persistent meet-in-the-middle oracle. Its standalone Rust driver uses this
+reduction and independently replays exported certificates on the CPU. That
+addition is source-only and awaits compilation and device tests. It retains
+the bounds below and does not fill the compact tensor/fast-contraction gaps.
+The default oracle and verifier continue to enumerate bases on the CPU.
 
 In crypto:
 

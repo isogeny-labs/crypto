@@ -1571,11 +1571,15 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.
 
-Explicit binary linear bases already use
-`binary-subspace:dimension=D,basis=B0;B1;...`; no separate plug-in is needed.
-The same spec works in `ecbench fb` and an `ic.pipeline` arm. See
-[explicit bases](explicit-bases.md) for syntax, identity rules, validation,
-and the source-only handoff to a build from `crypto` `main`.
+Explicit x-coordinate lists use `explicit-x:xs=X0;X1;...` on prime and narrow
+binary curves. The plug-in lifts exactly those abscissae, rejects duplicates
+and missing roots, and preserves input order as column order. Binary linear
+bases separately use `binary-subspace:dimension=D,basis=B0;B1;...`.
+Both specs work in `ecbench fb` and an `ic.pipeline` arm. See
+[explicit bases](explicit-bases.md) for identity/accounting rules and the
+[standalone CUDA relation service](../../gpu/explicit-relations/README.md)
+for signed per-slot bases and the paper reduction. GPU work is not priced as
+CPU GAE or registered as a measured ecbench method.
 
 ## 12. Limits
 
