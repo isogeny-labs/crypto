@@ -17,7 +17,6 @@ use num_traits::ToPrimitive;
 use serde_json::{json, Value};
 
 use crate::binary_ecc::{curve as binary, BinaryCurve, BinaryPoint, F2mElement};
-use crate::cryptanalysis::binary_semaev::{binary_semaev_s3_in_x3, solve_quadratic_f2m};
 use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crate::cryptanalysis::f6_wide_geometry::F6WidePairIndex;
 use crate::cryptanalysis::koblitz_groebner::{self as boolean, FieldStructure, SymElement};
@@ -30,6 +29,11 @@ use crate::ecc::{CurveParams, Point};
 use super::capture::{AttemptBinding, CaptureEmitter, CaptureLimits};
 use super::curves;
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
+
+#[path = "binary_roots.rs"]
+mod binary_roots;
+
+pub(super) const BINARY_ROOT_CERTIFICATE_SCOPE: &str = binary_roots::CERTIFICATE_SCOPE;
 
 const TRACE_EVENT_CAP: u64 = 100_000;
 const TRACE_BYTE_CAP: usize = 64 * 1024 * 1024;
@@ -250,7 +254,7 @@ pub fn capabilities() -> Value {
             {"id":"f4","families":["koblitz","binary","prime"],"m":[2,2],"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; native prime F4 for p<2^32 plus bounded finite-domain extraction","trace":"original systems (also retained for larger unsupported prime moduli), reduced rows, splitting nodes or useful-row replay schedule","gaps":["prime-field elimination at p>=2^32","internal pivot operations at every node","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
-            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime native field operations including inverse exponentiation, modular-power/Euclidean/split states and independently checked distinct-root certificates; binary polynomial/returned roots/lifts","gaps":["binary internal root states","higher-m elimination","independent proof of complete execution and operation-count trajectory"]},
+            {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime native field operations including inverse exponentiation, modular-power/Euclidean/split states and independently checked distinct-root certificates; binary inverse, trace, half-trace and GF(2) matrix states with independently checked distinct-root certificates","gaps":["higher-m elimination","independent proof of complete execution and operation-count trajectory"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
             {"id":"double-large-prime","families":["koblitz","binary","prime"],"m":[2,15],"kind":"native verified two-residual elimination with signed Frobenius for admitted Koblitz models or identity/sign action with generic sparse filtering; recovery of determined target columns","trace":"residual discovery, exact domains, partial candidates, source coefficients, native sparse filtering and modular rank/recovery certificates","gaps":["internal pivot-selection events","complete private filter mutation stream"]}
         ],
@@ -470,7 +474,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "f4" if matches!(group, Group::Prime(_)) => prime_f4(config, &group, &points, &target)?,
         "weil" | "weil-descent" | "f4" | "f5" => boolean_solve(config, &group, &points, &target)?,
         "f6" => f6_solve(config, &group, &points, &target)?,
-        "root" => root_solve(config, &group, &points, &target)?,
+        "root" => root_solve(config, case, &group, &points, &target)?,
         "pkm" => pkm_solve(config, case, &group, &points, &target)?,
         "double-large-prime" => super::relations::solve(config, case)?,
         other => return Err(format!("unknown solver {other}")),
@@ -1850,6 +1854,7 @@ fn f6_solve(
 
 fn root_solve(
     config: &CaseConfig,
+    case: &CaseData,
     group: &Group,
     domain: &[Element],
     target: &Element,
@@ -1862,156 +1867,16 @@ fn root_solve(
     if matches!(group, Group::Prime(_)) {
         return prime_root_solve(config, group, domain, target);
     }
-    let Some(xr) = target.x() else {
-        return Ok(unsupported("S3 root adapter requires affine target"));
-    };
-    let mut codes: Vec<BigUint> = domain.iter().filter_map(Element::x).collect();
-    codes.sort();
-    codes.dedup();
-    let mut data = SolverData {
-        outcome: outcome(
-            "partial",
-            "Native univariate S3 roots checked against the finite domain and curve group",
-        ),
-        artifacts: vec![],
-    };
-    let mut rows = vec![];
-    let mut calls = 0;
-    let mut lift_ops = 0;
-    let mut prime_muls = 0;
-    let limit = config.work_limit.min(TRACE_EVENT_CAP);
-    let mut found = None;
-    for x1 in &codes {
-        if calls >= limit || lift_ops >= limit {
-            break;
-        }
-        let (coefficients, roots) = match group {
-            Group::Binary(c) => {
-                let a = F2mElement::from_biguint(x1, c.m);
-                let r = F2mElement::from_biguint(&xr, c.m);
-                let (a, b, z) = binary_semaev_s3_in_x3(&a, &r, &c.b, &c.irreducible);
-                live_event(
-                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":[z.to_biguint().to_string(),b.to_biguint().to_string(),a.to_biguint().to_string()]}),
-                )?;
-                let roots = solve_quadratic_f2m(&a, &b, &z, c.m, &c.irreducible)
-                    .iter()
-                    .map(F2mElement::to_biguint)
-                    .collect::<Vec<_>>();
-                (
-                    vec![
-                        z.to_biguint().to_string(),
-                        b.to_biguint().to_string(),
-                        a.to_biguint().to_string(),
-                    ],
-                    roots,
-                )
-            }
-            Group::Prime(c) => {
-                let p = c.p.to_u64().ok_or("prime root lane modulus exceeds u64")?;
-                let u = x1.to_u64().ok_or("x exceeds u64")?;
-                let r = xr.to_u64().ok_or("target x exceeds u64")?;
-                let a = c.a.to_u64().ok_or("a exceeds u64")?;
-                let b = c.b.to_u64().ok_or("b exceeds u64")?;
-                let add = |x: u64, y: u64| ((x as u128 + y as u128) % p as u128) as u64;
-                let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
-                let sub = |x: u64, y: u64| ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
-                let product = mul(u, r);
-                let sum = add(u, r);
-                let coeffs = vec![
-                    sub(
-                        mul(sub(product, a), sub(product, a)),
-                        mul(4 % p, mul(b, sum)),
-                    ),
-                    sub(0, add(mul(2 % p, mul(sum, add(product, a))), mul(4 % p, b))),
-                    mul(sub(u, r), sub(u, r)),
-                ];
-                live_event(
-                    &json!({"kind":"root_problem","fixed_x":x1.to_string(),"coefficients_constant_first":coeffs.iter().map(ToString::to_string).collect::<Vec<_>>()}),
-                )?;
-                let roots = crate::cryptanalysis::glv_invariant_base::poly_roots_fp_counted(
-                    &coeffs,
-                    p,
-                    config.seed ^ calls,
-                    &mut prime_muls,
-                )
-                .into_iter()
-                .map(BigUint::from)
-                .collect::<Vec<_>>();
-                (coeffs.iter().map(ToString::to_string).collect(), roots)
-            }
-        };
-        calls += 1;
-        let mut checks = vec![];
-        for x2 in &roots {
-            let verified = match group {
-                Group::Binary(c) => {
-                    let x = F2mElement::from_biguint(x2, c.m);
-                    let mut value = F2mElement::zero(c.m);
-                    for coefficient in coefficients.iter().rev() {
-                        let value_big = BigUint::parse_bytes(coefficient.as_bytes(), 10)
-                            .ok_or("invalid root polynomial coefficient")?;
-                        value = value
-                            .mul(&x, &c.irreducible)
-                            .add(&F2mElement::from_biguint(&value_big, c.m));
-                    }
-                    value.is_zero()
-                }
-                Group::Prime(c) => {
-                    let p = c.p.to_u64().unwrap();
-                    let x = x2.to_u64().ok_or("root exceeds u64")?;
-                    let mut value = 0u64;
-                    for coefficient in coefficients.iter().rev() {
-                        let coefficient = coefficient.parse::<u64>().map_err(|e| e.to_string())?;
-                        value =
-                            ((value as u128 * x as u128 + coefficient as u128) % p as u128) as u64;
-                    }
-                    value == 0
-                }
-            };
-            if !verified {
-                return Err("native root solver returned a non-root".into());
-            }
-            let (w, adds, exhausted) = lift(
-                group,
-                domain,
-                &[x1.clone(), x2.clone()],
-                target,
-                limit.saturating_sub(lift_ops),
-            );
-            lift_ops += adds;
-            checks.push(json!({"x":x2.to_string(),"in_factor_base":codes.contains(x2),"group_lift_verified":w.is_some(),"lift_budget_exhausted":exhausted}));
-            if w.is_some() {
-                found = w;
-                break;
-            }
-        }
-        let event = json!({"kind":"root_result","fixed_x":x1.to_string(),"coefficients_constant_first":coefficients,"all_returned_roots":roots.iter().map(ToString::to_string).collect::<Vec<_>>(),"checks":checks});
-        live_event(&event)?;
-        rows.push(event);
-        if found.is_some() {
-            break;
-        }
-    }
-    data.outcome["counters"] = json!({"root_solver_calls":calls,"prime_field_multiplications_native_root_only":prime_muls,"group_lift_add_calls":lift_ops});
-    data.outcome["trace_gaps"] = json!([
-        "Native root solver gcd/factorization states and internal root counter are not exported",
-        "Root completeness is not independently certified"
-    ]);
-    save(
-        &mut data,
-        "root-polynomials.json",
-        "native-univariate-inputs-roots-and-group-lifts",
-        &json!(rows),
-    )?;
-    if let Some(w) = found {
-        set_witness(&mut data, group, &w, target)?;
-    } else if calls < codes.len() as u64 || lift_ops >= limit {
-        data.outcome["status"] = json!("budget_exhausted");
-        data.outcome["reason"] = json!("Root/lift work cap reached");
-    } else {
-        data.outcome["solver_completed"] = json!(true);
-    }
-    Ok(data)
+    binary_roots::solve(config, case, group, domain, target)
+}
+
+pub(super) fn verify_binary_root_artifact(
+    public: &Value,
+    base: &Value,
+    config: &CaseConfig,
+    artifact: &Value,
+) -> Result<(), String> {
+    binary_roots::verify(public, base, config, artifact)
 }
 
 // This fixed recipe performs exactly 15 field operations: 3 additions,

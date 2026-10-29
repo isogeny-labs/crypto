@@ -1,5 +1,14 @@
 # Original-scope coverage and remaining work
 
+Binary-root extension runtime `d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83`
+subsequently passed **5,183 full-library tests, zero failures, 123 ignored**,
+158 dataset tests, nine binary-root tests and eight CLI tests, plus strict
+integrated Clippy. Its independent consumer checked 30 completed polynomial
+root sets among 51 retained software fixtures, preserving setup failures and
+censored cells. Source-bound binaries, raw logs and the fresh-download-verified
+S3 receipts are in the [binary validation record](../../research/ml_dataset_binary_root_20261028/VALIDATION.md).
+This extends software evidence, not cloud corpus coverage or fall-degree claims.
+
 This is an implementation handoff, not a completed-corpus certificate. Read the
 committed validation manifests, frozen campaign plan, per-cell outcomes and S3
 receipts for executed coverage. Current policy runtime source
@@ -56,7 +65,7 @@ enormous corpus.
 | Prime SAT | No prime-field SAT adapter is yet declared complete | Integrate an actual prime-field bit-vector/modular encoding with exact domain maps, verified models and proof-checkable outcomes |
 | F4/F5 | Native Boolean matrix engines and prime F4 have scoped m = 2 adapters; the prime F4 backend requires p < 2^32 and 1..32 distinct factor-base abscissae; larger prime moduli retain the public S3/membership equations with an explicit unsupported outcome and no native elimination | Extend the native prime-field arithmetic before claiming F4 support at n = 47..61 or p = 2^61-1; integrate larger-m algebra with exact ring/quotient/order maps and export matrices, row provenance, pivots, syzygies, F5 signatures and criteria; distinguish Boolean matrix F5 from general incremental F5 |
 | F6 | Native geometric four-sum index has its own declared m=4 lane | Expose each implemented F6 algebraic/geometric variant separately, document its exact operation, and integrate the remaining arities without changing what the F6 name denotes |
-| Root solvers | Native S3 univariate root routes are m=2 adapters. Prime-root code emits bounded field/polynomial/GCD/splitting states and separately checks complete distinct-root sets through degree eight and p <= 2^61-1; native source validation passed | Validate emitted cloud artifacts and independent consumer root-set checks; integrate binary root states and higher-m elimination/root extraction. Supplied event identities and tallies do not certify a complete execution stream or total cost; retain those flags false |
+| Root solvers | Native S3 univariate root routes are m=2 adapters. Prime-root code emits bounded field/polynomial/GCD/splitting states and checks complete distinct-root sets through degree eight and p <= 2^61-1. Binary/Koblitz now emits bounded quadratic, half-trace/even-field matrix states and exact public/config/domain-bound reports for n3..61. Native source validation and independent prime/binary root-set software fixtures passed | Validate actual cloud populations and integrate higher-m elimination/root extraction. Supplied event identities and tallies do not certify a complete execution stream or total cost; retain those flags false. Independent mathematical root-set verification does not establish complete solver execution, UNSAT or a fall-degree invariant |
 | Weil descent and PKM | Boolean exact selector restriction is scoped to m = 2; native prime Kummer-tower PKM supports m = 2/3 and p < 2^31, with exact alternative Kummer points, column/sign maps, prepared equations and bounded grid extraction retained | Preserve every tower/basis/modulus/quotient intermediate; extend legitimate native coverage to requested higher m and larger primes, including p = 2^61-1; retain separate cost for finite-grid fallback; rational Kummer points outside the target subgroup make this PDP evidence, not completed ECDLP recovery |
 | Fall degrees | Exact first and last fall degree remain null | Define each invariant for the actual ring and field equations; export degree-fall witnesses, complete lower-degree exclusion/closure evidence and independently checked counterexamples; formalize universal claims separately |
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |

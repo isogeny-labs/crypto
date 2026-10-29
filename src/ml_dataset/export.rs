@@ -954,6 +954,7 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                         "independently-verified-pdp",
                         "restricted-independent-scalar-label",
                         "prime-root-certificates/v1",
+                        "binary-root-certificates/v1",
                     ]
                     .contains(&a.role.as_str())
                 })

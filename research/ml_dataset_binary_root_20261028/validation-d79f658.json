@@ -1,0 +1,16 @@
+{
+  "schema":"crypto.ml-dataset.software-validation/v1",
+  "kind":"software-validation-only",
+  "source_commit":"d79f658f7a0a83e2f75f4cb6f0d1f7542d0e6b83",
+  "source_base":"d71ec2ef5ab9b7f2a038f61c941af10297a775ad",
+  "source_dirty_at_bound_build":false,
+  "rust_toolchain":"1.98.0",
+  "full_library":{"passed":5183,"failed":0,"ignored":123,"measured":0,"filtered_out":0,"seconds":1191.22,"terminal_exit_code":0,"executable_sha256":"aee1ba0b4916b6f55af6511eb3957a0f1b2c36b75d7d07336e367b7445956830","command":"RAYON_NUM_THREADS=16 crypto-lib-tests-source-bound --test-threads=1","scope":"Native software validation; elapsed time is diagnostic, not a performance comparison"},
+  "other_checks":{"native_binary_roots_passed":9,"dataset_passed":158,"dataset_ignored":1,"cli_integration_passed":8,"strict_release_clippy_lib_bin_crypto_cli_integration":"passed","scoped_format_and_whitespace":"passed"},
+  "prior_source_and_binaries_archive":{"uri":"s3://setec-astronomy-artifacts/ml-dataset/20261028/software/binary-root/432c4e3141166bb7ac7df4b6713c979e630b2281727c58528a4878dd92d4dd1b/validation.tar.gz","sha256":"432c4e3141166bb7ac7df4b6713c979e630b2281727c58528a4878dd92d4dd1b","bytes":49959713,"historical_pending_full_gate_preserved":true},
+  "independent_consumer":{"runtime_commit":"25e863fe6075d7bac795ee62680b72c123ba0f33","tested_source_commit":"a39594756923822f3705b4e5a916bb9321dacba6","standalone_tests_passed":95,"retained_software_fixture_cells":51,"completed_root_sets_independently_checked":30,"setup_error_rows_retained":5,"archive_uri":"s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/consumer-root-certificates/40d88d8d0bdfbe57ab8c201970d4ced5c49792c86eea552067e44726921c4809/validation.tar.gz","archive_sha256":"40d88d8d0bdfbe57ab8c201970d4ced5c49792c86eea552067e44726921c4809","archive_bytes":12750951,"implementation_owner_reported_fresh_restore_reaudit":true,"source_review_finding_count":0,"source_review_is_runtime_validation":false},
+  "scope":{"families":["binary","koblitz"],"arity":2,"field_degree_min":3,"field_degree_max":61,"polynomial_degree_max":2,"both_twists_in_adapter_tests":true,"higher_m_supported":false,"root_set_certificate":"gcd(f,X^(2^n)+X) equals the distinct reported linear-factor product","aggregate_work":"Selected mixed field, matrix and lift admission units; not CPU instructions or a complete operation count"},
+  "claims":{"scientific_result":false,"cloud_dataset_generated":false,"corpus_complete":false,"execution_trace_complete_verified":false,"total_operation_count_verified":false,"scalar_recovery":false,"first_or_last_fall_degree_theorem":false},
+  "budget":{"original_total_usd_min":100,"original_total_usd_max":200,"new_budget_or_deadline":false},
+  "remaining":"Hosted checks and bottom-up lineage integration; cloud worker IAM and durable quota authority; extensive requested corpus and remaining native solver instrumentation. No new campaign worker or retry."
+}
