@@ -1,5 +1,6 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
 pub mod budget;
+pub mod capture;
 pub mod curves;
 pub mod export;
 pub mod relations;
@@ -1200,6 +1201,27 @@ struct CellManifest {
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
+    let checked_policy = telemetry::checked::policy_present(&out)?;
+    if !checked_policy
+        && (out.join("capture-binding.json").exists() || out.join("capture-limits.json").exists())
+    {
+        return Err("bound capture requires the frozen checked measurement policy".into());
+    }
+    if checked_policy {
+        let expected = capture::AttemptBinding::from_cell_files(&out)?;
+        if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
+            return Err("checked worker configuration differs from attempt binding".into());
+        }
+        if out.join("capture-binding.json").exists() || out.join("capture-limits.json").exists() {
+            let actual: capture::AttemptBinding = read_json(&out.join("capture-binding.json"))?;
+            let limits: capture::CaptureLimits = read_json(&out.join("capture-limits.json"))?;
+            if actual != expected {
+                return Err("capture binding differs from original attempt".into());
+            }
+            limits.validate()?;
+        }
+        registry.push(telemetry::checked::install_policy(&out)?);
+    }
     let mut known_answer = false;
     let mut factor_base_verified = false;
     let result = (|| {
@@ -1233,7 +1255,17 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         known_answer = true;
         factor_base_verified = true;
         let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            if out.join("capture-binding.json").exists() {
+                solvers::solve_with_bound_event_sink(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    read_json(&out.join("capture-binding.json"))?,
+                    read_json(&out.join("capture-limits.json"))?,
+                )
+            } else {
+                solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            }
         })?;
         let mut names = BTreeSet::new();
         for artifact in solved.artifacts {
@@ -1253,6 +1285,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "worker-process.json",
                 "host.json",
                 "worker-artifacts.json",
+                "measurement-policy.json",
+                "capture-binding.json",
+                "capture-limits.json",
             ]
             .contains(&artifact.path.as_str())
                 || artifact.path.starts_with("publication/")
@@ -1291,6 +1326,65 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         &registry,
     )?;
     Ok(())
+}
+
+fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
+    let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
+        read_json(&dir.join("worker-artifacts.json"))?
+    } else {
+        Vec::new()
+    };
+    storage::verify_manifest(dir, &registry)?;
+    let registered: BTreeMap<_, _> = registry.iter().map(|a| (a.path.as_str(), a)).collect();
+    // A killed worker may never write its registry. Promote only an exact,
+    // fully validated finite phase prefix; malformed bytes remain partial.
+    let recovered_phase_roles = if dir.join(telemetry::checked::POLICY_PATH).exists() {
+        telemetry::checked::validate_directory(dir).unwrap_or_default()
+    } else {
+        BTreeMap::new()
+    };
+    let mut artifacts = Vec::new();
+    for path in tree_files(dir)? {
+        let relative = path
+            .strip_prefix(dir)
+            .map_err(|e| e.to_string())?
+            .to_str()
+            .ok_or("non-UTF8 output")?
+            .to_string();
+        File::open(&path)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| format!("sync {}: {e}", path.display()))?;
+        if let Some(artifact) = registered.get(relative.as_str()) {
+            artifacts.push((**artifact).clone());
+            continue;
+        }
+        let (sha256, bytes) = crate::store::hash_file(&path)?;
+        let (role, encoding) = if let Some(role) = recovered_phase_roles.get(&relative) {
+            (*role, "json")
+        } else {
+            match relative.as_str() {
+                "witness.json" => ("restricted-known-answer", "json"),
+                "config.json" => ("restricted-provenance", "json"),
+                "plan.json" => ("restricted-frozen-plan", "json"),
+                "run.json" => ("restricted-run-binding", "json"),
+                "protocol.json" => ("restricted-frozen-protocol", "json"),
+                "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
+                "host.json" => ("host-measurement-context", "json"),
+                "worker-artifacts.json" => ("artifact-registry", "json"),
+                "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                _ => ("unregistered-partial-artifact", "native"),
+            }
+        };
+        artifacts.push(Artifact {
+            role: role.into(),
+            path: relative,
+            sha256,
+            bytes,
+            encoding: encoding.into(),
+        });
+    }
+    sync_dir(dir)?;
+    Ok(artifacts)
 }
 
 fn verify_resumed_cell(
@@ -1454,6 +1548,20 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
             "status":"attempt_started"}),
             )?;
+            telemetry::checked::install_policy(&dir)?;
+            let capture_binding = capture::AttemptBinding::from_cell_files(&dir)?;
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &capture_binding,
+            )?;
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &capture::capture_limits(a.trace_mib)?,
+            )?;
             let stdout = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -1560,54 +1668,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
             "output_budget_scope":"all_cell_files_before_manifest_seal",
             "checkpoint_mid_call":false,"interrupted_trace_loss_possible":true});
-            let registry: Vec<Artifact> = if dir.join("worker-artifacts.json").exists() {
-                read_json(&dir.join("worker-artifacts.json"))?
-            } else {
-                Vec::new()
-            };
-            storage::verify_manifest(&dir, &registry)?;
-            let registered: BTreeMap<_, _> =
-                registry.iter().map(|a| (a.path.as_str(), a)).collect();
-            let mut artifacts = Vec::new();
-            for path in tree_files(&dir)? {
-                let relative = path
-                    .strip_prefix(&dir)
-                    .map_err(|e| e.to_string())?
-                    .to_str()
-                    .ok_or("non-UTF8 output")?
-                    .to_string();
-                File::open(&path)
-                    .and_then(|f| f.sync_all())
-                    .map_err(|e| format!("sync {}: {e}", path.display()))?;
-                if let Some(artifact) = registered.get(relative.as_str()) {
-                    artifacts.push((**artifact).clone());
-                    continue;
-                }
-                let (sha256, bytes) = crate::store::hash_file(&path)?;
-                let (role, encoding) = match relative.as_str() {
-                    "witness.json" => ("restricted-known-answer", "json"),
-                    "config.json" => ("restricted-provenance", "json"),
-                    "plan.json" => ("restricted-frozen-plan", "json"),
-                    "run.json" => ("restricted-run-binding", "json"),
-                    "protocol.json" => ("restricted-frozen-protocol", "json"),
-                    "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
-                    "host.json" => ("host-measurement-context", "json"),
-                    "worker-artifacts.json" => ("artifact-registry", "json"),
-                    "stdout.log" | "stderr.log" => ("process-log", "utf8"),
-                    _ => ("unregistered-partial-artifact", "native"),
-                };
-                artifacts.push(Artifact {
-                    role: role.into(),
-                    path: relative,
-                    sha256,
-                    bytes,
-                    encoding: encoding.into(),
-                });
-            }
-            sync_dir(&dir)?;
-            let has = |path: &str| artifacts.iter().any(|a| a.path == path);
-            outcome["known_answer_verified"] = json!(has("public.json") && has("witness.json"));
-            outcome["factor_base_verified"] = json!(has("public.json") && has("factor-base.json"));
+            let artifacts = collect_cell_artifacts(&dir)?;
             let manifest = CellManifest {
                 schema: "crypto.ml-dataset.cell/v1".into(),
                 cell_index: index,
@@ -2364,6 +2425,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         return Err("unknown cell schema".into());
     }
     storage::verify_manifest(dir, &manifest.artifacts)?;
+    telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     for required in [
         "config.json",
         "run.json",

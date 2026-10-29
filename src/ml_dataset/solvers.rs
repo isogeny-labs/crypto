@@ -26,6 +26,7 @@ use crate::cryptanalysis::prime_root_trace::{self, RootEvent, RootLimits, RootRe
 use crate::cryptanalysis::sat::{self, SolveResult};
 use crate::ecc::Point;
 
+use super::capture::{AttemptBinding, CaptureEmitter, CaptureLimits};
 use super::curves;
 use super::types::{ArtifactPayload, CaseConfig, CaseData, SolverData};
 
@@ -76,7 +77,26 @@ struct LiveSink {
     events: File,
     sequence: u64,
 }
-thread_local! { static LIVE_SINK:RefCell<Option<LiveSink>>=const { RefCell::new(None) }; }
+enum EventSink {
+    Legacy(LiveSink),
+    Bound(CaptureEmitter),
+}
+impl EventSink {
+    fn event(&mut self, event: &Value) -> Result<(), String> {
+        match self {
+            Self::Legacy(s) => s.event(event),
+            Self::Bound(s) => s.event(event).map_err(|e| e.to_string()),
+        }
+    }
+    fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), String> {
+        match self {
+            Self::Legacy(s) => s.payload(payload),
+            Self::Bound(s) => s.payload(payload).map_err(|e| e.to_string()),
+        }
+    }
+}
+thread_local! { static LIVE_SINK:RefCell<Option<EventSink>>=const { RefCell::new(None) }; }
+
 #[cfg(test)]
 thread_local! { static FAIL_PRIME_LIFT_EVENT:std::cell::Cell<bool>=const { std::cell::Cell::new(false) }; }
 impl LiveSink {
@@ -175,11 +195,11 @@ pub fn solve_with_event_sink(
             .map_err(|e| e.to_string())?;
     }
     LIVE_SINK.with(|slot| {
-        *slot.borrow_mut() = Some(LiveSink {
+        *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
             directory: directory.to_owned(),
             events,
             sequence: 0,
-        })
+        }))
     });
     let _guard = LiveSinkGuard;
     live_event(
@@ -212,6 +232,65 @@ pub fn solve_with_event_sink(
     live_event(
         &json!({"kind":"solver_return","outcome":result.as_ref().map(|r|&r.outcome).ok(),"error":result.as_ref().err()}),
     )?;
+    result
+}
+
+/// Bound, capped event capture for supervised dataset attempts. The emitter
+/// commits its initial watermark before the first native call. Its artifacts
+/// can be copied by the supervisor while a native call is still running, but
+/// they do not contain a restorable native solver state.
+pub fn solve_with_bound_event_sink(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+) -> Result<SolverData, String> {
+    if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
+        return Err("nested live solver sink".into());
+    }
+    let emitter = CaptureEmitter::create(directory, binding, limits)?;
+    LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+    let _guard = LiveSinkGuard;
+    live_event(&json!({"kind":"solver_begin","solver":config.solver,
+        "family":config.family,"n":config.n,"m":config.m,
+        "work_limit":config.work_limit,"degree_bound":config.degree_bound,
+        "format":"crypto.ml-dataset.live-event/v2",
+        "sync_policy":"event fsync followed by atomic committed watermark",
+        "solver_state_restorable":false}))?;
+    let mut result = solve(config, case);
+    if let Ok(data) = &mut result {
+        if is_prime_chain(data) {
+            flush_prime_chain_payloads(data);
+            if data.outcome.get("live_persistence_errors").is_none() {
+                if let Err(error) =
+                    live_event(&json!({"kind":"solver_return","outcome":data.outcome,"error":null}))
+                {
+                    record_prime_chain_persistence_error(data, "solver_return", &error);
+                }
+            }
+            let finished = LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(s)) => s.finish().map_err(|e| e.to_string()),
+                _ => Err("bound capture sink disappeared".into()),
+            });
+            if let Err(error) = finished {
+                record_prime_chain_persistence_error(data, "capture_finish", &error);
+            }
+            return result;
+        }
+    }
+    if let Ok(data) = &result {
+        for payload in &data.artifacts {
+            live_payload(payload)?;
+        }
+    }
+    live_event(&json!({"kind":"solver_return",
+        "outcome":result.as_ref().map(|r| &r.outcome).ok(),
+        "error":result.as_ref().err()}))?;
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(s)) => s.finish().map_err(|e| e.to_string()),
+        _ => Err("bound capture sink disappeared".into()),
+    })?;
     result
 }
 
@@ -3762,6 +3841,46 @@ mod tests {
             serde_json::from_slice(&fs::read(canonical.join("prime-f4-input.json")).unwrap())
                 .unwrap();
         verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &input).unwrap();
+        fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn bound_prime_chain_payload_cap_preserves_canonical_equations() {
+        let (cfg, case) = tiny_prime_chain_case(3, false);
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory =
+            std::env::temp_dir().join(format!("bound-chain-cap-{}-{nonce}", std::process::id()));
+        let binding = AttemptBinding {
+            schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+            run_sha256: "1".repeat(64),
+            plan_sha256: "2".repeat(64),
+            protocol_sha256: "3".repeat(64),
+            config_sha256: "4".repeat(64),
+            source_commit: "5".repeat(40),
+            binary_sha256: "6".repeat(64),
+            cell_index: 0,
+            attempt_sha256: "7".repeat(64),
+        };
+        let mut limits = super::super::capture::capture_limits(64).unwrap();
+        limits.max_payload_bytes = 0;
+        let result = solve_with_bound_event_sink(&cfg, &case, &directory, binding, limits).unwrap();
+        assert_eq!(result.outcome["live_persistence_complete"], false);
+        assert_eq!(result.outcome["canonical_artifact_write_required"], true);
+        assert!(!result.outcome["live_persistence_errors"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        let input = result
+            .artifacts
+            .iter()
+            .find(|a| a.path == "prime-f4-input.json")
+            .unwrap();
+        let value: Value = serde_json::from_slice(&input.bytes).unwrap();
+        verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &value).unwrap();
+        assert!(directory.join("committed.json").is_file());
         fs::remove_dir_all(directory).unwrap();
     }
 
