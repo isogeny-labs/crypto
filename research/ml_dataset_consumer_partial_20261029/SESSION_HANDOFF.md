@@ -1,0 +1,32 @@
+# Session handoff
+
+## 2026-10-29 05:02 UTC — freeze independent partial consumer implementation
+
+### What was done
+
+Reconciled completed PR2824 and released T-780. Created isolated branch
+`codex/ml-consumer-partial-20261029` at exact delivered head
+`ee936f2f498bba8a0a4e5df69c218034d4e8a009`. Fresh T-783 owns only the
+standalone native consumer and this research directory. Copied and verified
+the parent's complete frozen design packet before implementation.
+
+### Decisions made
+
+Preserve all partial lineage/capture requirements and existing sealed bytes.
+Keep the 256 MiB parent and 32 MiB carried child allocation models explicit;
+use descriptor-rooted Linux I/O and bounded exact-byte replay. No producer,
+PMU, real remote read, cloud job, IAM or budget/deadline extension is included.
+
+### Open threads
+
+Implementation, frozen acceptance fixtures, final tests/review and delivery
+remain pending. PR2824 app attachment remains one outstanding call, with no
+retry; its CI observation belongs to the parent after 05:40:17 UTC. Transfer
+this timestamped entry to the daily log only after its current scope is free.
+
+### Errors
+
+Initial Conductor check found T-779 holds the shared daily log. Per parent
+direction, excluded that file and claimed the non-overlapping implementation
+scopes. No other chat or owner was contacted. The base has no referenced
+docs/CONDUCTOR.md; live CLI help and the successful task claim were retained.
