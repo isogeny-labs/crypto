@@ -3084,6 +3084,10 @@ mod tests {
     #[test]
     fn prime_root_payload_failure_preserves_live_prefix_without_completed_certificate() {
         let mut cfg = config("prime", "root");
+        // The n=7 fixture has a subgroup of order three: doubling preserves x
+        // and makes the first S3 query linear. Use a larger fixed software
+        // fixture so this control actually reaches a selected power/GCD state.
+        cfg.n = 11;
         cfg.work_limit = TRACE_EVENT_CAP;
         let mut case = curves::generate(&cfg).unwrap();
         case.private_witness = Value::Null;
