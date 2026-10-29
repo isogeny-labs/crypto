@@ -69,6 +69,13 @@ the standalone `hashed_ecdl_tensor` crate. The earlier bounded `hashed_ecdl`
 API remains available for comparison; its generic residual-enumeration oracle
 and field bound are not the implementation of the tensor path.
 
+Crypto's [CUDA relation service](../gpu/explicit-relations/README.md) adds
+GPU explicit-x lifting, signed inverse-hash enumeration and a persistent
+meet-in-the-middle oracle to that bounded API. Its Rust driver independently
+replays exported certificates on the CPU. It does not accelerate the separate
+arbitrary-precision tensor implementation. See the GPU validation record for
+the actual build and device-test status.
+
 ```rust
 use crypto_lib::cryptanalysis::hashed_ecdl::tensor::{
     arithmetic::OsRandom, contraction::Counter, curve::{Curve, Point},

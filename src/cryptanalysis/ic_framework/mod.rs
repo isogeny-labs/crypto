@@ -64,6 +64,7 @@
 
 pub mod archive;
 pub mod cm_orbit;
+pub mod explicit_base;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
