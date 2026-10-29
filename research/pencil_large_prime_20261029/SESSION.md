@@ -225,3 +225,31 @@ Diem remains deadline-expired at 50/52 records and was not restarted.
 
 An overlapping local build produced a missing-object linker diagnostic; all
 builds were allowed to finish and default tests were rerun sequentially.
+
+## 2026-10-29 T-798: phase and scalar ledger reconciliation
+
+### What was done
+Added field/native/symbolic phase sum checks and explicit interval remainder.
+Moved walk-label generation into generation timing. Independent source review
+found candidate expanded inversion versus reference atomic inversion counters.
+Added a checked native scalar normalization and tests against both actual
+inverse implementations; recorded formulas and open gates in COST_MODEL_DRAFT.json.
+
+### Decisions made
+Retain raw counts and immutable old evidence. Do not apply historical prices
+unchanged to this producer. Atomic scalar inverse weights remain unfrozen;
+no new ratio or full-cost claim follows from the normalization. Sources reviewed:
+Ring/modpow in three_leads.rs, frozen price_sparse.rs, and producer/library pow.
+
+### Open threads
+EKS retained-job listing again failed AssumeRole authorization on the existing
+job-submitter connection. No role changes or cohort submission. Full protocol,
+logical/setup coverage, valuation and remaining 717 candidate completions remain.
+
+### Errors
+Historical scalar event sums use asymmetric inversion internals. Recorded the
+specific discrepancy without changing saved results or claiming a revised ratio.
+
+Independent read-only review found no formula/path/phase-ordering defect.
+Prime validity remains a caller obligation. Future analyzer aggregation must
+use checked sums; existing producer phase aggregation is not overflow-checked.
