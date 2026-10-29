@@ -78,7 +78,7 @@ unit tests or code delivery as a theorem proof or performance result.
 
 2026-10-29 prime-field companion extension: the user's prime counterpart is
 officially Certicom ECCp-131. The paired
-[implementation and validation receipt](https://github.com/isogeny-labs/cryptanalysis/blob/3278756b3d52e3f5a2fa5d6e13ac5c5080b0941e/experiments/hashed-ecdl-tensor-reference/prime-development/README.md)
+[implementation and validation receipt](https://github.com/isogeny-labs/cryptanalysis/blob/a3e8d29f05625a38a6c5f6c1361527b782dcb43c/experiments/hashed-ecdl-tensor-reference/prime-development/README.md)
 now composes canonical prime-field arithmetic, modular Fourier multiplication,
 point validity/addition, fixed-cofactor image and affine hash constraints with
 the scalar BTN engine. Its 39 combined development tests pass, including 16

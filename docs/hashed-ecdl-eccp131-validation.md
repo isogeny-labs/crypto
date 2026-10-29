@@ -37,7 +37,7 @@ The challenge command exits 1 with **`resource limit: AKS multiplicative order`*
 under the bundled 2,000,000-step, 200,000-vector, 4,096-bit limits. It loads the
 challenge input but exhausts exact prime certification before graph/relation
 search and writes no recovery receipt. The paired
-[raw preflight](https://github.com/isogeny-labs/cryptanalysis/blob/3278756b3d52e3f5a2fa5d6e13ac5c5080b0941e/experiments/hashed-ecdl-tensor-reference/prime-development/native-preflight.txt)
+[raw preflight](https://github.com/isogeny-labs/cryptanalysis/blob/a3e8d29f05625a38a6c5f6c1361527b782dcb43c/experiments/hashed-ecdl-tensor-reference/prime-development/native-preflight.txt)
 and command/source/environment manifest preserve that failure. Increasing
 limits has not been verified to solve this or either published challenge.
 

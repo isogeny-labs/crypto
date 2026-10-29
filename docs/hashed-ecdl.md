@@ -8,7 +8,7 @@ checks do not establish the manuscript's asymptotic bound or a practical speedup
 
 
 The paired cryptanalysis repository now contains an independently executable
-[scalar BTN reference](https://github.com/isogeny-labs/cryptanalysis/tree/3278756b3d52e3f5a2fa5d6e13ac5c5080b0941e/experiments/hashed-ecdl-tensor-reference).
+[scalar BTN reference](https://github.com/isogeny-labs/cryptanalysis/tree/a3e8d29f05625a38a6c5f6c1361527b782dcb43c/experiments/hashed-ecdl-tensor-reference).
 It implements the ell=1 Cauchy/mode/Hermite recursion, together with integer
 Fourier multiplication and an independently tested binary-polynomial Fourier
 adaptation for ECC2K-130 coordinate constraints. Its recursive small-network
@@ -22,7 +22,7 @@ passes 39 development tests, including 16 OpenSSL multiples of the published
 prime-field P/Q. The actual prime target graph compiles to 1,564,506 edges and
 degree 1,032; u_0=0 selects exact summation and exceeds its work budget.
 Neither challenge has produced a relation or recovered scalar. See the
-[prime validation report](https://github.com/isogeny-labs/cryptanalysis/blob/3278756b3d52e3f5a2fa5d6e13ac5c5080b0941e/experiments/hashed-ecdl-tensor-reference/prime-development/README.md).
+[prime validation report](https://github.com/isogeny-labs/cryptanalysis/blob/a3e8d29f05625a38a6c5f6c1361527b782dcb43c/experiments/hashed-ecdl-tensor-reference/prime-development/README.md).
 
 The companion is Python and is not a native backend for `hashed_ecdl`. No
 Python execution path is introduced in this repository. The native tensor implementation is now available on main; the companion is
