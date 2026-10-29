@@ -358,7 +358,7 @@ Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining,
 
 [Report](../../research/ic_dg_blocked_20261029/README.pdf) · [study](../../research/ic_dg_blocked_20261029/).
 
-Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+validated (28 bits): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_blocked_20261029/VALIDATION.json)
 
 ## Linear-algebra engine, outside tables A–C
 
