@@ -5,7 +5,7 @@
 
 use clap::Args;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -15,7 +15,8 @@ use std::time::{Duration, Instant};
 use super::budget::{self, BudgetSession};
 use super::capture::{self, AttemptBinding, CaptureCursor, CaptureLimits};
 use super::snapshot::{
-    self, AttemptObservation, AttemptStatus, SnapshotAnchor, SnapshotLimits, SnapshotRequest,
+    self, AttemptObservation, AttemptStatus, SnapshotAnchor, SnapshotLimits, SnapshotProfile,
+    SnapshotRequest,
 };
 use super::{storage, Artifact, SupervisedChild};
 use crate::store::backend::{Phase, RemoteSpec, S3Guard};
@@ -150,10 +151,80 @@ const CONTEXT_FILES: &[(&str, &str)] = &[
     ("factor-base.json", "factor-base"),
 ];
 
+pub(crate) fn context_role(path: &str) -> Option<&'static str> {
+    CONTEXT_FILES
+        .iter()
+        .find_map(|(name, role)| (*name == path).then_some(*role))
+        .or_else(|| super::telemetry::checked::role(path))
+}
+
+fn helper_schema(profile: SnapshotProfile, kind: &str) -> String {
+    format!(
+        "crypto.ml-dataset.{kind}/v{}",
+        if profile.is_legacy() { 1 } else { 2 }
+    )
+}
+
+fn acknowledged_present<'de, D: serde::Deserializer<'de>>(
+    d: D,
+) -> Result<Option<Vec<Artifact>>, D::Error> {
+    Vec::<Artifact>::deserialize(d).map(Some)
+}
+
+fn identity_set(
+    profile: SnapshotProfile,
+    copied: &BTreeSet<String>,
+    artifacts: &Option<Vec<Artifact>>,
+) -> Result<(), String> {
+    if profile.is_legacy() {
+        if artifacts.is_some() {
+            return Err("legacy helper must omit acknowledged identities".into());
+        }
+        return Ok(());
+    }
+    let identities = artifacts
+        .as_ref()
+        .ok_or("checked helper lacks acknowledged identities")?;
+    if identities.len() > 19 {
+        return Err("checked helper context count".into());
+    }
+    let mut paths = BTreeSet::new();
+    let mut bytes = 0u64;
+    for artifact in identities {
+        let name = artifact
+            .path
+            .strip_prefix("context/")
+            .ok_or("checked identity prefix")?;
+        if context_role(name) != Some(artifact.role.as_str())
+            || artifact.encoding != "json"
+            || !paths.insert(name.to_owned())
+            || artifact.bytes > super::telemetry::checked::byte_limit(name)
+        {
+            return Err("invalid checked acknowledged identity".into());
+        }
+        crate::store::index::validate_sha256(&artifact.sha256)?;
+        bytes = bytes
+            .checked_add(artifact.bytes)
+            .ok_or("checked context byte overflow")?;
+    }
+    if &paths != copied || bytes > super::telemetry::checked::MAX_CONTEXT {
+        return Err("checked acknowledged path set or bytes mismatch".into());
+    }
+    Ok(())
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct HelperRequest {
     schema: String,
+    #[serde(default, skip_serializing_if = "SnapshotProfile::is_legacy")]
+    profile: SnapshotProfile,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "acknowledged_present"
+    )]
+    acknowledged_context: Option<Vec<Artifact>>,
     cell: PathBuf,
     snapshot: PathBuf,
     binding: AttemptBinding,
@@ -171,6 +242,14 @@ struct HelperRequest {
 #[serde(deny_unknown_fields)]
 struct HelperResult {
     schema: String,
+    #[serde(default, skip_serializing_if = "SnapshotProfile::is_legacy")]
+    profile: SnapshotProfile,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "acknowledged_present"
+    )]
+    acknowledged_context: Option<Vec<Artifact>>,
     request_sha256: String,
     cursor: CaptureCursor,
     anchor: Option<SnapshotAnchor>,
@@ -182,6 +261,12 @@ struct HelperResult {
 #[serde(deny_unknown_fields)]
 struct PreparedSnapshot {
     schema: String,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "acknowledged_present"
+    )]
+    acknowledged_context: Option<Vec<Artifact>>,
     helper_request_sha256: String,
     snapshot: SnapshotRequest,
     copied_context: BTreeSet<String>,
@@ -199,10 +284,20 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
     }
     let request: HelperRequest =
         serde_json::from_slice(&request_bytes).map_err(|e| e.to_string())?;
-    if request.schema != "crypto.ml-dataset.snapshot-helper/v1" {
+    if request.schema != helper_schema(request.profile, "snapshot-helper") {
         return Err("unknown snapshot helper schema".into());
     }
     request.binding.validate()?;
+    identity_set(
+        request.profile,
+        &request.copied_context,
+        &request.acknowledged_context,
+    )?;
+    if (request.profile == SnapshotProfile::CheckedPhaseV2)
+        != super::telemetry::checked::policy_present(&request.cell)?
+    {
+        return Err("helper profile differs from measurement policy".into());
+    }
     request.limits.validate()?;
     if AttemptBinding::from_cell_files(&request.cell)? != request.binding {
         return Err("cell binding changed before snapshot".into());
@@ -222,7 +317,8 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
             return Err("prepared snapshot exceeds four MiB".into());
         }
         let prepared: PreparedSnapshot = super::read_json(&prepared_path)?;
-        if prepared.schema != "crypto.ml-dataset.prepared-snapshot/v1"
+        if prepared.schema != helper_schema(request.profile, "prepared-snapshot")
+            || prepared.snapshot.profile != request.profile
             || prepared.helper_request_sha256 != super::digest(&request_bytes)
             || prepared.snapshot.binding != request.binding
             || prepared.snapshot.ordinal != request.ordinal
@@ -231,6 +327,28 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
             || !request.copied_context.is_subset(&prepared.copied_context)
         {
             return Err("prepared snapshot belongs to a different helper request".into());
+        }
+        identity_set(
+            request.profile,
+            &prepared.copied_context,
+            &prepared.acknowledged_context,
+        )?;
+        if request.profile == SnapshotProfile::CheckedPhaseV2 {
+            recheck_acknowledged(&request)?;
+            for identity in request
+                .acknowledged_context
+                .as_ref()
+                .ok_or("checked identities absent")?
+            {
+                if !prepared
+                    .acknowledged_context
+                    .as_ref()
+                    .ok_or("prepared identities absent")?
+                    .contains(identity)
+                {
+                    return Err("prepared snapshot changes acknowledged identity".into());
+                }
+            }
         }
         prepared
     } else {
@@ -244,7 +362,9 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
         prepared
     };
     let mut result = HelperResult {
-        schema: "crypto.ml-dataset.snapshot-helper-result/v1".into(),
+        schema: helper_schema(request.profile, "snapshot-helper-result"),
+        profile: request.profile,
+        acknowledged_context: prepared.acknowledged_context,
         request_sha256: super::digest(&request_bytes),
         cursor: request.cursor.clone(),
         anchor: request.previous.clone(),
@@ -289,6 +409,9 @@ fn prepare_snapshot(
     request: &HelperRequest,
     request_bytes: &[u8],
 ) -> Result<PreparedSnapshot, String> {
+    if request.profile == SnapshotProfile::CheckedPhaseV2 {
+        return prepare_checked_snapshot(request, request_bytes, |_| Ok(()));
+    }
     let mut copied_context = request.copied_context.clone();
     let mut context = Vec::new();
     let mut context_bytes = 0u64;
@@ -335,8 +458,149 @@ fn prepare_snapshot(
         || !matches!(request.observation.status, AttemptStatus::Running);
     Ok(PreparedSnapshot {
         schema: "crypto.ml-dataset.prepared-snapshot/v1".into(),
+        acknowledged_context: None,
         helper_request_sha256: super::digest(request_bytes),
         snapshot: SnapshotRequest {
+            profile: SnapshotProfile::LegacyV1,
+            binding: request.binding.clone(),
+            ordinal: request.ordinal,
+            previous: request.previous.clone(),
+            context,
+            delta,
+            observation: request.observation.clone(),
+        },
+        copied_context,
+        publish,
+    })
+}
+
+fn recheck_acknowledged(request: &HelperRequest) -> Result<BTreeMap<String, Vec<u8>>, String> {
+    identity_set(
+        request.profile,
+        &request.copied_context,
+        &request.acknowledged_context,
+    )?;
+    let mut files = BTreeMap::new();
+    for identity in request
+        .acknowledged_context
+        .as_ref()
+        .ok_or("checked identities absent")?
+    {
+        let local = identity
+            .path
+            .strip_prefix("context/")
+            .ok_or("checked identity prefix")?;
+        // The saved identity length bounds the read, including after file growth.
+        let bytes = super::telemetry::checked::read(&request.cell, local, identity.bytes)?;
+        if bytes.len() as u64 != identity.bytes || super::digest(&bytes) != identity.sha256 {
+            return Err("acknowledged context changed".into());
+        }
+        files.insert(local.to_owned(), bytes);
+    }
+    Ok(files)
+}
+
+fn prepare_checked_snapshot(
+    request: &HelperRequest,
+    request_bytes: &[u8],
+    mut after_probe: impl FnMut(&str) -> Result<(), String>,
+) -> Result<PreparedSnapshot, String> {
+    use super::telemetry::checked;
+    let mut files = recheck_acknowledged(request)?;
+    let mut copied_context = request.copied_context.clone();
+    let mut identities = request
+        .acknowledged_context
+        .clone()
+        .ok_or("checked identities absent")?;
+    let mut context = Vec::new();
+    let mut total = files.values().map(|b| b.len() as u64).sum::<u64>();
+    // Prior context is copied locally for authoritative full-prefix validation;
+    // only newly discovered identities enter the next immutable delta manifest.
+    for identity in &identities {
+        let local = identity
+            .path
+            .strip_prefix("context/")
+            .ok_or("context prefix")?;
+        storage::write_bytes(
+            &request.snapshot,
+            &identity.path,
+            &identity.role,
+            "json",
+            &files[local],
+        )?;
+    }
+    let mut probe = |name: &str, role: &str, mandatory: bool| -> Result<bool, String> {
+        if copied_context.contains(name) {
+            return Ok(true);
+        }
+        let exists = match fs::symlink_metadata(request.cell.join(name)) {
+            Ok(_) => true,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
+            Err(e) => return Err(e.to_string()),
+        };
+        // Test hook runs after the membership decision, never changing it.
+        after_probe(name)?;
+        if !exists {
+            if mandatory {
+                return Err(format!("required checked context absent: {name}"));
+            }
+            return Ok(false);
+        }
+        let remaining = checked::MAX_CONTEXT
+            .checked_sub(total)
+            .ok_or("checked context total")?;
+        let bytes = checked::read(
+            &request.cell,
+            name,
+            checked::byte_limit(name).min(remaining),
+        )?;
+        total = total
+            .checked_add(bytes.len() as u64)
+            .ok_or("checked context overflow")?;
+        let artifact = storage::write_bytes(
+            &request.snapshot,
+            &format!("context/{name}"),
+            role,
+            "json",
+            &bytes,
+        )?;
+        files.insert(name.to_owned(), bytes);
+        copied_context.insert(name.to_owned());
+        context.push(artifact.clone());
+        identities.push(artifact);
+        Ok(true)
+    };
+    // Policy is always captured before any phase, including the pre-worker flush.
+    probe(checked::POLICY_PATH, "restricted-measurement-policy", true)?;
+    for (index, &(name, role)) in CONTEXT_FILES.iter().enumerate() {
+        probe(name, role, index < 5)?;
+    }
+    for phase in checked::types::Phase::ALL {
+        if !probe(&phase.path(true), "phase-start", false)? {
+            break;
+        }
+        if !probe(&phase.path(false), "hardware-and-resource-telemetry", false)? {
+            break;
+        }
+    }
+    checked::validate_context(&request.binding, &files)?;
+    identity_set(request.profile, &copied_context, &Some(identities.clone()))?;
+    let delta = capture::capture_committed_delta(
+        &request.cell,
+        &request.snapshot,
+        &request.binding,
+        &request.cursor,
+        &request.limits,
+    )?;
+    let publish = !context.is_empty()
+        || delta.is_some()
+        || !matches!(request.observation.status, AttemptStatus::Running);
+    Ok(PreparedSnapshot {
+        schema: helper_schema(request.profile, "prepared-snapshot"),
+        acknowledged_context: Some(identities),
+        helper_request_sha256: super::digest(request_bytes),
+        snapshot: SnapshotRequest {
+            profile: request.profile,
             binding: request.binding.clone(),
             ordinal: request.ordinal,
             previous: request.previous.clone(),
@@ -357,6 +621,8 @@ struct Pending {
 }
 
 pub struct LiveSupervisor {
+    profile: SnapshotProfile,
+    acknowledged_context: Option<Vec<Artifact>>,
     root: PathBuf,
     cell: PathBuf,
     binding: AttemptBinding,
@@ -380,6 +646,11 @@ impl LiveSupervisor {
             return Err("snapshot interval and timeout must be positive".into());
         }
         let binding = AttemptBinding::from_cell_files(cell)?;
+        let profile = if super::telemetry::checked::policy_present(cell)? {
+            SnapshotProfile::CheckedPhaseV2
+        } else {
+            SnapshotProfile::LegacyV1
+        };
         let cursor = CaptureCursor::initial(&binding)?;
         let limits = capture_limits(args.trace_mib)?;
         storage::write_json(
@@ -406,6 +677,8 @@ impl LiveSupervisor {
             true,
         )?;
         Ok(Self {
+            profile,
+            acknowledged_context: (!profile.is_legacy()).then(Vec::new),
             root: base,
             cell: cell.to_owned(),
             binding,
@@ -442,7 +715,9 @@ impl LiveSupervisor {
             true,
         )?;
         let request = HelperRequest {
-            schema: "crypto.ml-dataset.snapshot-helper/v1".into(),
+            schema: helper_schema(self.profile, "snapshot-helper"),
+            profile: self.profile,
+            acknowledged_context: self.acknowledged_context.clone(),
             cell: self.cell.clone(),
             snapshot: self
                 .root
@@ -536,10 +811,26 @@ impl LiveSupervisor {
             ));
         }
         let result: HelperResult = super::read_json(&pending.directory.join("result.json"))?;
-        if result.schema != "crypto.ml-dataset.snapshot-helper-result/v1"
+        if result.schema != helper_schema(self.profile, "snapshot-helper-result")
+            || result.profile != self.profile
             || result.request_sha256 != pending.request.sha256
         {
             return Err("snapshot helper result is not bound to its request".into());
+        }
+        identity_set(
+            self.profile,
+            &result.copied_context,
+            &result.acknowledged_context,
+        )?;
+        if let Some(previous) = &self.acknowledged_context {
+            if previous.iter().any(|a| {
+                !result
+                    .acknowledged_context
+                    .as_ref()
+                    .is_some_and(|next| next.contains(a))
+            }) {
+                return Err("snapshot acknowledgement changes existing context identity".into());
+            }
         }
         if result.published {
             if result.anchor.is_none() {
@@ -553,6 +844,7 @@ impl LiveSupervisor {
         self.cursor = result.cursor;
         self.previous = result.anchor;
         self.context = result.copied_context;
+        self.acknowledged_context = result.acknowledged_context;
         self.pending = None;
         Ok(())
     }
@@ -707,6 +999,8 @@ mod tests {
             };
             HelperRequest {
                 schema: "crypto.ml-dataset.snapshot-helper/v1".into(),
+                profile: SnapshotProfile::LegacyV1,
+                acknowledged_context: None,
                 cell: self.cell(),
                 snapshot: self.0.join(format!("snapshot-{ordinal}")),
                 binding,
@@ -792,6 +1086,177 @@ mod tests {
         assert_eq!(report["solver_resumed"], false);
         assert!(!restored.join("cells").exists());
         assert!(!fixture.cell().join("manifest.json").exists());
+    }
+
+    fn checked_request(
+        fixture: &Fixture,
+        binding: AttemptBinding,
+        previous: Option<HelperResult>,
+    ) -> HelperRequest {
+        let acknowledged = previous
+            .as_ref()
+            .and_then(|r| r.acknowledged_context.clone())
+            .unwrap_or_default();
+        let mut request = fixture.request(binding, previous);
+        request.profile = SnapshotProfile::CheckedPhaseV2;
+        request.schema = helper_schema(request.profile, "snapshot-helper");
+        request.acknowledged_context = Some(acknowledged);
+        request
+    }
+
+    #[test]
+    fn checked_initial_policy_and_start_only_restore_use_authoritative_context() {
+        use super::super::telemetry::checked;
+        let fixture = Fixture::new();
+        let binding = fixture.prepare();
+        checked::install_policy(&fixture.cell()).unwrap();
+        let initial = fixture.run(&checked_request(&fixture, binding.clone(), None));
+        assert_eq!(initial.profile, SnapshotProfile::CheckedPhaseV2);
+        assert_eq!(initial.copied_context.len(), 6);
+        assert_eq!(initial.acknowledged_context.as_ref().unwrap().len(), 6);
+        checked::tests::write_phase(
+            &fixture.cell(),
+            &binding,
+            checked::types::Phase::CurveConstruction,
+            true,
+        );
+        assert!(!fixture.cell().join("worker-artifacts.json").exists());
+        let roles = checked::validate_directory(&fixture.cell()).unwrap();
+        assert_eq!(
+            roles["telemetry/curve-construction-start.json"],
+            "phase-start"
+        );
+        let (kind, _) =
+            checked::restricted_record(&fixture.cell(), "telemetry/curve-construction-start.json")
+                .unwrap();
+        assert_eq!(kind, "interrupted_or_unfinished");
+        let mut request = checked_request(&fixture, binding.clone(), Some(initial));
+        request.observation =
+            observation(AttemptStatus::Interrupted, None, Some("mock interruption"));
+        let terminal = fixture.run(&request);
+        let cfg = store_config(&fixture.0, Some(&request.remote)).unwrap();
+        let report = snapshot::restore_partial(
+            cfg,
+            None,
+            terminal.anchor.as_ref().unwrap(),
+            &fixture.0.join("restored"),
+            &SnapshotLimits::default(),
+        )
+        .unwrap();
+        let restored = report.restored_directory.join("artifacts/context");
+        assert_eq!(AttemptBinding::from_cell_files(&restored).unwrap(), binding);
+        assert_eq!(checked::validate_directory(&restored).unwrap(), roles);
+        assert!(!restored.join("telemetry/curve-construction.json").exists());
+        assert!(
+            !report.solver_resumed && !report.cell_complete && !report.scientific_result_verified
+        );
+    }
+
+    #[test]
+    fn checked_scan_defers_end_created_after_missing_start_probe() {
+        use super::super::telemetry::checked;
+        let fixture = Fixture::new();
+        let binding = fixture.prepare();
+        checked::install_policy(&fixture.cell()).unwrap();
+        let request = checked_request(&fixture, binding.clone(), None);
+        fs::create_dir(&request.snapshot).unwrap();
+        let bytes = serde_json::to_vec(&request).unwrap();
+        let prepared = prepare_checked_snapshot(&request, &bytes, |name| {
+            if name == "telemetry/curve-construction-start.json" {
+                checked::tests::write_phase(
+                    &fixture.cell(),
+                    &binding,
+                    checked::types::Phase::CurveConstruction,
+                    false,
+                );
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(fixture
+            .cell()
+            .join("telemetry/curve-construction.json")
+            .exists());
+        assert!(!prepared
+            .copied_context
+            .iter()
+            .any(|p| p.starts_with("telemetry/")));
+        assert_eq!(prepared.copied_context.len(), 6);
+        assert!(checked::validate_directory(&request.snapshot.join("context")).is_ok());
+    }
+
+    #[test]
+    fn checked_acknowledged_mutation_deletion_and_policy_downgrade_fail() {
+        use super::super::telemetry::checked;
+        for delete in [false, true] {
+            let fixture = Fixture::new();
+            let binding = fixture.prepare();
+            checked::install_policy(&fixture.cell()).unwrap();
+            let initial = fixture.run(&checked_request(&fixture, binding.clone(), None));
+            let request = checked_request(&fixture, binding, Some(initial));
+            if delete {
+                fs::remove_file(fixture.cell().join("config.json")).unwrap();
+            } else {
+                fs::write(fixture.cell().join("config.json"), b"{}").unwrap();
+            }
+            assert!(recheck_acknowledged(&request).is_err());
+        }
+        let fixture = Fixture::new();
+        let binding = fixture.prepare();
+        checked::install_policy(&fixture.cell()).unwrap();
+        let request = fixture.request(binding, None);
+        let dir = fixture.0.join("legacy-request");
+        fs::create_dir(&dir).unwrap();
+        storage::write_json(&dir, "request.json", "request", &request).unwrap();
+        assert!(snapshot_worker(&dir.join("request.json"))
+            .unwrap_err()
+            .contains("profile"));
+        let mut value = serde_json::to_value(&request).unwrap();
+        value["acknowledged_context"] = serde_json::Value::Null;
+        assert!(serde_json::from_value::<HelperRequest>(value).is_err());
+        let value = serde_json::to_value(&request).unwrap();
+        assert!(value.get("profile").is_none());
+        assert!(value.get("acknowledged_context").is_none());
+    }
+
+    #[test]
+    fn checked_local_publication_rejects_role_and_rehashed_policy_substitution() {
+        use super::super::telemetry::checked;
+        for replace_policy in [false, true] {
+            let fixture = Fixture::new();
+            let binding = fixture.prepare();
+            checked::install_policy(&fixture.cell()).unwrap();
+            let request = checked_request(&fixture, binding, None);
+            fs::create_dir(&request.snapshot).unwrap();
+            let mut prepared =
+                prepare_checked_snapshot(&request, &serde_json::to_vec(&request).unwrap(), |_| {
+                    Ok(())
+                })
+                .unwrap();
+            let policy = prepared
+                .snapshot
+                .context
+                .iter_mut()
+                .find(|a| a.path == "context/measurement-policy.json")
+                .unwrap();
+            if replace_policy {
+                let bytes = b"{}\n";
+                fs::write(request.snapshot.join(&policy.path), bytes).unwrap();
+                policy.sha256 = super::super::digest(bytes);
+                policy.bytes = bytes.len() as u64;
+            } else {
+                policy.role = "public-instance".into();
+            }
+            let cfg = store_config(&request.snapshot, Some(&request.remote)).unwrap();
+            assert!(snapshot::publish_partial(
+                &request.snapshot,
+                cfg,
+                None,
+                &prepared.snapshot,
+                &SnapshotLimits::default()
+            )
+            .is_err());
+        }
     }
 
     #[test]

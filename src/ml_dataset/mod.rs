@@ -714,6 +714,13 @@ struct CellManifest {
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
+    if telemetry::checked::policy_present(&out)? {
+        capture::AttemptBinding::from_cell_files(&out)?;
+        if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
+            return Err("checked worker configuration differs from attempt binding".into());
+        }
+        registry.push(telemetry::checked::install_policy(&out)?);
+    }
     let mut known_answer = false;
     let mut factor_base_verified = false;
     let result = (|| {
@@ -779,6 +786,7 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "worker-process.json",
                 "host.json",
                 "worker-artifacts.json",
+                "measurement-policy.json",
             ]
             .contains(&artifact.path.as_str())
                 || artifact.path.starts_with("publication/")
@@ -981,6 +989,8 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
             "status":"attempt_started"}),
         )?;
+        // Freeze the measurement profile before the initial snapshot and spawn.
+        telemetry::checked::install_policy(&dir)?;
         // The initial source/protocol/attempt context is durable before any
         // expensive worker starts. Subsequent uploads run outside its monitor.
         let mut live_capture = if a.publish {
@@ -1157,6 +1167,13 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         };
         storage::verify_manifest(&dir, &registry)?;
         let registered: BTreeMap<_, _> = registry.iter().map(|a| (a.path.as_str(), a)).collect();
+        // A killed worker may never write its registry. Promote only an exact,
+        // fully validated finite phase prefix; malformed bytes remain partial.
+        let recovered_phase_roles = if dir.join(telemetry::checked::POLICY_PATH).exists() {
+            telemetry::checked::validate_directory(&dir).unwrap_or_default()
+        } else {
+            BTreeMap::new()
+        };
         let mut artifacts = Vec::new();
         for path in tree_files(&dir)? {
             let relative = path
@@ -1173,17 +1190,21 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 continue;
             }
             let (sha256, bytes) = crate::store::hash_file(&path)?;
-            let (role, encoding) = match relative.as_str() {
-                "witness.json" => ("restricted-known-answer", "json"),
-                "config.json" => ("restricted-provenance", "json"),
-                "plan.json" => ("restricted-frozen-plan", "json"),
-                "run.json" => ("restricted-run-binding", "json"),
-                "protocol.json" => ("restricted-frozen-protocol", "json"),
-                "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
-                "host.json" => ("host-measurement-context", "json"),
-                "worker-artifacts.json" => ("artifact-registry", "json"),
-                "stdout.log" | "stderr.log" => ("process-log", "utf8"),
-                _ => ("unregistered-partial-artifact", "native"),
+            let (role, encoding) = if let Some(role) = recovered_phase_roles.get(&relative) {
+                (*role, "json")
+            } else {
+                match relative.as_str() {
+                    "witness.json" => ("restricted-known-answer", "json"),
+                    "config.json" => ("restricted-provenance", "json"),
+                    "plan.json" => ("restricted-frozen-plan", "json"),
+                    "run.json" => ("restricted-run-binding", "json"),
+                    "protocol.json" => ("restricted-frozen-protocol", "json"),
+                    "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
+                    "host.json" => ("host-measurement-context", "json"),
+                    "worker-artifacts.json" => ("artifact-registry", "json"),
+                    "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                    _ => ("unregistered-partial-artifact", "native"),
+                }
             };
             artifacts.push(Artifact {
                 role: role.into(),
@@ -1841,6 +1862,7 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         return Err("unknown cell schema".into());
     }
     storage::verify_manifest(dir, &manifest.artifacts)?;
+    telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     for required in [
         "config.json",
         "run.json",

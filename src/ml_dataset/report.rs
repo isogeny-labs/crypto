@@ -395,6 +395,18 @@ fn measurement(
         return Ok(());
     }
     let raw: Value = read_json(dir, &artifact.path)?;
+    if matches!(
+        raw["schema"].as_str(),
+        Some("crypto.ml-dataset.phase-start/v2" | "crypto.ml-dataset.phase-metrics/v2")
+    ) {
+        let (kind, raw) = super::telemetry::checked::restricted_record(dir, &artifact.path)?;
+        return streams.measurements.push(&format!("{attempt}/{}",artifact.path),&json!({
+            "schema":"crypto.ml-dataset.coverage-measurement/v2","attempt":attempt,"cell_index":index,
+            "manifest_bound":sealed,"kind":kind,"source_artifact":artifact,"raw":raw,
+            "training_cost_eligible":false,"whole_worker_retired_instructions":null,
+            "whole_worker_coverage_verified":false,"independently_verified":false,"consumer_v2_admitted":false,
+            "platform_admitted":false,"clock_valid_for_comparison":false,"interpreted_as_whole_solve_instructions":false}));
+    }
     if ![
         "crypto.ml-dataset.phase-start/v1",
         "crypto.ml-dataset.phase-metrics/v1",
