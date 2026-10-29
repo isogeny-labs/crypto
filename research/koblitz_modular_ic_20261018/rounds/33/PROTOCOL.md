@@ -109,3 +109,16 @@ formal result was accepted. Make K and its module assumptions explicit in
 that lemma, pass K at call sites, preserve the failed source/log, and use
 fresh lean33-02 after the first runner is terminal. Mathematical statements
 and compile/audit caps are unchanged.
+
+## EVAL33 completed native evidence / snapshot-wrapper reconciliation
+
+All ten point evaluations complete with nativeexit0, exact final marker,
+no error lines and the prescribed83/113 certificates. The runner then exits1
+because its bulk tar raced an active LOCAL33 run and reported 'runs: file
+changed as we read it'. Preserve that software failure and reconcile native
+acceptance by the SAME frozen exit/error/marker/count checks. Snapshot only
+the immutable completed eval33-01 directory; do not repeat its mathematics.
+Future independent CAS invocations use REPLAY_CAS_ISOLATED.sh, whose only
+change is per-attempt archive naming and snapshotting its own completed run.
+This avoids a shared mutable directory/archive, without changing gates, math
+inputs, acceptance, caps or existing active runner copies.
