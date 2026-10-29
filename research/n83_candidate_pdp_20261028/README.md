@@ -29,6 +29,7 @@ Read the [native summary](evidence/degree3-continuation/summary.json),
 [storage/restore](evidence/degree3-continuation-storage.json),
 [publication checks](evidence/degree3-continuation-publication.json) and
 [run report](reports/run-20261029T0653Z/report.pdf).
+The [delivery record](evidence/continuation-delivery.json) gives report/support hashes and S3 locations.
 The prior [capped parent run](evidence/degree3-m3/summary.json) and its
 [report](reports/run-20261029T0306Z/report.pdf) remain intact. Both parent and
 suffix archives are required for replay. All original points, systems,

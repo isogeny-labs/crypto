@@ -34,10 +34,21 @@ _BLOB_READER = None
 
 
 def _close_blob_reader():
+    global _BLOB_READER
     if _BLOB_READER is not None:
-        _BLOB_READER.stdin.close()
-        _BLOB_READER.stdout.close()
-        _BLOB_READER.wait(timeout=5)
+        reader, _BLOB_READER = _BLOB_READER, None
+        reader.stdin.close()
+        reader.stdout.close()
+        try:
+            reader.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            # All requested blobs have been read; reap only our idle reader.
+            reader.terminate()
+            try:
+                reader.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                reader.kill()
+                reader.wait(timeout=5)
 
 
 atexit.register(_close_blob_reader)
