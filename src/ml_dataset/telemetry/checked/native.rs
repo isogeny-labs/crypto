@@ -245,6 +245,22 @@ pub(super) fn validate(c: &Collection, pid: u32) -> Result<(bool, Vec<Observatio
     )?;
     let start_matched = context(c, &c.context_checks[0], "start")?;
     let finish_matched = context(c, &c.context_checks[1], "finish")?;
+    let byte_order = c.attempts[0]
+        .events
+        .first()
+        .ok_or("empty checked attempt")?
+        .request
+        .byte_order
+        .as_str();
+    require(
+        matches!(byte_order, "little" | "big")
+            && !(c.architecture == "x86_64" && byte_order != "little")
+            && c.attempts
+                .iter()
+                .flat_map(|a| &a.events)
+                .all(|e| e.request.byte_order == byte_order),
+        "inconsistent or impossible collector byte order",
+    )?;
     // Native perf bitfield layout is admitted only on the retained LE ABI.
     let supported = c.os == "linux"
         && matches!(c.architecture.as_str(), "x86_64" | "aarch64")
@@ -252,6 +268,12 @@ pub(super) fn validate(c: &Collection, pid: u32) -> Result<(bool, Vec<Observatio
             .events
             .first()
             .is_some_and(|e| e.request.byte_order == "little");
+    if !supported {
+        require(
+            c.owner_tid.is_none() && c.context_checks.iter().all(|x| x.current.tid.is_none()),
+            "unsupported native backend cannot report a thread identity",
+        )?;
+    }
     let mut selected = None;
     let mut start_returned = false;
     let mut fallback_required = false;
@@ -275,6 +297,10 @@ pub(super) fn validate(c: &Collection, pid: u32) -> Result<(bool, Vec<Observatio
             let mut member = Replay::new(&a.events[1], "cpu_cycles", group_fd)?;
             if prepared {
                 prepared = member.prepare(events[0].expected.kernel_event_id)?;
+                require(
+                    member.fd.is_none() || member.fd != events[0].fd,
+                    "live counter descriptors alias",
+                )?;
             }
             events.push(member);
         }

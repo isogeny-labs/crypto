@@ -159,6 +159,11 @@ pub(crate) fn write_phase(root: &Path, binding: &AttemptBinding, phase: Phase, s
 fn unsupported() -> Collection {
     let mut c = collection();
     c.os = "unsupported_fixture_os".into();
+    c.owner_tid = None;
+    for context in &mut c.context_checks {
+        context.current.tid = None;
+        context.status = "unavailable".into();
+    }
     c.selected_attempt = None;
     c.attempts[0].start_succeeded = false;
     c.attempts[0].events[1] = event("cpu_cycles", -1, 102, 100);
@@ -323,6 +328,50 @@ fn lifecycle_and_projected_measurements_reject_tampering() {
         mutate(&mut c);
         assert!(native::validate(&c, std::process::id()).is_err());
     }
+}
+
+fn set_big_endian(event: &mut Event) {
+    event.request.byte_order = "big".into();
+    let attr = &mut event.request.attr_bytes_native_endian;
+    attr[4..8].copy_from_slice(&112u32.to_be_bytes());
+    attr[8..16].copy_from_slice(&event.request.config.to_be_bytes());
+    attr[32..40].copy_from_slice(&7u64.to_be_bytes());
+    attr[40..48].copy_from_slice(&event.request.attr_flags.to_be_bytes());
+}
+
+#[test]
+fn request_endianness_is_process_wide_and_open_descriptors_are_unique() {
+    let mut c = collection();
+    c.architecture = "aarch64".into();
+    set_big_endian(&mut c.attempts[0].events[1]);
+    assert!(native::validate(&c, std::process::id())
+        .unwrap_err()
+        .contains("byte order"));
+    let mut c = unsupported();
+    c.architecture = "x86_64".into();
+    for event in &mut c.attempts[0].events {
+        set_big_endian(event);
+    }
+    assert!(native::validate(&c, std::process::id())
+        .unwrap_err()
+        .contains("byte order"));
+    c.architecture = "aarch64".into();
+    c.os = "linux".into();
+    assert!(native::validate(&c, std::process::id()).is_ok());
+    let mut c = collection();
+    c.attempts[0].events[1].lifecycle[0] = call("open", 10);
+    assert!(native::validate(&c, std::process::id())
+        .unwrap_err()
+        .contains("descriptors alias"));
+    let mut c = unsupported();
+    c.owner_tid = Some(1);
+    for context in &mut c.context_checks {
+        context.current.tid = Some(1);
+        context.status = "matched".into();
+    }
+    assert!(native::validate(&c, std::process::id())
+        .unwrap_err()
+        .contains("thread identity"));
 }
 
 #[test]
