@@ -26,7 +26,7 @@ proc checkCompact33(string label,number b,number c,number descentL,number descen
  }
  if(productIndex!=51){ERROR("LOCAL33_COMPACT_WITNESS_COUNT");}
  ideal gens=residueCompact33,products;if(std(gens)[1]!=1){ERROR("LOCAL33_COMPACT_NO_PRESENTATION_ON_SOME_BRANCH");}
- matrix witness=lift(gens,ideal(1));matrix check=matrix(gens)*witness;if(check[1,1]!=1){ERROR("LOCAL33_COMPACT_EXACT_UNIT_IDENTITY");}
+ matrix witness=lift(gens,ideal(1));matrix reconstructed=matrix(gens)*witness;if(reconstructed[1,1]!=1){ERROR("LOCAL33_COMPACT_EXACT_UNIT_IDENTITY");}
  link out="ASCII:w compact-local-"+label+".sing";open(out);
  write(out,"poly localDValue="+string(dValue)+";poly localDInverse="+string(di)+";poly localHValue="+string(hValue)+";poly localHInverse="+string(hi)+";ideal localUnitGenerators;");
  write(out,"matrix localUnitWitness["+string(nrows(witness))+"][1];");

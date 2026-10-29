@@ -6,12 +6,17 @@ h=Path(__file__).resolve().parent;p=h/'runs/local33-compact-dump01'
 s=(p/'native.log').read_text();assert (p/'exit.txt').read_text().strip()=='0' and 'LOCAL33_COMPACT_DUMP_ALL_CHECKS_PASS' in s and not re.search(r'^\s*\?',s,re.M)
 lines=(p/'rational-family.sing').read_text().splitlines();assert lines[0]=='ring rationalFamily33=(2,u),(n,l,v),dp;'
 rename={'u':'uValue33','n':'nValue33','l':'lValue33','v':'vValue33'}
+exponent_tokens=re.findall(r'\bu\^([0-9]+)\b','\n'.join(lines))
+maximum_token=max(exponent_tokens,key=lambda x:(len(x),x)) if exponent_tokens else '1'
 body=[]
 for line in lines[1:]:
- body.append(re.sub(r'\b(u|n|l|v)\b',lambda m:rename[m[0]],line))
+ cached=re.sub(r'\bu\^([0-9]+)\b',lambda m:'number(uPowerCache33[('+m[1]+')+1])',line)
+ body.append(re.sub(r'\b(u|n|l|v)\b',lambda m:rename[m[0]],cached))
  if line.startswith('rationalDenominator33='):
   body.append('if(rationalDenominator33==0){ERROR("LOCAL33_COEFFICIENT_DENOMINATOR_SPECIALIZATION_ZERO");}')
-func='proc specialiseLocalFamily33(number uValue33,poly nValue33,poly lValue33,poly vValue33){\n'+'\n'.join(body)+'\n'
+cache='list uPowerCache33;number uPowerRunning33=1;int uPowerIndex33;\n'
+cache+='for(uPowerIndex33=0;uPowerIndex33<='+maximum_token+';uPowerIndex33++){uPowerCache33[uPowerIndex33+1]=uPowerRunning33;uPowerRunning33=uPowerRunning33*uValue33;}\n'
+func='proc specialiseLocalFamily33(number uValue33,poly nValue33,poly lValue33,poly vValue33){\n'+cache+'\n'.join(body)+'\n'
 func+='return(list(rationalSource33,rationalSyzygies33,rationalH33,rationalDenominator33,rationalJacobian33,rationalTate33,rationalBezout33,rationalBase33,rationalOriginalQR33));\n}\n'
 (h/'source-data/local-family-function.sing').write_text(func)
 rt='\nlist roundtripFamily33=specialiseLocalFamily33(u,n,l,v);\n'

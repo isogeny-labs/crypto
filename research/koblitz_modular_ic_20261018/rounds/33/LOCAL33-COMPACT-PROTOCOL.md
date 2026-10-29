@@ -32,3 +32,11 @@ reuse those results; do not repeat merely for counts. If they reach a terminal
 failure/cap, a fresh compact point-check invocation may use this equivalent
 certified representation under the same bounds. No coefficient box, changed
 unit tests, field expansion or cap increase. Record every original failure.
+
+Before the first function-roundtrip/point data, the text assembler replaces
+literal u^k tokens by lookups in a native precomputed field-power list. The
+allocation bound is the largest exponent TOKEN in the retained native source;
+Python does only lexical metadata/renaming. Every field multiplication occurs
+in Singular, and the formal-argument native roundtrip checks the complete
+transformed result. This changes expression evaluation, not any witness or
+condition. No timing comparison/IC performance claim is made.
