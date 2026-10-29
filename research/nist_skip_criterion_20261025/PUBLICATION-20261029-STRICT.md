@@ -1,3 +1,20 @@
+# Published strict-count result
+
+At 2026-10-29T15:51Z, normal push of result/custody head
+`728caf6075382af445f6bc6149d94188aa3e2b37` succeeded. The connector confirms
+that exact head on open, non-draft, mergeable PR 2666, based on main
+`992c2579e`. The scientific description and publication state are updated.
+Hosted validation-gate, large-files and artifacts are in progress at this
+first post-push snapshot; no review or inline review thread is returned.
+Those are pending, not approvals. The following final journal publication
+commit also requires its own current-head checks. No merge is claimed.
+
+Local full-PR artifact admission and 10 MiB size checks pass. The source
+metric check and all original/custody bindings remain valid. All earlier
+approval-service obstacles are resolved; no further plot upload or new
+scientific experiment is needed. Hydration instructions and the preserved
+chronology follow.
+
 # Strict-count publication: storage correction verified
 
 Update 2026-10-29T15:45Z: automatic review recovered and the same original artifact

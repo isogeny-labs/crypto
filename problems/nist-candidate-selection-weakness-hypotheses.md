@@ -314,3 +314,10 @@ The new pointer/receipt are bound separately, preserving all 51 result hashes
 and 77 previous parent lines. The temporary artifact-storage obstacle above
 is resolved. Normal push and current-head checks remain delivery steps; the
 historical and vulnerability obstructions are unchanged.
+
+2026-10-29T15:51Z delivery update: normal push of728caf607 succeeds; the connector
+confirms that exact open, non-draft, mergeable PR head. Local artifact/size
+checks pass and earlier approval-service obstacles are resolved. Hosted
+gate/size/artifacts are running and PR review has not returned; no merge or
+current-head hosted approval is claimed. The finite criterion and PDF are
+published deliverables. Historical attribution and weakness remain open.
