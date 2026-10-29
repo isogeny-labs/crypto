@@ -1050,6 +1050,47 @@ mod tests {
             };
             storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest).unwrap();
         }
+
+        // Test-only opt-in export of the already verified sealed fixture. This
+        // never changes acquisition, solver inputs, runtime dispatch or claims.
+        fn retain_checked(&self, name: &str) {
+            let Some(root) = std::env::var_os("CRYPTO_ML_CHECKED_FIXTURE_DIR") else {
+                return;
+            };
+            let root = PathBuf::from(root);
+            assert!(root.is_absolute());
+            let destination = root.join(name);
+            fs::create_dir(&destination).unwrap();
+            let cell = "cells/000000000000";
+            let manifest: CellManifest =
+                super::super::read_json(&self.source.join(cell).join("manifest.json")).unwrap();
+            let mut paths = std::collections::BTreeSet::from([
+                "run.json".to_owned(),
+                "plan.json".to_owned(),
+                "protocol.json".to_owned(),
+                format!("{cell}/manifest.json"),
+            ]);
+            paths.extend(manifest.artifacts.iter().map(|a| format!("{cell}/{}", a.path)));
+            assert!(paths.len() <= 256);
+            let mut total = 0u64;
+            for relative in paths {
+                let source = storage::contained_path(&self.source, &relative, false).unwrap();
+                let metadata = fs::symlink_metadata(&source).unwrap();
+                assert!(metadata.is_file());
+                total = total.checked_add(metadata.len()).unwrap();
+                assert!(total <= 32 * 1024 * 1024);
+                let bytes = fs::read(&source).unwrap();
+                assert_eq!(bytes.len() as u64, metadata.len());
+                storage::write_bytes(
+                    &destination,
+                    &relative,
+                    "retained-test-fixture",
+                    "native",
+                    &bytes,
+                )
+                .unwrap();
+            }
+        }
         fn partial(&self, index: u64, retained: bool) {
             let dir = if retained {
                 self.source
@@ -1153,6 +1194,7 @@ mod tests {
         let checked_export = f.root.join("checked-export");
         super::super::export::export(&f.source, &checked_export).unwrap();
         let public_features = fs::read(checked_export.join("features.jsonl")).unwrap();
+        f.retain_checked("sealed-worker");
         let mut manifest: CellManifest =
             super::super::read_json(&dir.join("manifest.json")).unwrap();
         manifest
@@ -1201,6 +1243,7 @@ mod tests {
         assert_eq!(start["raw"]["schema"], "crypto.ml-dataset.phase-start/v2");
         assert_eq!(start["training_cost_eligible"], false);
         assert_eq!(start["whole_worker_retired_instructions"], Value::Null);
+        f.retain_checked("sealed-registryless-prefix");
     }
 
     #[test]
