@@ -38,3 +38,16 @@ source/binary identities and failures. This author runs no builds or tests.
 The original corpus scope, $200 total ceiling and worker IAM/admission gates
 remain in force. Complete execution costs, broad dataset production, trained
 model efficacy and first/last-fall-degree claims remain unresolved.
+
+## Pre-build bridge-test amendment
+
+Before any combined build or fixture execution, extend the existing frozen
+large-cofactor test with a bounded m=2 native root invocation on precisely its
+existing public target and factor-base object, with private_witness still null.
+Require one retained prime-root certificate, parse it and invoke the independent
+prime root artifact verifier against the exact public/base/config objects.
+Do not demand a PDP solution, change seeds or regenerate a different fixture.
+If the configured budget censors the call, retain and assert its incomplete
+status rather than calling it completed. Preserve the original BSGS, scalar
+tamper and F4/PKM boundary assertions. This is an arithmetic-context integration
+bridge, not a full factor-base transcript/export or scientific corpus cell.
