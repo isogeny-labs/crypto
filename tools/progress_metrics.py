@@ -17,6 +17,8 @@ Sources (all committed, read at --ref unless noted):
                                 distinct original orders in the recovered FreeLIP replay
   research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
                                 independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -273,6 +275,17 @@ def nist_selection_period_work(ref, since):
 
 
 
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -364,6 +377,7 @@ def main():
     nist_selection_exact_embedding(a.ref, a.since)
     nist_selection_freelip(a.ref, a.since)
     nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)

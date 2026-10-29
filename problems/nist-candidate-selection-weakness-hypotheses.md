@@ -5,9 +5,21 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-29
-- **Latest search:** [27 October current-source and historical-record recheck](../research/nist_skip_criterion_20261025/source_check_20261027/REPORT.md)
+- **Latest search:** [29 October verified generator/coefficient census](../research/nist_skip_criterion_20261025/generator_b_execution_20261029/REPORT.md)
 
 ## Problem
+
+**Current status, 29 October:** the full declared generator/coefficient
+comparison has now run and passed separate native verification on all 21
+choices. It checks 100,548 point-trait cells, 19,152 single envelopes,
+147,875 same-field difference cells and 880 scalar checks. No exact single
+envelope separates all labels and no tested scalar recipe matches. The
+canonical P-224 x pattern 0/1/1 versus 3 holds in both views but retains eight
+other omissions. All eleven unknown historical skipped generators remain NA.
+The original four factor targets remain proved complete (84/84 records).
+The prior access blocker is resolved by testing the already-authorized
+client; earlier dated blocked/unrun notes below are historical. See the
+[current report/PDF](../research/nist_skip_criterion_20261025/generator_b_execution_20261029/REPORT.md).
 
 We cannot yet establish that the published P-224 or P-256 curve is vulnerable
 to an ordinary-input attack, or that weaknesses in earlier eligible curves
@@ -223,3 +235,28 @@ protocol with independent checking. Preserve all unknowns and failures.
 Completion would characterize the declared finite family; historical use would
 still require a decision trace or independent historical predictions.
 The current preparation/report/PDF is an additive partial deliverable.
+
+2026-10-29 actual execution: the existing authorized client authenticates,
+preparation remote GET/member verification passes and checkpoints upload.
+The earlier failure to test that access was corrected explicitly. Local exact
+analysis was declared after the supported EKS contract could not express
+the native job and project inspection was denied. No paid job, policy change
+or DLP campaign was substituted.
+
+Attempt001 is preserved: positive0, production124 at300seconds under768MiB,
+verification not attempted and zero point-trait rows. Resource diagnostics
+support an explicit frozen version2 with only the uniform address ceiling
+raised to1536MiB. Original binaries/prover and all inputs/families are unchanged.
+Attempt002 completes all three phases0 and all21choices. A separate GMP
+affine verifier checks the full finite outputs; underlying GMP integers and
+OpenSSL SHA are shared. Full raw objects pass remote GET and member checks.
+Canonical version2 export passes file verification with zero findings.
+Version1's partial export remains refused, with its missing phase disclosed.
+
+The wider finite inventory is now a verified deliverable, superseding the
+preparation's unrun status additively. No supported historical skip rule or
+applicable attack is established. The user's absence of original logs is
+recorded; do not ask for them again. New evidence or an independently
+predictive mathematical mechanism is needed for the historical claim.
+The prior six-basepoint FreeLIP RNG reconstruction remains relevant and is
+not refuted by zero matches in this different scalar-recipe family.
