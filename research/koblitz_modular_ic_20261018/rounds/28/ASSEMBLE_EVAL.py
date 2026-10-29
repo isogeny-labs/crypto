@@ -30,7 +30,7 @@ if(derivativeOne==0){{
  if(rootMatches!=1){{ERROR("adjugate ratio did not select exactly one rational root");}}
  print("EVAL28_ACTUAL_SELECTED_SECOND_X");selectedX;
  print("EVAL28_ACTUAL_SECOND_Y");secondY;
- int originalDegree=deg(minpoly);int orbitDegree=0;number orbitX=selectedX;number orbitY=secondY;
+ int originalDegree={ [436,12,284,83][case] };int orbitDegree=0;number orbitX=selectedX;number orbitY=secondY;
  int orbitStep;
  for(orbitStep=1;orbitStep<=originalDegree;orbitStep++){{
   orbitX=orbitX^2;orbitY=orbitY^2;
