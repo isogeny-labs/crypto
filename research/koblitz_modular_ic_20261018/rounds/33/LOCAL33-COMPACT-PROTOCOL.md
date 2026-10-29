@@ -1,0 +1,34 @@
+# Compact specialization of the exact LOCAL33 family (prospective)
+
+The accepted LOCAL33 generator already verified the cleared polynomial
+identities, including all51 standard-smooth products. Its expanded source
+certificate is6.2MB and product record60MB. The original degree83 point
+checker is live; do not infer terminal state or restart it because it has
+not printed a result. Preserve its eventual accepted/failed/cap receipt.
+
+This amendment changes representation of the SAME exact witness family.
+Retain the native rational F2(u)[n,l,v] generators, Tate gcd/Bezout witnesses,
+all syzygies and their Jacobian. Retain the product D(u) of every coefficient
+denominator and verify D clears every coefficient. Serialize with short=0.
+Native generic roundtrip must reproduce every object and all identities.
+
+A text-only assembler lexically renames u,n,l,v to function arguments and
+wraps these exact native expressions into a specialization procedure. The
+procedure evaluates D FIRST and rejects D=0 before any rational expression.
+A SECOND native roundtrip at the formal arguments u,n,l,v must reproduce
+the original rational family, so syntactic assembly does not stand in for
+a mathematical check. Point consumers use only this roundtripped procedure.
+
+At points the raw J,S,Jacobian and H are evaluated in the residue algebra.
+All exact point/source/plane checks, D/H unit conditions and full51product
+unit-ideal witness requirements remain. Cleared and raw families differ by
+units: J'=D*J, S'=D*S, so each cleared h*det product is D^4 times its raw
+counterpart. No proper-model or branch claim is inferred without the same
+successful local presentation certificate. Old expanded bytes are unchanged.
+
+Native4GiB/1200seconds each. Use per-attempt isolated snapshot runner to avoid
+shared-directory archive races. If the old83/5 point runs complete acceptably,
+reuse those results; do not repeat merely for counts. If they reach a terminal
+failure/cap, a fresh compact point-check invocation may use this equivalent
+certified representation under the same bounds. No coefficient box, changed
+unit tests, field expansion or cap increase. Record every original failure.
