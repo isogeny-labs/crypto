@@ -1741,8 +1741,8 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
 /// the phases a rho or kangaroo pays before its first step whatever `r` is
 /// (`setup`, `automorphism_setup`).  `None` for a method whose set-up scales
 /// with `√r` (BSGS's table, the claw's base and table) or that has none.
-/// [`row_flags`] flags a share above [`SETUP_SHARE_FLAG`]; `ecbench table`
-/// does not print that flag yet (README §12).
+/// [`row_flags`] flags a share above [`SETUP_SHARE_FLAG`], and `ecbench
+/// table` prints it in its `flags` column.
 pub fn setup_share(family: &str, phases: &[PhaseRecord], total: f64) -> Option<f64> {
     if !matches!(family, "rho" | "kangaroo")
         || total.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
@@ -1800,6 +1800,32 @@ pub fn row_flags(
         ));
     }
     flags
+}
+
+/// [`row_flags`] for a table row pooling several runs: each phase's GAE and
+/// the totals are summed over `runs` (phases, `total_gae`) before the share
+/// is taken, so the share is that of the row's summed `S`.
+pub fn pooled_row_flags(
+    curve_family: &str,
+    log2_r: f64,
+    method_family: &str,
+    runs: &[(&[PhaseRecord], f64)],
+) -> Vec<String> {
+    let mut pooled: Vec<PhaseRecord> = Vec::new();
+    for (phases, _) in runs {
+        for p in phases.iter() {
+            match pooled.iter_mut().find(|q| q.name == p.name) {
+                Some(q) => q.gae += p.gae,
+                None => pooled.push(PhaseRecord {
+                    name: p.name.clone(),
+                    gae: p.gae,
+                    ..Default::default()
+                }),
+            }
+        }
+    }
+    let total: f64 = runs.iter().map(|(_, t)| t).sum();
+    row_flags(curve_family, log2_r, method_family, &pooled, total)
 }
 
 /// A tuned rho run reported under the `_v2` accounting: the same phases as
@@ -7633,6 +7659,13 @@ mod accounting_rules_tests {
         let f = row_flags("prime", 24.0, "bsgs", &phases(30.0, 70.0), 100.0);
         assert_eq!(f.len(), 1, "{f:?}");
         assert!(row_flags("prime", 26.0, "bsgs", &phases(30.0, 70.0), 100.0).is_empty());
+        // Pooled: 5/100 and 25/100 are 30/200 = 15%, flagged though one run
+        // alone is under 10%.
+        let (a, b) = (phases(5.0, 95.0), phases(25.0, 75.0));
+        let f = pooled_row_flags("koblitz", 40.0, "rho", &[(&a, 100.0), (&b, 100.0)]);
+        assert_eq!(f.len(), 1, "{f:?}");
+        assert!(f[0].contains("15%"), "{f:?}");
+        assert!(pooled_row_flags("koblitz", 40.0, "rho", &[(&a, 100.0)]).is_empty());
     }
 
     /// Every method of the accounting work, frozen and `_v2`, has a case
