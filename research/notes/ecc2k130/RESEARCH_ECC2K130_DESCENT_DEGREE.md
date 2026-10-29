@@ -95,6 +95,22 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
      degree-4 row (`2^68.43`) is contradicted.
    - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+   - **Update 2026-10-23.** Another session measured m = 4, ℓ = 6 (N = 54)
+     on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): the degree-4 closure
+     refutes on 2 of 2 unsatisfiable draws. So **m·ℓ ≥ 21 is refuted and
+     ℓ = 7 is what survives.** The m = 4 degree-4 row stays contradicted,
+     because the rise at ℓ = 7 is still far below the priced ℓ = 33.
+9. **Guess-then-degree-4 survives to ℓ = 8, with k ≤ 4 (§9, §10).**
+   - At m = 3, ℓ = 8, four guessed variables make degree 4 refute on all 64
+     branches of 4 draws. The linear rule `m·(ℓ−6)` (6 guesses) fails.
+   - At the priced m = 4, ℓ = 33 cell the hybrid beats degree 5 only if
+     k ≤ 6. Linear growth in ℓ gives about 105; a bounded k is not
+     excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
+10. **Three guesses at ℓ = 8 do not suffice for variables 7, 15, 23 (§11).**
+    - Three of four draws have a branch that saturates degree 4; four guesses
+      (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
+      pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
+      a result. No row moves.
 
 ## 1. What is measured
 
@@ -481,6 +497,48 @@ m = 3, ℓ = 7 draws that do not refute at degree 4.
     far worse than degree 5, so no row is added.
   - The measurement that would decide it is k at ℓ = 8 and 9.
 - **No row beats rho.**
+
+## 10. Guesses at ℓ = 8 (2026-10-22)
+
+`research/dreg_closure_guess_20261022/` guessed four variables (one per
+summand and one intermediate coordinate) on 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 46), all 16 branches each.
+
+- **All 64 branches refute at degree 4**, and the dimension-6 positive
+  control refutes on 4 of 4. So k ≤ 4 at ℓ = 8; fewer is not measurable
+  in the 16 GB container.
+- **The price.** At w = 1 and the m = 4, ℓ = 33 cell (N = 394), the oracle
+  ratio `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2 at k = 0, 5.09 at k = 4,
+  1.30 at k = 6 and 0.66 at k = 7. The hybrid beats degree 5 there only if
+  k ≤ 6.
+- **What would move a row:** k measured to stay bounded as ℓ grows (k = 3
+  at ℓ = 8, then ℓ = 9). Even then its best case is the degree-4 row
+  `2^68.43`, `2^+7.62` over rho. The free-oracle floor binds every row.
+
+## 11. Three guesses at ℓ = 8 (2026-10-23)
+
+`research/dreg_closure_guess3_20261023/` guessed variables 7, 15 and 23 (the
+top coordinate of each summand) on the same 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 43, 136,698 columns), 8 branches per draw.
+
+- **Three do not suffice for this set.** Draws 0, 3 and 5 each have a branch
+  that saturates degree 4 without refuting; draw 6 refutes on 8 of 8. The
+  controls are valid (the ℓ = 7 identity control matches its committed
+  record; the dimension-6 control refutes on 4 of 4).
+- **Four did (§10).** So the set matters or the count does, and this study
+  does not separate them.
+- **Reading (not registered).** The 3-set leaves each summand in dimension 7
+  at N = 43: structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (§7, §8). The result fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8.
+  Extended linearly that is 105 at the priced m = 4, ℓ = 33 cell, against
+  the break-even of 6 with degree 5. It rests on two values of ℓ and is the
+  first evidence leaning toward a count that grows with ℓ. The matched null
+  (unspecialised (22, 7), same matrix size) and a 3-set that leaves one
+  summand at dimension 8 would test it.
+- **The price is unchanged.** At the m = 4, ℓ = 33 cell (N = 394) the ratio
+  `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
+  k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
+- **No row moves** and none beats rho.
 
 ## Scope and disclosures
 
