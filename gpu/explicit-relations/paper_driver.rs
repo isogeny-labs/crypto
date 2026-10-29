@@ -192,7 +192,9 @@ impl GpuOracle {
             return Err(Error::Verification);
         }
         let points = fields[2..]
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .map(|p| Ok(Some((integer(&p[0])?, integer(&p[1])?))))
             .collect::<Result<Vec<_>, Error>>()?;
         if points.iter().any(|&p| !self.curve.contains(p))
