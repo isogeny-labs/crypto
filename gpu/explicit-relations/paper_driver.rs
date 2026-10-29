@@ -3,6 +3,8 @@
 #![allow(dead_code)] // The included reference also exposes its CPU-only entry.
 #[path = "../../src/cryptanalysis/hashed_ecdl.rs"]
 mod paper;
+// Preserve the included reference's public export in this standalone crate.
+pub use paper::tensor;
 
 use paper::{Curve, DecompositionOracle, Error, HashBase, Point};
 use std::fmt::Write as _;
@@ -345,7 +347,7 @@ fn selftest(executable: &str) -> Result<(), Error> {
             return Err(Error::Verification);
         }
     }
-    println!("PASS GPU hash bases, all-target CPU oracle differential, deterministic replay, complete reduction certificates");
+    println!("PASS service hash bases, all-target CPU oracle differential, deterministic replay, complete reduction certificates");
     Ok(())
 }
 fn run() -> Result<(), Box<dyn std::error::Error>> {

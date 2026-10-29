@@ -20,7 +20,9 @@ grep -Eq 'RTX PRO 6000' "$out/gpu.csv"
 nvcc --version
 c++ --version
 rustc --version
+rustup component add clippy
 make test
 make ARCH=sm_120 test-cuda
+cargo clippy --locked --release --manifest-path Cargo.toml --target-dir build/cargo -- -D warnings
 timeout 600 compute-sanitizer --tool memcheck --error-exitcode 86 build/explicit-relations-cuda --self-test
 echo 'RTX PRO 6000 build, host reference, CUDA differential, reduction replay and memcheck passed'
