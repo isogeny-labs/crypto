@@ -69,8 +69,19 @@ struct LiveSink {
     sequence: u64,
 }
 thread_local! { static LIVE_SINK:RefCell<Option<LiveSink>>=const { RefCell::new(None) }; }
+#[cfg(test)]
+thread_local! { static FAIL_PRIME_LIFT_EVENT:std::cell::Cell<bool>=const { std::cell::Cell::new(false) }; }
 impl LiveSink {
     fn event(&mut self, event: &Value) -> Result<(), String> {
+        #[cfg(test)]
+        if event["event"]["kind"] == "group_lift"
+            && FAIL_PRIME_LIFT_EVENT.with(|flag| flag.replace(false))
+        {
+            // Actual write failure on this event stream; other artifact paths
+            // remain writable, as in the regression's canonical worker writer.
+            self.events = File::open(self.directory.join("events.jsonl"))
+                .map_err(|e| format!("inject readonly event stream: {e}"))?;
+        }
         self.sequence += 1;
         let bytes = serde_json::to_vec(&json!({"sequence":self.sequence,"event":event}))
             .map_err(|e| e.to_string())?;
@@ -166,7 +177,25 @@ pub fn solve_with_event_sink(
     live_event(
         &json!({"kind":"solver_begin","solver":config.solver,"family":config.family,"n":config.n,"m":config.m,"work_limit":config.work_limit,"degree_bound":config.degree_bound,"format":"ml-dataset.live-events/v1","sync_policy":"fsync every emitted event and complete payload"}),
     )?;
-    let result = solve(config, case);
+    let mut result = solve(config, case);
+    match &mut result {
+        Ok(data) if is_prime_chain(data) => {
+            flush_prime_chain_payloads(data);
+            let terminal_write = if data.outcome.get("live_persistence_errors").is_none() {
+                live_event(&json!({"kind":"solver_return","outcome":data.outcome,"error":null}))
+            } else {
+                Ok(())
+            };
+            if let Err(error) = terminal_write {
+                record_prime_chain_persistence_error(data, "solver_return", &error);
+            }
+            // Canonical worker output is a separate persistence attempt. Keep
+            // verified mathematics and staged artifacts even if live tracing
+            // failed; the explicit error prevents a durable-prefix claim.
+            return result;
+        }
+        _ => {}
+    }
     if let Ok(data) = &result {
         for payload in &data.artifacts {
             live_payload(payload)?;
@@ -186,7 +215,7 @@ pub fn capabilities() -> Value {
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,2],"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; native prime F4 for p<2^32 plus bounded finite-domain extraction","trace":"original systems (also retained for larger unsupported prime moduli), reduced rows, splitting nodes or useful-row replay schedule","gaps":["prime-field elimination at p>=2^32","internal pivot operations at every node","complete critical-pair stream"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["prime-field elimination at p>=2^32","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"each polynomial, returned roots, lift checks","gaps":["internal factorization and gcd states"]},
@@ -397,7 +426,22 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "enumerate" | "pdp" => enumerate(config, &group, &points, &target)?,
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
-        "f4" if matches!(group, Group::Prime(_)) => prime_f4(config, &group, &points, &target)?,
+        "f4" if matches!(group, Group::Prime(_)) => {
+            let result = prime_f4(config, &group, &points, &target)?;
+            if let Some(input) = result
+                .artifacts
+                .iter()
+                .find(|a| a.path == "prime-f4-input.json")
+                .filter(|_| config.m > 2)
+            {
+                verify_prime_f4_chain_input(
+                    &case.public_instance,
+                    &case.factor_base,
+                    &serde_json::from_slice(&input.bytes).map_err(|e| e.to_string())?,
+                )?;
+            }
+            result
+        }
         "weil" | "weil-descent" | "f4" | "f5" => boolean_solve(config, &group, &points, &target)?,
         "f6" => f6_solve(config, &group, &points, &target)?,
         "root" => root_solve(config, &group, &points, &target)?,
@@ -419,12 +463,22 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "inversion_count_includes_its_mul_and_square_cost":true,
         "complete_machine_instruction_count":false
     });
-    save(
-        &mut result,
-        "solver-domain.json",
-        "exact-signed-factor-base",
-        &json!({"points":points.iter().map(Element::json).collect::<Vec<_>>(),"negation_closed":true,"repetitions_allowed":true}),
-    )?;
+    let solver_domain = json!({"points":points.iter().map(Element::json).collect::<Vec<_>>(),"negation_closed":true,"repetitions_allowed":true});
+    if is_prime_chain(&result) {
+        result.artifacts.push(ArtifactPayload::json(
+            "solver-domain.json",
+            "exact-signed-factor-base",
+            &solver_domain,
+        )?);
+        flush_prime_chain_payloads(&mut result);
+    } else {
+        save(
+            &mut result,
+            "solver-domain.json",
+            "exact-signed-factor-base",
+            &solver_domain,
+        )?;
+    }
     Ok(result)
 }
 
@@ -1516,6 +1570,532 @@ fn pkm_solve(
     Ok(data)
 }
 
+const PRIME_CHAIN_STRATEGY: &str = "prime-affine-s3-chain-f4-visitor/v1";
+const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached";
+
+fn is_prime_chain(data: &SolverData) -> bool {
+    data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
+}
+fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
+    data.outcome["live_persistence_complete"] = json!(false);
+    data.outcome["exposed_event_stream_complete"] = json!(false);
+    data.outcome["canonical_artifact_write_required"] = json!(true);
+    data.outcome["persistence_scope"] = json!("Live persistence failed; staged artifacts require a separate successful canonical worker write. Total storage failure does not establish durability.");
+    if data.outcome.get("live_persistence_errors").is_none() {
+        data.outcome["live_persistence_errors"] = json!([]);
+    }
+    data.outcome["live_persistence_errors"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({"phase":phase,"error":error.chars().take(512).collect::<String>()}));
+}
+fn flush_prime_chain_payloads(data: &mut SolverData) {
+    if data.outcome.get("live_persistence_errors").is_some() {
+        return;
+    }
+    let failure = data.artifacts.iter().find_map(|payload| {
+        live_payload(payload)
+            .err()
+            .map(|error| (payload.path.clone(), error))
+    });
+    if let Some((path, error)) = failure {
+        record_prime_chain_persistence_error(data, &path, &error);
+    }
+}
+
+#[derive(Clone, Copy)]
+struct PrimeChainLimits {
+    events: u64,
+    bytes: usize,
+    lift_additions: u64,
+    time: Duration,
+}
+impl From<&CaseConfig> for PrimeChainLimits {
+    fn from(config: &CaseConfig) -> Self {
+        Self {
+            events: config.work_limit.min(TRACE_EVENT_CAP),
+            bytes: TRACE_BYTE_CAP / 4,
+            lift_additions: config.work_limit.min(TRACE_EVENT_CAP),
+            time: Duration::from_secs(5),
+        }
+    }
+}
+
+/// Bound serialization itself, before constructing an owned JSON tree. Native
+/// F4 still materializes its own rows; this is not a native matrix memory cap.
+struct LimitedJsonWriter {
+    bytes: Vec<u8>,
+    limit: usize,
+}
+impl Write for LimitedJsonWriter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() > self.limit.saturating_sub(self.bytes.len()) {
+            return Err(std::io::Error::other(PRIME_CHAIN_TRACE_CAP));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+#[derive(Default)]
+struct PrimeChainEvents {
+    bytes: Vec<u8>,
+    events: u64,
+    error: Option<String>,
+}
+impl PrimeChainEvents {
+    fn append<T: serde::Serialize>(
+        &mut self,
+        event: &T,
+        limits: PrimeChainLimits,
+    ) -> Result<(), String> {
+        if let Some(error) = &self.error {
+            return Err(error.clone());
+        }
+        let result: Result<(), String> = (|| {
+            if self.events >= limits.events || self.bytes.len() >= limits.bytes {
+                return Err(PRIME_CHAIN_TRACE_CAP.into());
+            }
+            #[derive(serde::Serialize)]
+            struct Row<'a, T> {
+                schema: &'static str,
+                sequence: u64,
+                event: &'a T,
+            }
+            let row = Row {
+                schema: "ml-dataset.prime-f4-chain-event/v1",
+                sequence: self.events + 1,
+                event,
+            };
+            let mut writer = LimitedJsonWriter {
+                bytes: vec![],
+                limit: limits.bytes.saturating_sub(self.bytes.len() + 1),
+            };
+            serde_json::to_writer(&mut writer, &row).map_err(|e| {
+                if e.is_io() {
+                    PRIME_CHAIN_TRACE_CAP.to_string()
+                } else {
+                    format!("serialize prime F4 trace: {e}")
+                }
+            })?;
+            // Only this bounded event is materialized for the existing sink.
+            let value: Value = serde_json::from_slice(&writer.bytes).map_err(|e| e.to_string())?;
+            live_event(&value)?;
+            self.bytes.extend_from_slice(&writer.bytes);
+            self.bytes.push(b'\n');
+            self.events += 1;
+            Ok(())
+        })();
+        if let Err(error) = &result {
+            self.error = Some(error.clone());
+        }
+        result
+    }
+}
+
+fn prime_chain_polynomials(
+    m: usize,
+    p: u64,
+    a: u64,
+    b: u64,
+    target_x: u64,
+    codes: &[u64],
+) -> Result<Vec<crate::cryptanalysis::f4_fp::Poly>, String> {
+    use crate::cryptanalysis::groebner_f4::{cmp_monomial, Ordering};
+    if !(3..=15).contains(&m)
+        || p < 5
+        || [a, b, target_x].iter().any(|&x| x >= p)
+        || codes.is_empty()
+        || codes.len() > 32
+        || codes.iter().any(|&x| x >= p)
+        || codes.windows(2).any(|w| w[0] >= w[1])
+    {
+        return Err("invalid prime affine-chain parameters or canonical domain".into());
+    }
+    let n_vars = 2 * m - 2;
+    let mul = |x: u64, y: u64| ((u128::from(x) * u128::from(y)) % u128::from(p)) as u64;
+    let add = |x: u64, y: u64| ((u128::from(x) + u128::from(y)) % u128::from(p)) as u64;
+    let neg = |x: u64| if x == 0 { 0 } else { p - x };
+    let canonical = |terms: Vec<(Vec<u32>, u64)>| {
+        let mut merged = std::collections::BTreeMap::new();
+        for (exponents, coefficient) in terms {
+            let old = merged.entry(exponents).or_insert(0u64);
+            *old = add(*old, coefficient);
+        }
+        let mut terms: Vec<_> = merged.into_iter().filter(|(_, c)| *c != 0).collect();
+        terms.sort_by(|x, y| cmp_monomial(&y.0, &x.0, Ordering::Grevlex));
+        terms
+    };
+    // Symmetric expansion of the odd-characteristic S3 formula. None fixes
+    // that local coordinate to the public target x; no native narrow reducer.
+    let s3 = |variables: [Option<usize>; 3]| {
+        let raw = [
+            ([2, 2, 0], 1),
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([2, 1, 1], neg(2)),
+            ([1, 2, 1], neg(2)),
+            ([1, 1, 2], neg(2)),
+            ([1, 1, 0], neg(mul(2, a))),
+            ([1, 0, 1], neg(mul(2, a))),
+            ([0, 1, 1], neg(mul(2, a))),
+            ([1, 0, 0], neg(mul(4, b))),
+            ([0, 1, 0], neg(mul(4, b))),
+            ([0, 0, 1], neg(mul(4, b))),
+            ([0, 0, 0], mul(a, a)),
+        ];
+        canonical(
+            raw.into_iter()
+                .map(|(powers, mut coefficient)| {
+                    let mut exponents = vec![0; n_vars];
+                    for (axis, &power) in powers.iter().enumerate() {
+                        if let Some(variable) = variables[axis] {
+                            exponents[variable] += power;
+                        } else {
+                            for _ in 0..power {
+                                coefficient = mul(coefficient, target_x);
+                            }
+                        }
+                    }
+                    (exponents, coefficient)
+                })
+                .collect(),
+        )
+    };
+    let mut polynomials = vec![s3([Some(0), Some(1), Some(m)])];
+    for auxiliary in 1..m - 2 {
+        polynomials.push(s3([
+            Some(m + auxiliary - 1),
+            Some(auxiliary + 1),
+            Some(m + auxiliary),
+        ]));
+    }
+    polynomials.push(s3([Some(2 * m - 3), Some(m - 1), None]));
+    let mut membership = vec![1u64];
+    for &x in codes {
+        let mut next = vec![0; membership.len() + 1];
+        for (power, &coefficient) in membership.iter().enumerate() {
+            next[power] = add(next[power], neg(mul(coefficient, x)));
+            next[power + 1] = add(next[power + 1], coefficient);
+        }
+        membership = next;
+    }
+    for leaf in 0..m {
+        polynomials.push(canonical(
+            membership
+                .iter()
+                .enumerate()
+                .map(|(power, &coefficient)| {
+                    let mut exponents = vec![0; n_vars];
+                    exponents[leaf] = power as u32;
+                    (exponents, coefficient)
+                })
+                .collect(),
+        ));
+    }
+    Ok(polynomials)
+}
+
+struct PrimeChainInput {
+    modulus: u64,
+    polynomials: Vec<crate::cryptanalysis::f4_fp::Poly>,
+    domains: Vec<Option<Vec<u64>>>,
+    artifact: Value,
+}
+fn prime_chain_input(
+    m: usize,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+) -> Result<PrimeChainInput, String> {
+    let Group::Prime(curve) = group else {
+        return Err("prime chain requires a prime curve".into());
+    };
+    let p = curve.p.to_u64().ok_or("prime chain modulus exceeds u64")?;
+    let a = curve
+        .a
+        .to_u64()
+        .ok_or("prime chain coefficient exceeds u64")?;
+    let b = curve
+        .b
+        .to_u64()
+        .ok_or("prime chain coefficient exceeds u64")?;
+    let target_x = target
+        .x()
+        .and_then(|x| x.to_u64())
+        .ok_or("prime chain requires an affine target")?;
+    let mut codes: Vec<_> = domain
+        .iter()
+        .map(|point| {
+            point
+                .x()
+                .and_then(|x| x.to_u64())
+                .ok_or("prime chain domain is not affine u64")
+        })
+        .collect::<Result<_, _>>()?;
+    codes.sort_unstable();
+    codes.dedup();
+    let polynomials = prime_chain_polynomials(m, p, a, b, target_x, &codes)?;
+    let domains: Vec<_> = (0..2 * m - 2)
+        .map(|i| (i < m).then(|| codes.clone()))
+        .collect();
+    let variables: Vec<_> = (0..m)
+        .map(|i| format!("x{i}"))
+        .chain((0..m - 2).map(|i| format!("u{i}")))
+        .collect();
+    let roles: Vec<_> = (0..2*m-2).map(|i|json!({"index":i,"name":variables[i],"role":if i<m{"factor_base_leaf"}else{"unrestricted_affine_auxiliary"},"domain":if i<m{"factor_base_x"}else{"all_Fp"}})).collect();
+    let artifact = json!({
+        "schema":"ml-dataset.prime-f4-chain-input/v1","strategy":PRIME_CHAIN_STRATEGY,
+        "m":m,"n_vars":2*m-2,"modulus":p.to_string(),"curve":{"a":a.to_string(),"b":b.to_string()},
+        "target":target.json(),"target_x":target_x.to_string(),"ring":"Fp[x0,...,x(m-1),u0,...,u(m-3)]",
+        "variables":variables,"variable_roles":roles,"monomial_order":"degrevlex",
+        "domains":domains,"factor_base_x":codes.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "signed_factor_base":domain.iter().map(Element::json).collect::<Vec<_>>(),
+        "polynomials":polynomials.iter().map(|f|f.iter().map(|(e,c)|json!({"exponents":e,"coefficient":c.to_string()})).collect::<Vec<_>>()).collect::<Vec<_>>(),
+        "chain_equation_count":m-1,"membership_equation_count":m,"membership_variables":(0..m).collect::<Vec<_>>(),
+        "native_normalization_applied":false,"coefficient_arithmetic":"u128 modular intermediates; merged nonzero terms, leading-first, no monic rescaling",
+        "native_modulus_limit_exclusive":"4294967296","affine_chain_exceptional_infinity_branches_covered":false,
+        "negative_scope":"encoding-relative only; no exhaustive PDP nonexistence claim"
+    });
+    Ok(PrimeChainInput {
+        modulus: p,
+        polynomials,
+        domains,
+        artifact,
+    })
+}
+
+/// Reconstruct the public chain encoding and domain map, without solving or
+/// consulting construction witnesses. Unknown metadata cannot replace a field.
+pub(super) fn verify_prime_f4_chain_input(
+    public: &Value,
+    factor_base: &Value,
+    artifact: &Value,
+) -> Result<(), String> {
+    let m = public["m"]
+        .as_u64()
+        .and_then(|m| usize::try_from(m).ok())
+        .ok_or("invalid public chain arity")?;
+    let case = CaseData {
+        public_instance: public.clone(),
+        factor_base: factor_base.clone(),
+        private_witness: Value::Null,
+    };
+    let group = Group::read(&case)?;
+    let target = group.point(&public["target"])?;
+    if !group.on_curve(&target) {
+        return Err("prime chain target is off curve".into());
+    }
+    let domain = domain(&group, &case)?;
+    let expected = prime_chain_input(m, &group, &domain, &target)?;
+    for (key, value) in expected
+        .artifact
+        .as_object()
+        .ok_or("invalid internal chain schema")?
+    {
+        if artifact.get(key) != Some(value) {
+            return Err(format!("prime F4 chain input differs at {key}"));
+        }
+    }
+    Ok(())
+}
+
+fn prime_f4_chain(
+    config: &CaseConfig,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+    limits: PrimeChainLimits,
+) -> Result<SolverData, String> {
+    use crate::cryptanalysis::f4_fp::{self, F4Options};
+    use crate::cryptanalysis::groebner_f4::Ordering;
+    if target.x().is_none() {
+        return Ok(unsupported(
+            "Affine S3 chain requires an affine target; infinity branches are not encoded",
+        ));
+    }
+    let input = match prime_chain_input(config.m, group, domain, target) {
+        Ok(input) => input,
+        Err(error) => return Ok(unsupported(&error)),
+    };
+    let mut data = SolverData {
+        outcome: outcome("partial", "Affine S3-chain F4 search is encoding-relative"),
+        artifacts: vec![],
+    };
+    data.outcome["strategy"] = json!(PRIME_CHAIN_STRATEGY);
+    data.outcome["exhaustive_no_decomposition"] = json!(false);
+    data.outcome["native_backend_invoked"] = json!(false);
+    data.outcome["algebra_completed"] = json!(false);
+    data.outcome["encoding_search_completed"] = json!(false);
+    save(
+        &mut data,
+        "prime-f4-input.json",
+        "complete-prime-field-polynomial-system",
+        &input.artifact,
+    )?;
+    if input.modulus >= 1u64 << 32 {
+        data.outcome["status"] = json!("unsupported");
+        data.outcome["reason"]=json!("Native prime F4 requires p<2^32; exact affine-chain and leaf-membership equations retained using u128 arithmetic without invoking elimination");
+        data.outcome["termination"] = json!("unsupported_native_modulus");
+        return Ok(data);
+    }
+    let mut opts =
+        F4Options::new(Ordering::Grevlex, config.degree_bound.min(12)).with_budget(limits.time);
+    opts.max_pairs_per_step = Some(config.work_limit.clamp(1, 256) as usize);
+    let events = RefCell::new(PrimeChainEvents::default());
+    let mut found = None;
+    let mut lift_additions = 0u64;
+    let mut lift_candidates = 0u64;
+    let mut lift_exhausted = false;
+    let mut truncated_native_calls = 0usize;
+    let mut native_pairs_above_bound = 0usize;
+    let report = f4_fp::solve_visit_traced(
+        &input.polynomials,
+        input.domains.len(),
+        input.modulus,
+        &opts,
+        &input.domains,
+        |assignment| {
+            lift_candidates += 1;
+            let xs: Vec<_> = assignment[..config.m]
+                .iter()
+                .copied()
+                .map(BigUint::from)
+                .collect();
+            let (witness, adds, exhausted) = lift(
+                group,
+                domain,
+                &xs,
+                target,
+                limits.lift_additions.saturating_sub(lift_additions),
+            );
+            lift_additions += adds;
+            lift_exhausted |= exhausted;
+            // Preserve the independently verified positive before a fallible
+            // observation write: trace censoring does not invalidate a witness.
+            if witness.is_some() {
+                found = witness;
+            }
+            let row = json!({"kind":"group_lift","candidate":lift_candidates,"leaf_x":assignment[..config.m],"group_lift_verified":found.is_some(),"group_add_calls":adds,"lift_budget_exhausted":exhausted});
+            let trace_failed = events.borrow_mut().append(&row, limits).is_err();
+            found.is_some() || exhausted || trace_failed
+        },
+        |event| {
+            if let f4_fp::VisitEvent::NativeResult { report, trace, .. } = &event {
+                native_pairs_above_bound =
+                    native_pairs_above_bound.saturating_add(report.pairs_above_bound);
+                if report.pairs_above_bound > 0
+                    || report.timed_out
+                    || report.staircase_at_stop.is_some()
+                    || trace.stopped
+                {
+                    truncated_native_calls += 1;
+                }
+            }
+            events.borrow_mut().append(&event, limits)
+        },
+    )?;
+    let events = events.into_inner();
+    let trace_error = events.error.as_deref().or(report.trace_error.as_deref());
+    let termination = if trace_error == Some(PRIME_CHAIN_TRACE_CAP) {
+        "trace_budget_exhausted"
+    } else if trace_error.is_some() {
+        "trace_sink_error"
+    } else if lift_exhausted {
+        "lift_budget_exhausted"
+    } else if report.timed_out {
+        "native_deadline"
+    } else if found.is_some() {
+        "verified_positive_stop"
+    } else if report.complete {
+        "encoding_search_complete"
+    } else {
+        "native_incomplete"
+    };
+    let summary = json!({"schema":"ml-dataset.prime-f4-chain-result/v1","strategy":PRIME_CHAIN_STRATEGY,
+        "termination":termination,"native_report":report,"trace_error":trace_error,"trace_events":events.events,"trace_bytes":events.bytes.len(),
+        "limits":{"events":limits.events,"bytes":limits.bytes,"group_lift_add_calls":limits.lift_additions,"native_deadline_milliseconds":limits.time.as_millis(),"degree_bound":opts.max_degree,"pairs_per_batch":opts.max_pairs_per_step},
+        "limit_scope":"work_limit bounds emitted events and separate group-lift additions; pair limit is batch width, not total native work; outer supervisor also bounds process lifetime/memory",
+        "group_lift_candidates":lift_candidates,"group_lift_add_calls":lift_additions,"group_lift_budget_exhausted":lift_exhausted,
+        "native_calls_with_truncation_or_stop":truncated_native_calls,"native_pairs_above_degree_bound":native_pairs_above_bound,
+        "encoding_search_completed":report.complete,"encoding_completion_implies_complete_groebner_basis":false,
+        "pdp_witness_verified":found.is_some(),"exhaustive_no_decomposition":false,
+        "trace_gaps":["Useful-row traces omit zero rows and private pivot operations","Internal univariate factorization/GCD states are not exposed","Native rows are materialized before bounded event serialization; no whole-call checkpoint recovery","Observed degrees are not exact first/last fall degrees"]});
+    let payload = ArtifactPayload {
+        path: "prime-f4-chain-events.jsonl".into(),
+        role: "restricted-native-prime-f4-recursion-and-lift-events".into(),
+        encoding: "jsonl".into(),
+        bytes: events.bytes,
+    };
+    data.artifacts.push(payload);
+    data.artifacts.push(ArtifactPayload::json(
+        "prime-f4-chain-result.json",
+        "restricted-native-prime-f4-chain-termination-and-counters",
+        &summary,
+    )?);
+    data.outcome["native_backend_invoked"] = json!(report.f4_runs > 0);
+    data.outcome["termination"] = json!(termination);
+    data.outcome["encoding_search_completed"] = json!(report.complete);
+    data.outcome["algebra_completed"] = json!(
+        report.complete
+            && report.f4_runs > 0
+            && truncated_native_calls == 0
+            && trace_error.is_none()
+    );
+    data.outcome["algebra_completed_scope"]=json!("All visited native bases and the full encoding traversal completed; distinct from encoding_search_completed, which can hold after degree-truncated elimination");
+    data.outcome["lift_completed"] = json!(!lift_exhausted);
+    data.outcome["lift_completed_scope"]=json!("Every attempted candidate lift completed within its own budget; does not assert all roots or PDP decompositions were attempted");
+    data.outcome["exposed_event_stream_complete"] = json!(trace_error.is_none());
+    data.outcome["trace_gaps"] = summary["trace_gaps"].clone();
+    data.outcome["counters"] = json!({"recursive_native_f4_runs":report.f4_runs,"native_elimination_fp_multiplies":report.field_ops,"native_domain_evaluations":report.domain_evaluations,"native_factored_univariates":report.factored_univariates,"native_root_finder_coefficient_multiplications":report.root_field_multiplications,"native_full_field_branches":report.full_field_branches,"equation_checked_candidates":report.solutions_visited,"group_lift_candidates":lift_candidates,"group_lift_add_calls":lift_additions,"persisted_trace_events":events.events});
+    if let Some(witness) = found {
+        let mut sum = group.zero();
+        for point in &witness {
+            if !group.on_curve(point) || !domain.contains(point) {
+                return Err("prime-chain witness outside actual signed domain".into());
+            }
+            sum = group.add(&sum, point);
+        }
+        if &sum != target || witness.len() != config.m {
+            return Err("prime-chain witness group replay failed".into());
+        }
+        data.outcome["status"] = json!("verified");
+        data.outcome["pdp_witness_verified"] = json!(true);
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["reason"]=json!("A signed factor-base decomposition was independently replayed in the curve group; trace persistence is reported separately");
+        let payload = ArtifactPayload::json(
+            "pdp-witness.json",
+            "independently-verified-pdp",
+            &json!({"summands":witness.iter().map(Element::json).collect::<Vec<_>>(),"target":target.json(),"sum":sum.json(),"replay_group_add_calls":witness.len()}),
+        )?;
+        // Place the certificate before final trace artifacts for successful
+        // flushes; construction is independent of the live stream's health.
+        data.artifacts.insert(1, payload);
+    } else if report.complete && trace_error.is_none() && !lift_exhausted {
+        data.outcome["solver_completed"] = json!(true);
+        data.outcome["reason"]=json!("The supplied affine-chain encoding search completed without a verified lift; exceptional infinity branches prevent a general PDP nonexistence claim");
+    } else {
+        data.outcome["status"] = json!(if termination == "trace_sink_error" {
+            "partial"
+        } else {
+            "budget_exhausted"
+        });
+        data.outcome["reason"] = json!(format!(
+            "Affine-chain search stopped with {termination}; no PDP nonexistence claim"
+        ));
+    }
+    if termination == "trace_sink_error" {
+        record_prime_chain_persistence_error(
+            &mut data,
+            "recursive_event_stream",
+            trace_error.unwrap_or("unknown trace sink error"),
+        );
+    }
+    Ok(data)
+}
+
 fn prime_f4(
     config: &CaseConfig,
     group: &Group,
@@ -1525,9 +2105,13 @@ fn prime_f4(
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
     if config.m != 2 {
-        return Ok(unsupported(
-            "Prime F4 finite-domain S3 adapter currently supports m=2",
-        ));
+        return prime_f4_chain(
+            config,
+            group,
+            domain,
+            target,
+            PrimeChainLimits::from(config),
+        );
     }
     let Group::Prime(curve) = group else {
         unreachable!()
@@ -2128,6 +2712,443 @@ mod tests {
                 &label
             )
             .is_err());
+        }
+    }
+
+    fn tiny_prime_chain_case(m: usize, twist: bool) -> (CaseConfig, CaseData) {
+        // E/F7: y²=x³+3, P=(1,2), order 13. The d=3 quadratic twist
+        // has B=4 and P=(0,2) of order 3. No construction scalar is saved.
+        let (b, x, order): (u64, u64, u64) = if twist { (4, 0, 3) } else { (3, 1, 13) };
+        let mut cfg = config("prime", "f4");
+        cfg.n = 3;
+        cfg.m = m;
+        cfg.twist = twist;
+        cfg.work_limit = 10_000;
+        let point = json!({"x":x.to_string(),"y":"2"});
+        let mut case = CaseData {
+            public_instance: json!({"family":"prime","n":3,"m":m,"twist":twist,
+                "field":{"modulus":"7","characteristic":"7","degree":1},
+                "curve":{"a":"0","b":b.to_string(),"group_order":order.to_string(),"subgroup_order":order.to_string(),"cofactor":"1"},
+                "generator":point,"target":point}),
+            private_witness: Value::Null,
+            factor_base: json!({"rule":"explicit-public-software-fixture","points":[point]}),
+        };
+        let group = Group::read(&case).unwrap();
+        let p = group.point(&point).unwrap();
+        assert!(group.on_curve(&p));
+        assert_eq!(group.mul(&p, order), group.zero());
+        let summands: Vec<_> = (0..m)
+            .map(|i| {
+                if twist && i >= 2 && i % 2 == 0 {
+                    group.neg(&p)
+                } else {
+                    p.clone()
+                }
+            })
+            .collect();
+        let target = summands
+            .iter()
+            .fold(group.zero(), |sum, p| group.add(&sum, p));
+        assert_ne!(target, group.zero());
+        case.public_instance["target"] = target.json();
+        (cfg, case)
+    }
+
+    fn assert_prime_equations_at(artifact: &Value, coordinates: &[BigUint]) {
+        let modulus: BigUint = artifact["modulus"].as_str().unwrap().parse().unwrap();
+        for polynomial in artifact["polynomials"].as_array().unwrap() {
+            let value =
+                polynomial
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .fold(BigUint::from(0u8), |sum, term| {
+                        let coefficient: BigUint =
+                            term["coefficient"].as_str().unwrap().parse().unwrap();
+                        let exponents = term["exponents"].as_array().unwrap();
+                        assert_eq!(exponents.len(), coordinates.len());
+                        let product =
+                            coordinates
+                                .iter()
+                                .zip(exponents)
+                                .fold(coefficient, |value, (x, e)| {
+                                    value * x.modpow(&BigUint::from(e.as_u64().unwrap()), &modulus)
+                                        % &modulus
+                                });
+                        (sum + product) % &modulus
+                    });
+            assert_eq!(value, BigUint::from(0u8), "polynomial {polynomial}");
+        }
+    }
+
+    #[test]
+    fn prime_chain_m3_m4_positive_lifts_replay_without_private_witness() {
+        for twist in [false, true] {
+            for m in [3, 4] {
+                let (cfg, case) = tiny_prime_chain_case(m, twist);
+                assert!(case.private_witness.is_null());
+                let group = Group::read(&case).unwrap();
+                let p = group.point(&case.public_instance["generator"]).unwrap();
+                if !twist {
+                    assert_eq!(group.mul(&p, 2).json(), json!({"x":"6","y":"3"}));
+                    assert_eq!(group.mul(&p, 3).json(), json!({"x":"2","y":"2"}));
+                    assert_eq!(group.mul(&p, 4).json(), json!({"x":"4","y":"5"}));
+                }
+                let result = solve(&cfg, &case).unwrap();
+                assert_eq!(
+                    result.outcome["pdp_witness_verified"], true,
+                    "{}",
+                    result.outcome
+                );
+                assert_eq!(result.outcome["exhaustive_no_decomposition"], false);
+                assert_eq!(result.outcome["termination"], "verified_positive_stop");
+                let input: Value = serde_json::from_slice(
+                    &result
+                        .artifacts
+                        .iter()
+                        .find(|a| a.path == "prime-f4-input.json")
+                        .unwrap()
+                        .bytes,
+                )
+                .unwrap();
+                verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &input)
+                    .unwrap();
+                let certificate = result
+                    .artifacts
+                    .iter()
+                    .find(|a| a.role == "independently-verified-pdp")
+                    .unwrap();
+                let label: Value = serde_json::from_slice(&certificate.bytes).unwrap();
+                verify_solution_artifact(
+                    &case.public_instance,
+                    &case.factor_base,
+                    &certificate.role,
+                    &label,
+                )
+                .unwrap();
+                let mut bad = label.clone();
+                bad["summands"][0] = Value::Null;
+                assert!(verify_solution_artifact(
+                    &case.public_instance,
+                    &case.factor_base,
+                    &certificate.role,
+                    &bad
+                )
+                .is_err());
+                for field in [
+                    "schema",
+                    "m",
+                    "modulus",
+                    "target",
+                    "variable_roles",
+                    "domains",
+                    "polynomials",
+                ] {
+                    let mut bad = input.clone();
+                    bad[field] = Value::Null;
+                    assert!(
+                        verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &bad)
+                            .is_err(),
+                        "{field}"
+                    );
+                }
+                let events = result
+                    .artifacts
+                    .iter()
+                    .find(|a| a.path == "prime-f4-chain-events.jsonl")
+                    .unwrap();
+                let rows: Vec<Value> = events
+                    .bytes
+                    .split(|b| *b == b'\n')
+                    .filter(|line| !line.is_empty())
+                    .map(|line| serde_json::from_slice(line).unwrap())
+                    .collect();
+                let calls = rows
+                    .iter()
+                    .filter(|r| r["event"]["kind"] == "native_result")
+                    .count();
+                assert_eq!(
+                    result.outcome["counters"]["recursive_native_f4_runs"],
+                    json!(calls)
+                );
+                assert!(calls > 0);
+                assert!(rows.iter().any(|r| r["event"]["kind"] == "group_lift"
+                    && r["event"]["group_lift_verified"] == true));
+            }
+        }
+    }
+
+    #[test]
+    fn prime_chain_equations_match_group_prefixes_and_keep_auxiliaries_unrestricted() {
+        for twist in [false, true] {
+            for m in [2, 3, 4, 15] {
+                let (mut cfg, mut case) = tiny_prime_chain_case(if m == 15 { 3 } else { m }, twist);
+                cfg.m = m;
+                case.public_instance["m"] = json!(m);
+                let group = Group::read(&case).unwrap();
+                let p = group.point(&case.public_instance["generator"]).unwrap();
+                // Alternating signs avoid every intermediate infinity even for
+                // m15 on the order-3 twist. This is a public group fixture.
+                let summands: Vec<_> = (0..m)
+                    .map(|i| {
+                        if i >= 2 && i % 2 == 0 {
+                            group.neg(&p)
+                        } else {
+                            p.clone()
+                        }
+                    })
+                    .collect();
+                let mut sum = group.zero();
+                let mut auxiliaries = vec![];
+                for (i, point) in summands.iter().enumerate() {
+                    sum = group.add(&sum, point);
+                    assert_ne!(sum, group.zero());
+                    if i >= 1 && i < m - 1 {
+                        auxiliaries.push(sum.x().unwrap());
+                    }
+                }
+                case.public_instance["target"] = sum.json();
+                let domain = domain(&group, &case).unwrap();
+                let mut coordinates: Vec<_> = summands.iter().map(|p| p.x().unwrap()).collect();
+                coordinates.extend(auxiliaries);
+                let artifact = if m == 2 {
+                    let result = solve(&cfg, &case).unwrap();
+                    serde_json::from_slice(
+                        &result
+                            .artifacts
+                            .iter()
+                            .find(|a| a.path == "prime-f4-input.json")
+                            .unwrap()
+                            .bytes,
+                    )
+                    .unwrap()
+                } else {
+                    let input = prime_chain_input(m, &group, &domain, &sum).unwrap();
+                    assert_eq!(input.polynomials.len(), 2 * m - 1);
+                    assert_eq!(input.domains.len(), 2 * m - 2);
+                    assert!(input.domains[..m].iter().all(Option::is_some));
+                    assert!(input.domains[m..].iter().all(Option::is_none));
+                    assert_eq!(
+                        input.artifact["membership_variables"],
+                        json!((0..m).collect::<Vec<_>>())
+                    );
+                    verify_prime_f4_chain_input(
+                        &case.public_instance,
+                        &case.factor_base,
+                        &input.artifact,
+                    )
+                    .unwrap();
+                    input.artifact
+                };
+                assert_prime_equations_at(&artifact, &coordinates);
+            }
+        }
+    }
+
+    #[test]
+    fn prime_chain_negative_and_bounded_outcomes_preserve_their_scope() {
+        let (cfg, mut case) = tiny_prime_chain_case(3, false);
+        let group = Group::read(&case).unwrap();
+        let domain = domain(&group, &case).unwrap();
+        let target = group.point(&case.public_instance["target"]).unwrap();
+        let baseline = solve(&cfg, &case).unwrap();
+        let count = baseline.outcome["counters"]["persisted_trace_events"]
+            .as_u64()
+            .unwrap();
+        let mut cap = PrimeChainLimits::from(&cfg);
+        cap.events = count - 1;
+        let positive = prime_f4_chain(&cfg, &group, &domain, &target, cap).unwrap();
+        assert_eq!(positive.outcome["pdp_witness_verified"], true);
+        assert_eq!(positive.outcome["termination"], "trace_budget_exhausted");
+        for expected in [
+            "trace_budget_exhausted",
+            "native_deadline",
+            "lift_budget_exhausted",
+        ] {
+            let mut limits = PrimeChainLimits::from(&cfg);
+            match expected {
+                "trace_budget_exhausted" => limits.bytes = 1,
+                "native_deadline" => limits.time = Duration::ZERO,
+                "lift_budget_exhausted" => limits.lift_additions = 0,
+                _ => unreachable!(),
+            }
+            let result = prime_f4_chain(&cfg, &group, &domain, &target, limits).unwrap();
+            assert_eq!(result.outcome["termination"], expected);
+            assert_eq!(result.outcome["status"], "budget_exhausted");
+            assert_eq!(result.outcome["solver_completed"], false);
+            assert_eq!(result.outcome["exhaustive_no_decomposition"], false);
+            if expected == "trace_budget_exhausted" {
+                assert_eq!(result.outcome["counters"]["recursive_native_f4_runs"], 0);
+            }
+        }
+        // Three ±P sum to ±P or ±3P, never 2P in the order-13 group.
+        case.public_instance["target"] = group.mul(&domain[0], 2).json();
+        let negative = solve(&cfg, &case).unwrap();
+        assert_eq!(
+            negative.outcome["encoding_search_completed"], true,
+            "{}",
+            negative.outcome
+        );
+        assert_eq!(negative.outcome["pdp_witness_verified"], false);
+        assert_eq!(negative.outcome["exhaustive_no_decomposition"], false);
+        assert!(negative.outcome["first_fall_degree"].is_null());
+        assert!(negative.outcome["last_fall_degree"].is_null());
+    }
+
+    #[test]
+    fn prime_chain_trace_serialization_stops_before_materializing_large_events() {
+        use serde::ser::SerializeSeq;
+        struct LargeEvent<'a>(&'a std::cell::Cell<usize>);
+        impl serde::Serialize for LargeEvent<'_> {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                let mut sequence = serializer.serialize_seq(Some(1_000_000))?;
+                for _ in 0..1_000_000 {
+                    self.0.set(self.0.get() + 1);
+                    sequence.serialize_element(&12345u64)?;
+                }
+                sequence.end()
+            }
+        }
+        let mut events = PrimeChainEvents::default();
+        let limits = PrimeChainLimits {
+            events: 10,
+            bytes: 256,
+            lift_additions: 10,
+            time: Duration::from_secs(1),
+        };
+        events.append(&json!({"kind":"first"}), limits).unwrap();
+        let prefix = events.bytes.clone();
+        let calls = std::cell::Cell::new(0);
+        assert_eq!(
+            events.append(&LargeEvent(&calls), limits).unwrap_err(),
+            PRIME_CHAIN_TRACE_CAP
+        );
+        assert!(calls.get() < 100);
+        assert_eq!(events.bytes, prefix);
+        let count = calls.get();
+        assert!(events.append(&LargeEvent(&calls), limits).is_err());
+        assert_eq!(calls.get(), count);
+    }
+
+    #[test]
+    fn prime_chain_event_io_failure_retains_positive_for_canonical_worker_write() {
+        let (cfg, case) = tiny_prime_chain_case(3, false);
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory =
+            std::env::temp_dir().join(format!("prime-chain-io-{}-{nonce}", std::process::id()));
+        struct Reset;
+        impl Drop for Reset {
+            fn drop(&mut self) {
+                FAIL_PRIME_LIFT_EVENT.with(|flag| flag.set(false));
+            }
+        }
+        let _reset = Reset;
+        FAIL_PRIME_LIFT_EVENT.with(|flag| flag.set(true));
+        let result = solve_with_event_sink(&cfg, &case, &directory.join("live")).unwrap();
+        assert_eq!(result.outcome["pdp_witness_verified"], true);
+        assert_eq!(result.outcome["termination"], "trace_sink_error");
+        assert_eq!(result.outcome["live_persistence_complete"], false);
+        assert_eq!(result.outcome["exposed_event_stream_complete"], false);
+        assert_eq!(result.outcome["canonical_artifact_write_required"], true);
+        assert!(!result.outcome["live_persistence_errors"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        let prefix = fs::read(directory.join("live/events.jsonl")).unwrap();
+        assert!(!prefix.is_empty());
+        for line in prefix
+            .split(|b| *b == b'\n')
+            .filter(|line| !line.is_empty())
+        {
+            let _: Value = serde_json::from_slice(line).unwrap();
+        }
+        assert!(directory
+            .join("live/payloads/prime-f4-input.json")
+            .is_file());
+        let canonical = directory.join("canonical");
+        fs::create_dir(&canonical).unwrap();
+        for payload in &result.artifacts {
+            super::super::storage::write_bytes(
+                &canonical,
+                &payload.path,
+                &payload.role,
+                &payload.encoding,
+                &payload.bytes,
+            )
+            .unwrap();
+        }
+        let certificate: Value =
+            serde_json::from_slice(&fs::read(canonical.join("pdp-witness.json")).unwrap()).unwrap();
+        verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            "independently-verified-pdp",
+            &certificate,
+        )
+        .unwrap();
+        let input: Value =
+            serde_json::from_slice(&fs::read(canonical.join("prime-f4-input.json")).unwrap())
+                .unwrap();
+        verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &input).unwrap();
+        fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn prime61_chain_m3_m15_retains_exact_wide_equations_without_elimination() {
+        for twist in [false, true] {
+            let mut cfg = config("prime", "f4");
+            cfg.n = 61;
+            cfg.twist = twist;
+            cfg.factor_base_size = 4;
+            let mut case = curves::generate(&cfg).unwrap();
+            case.private_witness = Value::Null;
+            let group = Group::read(&case).unwrap();
+            let p = domain(&group, &case).unwrap()[0].clone();
+            for m in [3, 15] {
+                cfg.m = m;
+                case.public_instance["m"] = json!(m);
+                let mut sum = group.zero();
+                let mut coordinates = vec![];
+                let mut auxiliaries = vec![];
+                for i in 0..m {
+                    let point = if i >= 2 && i % 2 == 0 {
+                        group.neg(&p)
+                    } else {
+                        p.clone()
+                    };
+                    coordinates.push(point.x().unwrap());
+                    sum = group.add(&sum, &point);
+                    if i >= 1 && i < m - 1 {
+                        auxiliaries.push(sum.x().unwrap());
+                    }
+                }
+                coordinates.extend(auxiliaries);
+                case.public_instance["target"] = sum.json();
+                let result = solve(&cfg, &case).unwrap();
+                assert_eq!(result.outcome["status"], "unsupported");
+                assert_eq!(result.outcome["native_backend_invoked"], false);
+                assert_eq!(result.outcome["exhaustive_no_decomposition"], false);
+                assert!(!result
+                    .artifacts
+                    .iter()
+                    .any(|a| a.path == "prime-f4-chain-events.jsonl"));
+                let input: Value = serde_json::from_slice(
+                    &result
+                        .artifacts
+                        .iter()
+                        .find(|a| a.path == "prime-f4-input.json")
+                        .unwrap()
+                        .bytes,
+                )
+                .unwrap();
+                assert_eq!(input["modulus"], "2305843009213693951");
+                assert_prime_equations_at(&input, &coordinates);
+                verify_prime_f4_chain_input(&case.public_instance, &case.factor_base, &input)
+                    .unwrap();
+            }
         }
     }
 
