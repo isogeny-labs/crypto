@@ -306286,6 +306286,393 @@
   "class": "engineering",
   "annotation_20261019": "R10 ledger (research/ic_tool_program/ledger/r10-20261019/README.md): the 10.40x at 262,144 columns holds at >= 8,192 synthetic columns. Below 4,096 the shipped `ic logs` default (CADO-style filter) is the slower one (0.40x at 1,024), and the default is unvalidated at the sizes real IC matrices have (repair R11)."
  },
+ "prime_base_size_component": {
+  "rows": [
+   {
+    "bits": 20,
+    "n_inc": 32,
+    "n_sel": 45,
+    "reading": "improvement: new prime-field IC baseline",
+    "inc": [
+     12.8534134376,
+     14.8257976624,
+     32.5772556857
+    ],
+    "sel": [
+     10.514525023,
+     11.82856881,
+     23.6549628933
+    ],
+    "ratio": [
+     {
+      "ratio": 0.818033674404,
+      "ci95": [
+       0.772727625891,
+       0.866360917503
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 0.797836924485,
+      "ci95": [
+       0.751603678217,
+       0.846834804499
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 0.726118956167,
+      "ci95": [
+       0.677461517948,
+       0.778193096193
+      ],
+      "pairs": 96
+     }
+    ],
+    "inc_over_rho": [
+     {
+      "ratio": 9.47098149321,
+      "ci95": [
+       8.48346693406,
+       10.6373746247
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 10.0559086475,
+      "ci95": [
+       8.99082075862,
+       11.3157629508
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 12.8807531189,
+      "ci95": [
+       11.4212433777,
+       14.621158391
+      ],
+      "pairs": 96
+     }
+    ],
+    "sel_over_rho": [
+     {
+      "ratio": 7.7475817911,
+      "ci95": [
+       6.92158103317,
+       8.69513805084
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 8.02297522823,
+      "ci95": [
+       7.14929053034,
+       9.01705282959
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 9.35295900932,
+      "ci95": [
+       8.27469871434,
+       10.6048939876
+      ],
+      "pairs": 96
+     }
+    ]
+   },
+   {
+    "bits": 24,
+    "n_inc": 162,
+    "n_sel": 115,
+    "reading": "relabelling (falls at w = 0, rises at w = 1); incumbent kept",
+    "inc": [
+     13.9760112245,
+     15.1676181566,
+     25.8920805448
+    ],
+    "sel": [
+     12.6052913181,
+     14.2596453175,
+     29.1488313124
+    ],
+    "ratio": [
+     {
+      "ratio": 0.901923382542,
+      "ci95": [
+       0.870218638687,
+       0.932940468861
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 0.940137414478,
+      "ci95": [
+       0.904989378889,
+       0.974907099776
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 1.12578173322,
+      "ci95": [
+       1.07317009128,
+       1.17938351469
+      ],
+      "pairs": 96
+     }
+    ],
+    "inc_over_rho": [
+     {
+      "ratio": 13.7949193129,
+      "ci95": [
+       12.2725909325,
+       15.64783165
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 13.7417311195,
+      "ci95": [
+       12.1916629867,
+       15.6152938564
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 13.4890708752,
+      "ci95": [
+       11.8569363435,
+       15.4828267158
+      ],
+      "pairs": 96
+     }
+    ],
+    "sel_over_rho": [
+     {
+      "ratio": 12.4419602885,
+      "ci95": [
+       11.0623088195,
+       14.1261244327
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 12.9191155651,
+      "ci95": [
+       11.470578215,
+       14.6993698109
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 15.1857495894,
+      "ci95": [
+       13.4023614137,
+       17.4163200599
+      ],
+      "pairs": 96
+     }
+    ]
+   },
+   {
+    "bits": 28,
+    "n_inc": 407,
+    "n_sel": 288,
+    "reading": "relabelling (falls at w = 0, rises at w = 1); incumbent kept",
+    "inc": [
+     20.478464385,
+     22.2042912286,
+     37.7367328206
+    ],
+    "sel": [
+     19.0165912343,
+     21.6184888538,
+     45.0355674295
+    ],
+    "ratio": [
+     {
+      "ratio": 0.928614122466,
+      "ci95": [
+       0.894224876173,
+       0.964459366838
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 0.973617605323,
+      "ci95": [
+       0.935381449061,
+       1.0135564027
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 1.19341458741,
+      "ci95": [
+       1.13361806288,
+       1.25725913699
+      ],
+      "pairs": 96
+     }
+    ],
+    "inc_over_rho": [
+     {
+      "ratio": 21.8019854244,
+      "ci95": [
+       18.6507084811,
+       25.4565842835
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 21.5470695241,
+      "ci95": [
+       18.4255084077,
+       25.1798000086
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 20.3830870552,
+      "ci95": [
+       17.3453604051,
+       23.9128843558
+      ],
+      "pairs": 96
+     }
+    ],
+    "sel_over_rho": [
+     {
+      "ratio": 20.2456315629,
+      "ci95": [
+       17.5037772795,
+       23.6370426808
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 20.9786062317,
+      "ci95": [
+       18.1223982055,
+       24.4877983995
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 24.3254734283,
+      "ci95": [
+       20.9396030258,
+       28.4273146494
+      ],
+      "pairs": 96
+     }
+    ]
+   },
+   {
+    "bits": 32,
+    "n_inc": 1024,
+    "n_sel": 1024,
+    "reading": "selection = incumbent; null",
+    "inc": [
+     32.2397783626,
+     35.3089487424,
+     62.931482161
+    ],
+    "sel": [
+     32.2397783626,
+     35.3089487424,
+     62.931482161
+    ],
+    "ratio": [
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 1.0,
+      "ci95": [
+       1.0,
+       1.0
+      ],
+      "pairs": 96
+     }
+    ],
+    "inc_over_rho": [
+     {
+      "ratio": 33.3017803929,
+      "ci95": [
+       29.61978035,
+       37.791673474
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 33.1762711191,
+      "ci95": [
+       29.5252478253,
+       37.6714939583
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 32.6096136543,
+      "ci95": [
+       29.0353494783,
+       37.0393991503
+      ],
+      "pairs": 96
+     }
+    ],
+    "sel_over_rho": [
+     {
+      "ratio": 33.3017803929,
+      "ci95": [
+       29.61978035,
+       37.791673474
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 33.1762711191,
+      "ci95": [
+       29.5252478253,
+       37.6714939583
+      ],
+      "pairs": 96
+     },
+     {
+      "ratio": 32.6096136543,
+      "ci95": [
+       29.0353494783,
+       37.0393991503
+      ],
+      "pairs": 96
+     }
+    ]
+   }
+  ],
+  "class": "engineering",
+  "study": "research/prime_base_oracle_tuning_20261029/",
+  "report": "research/prime_base_oracle_tuning_20261029/README.pdf",
+  "second_host": "Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.",
+  "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
+ },
  "lazy_members_component": {
   "rows": [
    {
