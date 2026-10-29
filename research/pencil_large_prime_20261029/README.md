@@ -2,8 +2,10 @@
 
 This is a mathematical implementation step toward the still-incomplete
 1,260-target pencil cohort. It contains an exact finite-field row reducer,
-independent unit tests, and four field-identity Lean lemmas. It has no curve
-interface and returns symbolic linear constraints, not a target scalar.
+independent unit tests, and four field-identity Lean lemmas. Its library
+returns symbolic linear constraints. An optional producer integrates the
+library into the existing synthetic pencil cohort path; it is compile-tested,
+not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
@@ -99,6 +101,39 @@ The Lean toolchain and mathlib revision are pinned in `lean-toolchain` and
 environment from the existing projective-law proof checkout.
 
 ## Remaining integration work
+
+### Optional geometric producer (T-793)
+
+Build with `cargo build --locked --release --features producer --bin
+pencil-symbolic`. The producer is a scoped fork of the frozen pencil source
+blob `e974121a123e13316ce3fcc820b4eca3f65a8a3a`; the original stays unchanged.
+It preserves the rational-point sieve, complement factor checks, Jacobian
+relation identity, source verification and same-process rho control. There
+is no independent dual-norm check in this cohort path. The source's 16-point
+subgroup projection diagnostic is retained; it is not a universal proof.
+
+The only execution mode is `--cohort BITS P`, run from the repository root.
+`PENCIL_SMALL_DENOMINATOR` must be explicit (2, 4, 8 or 16). The partition
+selects original identity-ordered columns divisible by that denominator;
+both symbolic label columns remain small. Node order must be identity. No
+value has been chosen by measurement or frozen for an experiment yet.
+
+Rows rejected for three large variables retain their collection and
+geometric-check work in the producer phases. New setup and target schema IDs
+are `pencil-symbolic-cohort-setup/v1` and `pencil-symbolic-cohort-target/v1`.
+Both explicitly report `incomplete_graph_and_allocation_accounting`; target
+cost ratios are null. Old price analyzers must not consume these records.
+Residual counters do not include graph work and are not total solver counts.
+
+The optional feature passes all ten library tests and two producer tests.
+The latter compare signed coefficient encoding against the frozen eliminator
+and ensure a constant-only inconsistent equation fails. They use algebraic
+fixtures, not sampled curves or performance data. Clippy passes with warnings
+denied. Review caught the missing constant-only check and an inaccurate copied
+dual-norm comment; both were corrected. Legacy peeling allocation and dead
+execution modes were removed. No geometric cohort was run. Full graph
+accounting, process resource limits, protocol amendment and experiment
+admission still precede execution.
 
 ### Composed relation adapter (T-792)
 

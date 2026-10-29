@@ -1,5 +1,36 @@
 # Session record — 2026-10-29 UTC / 2026-10-28 Pacific
 
+## 2026-10-29 T-793 continuation
+
+### What was done
+
+Forked the frozen pencil producer into the optional producer feature and
+connected the symbolic collector. Preserved geometric relation checks and
+same-process rho/source checks. Ten library and two producer release tests
+pass; producer-feature clippy passes with warnings denied. No cohort ran.
+
+### Decisions made
+
+Require an explicit identity-column partition parameter; do not choose it
+from measurements. Use new schema IDs and incomplete-cost status, with null
+ratios. Remove dead legacy modes and peeling storage. The original source
+and its stopping rule remain unchanged. The migration receipt was read with
+existing sudo access; no external job or generator was restarted.
+
+### Open threads
+
+Complete graph and allocation accounting, freeze a new protocol and resource
+contract, reconcile live EKS jobs, then execute the admitted upper gate and
+remaining cohort. Preserve the subgroup-proof limitation in the report.
+
+### Errors
+
+Review caught a missing constant-only inconsistency assertion and copied
+dual-norm overstatement; both corrected and a regression added. First build
+exceeded the JSON macro recursion limit; removing inapplicable old solver
+fields resolved it. Clippy found dead imports and a long legacy tuple type;
+removed the imports and named the type. Final checks pass.
+
 ## 2026-10-29 T-792 continuation
 
 ### What was done

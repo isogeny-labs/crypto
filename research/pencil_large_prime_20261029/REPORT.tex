@@ -35,14 +35,18 @@ coefficient limits, not process-memory guarantees or a complete cost model.
 The composed adapter binds both stages to one field and fixed column
 partition, rejects three-large-variable rows explicitly, and retains an
 unincorporated constraint on terminal cap. Its row space is also checked
-at all 25,600 prefixes. It accepts checked equations; geometric producer
-integration and a frozen partition remain open.
+at all 25,600 prefixes. The optional producer now connects this adapter to
+the existing geometric checks and matched control. Two producer tests check
+signed coefficient parity and rejection of constant-only inconsistencies.
+The producer has not run a cohort. Its new schemas explicitly mark costs
+incomplete and ratios null; a frozen partition and full accounting remain open.
 \section*{Next integration gates}
 \begin{tabular}{p{0.61\linewidth}p{0.28\linewidth}}\toprule
 Requirement & Status\\\midrule
 Prime-field row kernel and independent prefix tests & Implemented and tested\\
 Forest-state induction and Rust correspondence & Open\\
-Pencil adapter, fixed small-base selection and admission accounting & Open\\
+Geometric producer wiring & Compile-tested only\\
+Fixed small-base selection and admission accounting & Open\\
 Full symbolic-vector, memory and residual elimination costs & Unmeasured\\
 Remaining 717 frozen candidate targets & No new results\\
 End-to-end cost against matched rho & Unknown\\\bottomrule
