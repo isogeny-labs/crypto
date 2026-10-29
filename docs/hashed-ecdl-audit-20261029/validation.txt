@@ -72,3 +72,22 @@ Historical receipts and manifests are preserved. General external-theorem
 correctness, admitted-recursion complexity and performance are unresolved;
 forced small parameters are correctness controls only. No cloud experiment,
 benchmark, deployed-curve input or leaderboard promotion was performed.
+
+Root runtime-fixture follow-up (23:43 UTC):
+The first broad root run reached execution of 5512 tests and exposed 14 missing
+sparse runtime-fixture failures. A focused diagnostic confirmed a missing tracked
+records.jsonl. Terminated that already-failing test process with SIGTERM; parent
+exit 101. That incomplete attempt is NOT a complete root regression result.
+Raw incomplete trace: /tmp/crypto-root-sparse-incomplete.log, 219964 bytes,
+SHA-256 97b5fb3e29e638f7de0884cb66da3dd7417e9f00fb54707c43e45cd1e316331c,
+NOT_UPLOADED (local trace, not a durable remote artifact).
+Applied scripts/sparse-checkout.sh apply --profile minimal with required native
+path crates and gpu/certicom; then added the exact nested archived session:
+research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/.
+All 14 observed failures now pass focused rechecks: 13 after the standard profile,
+and the final version-1 bounds case after restoring its dynamic nested path.
+No code, assertion, ignored-test annotation or frozen fixture was changed.
+A fresh FULL cargo test --locked --release --lib is executing using the cached
+build, output /tmp/crypto-root-tests-restored.log. Its wrapper records the actual
+exit status in /tmp/crypto-root-tests-restored.exit. No final pass is claimed.
+The earlier item 12's compiling status is superseded by this executing rerun.
