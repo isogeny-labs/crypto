@@ -1,6 +1,29 @@
 # Hashed-factor-base ECDL reference
 
-2026-10-29. **Partial replication: executable reduction, no fast tensor solver.**
+2026-10-29. **Native Rust reference: executable reduction; the native tensor
+backend and conditional asymptotic replication remain open.**
+
+## Scalar tensor companion
+
+The paired cryptanalysis repository now contains an independently executable
+[scalar BTN reference](https://github.com/isogeny-labs/cryptanalysis/tree/a182e2a63c53f4de804744df2c43b0876a9f2c59/experiments/hashed-ecdl-tensor-reference).
+It implements the ell=1 Cauchy/mode/Hermite recursion, together with integer
+Fourier multiplication and an independently tested binary-polynomial Fourier
+adaptation for ECC2K-130 coordinate constraints. Its recursive small-network
+checks and source snapshots are separate from the native Rust API below.
+
+The companion is Python and is not a native backend for `hashed_ecdl`. No
+Python execution path is introduced in this repository. Native integration,
+the prime-field composition required by the original paper, a complete
+complexity audit, and formal verification remain open. Historical Python
+timings are retrospective development diagnostics, not admitted performance
+evidence. The recorded challenge graph selects the manuscript's exact leaf
+fallback and yields no challenge relation or scalar. See the canonical
+[obstruction record](../problems/hashed-ecdl-tensor-backend.md).
+
+Publication and current checks: [cryptanalysis PR #1299](https://github.com/isogeny-labs/cryptanalysis/pull/1299).
+
+## Native reference scope
 
 The requested source is Akshima et al., *A Subexponential Time Algorithm for
 Elliptic Curve Discrete Logarithm*, v0.2 (October 29, 2026),

@@ -64,6 +64,18 @@ verified encoder or contraction implementation becomes available.
 
 ## Resolution and history
 
+2026-10-29 companion update: a scalar ell=1 executable Cauchy/mode/Hermite
+reference and characteristic-two coordinate encoder are being published in
+[cryptanalysis](https://github.com/isogeny-labs/cryptanalysis/tree/a182e2a63c53f4de804744df2c43b0876a9f2c59/experiments/hashed-ecdl-tensor-reference),
+with review tracked by [PR #1299](https://github.com/isogeny-labs/cryptanalysis/pull/1299).
+The prototype's bounded correctness checks do not close this record. It is
+Python, not a native Rust integration; its binary-field Fourier construction
+is an adaptation rather than a complete prime-field replication. The actual
+target's default u_0 is zero and its exact-leaf search exceeds its stated
+budget. No theorem falsity, complexity verification, performance improvement,
+challenge relation, or challenge scalar follows. Next steps are a native
+port, independent algorithm/encoding audit, and protocol-compliant validation.
+
 2026-10-29: unresolved. The reference-code PR delivers the native reduction
 and keeps full replication open rather than relabelling enumeration as tensor
 contraction. The cryptanalysis sibling links this canonical obstruction.

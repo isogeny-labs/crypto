@@ -2,8 +2,10 @@
 
 For the Bochum v0.2 paper's separate hashed-factor-base reduction, see the
 [native Rust reference](docs/hashed-ecdl.md). Its compact tensor encoder and
-fast contraction backend remain unimplemented; no subexponential speedup is
-claimed by that reference.
+fast contraction backend remain unimplemented in that native Rust API; no
+subexponential speedup is claimed by that reference. A separately scoped
+[scalar tensor companion](docs/hashed-ecdl.md#scalar-tensor-companion) is
+available in the cryptanalysis sibling.
 
 **Decision: engineering.** The new oracles verify, replay identically, and
 match the query stream of the existing table/subtract arms; they do not
