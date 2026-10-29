@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "c9f599087e972db2387fa285a0deb615ea45257b579b16b636cde1692c5599ad"
+   "sha256": "3c2c88213b816db9b8499765fad37d5c89f532401f30d404667225e8b7fc9f12"
   },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
@@ -117,6 +117,22 @@
   "postgb_linear_stage": {
    "path": "research/postgb_linear_stage_20261026/analysis/summary.json",
    "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
+  },
+  "d4_char2_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+   "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
+  },
+  "d4_char2_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
+   "sha256": "5c8e0a776a8d99a85e7b66416ae2c1823a716286a63ca524209df1862c89e9e0"
+  },
+  "d4_char2_cmp_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
+   "sha256": "b17171b59d16d34fa504a59c71b784b84ceebabd37dfbfb6ba917f9b97313e3b"
+  },
+  "d4_char2_cmp_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json",
+   "sha256": "f0a9ddb6f02528e6221a0922d6f06a894890464e6e2c308650a03e173ca25165"
   },
   "ic_m2_linear_ladder": {
    "path": "research/ic_m2_linear_ladder_20261024/fit.json",
@@ -723,7 +739,7 @@
  },
  "progress": {
   "source": "docs/ic/progress-timeline.json",
-  "updated": "2026-10-28",
+  "updated": "2026-10-29",
   "series_id": "ec-cold",
   "label": "Elliptic curve, whole method, cold, one target",
   "points": [
@@ -308245,6 +308261,103 @@
   "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
   "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "d4_char2_frob_roots_component": {
+  "rows": [
+   {
+    "m": 12,
+    "target": 0,
+    "base": 44.0338071586,
+    "lever": 37.6181988912,
+    "ratio": 0.854302666943,
+    "base_over_rho": [
+     47.2333729676,
+     42.9397677659,
+     23.6177083507
+    ],
+    "lever_over_rho": [
+     40.3515964949,
+     36.6835581203,
+     20.1766712311
+    ]
+   },
+   {
+    "m": 12,
+    "target": 1,
+    "base": 42.5916166108,
+    "lever": 36.385813154,
+    "ratio": 0.854295188806,
+    "base_over_rho": [
+     50.2949002185,
+     45.7230602911,
+     25.1487319424
+    ],
+    "lever_over_rho": [
+     42.9666912781,
+     39.0609904242,
+     21.4844407029
+    ]
+   },
+   {
+    "m": 12,
+    "target": 2,
+    "base": 41.4671913386,
+    "lever": 35.4261486254,
+    "ratio": 0.854317533497,
+    "base_over_rho": [
+     39.8839629278,
+     36.2584122428,
+     19.9427804731
+    ],
+    "lever_over_rho": [
+     34.0735688346,
+     30.9761973158,
+     17.0374670248
+    ]
+   },
+   {
+    "m": 14,
+    "target": 0,
+    "base": 5.37011348377,
+    "lever": 4.37864554447,
+    "ratio": 0.815373000533,
+    "base_over_rho": [
+     4.26844358013,
+     3.88040396669,
+     2.13422394393
+    ],
+    "lever_over_rho": [
+     3.48037364954,
+     3.1639766256,
+     1.74018858097
+    ]
+   }
+  ],
+  "paired": {
+   "12": {
+    "ratio": 0.854304993137,
+    "ci95": [
+     0.854295188806,
+     0.854317533497
+    ],
+    "pairs": 3
+   },
+   "14": {
+    "ratio": 0.815373000533,
+    "ci95": [
+     0.815373000533,
+     0.815373000533
+    ],
+    "pairs": 1
+   }
+  },
+  "class": "engineering",
+  "unit": "S = counted cost in GAE per sqrt(r), ecbench",
+  "study": "research/ic_d4_char2_lever_20261023/",
+  "report": "research/ic_d4_char2_lever_20261023/REPORT.pdf",
+  "source": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)",
   "validated": true
  },
  "algebraic_ladder": {

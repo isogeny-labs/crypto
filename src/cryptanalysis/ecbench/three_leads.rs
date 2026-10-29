@@ -4,6 +4,7 @@ use super::methods::{PhaseRecord, ResolvedMethod, SolveReport};
 use super::workload::{CurveFacts, CurveSpec};
 use crate::cryptanalysis::curve_id;
 use crate::cryptanalysis::ic_boundary::FieldOps;
+use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::three_leads::{
     self as engine, Counts, NativePhase, Outcome, Point, StudyInstance,
 };
@@ -11,6 +12,9 @@ use num_bigint::BigUint;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::time::Instant;
+
+#[path = "pencil.rs"]
+mod pencil;
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -111,6 +115,9 @@ pub fn solve(
     target: Point,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        return pencil::solve(m, inst, target, seed);
+    }
     let cap = m
         .params
         .get("trial_cap")
@@ -162,6 +169,10 @@ pub fn solve(
             return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
         }
     }
+    let rho_online = matches!(
+        m.id.as_str(),
+        "rho.three_leads_plain_v1" | "rho.three_leads_negation_v1" | "rho.three_leads_jacobian_v1"
+    );
     let mut out: Outcome = match m.id.as_str() {
         "ic.three_leads_decomposition_v2" => engine::solve_subfield_or_pkm_v2(
             inst,
@@ -197,9 +208,17 @@ pub fn solve(
             m.params["independent"] == "1",
             m.params["unique_relations"] == "1",
         ),
-        "rho.three_leads_plain_v1" => engine::solve_rho(inst, target, seed, cap, false, false),
-        "rho.three_leads_negation_v1" => engine::solve_rho(inst, target, seed, cap, true, false),
-        "rho.three_leads_jacobian_v1" => engine::solve_rho(inst, target, seed, cap, true, true),
+        "rho.three_leads_plain_v1"
+        | "rho.three_leads_negation_v1"
+        | "rho.three_leads_jacobian_v1" => engine::solve_rho_with_target_hook(
+            inst,
+            target,
+            seed,
+            cap,
+            m.id != "rho.three_leads_plain_v1",
+            m.id == "rho.three_leads_jacobian_v1",
+            || measurement::begin_online(Phase::RhoSolve),
+        ),
         "ic.three_leads_genus2_v1" => engine::solve_genus2(
             inst,
             target,
@@ -229,6 +248,7 @@ pub fn solve(
     // Independent post-solver verification is part of the charged cold solve.
     // The ecbench parent then verifies the returned scalar a second time.
     if let Some(k) = out.recovered {
+        let _verification_phase = rho_online.then(|| measurement::scope(Phase::RecoveryCheck));
         let verifier = inst.fresh();
         let got = verifier.curve.mul(verifier.generator, k);
         if got != target {
@@ -240,6 +260,9 @@ pub fn solve(
             name: "source_verification".into(),
             counts: c,
         });
+    }
+    if rho_online {
+        measurement::end_online();
     }
     // This is an operation-count conversion, not a host-time calibration.
     // The complete twelve-cell band is derived from the retained primitives.
