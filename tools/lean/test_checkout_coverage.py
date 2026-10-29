@@ -20,7 +20,8 @@ class CheckoutCoverageTests(unittest.TestCase):
         required = {name for name in tracked if name and (
             name.endswith(".lean") or Path(name).name in {
                 "lakefile.toml", "lake-manifest.json", "lean-toolchain"}
-            or name.startswith("tools/lean/"))}
+            or name.startswith("tools/lean/")
+            or name == ".github/workflows/lean-proof-gate.yml")}
         self.assertTrue(required)
         with tempfile.TemporaryDirectory(prefix="lean-checkout-coverage-") as temp:
             root = Path(temp)

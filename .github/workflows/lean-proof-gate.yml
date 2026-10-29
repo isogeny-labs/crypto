@@ -36,6 +36,7 @@ env:
     lake-manifest.json
     lean-toolchain
     /tools/lean/
+    /.github/workflows/lean-proof-gate.yml
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && '-hosted' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
