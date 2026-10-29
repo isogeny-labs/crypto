@@ -82,6 +82,8 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "aimed_gather": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+    "aimed_gather_first": "research/ic_aimed_gather_20261023/summary.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
     "quartic_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
     "quartic_tagged_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
@@ -905,6 +907,42 @@ def pair_table_component() -> dict:
     return {**res, "study": "research/ic_oracle_setup_blocked_20261020/",
             "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
             "class": "engineering"}
+
+
+AIMED_GATHER_EVIDENCE = "benchmarks/20261029-ic-aimed-gather"
+
+
+def aimed_gather_component() -> dict:
+    """The per-unit gather of aimed-subset coordinates in relation collection
+    (#2448), from research/ic_aimed_gather_20261023: the 2026-10-29 session's
+    paired native ratios against its own 42-round A/A, copied from its
+    summary.json (made by summarise.sh from the session records), with the
+    first session's 5-pair A/A kept as the before mark. Every arm counts the
+    same operations and recovers the same logarithm, so no row of tables A-C
+    moves. Its standing comes from the benchmarks directory's VALIDATION.json."""
+    d = load(SOURCES["aimed_gather"])
+    first = load(SOURCES["aimed_gather_first"])
+    if not d.get("identity_ok") or d.get("rounds_kept") != 42:
+        raise SystemExit(f"{SOURCES['aimed_gather']}: an identity failure or an incomplete session")
+    errs = gate.check_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
+
+    def pick(s, metric):
+        return {"ab": {"median": s[f"ab_{metric}"]["median"], "ci95": [s[f"ab_{metric}"]["ci95"]["lo"], s[f"ab_{metric}"]["ci95"]["hi"]],
+                       "above_one": s[f"ab_{metric}"]["above_one"], "n": s[f"ab_{metric}"]["n"]},
+                "aa": {"median": s[f"aa_{metric}"]["median"], "ci95": [s[f"aa_{metric}"]["ci95"]["lo"], s[f"aa_{metric}"]["ci95"]["hi"]],
+                       "n": s[f"aa_{metric}"]["n"]},
+                "established": s[f"established_{metric}"]}
+    rows = [{"metric": label, "session": pick(d, m), "before": pick(first["native"], m)}
+            for m, label in (("collect", "collect phase"), ("total", "whole set-up"))]
+    cg = {r["params"]: r["ratio"] for r in first["callgrind"]}
+    return {"rows": rows, "curve": "icv1-f2m53-tm56619371-dac20a85", "callgrind_ratio": cg,
+            "median_ms": d["median_ms"], "processes": d["processes"], "refused": d["refused_then_retried"],
+            "class": "engineering", "study": "research/ic_aimed_gather_20261023/",
+            "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+            "source": SOURCES["aimed_gather"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({AIMED_GATHER_EVIDENCE}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
 
 
 def quartic_twist_pair_component() -> dict:
@@ -1903,6 +1941,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
+        "aimed_gather_component": aimed_gather_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -2523,6 +2562,28 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    ag = doc["aimed_gather_component"]
+
+    def agq(q):
+        return f"{q['median']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]"
+    L += ["## Aimed-subset gather in relation collection, outside tables A–C", "",
+          f"`ic price` on {ag['curve']} (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the "
+          "change that gathers the aimed subset's coordinates once per unit instead of on every trial "
+          "(class: engineering, #2448). Every arm counts the same operations and recovers the same logarithm, "
+          "so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the "
+          f"change and is not re-priced. Callgrind instructions per process, main / candidate: "
+          f"{ag['callgrind_ratio']['k0n53']:.3f} at n53, {ag['callgrind_ratio']['k0n61']:.3f} at n61. "
+          "Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where "
+          f"its lower end clears 1 and the same-session A/A's upper end. {ag['processes']} processes, "
+          f"none contended. {ag['validation'].rstrip('.')}. Study: [{ag['study']}](../../{ag['study']}).", "",
+          "| metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |",
+          "|:--|:--|--:|:--|:--|:--|:--|:--|"]
+    for r in ag["rows"]:
+        s, b = r["session"], r["before"]
+        L.append(f"| {r['metric']} | {agq(s['ab'])} | {s['ab']['above_one']} / {s['ab']['n']} | {agq(s['aa'])} | "
+                 f"{'**established**' if s['established'] else 'not established'} | {agq(b['ab'])} | {agq(b['aa'])} | "
+                 f"{'established' if b['established'] else 'not established'} |")
     L.append("")
     qt = doc["quartic_twist_pair_component"]
     L += ["## Quartic-twist pair index, outside tables A–C", "",
@@ -3318,6 +3379,33 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    ag = doc["aimed_gather_component"]
+
+    def agh(q):
+        return f'{q["median"]:.3f} <span class="muted">[{q["ci95"][0]:.3f}, {q["ci95"][1]:.3f}]</span>'
+    P.append('<section class="card" id="aimed-gather-component"><h2>Aimed-subset gather in relation collection, outside the priced tables</h2>'
+             f'<p><code>ic price</code> on <code>{esc(ag["curve"])}</code> (rule v3 <code>k0n53/T01</code>, aimed m = 3 '
+             'collection): main against the change that gathers the aimed subset&#x27;s coordinates once per unit '
+             'instead of on every trial (class: engineering, #2448). Every arm counts the same operations and recovers '
+             'the same logarithm, so S and every row above are unchanged; the rule v7 row for this curve was timed '
+             f'before the change and is not re-priced. Callgrind instructions per process, main / candidate: '
+             f'{ag["callgrind_ratio"]["k0n53"]:.3f} at n53, {ag["callgrind_ratio"]["k0n61"]:.3f} at n61. '
+             'Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its '
+             f'lower end clears 1 and the same-session A/A&#x27;s upper end. {ag["processes"]} processes, none contended. '
+             f'{esc(ag["validation"].rstrip("."))}. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(ag["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>metric</th><th>2026-10-29 A/B</th><th class="n">rounds &gt; 1</th>'
+             '<th>A/A (42 rounds)</th><th>verdict</th><th>before: 2026-10-23 A/B</th><th>before: A/A (5 pairs)</th>'
+             '<th>before: verdict</th></tr></thead><tbody>')
+    for r in ag["rows"]:
+        s, b = r["session"], r["before"]
+        P.append(f'<tr><td>{esc(r["metric"])}</td><td>{agh(s["ab"])}</td>'
+                 f'<td class="n">{s["ab"]["above_one"]} / {s["ab"]["n"]}</td><td>{agh(s["aa"])}</td>'
+                 f'<td>{"<strong>established</strong>" if s["established"] else "not established"}</td>'
+                 f'<td>{agh(b["ab"])}</td><td>{agh(b["aa"])}</td>'
+                 f'<td>{"established" if b["established"] else "not established"}</td></tr>')
     P.append('</tbody></table></section>')
 
     qt = doc["quartic_twist_pair_component"]
