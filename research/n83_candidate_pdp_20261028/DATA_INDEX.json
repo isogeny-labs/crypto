@@ -271,6 +271,36 @@
           "sha256": "a28f63a0e49dc7e7065a1ac59d2f062f3ce8dcbe25a00c73cc1d6149af41d2e0"
         }
       ]
+    },
+    {
+      "id": "binary-m3-lfd-continuation",
+      "contains": "Twelve retained m3 identities; 12 complete V3 spaces; inherited LFD>=3, global upper and exact unknown",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree3-continuation/summary.json",
+          "bytes": 30582,
+          "sha256": "6b38006e3bcba14f14e1f63c5b8f2a34566a91d493919310d3d9210234f1dc3c"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE3_CONTINUATION_FORMAT.json",
+          "bytes": 4222,
+          "sha256": "bf299c07013b7c155b7e0939b8d313635b09c276f18893cfe9121a506ca23dc1"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree3-continuation-storage.json",
+          "bytes": 1336,
+          "sha256": "183c67574d0f1ad8c6c59b55bdfa40329b5478a7e3cb462b3a93644bc1e239e3"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/degree3-continuation-publication.json",
+          "bytes": 8958,
+          "sha256": "cd6275929f39def0f63314737fb76c5dad54380d19adcca8fbe648f34c2a10d6"
+        }
+      ]
     }
   ],
   "semantics": [
@@ -280,5 +310,19 @@
     "All earlier datasets and failed attempts remain; later bounds do not overwrite earlier evidence",
     "No universal FFD/LFD or elite-base conclusion; independent scientific review remains pending"
   ],
-  "latest_dataset": "binary-m3-lfd-capped"
+  "latest_dataset": "binary-m3-lfd-continuation",
+  "views": [
+    {
+      "path": "FIXED_BASE_REGULARITY.json",
+      "bytes": 35635,
+      "sha256": "882079a892fb7d3dca09205082f87991d452535c2f55bbe22a608c6ea7c5de36",
+      "contains": "Source-joined view of the 48 original fixed-base systems; exact values, intervals and positive-dimensional quotients remain distinct"
+    },
+    {
+      "path": "FIXED_BASE_REGULARITY.csv",
+      "bytes": 14285,
+      "sha256": "8436aa414b8ee62369d6e162a89b3a79cfad69f4140d56d24988419b744640aa",
+      "contains": "Source-joined view of the 48 original fixed-base systems; exact values, intervals and positive-dimensional quotients remain distinct"
+    }
+  ]
 }

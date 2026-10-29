@@ -4,13 +4,13 @@
 - **Kind:** resource limit; presentation limitation; instrumentation gap
 - **Affected work:** [N83 m2–m9 study](../research/n83_ic_degree_sweep_20261027/README.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-28
+- **Last updated:** 2026-10-29
 
 ## Problem
 
-The requested finite degree-of-regularity measurements are not established by the bounded n83 sweep, and the chosen prime top-form presentation is positive-dimensional for m>=3.
+For the current fixed-base n83 request, m2 highest-form regularities are certified exactly, while m3..9 binary/Koblitz values remain intervals and the prime top-form presentation is positive-dimensional for m>=3. Intermediate solving degree and an elite-base improvement remain unestablished.
 
-The scope is all Koblitz, general binary and prime cells at m=2..9 with ell=floor(83/m), one planted and one natural full-curve target per cell. Top-form regularity and affine final-basis degree are different computations; maximum intermediate solving degree is not instrumented. Retain the original requested measurements as unresolved where no finite result is certified.
+The current scope is all Koblitz, general binary and prime cells at m=2..9 with one fixed ell27 factor base per curve, one planted and one natural full-curve target per cell. The earlier ell=floor(83/m) sweep below remains historical evidence. Top-form regularity and affine final-basis degree are different computations; maximum intermediate solving degree is not instrumented. Retain the original requested measurements as unresolved where no finite result is certified.
 
 ## Evidence and uncertainty
 
@@ -59,3 +59,37 @@ input expansion from solver work and validate an appropriate finite-degree
 presentation/backend. No first-fall substitution or timeout-derived bound
 resolves the remaining regularity measurements. The earlier balanced-domain
 results and protocol remain historical evidence, unchanged.
+
+
+## Fixed-base certificates and continuation, 2026-10-29
+
+Later native certificates resolve original highest-form regularity at m=2:
+Koblitz/general binary exactly 28 and prime exactly 42, on both retained
+original target kinds and the paired baseline/spike40 panels. For binary and
+Koblitz m=3..9, certified intervals are respectively [111,138], [194,221],
+[277,331], [360,414], [443,524], [526,607] and [609,717]. Exact higher-m
+values remain unresolved. Prime m>=3 retains the positive-dimensional
+highest-form quotient in this presentation. This is not a statement of
+infinite Castelnuovo–Mumford regularity.
+
+The [48-row original fixed-base view](../research/n83_candidate_pdp_20261028/FIXED_BASE_REGULARITY.json)
+joins those existing certificates only after matching exact system and point
+manifest hashes. [DATA_INDEX](../research/n83_candidate_pdp_20261028/DATA_INDEX.json)
+preserves the original attempts, all later certificates, formats and storage
+records. The earlier zero-completion statement above describes the bounded
+solver attempts, not these later exact certificates.
+
+The twelve retained m3 V3 prefixes have now been continued to complete V3
+spaces, with producer, fresh and S3-restored replay checks. Their LFD>=3
+witnesses were already in the parent prefixes. No global LFD upper bound or
+exact LFD follows from V3 completion. All earlier data and capped traces remain.
+See the [continuation publication record](../research/n83_candidate_pdp_20261028/evidence/degree3-continuation-publication.json).
+
+The next regularity obligation is an exact certificate for the overlapping
+binary m3 chain on the unchanged polynomial presentation. Current disjoint
+component bounds do not resolve that overlap. For higher LFD witnesses, the
+complete V3 spaces can now support strict nonmembership tests; further closure
+work needs a new frozen protocol and preserved parent/suffix data. A global
+upper certificate is still a separate obligation. Neither the equal m2
+regularities nor the higher-m bounds establish an elite base; held-out matched
+targets and unchanged preprocessing remain required. This problem stays open.

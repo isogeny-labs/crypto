@@ -117,3 +117,25 @@ planted; these are recorded queue sizes, not estimates of work to completion.
 Even full V3 closure alone would not prove an LFD upper bound. A global unit,
 affine-completion or another independently justified stabilization certificate
 remains necessary. Higher-m/prime LFD and elite-base selection remain open.
+
+
+## 2026-10-29 update: retained m3 V3 continuation finished
+
+Run `n83-degree3-continuation-20261029-r1` extended all twelve immutable
+prefixes. All twelve producers, fresh replays and S3-restored replays passed.
+12 queues exhausted and 0 remained capped.
+It adds 40748 independent rows and 61224
+processed operations, summed from native records. The strict lower bound LFD>=3
+is inherited in 12 cases; no new global upper
+bound or exact LFD is certified. Complete V3 is not a stabilization theorem.
+All 270 new manifest entries and
+230 parent entries match before
+and after restored replay. The original prefixes remain unchanged.
+
+See `DEGREE3_CONTINUATION_FORMAT.json`, `experiment-degree3-continuation.export.json`
+and `evidence/degree3-continuation-publication.json`. Do not repeat this run.
+Complete V3 now permits verified nonmembership tests for future degree-four
+fall witnesses. Any such extension needs a new frozen method/protocol and
+must preserve parent and suffix traces. Exact higher-m regularity, prime LFD,
+held-out matched target sampling and elite-base selection remain unresolved.
+No regularity change or factor-base quality ranking follows from closure rank.
