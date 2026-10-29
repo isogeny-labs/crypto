@@ -282,6 +282,35 @@ def koblitz_modular_geometry(ref, since):
                  better="neutral", label=label, source=f"{path}@{commit}")
 
 
+    # Exact construction counters in the later Koblitz batches. These are
+    # recorded certificate sizes, not attack rank or comparative cost.
+    for round_id in (27, 28, 29):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            counters = []
+            if round_id == 27:
+                rr = record.get("complete_RR", {})
+                models = record.get("projective_models", {})
+                if rr.get("accepted") and rr.get("complete_serialized_exports"):
+                    counters.append(("koblitz_modular.complete_rr_sections", rr.get("sections"),
+                                     "sections", "Complete prescribed source RR basis; written geometry bridge"))
+                if models.get("accepted") and models.get("all_kernel_vectors_and_pivots_recombined"):
+                    counters.append(("koblitz_modular.proper_source_quadrics", models.get("source_quadrics"),
+                                     "homogeneous equations", "Complete source I2 basis; no IC relation-rank claim"))
+                    counters.append(("koblitz_modular.proper_quotient_quadrics", models.get("quotient_quadrics"),
+                                     "homogeneous equations", "Complete invariant quotient I2 basis; old coupled saturation remains separate"))
+            else:
+                images = record.get("ordinary_images", {})
+                if images.get("accepted"):
+                    count = images.get("selected_supports_cumulative", images.get("selected_supports"))
+                    counters.append(("koblitz_modular.ordinary_supports_with_selected_hecke_images", count,
+                                     "closed first-image supports", "Selected ordinary Hecke images under written norm bridge; C5 lifts and IC rank separate"))
+            for metric, value, unit, label in counters:
+                emit(metric, value, date=date, problem=P_IC, unit=unit,
+                     better="neutral", label=label, source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"

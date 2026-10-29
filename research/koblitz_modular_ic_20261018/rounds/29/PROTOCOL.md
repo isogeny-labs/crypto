@@ -79,3 +79,12 @@ SS/cusp avoidance andfivecoefficient-descent curve/product residuals. Record
 alloffsets, includingnone. These are E49closed-image dependencies only; the
 scalarC5lift/coloredF32modularfactor columns are not replaced by these tests.
 No independence/rank promoted from noncoincident baseimages. Samecaps.
+
+DEPENDENCIES01strictPASS: allfourordinarypairs/fiveconjugates andtranslation
+controls. On degree436,secondimage=Frobenius218(first);degree12=Frobenius6,
+withmultiplicity2. Thus ordinary460difference vanishesasBASEE49closeddivisor.
+On284/83 allfourtestedidentity/negation/2torsiontranslation offsets areabsent.
+ColoredC5deckoffsets andactualmodularfactor projectedcolumns remainuncomputed;
+no zero/nonzeroICrank conclusion is drawn fromthisbaseclassification.
+Lean29accepted2named/2audited,0failing/0trustednative. AcrossR27-R29:40named,
+41auditedincludingonegeneratedcongruence. No scientificsource/failure replaced.

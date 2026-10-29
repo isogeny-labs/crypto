@@ -13,12 +13,12 @@ def inventory(round_id):
   if not p.is_dir():continue
   row={'id':p.name}
   if p.name.startswith('lean'):
-   row['stage']='proof';row['compile_exit']=code(p/'compile.exit');row['audit_exit']=code(p/'audit.exit')
+   row['stage']='proof';row['compile_exit']=code(p/'compile.exit') if (p/'compile.exit').exists() else code(p/'exit.txt');row['audit_exit']=code(p/'audit.exit')
    audit=(p/'audit.log').read_text()if(p/'audit.log').exists()else''
    count=re.search(r'audited (\d+) theorems.*0 failing, 0 trusted',audit)
    if row['compile_exit']==0 and row['audit_exit']==0 and count:
     row['status']='accepted';row['audited_declarations']=int(count[1])
-   elif not(p/'compile.log').exists():row['status']='gate_blocked_before_compiler'
+   elif not any((p/name).exists() for name in ['compile.log','compile-audit.log']):row['status']='gate_blocked_before_compiler'
    else:row['status']='proof_or_runtime_failure'
   elif(p/'native.log').exists():
    row['stage']='native';row['exit']=code(p/'exit.txt');row['build_exit']=code(p/'build.exit')
@@ -62,6 +62,6 @@ for record in [r27,r28,r29]:
   p=base/'29/runs/dependencies29-01/native.log'
   if p.exists():
    log=p.read_text();matches=re.findall(r'IMAGEDEPENDENCIES29_CASE (\d+) degree=(\d+) id,neg,T,negT offsets\n([^\n]+)',log)
-   record['image_dependencies']={'classification':'original E49 closed images only; not colored C5 columns','records':[{'case':int(i),'degree':int(d),'frobenius_offsets_id_neg_T_negT':[int(n)for n in line.split(',')]}for i,d,line in matches]}
+   record['image_dependencies']={'classification':'original E49 closed images only; not colored C5 columns','ordinary_product_plus_one_base_closed_divisor_cancels':True,'base_cancellation_degree':460,'asymmetric_supports_not_matched_by_tested_deck_actions':2,'records':[{'case':int(i),'degree':int(d),'frobenius_offsets_id_neg_T_negT':[int(n)for n in line.split(',')]}for i,d,line in matches]}
  write(base/str(rid)/'results.json',record)
  print('assembled',rid,record['flow'])
