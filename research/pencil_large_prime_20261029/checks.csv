@@ -1,5 +1,5 @@
 check_id,class,status,count,unit,evidence,scope
-producer_tests,development_test,pass,5,tests,producer-tests.log,signed parity and inconsistency rejection and phase attribution
+producer_tests,development_test,pass,6,tests,producer-tests.log,signed parity and inconsistency rejection and phase attribution
 producer_lint,software_check,pass,0,warnings,producer-clippy.log,producer feature and all targets
 producer_execution,cohort_result,not_run,0,targets,README.md,geometric producer wired but not executed
 rust_suite,development_test,pass,14,tests,rust-tests.log,symbolic reduction and semantic and allocation instrumentation
@@ -19,5 +19,6 @@ collector_integration,implementation_gap,open,,,README.md,pencil adapter and exa
 new_cohort_targets,cohort_result,not_run,0,targets,README.md,no new cohort execution
 candidate_over_rho,comparative,unmeasured,,,README.md,no new end to end price
 sparse_map_contract,development_test,pass,2,tests,src/sparse.rs,numeric ordering and exact size hints and unmetered JSON serialization
-phase_attribution,development_test,pass,1,test,src/bin/pencil_symbolic.rs,reject missing field native symbolic work and negative interval remainder
+phase_attribution,development_test,pass,1,test,src/native_solver.rs,reject missing field native symbolic work and negative interval remainder
 scalar_normalization,development_test,pass,2,tests,src/scalar_ledger.rs,loop-count identity and actual Ring inverse parity and invalid-ledger rejection
+solver_api_contract,development_test,pass,1,test,src/native_solver.rs,explicit config and source rejection and unavailable observer and flag cleanup
