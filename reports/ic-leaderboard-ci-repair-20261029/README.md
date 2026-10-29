@@ -39,3 +39,18 @@ objects are byte-semantic identical, and every non-curve scientific section
 is unchanged. Only counts and input-source bindings change beside those
 additions. Browser currentness and the existing browser/leaderboard parser
 suites pass. No browser UI or generator algorithm changes.
+
+## Latest accepted main: 20,787 rows
+
+After normal integration of concurrent main synchronization, both views add
+195 curves relative to original main d0c081c8, with zero removals. Existing
+numeric model, order, generator and result fields remain identical. Accepted
+main adds two EC1 representations and aliases for one existing curve and
+refreshes 121 source-reference lists. That curve also receives its canonical
+generator-construction label and expanded record-UID list. Progress-point
+values are unchanged; the source's updated-date metadata advances from
+October 27 to October 28. The exact field-level comparison records these
+inherited metadata changes. All non-curve scientific sections are unchanged.
+Currentness of all four outputs and complete 860-file coverage pass again.
+Missing Git objects were fetched by exact named input; the generator's strict
+missing-input refusal remains active.
