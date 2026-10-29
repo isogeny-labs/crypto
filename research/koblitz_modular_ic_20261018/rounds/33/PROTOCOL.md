@@ -89,3 +89,16 @@ Preserve its full source/log and exit. Replace only the initializer by an
 explicit68x68zero matrix with diagonal entries1. Reassemble/commit before
 fresh desc33-02, after observing desc33-01 terminal. No cap, mathematical
 input, Gaussian routine or acceptance condition changes.
+
+After verifying its PID/cwd and the matrix type error, the operator sentTERM
+to the own desc33-01 CAS to avoid further invalid work. Native exit0 still
+failed the runner's error/marker gate; no cubic result is accepted. The
+corrected invocation uses fresh desc33-02 only after the old handle terminal.
+
+## Prospective universal Lean descent lemmas
+
+KoblitzTwistDescent33 proves add-self-zero for a characteristic2 module,
+C_t²=I, (I+N)C_(t+1)=C_t and bijectivity, assuming N²=0. These give the
+operator algebra for completeness/descent. They do not import actual native
+matrices, point tables, global pole bounds or the proper-model bridge.
+Pinned compile and transitive standard-foundations-only audit as above.
