@@ -5,6 +5,7 @@ paddingRepresentatives33[2]=list(number((a+1)),number((a2+a)),number((a3+a2+a+1)
 
 proc trace35(number x){number s=0;int i;for(i=0;i<5;i++){s=s+x;x=x^2;}if(s!=0 && s!=1){ERROR("ALG35_TRACE");}return(s);}
 list point35=paddingRepresentatives33[1];number u0Alg35=(number(point35[1])+number(point35[2]))/number(point35[2])^2;
+if(u0Alg35^5+u0Alg35^3+1!=0){ERROR("ALG35_BASE_MINIMAL_POLYNOMIAL");}
 list smallPiv35;list smallCo35;int iAlg35;int jAlg35;int pAlg35;int smallRank35;poly bitsAlg35;poly coAlg35;poly targetAlg35;poly solutionAlg35;
 for(iAlg35=1;iAlg35<=5;iAlg35++){smallPiv35[iAlg35]=poly(0);smallCo35[iAlg35]=poly(0);}
 for(iAlg35=0;iAlg35<5;iAlg35++){
