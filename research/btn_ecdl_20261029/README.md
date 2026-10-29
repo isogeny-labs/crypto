@@ -84,7 +84,7 @@ results through presigned S3 URLs, pod terminated in `finally`) and runs
 export RUNPOD_API_KEY=...            # and AWS credentials for the S3 bucket
 scripts/checkpoint.sh init           # resume checkpoint; hooks refuse launchers without it
 python3 research/btn_ecdl_20261029/runpod/launch.py --list-gpus
-python3 research/btn_ecdl_20261029/runpod/launch.py --out /tmp/btn-runpod-1 --gpu-match L40S --env TOY_SEEDS="1 2"
+python3 research/btn_ecdl_20261029/runpod/launch.py --out /tmp/btn-runpod-1 --gpu-match L40S   # one seed fits the 330-min job; raise --job-minutes for more
 python3 research/btn_ecdl_20261029/runpod/launch.py --dry-run --out /tmp/btn-dry   # no credentials needed
 ```
 

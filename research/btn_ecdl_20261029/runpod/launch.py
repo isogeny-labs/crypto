@@ -2,7 +2,7 @@
 
     export RUNPOD_API_KEY=...   # plus AWS credentials for the S3 result channel
     python3 launch.py --list-gpus
-    python3 launch.py --out /tmp/btn-runpod-1 [--gpu-match "L40S"] [--env TOY_SEEDS="1 2"]
+    python3 launch.py --out /tmp/btn-runpod-1 [--gpu-match "L40S"] [--env TOY_SEEDS=1]
 
 Reuses the container contract of ecc2k130/runpod_job.py (CUDA image, source
 tarball and results through presigned S3 URLs, pod terminated in `finally`).
