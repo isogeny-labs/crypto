@@ -9,6 +9,26 @@ not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
 
+## Sparse map observations (T-797)
+
+The symbolic maps now record map API calls, ordered-key comparisons, yielded
+entries and cloned entries. Numeric key ordering and JSON coefficient maps
+are preserved. Iterators forward the underlying exact size hint so collecting
+rows does not add growth allocations merely because instrumentation was added.
+Serialization bypasses metering; equality, length queries, dropped iterator
+remainders and internal tree-node movement are not charged by these counters.
+These are separate semantic observations, not a count of all CPU instructions.
+Comparison counts depend on the Rust standard-library implementation; the
+recorded toolchain identity is part of the measurement contract.
+
+The implementation follows the official
+[BTreeMap API](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html):
+ordered traversal and consistent lookup ordering. A read-only peer review
+identified lost iterator size hints; forwarding and regression assertions
+were added before delivery. Current validation is 13 default library tests,
+14 producer-feature library tests and three producer adapter tests. Cohort
+execution and a complete frozen pricing model remain open.
+
 ## Inputs and outputs
 
 Each input equation is homogeneous, `sum a_i X_i + sum b_j S_j = 0`, with

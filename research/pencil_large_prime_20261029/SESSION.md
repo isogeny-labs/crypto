@@ -199,3 +199,29 @@ no migration-dependent jobs were restarted. Diem is deadline-expired and idle.
   successful run. Native test behavior remained unchanged.
 - T-789's first CLI lease expired; checked for conflicting owners and reclaimed
   the same task. A bounded lease keeper maintains the second claim until handoff.
+
+## 2026-10-29 T-797: sparse map observations
+
+### What was done
+Added transparent tracked sparse maps and four semantic counters, preserving
+numeric key order and coefficient JSON. Reviewed against official BTreeMap
+documentation. Independent read-only review found lost iterator size hints;
+forwarding and regression checks now preserve collection allocation sizing.
+
+### Decisions made
+This is mathematical implementation and instrumentation, not a real-world
+key-recovery result. No new cohort or comparative result is asserted. Map
+comparison counts are implementation-dependent; equality and tree internals
+are not fully counted. Output serialization remains outside the meter.
+
+### Open threads
+Frozen pricing contract, experimental admission and EKS ownership reconciliation
+remain open. The pencil cohort still has 717 missing candidate completions.
+Shared dated session log remains reserved to another task; record kept here.
+
+### Errors
+Initial wrapper omitted iterator size hints; corrected following peer review.
+Diem remains deadline-expired at 50/52 records and was not restarted.
+
+An overlapping local build produced a missing-object linker diagnostic; all
+builds were allowed to finish and default tests were rerun sequentially.

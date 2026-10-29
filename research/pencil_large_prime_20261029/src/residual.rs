@@ -1,8 +1,8 @@
 //! Retained row space for the graph's emitted small-variable constraints.
 //! Caps count coefficients, not bytes or total memory. No row is silently lost.
 
+use crate::sparse::TrackedMap;
 use crate::{accumulate, inverse, is_prime, mul, neg, reduce, Error, Sparse};
-use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Limits {
@@ -36,7 +36,7 @@ pub struct Basis {
     p: u64,
     columns: usize,
     limits: Limits,
-    rows: BTreeMap<usize, Sparse>,
+    rows: TrackedMap<Sparse>,
     retained: usize,
     counts: Counts,
 }
@@ -50,7 +50,7 @@ impl Basis {
             p,
             columns,
             limits,
-            rows: BTreeMap::new(),
+            rows: TrackedMap::new(),
             retained: 0,
             counts: Counts::default(),
         })
