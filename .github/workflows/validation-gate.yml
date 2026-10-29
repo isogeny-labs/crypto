@@ -31,8 +31,10 @@ concurrency:
 
 jobs:
   gate:
-    runs-on: ${{ (((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.CRYPTO_VALIDATION_LOCAL_BRANCH != '' && vars.CRYPTO_VALIDATION_LOCAL_BRANCH == github.head_ref) || (github.event_name == 'workflow_dispatch' && inputs.local_runner)) && 'crypto-cli-gate-arm64') || ((github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-highmem') || ((github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|validation-gate.yml|') && 'crypto-eks-linux') || 'ubuntu-24.04' }}
-    timeout-minutes: 30
+    # Keep the merge gate available while the optional EKS pools are offline.
+    # This is ordinary CPU validation; experiment runner selection is separate.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     steps:
       # The full-history checkout no longer fits a hosted runner: from
       # 2026-10-23 04:20 UTC every run died with "No space left on device".
@@ -51,6 +53,26 @@ jobs:
         with:
           fetch-depth: 1
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
       - name: Fetch the base tip
         if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.local_runner)
         env:
@@ -67,10 +89,18 @@ jobs:
         if: runner.environment == 'github-hosted' || !startsWith(runner.name, 'crypto-cli-gate-')
         with:
           python-version: '3.11'
-      - name: Confirm Python 3.11
-        run: python3 -c 'import sys; assert sys.version_info[:2] == (3, 11), sys.version'
+      - name: Restore tracked benchmark inputs for committed-tree tests
+        run: |
+          git restore --source=HEAD --worktree -- \
+            research/postgb_linear_stage_20261026 \
+            research/ic_m2_linear_ladder_20261024 \
+            research/s5_plain_c4_options_20261019
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
+      - name: Reject stale native curve catalog bindings
+        run: |
+          python3 scripts/test_curve_catalog_consistency.py
+          python3 scripts/check_curve_catalog_consistency.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
         env:
           BASE_REF: ${{ github.base_ref || (github.event_name == 'workflow_dispatch' && inputs.local_runner && 'main') || '' }}

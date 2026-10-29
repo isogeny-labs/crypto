@@ -119,9 +119,8 @@ pub const NIST_CURVES: &[(&str, &str, Family)] = &[
     ("B-571", "sect571r1", Family::BinaryRandom),
 ];
 
-/// Published Certicom challenge groups: the binary-field curves and the
-/// 131-bit prime-field ECCp-131. The display suffix is the subgroup bit
-/// size; it is not always the field degree.
+/// Published Certicom challenge groups. Their historical display suffixes
+/// need not match the field degree or the exact subgroup bit length.
 pub const CERTICOM_CURVES: &[(&str, &str, Family)] = &[
     ("ECCp-131", "eccp-131", Family::Prime),
     ("ECC2K-130", "ecc2k-130", Family::Koblitz),

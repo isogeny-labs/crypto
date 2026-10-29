@@ -1960,14 +1960,26 @@ fn dump_instance(f: &Fq3, ec: &EllE, spec: &Spec, seed: u64, dd: u64) {
     };
     let e2 = |x: &E2| format!("[{},{}]", x.0[0], x.0[1]);
     let e6 = |x: &E6| format!("[{},{},{}]", e2(&x.0[0]), e2(&x.0[1]), e2(&x.0[2]));
-    let pt = |q: &PtE6| format!("{{\"x\":{},\"y\":{},\"inf\":{}}}", e6(&q.x), e6(&q.y), q.inf);
+    let pt = |q: &PtE6| {
+        format!(
+            "{{\"x\":{},\"y\":{},\"inf\":{}}}",
+            e6(&q.x),
+            e6(&q.y),
+            q.inf
+        )
+    };
     let line = format!(
         "{{\"p\":{},\"seed\":{},\"w\":{},\"s\":{},\"a2\":{},\"a4\":{},\"l\":{},\"g\":{},\"q\":{},\"d\":{},\"dd\":{},\"lin\":\"{}\"}}\n",
         spec.p, seed, f.f.w, e2(&f.s), e6(&ec.a2), e6(&ec.a4), spec.l, pt(&spec.g), pt(&spec.q), spec.d, dd, lin_mode_name()
     );
     use std::io::Write;
-    let mut out = std::fs::OpenOptions::new().create(true).append(true).open(&path).expect("JV_DUMP_INSTANCE");
-    out.write_all(line.as_bytes()).expect("JV_DUMP_INSTANCE write");
+    let mut out = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .expect("JV_DUMP_INSTANCE");
+    out.write_all(line.as_bytes())
+        .expect("JV_DUMP_INSTANCE write");
 }
 
 /// `JV_LIN=dense|l1a|sparse|fast` (default fast since
@@ -2698,7 +2710,15 @@ pub fn rho_e_neg(spec: &Spec, seed: u64) -> RhoRunE {
     let canon = |pt: PtE6, a: u64, b: u64| -> (PtE6, u64, u64) {
         let ny = f.neg(&pt.y);
         if !pt.inf && ny < pt.y {
-            (PtE6 { x: pt.x, y: ny, inf: false }, (n - a) % n, (n - b) % n)
+            (
+                PtE6 {
+                    x: pt.x,
+                    y: ny,
+                    inf: false,
+                },
+                (n - a) % n,
+                (n - b) % n,
+            )
         } else {
             (pt, a, b)
         }
@@ -2733,7 +2753,11 @@ pub fn rho_e_neg(spec: &Spec, seed: u64) -> RhoRunE {
             let mut j = index(&l);
             let mut next = None;
             for _ in 0..r {
-                let c = canon(ec.add(&l, &mults[j].2), (a + mults[j].0) % n, (b + mults[j].1) % n);
+                let c = canon(
+                    ec.add(&l, &mults[j].2),
+                    (a + mults[j].0) % n,
+                    (b + mults[j].1) % n,
+                );
                 if index(&c.0) != j {
                     next = Some(c);
                     break;

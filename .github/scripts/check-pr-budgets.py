@@ -17,22 +17,36 @@ UNKNOWN = object()
 EVENTS = ("pull_request", "merge_group")
 ROUTINE_PR_TYPES = {"opened", "synchronize", "reopened", "ready_for_review"}
 
+# These existing PR jobs are historical proof artifacts: their exact workflow
+# bytes are included in checked Lean evidence seals. Keep each exception tied
+# to the exact seal and workflow content, rather than allowing a workflow name
+# or a proof-job label to exempt future work.
+FROZEN_BUDGET_EXCEPTIONS = {
+    ".github/workflows/weak-curve-lean.yml": {
+        "job": "proofs",
+        "timeout": 60,
+        "seal": "research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv",
+        "seal_sha256": "bd7de95c3c6fc9060a15cd03a99fe6bea2272ccf815cee59a0d1d02e5606e625",
+        "pin_path": "../../.github/workflows/weak-curve-lean.yml",
+    },
+    ".github/workflows/weak-curve-conjectures.yml": {
+        "job": "evidence",
+        "timeout": 60,
+        "seal": "research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS",
+        "seal_sha256": "bd1fbaf84fcb00ca2cf7d2eb7c6691463c6e1d7e5bd00c6744fa1870b1ff711c",
+        "pin_path": "../../.github/workflows/weak-curve-conjectures.yml",
+    },
+}
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Named jobs whose routine PR budget is longer than 25 minutes, each with the
 # reason. Exact on workflow path, job name and timeout; nothing else matches.
 NAMED_BUDGET_EXCEPTIONS = {
-    (".github/workflows/phase-paired-native.yml", "replay"): {
+    (".github/workflows/certicom-devices.yml", "metal-qualification"): {
         "timeout": 45,
-        "reason": "Full native phase-paired replay and committed output comparison",
-    },
-    (".github/workflows/planner-proofs-lean.yml", "lean"): {
-        "timeout": 45,
-        "reason": "Lean certificate regeneration, theorem audit, and leanchecker replay",
-    },
-    (".github/workflows/validation-gate.yml", "gate"): {
-        "timeout": 30,
-        "reason": "Repository-wide validation gate with base-tip fetch and row replay",
+        # The macOS library phase took 27m42s in run 40571119394 and
+        # 30m17s in run 40511856969; both completed successfully.
+        "reason": "Native Metal compilation and solver qualification on macOS",
     },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
