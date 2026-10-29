@@ -3134,7 +3134,18 @@ mod tests {
             .map(|line| serde_json::from_str(line).unwrap())
             .collect();
         assert!(!rows.is_empty());
-        assert_eq!(rows.last().unwrap()["event"], expected_row);
+        let last_native = rows
+            .iter()
+            .map(|row| &row["event"])
+            .rfind(|event| event["schema"] == "ml-dataset.prime-root-event/v1")
+            .unwrap();
+        assert_eq!(*last_native, expected_row);
+        let terminal = &rows.last().unwrap()["event"];
+        assert_eq!(terminal["kind"], "solver_return");
+        assert!(terminal["error"].as_str().is_some_and(|error| {
+            error.contains("live payload path collision with different bytes")
+        }));
+        assert!(terminal["outcome"].is_null());
         assert!(matches!(
             expected_row["native"]["kind"].as_str(),
             Some("power_end" | "gcd_end")
