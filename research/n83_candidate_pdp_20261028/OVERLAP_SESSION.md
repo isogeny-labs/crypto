@@ -47,3 +47,41 @@ used Git --since with a date interpreted at current time and returned no new
 rows; explicit UTC midnight corrected that query, with failure/helper preserved.
 Initial artifact push selected an untracked directory; explicit files succeeded.
 No production or replay was repeated for any publication correction.
+
+## 2026-10-29 16:55 UTC — Requested fixed-base sweep reconciled
+
+### What was done
+Verified the completed original fixed-base sweep against the currently saved
+point data: all48 system hashes match the48-row V2 result view, all three actual
+point manifests match their recorded hashes, and every family uses one manifest
+across m2..9 with134217728 candidate x-values. Checked45 navigation-file hashes,
+six regularity-source hashes,84 overlap-certificate hashes and all360 raw archive
+manifest entries. Every check passed. Fresh S3 downloads of
+FIXED_BASE_REGULARITY_V2.csv and BASE_BINDINGS.json are byte-identical to Git.
+The result CSV SHA256 is
+ae52848b740f9daa93620a6f6737a628bf78ad8ec1b5dac6233924b909bbd0f2.
+The retained96 solver attempts comprise4 complete affine bases,63 time-limit
+exits and29 memory-limit exits; subsequent certificates give34 exact top-form
+degrees and14 positive-dimensional prime top quotients in the original48 cases.
+
+### Decisions made
+Reuse the completed, published fixed-base run. This reconciliation launches no
+duplicate enumeration or solver trials and changes no numerical result. The
+ordinary top-form degree convention remains distinct from affine solving degree,
+FFD and LFD, consistent with Caminata--Gorla, arXiv:2112.05579. Certificate-based
+results retain their pending independent-review and full-formalization status.
+
+### Open threads
+The broader FFD/LFD and elite-base objective remains active. PR2706 was open at
+50d18d3d98348d3aa431551663d75a5e6e3e2211: review passed, artifact migration was
+still running and GitHub reported mergeStateStatus DIRTY. This is publication
+status, not a claim of current CI completion or merge readiness.
+
+### Errors
+The first read-only reconciliation assertion compared the input format's decimal
+string candidate_x_count with an integer. Parsing that documented numeric value
+as an integer made the check pass; no input or result was changed. The shared
+daily log is held write-exclusively by Conductor T827; the narrower check for this
+scoped handoff was clear, so the shared log was left to its owner. A storage-path
+lookup in the point dataset used a nonexistent evidence/storage.json; its actual
+README and content-addressed per-family manifests provide the storage contract.
