@@ -6,6 +6,7 @@ h=Path(__file__).resolve().parent;repo=h.parents[3]
 assert not (h/'runs.tar.xz').exists()
 assert (h/'results.json').exists()
 assert len(json.loads((h/'results.json').read_text())['runs'])==12
+assert {r['attempt'] for r in json.loads((h/'results.json').read_text())['runs']}=={p.name for p in (h/'runs').iterdir() if p.is_dir()}
 revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()
 tracked=subprocess.check_output(['git','ls-files','--',str(h.relative_to(repo))],cwd=repo,text=True).splitlines()
 exclude={'.artifacts.json','.gitignore','report.pdf','artifact-verification.json','export.json',

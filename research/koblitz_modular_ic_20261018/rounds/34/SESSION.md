@@ -57,3 +57,30 @@ be checked before launch. New CM-fiber j observation is recorded by jet check.
 prefix34-check83-01 rejected reserved coeffs name, corrected02 passes all10.
 Global quotient-basis Qdomain exclusions remain explicit566/682zeros each;
 no native run or old source record was rewritten as a success.
+
+## Completed coupled-divisor construction and delivery split
+
+### What was done
+jets34-01 passes complete9Qjets,8registered units plus discriminant unit,
+all5descent conjugates,68function comparisons, rank45/kernel151. The actual
+fiber has j=1. couple34-01 passes all10joint evaluations:rank128/kernel68,
+independent component/kernel/pivot recombinations and corrupt controls.
+Written nonprincipality and remaining projection obligations are documented.
+All12R34attempts terminal; no native/Lean CAS left running.
+
+### Decisions made
+Owner aburan28 enabled auto-merge onR33PR2873 at ba0a25ba on19:23:32UTC.
+Preserve that approved remote head. R34 is isolated on branch
+codex/koblitz-r34-integral-qcolon, with a separate review PR; do not change
+or disable the owner's R33 request. New R34auto-merge remains off.
+Next full Picard setup uses the certified154Qfinite evaluation algebra,
+subject to a fresh native protocol and checks; no setup completion claimed.
+
+### Open threads
+Publish/verify R34raw/report, then L6D0/Picard and integral desired-factor
+map. Signed E[P] may still cancel. All broader quotient/theta/embedding and
+larger support obligations remain. Independent scientific review pending.
+
+### Errors
+One rejected reserved-name run retained. Negative domain/old-module results
+are completed diagnostics, not claimed nonexistence or successful embeddings.
