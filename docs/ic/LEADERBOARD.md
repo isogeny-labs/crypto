@@ -346,6 +346,20 @@ Rho stays ahead at every size and weight; the IC ÷ rho column is the distance r
 
 validated (24 and 32 bits pass, 28 bits pass with caveats): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_wall_20261029/VALIDATION.json)
 
+## Component speed-up: a cache-blocked packed pair table in wall time (2026-10-29, engineering)
+
+Frozen protocol (backlog XP-20261029-dg-blocked): `dgb` (oracle `mitm-prime-blocked:m=2`, the pair table built cache-blocked as a PackedPairTable) against `dg` (oracle `mitm:negation_folded=1`, a scalar FastMap), both `targets = stride-renew-deferred-guard` at N_inc. Charged work is identical record by record, so this moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly given back by a slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks with native A/A admission. ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation. Only 28 bits decides: 24 and 32 bits are undecidable under the frozen rule (a below-L2 wall execution).
+
+| bits | N | pairs | ns/GAE dg → dgb | A/A | corrected dgb ÷ dg (wall) | counted dgb ÷ dg (w = 0 / 0.1 / 1) | IC ÷ rho-neg dg → dgb (w = 0 / 0.1 / 1) | reading |
+|--:|--:|--:|:--|:--|:--|:--|:--|:--|
+| 28 | 407 | 288 | 73.83 → 68.66 | 1.0001 [0.9991, 1.0012] | **0.9300 [0.9266, 0.9333]** | 1.0000 / 1.0000 / 1.0000 | 21.79 → 21.79 / 20.66 → 20.66 / 15.48 → 15.48 | component speed-up (wall per GAE); counted S identical |
+
+Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. Wall time is host-specific (one host class) and cannot be replayed.
+
+[Report](../../research/ic_dg_blocked_20261029/README.pdf) · [study](../../research/ic_dg_blocked_20261029/).
+
+validated (28 bits): replay certificate, validator report and the matched rho reference with the §5a band (research/ic_dg_blocked_20261029/VALIDATION.json)
+
 ## Linear-algebra engine, outside tables A–C
 
 The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime (class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, and no row moves. Study: [research/la_engines_20261014/](../../research/la_engines_20261014/).

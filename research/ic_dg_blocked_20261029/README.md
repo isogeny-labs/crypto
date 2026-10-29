@@ -4,7 +4,7 @@ Frozen protocol: `backlog/XP-20261029-dg-blocked/PROTOCOL.md` (commit cd04cfd2d1
 
 **Question.** The incumbent prime-field oracle `mitm:negation_folded=1` ("dg") keeps its pair table in a scalar FastMap. `mitm-prime-blocked:m=2` ("dgb") builds the same table as a PackedPairTable, cache-blocked. Both arms run `targets=stride-renew-deferred-guard` at the incumbent factor base N_inc. They charge identical work, so the question is whether the packed layout costs less real time. This study measures it as wall time per charged GAE, at L2, with a native A/A correction.
 
-Every number below is read from `ecbench compare` or `ecbench band` output, or from the card's `phase_sums.json`, in `P<b>/{wall,counted}/analysis/`. Nothing here is computed by hand.
+Every ratio and interval in the decision and counted tables is read from `ecbench compare` or `ecbench band` output, and every phase sum from the card's `phase_sums.json`, in `P<b>/{wall,counted}/analysis/`. The percentages and fractions in the phase discussion are descriptive arithmetic on those sums; the validation figures come from the validator report.
 
 ![wall ratios, ns per GAE and phase sums](figures/ratios.png)
 
@@ -34,7 +34,18 @@ Statistic: the `wall` block of `ecbench compare --a dg --b dgb --weight 0` on th
 
 **The ns/GAE figures are upper bounds per operation.** Both arms carry unpriced native work.
 
-**Not relabelling, not accounting.** dg and dgb charge identical work record by record at every size, so their counted S is identical (see the next table). The wall difference is executed native work: a different memory layout for the same table.
+**Not relabelling, not accounting.** dg and dgb charge identical work record by record at every size, so their counted S is identical (see "Counted units" below). The wall difference is executed native work: a different memory layout for the same table.
+
+**Arm positions** (validator, `validation/work/recompute.json`, `sizes.P<b>.positions`; identical at 24, 28 and 32 bits over the 288 measured blocks):
+
+| arm | block positions | blocks per position |
+|:--|:--|--:|
+| `dg` | 0 and 3 | 144 each |
+| `dg-aa` | 1 and 2 | 144 each |
+| `dgb` | 1 and 2 | 144 each |
+| `dgb-edge` | 0 and 3 | 144 each |
+
+There are 144 forward and 144 reversed blocks; `dgb` follows `dg-aa` in 144 blocks and precedes it in 144.
 
 **Position control.** `dgb-edge` runs the same oracle as `dgb` at the edge of the alternate block. Its corrected ratio is 0.9302 [0.9268, 0.9336] at 28 bits, and 0.9077 and 0.8977 at 24 and 32 bits (descriptive), so the block position does not explain the gain.
 
@@ -48,7 +59,7 @@ Phase sums over the 288 measured runs, from `P<b>/wall/analysis/phase_sums.json`
 | 28 | 1769 → 1000 | 1062 → 1428 | 3800 → 4161 | 5766 → 5363 |
 | 32 | 13627 → 6150 | 10998 → 13353 | 36367 → 38616 | 50848 → 45639 |
 
-The blocked build roughly halves the oracle set-up, but probing the packed table in the target PDP phase is slower than probing FastMap (+5%, +34% and +21%). The probe cost gives back part of the set-up gain, which is why every ratio missed its prediction. E6 flagged this risk, and PR #2844's table-floor micro-benchmark points the same way: a flat one-region table is 2.3–2.9× slower on misses.
+The blocked build roughly halves the oracle set-up, but probing the packed table in the target PDP phase is slower than probing FastMap (+5%, +34% and +21%). The probe cost gives back part of the set-up gain. Together with a set-up saving smaller than predicted at 24 and 28 bits (0.594 and 0.565 of dg's, against 0.25–0.5), it explains why every ratio missed its prediction: with the target-PDP phase unchanged, the ratios would still be 0.898, 0.867 and 0.851 (validator, descriptive, taking phase times as additive). Only at 32 bits, where the set-up fell to 0.451, is the PDP rise nearly the whole miss. E6 flagged the probe risk. PR #2844's table-floor micro-benchmark (outside this evidence, not checked by the validator) points the same way: a flat one-region table is 2.3–2.9× slower on misses.
 
 **Next lever (untested):** keep the blocked build and probe through the map layout, or prefetch packed slots in the PDP phase.
 

@@ -85,11 +85,84 @@
   "The pre-registered prediction (corrected 0.77-0.84 at 28 bits) was missed: the set-up fell to 0.565 of the scalar build (predicted 0.25-0.5) and target PDP rose from 1062.3 to 1427.6 ms (+34%), consistent with a slower probe on the packed table, as the section 7 model-risk bullet allowed. The prediction decides nothing.",
   "24 and 32 bits are undecidable under the frozen rule (section 6.1 fails); their descriptive corrected ratios (0.9075, 0.8975) are reported but are not results."
  ],
- "promotion_blockers": [
-  "Section 10 outputs missing at bf899979a6: no README.md with the position table and the section 6.2 position-control figures, no figure and no PDF (research-visuals) under research/ic_dg_blocked_20261029/. They must be committed before the leaderboard or benchmarks/ change. (An untracked README.md and figures/ appeared in the working tree after the snapshot push; they are uncommitted and were not reviewed.)",
-  "The launch/ folders (requests, launcher receipts, logs) are untracked at bf899979a6; commit them in the Coordinator's snapshot (they are byte-equal to the S3 launcher receipts this validation used) or cite the S3 receipts.",
-  "The evidence review must record which leaderboard section receives the 28-bit row (pair_table_component, or a new oracle-named component section if that section holds set-up figures only), per PROTOCOL section 10."
- ],
- "promotion_note": "Evidence admissibility only for the two 28-bit rows. 24 and 32 bits are undecidable and get no row. Promotion and placement are the Coordinator's decision.",
- "draft_note": "Draft written by the validator outside the repository. Place it as research/ic_dg_blocked_20261029/VALIDATION.json with the validator files under research/ic_dg_blocked_20261029/validation/ (replay-certificate.json, validator-report.json and the rest); the two pinned sha256 values hold only if those files are copied byte for byte."
+ "promotion_blockers": [],
+ "promotion_note": "Evidence admissibility only for the two 28-bit rows; 24 and 32 bits are undecidable and get no row. No promotion blocker known to the validator remains, provided the files pinned in followup_review_2.reviewed_files_sha256 are committed byte for byte with this file. Promotion is the Coordinator's decision: this file records evidence admissibility, not authorization.",
+ "placement_note": "Placed at 313ec5d2af. The validator's draft is kept unchanged as validation/VALIDATION.draft.json; this file differs from it only in promotion_blockers, promotion_note, this note (was draft_note), followup_review and followup_review_2. validation/validator-report.json still lists the blockers as of bf899979a6; the two follow-up reviews record what changed.",
+ "followup_review": {
+  "reviewed_commit": "313ec5d2af38fe7994a6eab34aa1ef98e374f309",
+  "date": "2026-10-29",
+  "by": "VAL-20261029-33a286 (same validator, own code)",
+  "scope": "README.md, README.pdf and figures/ against the validator's numbers; P<b>/{wall,counted}/launch/ against the S3 launcher receipts; placement record",
+  "code": {
+   "path": "/dev/shm/dgb-validation/followup/followup.py (outside the repository)",
+   "sha256": "027fe5581f4a666f97baafffac3a974a568325f5c0d1fd5e426d9034e4a7706f"
+  },
+  "output": {
+   "path": "/dev/shm/dgb-validation/followup/followup.json (outside the repository)",
+   "sha256": "f3be5deb71bfc959d64265052d1d1bbdb700e341dbf089aa049db43372bebb51"
+  },
+  "checks": [
+   "313ec5d2af equals the origin tip; it adds 141 files to bf899979a6 and modifies or deletes none; validation/ equals the validator's output byte for byte (82 files, SHA256SUMS 15cc8caa...); VALIDATION.json was the draft (01d4bc34...); 46 artifact-store files match their committed .artifacts.json manifests",
+   "launch/ committed for all six sessions: receipts/request.json and result.json byte-equal to the S3 launcher receipts; request-P*.json spec = frozen spec and = the receipt job except the launcher-added memory key; CodeBuild build id = the S3 launcher id; start-request idempotency token = sha256(request.json) = result.request_sha256; CodeBuild SUCCEEDED for 28-bit wall and FAILED for the five exit-42 sessions, matching the launcher states; each log names its launcher id and state; no credentials",
+   "README.md: 80 numeric claims checked against the validator's recomputation or the committed ecbench output, 0 disagree: decision table, A/A, edge control (A/A-corrected 0.9302 [0.9268, 0.9336], 0.9077, 0.8977; recomputed exactly), phase sums, PDP rises +5/+34/+21%, set-up 0.565, counted band points 12.96/21.79/33.07 etc.; the band intervals are ecbench ops.ci95_bootstrap (cluster, 4,000 resamples) and contain the validator's own target-cluster bootstraps, so they are conservative",
+   "README.md facts: 28-bit 1,344 executions all L2; native A/A 'includes arm A', 288 pairs; card sha256 edc0da03...7ccd and 64754a62...cfda; APPROVAL.md E1-E10 and the residual-risk 'reported and not rerun'; linalg incremental-gauss; node pool cpu-spot; pods, jobs and curves as in the validator report",
+   "figures/: plot.py reads only the committed compare-dg__dgb-w0, compare-dg__dgb-edge-w0 (wall block) and phase_sums.json files, all equal to the recompute; re-rendered in scratch, ratios.png is byte-identical (e07a13a0...) and ratios.svg identical apart from matplotlib's random ids and date; the benchmarks copies are equal",
+   "README.pdf (7fd183ed...): all 81 decimal numbers of README.md appear in its text; the figure is embedded; benchmarks REPORT.pdf is the same file"
+  ],
+  "resolved_blockers": [
+   "Section 10 figure and PDF: committed at 313ec5d2af and checked (README.md also committed; see the two README blockers that remain).",
+   "launch/ folders: committed at 313ec5d2af, byte-equal to the S3 launcher receipts."
+  ],
+  "notes_not_blocking": [
+   "README.md says every number is read from ecbench compare or band output or from phase_sums.json and 'nothing here is computed by hand', but +5/+34/+21% and 0.565 are derived from phase_sums.json and the Validation section quotes the validator report.",
+   "README.md 'so their counted S is identical (see the next table)': the next table is the phase-sums table; the counted table follows it.",
+   "README.md cites PR #2844's table-floor micro-benchmark (2.3-2.9x slower on misses); that is outside this evidence and was not checked.",
+   "The uncommitted benchmarks/README.md row gives 'edge control 0.9303', the uncorrected dgb-edge/dg ratio (0.930331); README.md gives the A/A-corrected 0.9302 [0.9268, 0.9336]. Name which.",
+   "scripts/validation_gate.py does not read promotion_blockers; a 'valid' gate result does not clear them."
+  ],
+  "archived_as": {
+   "code": "validation/followup/followup.py",
+   "output": "validation/followup/followup.json",
+   "placement": "validation/followup/place.py"
+  }
+ },
+ "followup_review_2": {
+  "reviewed": "working-tree corrections on top of 313ec5d2af (uncommitted when reviewed)",
+  "date": "2026-10-29",
+  "by": "VAL-20261029-33a286 (same validator, own code)",
+  "code": {
+   "path": "validation/followup/followup2.py",
+   "sha256": "0c20d64809bc1c3ea696beefda973f395c9659d0784e91f3ffd73ef5431f9050"
+  },
+  "output": {
+   "path": "validation/followup/followup2.json",
+   "sha256": "92b7d4bb242935386dd9d74700f244c3f6bc4d93272682b2c79ee85d9ddb0f9f"
+  },
+  "checks": [
+   "README.md: the arm-position table equals the recomputed positions (dg and dgb-edge at 0 and 3, dg-aa and dgb at 1 and 2, 144 each; 144 forward and 144 reversed blocks; dgb follows dg-aa in 144 and precedes it in 144), identical at 24, 28 and 32 bits, and cites validation/work/recompute.json",
+   "README.md: the sentence 'which is why every ratio missed its prediction' is gone; its replacement states both causes and carries 0.594, 0.565, 0.451, 0.898, 0.867 and 0.851, each equal to the validator's phase arithmetic at three decimals",
+   "README.md: provenance line reworded, '(see the next table)' now points to 'Counted units', PR #2844 marked as outside the evidence and unchecked; no number of the committed README was dropped except in the replaced lines",
+   "README.pdf (b34abb27...): all 86 decimal numbers of README.md, the position table and the new sentence are in its text, the old sentence is not, the figure is embedded; benchmarks REPORT.pdf is the same file",
+   "PLACEMENT.md records dg_blocked_component outside tables A-C for the two 28-bit rows and no row for 24 and 32 bits; pair_table_component at 313ec5d2af holds set-up figures only, so this is the PROTOCOL section 10 branch",
+   "docs/ic/leaderboard.json dg_blocked_component: one 28-bit row, values equal to the recompute to 4e-12 (12-digit rounding), counted dgb/dg 1.0 at every weight; LEADERBOARD.md and ic-leaderboard.html carry 0.9300 [0.9266, 0.9333]; the section reads 'validated (28 bits)'",
+   "benchmarks/README.md row: edge control now 'A/A-corrected 0.9302'; decision 0.9300 [0.9266, 0.9333]"
+  ],
+  "reviewed_files_sha256": {
+   "benchmarks/20261029-ic-dg-blocked/REPORT.pdf": "b34abb27869fa0b17f4955b22563ca3b3351199ea32640a3e87e8f3503f29db5",
+   "benchmarks/README.md": "b477bb71047bfd35d36bea4c39c49991b458d47c7eaf1496fbb4b59986ebb6eb",
+   "docs/ic-leaderboard.html": "4369ec1efd830d659bb91eff004a7f1bc31461466b0cb9419cfc45df62dce0d7",
+   "docs/ic/LEADERBOARD.md": "10447825730a9abdd481751dbdf18f81818bf48b3c7f15103f48f70e48e6b8dd",
+   "docs/ic/leaderboard.json": "2ecde6f9bdc15d6d14e327a21c60e0f0d6cb18a9524ae6a1c634e63b49052a42",
+   "research/ic_dg_blocked_20261029/PLACEMENT.md": "557ce691a38a08116b96e54fa017914f331d65f5eccc2eaa463aeb7c5d1ba105",
+   "research/ic_dg_blocked_20261029/README.md": "2285e932d22a3fb677304ac965422f01fae7ad6f6d46b654c76f7265791369d8",
+   "research/ic_dg_blocked_20261029/README.pdf": "b34abb27869fa0b17f4955b22563ca3b3351199ea32640a3e87e8f3503f29db5",
+   "scripts/build_ic_leaderboard.py": "8930f9992452d0893ef34b89e389018da7ebf76c68a941dd5a5c87895fcb90f5"
+  },
+  "clearance_condition": "The three promotion blockers are cleared for the reviewed bytes above. They were working-tree files when reviewed (PLACEMENT.md untracked): the clearance holds only if they are committed byte for byte with this VALIDATION.json. A differing hash reopens the corresponding blocker.",
+  "cleared_blockers": [
+   "README position table (PROTOCOL section 10)",
+   "README causal sentence on the prediction miss",
+   "placement record (PLACEMENT.md: dg_blocked_component)"
+  ]
+ }
 }

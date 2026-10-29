@@ -944,6 +944,45 @@ def dg_wall_component() -> dict:
             "validated": not errs}
 
 
+def dg_blocked_component() -> dict:
+    """Wall time per charged GAE of the cache-blocked packed pair table, research/ic_dg_blocked_20261029
+    (backlog XP-20261029-dg-blocked, frozen protocol): `dgb` (oracle mitm-prime-blocked:m=2) against `dg`
+    (oracle mitm:negation_folded=1), both targets = stride-renew-deferred-guard at N_inc. The A/A-corrected
+    ns/GAE ratio from the `wall` block of the wall session's `ecbench compare --a dg --b dgb --weight 0`
+    and the arms' gap to the counted session's rho.negation, copied from the study's saved outputs. Only
+    28 bits decides (24 and 32 bits are undecidable under the frozen rule). Its standing comes from the
+    study's VALIDATION.json."""
+    study = "research/ic_dg_blocked_20261029"
+    rows = []
+    for bits, n, reading in (
+            (28, 407, "component speed-up (wall per GAE); counted S identical"),):
+        wall = load(f"{study}/P{bits}/wall/analysis/compare-dg__dgb-w0.json")["wall"]
+        if wall.get("status") != "admitted" or wall.get("pairs_below_level") or wall.get("aa_selection") != "includes arm A":
+            raise SystemExit(f"{study}: wall P{bits} not admitted")
+        counted, dg_rho, dgb_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for path, acc in ((f"wall/analysis/compare-dg__dgb-w{w}", counted),
+                              (f"counted/analysis/compare-rho-neg__dg-w{w}", dg_rho),
+                              (f"counted/analysis/compare-rho-neg__dgb-w{w}", dgb_rho)):
+                o = load(f"{study}/P{bits}/{path}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {path} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n": n, "reading": reading, "pairs": wall["pairs"],
+                     "ns_dg": wall["ns_per_gae_a"], "ns_dgb": wall["ns_per_gae_b"],
+                     "aa_ratio": wall["aa_ratio"], "aa_ci95": wall["aa_ci95"],
+                     "corrected": wall["corrected_ratio"], "corrected_ci95": wall["corrected_ci95"],
+                     "counted": counted, "dg_over_rho": dg_rho, "dgb_over_rho": dgb_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, "
+                    "EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation",
+            "validation": ("validated (28 bits): replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -2008,6 +2047,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "stride_renew_component": stride_renew_component(),
         "deferred_guard_component": deferred_guard_component(),
         "dg_wall_component": dg_wall_component(),
+        "dg_blocked_component": dg_blocked_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2644,6 +2684,27 @@ def markdown(doc: dict) -> str:
           "Wall time is host-specific (one host class) and cannot be replayed; the validator recomputed it from the "
           "records and bounded the run-order confound with the oracle set-up phase as a null.", "",
           f"[Report]({'../../' + dw['report']}) · [study](../../{dw['study']}).", "", dw["validation"], ""]
+    db = doc["dg_blocked_component"]
+    L += ["## Component speed-up: a cache-blocked packed pair table in wall time (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261029-dg-blocked): `dgb` (oracle `mitm-prime-blocked:m=2`, the pair table "
+          "built cache-blocked as a PackedPairTable) against `dg` (oracle `mitm:negation_folded=1`, a scalar FastMap), "
+          "both `targets = stride-renew-deferred-guard` at N_inc. Charged work is identical record by record, so this "
+          "moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly given back by a "
+          "slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks with native A/A "
+          f"admission. {db['unit']}. Only 28 bits decides: 24 and 32 bits are undecidable under the frozen rule "
+          "(a below-L2 wall execution).", "",
+          "| bits | N | pairs | ns/GAE dg → dgb | A/A | corrected dgb ÷ dg (wall) | counted dgb ÷ dg (w = 0 / 0.1 / 1) | IC ÷ rho-neg dg → dgb (w = 0 / 0.1 / 1) | reading |",
+          "|--:|--:|--:|:--|:--|:--|:--|:--|:--|"]
+    for r in db["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["dg_over_rho"], r["dgb_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n']} | {r['pairs']} | {r['ns_dg']:.2f} → {r['ns_dgb']:.2f} | "
+                 f"{r['aa_ratio']:.4f} [{r['aa_ci95'][0]:.4f}, {r['aa_ci95'][1]:.4f}] | "
+                 f"**{r['corrected']:.4f} [{r['corrected_ci95'][0]:.4f}, {r['corrected_ci95'][1]:.4f}]** | "
+                 f"{c_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. "
+          "Wall time is host-specific (one host class) and cannot be replayed.", "",
+          f"[Report]({'../../' + db['report']}) · [study](../../{db['study']}).", "", db["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -3507,6 +3568,32 @@ def page(doc: dict, standalone: bool) -> str:
              'Wall time is host-specific (one host class) and cannot be replayed.</p>'
              f'<p>{gh(dw["report"], "Report")} · {gh(dw["study"], "study")}.</p>'
              f'<p class="muted">{esc(dw["validation"])}</p></section>')
+    db = doc["dg_blocked_component"]
+    P.append('<section class="card" id="dg-blocked"><h2>Component speed-up · a cache-blocked packed pair table in wall time '
+             '<span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261029-dg-blocked): <code>dgb</code> (oracle '
+             '<code>mitm-prime-blocked:m=2</code>) against <code>dg</code> (oracle <code>mitm:negation_folded=1</code>), '
+             'both <code>targets = stride-renew-deferred-guard</code> at N_inc. Charged work is identical record by '
+             'record, so this moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly '
+             'given back by a slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks '
+             f'with native A/A admission. {esc(db["unit"])}. Only 28 bits decides: 24 and 32 bits are undecidable '
+             'under the frozen rule.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th class="n">N</th><th class="n">Pairs</th>'
+             '<th>ns/GAE dg → dgb</th><th>A/A</th><th>Corrected dgb ÷ dg (wall)</th>'
+             '<th>Counted dgb ÷ dg (w = 0 / 0.1 / 1)</th><th>IC ÷ rho-neg dg → dgb</th><th>Reading</th></tr></thead><tbody>')
+    for r in db["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["dg_over_rho"], r["dgb_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["n"]}</td><td class="n">{r["pairs"]}</td>'
+                 f'<td>{r["ns_dg"]:.2f} → {r["ns_dgb"]:.2f}</td>'
+                 f'<td>{r["aa_ratio"]:.4f} [{r["aa_ci95"][0]:.4f}, {r["aa_ci95"][1]:.4f}]</td>'
+                 f'<td><b>{r["corrected"]:.4f} [{r["corrected_ci95"][0]:.4f}, {r["corrected_ci95"][1]:.4f}]</b></td>'
+                 f'<td>{c_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. '
+             'Wall time is host-specific (one host class) and cannot be replayed.</p>'
+             f'<p>{gh(db["report"], "Report")} · {gh(db["study"], "study")}.</p>'
+             f'<p class="muted">{esc(db["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
