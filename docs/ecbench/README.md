@@ -534,9 +534,9 @@ for all targets (memory grows with `L`).
 `ic.koblitz_descent` reproduces `ic price --single-target` stage for stage
 (`src/bin/ic/price.rs`, test `the_ecbench_koblitz_descent_pipeline_is_this_pass`:
 the same logs, trials, relations, summands scanned, units and descent trials on
-the rule v8 `k0n41` recipe at three seeds). Its parameters are the rule v8
+the rule v8 `icv1-f2m41-tm2308219-7f48b14a` recipe at three seeds). Its parameters are the rule v8
 parameter files' fields; each defaults to `rule_v8`, the file's value at the
-six §23 sizes (k0n41, k0n53, k0n57, k0n61, k1n47, k1n59), and the planner
+six §23 sizes (icv1-f2m41-tm2308219-7f48b14a, icv1-f2m53-tm56619371-dac20a85, icv1-f2m57-tm747311035-c1f545af, icv1-f2m61-t158598901-ab42b6c5, icv1-f2m47-t22705043-f4e44623, icv1-f2m59-tm943548413-98844ecc), and the planner
 refuses `rule_v8` anywhere else, where every value must be given. `seed = run`
 takes the run's algorithm seed; by default the recipe's seed 201 fixes the
 base, the probes and the descent walks, so only the target varies between
@@ -1132,7 +1132,7 @@ run was a lower bound); linear harvest on by default (`d1d034d94`,
 F4/F6-IC search and word count; #2043 (`d72e8b04d`) made every aarch64
 host charge the eager rewrite that x86-64 already charged, where before
 it rewrote lazily and charged only the rows read (the Apple-silicon
-records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/K_0 / GF(2^23)` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
+records of 2026-10-13/14); #1646 (`e49afb98f`, 2026-10-11) sent the root's echelon form through the Four Russians kernel and had a child ask the node oracle before specialising (the F6-IC ladder of 2026-10-05, the yield sweep); #1640 (`31dd89b67`) added the `koblitz/icv1-f2m23-t5197-69e76b73` row to `docs/ic/calibration.json`, so native units of that curve were unpriced before; amendment A1 of `research/ext_endo_rho_20261023` changed the uncharged endomorphism counters of `rho.gls` and `rho.frobenius_orbit` in place (no `endomorphism_field_muls_uncharged`, three applications per GLS step), reproduced from the replay by `legacy::pre_endomorphism_a1`. The `oracle_setup` descriptors
 `pair_table_kind`, `pair_table_points` and `window_div` were added to
 `pdp3-koblitz`'s set-up counters later; a record without one is compared
 without it. `engine=rootfind-window-negfold` without `window_div` is the
