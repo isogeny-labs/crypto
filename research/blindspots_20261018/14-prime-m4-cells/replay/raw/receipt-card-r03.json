@@ -1,0 +1,268 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-R03",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r03.yaml",
+  "card_sha256": "1022f9c7a2dacd7c0e7343e3274ff3567967cc7f27ba7f7779d37c43785d2993",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03/b14",
+        "research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.225,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 5.225,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03/b14",
+        "tdec",
+        "--bits",
+        "28",
+        "--arms",
+        "b",
+        "--bx",
+        "63",
+        "--targets",
+        "16",
+        "--bcap-madds",
+        "3000000000",
+        "--bcap-nnz",
+        "25000000",
+        "--bdeadline-s",
+        "60",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b28-bx63.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 71.365,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b28-bx63",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b28-bx63.jsonl": "77f176bb413a64e3896173936c8f365691ea8b0c8dca29c5703ad9d3f484ed55"
+      },
+      "seconds": 71.365,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "77f176bb413a64e3896173936c8f365691ea8b0c8dca29c5703ad9d3f484ed55",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":28,\"p\":248685287,\"a\":49054657,\"b\":177851102,\"n\":248685841,\"B\":122,\"bx\":63,\"signed\":126,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":85.358,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":0,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4587.972}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":1,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4583.398}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":2,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4650.027}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":3,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4580.660}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":4,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4292.465}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":5,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4347.559}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":6,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4381.968}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":7,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4354.606}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":8,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4520.907}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":9,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4363.623}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":10,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4304.996}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":11,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4519.120}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":12,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4439.148}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":13,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4482.338}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":14,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4363.838}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":15,\"tkind\":\"random\",\"status\":\"budget-nnz\",\"dim\":null,\"brute_roots\":null,\"planted_vanishes\":null,\"steps\":12,\"max_degree\":87,\"max_rows\":38184,\"max_cols\":335831,\"peak_nnz\":35881564,\"zero_rows\":29,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":22856006,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":59049},\"native\":22915055,\"ms\":4475.636}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03/b14",
+        "tdec",
+        "--bits",
+        "16",
+        "--arms",
+        "b",
+        "--bx",
+        "8",
+        "--targets",
+        "16",
+        "--planted",
+        "2",
+        "--check",
+        "--t0",
+        "0",
+        "--t1",
+        "1",
+        "--bcap-madds",
+        "100000000000",
+        "--bcap-nnz",
+        "120000000",
+        "--bdeadline-s",
+        "400",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx8-t00-01.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 46.995,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b16-bx8-t00-01",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx8-t00-01.jsonl": "a87ec39dae16b4c14534550d8cb0f42a6219d6cf827d59c09c1cb839b1001c0a"
+      },
+      "seconds": 46.995,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a87ec39dae16b4c14534550d8cb0f42a6219d6cf827d59c09c1cb839b1001c0a",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":16,\"p\":48479,\"a\":25392,\"b\":20877,\"n\":48383,\"B\":17,\"bx\":8,\"signed\":16,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":52.167,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":0,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792712,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487513877,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487592646,\"ms\":46928.538}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r03"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "e5559cb2704e5a545eef1ca7a3ebf562e33b5a00",
+  "dirty_after": [
+    "benchmarks/20261018-blindspots-fp2-gaudry-k2/rho-reference.json",
+    "benchmarks/20261018-blindspots-fp2-gaudry-k2/validator-report.json",
+    "benchmarks/20261018-blindspots-fp2-gaudry-k2/validator_recompute.py",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r03-build.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r03-build.stdout.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r03-tdec-b-b16-bx8-t00-01.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r03-tdec-b-b28-bx63.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx8-t00-01.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b28-bx63.jsonl"
+  ],
+  "dirty_before": [
+    "benchmarks/20261018-blindspots-prime-m4-cells/rho-reference.json",
+    "benchmarks/20261018-blindspots-prime-m4-cells/validator-report.json",
+    "benchmarks/20261018-blindspots-prime-m4-cells/validator_recompute.py"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
