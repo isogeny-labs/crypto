@@ -1276,3 +1276,21 @@ Added a separate presentation-only native renderer for dynamic workload counts a
 
 ### Finite-cost graph and standalone provenance
 Added a separate36-cell ratioSVG with algorithm-only/calibration-inclusive series, explicit unavailable values, exact-fraction metadata and a shared axis. JSON/CSV remain exact; plotcoordinates are labelled visual approximations. Added visible title/run/scope to prevent standalone fixture misidentification. Final9tests, strictClippy andformatting pass; independentreviewaeded733... verified unchanged numericalprojection and visually inspected native raster. Root installed native librsvg2-tools2.59.2 and independently inspected the graph. Priorv2 andv3 softwarefixture packets remain separate; no experimental ratio is inferred. ProtocolPR2913 merged; reportdelivery continues on codex/pencil-observation-report-20261030.
+
+## 2026-10-30T03:33Z — Upper-gate terminal checkpoint reconciliation
+
+### What was done
+
+Observed native upper gate pencil-p186379-20261030-b1 fail with `original UTC deadline expired` at the unchanged 03:28:20 UTC deadline; controller failure receipt at 03:28:28 and CodeBuild terminal at 03:28:38.987. Downloaded version-pinned generation 6 archive read-only and checked SHA-256 and 528281600-byte size. Independent audit verified all seven extracted files against its manifest. Preserved raw checkpoint/session and controller receipts plus source-bound terminal semantics review. No restore, duplicate payload, solver replay or new cohort launch. Renderer PR #2917 merged with applicable checks passing.
+
+### Decisions made
+
+Retain all 18 planned slots: checkpoint has two reference/control warmups, zero measured observations, sixteen missing slots and zero of five measured pairs. All 36 ratios remain null. Embedded session is an unfinished checkpoint snapshot, not a fabricated terminal session. Original 10800 worker-second ceiling and 05:05:50 outer expiry remain unchanged. Native source review and frozen protocol govern interpretation; operational deadline failure is not a mathematical conclusion.
+
+### Open threads
+
+Publish native partial analysis, canonical shortfall findings, PDF and graph after this raw evidence commit. Upper gate is incomplete, so the remaining full cohort has not been admitted. Exact final worker duration/termination is not established by the stale supervisor receipt. Direct Kubernetes readback timed out; retain this gap rather than inferring a verified shutdown from controller completion.
+
+### Errors
+
+Native controller recorded deadline expiration and a last-contact error that the supervisor container could not be found. Supervisor receipt still says running with an earlier timestamp and null exit code. The controller's terminal state and stale supervisor status are both preserved unchanged. No IAM or RBAC expansion attempted.
