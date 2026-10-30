@@ -11,6 +11,10 @@ Both original EKS attempts expired unscheduled and remain preserved. The origina
 Full raw prefixes: `s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r2/raw/` and `s3://setec-astronomy-artifacts/runs/n83-radix-census-20261030-r2/raw/`. All earlier data and original fixed-base views remain unchanged. Next investigate candidate-domain geometry beyond the tested nonzero-reweighting and radix families, using the retained centered coefficients for source-bound filtered-space work.
 
 
+## Next candidate: broader Boolean encoding obstruction
+
+[The proposed derivation](BOOLEAN_ENCODING_CANDIDATE.md) extends the dimension argument to arbitrary nonconstant coordinate polynomials on disjoint Boolean blocks for prime m2. It is unvalidated and changes no result table. The next dataset would retain all729 multilinear degree pairs plus explicit native matrix controls. The [one-page search report](reports/search-20261030T2315Z-encoding/report.pdf) records the scope and proof obligations. [Final publication receipts](evidence/panels-publication-20261030.json) and the [operational file index](evidence/panels-operations-index.json) document the completed panels and preserved ancillary data.
+
 ## New development: cubic coefficient controls
 
 The separate cubic implementation passes28 test invocations and S3-restored replay. It retains six small-prime dense/sparse matrices, terminal positive controls, a seven-selector annihilator, explicit triple coverage and all four bounded-journal cap fixtures. This is development only: no n83 cubic run and no new bound. See [control summary](validation-prime-cubic-development/summary.json), [format](PRIME_CUBIC_FORMAT.json), [custody](evidence/prime-cubic-development-storage.json), and [inspected report](reports/development-20261030T1600Z-prime-cubic/report.pdf).
