@@ -23,6 +23,7 @@ pub fn canonical<T: Serialize>(v: &T) -> Result<Vec<u8>> {
 pub fn source_digest() -> String {
     digest(
         [
+            include_str!("lib.rs"),
             include_str!("arithmetic.rs"),
             include_str!("recipe.rs"),
             include_str!("store.rs"),

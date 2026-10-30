@@ -152,6 +152,9 @@ class RoundTrip(unittest.TestCase):
         diffs = [line for line in log.read_text().splitlines() if " diff " in f" {line} " and "--raw" in line]
         self.assertTrue(diffs, "check never ran git diff --raw")
         self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
+        sizes = [line for line in log.read_text().splitlines() if " cat-file " in f" {line} "]
+        self.assertEqual(len(sizes), 1)
+        self.assertIn("--batch-check", sizes[0])
 
     def test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree(self):
         self.art("push", "research/r1/runs/a.jsonl")
@@ -178,6 +181,27 @@ class RoundTrip(unittest.TestCase):
         self.art("push", "new.jsonl")
         self.git("commit", "-qm", "move it")
         self.assertEqual(self.art("check", base).returncode, 0)
+
+    def test_migrate_from_subdirectory_resolves_root_level_candidates(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        self.git("add", "new.jsonl")
+        self.git("commit", "-qm", "add root-level data")
+        caller = self.repo / "research"
+
+        dry = self.art("migrate", base, "--dry-run", cwd=caller)
+        self.assertIn("new.jsonl", dry.stdout)
+        self.assertEqual(self.art("migrate", base, cwd=caller).returncode, 0)
+
+        tracked = self.git("ls-files").splitlines()
+        self.assertNotIn("new.jsonl", tracked)
+        manifest = self.repo / ".artifacts.json"
+        self.assertTrue(manifest.is_file())
+        entry = json.loads(manifest.read_text())["files"]["new.jsonl"]
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual(entry, {"sha256": digest, "bytes": len(payload)})
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
 
     def test_migrate_selects_changed_data_and_replays_remote(self):
         base = self.git("rev-parse", "HEAD").strip()

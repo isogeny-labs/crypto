@@ -1,0 +1,88 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-CHECKED-PHASE-PRIME-CLI-SOFTWARE-20261029",
+  "classification": "software_correctness_fixture",
+  "purpose": "Verify local checked phase and bound root capture through actual native CLI generation, replay, restricted report and export.",
+  "inputs": {
+    "family": "prime",
+    "n": 7,
+    "m": 2,
+    "solver": "root",
+    "curve_seeds": 8,
+    "generators": 2,
+    "keys": 2,
+    "seed": 42,
+    "factor_base_size": 2,
+    "degree_bound": 4,
+    "work_limit": 50000,
+    "twists": [
+      false,
+      true
+    ],
+    "selected_shards": [
+      62,
+      63
+    ],
+    "shard_count": 64,
+    "max_cases_per_invocation": 1
+  },
+  "limits": {
+    "seconds_per_case": 20,
+    "memory_mib": 512,
+    "polled_trace_mib": 16,
+    "seconds_per_command": 45,
+    "total_runner_seconds": 300,
+    "retries": 0
+  },
+  "acceptance": [
+    "clean binary source identity and immutable binary hash",
+    "both selected cells sealed with native prime root certificates",
+    "native semantic verification succeeds",
+    "export retains restricted root artifacts and leaks no certificate payload to public structural features",
+    "four checked phase starts and four metrics per selected cell; unavailable counters allowed",
+    "capture binding and limits admitted by native replay",
+    "eight checked-phase v2 report rows plus one native-solver counter row per cell; no whole-worker or training-cost claim",
+    "no phase measurements enter public feature objects"
+  ],
+  "controls": {
+    "positive": "both fixed natural targets, no success resampling",
+    "negative": "separate source-bound Rust tests reject hash-consistent certificate/outcome/role tampering",
+    "aa": "not applicable: exact software assertions, no timing or statistical comparison"
+  },
+  "stopping": "any command or assertion failure stops fixture; retain all partial outputs; no automatic retry",
+  "exclusions": [
+    "scientific corpus rows",
+    "cloud worker publication",
+    "complete execution or instruction counts",
+    "independent scalar recovery requirement",
+    "PDP solve requirement",
+    "fall-degree bound",
+    "model efficacy"
+  ],
+  "analysis": "Exact software validation of this combined source only. Preserve every outcome, verify retained root artifacts and restricted export. No timing comparison, scientific corpus, broad parameter coverage, or mathematical claim.",
+  "runner_sha256": "49508a7422eeaf9bb2d4f6304e7b1ddddae493238d1340c3331ba33f2fdfb63f",
+  "version": 3,
+  "amendment": {
+    "filed_before_affected_data": true,
+    "reason": "Correct report assertion to check eight checked-phase v2 records plus existing v1 native-solver counter record. First v2 cells generated, replayed and exported successfully but fixture stopped on total-row assertion. Preserve prior outputs. Repeat identical fixed inputs solely to validate corrected software assertion, without seed search or scientific resampling.",
+    "prior_protocol_file_sha256": "86254214199241cb42d17d888ebf27a74e3bc949bfa62e308de2dc469eff1be1"
+  },
+  "variable_ledger": {
+    "inputs": "fixed identical known software inputs; not blinded research draws",
+    "binary": "Bind exact final validated source and executable hash before freezing; no execution while draft.",
+    "output_filesystem": "fixed local XFS under /var/tmp, asserted before output creation",
+    "limits": "unchanged20s per case,45s per command,300s outer timeout; no retries",
+    "host_and_cotenants": "measured metadata; not isolated; elapsed clocks inadmissible for comparison",
+    "exporter": "Merged main 78f84234e18 policy strict-structural-allowlist-v4; root fixtures remain structural projection."
+  },
+  "software_binding": {
+    "source": "c59a5dd8a8a81c4749540b92ebcdf7fb24da4a59",
+    "binary_sha256": "74b23756aa776d85085bbfeef03400b68a354994bc3a8a2bea6c1d19735414d1"
+  },
+  "freeze": {
+    "status": "frozen",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-29T19:45:47.244391+00:00",
+    "protocol_sha256": "c8e4893d26e237f96868f55efb1e182751ce6b8ba06f7d835a55ebb3e770b0ca"
+  }
+}
