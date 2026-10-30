@@ -2,6 +2,9 @@
 #include "host.hpp"
 #include <cstdio>
 #include <cuda_runtime.h>
+#ifdef ER_QUERY_PERSISTENT
+#include <cuda/atomic>
+#endif
 #ifdef ER_CUB_SORT
 #include <cub/device/device_merge_sort.cuh>
 #endif
@@ -262,6 +265,81 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
     }
   }
 }
+#ifdef ER_QUERY_PERSISTENT
+// A fixed grid visits disjoint BLOCK-sized tiles in increasing grid strides.
+// A tile may stop only above an already found right ID, so every ID below the
+// final minimum is still examined. No cross-block barrier or spin wait exists.
+__global__ void search_right_persistent(
+    Curve c, Bases b, unsigned split, Point target, U count,
+    const DeviceRow *left, U left_size, unsigned long long *result,
+    const U *offsets, unsigned shift, RightPartials partials) {
+  __shared__ unsigned long long bound;
+  cuda::atomic_ref<unsigned long long, cuda::thread_scope_device> best(result[0]);
+  U visited = 0;
+  const U stride = U(gridDim.x) * BLOCK;
+  for (U start = U(blockIdx.x) * BLOCK; start < count;) {
+    if (!threadIdx.x)
+      bound = best.load(cuda::memory_order_relaxed);
+    __syncthreads();
+    if (start > bound)
+      break; // Uniform for the entire block, including padded lanes.
+    const U count_here = count - start < BLOCK ? count - start : BLOCK;
+    const bool active = threadIdx.x < count_here;
+    U id = active ? start + threadIdx.x : 0;
+    Jac sum;
+    if (active) {
+      if (partials.first) {
+        sum = c.mixed(sum, partials.first[id / partials.second_size]);
+        sum = c.mixed(sum, partials.second[id % partials.second_size]);
+      } else {
+        sum = tuple_sum(c, b, split, b.slots, id);
+      }
+      if (sum.y)
+        sum.y = c.f.p - sum.y;
+      sum = c.mixed(sum, target);
+    }
+    Point residual = normalize_block(c, sum);
+    if (active && id <= bound &&
+        indexed_lookup(left, left_size, residual, offsets, shift) != UINT64_MAX)
+      atomicMin(result, static_cast<unsigned long long>(id));
+    if (!threadIdx.x)
+      visited += count_here;
+    // normalize_block owns reusable shared storage; all reads must finish
+    // before any lane enters its next iteration or rewrites the shared bound.
+    __syncthreads();
+    if (count - start <= stride)
+      break;
+    start += stride;
+  }
+  if (!threadIdx.x)
+    atomicAdd(result + 2, static_cast<unsigned long long>(visited));
+}
+// Resolve the minimum duplicate left ID only after the right minimum is final.
+// Keeping two IDs separate avoids a potentially overflowing packed product.
+__global__ void resolve_persistent_winner(
+    Curve c, Bases b, unsigned split, Point target, const DeviceRow *left,
+    U left_size, unsigned long long *result, const U *offsets, unsigned shift,
+    RightPartials partials) {
+  const U id = result[0];
+  if (id == UINT64_MAX)
+    return; // Uniform; previous kernel completed on the same stream.
+  Jac sum;
+  if (!threadIdx.x) {
+    if (partials.first) {
+      sum = c.mixed(sum, partials.first[id / partials.second_size]);
+      sum = c.mixed(sum, partials.second[id % partials.second_size]);
+    } else {
+      sum = tuple_sum(c, b, split, b.slots, id);
+    }
+    if (sum.y)
+      sum.y = c.f.p - sum.y;
+    sum = c.mixed(sum, target);
+  }
+  Point residual = normalize_block(c, sum);
+  if (!threadIdx.x)
+    result[1] = indexed_lookup(left, left_size, residual, offsets, shift);
+}
+#endif
 __global__ void lift_x(Curve c, const U *xs, U n, Point *out) {
   U i = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (i >= n)
@@ -310,6 +388,12 @@ class DeviceBackend {
   Plan p;
   U cap, chunk;
   bool packed = false;
+#ifdef ER_QUERY_PERSISTENT
+  unsigned persistent_grid = 1;
+  static constexpr unsigned result_words = 3;
+#else
+  static constexpr unsigned result_words = 1;
+#endif
   thrust::device_vector<Point> points;
   thrust::device_vector<DeviceRow> rows;
   thrust::device_vector<U> matches;
@@ -348,6 +432,19 @@ public:
       throw std::runtime_error("invalid GPU row/chunk caps");
     blocks(cap);
     cuda_check(cudaFree(nullptr));
+#ifdef ER_QUERY_PERSISTENT
+    int device = 0, processors = 0;
+    cuda_check(cudaGetDevice(&device));
+    cuda_check(cudaDeviceGetAttribute(&processors, cudaDevAttrMultiProcessorCount,
+                                      device));
+    if (processors <= 0 || processors > 1048576)
+      throw std::runtime_error("invalid CUDA processor count");
+    persistent_grid = unsigned(processors) * 8;
+#ifdef ER_PERSISTENT_BLOCK_LIMIT
+    static_assert(ER_PERSISTENT_BLOCK_LIMIT > 0, "positive persistent grid limit");
+    persistent_grid = std::min(persistent_grid, unsigned(ER_PERSISTENT_BLOCK_LIMIT));
+#endif
+#endif
   }
   void prepare(const Plan &next) {
     rows.clear();
@@ -372,6 +469,10 @@ public:
     packed = packed_winner_fits(p.left, std::min(chunk, p.right));
 #ifdef ER_QUERY_REFERENCE
     packed = false;
+#endif
+#ifdef ER_QUERY_PERSISTENT
+    // This path stores separate global IDs and needs no per-tuple match array.
+    packed = true;
 #endif
     U first_count = 0, second_count = 0;
     unsigned middle = 0;
@@ -413,7 +514,7 @@ public:
       throw std::runtime_error("LIMIT sort allocation overflow");
     U bytes = row_bytes + sort_bytes +
               product(p.points.size(), sizeof(Point)) +
-              (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U) +
+              (packed ? 0 : product(chunk, sizeof(U))) + result_words * sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
               product(first_count + second_count, sizeof(Point));
 #ifdef ER_TABLE_DIAGNOSTICS
@@ -432,7 +533,7 @@ public:
     rows.resize(p.left);
     if (!packed)
       matches.resize(chunk);
-    winner.resize(1);
+    winner.resize(result_words);
     if (middle) {
       right_first.resize(first_count);
       right_second.resize(second_count);
@@ -478,6 +579,37 @@ public:
     RightPartials partials;
     if (!right_first.empty())
       partials = {data(right_first), data(right_second), right_second.size()};
+#ifdef ER_QUERY_PERSISTENT
+    if (p.right) {
+      cuda_check(cudaMemsetAsync(data(winner), 0xff, 2 * sizeof(U)));
+      cuda_check(cudaMemsetAsync(data(winner) + 2, 0, sizeof(U)));
+      search_right_persistent<<<std::min(persistent_grid, blocks(p.right)), BLOCK>>>(
+          c, p.view(data(points)), p.split, target, p.right, data(rows), p.left,
+          data(winner), prefixes.empty() ? nullptr : data(prefixes), prefix_shift,
+          partials);
+      cuda_check(cudaGetLastError());
+      resolve_persistent_winner<<<1, BLOCK>>>(
+          c, p.view(data(points)), p.split, target, data(rows), p.left,
+          data(winner), prefixes.empty() ? nullptr : data(prefixes), prefix_shift,
+          partials);
+      cuda_check(cudaGetLastError());
+      unsigned long long result[3];
+      cuda_check(cudaMemcpy(result, data(winner), sizeof(result),
+                            cudaMemcpyDeviceToHost));
+      r.visited = result[2];
+      if (r.visited > p.right)
+        throw std::runtime_error("invalid persistent visit count");
+      if (result[0] != UINT64_MAX) {
+        if (result[0] >= p.right || result[1] >= p.left ||
+            r.visited <= result[0])
+          throw std::runtime_error("invalid persistent witness or coverage");
+        r.found = true;
+        r.indices = p.indices(result[1], result[0]);
+      } else if (r.visited != p.right) {
+        throw std::runtime_error("incomplete persistent miss");
+      }
+    }
+#else
     for (U start = 0; start < p.right;) {
       U n = std::min(chunk, p.right - start);
       unsigned long long best = UINT64_MAX;
@@ -520,6 +652,7 @@ public:
       }
       start += n;
     }
+#endif
     verify(c, p, target, r);
     return r;
   }
