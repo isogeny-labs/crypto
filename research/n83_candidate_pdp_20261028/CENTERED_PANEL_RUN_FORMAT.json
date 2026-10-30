@@ -1,0 +1,33 @@
+{
+  "schema": "n83.centered-panel-run-format/v1",
+  "run": "n83-centered-panel-20261030-r1",
+  "prepared_cases": 84,
+  "scope": "Prime n83 m3-9; three existing factor-base arms, retained planted/natural and explicitly synthetic centered/adjacent targets",
+  "raw_layout": {
+    "instrument": "Exact digest-pinned native generator/replayer copied from the task image",
+    "protocol.json": "Frozen experiment.protocol/v1 document",
+    "host.txt": "Kernel/CPU metadata; no performance timing claim",
+    "source/": "Native source, dependencies, lockfile, controller and design snapshots",
+    "prepared/index.json": "84 exact input identities, parent/effective source hashes, target origin and base hash",
+    "prepared/KEY.json": "Normalized arithmetic input plus exact embedded parent bytes, effective source, transform and provenance",
+    "results/KEY/input.json": "Byte-identical canonical prepared input, checked before replay",
+    "results/KEY/A0.poly,A1.poly,A2.poly": "P and centered quotient normal forms of XP and X^2P",
+    "results/KEY/F0.poly,F1.poly,F2.poly": "Full terminal remainder coefficients of 1,U,U^2",
+    "results/KEY/certificate.json": "Exact degrees, counts, alternating projection, formula checks and source binding",
+    "results/KEY/manifest.json": "Native payload hashes excluding this per-case manifest",
+    "producer-rows.jsonl,replay-rows.jsonl": "One observation per successfully completed case and phase",
+    "producer-status.json,replay-status.json": "Phase started/exit/interruption status",
+    "producer.log,replay.log": "Full phase stdout/stderr, including failures",
+    "terminal.json": "Whole worker exit, timestamps, backend and phase statuses",
+    "manifest.sha256": "All final raw payload hashes, excluding files named manifest.sha256"
+  },
+  "codec": "CENTERED_WITNESS_FORMAT.json defines N83CEN1 bytes and the centered quotient",
+  "custody": {
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r1/raw/",
+    "preparation_archive": "s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r1/preparation.tar.gz",
+    "harness_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-centered-panel-20261030-r1/"
+  },
+  "failure_semantics": "Only successfully generated/replayed case rows establish those checks. Partial uploads and absent rows remain incomplete; all failures and original attempts are retained.",
+  "target_semantics": "synthetic_centered_control and synthetic_adjacent_control have no asserted rational target lift. The legacy effective target_kind=natural means non-planted source only; target_origin gives the actual origin.",
+  "degree_semantics": "Remainder degree includes unrestricted U. Exact LFD and regularity remain null in arithmetic certificates."
+}
