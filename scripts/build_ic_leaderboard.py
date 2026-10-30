@@ -57,6 +57,7 @@ SOURCES = {
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
     "progress_timeline": "docs/ic/progress-timeline.json",
+    "native_tournament26": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
     "koblitz_s20": "research/ic_exponent_20260926/analysis.json",
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
@@ -109,9 +110,6 @@ SOURCES = {
     "quartic_thin_validation": "research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json",
     "quartic_peeled_reuse": "research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
-    "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
-    "wide_producer": "benchmarks/20261018-wide-producer-engineering/summary.json",
-    "f4_gf2_port": "benchmarks/20261018-f4-gf2-port/summary.json",
     "bitop_ladder": "research/bitop_ladder_20261019/summary.json",
     "hec_bitop": "research/hec_bitop_20261020/analysis/analysis.json",
     "hec_round7_rows": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
@@ -123,10 +121,6 @@ SOURCES = {
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
-    "n83_precomp_rho_k600_run1": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
-    "n83_precomp_rho_k600_run2": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
-    "n83_precomp_rho_k3300_run2": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
-    "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "n83_tier1_finalist_rows": "research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json",
     "n83_tier1_finalist_validated": "research/n83_e2e_final_holdout_20261016/validated_rows.json",
@@ -427,8 +421,6 @@ def ladder_rows(names: Names) -> list[dict]:
             "targets": 1, "recipes": recipes, "best": recipes[0],
             "source": SOURCES["round5"], "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
             "class": "accounting",
-            "gae_pin": {**gae_pin_state((inst.get("calibration_pinned") or {}).get("pinned")),
-                        "record": SOURCES["round5"] + " instances[].calibration_pinned.pinned"},
         })
     return rows
 
@@ -592,7 +584,6 @@ def koblitz_rows(names: Names) -> list[dict]:
                          "(a 32-target batch: a historical diagnostic under AGENTS.md's one-target rule)",
             "reference_s": x["s_rho_s20"], "floor_s": floor_s, "targets": 32,
             "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_s22"],
-            "gae_pin": gae_pin_state(None, priced_in_gae=False),
             "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
             "class": "engineering",
         })
@@ -659,7 +650,6 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
             "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
             "before_source": SOURCES["koblitz_s23"],
-            "gae_pin": gae_pin_state(None, priced_in_gae=False),
             "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
             "class": "accounting",
         })
@@ -751,9 +741,7 @@ def families(board: list[dict]) -> dict:
         rows = [r for r in board if r["family"] == code]
         canon = [r["best"]["canonical_step_units"] for r in rows if "canonical_step_units" in r["best"]]
         built = [r["best"]["rho_step_units_as_built"] for r in rows if "rho_step_units_as_built" in r["best"]]
-        gae = [r for r in rows if r["gae_pin"]["priced_in_gae"]]
         out[code] = {**f, "rows": len(rows),
-                     "gae_rows": len(gae), "gae_unpinned_rows": sum(r["gae_pin"]["unpinned"] for r in gae),
                      "canonical_step_units": [min(canon), max(canon)] if canon else None,
                      "rho_step_units_as_built": [min(built), max(built)] if built else None}
     return out
@@ -806,6 +794,48 @@ NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. 
                  "benchmarks/README.md row is withheld until it validates.")
 
 
+def prime_base_size_component() -> dict:
+    """Prime-field factor-base size and oracle tuning, research/prime_base_oracle_tuning_20261029
+    (backlog XP-20261016, frozen protocol, holdout decided per size): the paired selected/incumbent
+    ratio of totals and the gap to the same-session rho.negation at w = 0, 0.1 and 1, copied from
+    the study's saved `ecbench compare --weight` outputs, and the holdout means from its
+    `ecbench band` table. Selected cells use the incumbent ic-pair oracle; only N changes. Its
+    standing comes from the study's VALIDATION.json."""
+    study = "research/prime_base_oracle_tuning_20261029"
+    means = {}
+    for r in load(f"{study}/analysis/band-holdout.json")["rows"]:
+        means[(int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"])] = r["mean_s"]
+    rows = []
+    for bits, n_inc, n_sel, reading in ((20, 32, 45, "improvement: new prime-field IC baseline"),
+                                        (24, 162, 115, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (28, 407, 288, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (32, 1024, 1024, "selection = incumbent; null")):
+        ratio, inc_rho, sel_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in (("inc__sel", ratio), ("rho-neg__inc", inc_rho), ("rho-neg__sel", sel_rho)):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n_inc": n_inc, "n_sel": n_sel, "reading": reading,
+                     "inc": means[(bits, "inc")], "sel": means[(bits, "sel")], "ratio": ratio,
+                     "inc_over_rho": inc_rho, "sel_over_rho": sel_rho})
+    m = load(f"{study}/second-host/analysis/match-original.json")
+    sh = {w: load(f"{study}/second-host/analysis/compare-inc__sel-w{w}.json")["ops"] for w in ("0", "0.1", "1")}
+    second_host = (f"Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another "
+                   f"host class and ecbench build); {m['matched_identical']} of {m['original_records']} original records "
+                   "identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent "
+                   + " / ".join(f"{sh[w]['ratio_b_over_a']:.3f}" for w in ("0", "0.1", "1"))
+                   + f" at w = 0 / 0.1 / 1 ({sh['0']['pairs']} pairs); report {study}/second-host/README.pdf.")
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "second_host": second_host,
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -818,133 +848,6 @@ def lazy_members_component() -> dict:
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
-
-PRECOMP_RHO_README = "research/20261016-n83-precomputed-rho-control/README.md"
-# The arms of the control that its README's verdict table reads (run 1's K3300
-# job ran on a host where arm (a) was not matched and is excluded there).
-PRECOMP_RHO_ARMS = (
-    ("K3300", "n83_precomp_rho_k3300_run2", "ic_over_bl_a2", "bl_a2_wall_equal",
-     "(a') table walks = IC setup wall, 1 thread"),
-    ("K3300", "n83_precomp_rho_k3300_run2", "ic_over_bl_b", "bl_b_memory_matched",
-     "(b) table = IC max RSS"),
-    ("K600", "n83_precomp_rho_k600_run2", "ic_over_bl_a2", "bl_a2_wall_equal",
-     "(a') table walks = IC setup wall, 1 thread"),
-    ("K600", "n83_precomp_rho_k600_run1", "ic_over_bl_a", "bl_a_time_matched",
-     "(a) 650 s table walks <= IC setup wall"),
-    ("K600", "n83_precomp_rho_k600_run2", "ic_over_bl_b", "bl_b_memory_matched",
-     "(b) table = IC max RSS"),
-)
-NOT_RUN_PRECOMP = {
-    "n61 compact orbit": "not run: no Bernstein-Lange precomputed-rho control exists for the n61 instance",
-    "n83 dense K1798": "not run for K1798: the n83 control measured K3300 and K600, a different factor "
-                       "base and a different run, so neither is a matched reference for this row",
-}
-
-
-def precomputed_rho_control() -> dict:
-    """The Bernstein-Lange precomputed-rho control on N83, copied from its analysis.json files.
-
-    Direction is IC online / precomputed-rho online: above 1 means the
-    precomputed table makes rho faster online than the index calculus.  The
-    frontier-audit rows quote rho / IC, the inverse direction."""
-    rows, verified = [], True
-    for k_label, src, paired_key, arm_key, arm_label in PRECOMP_RHO_ARMS:
-        a = load(SOURCES[src])
-        pr = a["paired"][paired_key]
-        if (a["ic_label"].upper() != k_label or a["all_scalars_verified_and_agreeing"] is not True
-                or a["hosted_reference_checked"] is not True
-                or pr["numerator"] != "ic" or pr["denominator"] != arm_key):
-            raise SystemExit(f"review the n83 precomputed-rho control {src} before updating the leaderboard")
-        rows.append({
-            "k": k_label, "arm": arm_label, "source": SOURCES[src],
-            "ic_median_ms": a["arms"]["ic"]["median_ms"],
-            "precomputed_rho_median_ms": a["arms"][arm_key]["median_ms"],
-            "ic_over_precomputed_rho": pr["median_of_paired_ratios"],
-            "ci95": list(pr["median_of_paired_ratios_ci95"]),
-            "targets": a["arms"]["ic"]["n"],
-        })
-    ratios = [r["ic_over_precomputed_rho"] for r in rows]
-    return {
-        "readme": PRECOMP_RHO_README, "rows": rows,
-        "range": [min(ratios), max(ratios)],
-        "direction": "IC online / precomputed-rho online, median of paired per-target ratios; "
-                     "above 1 means precomputed rho is faster online",
-        "scope": "Neither factor base is the K1798 instance of the frontier-audit row",
-    }
-
-
-def gae_pin_state(pinned, priced_in_gae: bool = True) -> dict:
-    """Whether a row's GAE conversion rests on pinned calibration ratios.
-
-    `pinned` is the source's `calibration_pinned.pinned` list, or None when
-    the source has no pin record.  An empty list or no record means the
-    native counters were converted at host-measured ratios, which differ
-    between identical runs (LEAD_LADDER_METHODOLOGY_20261010 section 1:
-    0.22 against 8.7 GAE for the same work), so the row is `GAE unpinned`
-    and no ranking sentence may use it.  Rows priced in a clock unit make no
-    GAE conversion and carry no flag."""
-    if not priced_in_gae:
-        return {"priced_in_gae": False, "unpinned": False, "pinned": None}
-    names = list(pinned) if pinned else []
-    return {"priced_in_gae": True, "unpinned": not names, "pinned": names}
-
-
-def leaders_of(board: list[dict]) -> dict:
-    """Per regime, the closest row, the largest row and their ratios.
-
-    GAE-unpinned rows are never named, whatever their ratio."""
-    leaders = {}
-    for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
-        rows = [r for r in board if r["regime"] == regime]
-        pinned_rows = [r for r in rows if not r["gae_pin"]["unpinned"]]
-        if rows and not pinned_rows:
-            raise SystemExit(f"every {regime} row is GAE unpinned; no ranking sentence can be written")
-        ranked = [r for r in pinned_rows if not r["best"].get("construction_artefact")] or pinned_rows
-        best = min(ranked, key=lambda r: r["best"]["ratio_rho"])
-        top = max(pinned_rows, key=lambda r: r["log2_r"])
-        leaders[regime] = {"slug": best["slug"], "log2_r": best["log2_r"],
-                           "ratio_rho": best["best"]["ratio_rho"], "s": best["best"]["s"],
-                           "recipe": best["best"]["label"],
-                           "one_target": best["best"].get("one_target_cold_ratio_section20"),
-                           "online_speedup": best["best"].get("online_speedup"),
-                           "largest": {"slug": top["slug"], "log2_r": top["log2_r"],
-                                       "ratio_rho": top["best"]["ratio_rho"]}}
-    return leaders
-
-
-def sixsum_resolvent_component() -> dict:
-    """The six-sum kernel B/B2 quartic root finder on its own: the frozen
-    summary of research/ic_techniques_20261012/sixsum_extraction (values
-    copied from raw_resolvent_20261018/), with the 2026-10-12 figure kept as
-    the before mark. A component (stage) speed-up on public toy instances:
-    it moves no row of tables A-C and carries no end-to-end S or rho claim."""
-    sm = load(SOURCES["sixsum_resolvent"])
-    return {**sm, "study": "research/ic_techniques_20261012/sixsum_extraction/",
-            "report": "research/ic_techniques_20261012/sixsum_extraction/REPORT_resolvent.pdf",
-            "class": "engineering"}
-
-
-def wide_producer_component() -> dict:
-    """The wide (64 < n <= 127) relation producer's probe path and index
-    build on their own: the frozen summary of
-    benchmarks/20261018-wide-producer-engineering, copied from the raw
-    same-binary interleaved A/B runs. A component (stage) speed-up: it moves
-    no row of tables A-C and carries no end-to-end S or rho claim."""
-    sm = load(SOURCES["wide_producer"])
-    if sm.get("schema") != "crypto.wide_producer_engineering/v1" or sm.get("class") != "engineering":
-        raise SystemExit("review the wide producer summary before updating the leaderboard")
-    return {**sm, "study": "benchmarks/20261018-wide-producer-engineering/"}
-
-
-def f4_gf2_port_component() -> dict:
-    """The ported rank-indexed Boolean F4 kernel against this crate's
-    matrix_f4_f2 family, same binary, on its own: the frozen summary of
-    benchmarks/20261018-f4-gf2-port. A component (kernel) speed-up: it moves
-    no row of tables A-C and carries no end-to-end S or rho claim."""
-    sm = load(SOURCES["f4_gf2_port"])
-    if sm.get("schema") != "crypto.f4_gf2_port/v1" or sm.get("class") != "engineering":
-        raise SystemExit("review the f4_gf2 port summary before updating the leaderboard")
-    return {**sm, "study": "benchmarks/20261018-f4-gf2-port/"}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1530,7 +1433,6 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
-            "precomputed_rho": {"status": NOT_RUN_PRECOMP["n61 compact orbit"]},
             "correction": n61["correction"],
         },
         "exploratory_online": {
@@ -1539,9 +1441,7 @@ def latest_frontier_audit() -> dict:
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
             "status": n83["status"], "correction": n83["correction"],
-            "precomputed_rho": {"status": NOT_RUN_PRECOMP["n83 dense K1798"]},
         },
-        "precomputed_rho_control": precomputed_rho_control(),
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
@@ -1883,6 +1783,18 @@ def build(allow_unvalidated: bool = False) -> dict:
         "fully_priced_cold_speedup": None,
     }
     ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+    native_tournament = load(SOURCES["native_tournament26"])
+    if (native_tournament.get("schema") != "ic-native-tournament-measurements/1"
+            or native_tournament.get("round") != "round-0026"
+            or native_tournament.get("audit", {}).get("status") != "VERIFIED"
+            or native_tournament.get("audit", {}).get("trial_receipts") != 1632
+            or native_tournament.get("decision", {}).get("winner") != "batch16"
+            or native_tournament.get("decision", {}).get("status") != "promoted"
+            or len([r for r in native_tournament["rows"]
+                    if r["stage"] == "confirmation" and r["arm"] == "batch16"]) != 5):
+        raise ValueError("native tournament round 0026 is incomplete")
+    native_tournament["source"] = SOURCES["native_tournament26"]
+    native_tournament["report"] = "research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md"
     timeline = load(SOURCES["progress_timeline"])
     progress = next(series for series in timeline["series"] if series["id"] == "ec-cold")
     board = ladder + kob1 + kob
@@ -1934,6 +1846,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "progress": {"source": SOURCES["progress_timeline"], "updated": timeline["updated"],
                      "series_id": progress["id"], "label": progress["label"],
                      "points": progress["points"]},
+        "native_tournament_pilot": native_tournament,
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
         "jv_sieve_weak_class": jv_sieve_table(),
@@ -1996,9 +1909,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
-        "sixsum_resolvent_component": sixsum_resolvent_component(),
-        "wide_producer_component": wide_producer_component(),
-        "f4_gf2_port_component": f4_gf2_port_component(),
+        "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2244,6 +2155,37 @@ def markdown(doc: dict) -> str:
         L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
                  f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
     L.append("")
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    L += ["## Native candidate tournament, round 0026 (separate Ir unit)", "",
+          f"[Frozen per-cell data](../../{pilot['source']}) and [full result](../../{pilot['report']}) "
+          "retain all arms and the exact ICV1 curve identities. One target is charged cold per job. "
+          "The selected `batch16` configuration improves the incumbent, but its matched worker rho "
+          "is still cheaper on every curve; this rho is not qualified as globally strongest. "
+          "The factor base was fixed within each paired arm, so this panel does not choose a new base. "
+          "`2^x Ir` is guest instructions, with no measured curve-addition conversion. "
+          "The hosted wall times lack core-reservation and contention receipts, so the native "
+          "wall condition is unqualified and promotion awaits an isolated new round. "
+          "The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.", "",
+          "| ICV1 curve | Signed base B | Was: incumbent | batch16 | S (Ir/√r) | IC/incumbent | IC/rho (1.0× parity) |",
+          "|:--|--:|--:|--:|--:|--:|--:|"]
+    for r in confirmed:
+        L.append(f"| `{r['curve_slug']}` | {r['signed_base_sizes'][0]} | "
+                 f"2^{before[r['cell']]['log2_mean_ir']:.2f} Ir | 2^{r['log2_mean_ir']:.2f} Ir | "
+                 f"{r['mean_s_ir_per_sqrt_r']:,.0f} | {saved[r['cell']]:.3f}× | {paired[r['cell']]:.3f}× |")
+    L += ["", "All smoke recipes in the same Ir unit, each with 12 verified jobs; "
+          "the ratios below are descriptive ratios of per-cell mean Ir:", "",
+          "| ICV1 curve | Arm | 2^x Ir | IC/incumbent | IC/rho |",
+          "|:--|:--|--:|--:|--:|"]
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            L.append(f"| `{r['curve_slug']}` | `{r['arm']}` | 2^{r['log2_mean_ir']:.2f} Ir | "
+                     f"{r['ratio_to_incumbent_mean_ir']:.3f}× | {r['ratio_to_rho_mean_ir']:.3f}× |")
+    L.append("")
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -2253,50 +2195,37 @@ def markdown(doc: dict) -> str:
     L += [f"## Frontier audit and subsequent corrections (implementation result {audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
-          "| boundary | observed result | leaderboard treatment | matched precomputed rho (IC online / pre-rho) |",
-          "|:--|:--|:--|:--|",
+          "| boundary | observed result | leaderboard treatment |",
+          "|:--|:--|:--|",
           f"| Standing strong-rho implementation | complete-solve Callgrind: optimized / archived "
           f"baseline {rho['optimized_over_archived_baseline']:.6f}× and optimized / same-binary legacy "
           f"{rho['optimized_over_same_binary_legacy']:.6f}×; GAE {rho['ops_ratio']:.3f} "
           f"[{rho['ops_ci95'][0]:.3f}, {rho['ops_ci95'][1]:.3f}] over {rho['ops_pairs']} pairs; "
           f"{rho['replays_identical']}/{rho['measured_replays']} measured replays identical | "
           f"Implementation win; operation boundary unchanged. Native wall remained {rho['wall_level']} "
-          "and is not admitted | n/a |",
+          "and is not admitted |",
           f"| Canonical medium-tier Koblitz cold operations | `{cold['method']}` / "
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
-          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row | n/a |",
+          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
           f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
           f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
-          f"table); not an improvement. {admitted['correction']} | {admitted['precomputed_rho']['status']} |",
+          f"table); not an improvement. {admitted['correction']} |",
           f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
           f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
-          f"table); not an improvement. {exploratory['correction']} | {exploratory['precomputed_rho']['status']} |",
+          f"table); not an improvement. {exploratory['correction']} |",
           f"| Current-binary root-finder replay-all | current main (2026-10-19): "
           f"{replay['current']['identical']}/{replay['current']['total']} identical; "
           f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
           f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
           "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
           "are not claimed to pass; affected stage counters blocked from promotion. "
-          f"{replay['current']['correction']} | n/a |", "",
+          f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
-    pc = audit["precomputed_rho_control"]
-    L += ["### Precomputed-rho control on N83 (Bernstein–Lange), the nearest matched evidence", "",
-          f"AGENTS.md asks for the precomputed-rho reference wherever setup is excluded. The only such control "
-          f"in the repository is [`{pc['readme']}`](../../{pc['readme']}), on N83 K3300 and K600. {pc['scope']}. "
-          f"Direction: {pc['direction']}; the frontier-audit rows above quote the inverse, rho / IC, against "
-          f"plain rho. Range over these rows: {pc['range'][0]:.2f}–{pc['range'][1]:.2f}×.", "",
-          "| K | precomputed-rho arm | IC online median ms | precomputed-rho median ms | median IC / pre-rho (95% CI) | targets | source |",
-          "|:--|:--|--:|--:|:--|--:|:--|"]
-    for x in pc["rows"]:
-        L.append(f"| {x['k']} | {x['arm']} | {x['ic_median_ms']:.2f} | {x['precomputed_rho_median_ms']:.2f} | "
-                 f"**{x['ic_over_precomputed_rho']:.2f}** ({x['ci95'][0]:.2f}–{x['ci95'][1]:.2f}) | "
-                 f"{x['targets']} | [`analysis.json`](../../{x['source']}) |")
-    L.append("")
     lz = doc["lazy_members_component"]
     L += ["## Component improvement: lazy orbit-member index (2026-10-18, engineering)", "",
           "The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point at build; "
@@ -2348,19 +2277,10 @@ def markdown(doc: dict) -> str:
                 (f"2^{r['reference_log2_total_gae']:.2f} GAE" if "reference_log2_total_gae" in r else "—"),
                 g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
-                                                   if "ratio_rho_section23" in b else "")
-                + (" **GAE unpinned**" if r["gae_pin"]["unpinned"] else ""),
+                                                   if "ratio_rho_section23" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
                 "✓" if b["verified"] else "✗", validation_cell(r["validation"])]
             L.append("| " + " | ".join(cells) + " |")
-        if f["gae_rows"]:
-            L += ["", f"- **Calibration pins:** {f['gae_rows'] - f['gae_unpinned_rows']} of {f['gae_rows']} rows "
-                  "record a non-empty `calibration_pinned.pinned` list in their source "
-                  f"(`{SOURCES['round5']}`). A row whose source has an empty list or no pin record is marked "
-                  "`GAE unpinned`, because its non-group-operation counters were converted at host-measured "
-                  "ratios that differ between identical runs "
-                  "([lead ladder methodology §1](LEAD_LADDER_METHODOLOGY_20261010.md)); it is excluded from "
-                  "every `× reference` ranking sentence. Tables A and C are clock-priced and make no GAE conversion."]
         L.append("")
     D = doc["jv_sieve_weak_class"]
     if D["comparison_status"] != "eligible":
@@ -2585,6 +2505,23 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    pb = doc["prime_base_size_component"]
+    L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
+          "decomposition oracle, selected on train curves, decided per size on a fresh holdout curve "
+          "(48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle "
+          "(`mitm:negation_folded=1`) at every size; only N changed. "
+          f"{pb['unit']}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.", "",
+          "| bits | N incumbent → selected | S incumbent → selected (w = 0 / 0.1 / 1) | selected ÷ incumbent (w = 0 / 0.1 / 1) | IC ÷ rho-neg incumbent → selected (w = 0 / 0.1 / 1) | reading |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n_inc']} → {r['n_sel']} | {s_txt} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          pb["second_host"], "",
+          f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -2876,47 +2813,6 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
-    w = doc["wide_producer_component"]
-    L += ["", "## Component: wide producer probe path and index build (engineering)", "",
-          f"Class **{w['class']}**: {w['claim']}. Instance size n = {w['n']}, public synthetic "
-          f"Koblitz fixtures, {w['host']}. Control arm `{w['scan_control']}`; all-switches arm "
-          f"`{w['scan_all_switches']}`. This panel is outside Tables A–C and moves no ranked row.", "",
-          "| K | control ns/probe (median, min-max) | lazy key | prefetch | all switches | all / control |",
-          "|---:|---|---|---|---|---:|"]
-    for row in w["scan_ns_per_probe"]:
-        a = row["arms"]
-        f = lambda x: f"{x['median']:.1f} ({x['min']:.1f}-{x['max']:.1f})"
-        L.append(f"| {row['k']} | {f(a['control'])} | {f(a['lazy_canon'])} | {f(a['prefetch'])} | "
-                 f"{f(a['all_three'])} | {a['all_three']['ratio_to_control']:.3f} |")
-    L += ["", "| K | index build serial s (median, min-max) | 4 threads + batch inversion s | ratio |",
-          "|---:|---|---|---:|"]
-    for row in w["index_build_seconds"]:
-        a = row["arms"]
-        f = lambda x: f"{x['median']:.2f} ({x['min']:.2f}-{x['max']:.2f})"
-        L.append(f"| {row['k']} | {f(a['serial'])} | {f(a['threads_batch_inv'])} | "
-                 f"{a['threads_batch_inv']['ratio_to_serial']:.3f} |")
-    e = w["e2e_identity"]
-    L += ["", f"Identity: {w['index_equality']}. End to end `{e['spec']}`: {e['arms']} arms, all identical "
-          f"to the control ({e['rank_relations']} relations, {e['targets_solved']} targets solved). "
-          "Caveats: " + "; ".join(w["caveats"]) + ".",
-          "", f"[Frozen summary](../../{SOURCES['wide_producer']}), [report](../../{w['report']}).", ""]
-    g = doc["f4_gf2_port_component"]
-    ag = g["agreement"]
-    L += ["", "## Component: ported rank-indexed Boolean F4 kernel (engineering)", "",
-          f"Class **{g['class']}**: {g['claim']}. Cell n = {g['n']}, m = {g['m']}, ell = {g['ell']} "
-          f"({g['n_vars']} variables), degree {g['degree']}, {g['draws']} draws, same test binary, {g['host']}. "
-          "This panel is outside Tables A–C and moves no ranked row.", "",
-          "| arm | median ms | min–max ms | median word XORs | vs crate full |",
-          "|---|---:|---|---:|---:|"]
-    for a in g["arms"]:
-        L.append(f"| {a['label']} | {a['median_ms']:.1f} | {a['min_ms']:.1f}–{a['max_ms']:.1f} | "
-                 f"{a['median_word_xors']:,} | {a['speedup_vs_crate_full']:.2f}x |")
-    L += ["", f"Four runs: port F5 on is {g['four_run_ranges']['port_f5_on_vs_crate_full']} the crate full path and "
-          f"{g['four_run_ranges']['port_f5_on_vs_crate_solver']} the crate solver path. Agreement with `matrix_f4_f2`: "
-          f"{ag['koblitz_decomposition_comparisons']} Koblitz comparisons ({ag['refuted']} refuted, "
-          f"{ag['forced']} forced, {ag['undecided']} undecided) plus random dense systems; {ag['checks']}. "
-          "Caveats: " + "; ".join(g["caveats"]) + ".",
-          "", f"[Frozen summary](../../{SOURCES['f4_gf2_port']}), [report](../../{g['report']}).", ""]
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     L += ["", f"## {t['title']}, outside tables A–C", "",
@@ -3097,10 +2993,8 @@ def ratio_chart(board: list[dict]) -> str:
         out.append(f'<text x="0" y="{y + 4}">{esc(REGIME_NAME[regime])} ({FAMILY_OF[regime]})</text>')
         for r in (r for r in board if r["regime"] == regime):
             v = r["best"]["ratio_rho"]
-            flag = r["gae_pin"]["unpinned"]
-            out.append(f'<circle cx="{x(v):.1f}" cy="{y}" r="5" fill="var(--data)" '
-                       f'fill-opacity="{"0" if flag else ".55"}" stroke="var(--data)"><title>{esc(r["slug"])}: '
-                       f'{times(v)} at 2^{r["log2_r"]:.1f}{" (GAE unpinned, not ranked)" if flag else ""}</title></circle>')
+            out.append(f'<circle cx="{x(v):.1f}" cy="{y}" r="5" fill="var(--data)" fill-opacity=".55" '
+                       f'stroke="var(--data)"><title>{esc(r["slug"])}: {times(v)} at 2^{r["log2_r"]:.1f}</title></circle>')
     out.append("</svg>")
     return "".join(out)
 
@@ -3108,8 +3002,7 @@ def ratio_chart(board: list[dict]) -> str:
 def page(doc: dict, standalone: bool) -> str:
     board = doc["board"]
     L = doc["leaders"]
-    by_regime = {g: sorted((r for r in board if r["regime"] == g),
-                           key=lambda r: (r["gae_pin"]["unpinned"], r["best"]["ratio_rho"]))
+    by_regime = {g: sorted((r for r in board if r["regime"] == g), key=lambda r: r["best"]["ratio_rho"])
                  for g in ("koblitz", "prime", "char2", "koblitz_batch")}
     head = ('<title>Index Calculus Leaderboard</title>\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
@@ -3196,6 +3089,65 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{esc(point["reference"])}</td>'
                  f'<td>{esc(point.get("unit") or "source-specific; see result")}</td></tr>')
     P.append('</tbody></table></div></section>')
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    repo_link = "https://github.com/isogeny-labs/crypto/blob/main/"
+    P.append('<section class="panel" id="native-tournament-round-0026"><h2>Native tournament round 0026 · every recipe and curve</h2>'
+             '<p>The selected <code>batch16</code> configuration reduces complete cold instruction cost '
+             'against the same-fixture incumbent. Its matched worker rho remains cheaper on all five '
+             'curves. This panel has its own Valgrind Ir unit and is outside the GAE-ranked tables. '
+             '<strong>1.0× IC/rho is parity.</strong> Guest instruction counts have no measured '
+             'curve-addition conversion. The factor base was fixed between paired arms; this round '
+             'does not choose a different base. The rank floor is the weak Ir ≥ K, and no scaling '
+             'exponent was promoted. Hosted wall times lack isolation receipts; the native wall '
+             'condition is unqualified and promotion awaits an isolated new round.</p>'
+             f'<p><a href="{esc(repo_link + pilot["report"])}">Full result</a> · '
+             f'<a href="{esc(repo_link + pilot["source"])}">Frozen per-cell data</a> · '
+             f'{pilot["audit"]["trial_receipts"]:,} native-audited trial receipts.</p>'
+             '<div class="scroll"><table><caption>Confirmation, one public target per cold job. '
+             'Was = incumbent on the same targets; B = verified signed factor-base size. '
+             'Ratios are native paired decision values.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>B</th><th>Was: incumbent</th>'
+             '<th>batch16</th><th>S (Ir/√r)</th><th>IC/incumbent</th><th>IC/rho</th><th>Verified</th>'
+             '</tr></thead><tbody>')
+    for r in confirmed:
+        P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                 f'<td>{r["signed_base_sizes"][0]}</td>'
+                 f'<td>2<sup>{before[r["cell"]]["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>{r["mean_s_ir_per_sqrt_r"]:,.0f}</td>'
+                 f'<td>{saved[r["cell"]]:.3f}×</td><td>{paired[r["cell"]]:.3f}×</td>'
+                 f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    P.append('</tbody></table></div><div class="scroll"><table>'
+             '<caption>All smoke recipes, each with 12 verified jobs. Ratios are per-cell mean Ir '
+             'quotients, not pooled paired intervals.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>Arm</th><th>2^x Ir</th>'
+             '<th>Ir/incumbent</th><th>Ir/rho</th><th>Verified</th></tr></thead><tbody>')
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                     f'<td><code>{esc(r["arm"])}</code></td>'
+                     f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                     f'<td>{r["ratio_to_incumbent_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["ratio_to_rho_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    center = next(r for r in confirmed if r["cell"] == "n19a0")
+    prior = before["n19a0"]
+    P.append('</tbody></table></div>'
+             f'<p>On <code>{esc(center["curve_slug"])}</code>, factor-base/table setup is '
+             f'{center["phase_mean_ir"]["factor_base_and_tables"] / 1e6:.3f} million Ir in both '
+             'arms. Collection and decomposition fall from '
+             f'{prior["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} million Ir; '
+             'verification/filtering/linear algebra fall from '
+             f'{prior["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} million Ir. '
+             'PDP and linear algebra are grouped with neighboring work by the worker, so their '
+             'individual slopes remain unset. This constant change does not discharge m=83.</p></section>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -3207,7 +3159,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
-             '<th>Leaderboard treatment</th><th>Matched precomputed rho (IC online / pre-rho)</th></tr></thead><tbody>'
+             '<th>Leaderboard treatment</th></tr></thead><tbody>'
              '<tr><td>Standing strong-rho implementation</td>'
              f'<td>complete-solve Callgrind: optimized / archived baseline '
              f'{rho["optimized_over_archived_baseline"]:.6f}× and optimized / same-binary legacy '
@@ -3215,46 +3167,30 @@ def page(doc: dict, standalone: bool) -> str:
              f'[{rho["ops_ci95"][0]:.3f}, {rho["ops_ci95"][1]:.3f}] over {rho["ops_pairs"]} pairs; '
              f'{rho["replays_identical"]}/{rho["measured_replays"]} measured replays identical</td>'
              f'<td>Implementation win; operation boundary unchanged. Native wall remained '
-             f'{esc(rho["wall_level"])} and is not admitted</td><td>n/a</td></tr>'
+             f'{esc(rho["wall_level"])} and is not admitted</td></tr>'
              '<tr><td>Canonical medium-tier Koblitz cold operations</td>'
              f'<td><code>{esc(acold["method"])}</code> / <code>{esc(acold["bound_id"])}</code>: '
              f'{acold["ops_over_floor"]:.3f}× floor [{acold["ops_ci95"][0]:.3f}, '
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
-             '<td>Standing rho boundary; not an IC row</td><td>n/a</td></tr>'
+             '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
              f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
              f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
-             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td><td>{esc(admitted["precomputed_rho"]["status"])}</td></tr>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
              f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
              f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
-             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td><td>{esc(exploratory["precomputed_rho"]["status"])}</td></tr>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
              f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
              f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
              f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
              f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
              '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
-             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td><td>n/a</td></tr>'
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
-             f'{gh(audit["previous_source"], "prior full synthesis")}.</p>')
-    pc = audit["precomputed_rho_control"]
-    P.append('<h3>Precomputed-rho control on N83 (Bernstein–Lange), the nearest matched evidence</h3>'
-             f'<p>AGENTS.md asks for the precomputed-rho reference wherever setup is excluded. The only such '
-             f'control in the repository is {gh(pc["readme"])}, on N83 K3300 and K600. {esc(pc["scope"])}. '
-             f'Direction: {esc(pc["direction"])}; the rows above quote the inverse, rho / IC, against plain rho. '
-             f'Range over these rows: {pc["range"][0]:.2f}–{pc["range"][1]:.2f}×.</p>'
-             '<div class="scroll"><table><thead><tr><th>K</th><th>Precomputed-rho arm</th>'
-             '<th class="n">IC online median ms</th><th class="n">Pre-rho median ms</th>'
-             '<th class="n">Median IC / pre-rho (95% CI)</th><th class="n">Targets</th><th>Source</th></tr></thead><tbody>')
-    for x in pc["rows"]:
-        P.append(f'<tr><td>{esc(x["k"])}</td><td>{esc(x["arm"])}</td><td class="n">{x["ic_median_ms"]:.2f}</td>'
-                 f'<td class="n">{x["precomputed_rho_median_ms"]:.2f}</td>'
-                 f'<td class="n"><span class="ratio">{x["ic_over_precomputed_rho"]:.2f}</span> '
-                 f'({x["ci95"][0]:.2f}–{x["ci95"][1]:.2f})</td><td class="n">{x["targets"]}</td>'
-                 f'<td>{gh(x["source"], "analysis.json")}</td></tr>')
-    P.append('</tbody></table></div></section>')
+             f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
     lz = doc["lazy_members_component"]
     P.append('<section class="panel" id="lazy-orbit-members"><h2>Component improvement · lazy orbit-member '
              'index <span class="chip">engineering</span></h2>'
@@ -3419,6 +3355,28 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
 
+    pb = doc["prime_base_size_component"]
+    P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '
+             'tuning <span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact '
+             'decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets '
+             '× 2 rounds, every arm in one session). Train picked the incumbent <code>ic-pair</code> oracle '
+             '(<code>mitm:negation_folded=1</code>) at every size; only N changed. '
+             f'{esc(pb["unit"])}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>N</th><th>S incumbent → selected '
+             '(w = 0 / 0.1 / 1)</th><th>selected ÷ incumbent</th><th>IC ÷ rho-neg incumbent → selected</th>'
+             '<th>Reading</th></tr></thead><tbody>')
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{r["n_inc"]} → {r["n_sel"]}</td><td>{s_txt}</td>'
+                 f'<td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{esc(pb["second_host"])}</p>'
+             f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pb["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
@@ -3648,10 +3606,7 @@ def page(doc: dict, standalone: bool) -> str:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
                      f'(§20; not table A\'s measurement)</span>')
-            unpinned = r["gae_pin"]["unpinned"]
-            if unpinned:
-                ci += '<br><span class="chip">GAE unpinned</span>'
-            rank = "—" if b.get("construction_artefact") or unpinned else i
+            rank = "—" if b.get("construction_artefact") else i
             P.append(f'<tr class="{"lead" if r["slug"] == L[g]["slug"] else ""}"><td class="n">{rank}</td>'
                      f'<td><span class="slug">{esc(r["slug"])}</span>{record_cell(r)}</td><td class="n">{r["log2_r"]:.1f}</td>'
                      f'<td class="recipe">{esc(b["label"])}</td><td class="n">{b["m"]}</td><td class="n">{b["base_points"]:,}</td>'
@@ -3687,13 +3642,7 @@ def page(doc: dict, standalone: bool) -> str:
             defs.append(("Rho step", steps))
         return ('<dl class="defs">' + "".join(
             f'<div><dt>{esc(k)}</dt><dd>{rich(v)}</dd></div>' for k, v in defs) + '</dl>'
-            f'<p class="muted">Read S, × ref and × floor in table {code} only.</p>' + (
-                f'<p class="muted"><strong>Calibration pins:</strong> {f["gae_rows"] - f["gae_unpinned_rows"]} of '
-                f'{f["gae_rows"]} rows record a non-empty <code>calibration_pinned.pinned</code> list in their '
-                f'source. A row with an empty list or no pin record is marked <span class="chip">GAE unpinned</span> '
-                'and excluded from every × reference ranking sentence, because its native counters were converted '
-                'at host-measured ratios that differ between identical runs (lead ladder methodology §1).</p>'
-                if f["gae_rows"] else ""))
+            f'<p class="muted">Read S, × ref and × floor in table {code} only.</p>')
 
     def family_table(code: str) -> None:
         f = doc["families"][code]
@@ -4051,48 +4000,6 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
-    w = doc["wide_producer_component"]
-    P.append('<section id="wide-producer-engineering-20261018"><h2>Wide producer probe path and index build (engineering component)</h2>'
-             f'<p>Class <strong>{esc(w["class"])}</strong>: {esc(w["claim"])}. n = {w["n"]}, {esc(w["host"])}. '
-             f'Control <code>{esc(w["scan_control"])}</code>. Outside Tables A–C; no ranked row moves.</p>'
-             '<div class="scroll"><table><thead><tr><th>K</th><th>Control ns/probe</th><th>Lazy key</th>'
-             '<th>Prefetch</th><th>All switches</th><th>All / control</th></tr></thead><tbody>')
-    fm = lambda x, d=1: f'{x["median"]:.{d}f} <span class="muted">({x["min"]:.{d}f}-{x["max"]:.{d}f})</span>'
-    for row in w["scan_ns_per_probe"]:
-        a = row["arms"]
-        P.append(f'<tr><td>{row["k"]}</td><td>{fm(a["control"])}</td><td>{fm(a["lazy_canon"])}</td>'
-                 f'<td>{fm(a["prefetch"])}</td><td>{fm(a["all_three"])}</td>'
-                 f'<td>{a["all_three"]["ratio_to_control"]:.3f}</td></tr>')
-    P.append('</tbody></table></div><div class="scroll"><table><thead><tr><th>K</th><th>Index build serial s</th>'
-             '<th>4 threads + batch inversion s</th><th>Ratio</th></tr></thead><tbody>')
-    for row in w["index_build_seconds"]:
-        a = row["arms"]
-        P.append(f'<tr><td>{row["k"]}</td><td>{fm(a["serial"], 2)}</td><td>{fm(a["threads_batch_inv"], 2)}</td>'
-                 f'<td>{a["threads_batch_inv"]["ratio_to_serial"]:.3f}</td></tr>')
-    e = w["e2e_identity"]
-    P.append('</tbody></table></div>'
-             f'<p>{esc(w["index_equality"])}. End to end <code>{esc(e["spec"])}</code>: {e["arms"]} arms identical to the control '
-             f'({e["rank_relations"]} relations, {e["targets_solved"]} targets solved). Caveats: '
-             + esc("; ".join(w["caveats"])) + '.</p>' + gh(SOURCES["wide_producer"], 'Frozen summary') + '</section>')
-
-    g = doc["f4_gf2_port_component"]
-    ag = g["agreement"]
-    P.append('<section id="f4-gf2-port-20261018"><h2>Ported rank-indexed Boolean F4 kernel (engineering component)</h2>'
-             f'<p>Class <strong>{esc(g["class"])}</strong>: {esc(g["claim"])}. n = {g["n"]}, m = {g["m"]}, ell = {g["ell"]} '
-             f'({g["n_vars"]} variables), degree {g["degree"]}, {g["draws"]} draws, {esc(g["host"])}. '
-             'Outside Tables A–C; no ranked row moves.</p>'
-             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Median ms</th><th>Min–max ms</th>'
-             '<th>Median word XORs</th><th>vs crate full</th></tr></thead><tbody>')
-    for a in g["arms"]:
-        P.append(f'<tr><td>{esc(a["label"])}</td><td>{a["median_ms"]:.1f}</td>'
-                 f'<td>{a["min_ms"]:.1f}–{a["max_ms"]:.1f}</td><td>{a["median_word_xors"]:,}</td>'
-                 f'<td>{a["speedup_vs_crate_full"]:.2f}x</td></tr>')
-    P.append('</tbody></table></div>'
-             f'<p>Four runs: port F5 on is {esc(g["four_run_ranges"]["port_f5_on_vs_crate_full"])} the crate full path and '
-             f'{esc(g["four_run_ranges"]["port_f5_on_vs_crate_solver"])} the crate solver path. Agreement with '
-             f'<code>matrix_f4_f2</code>: {ag["koblitz_decomposition_comparisons"]} Koblitz comparisons '
-             f'({ag["refuted"]} refuted, {ag["forced"]} forced, {ag["undecided"]} undecided) plus random dense systems. Caveats: '
-             + esc("; ".join(g["caveats"])) + '.</p>' + gh(SOURCES["f4_gf2_port"], 'Frozen summary') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'
