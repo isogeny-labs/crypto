@@ -19,6 +19,15 @@ they inherit no transfer or subgroup-support conclusion from it. See the
 [coverage gap](../../problems/catalog-cover-subgroup-certificates-incomplete.md)
 for the separate current-catalog obligation.
 
+The legacy formula-inventory finding is also historical: its source artifact
+now declares `source_commit` =
+`0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5`, preserving the exact 2,572-entry
+inventory that the finding describes. Separately, the live Jacobian formula
+catalog now screens 20,592 registry entries with the same cost model. This
+completes the metadata refresh in historical obligation 7 below; it supplies no
+new transfer certificate, solver execution, or measured advantage. All other
+implementation artifacts still bind their current repository bytes.
+
 Every current cover map and every linked EC1 representation now has an
 explicit v2 assessment. Classification is complete; implementation support is
 not. In particular, the complete inventory must not be read as a complete
@@ -369,12 +378,15 @@ The additional bridge from `[r]G=O` to
 is used in the native certificate but is not a separately formalized Lean
 corollary here; additivity and all-element composition are still missing.
 The sources pin Lean 4.34.1 and Mathlib revision
-`d13f23b723b8a846827a245b89c10fc7d3f11612`. Local kernel replay remains
-blocked: `lake exe cache get` stopped at 2,536 of 8,908 files when the sandbox
-ran out of space, so `lake build` and the axiom audit have not been executed
-locally. Until CI completes those commands, the source is a formalization
-candidate, not a kernel-verified proof receipt. The exact boundary is recorded
-in the [Lean README](lean/README.md).
+`d13f23b723b8a846827a245b89c10fc7d3f11612`. The original October 13
+mounted-home attempt stopped at 2,536 of 8,908 cache files when the sandbox
+ran out of space. The [October 22 pinned scratch replay](lean/README.md#pinned-replay-2026-10-22)
+subsequently completed all 8,908 cache files, built 1,131 jobs, and passed
+the Lean axiom audit with only the repository's standard axioms. The named
+conditional `pull_injective_on_subgroup` theorem is kernel-verified under
+those pinned dependencies. This does not verify any catalog row's concrete
+cover maps, subgroup order, or composition identity; those per-cover
+obligations remain open.
 
 ## Odd-characteristic boundary
 

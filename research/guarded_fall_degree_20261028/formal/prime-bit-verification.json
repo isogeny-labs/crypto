@@ -1,0 +1,97 @@
+{
+  "schema": "prime-bit-local-identities-verification/v1",
+  "status": "checked_partial_formalization",
+  "date": "2026-10-29",
+  "source": "PrimeBitLocal.lean",
+  "source_sha256": "d93729a96a0e92c5ad381980ff6ed0d0ba1219f14e13beb24e9addb61a7bfb01",
+  "checked_theorems": 8,
+  "lean_version": "4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "toolchain_archive": {
+    "url": "https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-linux.tar.zst",
+    "sha256": "47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+  },
+  "commands": [
+    {
+      "command": "lake build",
+      "exit_code": 0,
+      "build_jobs": 770,
+      "scope": "Both default library targets: unchanged FallDegreeIdentities and new PrimeBitLocal",
+      "log": "prime-bit-build.log"
+    },
+    {
+      "command": "lake env leanchecker --fresh --verbose PrimeBitLocal",
+      "exit_code": 0,
+      "log": "prime-bit-fresh-check.log",
+      "meaning": "Lean's built-in fresh kernel replay of the module and its imported constants; not a separate external kernel implementation"
+    }
+  ],
+  "declarations": [
+    {
+      "name": "PrimeBitLocal.quadratic_linear_cancellation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "H(u)-u*(u-alpha)-(A+alpha)*(u-alpha)=alpha^2+A*alpha+B",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.odd_s3_diagonal",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The explicit odd S3(t,t,u) formula is linear in u with the stated cubic coefficient and constant term",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.diagonal_constant_relation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The diagonal constant equals (3*t^2+a)^2-8*t*(t^3+a*t+b)",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.odd_s3_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0",
+      "claim": "S3(t,t,u)=(3*t^2+a)^2",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.derivative_ne_zero_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "3*t^2+a != 0",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.odd_s3_diagonal_ne_zero",
+      "hypotheses": "Field; cubic root with explicitly nonzero derivative",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.odd_s3_diagonal_ne_zero_of_discriminant",
+      "hypotheses": "Field; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+    },
+    {
+      "name": "PrimeBitLocal.normalized_quadratic_linear_refutation",
+      "hypotheses": "Field; alpha^2+A*alpha+B != 0",
+      "claim": "Multiplying the quadratic-linear cancellation by the evaluation's inverse yields one",
+      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+    }
+  ],
+  "sorry_or_custom_axioms": false,
+  "native_decide_or_unverified_native_evaluation": false,
+  "old_source_unchanged": {
+    "source": "FallDegreeIdentities.lean",
+    "sha256": "7aa8afec68e132b490bb256e168df6e62dbdb5bf2ac3118aa66e92cd55fce661",
+    "existing_proof_references_and_receipts_preserved": true
+  },
+  "full_prime_bit_last_fall_theorem_formalized": false,
+  "remaining_obligations": [
+    "The V_(F,D) definition and filtered closure/degree rules.",
+    "Boolean normal-form degree bounds and support-aware assignment localization.",
+    "Lookup-image rational lifts and rational splitting of the specialized first S3 polynomial.",
+    "Auxiliary-bit surjectivity and the inference of local univariate coprimality from Boolean UNSAT.",
+    "All coprime quadratic/linear cases connected to an actual degree-two closure derivation.",
+    "The final sum of indicators and unit-ideal/last-fall-degree bridge.",
+    "Connection of oddS3 and the explicit discriminant expression to Mathlib elliptic-curve objects."
+  ]
+}
