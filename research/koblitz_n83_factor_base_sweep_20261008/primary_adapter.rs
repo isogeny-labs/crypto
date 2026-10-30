@@ -389,6 +389,16 @@ fn sha256_hex(bytes: &[u8]) -> String {
         .collect()
 }
 
+fn pack_model_bits(model: &[bool]) -> Vec<u8> {
+    let mut packed = vec![0u8; model.len().div_ceil(8)];
+    for (index, &value) in model.iter().enumerate() {
+        if value {
+            packed[index / 8] |= 1 << (index % 8);
+        }
+    }
+    packed
+}
+
 fn full_d18_phase(file: &mut fs::File, started: Instant, phase: &str, detail: Value) -> Result<()> {
     writeln!(
         file,
@@ -1011,7 +1021,11 @@ fn full_d18_m4_impl(
     ordered_first_pair: bool,
     xor_decision_cadence: usize,
 ) -> Result<Value> {
-    if !["positive", "natural"].contains(&mode) || output.exists() {
+    if !["positive", "natural"].contains(&mode)
+        || output.exists()
+        || ((native_xcnf_witness || (ordered_first_pair && xor_decision_cadence == 32))
+            && output.with_extension("model.bin").exists())
+    {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
     }
     if l0_diagnostic && mode != "positive" && !phase_zero_first {
@@ -1064,9 +1078,7 @@ fn full_d18_m4_impl(
     {
         return Err("full D18 XCNF export differs from the frozen mode".into());
     }
-    if native_xcnf_witness
-        && (!export_xcnf || mode != "positive" || output.with_extension("model.bin").exists())
-    {
+    if native_xcnf_witness && (!export_xcnf || mode != "positive") {
         return Err("full D18 native XCNF witness differs from the frozen mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
@@ -1359,12 +1371,7 @@ fn full_d18_m4_impl(
             if checked_primary_relation_row(&base.curve, fb, &indices, &changed).is_ok() {
                 return Err("native XCNF witness accepted altered target".into());
             }
-            let mut packed = vec![0u8; model.len().div_ceil(8)];
-            for (index, &value) in model.iter().enumerate() {
-                if value {
-                    packed[index / 8] |= 1 << (index % 8);
-                }
-            }
+            let packed = pack_model_bits(&model);
             let model_path = output.with_extension("model.bin");
             let mut model_file = OpenOptions::new()
                 .write(true)
@@ -1502,6 +1509,28 @@ fn full_d18_m4_impl(
             }
         }
     };
+    let mut model_certificate = Value::Null;
+    if answer == SolveResult::Sat && ordered_first_pair && xor_decision_cadence == 32 {
+        let model = enc.solver.model();
+        if model.len() != enc.solver.n_vars() as usize {
+            return Err("full D18 SAT assignment length differs from formula".into());
+        }
+        let packed = pack_model_bits(&model);
+        let model_path = output.with_extension("model.bin");
+        let mut model_file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&model_path)?;
+        model_file.write_all(&packed)?;
+        model_file.sync_all()?;
+        model_certificate = json!({
+            "schema":"n83.full-d18-m4-model-certificate/v1",
+            "encoding":"bit i of byte i/8 is variable i+1, low bit first",
+            "bits":model.len(),"bytes":packed.len(),
+            "sha256":sha256_hex(&packed),
+            "path":model_path.to_string_lossy(),
+        });
+    }
     let peak_bytes: Option<u64> = if l0_diagnostic {
         None
     } else {
@@ -1550,6 +1579,7 @@ fn full_d18_m4_impl(
         "solver_limit_reason":limit_reason,
         "solver_conflicts":enc.solver.conflicts(),
         "solver_stats":solver_stats,
+        "model_certificate":model_certificate,
         "relation":relation,
         "process_usage":process_usage(),
         "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
@@ -3586,6 +3616,13 @@ mod tests {
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn packed_model_uses_low_bit_first_and_zero_padding() {
+        let model = [true, false, true, false, false, false, false, false, true];
+        assert_eq!(pack_model_bits(&model), [0b0000_0101, 0b0000_0001]);
+        assert!(pack_model_bits(&[]).is_empty());
+    }
 
     #[test]
     fn cgroup_v2_membership_resolves_container_and_native_scope() {

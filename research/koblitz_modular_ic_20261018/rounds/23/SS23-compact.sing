@@ -1,0 +1,39 @@
+// Append to original prefix, then bound literal h and its three lift entries.
+print("BEGIN_SS23_COMPACT");
+poly F=b*c7+b2*c5+b*c6+b2*c4+c6+b5+b4*c+b3*c2+b2*c3;
+poly Q0=nn[239];poly Q1=nn[241];poly Q2=nn[243];
+poly tateCofactorA=nn[49]/F;
+poly tateCofactorB=nn[53]/F;
+print("ORIGINAL_TATE_FACTOR_RESIDUALS");nn[49]-tateCofactorA*F;nn[53]-tateCofactorB*F;
+if(nn[49]-tateCofactorA*F!=0 || nn[53]-tateCofactorB*F!=0){ERROR("Tate source factor mismatch");}
+print("COMPACT_COLON_MEMBERSHIP_RESIDUAL");h*Q2-liftF*F-liftQ0*Q0-liftQ1*Q1;
+if(h*Q2-liftF*F-liftQ0*Q0-liftQ1*Q1!=0){ERROR("compact source certificate failed");}
+poly baseDerivative=diff(F,b);
+poly qrDerivative=diff(Q0,n)*diff(Q1,l)-diff(Q0,l)*diff(Q1,n);
+ring ss=(2,a),(n,l),lp;
+minpoly=a5+a3+1;
+number bb=a+1;
+map sp=r,n,l,bb,1;
+print("ORIGINAL_TATE_COFACTORS_ON_FIBER");sp(tateCofactorA);sp(tateCofactorB);
+if(sp(tateCofactorA)!=1){ERROR("original Tate equation does not recover F near the fiber");}
+poly hs=sp(h);
+poly L=l4+bb*l+bb^2;
+poly C=n4+bb^3*n+bb^4*(l+1);
+print("COMPACT_H_SPECIALIZATION");hs;
+print("COMPACT_H_FACTORS");factorize(hs);
+poly inv=(a4+a)*n2+(a4+a3+a2+a+1)*n+(a4+a3+a2+a+1)*l3+(a3)*l+(a3);
+poly aa=(a3)*l2;
+poly ab=(a4+a);
+// J's stored lex basis order is L,C as confirmed by the frozen source.
+print("COMPACT_UNIT_RESIDUAL");aa*L+ab*C+inv*hs-1;
+if(aa*L+ab*C+inv*hs-1!=0){ERROR("compact unit identity failed");}
+poly fbs=sp(baseDerivative);
+poly qr=sp(qrDerivative);
+ideal J=std(ideal(L,C));
+print("BASE_DERIVATIVE");fbs;
+print("BASE_DERIVATIVE_FACTOR_RESIDUAL");fbs-bb^2*(bb+1)^2;
+print("RELATIVE_QR_JACOBIAN_REDUCTION");reduce(qr,J);
+print("RELATIVE_QR_JACOBIAN_FACTOR_RESIDUAL");reduce(qr-bb^4*(n2+bb*n+bb*l3+bb^2*l),J);
+if(fbs-bb^2*(bb+1)^2!=0 || reduce(qr-bb^4*(n2+bb*n+bb*l3+bb^2*l),J)!=0){ERROR("Jacobian bridge failed");}
+print("SS23_COMPACT_ALL_CHECKS_PASS");
+print("END_SS23_COMPACT");quit;

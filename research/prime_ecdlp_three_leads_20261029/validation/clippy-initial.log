@@ -1,0 +1,12 @@
+    Checking crypto v0.1.0 (/workspace/crypto)
+warning: manual implementation of `.is_multiple_of()`
+  --> examples/hecke_target_router.rs:55:8
+   |
+55 |     if (4 * (input.a as u128).pow(3) + 27 * (input.b as u128).pow(2)) % p == 0 {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `(4 * (input.a as u128).pow(3) + 27 * (input.b as u128).pow(2)).is_multiple_of(p)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: `crypto` (example "hecke_target_router") generated 1 warning (run `cargo clippy --fix --example "hecke_target_router" -p crypto -- --no-deps` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3m 39s
