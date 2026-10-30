@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
 | [Exact compact scalar-predicate splitting](prime-scalar-exact-splitting.md) | open | an essentially new compact scalar-verification route to sub-exponential prime-field ECDLP | constructible exact splitting/weighted extension with complete network, recursive, cost and formal proof bounds |
