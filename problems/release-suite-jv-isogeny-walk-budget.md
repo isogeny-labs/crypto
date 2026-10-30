@@ -43,3 +43,23 @@ Unresolved. The two raw logs remain at the exact local paths/hashes in their
 respective validation receipts; required artifact upload is unavailable. Current
 raw-log digest/size and bounded excerpt are retained beside the PKM execution
 report. Completing this problem record does not complete the validation gate.
+
+
+## Integrated validation at source merge 2acf618dd (2026-10-30)
+
+The new 5646-case serial release-library execution capped at 40 minutes:
+2208 observed passes, zero observed failures, 47 ignored, the same JV case
+active and 3390 cases not reached. The timeout wrapper and supervisor exit
+124; Cargo's direct exit is unknown. No final suite summary/full pass exists.
+The JV source Git blob remains 568a67fb3a7e4067036c7b5985648c477a46290d,
+identical to the original 8baeee2d snapshot. No test or assertion was changed.
+
+The new 214615-byte raw log is NOT_UPLOADED, SHA256
+`d41f2749c59315e4f1c11d5315c212e67489ab983662dd94633aabc39c0977ca`.
+Exact command/source/binary bindings, reconciliation and bounded excerpt are
+in [the final integration receipt](../research/prime_ecdlp_three_leads_20261029/execution-20261030/integration-validation/final-receipt.json).
+The scoped 20-example suite, strict lint/formatting, CLI checkpoint refusal,
+backlog validation and library build pass on that source. They do not replace
+a full-library pass. All earlier receipts/logs remain separate and unchanged.
+This repeated validation limit remains unresolved; no duplicate attempt is
+launched merely to repeat the same cap. Scientific G1–G6 is also incomplete.
