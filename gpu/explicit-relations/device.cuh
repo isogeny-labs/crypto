@@ -323,7 +323,6 @@ public:
               (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
               product(first_count + second_count, sizeof(Point));
-    admission(bytes);
 #ifdef ER_TABLE_DIAGNOSTICS
     std::fprintf(stderr,
                  "TABLE left=%llu right=%llu bins=%llu admission_bytes=%llu "
@@ -333,6 +332,7 @@ public:
                  (unsigned long long)first_count,
                  (unsigned long long)second_count);
 #endif
+    admission(bytes);
     points.assign(p.points.begin(), p.points.end());
     rows.resize(p.left);
     if (!packed)
