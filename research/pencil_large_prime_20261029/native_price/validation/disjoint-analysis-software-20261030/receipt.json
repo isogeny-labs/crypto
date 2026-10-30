@@ -1,0 +1,99 @@
+{
+  "schema": "pencil-disjoint-native-price-software-validation/v1",
+  "status": "software_validated_source_frozen_no_execution_authorization",
+  "observed_at_utc": "2026-10-30T02:25:10Z",
+  "repository_head_before_commit": "d66d95baaabb077afd5d7c888c77fb6b3b5f52fc",
+  "branch": "codex/pencil-continuation-admission-20261030",
+  "source_manifest": {
+    "path": "source-files.sha256",
+    "sha256": "b20f282b8dd083355f71f7e4b99520a3fcd8cfe56a1f446baf35ece630ca23bf",
+    "files": 18,
+    "before_after_equal": true
+  },
+  "routes": {
+    "default_full1260": {
+      "plans": 7,
+      "membership": "exact original plan names and SHA-256 digests",
+      "workloads": 1260,
+      "changed_arithmetic": false
+    },
+    "p739_gate60": {
+      "kind": "p739-gate60",
+      "workloads": 60,
+      "executions": 1080,
+      "measured_pairs": 300,
+      "changed_arithmetic": false
+    },
+    "p186379_target0": {
+      "kind": "gate-p186379-target0/v1",
+      "plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
+      "workloads": 1,
+      "executions": 18,
+      "measured_executions": 15,
+      "warmup_executions": 3,
+      "measured_pairs": 5,
+      "charged_separately_from_full_cohort": true
+    },
+    "full1260_disjoint_p739": {
+      "kind": "full1260-disjoint-p739/v1",
+      "plans": 8,
+      "workloads": 1260,
+      "executions": 22680,
+      "measured_executions": 18900,
+      "warmup_executions": 3780,
+      "measured_pairs": 6300,
+      "request_sha256": "6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2",
+      "certificate_sha256": "de0003271c4f49898dd38f261c279338bfe756779d405d0753d0401d58b83e72",
+      "preparation_receipt_sha256": "b33c6acb87806e63104f7f1b0bcc1ecbb5f2f5760a9cc1026b5819a864eff4e9",
+      "native_preparation_verifier_sha256": "8ce29108cbb6471bee85aa4e1b6087f6ef9340c7d25e8161079cb28e62806820",
+      "native_preparation_verifier_source_sha256": "583377eed49f1f6d409376d8f57040379be95671e9274613f579319225ff19ae",
+      "known_gate_records_sha256": "9ccc07c9b55b9180af36c3b910891803dde7f4249742881a7322f748bfdb73f7",
+      "known_gate_session_id": "ECBS1h4c7220d5a9f6",
+      "known_gate_history_sha256": "dab9c1abf78c3e5f892ef271a0172f12b5b3d0571d4fcdcb6f5f36188b97d169",
+      "prospective_execution_identity_rule": "session, records and history are either all null or all present and hash-bound",
+      "continuation_protocol_rule": "canonical freeze-removed body hash, freeze.status=frozen, exact scope, prospective-only known-data amendment, exact certificate/observation/reuse bindings",
+      "scientific_reuse_rule": "hard-pinned prior plan/protocol/records/session plus independently reviewed reuse artifact",
+      "launch_authorization": false
+    }
+  },
+  "software_checks": [
+    {
+      "command": "cargo +1.99.1 fmt --all -- --check",
+      "passed": true,
+      "log": "cargo-fmt-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked --offline",
+      "passed": true,
+      "lib_tests_passed": 34,
+      "cli_tests_passed": 2,
+      "exact_packet_test_ignored_by_default": 1,
+      "log": "cargo-test-release-locked.log",
+      "log_sha256": "683ac4b51b8e1e1705e9cd2c9f82bd09e059d715899a1329cd53f16cb4f2250d"
+    },
+    {
+      "command": "cargo +1.99.1 clippy --release --all-targets --locked --offline -- -D warnings",
+      "passed": true,
+      "log": "cargo-clippy-release-locked.log",
+      "log_sha256": "4b0da1286c8d01adb6f3e52baafd172c071f365a6141095184f9eeb594af6b84"
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked --offline --test disjoint_actual_packet -- --ignored --exact reviewed_packet_recomputes_and_preserves_all_missing_future_slots --nocapture",
+      "passed": true,
+      "actual_gate_records": 1080,
+      "prospective_missing_executions": 21600,
+      "qualified_ratios": null,
+      "log": "actual-packet-integration.log",
+      "log_sha256": "db0a64d50ceabcc0873b802fe54ad7eb69703359cb59ebbfb5bd54a606c7ceda"
+    }
+  ],
+  "execution_boundary": {
+    "new_plan_invocations": 0,
+    "new_solver_executions": 0,
+    "new_cloud_jobs": 0,
+    "new_measurements": 0,
+    "deterministic_native_reanalysis_only": true
+  },
+  "claim_boundary": "This receipt validates source, membership, lineage and null-preserving deterministic analysis behavior. It does not freeze a scientific protocol, create reuse admission, qualify clocks or finite costs, authorize launch, or establish a completed cohort result."
+}
