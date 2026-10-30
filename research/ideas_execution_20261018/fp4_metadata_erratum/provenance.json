@@ -1,0 +1,188 @@
+{
+  "schema": "crypto.fp4_metadata_erratum.v1",
+  "scope": "Living mirror correction; research-only exact snapshot, not canonical model or representation registration. No field/curve preimage or old plan/evidence changed.",
+  "source_repository": "aburan28/cryptanalysis",
+  "source_branch": "main",
+  "source_commit": "3ce4c29ec497ff3149eb841c07e9dd9f6631de77",
+  "source_files": [
+    {
+      "file": "curves.yaml",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/curves.yaml",
+      "sha256": "ab4891397fe07fca9478d96e1533c167a885b7557be9e6801025d14fec0976c5",
+      "bytes": 7680
+    },
+    {
+      "file": "curves.schema.json",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/curves.schema.json",
+      "sha256": "42cd9793dd2993849a38e18cf6411d7159309f48ab1f8de1f94ae298535b74bd",
+      "bytes": 5953
+    },
+    {
+      "file": "curve-links/link.schema.json",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/curve-links/link.schema.json",
+      "sha256": "29ae784f278af450ddf90ff5230c173e5e055f3689ff41c382e7832ff7c62696",
+      "bytes": 7198
+    },
+    {
+      "file": "validate_semantics.py",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/validate_semantics.py",
+      "sha256": "0452077680d3151bdb6704f6c63c4e9aba51d0072a55ba689b93775b59ba1e28",
+      "bytes": 28164
+    },
+    {
+      "file": "test_validate_semantics.py",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/test_validate_semantics.py",
+      "sha256": "67ce1cb3933348d26100fb5fa474a6c3cef9b15fb32bc0bad0d7b18faee8a567",
+      "bytes": 6901
+    },
+    {
+      "file": "mirror-lock.json",
+      "url": "https://raw.githubusercontent.com/aburan28/cryptanalysis/3ce4c29ec497ff3149eb841c07e9dd9f6631de77/experiments/ic-candidate-catalog/mirror-lock.json",
+      "sha256": "85e0e283349e6a903c7ce233fee06841af7d4b637c83ff409bb2887da342e0c7",
+      "bytes": 282
+    }
+  ],
+  "prior_crypto_commit": "eaedaf1c132ed1f1ff101edd10c75369ab5e2dfe",
+  "prior_curve_file_sha256": "658a422ce97ef3ea505ed6337fe4680e146f1b951b208688a13f9199bbdd5712",
+  "restored_curve_file_sha256": "ab4891397fe07fca9478d96e1533c167a885b7557be9e6801025d14fec0976c5",
+  "snapshot_path": "research/ideas_execution_20261018/fp4_metadata_erratum/candidate-entries.snapshot.yaml",
+  "snapshot_sha256": "0a5584412e3c9db75d34df2702528f8c57350057307f752d30e8ff5839f4d817",
+  "reconstruction_rule": "prior curves.yaml bytes = restored authoritative curves.yaml bytes + candidate-entries.snapshot.yaml bytes",
+  "local_mirror_lock_unchanged_sha256": "3966e1060c7551e842042817b23586f7bd1ddab9b5f8bfc47f8df2c5960b5aca",
+  "upstream_mirror_lock_caveat": "The upstream lock itself pins an older curves.yaml digest566ed698\u2026; it is not one of the5PEER_FILES. Retain crypto existing lock because its3digests match the authoritative files.",
+  "constructor_entries": [
+    {
+      "snapshot_alias": "ideas20261018_fp4p13_seed1_h0a8c321bb635",
+      "curve_id": "EC1Q13D4Ctau2h0a8c321bb635",
+      "curve_uid": "urn:ec-record:1:sha256:0a8c321bb63512b4d4b1c0b3620e435a4c011dbf86437cc57c8947c5fea19b52",
+      "field_curve_preimage_sha256": "0a8c321bb63512b4d4b1c0b3620e435a4c011dbf86437cc57c8947c5fea19b52",
+      "exact_record_equal_to_prior_appended_entry": true,
+      "icv1_registration": {
+        "status": "unregistered",
+        "registry_slug": null,
+        "registry_full": null
+      },
+      "historical_computed_identity": {
+        "full": "ICV1:fpk-13-4-fc4a7b1c:-210:28772:6,1,1,4:unk:unk:r:19073b0faba2",
+        "model_json": "{\"a\":[\"12\",\"7\",\"8\",\"6\"],\"b\":[\"5\",\"9\",\"7\",\"5\"],\"field\":\"fpk-13-4-fc4a7b1c\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"4\",\"modulus\":[\"11\",\"0\",\"0\",\"0\"],\"p\":\"13\",\"v\":\"1\"}",
+        "slug": "icv1-fp4k4-tm210-19073b0f",
+        "status": "verified_constructor_model_not_main_registry_entry"
+      },
+      "legacy_constructor_identity": {
+        "full": "ICV1:fp4-p13:-210:28772:-:-:-:-:eca6806bc38d",
+        "slug": "icv1-fp4p13-tm210-eca6806b",
+        "status": "exact_parameters_verified_against_frozen_workloads"
+      },
+      "trait_status": "unknown; no new arithmetic or trait certification",
+      "representation_links": "not enumerated; no new link asserted"
+    },
+    {
+      "snapshot_alias": "ideas20261018_fp4p17_seed1_hd33452c3120a",
+      "curve_id": "EC1Q17D4Ctau2hd33452c3120a",
+      "curve_uid": "urn:ec-record:1:sha256:d33452c3120ad3a37b46d3e6d4eedc81892bee1ea152d00e7a7638c9e6b410fc",
+      "field_curve_preimage_sha256": "d33452c3120ad3a37b46d3e6d4eedc81892bee1ea152d00e7a7638c9e6b410fc",
+      "exact_record_equal_to_prior_appended_entry": true,
+      "icv1_registration": {
+        "status": "unregistered",
+        "registry_slug": null,
+        "registry_full": null
+      },
+      "historical_computed_identity": {
+        "full": "ICV1:fpk-17-4-4df123c6:30:83492:9,14,16,0:unk:unk:r:b008f9b762dd",
+        "model_json": "{\"a\":[\"9\",\"3\",\"14\",\"5\"],\"b\":[\"4\",\"1\",\"9\",\"5\"],\"field\":\"fpk-17-4-4df123c6\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"4\",\"modulus\":[\"14\",\"0\",\"0\",\"0\"],\"p\":\"17\",\"v\":\"1\"}",
+        "slug": "icv1-fp5k4-t30-b008f9b7",
+        "status": "verified_constructor_model_not_main_registry_entry"
+      },
+      "legacy_constructor_identity": {
+        "full": "ICV1:fp4-p17:30:83492:-:-:-:-:2d9280aede79",
+        "slug": "icv1-fp4p17-t30-2d9280ae",
+        "status": "exact_parameters_verified_against_frozen_workloads"
+      },
+      "trait_status": "unknown; no new arithmetic or trait certification",
+      "representation_links": "not enumerated; no new link asserted"
+    },
+    {
+      "snapshot_alias": "ideas20261018_fp4p29_seed1_hb7e4ca0ac1bb",
+      "curve_id": "EC1Q29D4Ctau2hb7e4ca0ac1bb",
+      "curve_uid": "urn:ec-record:1:sha256:b7e4ca0ac1bb9f46a78b34d7edcc16b6e8c73537a88c87201b946771d2f535c1",
+      "field_curve_preimage_sha256": "b7e4ca0ac1bb9f46a78b34d7edcc16b6e8c73537a88c87201b946771d2f535c1",
+      "exact_record_equal_to_prior_appended_entry": true,
+      "icv1_registration": {
+        "status": "unregistered",
+        "registry_slug": null,
+        "registry_full": null
+      },
+      "historical_computed_identity": {
+        "full": "ICV1:fpk-29-4-9dbb234a:-746:708028:3,13,22,12:unk:unk:r:dc56f0aa6ab0",
+        "model_json": "{\"a\":[\"28\",\"0\",\"9\",\"24\"],\"b\":[\"25\",\"26\",\"21\",\"20\"],\"field\":\"fpk-29-4-9dbb234a\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"4\",\"modulus\":[\"27\",\"0\",\"0\",\"0\"],\"p\":\"29\",\"v\":\"1\"}",
+        "slug": "icv1-fp5k4-tm746-dc56f0aa",
+        "status": "verified_constructor_model_not_main_registry_entry"
+      },
+      "legacy_constructor_identity": {
+        "full": "ICV1:fp4-p29:-746:708028:-:-:-:-:32920c0af807",
+        "slug": "icv1-fp4p29-tm746-32920c0a",
+        "status": "exact_parameters_verified_against_frozen_workloads"
+      },
+      "trait_status": "unknown; no new arithmetic or trait certification",
+      "representation_links": "not enumerated; no new link asserted"
+    },
+    {
+      "snapshot_alias": "ideas20261018_fp4p37_seed1_h78eaf2768f3d",
+      "curve_id": "EC1Q37D4Ctau2h78eaf2768f3d",
+      "curve_uid": "urn:ec-record:1:sha256:78eaf2768f3dd1edd0f1d5d4c257823251f08dcf5a6da83bbd9bc7f69d4fbef1",
+      "field_curve_preimage_sha256": "78eaf2768f3dd1edd0f1d5d4c257823251f08dcf5a6da83bbd9bc7f69d4fbef1",
+      "exact_record_equal_to_prior_appended_entry": true,
+      "icv1_registration": {
+        "status": "unregistered",
+        "registry_slug": null,
+        "registry_full": null
+      },
+      "historical_computed_identity": {
+        "full": "ICV1:fpk-37-4-b090796d:-290:1874452:24,5,11,26:unk:unk:r:f3916f660776",
+        "model_json": "{\"a\":[\"3\",\"36\",\"1\",\"4\"],\"b\":[\"25\",\"32\",\"34\",\"2\"],\"field\":\"fpk-37-4-b090796d\",\"form\":\"y^2=x^3+a*x+b\",\"k\":\"4\",\"modulus\":[\"35\",\"0\",\"0\",\"0\"],\"p\":\"37\",\"v\":\"1\"}",
+        "slug": "icv1-fp6k4-tm290-f3916f66",
+        "status": "verified_constructor_model_not_main_registry_entry"
+      },
+      "legacy_constructor_identity": {
+        "full": "ICV1:fp4-p37:-290:1874452:-:-:-:-:214b4b57c600",
+        "slug": "icv1-fp4p37-tm290-214b4b57",
+        "status": "exact_parameters_verified_against_frozen_workloads"
+      },
+      "trait_status": "unknown; no new arithmetic or trait certification",
+      "representation_links": "not enumerated; no new link asserted"
+    }
+  ],
+  "conductor": {
+    "command": [
+      "conductor",
+      "check",
+      "--summary",
+      "Restore authoritative IC curve mirror; preserve verbatim unregistered Fp4 candidate metadata and living errata",
+      "--scope",
+      "path:docs/curves/ic/curves.yaml",
+      "--scope",
+      "path:docs/curves/ic/README.md",
+      "--scope",
+      "path:research/ideas_execution_20261018/fp4_metadata_erratum",
+      "--scope",
+      "path:research/ideas_execution_20261018/oracle_integration/README.md",
+      "--scope",
+      "path:benchmarks/20261018-oracle-components/README.md"
+    ],
+    "exit_status": 127,
+    "stdout": "",
+    "stderr": "[Errno 2] No such file or directory: 'conductor'",
+    "status": "required command unavailable; root informed; exclusive scope kept"
+  },
+  "not_changed": [
+    "canonical model registry",
+    "schemas",
+    "semantic validator and controls",
+    "mirror-lock.json",
+    "all field and curve hash preimages",
+    "frozen plans and original run/source/registration evidence",
+    "cryptanalysis worktree/PR956"
+  ],
+  "required_followup": "Root owns native curve_traits dependency-equivalence/freshness and browser/leaderboard regeneration. Parsed crosswalk should be unchanged because all4string-slug entries were already skipped; source digest changes.",
+  "scientific_trials": 0
+}

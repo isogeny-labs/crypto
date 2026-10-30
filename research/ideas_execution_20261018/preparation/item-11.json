@@ -1,0 +1,50 @@
+{
+  "item": 11,
+  "title": "Learned necessary-condition prefilter / bucket gain",
+  "original_requirement": "Learn an x_R prefilter beyond exact trace baseline on subspace bases; also execute actual open problem91d4f6 with subgroup single-bucket gain.",
+  "acceptance_criteria": [
+    "11a natural target law, certified decomposability labels; hold out curves,bases,sizes,charge feature/inference; classifier accuracy does not prove a necessary condition.",
+    "11b measure G(M)=M max_c,d pi_c(d) on prime-order subgroup with SHA null; separate full-group trace/halving positive controls.",
+    "No average-agreement surrogate for max bucket gain; explicit false-negative handling and proof obligations for safe rejection."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "knowledge/open-problems/KN-OPEN-91d4f6.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_03_trace_theory.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_03_tracezero_freerel.rs"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/target_fiber.py"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "91d4f6 is approximate subgroup bucket gain, not learned decomposability. Both original learned classifier and correct open problem remain requested.",
+    "Trace is constant on odd-prime subgroup, so claimed50% rejection applies only different full-curve/abscissa law.",
+    "Need generator/labels, learning model, conformal/uncertainty handling and prospective rejection certificate before oracle use."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "Trace integration already observed0/29624subgroup-target rejections in prior item16; keep this domain correction in protocol."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "A learned necessary-condition prefilter on x_R for subspace bases. This is open problem 91d4f6 and the first proposed ML-lab experiment, unrun. The trace-zero filter refutes half of targets at degree 2. Any classifier beating that baseline has found a new algebraic invariant, and Theorem 13.1 excludes only fiber invariants. Cheap.",
+  "historical_source_references_unresolved": [
+    {
+      "repository": "crypto-autoresearcher",
+      "id": "EXP-SEMBIN-3d9a71",
+      "origin": "knowledge/open-problems/KN-OPEN-91d4f6.md",
+      "observation": "The knowledge entry references this draft experiment, but its specification path is not present in current HEAD. Do not report it as an executable current source."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "parent-library-validation-publication-limits-v1",
+  "recorded_at": "2026-10-27T01:06:41.854535+00:00",
+  "full_raw_log": {
+    "local_path": "/workspace/smallroot-session/native-owner-current-cargo-attempt9-60e694.log",
+    "bytes": 431104,
+    "sha256": "b37a4217610b6d40aa72004ef36b170bac669545f389b6bc218f7f6c2cd38636",
+    "durable_publication": false,
+    "reason": "Normal configured AWS CLI STS lookup returned255: Unable to locate credentials. Full log exceeds64KiB artifact-store threshold; no large-log Git bypass or alternate identity attempted."
+  },
+  "exact_failure_excerpt": {
+    "path": "experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/parent-library-validation-60e694/attempt9.failure-excerpt.log",
+    "full_log_byte_offset": 428254,
+    "bytes": 2850,
+    "sha256": "1b16c4ca40f2e2b736823084fce3f6f0f4c8d48669ca3c6a6001689181088c3d",
+    "is_complete_full_run_log": false
+  },
+  "full_run_passed": false,
+  "full_run_counts": {
+    "passed": 4888,
+    "failed": 6,
+    "ignored": 121,
+    "duration_seconds": 1290.51
+  },
+  "same_binary_replays": "All six retained. Work fixture passed after exact tracked restoration; weighted and three hyper_ic failures reproduced; HAWK passed once with its original failure retained. No HAWK fix or full-pass claim.",
+  "recheck": "Retry official artifact-store publication when the configured credential chain is available. Preserve full raw bytes locally until then.",
+  "scientific_panel_cases_run": 0
+}
