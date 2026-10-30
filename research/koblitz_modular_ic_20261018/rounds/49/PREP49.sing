@@ -20,10 +20,11 @@ ideal descGamma49=desc49,gamma49;
 print("PREP49_STAGE generic_descent_Groebner_begin=true");
 ideal physicalStd49=std(physicalIdeal49);ideal descStd49=std(descGamma49);
 if(vdim(physicalStd49)!=64 || vdim(descStd49)!=64){ERROR("PREP49_GENERIC_DIMENSION");}
-if(reduce(physicalIdeal49,descStd49)!=0 || reduce(descGamma49,physicalStd49)!=0){ERROR("PREP49_DESCENT_IDEAL_EQUALITY");}
+print("PREP49_IDEAL_REMAINDER_SIZES "+string(size(reduce(physicalIdeal49,descStd49)))+","+string(size(reduce(descGamma49,physicalStd49))));
+if(size(reduce(physicalIdeal49,descStd49))!=0 || size(reduce(descGamma49,physicalStd49))!=0){ERROR("PREP49_DESCENT_IDEAL_EQUALITY");}
 print("PREP49_STAGE physical_and_descended_ideals_equal=true degree_over_F2u_with_gamma=64");
 for(i49=1;i49<=8;i49++){
- ideal unitStd49=std(ideal(descStd49,units49[i49]));
+ ideal unitInput49=descStd49,units49[i49];ideal unitStd49=std(unitInput49);
  if(unitStd49[1]!=1){ERROR("PREP49_GENERIC_REGISTERED_UNIT");}
  print("PREP49_GENERIC_UNIT index="+string(i49)+" verified=true");
 }
