@@ -68,6 +68,15 @@ the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
 
+2026-10-30 engineering follow-up: [native exact-primality and witness changes](../research/hashed_ecdl_speed_20261029/README.md)
+pass bounded correctness controls and preserve complete seeded certificates.
+Checked Pocklington input now validates ECCp-131 parameters within the original
+two-million-step policy. The functional leaf can avoid repeated prefix counts;
+count queries, full graph replay and source recursion guards are preserved.
+Profiling and the frozen baseline/candidate panel remain blocked by checkpoint/
+execution access, so no general performance conclusion follows. This does not
+close the independent audit or either published challenge solve requirement.
+
 2026-10-29, first reference: bounded generic reduction landed; missing compact
 encoder and backend were correctly recorded as an implementation gap.
 
