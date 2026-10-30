@@ -395,3 +395,20 @@ frozen analyzer bytes are replayed; initial failures/all controls retained.
 Original useful-yield/lower-degree/actual-main-source objective remains open;
 next discriminate actual matrix/probability binding or a new relevant-degree
 encoding, not another identical complete-two-summand census.
+
+
+## 2026-10-30 actual relation-span and source-scalar bridge
+
+[Actual F13 row transport](../research/quadratic_twist_evidence_20261021/reports/row-transport-20261030/README.md) passes
+20named/24audited,0extra trusted:complete matched row/cardinality/mod7span/
+incremental-rank equality on explicit7torsion,adaptive complete-oracle state
+coupling,admitted-row validity and signed public-log shifted recovery of the
+ORIGINALmain scalar modulo7. GlobalPhi injectivity is explicitly disproved by
+actual nonzero source2torsionK. Abstract degree-profile inclusion is conditional;
+no actual capped-solver/regularity/cost advantage or iid stopping-time theorem.
+The separate [all16F13degree-qualified experiment](../backlog/XP-20261030-degree-qualified-f13/README.md)
+is VALIDATED DRAFT,unimplemented/unexecuted;no source/auditor/runner/protocol or
+Cairnlease/funding. Do not repeat these proved bridges as substitute for that
+next concrete experiment. Native/proof old18identities and all dated data remain.
+Original better-yield/lower-relevant-degree objective and all registry/library/
+naming/requiredCI/review/coordination/integration holds remain open.
