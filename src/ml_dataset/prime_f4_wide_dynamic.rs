@@ -996,7 +996,24 @@ struct ObserverState {
     pending: Option<PhaseEvent>,
     stop: Option<Stop>,
     last_native: Supply,
+    terminal_acknowledged: bool,
     persistence: EventPersistence,
+}
+/// Check only information actually present in native callback snapshots.
+/// No clock check: a censored call may legitimately return after phase expiry.
+fn validate_final_snapshot(report: &dynamic::Report, observer: &ObserverState) -> Result<(), Stop> {
+    let final_work = report.reserved.work;
+    let final_bytes = report.reserved.bytes;
+    if report.acknowledged_events != observer.native
+        || final_work < observer.last_native.work
+        || final_bytes < observer.last_native.bytes
+        || (observer.terminal_acknowledged
+            && (final_work != observer.last_native.work
+                || final_bytes != observer.last_native.bytes))
+    {
+        return Err(Stop::InvalidInput);
+    }
+    Ok(())
 }
 fn encode_record<T: serde::Serialize>(
     record: &T,
@@ -1411,6 +1428,7 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             pending: None,
             stop: None,
             last_native: Supply { work: 0, bytes: 0 },
+            terminal_acknowledged: false,
             persistence,
         };
         let supplied = remaining(&ledger);
@@ -1564,7 +1582,8 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
         &native_limits,
         prepared.phase_deadline,
         &mut |event| {
-            if event.sequence != prepared.observer.native
+            if prepared.observer.terminal_acknowledged
+                || event.sequence != prepared.observer.native
                 || event.reserved.work < prepared.observer.last_native.work
                 || event.reserved.bytes < prepared.observer.last_native.bytes
                 || event.reserved.work > native_supply.work
@@ -1595,6 +1614,7 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
                 work: event.reserved.work,
                 bytes: event.reserved.bytes,
             };
+            prepared.observer.terminal_acknowledged = event.stage == dynamic::Stage::Terminal;
             Ok(())
         },
     );
@@ -1618,9 +1638,7 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
             },
             observer_budget.performed_work,
         )?;
-        if report.acknowledged_events != prepared.observer.native {
-            return Err(Stop::InvalidInput);
-        }
+        validate_final_snapshot(&report, &prepared.observer)?;
         Ok((native, observer))
     })();
     let (settlement, observer_settlement) = match settled {
@@ -2327,6 +2345,7 @@ mod tests {
             pending: None,
             stop: None,
             last_native: Supply { work: 0, bytes: 0 },
+            terminal_acknowledged: false,
             persistence: EventPersistence::BoundCapture,
         };
         let event = PhaseEvent {
@@ -2387,6 +2406,48 @@ mod tests {
         assert_eq!(phase.report.stop, dynamic::Stop::EventLimit);
         assert_eq!(phase.report.acknowledged_events, 0);
         assert_eq!(phase.prepared.observer.acknowledged, 4096);
+    }
+    #[test]
+    fn final_native_receipt_rejects_snapshot_regression_and_terminal_disagreement() {
+        let mut phase = invoke_original(prepared_small(), &mut |_, _| Ok(())).unwrap();
+        validate_final_snapshot(&phase.report, &phase.prepared.observer).unwrap();
+        let original_work = phase.report.reserved.work;
+        let original_bytes = phase.report.reserved.bytes;
+        assert!(original_work > 0 && original_bytes > 0);
+        // Deliberately modified receipt/state controls, not alleged engine bugs.
+        phase.prepared.observer.last_native = Supply {
+            work: original_work,
+            bytes: original_bytes,
+        };
+        phase.prepared.observer.terminal_acknowledged = true;
+        validate_final_snapshot(&phase.report, &phase.prepared.observer).unwrap();
+        phase.report.reserved.work -= 1;
+        assert_eq!(
+            validate_final_snapshot(&phase.report, &phase.prepared.observer),
+            Err(Stop::InvalidInput)
+        );
+        phase.report.reserved.work = original_work;
+        phase.report.reserved.bytes += 1;
+        assert_eq!(
+            validate_final_snapshot(&phase.report, &phase.prepared.observer),
+            Err(Stop::InvalidInput)
+        );
+        // No-terminal deadline/observer censoring may consume more than its
+        // last acknowledged snapshot; it must not be forced to exact equality.
+        phase.prepared.observer.terminal_acknowledged = false;
+        phase.report.stop = dynamic::Stop::Deadline;
+        validate_final_snapshot(&phase.report, &phase.prepared.observer).unwrap();
+        phase.report.reserved.bytes = original_bytes - 1;
+        assert_eq!(
+            validate_final_snapshot(&phase.report, &phase.prepared.observer),
+            Err(Stop::InvalidInput)
+        );
+        phase.report.reserved.bytes = original_bytes;
+        phase.report.acknowledged_events += 1;
+        assert_eq!(
+            validate_final_snapshot(&phase.report, &phase.prepared.observer),
+            Err(Stop::InvalidInput)
+        );
     }
     /// Explicit long panel: all432 cases are attempted; ignored/unrun is NOT coverage.
     #[test]
