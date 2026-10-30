@@ -2,6 +2,9 @@
 #include "host.hpp"
 #include <cstdio>
 #include <cuda_runtime.h>
+#ifdef ER_CUB_SORT
+#include <cub/device/device_merge_sort.cuh>
+#endif
 #ifdef ER_NORMALIZE_CUB_REFERENCE
 #include <cub/block/block_scan.cuh>
 #endif
@@ -109,6 +112,27 @@ RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
 using DeviceRow = Row;
 using DeviceRowLess = RowLess;
 RF_HD DeviceRow device_row(Point point, U id) { return {point, id}; }
+#endif
+#ifdef ER_CUB_SORT
+struct MergeScratch {
+  void *ptr = nullptr;
+  explicit MergeScratch(size_t bytes) {
+    if (bytes)
+      cuda_check(cudaMalloc(&ptr, bytes));
+  }
+  MergeScratch(const MergeScratch &) = delete;
+  MergeScratch &operator=(const MergeScratch &) = delete;
+  ~MergeScratch() { if (ptr) cudaFree(ptr); }
+};
+inline size_t merge_sort_bytes(U count) {
+  size_t bytes = 0;
+  // Explicit signed64-bit count: the admitted row cap can exceed INT_MAX.
+  // A null scratch pointer requests sizing only, without touching keys.
+  cuda_check(cub::DeviceMergeSort::SortKeys(
+      nullptr, bytes, static_cast<DeviceRow *>(nullptr), int64_t(count),
+      DeviceRowLess{}));
+  return bytes;
+}
 #endif
 RF_HD bool row_less_key(const Row &row, Point key) {
   return compare(row.point, key) < 0;
@@ -376,8 +400,18 @@ public:
     const auto layout = prefix_layout(c.f.p, p.left);
     U bins = layout.bins;
     prefix_shift = layout.shift;
-    // 3 row buffers cover the retained table and conservative sort scratch.
-    U bytes = product(p.left, 3 * sizeof(DeviceRow)) +
+    const U row_bytes = product(p.left, sizeof(DeviceRow));
+#ifdef ER_CUB_SORT
+    const size_t sort_bytes = merge_sort_bytes(p.left);
+    [[maybe_unused]] constexpr unsigned queried_sort = 1;
+#else
+    // Legacy Thrust admission reserves two additional complete row buffers.
+    const size_t sort_bytes = product(row_bytes, 2);
+    [[maybe_unused]] constexpr unsigned queried_sort = 0;
+#endif
+    if (sort_bytes > UINT64_MAX - row_bytes)
+      throw std::runtime_error("LIMIT sort allocation overflow");
+    U bytes = row_bytes + sort_bytes +
               product(p.points.size(), sizeof(Point)) +
               (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
@@ -385,11 +419,13 @@ public:
 #ifdef ER_TABLE_DIAGNOSTICS
     std::fprintf(stderr,
                  "TABLE left=%llu right=%llu bins=%llu admission_bytes=%llu "
-                 "partial_first=%llu partial_second=%llu\n",
+                 "partial_first=%llu partial_second=%llu row_width=%u "
+                 "sort_bytes=%llu sort_queried=%u\n",
                  (unsigned long long)p.left, (unsigned long long)p.right,
                  (unsigned long long)bins, (unsigned long long)bytes,
                  (unsigned long long)first_count,
-                 (unsigned long long)second_count);
+                 (unsigned long long)second_count, unsigned(sizeof(DeviceRow)),
+                 (unsigned long long)sort_bytes, queried_sort);
 #endif
     admission(bytes);
     points.assign(p.points.begin(), p.points.end());
@@ -413,7 +449,17 @@ public:
       build_left<<<blocks(p.left), BLOCK>>>(c, p.view(data(points)), p.split,
                                             p.left, data(rows));
       cuda_check(cudaGetLastError());
+#ifdef ER_CUB_SORT
+      {
+        MergeScratch scratch(sort_bytes);
+        size_t available = sort_bytes;
+        cuda_check(cub::DeviceMergeSort::SortKeys(
+            scratch.ptr, available, data(rows), int64_t(p.left), DeviceRowLess{}));
+        cuda_check(cudaDeviceSynchronize());
+      } // Scratch is released before indexing and relation queries.
+#else
       thrust::sort(rows.begin(), rows.end(), DeviceRowLess{});
+#endif
       if (bins) {
         prefixes.resize(bins + 1);
         build_prefix<<<blocks(bins + 1), BLOCK>>>(data(rows), p.left, bins,
