@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="560" viewBox="0 0 1040 560" role="img" aria-label="Reviewed experiment metadata flows through an atomic GitHub claim, private Isolab EKS execution, verified collection, and a results PR, with separate credentials.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#476580"/></marker>
+  </defs>
+  <rect width="1040" height="560" fill="#fff"/>
+  <g font-family="DejaVu Sans,sans-serif" fill="#172f46">
+    <text x="28" y="34" font-size="22" font-weight="bold">Pending experiment → private EKS job → results PR</text>
+    <text x="28" y="60" font-size="14">Implementation architecture · 2026-10-27 · mock services tested; live EKS qualification pending</text>
+    <rect x="20" y="85" width="1000" height="115" rx="12" fill="#edf4fb" stroke="#9ab2c9"/>
+    <text x="38" y="109" font-size="14" font-weight="bold">GitHub planner · repository write permission · no AWS identity</text>
+    <rect x="38" y="122" width="295" height="59" rx="7" fill="#fff" stroke="#9ab2c9"/>
+    <text x="52" y="145" font-size="15">Approved spec + frozen protocol</text>
+    <text x="52" y="166" font-size="13">Pinned source, image, inputs, budget</text>
+    <path d="M333 151H377" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="386" y="122" width="267" height="59" rx="7" fill="#fff" stroke="#9ab2c9"/>
+    <text x="400" y="145" font-size="15">Validate readiness and limits</text>
+    <text x="400" y="166" font-size="13">Missing requirements → blocker</text>
+    <path d="M653 151H697" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="706" y="122" width="296" height="59" rx="7" fill="#fff" stroke="#9ab2c9"/>
+    <text x="720" y="145" font-size="15">Atomic permanent claim tag</text>
+    <text x="720" y="166" font-size="13">Existing claim → collect only</text>
+    <path d="M854 200V219H185V232" fill="none" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="20" y="239" width="1000" height="128" rx="12" fill="#f0f7f0" stroke="#9bb99a"/>
+    <text x="38" y="263" font-size="14" font-weight="bold">Execution · temporary AWS OIDC identity · no repository write permission</text>
+    <rect x="38" y="279" width="295" height="69" rx="7" fill="#fff" stroke="#9bb99a"/>
+    <text x="52" y="304" font-size="15">Actions submits once</text>
+    <text x="52" y="326" font-size="13">Durable hashed request in private S3</text>
+    <path d="M333 313H377" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="386" y="279" width="267" height="69" rx="7" fill="#fff" stroke="#9bb99a"/>
+    <text x="400" y="304" font-size="15">Existing CodeBuild bridge</text>
+    <text x="400" y="326" font-size="13">Native MCP → private EKS API</text>
+    <path d="M653 313H697" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="706" y="279" width="296" height="69" rx="7" fill="#fff" stroke="#9bb99a"/>
+    <text x="720" y="304" font-size="15">Isolab Spot pod</text>
+    <text x="720" y="326" font-size="13">Pinned task + verifier; retries = 0</text>
+    <path d="M854 367V386H185V400" fill="none" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="20" y="407" width="1000" height="115" rx="12" fill="#fff5e9" stroke="#c9ae87"/>
+    <text x="38" y="431" font-size="14" font-weight="bold">Verified return and PR publication · publisher has repository write permission, no AWS identity</text>
+    <rect x="38" y="444" width="295" height="59" rx="7" fill="#fff" stroke="#c9ae87"/>
+    <text x="52" y="467" font-size="15">Private receipts + raw outputs</text>
+    <text x="52" y="488" font-size="13">Failures and interrupted attempts kept</text>
+    <path d="M333 474H377" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="386" y="444" width="267" height="59" rx="7" fill="#fff" stroke="#c9ae87"/>
+    <text x="400" y="467" font-size="15">Verify identity, hashes, export</text>
+    <text x="400" y="488" font-size="13">Large files stay in private S3</text>
+    <path d="M653 474H697" stroke="#476580" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="706" y="444" width="296" height="59" rx="7" fill="#fff" stroke="#c9ae87"/>
+    <text x="720" y="467" font-size="15">One results branch and PR</text>
+    <text x="720" y="488" font-size="13">Observations; independent review follows</text>
+    <text x="28" y="546" font-size="13">No automatic scientific verdict · no leaderboard promotion · unresolved claims never trigger a duplicate submission</text>
+  </g>
+</svg>

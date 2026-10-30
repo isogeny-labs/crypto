@@ -7,7 +7,7 @@ and weekly.
 
 | target | how it is checked |
 |:--|:--|
-| Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build`, then an audit of every module the project built |
+| Lake project (directory with `lakefile.toml` / `lakefile.lean`) | `lake exe cache get` if it uses Mathlib, then `lake build`, then explicitly build every tracked project `.lean` source as a `+Module` target, and audit every built module |
 | standalone `.lean` file outside any Lake project | `lean -o` against the core library under its directory's `lean-toolchain`, then an audit of that module |
 
 The retained first attempt at
@@ -26,6 +26,13 @@ collects each theorem's **transitive** axioms. Only `propext`,
 `Classical.choice` and `Quot.sound` are accepted. A grep cannot do this
 check, because a `sorry` or axiom can be several imports away.
 
+The gate supplies the trust-manifest path to the audit program through
+`LEAN_AUDIT_TRUSTED_FILE`. This keeps its command-line arguments as module
+names, including under Lean 4.19, whose CLI rejects a `--trusted` argument
+after `--run`. CI installs each target's pinned toolchain before the proof
+step and retries only transient installation failures; an axiom or build
+failure remains a failure.
+
 | outcome | meaning |
 |:--|:--|
 | `ok` | kernel-checked on the standard foundations |
@@ -36,6 +43,12 @@ A target also fails when it doesn't build, when its build log reports
 `declaration uses 'sorry'`, or when it contains no theorems. A gate that
 audits nothing must not pass. A failure to fetch the Mathlib cache exits 3. It
 is an infrastructure failure and never evidence about a proof.
+Tracked project sources that Lake cannot build as module targets fail the gate
+as `FAIL_source_build`; they cannot silently disappear behind `defaultTargets`.
+Project `lakefile.lean` configuration and dedicated `AxiomAudit.lean` scripts
+are excluded from this source enumeration. The separate self-test project is
+excluded from normal repository discovery because its deliberately false
+theorem must be rejected by the self-test.
 
 ```sh
 tools/lean/proof-gate.sh --list                  # what would be checked
@@ -50,7 +63,13 @@ tools/lean/proof-gate.sh --out receipts          # keep build and audit logs
 `selftest/pass/` must pass (`Good.lean` is plain kernel proofs,
 `Trusted.lean` is a listed `native_decide`), and `selftest/fail/` must fail
 (a transitive `sorry`, a user axiom, an unlisted `native_decide`, a file with
-no theorems, a build error). CI runs it on every trigger, so the gate stays
+no theorems, a build error). The `project-omitted/` fixture registers a module
+outside its Lake default targets and requires the gate to catch its `sorryAx`.
+The same control runs with canonical, leading `./`, and trailing `/` project
+paths. Targets are normalized against the repository root with Python 3 before
+module names or archived-control exclusions are derived; paths outside the
+checkout are refused. Python 3 is therefore required alongside Git and Lean.
+CI runs it on every trigger, so the gate stays
 exercised even in a repository with no Lean proofs yet. The CI matrix covers
 the repository's pinned toolchain and Lean 4.19, used by the SEA project.
 `LEAN_GATE_TRUSTED`

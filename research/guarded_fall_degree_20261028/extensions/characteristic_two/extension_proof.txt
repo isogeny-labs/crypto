@@ -1,0 +1,242 @@
+Characteristic-two extension of the guarded three-abscissa upper bound
+Date: 2026-10-28
+
+Status and literature boundary
+------------------------------
+This note gives an explicit algebraic derivation extending the session's
+ordinary-degree upper bound to the ordinary binary Weierstrass model. It
+does not claim novelty or establish a bound for growing Boolean Weil-descent
+systems. The derivation below is separate from numerical tests and has not
+been formalized in Lean.
+
+Primary sources checked before this extension:
+1. Igor Semaev, New algorithm for the discrete logarithm problem on elliptic
+   curves, arXiv:1504.01175, Section 2, displayed binary S3 formula:
+   https://arxiv.org/html/1504.01175
+2. Michiel Kosters and Sze Ling Yeo, Notes on summation polynomials,
+   arXiv:1503.08001, Section 2 (general S3 and Proposition 2.1), Section 4.2
+   (binary Weil descent, trace relation, and first-fall limitations):
+   https://arxiv.org/html/1503.08001
+The first source's first-fall heuristic is not used as a theorem here.
+The second source's trace/Weil-descent phenomenon concerns a different
+presentation from the ordinary coefficient-field system treated below.
+
+Theorem
+-------
+Let k be a finite field of characteristic two, E/k the ordinary nonsingular
+curve
+  Y^2+X*Y=X^3+a2*X^2+a6,  a6 != 0,
+and S a set of exactly three distinct abscissas of k-rational affine points.
+Both rational point signs are allowed in the factor base. Let R be an affine
+k-rational target and r=x(R). Put
+  g(T)=product_(s in S)(T+s),
+  f3(X,Y,Z)=(X*Y+X*Z+Y*Z)^2+X*Y*Z+a6,
+  F={g(x),g(y),g(z),f3(x,y,u),f3(u,z,r),v*(x+y)+1}.
+If F is unsatisfiable over k, then its ordinary-polynomial-ring last fall
+degree satisfies 4 <= d_F <= 5. No implicit Boolean reduction or field equation
+is used. The ordinary top-syzygy/Koszul first-fall degree is four.
+The complete classification is
+  d_F=4 if sigma1=sigma2=0 (the cube-orbit family g(T)=T^3+c),
+  d_F=5 otherwise.
+In particular, over GF(2^n) with n odd, every such unsatisfiable B=3
+instance has the exact pair (d_ff,d_F)=(4,5). The cube-orbit family can
+split into three distinct roots only when n is even; there its pair is
+(4,4). These statements include the repeated-root cases relevant below.
+
+As usual V_D is the smallest k-linear space containing eligible inputs and
+closed under multiplication whenever the ordinary product degree is <=D.
+For a unit ideal, the least D deriving 1 equals last fall degree. We derive
+1 in V_5 constructively.
+
+Step 1: missing-root reduction within degree four
+------------------------------------------------
+Write g(T)=T^3+s1*T^2+s2*T+s3 and define
+  Q=(g(x)+g(y))/(x+y),  w=s1+x+y,  h=v*(x+y)+1.
+The exact identities
+  v*(g(x)+g(y))+Q*h=Q,
+  g(w)=g(y)+(w+y)*Q
+put Q and g(w) in V_4. Set
+  L=s1+w=x+y,  M=w^2+s1*w+s2.
+Then x*y=M+Q. Expanding the binary S3 formula gives
+  f3(x,y,u)=L^2*u^2+M*u+M^2+a6+Q*(u+Q).
+Every term in the Q correction has degree at most four. Subtract it and
+reduce coefficient powers of w modulo the monic cubic g(w), preserving
+total degree. This yields q1(w,u) in V_4, where
+  q1=alpha(w)*u^2+beta(w)*u+gamma(w),
+  deg alpha,deg beta,deg gamma <=2, alpha=(s1+w)^2.
+For w=c in S, the other two roots a,b satisfy a+b=s1+c !=0, so
+alpha(c)=(a+b)^2 !=0. The first quadratic's roots are the rational
+abscissas x(P_a+P_b),x(P_a-P_b), including multiplicity.
+
+The second input is already
+  q2(z,u)=(z+r)^2*u^2+z*r*u+(z*r)^2+a6,
+whose coefficient degrees in z are at most two. An unsatisfiable target
+has r outside S: if R lies above S, choose a different abscissa point P;
+the decomposition R+P-P=R has distinct first abscissas and supplies a
+solution. Hence the second leading coefficient is nonzero at every z in S.
+
+Step 2: monic normalization within degree five, valid in every characteristic
+----------------------------------------------------------------------------
+For any q(t,u)=alpha(t)u^2+beta(t)u+gamma(t) with coefficient degrees <=2,
+available in V_4, reduction modulo the monic cubic g(t) leaves t-degree <=2
+and u-degree <=2, hence total degree <=4. Multiplication by t costs <=5
+and reduction returns to <=4. Repeating produces
+  q, NF_g(t*q), NF_g(t^2*q)
+inside V_5. Let I(t)=I0+I1*t+I2*t^2 be alpha inverse modulo g. Their
+scalar linear combination with coefficients I0,I1,I2 is the monic
+normalization, with u and constant coefficients of degree <=2.
+
+We thus have, inside V_5,
+  H1=u^2+A(w)*u+B(w), H2=u^2+C(z)*u+D(z),
+where A,B,C,D are quadratic or lower.
+
+Step 3: the characteristic-two resultant identity
+-------------------------------------------------
+Take coefficient normal forms modulo g(w),g(z). Put
+  E=A+C, J=B+D, L0=H1+H2=E*u+J,
+  P=NF(E*L0)=K*u+G,
+  K=NF(E^2)=NF(A^2+C^2), G=NF(E*J).
+The product E*L0 costs degree at most five. Frobenius makes K a sum of
+univariate quadratics after cubic reduction. G has bidegree at most (2,2).
+Thus P has total degree at most four.
+
+The reduced polynomial w*P still has total degree at most four: multiplying
+the separable quadratic K by w gives coefficient degree <=3, and the scalar
+part reduces back to bidegree <=(2,2). Multiplying once more by w therefore
+costs at most five. As A depends only on w with degree <=2, these staged
+products yield NF(A*P) within degree five, despite the formal product's
+possible degree six.
+
+Each of K*H1, u*P, and J*L0 also costs at most five. In characteristic two,
+their sum with A*P has exact cancellation of all u terms:
+  NF(K*H1+u*P+J*L0+A*P)
+    = NF(J^2+A*E*J+B*E^2)
+    = NF(Res_u(H1,H2)).
+This is the replacement for the odd-characteristic identity that divided
+by -2. No division by two is used. Repeated roots cause no exception to
+the monic quadratic resultant criterion.
+
+Step 4: invert on the nine-point state grid
+------------------------------------------
+Call this scalar resultant T(w,z). It has degree at most four. A zero at
+any (w,z) in S^2 would give a common u root of the two quadratics. The first
+quadratic splits over k by the rational-point sum/difference description,
+so that common root lies in k and supplies a solution of the original
+guarded polynomial system. Unsatisfiability implies T is nowhere zero.
+
+The scalar quotient k[w,z]/(g(w),g(z)) is k^9. Every element has bidegree
+<= (2,2), hence total degree <=4. Its normal forms already in V_5 are
+closed under multiplication by w or z: multiply at degree <=5, then reduce.
+They form an ideal containing the unit T, and therefore contain 1. This
+proves d_F<=5. Substituting the linear w=s1+x+y never increases any degree.
+
+Why the old lower argument fails, and its partial replacement
+------------------------------------------------------------
+The odd-characteristic lower proof compares quadratic functions of pair
+differences against affine functions in x,y,v. That argument genuinely
+fails in characteristic two. The three nonzero distinct pair sums d=x+y
+have sum zero; their cubic is
+  g_d(d)=d^3+tau2*d+tau3, tau3 !=0.
+Since v*d=1, the base coordinate ring satisfies
+  d^2=tau2+tau3*v.
+Thus the u^2 coefficient of f3(x,y,u) is already affine in the inverse
+guard variable. This relation can be obtained within degree four and can
+reduce the first quartic summation input to a cubic. Thus the former lower
+argument must not be transported verbatim.
+
+A new independently audited argument supplies the generic matching lower
+bound. Put kappa=sigma1*sigma2+sigma3!=0. The three unordered pair states
+have affine coordinate basis 1,w,v and the degree-preserving quadratic
+relations
+ w^2+kappa*v+sigma2,
+ w*v+sigma1*v+1,
+ v^2+((sigma1^2+sigma2)/kappa)*v+(w+sigma1)/kappa.
+Together with the orientation quadratic, the third membership cubic, and
+the monic first S3 quadratic, these give a degree-preserving Groebner
+basis. Its normal form of the second S3 has quartic top
+ z^2*u*(A_w*w+A_v*v).
+The first monic linear coefficient A is constant exactly when
+sigma1=sigma2=0. Otherwise this nonzero quartic yields a closed separating
+superspace at degree four, proving d_F>=5. See the complete proof and all
+derivation-degree details in generic_lower_five_independent_audit.txt.
+
+If sigma1=sigma2=0, three distinct roots of g require a nontrivial cube
+root of unity. Such roots are absent in GF(2^n) when n is odd. Hence the
+generic lower bound covers every B=3 instance over odd extension degrees.
+The exceptional even-degree cube-orbit family is settled in the next step.
+
+The lower bound four is immediate for the raw input presentation. At any
+degree below four neither summation input is eligible. The membership and
+inverse-guard inputs have a common zero (choose distinct x,y in S, any z
+in S, v=(x+y)^(-1), and leave u arbitrary), so their ideal is proper and
+cannot derive 1. Hence an unsatisfiable full system has d_F>=4.
+
+Step 5: the cube-orbit family has exact last fall four
+-----------------------------------------------------
+Suppose sigma1=sigma2=0, so g(T)=T^3+c with c!=0. The state relations
+  w^2+c*v, w*v+1, v^2+w/c
+are available in V_4 and form a degree-preserving Groebner basis for
+the three unordered pair states. The first S3 reduces to a cubic; multiply
+it by w/c and reduce the state relations to obtain, within degree four,
+  H1=u^2+u+b, b=c*v+(a6/c)*w.
+Thus b is affine in the pair-state coordinates. Any squared state function,
+including b^2, also has an affine normal form.
+
+Let q=z^2+r*z+r^2, t=z^2+r^2, s=r^2*z^2+a6. Adding t*H1 to the second
+S3 input costs degree four and gives the cubic
+  P=u*q+b*t+s.
+Unsatisfiability forces r outside S, so c+r^3 is nonzero. The identity
+  q*(z+r)=z^3+r^3
+shows that the inverse of q modulo g(z) is LINEAR:
+  I(z)=(z+r)/(c+r^3).
+Multiply P by I and reduce the cubic membership polynomial at degree four.
+The result is
+  L=u+R, R=b*f(z)+j(z), deg f,deg j<=2.
+It has total degree at most three.
+
+The product b*L costs at most degree four. After pair reduction b^2 is
+affine, so NF(b*L) returns to total degree at most three. Multiplying this
+by z and reducing also returns to degree at most three. A second z
+multiplication therefore costs at most four, giving NF(z^2*b*L).
+Consequently NF(f(z)*b*L) is available within degree four. The same staged
+argument applied to L yields NF(j(z)*L) within degree four. Together these
+give NF(R*L), despite the possible formal product degree six.
+
+The characteristic-two identity
+  H1+u*L+R*L+L=R^2+R+b
+now supplies a scalar consequence within degree four. After state and z
+reduction its degree is at most three: Frobenius removes cross terms,
+b^2 reduces affine, and z powers reduce below three. A zero on any pair
+state and third-abscissa state would give u=R and hence a common zero of
+both S3 equations, contradicting unsatisfiability. This scalar is therefore
+a unit on the nine states. Scalar representatives have maximum degree
+three (affine pair state times a quadratic in z), so multiplication and
+reduction stay within degree four. Unit inversion derives 1 in V_4.
+The raw-input lower bound four proves d_F=4 exactly.
+
+Full independent degree accounting is in cube_orbit_exact_four_audit.txt.
+
+Growing factor bases and Boolean Weil descent
+--------------------------------------------
+The older unordered-pair interpolation proof uses only quartic symmetry,
+quadratic degree in u, rational splitting, and degree-preserving membership
+division. It also works with the binary S3 formula: unsatisfiable guarded
+systems with B>=3 distinct rational abscissas satisfy d_F<=3B-3. The B=3
+theorem above improves this to five. The B=2 special proof works unchanged
+and gives exact d_F=4 on unsatisfiable raw-S3 inverse-guarded systems.
+
+B here is CARDINALITY of the abscissa set. A binary factor base of
+F_2-dimension ell usually has B=2^ell. The bound growing with B does not
+prove a constant ceiling for those systems. Moreover Weil descent to F_2
+changes the polynomial presentation: Frobenius terms become linear after
+coordinate expansion/Boolean reduction, and trace-derived first falls are
+known. The degree and first-fall statements here must not be identified
+with that descended system without an explicit transfer theorem.
+
+Verification status
+-------------------
+The normalized characteristic-two cancellation identity has been expanded
+and independently audited algebraically. This proof does not depend on
+the incomplete finite-field experiment campaign. True GF(2^m) arithmetic
+is required for such a campaign; integer arithmetic modulo 2^m is not a
+field and must never be used as a substitute.

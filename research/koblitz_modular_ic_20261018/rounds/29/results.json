@@ -1,0 +1,185 @@
+{
+  "date_utc": "2026-10-29",
+  "client_date": "2026-10-28 America/Los_Angeles",
+  "performance_measured": false,
+  "new_IC_relation_rank_claim": false,
+  "full_F2_modular_factor_transfer": false,
+  "merge_authorized": false,
+  "generic_checker_available": false,
+  "schema": "koblitz.round29/double-image-and-full-level-bridge-v1",
+  "round": 29,
+  "second_adjugate": {
+    "accepted": true,
+    "functions": 3,
+    "q_coefficients_each": 1024,
+    "weights": [
+      "1",
+      "xinf",
+      "1+xinf"
+    ],
+    "original_M15_and_R28_coefficients_match_exactly": true
+  },
+  "ordinary_images": {
+    "accepted": true,
+    "selected_supports_cumulative": 4,
+    "all_first_degrees": [
+      436,
+      12,
+      284,
+      83
+    ],
+    "all_second_degrees": [
+      436,
+      12,
+      284,
+      83
+    ],
+    "multiplicities": [
+      1,
+      2,
+      1,
+      1
+    ],
+    "ordinary_product_plus_one_degree": 460,
+    "ordinary_asymmetric_plus_one_degree": 367,
+    "degree12_distinct_selected_second_points": 1,
+    "degree12_selected_multiplicity": 2,
+    "degree12_quadratic": "X^2+(beta^11+beta^8+beta^5+beta^3+beta)",
+    "degree12_second_x": "beta^11+beta^8+beta^5+beta^3+beta^2+1",
+    "complete_ordinary_paired_Hecke_images_under_written_norm_bridge": true,
+    "complete_scalar_C5_source_fibers": false,
+    "complete_reverse_signed_divisors": false
+  },
+  "full_level_cubic": {
+    "accepted": true,
+    "registered_base_point_degree": 14,
+    "irreducible_specialization_degree": 3,
+    "residue_field_degree": 42,
+    "actual_Tate_point_exact_order": 77,
+    "CRT_projectors": [
+      56,
+      22
+    ],
+    "diamond_generator": 23,
+    "diamond_order": 3,
+    "source_genus": 61,
+    "X1_77_genus": 181,
+    "generic_cubic_irreducibility_under_monic_DVR_bridge": true,
+    "proper_moduli_identification": "written; MODULI_BRIDGE.md",
+    "independent_MIT_global_birational_identity_verified": false
+  },
+  "proof": {
+    "named_theorems": 2,
+    "audited_declarations": 2,
+    "failing": 0,
+    "trusted_native": 0,
+    "run": "lean29-01",
+    "actual_norm_and_moduli_geometry_formalized": false
+  },
+  "runs": [
+    {
+      "id": "cubic29-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "CUBIC29_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "dependencies29-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "IMAGEDEPENDENCIES29_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "eval29-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "EVAL29_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "jet29-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": 0,
+      "singular_errors": false,
+      "markers": [
+        "JET29_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "lean29-01",
+      "stage": "proof",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2
+    }
+  ],
+  "flow": {
+    "native_accepted": 4,
+    "proof_accepted": 1
+  },
+  "image_dependencies": {
+    "classification": "original E49 closed images only; not colored C5 columns",
+    "ordinary_product_plus_one_base_closed_divisor_cancels": true,
+    "base_cancellation_degree": 460,
+    "asymmetric_supports_not_matched_by_tested_deck_actions": 2,
+    "records": [
+      {
+        "case": 0,
+        "degree": 436,
+        "frobenius_offsets_id_neg_T_negT": [
+          218,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "case": 1,
+        "degree": 12,
+        "frobenius_offsets_id_neg_T_negT": [
+          6,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "case": 2,
+        "degree": 284,
+        "frobenius_offsets_id_neg_T_negT": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "case": 3,
+        "degree": 83,
+        "frobenius_offsets_id_neg_T_negT": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    ]
+  }
+}

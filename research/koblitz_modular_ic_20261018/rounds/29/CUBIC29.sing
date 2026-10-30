@@ -1,0 +1,67 @@
+// Actual registered lambda-zero point of degree14, not arbitrary Tate data.
+ring fullLevel29=(2,a),(x),lp;
+minpoly=a^14+a^13+a^9+a^5+a^4+a^3+1;
+number bb=a^8+a^6+a^2+a+1;
+number cc=a^12+a^11+a^9+a^5+a^2+a+1;
+number nn=a^11+a^10+a^8+a^7+a^6+a^4+1;
+number aa=1+cc;
+poly cubic29=x^3+bb*x^2+aa*nn*x+nn^2+bb*nn;
+list cubicFactors29=factorize(cubic29);poly cubicProduct29=1;int i29;
+for(i29=1;i29<=size(cubicFactors29[1]);i29++){cubicProduct29=cubicProduct29*cubicFactors29[1][i29]^cubicFactors29[2][i29];}
+if(cubicProduct29!=cubic29 || gcd(cubic29,diff(cubic29,x))!=1){ERROR("QR cubic factor/separability control failed");}
+print("CUBIC29_ACTUAL_ORDER7_LINE_CUBIC");cubic29;cubicFactors29;
+ideal cubicIdeal29=std(ideal(cubic29));
+proc qi29(poly input){
+ ideal generators29=cubic29,input;ideal unit29=std(generators29);
+ if(size(unit29)!=1 || unit29[1]!=1){ERROR("nonunit elliptic denominator in cubic fiber");return(poly(0));}
+ matrix inverseWitness29=lift(generators29,ideal(1));poly inverse29=reduce(inverseWitness29[2,1],cubicIdeal29);
+ if(reduce(input*inverse29+1,cubicIdeal29)!=0){ERROR("actual cubic inverse witness failed");}
+ return(inverse29);
+}
+proc point29(poly px,poly py){
+ if(reduce(py^2+aa*px*py+bb*py+px^3+bb*px^2,cubicIdeal29)!=0){ERROR("actual point off Tate curve");}
+ return(list(1,reduce(px,cubicIdeal29),reduce(py,cubicIdeal29)));
+}
+proc add29(list pp,list qq){
+ if(pp[1]==0){return(qq);}if(qq[1]==0){return(pp);}
+ poly px=pp[2];poly py=pp[3];poly qx=qq[2];poly qy=qq[3];poly slope;
+ if(px==qx){
+  if(reduce(py+qy+aa*px+bb,cubicIdeal29)==0){return(list(0,poly(0),poly(0)));}
+  if(py!=qy){ERROR("equalx point comparison failed");}
+  slope=reduce((px^2+aa*py)*qi29(aa*px+bb),cubicIdeal29);
+ }else{slope=reduce((py+qy)*qi29(px+qx),cubicIdeal29);}
+ poly intercept=reduce(py+slope*px,cubicIdeal29);
+ poly rx=reduce(slope^2+aa*slope+bb+px+qx,cubicIdeal29);
+ poly ry=reduce((slope+aa)*rx+intercept+bb,cubicIdeal29);
+ return(point29(rx,ry));
+}
+proc mul29(list pp,int scalar){
+ list answer=list(0,poly(0),poly(0));list base=pp;
+ while(scalar>0){if(scalar%2==1){answer=add29(answer,base);}scalar=scalar div 2;if(scalar>0){base=add29(base,base);}}
+ return(answer);
+}
+proc equal29(list pp,list qq){
+ if(pp[1]!=qq[1]){return(0);}if(pp[1]==0){return(1);}
+ if(pp[2]!=qq[2] || pp[3]!=qq[3]){return(0);}return(1);
+}
+if(size(cubicFactors29[1])==2 && deg(cubicFactors29[1][2])==3 && cubicFactors29[2][2]==1){
+ print("CUBIC29_IRREDUCIBLE_DEGREE3_SPECIALIZATION");
+ list p11=point29(0,0);list q7=point29(x,nn);
+ list p11multiple=mul29(p11,11);list q7multiple=mul29(q7,7);
+ if(p11multiple[1]!=0 || q7multiple[1]!=0){ERROR("actual independent11/7torsion checks failed");}
+ list q2=mul29(q7,2);list q4=mul29(q7,4);list q8=mul29(q7,8);
+ if(q2[3]!=nn || q4[3]!=nn || equal29(q8,q7)!=1){ERROR("actual QRline orbit failed");}
+ list r77=add29(p11,q7);list r7=mul29(r77,7);list r11=mul29(r77,11);list rorder=mul29(r77,77);
+ if(rorder[1]!=0 || r7[1]==0 || r11[1]==0){ERROR("actual exact77order failed");}
+ if(equal29(mul29(r77,56),p11)!=1 || equal29(mul29(r77,22),q7)!=1){ERROR("actual CRT recovery failed");}
+ list diamond23=mul29(r77,23);
+ if(equal29(diamond23,add29(p11,q2))!=1 || equal29(mul29(diamond23,23*23),r77)!=1){ERROR("actual fulllevel diamond23 orbit failed");}
+ print("CUBIC29_ACTUAL_ORDER77_POINT_OVER_DEGREE42_FIELD");r77;
+ print("CUBIC29_CRT56_22_AND_DIAMOND23_PASS");
+}else{print("CUBIC29_SPLIT_SPECIALIZATION_GENERIC_IRREDUCIBILITY_UNRESOLVED");}
+// Pure modular-genus and quotient arithmetic, interpretation separate.
+if(23%11!=1 || 23%7!=2 || (23*23*23)%77!=1 || 56%11!=1 || 56%7!=0 || 22%7!=1 || 22%11!=0){ERROR("CRT full-level control failed");}
+if(1+2880 div 12-120 div 2!=181 || 2*181-2!=3*(2*61-2)){ERROR("fulllevel genus/etale3 quotient arithmetic failed");}
+print("CUBIC29_GENUS181_AND_DEGREE3_BRIDGE_ARITHMETIC_PASS");
+print("CUBIC29_SCOPE exactspecialization andgenericirreducibility ifinert; MITglobalbirationalidentity NOT checked");
+print("CUBIC29_ALL_CHECKS_PASS");quit;

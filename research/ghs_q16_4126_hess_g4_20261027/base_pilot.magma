@@ -1,0 +1,18 @@
+K<w> := GF(4096);
+k<a> := GF(16);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..11]]>;
+E := EllipticCurve([K|1,fromint(32),0,0,fromint(63)]);
+C,h := WeilDescent(E,k,K!1 : HyperellipticImage := false);
+pts := RationalPoints(C);
+print "rational_plane_points", #pts;
+for i in [1..#pts] do
+    P := pts[i];
+    try
+        D0 := Divisor(P);
+        print "usable_point_index", i, "degree", Degree(D0);
+        break;
+    catch e
+        print "point_failed", i;
+    end try;
+end for;

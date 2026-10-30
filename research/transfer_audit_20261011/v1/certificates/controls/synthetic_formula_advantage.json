@@ -1,0 +1,71 @@
+{
+  "costs": {
+    "destination_solver": "HyperellipticIndexCalculus",
+    "log2_baseline": 93.254,
+    "log2_cost_ratio": -11.665,
+    "log2_total": 81.589,
+    "repo_ratio_log2": 12.165,
+    "rows": [
+      {
+        "formula": "synthetic: construction priced at zero",
+        "log2": 0.0,
+        "phase": "map_construction",
+        "status": "modeled"
+      },
+      {
+        "formula": "g elliptic operations over the source field: log2 g + log2(10 * M(source_bits)); a lower bound, the conorm-norm formulas are not implemented",
+        "log2": 16.927,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "g! * q Jacobian operations (random divisor splits over the degree-1 factor base with probability 1/g!)",
+        "log2": 62.174,
+        "phase": "relation_collection",
+        "status": "modeled"
+      },
+      {
+        "formula": "g^2 * q^(2 - 2/g) Jacobian operations (double large primes, Gaudry-Thome-Theriault-Diem)",
+        "log2": 81.589,
+        "phase": "linear_algebra",
+        "status": "modeled"
+      },
+      {
+        "formula": "phases split above",
+        "log2": null,
+        "phase": "destination_solve_unsplit",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "the discrete logarithm of the image is the logarithm of the source (homomorphism), so recovery is free; one scalar multiplication on E verifies it: log2(1.5 log2 r) + log2(op)",
+        "log2": 22.816,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnJacobian",
+        96.415
+      ],
+      [
+        "HyperellipticIndexCalculus",
+        81.589
+      ],
+      [
+        "EngeGaudrySmoothness",
+        91.576
+      ]
+    ],
+    "total_is_lower_bound": false,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "description": "synthetic GHS instance: genus 4 over F_(2^40) carrying a 158-bit subgroup of a curve over a 160-bit field; no curve, no map, formulas only",
+  "expected_lead_class": "formula_advantage",
+  "id": "control:synthetic_formula_advantage",
+  "lead_class": "formula_advantage",
+  "note": "shows the classifier can flag a lead; the lead is not a weakness (no map, no subgroup certificate)",
+  "pass": true,
+  "protocol": "F10",
+  "schema": "transfer-audit/control/v1"
+}
