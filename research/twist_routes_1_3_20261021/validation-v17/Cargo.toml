@@ -1,0 +1,35 @@
+[package]
+name = "twist-cold-validation"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+num-bigint = "0.4"
+num-traits = "0.2"
+num-integer = "0.1"
+hex = "0.4"
+
+[[bin]]
+name = "twist-cold-pipeline"
+path = "../runner/src/bin/twist-cold-pipeline.rs"
+
+[[bin]]
+name = "twist-cold-harness"
+path = "../runner/src/bin/twist-cold-harness.rs"
+
+[[bin]]
+name = "twist-cold-summary"
+path = "../runner/src/bin/twist-cold-summary.rs"
+
+[[bin]]
+name = "twist-cold-models"
+path = "../runner/src/bin/twist-cold-models.rs"
+
+[[bin]]
+name = "twist-registry-check"
+path = "../runner/src/bin/twist-registry-check.rs"
