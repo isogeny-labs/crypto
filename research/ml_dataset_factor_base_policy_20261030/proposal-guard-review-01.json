@@ -1,0 +1,95 @@
+{
+  "schema": "ml-dataset.proposal-guard-software-review/v1",
+  "status": "passed_after_correction",
+  "scripts": {
+    "snapshot": "6a22351a3c5f59c0a7b68f894f9662a8973dc98f179aaec1f31fbfeae73b95b7",
+    "guard": "9172f5fb2efd0b0e0a7f797b8d96a2b6f3d211aed199780a1de4753ea27fb006",
+    "runner": "041dcf4a13ee83eea1d97ea3e5ac5a2acd50f45691ae0a54c0b7213fac2279c5"
+  },
+  "fixture_driver_sha256": "06382d6939eb191c76f2d39fb9159c92e1a1b00e370c5cb8ed57ef20bf05b323",
+  "fixture_base_commit": "ffc0b7dd998ea33571854b92ccfee83aca3422e7",
+  "fixture_manifest_sha256": "e5a4b93d24b539cdbcf6042ed3f956bd7fc60b6edd83c22a42a7176ff71d4edb",
+  "controls": [
+    {
+      "name": "snapshot-copy-patch",
+      "expected": "accept",
+      "exit_code": 0,
+      "result": "pass"
+    },
+    {
+      "name": "valid-guard",
+      "expected": "accept",
+      "exit_code": 0,
+      "result": "pass"
+    },
+    {
+      "name": "byte-mutation",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "mode-mutation",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "new-file",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "file-symlink-replacement",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "added-directory-symlink",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "added-file-symlink",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "added-nonregular-fifo",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    },
+    {
+      "name": "base-space-path",
+      "expected": "reject",
+      "exit_code": 5,
+      "result": "pass"
+    },
+    {
+      "name": "overlay-space-path",
+      "expected": "reject",
+      "exit_code": 1,
+      "result": "pass"
+    }
+  ],
+  "runner_negative_preflight": {
+    "passed": true,
+    "command_started": false,
+    "command_exit_code": null,
+    "receipt_sha256": "caa92d6c0ab7b8d9aa047edf699bea6707e588f6c0e585157767a1cf0515c2f3"
+  },
+  "bash_syntax": "passed",
+  "cargo_invoked": false,
+  "native_solver_invoked": false,
+  "live_source_edited": false,
+  "git_mutations": "isolated disposable fixture repo only",
+  "prior_failure_fixture": "fixture.altRr7",
+  "passing_fixture": "fixture.ENypHf",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}
