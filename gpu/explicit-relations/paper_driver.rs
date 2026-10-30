@@ -337,6 +337,18 @@ fn selftest(executable: &str) -> Result<(), Error> {
             return Err(Error::Verification);
         }
         let archive = encode_certificate(&c, p, target, &cert)?;
+        let expanded = paper::solve_with_oracle_profile_budget(
+            &c,
+            p,
+            target,
+            &config,
+            &mut gpu,
+            &mut paper::ReductionStats::default(),
+            128,
+        )?;
+        if encode_certificate(&c, p, target, &expanded)? != archive {
+            return Err(Error::Verification);
+        }
         let (cc, pp, qq, replayed) = decode_certificate(&archive)?;
         paper::verify(&cc, pp, qq, &replayed)?;
         if replayed != cert {
@@ -366,8 +378,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         selftest(&args[1])?;
         return Ok(());
     }
-    if args.len() != 15 && args.len() != 18 {
-        return Err("usage: paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows [max_columns max_work max_trials]; or SERVICE --self-test".into());
+    if args.len() != 15 && args.len() != 18 && args.len() != 19 {
+        return Err("usage: paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows [max_columns max_work max_trials [attempts_per_column]]; or SERVICE --self-test".into());
     }
     let n = |i: usize| -> Result<u64, Box<dyn std::error::Error>> { Ok(args[i].parse()?) };
     let started = std::time::Instant::now();
@@ -376,13 +388,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let c = Curve::with_order_witness(n(2)?, n(3)?, n(4)?, n(5)?, p)?;
     let validated = std::time::Instant::now();
     let config = paper::Config {
-        max_columns: if args.len() == 18 {
+        max_columns: if args.len() >= 18 {
             usize::try_from(n(15)?)?
         } else {
             512
         },
-        max_work: if args.len() == 18 { n(16)? } else { 1_000_000 },
-        max_trials: if args.len() == 18 {
+        max_work: if args.len() >= 18 { n(16)? } else { 1_000_000 },
+        max_trials: if args.len() >= 18 {
             usize::try_from(n(17)?)?
         } else {
             16
@@ -394,7 +406,21 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut oracle = GpuOracle::new(&args[1], &c, n(13)?, n(14)?)?;
     let ready = std::time::Instant::now();
     let mut stats = paper::ReductionStats::default();
-    let cert = paper::solve_with_oracle_profile(&c, p, q, &config, &mut oracle, &mut stats)?;
+    let attempts_per_column = if args.len() == 19 {
+        usize::try_from(n(18)?)?
+    } else {
+        20
+    };
+    eprintln!("QUERY_BUDGET attempts_per_column={attempts_per_column}");
+    let cert = paper::solve_with_oracle_profile_budget(
+        &c,
+        p,
+        q,
+        &config,
+        &mut oracle,
+        &mut stats,
+        attempts_per_column,
+    )?;
     let archive = encode_certificate(&c, p, q, &cert)?;
     print!("{archive}");
     std::io::stdout().flush()?;

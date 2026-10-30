@@ -164,9 +164,8 @@ __global__ void build_partial(Curve c, Bases b, unsigned first, unsigned end,
     points[id] = point;
 }
 #ifdef ER_RIGHT_FULL_CACHE
-#if defined(ER_QUERY_CACHED)
-#error "full and partial right caches are distinct experimental variants"
-#endif
+// With ER_QUERY_CACHED, the full cache takes precedence and the charged
+// partial tables serve as the exact fallback when full-cache admission fails.
 __global__ void build_right_cache(Curve c, Bases b, unsigned split, U count,
                                  CachedPoint *out) {
   U id = U(blockIdx.x) * BLOCK + threadIdx.x;
@@ -500,6 +499,9 @@ class DeviceBackend {
   }
 
 public:
+  U cached_partial_rows() const {
+    return right_first.size() + right_second.size();
+  }
   DeviceBackend(Curve curve, U max_rows, U batch, U full_cache_limit = UINT64_MAX)
       : c(curve), cap(max_rows), chunk(batch) {
 #ifdef ER_RIGHT_FULL_CACHE

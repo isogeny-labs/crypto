@@ -17,7 +17,8 @@ Admission preserves the existing free-minus-free/4 threshold. The peak bound
 is max(sort-phase bytes, retained table/index/points/results plus full-cache
 bytes). The sort scratch has been synchronized and freed before the full
 cache is allocated. Existing prefix/partial reservations remain charged;
-full and partial cache macros cannot be enabled together. An overflow-safe
+the optional combined variant can enable both cache macros. The full cache
+takes precedence; charged partial tables serve as its fallback. An overflow-safe
 capacity test selects the full cache only when it fits both the memory
 budget and an explicit byte cap. Otherwise the same exact persistent search
 runs uncached. Unexpected CUDA allocation errors remain errors, not hidden
