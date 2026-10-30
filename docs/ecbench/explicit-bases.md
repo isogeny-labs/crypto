@@ -999,3 +999,28 @@ V15 pod `ndiwvrvehbf4hy` deleted with verified absence; controller1, bootstrap12
 Failure archive SHA256 `ce7b1a34a7059c30331e4a9f9e3b34473c101be74d51c603cd2fd7db0ebe6554`.
 Typst CLI was absent; the existing Python Typst binding rendered the report.
 Poppler emitted a tagged-metadata warning but rendered both pages successfully.
+
+## 2026-10-30 20:18 UTC — source delivery repaired
+
+### What was done
+V15's zero-trial failure is preserved in `failed-launch-v15`, with its inspected
+one-page report at `reports/run-20261030T2010Z`. V16 is frozen at hash
+`fe424abdd265c0ded0c191edf1c36810d86a87163502a1497c2da43ffece378f`.
+Its source archive retains exact original commit `23dc8a61ca928e47237f8fb5a3a8d87228649628`;
+all 1030 materialized files match original Git blob IDs. S3 readback is byte-identical.
+
+### Decisions made
+Use the verified sparse checkout archive and unchanged run-filter instruments.
+Keep v15's one-attempt contract closed. The owner clarified reporting style:
+lead with completed component work; state concrete dependencies once where
+needed, while retaining exact checks, measured costs and failures.
+
+### Open threads
+Launch v16 after checkpoint, run all preflight checks, then six matched 52-bit
+controls and two 63-bit targets. Update this handoff with actual outcomes.
+
+### Errors
+An administrative catalog-copy script initially used the wrong JSON key;
+corrected to `files`, completed all v13 copies, and verified every catalog hash.
+The first v16 freeze call omitted the required draft freeze object; it was
+rejected before data, then corrected and successfully frozen.
