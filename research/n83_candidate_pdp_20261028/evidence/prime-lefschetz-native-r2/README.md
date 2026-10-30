@@ -1,0 +1,11 @@
+# Native Lefschetz r2: infrastructure deadline
+
+The single EKS job `n83-native-lefschetz-20261030-r2` (UID `e157574b-2d6a-4450-9e13-fbc596db96fd`) reached DeadlineExceeded at2026-10-30T17:29:56Z and terminal Failed at17:29:57Z. The last predeadline observation was an unscheduled Pending Pod with node=null. Terminal status retained no Pod; worker start was never observed, rather than conclusively disproved across every instant. Final logs are empty. The approved raw S3 prefix contains zero objects, confirmed by an untruncated listing.
+
+Counts: one submitted job;42planned case slots;zero published source audits;zero published certificates;zero degree measurements. This is an infrastructure outcome, not42failed algebra computations or a mathematical counterexample. No new FFD,LFD,regularity or elite-base claim follows.
+
+The unified export has42infra_error slot rows so every protocol arm/instance remains represented. Its attempts=1 per row and flow.attempted=42 count submission of these slots in ONE job, not native execution. All rows share the Job UID, carry empty counted measurements, and have verification=not_run. The backend record supplies the separate job/publication counts and the uncertainty about whether any unobserved worker start occurred. The first export draft used descriptive instance names instead of protocol seed-table ordinals; it and its42validation findings are retained in the outcome archive. Corrected metadata validates with file hashes.
+
+Frozen protocol v2, both native binaries, all42input/source/base identities, tested image and source archive remain unchanged. No retry or local fallback was made. The read-only node-pool diagnostic was denied an AssumeRole call; the error is preserved. No IAM, node-pool, quota, placement or other job changes were made.
+
+Archive pointer: `../../prime-lefschetz-native-production-archives/.artifacts.json` (source.tar.gz and outcome.tar.gz). The outcome archive contains every status snapshot, empty log response, inventory, diagnostic error, export draft and final validation plus a self-contained copy of the export and referenced receipts. Data fields are described in `../../PRIME_LEFSCHETZ_NATIVE_RUN_FORMAT.json` and outcome.json. A future run requires a demonstrably available execution route and a new frozen attempt; r2 must never be resubmitted.
