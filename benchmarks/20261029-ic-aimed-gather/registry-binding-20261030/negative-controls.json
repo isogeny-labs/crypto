@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-30T11:22:15.778824+00:00",
+  "controls": [
+    {
+      "case": "changed_target",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "b275e71cbf90909905e72e224da06fd0292371bf2d99a48260c6022aa85d038e",
+      "fixture_bytes": 17874127,
+      "stderr_sha256": "1b5d01c02fdc938a04a0cf55912eea07d125e17ed141d662fc633fddae7c489a",
+      "success_output_absent": true
+    },
+    {
+      "case": "duplicate_target",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "f8390887272a2a86d1b61ad0c43e2f58078aa2c245e9b24e3152bcd90a5f1a69",
+      "fixture_bytes": 17875935,
+      "stderr_sha256": "af2442e18ec71a60db30432694a73ab5fb543f71388cf662687dbc6d2bf8f19a",
+      "success_output_absent": true
+    },
+    {
+      "case": "wrong_original_registry_pin",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "8c5063fceba3b473851ac4816c86e5b36ba9925b61734beb323a76a92497a6bc",
+      "fixture_bytes": 20832672,
+      "stderr_sha256": "5722aaef700cbc5d9ac43727f35f093e4a826044372fc5f7cec2db73430d59dd",
+      "success_output_absent": true
+    },
+    {
+      "case": "wrong_original_report_pin",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "b9b6813a9d4d92c86a3a93c97f7f29ee20c08437fcd52bc5b374d7826caf51d6",
+      "fixture_bytes": 169891,
+      "stderr_sha256": "6e1ad570389572fa9e7a957d6166167683f4e3acd4cd4e3ffff59d598f4365aa",
+      "success_output_absent": true
+    }
+  ],
+  "scope": "Actual failed child processes on deliberately mutated copies only; original input and scientific report files unchanged."
+}

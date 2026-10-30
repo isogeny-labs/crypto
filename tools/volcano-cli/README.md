@@ -86,6 +86,40 @@ independent exhaustive census of all nonsingular models.
 Use a working copy when auditing a byte-frozen snapshot; check its file hash
 before that update.
 
+The `crypto isogeny class` wrapper accepts checked `store:NAME` or
+`sha256:DIGEST` references for `plan/build --curve` and the read-only
+`status/vertex/solve --input` commands. It downloads on demand, verifies the
+cached bytes, and adds `input_artifact` with the original reference, SHA-256,
+and byte count to the JSON report. The standalone `isogeny-class` binary
+accepts local paths. `resume` and `verify` update the SQLite input; for an
+indexed graph, first use `crypto store pull store:NAME --out graph.sqlite`,
+then pass that writable copy through `--input graph.sqlite`.
+
+The wrapper also accepts `--store-name NAME` on `build` and `resume` to publish
+the resulting SQLite graph directly. It checks the name and store configuration before
+computation, retains the local graph if publication fails, and reports the
+reference, SHA-256, byte count, and upload status in `publication`. A partial
+graph is published as a checkpoint but `build` or `resume` still exits 3 until
+the selected-degree class is complete. Each published generation needs a new
+logical name; use `resume --input` on a writable copy, then publish under that
+new name. The tracked store index must travel with the graph reference.
+
+```sh
+crypto isogeny class build --curve curve.json --out graph.sqlite --steps 1 \
+  --store-name graphs/run-1/checkpoint-1.sqlite
+crypto isogeny class resume --input graph.sqlite --steps all \
+  --store-name graphs/run-1/complete.sqlite
+crypto store verify graphs/run-1/complete.sqlite --remote --download --json
+crypto isogeny class status --input store:graphs/run-1/complete.sqlite
+```
+
+The [direct-publication acceptance](../../docs/store/ISOGENY_CLASS_PUBLISH_S3_ACCEPTANCE_20261023.json)
+records partial and complete generations, fresh-cache retrieval, remote byte
+checks, failure retention, and exact-object cleanup.
+The live Setec upload, remote byte check, empty-cache reads, DLP verification,
+and exact-object cleanup are recorded in
+[`ISOGENY_CLASS_STORE_S3_ACCEPTANCE_20261023.json`](../../docs/store/ISOGENY_CLASS_STORE_S3_ACCEPTANCE_20261023.json).
+
 SQLite is the lossless graph export: `nodes(id,a,b,j,expanded,conductor)` and
 `edges(source,ell,kernel,target,u)`, with the full plan and replay receipt in
 `metadata`. `kernel` lists ascending coefficients. Reconstruct the normalized

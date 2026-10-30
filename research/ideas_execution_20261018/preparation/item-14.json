@@ -1,0 +1,57 @@
+{
+  "item": 14,
+  "title": "Prime-field arity m>=4 cost cells",
+  "original_requirement": "Run genuine prime-field aritym>=4 cells beginning S5, including small-root reach against required delta~1/5.",
+  "acceptance_criteria": [
+    "Immutable full systems with factor-base constraints and charged construction.",
+    "Verified decompositions or bounded failures; solver/lattice dimensions,root bound,memory,yield,full cost.",
+    "Separate small-root reach delta from required regime; no single univariate-specialization substitute."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/semaev_higher.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/semaev_higher_demo.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/lit2026_w10_coppersmith_bound.rs"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-ALPF-016/specification.yaml"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-PFGB-d630f6/specification.yaml"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "crypto",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--example",
+        "semaev_higher_demo"
+      ],
+      "purpose": "Existing S3-S6 univariate-specialization construction sanity check only.",
+      "kind": "construction_diagnostic"
+    }
+  ],
+  "remaining_gaps": [
+    "Existing S5/S6 univariate specialization is not full multivariate small-root oracle or matched aritycost cell.",
+    "Need S5 full factor-base-constrained system exporter and correctly attributed polynomial/lattice solve plus natural yield.",
+    "ALPF016 contains m4 experiment title; inspect exact contract/receipts to avoid asserting no data points from global absence."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Prime-field arity m ≥ 4 cost cells. The first arity that can beat rho has zero data points."
+}

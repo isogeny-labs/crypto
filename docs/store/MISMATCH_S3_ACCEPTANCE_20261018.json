@@ -1,0 +1,21 @@
+{
+  "schema": "crypto.store-mismatch-s3-acceptance/v1",
+  "date_utc": "2026-10-18",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261018T080425Z-611efdd2-1429-4b1a-a1f8-84410a2611d1",
+  "object_key": "ic/v1/acceptance/20261018T080425Z-611efdd2-1429-4b1a-a1f8-84410a2611d1/sha256/1b/1b1eb355e4c71ed6b5b194987ce03f4a887c2648e7f42dc688c2739edbfee8a1",
+  "logical_name": "evidence/acceptance/20261018T080425Z-611efdd2-1429-4b1a-a1f8-84410a2611d1/wrong-content-check.json",
+  "bytes": 3332,
+  "expected_sha256": "1b1eb355e4c71ed6b5b194987ce03f4a887c2648e7f42dc688c2739edbfee8a1",
+  "existing_object_sha256": "0dcf612a41b56bce15b98e4e2c3cd6334ad7156c2cc7bd9717619bbe6ecd0e29",
+  "binary_sha256": "28d9ca17d0980ee33059768776400a0b6e012ef9907abcf4e49b41a653b2e1a5",
+  "results": {
+    "same_size_wrong_object_uploaded_for_check": true,
+    "store_push_rejected_digest_mismatch": true,
+    "rejected_push_did_not_index_object": true,
+    "delete_unique_test_object": true,
+    "head_after_delete_http_status": 404
+  }
+}

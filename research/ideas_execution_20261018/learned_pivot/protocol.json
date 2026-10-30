@@ -1,0 +1,15 @@
+{
+ "schema":"retrospective-whole-pass-policy-selector/v1",
+ "frozen_before_new_training_and_replays":true,
+ "original_item_9_status":"partial",
+ "split":{"train_shapes":["n5-m4-ell2","n9-m4-ell3"],"heldout_shapes":["n15-m4-ell5","n17-m4-ell6"],"calibration":"none; too few independent shapes for calibrated uncertainty"},
+ "retrospective_warning":"The historical summary was already visible before this split; fitting is frozen before new training/replays, but these are not blinded or prospectively untouched test outcomes.",
+ "features":"N, D, sum and maximum of row term counts among the first 64 input rows; all available before reduction; prefix is scanned even if the final fitted rule is constant.",
+ "labels_and_loss":"Minimize exact integer proxy sparse_entries_visited_by_xor + (pivot_read_bytes+pivot_write_bytes)/8 over the two legal policies. Preserve components because one word of I/O and one sparse term visit are conventional equal weights, not machine instruction equivalents.",
+ "model":"Exhaustive empirical-risk minimization over two constants and one-level decision stumps on the four input features, split at adjacent training values. Tie: fewer branches, then first encountered. With one label class this returns an explicitly constant predictor.",
+ "training_charge":"Both archived training-policy reductions charged by the proxy, plus trace/input bytes and parsed scalar/term counts and candidate-evaluation counts separately; no free label oracle. Dense RREF, hashing, parsing, decompression, filesystem and trace writing are not fully instruction-priced, so this is a total of counted proxy components, not complete computational cost.",
+ "evaluation":"Fresh n5/n9 both-policy dense-RREF controls and n15 both-policy replay. Heldout n17 remains archival evaluation unless spare budget permits replay. Choose each heldout policy from input features/model only before reading heldout outcomes. Compare selected policy with both fixed policies; include prefix/model overhead and one-time training separately. No post-outcome model revision.",
+ "budgets":{"address_space_bytes_per_process":536870912,"cpu_threads":1,"disk_bytes":1073741824,"per_reduction_wall_seconds":120,"overall_wall_seconds":1200},
+ "boundaries":"Restricted whole-pass selector for one fixed D=4 Macaulay row pass. No general learned F4, closure, solving-degree, GPU, distribution, end-to-end ECDLP, speedup or external-fastest claim. Large row spaces retain independent correctness gap; same rank/hash/replay is not independent certification.",
+ "controls":"Fresh exact mutual dense RREF on n5/n9 both policies, archived/fresh deterministic counter comparison on n15, negative/null result retained, frozen source/input/binary digests. Shared host L0 diagnostic only."
+}

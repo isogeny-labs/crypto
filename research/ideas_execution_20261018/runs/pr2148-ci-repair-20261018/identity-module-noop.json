@@ -1,0 +1,14 @@
+{
+  "invocation": {
+    "name": "curve-identity-selftest",
+    "argv": [
+      "python3",
+      "tools/curve_identity.py",
+      "--self-test"
+    ],
+    "exit": 0
+  },
+  "qualification": "tools/curve_identity.py defines helpers only and has no CLI self-test; exit0 is not test validation. Replaced by actual scripts/curve_id.py selftest below.",
+  "original_log_availability": "Unavailable: the original output files were overwritten by the corrected invocation before archival. No original stdout/stderr payload is retained or inferred here.",
+  "corrected_validation_logs": "curve-identity-selftest.stdout and .stderr belong exclusively to python3 scripts/curve_id.py selftest; see software-checks.json."
+}

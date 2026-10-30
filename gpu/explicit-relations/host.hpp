@@ -170,10 +170,10 @@ inline void verify(Curve c, const Plan &p, Point target, const Result &r) {
     throw std::runtime_error("invalid GPU witness sum");
 }
 inline void hash_parameters(Curve c, U s, U alpha, U beta, U tau, U cap) {
-  if (c.f.p >= (U(1) << 60) || s < 2 * c.f.p || s > 4 * c.f.p || !prime(s) ||
+  if (s >= (U(1) << 63) || s < 2 * c.f.p || s > 4 * c.f.p || !prime(s) ||
       !alpha || alpha >= s || beta >= s || !tau || tau > s)
     throw std::runtime_error(
-        "invalid hash parameters (hash mode requires p < 2^60)");
+        "invalid hash parameters (hash modulus must be below 2^63)");
   if (tau > cap)
     throw std::runtime_error("LIMIT hash candidates exceed row cap");
 }

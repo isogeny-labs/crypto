@@ -1,0 +1,49 @@
+{
+  "kind": "committed-state-publication-admission/v1",
+  "validated_commit": "0ffc59fa368c961b1753c6049216ac3de788e640",
+  "base": "8eef1252714097e0b8279c0bf55b82ed9e49943d",
+  "artifact_policy": "pass",
+  "size_policy": "pass",
+  "child_bindings_verified_at_validated_commit": 96,
+  "parent_bindings_verified_at_validated_commit": 70,
+  "all_69_older_parent_lines_preserved_byte_for_byte": true,
+  "older_parent_manifest_sha256": "f8bb432160332401a10cc56f5fc168faae4056b63d610285e19b152be08ec999",
+  "reachable_new_raw_run_paths": 0,
+  "committed_metrics": [
+    {
+      "metric": "nist.selection_period_ecpp.retained_rows",
+      "value": 21,
+      "date": "2026-10-26",
+      "problem": "nist-candidate-selection",
+      "unit": "orders",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Period ECPP trial: original cohort rows retained, including indeterminate",
+      "source": "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json@fde041670aa1"
+    },
+    {
+      "metric": "nist.selection_exact_embedding.certified_rows",
+      "value": 21,
+      "date": "2026-10-26",
+      "problem": "nist-candidate-selection",
+      "unit": "curves",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "NIST all-21 census: exact embedding degrees with direct-power certificates",
+      "source": "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json@19f1f5468f2e"
+    },
+    {
+      "metric": "nist.selection_freelip.distinct_orders",
+      "value": 21,
+      "date": "2026-10-27",
+      "problem": "nist-candidate-selection",
+      "unit": "orders",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+      "source": "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json@0ffc59fa368c"
+    }
+  ],
+  "hosted_current_head_gates": "not yet observed for publication commit; no hosted pass claimed",
+  "historical_criterion": "unresolved"
+}

@@ -1,0 +1,87 @@
+{
+  "item": 16,
+  "title": "Integrate equivariant F4, trace filter, free relations",
+  "original_requirement": "Integrate equivariant F4, the trace-zero filter and free relations into the incumbent oracle, with separate switches and combinations, and measure the complete pipeline in ecbench.",
+  "acceptance_criteria": [
+    "Register incumbent and candidate with standalone and factorial ablations on the same targets and cost interval.",
+    "Check correctness and independent replay; report complete setup and online costs. A reproducible end-to-end gain needs its own complete pipeline evidence.",
+    "Preserve the failed equivariant step gate and subgroup-vacuous trace rule. A new presentation or integration gets a distinct prospective protocol."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_02_equivariant_oracle.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_02_fall_rows_pipeline.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_03_tracezero_freerel.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261014/02-equivariant-oracle/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261014/03-tracezero-freerel/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261015/02-freerel-production/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/ecbench/methods.rs"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/examples/ic_improve_02_equivariant_oracle",
+        "--mode",
+        "oracle",
+        "--n",
+        "5,7,11,13",
+        "--targets",
+        "12"
+      ],
+      "purpose": "Existing48-target oraclepanel, stdoutJSONL; L0shared-host timings not isolated evidence.",
+      "kind": "scientific_trial"
+    },
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/examples/ic_improve_02_equivariant_oracle",
+        "--mode",
+        "step",
+        "--n",
+        "7,11,13",
+        "--targets",
+        "8",
+        "--check",
+        "--posctl"
+      ],
+      "purpose": "Existing small steppanel with exact span andpositive controls.",
+      "kind": "scientific_trial"
+    }
+  ],
+  "remaining_gaps": [
+    "The production system has a fixed target and is not Frobenius-symmetric. The proposed equivariant hook applies at zero current nodes; the prior step gate failed on 37 of 37 targets.",
+    "The trace filter is vacuous on odd-order subgroup targets. Preserve the requested no-op ablation; do not claim a 50% rejection gain for that target law.",
+    "Free relations are already the default for the u64 production example. ecbench registration and complete cold accounting remain separate from this standalone implementation. Use the round-2 tuned-K incumbent."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "The prior equivariant barrel oracle improved at n=11 and 13; ordinary degree-fall transfer to the production system regressed.",
+    "The round-1 free-relations pooled ratio 0.957 was qualified by round-2 tuned-K evidence. At the same tuned K, n=41 and n=53 intervals include 1.",
+    "The production flag KIC_FREE_RELATIONS=0 restores the previous u64 path; an explicit enable is refused above n=63."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Wire the equivariant F4 pass, the trace-zero prefilter and the free relations into the incumbent oracle and measure them in ecbench."
+}

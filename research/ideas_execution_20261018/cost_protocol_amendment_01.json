@@ -1,0 +1,11 @@
+{
+  "schema": "ideas-execution-cost-amendment/v1",
+  "item": 2,
+  "date": "2026-10-18",
+  "base_protocol": "cost_protocol.json",
+  "reason": "Include the zero-charge sensitivity required by repository operation-accounting policy, retaining all original conversion arms and historical output.",
+  "change": {"assumed_group_equivalents_per_column_work_unit": [0.0, 0.1, 1.0, 10.0]},
+  "unchanged": "All formulas, curves, degree models, minimization, historical controls, and limitations.",
+  "output": "cost_surface_amendment_01.json",
+  "interpretation": "Zero conversion is an optimistic accounting bound; it is not a measured zero-cost oracle. All model outputs remain partial, conditional derived values."
+}

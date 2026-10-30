@@ -40,6 +40,16 @@ Explicit work policies can terminate a run with an unknown result.
   not mathematical impossibility or evidence that the theorem is false.
 - No timing, sub-rho result, security conclusion or practical attack follows
   from these development tests.
+- Follow-up software controls add exact prefix sampling (including the
+  nonparsimonious 1:2 projection case) and nine direct-versus-forced recursive
+  comparisons retaining both taper levels. See the
+  [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
+  These bounded checks leave the general obligations below open.
+- The follow-up source review makes the representation boundary explicit:
+  on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
+  for every publicly representable graph. Public calls therefore select a
+  finite-size fallback; only forced private controls enter the recursive
+  kernel. This is not a counterexample to the external asymptotic theorem.
 
 ## Obligations
 

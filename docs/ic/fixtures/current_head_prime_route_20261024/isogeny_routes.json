@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "curve_nodes": [
+    {
+      "ref": "icwalk/fp/n000000",
+      "icv1_slug": "icv1-fp9-tm9-646fa80e",
+      "curve_id": "EC1P9Cfph8f235fad5066",
+      "curve_uid": "urn:ec-record:1:sha256:8f235fad5066f836fc5a166b776ccc5f8fa2ab7f69726860100651cf8dac245f",
+      "field_characteristic": "271",
+      "equation": "y^2=x^3+1*x+19",
+      "coefficients_a1_a2_a3_a4_a6": [0, 0, 0, "1", "19"],
+      "j_invariant": "81",
+      "generator_G": ["3", "7"],
+      "group_order": "281",
+      "subgroup_order": "281",
+      "cofactor": "1",
+      "depth": 0,
+      "expanded": true,
+      "proved_volcano_levels": {
+        "11": 0
+      },
+      "position_alias": "EC1P9Cfph8f235fad5066V11L0"
+    },
+    {
+      "ref": "icwalk/fp/n000001",
+      "icv1_slug": "icv1-fp9-tm9-d5d35b41",
+      "curve_id": "EC1P9Cfpha92821d8b486",
+      "curve_uid": "urn:ec-record:1:sha256:a92821d8b4867c9fcd2fbc22e38d5df699e210039e51b384d23add766a9c7a18",
+      "field_characteristic": "271",
+      "equation": "y^2=x^3+268*x+85",
+      "coefficients_a1_a2_a3_a4_a6": [0, 0, 0, "268", "85"],
+      "j_invariant": "72",
+      "generator_G": ["0", "76"],
+      "group_order": "281",
+      "subgroup_order": "281",
+      "cofactor": "1",
+      "depth": 1,
+      "expanded": false,
+      "proved_volcano_levels": {
+        "11": 0
+      },
+      "position_alias": "EC1P9Cfpha92821d8b486V11L0"
+    },
+    {
+      "ref": "icwalk/fp/n000002",
+      "icv1_slug": "icv1-fp9-tm9-2189a311",
+      "curve_id": "EC1P9Cfph9fcccf64f845",
+      "curve_uid": "urn:ec-record:1:sha256:9fcccf64f84543a5998aac5515575ccbb360c19fb30ca21c0f7ce2040dbbe864",
+      "field_characteristic": "271",
+      "equation": "y^2=x^3+189*x+19",
+      "coefficients_a1_a2_a3_a4_a6": [0, 0, 0, "189", "19"],
+      "j_invariant": "104",
+      "generator_G": ["2", "26"],
+      "group_order": "281",
+      "subgroup_order": "281",
+      "cofactor": "1",
+      "depth": 1,
+      "expanded": false,
+      "proved_volcano_levels": {
+        "11": 0
+      },
+      "position_alias": "EC1P9Cfph9fcccf64f845V11L0"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e11h1_8bfca9c544e5",
+      "status": "verified",
+      "source_curve_ref": "icwalk/fp/n000000",
+      "target_curve_ref": "icwalk/fp/n000001",
+      "degree": 11,
+      "direction": "h",
+      "separable": true,
+      "source_curve_uid": "urn:ec-record:1:sha256:8f235fad5066f836fc5a166b776ccc5f8fa2ab7f69726860100651cf8dac245f",
+      "target_curve_uid": "urn:ec-record:1:sha256:a92821d8b4867c9fcd2fbc22e38d5df699e210039e51b384d23add766a9c7a18",
+      "kernel_polynomial": ["27", "162", "238", "224", "28", "1"],
+      "velu_codomain_a4_a6": ["169", "16"],
+      "isomorphism_u2": "79",
+      "kernel_certificate": "kernel::verify_kernel: squarefree, divides psi_ell, closed under [g], Velu codomain F_p-isomorphic to the target"
+    },
+    {
+      "id": "e11h1_08ee1ca3d795",
+      "status": "verified",
+      "source_curve_ref": "icwalk/fp/n000000",
+      "target_curve_ref": "icwalk/fp/n000002",
+      "degree": 11,
+      "direction": "h",
+      "separable": true,
+      "source_curve_uid": "urn:ec-record:1:sha256:8f235fad5066f836fc5a166b776ccc5f8fa2ab7f69726860100651cf8dac245f",
+      "target_curve_uid": "urn:ec-record:1:sha256:9fcccf64f84543a5998aac5515575ccbb360c19fb30ca21c0f7ce2040dbbe864",
+      "kernel_polynomial": ["39", "128", "146", "3", "53", "1"],
+      "velu_codomain_a4_a6": ["142", "192"],
+      "isomorphism_u2": "63",
+      "kernel_certificate": "kernel::verify_kernel: squarefree, divides psi_ell, closed under [g], Velu codomain F_p-isomorphic to the target"
+    }
+  ],
+  "routes": [
+    {
+      "id": "IW1E11h1h1a619f4ab250",
+      "status": "verified",
+      "source_curve_ref": "icwalk/fp/n000000",
+      "target_curve_ref": "icwalk/fp/n000001",
+      "edge_ids": ["e11h1_8bfca9c544e5"],
+      "search_prime": null
+    },
+    {
+      "id": "IW1E11h1h3ea8bdeef413",
+      "status": "verified",
+      "source_curve_ref": "icwalk/fp/n000000",
+      "target_curve_ref": "icwalk/fp/n000002",
+      "edge_ids": ["e11h1_08ee1ca3d795"],
+      "search_prime": null
+    }
+  ]
+}

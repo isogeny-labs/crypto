@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-18",
+  "scope": "Internal cross-track review and additive target-verification repair; no original evidence overwritten",
+  "frozen_manifest_checks": {
+    "manifest_files": 4,
+    "hash_entries_including_repeated_dependencies": 47,
+    "all_passed": true,
+    "log": "final-hash-check.log"
+  },
+  "original_certificate_replay": {
+    "actual_source_target_rows": 999,
+    "source_declared_hit_certificates": 79,
+    "all_passed": true,
+    "coverage_scope": "All source-declared hits in externally digest-pinned files; reported misses not independently re-searched"
+  },
+  "negative_controls": {
+    "expected_rejections": 9,
+    "observed_rejections": 9
+  },
+  "corrected_fp2_replication": {
+    "actual_fixtures": 24,
+    "identical_complete_records": 24,
+    "source_hit_certificates_verified": 23,
+    "table_hits": 23,
+    "rho_successes": 24,
+    "candidate_draws": 49,
+    "singular_regression_passed": true
+  },
+  "boundary_checks": {
+    "direct_dft_probabilities": 256,
+    "exact_congruence_records": 18,
+    "resource_rows": 75,
+    "all_passed": true,
+    "details": "boundary_checks.json"
+  },
+  "additional_internal_source_check": "V2_SECOND_CHECK.md",
+  "known_limitations": [
+    "Not external review or formal certification",
+    "Finite-field arithmetic shared with original generator",
+    "Disk family metadata remains an input assumption; P3 hardening suggested",
+    "No GPU, full IC, F4 solving-degree or asymptotic-exponent claim",
+    "Root owns publication and amendments to original reports"
+  ]
+}

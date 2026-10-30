@@ -20,9 +20,11 @@
 //! # What is implemented
 //!
 //! `k = 3`, `m = 3`: random curves `y² = x³ + ax + b` with
-//! `a, b ∈ F_{p³}` and prime group order `n ≈ p³`, the factor base of
+//! `a, b ∈ F_{p³}` and a prime-order subgroup `n` of `#E(F_{p³})`, the factor base of
 //! the `≈ p/2` points with `x ∈ F_p`, and the decomposition
-//! `R = ±P_i ± P_j ± P_k`.  The oracle is the meet-in-the-middle form:
+//! `R + T = ±P_i ± P_j ± P_k`, with `T` in the cofactor subgroup when
+//! `#E = hn`. Relations are checked in the full group and then multiplied
+//! by `h` before elimination modulo `n`. The oracle is the meet-in-the-middle form:
 //! for every `P_k` in the base, `Y = R ∓ P_k` (one group operation) is
 //! tested for `Y ∈ ±F ± F` by the **Weil-restricted `S₃`**:
 //! `S₃(x_Y, x_1, x_2) = 0` with `x_1, x_2 ∈ F_p` unknown is three
@@ -97,13 +99,16 @@ pub(crate) fn sm(a: u64, b: u64, p: u64) -> u64 {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct E3(pub [u64; 3]);
 
-/// The cubic extension `F_p[t]/(t³ − c)`, `c` a non-cube, with an
-/// `F_p`-multiplication counter.
+/// A cubic extension in the basis `1,t,t²`, with an `F_p`-multiplication
+/// counter. The usual representation is `t³ = c`; `modulus` supports a
+/// general monic irreducible cubic `t³ + m₂t² + m₁t + m₀`.
 #[derive(Clone, Debug, Serialize)]
 pub struct Fp3 {
     pub p: u64,
-    /// `t³ = c`.
+    /// Binomial constant in `t³ = c`; zero when `modulus` is present.
     pub c: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modulus: Option<[u64; 3]>,
     #[serde(skip)]
     muls: Cell<u64>,
 }
@@ -122,6 +127,7 @@ impl Fp3 {
         Fp3 {
             p,
             c,
+            modulus: None,
             muls: Cell::new(0),
         }
     }
@@ -140,6 +146,33 @@ impl Fp3 {
         Ok(Fp3 {
             p,
             c: c % p,
+            modulus: None,
+            muls: Cell::new(0),
+        })
+    }
+
+    /// Construct `F_p[t]/(t³ + m₂t² + m₁t + m₀)` from canonical
+    /// coefficients. A degree-three polynomial is irreducible over a field
+    /// exactly when it has no root in that field.
+    pub fn with_irreducible_cubic(p: u64, modulus: [u64; 3]) -> Result<Fp3, String> {
+        if !(3..=1_000_000).contains(&p) || !is_prime_u64(p) {
+            return Err("cubic field base must be prime and at most 1000000".into());
+        }
+        if modulus.iter().any(|&coefficient| coefficient >= p) {
+            return Err("cubic modulus coefficients must be less than p".into());
+        }
+        if (0..p).any(|x| {
+            let value = am(x, modulus[2], p);
+            let value = am(mm(value, x, p), modulus[1], p);
+            let value = am(mm(value, x, p), modulus[0], p);
+            value == 0
+        }) {
+            return Err("cubic modulus has a root and is reducible".into());
+        }
+        Ok(Fp3 {
+            p,
+            c: 0,
+            modulus: Some(modulus),
             muls: Cell::new(0),
         })
     }
@@ -194,6 +227,23 @@ impl Fp3 {
         let p = self.p;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
         let (b0, b1, b2) = (b.0[0], b.0[1], b.0[2]);
+        if let Some([m0, m1, m2]) = self.modulus {
+            self.count(15);
+            let mut d = [
+                mm(a0, b0, p),
+                am(mm(a0, b1, p), mm(a1, b0, p), p),
+                am(am(mm(a0, b2, p), mm(a1, b1, p), p), mm(a2, b0, p), p),
+                am(mm(a1, b2, p), mm(a2, b1, p), p),
+                mm(a2, b2, p),
+            ];
+            for degree in (3..=4).rev() {
+                let coefficient = d[degree];
+                d[degree - 3] = sm(d[degree - 3], mm(coefficient, m0, p), p);
+                d[degree - 2] = sm(d[degree - 2], mm(coefficient, m1, p), p);
+                d[degree - 1] = sm(d[degree - 1], mm(coefficient, m2, p), p);
+            }
+            return E3([d[0], d[1], d[2]]);
+        }
         self.count(11);
         let d0 = mm(a0, b0, p);
         let d1 = am(mm(a0, b1, p), mm(a1, b0, p), p);
@@ -209,9 +259,13 @@ impl Fp3 {
     pub fn sq(&self, a: &E3) -> E3 {
         self.mul(a, a)
     }
-    /// Inverse via the norm: `a⁻¹ = (a^{p} a^{p²}) / N(a)` computed as
-    /// the adjugate of the multiplication matrix.
+    /// Invert in the selected cubic presentation. The binomial path uses
+    /// an adjugate; the general path uses `a^(p³-2)` in the verified field.
     pub fn inv(&self, a: &E3) -> E3 {
+        if self.modulus.is_some() {
+            assert_ne!(*a, Fp3::ZERO, "inverse of zero in F_p³");
+            return self.pow(a, (self.p as u128).pow(3) - 2);
+        }
         let p = self.p;
         let c = self.c;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
@@ -2964,11 +3018,15 @@ pub struct GaudryReport {
     pub relations_independent: u64,
     pub rank: usize,
     pub solved: bool,
+    /// Candidate logarithm, accepted only after independent group replay.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     /// Affine additions in `E(F_{p³})` (sampling, neighbours, verification).
     pub group_ops: u64,
     /// `F_p` multiplications inside the pair tests.
     pub oracle_fp_muls: u64,
+    /// Field multiplications spent lifting points for cofactor shifts.
+    pub torsion_lift_fp_muls: u64,
     /// `F_p` multiplications per affine addition, measured.
     pub fp_muls_per_add: f64,
     /// `group_ops + oracle_fp_muls / fp_muls_per_add`.
@@ -3028,6 +3086,9 @@ pub struct GaudryReport {
 #[derive(Clone, Debug, Serialize)]
 pub struct GaudryOptions {
     pub max_residuals: u64,
+    /// Cofactor of the prime-order target subgroup. Relations are projected
+    /// through multiplication by this value before linear algebra.
+    pub cofactor: u64,
     pub solver: Solver,
     /// Run the other oracle on every residual and count disagreements.
     pub cross_check: bool,
@@ -3057,6 +3118,7 @@ impl Default for GaudryOptions {
     fn default() -> Self {
         GaudryOptions {
             max_residuals: 1_000_000,
+            cofactor: 1,
             solver: Solver::MeetInTheMiddle,
             cross_check: false,
             sparse_la: false,
@@ -3602,6 +3664,11 @@ pub fn run_gaudry_opts(
     let la_fp_equiv = 9.0;
     let curve = &inst.curve;
     let n = curve.n;
+    let h = opts.cofactor;
+    assert!(
+        h > 0 && !h.is_multiple_of(n),
+        "cofactor must be invertible modulo n"
+    );
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9A0D);
     curve.reset();
     let start = Instant::now();
@@ -3646,9 +3713,11 @@ pub fn run_gaudry_opts(
         relations_independent: 0,
         rank: 0,
         solved: false,
+        recovered_scalar: None,
         correct: None,
         group_ops: 0,
         oracle_fp_muls: 0,
+        torsion_lift_fp_muls: 0,
         fp_muls_per_add: fp_per_add,
         total_ops: 0.0,
         s: 0.0,
@@ -3688,7 +3757,29 @@ pub fn run_gaudry_opts(
         rep.residuals += 1;
         let a = rng.gen_range(0..n);
         let b = rng.gen_range(1..n);
-        let r = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        let subgroup_residual = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        // A raw subspace decomposition can have any cofactor component.
+        // Sample one component in ker([h]) using [n] of a curve point;
+        // [h][n]P = O because #E = hn. Every accepted relation is then
+        // checked in the full group below before projection modulo n.
+        let torsion = if h == 1 {
+            Pt3::INFINITY
+        } else {
+            loop {
+                let x = E3([
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                ]);
+                let before_lift = curve.field.muls();
+                let point = curve.lift(&x, &mut rng);
+                rep.torsion_lift_fp_muls += curve.field.muls() - before_lift;
+                if let Some(point) = point {
+                    break curve.mul(&point, n);
+                }
+            }
+        };
+        let r = curve.add(&subgroup_residual, &torsion);
         let decs = match solver {
             Solver::MeetInTheMiddle => {
                 let (decs, muls) = subspace_triple_oracle(inst, base, &r, &mut rng);
@@ -3755,7 +3846,7 @@ pub fn run_gaudry_opts(
         }
         for terms in decs {
             rep.decompositions += 1;
-            // Verify aG + bQ = Σ c_i P_i.
+            // Verify aG + bQ + T = Σ c_i P_i in the full curve group.
             let mut acc = r;
             for &(i, c) in &terms {
                 acc = curve.sub(&acc, &curve.mul_signed(&base.points[i], c));
@@ -3775,7 +3866,7 @@ pub fn run_gaudry_opts(
                     (if i < small { i } else { i + 1 }, v)
                 })
                 .collect();
-            cols.push((small, (n - b) % n));
+            cols.push((small, (n - mm(h % n, b, n)) % n));
             cols.sort_unstable();
             let lp_count = cols.iter().filter(|&&(c, _)| c > small).count();
             rep.lp_histogram[lp_count.min(3)] += 1;
@@ -3783,7 +3874,10 @@ pub fn run_gaudry_opts(
                 continue;
             }
             let t0 = Instant::now();
-            let rel = SparseRel { cols, rhs: a };
+            let rel = SparseRel {
+                cols,
+                rhs: mm(h % n, a, n),
+            };
             let full = if lp_count == 0 {
                 Some(rel)
             } else {
@@ -3836,6 +3930,7 @@ pub fn run_gaudry_opts(
                             let dd = x.map(|x| x[map[small]]);
                             if dd.is_some_and(|dd| curve.mul(&curve.g, dd) == inst.q) {
                                 rep.solved = true;
+                                rep.recovered_scalar = dd;
                                 rep.correct = Some(dd == Some(inst.d));
                             } else {
                                 next_attempt = full_rels.len() + (sel.len() / 20).max(1);
@@ -3852,7 +3947,8 @@ pub fn run_gaudry_opts(
                     if system.insert(row, full.rhs) {
                         rep.relations_independent += 1;
                         if let Some(dd) = system.solved(small) {
-                            rep.solved = true;
+                            rep.solved = curve.mul(&curve.g, dd) == inst.q;
+                            rep.recovered_scalar = rep.solved.then_some(dd);
                             rep.correct = Some(dd == inst.d);
                         }
                     }
@@ -3892,7 +3988,7 @@ pub fn run_gaudry_opts(
         };
     }
     rep.total_ops = rep.group_ops as f64
-        + (rep.oracle_fp_muls + precompute_muls) as f64 / fp_per_add
+        + (rep.oracle_fp_muls + rep.torsion_lift_fp_muls + precompute_muls) as f64 / fp_per_add
         + rep.la_ops as f64 * la_fp_equiv / fp_per_add;
     rep.s = rep.total_ops / (n as f64).sqrt();
     rep.fp_muls_per_pair_test = rep.oracle_fp_muls as f64 / rep.pair_tests.max(1) as f64;
@@ -3911,6 +4007,8 @@ pub struct RhoReport3 {
     pub steps: u64,
     pub group_ops: u64,
     pub solved: bool,
+    /// Candidate logarithm, independently checked by callers using G and Q.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     pub s: f64,
     pub wall_ms: f64,
@@ -3970,6 +4068,7 @@ pub fn run_rho3(inst: &Instance3, seed: u64) -> RhoReport3 {
         steps,
         group_ops: curve.ops(),
         solved: solved.is_some(),
+        recovered_scalar: solved,
         correct: solved.map(|d| d == inst.d),
         s: curve.ops() as f64 / (n as f64).sqrt(),
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
@@ -4015,6 +4114,29 @@ mod tests {
         assert_eq!(f.mul(&f.mul(&t, &t), &t), f.from_base(f.c));
         let q = (f.p as u128).pow(3) - 1;
         assert_eq!(f.pow(&t, q), Fp3::ONE);
+    }
+
+    #[test]
+    fn irreducible_non_binomial_cubic_field_axioms() {
+        // t^3 + 4t^2 + 1 has no root over F_11; no irreducible
+        // binomial t^3-c exists there because 11 is 2 modulo 3.
+        let f = Fp3::with_irreducible_cubic(11, [1, 0, 4]).unwrap();
+        assert!(Fp3::with_irreducible_cubic(11, [0, 0, 1]).is_err());
+        assert!(Fp3::with_irreducible_cubic(11, [1, 0, 11]).is_err());
+        let t = E3([0, 1, 0]);
+        let t3 = f.mul(&f.sq(&t), &t);
+        assert_eq!(t3, E3([10, 0, 7]));
+        let mut rng = StdRng::seed_from_u64(11);
+        for _ in 0..64 {
+            let value = E3([
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+            ]);
+            if value != Fp3::ZERO {
+                assert_eq!(f.mul(&value, &f.inv(&value)), Fp3::ONE);
+            }
+        }
     }
 
     #[test]

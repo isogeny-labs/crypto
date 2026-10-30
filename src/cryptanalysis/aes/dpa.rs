@@ -23,6 +23,12 @@
 //! 2. Compute Pearson correlation `ρ(H(k), measured_power)` over `i`.
 //! 3. The correct `k` gives the maximum |ρ|.
 //!
+//! Difference-of-means DPA uses each predicted S-box output bit to split
+//! traces into bit-zero and bit-one groups. For every key guess it measures
+//! the mean-trace difference for each of the eight splits and sums their
+//! squares. This is a separate statistic from the Hamming-weight Pearson
+//! correlation used by CPA.
+//!
 //! Expected success: with `N = O(σ²_noise · 100)` traces (around
 //! 100-1000 for clean models, more for noisy ones), the correct key
 //! byte is reliably the top peak.
@@ -120,6 +126,53 @@ pub fn cpa_recover_byte(
         .map(|(i, _)| i as u8)
         .unwrap();
     (recovered, corrs)
+}
+
+/// Difference-of-means DPA on one AES-128 first-round key byte.
+///
+/// Each key guess partitions the measured traces by every predicted S-box
+/// output bit. The score is the sum of the eight squared differences between
+/// the bit-one and bit-zero mean traces, in squared trace units. Empty
+/// partitions contribute zero; callers should reject channels without useful
+/// plaintext and trace variation. The returned key byte maximizes this score.
+pub fn dpa_recover_byte(
+    plaintexts: &[[u8; 16]],
+    traces: &[f64],
+    byte_pos: usize,
+) -> (u8, [f64; 256]) {
+    assert_eq!(plaintexts.len(), traces.len());
+    let mut scores = [0.0f64; 256];
+    for (guess, score) in scores.iter_mut().enumerate() {
+        let mut sums_one = [0.0f64; 8];
+        let mut counts_one = [0usize; 8];
+        let mut total = 0.0f64;
+        for (plaintext, &trace) in plaintexts.iter().zip(traces) {
+            total += trace;
+            let output = SBOX[(plaintext[byte_pos] ^ guess as u8) as usize];
+            for bit in 0..8 {
+                if output & (1 << bit) != 0 {
+                    sums_one[bit] += trace;
+                    counts_one[bit] += 1;
+                }
+            }
+        }
+        for bit in 0..8 {
+            let ones = counts_one[bit];
+            let zeros = traces.len() - ones;
+            if ones > 0 && zeros > 0 {
+                let difference =
+                    sums_one[bit] / ones as f64 - (total - sums_one[bit]) / zeros as f64;
+                *score += difference * difference;
+            }
+        }
+    }
+    let recovered = scores
+        .iter()
+        .enumerate()
+        .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
+        .map(|(guess, _)| guess as u8)
+        .unwrap();
+    (recovered, scores)
 }
 
 /// **Full CPA attack on all 16 key bytes** of K_R0.  Returns the
@@ -276,6 +329,20 @@ mod tests {
         let (recovered, report) = cpa_attack_full_key(&pts, &traces, &key);
         assert_eq!(recovered, key);
         assert_eq!(report.bytes_correct, 16);
+    }
+
+    #[test]
+    fn dpa_recovers_all_key_bytes_from_independent_bit_partitions() {
+        let mut key = [0u8; 16];
+        for (index, byte) in key.iter_mut().enumerate() {
+            *byte = index as u8;
+        }
+        let (plaintexts, traces) = generate_traces(512, &key, 0.0, 0xD0A);
+        for byte in 0..16 {
+            let (recovered, scores) = dpa_recover_byte(&plaintexts, &traces[byte], byte);
+            assert_eq!(recovered, key[byte], "byte {byte}");
+            assert!(scores[recovered as usize] > 0.0);
+        }
     }
 
     /// **Trace-count threshold**: with too few traces, the attack

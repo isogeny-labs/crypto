@@ -1,0 +1,5 @@
+ring R=0,(p),Wp(1000);
+option(redSB); option(redTail);
+proc emit(poly f) { while(f!=0) { print(string(leadcoef(f))+":"+string(leadexp(f))); f=f-lead(f); } print("ENDPOLY"); }
+
+print("SUCCESS-END"); quit;

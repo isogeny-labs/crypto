@@ -1,0 +1,25 @@
+{
+  "schema": "crypto.store-multipart-head-acceptance/v1",
+  "date_utc": "2026-10-18",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261018T080308Z-0b215cc5-6596-4d0d-8581-2301f5e3a0ca",
+  "object_key": "ic/v1/acceptance/20261018T080308Z-0b215cc5-6596-4d0d-8581-2301f5e3a0ca/sha256/b8/b8b5dabaa3454f7fa46a97c51cec9ccd118ffc0d61df6e46d845ef200a2fd1bb",
+  "logical_name": "evidence/acceptance/20261018T080308Z-0b215cc5-6596-4d0d-8581-2301f5e3a0ca/multipart-nine-mib.bin",
+  "bytes": 9437184,
+  "sha256": "b8b5dabaa3454f7fa46a97c51cec9ccd118ffc0d61df6e46d845ef200a2fd1bb",
+  "binary_sha256": "28d9ca17d0980ee33059768776400a0b6e012ef9907abcf4e49b41a653b2e1a5",
+  "head_checksum_type": "FULL_OBJECT",
+  "head_checksum_sha256": null,
+  "head_etag": "\"6ce34f844a40d3d63a4a0c84040c6adc-2\"",
+  "results": {
+    "aws_cli_multipart_upload": true,
+    "store_repeat_push_skipped_with_full_object_metadata": true,
+    "store_verify_remote": "cache ok, remote ok",
+    "fresh_cache_pull_sha256_match": true,
+    "delete_unique_test_object": true,
+    "head_after_delete_http_status": 404
+  },
+  "limits": "This exercises the AWS CLI multipart transport and crypto store HEAD, verify, and pull paths on 9 MiB. The crypto store automatic >4 GiB upload branch was not invoked."
+}

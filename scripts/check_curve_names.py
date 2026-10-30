@@ -78,6 +78,12 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": {
+        "sha256": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
+        "labels": {
+            "K_0/GF(2^7)": "icv1-f2m7-t13-616700dd",
+        },
+    },
     # Two unregistered curve IDs are retained in this frozen Certicom
     # experiment and its generated mirrors. Permit only these exact bytes;
     # new prose or regenerated artifacts must resolve through the registry.

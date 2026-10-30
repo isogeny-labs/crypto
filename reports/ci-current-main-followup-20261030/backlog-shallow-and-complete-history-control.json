@@ -1,0 +1,236 @@
+{
+  "at": "2026-10-30T12:45:08.078878+00:00",
+  "scope": "Exact workflow Bash command on genuine depth1, blob-filtered Git fixture and repeated complete checkout; original ready card and pins unchanged.",
+  "fixture": "/workspace/backlog-fetch-history-control-xb7kdwa3",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "init",
+        "--initial-branch=main",
+        "/workspace/backlog-fetch-history-control-xb7kdwa3/origin"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "stdout": "Initialized empty Git repository in /workspace/backlog-fetch-history-control-xb7kdwa3/origin/.git/\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "config",
+        "user.name",
+        "CI Repair Control"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "config",
+        "user.email",
+        "ci-repair@example.invalid"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "config",
+        "uploadpack.allowFilter",
+        "true"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "add",
+        "input.txt"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "commit",
+        "-m",
+        "history control 0"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "[main (root-commit) d20caa6] history control 0\n 1 file changed, 1 insertion(+)\n create mode 100644 input.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "d20caa6bd843ef8d6e3a296d9a4ad16ec008caa1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "add",
+        "input.txt"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "commit",
+        "-m",
+        "history control 1"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "[main ffd6bac] history control 1\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "add",
+        "input.txt"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "commit",
+        "-m",
+        "history control 2"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+      "exit": 0,
+      "stdout": "[main f200bad] history control 2\n 1 file changed, 1 insertion(+), 1 deletion(-)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "clone",
+        "--depth=1",
+        "--filter=blob:none",
+        "file:///workspace/backlog-fetch-history-control-xb7kdwa3/origin",
+        "/workspace/backlog-fetch-history-control-xb7kdwa3/clone"
+      ],
+      "cwd": null,
+      "exit": 0,
+      "stdout": "",
+      "stderr": "Cloning into '/workspace/backlog-fetch-history-control-xb7kdwa3/clone'...\n"
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "--is-shallow-repository"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "true\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d20caa6bd843ef8d6e3a296d9a4ad16ec008caa1",
+        "origin/main"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bash",
+        "-e",
+        "-c",
+        "history_args=()\nif [ \"$(git rev-parse --is-shallow-repository)\" = true ]; then\n  history_args+=(--unshallow)\nfi\ngit fetch \"${history_args[@]}\" --no-tags --filter=blob:none --recurse-submodules=no origin +refs/heads/main:refs/remotes/origin/main\n"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d20caa6bd843ef8d6e3a296d9a4ad16ec008caa1",
+        "origin/main"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "--is-shallow-repository"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "false\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bash",
+        "-e",
+        "-c",
+        "history_args=()\nif [ \"$(git rev-parse --is-shallow-repository)\" = true ]; then\n  history_args+=(--unshallow)\nfi\ngit fetch \"${history_args[@]}\" --no-tags --filter=blob:none --recurse-submodules=no origin +refs/heads/main:refs/remotes/origin/main\n"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "d20caa6bd843ef8d6e3a296d9a4ad16ec008caa1",
+        "origin/main"
+      ],
+      "cwd": "/workspace/backlog-fetch-history-control-xb7kdwa3/clone",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "result": "PASS",
+  "old_pin": "d20caa6bd843ef8d6e3a296d9a4ad16ec008caa1"
+}

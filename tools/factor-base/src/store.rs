@@ -28,6 +28,7 @@ pub fn source_digest() -> String {
             include_str!("recipe.rs"),
             include_str!("store.rs"),
             include_str!("evaluate.rs"),
+            include_str!("decomposition.rs"),
             include_str!("main.rs"),
             include_str!("../Cargo.toml"),
             include_str!("../Cargo.lock"),

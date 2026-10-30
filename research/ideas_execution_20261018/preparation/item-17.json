@@ -1,0 +1,100 @@
+{
+  "item": 17,
+  "title": "Cyclotomic-sparse n23 to n83",
+  "original_requirement": "Complete the cyclotomic-sparse n=23 experiment, including the solving-degree clause, and retain an executable path toward n=83.",
+  "acceptance_criteria": [
+    "Audit and reuse completed n=23 yield/cost evidence; separately complete the requested solver-degree comparison at n=23.",
+    "Match columns and base size, check subgroup validity, natural yield, certificates, oracle work and useful rank.",
+    "Provide an explicit multiword n=83 construction and solver continuation; an exponential exact-log table is not the requested n=83 method."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "examples/cyclotomic_falsifier_yield.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/a2_cyclotomic_base.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/cyclotomic_factor_base.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/cyclotomic_falsifier_20261015/PROTOCOL.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/cyclotomic_falsifier_20261015/README.md"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/examples/cyclotomic_falsifier_yield",
+        "--a",
+        "1",
+        "--n",
+        "23",
+        "--nulls",
+        "1999",
+        "--seed",
+        "20261015",
+        "--alpha",
+        "0.05",
+        "--family",
+        "15",
+        "--out",
+        "FRESH/yield-a1-n23.json"
+      ],
+      "purpose": "Original yield cell; the complete original yield panel also includes a=0,n=23 and a=1,n=11.",
+      "kind": "scientific_trial"
+    },
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/examples/a2_cyclotomic_base",
+        "--out",
+        "FRESH/a2-n23",
+        "--targets",
+        "16",
+        "--yield-targets",
+        "64",
+        "--seed",
+        "20261012",
+        "--cell-timeout-secs",
+        "150",
+        "--wdsat-timeout-secs",
+        "20",
+        "--node-budget",
+        "1024",
+        "--macaulay-extra",
+        "1",
+        "--engine",
+        "inherited",
+        "--cells",
+        "n23",
+        "--label",
+        "execution-20261018"
+      ],
+      "purpose": "Source-supported original n=23 solver package. Each child retains timeout and partial records; n=11 solver cells are excluded by the explicit scope while census code still runs its declared census. WDSAT_BINARY or WDSAT_SRC enables its separate SAT leg.",
+      "kind": "scientific_trial",
+      "launch_qualification": "This command repeats the prior bounded solver scope; a timeout does not discharge the requested degree measurement."
+    }
+  ],
+  "remaining_gaps": [
+    "The n=23 yield leg already completed: all 10 coverage and 5 energy tests were inside the 1999-draw null distribution. This does not discharge the solving-degree clause.",
+    "The prior n=23 solver cells timed out. The original parameters and degree/memory outputs remain required.",
+    "CyclotomicField and the plugin use a single word; n=83 needs a multiword construction and algebraic membership method. An exact log table would require about 2^81 entries."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "The source README explicitly says n=83 was not run and the n=23 solver clause remains untested. At n=11, the recorded F4 maximum degree was 4 versus 3 for the ONB control."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Cyclotomic-sparse bases at n = 23 with the n = 83 ladder in view. Still backlog."
+}

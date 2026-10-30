@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-30T10:24:18.996880+00:00",
+  "before_head": "32a11289f32f648ce8de75b90a10396413b0930a",
+  "workflow": ".github/workflows/backend-leaderboard.yml",
+  "change": "Exact existing generator adds the named frozen fixture prefix to the initial artifact pull. Artifact read_manifest reads exact staged manifest bytes when sparse checkout leaves a manifest off disk; no extra checkout is needed.",
+  "existing_steps_triggers_permissions_timeouts_budgets_preserved": true,
+  "library_manifest_path_crate_and_proof_sources_unchanged": true,
+  "generator": "python3 tools/artifacts/wire_workflows.py .github/workflows/backend-leaderboard.yml",
+  "wire_check_exit": 0,
+  "artifact_controls": 28,
+  "artifact_migration": "32a11289f32f648ce8de75b90a10396413b0930a only moves the94530byte passing-library gzip; its actual payload hash/size matched published manifest before fast-forward."
+}

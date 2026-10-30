@@ -1,0 +1,137 @@
+{
+  "schema": "q4-source-only-runtime-source-seal-v1",
+  "task_id": "TASK-20261029-30f612",
+  "recorded_at": "2026-10-29T16:12:30.209491+00:00",
+  "qualification_task": "TASK-20261029-6f4f28",
+  "launcher": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/launcher.sh",
+    "bytes": 13545,
+    "sha256": "f58e0873203232b5bb58c1d8baebb54421a3855ae584f31c60b3ce4618c9a5f7"
+  },
+  "source_binary_library_manifest": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/source-binary-library-manifest.json",
+    "bytes": 27374,
+    "sha256": "86d651c2df5c2af49949a32cd25d6c01683effdf06e8614735ff01702b8ac158"
+  },
+  "expected_checks": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/expected-checks.json",
+    "bytes": 2568,
+    "sha256": "c915b742cb5c53291f90bb2f03119fe37ab34a2bdee1c7f285d431592da87cb5"
+  },
+  "candidate_inventory": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-candidate-inventory.json",
+    "bytes": 52165,
+    "sha256": "509d71366b54dcb5d50e11f67ebf236f1615a9e388026a9076165d59bf038365"
+  },
+  "eligible_allowlist": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-eligible/allowlist.json",
+    "bytes": 56019,
+    "sha256": "cd7ebc1ad6ec2ea9c7790fe234750f7ebe9ded5431ca5639617a1456d0b1991e"
+  },
+  "eligible_parts_index": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-eligible/parts.txt",
+    "bytes": 131,
+    "sha256": "f2af1d4a0ccedd76fcb0748b38fa6aa5edf8a32c8ef6c7a0af365cc0cbf32853"
+  },
+  "eligible_tsv": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-eligible/eligible.tsv",
+    "bytes": 15376,
+    "sha256": "abd39b366179c0b7d8de429f4880636467aa1f2b7193b8ac91aaf78ea4f09c2f"
+  },
+  "native_seal_input_invocation": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-seal-input/invocation.json",
+    "bytes": 2514,
+    "sha256": "e2dd7e0cd264c0a8e422ce0e7c60ab77cfafb9166691c6eace5093d2c9518860"
+  },
+  "native_seal_result": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/cache-seal/result",
+    "bytes": 146,
+    "sha256": "0fcfa01c6a8c830815b13e05409495ef26588b4189c24e4a26cdaabdb7808c30"
+  },
+  "native_seal_invocations": 1,
+  "native_seal_exit": 0,
+  "accepted_count": 80,
+  "excluded_count": 0,
+  "accepted_bytes": 4557159684,
+  "image": {
+    "Id": "sha256:133aec7ab1411181567fef7fc3f4512123e1f9660090b49851de4b698b4ff772",
+    "RepoDigests": [
+      "debian@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad"
+    ],
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 78821571,
+    "RootFS": {
+      "Layers": [
+        "sha256:a70f6272827f64e1427d048ced77491aab5d64ab95725e56920802ff391197d7"
+      ],
+      "Type": "layers"
+    }
+  },
+  "daemon": {
+    "ServerVersion": "28.4.0",
+    "CgroupVersion": "2",
+    "Driver": "vfs",
+    "CgroupDriver": "cgroupfs",
+    "MemoryLimit": true,
+    "SwapLimit": true
+  },
+  "image_inspect": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/runtime-metadata/image-inspect.json",
+    "bytes": 342,
+    "sha256": "d7e2f041bab00abaad37e97c1f62de100cd216b4b0e02b7025c79d516d52a5c3"
+  },
+  "docker_info": {
+    "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/runtime-metadata/docker-info.json",
+    "bytes": 124,
+    "sha256": "4231d8a5421d3226c006ee6631f7a2c5b472f957af9f709e313aee964b756680"
+  },
+  "image_observation": "Local explicit socket with endpoint/context/TLS selectors cleared; allowlisted metadata only, no Config.Env/dockerconfig/secrets. Immutable image identity verified without create/start or fresh extraction.",
+  "dynamic_loader_selectors": {
+    "LD_LIBRARY_PATH": "observed unset_or_empty",
+    "LD_PRELOAD": "observed unset_or_empty",
+    "LD_AUDIT": "observed unset_or_empty"
+  },
+  "case_admission_schema": {
+    "path": "/workspace/crypto-autoresearcher/coordination/goals/GOAL-PFDR-fd09e0/batches/BATCH-ee839d/continuations/DEC-20261029-03e304/admission/TASK-20261029-6f4f28/prelaunch-admission.json",
+    "verdict": "admitted_Q4",
+    "task_id": "TASK-20261029-6f4f28",
+    "source_runtime_seal": {
+      "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/runtime-source-seal.json",
+      "sha256": "actual external SHA256 of this frozen file"
+    },
+    "source_binary_library_manifest": {
+      "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/source-binary-library-manifest.json",
+      "bytes": 27374,
+      "sha256": "86d651c2df5c2af49949a32cd25d6c01683effdf06e8614735ff01702b8ac158"
+    },
+    "expected_checks": {
+      "path": "/workspace/crypto-native-smallroot/experiments/joint-smallroot-native/spec/checks/TASK-20261029-30f612/expected-checks.json",
+      "bytes": 2568,
+      "sha256": "c915b742cb5c53291f90bb2f03119fe37ab34a2bdee1c7f285d431592da87cb5"
+    },
+    "prep_publication": {
+      "path": "/workspace/crypto-autoresearcher/coordination/goals/GOAL-PFDR-fd09e0/batches/BATCH-ee839d/continuations/DEC-20261029-03e304/archives/TASK-20261029-6cad2d/publication-verification.json",
+      "sha256": "actual separately published bytes",
+      "commit": "actual root publication commit"
+    },
+    "claim_publication": {
+      "path": "/workspace/crypto-autoresearcher/coordination/goals/GOAL-PFDR-fd09e0/batches/BATCH-ee839d/continuations/DEC-20261029-03e304/admission/TASK-20261029-6f4f28/claim-publication.json",
+      "sha256": "actual separately published bytes",
+      "commit": "actual root publication commit"
+    },
+    "case_lease": {
+      "task_ref": "T-6",
+      "safe_proof_path": "/workspace/smallroot-session/20261029-q4-current-lease.json",
+      "required": "Actual task_id/lease_id/fencing_epoch/live/expected_principal/observed_at/expires_at; exact matches to maintained proof, observed age<75s, unexpired"
+    }
+  },
+  "operational_case_execution": "not attempted; separate actual published admissions and fresh live ownership required",
+  "advice_calls": 0,
+  "container_create_start": 0,
+  "driver_worker_allocator_calls": 0,
+  "scientific_calls": 0,
+  "production_watchdog_seconds": 1800,
+  "external_protection_seconds": 1950,
+  "owner_source_stage_commit": "Not asserted here: root commits/pushes exact stage and supplies actual commit for programme outputs."
+}

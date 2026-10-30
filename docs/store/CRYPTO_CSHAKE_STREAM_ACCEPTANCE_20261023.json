@@ -1,0 +1,58 @@
+{
+  "schema": "crypto.cshake-stream-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T04:34:52.297148+00:00",
+  "source_base_commit": "912b8fc2709e1c0c0be84d4bbeb9fe77f415c117",
+  "source_state": "committed streamed hash implementation",
+  "binary_sha256": "405895bf17e48945725fcb599dc86c85062d72e41f766b0135bc0daf16863b0b",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T043445Z-8da684f2",
+  "logical_name": "evidence/crypto-cshake-stream/20261024T043445Z-8da684f2/input.bin",
+  "object": {
+    "key": "ic/v1/acceptance/20261024T043445Z-8da684f2/sha256/dc/dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "sha256": "dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "bytes": 1048577
+  },
+  "checks": {
+    "local_comparisons": 48,
+    "local_algorithms": [
+      "cshake128",
+      "cshake256"
+    ],
+    "local_size_cases": [
+      0,
+      1,
+      135,
+      136,
+      137,
+      167,
+      168,
+      169,
+      65535,
+      65536,
+      65537,
+      1048577
+    ],
+    "local_customizations": [
+      "empty",
+      "Email Signature"
+    ],
+    "remote_download_status": "bytes_ok",
+    "fresh_cache_matches": {
+      "cshake128:empty": "e0e398094cff910ce948db1588fea497440e083f5248fcd688e33cdafb911f64",
+      "cshake128:456d61696c205369676e6174757265": "6dd7ae660492fb2b8c2c680aed3f2576e1728ddcaea092d1f2c4a5c9e03723e4",
+      "cshake256:empty": "f0cf587aba989e2aced6110aeb9a3d323d8bc4cc37da21df5aebf5bc91661e27",
+      "cshake256:456d61696c205369676e6174757265": "f73ce67283495fff8ffb6779e26d64958478f351d6c604665cd18432f1112b50"
+    },
+    "release_binary_tests_passed": 29,
+    "release_binary_tests_failed": 0
+  },
+  "external_reference": "PyCryptodome cSHAKE128 and cSHAKE256",
+  "cleanup": {
+    "objects_deleted": 1,
+    "prefix_empty": true,
+    "errors": []
+  },
+  "source_commit": "b167f617065"
+}

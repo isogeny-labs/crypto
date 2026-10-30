@@ -63,19 +63,20 @@ fn decode_certificate(text: &str) -> Result<(Curve, Point, Point, paper::Certifi
     }
     tag(&mut words, "hashed-ecdl-gpu-certificate/v1")?;
     tag(&mut words, "curve")?;
-    let c = Curve::new(
+    let (modulus, a, b, order) = (
         num(&mut words)?,
         num(&mut words)?,
         num(&mut words)?,
         num(&mut words)?,
-    )?;
+    );
     tag(&mut words, "public")?;
     let p = Some((num(&mut words)?, num(&mut words)?));
     let q = Some((num(&mut words)?, num(&mut words)?));
+    let c = Curve::with_order_witness(modulus, a, b, order, p)?;
     tag(&mut words, "summary")?;
     let scalar = num(&mut words)?;
     let trials = count(&mut words, 1000)?;
-    let attempts = count(&mut words, 20 * 513 * 1000)?;
+    let attempts = count(&mut words, 20 * (paper::MAX_COLUMNS + 1) * 1000)?;
     tag(&mut words, "hashes")?;
     let m = count(&mut words, 8)?;
     let hashes = (0..m)
@@ -89,7 +90,7 @@ fn decode_certificate(text: &str) -> Result<(Curve, Point, Point, paper::Certifi
         })
         .collect::<Result<Vec<_>, Error>>()?;
     tag(&mut words, "relations")?;
-    let n = count(&mut words, 513)?;
+    let n = count(&mut words, paper::MAX_COLUMNS + 1)?;
     let mut relations = Vec::with_capacity(n);
     for _ in 0..n {
         let u = num(&mut words)?;
@@ -101,7 +102,7 @@ fn decode_certificate(text: &str) -> Result<(Curve, Point, Point, paper::Certifi
         relations.push(paper::Relation { u, v, points });
     }
     tag(&mut words, "dependency")?;
-    let n = count(&mut words, 513)?;
+    let n = count(&mut words, paper::MAX_COLUMNS + 1)?;
     let dependency = (0..n)
         .map(|_| num(&mut words))
         .collect::<Result<Vec<_>, _>>()?;
@@ -365,23 +366,45 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         selftest(&args[1])?;
         return Ok(());
     }
-    if args.len() != 15 {
-        return Err("usage: paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows; or SERVICE --self-test".into());
+    if args.len() != 15 && args.len() != 18 {
+        return Err("usage: paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows [max_columns max_work max_trials]; or SERVICE --self-test".into());
     }
     let n = |i: usize| -> Result<u64, Box<dyn std::error::Error>> { Ok(args[i].parse()?) };
-    let c = Curve::new(n(2)?, n(3)?, n(4)?, n(5)?)?;
+    let started = std::time::Instant::now();
     let p = Some((n(6)?, n(7)?));
     let q = Some((n(8)?, n(9)?));
+    let c = Curve::with_order_witness(n(2)?, n(3)?, n(4)?, n(5)?, p)?;
+    let validated = std::time::Instant::now();
     let config = paper::Config {
+        max_columns: if args.len() == 18 {
+            usize::try_from(n(15)?)?
+        } else {
+            512
+        },
+        max_work: if args.len() == 18 { n(16)? } else { 1_000_000 },
+        max_trials: if args.len() == 18 {
+            usize::try_from(n(17)?)?
+        } else {
+            16
+        },
         m: usize::try_from(n(10)?)?,
         tau: Some(n(11)?),
         seed: n(12)?,
-        ..Default::default()
     };
     let mut oracle = GpuOracle::new(&args[1], &c, n(13)?, n(14)?)?;
-    let cert = paper::solve_with_oracle(&c, p, q, &config, &mut oracle)?;
-    paper::verify(&c, p, q, &cert)?;
-    print!("{}", encode_certificate(&c, p, q, &cert)?);
+    let ready = std::time::Instant::now();
+    let mut stats = paper::ReductionStats::default();
+    let cert = paper::solve_with_oracle_profile(&c, p, q, &config, &mut oracle, &mut stats)?;
+    let archive = encode_certificate(&c, p, q, &cert)?;
+    print!("{archive}");
+    std::io::stdout().flush()?;
+    eprintln!("E2E total_ms={:.6} validate_ms={:.6} service_ms={:.6} bases_ms={:.6} targets_ms={:.6} oracle_ms={:.6} linear_ms={:.6} replay_ms={:.6} trials={} attempts={} relations={} certificate_bytes={}",
+        started.elapsed().as_secs_f64()*1000.0,
+        validated.duration_since(started).as_secs_f64()*1000.0,
+        ready.duration_since(validated).as_secs_f64()*1000.0,
+        stats.bases.as_secs_f64()*1000.0,stats.targets.as_secs_f64()*1000.0,
+        stats.oracle.as_secs_f64()*1000.0,stats.linear.as_secs_f64()*1000.0,
+        stats.replay.as_secs_f64()*1000.0,cert.trials,cert.attempts,cert.relations.len(),archive.len());
     Ok(())
 }
 fn main() {

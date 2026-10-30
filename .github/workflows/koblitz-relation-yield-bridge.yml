@@ -26,8 +26,7 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+# Superseding main pushes share a group; manual dispatches get an independent group.
 concurrency:
   group: ${{ github.event_name == 'push' && github.workflow_ref || format('run-{0}', github.run_id) }}
   cancel-in-progress: ${{ github.event_name == 'push' }}
@@ -35,9 +34,9 @@ concurrency:
 jobs:
   smoke-and-custody:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    # The metered smoke takes about 12 minutes on ARC and longer on hosted
-    # runners; keep the PR cap high enough for the hosted fallback.
-    timeout-minutes: 25
+    # Include cold builds and custody checks around the fixed operational
+    # smoke. Its frozen inputs, inner meter caps and ineligible status are unchanged.
+    timeout-minutes: 45
     # Keep the full test set and assertions while avoiding oversized debug artifacts.
     env:
       CARGO_INCREMENTAL: "0"

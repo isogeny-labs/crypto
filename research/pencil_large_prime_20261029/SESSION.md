@@ -1460,3 +1460,93 @@ builds report45min, cause not established. AutoRetryLimit2 allows three total
 builds, discovered during reconciliation. First amendment metadata candidate
 used timestamp for date-only field; native checker rejected it; corrected before
 review/admission. Manual takeover proposal was never executed.
+
+## 2026-10-30T07:03Z — C1 generation9 interim report
+
+### What was done
+
+Preserved and published selected non-memory checkpoint9 files at799fff06e;
+versioned archive, manifest and selected payload hashes were checked. Four rows
+are retained: two control warmups producer-verified, pencil warmup timeout
+(watchdog expired, signal9), one measured rho producer-verified. Native accounting
+retains18planned/4observed/14missing, five incomplete pairs and36null ratio cells.
+Rendered and visually inspected native four-page PDF and a five-page review
+packet with coverage graph; CSV/JSON/LaTeX/SVG retained. Independent observation
+and presentation reviews found no scope defect. PDFs stored content-addressed.
+
+### Decisions made
+
+This is explicitly an interim snapshot of a still-running gate, not full1260
+completion or a cost-ratio claim. All timings remain unqualified, all required
+scientific replays remain unperformed. Keep v4 scientific identity and v5
+controller-only amendment separate. No additional scientific run was launched.
+
+### Open threads
+
+Follow existing controller592e9381 and potential exact same-request third
+controller; immutable08:10:24 cutoff and11:17:54 outer expiry remain. Publish
+terminal accounting and report separately when actual terminal evidence exists.
+The full four-lead objective and full-cohort requirements remain active.
+
+### Errors
+
+Canonical package exits1 with four shortfalls; semantic check exits1 with five
+incompleteness findings. These are retained, not suppressed. Root resource-update
+race restored original exact bytes; post-restoration check has the same five
+findings and no binding error. Optional CairoSVG import failed; installed
+rsvg-convert rendered the graph successfully. Git push warned about unrelated
+historical large blobs; no history rewrite was performed.
+
+## 2026-10-30T07:27Z — Additive controller continuity evidence
+
+### What was done
+
+Reconciled the third automatic controller with its terminal predecessor and unchanged worker, Pod and request. Published hash-bound lineage and an independent scope clarification as additive resource-support files. Verified checkpoint14 archive, manifest and selected records privately; records are byte-identical to checkpoint9.
+
+### Decisions made
+
+Continue under the existing T-913 lease. Preserve the original admission and all scientific data. Remaining distinct scheduled rows are not retries; the warmup timeout blocks later-cohort admission. Optional fourth controller remains conditional on fresh checks after controller3 terminates; no fourth was invoked.
+
+### Open threads
+
+Current controller remains live. PR2957 artifacts and harness checks remain pending. Terminal accounting, independent scientific replay and full1260 pencil coverage remain incomplete.
+
+### Errors
+
+Private checkpoint14 custody summary initially read outcome at the row root, producing null summaries; an additive correction uses nested producer outcomes and preserves the original receipt. Hash checks were unaffected. Python lacked hashlib.file_digest; streaming SHA256 completed the same archive check. Conductor check reported this task's own reservation; task show confirmed the same live T-913 owner and epoch before editing.
+
+## 2026-10-30T14:52Z — Terminal C1 accounting and report
+
+### What was done
+
+Preserved terminal controller failure and checkpoint18 raw observations at ed12fa3d1. Ran pinned native saved-record accounting and canonical export; rendered and visually inspected all5 pages of the terminal PDF packet, with SVG coverage graph, exact36-cell CSV, standardized JSON and LaTeX.
+
+### Decisions made
+
+Retain7/18 observed and4/15 measured rows, two pencil watchdog timeouts,11 missing rows and36 null ratios. Distinguish generation19 CRIU failure from scientific timeouts. No new execution after expired authorization. Total active time and spending remain unknown; producer-verified controls are not independent replay.
+
+### Open threads
+
+Independent terminal review and scientific replay remain absent; delegated agents hit a usage limit. Full1260 pencil cohort remains incomplete. PR2957 current checks and publication readback require reconciliation.
+
+### Errors
+
+Native export and semantic checks each return1 with completeness findings; preserved unchanged. Controller3 ended07:54:08.858UTC, before its normal timeout, with CRIU dump failure. No fourth controller ran. A long interruption preceded14:46 reconciliation; all old cutoffs remain binding.
+
+## 2026-10-30T14:55Z — Supervisor receipt and artifact automation
+
+### What was done
+
+Downloaded the saved versioned supervisor receipt: failed generation19, exit137, original request, attempt0, update07:53:56UTC. Added a separate supplement without changing bound terminal report inputs. Fast-forwarded artifact automation52f0617a0 and hydrated analysis.stdout; bytes equal native-analysis.json.
+
+### Decisions made
+
+The receipt corroborates terminal failure but does not prove OOM, exact worker termination, active runtime or spending. Leave those values unresolved.
+
+### Open threads
+
+Exact-head CI, independent review/replay and full pencil cohort remain outstanding. No execution authorization remains.
+
+### Errors
+
+The single-branch fetch populated FETCH_HEAD without a remote-tracking ref; initial ff-only merge by remote name failed without mutation. Merged the fetched commit via FETCH_HEAD. No rebase or evidence rewrite.

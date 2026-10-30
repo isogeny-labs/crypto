@@ -1,0 +1,117 @@
+{
+  "schema": "native-guard-successor-builds-v1",
+  "toolchain": [
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-g++-14",
+      "bytes": 1166360,
+      "sha256": "6b3696e4dcb85e1c949c732a02befa50e3983ecf94ce7e8e58d9d503b954b79d"
+    },
+    {
+      "path": "/usr/libexec/gcc/x86_64-linux-gnu/14/cc1plus",
+      "bytes": 36389344,
+      "sha256": "3064a74d411cc6a72fa3d8d2ce47d72925a42807d89d60618d8467b0eb10c948"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-ld.bfd",
+      "bytes": 1861256,
+      "sha256": "d2766988b6a1b1d1518cdc09242e726d1f24e151e16410ada3092b11ffd9081b"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-as",
+      "bytes": 795184,
+      "sha256": "07dd8551ea0aa065975e4dddb8e1bb7dc308d12d54eca22c3858db79467c7cb9"
+    }
+  ],
+  "flags": "-std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror",
+  "build_attempts": {
+    "helper": 1,
+    "regression": 1,
+    "cache": 1
+  },
+  "all_build_exit_codes": 0,
+  "compile_commands": [
+    "g++ -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror -Iexperiments/joint-smallroot-native/src -I/workspace/skeleton_sage-runtime/include experiments/joint-smallroot-native/tests/guard_qualification.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lgmpxx -lgmp -lcrypto -pthread -o /workspace/native-smallroot-guard-followup-b83007/guard-qualification",
+    "g++ -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror -Iexperiments/joint-smallroot-native/src experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/source/competitor-retention-regression.cpp -o /workspace/native-smallroot-guard-followup-b83007/competitor-retention-regression",
+    "g++ -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Werror -I/workspace/skeleton_sage-runtime/include experiments/joint-smallroot-native/spec/checks/TASK-20261026-1525ac/source/cache-preparation.cpp -L/workspace/skeleton_sage-runtime/lib -Wl,-rpath,/workspace/skeleton_sage-runtime/lib -lcrypto -o /workspace/native-smallroot-guard-followup-b85397/cache-preparation"
+  ],
+  "binaries": [
+    {
+      "path": "/workspace/native-smallroot-guard-followup-b83007/guard-qualification",
+      "bytes": 2004464,
+      "sha256": "9ca4ea5bde491c2470117d7713b7cbe8e001cbc8ebd964f974f84a0f481832c4"
+    },
+    {
+      "path": "/workspace/native-smallroot-guard-followup-b83007/competitor-retention-regression",
+      "bytes": 862288,
+      "sha256": "4f2ae7ac09d815a670204556421e25b52f34b25bd2dfa3edcea252f581980630"
+    },
+    {
+      "path": "/workspace/native-smallroot-guard-followup-b85397/cache-preparation",
+      "bytes": 666296,
+      "sha256": "5615bb5614bce490f39d8e715c77e1ecdae0defd2dad6a67b977acbe3ee31144"
+    },
+    {
+      "path": "/workspace/native-smallroot-guard-build-6374dd/guard-qualification",
+      "bytes": 1991528,
+      "sha256": "2738ade011be6b544d403d58ebe8f2245bbd973e4ce3269aa7f45e5807491c15"
+    },
+    {
+      "path": "/workspace/native-smallroot-guard-build-6374dd/guard-worker",
+      "bytes": 866856,
+      "sha256": "f06e008bb405bbbf11a3f85fafb10fb95e6c781e321ed1e11ffb787721f2afdb"
+    }
+  ],
+  "actual_host_dependencies": [
+    {
+      "path": "/lib/x86_64-linux-gnu/libc.so.6",
+      "bytes": 1995216,
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libdl.so.2",
+      "bytes": 14408,
+      "sha256": "295fa521a03cd2faa99974f378c9e23dd622021ec7d32bcad4f8ea61aec8a872"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "bytes": 182856,
+      "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libm.so.6",
+      "bytes": 977112,
+      "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libpthread.so.0",
+      "bytes": 14408,
+      "sha256": "85e21f7dba0394411d00959176fd18b470e575b0b05f1f4f41e5636802ce0500"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libstdc++.so.6",
+      "bytes": 2497768,
+      "sha256": "972bb2a18b71140dab0240f8a1f68ab3fb1d56bcd4c4f824a91b70888faf5a00"
+    },
+    {
+      "path": "/lib64/ld-linux-x86-64.so.2",
+      "bytes": 225672,
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libcrypto.so.3",
+      "bytes": 7252896,
+      "sha256": "1a8cc605fb88783cc0e69effd9bb1c9fe4b5ddf38aa5f0b0ccdb119298ce89f6"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libgcc_s.so.1",
+      "bytes": 922624,
+      "sha256": "5444fbe71e8cfe3bd05cdf2b44bd8c2e553e6e7e276977089b5e4e1a1ceed531"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libstdc++.so.6",
+      "bytes": 23874544,
+      "sha256": "10f0d3c46c070acd4abea2ccf2500ff0ec77e9b90154b82ea2720dba05510cb9"
+    }
+  ],
+  "retention": "External immutable fresh prefixes; old build retained. No raw ELF Git distribution."
+}

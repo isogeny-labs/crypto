@@ -17,13 +17,22 @@ protocol. The current executable's replay is same-implementation verification.
 | TR-01 | Implemented | Charged known-answer solves: random/progression/twist-run bases, equal B, identical G,Q and tracked random-walk streams; direct BSGS comparator. |
 | TR-02 | Implemented | Exhaust every three-x base over the fixed small fields, average all maximum-score ties, compare canonical and both-sign coverage. |
 | TR-03 | Implemented | Exhaust all finite S3 triples and cross-check complete zero sets using separate curve/twist group additions. |
-| TR-04 | Planned | Fixed-threshold rejection sampling versus random and generic collision-avoiding selection; retain every failed sample and compare to a free tiny-field oracle selector. |
+| TR-04 | Implementation in progress; execution pending | Exact bounded-sampler and relation-rank census under the new [finite protocol](../../research/twist_relations_tr04_20261029/PROTOCOL.md): random/progression/collision-avoiding controls, L=1..4, B=2,3; retain all failed mass. |
 | TR-05 | Planned | Three/four-point decomposition algorithms checked against exact tiny-field solution inventories, including root filtering and all elimination work. No efficient twist-assisted elimination is assumed. |
 | TR-06 | Planned | Target-adaptive bases and target-identifiability stopping: compare independent information gained with newly introduced logarithm unknowns. |
 | TR-07 | Planned | Frozen algorithms on held-out generic curves; cold single-target and genuinely shared-setup workloads, symmetric reuse opportunities for references. |
 
 For TR-04, freeze thresholds before evaluation and impose a finite rejection
 budget. A larger sumset alone does not establish lower complete solve cost.
+The current TR-04 implementation effort has its own machine-readable protocol
+and checkpoint-gated field matrix in the linked study. Its draft is not a
+completed experiment. The seven selector algorithms remain separate from the
+two auxiliary instrument-control fixtures; the canonical export uses nine
+arms by three field instances, with both base sizes retained separately.
+An exact subset-state DP represents every finite IID candidate word, while
+the audit's acceleration is never treated as selector runtime. No free oracle
+selector enters the executed search; an oracle inventory, if used later,
+is explicitly audit-only.
 For TR-05, a complete oracle solution inventory is a correctness tool, not an
 efficient large-field decomposition. Mixed original/twist component labels must
 remain explicit. For TR-06, solve `Ax=c` for k only when the unit row selecting

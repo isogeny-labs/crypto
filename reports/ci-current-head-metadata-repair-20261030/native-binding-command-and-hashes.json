@@ -1,0 +1,34 @@
+{
+  "build": [
+    "rustc",
+    "+1.98.0",
+    "--edition=2021",
+    "-O",
+    "/workspace/crypto-ic-path-events-repair/benchmarks/20261029-ic-aimed-gather/registry-binding-20261030/verify_registry_binding.rs",
+    "-L",
+    "dependency=/workspace/crypto/target/release/deps",
+    "--extern",
+    "serde_json=/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib",
+    "--extern",
+    "sha2=/workspace/crypto/target/release/deps/libsha2-f362a5f3036231ae.rlib",
+    "-o",
+    "/workspace/verify-root-aimed-gather-registry-binding-20261030"
+  ],
+  "build_returncode": 0,
+  "verify": [
+    "/workspace/verify-root-aimed-gather-registry-binding-20261030",
+    "/workspace/root-frozen-aimed-gather-registry-ddaba2819-20261030.json",
+    "/workspace/crypto-ic-path-events-repair/docs/curves/registry.json",
+    "/workspace/crypto-ic-path-events-repair/benchmarks/20261029-ic-aimed-gather/validator-report.json",
+    "/workspace/crypto-ic-path-events-repair/benchmarks/20261029-ic-aimed-gather",
+    "/workspace/crypto-ic-path-events-repair/benchmarks/20261029-ic-aimed-gather/registry-binding-20261030/validator-report.json",
+    "/workspace/crypto-ic-path-events-repair/benchmarks/20261029-ic-aimed-gather/registry-binding-20261030/source-equivalence.json"
+  ],
+  "verify_returncode": 0,
+  "source_sha256": "1d61a6cf9f417f9590ee799ff4ca3d21619d20798a438169a6ae679ffaabceff",
+  "executable_sha256": "d9b1dd700139a0e7bdc20dec3f523b2d89095d41600114922dacb319ba1488f9",
+  "dependency_hashes": {
+    "/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib": "48a9b9e724107bd9a9260771d23fa0e76024261acb177b6da5ab45d5b518d77d",
+    "/workspace/crypto/target/release/deps/libsha2-f362a5f3036231ae.rlib": "af01aa416d74dc16fd1789fe5df59a5c9d5c5201bd5fe2ae4dcbb12016733990"
+  }
+}

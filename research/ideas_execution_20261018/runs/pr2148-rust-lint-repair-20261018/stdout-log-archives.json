@@ -1,0 +1,32 @@
+{
+  "schema": "crypto.exact-stdout-gzip-archive/v1",
+  "reason": "git diff --check flagged intentional blank EOF lines in newly added raw release stdout logs. This is an archive-format issue, not a failed test. No raw bytes were trimmed, old frozen logs altered, tests suppressed or commands rerun.",
+  "compression": {
+    "format": "gzip",
+    "compresslevel": 9,
+    "mtime": 0,
+    "embedded_filename": null
+  },
+  "logs": [
+    {
+      "original_path": "research/ideas_execution_20261018/runs/pr2148-rust-lint-repair-20261018/logs/rust-repair-curve-traits-tests.log",
+      "original_sha256": "01ebfda04a17009d9f8362ec30431e66b6df8f7056b2ace2323953b6d9fcebf7",
+      "original_bytes": 3949,
+      "archive_path": "research/ideas_execution_20261018/runs/pr2148-rust-lint-repair-20261018/logs/rust-repair-curve-traits-tests.log.gz",
+      "archive_sha256": "ad95d5eea3ff81d6f80ac5e4b14d3ffd83ada151fd691f4eeda07050cd293fe7",
+      "archive_bytes": 1120,
+      "decompressed_sha256": "01ebfda04a17009d9f8362ec30431e66b6df8f7056b2ace2323953b6d9fcebf7",
+      "decompressed_bytes_equal_original": true
+    },
+    {
+      "original_path": "research/ideas_execution_20261018/runs/pr2148-rust-lint-repair-20261018/logs/rust-repair-example-tests.log",
+      "original_sha256": "c39f0cb6aa8f56bd20fc077e116995c3a3cb6e8926c4132b4876ffd51140a12d",
+      "original_bytes": 1135,
+      "archive_path": "research/ideas_execution_20261018/runs/pr2148-rust-lint-repair-20261018/logs/rust-repair-example-tests.log.gz",
+      "archive_sha256": "b365dbd30b91352ef59cc93c0ab908052eaf69066360f2e765ce7c7dfd00ad83",
+      "archive_bytes": 473,
+      "decompressed_sha256": "c39f0cb6aa8f56bd20fc077e116995c3a3cb6e8926c4132b4876ffd51140a12d",
+      "decompressed_bytes_equal_original": true
+    }
+  ]
+}

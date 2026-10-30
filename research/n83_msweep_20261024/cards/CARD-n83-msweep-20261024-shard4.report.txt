@@ -1,0 +1,13 @@
+Result: the card run did not complete, and I did not rerun it, because the frozen-command rules forbid rerunning `run`.
+
+Command: `python3 tools/task_card.py run research/n83_msweep_20261024/cards/CARD-n83-msweep-20261024-shard4.yaml`, started in the background from `/home/user/crypto`.
+
+Verbatim output (the full captured output, from `/tmp/claude-0/-home-user/be4726a6-6887-5b0f-a70f-09baacd976f4/tasks/btt1f3khv.output`):
+
+```
+[killed]
+```
+
+The tool printed no summary, no `IMPEDIMENT` line and no exit status. The harness stopped the background command at its background time limit. The Python process (PID 11232) later exited, but no completion or exit status was captured. Whether the card's commands finished, and whether a receipt was written, is unknown from my side. I did not inspect `research/n83_msweep_20261024/receipts/` or `raw/`.
+
+Status: stopped, incomplete. Not `refused`, because the tool never returned exit 2. The Coordinator needs to decide whether to rerun the card with a longer background timeout, which is a separate dispatch.

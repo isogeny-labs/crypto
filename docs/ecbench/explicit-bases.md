@@ -229,3 +229,446 @@ a managed exec session launched the one recorded pod after reconciliation.
 The shared daily log remains reserved by T-827, so this scoped handoff carries
 the entry under Conductor T-861. AWS quota blocks are historical and no longer
 block this completed device validation.
+
+## Normalization optimization — 2026-10-29 Pacific
+
+### What was done
+
+Implemented a CUDA product-tree block inverse, retaining old-scan and CUB
+reference builds. Ran the frozen four-arm panel on RunPod pod 1lq0cd2l0en5ju:
+120 complete rows, identical cross-arm outputs, independent CPU witness
+checks, and zero memcheck/racecheck/synccheck errors. The pod was deleted.
+Committed the frozen protocol, native instrument/analyzer and raw records;
+[the report](../../research/explicit_relations_perf_20261030/RESULTS.md)
+records exact sources, hashes, diagnostics and limitations.
+
+### Decisions made
+
+Use the product tree by default: it preserves outputs while reducing the
+normalization inversion-preparation count from 4608 to 765 multiplies/block.
+Keep timings as L0 diagnostics. The observed kernel change did not establish
+an end-to-end speedup; query/cold costs and A/A ranges remain in the report.
+No leaderboard or scientific claim is promoted from this software panel.
+
+### Open threads
+
+Chunk synchronization and repeated right sums are next optimization targets;
+respect explicit memory caps and deterministic witness order. Root/ecbench
+integration and the separate GPU tensor backend remain outside this run.
+
+### Errors
+
+The initial export adapter needed its native passed label mapped to the
+schema's verified label. A metadata-only corrected export withdraws an
+unobserved unmasking timestamp; raw rows are unchanged. A concurrent Git
+staging attempt hit the index lock and was retried after the first commit
+finished; the frozen protocol was verified committed before the GPU launch.
+Conductor T-863 replaced the expired/cancelled T-862 reservation.
+
+## Query transfer optimization — 2026-10-30 02:24 UTC
+
+### What was done
+
+Implemented radix-packed deterministic query winners, overflow fallback and
+device-side reset. This removes the match buffer for encodable batches and
+the extra witness readback without changing explicit chunk/work limits.
+Added repeated-query/prepare, empty-plan, chunk-tail and integer-boundary
+regression checks to `make test-cuda`. RunPod pod `bbrl08j1o8gizz` executed
+pinned source `68be1081e696c232881b2da8d864d93b297e5092`: all 120 fixed rows,
+host/CUDA/reduction tests, 10 Rust tests, Clippy and all three sanitizers passed.
+The pod was deleted, archived evidence was downloaded back with matching
+SHA-256, and the temporary local credential was removed. The checked export,
+full ranges and inspected PDF are in the new
+[query study](../../research/explicit_relations_query_20261030/RESULTS.md).
+
+### Decisions made
+
+Keep the new path as default with the previous array path for unencodable
+radix products. The observed query medians fell by 14.24%, 18.43% and 5.81%
+on the three fixed sizes; these remain descriptive L0 observations. Query
+API payloads fell from 80 to 32 bytes on each small case and 800 to 392 on
+the largest, excluding preparation and physical bus framing. Preserve A/A
+variation and preparation/cold outliers; no leaderboard claim is promoted.
+
+### Open threads
+
+Repeated right-side tuple construction is the next optimization target;
+charge caching to preparation and explicit memory limits under a new frozen
+panel. No further GPU run is scheduled. Root integration, general paper
+reduction and the GPU tensor backend remain outside this change. PR #2896
+contains both optimization stages; check current-head CI separately.
+
+### Errors
+
+No device/compiler/sanitizer failure occurred. The canonical CSV adapter
+requires mapping native `passed` to schema `verified` in export metadata;
+the completed export has zero checker findings and raw data is unchanged.
+GitHub's artifact migration may move large validation logs to its manifest;
+retain that commit and verify the manifest against the archived log. The
+shared daily log remains reserved, so this scoped handoff is under T-869.
+
+## Full recovery scaling — 2026-10-30 04:54 UTC
+
+### What was done
+
+Removed the standalone reduction's exhaustive tiny-field restriction with
+an exact prime-order/Hasse witness, Tonelli–Shanks roots, checked wide
+products, deferred dependency reconstruction and sparse certificate replay.
+The default tiny constructor and 512-column cap remain. Explicit driver
+arguments admit larger work/column bounds. Protocol-v3 ran all44 prescribed
+cells on one RTX PRO6000:40verified recoveries through52bits and4retained
+56-bit timeouts. Protocol-v4 added bounded high-x-bit table indexing and
+completed both56-bit targets and identical repeats in212–232s including
+audit; all4attempted58-bit cells hit explicit work limits. Both pods are
+deleted, with content-hashed archives and raw records committed under
+`research/explicit_relations_e2e_20261030/results-v3` and `results-v4`.
+
+### Decisions made
+
+The52-bit stage records put almost all cost in relation search, so the next
+change reuses two right-side partial sums, each bounded by chunk_rows, with
+all setup and storage charged. Preserve the uncached prefix path as a build
+reference and the exact witness/visited ordering. Frozen protocol-v5 compares
+at52bits and probes56/58/60 with both public targets, explicitly raising
+max_rows to2^30 and max_work to2^31. The prior2^29 row cap forced a highly
+unbalanced58-bit split; its failure was not a nonexistence result.
+
+### Open threads
+
+V5sourcef6338418572c72e1bf97ad24903cd5efd17cf7da is running on RunPod
+9fil2lhphdymz0, controller session69390, local launch bundle
+`/home/ec2-user/ecbench-e2e-20261030-v5`. Reconcile that exact job before any
+launch. One GPU, worker4500s/controller4800s; collect the archive and verify
+deletion. The report draft coversv1–v4; appendv5, render and inspect every PDF
+page before publication. PR2896 remains the delivery PR; exact-head CI and
+runtime validation are separate. No GPU tensor backend, matched rho result,
+fastest-tool status or certified speedup is claimed.
+
+### Errors
+
+V1joined two wrapper commands and failed before compilation. V2passed
+preflight but failed compiling the native chart analyzer; neither produced
+ladder data. Both failures and immutable protocols remain. CI found a
+manual-divisibility lint in the wide constructor; it was fixed. Canonical
+export schema/flow/hash checks pass, but its protocol-aware coverage check
+assumes rectangular panels and retains3findings forv3 and5forv4. The frozen
+native analyzers verify the explicitly nonrectangular contracts and stopping
+rules; this is not a full canonical checker pass. A concurrent staging
+attempt hit index.lock; it was retried after the active commit completed,
+without removing a lock or rewriting history. Artifact-bot migrations are
+preserved and checked against archived log hashes. T884owns this continuation;
+T882was released after its implementation phase. The shared daily log remains
+outside this task's scope, so this is the committed project handoff.
+
+## 2026-10-30 05:58 UTC — compact-row continuation
+
+### What was done
+
+V5 completed ten executions: nine independently replayed recoveries and one
+58-bit timeout. The largest two-target rung was 56 bits; seed 101 recovered
+at 58 bits in 595.862060 seconds cold, while seed 202 reached 600 seconds.
+Raw records, archive hash and verified deletion are committed under
+`research/explicit_relations_e2e_20261030/results-v5/`.
+
+Exact x/parity compression now provides an opt-in 16-byte table row instead
+of 32 bytes, retaining original tuple IDs and deterministic witnesses.
+`make cuda-compact ARCH=sm_120` selects it. Full/cached/compact service builds,
+13 Rust tests, reduction replay, exhaustive compact/full lookup checks and
+query sanitizers passed on RTX PRO 6000. The corrected maximum row-cap
+header also passed in the active retry before timing began.
+
+Separate post-run audits validate the earlier 120-row normalization/query
+panels and v3/v4/v5 frontier coverage. Their regression controls reject
+missing and duplicate executions, wrong inputs/flags and truncated successful
+prefixes. Frozen analyzers and measurements are unchanged. Unadmitted
+benchmark visual copies and a clearly labeled catalog link are committed;
+the admitted benchmark table remains byte-identical.
+
+### Decisions made
+
+The cache showed no matched 52-bit timing benefit, so it remains opt-in.
+Compact storage is exact on a fixed validated odd-prime curve (SEC 1 v2,
+section 2.3.3), not a probabilistic key. New protocol-v7 keeps the v6 fixtures,
+arms and explicit limits, while correcting the service-header cap. Only one
+task GPU runs at a time. All clocks remain L0 diagnostics; no external-tool,
+matched-rho or conditional tensor-contraction result is claimed.
+
+### Open threads
+
+V7 pod `ex8tm7votw4h4g` is active, controller session `16482`, local bundle
+`/home/ec2-user/ecbench-e2e-20261030-v7`, pinned source
+`4014622e18caef9a6b6c89d79653e7633f5aaaff`. Reconcile it before any launch.
+The six 52-bit cells and both 56-bit targets passed; 58/60-bit outcomes are
+pending. Collect the complete archive, verify deletion, run the strict
+frontier audit and publish raw records before the final inspected report.
+The draft report covers v1–v6; its final chapter and benchmark copies await
+v7. T894 owns this continuation; T895 owns the visual catalog. The shared
+progress exporter remains reserved by T890 and has not been edited.
+
+### Errors
+
+V6 passed preflight but failed its first solver header: the protocol requested
+2^31 rows while the service still enforced 2^30. No CSV data row was recorded.
+The failed archive and deletion receipt remain in `failed-launch-v6/`.
+Source 4014622 adds consistent cap admission, boundary tests and actual header
+preflight under a new frozen protocol. The initial push was rejected after
+an artifact-bot update; that update was merged without rewriting history,
+and moved log/PNG hashes were verified. Canonical rectangular-coverage
+findings remain disclosed; the separate audit verifies the actual frozen
+nonrectangular plans. The separate CPU tensor implementation and its open
+independent audit are documented in `problems/hashed-ecdl-tensor-backend.md`;
+this CUDA service does not port that backend.
+
+## 2026-10-30 06:24 UTC: larger prefix index prepared
+
+### What was done
+
+Reconciled the active v7 pod without launching another GPU. Both 58-bit
+public targets passed recovery and fresh replay; 60-bit outcomes remain
+pending. Merged remote CPU work already delivered through PR2933 without
+rewriting evidence. The v7 source stays4014622; the merged CPU changes are
+not retroactively GPU-validated by that run. Added optional ER_WIDE_INDEX,
+a 2^24-bucket ceiling with actual storage charged to admission, and exact
+CPU/device offset and lookup boundary tests. Host syntax and Rust instrument
+metadata checks passed; CUDA validation remains pending.
+
+### Decisions made
+
+Relation lookup dominates the observed large-field stage clocks. The next
+matched52-bit panel changes only the index ceiling on identical16-byte rows
+and the same driver, then probes56/58/60bits. Frozen v8 hash
+fd8bf698d02f02bea73c7ed46c4b55e039ee62927e4f18fa74165b691afc793c;
+worker9000/controller9300seconds,60-bit solve1800seconds. No new GPU before
+v7 collection and verified deletion. Field61/62 widening was assessed but
+not implemented; no task or run for that arithmetic change exists.
+
+### Open threads
+
+Collect v7; preserve every outcome and archive; validate optional wide index
+and the merged CPU driver on the next single RTX PRO6000. Publish raw data
+before the final inspected report and benchmark copies. The progress exporter
+is now reserved by T901, so its shared file remains untouched.
+
+### Errors
+
+The first draft v8 schema check rejected its absent freeze block. Added the
+required draft block, validated and froze it before any affected data. This
+was a metadata preparation error, not a GPU launch.
+
+## 2026-10-30 06:48 UTC: compact-table frontier collected
+
+### What was done
+
+V7 completed12 prescribed executions: ten verified recoveries through both
+58-bit targets and two60-bit timeouts at1200seconds. Exact58-bit cold times
+were489.753544246 and530.119796136seconds. Both60-bit tables admitted:
+1,202,274,400/1,025,758,188 left rows with conservative allocations
+57,709,730,784/49,236,951,816bytes. These were time limits, not memory refusal.
+Archive SHA25601cd78dbd5cb64410d0c02ba12473964683299f42702a7c5cb46a8f4b7c37891
+matched. Worker/controller exited0 and podex8tm7votw4h4g deletion was verified.
+Public receipts were uploaded; the key remains only in v8's restricted binding.
+
+### Decisions made
+
+Retain58bits as the largest complete rung in v7. All six52-bit matched
+certificates agree; full32-byte cold times37.660575827/40.318152374seconds
+and compact16-byte candidate29.427842022/31.972280910seconds are L0
+observations. Keep every timeout. Continue only with the separately frozen
+v8 larger-index comparison, pinnedbbf0f2f51e73, after raw publication.
+
+### Open threads
+
+V8 request is prepared, no pod created yet. T910owns the wider-index phase.
+Final inspected report and benchmark copies will include both panels.
+The shared driver source is reserved by T906; wider-field arithmetic remains
+unmodified. The progress exporter is reserved by T901.
+
+### Errors
+
+Canonical schema/flow/file hashes pass. The protocol-aware checker reports
+four rectangular-coverage findings; CHECKER-NOTE.md preserves them. Frozen
+native analysis and separate strict audit pass the actual12-cell contract
+and reject corrupt coverage. No failed execution is counted as a recovery.
+
+
+## 2026-10-30T14:56Z — completed 60-bit panel
+
+### What was done
+
+Collected v8 on source bbf0f2f51e73afd7e41174094feb2c56a72d3d9d: all 12
+prescribed executions recovered, including both 60-bit targets. Fresh CPU
+replay, wrong-scalar rejection and matched-arm byte equality passed. Archived
+results SHA-256 f8924a3418fd268f0f8492f260b8e7fda66616017e1b60fc84488342a98e7d10;
+controller/worker exited zero and royvvmmehidtwt deletion was verified.
+Public receipts were uploaded and task credential/request files removed.
+Raw results committed before final report generation. The seven-page v1-v8
+report was visually inspected; complete graphs and browsing copies accompany it.
+
+### Decisions made
+
+Retain all prior failures and timeouts. Wide indexing remains explicit opt-in.
+The 60-bit cold solves were 770.270416129 and 845.179937170 seconds; L0 clocks
+remain descriptive. Current source includes separately merged CPU work, so
+v7/v8 timing differences do not isolate one change. Extend the existing T-906
+field-width task only after this completed panel is safely published.
+
+### Open threads
+
+Fields 61/62 need reviewed hash/driver arithmetic and a separately frozen
+single-device admission/recovery probe. No hardware maximum, matched rho,
+fastest external solver, GPU tensor backend or independent scientific
+validation is established. Current-head CI remains a separate check.
+The new progress-metadata reader emits 20 exact metrics in 3.563 seconds;
+the entire pre-existing exporter reached a 55-second administrative timeout
+before the new function on this storage, so its full runtime requirement is
+not claimed passed.
+
+### Errors
+
+System Python lacked the schema validator API; the established tools venv
+passed schema/flow/hashes. Four canonical rectangular-coverage findings remain
+recorded, while the exact native analyzer and eight-mutation strict audit pass.
+An initial sparse git add excluded tools/progress_metrics.py; it is staged
+explicitly with --sparse in the subsequent metadata commit. A ready T-906
+reservation was initially mistaken for another live worker; inspection and
+successful claim resolved it without overriding ownership.
+
+## 2026-10-30T15:06Z — bounded wider probe and exporter runtime repair
+
+### What was done
+
+Committed/pushed e1a38ce4bc586050c3faa67a3ab79f312eb549b5 with p<2^62,
+r<2^63 and checked hash s<2^63. Frozen v9 hash
+bf1e4a2dddbfdadb2cb8de32a0c659bbcdd528cc2851c63864c66d009f4e5142
+was committed before launching pod nd5qev6envru7z at 15:02:46UTC. One full
+RTX PRO6000 in US-NC-1 at catalog2.49USD/hour, pinned CUDA image; worker18000s,
+controller18300s, single-object upload expires after21600s. Existing unrelated
+pods were inspected and left untouched. All19 Rust tests and initial CUDA,
+Clippy/memcheck controls passed; first52-bit execution succeeded. Larger
+outcomes remain pending. No second taskGPU is authorized concurrently.
+
+### Decisions made
+
+Preserve fast Montgomery hashing below2^62; use exact canonical add/double
+only for wider hash moduli. Retain25%free-memory reserve and conservative
+sort admission. The new row cap2^32 allocates no memory by itself. Frozen
+52-bit controls precede two fixed61/62-bit targets; stop after the first
+incomplete rung, recording every refusal/timeout.
+
+### Open threads
+
+Collect, hash, replay-audit, export and report v9; verify deletion before
+any further GPU launch. Its source is distinct from the completed v8 record.
+Current-head CI and independent scientific review remain separate.
+
+### Errors
+
+The full progress exporter previously exceeded55s due to repeated Git
+processes. Persistent cat-file reads now preserve exact git-show bytes,
+missing-source behavior and cleanup. Default command with --since2026-10-01
+passed in24.17s; HEAD export also passed within55s with675records. The prior
+runtime limitation is resolved for these observed checks, not hidden.
+
+## 2026-10-30T15:49Z — 61-bit result and queried-sort follow-up
+
+### What was done
+
+V9 completed with eight executions: seven verified recoveries and one explicit
+memory refusal. The 61-bit seed202 recovery took1537.918072841s including fresh
+verification (L0 diagnostic). Seed101 refused admission at85969611408bytes;
+62-bit cells were unattempted by the frozen stopping rule. Raw artifacts and
+strict eight-mutation audit are committed in6e850f7dfc14. Pod nd5qev6envru7z
+was deleted and its absence was independently rechecked before continuation.
+PR2896 merged; remaining changes will be delivered in a follow-up PR.
+
+### Decisions made
+
+V10 remains frozen but unexecuted. V11 retains separate four-arm52-bit controls
+for exact12-byte rows and queried CUB DeviceMergeSort scratch, then probes the
+same two61/62-bit targets once. NVIDIA CCCL3.2 dispatch source confirms null
+scratch sizing includes keys, partitions and virtual shared memory. The same
+25%free-memory reserve remains. No default backend promotion or certified
+speedup claim is made. Protocol hash:
+0f916e48bea43b0b7dabb85bc8cb50fe0d31c2a268aa89c016e1df6b46a0a09e.
+
+### Open threads
+
+Commit/push v11 before launch; checkpoint; validate CUDA and all sanitizer
+controls on one RTX PRO6000, then collect every outcome and verify deletion.
+V9's largest complete prescribed rung is52bits, with one61-bit recovery;
+the separate v8 panel completed both60-bit targets. Absolute hardware maximum
+and the paper's conditional tensor backend remain unresolved.
+
+### Errors
+
+No v11 GPU execution yet. Local host syntax, shell syntax and both native
+metadata compiles passed; local root/plugin builds remain prohibited by the
+user's disk constraint. The standard dated log is absent in this sparse
+branch; this existing scoped project handoff preserves the required headings.
+
+## 2026-10-30T15:54Z — v9 report and v11 execution
+
+### What was done
+
+Published a separate two-page v9 observation report, preserving the earlier
+seven-page v1-v8 report. Both new pages were visually inspected; SVG/PNG/PDF
+catalog copies are hash-bound and explicitly unadmitted. The post-run strict
+checker now recognizes v11's four-arm52-bit and v-only61/62-bit contract;
+existing v9 positive and eight mutation controls still pass.
+
+### Decisions made
+
+V11 source d44b59149f468357e86186f956ecb7e323f38915 was pushed and checkpointed
+before pod jees49ew9dkfd7 launched15:50:53UTC at2.49USD/hour inUS-NE-1. It is
+one RTX PRO6000 with97887MiB reported by nvidia-smi, CUDA13.2.51, Rust1.88.0.
+Controller exec90595 collects and deletes with its18300s bound. New PR2971
+is open with auto-merge enabled; PR2896 is merged. GPU preflight is in progress.
+
+### Open threads
+
+Collect/audit/export every v11 outcome, verify deletion, remove private request
+and credential, publish raw data before its report, and recheck exact-head CI.
+The protocol is unchanged after launch. No v11 recovery claim yet.
+
+### Errors
+
+The first report render interpreted an unescaped less-than sign as a Typst
+label; corrected to code markup and both final pages rendered and inspected.
+CUDA emits ignored defaulted-constructor annotation warnings; no failure has
+been observed so far. PR attachment tool calls remain pending in the app.
+
+## 2026-10-30T16:06Z — optional GPU-resident query prototype
+
+### What was done
+
+T940 holds the GPU source and this handoff. Added an optional persistent
+right-search grid, exact two-stage minimum witness resolution, a24-byte result
+readback and actual search-visit accounting. The ordinary chunked path stays
+available. Tests force a two-block grid, multi-stride late matches, complete
+misses, partial tiles, resets and empty reprepare. Host syntax passed; the first late-hit fixture constructor failed because
+its row cap also bounded input-base size. A corrected explicit unbalanced
+split is checked in the following repair; CUDA validation remains pending. Updated README
+arithmetic guards to match the already validated v9 source.
+
+### Decisions made
+
+NVIDIA grid-stride guidance and CUDA device-scope atomic memory semantics
+were read before implementation; links and correctness argument are in
+PERSISTENT-QUERY.md. No cross-block wait or occupancy requirement is introduced.
+The active v11 remains pinned to d44b59149f46 and is unaffected by these edits.
+A separate frozen matched panel must precede any timing or backend promotion.
+
+### Open threads
+
+V11's eight52-bit control solves verified. Both61-bit outcomes remain pending.
+Prepare a separately bounded persistent-query validation after collection and
+deletion; never launch a concurrent taskGPU. Preserve every failed attempt.
+
+### Errors
+
+Full HEAD progress export twice hit55s on the shared workspace; a scoped
+committed GPU export completed in7.76s with all24metrics including v9 counts.
+A default-ref diagnostic invocation completed successfully within55s. Moving
+the script outside sparse checkout first lacked its repository selector;
+PM_REPO_PATH fixed that administrative invocation. No metrics source change
+was made, and no failed invocation is treated as a pass.

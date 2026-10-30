@@ -1,0 +1,28 @@
+card_id: CARD-n83-msweep-20261024-shard4
+relay_verbatim: not_checkable   # check-relay reported relay_verbatim=false only because "no receipt: the card never ran"; no card receipt exists, so there is nothing to recompute against (applicable=true, missing_lines=[])
+outcome: stopped
+stopped_at_step: run-shard4
+recommendation: rerun_after_infrastructure_fix   # the executor text says the background command was killed at its time limit with no exit status; the card's must_not_exist guard on raw/shard4 now blocks a rerun of the same card, so a new card is needed
+execution_class: partially_executed   # 1 of 1 command started; no exit status recorded; 9 cell files complete, a 10th interrupted
+per_command:
+  run-shard4:
+    on_disk: interrupted
+    evidence:
+      - raw/shard4 holds 9 *.json cell files (counted with find), and 9 of them have status process_cap (read by key)
+      - raw/shard4 holds one in-progress pair n83k1__m6__union-2__chain-s3-orbit-ordered__public.json.tmp and .err, both 0 bytes, with no .json
+      - receipts/ directory does not exist, so the card's stdout and stderr files shard4.stdout and shard4.stderr were never created
+      - executor report: output "[killed]", no summary, no IMPEDIMENT line, no exit status; "stopped, incomplete"
+      - no process with n83_msweep_cell or run_shard in its command line is alive now
+checks:
+  card_receipt_exists: false
+  receipts_dir_exists: false
+  relay_checked_by_tool: "python3 tools/task_card.py check-relay ... --report ...shard4.report.txt exited 1: relay_verbatim=false, verify_findings=[no receipt: the card never ran]"
+  report_file_written_exactly: true
+  only_card_argv_ran: not_determinable from disk (no receipt)
+  write_scope: not_checked beyond raw/shard4 and cards/ listing
+reasons:
+  - "The executor report states the command was killed at the background time limit; no exit status of 0, 2 or 3 and no IMPEDIMENT line is on record."
+  - "The card was not executed to completion: raw/shard4 holds a 0-byte .tmp/.err pair for the m6 union-2 chain-s3-orbit-ordered cell with no .json."
+  - "No receipt exists, so exit codes and verbatim relay of the executor text cannot be checked; those fields are not assessed rather than assumed."
+  - "The counts above were taken by the director from disk."
+interpretation: not_assessed

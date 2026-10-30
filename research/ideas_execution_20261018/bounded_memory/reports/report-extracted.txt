@@ -1,0 +1,139 @@
+Bounded-memory Boolean Macaulay passes
+
+Execution record, 18 October 2026. Items 7 and 9; public synthetic inputs.
+Eight degree-4 passes on actual chained S3 Weil-descended systems completed. Four small controls agreed exactly
+with an independent dense bit-matrix RREF. The larger passes remain independently unveried. This is a xeddegree row-reduction result, not full F4, iterative closure, solving degree, or an ECDLP cost result.
+ℓ
+
+5
+9
+15
+17
+
+2
+3
+5
+6
+
+Variables
+18
+30
+50
+58
+
+Rows / rank
+1,050 / 987
+4,752 / 4,648
+20,670 / 20,490
+31,110 / 30,888
+
+Disk-backed Boolean Macaulay passes
+
+Recorded forward-echelon rank (rows)
+
+Fixed degree D=4 row spaces
+30000
+
+first
+min-weight
+
+25000
+20000
+15000
+10000
+5000
+0
+
+20
+
+25 30 35 40 45 50 55
+Boolean variables N (one target per shape)
+
+Dense RREF control
+Exact equality, both policies
+Exact equality, both policies
+256 MiB reference limit refused
+Open on diagnostic continuation
+
+run 20261018 native-v2 + continuation-v1
+Recorded committed sparse entries per XOR (count)
+
+n
+
+60
+
+Deterministic legal pivot controls
+
+109
+
+first
+min-weight
+
+108
+107
+106
+105
+20
+
+25 30 35 40 45 50 55
+Boolean variables N (one target per shape)
+
+60
+
+One target [17]G per shape and policy; K1 curves over F2n , polynomial-basis subspaces, m = 4, D = 4. Graph
+values are native recorded counters. Large-case ranks are engine observations, not independent certicates.
+Sparse-entry counters cover committed checkpoint history and exclude rolled-back sux work; they establish no
+full-cost speed comparison.
+The n=5 zero-cache and row-31 checkpoint/restart controls returned the same independently certied RREF.
+One hundred seeded native arithmetic/oracle controls passed. Truncated streams, inadequate output disk, restart
+input SHA mismatch, and the n=19/ell=7 layout requiring 66 variables failed closed. The current exporter is
+limited to 64-bit monomials.
+The original native-v1 launches exited 127 because /usr/bin/time was unavailable; no scientic binaries ran in
+that attempt. A native wait4 launcher replaced it and enforced a 536,870,912-byte child address-space ceiling.
+Initial n=15 runs reached EOF before the dense oracle's 256 MiB allocation guard refused them. Initial n=17 runs
+reached their 64 MiB trace cap. Copies of checkpoints/journals were continued in fresh directories, preserving
+original failures.
+
+1
+
+Scope, accounting and evidence
+
+The pivot cache has an explicit 1,048,576-byte row-payload limit with LRU eviction. Index/LRU metadata
+and temporary rows add overhead; the process-wide address-space limit bounds total address space. Journal
+and trace caps are 1 GiB and 64 MiB per phase. Row-size guards allow 16 MiB of terms; temporary XOR
+vector reservations may use 32 MiB before the guard. The reducer is serial and disk-backed. There is no GPU,
+distributed executor, or incumbent-oracle integration.
+Per-process CPU, wall time and peak RSS are recorded separately for every launch in resources.json les. The
+host was shared (isolation tier 0). Initial n=15 rst/minimum-weight runs recorded 26,932/27,048 KiB peak
+RSS. Build, export, generation, failed attempts, verication, copied state and resumed reductions are separate
+phases. Journal counters omit index reconstruction/input reads and rolled-back sux work; process resource
+records retain their executed costs. No matched external engine or full pipeline/rho comparison was run.
+The policy hooks allow only choosing between rows with the same leading monomial. First-pivot and minimumweight controls log lead, row index, incoming and pivot weight, replacement action, and feature/decision timer
+counts. No learned model, training/calibration/heldout split, charged training experiment, learned column policy
+or heldout transfer result exists in this deliverable.
+Checkpoints ush journal data before atomically renaming metadata, binding input SHA256, policy, cache size,
+next input oset, journal boundary and counters. The tests establish the stated process restart and input-identity
+checks; power-loss/fsync durability and arbitrary journal-corruption handling remain open.
+Item 7 remains partial: canonical frontier ell=6/7 and guess-count ell=8/9 closure trials, full F4/MutantXL
+scheduling, certied large-case replay and distributed/GPU kernels remain outstanding. The selected n=17/ell=6
+cell is a diagnostic, not a substitution for a canonical frozen frontier requirement. Item 9 has deterministic legal
+hooks only. No solving-degree, deployed-security or fastest-engine claim is made. Canonical leaderboard and
+solving-degree plots stay unchanged.
+The study directory is research/ideas_execution_20261018/bounded_memory/.
+Frozen protocols precede their respective trial scripts. Runs native-v1, native-v2 and large-continuation-v1 retain
+exact argv, UTC times, exits, raw stderr, resources, input/source/binary/dependency digests, checkpoints and
+traces. Input metadata binds eld structure, target coordinates, subgroup order and subspace basis. Gzip archives
+preserve raw record contents; SHA256 manifests refer to their uncompressed basenames. Full observations and
+links are in REPORT.md and README.md.
+
+Reproducible evidence.
+
+Pinned source base: e063d98475589d9aba7ae265a8cba830927e3156, with root-agent library build
+repairs. The ANF builder and row family are from src/cryptanalysis/koblitz_groebner.rs; the existing
+sparse control context is sparse_macaulay.rs. Full F4 semantics in pq_f4_f2.rs are explicitly outside this
+standalone reducer. No library core is edited here.
+Sources.
+
+2
+
+

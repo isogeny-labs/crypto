@@ -1,0 +1,1129 @@
+{
+  "claim_ceiling": "Deterministic formula-model regression reproduction; no timing or security claim",
+  "current_measured_cantor_model": {
+    "best_route": 3,
+    "family": "binary",
+    "field": {
+      "degree": 304,
+      "kind": "binary",
+      "log2_base": 304.0,
+      "log2_size": 304.0
+    },
+    "icv1": "ICV1:f2m-304-1b812216:-1949050066876782037155448244017940336576672053:32592575621351777380295131014550050576823494300604030077055029226825549040231327635511030070:0xe94cd000c1f1012c27c47de234f525556965fca8774276731fb00f70a04fef673514b3e30da6:unk:unk:r:02fbe0891c08",
+    "reference_log2": 160.226,
+    "routes": [
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                153.493
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 153.493,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 153.493,
+          "log2_transfer": 16.395,
+          "ratio_log2": 6.733
+        },
+        "destination": {
+          "field_bits": 16.0,
+          "genus": "1",
+          "log2_genus": 0.0,
+          "log2_order": 16.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 1,
+          "base_degree": 16,
+          "cover_degree_log2": 1,
+          "magic_number": 1,
+          "mmt_condition_8": true,
+          "relative_degree": 19,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^16), N = 19 * 16",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here",
+          "sqrt(b) lies in the subfield: E is defined over GF(2^l) and the descent is the trace map onto E(GF(2^l)), which cannot carry the subgroup"
+        ],
+        "transport": "degenerate"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                162.683
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                173.437
+              ],
+              [
+                "enge_gaudry_smoothness",
+                315.949
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 162.683,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 162.683,
+          "log2_transfer": 17.395,
+          "ratio_log2": -2.457
+        },
+        "destination": {
+          "field_bits": 152.0,
+          "genus": "2",
+          "log2_genus": 1.0,
+          "log2_order": 304.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 2,
+          "base_degree": 152,
+          "cover_degree_log2": 2,
+          "magic_number": 2,
+          "mmt_condition_8": true,
+          "relative_degree": 2,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^152), N = 2 * 152",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                155.95
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                22.704
+              ],
+              [
+                "enge_gaudry_smoothness",
+                27.956
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 22.704,
+            "log2_leading": 9.0,
+            "solver": "hyperelliptic_index_calculus"
+          },
+          "exponent_ratio_log2": 135.005,
+          "log2_search": null,
+          "log2_total": 22.74,
+          "log2_transfer": 17.395,
+          "ratio_log2": 137.487
+        },
+        "destination": {
+          "field_bits": 8.0,
+          "genus": "2",
+          "log2_genus": 1.0,
+          "log2_order": 16.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 2,
+          "base_degree": 8,
+          "cover_degree_log2": 2,
+          "magic_number": 2,
+          "mmt_condition_8": true,
+          "relative_degree": 38,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^8), N = 38 * 8",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                165.09
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                160.259
+              ],
+              [
+                "enge_gaudry_smoothness",
+                165.949
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 160.259,
+            "log2_leading": 133.0,
+            "solver": "hyperelliptic_index_calculus"
+          },
+          "exponent_ratio_log2": 11.005,
+          "log2_search": null,
+          "log2_total": 160.259,
+          "log2_transfer": 19.395,
+          "ratio_log2": -0.033
+        },
+        "destination": {
+          "field_bits": 76.0,
+          "genus": "8",
+          "log2_genus": 3.0,
+          "log2_order": 608.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 4,
+          "base_degree": 76,
+          "cover_degree_log2": 4,
+          "magic_number": 4,
+          "mmt_condition_8": true,
+          "relative_degree": 4,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^76), N = 4 * 76",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                158.357
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                33.843
+              ],
+              [
+                "enge_gaudry_smoothness",
+                28.479
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 28.479,
+            "log2_leading": 15.304,
+            "solver": "enge_gaudry_smoothness"
+          },
+          "exponent_ratio_log2": 128.701,
+          "log2_search": null,
+          "log2_total": 28.482,
+          "log2_transfer": 19.395,
+          "ratio_log2": 131.744
+        },
+        "destination": {
+          "field_bits": 4.0,
+          "genus": "8",
+          "log2_genus": 3.0,
+          "log2_order": 32.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 4,
+          "base_degree": 4,
+          "cover_degree_log2": 4,
+          "magic_number": 4,
+          "mmt_condition_8": true,
+          "relative_degree": 76,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^4), N = 76 * 4",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                173.486
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                783.816
+              ],
+              [
+                "enge_gaudry_smoothness",
+                334.361
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 173.486,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 173.486,
+          "log2_transfer": 23.395,
+          "ratio_log2": -13.259
+        },
+        "destination": {
+          "field_bits": 38.0,
+          "genus": "128",
+          "log2_genus": 7.0,
+          "log2_order": 4864.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 8,
+          "base_degree": 38,
+          "cover_degree_log2": 8,
+          "magic_number": 8,
+          "mmt_condition_8": true,
+          "relative_degree": 8,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^38), N = 8 * 38",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                166.753
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                741.083
+              ],
+              [
+                "enge_gaudry_smoothness",
+                74.896
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 74.896,
+            "log2_leading": 58.107,
+            "solver": "enge_gaudry_smoothness"
+          },
+          "exponent_ratio_log2": 85.898,
+          "log2_search": null,
+          "log2_total": 74.896,
+          "log2_transfer": 23.395,
+          "ratio_log2": 85.33
+        },
+        "destination": {
+          "field_bits": 2.0,
+          "genus": "128",
+          "log2_genus": 7.0,
+          "log2_order": 256.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 8,
+          "base_degree": 2,
+          "cover_degree_log2": 8,
+          "magic_number": 8,
+          "mmt_condition_8": true,
+          "relative_degree": 152,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^2), N = 152 * 2",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                190.677
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                444320.44
+              ],
+              [
+                "enge_gaudry",
+                4874.764
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 190.677,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 190.677,
+          "log2_transfer": 31.395,
+          "ratio_log2": -30.45
+        },
+        "destination": {
+          "field_bits": 19.0,
+          "genus": "32768",
+          "log2_genus": 15.0,
+          "log2_order": 622592.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 16,
+          "base_degree": 19,
+          "cover_degree_log2": 16,
+          "magic_number": 16,
+          "mmt_condition_8": true,
+          "relative_degree": 16,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^19), N = 16 * 19",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                183.944
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                444295.707
+              ],
+              [
+                "enge_gaudry",
+                1013.964
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 183.944,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 183.944,
+          "log2_transfer": 31.395,
+          "ratio_log2": -23.717
+        },
+        "destination": {
+          "field_bits": 1.0,
+          "genus": "32768",
+          "log2_genus": 15.0,
+          "log2_order": 32768.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 16,
+          "base_degree": 1,
+          "cover_degree_log2": 16,
+          "magic_number": 16,
+          "mmt_condition_8": true,
+          "relative_degree": 304,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^1), N = 304 * 1",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                165.308
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                429.98
+              ],
+              [
+                "enge_gaudry_smoothness",
+                620.534
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 165.308,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 165.308,
+          "log2_transfer": 17.98,
+          "ratio_log2": -5.082
+        },
+        "destination": {
+          "field_bits": 304.0,
+          "genus": "3",
+          "log2_genus": 1.585,
+          "log2_order": 912.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "construction",
+        "invariants": {
+          "construction": "docs/curves/COVERS.md ordinary binary",
+          "map_degree": 3
+        },
+        "kind": "same_field_cover",
+        "label": "same-field genus-3 cover H -> E of degree 3 over GF(2^304) (ordinary_binary_cubic_pullback)",
+        "notes": [
+          "the Jacobian over the same field is larger than E: index calculus there is q^(4/3) against rho's q^(1/2)"
+        ],
+        "transport": "carried_if_coprime_to_degree"
+      }
+    ],
+    "slug": "icv1-f2m304-tm1949050066876782037155448244017940336576672053-02fbe089",
+    "standard_names": [
+      "c2pnb304w1"
+    ],
+    "subgroup": {
+      "bits": 288.01,
+      "order": "500884825900595933307132795674658837818095809137913478977332553047879960661308247049501",
+      "status": "registry_representation"
+    },
+    "trace": "-1949050066876782037155448244017940336576672053",
+    "verdict": "boundary"
+  },
+  "legacy_10g2_model_current_geometry": {
+    "best_route": 3,
+    "family": "binary",
+    "field": {
+      "degree": 304,
+      "kind": "binary",
+      "log2_base": 304.0,
+      "log2_size": 304.0
+    },
+    "icv1": "ICV1:f2m-304-1b812216:-1949050066876782037155448244017940336576672053:32592575621351777380295131014550050576823494300604030077055029226825549040231327635511030070:0xe94cd000c1f1012c27c47de234f525556965fca8774276731fb00f70a04fef673514b3e30da6:unk:unk:r:02fbe0891c08",
+    "reference_log2": 160.226,
+    "routes": [
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                153.493
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 153.493,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 153.493,
+          "log2_transfer": 16.395,
+          "ratio_log2": 6.733
+        },
+        "destination": {
+          "field_bits": 16.0,
+          "genus": "1",
+          "log2_genus": 0.0,
+          "log2_order": 16.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 1,
+          "base_degree": 16,
+          "cover_degree_log2": 1,
+          "magic_number": 1,
+          "mmt_condition_8": true,
+          "relative_degree": 19,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^16), N = 19 * 16",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here",
+          "sqrt(b) lies in the subfield: E is defined over GF(2^l) and the descent is the trace map onto E(GF(2^l)), which cannot carry the subgroup"
+        ],
+        "transport": "degenerate"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                160.641
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                171.395
+              ],
+              [
+                "enge_gaudry_smoothness",
+                315.949
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 160.641,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 160.641,
+          "log2_transfer": 17.395,
+          "ratio_log2": -0.415
+        },
+        "destination": {
+          "field_bits": 152.0,
+          "genus": "2",
+          "log2_genus": 1.0,
+          "log2_order": 304.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 2,
+          "base_degree": 152,
+          "cover_degree_log2": 2,
+          "magic_number": 2,
+          "mmt_condition_8": true,
+          "relative_degree": 2,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^152), N = 2 * 152",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                153.908
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                20.662
+              ],
+              [
+                "enge_gaudry_smoothness",
+                27.951
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 20.662,
+            "log2_leading": 9.0,
+            "solver": "hyperelliptic_index_calculus"
+          },
+          "exponent_ratio_log2": 135.005,
+          "log2_search": null,
+          "log2_total": 20.804,
+          "log2_transfer": 17.395,
+          "ratio_log2": 139.422
+        },
+        "destination": {
+          "field_bits": 8.0,
+          "genus": "2",
+          "log2_genus": 1.0,
+          "log2_order": 16.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 2,
+          "base_degree": 8,
+          "cover_degree_log2": 2,
+          "magic_number": 2,
+          "mmt_condition_8": true,
+          "relative_degree": 38,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^8), N = 38 * 8",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "formula_marginal",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                163.056
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                158.225
+              ],
+              [
+                "enge_gaudry_smoothness",
+                165.949
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 158.225,
+            "log2_leading": 133.0,
+            "solver": "hyperelliptic_index_calculus"
+          },
+          "exponent_ratio_log2": 11.005,
+          "log2_search": null,
+          "log2_total": 158.225,
+          "log2_transfer": 19.395,
+          "ratio_log2": 2.001
+        },
+        "destination": {
+          "field_bits": 76.0,
+          "genus": "8",
+          "log2_genus": 3.0,
+          "log2_order": 608.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 4,
+          "base_degree": 76,
+          "cover_degree_log2": 4,
+          "magic_number": 4,
+          "mmt_condition_8": true,
+          "relative_degree": 4,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^76), N = 4 * 76",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                156.323
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                31.809
+              ],
+              [
+                "enge_gaudry_smoothness",
+                28.219
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 28.219,
+            "log2_leading": 15.304,
+            "solver": "enge_gaudry_smoothness"
+          },
+          "exponent_ratio_log2": 128.701,
+          "log2_search": null,
+          "log2_total": 28.223,
+          "log2_transfer": 19.395,
+          "ratio_log2": 132.004
+        },
+        "destination": {
+          "field_bits": 4.0,
+          "genus": "8",
+          "log2_genus": 3.0,
+          "log2_order": 32.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 4,
+          "base_degree": 4,
+          "cover_degree_log2": 4,
+          "magic_number": 4,
+          "mmt_condition_8": true,
+          "relative_degree": 76,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^4), N = 76 * 4",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                169.471
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                779.802
+              ],
+              [
+                "enge_gaudry_smoothness",
+                330.347
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 169.471,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 169.471,
+          "log2_transfer": 23.395,
+          "ratio_log2": -9.245
+        },
+        "destination": {
+          "field_bits": 38.0,
+          "genus": "128",
+          "log2_genus": 7.0,
+          "log2_order": 4864.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 8,
+          "base_degree": 38,
+          "cover_degree_log2": 8,
+          "magic_number": 8,
+          "mmt_condition_8": true,
+          "relative_degree": 8,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^38), N = 8 * 38",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "not_carried",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                162.738
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                737.069
+              ],
+              [
+                "enge_gaudry_smoothness",
+                71.813
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 71.813,
+            "log2_leading": 54.743,
+            "solver": "enge_gaudry_smoothness"
+          },
+          "exponent_ratio_log2": 89.262,
+          "log2_search": null,
+          "log2_total": 71.813,
+          "log2_transfer": 23.395,
+          "ratio_log2": 88.414
+        },
+        "destination": {
+          "field_bits": 2.0,
+          "genus": "128",
+          "log2_genus": 7.0,
+          "log2_order": 256.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 8,
+          "base_degree": 2,
+          "cover_degree_log2": 8,
+          "magic_number": 8,
+          "mmt_condition_8": true,
+          "relative_degree": 152,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^2), N = 152 * 2",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "too_small"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                183.886
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                444313.65
+              ],
+              [
+                "enge_gaudry",
+                4867.974
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 183.886,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 183.886,
+          "log2_transfer": 31.395,
+          "ratio_log2": -23.66
+        },
+        "destination": {
+          "field_bits": 19.0,
+          "genus": "32768",
+          "log2_genus": 15.0,
+          "log2_order": 622592.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 16,
+          "base_degree": 19,
+          "cover_degree_log2": 16,
+          "magic_number": 16,
+          "mmt_condition_8": true,
+          "relative_degree": 16,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^19), N = 16 * 19",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                177.153
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                444288.917
+              ],
+              [
+                "enge_gaudry",
+                1007.173
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": true,
+            "log2_cost": 177.153,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 177.153,
+          "log2_transfer": 31.395,
+          "ratio_log2": -16.927
+        },
+        "destination": {
+          "field_bits": 1.0,
+          "genus": "32768",
+          "log2_genus": 15.0,
+          "log2_order": 32768.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "exact_invariant",
+        "invariants": {
+          "audit_curve_magic_number": 16,
+          "base_degree": 1,
+          "cover_degree_log2": 16,
+          "magic_number": 16,
+          "mmt_condition_8": true,
+          "relative_degree": 304,
+          "relative_trace_b_zero": false,
+          "trace_a": 1,
+          "type_i": false
+        },
+        "kind": "ghs_weil_descent",
+        "label": "GHS descent to Jac(C)/GF(2^1), N = 304 * 1",
+        "notes": [
+          "GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here"
+        ],
+        "transport": "size_admits"
+      },
+      {
+        "class": "boundary",
+        "cost": {
+          "destination": {
+            "considered": [
+              [
+                "rho_on_jacobian",
+                163.396
+              ],
+              [
+                "hyperelliptic_index_calculus",
+                428.068
+              ],
+              [
+                "enge_gaudry_smoothness",
+                620.534
+              ]
+            ],
+            "enge_gaudry_hypothesis_holds": false,
+            "log2_cost": 163.396,
+            "log2_leading": 144.005,
+            "solver": "rho_on_jacobian"
+          },
+          "exponent_ratio_log2": 0.0,
+          "log2_search": null,
+          "log2_total": 163.396,
+          "log2_transfer": 17.98,
+          "ratio_log2": -3.17
+        },
+        "destination": {
+          "field_bits": 304.0,
+          "genus": "3",
+          "log2_genus": 1.585,
+          "log2_order": 912.0,
+          "object": "Jac(C)"
+        },
+        "evidence": "construction",
+        "invariants": {
+          "construction": "docs/curves/COVERS.md ordinary binary",
+          "map_degree": 3
+        },
+        "kind": "same_field_cover",
+        "label": "same-field genus-3 cover H -> E of degree 3 over GF(2^304) (ordinary_binary_cubic_pullback)",
+        "notes": [
+          "the Jacobian over the same field is larger than E: index calculus there is q^(4/3) against rho's q^(1/2)"
+        ],
+        "transport": "carried_if_coprime_to_degree"
+      }
+    ],
+    "slug": "icv1-f2m304-tm1949050066876782037155448244017940336576672053-02fbe089",
+    "standard_names": [
+      "c2pnb304w1"
+    ],
+    "subgroup": {
+      "bits": 288.01,
+      "order": "500884825900595933307132795674658837818095809137913478977332553047879960661308247049501",
+      "status": "registry_representation"
+    },
+    "trace": "-1949050066876782037155448244017940336576672053",
+    "verdict": "formula_marginal"
+  },
+  "only_changed_model_fields": [
+    "jacobian_group_op_mults_measured",
+    "jacobian_group_op_extrapolation_exponent"
+  ]
+}

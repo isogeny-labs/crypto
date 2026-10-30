@@ -1,0 +1,66 @@
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/hashed-ecdl-cpu-combined-20261030/snapshot/crates/hashed-ecdl-tensor)
+   Compiling hashed-ecdl-cpu v0.1.0 (/home/ec2-user/hashed-ecdl-cpu-combined-20261030/snapshot/crates/hashed-ecdl-cpu)
+    Finished `release` profile [optimized] target(s) in 27.13s
+     Running unittests src/lib.rs (/home/ec2-user/hashed-ecdl-cpu-build-20261030/release/deps/hashed_ecdl_cpu-87199c3e2d7aa327)
+
+running 33 tests
+test paper::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test paper::tests::collected_relation_reuses_target_but_full_replay_recomputes_it ... ok
+test checked_sum::tests::checked_sums_reject_noncanonical_and_off_curve_points ... ok
+test paper::tests::identity_and_bounds_are_explicit ... ok
+test certificate::tests::archived_public_recovery_replays_and_rejects_corruption ... ok
+test paper::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test paper::tests::rejects_corrupt_accelerated_base_before_relation_queries ... ok
+test paper::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test paper::tests::overlapping_slots_keep_separate_columns ... ok
+test paper::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test paper::tests::order_witness_and_square_roots_match_exhaustive_constructor ... ok
+test paper::tests::validates_curve_and_canonical_points ... ok
+test paper::tests::wide_arithmetic_and_certified_40_bit_curve ... ok
+test tests::caps_and_bad_bases_fail_closed ... ok
+test tests::equivalent_validated_curve_representations_reuse_tables ... ok
+test paper::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test tests::suffix_index_preserves_duplicates_identity_and_collision_chains ... ok
+test paper::tests::solves_and_replays_seeded_known_answers ... ok
+test tests::full_recovery_certificates_equal_original ... ok
+test tests::complete_certificates_match_frozen_preoptimization_records ... ok
+test paper::tests::deferred_dependency_matches_eager_reference ... ok
+test tests::residual_multiplication_matches_independent_remainder ... ok
+test tests::batched_subtraction_matches_every_group_pair ... ok
+test paper::tests::jacobian_mixed_add_matches_affine_with_nonunit_scales ... ok
+test paper::tests::optional_profile_preserves_queries_certificates_and_stats ... ok
+test tests::wide_field_batch_and_tuple_witnesses_match_checked_reference ... ok
+test paper::tests::euclidean_inverses_match_fermat_reference ... ok
+test paper::tests::finite_difference_constructor_matches_exhaustive_reference ... ok
+test paper::tests::reciprocal_products_match_wide_remainders ... ok
+test checked_sum::tests::checked_sums_match_independent_affine_sequences ... ok
+test paper::tests::cached_square_roots_match_uncached_reference ... ok
+test tests::exact_lexicographic_witnesses_all_targets_and_resets ... ok
+test paper::tests::fixed_pair_matches_independent_binary_multiplication ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/main.rs (/home/ec2-user/hashed-ecdl-cpu-build-20261030/release/deps/hashed_ecdl_cpu-9a08325d7598c936)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/complete.rs (/home/ec2-user/hashed-ecdl-cpu-build-20261030/release/examples/complete-a1ba59feb3c8819f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/fixture.rs (/home/ec2-user/hashed-ecdl-cpu-build-20261030/release/examples/fixture-0c77ffada5ac176e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/scale.rs (/home/ec2-user/hashed-ecdl-cpu-build-20261030/release/examples/scale-e99530cfdfea68e6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

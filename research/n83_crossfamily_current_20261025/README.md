@@ -19,6 +19,11 @@ regenerates the points from the domain
 35,172 earlier distinct public points in the prior inventory, nearby-grid
 screen, and sealed nearby-grid confirmation; it reports zero overlap and zero
 duplicates. Each point belongs to the subgroup of order `8569786107849059`.
+This `a=1` curve is the 53-bit-subgroup diagnostic in the broader N83 sweep.
+The sweep's primary `a=0` curve has subgroup order
+`2417851639230796216685689` and needs its own candidate and measurement
+comparison. The validated row and selector carry this curve ID and subgroup
+order explicitly.
 
 The measured panel compares the current-source K3300 wide3, K3450 wide3,
 K3500 root4, and K3596 root4 candidates on these same 16 points. The fixed panel has two
@@ -91,6 +96,58 @@ two exact producers, runs one stratum with four exposed CPU IDs, verifies the
 raw receipts, and archives them even when a stage fails. The dispatch output
 and source bundle both belong outside the repository. Stage and collect require
 the configured RunPod key and SSH public-key access to the account's Pods.
+
+### AWS Spot Tier 1 alternative
+
+`plan_aws_spot.py` checks an exact-source, two-instance Tier 1 alternative
+before any AWS mutation. It requires two separately identified `g5g.4xlarge`
+ARM64 Spot instances, each exposing 16 vCPUs and 32 GiB RAM, in
+`us-east-1d`. This same-zone placement follows the practical cloud-instance
+Tier 1 contract; it does not establish physical host isolation. The six-hour
+maximum bid is $0.27 per instance-hour. At those bids, two 50 GB gp3 root
+volumes and a $0.05 S3 allowance, its six-hour projection is $3.37 under a
+$4.20 allocation cap. This projection is not a guaranteed account billing
+ceiling. On 2026-10-26 the AWS API returned G/VT Spot quota 64 vCPUs, a
+$3.10 projection at quoted rates, and placement score 9 for two units in
+`us-east-1d`. Prices and scores must be rechecked before allocation. The gp3
+rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
+and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
+`allocate_aws.py` refreshes this plan from the provider immediately before
+allocation. Its default invocation is read only. The `--execute` option
+stages the exact source in a versioned S3 bucket and requests two Spot
+instances, with a fixed bid, encrypted deletion-on-termination root disk,
+outbound-only security group, host-side shutdown timer, and independently
+running local termination guard. The host checks its IMDSv2 instance identity,
+builds both pinned ARM64 producers, runs the frozen alternating IC/rho schedule,
+and uploads raw results and a status archive. `collect_aws.py` downloads exact
+S3 object versions and checks archive bytes; `aggregate_aws.py` replays both
+strata, binds the EC2 API snapshot to the host receipts, and applies the sealed
+selector. Missing, partial, noisy, or failed pairs remain bounded unknown.
+An allocation requires separate spend approval. The bid projection is not a
+guaranteed account billing ceiling if both deletion guards fail.
+
+```sh
+python3 -m research.n83_crossfamily_current_20261025.plan_aws_spot \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-aws-plan.json
+# Use a dedicated Python environment with requirements-aws-control.txt.
+python3 -m research.n83_crossfamily_current_20261025.allocate_aws \
+  --plan /absolute/path/outside/repository/n83-aws-plan.json \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-aws-allocation
+# After separate approval, add --execute to allocate two Spot hosts.
+python3 -m research.n83_crossfamily_current_20261025.collect_aws \
+  --controller-receipt /absolute/path/outside/repository/n83-aws-allocation/allocation.json \
+  --output /absolute/path/outside/repository/n83-aws-collected
+python3 -m research.n83_crossfamily_current_20261025.aggregate_aws \
+  --snapshot /absolute/path/outside/repository/n83-aws-collected/provider_snapshot.json \
+  --stratum0 /absolute/path/outside/repository/n83-aws-collected/stratum0/results \
+  --stratum1 /absolute/path/outside/repository/n83-aws-collected/stratum1/results \
+  --archive0 /absolute/path/outside/repository/n83-aws-collected/stratum0.raw_results.tar.gz \
+  --archive1 /absolute/path/outside/repository/n83-aws-collected/stratum1.raw_results.tar.gz \
+  --head-sha "$(git rev-parse HEAD)" \
+  --output /absolute/path/outside/repository/n83-aws-replay
+```
 
 Replay the sealed preparation in a full checkout with Python `blake3==1.0.8`
 installed and the archived K3596 dump available:

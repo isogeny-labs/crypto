@@ -35,6 +35,31 @@ def read(path):
 
 
 def provider_receipt(output, host, source, stratum):
+    if host.get('provider') == 'aws_ec2_spot':
+        from research.n83_crossfamily_current_20261025 import aws_runner
+        path = output / 'aws_allocation.json'
+        allocation = aws_runner.read_allocation(path, stratum)
+        allocation_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        adapter_sha = hashlib.sha256((HERE / 'aws_runner.py').read_bytes()).hexdigest()
+        if (allocation.get('source_head_sha') != host.get('git_sha') or
+                allocation.get('source_archive_sha256') !=
+                host.get('source_archive_sha256') or
+                allocation.get('source_archive_sha256') !=
+                source.get('source_archive_sha256') or
+                allocation.get('source_manifest_sha256') !=
+                host.get('source_manifest_sha256') or
+                allocation.get('source_manifest_sha256') !=
+                source.get('source_manifest_sha256') or
+                host.get('parent_instance_id') != allocation['instance_id'] or
+                host.get('aws_allocation_sha256') != allocation_sha or
+                source.get('aws_allocation_sha256') != allocation_sha or
+                host.get('aws_adapter_sha256') != adapter_sha or
+                source.get('aws_adapter_sha256') != adapter_sha):
+            raise ValueError('AWS allocation, source or adapter differs')
+        aws_runner.check_instance(allocation, host['instance_identity'])
+        return {'status': 'PASS_AWS_ALLOCATION',
+                'allocation_sha256': allocation_sha,
+                'instance_id': allocation['instance_id']}
     if host.get('provider') != 'runpod':
         return {'status': 'NOT_RUNPOD'}
     path = output / 'runpod_allocation.json'
