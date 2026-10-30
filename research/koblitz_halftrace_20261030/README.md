@@ -8,6 +8,9 @@ claim that existing Frobenius folding and pair joins are new work.
 **Track:** generic decomposition (bounded by sqrt(r); cannot beat rho).
 **Measurement status:** pending, blocked by pre-experiment S3 checkpoint access.
 No native speed ratio or end-to-end improvement is established.
+The [Actions preparation](https://github.com/isogeny-labs/crypto/actions/runs/41082358257)
+also failed because the approved upload secret is not configured. All build and
+experiment jobs were skipped; there are no scientific measurements.
 
 ## Implementation
 
@@ -52,7 +55,9 @@ development checks; their elapsed times are not performance evidence.
 | --- | --- |
 | Existing Rust baseline and source identity | built before source edits; [BASELINE.txt](BASELINE.txt) |
 | Rust cache and factor-base integration | implemented; no Python execution path |
-| Native correctness and regression gates | [development checks](development/README.md); full-suite completion tracked separately |
+| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; final-source filters/E2E/Clippy pass; later merged-main checks hit a retained base syntax error |
+| Prospective native comparison protocol | [protocol.json](protocol.json) frozen before data; canonical schema/hash and corrupted-hash negative check pass |
+| Source-resume checkpoint preparation | [failed Actions receipt](development/checkpoint-actions-receipt.json); no uploader secret; all experiment jobs skipped |
 | Matched native end-to-end measurement | not run; [access blocker](../../problems/native-koblitz-measurement-access.md) |
 | Source-pinned EKS image, L2, A/A, independent replay | pending; no scientific job was submitted |
 | m=83 confidence gate / transfer toward ECC2K-130 | not established by this one-word change |
@@ -67,6 +72,12 @@ are preserved outside this repository and do not enter its benchmark ledger.
 Initial sparse-checkout/build failures and the failed checkpoint-upload attempt
 are retained in `development/`. No missing fixture was replaced with invented
 data: tracked fixtures were materialized from the baseline revision.
+The P1 review requires the saved matched comparison before landing; auto-merge is
+paused. Current-main build validation and its merge conflicts remain separate
+requirements. Scientific preparation pins tested source
+`7c58661935b79153ff74c1208d0592aa56ed04a1` and the unchanged spec bytes. It does
+not validate later main merges. The 280 planned executions have zero attempted
+or completed scientific rows; no canonical data export is fabricated.
 
 [Implementation and execution-status diagram](pipeline.svg).
 [Printable report](report.pdf), built from [report.typ](report.typ); an

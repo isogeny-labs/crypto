@@ -43,5 +43,26 @@ invented. `LOCAL_ARCHIVE.sha256` identifies this local snapshot. Short complete
 check logs are retained as loose files; `SHA256SUMS` identifies the final source
 and committed check logs. This is development evidence, not an admitted ecbench
 run, replay certificate or performance ledger row. The full-suite archive log
-is explicitly a snapshot if its process is still active. Readable short
-transcripts normalize trailing blank lines; exact raw bytes stay in the archive.
+is an explicitly dated pre-completion snapshot. A separate completed snapshot,
+`checks-complete.tar.xz`, retains the final parent result and later failed checks;
+its local identity is COMPLETE_LOCAL_ARCHIVE.sha256. Both exceed the store
+threshold and remain ignored pending authorized upload. Readable short transcripts
+normalize trailing blank lines; exact raw bytes stay in these local archives.
+
+The checkpoint-only Actions attempt failed with an absent approved upload secret.
+checkpoint-actions-receipt.json binds the workflow, immutable source, spec and
+protocol hashes. Its build and experiment jobs were skipped: planned scientific
+executions 280, attempted 0, completed 0. This is an administrative failure record,
+not an invented canonical experimental export.
+
+The native metadata verifier uses the existing queue module's jsonschema/v6
+dependency. Fetch the canonical schema at the Git blob recorded in
+protocol-validation.txt, verify its SHA-256, then run from the repository root:
+
+```sh
+go -C tools/experiment-queue run "$PWD/research/koblitz_halftrace_20261030/validate_protocol.go" \
+  /path/to/experiment-protocol.v1.json \
+  "$PWD/research/koblitz_halftrace_20261030/protocol.json" check
+```
+
+This checks schema and the prospective canonical hash, not experimental outcomes.

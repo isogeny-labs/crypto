@@ -34,24 +34,28 @@ recorded rather than attributed to the cache or hidden. An inherited Cargo.lock
 reference mismatch was normalized by Cargo. No scientific run has
 started, and no speedup is claimed. Auto-merge is paused for the unresolved P1
 requirement to retain a matched native comparison. Local checkpoint transport
-has no credentials; this Actions preparation uses only the existing approved
-CHECKPOINT_UPLOAD_TOKEN secret and fails closed if it is absent or invalid.
+has no credentials. Checkpoint-only Actions run41082358257 at preparation
+source1e6c9a434058f274ddb559c72a81bc279ec3f1cf failed because its approved upload
+secret is not configured; all build/experiment jobs were skipped. No checkpoint
+was uploaded. protocol.json is prospectively frozen with canonical hash
+e8e527aacb96a7e172069353254b47bce33526da7111f913b67bcdc4648c0d07.
 
 ## Next steps
-Complete the prospective protocol.json before scientific execution. Collect the
-checkpoint-only Actions result; a successful upload is required before dispatching
-the trusted main-branch isolab-experiment.yml with an explicit tested source SHA
-and this spec. Retain original workflow identity, image and binary hashes, L2/A/A
+Attach an existing approved checkpoint/lab connection or configure the approved
+Actions upload secret. Do not repeat the failed preparation until its cause has
+changed. A fresh successful source-pinned checkpoint is required before dispatching
+the trusted main-branch isolab-experiment.yml with the tested source SHA and this
+unchanged spec. Retain original workflow identity, image and binary hashes, L2/A/A
 admission, S3 manifests, independent replay, all failures and the canonical export.
 Update this PR's report, request resolution of the P1 only with actual evidence,
 and verify current-head gate/size/artifacts checks before merge.
 
 ## Runs in flight
-This preparation job only: GitHub workflow/run identity is in its Actions URL.
-It creates a source-pinned S3 resume checkpoint and does not launch an experiment.
-No scientific EKS request, Job UID or result receipt exists yet. Local development
-checks, if still active, are under /tmp/crypto-halftrace-followup-*.log in the
-authoring workspace. Earlier complete suite: /tmp/crypto-native-lib-tests-final.log.
+None. The preparation is terminal failed. No scientific EKS request, Job UID,
+data export or result receipt exists. Local development checks have finished;
+complete original suite is /tmp/crypto-native-lib-tests-final.log. Later failed
+checks are /tmp/crypto-halftrace-followup-*.log. The two raw development archives
+are ignored locally pending authorized artifact-store upload, with separate hashes.
 
 ## Stop and success conditions
 Stop before scientific launch if checkpoint upload fails, source identity is

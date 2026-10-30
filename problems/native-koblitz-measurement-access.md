@@ -17,15 +17,25 @@ This is an access gap, not a mathematical or measured performance obstruction.
 - **Observed:** `scripts/checkpoint.sh push` reports no AWS profile
   `ecc-challenges-new`, no `CHECKPOINT_UPLOAD_TOKEN`, and no configured upload-token
   file; nothing was checkpointed. `scripts/checkpoint.sh gate` was also executed
-  and exits 1 with the same upload failure. The cloud runtime reports no configured secret bindings or outbound
-  identities. GitHub read/write access is available and Rust 1.99.1 is installed.
-- GitHub Actions has an OIDC experiment workflow, but it does not perform this
-  source-resume checkpoint. Secret-name metadata lookup returned HTTP 403. That
-  response does not establish whether an Actions upload secret exists; none was
-  obtained or copied into this session. The checkpoint gate was not bypassed.
+  and exits 1 with the same upload failure. The resumed cloud runtime has current
+  observations with no configured secret bindings or outbound identities.
+  GitHub read/write access is available and Rust 1.99.1 is installed.
+- **Actions attempt:** the source-pinned checkpoint-only preparation
+  [run 41082358257](https://github.com/isogeny-labs/crypto/actions/runs/41082358257)
+  checked out source `1e6c9a434058f274ddb559c72a81bc279ec3f1cf`, then failed with
+  `Approved CHECKPOINT_UPLOAD_TOKEN secret is not configured.` Its contracts,
+  build and experiment jobs were skipped. No checkpoint was uploaded and no
+  scientific job was launched. The [receipt](../research/koblitz_halftrace_20261030/development/checkpoint-actions-receipt.json)
+  and timestamped failure excerpt are retained. This is stronger evidence than
+  the earlier secret-name metadata lookup's HTTP 403; no secret was copied out.
+- The declared GitHub OIDC trigger policy in
+  `taskq/deploy/eks-karpenter/remote/bridge.yaml` grants lab request/result
+  prefixes, not this checkpoint bucket. No identity, trust or access scope was
+  broadened to bypass the missing uploader.
 - **Derived:** AGENTS.md's S3 checkpoint rule prohibits scientific launch before
   this gate succeeds. An EKS image or Git commit alone does not satisfy that gate.
-- **Suspected explanation:** this fresh workspace lacks the existing lab connection.
+- **Suspected explanation:** the existing lab uploader is not attached to this
+  workspace or configured as the expected Actions secret.
 - **Missing capability:** an existing authorized checkpoint uploader or an existing
   lab environment that can perform and verify the checkpoint and EKS submission.
 - **Limits:** no EKS native timing, L2 result, A/A admission or runtime speedup is
@@ -35,6 +45,8 @@ This is an access gap, not a mathematical or measured performance obstruction.
 
 - [ ] Attach the existing approved lab identity or checkpoint uploader through
   environment configuration; do not put credentials in Git, issues or chat.
+- [ ] Alternatively configure the existing approved Actions upload secret and
+  run a fresh checkpoint-only preparation at an explicit immutable source.
 - [ ] Run `scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate` successfully.
 - [ ] Build the reviewed source into a pinned image, submit the frozen native
   spec on EKS Spot, retain failures, and verify L2, scalar replay and S3 receipts.
