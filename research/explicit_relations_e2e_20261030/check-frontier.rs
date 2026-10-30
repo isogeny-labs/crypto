@@ -8,7 +8,7 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
     let fields: Vec<u32> = match version {
         3 => (20..=56).step_by(4).collect(),
         4 => vec![48, 52, 56, 58, 60],
-        5 | 7 => vec![52, 56, 58, 60],
+        5 | 7 | 8 => vec![52, 56, 58, 60],
         _ => return Err("version has no completed frontier contract".into()),
     };
     let mut lines = raw.lines();

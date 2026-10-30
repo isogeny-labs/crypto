@@ -454,3 +454,38 @@ is now reserved by T901, so its shared file remains untouched.
 The first draft v8 schema check rejected its absent freeze block. Added the
 required draft block, validated and froze it before any affected data. This
 was a metadata preparation error, not a GPU launch.
+
+## 2026-10-30 06:48 UTC: compact-table frontier collected
+
+### What was done
+
+V7 completed12 prescribed executions: ten verified recoveries through both
+58-bit targets and two60-bit timeouts at1200seconds. Exact58-bit cold times
+were489.753544246 and530.119796136seconds. Both60-bit tables admitted:
+1,202,274,400/1,025,758,188 left rows with conservative allocations
+57,709,730,784/49,236,951,816bytes. These were time limits, not memory refusal.
+Archive SHA25601cd78dbd5cb64410d0c02ba12473964683299f42702a7c5cb46a8f4b7c37891
+matched. Worker/controller exited0 and podex8tm7votw4h4g deletion was verified.
+Public receipts were uploaded; the key remains only in v8's restricted binding.
+
+### Decisions made
+
+Retain58bits as the largest complete rung in v7. All six52-bit matched
+certificates agree; full32-byte cold times37.660575827/40.318152374seconds
+and compact16-byte candidate29.427842022/31.972280910seconds are L0
+observations. Keep every timeout. Continue only with the separately frozen
+v8 larger-index comparison, pinnedbbf0f2f51e73, after raw publication.
+
+### Open threads
+
+V8 request is prepared, no pod created yet. T910owns the wider-index phase.
+Final inspected report and benchmark copies will include both panels.
+The shared driver source is reserved by T906; wider-field arithmetic remains
+unmodified. The progress exporter is reserved by T901.
+
+### Errors
+
+Canonical schema/flow/file hashes pass. The protocol-aware checker reports
+four rectangular-coverage findings; CHECKER-NOTE.md preserves them. Frozen
+native analysis and separate strict audit pass the actual12-cell contract
+and reject corrupt coverage. No failed execution is counted as a recovery.
