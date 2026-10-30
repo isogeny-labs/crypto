@@ -5,6 +5,11 @@ instances using C++17/FLINT, native Singular and the pinned Rust quartic backend
 It does not execute Sage or Python crypto code. This is a correctness result;
 the requested qualified cold comparison remains unfinished.
 
+An evidence-linked diagram, sixteen-target attempt-count graph, and inspected
+PDF summarizing these existing correctness receipts are in
+[reports/transfer-results-20261030/](reports/transfer-results-20261030/).
+They were derived from the committed receipts without rerunning the solver.
+
 | Public source | Source/target order r | 3-isogenies | Recovered k | Jacobian base-point attempts |
 | --- | ---: | ---: | ---: | ---: |
 | p109 | 1,293,169 | 1 | 1,729 | 1 |
