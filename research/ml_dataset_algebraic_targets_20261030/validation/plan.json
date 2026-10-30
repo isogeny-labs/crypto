@@ -2,14 +2,14 @@
   "schema": "software-validation-plan/v1",
   "execution_source": "CLI and validation scripts must be committed; pass exact resulting commit to run-pipeline.sh",
   "purpose": "Retained software correctness checks, not research trials or timing comparisons",
-  "prerequisite": "Original cap-fix pipeline terminal success; materialized exact-HEAD dependencies and full maintained examples; live Conductor ownership",
+  "prerequisite": "Parent confirms SAT encoder phase is terminal and shared Cargo target has no competing validation/build; original cap-fix terminal receipt and live ownership; exact merged-source dependencies bound by inventory03; commit this updated plan before full pipeline05.",
   "materialization_inventory": {
-    "path": "/home/ec2-user/ml-dataset-work-20261028/algebraic-materialization-02.json",
-    "sha256": "e76e3a7ea2d287da89e6b52fa96f5c51ae8823f719675fa768b6126a768e2844",
-    "source_commit": "51e0c7abe7350a0da83e27b42b181117c9395590",
-    "files": 151,
-    "bytes": 210027745,
-    "binding": "Before and after every phase, verify inventory SHA, every recorded blob against the execution commit with one git ls-tree read, and every materialized file SHA and size"
+    "path": "/home/ec2-user/ml-dataset-work-20261028/algebraic-materialization-03.json",
+    "sha256": "e7a9ffeb5a1cb9e85ee4b63b2057aaf1492fd815ab6b50929fa09d31a9ff735f",
+    "source_commit": "5dc0a001d52487094becef7639364892921ce1c6",
+    "files": 1184,
+    "bytes": 230098765,
+    "binding": "Before and after every phase verify inventory SHA, every recorded blob against execution commit using one git ls-tree read, and each materialized file SHA and size. Includes prior151 fixtures, recursive local Cargo manifests/source trees, declared targets, maintained root examples/tests/benches, and embedded inputs introduced by merged main."
   },
   "source_binding": "Compare all tracked paths against execution commit except docs/session-logs/** and this task's exact store-index.json; reject untracked Rust/Cargo/config inputs. Restored sparse inputs also require explicit byte checks.",
   "sequence": [
@@ -38,7 +38,7 @@
   "verified_cloud_dataset_cells": 0,
   "implementation_base": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
   "runtime_source": "The exact execution commit passed to run-pipeline.sh; all tracked source and restored-input hashes checked before and after each phase",
-  "attempt_identity": "Explicit two-digit argument, default01; attempt02 follows a recorded compile failure and local manifest refactor. Never reuse existing logs/receipt/output.",
+  "attempt_identity": "Explicit two-digit argument; run full pipeline05 after merged-main source freeze and SAT encoder termination. Preserve all prior attempt artifacts. Never reuse existing logs, receipts, binaries or CLI outputs.",
   "prior_attempt": {
     "execution_source": "6e1e0d0db9f256dccff1eaa1d550f26c77e523af",
     "attempt": "01",
@@ -60,7 +60,7 @@
     "failure_receipt": "algebraic-pipeline-02.receipt.json",
     "no_automatic_retry": true
   },
-  "manual_continuation": {
+  "prior_manual_continuation_04": {
     "attempt": "04",
     "runner": "run-full-continuation.sh",
     "reason": "attempt03 CLI passed; full release suite failed only on missing tracked wide-archive manifests",
@@ -73,5 +73,99 @@
     "fixture_validation_source": "exact committed revision passed to continuation runner",
     "failure_receipt": "algebraic-pipeline-03.receipt.json",
     "no_automatic_retry": true
+  },
+  "next_full_pipeline": {
+    "attempt": "05",
+    "runner": "run-pipeline.sh",
+    "merged_runtime_base": "5dc0a001d52487094becef7639364892921ce1c6",
+    "execution_source": "Exact new commit after this validation plan is frozen; inventory blobs must match that commit",
+    "reason": "Revalidate merged main through the complete existing pipeline, without reusing earlier runtime pass labels",
+    "sequence": [
+      "dataset release library tests",
+      "strict maintained Clippy",
+      "release crypto CLI build",
+      "v6 retained curve and twist CLI fixture with negative control",
+      "full serialized release library suite"
+    ],
+    "command": [
+      "bash",
+      "research/ml_dataset_algebraic_targets_20261030/validation/run-pipeline.sh",
+      "FROZEN_SOURCE_COMMIT",
+      "05"
+    ],
+    "prior_success": {
+      "attempt": "04",
+      "source_commit": "4ed26d60bb3a8dd2e8facaa5093453af21f28bd4",
+      "pipeline_receipt": "algebraic-pipeline-04.receipt.json",
+      "full_receipt": "algebraic-full-04.receipt.json",
+      "exit_code": 0,
+      "scope": "Historical pre-merge full continuation; not evidence for merged pipeline05"
+    },
+    "automatic_execution": false,
+    "target_reuse_precondition": "SAT encoder phase terminal; parent controls launch"
+  },
+  "merged_materialization_audit": {
+    "previous_inventory": "algebraic-materialization-02.json",
+    "previous_inventory_sha256": "e76e3a7ea2d287da89e6b52fa96f5c51ae8823f719675fa768b6126a768e2844",
+    "dependency_manifests": [
+      "Cargo.toml",
+      "crates/ecdl-tensor-ic/Cargo.toml",
+      "crates/hashed-ecdl-tensor/Cargo.toml",
+      "isogeny_algos/Cargo.toml",
+      "research/five_leads_e2e_20261019/native/Cargo.toml",
+      "research/pencil_large_prime_20261029/Cargo.toml",
+      "tools/factor-base/Cargo.toml",
+      "tools/volcano-cli/Cargo.toml"
+    ],
+    "dependency_edges": [
+      [
+        "Cargo.toml",
+        "hashed-ecdl-tensor",
+        "crates/hashed-ecdl-tensor/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "ecdl-tensor-ic",
+        "crates/ecdl-tensor-ic/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "pencil-symbolic-graph",
+        "research/pencil_large_prime_20261029/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "factor-base",
+        "tools/factor-base/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "volcano-cli",
+        "tools/volcano-cli/Cargo.toml"
+      ],
+      [
+        "tools/volcano-cli/Cargo.toml",
+        "isogeny_algos",
+        "isogeny_algos/Cargo.toml"
+      ],
+      [
+        "research/pencil_large_prime_20261029/Cargo.toml",
+        "five-leads-study",
+        "research/five_leads_e2e_20261019/native/Cargo.toml"
+      ]
+    ],
+    "selected_files": 1184,
+    "restored_missing_files": 173,
+    "existing_mismatches": 0,
+    "changed_previous_inventory_blobs": [
+      {
+        "path": "docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json",
+        "previous_blob": "f3d1d6485b295baff0c971728c6b1b1fe52d8407",
+        "merged_blob": "144838969308bf489dc5ab43da394c4bc0c5994f"
+      }
+    ],
+    "source_edit_performed": false,
+    "sparse_checkout_changed": false,
+    "restore_method": "Single git cat-file --batch for selected missing blobs; create-exclusive files; verify Git blob and SHA256 bytes; preserve previous inventories"
   }
 }

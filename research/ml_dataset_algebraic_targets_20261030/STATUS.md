@@ -76,3 +76,11 @@ only in the shared session log according to merge-tree preview. Checkpoint07 has
 a valid6d391aa194df bundle but inconsistent later metadata; preserve its coherence
 audit and supersede with a stable-head checkpoint. Earlier coherent checkpoints
 and pushed Git commits remain available. No source or validation evidence was lost.
+
+## Merged-main validation preparation
+
+Main was merged as5dc0a001d524 with both session-log histories preserved. The merged
+source includes newer native solver and dataset adapters; historical04 passes do
+not validate it. Inventory03 binds1184 exact dependency/fixture files. Full pipeline05
+will run dataset tests, strict maintained Clippy, build, actual CLI and full library
+tests after committing this source. It stops on failure and retains each receipt.
