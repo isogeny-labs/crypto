@@ -732,7 +732,10 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
     found = defaultdict(lambda: {"count": 0, "files": Counter()})
     for pattern in IC1_SCAN_GLOBS:
         for path in source.glob_files(pattern):
-            if source.size(path) > MAX_SCAN_BYTES:
+            # The core leaderboard is already a required, fully parsed input
+            # to build(). Its growth must not hide IDs named only there. Keep
+            # the bound for the general research-note/candidate scan.
+            if path != LEADERBOARD and source.size(path) > MAX_SCAN_BYTES:
                 continue
             text = source.read_text(path, errors="replace")
             for ident in IC1_FULL_RE.findall(text):
