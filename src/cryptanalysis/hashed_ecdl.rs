@@ -4,8 +4,9 @@
 //! with a separate complete tensor implementation exported as [`tensor`].
 //! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
-//! performance claim is made. Only small, cofactor-one prime-field curves are
-//! supported. All returned answers carry a replayable algebraic certificate.
+//! performance claim is made. Cofactor-one prime-field curves below 2^60 are
+//! supported using an exact prime-order witness; the original constructor
+//! retains its small-field exhaustive check. Answers carry replayable certificates.
 //!
 //! Source: <https://github.com/bochum-crypto/subexponential-ecdl>, commit
 //! `1ee44e562b1b9a50ea339f3b8f81112b5a24b96f`, §3.2–3.5, Figure 2.
@@ -40,37 +41,174 @@ impl std::error::Error for Error {}
 
 #[clippy::msrv = "1.78"]
 fn prime(n: u64) -> bool {
-    n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0)
+    if n < 2 {
+        return false;
+    }
+    for p in [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+        if n % p == 0 {
+            return n == p;
+        }
+    }
+    let s = (n - 1).trailing_zeros();
+    let d = (n - 1) >> s;
+    // Deterministic Miller-Rabin witness set for the entire u64 domain.
+    for a in [2, 325, 9375, 28178, 450775, 9780504, 1795265022] {
+        if a % n == 0 {
+            continue;
+        }
+        let mut x = pow(a % n, d, n);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+        let mut passed = false;
+        for _ in 1..s {
+            x = mulmod(x, x, n);
+            if x == n - 1 {
+                passed = true;
+                break;
+            }
+        }
+        if !passed {
+            return false;
+        }
+    }
+    true
+}
+fn mulmod(a: u64, b: u64, p: u64) -> u64 {
+    if p <= u64::from(u32::MAX) {
+        a * b % p
+    } else {
+        (u128::from(a) * u128::from(b) % u128::from(p)) as u64
+    }
 }
 fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
     let mut r = 1;
     while n != 0 {
         if n & 1 != 0 {
-            r = r * a % p;
+            r = mulmod(r, a, p);
         }
-        a = a * a % p;
+        a = mulmod(a, a, p);
         n >>= 1;
     }
     r
 }
 fn sub(a: u64, b: u64, p: u64) -> u64 {
-    (a + p - b) % p
+    if a >= b {
+        a - b
+    } else {
+        p - (b - a)
+    }
 }
 
+fn floor_sqrt(n: u64) -> u64 {
+    let (mut lo, mut hi) = (0u64, 1u64 << 32);
+    while lo + 1 < hi {
+        let mid = (lo + hi) / 2;
+        if u128::from(mid) * u128::from(mid) <= u128::from(n) {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    lo
+}
+
+fn sqrtmod(a: u64, p: u64) -> Option<u64> {
+    if a == 0 {
+        return Some(0);
+    }
+    if pow(a, (p - 1) / 2, p) != 1 {
+        return None;
+    }
+    if p % 4 == 3 {
+        return Some(pow(a, (p + 1) / 4, p));
+    }
+    let mut m = (p - 1).trailing_zeros();
+    let q = (p - 1) >> m;
+    let z = (2..p).find(|&z| pow(z, (p - 1) / 2, p) == p - 1)?;
+    let mut c = pow(z, q, p);
+    let mut x = pow(a, q.div_ceil(2), p);
+    let mut t = pow(a, q, p);
+    while t != 1 {
+        let (mut power, mut i) = (t, 0);
+        while power != 1 && i < m {
+            power = mulmod(power, power, p);
+            i += 1;
+        }
+        if i == m {
+            return None;
+        }
+        let b = pow(c, 1u64 << (m - i - 1), p);
+        x = mulmod(x, b, p);
+        c = mulmod(b, b, p);
+        t = mulmod(t, c, p);
+        m = i;
+    }
+    (mulmod(x, x, p) == a).then_some(x)
+}
+
+/// Explicit CPU reduction memory ceiling; callers must opt in above 512.
+/// Two dense triangular workspaces can require several GiB at this ceiling.
+pub const MAX_COLUMNS: usize = 16384;
+/// Bound inverse-hash enumeration, including independent certificate replay.
+pub const MAX_HASH_CANDIDATES: u64 = 1 << 24;
+
 /// Validated short-Weierstrass curve of odd prime cardinality, cofactor one.
-/// Construction counts points exactly; the deliberate field bound is 65521.
+/// The tiny constructor counts points; the scalable constructor proves order
+/// from a nonzero torsion witness and the Hasse interval.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Curve {
     p: u64,
     a: u64,
     b: u64,
     r: u64,
-    // Canonical square-root lookup, constructed in O(p), for tiny fixtures.
-    // Replacing this with Tonelli–Shanks is needed before lifting the bound.
+    // Tiny constructor's lookup; empty for the order-witness constructor.
     roots: Vec<Option<u64>>,
 }
 
 impl Curve {
+    /// Certify cofactor one without scanning the field. A nonzero point killed
+    /// by prime r has exact order r. The unique multiple of r in the integer
+    /// Hasse interval must be r itself. No unverified cardinality is accepted.
+    pub fn with_order_witness(
+        p: u64,
+        a: u64,
+        b: u64,
+        r: u64,
+        generator: Point,
+    ) -> Result<Self, Error> {
+        if !(5..(1u64 << 60)).contains(&p)
+            || !(3..(1u64 << 61)).contains(&r)
+            || !prime(p)
+            || !prime(r)
+            || a >= p
+            || b >= p
+        {
+            return Err(Error::Invalid("prime field/order witness parameters"));
+        }
+        if (mulmod(4, mulmod(mulmod(a, a, p), a, p), p) + mulmod(27 % p, mulmod(b, b, p), p)) % p
+            == 0
+        {
+            return Err(Error::Invalid("singular curve"));
+        }
+        let curve = Self {
+            p,
+            a,
+            b,
+            r,
+            roots: Vec::new(),
+        };
+        if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
+            return Err(Error::Invalid("invalid prime-order witness"));
+        }
+        let radius = floor_sqrt(4 * p);
+        let (lower, upper) = (p + 1 - radius, p + 1 + radius);
+        if lower.div_ceil(r) != 1 || upper / r != 1 {
+            // Preserve exact validation for ambiguous tiny Hasse intervals.
+            return Self::new(p, a, b, r);
+        }
+        Ok(curve)
+    }
     /// Check primality, nonsingularity, and the exact prime group order.
     #[clippy::msrv = "1.78"]
     pub fn new(p: u64, a: u64, b: u64, r: u64) -> Result<Self, Error> {
@@ -116,14 +254,14 @@ impl Curve {
         self.r
     }
     fn rhs(&self, x: u64) -> u64 {
-        (x * x % self.p * x + self.a * x + self.b) % self.p
+        (mulmod(mulmod(x, x, self.p), x, self.p) + mulmod(self.a, x, self.p) + self.b) % self.p
     }
 
     /// Test canonical coordinates and the curve equation; accepts the identity.
     pub fn contains(&self, point: Point) -> bool {
         match point {
             None => true,
-            Some((x, y)) => x < self.p && y < self.p && y * y % self.p == self.rhs(x),
+            Some((x, y)) => x < self.p && y < self.p && mulmod(y, y, self.p) == self.rhs(x),
         }
     }
 
@@ -143,7 +281,11 @@ impl Curve {
             return None;
         }
         let x = z / 2;
-        let mut y = self.roots[self.rhs(x) as usize]?;
+        let mut y = if self.roots.is_empty() {
+            sqrtmod(self.rhs(x), self.p)?
+        } else {
+            self.roots[self.rhs(x) as usize]?
+        };
         if y & 1 != z & 1 {
             y = (self.p - y) % self.p;
         }
@@ -167,13 +309,13 @@ impl Curve {
             return None;
         }
         let (num, den) = if x == xx {
-            ((3 * x * x + self.a) % p, 2 * y % p)
+            ((3 * mulmod(x, x, p) + self.a) % p, 2 * y % p)
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
-        let slope = num * pow(den, p - 2, p) % p;
-        let nx = sub(sub(slope * slope % p, x, p), xx, p);
-        Some((nx, sub(slope * sub(x, nx, p) % p, y, p)))
+        let slope = mulmod(num, pow(den, p - 2, p), p);
+        let nx = sub(sub(mulmod(slope, slope, p), x, p), xx, p);
+        Some((nx, sub(mulmod(slope, sub(x, nx, p), p), y, p)))
     }
 
     /// Checked affine addition, including identity, inverses, and doubling.
@@ -233,10 +375,13 @@ impl HashBase {
     /// Enumerate by inverse hashing, not by scanning all curve points (§3.5).
     pub fn enumerate(&self, curve: &Curve) -> Result<Vec<Point>, Error> {
         self.validate(curve)?;
+        if self.tau > MAX_HASH_CANDIDATES {
+            return Err(Error::Limit("inverse-hash candidate bound"));
+        }
         let inv = pow(self.alpha, self.s - 2, self.s);
         let mut points = Vec::new();
         for t in 0..self.tau {
-            let z = inv * sub(t, self.beta, self.s) % self.s;
+            let z = mulmod(inv, sub(t, self.beta, self.s), self.s);
             if let Some(point) = curve.decode(z) {
                 points.push(Some(point));
             }
@@ -344,7 +489,7 @@ pub struct Config {
     pub max_trials: usize,
     /// Per-query oracle work bound (first `m-1` tuples for `Enumerate`).
     pub max_work: u64,
-    /// Maximum total slot-specific columns, at most 512 for dense elimination.
+    /// Maximum total slot-specific columns, at most MAX_COLUMNS; default 512.
     pub max_columns: usize,
 }
 impl Default for Config {
@@ -429,33 +574,63 @@ fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>,
         .collect()
 }
 
-// First row dependency by deterministic elimination, independent of u and v.
+// First row dependency, independent of u/v. Keep elimination factors instead
+// of updating a full provenance vector at every pivot; reconstruct once by
+// triangular back-substitution when the first dependent row is reached.
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
-    let mut pivots: BTreeMap<usize, (Vec<u64>, Vec<u64>)> = BTreeMap::new();
+    struct Pivot {
+        row: Vec<u64>,
+        source: usize,
+        inverse: u64,
+        factors: Vec<(usize, u64)>,
+    }
+    let mut columns = BTreeMap::<usize, usize>::new();
+    let mut pivots: Vec<Pivot> = Vec::new();
     for (i, source) in rows.iter().enumerate() {
         let mut row = source.clone();
-        let mut combination = vec![0; rows.len()];
-        combination[i] = 1;
-        for (&col, (pivot, coeff)) in &pivots {
+        let mut factors = Vec::new();
+        for (&col, &index) in &columns {
             let k = row[col];
-            for (a, &b) in row.iter_mut().zip(pivot) {
-                *a = sub(*a, k * b % r, r);
+            if k == 0 {
+                continue;
             }
-            for (a, &b) in combination.iter_mut().zip(coeff) {
-                *a = sub(*a, k * b % r, r);
+            factors.push((index, k));
+            for (a, &b) in row[col..].iter_mut().zip(&pivots[index].row[col..]) {
+                *a = sub(*a, mulmod(k, b, r), r);
             }
         }
         match row.iter().position(|&a| a != 0) {
-            None => return Some(combination),
+            None => {
+                let mut combination = vec![0; rows.len()];
+                combination[i] = 1;
+                let mut weights = vec![0; pivots.len()];
+                for (j, k) in factors {
+                    weights[j] = sub(0, k, r);
+                }
+                for j in (0..pivots.len()).rev() {
+                    let pivot = &pivots[j];
+                    let k = mulmod(weights[j], pivot.inverse, r);
+                    combination[pivot.source] = k;
+                    if k != 0 {
+                        for &(ancestor, factor) in &pivot.factors {
+                            weights[ancestor] = sub(weights[ancestor], mulmod(k, factor, r), r);
+                        }
+                    }
+                }
+                return Some(combination);
+            }
             Some(col) => {
                 let inv = pow(row[col], r - 2, r);
-                for a in &mut row {
-                    *a = *a * inv % r;
+                for a in &mut row[col..] {
+                    *a = mulmod(*a, inv, r);
                 }
-                for a in &mut combination {
-                    *a = *a * inv % r;
-                }
-                pivots.insert(col, (row, combination));
+                columns.insert(col, pivots.len());
+                pivots.push(Pivot {
+                    row,
+                    source: i,
+                    inverse: inv,
+                    factors,
+                });
             }
         }
     }
@@ -465,10 +640,10 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
 fn extract(relations: &[Relation], coeff: &[u64], r: u64) -> Option<u64> {
     let (mut u, mut v) = (0, 0);
     for (rel, &c) in relations.iter().zip(coeff) {
-        u = (u + c * rel.u) % r;
-        v = (v + c * rel.v) % r;
+        u = (u + mulmod(c, rel.u, r)) % r;
+        v = (v + mulmod(c, rel.v, r)) % r;
     }
-    (v != 0).then(|| sub(0, u, r) * pow(v, r - 2, r) % r)
+    (v != 0).then(|| mulmod(sub(0, u, r), pow(v, r - 2, r), r))
 }
 
 /// Run Figure 2 with the bounded generic enumeration backend.
@@ -485,6 +660,35 @@ pub fn solve_with_oracle(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
 ) -> Result<Certificate, Error> {
+    solve_with_oracle_profile(curve, p, q, config, oracle, &mut ReductionStats::default())
+}
+
+/// Descriptive stage clocks, accumulated across all attempted trials.
+/// These are not isolated benchmark measurements or an operation ledger.
+#[derive(Default, Debug)]
+pub struct ReductionStats {
+    /// Hash-base construction and validation.
+    pub bases: std::time::Duration,
+    /// Target scalar multiplication and accepted relation checking.
+    pub targets: std::time::Duration,
+    /// Oracle calls, including preparation on the first query of each trial.
+    pub oracle: std::time::Duration,
+    /// Matrix construction, dependency and extraction.
+    pub linear: std::time::Duration,
+    /// Independent certificate replay before returning.
+    pub replay: std::time::Duration,
+}
+
+/// The same reduction with accumulated diagnostic stage clocks.
+pub fn solve_with_oracle_profile(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+) -> Result<Certificate, Error> {
+    use std::time::Instant;
     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
         return Err(Error::Invalid("generator or target"));
     }
@@ -492,7 +696,7 @@ pub fn solve_with_oracle(
         || config.max_trials == 0
         || config.max_trials > 1000
         || config.max_columns == 0
-        || config.max_columns > 512
+        || config.max_columns > MAX_COLUMNS
         || config.max_work == 0
     {
         return Err(Error::Invalid("reduction bounds"));
@@ -508,14 +712,23 @@ pub fn solve_with_oracle(
         });
     }
     let s = (2 * curve.p..=4 * curve.p).find(|&s| prime(s)).unwrap();
-    let mut root = 1u64;
-    while root.pow(config.m as u32) < curve.r {
-        root += 1;
+    // Binary search and saturating products avoid both a sqrt(r) setup loop
+    // and overflow for large exponents; only comparison against r matters.
+    let (mut lower, mut root) = (0, curve.r);
+    while lower + 1 < root {
+        let mid = (lower + root) / 2;
+        let value = (0..config.m).fold(1u128, |v, _| v.saturating_mul(u128::from(mid)));
+        if value < u128::from(curve.r) {
+            lower = mid;
+        } else {
+            root = mid;
+        }
     }
-    let tau = config
-        .tau
-        .unwrap_or_else(|| (s * root.max(10 * config.m as u64)).div_ceil(curve.r - 1));
-    if tau == 0 || tau > s {
+    let tau = config.tau.unwrap_or_else(|| {
+        (u128::from(s) * u128::from(root.max(10 * config.m as u64)))
+            .div_ceil(u128::from(curve.r - 1)) as u64
+    });
+    if tau == 0 || tau > s || tau > MAX_HASH_CANDIDATES {
         return Err(Error::Invalid(
             "threshold outside 1..=s; use a larger toy group or explicit tau",
         ));
@@ -523,6 +736,7 @@ pub fn solve_with_oracle(
     let mut rng = Rng(config.seed);
     let mut attempts = 0;
     for trial in 1..=config.max_trials {
+        let stage = Instant::now();
         let hashes: Vec<_> = (0..config.m)
             .map(|_| HashBase {
                 s,
@@ -536,7 +750,7 @@ pub fn solve_with_oracle(
             || bases.iter().zip(&hashes).any(|(base, h)| {
                 base.windows(2).any(|w| w[0] >= w[1])
                     || base.iter().any(|&point| match curve.encode(point) {
-                        Ok(z) => (h.alpha * z + h.beta) % h.s >= h.tau,
+                        Ok(z) => (mulmod(h.alpha, z, h.s) + h.beta) % h.s >= h.tau,
                         Err(_) => true,
                     })
             })
@@ -544,6 +758,7 @@ pub fn solve_with_oracle(
             return Err(Error::Verification);
         }
         let n: usize = bases.iter().map(Vec::len).sum();
+        stats.bases += stage.elapsed();
         if n > config.max_columns {
             return Err(Error::Limit("dense relation matrix columns"));
         }
@@ -553,12 +768,19 @@ pub fn solve_with_oracle(
         let mut relations = Vec::new();
         for _ in 0..20 * (n + 1) {
             attempts += 1;
+            let stage = Instant::now();
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
             let target = curve.add_valid(curve.mul(p, u)?, curve.mul(q, v)?);
-            if let Some(points) = oracle.find(curve, &bases, target, config.max_work)? {
+            stats.targets += stage.elapsed();
+            let stage = Instant::now();
+            let found = oracle.find(curve, &bases, target, config.max_work);
+            stats.oracle += stage.elapsed();
+            if let Some(points) = found? {
+                let stage = Instant::now();
                 let rel = Relation { u, v, points };
                 check_relation(curve, p, q, &bases, &rel)?;
                 relations.push(rel);
+                stats.targets += stage.elapsed();
                 if relations.len() == n + 1 {
                     break;
                 }
@@ -567,8 +789,11 @@ pub fn solve_with_oracle(
         if relations.len() != n + 1 {
             continue;
         }
+        let stage = Instant::now();
         let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
-        if let Some(scalar) = extract(&relations, &coeff, curve.r) {
+        let scalar = extract(&relations, &coeff, curve.r);
+        stats.linear += stage.elapsed();
+        if let Some(scalar) = scalar {
             let cert = Certificate {
                 scalar,
                 hashes,
@@ -577,7 +802,9 @@ pub fn solve_with_oracle(
                 trials: trial,
                 attempts,
             };
+            let stage = Instant::now();
             verify(curve, p, q, &cert)?;
+            stats.replay += stage.elapsed();
             return Ok(cert);
         }
     }
@@ -638,7 +865,7 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
         .map(|h| h.enumerate(curve))
         .collect::<Result<_, _>>()?;
     let n: usize = bases.iter().map(Vec::len).sum();
-    if n > 512
+    if n > MAX_COLUMNS
         || bases.iter().any(Vec::is_empty)
         || cert.relations.len() != n + 1
         || cert.dependency.len() != n + 1
@@ -650,15 +877,19 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
     for rel in &cert.relations {
         check_relation(curve, p, q, &bases, rel)?;
     }
-    let rows = matrix(&bases, &cert.relations)?;
-    for col in 0..n {
-        let sum = rows
-            .iter()
-            .zip(&cert.dependency)
-            .fold(0, |a, (row, &c)| (a + row[col] * c) % curve.r);
-        if sum != 0 {
-            return Err(Error::Verification);
+    // A relation has exactly one entry per slot. Replay the dependency in
+    // O(m * relations) space/time for entries, without a dense N-by-N matrix.
+    let mut sums = vec![0u64; n];
+    for (rel, &coefficient) in cert.relations.iter().zip(&cert.dependency) {
+        let mut offset = 0;
+        for (base, point) in bases.iter().zip(&rel.points) {
+            let index = base.binary_search(point).map_err(|_| Error::Verification)?;
+            sums[offset + index] = (sums[offset + index] + coefficient) % curve.r;
+            offset += base.len();
         }
+    }
+    if sums.iter().any(|&x| x != 0) {
+        return Err(Error::Verification);
     }
     if extract(&cert.relations, &cert.dependency, curve.r) != Some(cert.scalar)
         || curve.mul(p, cert.scalar)? != q
@@ -673,6 +904,108 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn order_witness_and_square_roots_match_exhaustive_constructor() {
+        for (p, a, b, r, generator) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+        ] {
+            let tiny = Curve::new(p, a, b, r).unwrap();
+            let wide = Curve::with_order_witness(p, a, b, r, generator).unwrap();
+            for z in 0..2 * p {
+                assert_eq!(tiny.decode(z), wide.decode(z));
+            }
+            for scalar in 0..r {
+                assert_eq!(tiny.mul(generator, scalar), wide.mul(generator, scalar));
+            }
+            assert!(Curve::with_order_witness(p, a, b, r, None).is_err());
+            assert!(Curve::with_order_witness(p, a, b, r + 2, generator).is_err());
+        }
+        for p in [5, 13, 17, 97, 211] {
+            for a in 0..p {
+                let got = sqrtmod(a, p);
+                assert_eq!(got.is_some(), (0..p).any(|x| x * x % p == a));
+                if let Some(x) = got {
+                    assert_eq!(x * x % p, a);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wide_arithmetic_and_certified_40_bit_curve() {
+        let p = 1_099_511_627_563;
+        let r = 1_099_512_551_701;
+        let generator = Some((1, 15_267_301_451));
+        let c = Curve::with_order_witness(p, p - 3, 56, r, generator).unwrap();
+        assert!(c.roots.is_empty());
+        assert_eq!(c.mul(generator, r).unwrap(), None);
+        assert_eq!(c.decode(c.encode(generator).unwrap()), generator);
+        for a in [0, 1, p - 1, p / 2] {
+            for b in [0, 1, p - 1, p / 2] {
+                assert_eq!(
+                    mulmod(a, b, p),
+                    (u128::from(a) * u128::from(b) % u128::from(p)) as u64
+                );
+            }
+        }
+        for n in [0, 1, 4, 341, 561, 3215031751, 3825123056546413051] {
+            assert!(!prime(n));
+        }
+        for n in [2, 17, 65537, p, r, 18446744073709551557] {
+            assert!(prime(n));
+        }
+        for n in [0, 1, 2, 3, 4, 15, 16, 17, u64::MAX] {
+            let x = u128::from(floor_sqrt(n));
+            assert!(x * x <= u128::from(n) && (x + 1) * (x + 1) > u128::from(n));
+        }
+    }
+
+    #[test]
+    fn deferred_dependency_matches_eager_reference() {
+        // Independent eager provenance elimination retained only as a test
+        // oracle. Compare exact coefficients, not merely a zero product.
+        fn eager(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
+            let mut pivots = BTreeMap::<usize, (Vec<u64>, Vec<u64>)>::new();
+            for (i, source) in rows.iter().enumerate() {
+                let mut row = source.clone();
+                let mut coeff = vec![0; rows.len()];
+                coeff[i] = 1;
+                for (&col, (pivot, pc)) in &pivots {
+                    let k = row[col];
+                    for (a, &b) in row.iter_mut().zip(pivot) {
+                        *a = sub(*a, mulmod(k, b, r), r);
+                    }
+                    for (a, &b) in coeff.iter_mut().zip(pc) {
+                        *a = sub(*a, mulmod(k, b, r), r);
+                    }
+                }
+                if let Some(col) = row.iter().position(|&x| x != 0) {
+                    let inv = pow(row[col], r - 2, r);
+                    for x in &mut row {
+                        *x = mulmod(*x, inv, r);
+                    }
+                    for x in &mut coeff {
+                        *x = mulmod(*x, inv, r);
+                    }
+                    pivots.insert(col, (row, coeff));
+                } else {
+                    return Some(coeff);
+                }
+            }
+            None
+        }
+        let mut rng = Rng(321);
+        for r in [3, 199, 1_099_512_551_701] {
+            for n in 1..25 {
+                let rows: Vec<Vec<u64>> = (0..n + 1)
+                    .map(|_| (0..n).map(|_| rng.below(r)).collect())
+                    .collect();
+                assert_eq!(dependency(&rows, r), eager(&rows, r));
+            }
+        }
     }
 
     #[test]
