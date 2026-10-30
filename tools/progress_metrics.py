@@ -411,6 +411,47 @@ def koblitz_modular_geometry(ref, since):
                  label=label, source=f"{path}@{commit}")
 
 
+
+def koblitz_larger_constructions(ref, since):
+    """Exact R42/R43 construction counters; never attack or timing metrics."""
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    path = base + "42/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if not isinstance(record.get("cases"), list):
+            continue
+        certified = [row for row in record["cases"]
+                     if row.get("global_recovery_status") == "certified"]
+        rows = (
+            ("koblitz_modular.cm_block_inverse_cases", len(certified), "fixed cases",
+             "Explicit CM-block polynomial inverses; no evaluated geometric transfer"),
+            ("koblitz_modular.cm_block_recovery_max_n",
+             max((row["n"] for row in certified), default=None), "cyclic length",
+             "Largest actual CM-block inverse case; not a larger-n point transfer"),
+            ("koblitz_modular.cm_denominator_lattices",
+             len(record["integer_lattices"]) if isinstance(record.get("integer_lattices"), list) else None,
+             "fixed integral lattices",
+             "Exact least scalar for fixed denominator maps; not full modular Hom lattices"),
+        )
+        for metric, value, unit, label in rows:
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+    path = base + "43/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        emit("koblitz_modular.source_jet_precision", record.get("source_precision"),
+             date=date, problem=P_IC, unit="local coefficients", better="neutral",
+             label="Actual source jets with full R35 regression; no target factor map",
+             source=f"{path}@{commit}")
+        for stage in record.get("product_stages", []):
+            if stage.get("stop") != "expected_rank_reached":
+                continue
+            emit("koblitz_modular.complete_rr_" + stage["label"] + "_dimension",
+                 stage.get("output_rank"), date=date, problem=P_IC,
+                 unit="F2 dimensions", better="neutral",
+                 label="Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
+                 source=f"{path}@{commit}")
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -506,6 +547,7 @@ def main():
 
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
+    koblitz_larger_constructions(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
