@@ -356,6 +356,11 @@ pub struct ChildOutput {
     pub workload_id: Option<String>,
     pub method_id: Option<String>,
     pub report: Option<SolveReport>,
+    /// Common cold method-call interval: dispatch through report construction,
+    /// including per-call setup and in-child checks. Excludes workload creation,
+    /// child serialization and the runner's independent audit verification.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ns: Option<u64>,
     pub error: Option<String>,
     pub placement: SelfPlacement,
     /// Scheduler statistics across the solve alone.
@@ -388,6 +393,7 @@ pub fn child_main(input: &str) -> ChildOutput {
         workload_id: None,
         method_id: None,
         report: None,
+        method_call_wall_ns: None,
         error: None,
         placement: placement.clone(),
         schedstat_solve: None,
@@ -454,6 +460,7 @@ pub fn child_main(input: &str) -> ChildOutput {
         if profile_solve {
             ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
         }
+        let method_call_start = std::time::Instant::now();
         let report = crate::cryptanalysis::ecbench::methods::solve_measured(
             &m,
             &inst,
@@ -477,6 +484,16 @@ pub fn child_main(input: &str) -> ChildOutput {
             &w.target,
             &mut report,
         )?;
+        // This common cold-method clock remains the outer boundary that the
+        // pre-split `methods::solve` call supplied.  In particular it covers
+        // post-measurement report completion, while the profiling, PMU and
+        // scheduler windows above still exclude that inventory rebuild.  It
+        // consequently also includes the small cost of closing those nested
+        // instrumentation windows before `complete` runs.
+        out.method_call_wall_ns = Some(
+            u64::try_from(method_call_start.elapsed().as_nanos())
+                .map_err(|_| "method-call interval overflow")?,
+        );
         let delta = match (before, after) {
             (Some(a), Some(b)) => Some(SchedStat {
                 cpu_ns: b.cpu_ns.saturating_sub(a.cpu_ns),
@@ -562,10 +579,27 @@ pub struct Boundaries {
     pub floor_rule: Option<String>,
 }
 
+/// Exported producer clock status. An absent object in a historical record is
+/// unknown; an object with `error: null` explicitly records no producer error.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct OnlineClockDiagnostics {
+    pub error: Option<String>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Timing {
     /// In-process wall time of the algorithm alone.
     pub solve_wall_ns: Option<u64>,
+    /// Shared enclosing method call, including per-call setup, in-child
+    /// verification and report construction. Never added to its nested timers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ns: Option<u64>,
+    /// Independent mathematical verification in the parent after child exit.
+    /// Diagnostic audit overhead; does not inherit the child's L2 isolation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_audit_verification_ns: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub online_clock_diagnostics: Option<OnlineClockDiagnostics>,
     /// Fork to reap, as the runner timed it: a practicality figure.
     pub process_wall_ns: u64,
     pub user_ns: u64,
@@ -2115,6 +2149,22 @@ mod allocator_tests {
         let input = child_input(curve, "bsgs.textbook", 1);
         let out = child_main(&serde_json::to_string(&input).unwrap());
         assert!(out.error.is_none(), "{:?}", out.error);
+        assert!(
+            out.method_call_wall_ns.expect("shared cold clock")
+                >= out.report.as_ref().unwrap().solve_wall_ns
+        );
+        let encoded = serde_json::to_value(&out).unwrap();
+        let mut legacy = encoded.clone();
+        legacy
+            .as_object_mut()
+            .unwrap()
+            .remove("method_call_wall_ns");
+        let decoded: ChildOutput = serde_json::from_value(legacy).unwrap();
+        assert_eq!(decoded.method_call_wall_ns, None);
+        assert_eq!(decoded.report, out.report);
+        let rejected = child_main("invalid JSON");
+        assert!(rejected.error.is_some());
+        assert_eq!(rejected.method_call_wall_ns, None);
         let facts = out.allocator.expect("the child records the allocator");
         assert!(!facts.name.is_empty());
         #[cfg(all(target_os = "linux", target_env = "gnu"))]
