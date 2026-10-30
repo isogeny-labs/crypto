@@ -1,5 +1,15 @@
 # n83 spike40 factor bases and matched PDP work
 
+## 2026-10-30: complete centered panel and fixed-domain radix census
+
+The source-bound centered panel completed all84 producer,fresh-replay and S3-restored-replay cases. It retains21 degree15 centered remainders and63 degree16 remainders, with84 nonzero projections. All872 restored payload hashes match. These are terminal-remainder degrees; exact LFD/regularity remain null. Synthetic controls have no asserted rational target lift. See [summary](evidence/centered-panel-r2/summary.json), [certificate index](evidence/centered-panel-r2/certificate-index.json), [custody](evidence/centered-panel-r2/custody.json), [file structure](CENTERED_PANEL_R2_FORMAT.json), [export](experiment-centered-panel-r2.export.json) and [inspected report](reports/run-20261030T2155Z-centered/report.pdf).
+
+The radix census covers all3010 partitions of27 for alternative encodings of the identical original prime candidate interval and point base. It retains35 exact Hilbert records and2975 certified lower bounds. The unique minimum exact original-top first vanishing degree is42 for the all-binary presentation; every bounded record has lower bound at least43. This excludes improvements within this specific presentation family. It does not compute affine FFD/LFD or higher-m regularity. See [native census index](evidence/radix-census-r2/summary.json), [exact records](evidence/radix-census-r2/exact-cases.json), [observations](evidence/radix-census-r2/observations.json), [format](RADIX_CENSUS_FORMAT.json), [custody](evidence/radix-census-r2/custody.json), [export](experiment-radix-census-r2.export.json) and [inspected report](reports/run-20261030T2202Z-radix/report.pdf).
+
+Both original EKS attempts expired unscheduled and remain preserved. The original radix protocol's unequal-arm accounting mismatch and failed export check are explicit in [the correction record](RADIX_ACCOUNTING_CORRECTION.json);v2 fixed execution units before arithmetic data. Both successful v2 exports pass protocol/file checks. The centered download's temporary-path warnings are retained alongside subsequent complete hash/native verification.
+
+Full raw prefixes: `s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r2/raw/` and `s3://setec-astronomy-artifacts/runs/n83-radix-census-20261030-r2/raw/`. All earlier data and original fixed-base views remain unchanged. Next investigate candidate-domain geometry beyond the tested nonzero-reweighting and radix families, using the retained centered coefficients for source-bound filtered-space work.
+
 
 ## New development: cubic coefficient controls
 
