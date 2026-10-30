@@ -27,7 +27,7 @@ pub use field::is_prime;
 pub use gadgets::{Arith, ArithRef, Builder, Operand, Term, Var};
 pub use linalg::left_kernel_vector;
 pub use pointgadget::{gadget_relation_network, gadget_shapes, FieldPoint};
-pub use relation::{relation_network, FactorBases};
+pub use relation::{mitm_find_relation, relation_network, FactorBases};
 pub use schedule::{DFSCounter, EdgeHint, Step};
 pub use solver::{Relation, Solver, Stats};
 pub use tensor::{
