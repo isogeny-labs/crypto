@@ -6,6 +6,8 @@ mod donor;
 mod math;
 #[path = "../prime_linear_source_donor.rs"]
 mod source_donor;
+#[path = "../prime_quadratic_bounded.rs"]
+mod bounded;
 use math::{add, mul, neg};
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, fs, path::Path};
@@ -112,6 +114,7 @@ fn validate_coverage(c:&[Vec<usize>])->bool {
 }
 fn panel(root:&Path,protocol:&Path,out:&Path,replay:bool){
     let protocol=math::read(protocol);
+    assert_eq!(protocol["freeze"]["status"],"frozen");
     let cases=protocol["extensions"]["cases"].as_array().unwrap();
     assert_eq!(cases.len(),42);
     let mut expected=std::collections::BTreeSet::new();
@@ -129,8 +132,31 @@ fn panel(root:&Path,protocol:&Path,out:&Path,replay:bool){
     let pc=donor::primality();persist("primality.json",&pc);
     let p=donor::field();let cover=coverage();assert!(validate_coverage(&cover));
     let mut templates=BTreeMap::new();
-    for m in 3..=9{
-        let c=certificate(m,7,p);persist(&format!("template-m{m}.json"),&c);templates.insert(m,c);
+    for m in 3..=9 {
+        let directory=root.join("templates").join(format!("m{m}"));
+        let attempt=math::read(&directory.join("attempt.json"));
+        assert_eq!(attempt["m"],m);
+        let verified=attempt["producer_exit_code"]==0 && attempt["replay_exit_code"]==0;
+        let result=if verified {
+            let path=directory.join("native/result.json");
+            assert_eq!(attempt["result_sha256"],math::sha(&fs::read(&path).unwrap()));
+            assert_eq!(attempt["journal_sha256"],math::sha(&fs::read(directory.join("native/journal.jsonl")).unwrap()));
+            let identity=math::read(&directory.join("native/identity.json"));
+            assert_eq!(identity["m"],m);assert_eq!(identity["ell"],7);assert_eq!(identity["p"],p.to_string());
+            assert_eq!(identity["limits"],protocol["extensions"]["template_limits"]);
+            let result=math::read(&path);
+            assert!(result["status"]=="complete" || result["status"]=="capped");
+            if result["status"]=="complete" {
+                let c=&result["certificate"];let nv=8*m-2;let columns=(m-1)*(nv*(nv+1)/2-7*m);
+                assert_eq!(c["m"],m);assert_eq!(c["ell_projected"],7);assert_eq!(c["p"],p.to_string());
+                assert_eq!(c["columns"],columns);assert_eq!(c["multiplier_degree"],2);
+                let rank=c["rank"].as_u64().unwrap() as usize;assert!(rank<=columns);
+                assert_eq!(c["injective"],rank==columns);assert_eq!(c["pivot_rows"].as_array().unwrap().len(),rank);
+            }else{assert!(result["certificate"].is_null());}
+            result
+        }else{Value::Null};
+        let record=json!({"attempt":attempt,"verified_result":result});
+        persist(&format!("template-m{m}.json"),&record);templates.insert(m,record);
     }
     let mut rows=Vec::new();
     for case in cases {
@@ -150,21 +176,29 @@ fn panel(root:&Path,protocol:&Path,out:&Path,replay:bool){
             let w=w.as_str().unwrap().parse::<u128>().unwrap();let inverse=power(w,p-2,p);
             assert!(w>0 && w<p);assert_eq!(mul(w,inverse,p),1);inverse.to_string()
         }).collect();
-        let c=&templates[&m];let injective=c["injective"].as_bool().unwrap();
+        let record=&templates[&m];let c=&record["verified_result"]["certificate"];let injective=c["injective"].as_bool().unwrap_or(false);
+        let nv=8*m-2;let column_count=(m-1)*(nv*(nv+1)/2-7*m);
         let bound=if injective{Some(7)}else{None::<u64>};
         let cert=json!({"schema":"n83.prime-quadratic-case/v1","key":key,"m":m,"arm":arm,"source":checked,"source_sha256":case["source_sha256"],"input_sha256":case["input_sha256"],"factor_base_manifest_sha256":case["factor_base_manifest_sha256"],"normalization_inverses":inverses,"covering_subsets":cover,"template":format!("template-m{m}.json"),"template_sha256":math::sha(&fs::read(out.join(format!("template-m{m}.json"))).unwrap()),"first_fall_lower_bound":bound,"last_fall_lower_bound":null,"exact_first_fall":null,"interpretation":if injective{"degree-six quadratic injectivity plus pair-covering projection argument"}else{"projection inconclusive; no original-system kernel claimed"}});
         persist(&format!("{key}.json"),&cert);
-        rows.push(json!({"key":key,"m":m,"arm":arm,"target_kind":input["target_kind"],"first_fall_lower_bound":bound,"projected_rank":c["rank"],"projected_columns":c["columns"],"source_sha256":case["source_sha256"],"factor_base_manifest_sha256":case["factor_base_manifest_sha256"]}));
+        rows.push(json!({"key":key,"m":m,"arm":arm,"target_kind":input["target_kind"],"first_fall_lower_bound":bound,"projected_rank":c["rank"],"projected_columns":column_count,"template_status":record["verified_result"]["status"],"template_attempt":record["attempt"],"source_sha256":case["source_sha256"],"factor_base_manifest_sha256":case["factor_base_manifest_sha256"]}));
     }
     persist("summary.json",&json!({"schema":"n83.prime-quadratic-summary/v1","rows":rows,"shared_template_count":7,"coverage":cover,"new_lfd_claim":false,"independent_review":"pending"}));
     println!("{}",json!({"cases_verified":rows.len(),"shared_templates":7,"replay":replay}));
 }
 fn main(){
     let args:Vec<_>=std::env::args().collect();
-    if args.get(1).map(String::as_str)==Some("run") || args.get(1).map(String::as_str)==Some("replay"){
+    if matches!(args.get(1).map(String::as_str),Some("template")|Some("template-replay")){
+        assert!(std::env::var("N83_QUADRATIC_FROZEN_PRODUCTION").as_deref()==Ok("1"));
+        assert_eq!(args.len(),5,"template|template-replay M LIMITS OUTPUT");
+        let m=args[2].parse().unwrap();let limits=bounded::Limits::read(&math::read(Path::new(&args[3])));
+        donor::primality();let result=bounded::execute(m,7,donor::field(),&limits,Path::new(&args[4]),args[1]=="template-replay");
+        println!("{}",json!({"m":m,"status":result["status"],"replay":args[1]=="template-replay"}));return;
+    }
+    if args.get(1).map(String::as_str)==Some("assemble") || args.get(1).map(String::as_str)==Some("assemble-replay"){
         assert!(std::env::var("N83_QUADRATIC_FROZEN_PRODUCTION").as_deref()==Ok("1"),"Production not enabled until a new protocol is frozen");
-        assert_eq!(args.len(),5,"run|replay INPUT_ROOT PROTOCOL OUTPUT");
-        panel(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),args[1]=="replay");return;
+        assert_eq!(args.len(),5,"assemble|assemble-replay INPUT_ROOT PROTOCOL OUTPUT");
+        panel(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),args[1]=="assemble-replay");return;
     }
     // Explicit small-prime development mode cannot impersonate n83 results.
     assert_eq!(args.len(),6,"development M ELL PRIME OUTPUT");

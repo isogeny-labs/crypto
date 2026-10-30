@@ -1,6 +1,6 @@
 {
   "schema": "n83.prime-quadratic-format/v1",
-  "status": "development_contract_no_production_dataset",
+  "status": "bounded_production_contract",
   "encoding": "UTF-8 JSON; field elements as canonical decimal strings; indices zero-based",
   "template": {
     "variables": "7 selectors per block in block-major order then m-2 unrestricted intermediate U variables",
@@ -19,7 +19,31 @@
     "success": "Full rank plus source normalization and pair-cover proof implies FFD>=7",
     "deficiency": "Inconclusive for original system; no lifted kernel claimed",
     "lfd": "No new claim",
-    "current_production": "Absent; existing6\u201317 interval unchanged"
+    "current_production": "Governed by the separate frozen protocol and run records; development records do not supply production bounds"
   },
-  "development_summary": "validation-prime-quadratic-development/summary.json; layout fields are exact domain dimensions, not measured ranks or memory bounds"
+  "development_summary": "validation-prime-quadratic-development/summary.json; layout fields are exact domain dimensions, not measured ranks or memory bounds",
+  "bounded_contract": "PRIME_QUADRATIC_BOUNDED.md",
+  "journal": {
+    "encoding": "UTF-8 JSONL; each event flushed; canonical coefficients are decimal strings",
+    "events": [
+      "header",
+      "column",
+      "pending_column",
+      "matrix_complete",
+      "row_complete",
+      "pending_row",
+      "terminal"
+    ],
+    "column": "column index plus exact [sorted monomial,coefficient] pairs",
+    "row_complete": "matrix row cursor,monomial,pivot record or null,cumulative reduction updates and basis entries",
+    "pending_row": "partially reduced row plus next reducer or null for pending insertion",
+    "terminal": "complete certificate or capped record with null certificate",
+    "hard_interruption": "Unverified prefix only; do not report a successful replay"
+  },
+  "attempt": "Per-template producer/replay exit codes,timeouts,started flags,result/journal hashes;125 indicates replay not attempted",
+  "assembly": "All42 source checks; new bound only when producer and fresh replay both succeeded and complete projected map is injective",
+  "replay_commands": [
+    "instrument template-replay M LIMITS TEMPLATE_DIR",
+    "instrument assemble-replay ROOT PROTOCOL RESULTS"
+  ]
 }
