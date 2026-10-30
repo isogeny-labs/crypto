@@ -462,7 +462,7 @@ proc passage44(int caseid,number mx,number my,poly kernelLocal44,int d){
  if(reduce(u*aa+1,base)!=0 || reduce(bb*u^3+rr,base)!=0){ERROR("POINT44_NORMALIZATION");}
  poly g2=reduce((rr+c2)*iu^2,base);poly g1=reduce((rr^2+c1)*iu^4,base);poly g0=reduce((rr^3+c2*rr^2+c1*rr+c0)*iu^6,base);
  list sumLocal44;list P=list(poly(0),poly(0));for(k=1;k<=11;k++){sumLocal44=add44(sumLocal44,P,bb,aa,base);if(k<11 && size(sumLocal44)==0){ERROR("POINT44_EARLY_ORDER");}}if(size(sumLocal44)!=0){ERROR("POINT44_ORDER11");}
- int certifiedBasePeriod44=baseTuplePeriod44(bb,cc,kernelLocal44,d);int twist;int unused;int step;int j;int matches;int matched;int period;poly L;poly traceLocal44;poly term;poly nv;ideal q;ideal physical;list p;list ph;list deck;list cur;list fp;list sign;list bad;
+ int certifiedBasePeriod44=0;int twist;int unused;int step;int j;int matches;int matched;int period;poly L;poly traceLocal44;poly term;poly nv;ideal q;ideal physical;list p;list ph;list deck;list cur;list fp;list sign;list bad;
  for(twist=0;twist<=1;twist++){
   L=Z^2+aa*Z+bb+g2+twist*aa^2;q=std(ideal(kernelLocal44,L,T));physical=std(ideal(kernelLocal44,L,T^2+T+1));
   if(vdim(q)!=10 || vdim(physical)!=20){ERROR("POINT44_SOURCE_DIM");}
@@ -477,6 +477,8 @@ proc passage44(int caseid,number mx,number my,poly kernelLocal44,int d){
    cur=deck44(cur,physical);
   }if(same44(cur,ph,physical)==0){ERROR("POINT44_DECK_PERIOD");}
   bad=list(ph[1],ph[2],ph[3],ph[4]+1);ideal cr=modularValues44(bad,physical);int rejected=0;for(j=1;j<=5;j++){if(reduce(cr[j],physical)!=0){rejected=1;}}if(rejected==0){ERROR("POINT44_CORRUPT_ACCEPTED");}
+  print("POINT44_STAGE case="+string(caseid)+" twist="+string(twist)+" stage=full_source_checks_complete equations=5 units=8 deck_iterates=10 corrupt_nu=rejected matrix_inverse_calls="+string(matrixInverseCalls44));
+  if(certifiedBasePeriod44==0){print("POINT44_STAGE stage=base_generation_begin");certifiedBasePeriod44=baseTuplePeriod44(bb,cc,kernelLocal44,d);print("POINT44_STAGE stage=base_generation_complete period="+string(certifiedBasePeriod44));}
   list frobData44=frobFormula44(p,kernelLocal44,L,d);fp=frobData44[1];traceLocal44=frobData44[4];if(traceLocal44!=1){ERROR("POINT44_INDEPENDENT_TRACE_REFERENCE");}
   matches=0;matched=-1;for(step=0;step<10;step++){if(same44(fp,deck[step+1],q)==1){matches++;matched=step;}}if(matches!=1){ERROR("POINT44_FROB_DECK_MATCH");}
   fp=p;for(k=1;k<=5;k++){fp=applyFrobMap44(fp,poly(frobData44[2]),poly(frobData44[3]),q);}sign=list(bb,cc,Z+aa,nv+bb);if(same44(fp,sign,q)==0){ERROR("POINT44_FROB_TRACE_SIGN");}
