@@ -5,18 +5,19 @@
   "created": "2026-10-26",
   "authors": ["conductor-gap research workstream"],
   "status": "blocked",
-  "status_note": "Parameter certificates and a precision objective do not supply exact models, transported targets, a larger-size pilot or an executable confirmation driver. No solver campaign is launched or funded.",
+  "status_note": "A native prospective pilot allocation planner/auditor is implemented; its preflight explicitly remains blocked. Exact models, transported targets, the measurement executor, independent replay, pilot calibration and confirmation are still pending. No solver campaign is launched or funded.",
   "blocked_on": [
     "problem:problems/conductor-gap-crater-sampling-and-size.md",
     "problem:problems/conductor-gap-upper-floor-and-cost.md",
-    "note:Construct and independently certify all selected curve models, orders, conductor strata and explicit generator/target maps; implement the resumable native pilot driver and freeze the confirmation count from the disjoint pilot.",
+    "note:Construct and independently certify all selected curve models, orders, conductor strata and explicit generator/target maps; implement the resumable native measurement executor and independent replay, then freeze the confirmation count from the disjoint pilot. The existing allocation-only example provides plan/audit/preflight commands, not the intended run.argv execution mode.",
     "hw:Establish execution feasibility under available local resources without paid provisioning; the provisional million-solve allocation is not an accepted runtime estimate."
   ],
   "links": {
     "lead": "research/conductor_gap_size_ladder_20261026/REPORT.md",
     "notes": [
       "research/conductor_gap_size_ladder_20261026/PROTOCOL.md",
-      "research/conductor_gap_size_ladder_20261026/AMENDMENT-v2.md"
+      "research/conductor_gap_size_ladder_20261026/AMENDMENT-v2.md",
+      "research/conductor_gap_preflight_20261027/PROTOCOL.md"
     ],
     "prs": [2560, 2430]
   },
@@ -26,7 +27,7 @@
   "code": {
     "repo": "crypto",
     "commit": null,
-    "branch": "codex/conductor-gap-size-ladder-20261026",
+    "branch": "codex/conductor-gap-preflight-20261027",
     "build": [["cargo", "build", "--release", "--example", "conductor_gap_confirmation"]]
   },
   "resources": {
@@ -36,7 +37,7 @@
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "The named future driver is unimplemented. Runtime and storage must be measured and recorded before ready promotion. The inherited ninety-minute local guard is a stop limit, not an estimate or evidence that the complete pilot fits. No paid allocation is authorized by this card."
+    "notes": "Only prospective allocation and audit are implemented; the named measurement execution mode remains unimplemented. Runtime and storage must be measured and recorded before ready promotion. The inherited ninety-minute local guard is a stop limit, not an estimate or evidence that the complete pilot fits. No paid allocation is authorized by this card."
   },
   "run": {
     "argv": ["target/release/examples/conductor_gap_confirmation", "--phase", "pilot", "--out", "{out}"],
