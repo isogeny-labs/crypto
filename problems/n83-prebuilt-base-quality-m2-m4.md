@@ -2,7 +2,7 @@
 
 - **Status:** `open`
 - **Kind:** implementation gap and empirical bottleneck; bounded natural m=4 query with missing durable inner-search progress; matched quality and full-cost measurements absent
-- **Affected work:** [prebuilt-base review](../research/n83_prebuilt_factor_base_20261016/REVIEW.md), [primary N83 sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md), [solver gates](../research/koblitz_n83_factor_base_sweep_20261008/SOLVER_GATES.md), [K=16,627 construction](../research/n83_k16627_prebuild_20261017/RUN_REPORT.md), [m=4 model capacity](../research/n83_k16627_m4_capacity_20261017/RUN_REPORT.md), [planted control](../research/n83_k16627_m4_planted_20261017/RUN_REPORT.md), [complete-witness phases](../research/n83_k16627_m4_witness_20261018/RUN_REPORT.md), [root-phase control](../research/n83_k16627_m4_root_phase_20261018/RUN_REPORT.md), [search-progress control](../research/n83_k16627_m4_search_progress_20261018/RUN_REPORT.md), [selector-pinned positive control](../research/n83_k16627_m4_selector_positive_20261018/RUN_REPORT.md), [selector-only control](../research/n83_k16627_m4_selector_only_20261018/RUN_REPORT.md), [bounded natural query](../research/n83_k16627_m4_natural_query_20261018/RESULT.md)
+- **Affected work:** [prebuilt-base review](../research/n83_prebuilt_factor_base_20261016/REVIEW.md), [primary N83 sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md), [solver gates](../research/koblitz_n83_factor_base_sweep_20261008/SOLVER_GATES.md), [K=16,627 construction](../research/n83_k16627_prebuild_20261017/RUN_REPORT.md), [m=4 model capacity](../research/n83_k16627_m4_capacity_20261017/RUN_REPORT.md), [planted control](../research/n83_k16627_m4_planted_20261017/RUN_REPORT.md), [complete-witness phases](../research/n83_k16627_m4_witness_20261018/RUN_REPORT.md), [root-phase control](../research/n83_k16627_m4_root_phase_20261018/RUN_REPORT.md), [search-progress control](../research/n83_k16627_m4_search_progress_20261018/RUN_REPORT.md), [selector-pinned positive control](../research/n83_k16627_m4_selector_positive_20261018/RUN_REPORT.md), [selector-only control](../research/n83_k16627_m4_selector_only_20261018/RUN_REPORT.md), [bounded natural query](../research/n83_k16627_m4_natural_query_20261018/RESULT.md), [dimension-18 direct-subgroup census](../research/n83_d18_subgroup_orbit_census_20261018/RESULT.md)
 - **Next action owner:** N83 index-calculus workstream
 - **Last updated:** 2026-10-19 UTC; [bounded natural query](../research/n83_k16627_m4_natural_query_20261018/RESULT.md)
 
@@ -64,6 +64,45 @@ the named bases under that oracle. The separate full-cost gate would determine
 their cost ordering at that workload. Neither would establish a universal
 best base, asymptotic crossover or transfer to a different curve.
 
+## D18 shared-bit continuation
+
+The [frozen shared-bit protocol](../research/n83_d18_shared_bits_20261020/PROTOCOL.md)
+keeps all 16,627 D18 representatives and 2,760,082 signed-Frobenius points.
+The independent inventory finds 66 common zero coordinates. Both actual local
+encodings have equal variables, XOR rows and choice wires; the m=2,3,4 clause
+counts change from 2,926,660 / 4,420,949 / 5,915,238 to 732,028 / 1,129,001 /
+1,525,974. These are structural counts, without a solver-time comparison.
+The [proof map](../research/n83_d18_shared_bits_20261020/PROOF_MAP.md) identifies
+the checked Lean factorization and counting statements and their implementation
+boundary. The original local example tests passed. On 2026-10-24 UTC the fresh
+library run passed all shared-bit tests, but nine unrelated socket tests failed
+under sandbox permissions. The complete updated-parent rerun then passed:
+4,478 library tests, zero failures, 119 ignored, plus all 28 affected-example
+tests. Its rebuilt construction receipt is byte-identical to the committed
+receipt; [validation v3](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0603Z/RUN_REPORT.md)
+retains both attempts.
+
+The subsequent [validation v4](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0640Z/RUN_REPORT.md)
+repeats all 4,478 library tests and passes 29 affected-example tests after adding
+independent construction-policy checks to the native freezer and auditor.
+The worker, construction tool and general-field replayer are unchanged.
+
+The subsequent Linux gate failed (4,473 passed, 15 failed, 119 ignored): nine
+missing runtime-fixture failures and six solver assertions, two explicitly
+timed out. Exact committed fixtures are materialized; a full serial rerun is
+queued without changing tests or caps. [Validation v5](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0650Z/RUN_REPORT.md)
+retains the failure and does not infer that all six solver failures share a
+cause. Bounded construction and the paired card remain gated on that rerun.
+
+The executable gate still requires a 4 GiB zero-swap Linux construction receipt,
+then a committed actual-host card for 22 constructed
+controls, 22 fresh independent replays and 18 natural queries. The native
+shared-card auditor checks source/input/binary identities, container policies,
+schedule, control equivalence, durable progress, every replay binding and
+retained natural-row rank separately by encoding. A cap remains censored.
+Qualified solver timing, natural useful rank and complete cold/reused IC cost
+remain open until those specific measurements pass their existing gates.
+
 ## Next discriminating step
 
 - **Action or proof obligation:** Finish the separately frozen direct-subgroup dimension-18 x-orbit census and, if it passes the 16,627-class threshold, export and replay that exact structured closure. Add a durable natural-oracle progress observer before another long capped query; the completed B arm did not emit decisions, conflicts or XOR counters. Then freeze common natural queries for the retained bases before a paired rank/cost run.
@@ -75,6 +114,54 @@ best base, asymptotic crossover or transfer to a different curve.
 A planned step is not a completed experiment.
 
 ## Resolution and history
+
+Unresolved. This record names the missing comparison; it does not close the
+underlying factor-base selection task.
+### XOR cache implementation and experiment
+
+The [XOR cache continuation](../research/n83_prebuild_cost_m23_20261019/xor-cache-v2/STATUS.md)
+adds a tested implementation and a completed sixteen-attempt matched
+component card with public target 1 as a fresh holdout. Four constructed
+controls passed independent replay. All sixteen natural searches capped
+at 10,000 conflicts, and the 294-file native audit passes all four exact
+matched endpoints. Checked row visits fall by 82.960–85.361%; L0 worker
+off/on ratios are 1.321160–1.345360. Natural useful rank and qualified
+complete IC cost remain open. Both launch failures and their separately
+frozen fixes are retained.
+
+The [full-base common-public panel](../research/n83_prebuild_cost_m23_20261019/full-m4-v1/STATUS.md)
+ran from 02:06:17 to 06:48:53 UTC on 2026-10-20 after four full-base
+controls, four independent replays and two native pair checks passed.
+All eighteen natural attempts over eight public points completed, each
+base with 16,627 columns / 2,760,082 points. The 329-file native audit
+passes. D has nine conflict caps; U has four conflict caps and five wall
+caps. Summed worker intervals are 2,636.872934 s and 14,284.411736 s
+respectively; different endpoints do not justify a speed ratio.
+The retained natural-row matrices are empty, with rank zero; useful-rank
+completion and natural yield remain null.
+
+The [reuse addendum](../research/n83_prebuild_cost_m23_20261019/reports/reuse-20261020/RUN_REPORT.md)
+completes q=1,8,64 projections and explicitly charges observed fresh
+replay/container intervals omitted from the earlier worker-only view.
+This is an accounting addition from the retained finite-policy runs;
+no 64-query card was executed. Full cold IC accounting remains open.
+
+### Catalog evidence drift blocking the current PR
+
+The N83 continuation PR also contains earlier catalog maintenance commits.
+Its [CI/provenance record](../research/n83_prebuild_cost_m23_20261019/CI_STATUS_20261020.md)
+identifies failed native count assertions, a removed nonexistent source
+reference, eleven stale artifact digests, and 28 remaining independent
+assessment-verifier problems. The
+[versioned reconciliation](../research/cover_transfer_assessment_20261013/catalog-refresh-20261020.md)
+now passes the independent catalog verifier, exact generation replay,
+2,572-model native verification, 77 affected example tests and the
+4,401-pass release-library suite. The catalog transition checks all
+2,098 retained model and 664 retained EC1 identities, with two removed
+non-EC1 models explicitly recorded. Original failed logs remain retained.
+This closes the local reconciliation gap. Successful applicable checks
+and required review at the final PR head remain the merge gate; N83
+tests alone do not substitute for those checks.
 
 Unresolved. This record names the missing comparison; it does not close the
 underlying factor-base selection task.

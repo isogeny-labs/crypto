@@ -1,0 +1,20 @@
+node:internal/fs/promises:1360
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
+    at async open (node:internal/fs/promises:1360:25)
+    at async readFile (node:internal/fs/promises:2149:14)
+    at async fileHash (file:///Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/scripts/build_cover_transfer_assessments.mjs:42:22)
+    at async sourceArtifact (file:///Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/scripts/build_cover_transfer_assessments.mjs:795:13)
+    at async Promise.all (index 32)
+    at async buildLedger (file:///Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/scripts/build_cover_transfer_assessments.mjs:1311:23)
+    at async main (file:///Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/scripts/build_cover_transfer_assessments.mjs:1671:38)
+    at async file:///Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/scripts/build_cover_transfer_assessments.mjs:1689:1 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
+}
+
+Node.js v26.7.0

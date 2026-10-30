@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "arm": "U",
+      "error": "relation point sum differs from target",
+      "exit_code": 1,
+      "input_sha256": "b62fbb825587f39c2a5215a8cf352c9d9bd9c4ccaa199eabfc86582c3a7a1f3c",
+      "mutation": "changed-point",
+      "stderr_sha256": "15dda45661e5010641374606a24e186ed076d83e54979049cdeb4bd189943b0e",
+      "success_output_exists": false
+    },
+    {
+      "arm": "U",
+      "error": "paired relation, rank or tamper replay failed",
+      "exit_code": 1,
+      "input_sha256": "04df0947fb5c396daf8b50d79794d830741f3c8cde786e42c8cf2ae8677c7a8c",
+      "mutation": "changed-row",
+      "stderr_sha256": "3ea5c344a36e29f17ec59565d17d1d75f9a0c1b1c30a3f1dbd5ca4434e907801",
+      "success_output_exists": false
+    },
+    {
+      "arm": "D",
+      "error": "relation point sum differs from target",
+      "exit_code": 1,
+      "input_sha256": "2047d0a677c0f506c40e6d1e5b582a8aba85a2cacb53bfc7bb8938ae22fcbb16",
+      "mutation": "changed-point",
+      "stderr_sha256": "15dda45661e5010641374606a24e186ed076d83e54979049cdeb4bd189943b0e",
+      "success_output_exists": false
+    },
+    {
+      "arm": "D",
+      "error": "paired relation, rank or tamper replay failed",
+      "exit_code": 1,
+      "input_sha256": "0b73da8ce802c51792f29e1bf7f8ebc4f192f49e86707123a5073b6e3ad95e55",
+      "mutation": "changed-row",
+      "stderr_sha256": "3ea5c344a36e29f17ec59565d17d1d75f9a0c1b1c30a3f1dbd5ca4434e907801",
+      "success_output_exists": false
+    }
+  ],
+  "replay_binary_sha256": "b6574f47066dd5749a06f6feed1a856909f7794f0b19ffc7a8adeaef0e670525",
+  "schema": "n83.paired-replay-negative-controls/v1",
+  "status": "PASS"
+}

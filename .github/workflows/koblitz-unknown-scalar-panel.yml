@@ -66,6 +66,9 @@ jobs:
           df -h /
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      # This job builds current-source operational smoke. Its smoke profile
+      # binds the committed workspace lock; production keeps its archived lock.
+      # Do not replace Cargo.lock with a historical experiment dependency graph.
       # Current-code validation uses the PR checkout's own Cargo.lock. The
       # Stage-23 historical producer is checked independently from its sealed
       # source closure and the archived Stage-20 lock below.

@@ -11,6 +11,7 @@ if [ ! -f "$jar" ]; then
   curl --proto '=https' --tlsv1.2 -fsSL \
     https://github.com/tlaplus/tlaplus/releases/download/v1.7.1/tla2tools.jar -o "$jar"
 fi
+printf '5bd7b64db99ae4c6c35f290de5e809c0ee41af43f8699cf696099ffb6452b1e2  %s\n' "$jar" | sha256sum -c -
 printf '9416f74257aa50f250776db34964db7ec99e9883  %s\n' "$jar" | sha1sum -c -
 printf 'd532ba31aafe17afba1130f92410d9257454ff7393d1eb2fe032f0c07f352da5  %s\n' "$jar" | sha256sum -c -
 cd "$study/formal"

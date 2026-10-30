@@ -1,0 +1,46 @@
+{
+    "SpotInstanceRequests": [
+        {
+            "CreateTime": "2026-10-19T13:16:29+00:00",
+            "InstanceId": "i-0355f2d911a051a3a",
+            "LaunchSpecification": {
+                "ImageId": "ami-0567589d25e06853e",
+                "InstanceType": "c7i.2xlarge",
+                "KeyName": "n83-cache-east-20261019-8cde893",
+                "NetworkInterfaces": [
+                    {
+                        "DeleteOnTermination": true,
+                        "DeviceIndex": 0,
+                        "SubnetId": "subnet-0c343d40111cce085"
+                    }
+                ],
+                "Placement": {
+                    "AvailabilityZone": "us-east-1f",
+                    "Tenancy": "default"
+                },
+                "SecurityGroups": [
+                    {
+                        "GroupId": "sg-0a723165c7351c46a",
+                        "GroupName": "n83-cache-east-20261019-8cde893"
+                    }
+                ],
+                "Monitoring": {
+                    "Enabled": false
+                }
+            },
+            "LaunchedAvailabilityZone": "us-east-1f",
+            "ProductDescription": "Linux/UNIX",
+            "SpotInstanceRequestId": "sir-zr27qyxg",
+            "SpotPrice": "0.357000",
+            "State": "active",
+            "Status": {
+                "Code": "fulfilled",
+                "Message": "Your Spot request is fulfilled.",
+                "UpdateTime": "2026-10-19T13:18:26+00:00"
+            },
+            "Tags": [],
+            "Type": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    ]
+}

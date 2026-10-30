@@ -1,0 +1,470 @@
+{
+  "candidate_id": null,
+  "columns": 16627,
+  "count_identity": {
+    "id": "IDC1hbc6bfea0a569542b",
+    "independence": "Native issuer and extra-seed replay in the same process; separate checked Lean theorem over Nat.",
+    "modulus": 2305843009213693951,
+    "points": 32,
+    "proof": null,
+    "schema": "identity.certificate/v1",
+    "seed": 2026102001,
+    "statement": {
+      "degree_bound": 3,
+      "lhs": {
+        "args": [
+          {
+            "args": "m",
+            "op": "var"
+          },
+          {
+            "args": [
+              {
+                "args": "k",
+                "op": "var"
+              },
+              {
+                "args": 1,
+                "op": "const"
+              }
+            ],
+            "op": "add"
+          },
+          {
+            "args": [
+              {
+                "args": "v",
+                "op": "var"
+              },
+              {
+                "args": "c",
+                "op": "var"
+              }
+            ],
+            "op": "add"
+          }
+        ],
+        "op": "mul"
+      },
+      "name": "Shared-root implication clause count, K=k+1",
+      "rhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": "m",
+                "op": "var"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "k",
+                            "op": "var"
+                          },
+                          {
+                            "args": 1,
+                            "op": "const"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": "v",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": "c",
+                    "op": "var"
+                  }
+                ],
+                "op": "add"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": [
+              {
+                "args": "m",
+                "op": "var"
+              },
+              {
+                "args": "c",
+                "op": "var"
+              },
+              {
+                "args": "k",
+                "op": "var"
+              }
+            ],
+            "op": "mul"
+          }
+        ],
+        "op": "add"
+      },
+      "source": "research/n83_d18_shared_bits_20261020/lean/SharedRootBits.lean#N83SharedRootBits.clauseCount",
+      "variables": [
+        "m",
+        "k",
+        "v",
+        "c"
+      ]
+    },
+    "value_digest": "79e895fb2142a689f0ffa09c579fb970c2cda7fa3256e400ca4914c6cb2c58f1"
+  },
+  "count_identity_extra_points": 32,
+  "curve_id": "icv1-f2m83-tm6151469093347-debefd74",
+  "object_blake3": "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682",
+  "public_corpus_sha256": "2895a78d28935a992d8d6155492eae928e165eafcc622e6c866080b8f91e70b5",
+  "representatives_sha256": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4",
+  "root_representatives_blake3": "f9fb7d25682a29556c133d74690b447a3ed5f125b6248dd89b0089be1ad4aced",
+  "rows": [
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 2864576,
+      "domain_variables": 69010,
+      "domain_xor_rows": 1328,
+      "m": 2,
+      "root_encoding": "per_representative",
+      "total_clauses": 2926660,
+      "total_variables": 90258,
+      "total_xor_rows": 1743
+    },
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 669944,
+      "domain_variables": 69010,
+      "domain_xor_rows": 1328,
+      "m": 2,
+      "root_encoding": "shared_bits",
+      "total_clauses": 732028,
+      "total_variables": 90258,
+      "total_xor_rows": 1743
+    },
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 4296864,
+      "domain_variables": 103515,
+      "domain_xor_rows": 1992,
+      "m": 3,
+      "root_encoding": "per_representative",
+      "total_clauses": 4420949,
+      "total_variables": 145928,
+      "total_xor_rows": 2822
+    },
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 1004916,
+      "domain_variables": 103515,
+      "domain_xor_rows": 1992,
+      "m": 3,
+      "root_encoding": "shared_bits",
+      "total_clauses": 1129001,
+      "total_variables": 145928,
+      "total_xor_rows": 2822
+    },
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 5729152,
+      "domain_variables": 138020,
+      "domain_xor_rows": 2656,
+      "m": 4,
+      "root_encoding": "per_representative",
+      "total_clauses": 5915238,
+      "total_variables": 201598,
+      "total_xor_rows": 3901
+    },
+    {
+      "actual_equals_preflight": true,
+      "domain_clauses": 1339888,
+      "domain_variables": 138020,
+      "domain_xor_rows": 2656,
+      "m": 4,
+      "root_encoding": "shared_bits",
+      "total_clauses": 1525974,
+      "total_variables": 201598,
+      "total_xor_rows": 3901
+    }
+  ],
+  "schema": "n83.d18-shared-root-construction/v1",
+  "search_performed": false,
+  "selected_best_total_runtime": null,
+  "shared_bits": [
+    {
+      "bit": 0,
+      "value": false
+    },
+    {
+      "bit": 18,
+      "value": false
+    },
+    {
+      "bit": 19,
+      "value": false
+    },
+    {
+      "bit": 20,
+      "value": false
+    },
+    {
+      "bit": 21,
+      "value": false
+    },
+    {
+      "bit": 22,
+      "value": false
+    },
+    {
+      "bit": 23,
+      "value": false
+    },
+    {
+      "bit": 24,
+      "value": false
+    },
+    {
+      "bit": 25,
+      "value": false
+    },
+    {
+      "bit": 26,
+      "value": false
+    },
+    {
+      "bit": 27,
+      "value": false
+    },
+    {
+      "bit": 28,
+      "value": false
+    },
+    {
+      "bit": 29,
+      "value": false
+    },
+    {
+      "bit": 30,
+      "value": false
+    },
+    {
+      "bit": 31,
+      "value": false
+    },
+    {
+      "bit": 32,
+      "value": false
+    },
+    {
+      "bit": 33,
+      "value": false
+    },
+    {
+      "bit": 34,
+      "value": false
+    },
+    {
+      "bit": 35,
+      "value": false
+    },
+    {
+      "bit": 36,
+      "value": false
+    },
+    {
+      "bit": 37,
+      "value": false
+    },
+    {
+      "bit": 38,
+      "value": false
+    },
+    {
+      "bit": 39,
+      "value": false
+    },
+    {
+      "bit": 40,
+      "value": false
+    },
+    {
+      "bit": 41,
+      "value": false
+    },
+    {
+      "bit": 42,
+      "value": false
+    },
+    {
+      "bit": 43,
+      "value": false
+    },
+    {
+      "bit": 44,
+      "value": false
+    },
+    {
+      "bit": 45,
+      "value": false
+    },
+    {
+      "bit": 46,
+      "value": false
+    },
+    {
+      "bit": 47,
+      "value": false
+    },
+    {
+      "bit": 48,
+      "value": false
+    },
+    {
+      "bit": 49,
+      "value": false
+    },
+    {
+      "bit": 50,
+      "value": false
+    },
+    {
+      "bit": 51,
+      "value": false
+    },
+    {
+      "bit": 52,
+      "value": false
+    },
+    {
+      "bit": 53,
+      "value": false
+    },
+    {
+      "bit": 54,
+      "value": false
+    },
+    {
+      "bit": 55,
+      "value": false
+    },
+    {
+      "bit": 56,
+      "value": false
+    },
+    {
+      "bit": 57,
+      "value": false
+    },
+    {
+      "bit": 58,
+      "value": false
+    },
+    {
+      "bit": 59,
+      "value": false
+    },
+    {
+      "bit": 60,
+      "value": false
+    },
+    {
+      "bit": 61,
+      "value": false
+    },
+    {
+      "bit": 62,
+      "value": false
+    },
+    {
+      "bit": 63,
+      "value": false
+    },
+    {
+      "bit": 64,
+      "value": false
+    },
+    {
+      "bit": 65,
+      "value": false
+    },
+    {
+      "bit": 66,
+      "value": false
+    },
+    {
+      "bit": 67,
+      "value": false
+    },
+    {
+      "bit": 68,
+      "value": false
+    },
+    {
+      "bit": 69,
+      "value": false
+    },
+    {
+      "bit": 70,
+      "value": false
+    },
+    {
+      "bit": 71,
+      "value": false
+    },
+    {
+      "bit": 72,
+      "value": false
+    },
+    {
+      "bit": 73,
+      "value": false
+    },
+    {
+      "bit": 74,
+      "value": false
+    },
+    {
+      "bit": 75,
+      "value": false
+    },
+    {
+      "bit": 76,
+      "value": false
+    },
+    {
+      "bit": 77,
+      "value": false
+    },
+    {
+      "bit": 78,
+      "value": false
+    },
+    {
+      "bit": 79,
+      "value": false
+    },
+    {
+      "bit": 80,
+      "value": false
+    },
+    {
+      "bit": 81,
+      "value": false
+    },
+    {
+      "bit": 82,
+      "value": false
+    }
+  ],
+  "source_example_sha256": "94bb16acf3cbbf050a796878d98085e7493f525fcd306d68349c1914c2987ed3",
+  "source_module_sha256": "04cc935ab105cf06052b54ee8c3e75b0786cc65e1f8bec2c4e34f10e492ddacf",
+  "status": "PASS",
+  "target_x": "1834913121178197242856238",
+  "timing_comparison": null
+}
