@@ -134,10 +134,14 @@ pub fn decomposition_network(
     let mut sum_square: Option<Word> = None;
     for base in bases {
         let (point, point_square) = if curve.cofactor().is_one() {
-            encoder.input_point_with_square(curve, meter)?
+            let (point, square) = encoder.input_point_with_square(curve, meter)?;
+            (point, Some(square))
         } else {
             let source = encoder.input_point(curve, true, meter)?;
-            (encoder.clear_cofactor(curve, &source, meter)?, Encoder::constant(1, &BigUint::zero())?)
+            (
+                encoder.clear_cofactor(curve, &source, meter)?,
+                None,
+            )
         };
         encoder.hash_member(
             curve,
@@ -152,7 +156,7 @@ pub fn decomposition_network(
         // input_point already validated the point; do not validate again.
         if first {
             sum = point;
-            sum_square = Some(point_square);
+            sum_square = point_square;
             first = false;
         } else {
             sum = encoder.point_add_raw_with(curve, &sum, &point, sum_square.as_ref(), meter)?;
@@ -816,9 +820,7 @@ mod tests {
             *curve.generator()
         );
 
-        let enumerated = base
-            .enumerate(&curve, &mut Seeded(3), &mut meter)
-            .unwrap();
+        let enumerated = base.enumerate(&curve, &mut Seeded(3), &mut meter).unwrap();
         let mut brute = BigUint::zero();
         for a in &enumerated {
             for b in &enumerated {
@@ -840,7 +842,7 @@ mod tests {
             let count = counter
                 .count(&net, &vec![None; net.edge_count()], &mut meter)
                 .unwrap();
-            assert_eq!(count, brute * curve.cofactor().clone());
+            assert_eq!(count, brute.clone() * curve.cofactor().clone());
         }
     }
 
@@ -892,7 +894,7 @@ pub fn decomposition_network_program(
     let mut first = true;
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
     for base in bases {
-        let (point, point_square) = if curve.cofactor().is_one() {
+        let (point, _point_square) = if curve.cofactor().is_one() {
             encoder.input_point_with_square(curve, meter)?
         } else {
             let source = encoder.input_point(curve, true, meter)?;
@@ -934,7 +936,15 @@ pub fn decomposition_network_derived(
         let source = encoder.input_point(curve, true, meter)?;
         encoder.clear_cofactor(curve, &source, meter)?
     };
-    encoder.hash_member(curve, &a1, &bases[0].prime, &bases[0].seed.alpha, &bases[0].seed.beta, &bases[0].threshold, meter)?;
+    encoder.hash_member(
+        curve,
+        &a1,
+        &bases[0].prime,
+        &bases[0].seed.alpha,
+        &bases[0].seed.beta,
+        &bases[0].threshold,
+        meter,
+    )?;
     encoder.mark_point_interface(&a1, meter)?;
     let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
     let target_words = Encoder::constant_point(curve, target)?;
@@ -943,6 +953,14 @@ pub fn decomposition_network_derived(
     } else {
         encoder.point_add_raw_with(curve, &target_words, &neg_a1, None, meter)?
     };
-    encoder.hash_member(curve, &a2, &bases[1].prime, &bases[1].seed.alpha, &bases[1].seed.beta, &bases[1].threshold, meter)?;
+    encoder.hash_member(
+        curve,
+        &a2,
+        &bases[1].prime,
+        &bases[1].seed.alpha,
+        &bases[1].seed.beta,
+        &bases[1].threshold,
+        meter,
+    )?;
     encoder.finish(meter)
 }

@@ -336,8 +336,13 @@ pub fn check_small(simple: bool, derived: bool, program: bool) {
         let target = curve.mul(&fpt(Some(g)), &fbig(2), &mut meter).expect("target");
         let net = if derived {
             hashed_ecdl_tensor_fast::reduction::decomposition_network_derived(
-                &curve, &[b1.clone(), b2.clone()], &target, program, &mut meter,
-            ).expect("derived net")
+                &curve,
+                &[b1.clone(), b2.clone()],
+                &target,
+                program,
+                &mut meter,
+            )
+            .expect("derived net")
         } else if program {
             fnet_program(&curve, &[b1.clone(), b2.clone()], &target, &mut meter)
                 .expect("program net")
