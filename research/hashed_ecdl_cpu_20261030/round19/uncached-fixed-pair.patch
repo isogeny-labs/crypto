@@ -1,0 +1,40 @@
+--- a/src/cryptanalysis/hashed_ecdl.rs
++++ b/src/cryptanalysis/hashed_ecdl.rs
+@@ -1297,20 +1297,6 @@
+             // With a complete inverse table, affine addition uses a lookup
+             // rather than Euclid. Avoid projective products and normalization
+             // scratch space in this bounded-field path.
+-            if !curve.inverses.is_empty() {
+-                for window in 0..windows {
+-                    let mut row = [None; 16];
+-                    row[1] = base;
+-                    for digit in 2..16 {
+-                        row[digit] = curve.add_valid(row[digit - 1], base);
+-                    }
+-                    if window + 1 < windows {
+-                        base = curve.add_valid(row[15], base);
+-                    }
+-                    out.push(row);
+-                }
+-                return out;
+-            }
+             for window in 0..windows {
+                 let mut row = [Jacobian::from_affine(None); 17];
+                 row[1] = Jacobian::from_affine(base);
+@@ -1336,16 +1322,6 @@
+     }
+     fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
+         debug_assert!(u < curve.r && v < curve.r);
+-        if !curve.inverses.is_empty() {
+-            let mut out = None;
+-            for (p, q) in self.p.iter().zip(&self.q) {
+-                out = curve.add_valid(out, p[(u & 15) as usize]);
+-                out = curve.add_valid(out, q[(v & 15) as usize]);
+-                u >>= 4;
+-                v >>= 4;
+-            }
+-            return out;
+-        }
+         let mut out = Jacobian::from_affine(None);
+         for (p, q) in self.p.iter().zip(&self.q) {
+             out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
