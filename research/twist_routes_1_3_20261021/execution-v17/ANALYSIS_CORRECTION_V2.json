@@ -1,0 +1,18 @@
+{
+  "schema": "twist.analysis-correction/v1",
+  "parent_frozen_protocol": "research/twist_routes_1_3_20261021/execution-v17/protocol.json",
+  "old_source": "research/twist_routes_1_3_20261021/runner/src/bin/twist-cold-summary.rs",
+  "old_source_sha256": "fa584c1fdf2e89f6f9a9fbc18f3efcf3130e1158cf43a2eec164e3dcd1f56a0c",
+  "old_failed_output_stderr_sha256": "ca095037a95555a097f7cdf1fd8f65a89168b9e3b11a6befaa44208df41e326b",
+  "new_source": "research/twist_routes_1_3_20261021/runner/src/bin/twist-cold-summary-v2.rs",
+  "new_source_sha256": "672641afdd55edcede0cb79458291523718315c0a95221afee175af406a3dcaa",
+  "reason": "Original summary rejected identical missing query hashes in matched underfilled/unsupported pre-query attempts. Guard recognizes only identical status, non-null equal base/known hashes and all three query hashes absent on both sides.",
+  "successful_pair_eligibility_unchanged": true,
+  "successful_pairs_still_require_all_five_nonnull_equal_hashes_and_verified_recovery": true,
+  "all_failures_retained": true,
+  "attack_profiles_reused": true,
+  "mathematical_replay": "research/twist_routes_1_3_20261021/execution-v17/audit-v2/ADMISSION.json",
+  "filed_before_profile_data": false,
+  "filed_before_successor_analysis": true,
+  "comparison_formulas_and_selection_unchanged": true
+}

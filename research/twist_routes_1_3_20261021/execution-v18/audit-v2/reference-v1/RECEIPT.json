@@ -1,0 +1,30 @@
+{
+  "schema": "twist.cold-reference-transport/v1",
+  "started": "2026-10-30T06:06:03.495Z",
+  "finished": "2026-10-30T06:06:33.406Z",
+  "argv": [
+    "/usr/bin/prlimit",
+    "--as=4294967296",
+    "--",
+    "/usr/bin/taskset",
+    "-c",
+    "0",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "1800s",
+    "/workspace/shared/twist-tools-20261023/cas/root/usr/bin/gp",
+    "-f",
+    "-q",
+    "-s",
+    "1024000000",
+    "research/twist_routes_1_3_20261021/execution-v18/audit-v2/verify.gp"
+  ],
+  "exit_code": 0,
+  "signal": null,
+  "script_sha256": "b0c5c61f8cc7ceac7f78417845b0d541361d2f14cf91068412b41647869e4f3e",
+  "stdout_sha256": "6ce170677f84a77108b7e22729384939c1f2f39d930dccaebc702f795052fcb5",
+  "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+  "gp_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+  "wall_time_admitted": false
+}
