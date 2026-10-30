@@ -1,5 +1,11 @@
 # Candidate links toward novel prime-field index calculus
 
+**Additive implementation follow-up:** the [C1–C3 bounded reference](implementation/README.md)
+now provides a structured predicate, exact prefix witnesses and reusable local
+membership diagrams. The proposal snapshot below and its original PDF remain
+historical; full summation messages, general novelty and an IC improvement are
+still unestablished.
+
 This is a proposal and finite-control record, not a new IC algorithm, theorem,
 speedup, unknown-scalar recovery or scientific-state promotion. Three candidate
 combinations are specified below. Their global novelty is **not established**.
