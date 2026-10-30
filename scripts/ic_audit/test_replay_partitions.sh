@@ -33,13 +33,23 @@ for name in session.json spec.json plan.json host.json records.jsonl; do
   files=$(jq -c --arg name "$name" --arg digest "$digest" '.+{($name):$digest}' <<< "$files")
 done
 jq -n --arg binary "$(sha256sum "$0"|cut -d' ' -f1)" --arg selection "$selection" \
+  --arg zero "${METADATA_ZERO:-0}" \
   --argjson files "$files" --argjson candidates "$candidates" \
   --argjson seqs "$(printf '%s\n' "${seqs[@]}"|jq -s .)" '
   {schema:"ecbench.audit/v1",session_status:"complete",session_id:"metadata-control",
    records_bound:true,auditor_binary_sha256:$binary,files:$files,ok:true,
    checks:{records_hash:true,executions_planned:true,replays:true},problems:[],
    replay_selection:$selection,replay_candidates:$candidates,
-   replays:[$seqs[]|{seq:.,record_id:("metadata-"+tostring),reproduced:true,detail:"identical"}]}' > "$out"
+   replays:[$seqs[]|{seq:.,record_id:("metadata-"+tostring),reproduced:true,detail:"identical"}]} |
+  if $zero == "1" then
+    .session_id="ECBS1h302934ff99ed" | .records=3 | .planned_executions=3 |
+    .verified_records=0 | .regraded=true | .replays=[] | .replay_candidates=0 |
+    del(.replay_selection) |
+    .checks=(["arms","env_class","executions","executions_planned","host_hash","plan_hash",
+      "record_count","records","records_hash","regraded","session_build",
+      "session_complete","session_id","spec_id","status_counts","workloads"] |
+      map({key:.,value:true})|from_entries)
+  else . end' > "$out"
 exit "${METADATA_STUB_EXIT:-0}"
 STUB
 chmod +x fake-native
@@ -182,6 +192,13 @@ printf 'changed\n' >> research/study/session/spec.json
 REPLAY_CHUNK_CACHE="$tmp/chunked/0" fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
 printf '{}\n' > research/study/session/spec.json
 REPLAY_CHUNK_SIZE=invalid fail bash "$here/replay_partition.sh" ./fake-native "$tmp/chunk-resumed/0" 0 1
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/good" 4
+for kind in probe receipt; do
+  printf '7\n' > "$tmp/good/0/0000.$kind.json.exit"
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/good" 4
+  printf '0\n' > "$tmp/good/0/0000.$kind.json.exit"
+  pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/good" 4
+done
 # A precise historical counter drift cannot waive new scalar or coverage failures.
 cp -a "$tmp/good" "$tmp/pinned"
 jq '.require_pinned_drift=true | .sessions[0].expect="drift" |
@@ -203,8 +220,10 @@ drift_receipt 0 'differs in phase counts'
 drift_receipt 1 'differs in phase counts'
 fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
 cp "$tmp/good/0/0000.receipt.json" "$tmp/pinned/0/0000.receipt.json"
+cp "$tmp/good/0/0000.receipt.json.exit" "$tmp/pinned/0/0000.receipt.json.exit"
 fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
 cp "$tmp/good/1/0000.receipt.json" "$tmp/pinned/1/0000.receipt.json"
+cp "$tmp/good/1/0000.receipt.json.exit" "$tmp/pinned/1/0000.receipt.json.exit"
 fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
 drift_receipt 0 'differs in phase counts'
 pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
@@ -215,4 +234,55 @@ for mutation in 'del(.sessions[0].expected_drift)' '.sessions[0].expected_drift=
   jq "$mutation" "$tmp/good-pinned-plan.json" > "$REPLAY_PLAN"
   fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/pinned" 4
 done
+# Explicitly synthetic zero-candidate controls; never research evidence.
+unset REPLAY_CHUNK_SIZE
+export REPLAY_PLAN="$tmp/zero-plan.json" METADATA_ZERO=1
+printf '%s\n' '{"schema":"ic-replay-plan/v1","sessions":[{"dir":"research/study/session","replay":"all","expect":"identical"}]}' > "$REPLAY_PLAN"
+cp research/study/session/records.jsonl positive-records.jsonl
+jq -c '.session_id="ECBS1h302934ff99ed" | .outcome.status="exhausted"' \
+  positive-records.jsonl > research/study/session/records.jsonl
+fail bash "$here/replay_partition.sh" ./fake-native "$tmp/unmarked-zero/0" 0 4
+./fake-native verify --dir research/study/session --replay 1 --out "$tmp/zero-probe.json"
+jq --slurpfile probe "$tmp/zero-probe.json" '.sessions[0].zero_replay_probe =
+  ($probe[0] | {schema:"ic-static-zero-replay/v1",session_id,records,planned_executions,
+    verified_records,files,reason:"Synthetic metadata control; not a native research receipt"})' \
+  "$REPLAY_PLAN" > zero-plan.tmp
+mv zero-plan.tmp "$REPLAY_PLAN"
+for p in 0 1 2 3; do pass bash "$here/replay_partition.sh" ./fake-native "$tmp/zero/$p" "$p" 4; done
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/zero" 4
+pass bash "$here/replay_plan.sh" ./fake-native "$tmp/zero-serial"
+METADATA_STUB_EXIT=1 fail bash "$here/replay_plan.sh" ./fake-native "$tmp/zero-serial"
+cp "$REPLAY_PLAN" zero-good-plan.json
+cp "$tmp/zero/0/0000.probe.json" zero-good-probe.json
+for mutation in '.replay_candidates=1' '.replays=[{seq:0,record_id:"metadata-0",reproduced:true,detail:"identical"}]' \
+  '.session_id="unknown"' '.records=4' '.planned_executions=4' '.verified_records=1' \
+  '.records_bound=false' '.regraded=false' '.session_status="interrupted"' \
+  '.auditor_binary_sha256=("0"*64)' '.files["records.jsonl"]=("0"*64)' \
+  '.ok=false' '.problems=["failure"]' '.checks.records=false' '.checks.replays=false' \
+  'del(.checks.status_counts)' 'del(.checks.records_hash)' '.replay_selection="all"'; do
+  jq "$mutation" zero-good-probe.json > "$tmp/zero/0/0000.probe.json"
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/zero" 4
+done
+cp zero-good-probe.json "$tmp/zero/0/0000.probe.json"
+printf '1\n' > "$tmp/zero/0/0000.probe.json.exit"
+fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/zero" 4
+printf '0\n' > "$tmp/zero/0/0000.probe.json.exit"
+for mutation in 'del(.sessions[0].zero_replay_probe)' '.sessions[0].expect="drift"' \
+  '.sessions[0].zero_replay_probe.session_id="unknown"' \
+  '.sessions[0].zero_replay_probe.files["spec.json"]=("0"*64)' \
+  '.sessions[0].zero_replay_probe.verified_records=1'; do
+  jq "$mutation" zero-good-plan.json > "$REPLAY_PLAN"
+  fail bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/zero" 4
+  fail bash "$here/replay_plan.sh" ./fake-native "$tmp/zero-serial"
+done
+cp zero-good-plan.json "$REPLAY_PLAN"
+METADATA_ZERO=0 fail bash "$here/replay_partition.sh" ./fake-native "$tmp/zero-positive-native/0" 0 4
+METADATA_ZERO=0 fail bash "$here/replay_plan.sh" ./fake-native "$tmp/zero-serial"
+printf 'changed\n' >> research/study/session/spec.json
+fail bash "$here/replay_plan.sh" ./fake-native "$tmp/zero-serial"
+printf '{}\n' > research/study/session/spec.json
+cp positive-records.jsonl research/study/session/records.jsonl
+fail bash "$here/replay_partition.sh" ./fake-native "$tmp/zero-positive-proposal/0" 0 4
+jq 'del(.sessions[0].zero_replay_probe)' zero-good-plan.json > "$REPLAY_PLAN"
+fail bash "$here/replay_partition.sh" ./fake-native "$tmp/positive-proposal-zero-native/0" 0 4
 echo "partition metadata controls: $controls passed"

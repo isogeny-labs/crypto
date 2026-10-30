@@ -20,10 +20,29 @@ for i in $(seq 0 $((n - 1))); do
   # The plan index prevents distinct directory spellings from sharing a receipt.
   tag=$(printf '%04d' "$i")
   flag=(--replay-all); [ "$rep" = all ] || flag=(--replay "$rep")
+  zero_pin=$(jq -c ".sessions[$i].zero_replay_probe // null" "$plan")
+  [ "$zero_pin" = null ] || flag=(--replay 1 --replay-seed 0)
   rm -f "$OUT/$tag.receipt.json"
   status=0
   "$EB" verify --dir "$dir" "${flag[@]}" --out "$OUT/$tag.receipt.json" > /dev/null 2> "$OUT/$tag.stderr" || status=$?
   [ -s "$OUT/$tag.receipt.json" ] || { echo "$dir: no receipt"; bad=1; continue; }
+  if [ "$zero_pin" != null ]; then
+    binary=$(sha256sum "$EB" | cut -d' ' -f1)
+    if [ "$status" != 0 ] || ! jq -e -L "$here" --arg binary "$binary" --argjson pin "$zero_pin" \
+        'include "replay_native"; valid_zero_probe($binary; $pin)' "$OUT/$tag.receipt.json" >/dev/null; then
+      echo "$dir: invalid pinned zero-candidate native probe (exit $status)"; bad=1; continue
+    fi
+    file_ok=true
+    while IFS=$'\t' read -r name expected; do
+      actual=$(sha256sum "$dir/$name" | cut -d' ' -f1) || { file_ok=false; break; }
+      [ "$actual" = "$expected" ] || { file_ok=false; break; }
+    done < <(jq -r '.files|to_entries[]|[.key,.value]|@tsv' "$OUT/$tag.receipt.json")
+    if [ "$file_ok" != true ]; then
+      echo "$dir: pinned static audit input changed"; bad=1; continue
+    fi
+    echo "$dir: static audit only ($(jq .records "$OUT/$tag.receipt.json") records, zero native replay candidates), exact inputs pinned"
+    continue
+  fi
   if [ "$status" -gt 1 ] || ! jq -e '.schema == "ecbench.audit/v1" and
     .session_status == "complete" and .records_bound == true and
     (.replays | type == "array" and length > 0) and

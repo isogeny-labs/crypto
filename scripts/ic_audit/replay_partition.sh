@@ -6,6 +6,7 @@ EB=${1:?native ecbench}; OUT=${2:?output}; part=${3:?partition}; parts=${4:?part
 [[ $part =~ ^[0-9]+$ && $parts =~ ^[1-9][0-9]*$ ]] && ((part < parts)) || exit 2
 here=$(cd "$(dirname "$0")" && pwd)
 plan=${REPLAY_PLAN:-docs/ic/validation/replay-plan.json}
+jq -e -L "$here" 'include "replay_native"; valid_drift_expectations' "$plan" >/dev/null
 jq -e '.schema == "ic-replay-plan/v1" and (.sessions | length > 0) and
   ([.sessions[].dir] | length == (unique | length)) and
   all(.sessions[]; .replay == "all" and (.expect == "identical" or .expect == "drift") and
@@ -16,6 +17,10 @@ binary=$(sha256sum "$EB" | cut -d' ' -f1)
 plan_hash=$(sha256sum "$plan" | cut -d' ' -f1)
 roster_hash=$(jq -c '[.sessions[]|{dir,replay}]' "$plan" | sha256sum | cut -d' ' -f1)
 check_native() { jq -e -L "$here" --arg binary "$binary" 'include "replay_native"; valid_native($binary)' "$1" >/dev/null; }
+check_zero_probe() {
+  jq -e -L "$here" --arg binary "$binary" --argjson pin "$zero_pin" \
+    'include "replay_native"; valid_zero_probe($binary; $pin)' "$1" >/dev/null
+}
 check_status() {
   [[ -s $1.exit ]] &&
     [[ $(cat "$1.exit") == "$(jq -r 'if .ok then 0 else 1 end' "$1")" ]]
@@ -33,7 +38,8 @@ audit() {
   local status=0
   "$EB" verify --dir "$dir" "$@" --out "$receipt" > /dev/null 2>"$receipt.stderr" || status=$?
   printf '%s\n' "$status" > "$receipt.exit"
-  ((status <= 1)) && check_native "$receipt" && check_files "$receipt" "$dir" || return 1
+  ((status <= 1)) && { check_native "$receipt" || check_zero_probe "$receipt"; } &&
+    check_files "$receipt" "$dir" || return 1
   if [[ $(jq -r .ok "$receipt") == true ]]; then [[ $status == 0 ]]; else [[ $status == 1 ]]; fi
 }
 check_partition_cache() {
@@ -62,6 +68,10 @@ check_partition_cache() {
   done
 }
 check_probe() {
+  if [[ $(jq length "$base.candidates.json") == 0 ]]; then
+    check_zero_probe "$1" && check_files "$1" "$dir" && check_status "$1"
+    return
+  fi
   check_native "$1" && check_files "$1" "$dir" && check_status "$1" || return 1
   jq -e --slurpfile candidates "$base.candidates.json" '
     .replay_selection == "sample" and .replay_candidates == ($candidates[0]|length) and
@@ -86,6 +96,7 @@ for ((offset=0; offset<n; offset++)); do
   i=$(((offset+start)%n))
   ((i % groups == group)) || continue
   dir=$(jq -r ".sessions[$i].dir" "$plan")
+  zero_pin=$(jq -c ".sessions[$i].zero_replay_probe // null" "$plan")
   tag=$(printf '%04d' "$i"); base="$OUT/$tag"
   rm -f "$base.partition.json"
   # This is a proposed set only: native candidate cardinality and explicit
@@ -101,7 +112,9 @@ for ((offset=0; offset<n; offset++)); do
      then .cost.deterministic == true and (.cost.total_gae | type == "number")
      else true end)) |
     {seq,record_id}] | sort_by(.seq)' "$dir/records.jsonl" > "$base.candidates.json"
-  jq -e 'length > 0 and all(.[]; (.seq|type=="number" and .>=0 and .==floor) and
+  jq -e -L "$here" --argjson pin "$zero_pin" 'include "replay_native";
+    (if $pin == null then length > 0 else length == 0 and ($pin | valid_zero_pin) end) and
+    all(.[]; (.seq|type=="number" and .>=0 and .==floor) and
     (.record_id|type=="string" and length>0)) and
     ([.[].seq]|length==(unique|length))' "$base.candidates.json" >/dev/null
   jq --argjson p "$part" --argjson n "$parts" '[to_entries[] | select(.key % $n == $p) | .value]' \
@@ -136,10 +149,7 @@ for ((offset=0; offset<n; offset++)); do
     else
       audit "$base.probe.json" --replay 1 --replay-seed 0
     fi
-    jq -e --slurpfile candidates "$base.candidates.json" '
-      .replay_selection == "sample" and .replay_candidates == ($candidates[0]|length) and
-      (.replays|length) == 1 and
-      ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0' "$base.probe.json" >/dev/null
+    check_probe "$base.probe.json"
     mapfile -t seqs < <(jq -r '.[].seq' "$base.selected.json")
     if ((${#seqs[@]} && chunk_size)); then
       mode=chunked

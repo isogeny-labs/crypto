@@ -46,9 +46,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: bash scripts/ic_audit/pull_replay_inputs.sh
-      - run: cargo build --release --bin ecbench
       - name: The plan covers every complete session the board cites
         run: bash scripts/ic_audit/check_plan_coverage.sh
+      - run: cargo build --release --bin ecbench
       - uses: actions/upload-artifact@v4
         with:
           name: ic-replay-native

@@ -16,10 +16,15 @@ jq -e '.schema == "ic-replay-plan/v1" and
 binary=$(sha256sum "$EB" | cut -d' ' -f1)
 roster=$(jq -c '[.sessions[]|{dir,replay}]' "$plan" | sha256sum | cut -d' ' -f1)
 mkdir -p "$ROOT/checked"
+check_exit() {
+  [[ $(cat "$1.exit") == "$(jq -r 'if .ok then 0 else 1 end' "$1")" ]]
+}
 bad=0
 for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
   tag=$(printf '%04d' "$i"); dir=$(jq -r ".sessions[$i].dir" "$plan")
+  zero_pin=$(jq -c ".sessions[$i].zero_replay_probe // null" "$plan")
   candidates="$ROOT/0/$tag.candidates.json"
+  jq -e --argjson pin "$zero_pin" 'if $pin == null then length > 0 else length == 0 end' "$candidates" >/dev/null
   receipts=(); probes=(); cached=0
   for ((p=0; p<parts; p++)); do
     base="$ROOT/$p/$tag"
@@ -40,10 +45,13 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
       cached=$((cached+1)); receipts+=("$base.receipt.json")
     else
       probes+=("$base.probe.json")
-      jq -e -L "$here" --arg binary "$binary" --slurpfile candidates "$candidates" '
-        include "replay_native"; valid_native($binary) and
+      check_exit "$base.probe.json"
+      jq -e -L "$here" --arg binary "$binary" --argjson pin "$zero_pin" --slurpfile candidates "$candidates" '
+        include "replay_native";
+        if ($candidates[0]|length) == 0 then valid_zero_probe($binary; $pin)
+        else valid_native($binary) and
         .replay_candidates == ($candidates[0]|length) and .replay_selection == "sample" and
-        (.replays|length) == 1 and ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0' \
+        (.replays|length) == 1 and ([.replays[]|{seq,record_id}] - $candidates[0] | length) == 0 end' \
         "$base.probe.json" >/dev/null
       if [[ $mode == chunked ]]; then
         [[ $(sha256sum "$base.chunks.json" | cut -d' ' -f1) == "$(jq -r .chunks_sha256 "$base.partition.json")" ]]
@@ -69,6 +77,7 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
         jq -e 'length==0' "$base.selected.json" >/dev/null
         [[ ! -e $base.receipt.json ]]
       else
+        check_exit "$base.receipt.json"
         jq -e -L "$here" --arg binary "$binary" --slurpfile selected "$base.selected.json" '
           include "replay_native"; valid_native($binary) and .replay_selection == "explicit" and
           (.replays|replay_keys) == $selected[0]' "$base.receipt.json" >/dev/null
@@ -85,13 +94,18 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
       "${receipts[0]}" >/dev/null
     receipts=("${receipts[0]}")
   fi
+  sources=("${receipts[@]}")
+  if [[ $(jq length "$candidates") == 0 ]]; then
+    ((cached == 0 && ${#receipts[@]} == 0 && ${#probes[@]} == parts))
+    sources=("${probes[0]}")
+  fi
   # Every native static audit must bind the same session and exact file map.
   jq -se '.[0] as $first | all(.[]; .session_id == $first.session_id and .files == $first.files)' \
     "${receipts[@]}" "${probes[@]}" >/dev/null
   while IFS=$'\t' read -r name expected; do
     actual=$(sha256sum "$dir/$name" | cut -d' ' -f1)
     [[ $actual == "$expected" ]] || { echo "$dir/$name: input changed"; exit 1; }
-  done < <(jq -r '.files|to_entries[]|[.key,.value]|@tsv' "${receipts[0]}")
+  done < <(jq -r '.files|to_entries[]|[.key,.value]|@tsv' "${sources[0]}")
   # This derived summary is explicitly not a native ecbench.audit/v1 receipt.
   jq -s --arg dir "$dir" --arg binary "$binary" --slurpfile candidates "$candidates" '
     {schema:"ic-replay-union/v1",dir:$dir,binary:$binary,files:.[0].files,session_id:.[0].session_id,
@@ -99,7 +113,7 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
     if ([.replays[]|{seq,record_id}] == $candidates[0] and
        ([.replays[].seq]|length==(unique|length))) then .
     else error("missing, duplicate or unexpected native replay") end' \
-    "${receipts[@]}" > "$ROOT/checked/$tag.union.json"
+    "${sources[@]}" > "$ROOT/checked/$tag.union.json"
   total=$(jq '.replays|length' "$ROOT/checked/$tag.union.json")
   ok=$(jq '[.replays[]|select(.reproduced)]|length' "$ROOT/checked/$tag.union.json")
   got=drift; [[ $ok != "$total" ]] || got=identical
@@ -110,7 +124,11 @@ for ((i=0; i<$(jq '.sessions|length' "$plan"); i++)); do
     echo "$dir: native drift identities/details differ from the evidence-backed pin"
     bad=1
   elif [[ $got == "$expected" ]]; then
-    echo "$dir: $got ($ok/$total), complete native coverage as planned"
+    if ((total == 0)); then
+      echo "$dir: static audit only ($(jq .records "${sources[0]}") records, zero native replay candidates), exact inputs pinned"
+    else
+      echo "$dir: $got ($ok/$total), complete native coverage as planned"
+    fi
   else
     echo "$dir: expected $expected, observed $got ($ok/$total); plan requires evidence-backed correction"
     bad=1

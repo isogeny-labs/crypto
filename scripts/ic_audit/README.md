@@ -22,6 +22,16 @@ drift with the plan; healed drift is a failure too. Its `ic-replay-union/v1`
 output is a derived coverage summary, never a native audit receipt. The
 original native receipts remain separate artifacts.
 
+An explicitly pinned `zero_replay_probe` covers a historical negative session
+whose failed outcomes the native registry already checks statically. It binds
+the exact session ID, complete input file map, record count and zero verified
+records. A positive native replay request must report zero eligible candidates,
+no replays, all sixteen required static checks passing, and exit0 on the current
+binary. Every partition must carry that probe; ordinary empty receipts still
+fail. Both serial and partitioned output label this case **static audit only**,
+without claiming a solved scalar or reproduced replay. Changing the inputs,
+adding an eligible candidate or omitting the explicit pin fails closed.
+
 A plan may pin `expected_drift` as the exact nonempty array of
 `{seq, record_id, detail}` for each known-drift session. Both serial and
 partitioned checkers reject an extra or healed failure, a different failed
