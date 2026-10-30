@@ -1,0 +1,16 @@
+{
+  "schema": "n83.lefschetz-format/v1",
+  "encoding": "UTF-8 JSON; finite-field coefficients canonical decimal strings; indices zero-based",
+  "source_audit": "Native source/primality/weight validation. No degree claim from the audit alone. summary.json includes every exact input/source/base hash.",
+  "structure": "Primitive degrees,multiplicities,string lengths and Hilbert counts; every degree4..16 universal slack. Explicit27-variable bases are not expanded; external SLP theorem plus written argument used.",
+  "leading": "Per-m six-term quartics,positive weights,unique leading monomials and disjoint support checks.",
+  "upper_witness": "8192 normalized squarefree terms as [bitmask,coefficient];degree13 and zero product after two L applications.",
+  "cases": "Native audit,structure,leading and upper witness hashes; source-matched lower/upper and conditional exactFFD17; no newLFD.",
+  "controls": "Explicit small-block vectors; direct and sector sparse coefficient matrices; multiplicities; independent Rust references; free Koszul columns and sign-corruption controls.",
+  "proof": "PRIME_LEFSCHETZ_ARGUMENT.md; independent review/formalization pending. Arithmetic gate success is not a formal proof.",
+  "replay": [
+    "N83_LEFSCHETZ_FROZEN_PRODUCTION=1 ROOT/instrument replay ROOT ROOT/protocol-prime-lefschetz.json ROOT/source-audit",
+    "N83_LEFSCHETZ_FROZEN_PRODUCTION=1 python3 ROOT/source/prime_lefschetz_certificate.py replay ROOT ROOT/protocol-prime-lefschetz.json ROOT/results"
+  ],
+  "unknowns": "No new LFD,solving degree,regularity,elite-base or speed claim"
+}
