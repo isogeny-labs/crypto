@@ -148,7 +148,7 @@ fn regression_controls(raw: &str, version: u32) {
         4 => "52",
         5 | 7 | 8 => "56",
         9 | 11 | 12 | 13 => "61",
-        14 | 15 => "63",
+        14..=19 => "63",
         _ => unreachable!(),
     }
     .into();
