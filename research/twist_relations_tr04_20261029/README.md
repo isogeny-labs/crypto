@@ -20,8 +20,12 @@ strict Clippy/formatting and the preserved incomplete root-library attempts.
 The final root-library run on code `445d84bf7` completed with **5,389 passed,
 zero failed, 123 ignored, zero filtered and Cargo exit 0**. Its
 [collected receipt](root-validation-445d84bf7.json) distinguishes the terminal
-full summary from two nested one-test summaries. Later filing commits leave
-the tested root/native runtime inputs unchanged; this validates no later main.
+full summary from two nested one-test summaries. Pre-data filing commits left
+those runtime inputs unchanged. The later `f81b1c6c` main integration changes
+root-runtime paths and is not covered by that old receipt; no broad rerun was
+started. Native code remains unchanged and its 40 tests, strict Clippy and
+formatting pass after integration. See
+[post-merge validation](postmerge-validation-20261030.json).
 The fixed development preflight and synthetic report tests are separate from
 the primary research census, which has not run.
 

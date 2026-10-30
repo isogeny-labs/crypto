@@ -77,3 +77,23 @@ is corrected and regression-checked without a rerun. Primary coverage and
 durable experiment delivery remain unverified.
 Nothing in these development checks establishes all 531 primary dispositions,
 27 completed export rows, a new scalar-preserving map, or a runtime gain.
+
+## Later main integration and publication
+
+After the Copilot conflict request remained unanswered for nearly four hours,
+the documented fallback merged the single fetched main snapshot
+`f81b1c6c562d10251eae883c8084affddc060f8b` with two parents. The fallback
+explanation was posted before editing. Main's complete daily-log bytes and
+the feature-only appends are preserved verbatim; only the two logs differ
+from Git's automatic combined tree. The original failed-run report, frozen
+protocols and native code are byte-identical to the prepared `ca40b6841` tree.
+
+All 40 standalone native tests, strict Clippy/formatting, Actionlint with
+ShellCheck, the routing regression and native frozen-protocol check pass.
+The inherited main changes 89 root-runtime paths relative to validated
+`445d84bf7`. No new full root run was authorized or launched, and that older
+pass is not extended to this merge. A broad whitespace scan reported
+pre-existing main-figure whitespace and was stopped; affected-path whitespace
+checks pass. No unrelated figure was patched. Raw validation receipts are in
+`postmerge-validation-20261030.tar.xz`, indexed by
+[postmerge-validation-20261030.json](postmerge-validation-20261030.json).

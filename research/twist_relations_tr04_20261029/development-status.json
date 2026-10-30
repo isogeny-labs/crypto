@@ -1,7 +1,7 @@
 {
   "schema": "tr04.development-status/v1",
   "base_revision": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
-  "implementation": "published in PR2890; reviewed artifact-routing defect corrected without a new run",
+  "implementation": "Routing fix and complete failed-workflow report prepared for safe publication after documented Copilot fallback/main merge",
   "protocol": "frozen",
   "primary_research_execution": "not_attempted: workflow preflight failed checkpoint upload before fields",
   "native_development": {
@@ -30,7 +30,7 @@
     "exit_code": 0,
     "signal": null,
     "ongoing": false,
-    "scope": "Completed TR04 development validation of exact source445d84bf7; unchanged root/native runtime inputs in later filing commits; separate from PR2857 evidence",
+    "scope": "Completed development validation of exact source445d84bf7 only; later mainf81b integration changes root-runtime paths and is not validated by that receipt. No new broad-library run.",
     "finished_at": "2026-10-29T23:23:56Z",
     "passed": 5389,
     "failed": 0,
@@ -97,5 +97,14 @@
     "missing_rows": 27,
     "report": "reports/run-20261029T233325Z/README.md",
     "retry_submitted": false
+  },
+  "main_integration": {
+    "main": "f81b1c6c562d10251eae883c8084affddc060f8b",
+    "merge": "3f8c917a16141ee68839c834101a7ed2a6674c52",
+    "frozen_native_and_study_bytes_preserved": true,
+    "log_proof": "merge-preservation-20261030.json",
+    "inherited_root_runtime_paths_changed": 89,
+    "full_root_validation_of_inherited_main": false,
+    "broad_library_rerun": false
   }
 }
