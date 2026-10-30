@@ -3,7 +3,9 @@ from pathlib import Path
 import hashlib,json,subprocess
 s=Path('research/n83_candidate_pdp_20261028');scratch=Path('/home/ec2-user/n83-candidate-recovery');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 p=json.loads((s/'protocol-prime-first-fall.json').read_text());p.pop('freeze');p['amendments']=[]
-commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();image=json.loads((scratch/'prime-terminal-support/image.json').read_text());assert image['source_revision']==commit
+image=json.loads((scratch/'prime-terminal-support/image.json').read_text());commit=image['source_revision']
+for name in ['src/bin/prime_terminal.rs','src/prime_terminal_math.rs','src/prime_first_fall_donor.rs','run-prime-terminal.py']:
+ assert subprocess.check_output(['git','show',commit+':'+str(s/name)])==(s/name).read_bytes()
 p.update(protocol_id='N83-PRIME-TERMINAL-20261030',created='2026-10-30',version=1,question='Do explicit terminal annihilators certify highest-form FFD upper bounds on all42 retained prime m3-9 systems, with exact affine consequences kept separate from strict LFD claims?')
 p['links']={'design':'PRIME_TERMINAL_DESIGN.md'}
 p['claims']=[{'id':'C1','class':'exact_computation','text':'Complete source checks and nontrivial terminal annihilator certify an upper bound on highest-form FFD under the written projection argument. No exact FFD claimed.','decided_by':[]},{'id':'C2','class':'exact_computation','text':'Store exact affine consequences with bounded derivation degree; strict lower-space nonmembership is not tested.','decided_by':[]},{'id':'C3','class':'out_of_scope','text':'No LFD lower/upper/exact certificate, solving-degree, elite-base advantage, timing or independent scientific review claim.','decided_by':[]}]
@@ -20,7 +22,7 @@ p['randomization']['seed_derivation']['note']='Historical input seed only;this c
 def metric(name,text):return {'id':name,'name':name,'unit':'degree','kind':'counted','definition':text,'source':'results/summary.json '+name,'aggregation':'per_row','resolution':'1','uncertainty':'none_exact'}
 p['metrics']={'primary':[metric('first_fall_upper_bound','Degree of a certified nontrivial highest-form syzygy;not equality')],'secondary':[metric('affine_derivation_degree_upper_bound','Degree bound on derivation of stored affine consequence'),metric('affine_consequence_degree','Exact degree after combining all compact circuit terms;omit if zero polynomial')]}
 p['measurement']['counters']=[x['id'] for xs in p['metrics'].values() for x in xs]
-p['execution'].update(backend='eks',queue='isolab/cpu-spot',timeout_seconds=1200);p['execution']['placement'].update(cpus=2,memory='4Gi')
+p['execution'].update(backend='isolab-k8s',queue='isolab/cpu-spot',timeout_seconds=1200);p['execution']['placement'].update(cpus=2,memory='4Gi')
 p['stopping_rules']=[{'kind':'fixed_n','preregistered':True,'rule':'All42cases once,controls then producer then fresh replay;retain partials/errors;stop on any mismatch'},{'kind':'budget','preregistered':True,'rule':'60s controls,300s producer,300s replay;2GiB child addressspace;1200s Job,zero automatic retries'}]
 p['invalidation_rules']=['Source,base,manifest,primality,annihilator,codec or replay mismatch invalidates','A degree drop is not strict filtered nonmembership;LFD fields remain null','Clock diagnostic only;no speed or quality ranking']
 p['decision_rule'].update(text='Record FFD upper bound after full source and annihilator/projection checks and replay;preserve exact compact affine consequence without strictness claims.',verdict_vocabulary=['certified_upper','error','incomplete'])
