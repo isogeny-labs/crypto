@@ -25,6 +25,7 @@ table='| Attempt | Outcome | Receipt |\n|---|---|---|\n'
 for x in rows:
  receipt='checkpoint HTTP503; no compiler' if x.get('compiler_started') is False else ('native exit '+str(x['native_exit']) if x['kind']=='Singular' else 'compile '+str(x['compile_exit'])+', audit '+str(x['audit_exit']))
  table+='| '+x['attempt']+' | '+x['status']+(' (timeout)' if x.get('timeout') else '')+' | '+receipt+' |\n'
+body+='\nGeneric source receipt: '+'; '.join(r.get('generic_source_result_lines',[]))+'\n\nPrimitive presentation receipt: '+'; '.join(r.get('primitive_result_lines',[]))+'\n\nLambda construction receipt: '+'; '.join(r.get('lambda_result_lines',[]))+'\n'
 counts=json.dumps(c,indent=2)
 (h/'REPORT.md').write_text('# R49: explicit twisted-source charts and normalization attempts\n\n'+intro+'\n\n'+table+'\nRecorded construction counters (not performance):\n\n```json\n'+counts+'\n```\n\n'+body+'\nSee PROTOCOL.md, COMPACT-NORMAL-PROTOCOL.md, LEAN-PROTOCOL.md, PROOF_MAP.md, results.json and ARTIFACTS.md. The SVG displays recorded statuses because no comparable timing measurements were taken.\n')
 quote=lambda s:json.dumps(s,ensure_ascii=False)
