@@ -96,5 +96,19 @@ returned exit0 with matching runtime-source readback. See
 [cap-fix-endpoint.receipt.json](cap-fix-endpoint.receipt.json), and
 [cap-fix-scoped-readback.json](cap-fix-scoped-readback.json) for their four archived
 logs/receipts and fresh S3 byte comparisons. The follow-up's strict Clippy,
-release build, CLI replay and full library phases remain pending. No additional
-scientific samples or cloud cells were produced.
+release build and four-command CLI export/retry checks have also passed with
+exit0 and matching runtime-source readback. See
+[cap-fix-clippy.receipt.json](cap-fix-clippy.receipt.json),
+[cap-fix-build.receipt.json](cap-fix-build.receipt.json), and
+[cap-fix-cli.receipt.json](cap-fix-cli.receipt.json).
+[cap-fix-cli-readback.json](cap-fix-cli-readback.json) retains fresh S3 byte
+comparisons for these logs/receipts, the frozen binary and CLI output archive.
+The full release library suite then passed **5,445 tests, 0 failed, 123 ignored**
+with exit0 and matching runtime-source readback. The finite pipeline completed
+successfully at2026-10-30T05:33:11Z; see
+[cap-fix-full-library.receipt.json](cap-fix-full-library.receipt.json) and
+[cap-fix-pipeline.receipt.json](cap-fix-pipeline.receipt.json).
+[cap-fix-final-readback.json](cap-fix-final-readback.json) consolidates the
+per-artifact fresh S3 download receipts and rehashes their retained downloaded
+bytes against the exact artifact-index snapshot. No additional scientific
+samples or cloud cells were produced.

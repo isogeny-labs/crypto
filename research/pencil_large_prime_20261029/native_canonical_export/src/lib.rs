@@ -1,4 +1,5 @@
 //! Native packaging of existing observations. This module never executes experiments.
+mod disjoint;
 mod erratum;
 mod output_contract;
 mod protocol_lint;
@@ -76,6 +77,7 @@ pub fn adapter_hash() -> String {
             include_str!("protocol_lint.rs"),
             include_str!("output_contract.rs"),
             include_str!("erratum.rs"),
+            include_str!("disjoint.rs"),
             include_str!("../Cargo.lock"),
             include_str!("../Cargo.toml"),
             include_str!("../schemas/experiment-protocol.v1.json"),
@@ -160,6 +162,8 @@ pub fn validate_protocol(p: &V, base: Option<&Path>) -> Result<()> {
     }
     if p["freeze"]["status"] == "frozen" {
         protocol_admission(p)?;
+    } else if disjoint::selected(p) {
+        disjoint::admit_protocol(p)?;
     } else {
         for amendment in arr(&p["amendments"])? {
             check(
@@ -188,12 +192,13 @@ fn basic_protocol_admission(p: &V, allow_post_data: bool) -> Result<()> {
         "frozen protocol digest mismatch",
     )?;
     check(
-        p["analysis_plan"]["frozen_before_data"] == true
+        (p["analysis_plan"]["frozen_before_data"] == true || disjoint::selected(p))
             && !p["analysis_plan"]["script"]["sha256"].is_null(),
         "analysis not frozen before data",
     )?;
     check(
-        !p["sample_size"]["preflight_runtime"]["estimated_total_seconds"].is_null(),
+        !p["sample_size"]["preflight_runtime"]["estimated_total_seconds"].is_null()
+            || protocol_lint::unknown_runtime_gate(p)?,
         "frozen protocol preflight absent",
     )?;
     let mut ids = BTreeSet::new();
@@ -209,6 +214,11 @@ fn basic_protocol_admission(p: &V, allow_post_data: bool) -> Result<()> {
     Ok(())
 }
 fn protocol_admission(p: &V) -> Result<Option<erratum::Admitted>> {
+    if disjoint::selected(p) {
+        basic_protocol_admission(p, true)?;
+        disjoint::admit_protocol(p)?;
+        return Ok(None);
+    }
     basic_protocol_admission(p, true)?;
     let admitted = erratum::admit(p)?;
     if admitted.is_none() {
@@ -281,9 +291,27 @@ fn replay_analysis(native: &V, protocol: &V) -> Result<()> {
     linked_source!("paired_export/src/lib.rs");
     linked_source!("paired_export/src/plan.rs");
     linked_source!("paired_export/src/main.rs");
+    if disjoint::selected(protocol) {
+        linked_source!("native_price/src/disjoint.rs");
+    }
     let manifest = &native["input_manifest"];
     let gate_scope = pencil_accounting_price_draft::aggregate::p739_gate60_scope();
     let rebuilt = match protocol["sample_size"]["instances"].as_u64() {
+        Some(1)
+            if protocol["freeze"]["status"] == "frozen"
+                && protocol["extensions"]["analysis_scope"]
+                    == pencil_accounting_price_draft::aggregate::p186379_target0_scope()
+                && manifest["analysis_scope"] == protocol["extensions"]["analysis_scope"] =>
+        {
+            pencil_accounting_price_draft::aggregate::aggregate_p186379_target0(manifest)?
+        }
+        Some(1260)
+            if disjoint::selected(protocol)
+                && protocol["freeze"]["status"] == "frozen"
+                && manifest["analysis_scope"] == protocol["extensions"]["analysis_scope"] =>
+        {
+            pencil_accounting_price_draft::aggregate::aggregate_disjoint_p739(manifest)?
+        }
         Some(60)
             if protocol["freeze"]["status"] == "frozen"
                 && protocol["extensions"]["analysis_scope"] == gate_scope
@@ -387,6 +415,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
             include_bytes!("output_contract.rs").as_slice(),
         ),
         ("src/erratum.rs", include_bytes!("erratum.rs").as_slice()),
+        ("src/disjoint.rs", include_bytes!("disjoint.rs").as_slice()),
         (
             "src/protocol_lint.rs",
             include_bytes!("protocol_lint.rs").as_slice(),
@@ -428,11 +457,18 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
     }
     let script_entry = attach(&mut files, &script, "analysis")?;
     let native_entry = attach(&mut files, &np, "summary")?;
-    let receipt = load(&attach_bound(
+    let mut receipt = load(&attach_bound(
         &mut files,
         &m["prepared_plan_validation"],
         "summary",
     )?)?;
+    let enrollment = if disjoint::selected(&p) {
+        let context = disjoint::load_context(&p, m, &mut files)?;
+        receipt = pencil_accounting_price_draft::aggregate::normalized_disjoint_receipt(m)?;
+        Some(context)
+    } else {
+        None
+    };
     check(
         receipt["schema"] == "pencil-prepared-plan-validation/v1" && receipt["passed"] == true,
         "invalid plan validation receipt",
@@ -453,14 +489,23 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
             "resource sidecar differs from native observation",
         )?;
     }
-    let hp = attach_bound(&mut files, &req["execution_history"], "receipt")?;
-    let history = load(&hp)?;
-    check(
-        history["schema"] == "pencil-execution-history/v1"
-            && history["protocol_sha256"] == data_protocol_sha256
-            && &history["binary_sha256"] == binary,
-        "execution history identity mismatch",
-    )?;
+    let history = if let Some(context) = &enrollment {
+        check(
+            req["execution_history"].is_null(),
+            "disjoint history must be per plan",
+        )?;
+        context.history(&mut files, binary)?
+    } else {
+        let hp = attach_bound(&mut files, &req["execution_history"], "receipt")?;
+        let history = load(&hp)?;
+        check(
+            history["schema"] == "pencil-execution-history/v1"
+                && history["protocol_sha256"] == data_protocol_sha256
+                && &history["binary_sha256"] == binary,
+            "execution history identity mismatch",
+        )?;
+        history
+    };
     let mut histories = BTreeMap::new();
     for ev in arr(&history["records"])? {
         let key = s(&ev["record_id"])?;
@@ -480,7 +525,11 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
         for b in evidence {
             attach_bound(&mut files, b, "receipt")?;
         }
-        output_contract::history(ev, &p)?;
+        let history_protocol = match &enrollment {
+            Some(context) => context.record_protocol(&ev["session_id"])?,
+            None => &p,
+        };
+        output_contract::history(ev, history_protocol)?;
         if n(&ev["resumed"])? > 0 {
             check(
                 ev["checkpoint"].is_object()
@@ -511,10 +560,18 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
             "plan set/digest differs from receipt",
         )?;
         let plan = load(&attach_bound(&mut files, entry, "protocol")?)?;
-        output_contract::plan(&plan, &p)?;
+        let plan_protocol = match &enrollment {
+            Some(context) => context.protocols.get(name).ok_or("lineage plan absent")?,
+            None => &p,
+        };
+        output_contract::plan(&plan, plan_protocol)?;
         check(plan["schema"] == "ecbench.plan/v1", "invalid plan schema")?;
-        let sid = s(&entry["session_id"])?;
-        check(sessions.insert(sid.to_owned()), "duplicate session")?;
+        let sid = &entry["session_id"];
+        if enrollment.is_some() && sid.is_null() {
+            check(entry["records"].is_null(), "null session with records")?;
+        } else {
+            check(sessions.insert(s(sid)?.to_owned()), "duplicate session")?;
+        }
         for w in arr(&plan["workloads"])? {
             check(
                 workloads.insert(s(&w["workload_id"])?.to_owned()),
@@ -538,7 +595,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
                 )?;
                 check(
                     r["schema"] == "ecbench.record/v1"
-                        && r["session_id"] == sid
+                        && r["session_id"] == *sid
                         && &r["binary_sha256"] == binary,
                     "record identity mismatch",
                 )?;
@@ -562,7 +619,11 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
                 .unwrap_or_else(|| ex["algorithm_seed"].to_string());
             all_slots.push(json!({"plan":name,"session_id":sid,"seq":seq,"arm":arm["name"],"workload_id":w["workload_id"],"round":ex["round"],"warmup":ex["warmup"],"algorithm_seed":seed}));
             let Some(r) = records.remove(&seq) else {
-                missing.push(json!({"session_id":sid,"seq":seq,"arm":arm["name"],"workload_id":w["workload_id"],"round":ex["round"],"warmup":ex["warmup"],"algorithm_seed":seed}));
+                let mut missing_slot = json!({"session_id":sid,"seq":seq,"arm":arm["name"],"workload_id":w["workload_id"],"round":ex["round"],"warmup":ex["warmup"],"algorithm_seed":seed});
+                if enrollment.is_some() {
+                    missing_slot["plan"] = json!(name);
+                }
+                missing.push(missing_slot);
                 continue;
             };
             let rseed = r["algorithm_seed"]
@@ -583,7 +644,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
                 .remove(s(&r["record_id"])?)
                 .ok_or("missing or mismatched explicit execution history")?;
             check(
-                ev["session_id"] == sid && ev["seq"] == ex["seq"],
+                ev["session_id"] == *sid && ev["seq"] == ex["seq"],
                 "missing or mismatched explicit execution history",
             )?;
             let outcome = &r["outcome"];
@@ -664,7 +725,10 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
         .map(|a| json!({"id":a["id"],"role":a["role"],"binary_sha256":binary,"commit":commit}))
         .collect();
     let post_data = provenance_erratum.as_ref().map(|a| json!({"applied":true,"filed_before_affected_data":false,"amendment_id":a.amendment_id,"parent_protocol_sha256":a.parent_protocol_sha256,"data_protocol_sha256":a.parent_protocol_sha256,"metadata_protocol_sha256":p["freeze"]["protocol_sha256"],"changed_fields":erratum::FIELDS}));
-    let e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"request_binding":req["_request_binding"],"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?,"post_data_provenance_erratum":post_data}});
+    let mut e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"request_binding":req["_request_binding"],"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?,"post_data_provenance_erratum":post_data}});
+    if let Some(context) = &enrollment {
+        e["backend_record"]["disjoint_protocol_lineage"] = context.lineage.clone();
+    }
     validate_schema(&e, false)?;
     check_files(&e)?;
     let findings = lint_rows(&e, &p)?;

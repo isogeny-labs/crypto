@@ -147,6 +147,18 @@ enormous corpus.
 
 ## Next discriminating validation
 
+The subsequent cap-handling correction at runtime
+`d9a69910198d14a829b689253a62a7663b41d753` passed240 dataset tests, the explicit
+360-case adapter check, strict maintained Clippy, the release CLI build, four
+retained curve/twist export/retry commands and the full release library suite
+(5,445 passed, zero failed,123 ignored). Every phase has an exit0 receipt and
+matching runtime-source readback in the
+[prefix evidence directory](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md).
+This completes that source's local software gates. Actual worker publication,
+budgeted remote restore and full campaign/model coverage remain open; the
+[current cloud readiness record](../../research/ml_dataset_20261028/cloud-resume-readiness-20261030.md)
+keeps those operational obligations separate.
+
 ### October 30 integration checkpoint
 
 Source `113526b577044a6283be81acb1a847c89c96aa4e` imports newer native libraries

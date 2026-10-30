@@ -1247,3 +1247,216 @@ resource envelope, remaining empirical cohort and timing requirements.
 
 ### Errors
 No failed CI observed at delivery; old PR2869 evidence shards remain pending.
+
+## 2026-10-30 — Continuation consumer validation and resource admission
+
+### What was done
+The disjoint native analyzer and canonical exporter passed their final source-held validation. Native price:34 library tests,2CLI tests and an explicit retained1080-record integration preserving21600missing future slots. Exporter:54library,1CLI,1historical hash,3production tests and separately hydrated exact7-plan1260-workload replay passed; formatting and strict Clippy passed. Raw development failures and final receipts are retained. The prior CI run40984336538 finished successfully including16evidence-audit shards.
+
+### Decisions made
+Recorded the user's3hrs as10800cumulative active worker seconds and conservative outer expiry2026-10-30T05:05:50Z from recording at02:05:50Z. No reset of first-gate authorization. The revised conditional operational guard uses internal03:28:20Z and900secondsreserve, reviewed against four bounded kube calls and normal scheduling/Kubernetes enforcement. This is resource admission only; source/protocol/coverage admission remains distinct.
+
+### Open threads
+Commit reviewed consumers, bind postcommit source receipts, finish prospective protocol/source coverage, freeze and commit before any affected observations, then reconcile live jobs before submission. All1260 targets and qualified timing remain the original completion scope. No new experiment was launched by these software checks.
+
+### Errors
+The exporter's first hydrated integration overlapped a source edit and correctly failed its source-integrity check. Sources were then held unchanged through the successful final replay; both logs remain. The initial180-second guard missed cumulative bounded API delays; its review and the corrected900-second version remain separate records.
+
+### Prospective upper gate freeze
+Frozen the reviewed p186379target0 finite-count protocol before data: canonical body009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091, file709cb1b8dca094588db8e85429e186db2580d45f996f20c1388a365bdf38b133. Native frozen validation passes. Exact source848f495fa7031f0d0b5ac0d811ec07aa29fed9e7 and additive postcommit build attestation are bound. No launch follows from validator success; independent exact-body coverage, committed publication and live owner/resource admission remain required. Software PR2912 created after branch push and auto-merge enabled. Initial PR creation ran before push completed and failed without creating a PR; the successful retry is the only PR.
+
+### Pre-data binary-size correction
+The solver-free actual upper-gate packaging check rejected version1 because analyzer byte-size fields were absent despite correct hashes. Preserved version1 and its failed diagnostic. Version2 adds only verified pair874424/cohort1653848byte metadata plus amendment/parent/freeze identity. Canonical body5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040, file65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746; native frozen validation passes. External coverage and actual missing-slot packaging are being rebound before launch. Scientific inputs, binary bytes, costs, resource caps, request and deadlines are unchanged. No experiment has started.
+
+### Upper-gate submission
+After corrected frozenprotocol and reviews were committed asf6c80df6e and pushed, submitted the exact reviewed request once. Runpencil-p186379-20261030-b1; controllerbuild3071de75-eb33-43ca-ba92-b44fd357c7de; nativecanonicalrequestdaf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a; internaldeadline03:28:20Z unchanged. Initial durable state is provisioning with0restores and no benchmark job. This is a submission/infrastructure receipt, not a completed mathematical result. SourcePR2912 merged; protocolPR2913 open with auto-merge enabled. No remaining-cohort launch is authorized by this gate submission.
+
+### Native observation reports
+Added a separate presentation-only native renderer for dynamic workload counts and incomplete outcomes; historical60-target renderer unchanged. Hash-bound native analysis becomes exactJSON/CSV, editableSVG/TeX andPDF. Eight tests, strictClippy andformatting pass; independentreviewc290a14f... inspected4PDFpages/2SVGs. Allmissingfixture0/18records and36nullcells; mixedsoftwarefixture18records,2completecells/34null. These are software examples, not empirical results. The renderer does not authenticate upstream pricing/admission or qualify timing. Uppergate is still running, attempt0/0restores, with generation1committed and readback verified; no result ratio yet.
+
+### Finite-cost graph and standalone provenance
+Added a separate36-cell ratioSVG with algorithm-only/calibration-inclusive series, explicit unavailable values, exact-fraction metadata and a shared axis. JSON/CSV remain exact; plotcoordinates are labelled visual approximations. Added visible title/run/scope to prevent standalone fixture misidentification. Final9tests, strictClippy andformatting pass; independentreviewaeded733... verified unchanged numericalprojection and visually inspected native raster. Root installed native librsvg2-tools2.59.2 and independently inspected the graph. Priorv2 andv3 softwarefixture packets remain separate; no experimental ratio is inferred. ProtocolPR2913 merged; reportdelivery continues on codex/pencil-observation-report-20261030.
+
+## 2026-10-30T03:33Z — Upper-gate terminal checkpoint reconciliation
+
+### What was done
+
+Observed native upper gate pencil-p186379-20261030-b1 fail with `original UTC deadline expired` at the unchanged 03:28:20 UTC deadline; controller failure receipt at 03:28:28 and CodeBuild terminal at 03:28:38.987. Downloaded version-pinned generation 6 archive read-only and checked SHA-256 and 528281600-byte size. Independent audit verified all seven extracted files against its manifest. Preserved raw checkpoint/session and controller receipts plus source-bound terminal semantics review. No restore, duplicate payload, solver replay or new cohort launch. Renderer PR #2917 merged with applicable checks passing.
+
+### Decisions made
+
+Retain all 18 planned slots: checkpoint has two reference/control warmups, zero measured observations, sixteen missing slots and zero of five measured pairs. All 36 ratios remain null. Embedded session is an unfinished checkpoint snapshot, not a fabricated terminal session. Original 10800 worker-second ceiling and 05:05:50 outer expiry remain unchanged. Native source review and frozen protocol govern interpretation; operational deadline failure is not a mathematical conclusion.
+
+### Open threads
+
+Publish native partial analysis, canonical shortfall findings, PDF and graph after this raw evidence commit. Upper gate is incomplete, so the remaining full cohort has not been admitted. Exact final worker duration/termination is not established by the stale supervisor receipt. Direct Kubernetes readback timed out; retain this gap rather than inferring a verified shutdown from controller completion.
+
+### Errors
+
+Native controller recorded deadline expiration and a last-contact error that the supervisor container could not be found. Supervisor receipt still says running with an earlier timestamp and null exit code. The controller's terminal state and stale supervisor status are both preserved unchanged. No IAM or RBAC expansion attempted.
+
+### 2026-10-30T03:37Z — Additive shutdown reconciliation
+
+AWS DescribeInstances now reports the exact bound worker instance i-027be1b63d0a94827 as terminated, with launch 02:47:55 UTC and transition reason timestamp 03:30:41 UTC. Saved response and readback timestamp unchanged. This resolves the live-worker existence question; it does not establish exact active payload time or repair the stale supervisor receipt. The report will bind this additive resource observation without converting infrastructure lifetime into algorithm costs. Two artifact-check invocations initially used the wrong path/missing base argument; the corrected tools/artifacts/artifacts.py check HEAD~1 HEAD passed.
+
+## 2026-10-30T03:42Z — Native partial analysis and observation report
+
+### What was done
+
+Retained the native analysis, original-plan execution history, partial canonical export, resource sidecars, editable coverage diagram, exact CSV/JSON and three-page PDF. Native analysis exits 0; canonical packaging exits 1 with five completeness findings; checking exits 1 with six findings. Independent review checked source/file bindings and every PDF page. Kept the first report and added a worker-terminal update after the separate EC2 readback. Raw records were committed/pushed before reports.
+
+### Decisions made
+
+All ratios remain null; no missing pencil work is treated as zero cost or a completed failure row. No numerical or scientific conclusion follows from the operational deadline. Current report is the worker-terminal-update artifact. Timestamp companion receives an additive provenance binding; old reports/reviews are unchanged.
+
+### Open threads
+
+PR delivery and applicable CI. Upper gate and full continuation remain incomplete. Exact active payload seconds remain unknown. Coordination heartbeats only were renewed for publication after the prior keeper ended; experiment deadlines, request and budget were not extended.
+
+### Errors
+
+Expected canonical incompleteness is retained as findings rather than suppressed. A background heartbeat launch did not survive the command session; verified it was absent before starting the same finite coordination loop in a managed exec session, with successful fenced heartbeats.
+
+## 2026-10-30T04:30Z — Completion boundary and source-only rejection proposal
+
+### What was done
+
+Reconciled the retained published weighted-law implementation/source audit and two 1260-target paired cohorts, and signed-label Kummer cohort. These records support their scoped implementation/finite-cost results; they do not close the separate universal compiled-law/Pic0 proof or pencil timing/cohort requirements. PR #2927 merged; two nonblocking ecbench jobs were still running at the merge readback.
+
+Reviewed the pencil candidate-verification order against native_solver.rs and retained an unapplied patch, algebraic proof, standardized proposal JSON, independent static review, editable control-flow SVG and inspected two-page PDF in proposals/root_count_rejection_20261030. The proposed length guard precedes complement construction; the prior lambda-zero sieve call establishes the needed divisibility. Independent review found no defect under the bounded valid-input assumptions.
+
+### Decisions made
+
+No frozen runtime source was changed and no experiment/test/solver was run. The proposed new instrument is not observationally identical: skipped rejected candidates change arithmetic, semantic events, allocations and possible diagnostics. The packet records exact symbolic per-rejection event deltas, not measured savings, aggregate cost ratios, or a speedup. Existing incomplete-gate stopping rules remain binding.
+
+### Open threads
+
+Prospective implementation requires software equivalence fixtures with both meters enabled and correct modulus bindings, then independent review and a new instrument identity. Any new measurement requires a prospective known-data protocol and valid resource admission. Full pencil workload matrix and timing requirements remain incomplete; no resampling, reduced denominator or automatic gate retry.
+
+### Errors
+
+A combined read-only source lookup used the historical worktree for the newer pencil path and reported file not found; the pencil source was inspected in its actual current worktree. No data or scientific result changed.
+
+## 2026-10-30T04:49Z — Isolated early-rejection implementation and software validation
+
+### What was done
+
+Implemented a separate prospective crate in research/pencil_early_rejection_20261030, preserving the frozen native solver SHA e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df. Its helper extraction/reorder is independently source-reviewed; default ecbench integration and frozen source remain unchanged. Five selected tests passed in debug and release, with twelve inherited solver-path tests filtered. Strict Clippy and fmt passed. The bounded F19 fixtures explicitly distinguish 612 ordinary-origin and 470 exceptional-only invocations, with 826 accepted and 256 rejected cases. These are software coverage counts, not target/cohort results.
+
+### Decisions made
+
+Retained source-bound baseline helper, source-fork correspondence, both arithmetic/semantic meters, exact rejected counter deltas, selected graph-cap parity and singular-polynomial branch labeling. Preserved independent proof of at most two rejected complements per valid smooth-quintic sieve and 32 across sixteen walks; it is not a runtime estimate. No solver trial, rho trial, cohort, cloud launch or prospective scientific admission occurred. PR #2932 merged with its checks complete.
+
+### Open threads
+
+Publish neutral software-validation PDF/SVG/JSON and implementation PR. Full pencil cohort and timing requirements remain incomplete and subject to the failed upper-gate stop rule and future prospective admission. This instrument has not executed solve_one. T-885 is the separately claimed software-validation task; its heartbeat maintains coordination only, with no experiment budget/deadline change.
+
+### Errors
+
+Retained initial fixture failures, source-fidelity/Clippy development failures, and the origin-coverage review correction. The report's first render lacked a math-font package; failed logs retained before presentation correction. Prior T-826 lease was reconciled as failed and not revived; new software work was attached to T-885. A later check reports an exclusive reservation by this same claimed task; current fenced ownership is retained rather than creating a duplicate owner.
+
+## 2026-10-30T05:02Z — Prospective software CI and timing source review
+
+### What was done
+
+Added a scoped PR/main/merge-group workflow for the isolated early-rejection crate. It selects exactly five equivalence tests, runs debug and release, and checks formatting/Clippy; inherited solver and rho tests remain unexecuted. The workflow includes the producer and engine source dependencies in sparse checkout. Independent read-only timing review inspected record.rs, pencil.rs, three_leads.rs, native_solver.rs and the canonical exporter.
+
+### Decisions made
+
+Keep scientific execution separate from software CI. Preserve old timing fields: a future instrument needs an immediate-return cold interval, separate instrumentation closure and completion, explicit adapter verification/calibration/report durations, and arm-specific online phase validation. The existing target hooks already delimit online work. Inline meter overhead cannot be inferred by subtracting enclosing and enclosed clocks. No changed timing source, new estimand, qualified clock, trial or resource extension follows from this review.
+
+### Open threads
+
+PR2935 CI and merge remain pending. Full pencil cohort and timing are incomplete. All retained rho/control intervals are below the existing 1 ms floor; endpoint correction alone cannot qualify them. A future timing design must resolve individual-call measurement without presenting repeated-call blocks as equivalent latency. The original resource deadline and failed upper-gate stopping rule remain unchanged.
+
+### Errors
+
+The general Rust CI scope skips this standalone crate, motivating explicit software-only CI. No scientific run was retried. The implementation packet's ignored Cargo.lock was explicitly committed, and the oversized retained attempt3 log was published and remotely verified in the required artifact store before PR creation.
+
+CI review addendum: the broad initial artifact-wiring match suggested credentialed hydration of logs that tests do not read. Independent review identified the PR-head script/credential exposure. The final workflow instead checks out only source/provenance/manifests and runs from the root with an explicit manifest path; it uses no secrets, artifact tooling or result downloads. YAML/Bash syntax and the exact five-test/zero-benchmark listing passed; independent final source/dependency review found no concrete blocker. The repository wiring check is separately required before publication.
+
+## 2026-10-30T05:38Z — Six-hour replacement gate preparation
+
+### What was done
+
+Recorded the renewed six-hour active-worker ceiling and conservative absolute expiry 2026-10-30T11:17:54Z; request c1 retains the reviewed conditional cutoff08:10:24Z and unchanged scientific instrument543a54b. Reconciled Diem as expired50/52 with no pending launcher, prior b1 terminal failure, unchanged reviewed controller deployment and absent c1 controller receipt. PR2935 merged at05:17:48Z after source-only CI passed. Independent review and59 release-library tests passed the native consumer's narrow unknown-runtime gate exception; strict Clippy/fmt passed. Original failed frozen validation remains retained. Corrected immutable protocol body18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9 froze05:37:28Z and passed native validation.
+
+### Decisions made
+
+Runtime estimate remains unknown;21600 seconds is a resource ceiling, not an estimated duration. New acceptance is restricted to the exact18-execution finite-count characterization gate. Clocks stay diagnostic. The earlier draft review is superseded only for freeze suitability by additive independent review. Draft/preparation status fields remain historical preparation state; any execution admission is external, exact-file-bound, and separate from mechanical freeze. No scientific payload has launched at this entry. The original1260-target objective and15 independent gate replay requirement remain unchanged.
+
+### Open threads
+
+Complete exact-body finite-coverage review, commit/publish freeze and source, retain current cloud reconciliation and separately admit the exact request before submission. Gate completion, independent replay/review, a separate cohort admission and full cohort remain pending. The daily shared log is reserved by T828, so this project handoff is retained here without editing that reserved file.
+
+### Errors
+
+Initial frozen validation rejected the honest null estimate. A scoped, fail-closed native admission exception resolves that software blocker without manufacturing an estimate. Conductor scope add replaces the reservation list; restored all three T891 scopes after detecting the native-only list. Reading the migration receipt as the ordinary user was denied; approved read-only sudo access succeeded. No duplicate migration recovery or scientific generator was started.
+
+## 2026-10-30T05:42Z — Exact c1 replacement submitted once
+
+### What was done
+
+Published frozen protocol/source/reviews at64fbfaf8a7389b71a8ca8ec7500d21a5ca6b5719 and opened regular PR2943 with auto-merge enabled. Independent final admission review checked exact committed files, approved client/controller/images, zero active controller builds/jobs and absent c1 state. Issued external execution-admission SHA5b6c92fe9e1e1329cc14351fc81a7e7bfb40b5502d2aa16ece5cd3513dfd1bfd. Submitted exact request once with the reviewed ac7 client; CodeBuild returned isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0 and request identity92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907. Receipt retained. Initial remote status is awaiting_controller_receipt, not a completed execution.
+
+### Decisions made
+
+No second submission on pending state. Preserve request cutoff08:10:24Z, outer expiry11:17:54Z and cumulative21600 active-worker seconds from05:17:54Z. Exact frozen design and external execution permission are separate; no remaining-cohort admission or timing qualification. Raw Cargo-log terminal blank lines retained rather than changing reviewed hashes; source whitespace check passed.
+
+### Open threads
+
+Monitor this controller/build/request identity, retain actual worker/epoch receipts and full costs, then package and independently review complete or incomplete output. All1260-target completion remains unresolved. PR2943 checks are in progress; native canonical-export and preparation jobs have passed.
+
+### Errors
+
+No submission error. GitHub push warned about existing historical large blobs; scoped artifact check reports no new data files committed. No history rewrite or unrelated cleanup performed.
+
+## 2026-10-30T05:47Z — Running-worker reconciliation and export handoff
+
+### What was done
+
+Re-polled exact c1 controller and EC2 worker: phase running, attempt0, instance i-04d58c2b309fb6549, Pod UID3a7ab215-49d1-4982-8c78-5a0c71646842, no restores/failure. EC2 describes the c8a.2xlarge instance as running with launch05:42:33UTC. Retained source-checked C1_EVIDENCE_HANDOFF.md for native analysis, canonical export and neutral PDF/SVG/CSV/JSON. PR2943 headc91c99d has no failed checks; artifacts,size,validation-gate remain in progress.
+
+### Decisions made
+
+All c1 records, attempt history and resources must derive from actual c1 immutable receipts. Preserve computation/fresh epochs separately; canonical accounting recomputation does not satisfy the15 independent scientific replays. Unobserved rows and costs remain absent/null. The old b1 packet is a shape example only. No additional scientific execution or request submission occurred.
+
+### Open threads
+
+Wait for exact live controller progress/checkpoints/terminal outcome, then ingest and verify raw artifacts. Keep both original cutoff and campaign expiry. Full cohort remains incomplete and conditionally admitted only after complete gate/replay/review. Required CI remains pending.
+
+### Errors
+
+Source review caught a handoff command using a directory for the canonical export --out argument. Corrected to C1_EXPORT.json and matched check-export path before use; analyzer stdout and renderer directory semantics separately verified. No scientific data or source code changed.
+
+## 2026-10-30T06:34Z — Controller lineage and prospective supervision amendment
+
+### What was done
+
+Reconciled CodeBuild and durable c1 state before any takeover action. Original
+controller ended FAILED/BUILD_TIMED_OUT at06:27:08.972; AWS auto-retry started
+successor592e9381 at06:27:09.164. Same request, Pod, instance, attempt0 and
+restores0. No manual StartBuild or repeated scientific submission occurred.
+Preserved full build/state receipts and pre-discovery manual review.
+Prepared v5 controller-only amendment, native validation passed, independent
+exact-document review confirms scientific and analysis fields unchanged.
+
+### Decisions made
+
+Keep original six-hour allowance and08:10:24/11:17:54 UTC cutoffs. Prospectively
+separate max4 controller invocations from unchanged max2 scientific/worker
+attempts and max1 restore; original v4 and all costs remain. Commit/review and
+separate admission must precede thirdcontroller. No project or IAM changes.
+
+### Open threads
+
+c1 remains running; no new completed candidate result established. Publish
+amendment/admission, follow terminal receipts, retain full1260 and replay gaps.
+
+### Errors
+
+Original controller timed out after45min. Shared project reports1500min; actual
+builds report45min, cause not established. AutoRetryLimit2 allows three total
+builds, discovered during reconciliation. First amendment metadata candidate
+used timestamp for date-only field; native checker rejected it; corrected before
+review/admission. Manual takeover proposal was never executed.
