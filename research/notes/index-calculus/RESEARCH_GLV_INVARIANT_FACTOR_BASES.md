@@ -3055,3 +3055,61 @@ Host: the 4-vCPU container (isolab-eks is not reachable from it); operation coun
 E31's distances read `≈ 1.45×` larger at `0` GAE: a correction of the reference, reported as such and
 not as a change of the index calculus.  The IC side gains a few tenths of a percent (engineering,
 negligible), because its `F_{p⁴}` work is `≈ 2 %` of `S`.
+
+### 9.26 E28 pre-registration: the GLS fold on the single-`τ_T` line (stages 0, A and A2 only)
+
+*Registered 2026-10-30, before any E28 code.*  **What E28 is, reconstructed.**  The 2026-10-22 draft is
+lost; what survives is the red team's reading that this `τ_T` variant "predicts itself `≥ 10×` behind
+E24, so it can improve the E19 row but not the baseline", and that only its cheap stages 0, A and A2
+should run, plus one new cheap control on solve cost.  §9.18 named the variant: the `ψ` fold without the
+full `V₄` symmetry, on E19's single-`τ_T` line, where §9.17's obstruction to `h = 4` does not apply but
+the solve is E19's weighted `D₄` solve (`≈ 1.4·10⁹` a call, `≈ 820×` E24's).  The derivation below is new
+and is checked by Stage 0 before anything is measured.
+
+1. **The curves.**  Over `F_p[t]/(t⁴ − c)` the `p²`-power map is `σ: t ↦ −t`.  Take `x₀` with
+   `σ(x₀) = −x₀` (coordinates on `t` and `t³` only, not both zero), `c ∈ F_p^*`, and E19's
+   `a = c² − 3x₀²`, `b = −x₀³ − a x₀`, so `T = (x₀, 0)` is on `E` and `f′(x₀) = c²`.  Then `x₀² ∈ F_{p²}`,
+   `σ(a) = a`, `σ(b) = −b`, and `E` is the quadratic twist over `F_{p⁴}` by `x₀` (a square root of a
+   non-square of `F_{p²}`) of a curve over `F_{p²}`: a GLS twist, `j ∈ F_{p²}`.
+2. **`ψ` keeps `T` and the line.**  `ψ(x, y) = (−σ(x), i·σ(y))`, `i² = −1` in `F_p` (`p ≡ 1 mod 4`): on
+   `E` because `σ(f(x)) = f(−σ(x))·(−1)` and `i² = −1`; `ψ² = −1`; `ψ(T) = T`.  On E19's line
+   `x = x₀ + u`, `u ∈ F_p`: `ψ(x₀ + u) = x₀ − u`, so `ψ` acts as `u ↦ −u`, `τ_T` as `u ↦ c²/u`, `τ_T ψ` as
+   `u ↦ −c²/u`: **`8` points a column** (`4` abscissae, `±`) against E19's `4`.  Points with `u² = −c²`
+   have `ψP = ±(P + T)`, so `λ·log P = ±log P` and `log P = 0`; they are excluded with `u ∈ {0, ±c}`.
+3. **The cofactor.**  All of `E[2]` is rational (the other two roots lie in `F_{p²}(√(9x₀² − 4c²)) ⊆ F_{p⁴}`),
+   so `4 | h`; §9.17's argument excludes `h = 4` only for the `V₄` line, which needs the halves of a second
+   `T`.  Here only `T`'s halves matter, and `f′(x₀) = c²` is already a square.  So `h = 4` is not excluded.
+4. **What it can buy.**  As in E25, `ψ` acts on the base, not on the system: decompositions per target
+   (`≈ 8`, E19's `τ_T` orbit) and `y` unchanged, columns halved, so the relation phase halves; the matched
+   walk is the `⟨±ψ⟩` walk, `√2` fewer steps than E19's negation walk.  Net against the matched rho
+   `≈ √2`, on a line whose rows are `2.6`–`8.8·10⁶×` from rho (E19) against E24's `1.3·10⁴`–`1.7·10⁵×`:
+   the variant can improve E19's row and cannot approach the baseline (E31 A on E25's curves).
+
+**Protocol.**  Sizes E19's: `p = 53, 101, 149, 197, 269`.  **Stage 0** (gate): seeds `1`–`8` per `p`,
+the generator keeping the least `h` (`≤ 16`) its budget meets; on every curve check on points `ψ² = −1`,
+`ψ(G) = [λ]G` with `λ² ≡ −1 (mod n)`, `ψ(T) = T`, and that every base point's `ψ`-, `τ_T`- and
+`τ_Tψ`-images are base points with the derived `u`-action; record `h`, density and points per column.
+**Stage A** (the fold, measured): seeds `1, 2` per `p`; one target stream `R = aG + bQ` decomposed by
+E18's exact meet-in-the-middle oracle (`mitm_signed`, every decomposition re-added in the group), one
+decomposition per target drawn uniformly, feeding two arms on the same points: **τ**, E19's `τ_T`-folded
+base (`4` points a column), and **τψ**, the `⟨τ_T, ψ⟩`-folded base (`8`); each filtered and solved by
+Wiedemann until `[d]G = Q` verifies; `16` `⟨±ψ⟩` and `16` negation walks per curve, priced both with
+E25's arithmetic and with E27's (§9.25).  **Solve-cost control** (new, cheap): E19's weighted `D₄` solve,
+unchanged (`weighted_system` → `solve_weighted` → `lift_back`), on `3` uniform targets of each Stage A
+curve, compared with `mitm_signed` on the same base.  **Stage A2** (a model, labelled as such):
+`S_model = (residuals to the τψ log) × (control's median C) + LA + generation`, against the matched
+walk, compared with E19's measured `S/rho` at the same `p` and with E31 A's.  **No Stage B** (no
+end-to-end run with the `D₄` solve).  Host: the 4-vCPU container, operation counts only.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.100 | Stage 0 (gate; **kill**) | at every `p` curves exist; `ψ² = −1`, `ψ(G) = [λ]G`, `λ² ≡ −1`, `ψ(T) = T` on points; every image in the base with the derived action; `8.00` / `4.00` points a column on the same points; density pooled in `[0.3, 0.7]`; `h = 4` on at least one of `8` seeds at every `p` | a `ψ`/line check fails or no curve (E28 stops, recorded as a negative); `h = 4` never met at some `p` (recorded; Stage A runs on the least `h`) |
+| G2.101 | Stage A (fold) | `cols_τ / cols_τψ = 2.00` on every curve; decompositions per decomposed target median `8`; `y_τψ / y_τ` pooled in `[0.8, 1.25]`; residuals to the log `τ / τψ` pooled in `[1.6, 2.4]`; both arms recover the log on every curve | outside, or a log not recovered |
+| G2.102 | solve-cost control | every solved call's decomposition set equals `mitm_signed`'s; per-call `C` median within `±30 %` of E19's `1.37`–`1.41·10⁹` at the same `p` | any disagreement, or outside |
+| G2.103 | Stage A2 (model, extrapolation) | `S_model / rho_⟨±ψ⟩` below E19's `S / rho_neg` at the same `p` by `[1.4, 4.0]` (E25 arithmetic on both); `≥ 10×` above E31 A's `S/rho` range on E25's curves at every `p` | outside the first band; within `10×` of E31 A |
+
+**What it would say.**  If G2.100–G2.103 hold, the `ψ` fold carries over to E19's line with `h = 4`, cuts
+that line's modelled cost by `≈ 2×` against its own matched walk, and leaves it two orders of magnitude
+behind the `V₄` line: **class engineering on the `D₄`/`τ_T` line, not an improvement of the baseline**,
+and since A2 is a model, not a measured `S` either.  A Stage B would be justified only if A2 put the line
+within reach of E31 A, which the derivation says it cannot.
