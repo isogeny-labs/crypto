@@ -24,6 +24,7 @@ set -euo pipefail
 printf 'aws %s\n' "$*" >> "$TEST_PUBLISH_LOG"
 case "$*" in
   'ecr get-login-password --region us-east-2') echo test-token ;;
+  'ecr-public get-login-password --region us-east-1') echo public-token ;;
   'ecr describe-images --repository-name isolab/tasks --image-ids imageTag=gh-123-1-'*) printf 'sha256:%064d\n' 0 ;;
   *) exit 2 ;;
 esac
