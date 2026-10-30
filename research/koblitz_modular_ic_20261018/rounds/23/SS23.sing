@@ -1,0 +1,54 @@
+// Append to the frozen R22 original polynomial-ring circuit prefix.
+LIB "elim.lib";
+poly F=b*c7+b2*c5+b*c6+b2*c4+c6+b5+b4*c+b3*c2+b2*c3;
+ideal orig=nn[49],nn[53],nn[239],nn[241],nn[243];
+ideal chart=F,nn[239],nn[241];
+poly remaining=nn[243];
+poly cofA=nn[49]/F;
+poly cofB=nn[53]/F;
+print("BEGIN_SS23_CHART");
+print("TATE_FACTOR_RESIDUALS");nn[49]-cofA*F;nn[53]-cofB*F;
+if(nn[49]-cofA*F!=0 || nn[53]-cofB*F!=0){ERROR("Tate factor binding failed");}
+poly Jac=diff(F,b)*(diff(nn[239],n)*diff(nn[241],l)-diff(nn[239],l)*diff(nn[241],n));
+print("BEGIN_COMPLETE_COLON");
+ideal colon=quotient(chart,ideal(remaining));colon;
+print("END_COMPLETE_COLON");
+matrix colonLift=lift(chart,colon*remaining);
+print("COLON_MEMBERSHIP_LIFT");colonLift;
+matrix colonResidual=matrix(colon*remaining)-matrix(chart)*colonLift;
+print("COLON_MEMBERSHIP_RESIDUAL");colonResidual;
+if(size(ideal(colonResidual))!=0){ERROR("colon certificate failed");}
+ring ss=(2,a),(n,l),lp;
+minpoly=a5+a3+1;
+number bb=a+1;
+map sp=r,n,l,bb,1;
+ideal J=std(ideal(l4+bb*l+bb^2,n4+bb^3*n+bb^4*(l+1)));
+ideal H=sp(colon);
+print("COLON_ON_ORIGINAL_FIBER");H;
+ideal cover=J,H;
+print("WHOLE_FIBER_COLON_UNIT_IDEAL");std(cover);
+matrix coverLift=lift(cover,ideal(1));
+print("WHOLE_FIBER_COLON_UNIT_LIFT");coverLift;
+matrix coverResidual=matrix(ideal(1))-matrix(cover)*coverLift;
+print("WHOLE_FIBER_COLON_UNIT_RESIDUAL");coverResidual;
+if(size(ideal(coverResidual))!=0){ERROR("no full-fiber source chart certificate");}
+poly U=n2+bb*n+bb*l3+bb^2*l;
+poly jac=sp(Jac);
+print("ORIGINAL_RELATIVE_JACOBIAN");reduce(jac,J);
+print("ORIGINAL_JACOBIAN_FACTOR_RESIDUAL");reduce(jac-bb^6*(bb+1)^2*U,J);
+print("JACOBIAN_UNIT_IDEAL");std(J+ideal(jac));
+if(std(J+ideal(jac))[1]!=1){ERROR("source chart Jacobian vanished");}
+if(reduce(jac-bb^6*(bb+1)^2*U,J)!=0){ERROR("Jacobian factor binding failed");}
+poly ca=sp(cofA);poly cb=sp(cofB);
+print("TATE_COFACTORS_ON_FIBER");ca;cb;
+print("TATE_COFACTOR_UNIT_IDEAL");std(J+ideal(ca,cb));
+if(std(J+ideal(ca,cb))[1]!=1){ERROR("original Tate equations do not recover base near SS5");}
+print("FIBER_DIMENSION_CONTROL");vdim(J);
+if(vdim(J)!=16){ERROR("frozen SS5 dimension mismatch");}
+// Invalid unit certificate must be rejected by the same exact residual check.
+matrix corrupt=coverLift;corrupt[1,1]=corrupt[1,1]+1;
+matrix badResidual=matrix(ideal(1))-matrix(cover)*corrupt;
+print("CORRUPTED_UNIT_CERTIFICATE_REJECTED");size(ideal(badResidual))!=0;
+if(size(ideal(badResidual))==0){ERROR("corrupted unit certificate was accepted");}
+print("SS23_ALL_SOURCE_CHART_CHECKS_PASS");
+print("END_SS23_CHART");quit;

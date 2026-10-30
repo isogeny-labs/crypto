@@ -30,10 +30,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install native zlib linker dependency
+        shell: bash
+        run: |
+          if ! command -v pkg-config >/dev/null || ! pkg-config --exists zlib; then
+            if [ "$(id -u)" -eq 0 ]; then
+              apt-get update
+              apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            else
+              sudo apt-get update
+              sudo apt-get install -y --no-install-recommends pkg-config zlib1g-dev
+            fi
+          fi
       - name: Build ic
-        run: cargo build --release --bin ic
+        run: cargo build --release --features ic-cli-contracts --bin ic
       - name: Parameter and synthetic pipeline checks
-        run: cargo test --release --test ic_framework --test ic_progress
+        env:
+          IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
+        # Run all three existing suites against the freshly built production CLI.
+        run: cargo test --release --features ic-cli-contracts --bin ic
       - name: Inspect supplied example documents
         run: |
           target/release/ic inspect --file docs/ic/prime-example.json --json

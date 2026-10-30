@@ -1,0 +1,92 @@
+schema: crypto.experiment/v1
+id: EXP-NIST-FILTER-001
+version: 1
+title: Inventory filtering of the saved NIST R08 relations with an R06 replay
+status: draft
+owner: NIST seed provenance research
+created: 2026-10-26
+tags: [nist, nfs, exact-counts, input-publication-blocked]
+question:
+  summary: Does the larger pinned checkpoint complete native filtering, and what counters and controller state result?
+  questions:
+    - {id: Q1, text: The reference reproduces the known R07 counters.}
+    - {id: Q2, text: The candidate has a complete and reconciled native filter inventory.}
+source:
+  repo: isogeny-labs/crypto
+  ref: codex/nist-r08-report-and-filter-experiment-20261026
+  frozen:
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/inspect_filter.rs, sha256: cbcba282afb5381d57f52461276b1f80cae11ae7198418228e9894f767bdc5db}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/run_filter.sh, sha256: 8685a4f30c74dd7852ff01a47c8ce55a8038d5f0ad4ba4ebd4a9645d0faefdf3}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/run_pair.sh, sha256: 2cf461b2b7deecd816b962681cae1f401f6e6db4858e5ee757ac16bab93aec3d}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/verify_pair.sh, sha256: fece29468dd26314ccc1a588db1a1a81c40889c067ac5691269de7c95758ec9d}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/reference-inputs.sha256, sha256: 9e2dca1a855cc6edf388992edccfb1f2f4caca4f55a701eabe1540df818ca778}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/candidate-inputs.sha256, sha256: c762d658bb751993bc7044fdabf5e9a4970863c2b58298b4758f10e053874a66}
+    - {path: backlog/XP-20261026-nist-p256-checkpoint-filter/protocol.json, sha256: d7f93abb5d03387c5d82e1b7986cede45d4a904e05d90667f3e6cfdd1ec8bdec}
+paths:
+  root: research/nist_skipped_curve_dissection_20261021/factorization/rounds/R09-filter-registered
+  out: research/nist_skipped_curve_dissection_20261021/factorization/rounds/R09-filter-registered/out
+cells:
+  - {id: reference, role: control, params: {raw_lines: 4592399}, requires: {vcpus: 2, memory_gb: 16}}
+  - {id: candidate, role: measure, params: {raw_lines: 10441117}, requires: {vcpus: 2, memory_gb: 16}}
+steps:
+  - id: build-checker-tests
+    scope: once
+    runs_on: controller
+    argv: [rustc, --edition=2021, --test, backlog/XP-20261026-nist-p256-checkpoint-filter/inspect_filter.rs, -o, "{{paths.root}}/checker-tests"]
+    timeout_s: 300
+    outputs: ["{{paths.root}}/checker-tests"]
+    on_failure: stop
+  - id: test-checker
+    scope: once
+    runs_on: controller
+    needs: [build-checker-tests]
+    argv: ["{{paths.root}}/checker-tests"]
+    timeout_s: 60
+    on_failure: stop
+  - id: build-checker
+    scope: once
+    runs_on: controller
+    needs: [test-checker]
+    argv: [rustc, --edition=2021, -O, backlog/XP-20261026-nist-p256-checkpoint-filter/inspect_filter.rs, -o, "{{paths.root}}/inspect-filter"]
+    timeout_s: 300
+    outputs: ["{{paths.root}}/inspect-filter"]
+    on_failure: stop
+  - id: run-pair
+    scope: once
+    runs_on: host
+    needs: [build-checker]
+    argv: [env, NIST_R06_STATE=.cache/nist-filter-inputs/R06/state, NIST_R08_STATE=.cache/nist-filter-inputs/R08/state, "NIST_FILTER_CHECKER={{paths.root}}/inspect-filter", GNFS_BIN_DIR=/opt/yafu/factor/lasieve5_64/bin, bash, backlog/XP-20261026-nist-p256-checkpoint-filter/run_pair.sh, "{{paths.out}}/pair"]
+    timeout_s: 1800
+    outputs: ["{{paths.out}}/pair/reference/counts.json", "{{paths.out}}/pair/candidate/counts.json"]
+    must_not_exist: ["{{paths.out}}/pair"]
+    evidence: true
+    on_failure: stop
+gates: []
+hosts:
+  selection: ordered
+  candidates:
+    - id: prepared-nonpreemptible-lab
+      backend: local
+      paid: false
+      preemptible: false
+      provides: {vcpus: 2, memory_gb: 16, disk_gb: 24, arch: x86_64}
+      timing_valid: false
+budget: {max_cost_usd: 0, max_wall_hours: 1}
+checkpoint: {resume: none, transport: none}
+metrics:
+  - {id: unique_relations, kind: counted, primary: true, description: Native rows after duplicate removal, source: {file: "{{paths.out}}/pair/{{cell.id}}/counts.json", path: unique_relations}}
+  - {id: singleton_survivors, kind: counted, primary: true, description: Native rows after singleton pruning, source: {file: "{{paths.out}}/pair/{{cell.id}}/counts.json", path: singleton_survivors}}
+outcome:
+  decision_rules:
+    - {id: R1, about: [Q1, Q2], when: Both native inventories reconcile and the exact reference matches, verdict: Apply the frozen protocol controller-state rules; no matrix-rank or factor claim.}
+  invalidation: [Reference mismatch blocks candidate interpretation; any incomplete native execution is retained.]
+  censoring: [Timeouts and interruptions are incomplete execution; no silent restart or retry.]
+reporting:
+  results_file: research/nist_skipped_curve_dissection_20261021/factorization/rounds/R09-filter-registered/RESULTS.md
+  required_artifacts: ["{{paths.out}}/pair/{{cell.id}}/counts.json", "{{paths.out}}/pair/{{cell.id}}/native-filter.log"]
+  visuals: true
+agent:
+  executor_model: claude-haiku-5-5
+  director_model: claude-sonnet-5-5
+  autonomy: {launch_paid_host: never, terminate_own_hosts: allowed, retry_failed_step: never, git_commit: never, git_push: never, open_pr: never}
+  escalate_on: [gate_failed, step_failed, spec_drift, any_error]

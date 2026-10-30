@@ -1,0 +1,547 @@
+{
+ "schema": "curve-model-source/v1",
+ "what_this_is": "Exact public toy models already named in committed protocols, plans and frozen fixtures; metadata export only, no benchmark run or claim promotion.",
+ "metadata_export_binary_sha256": "1041f9957786edbbabfeb2ab028450fff85c531d533b412468dd355a353f97e2",
+ "curves": [
+  {
+   "name": "icv1-f2m8-tm17-ec7ed2e8",
+   "field": {
+    "kind": "binary",
+    "degree": 8,
+    "polynomial_low_terms": [
+     0,
+     1,
+     3,
+     4
+    ]
+   },
+   "a": "0x25",
+   "b": "0x4",
+   "group_order": 274,
+   "subgroup_order": 137,
+   "cofactor": 2,
+   "generator": {
+    "x": "0xdb",
+    "y": "0xec"
+   },
+   "koblitz": false,
+   "icv1": "ICV1:f2m-8-c0a488c4:-17:274:0xcb:unk:unk:r:ec7ed2e8f048",
+   "slug": "icv1-f2m8-tm17-ec7ed2e8",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/three_leads_e2e_20261018/coverage-fixtures-v3/fixtures.json",
+    "sha256": "d55dc9bb55d731080c4737c23b348537d377ebaec80edf7644f917a918179ae7",
+    "pointer": "/5",
+    "evidence": {
+     "kind": "exhaustive_point_count",
+     "order": 274
+    }
+   }
+  },
+  {
+   "name": "icv1-fp20-tm1195-26505147",
+   "p": 759371,
+   "a": 425665,
+   "b": 129843,
+   "group_order": 760567,
+   "subgroup_order": 760567,
+   "cofactor": 1,
+   "generator": {
+    "x": 100130,
+    "y": 517390
+   },
+   "icv1": "ICV1:fp-759371:-1195:760567:28014:unk:unk:r:2650514760b6",
+   "slug": "icv1-fp20-tm1195-26505147",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/specs/train-ext-P20-rfmitm3-n128.json",
+    "sha256": "575440f68b5a0c3bf768ed06e3e3651c1b556cbf01412334e449a4b622cb8456",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 20,
+     "seed": 20261018101
+    }
+   }
+  },
+  {
+   "name": "icv1-fp20-tm1319-e428a267",
+   "p": 819823,
+   "a": 796189,
+   "b": 504631,
+   "group_order": 821143,
+   "subgroup_order": 821143,
+   "cofactor": 1,
+   "generator": {
+    "x": 391530,
+    "y": 151516
+   },
+   "icv1": "ICV1:fp-819823:-1319:821143:496098:unk:unk:r:e428a2674461",
+   "slug": "icv1-fp20-tm1319-e428a267",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/p20_large_n_20261029/launch/request.json",
+    "sha256": "5f509f8dce2f8f6ff88484239d25bfef01b0ad5e2dc05e77930b53e37c0ca0cb",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 20,
+     "seed": 20261029203
+    }
+   }
+  },
+  {
+   "name": "icv1-fp20-tm39-90315544",
+   "p": 984421,
+   "a": 348381,
+   "b": 691194,
+   "group_order": 984461,
+   "subgroup_order": 984461,
+   "cofactor": 1,
+   "generator": {
+    "x": 736992,
+    "y": 213688
+   },
+   "icv1": "ICV1:fp-984421:-39:984461:144346:unk:unk:r:903155448735",
+   "slug": "icv1-fp20-tm39-90315544",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/p20_large_n_20261029/launch/request.json",
+    "sha256": "5f509f8dce2f8f6ff88484239d25bfef01b0ad5e2dc05e77930b53e37c0ca0cb",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 20,
+     "seed": 20261029201
+    }
+   }
+  },
+  {
+   "name": "icv1-fp20-tm565-6d7d1d32",
+   "p": 803441,
+   "a": 232725,
+   "b": 341758,
+   "group_order": 804007,
+   "subgroup_order": 804007,
+   "cofactor": 1,
+   "generator": {
+    "x": 276210,
+    "y": 216178
+   },
+   "icv1": "ICV1:fp-803441:-565:804007:109888:unk:unk:r:6d7d1d329490",
+   "slug": "icv1-fp20-tm565-6d7d1d32",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/specs/holdout-P20.json",
+    "sha256": "e5f640d0ee37936f38cecbd9c279ec81ba26646da0285eb81ffafc1909820ce2",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 20,
+     "seed": 20261018202
+    }
+   }
+  },
+  {
+   "name": "icv1-fp20-tm979-7535758a",
+   "p": 684557,
+   "a": 524451,
+   "b": 256308,
+   "group_order": 685537,
+   "subgroup_order": 685537,
+   "cofactor": 1,
+   "generator": {
+    "x": 605308,
+    "y": 599034
+   },
+   "icv1": "ICV1:fp-684557:-979:685537:528921:unk:unk:r:7535758a3804",
+   "slug": "icv1-fp20-tm979-7535758a",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/p20_large_n_20261029/launch/request.json",
+    "sha256": "5f509f8dce2f8f6ff88484239d25bfef01b0ad5e2dc05e77930b53e37c0ca0cb",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 20,
+     "seed": 20261029202
+    }
+   }
+  },
+  {
+   "name": "icv1-fp24-t553-4d349218",
+   "p": 8416129,
+   "a": 1040051,
+   "b": 1713668,
+   "group_order": 8415577,
+   "subgroup_order": 8415577,
+   "cofactor": 1,
+   "generator": {
+    "x": 3920230,
+    "y": 6272257
+   },
+   "icv1": "ICV1:fp-8416129:553:8415577:3524779:unk:unk:r:4d3492187c9c",
+   "slug": "icv1-fp24-t553-4d349218",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P24.json",
+    "sha256": "f0c1a723ae059559c3a1398ec61adac0c9ae3dadc0a8b7b81ad1f6bbad4f9e0c",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 24,
+     "seed": 20261029244
+    }
+   }
+  },
+  {
+   "name": "icv1-fp24-tm1013-0c7556ce",
+   "p": 9253267,
+   "a": 9014437,
+   "b": 8604106,
+   "group_order": 9254281,
+   "subgroup_order": 9254281,
+   "cofactor": 1,
+   "generator": {
+    "x": 2793022,
+    "y": 1583197
+   },
+   "icv1": "ICV1:fp-9253267:-1013:9254281:644289:unk:unk:r:0c7556ce2377",
+   "slug": "icv1-fp24-tm1013-0c7556ce",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/sessions/train-P24/plan.json",
+    "sha256": "530f6f4c4c36b19203beb36cf078a7664474eaa5cf6fe93edce6c75fbaa82afe",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 24,
+     "seed": 20261018101
+    }
+   }
+  },
+  {
+   "name": "icv1-fp24-tm4739-bb3c4b72",
+   "p": 11942297,
+   "a": 7271853,
+   "b": 278044,
+   "group_order": 11947037,
+   "subgroup_order": 11947037,
+   "cofactor": 1,
+   "generator": {
+    "x": 11443043,
+    "y": 3646884
+   },
+   "icv1": "ICV1:fp-11942297:-4739:11947037:950074:unk:unk:r:bb3c4b729ac7",
+   "slug": "icv1-fp24-tm4739-bb3c4b72",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/specs/holdout-P24.json",
+    "sha256": "c2526b1f484c240a4ffee49d3b052041384e72fa2276cde117d3a8f26afc609d",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 24,
+     "seed": 20261018202
+    }
+   }
+  },
+  {
+   "name": "icv1-fp24-tm589-5e500858",
+   "p": 8822717,
+   "a": 5904289,
+   "b": 1857337,
+   "group_order": 8823307,
+   "subgroup_order": 8823307,
+   "cofactor": 1,
+   "generator": {
+    "x": 4398220,
+    "y": 6108587
+   },
+   "icv1": "ICV1:fp-8822717:-589:8823307:7244300:unk:unk:r:5e50085867a4",
+   "slug": "icv1-fp24-tm589-5e500858",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P24.json",
+    "sha256": "f0c1a723ae059559c3a1398ec61adac0c9ae3dadc0a8b7b81ad1f6bbad4f9e0c",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 24,
+     "seed": 20261029243
+    }
+   }
+  },
+  {
+   "name": "icv1-fp28-tm12605-c71cc691",
+   "p": 157218301,
+   "a": 119649881,
+   "b": 106155159,
+   "group_order": 157230907,
+   "subgroup_order": 157230907,
+   "cofactor": 1,
+   "generator": {
+    "x": 22753418,
+    "y": 134591654
+   },
+   "icv1": "ICV1:fp-157218301:-12605:157230907:10216932:unk:unk:r:c71cc6917fbe",
+   "slug": "icv1-fp28-tm12605-c71cc691",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/sessions/train-P28/plan.json",
+    "sha256": "a3424e78f484439c330dd151d44fe7c843b48280f31a29a0691164cf084cbda9",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 28,
+     "seed": 20261018101
+    }
+   }
+  },
+  {
+   "name": "icv1-fp28-tm13337-3a482fe3",
+   "p": 155901469,
+   "a": 67774287,
+   "b": 48365344,
+   "group_order": 155914807,
+   "subgroup_order": 155914807,
+   "cofactor": 1,
+   "generator": {
+    "x": 89262494,
+    "y": 36321060
+   },
+   "icv1": "ICV1:fp-155901469:-13337:155914807:73007576:unk:unk:r:3a482fe34f63",
+   "slug": "icv1-fp28-tm13337-3a482fe3",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P28.json",
+    "sha256": "fd64f9038a464250249045bb60fba6c670fd169090d2bb9fda73fc538f067492",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 28,
+     "seed": 20261029283
+    }
+   }
+  },
+  {
+   "name": "icv1-fp28-tm1499-56171ddc",
+   "p": 198726023,
+   "a": 40994317,
+   "b": 95729377,
+   "group_order": 198727523,
+   "subgroup_order": 198727523,
+   "cofactor": 1,
+   "generator": {
+    "x": 114543842,
+    "y": 104128370
+   },
+   "icv1": "ICV1:fp-198726023:-1499:198727523:91031691:unk:unk:r:56171ddcadec",
+   "slug": "icv1-fp28-tm1499-56171ddc",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/specs/holdout-P28.json",
+    "sha256": "446c3a76e5d2c5a3d491a1311e62c83646afd917b3e11241ee8469bc3a84f474",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 28,
+     "seed": 20261018202
+    }
+   }
+  },
+  {
+   "name": "icv1-fp28-tm24531-24294e5d",
+   "p": 259182139,
+   "a": 256310742,
+   "b": 86097094,
+   "group_order": 259206671,
+   "subgroup_order": 259206671,
+   "cofactor": 1,
+   "generator": {
+    "x": 45628166,
+    "y": 174691488
+   },
+   "icv1": "ICV1:fp-259182139:-24531:259206671:228161789:unk:unk:r:24294e5ddf56",
+   "slug": "icv1-fp28-tm24531-24294e5d",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/rho_negation_audit_20261020/curves.json",
+    "sha256": "022bef4927fd073fc140c3f968f36f5ddd308ca91578658e13f7ce4ed5e0f8f2"
+   }
+  },
+  {
+   "name": "icv1-fp28-tm5065-1146b4a5",
+   "p": 212738657,
+   "a": 165004078,
+   "b": 55568895,
+   "group_order": 212743723,
+   "subgroup_order": 212743723,
+   "cofactor": 1,
+   "generator": {
+    "x": 38483304,
+    "y": 166019982
+   },
+   "icv1": "ICV1:fp-212738657:-5065:212743723:88321037:unk:unk:r:1146b4a56e3a",
+   "slug": "icv1-fp28-tm5065-1146b4a5",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P28.json",
+    "sha256": "fd64f9038a464250249045bb60fba6c670fd169090d2bb9fda73fc538f067492",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 28,
+     "seed": 20261029284
+    }
+   }
+  },
+  {
+   "name": "icv1-fp32-t46781-77aa234d",
+   "p": 3855283769,
+   "a": 2746834144,
+   "b": 2818779974,
+   "group_order": 3855236989,
+   "subgroup_order": 3855236989,
+   "cofactor": 1,
+   "generator": {
+    "x": 1227377624,
+    "y": 1990778100
+   },
+   "icv1": "ICV1:fp-3855283769:46781:3855236989:1168235873:unk:unk:r:77aa234ddece",
+   "slug": "icv1-fp32-t46781-77aa234d",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P32.json",
+    "sha256": "68d4dd5e66dd63a87f5680c2458b4987d917a9bf0d0b0b3af39ce3b7e5700d0c",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 32,
+     "seed": 20261029324
+    }
+   }
+  },
+  {
+   "name": "icv1-fp32-t93403-ef655380",
+   "p": 3642104651,
+   "a": 3608834951,
+   "b": 2170327929,
+   "group_order": 3642011249,
+   "subgroup_order": 3642011249,
+   "cofactor": 1,
+   "generator": {
+    "x": 1507077640,
+    "y": 768273803
+   },
+   "icv1": "ICV1:fp-3642104651:93403:3642011249:3455714807:unk:unk:r:ef6553807a3e",
+   "slug": "icv1-fp32-t93403-ef655380",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/rho_negation_audit_20261020/curves.json",
+    "sha256": "022bef4927fd073fc140c3f968f36f5ddd308ca91578658e13f7ce4ed5e0f8f2"
+   }
+  },
+  {
+   "name": "icv1-fp32-tm11535-8e4578de",
+   "p": 2469181963,
+   "a": 574625700,
+   "b": 1622048318,
+   "group_order": 2469193499,
+   "subgroup_order": 2469193499,
+   "cofactor": 1,
+   "generator": {
+    "x": 340233080,
+    "y": 398213012
+   },
+   "icv1": "ICV1:fp-2469181963:-11535:2469193499:135475565:unk:unk:r:8e4578de7069",
+   "slug": "icv1-fp32-tm11535-8e4578de",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "backlog/XP-20261029-srenew-deferred-guard/spec-P32.json",
+    "sha256": "68d4dd5e66dd63a87f5680c2458b4987d917a9bf0d0b0b3af39ce3b7e5700d0c",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 32,
+     "seed": 20261029323
+    }
+   }
+  },
+  {
+   "name": "icv1-fp32-tm36751-2eaac89e",
+   "p": 3852015119,
+   "a": 2100959240,
+   "b": 443615254,
+   "group_order": 3852051871,
+   "subgroup_order": 3852051871,
+   "cofactor": 1,
+   "generator": {
+    "x": 3499568431,
+    "y": 2268128061
+   },
+   "icv1": "ICV1:fp-3852015119:-36751:3852051871:79122122:unk:unk:r:2eaac89e06d8",
+   "slug": "icv1-fp32-tm36751-2eaac89e",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/specs/holdout-P32.json",
+    "sha256": "fea7bbb570f2e433b13bf6e3bee54d07db238d5f7fe8f6d1684def9e3505fa65",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 32,
+     "seed": 20261018202
+    }
+   }
+  },
+  {
+   "name": "icv1-fp32-tm86293-2d8c0ae9",
+   "p": 3221061227,
+   "a": 2708394380,
+   "b": 2584888744,
+   "group_order": 3221147521,
+   "subgroup_order": 3221147521,
+   "cofactor": 1,
+   "generator": {
+    "x": 2846616182,
+    "y": 874195030
+   },
+   "icv1": "ICV1:fp-3221061227:-86293:3221147521:631513305:unk:unk:r:2d8c0ae9cb29",
+   "slug": "icv1-fp32-tm86293-2d8c0ae9",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/prime_base_oracle_tuning_20261029/sessions/train-P32/plan.json",
+    "sha256": "fb32497fddc1ddacb1bffe8fa0a0e0b4e0d0de0172b360bbd90ac6ab58ee2f44",
+    "curve_selector": {
+     "kind": "prime_search",
+     "bits": 32,
+     "seed": 20261018101
+    }
+   }
+  },
+  {
+   "name": "icv1-fp36-t360541-9f646956",
+   "p": 39688394183,
+   "a": 18505017641,
+   "b": 23501859795,
+   "group_order": 39688033643,
+   "subgroup_order": 39688033643,
+   "cofactor": 1,
+   "generator": {
+    "x": 36684580884,
+    "y": 26064464920
+   },
+   "icv1": "ICV1:fp-39688394183:360541:39688033643:36772340693:unk:unk:r:9f64695673ef",
+   "slug": "icv1-fp36-t360541-9f646956",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/rho_negation_audit_20261020/curves.json",
+    "sha256": "022bef4927fd073fc140c3f968f36f5ddd308ca91578658e13f7ce4ed5e0f8f2"
+   }
+  },
+  {
+   "name": "icv1-fp40-tm62443-8b49d5b3",
+   "p": 909903817187,
+   "a": 567284737849,
+   "b": 258589946179,
+   "group_order": 909903879631,
+   "subgroup_order": 909903879631,
+   "cofactor": 1,
+   "generator": {
+    "x": 906316477920,
+    "y": 570572347979
+   },
+   "icv1": "ICV1:fp-909903817187:-62443:909903879631:103238707805:unk:unk:r:8b49d5b3e566",
+   "slug": "icv1-fp40-tm62443-8b49d5b3",
+   "provenance": {
+    "revision": "e0378e02f75a035f3104d552693b3a750d3b265d",
+    "file": "research/rho_negation_audit_20261020/curves.json",
+    "sha256": "022bef4927fd073fc140c3f968f36f5ddd308ca91578658e13f7ce4ed5e0f8f2"
+   }
+  }
+ ]
+}

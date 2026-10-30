@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1110 775" width="1110" height="775" role="img" aria-labelledby="t d">
+<title id="t">Prime-field IC program, 2026-10-29</title>
+<desc id="d">Six prep tracks in three lanes (baseline definition, PKM-tower exponent at m of at least 4, constant engineering), their dependencies and their blockers. A plan diagram: no box reports a new measurement.</desc>
+<style>
+  .bg { fill: #ffffff; }
+  .lane { fill: #f2f4f7; }
+  .box { fill: #ffffff; stroke: #4a5568; stroke-width: 1.2; }
+  .out { fill: #eaf2fd; stroke: #2b6cb0; stroke-width: 1.6; }
+  .own { fill: #fff8e6; stroke: #b7791f; stroke-width: 1.4; }
+  text { font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1a202c; font-size: 12px; }
+  .h { font-weight: 700; font-size: 13px; }
+  .lab { font-weight: 700; font-size: 13px; fill: #2d3748; }
+  .m { fill: #4a5568; font-size: 11px; }
+  .blk { fill: #c53030; font-weight: 600; font-size: 11.5px; }
+  .ttl { font-weight: 700; font-size: 17px; }
+  .a { stroke: #2d3748; stroke-width: 1.6; fill: none; }
+  .ad { stroke: #2d3748; stroke-width: 1.4; fill: none; stroke-dasharray: 6 4; }
+  .ar { stroke: #c53030; stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+  .ah { fill: #2d3748; }
+  .ahr { fill: #c53030; }
+  .dot { fill: #c53030; }
+  .doti { fill: #ffffff; font-weight: 700; font-size: 11px; }
+  @media (prefers-color-scheme: dark) {
+    .bg { fill: #14171c; }
+    .lane { fill: #1c2129; }
+    .box { fill: #232a33; stroke: #a0aec0; }
+    .out { fill: #1a2a42; stroke: #63b3ed; }
+    .own { fill: #2e2716; stroke: #d69e2e; }
+    text { fill: #e2e8f0; }
+    .lab { fill: #cbd5e0; }
+    .m { fill: #a0aec0; }
+    .blk { fill: #fc8181; }
+    .a, .ad { stroke: #cbd5e0; }
+    .ar { stroke: #fc8181; }
+    .ah { fill: #cbd5e0; }
+    .ahr, .dot { fill: #fc8181; }
+    .doti { fill: #14171c; }
+  }
+</style>
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 Z"/></marker>
+  <marker id="arrr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="ahr" d="M0 0 L10 5 L0 10 Z"/></marker>
+</defs>
+<rect class="bg" x="0" y="0" width="1110" height="775"/>
+
+<!-- title and legend -->
+<text class="ttl" x="20" y="32">Prime-field IC program, 2026-10-29 (plan; nothing here is a measurement)</text>
+<line class="a" x1="720" y1="44" x2="760" y2="44" marker-end="url(#arr)"/>
+<text class="m" x="766" y="48">feeds</text>
+<line class="ad" x1="810" y1="44" x2="850" y2="44" marker-end="url(#arr)"/>
+<text class="m" x="856" y="48">defines / ratchets</text>
+<circle class="dot" cx="968" cy="44" r="7"/><text class="doti" x="968" y="48" text-anchor="middle">!</text>
+<text class="m" x="980" y="48">blocker</text>
+
+<!-- lanes -->
+<rect class="lane" x="10" y="58" width="1090" height="337" rx="6"/>
+<rect class="lane" x="10" y="405" width="1090" height="140" rx="6"/>
+<rect class="lane" x="10" y="555" width="1090" height="145" rx="6"/>
+<text class="lab" x="22" y="90">1. Baseline</text>
+<text class="lab" x="22" y="107">definition</text>
+<text class="lab" x="22" y="437">2. Exponent:</text>
+<text class="lab" x="22" y="454">PKM towers,</text>
+<text class="lab" x="22" y="471">m ≥ 4</text>
+<text class="lab" x="22" y="587">3. Constant</text>
+<text class="lab" x="22" y="604">engineering</text>
+
+<!-- lane 1: ruling -->
+<rect class="box" x="170" y="72" width="330" height="95" rx="5"/>
+<text class="h" x="182" y="92">ruling/ — is rootfind-subtract IC?</text>
+<text x="182" y="110">Memo recommended Option B; the owner</text>
+<text x="182" y="125">delegated Option C (two counted tracks).</text>
+<text x="182" y="140">Decides: the track of every oracle.</text>
+<circle class="dot" cx="188" cy="154" r="6"/><text class="doti" x="188" y="158" text-anchor="middle">!</text>
+<text class="blk" x="199" y="158">AGENTS.md wording lands only by merge</text>
+
+<!-- lane 1: decisions -->
+<rect class="own" x="525" y="72" width="275" height="95" rx="5"/>
+<text class="h" x="537" y="92">DECISIONS.md (owner, 2026-10-29)</text>
+<text x="537" y="110">R1 = C (delegated); D1 yes, tentative</text>
+<text x="537" y="125">D3 allowed; D-EKS approved (~49 CPU-h)</text>
+<text x="537" y="142">D2 yes: tracks may be ranked</text>
+<text class="m" x="537" y="158">confirmed by merging the PR</text>
+<line class="a" x1="500" y1="119" x2="523" y2="119" marker-end="url(#arr)"/>
+
+<!-- lane 1: reference arm -->
+<rect class="box" x="170" y="185" width="330" height="92" rx="5"/>
+<text class="h" x="182" y="205">reference_arm/ — Semaev naive + msolve</text>
+<text x="182" y="223">small-abscissa base, m = 2; draft protocol</text>
+<text x="182" y="238">Decides: the first counted algebraic row</text>
+<text class="m" x="182" y="252">phase 2: PKM arm (pkm-semaev, msolve)</text>
+<circle class="dot" cx="188" cy="265" r="6"/><text class="doti" x="188" y="269" text-anchor="middle">!</text>
+<text class="blk" x="199" y="269">no code; msolve pin; build host; EKS run</text>
+<line class="a" x1="500" y1="225" x2="838" y2="225" marker-end="url(#arr)"/>
+<text class="m" x="560" y="219">first verified cold DLP</text>
+
+<!-- lane 1: gate -->
+<rect class="box" x="170" y="292" width="330" height="92" rx="5"/>
+<text class="h" x="182" y="312">table_b_gate/ — validation-gate dossier</text>
+<text x="182" y="330">8 Table B rows pass: validated, caveats</text>
+<text x="182" y="345">20-bit row passes; no second-host replay</text>
+<text class="m" x="182" y="359">pricing_ok=False; protocol partly frozen</text>
+<circle class="dot" cx="188" cy="372" r="6"/><text class="doti" x="188" y="376" text-anchor="middle">!</text>
+<text class="blk" x="199" y="376">S3 read identity; a second host class</text>
+<line class="a" x1="500" y1="338" x2="838" y2="338" marker-end="url(#arr)"/>
+<text class="m" x="560" y="332">shown rows; 20-bit row after replay</text>
+
+<!-- lane 1: outcomes -->
+<rect class="out" x="840" y="185" width="230" height="75" rx="5"/>
+<text class="h" x="852" y="205">Algebraic-track baseline</text>
+<text x="852" y="223">EMPTY until the reference</text>
+<text x="852" y="238">arm completes a verified</text>
+<text x="852" y="253">cold DLP</text>
+
+<rect class="out" x="840" y="298" width="230" height="86" rx="5"/>
+<text class="h" x="852" y="318">Generic-track baseline</text>
+<text x="852" y="336">Table B: 5.47–13.5× matched</text>
+<text x="852" y="351">rho (docs/ic/LEADERBOARD.md)</text>
+<text class="m" x="852" y="366">+ 20-bit row once replayed</text>
+<text class="m" x="852" y="379">cannot beat rho (√r bound)</text>
+
+<line class="ar" x1="950" y1="262" x2="950" y2="296" marker-start="url(#arrr)" marker-end="url(#arrr)"/>
+<text x="958" y="283">ranked (D2)</text>
+
+<line class="ad" x1="790" y1="167" x2="846" y2="184" marker-end="url(#arr)"/>
+<line class="ad" x1="760" y1="167" x2="866" y2="297" marker-end="url(#arr)"/>
+<text class="m" x="716" y="182">R1 defines</text>
+
+<!-- lane 2 -->
+<rect class="box" x="170" y="418" width="330" height="117" rx="5"/>
+<text class="h" x="182" y="438">fall_degree_relaunch/ — Amend. 7 and 8</text>
+<text x="182" y="456">t = 12–14 score C-step (t = 14 decisive)</text>
+<text x="182" y="471">m = 4: d_F = 7 at N = 16 (derived)</text>
+<text x="182" y="486">relaunch card, image, jobs, Mac recovery</text>
+<text x="182" y="501">Decides: keep or close the PKM lane</text>
+<circle class="dot" cx="188" cy="520" r="6"/><text class="doti" x="188" y="524" text-anchor="middle">!</text>
+<text class="blk" x="199" y="524">harness host; Mac data; m=4 N=20 &gt;128 GiB</text>
+<line class="a" x1="500" y1="450" x2="838" y2="450" marker-end="url(#arr)"/>
+<text class="m" x="515" y="482">Why m ≥ 4: cost ≈ r^(2/(m+1)), so no oracle</text>
+<text class="m" x="515" y="498">beats rho at m ≤ 3 (PKM note §3.7). Bounded</text>
+<text class="m" x="515" y="514">d_F = 7 at m = 4 still ≈ 25 bits above rho</text>
+<text class="m" x="515" y="530">at 256 bits (derived, optimistic model).</text>
+
+<rect class="out" x="840" y="420" width="230" height="95" rx="5"/>
+<text class="h" x="852" y="440">m ≥ 4 decision</text>
+<text x="852" y="458">keep or close the PKM</text>
+<text x="852" y="473">tower exponent lane</text>
+<text class="m" x="852" y="490">rules fixed in Amendment 8</text>
+<text class="m" x="852" y="505">before any m = 4 data (plan)</text>
+
+<!-- lane 3 -->
+<rect class="box" x="170" y="568" width="330" height="117" rx="5"/>
+<text class="h" x="182" y="588">hashtable_prefetch/ — line tables</text>
+<text x="182" y="606">hash floor ≈ 168–188 of 318 ns (derived)</text>
+<text x="182" y="621">patch.diff UNCOMPILED AND UNTESTED</text>
+<text x="182" y="636">draft paired L2 protocol, fp20–fp32</text>
+<text x="182" y="651">Decides: next constant gain (generic)</text>
+<circle class="dot" cx="188" cy="670" r="6"/><text class="doti" x="188" y="674" text-anchor="middle">!</text>
+<text class="blk" x="199" y="674">build host; open #2806/#2783; EKS run</text>
+<line class="a" x1="500" y1="610" x2="838" y2="610" marker-end="url(#arr)"/>
+<text class="m" x="515" y="640">20-bit fb-size row: 0.818× [0.773, 0.866]</text>
+<text class="m" x="515" y="656">at w = 0 (measured, research/prime_base_</text>
+<text class="m" x="515" y="672">oracle_tuning_20261029); lands after the</text>
+<text class="m" x="515" y="688">gate's second-host replay.</text>
+
+<rect class="out" x="840" y="570" width="230" height="95" rx="5"/>
+<text class="h" x="852" y="590">Generic-track ratchet</text>
+<text x="852" y="608">counts under R1 = Option C</text>
+<text x="852" y="623">bounded by √r: cannot beat</text>
+<text x="852" y="638">rho (Shoup; Corrigan-Gibbs–</text>
+<text x="852" y="653">Kogan)</text>
+<path class="ad" d="M1070 617 L1092 617 L1092 342 L1072 342" marker-end="url(#arr)"/>
+
+<!-- footer -->
+<rect class="box" x="170" y="712" width="900" height="52" rx="5"/>
+<text class="h" x="182" y="731">Cross-cutting</text>
+<text x="290" y="731">Lead atlas (crypto-autoresearcher knowledge/leads/ecdlp): 1 new and 48 edited leads; --check passes; uncommitted.</text>
+<text x="290" y="752">review/: about 35 cited numbers checked against sources; D2 vs Option C conflict resolved in DECISIONS.md.</text>
+</svg>
