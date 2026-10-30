@@ -1,0 +1,25 @@
+{
+  "schema": "software-source-review/v1",
+  "source": "src/ml_dataset/sat_prefix.rs",
+  "source_sha256": "19f180408a0e3b1114cb510386741d02d5ea951acc4e9f6b3fcc9a047f9c21db",
+  "reviewer": "consequence_review",
+  "previous_reviewed_sha256": "ed235acc792f6eb7511c56f56859551bf8ecc521cb616b792ca4994e6bbebdcf",
+  "scope": "learned clause entailment, XOR explanations, backjump/deletion and predecision causality; narrow follow-up review of duplicate declaration and sticky contradiction repairs",
+  "prior_findings": 2,
+  "outstanding_findings": 0,
+  "corrections": [
+    "Exact original and learned raw literal count enforced; arena increment from proved pending length",
+    "SAT endpoint rejects retained construction-time contradiction"
+  ],
+  "controls_authored": [
+    "duplicate original declaration rejects without state change",
+    "duplicate learned confirmation rejects without arena advance",
+    "valid literal reorder accepted",
+    "fully assigned contradictory formula rejects SAT endpoint"
+  ],
+  "tests_authored_total": 13,
+  "tests_executed": false,
+  "compiled": false,
+  "native_execution_complete": false,
+  "verified_cloud_dataset_cells": 0
+}

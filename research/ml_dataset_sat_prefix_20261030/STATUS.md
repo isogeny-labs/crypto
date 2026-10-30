@@ -30,3 +30,30 @@ Fixture-only correction is being prepared separately. No competing builds
 have started. Sourcecheckpoint01 was freshly
 restored and its Git bundle verified; it contains a committed design/handoff and
 in-progress source, not a validated runtime. Verified cloud dataset cells0.
+
+## First execution attempt
+
+Standalone sourcef3747f693fc8 and validation freeze27f12537ea4a are committed.
+SAT dataset phase01 ended06:53:21Z with exit101 before compilation: the sparse
+checkout lacked tools/factor-base/Cargo.toml. Both source guards passed; the
+151-entry fixture inventory did not include build dependencies previously
+selected by sparse paths in the parent worktree. The failed receipt and log are
+retained with fresh S3 readback. A complete local dependency-tree materialization
+repair is in progress; no tests have run.
+
+Independent semantic review found two additional corruption checks to tighten:
+reject duplicate literals in exact original/learned Clause declarations so
+arena IDs cannot drift, and reject a SAT endpoint when normalization retained
+a sticky contradiction. The author is adding controls before a new source freeze.
+Earlier review receipts remain point-in-time scoped reviews, not final certification.
+Consequence continuation04 now owns the shared target; no SAT build can start
+until it terminates.
+
+Sourcecheckpoint03 was freshly downloaded and its bundle verified:
+SHA2459dd5eb4f4422b478b834f4a4bdd56e1484a4bf92baa70c2228b62d9b7bbb5.
+It captures27f12537ea4a before these review corrections and materialization repair.
+
+Semantic corrections are now implemented and independently re-reviewed at
+SHA19f180408a0e3b1114cb510386741d02d5ea951acc4e9f6b3fcc9a047f9c21db.
+No outstanding blocker was found in that scoped correction review. There are
+13 authored replay tests; none has executed. See replay-semantic-review-02.json.

@@ -1,0 +1,24 @@
+{
+  "kind": "software-validation",
+  "source_commit": "27f12537ea4a4e9eab243b23947a94764e719c3f",
+  "started_utc": "2026-10-30T06:53:04Z",
+  "finished_utc": "2026-10-30T06:53:21Z",
+  "stage": "command_failed",
+  "exit_code": 101,
+  "command_started": true,
+  "command_exit_code": 101,
+  "source_preflight_matches": true,
+  "source_readback_matches": true,
+  "materialization_inventory_sha256": "035f0bc084cd1c78bd9e08ef96015b5685db084d0a745cca3ac04e3deb0ad2fc",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "ml_dataset::",
+    "--",
+    "--test-threads=1"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

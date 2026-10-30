@@ -974,6 +974,7 @@ impl State {
                 *existing
                     && !*detached
                     && *clause_id == c.id
+                    && literals.len() == c.lits.len()
                     && canonical(literals, self.f.n, b)? == c.lits,
                 "original clause snapshot mismatch",
             )?;
@@ -1335,6 +1336,7 @@ impl State {
                         && !detached
                         && !p.confirmed
                         && clause_id == p.id
+                        && literals.len() == p.lits.len()
                         && canonical(&literals, self.f.n, b)? == canonical(&p.lits, self.f.n, b)?
                         && self.boundaries.len() == p.backjump,
                     "learned installation mismatch",
@@ -1342,7 +1344,7 @@ impl State {
                 self.f.next = self
                     .f
                     .next
-                    .checked_add(1 + literals.len() as u32)
+                    .checked_add(1 + p.lits.len() as u32)
                     .ok_or("clause arena overflow")?;
                 self.f.logical_bytes += 32 + p.lits.len() as u64 * 4;
                 b.retained(self.f.logical_bytes + self.matrix_bytes + self.reason_bytes)?;
@@ -1433,6 +1435,10 @@ impl State {
                 match result.as_str() {
                     "Unknown" | "unknown" => return Err(Issue::Stop(StopReason::NativeUnknown)),
                     "Sat" | "sat" => {
+                        ensure(
+                            !self.f.unsat,
+                            "SAT endpoint contradicts construction-time contradiction",
+                        )?;
                         b.charge(self.f.assignment.len(), false)?;
                         ensure(
                             self.f.assignment.iter().all(|&x| x != 0),
@@ -2017,11 +2023,23 @@ mod tests {
             },
         )
         .unwrap();
+        assert!(step(
+            &mut s,
+            SolverEvent::Clause {
+                clause_id: 8,
+                literals: vec![-2, -1, -1],
+                existing: false,
+                detached: false
+            }
+        )
+        .is_err());
+        assert_eq!(s.f.next, 8);
+        assert!(!s.learned.as_ref().unwrap().confirmed);
         step(
             &mut s,
             SolverEvent::Clause {
                 clause_id: 8,
-                literals: vec![-2, -1],
+                literals: vec![-1, -2],
                 existing: false,
                 detached: false,
             },
@@ -2040,6 +2058,7 @@ mod tests {
         .unwrap();
         assert!(s.learned.is_none());
         assert_eq!(s.trail, vec![1, -2]);
+        assert_eq!(s.f.next, 11);
     }
     #[test]
     fn xor_reasons_and_row_operations_are_checked() {
@@ -2509,5 +2528,98 @@ mod tests {
         }
         assert!(s.ended);
         assert!(decisions > 0);
+    }
+    #[test]
+    fn original_snapshot_rejects_duplicates_but_accepts_reordered_literals() {
+        let mut f = Installed::new(4);
+        f.clause(&[1, 2], &mut budget()).unwrap();
+        let mut s = State::new(f);
+        assert!(s
+            .snapshot_event(
+                &SolverEvent::Clause {
+                    clause_id: 0,
+                    literals: vec![2, 1, 1],
+                    existing: true,
+                    detached: false
+                },
+                &mut budget()
+            )
+            .is_err());
+        assert_eq!(s.snapshot_pos, 0);
+        assert_eq!(s.f.next, 3);
+        assert!(s
+            .snapshot_event(
+                &SolverEvent::Clause {
+                    clause_id: 0,
+                    literals: vec![2, 1],
+                    existing: true,
+                    detached: false
+                },
+                &mut budget()
+            )
+            .unwrap());
+        assert_eq!(s.snapshot_pos, 1);
+        assert_eq!(s.f.next, 3);
+    }
+    #[test]
+    fn sticky_construction_contradiction_cannot_end_sat() {
+        let mut f = Installed::new(4);
+        for literal in 1..=4 {
+            f.clause(&[literal], &mut budget()).unwrap();
+        }
+        f.clause(&[], &mut budget()).unwrap();
+        assert!(f.unsat);
+        let mut s = State::new(f);
+        for i in 0..4 {
+            step(
+                &mut s,
+                SolverEvent::Clause {
+                    clause_id: i * 2,
+                    literals: vec![i as i32 + 1],
+                    existing: true,
+                    detached: false,
+                },
+            )
+            .unwrap();
+        }
+        for i in 0..4 {
+            step(
+                &mut s,
+                SolverEvent::Assignment {
+                    literal: i as i32 + 1,
+                    level: 0,
+                    trail_index: i,
+                    initial: true,
+                    reason: SolverEventReason::Clause {
+                        clause_id: i as u32 * 2,
+                    },
+                },
+            )
+            .unwrap();
+        }
+        step(
+            &mut s,
+            SolverEvent::SolveBegin {
+                conflicts: 0,
+                conflict_budget: 10,
+            },
+        )
+        .unwrap();
+        assert!(step(
+            &mut s,
+            SolverEvent::SolveEnd {
+                result: "Sat".into()
+            }
+        )
+        .is_err());
+        assert!(!s.ended);
+        step(
+            &mut s,
+            SolverEvent::SolveEnd {
+                result: "Unsat".into(),
+            },
+        )
+        .unwrap();
+        assert!(s.ended);
     }
 }
