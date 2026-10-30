@@ -55,7 +55,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - uses: dtolnay/rust-toolchain@stable
       - name: Check source-locked database and graph
         run: |
@@ -133,7 +133,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build cubic norm-one theorems and replay in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
@@ -175,7 +175,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build P-192 norm theorem and replay in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
@@ -229,7 +229,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build line inverse, support, and Frobenius fiber theorems
         uses: leanprover/lean-action@v1
         with:
@@ -279,7 +279,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build and fresh-check line-closure theorem
         uses: leanprover/lean-action@v1
         with:
@@ -321,7 +321,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build and fresh-check line-centering theorems
         uses: leanprover/lean-action@v1
         with:
@@ -363,7 +363,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build and fresh-check full-line incidence implication
         uses: leanprover/lean-action@v1
         with:
@@ -405,7 +405,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build and fresh-check residual-discriminant theorems
         uses: leanprover/lean-action@v1
         with:
@@ -447,7 +447,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build unordered-support and third-pivot theorems
         uses: leanprover/lean-action@v1
         with:
@@ -491,7 +491,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Replay every third-pivot row and independent sorted union
         run: |
           python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
@@ -523,7 +523,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build cross-pivot and grid theorems
         uses: leanprover/lean-action@v1
         with:
@@ -573,7 +573,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Replay complete-fan rank, reduced rectangles, and grid support
         run: |
           python3 -B research/p192_extension_cover_20261012/line_full_cross_pivot_cycle_rank.py
@@ -610,7 +610,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -646,7 +646,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -682,7 +682,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Install independent PARI checker
         run: |
           sudo apt-get update
@@ -728,7 +728,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/p192_extension_cover_20261012 research/weak_curve_leaderboard_20261012
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/p192_extension_cover_20261012 research/weak_curve_database_20261012 research/weak_curve_leaderboard_20261012
       - name: Build all leaderboard theorem modules
         uses: leanprover/lean-action@v1
         with:

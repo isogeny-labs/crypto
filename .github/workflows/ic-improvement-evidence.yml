@@ -50,7 +50,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_candidate_tournament_20260915/evidence
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_candidate_tournament_20260915/evidence research/ic_candidate_tournament_20260915/goal_20260924/improvement
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
