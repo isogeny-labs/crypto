@@ -11,7 +11,7 @@ use crate::field::{add_mod, inv_mod, mul_mod, rand_below, sub_mod};
 use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
 use crate::linalg::left_kernel_vector;
 use crate::pointgadget::gadget_relation_network;
-use crate::relation::{new_affine_factor_bases, new_factor_bases, relation_network, FactorBases};
+use crate::relation::{new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases};
 use crate::tensor::{find_witness, Counter, Network, NetworkStats};
 use crate::{Error, Result};
 
@@ -52,6 +52,9 @@ pub struct Solver {
     /// whole-point vertices. The Counter must then support hinted schedules,
     /// e.g. DFSCounter.
     pub gadgets: bool,
+    /// WindowBits > 0 (with `gadgets`) adds the coordinate window x < p >> k
+    /// to every factor base; see `new_windowed_factor_bases`.
+    pub window_bits: usize,
     /// Logf, if set, receives progress messages (already formatted; Go passes
     /// format + args).
     pub logf: Option<Box<dyn Fn(&str)>>,
@@ -70,6 +73,7 @@ impl Solver {
             rng,
             max_restarts: 0,
             gadgets: false,
+            window_bits: 0,
             logf: None,
             arith: None,
         }
@@ -113,7 +117,7 @@ impl Solver {
             // Step 1: factor-base selection.
             crate::opcount::set_phase("factor_base");
             let fb = if self.gadgets {
-                new_affine_factor_bases(&c, self.m, &mut self.rng)
+                new_windowed_factor_bases(&c, self.m, &mut self.rng, self.window_bits)
             } else {
                 new_factor_bases(&c, self.m, &mut self.rng)
             };

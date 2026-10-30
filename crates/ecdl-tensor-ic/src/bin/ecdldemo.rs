@@ -9,6 +9,7 @@
 //!   -seed N     random seed, default current time in nanoseconds
 //!   -q          suppress progress output
 //!   -gadgets    use low-degree arithmetic gadgets (slow; keep -bits small)
+//!   -window K   with -gadgets: constrain x < p>>K in every factor base (0 = off)
 
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -26,6 +27,7 @@ struct Flags {
     seed: i64,
     quiet: bool,
     gadgets: bool,
+    window: i64,
 }
 
 /// Marker error text for -h / -help (Go: flag.ErrHelp).
@@ -40,6 +42,8 @@ fn usage() {
     eprintln!("  -m int");
     eprintln!("    \tnumber of factor bases (default 2)");
     eprintln!("  -q\tsuppress progress output");
+    eprintln!("  -window int");
+    eprintln!("    \twith -gadgets: constrain x < p>>k in every factor base (0 = off)");
     eprintln!("  -seed int");
     eprintln!("    \trandom seed (default <current time in ns>)");
 }
@@ -98,6 +102,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
         seed: seed_default,
         quiet: false,
         gadgets: false,
+        window: 0,
     };
     let mut i = 0;
     while i < args.len() {
@@ -136,7 +141,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
                     f.gadgets = v;
                 }
             }
-            "bits" | "m" | "seed" => {
+            "bits" | "m" | "seed" | "window" => {
                 let v = match inline {
                     Some(v) => v,
                     None => {
@@ -154,6 +159,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
                 match name {
                     "bits" => f.bits = n,
                     "m" => f.m = n,
+                    "window" => f.window = n,
                     _ => f.seed = n,
                 }
             }
@@ -232,6 +238,7 @@ fn main() {
     if flags.gadgets {
         s.gadgets = true;
         s.counter = Box::new(DFSCounter);
+        s.window_bits = usize::try_from(flags.window).unwrap_or(0);
     }
     if !flags.quiet {
         s.logf = Some(Box::new(|msg: &str| eprintln!("{}", msg)));
