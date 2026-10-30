@@ -836,6 +836,154 @@ def prime_base_size_component() -> dict:
             "validated": not errs}
 
 
+def stride_renew_component() -> dict:
+    """Prime-field relation targets, research/ic_stride_renew_prime_20261029 (backlog
+    XP-20261029-stride-renew-prime, frozen protocol, decided per size on two fresh curves):
+    `targets = stride-renew` against the `walk` baseline with the incumbent factor base and
+    oracle. The paired srenew/walk ratio of totals and the gap of each arm to the same-session
+    rho.negation at w = 0, 0.1 and 1, and each arm's mean S (unweighted), copied from the study's
+    saved `ecbench compare --weight` outputs. Its standing comes from the study's VALIDATION.json."""
+    study = "research/ic_stride_renew_prime_20261029"
+    rows = []
+    for bits, n, reading in ((20, 45, "improvement: stride-renew becomes the 20-bit target source"),
+                             (24, 162, "null at this sample size; walk kept"),
+                             (28, 407, "improvement (validated with caveats): stride-renew becomes the 28-bit target source"),
+                             (32, 1024, "null at this sample size; walk kept")):
+        ratio, walk_rho, sr_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in (("walk__srenew", ratio), ("rho-neg__walk", walk_rho), ("rho-neg__srenew", sr_rho)):
+                o = load(f"{study}/P{bits}/analysis/compare-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        c = load(f"{study}/P{bits}/analysis/compare-walk__srenew-w0.json")
+        rows.append({"bits": bits, "n": n, "reading": reading, "walk": c["a"]["mean_s"],
+                     "srenew": c["b"]["mean_s"], "ratio": ratio, "walk_over_rho": walk_rho,
+                     "srenew_over_rho": sr_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated (20 bits pass, 28 bits pass with caveats): replay certificate, validator "
+                           f"report and the matched rho reference with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def deferred_guard_component() -> dict:
+    """Prime-field deferred-guard stride-renew at a smaller factor base,
+    research/ic_srenew_deferred_guard_20261029 (backlog XP-20261029-srenew-deferred-guard-v3,
+    frozen follow-up protocol on fresh curves; the first study is descriptive only and is not
+    read here): `dg-small` (targets = stride-renew-deferred-guard, factor base N_b) against the
+    baseline at each size. The paired dg-small/baseline ratio of totals and the gap of each arm
+    to the same-session rho.negation at w = 0, 0.1 and 1, and each arm's mean S (unweighted),
+    copied from the study's saved `ecbench compare --weight` outputs. Its standing comes from the
+    study's VALIDATION.json."""
+    study = "research/ic_srenew_deferred_guard_20261029"
+    rows = []
+    for bits, base, n_inc, n_b, reading in (
+            (24, "walk", 162, 130, "improvement: dg-small becomes the 24-bit baseline (targets and N)"),
+            (28, "srenew", 407, 267, "pooled ratio below 1, band unresolved on one curve; srenew kept"),
+            (32, "walk", 1024, 741, "improvement: dg-small becomes the 32-bit baseline (targets and N)")):
+        ratio, base_rho, dg_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in ((f"{base}__dg-small", ratio), (f"rho-neg__{base}", base_rho), ("rho-neg__dg-small", dg_rho)):
+                o = load(f"{study}/v3/P{bits}/analysis/compare-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare v3 P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        c = load(f"{study}/v3/P{bits}/analysis/compare-{base}__dg-small-w0.json")
+        rows.append({"bits": bits, "base": base, "n_inc": n_inc, "n_b": n_b, "reading": reading,
+                     "base_s": c["a"]["mean_s"], "dg_s": c["b"]["mean_s"], "ratio": ratio,
+                     "base_over_rho": base_rho, "dg_over_rho": dg_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated (24 and 32 bits): replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def dg_wall_component() -> dict:
+    """Wall time per charged GAE of the deferred repeat guard, research/ic_dg_wall_20261029
+    (backlog XP-20261029-dg-wall, frozen protocol): `dg` (targets = stride-renew-deferred-guard)
+    against `srenew` (targets = stride-renew) at the same factor base N_inc. The A/A-corrected
+    ns/GAE ratio from the `wall` block of the wall session's `ecbench compare --a srenew --b dg
+    --weight 0`, the counted dg/srenew ratio at w = 0, 0.1 and 1 from the same session, and each
+    arm's gap to the counted session's rho.negation, all copied from the study's saved outputs.
+    Its standing comes from the study's VALIDATION.json."""
+    study = "research/ic_dg_wall_20261029"
+    rows = []
+    for bits, n, reading in (
+            (24, 162, "component speed-up (wall per GAE); counted S unchanged"),
+            (28, 407, "component speed-up (wall per GAE); E6 condition 2 fails, srenew stays the 28-bit baseline"),
+            (32, 1024, "component speed-up (wall per GAE); counted S unchanged")):
+        wall = load(f"{study}/P{bits}/wall/analysis/compare-srenew__dg-w0.json")["wall"]
+        if wall.get("status") != "admitted" or wall.get("pairs_below_level") or wall.get("aa_selection") != "includes arm A":
+            raise SystemExit(f"{study}: wall P{bits} not admitted")
+        counted, base_rho, dg_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for path, acc in ((f"wall/analysis/compare-srenew__dg-w{w}", counted),
+                              (f"counted/analysis/compare-rho-neg__srenew-w{w}", base_rho),
+                              (f"counted/analysis/compare-rho-neg__dg-w{w}", dg_rho)):
+                o = load(f"{study}/P{bits}/{path}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {path} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n": n, "reading": reading, "pairs": wall["pairs"],
+                     "ns_srenew": wall["ns_per_gae_a"], "ns_dg": wall["ns_per_gae_b"],
+                     "aa_ratio": wall["aa_ratio"], "aa_ci95": wall["aa_ci95"],
+                     "corrected": wall["corrected_ratio"], "corrected_ci95": wall["corrected_ci95"],
+                     "counted": counted, "srenew_over_rho": base_rho, "dg_over_rho": dg_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, "
+                    "EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation",
+            "validation": ("validated (24 and 32 bits pass, 28 bits pass with caveats): replay certificate, validator "
+                           f"report and the matched rho reference with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def dg_blocked_component() -> dict:
+    """Wall time per charged GAE of the cache-blocked packed pair table, research/ic_dg_blocked_20261029
+    (backlog XP-20261029-dg-blocked, frozen protocol): `dgb` (oracle mitm-prime-blocked:m=2) against `dg`
+    (oracle mitm:negation_folded=1), both targets = stride-renew-deferred-guard at N_inc. The A/A-corrected
+    ns/GAE ratio from the `wall` block of the wall session's `ecbench compare --a dg --b dgb --weight 0`
+    and the arms' gap to the counted session's rho.negation, copied from the study's saved outputs. Only
+    28 bits decides (24 and 32 bits are undecidable under the frozen rule). Its standing comes from the
+    study's VALIDATION.json."""
+    study = "research/ic_dg_blocked_20261029"
+    rows = []
+    for bits, n, reading in (
+            (28, 407, "component speed-up (wall per GAE); counted S identical"),):
+        wall = load(f"{study}/P{bits}/wall/analysis/compare-dg__dgb-w0.json")["wall"]
+        if wall.get("status") != "admitted" or wall.get("pairs_below_level") or wall.get("aa_selection") != "includes arm A":
+            raise SystemExit(f"{study}: wall P{bits} not admitted")
+        counted, dg_rho, dgb_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for path, acc in ((f"wall/analysis/compare-dg__dgb-w{w}", counted),
+                              (f"counted/analysis/compare-rho-neg__dg-w{w}", dg_rho),
+                              (f"counted/analysis/compare-rho-neg__dgb-w{w}", dgb_rho)):
+                o = load(f"{study}/P{bits}/{path}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {path} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n": n, "reading": reading, "pairs": wall["pairs"],
+                     "ns_dg": wall["ns_per_gae_a"], "ns_dgb": wall["ns_per_gae_b"],
+                     "aa_ratio": wall["aa_ratio"], "aa_ci95": wall["aa_ci95"],
+                     "corrected": wall["corrected_ratio"], "corrected_ci95": wall["corrected_ci95"],
+                     "counted": counted, "dg_over_rho": dg_rho, "dgb_over_rho": dgb_rho})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "unit": "ns of solve wall time per charged GAE (an upper bound per operation for both arms), L2, "
+                    "EKS c8a.2xlarge; counted S = GAE per sqrt(r) with native work priced at w GAE per operation",
+            "validation": ("validated (28 bits): replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)")
+                          if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -1910,6 +2058,10 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "stride_renew_component": stride_renew_component(),
+        "deferred_guard_component": deferred_guard_component(),
+        "dg_wall_component": dg_wall_component(),
+        "dg_blocked_component": dg_blocked_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2522,6 +2674,82 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    sr = doc["stride_renew_component"]
+    L += ["## Prime-field baseline: relation targets, stride-renew against the walk (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261029-stride-renew-prime): one parameter of the prime-field baseline, "
+          "the relation-target source, from `walk` (16 jumps plus restart offsets, each a charged scalar "
+          "multiplication) to `stride-renew` (R ← R + S, S renewed per relation, 4 scalar multiplications of "
+          "set-up); the factor base and the `mitm:negation_folded=1` oracle are the incumbents at each size. "
+          "Two fresh curves × 24 targets × 6 rounds per size, L2 on isolab-eks. "
+          f"{sr['unit']}. Ratios are paired Σ srenew ÷ Σ walk with cluster-bootstrap 95% intervals.", "",
+          "| bits | N | mean S walk → srenew (w = 0) | srenew ÷ walk (w = 0 / 0.1 / 1) | IC ÷ rho-neg walk → srenew (w = 0 / 0.1 / 1) | reading |",
+          "|--:|--:|:--|:--|:--|:--|"]
+    for r in sr["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["walk_over_rho"], r["srenew_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n']} | {r['walk']:.2f} → {r['srenew']:.2f} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + sr['report']}) · [study](../../{sr['study']}).", "", sr["validation"], ""]
+    dgc = doc["deferred_guard_component"]
+    L += ["## Prime-field baseline: deferred-guard stride-renew at a smaller factor base (2026-10-29, engineering)", "",
+          "Frozen follow-up protocol on fresh curves (backlog XP-20261029-srenew-deferred-guard-v3): `dg-small` "
+          "uses `targets = stride-renew-deferred-guard` (the repeat guard probed only on targets that decompose) "
+          "at a smaller factor base N_b, against the baseline at each size; the `mitm:negation_folded=1` oracle is "
+          "unchanged. Two fresh curves × 24 targets × 6 rounds per size, isolab-eks, counted units only (no wall "
+          f"time is claimed). {dgc['unit']}. Ratios are paired Σ dg-small ÷ Σ baseline with cluster-bootstrap 95% "
+          "intervals. An earlier study on other curves is undecidable (its L2 rule refused sub-millisecond rho "
+          "solves) and is reported descriptively in the study only.", "",
+          "| bits | baseline (N) → dg-small (N_b) | mean S baseline → dg-small (w = 0) | dg-small ÷ baseline (w = 0 / 0.1 / 1) | IC ÷ rho-neg baseline → dg-small (w = 0 / 0.1 / 1) | reading |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in dgc["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["base_over_rho"], r["dg_over_rho"]))
+        L.append(f"| {r['bits']} | {r['base']} ({r['n_inc']}) → {r['n_b']} | {r['base_s']:.2f} → {r['dg_s']:.2f} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + dgc['report']}) · [study](../../{dgc['study']}).", "", dgc["validation"], ""]
+    dw = doc["dg_wall_component"]
+    L += ["## Component speed-up: the deferred repeat guard in wall time (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261029-dg-wall): `dg` (`targets = stride-renew-deferred-guard`, the repeat "
+          "guard probed only on targets that decompose) against `srenew` (`targets = stride-renew`) at the same factor "
+          "base N_inc and `mitm:negation_folded=1` oracle. Both charge the same GAE (to within 2e-6: `dg` charges one "
+          "extra GAE per repeated target its guard catches), so this moves no row of tables A–C and no counted S at "
+          "w = 0; the gain is native guard work `dg` no longer executes. Two curves × 24 targets × 6 rounds per size, "
+          f"L2 on isolab-eks with native A/A admission. {dw['unit']}. The corrected ratio is dg ÷ srenew ns/GAE over "
+          "the srenew-aa ÷ srenew A/A, from the `wall` block of `ecbench compare`.", "",
+          "| bits | N | pairs | ns/GAE srenew → dg | A/A | corrected dg ÷ srenew (wall) | counted dg ÷ srenew (w = 0 / 0.1 / 1) | IC ÷ rho-neg srenew → dg (w = 0 / 0.1 / 1) | reading |",
+          "|--:|--:|--:|:--|:--|:--|:--|:--|:--|"]
+    for r in dw["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["srenew_over_rho"], r["dg_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n']} | {r['pairs']} | {r['ns_srenew']:.2f} → {r['ns_dg']:.2f} | "
+                 f"{r['aa_ratio']:.4f} [{r['aa_ci95'][0]:.4f}, {r['aa_ci95'][1]:.4f}] | "
+                 f"**{r['corrected']:.4f} [{r['corrected_ci95'][0]:.4f}, {r['corrected_ci95'][1]:.4f}]** | "
+                 f"{c_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate. "
+          "Wall time is host-specific (one host class) and cannot be replayed; the validator recomputed it from the "
+          "records and bounded the run-order confound with the oracle set-up phase as a null.", "",
+          f"[Report]({'../../' + dw['report']}) · [study](../../{dw['study']}).", "", dw["validation"], ""]
+    db = doc["dg_blocked_component"]
+    L += ["## Component speed-up: a cache-blocked packed pair table in wall time (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261029-dg-blocked): `dgb` (oracle `mitm-prime-blocked:m=2`, the pair table "
+          "built cache-blocked as a PackedPairTable) against `dg` (oracle `mitm:negation_folded=1`, a scalar FastMap), "
+          "both `targets = stride-renew-deferred-guard` at N_inc. Charged work is identical record by record, so this "
+          "moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly given back by a "
+          "slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks with native A/A "
+          f"admission. {db['unit']}. Only 28 bits decides: 24 and 32 bits are undecidable under the frozen rule "
+          "(a below-L2 wall execution).", "",
+          "| bits | N | pairs | ns/GAE dg → dgb | A/A | corrected dgb ÷ dg (wall) | counted dgb ÷ dg (w = 0 / 0.1 / 1) | IC ÷ rho-neg dg → dgb (w = 0 / 0.1 / 1) | reading |",
+          "|--:|--:|--:|:--|:--|:--|:--|:--|:--|"]
+    for r in db["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["dg_over_rho"], r["dgb_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n']} | {r['pairs']} | {r['ns_dg']:.2f} → {r['ns_dgb']:.2f} | "
+                 f"{r['aa_ratio']:.4f} [{r['aa_ci95'][0]:.4f}, {r['aa_ci95'][1]:.4f}] | "
+                 f"**{r['corrected']:.4f} [{r['corrected_ci95'][0]:.4f}, {r['corrected_ci95'][1]:.4f}]** | "
+                 f"{c_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. "
+          "Wall time is host-specific (one host class) and cannot be replayed.", "",
+          f"[Report]({'../../' + db['report']}) · [study](../../{db['study']}).", "", db["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -3377,6 +3605,99 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    sr = doc["stride_renew_component"]
+    P.append('<section class="card" id="stride-renew"><h2>Prime-field baseline · relation targets, stride-renew '
+             'against the walk <span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261029-stride-renew-prime): one parameter of the prime-field baseline, '
+             'the relation-target source, from <code>walk</code> (16 jumps plus restart offsets, each a charged scalar '
+             'multiplication) to <code>stride-renew</code> (R ← R + S, S renewed per relation, 4 scalar '
+             'multiplications of set-up); factor base and oracle are the incumbents at each size. Two fresh curves '
+             '× 24 targets × 6 rounds per size, L2 on isolab-eks. '
+             f'{esc(sr["unit"])}. Ratios are paired Σ srenew ÷ Σ walk with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th class="n">N</th><th>mean S walk → '
+             'srenew (w = 0)</th><th>srenew ÷ walk (w = 0 / 0.1 / 1)</th><th>IC ÷ rho-neg walk → srenew</th>'
+             '<th>Reading</th></tr></thead><tbody>')
+    for r in sr["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["walk_over_rho"], r["srenew_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["n"]}</td><td>{r["walk"]:.2f} → {r["srenew"]:.2f}</td>'
+                 f'<td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(sr["report"], "Report")} · {gh(sr["study"], "study")}.</p>'
+             f'<p class="muted">{esc(sr["validation"])}</p></section>')
+    dgc = doc["deferred_guard_component"]
+    P.append('<section class="card" id="deferred-guard"><h2>Prime-field baseline · deferred-guard stride-renew at '
+             'a smaller factor base <span class="chip">engineering</span></h2>'
+             '<p>Frozen follow-up protocol on fresh curves (backlog XP-20261029-srenew-deferred-guard-v3): '
+             '<code>dg-small</code> uses <code>targets = stride-renew-deferred-guard</code> (the repeat guard probed '
+             'only on targets that decompose) at a smaller factor base N_b, against the baseline at each size; the '
+             'oracle is unchanged. Two fresh curves × 24 targets × 6 rounds per size, isolab-eks, counted units only. '
+             f'{esc(dgc["unit"])}. Ratios are paired Σ dg-small ÷ Σ baseline with cluster-bootstrap 95% intervals. '
+             'An earlier study on other curves is undecidable and is reported descriptively in the study only.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>Baseline (N) → dg-small (N_b)</th>'
+             '<th>mean S baseline → dg-small (w = 0)</th><th>dg-small ÷ baseline (w = 0 / 0.1 / 1)</th>'
+             '<th>IC ÷ rho-neg baseline → dg-small</th><th>Reading</th></tr></thead><tbody>')
+    for r in dgc["rows"]:
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["base_over_rho"], r["dg_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{esc(r["base"])} ({r["n_inc"]}) → {r["n_b"]}</td>'
+                 f'<td>{r["base_s"]:.2f} → {r["dg_s"]:.2f}</td><td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(dgc["report"], "Report")} · {gh(dgc["study"], "study")}.</p>'
+             f'<p class="muted">{esc(dgc["validation"])}</p></section>')
+    dw = doc["dg_wall_component"]
+    P.append('<section class="card" id="dg-wall"><h2>Component speed-up · the deferred repeat guard in wall time '
+             '<span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261029-dg-wall): <code>dg</code> (<code>targets = '
+             'stride-renew-deferred-guard</code>) against <code>srenew</code> (<code>targets = stride-renew</code>) at '
+             'the same factor base N_inc and oracle. Both charge the same GAE (to within 2e-6), so this moves no row of '
+             'tables A–C and no counted S at w = 0; the gain is native guard work <code>dg</code> no longer executes. '
+             'Two curves × 24 targets × 6 rounds per size, L2 on isolab-eks with native A/A admission. '
+             f'{esc(dw["unit"])}. The corrected ratio is dg ÷ srenew ns/GAE over the srenew-aa ÷ srenew A/A.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th class="n">N</th><th class="n">Pairs</th>'
+             '<th>ns/GAE srenew → dg</th><th>A/A</th><th>Corrected dg ÷ srenew (wall)</th>'
+             '<th>Counted dg ÷ srenew (w = 0 / 0.1 / 1)</th><th>IC ÷ rho-neg srenew → dg</th><th>Reading</th></tr></thead><tbody>')
+    for r in dw["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["srenew_over_rho"], r["dg_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["n"]}</td><td class="n">{r["pairs"]}</td>'
+                 f'<td>{r["ns_srenew"]:.2f} → {r["ns_dg"]:.2f}</td>'
+                 f'<td>{r["aa_ratio"]:.4f} [{r["aa_ci95"][0]:.4f}, {r["aa_ci95"][1]:.4f}]</td>'
+                 f'<td><b>{r["corrected"]:.4f} [{r["corrected_ci95"][0]:.4f}, {r["corrected_ci95"][1]:.4f}]</b></td>'
+                 f'<td>{c_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate. '
+             'Wall time is host-specific (one host class) and cannot be replayed.</p>'
+             f'<p>{gh(dw["report"], "Report")} · {gh(dw["study"], "study")}.</p>'
+             f'<p class="muted">{esc(dw["validation"])}</p></section>')
+    db = doc["dg_blocked_component"]
+    P.append('<section class="card" id="dg-blocked"><h2>Component speed-up · a cache-blocked packed pair table in wall time '
+             '<span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261029-dg-blocked): <code>dgb</code> (oracle '
+             '<code>mitm-prime-blocked:m=2</code>) against <code>dg</code> (oracle <code>mitm:negation_folded=1</code>), '
+             'both <code>targets = stride-renew-deferred-guard</code> at N_inc. Charged work is identical record by '
+             'record, so this moves no row of tables A–C and no counted S; the gain is a cheaper oracle set-up, partly '
+             'given back by a slower packed probe in the PDP phase. Two curves × 24 targets × 6 rounds, L2 on isolab-eks '
+             f'with native A/A admission. {esc(db["unit"])}. Only 28 bits decides: 24 and 32 bits are undecidable '
+             'under the frozen rule.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th class="n">N</th><th class="n">Pairs</th>'
+             '<th>ns/GAE dg → dgb</th><th>A/A</th><th>Corrected dgb ÷ dg (wall)</th>'
+             '<th>Counted dgb ÷ dg (w = 0 / 0.1 / 1)</th><th>IC ÷ rho-neg dg → dgb</th><th>Reading</th></tr></thead><tbody>')
+    for r in db["rows"]:
+        c_txt = " / ".join(f"{q['ratio']:.4f}" for q in r["counted"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["dg_over_rho"], r["dgb_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["n"]}</td><td class="n">{r["pairs"]}</td>'
+                 f'<td>{r["ns_dg"]:.2f} → {r["ns_dgb"]:.2f}</td>'
+                 f'<td>{r["aa_ratio"]:.4f} [{r["aa_ci95"][0]:.4f}, {r["aa_ci95"][1]:.4f}]</td>'
+                 f'<td><b>{r["corrected"]:.4f} [{r["corrected_ci95"][0]:.4f}, {r["corrected_ci95"][1]:.4f}]</b></td>'
+                 f'<td>{c_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate. '
+             'Wall time is host-specific (one host class) and cannot be replayed.</p>'
+             f'<p>{gh(db["report"], "Report")} · {gh(db["study"], "study")}.</p>'
+             f'<p class="muted">{esc(db["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
