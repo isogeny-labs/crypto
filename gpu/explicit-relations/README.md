@@ -77,6 +77,10 @@ certificate. These are implementation limits, not demonstrated scale claims.
   to the left table cap. Sort full `(infinity,x,y,tuple_id)` keys on device.
 - Keep the left table resident across targets from the same bases. The Rust
   adapter sends bases only when their exact contents change.
+- Reuse two contiguous right-side partial-sum tables when each fits the explicit
+  chunk bound; otherwise retain direct tuple construction. At most
+  `2*chunk_rows*sizeof(Point)` extra storage is charged to admission and cold
+  setup. `ER_QUERY_UNCACHED_REFERENCE` disables this reuse for comparisons.
 - Stream right tuples in capped batches. Probe the sorted left table on the
   device; return only witness indices. Large tables use at most 65537 u64
   prefix offsets to restrict full-key binary search to one high-x-bit bucket.

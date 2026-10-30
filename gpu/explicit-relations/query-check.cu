@@ -108,10 +108,48 @@ int main() {
         }
       }
     }
+    std::vector<Point> signed_base;
+    for (unsigned i = 0; i < 6; ++i) {
+      signed_base.push_back(base[i]);
+      signed_base.push_back(wide.neg(base[i]));
+    }
+    std::sort(signed_base.begin(), signed_base.end(), PointLess{});
+    signed_base.erase(
+        std::unique(signed_base.begin(), signed_base.end(), equal),
+        signed_base.end());
+    require(signed_base.size() >= 11);
+    for (U chunk : {U(31), U(257)}) {
+      DeviceBackend cached(wide, 32768, chunk);
+      HostBackend exact(wide, 32768, chunk);
+      for (unsigned size : {11, 0, 3, 11}) {
+        std::vector<std::vector<Point>> bases(8);
+        for (auto &slot : bases)
+          slot.assign(signed_base.begin(), signed_base.begin() + size);
+        Plan p = plan(wide, bases, 32768);
+        cached.prepare(p);
+        exact.prepare(p);
+        for (Point target :
+             {signed_base.front(), Point{}, signed_base.back()}) {
+          auto got = cached.find(target, p.left + p.right);
+          auto expected = exact.find(target, p.left + p.right);
+          require(got.found == expected.found &&
+                  got.indices == expected.indices);
+          U visited = p.right;
+          if (got.found) {
+            U right = 0;
+            for (unsigned j = p.split; j < p.slots; ++j)
+              right = right * size + expected.indices[j];
+            visited = std::min(p.right, (right / chunk + 1) * chunk);
+          }
+          require(got.visited == visited);
+        }
+      }
+    }
     std::cout
         << "PASS packed overflow bounds, deterministic witnesses, repeated "
            "queries/prepares, chunk tails, empty plans, visited counts and "
-           "prefix bucket/duplicate/infinity boundaries\n";
+           "prefix bucket/duplicate/infinity boundaries, bounded partial-sum "
+           "reuse and uncached fallback\n";
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
     return 1;

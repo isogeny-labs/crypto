@@ -34,6 +34,28 @@ are a conservative allocation bound, not measured peak device usage.
 and the existing full-key comparator informed this conventional indexing
 change. No new algorithmic exponent or external-tool superiority is claimed.
 
+The next separate panel is frozen as `protocol-v5.json`, hash
+`554c7aff798beddcdbeade7b0107575a7c66059fbac6e030bd982a8a4e55b86f`.
+It reuses two contiguous partial sums of right tuples across targets. Each
+partial table must fit `chunk_rows`; otherwise the original query path is
+used. At most2*chunk_rows*sizeof(Point) extra bytes are charged to admission.
+The mixed-radix right id and lowest matching left id are unchanged, including
+infinity and duplicate sums. `ER_QUERY_UNCACHED_REFERENCE` is the ablation.
+This follows conventional reuse of invariant work, with explicit memory
+accounting and full-workload testing, as discussed in
+[NVIDIA's best-practices guide](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html).
+
+V5 compares b/u/x at52bits for both seeds, then runs u on both targets at
+56/58/60bits: at most12executions. The explicit row cap rises to2^30 and
+work cap to2^31 for every arm; chunk remains2^20 and the GPU admission still
+reserves sort space and leaves25%free. Solve caps are180s at52bits,300s at56,
+and600s at58/60; worker4500s/controller4800s. The same complete-rung stopping
+rule applies. The larger caps probe actual GPU admission beyond v4's planning
+cap; they are not used to make cross-run timing comparisons. A/A timing
+controls apply at52bits only, while every larger result still requires both
+public targets, fresh replay and corrupt-scalar rejection. V4 remains pinned
+and unchanged. No new panel runs concurrently with it.
+
 ## Implementation and mathematical checks
 
 The standalone Rust adapter now accepts a nonzero point killed by the
