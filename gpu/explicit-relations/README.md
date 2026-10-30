@@ -77,10 +77,13 @@ certificate. These are implementation limits, not demonstrated scale claims.
   to the left table cap. Sort full `(infinity,x,y,tuple_id)` keys on device.
 - Keep the left table resident across targets from the same bases. The Rust
   adapter sends bases only when their exact contents change.
-- Reuse two contiguous right-side partial-sum tables when each fits the explicit
-  chunk bound; otherwise retain direct tuple construction. At most
-  `2*chunk_rows*sizeof(Point)` extra storage is charged to admission and cold
-  setup. `ER_QUERY_UNCACHED_REFERENCE` disables this reuse for comparisons.
+- Optional `cuda-cached` builds reuse two contiguous right-side partial-sum
+  tables when each fits the explicit chunk bound; otherwise they use direct
+  tuple construction. At most `2*chunk_rows*sizeof(Point)` extra storage is
+  charged to admission and cold setup. Enable with `ER_QUERY_CACHED`;
+  `ER_QUERY_UNCACHED_REFERENCE` overrides it for comparisons. The ordinary
+  `cuda` build retains uncached indexed search: the matched v5 52-bit cases
+  did not show a timing gain from caching. Both paths preserve exact results.
 - Stream right tuples in capped batches. Probe the sorted left table on the
   device; return only witness indices. Large tables use at most 65537 u64
   prefix offsets to restrict full-key binary search to one high-x-bit bucket.
@@ -107,7 +110,8 @@ Blackwell, use CUDA with `sm_120` support:
 make host                  # small C++/Rust reference executables
 make test                  # host arithmetic, protocol driver and reduction
 make all ARCH=sm_120        # select the actual GPU architecture
-make test-cuda ARCH=sm_120
+make test-cuda ARCH=sm_120   # exercises default and optional cached variants
+make cuda-cached ARCH=sm_120 # optional build/explicit-relations-cached service
 compute-sanitizer --tool memcheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool racecheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool synccheck build/explicit-relations-cuda --self-test
@@ -190,3 +194,14 @@ wall clocks are L0 observations, not certified speedups. The separate `crates/ha
 CPU code; this GPU service accelerates the bounded meet-in-the-middle path.
 The standalone Cargo manifest resolves that crate because the included
 reference module re-exports it, without building the root crypto package.
+
+### Replaying the scaling studies
+
+The frozen `research/explicit_relations_e2e_20261030/run*.sh` instruments must
+be run from their recorded source commits. In particular, v5 measured caching
+as the candidate default on f6338418572c72e1bf97ad24903cd5efd17cf7da. After its
+matched 52-bit rows showed no gain, the normal build selected the uncached
+path and the same cache implementation became the explicit `cuda-cached`
+option. Do not run historical scripts against a different source revision
+and label the result a replay. The active v5 larger-field probes remain
+unchanged on their pinned source; their final outcomes are recorded separately.

@@ -280,7 +280,7 @@ public:
 #endif
     U first_count = 0, second_count = 0;
     unsigned middle = 0;
-#ifndef ER_QUERY_UNCACHED_REFERENCE
+#if defined(ER_QUERY_CACHED) && !defined(ER_QUERY_UNCACHED_REFERENCE)
     // Each partial table is capped by the explicit chunk bound. This reuses
     // short sums without retaining the exponentially larger full right table.
     if (p.right >= 4096 && p.slots - p.split >= 3) {
