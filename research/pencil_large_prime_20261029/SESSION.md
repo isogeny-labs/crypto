@@ -1374,3 +1374,21 @@ PR2935 CI and merge remain pending. Full pencil cohort and timing are incomplete
 The general Rust CI scope skips this standalone crate, motivating explicit software-only CI. No scientific run was retried. The implementation packet's ignored Cargo.lock was explicitly committed, and the oversized retained attempt3 log was published and remotely verified in the required artifact store before PR creation.
 
 CI review addendum: the broad initial artifact-wiring match suggested credentialed hydration of logs that tests do not read. Independent review identified the PR-head script/credential exposure. The final workflow instead checks out only source/provenance/manifests and runs from the root with an explicit manifest path; it uses no secrets, artifact tooling or result downloads. YAML/Bash syntax and the exact five-test/zero-benchmark listing passed; independent final source/dependency review found no concrete blocker. The repository wiring check is separately required before publication.
+
+## 2026-10-30T05:38Z — Six-hour replacement gate preparation
+
+### What was done
+
+Recorded the renewed six-hour active-worker ceiling and conservative absolute expiry 2026-10-30T11:17:54Z; request c1 retains the reviewed conditional cutoff08:10:24Z and unchanged scientific instrument543a54b. Reconciled Diem as expired50/52 with no pending launcher, prior b1 terminal failure, unchanged reviewed controller deployment and absent c1 controller receipt. PR2935 merged at05:17:48Z after source-only CI passed. Independent review and59 release-library tests passed the native consumer's narrow unknown-runtime gate exception; strict Clippy/fmt passed. Original failed frozen validation remains retained. Corrected immutable protocol body18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9 froze05:37:28Z and passed native validation.
+
+### Decisions made
+
+Runtime estimate remains unknown;21600 seconds is a resource ceiling, not an estimated duration. New acceptance is restricted to the exact18-execution finite-count characterization gate. Clocks stay diagnostic. The earlier draft review is superseded only for freeze suitability by additive independent review. Draft/preparation status fields remain historical preparation state; any execution admission is external, exact-file-bound, and separate from mechanical freeze. No scientific payload has launched at this entry. The original1260-target objective and15 independent gate replay requirement remain unchanged.
+
+### Open threads
+
+Complete exact-body finite-coverage review, commit/publish freeze and source, retain current cloud reconciliation and separately admit the exact request before submission. Gate completion, independent replay/review, a separate cohort admission and full cohort remain pending. The daily shared log is reserved by T828, so this project handoff is retained here without editing that reserved file.
+
+### Errors
+
+Initial frozen validation rejected the honest null estimate. A scoped, fail-closed native admission exception resolves that software blocker without manufacturing an estimate. Conductor scope add replaces the reservation list; restored all three T891 scopes after detecting the native-only list. Reading the migration receipt as the ordinary user was denied; approved read-only sudo access succeeded. No duplicate migration recovery or scientific generator was started.
