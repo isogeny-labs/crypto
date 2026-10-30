@@ -58,3 +58,7 @@ against). It also prices the (4,6) Weil-descent cell against a published floor (
 
 Spec: done here. Build: ~45-70 engineer-days (INVENTORY §3). Run: one week on the existing
 ladders after build (REVIEW §5.1 F2: 2-3 days to specify, one week to run).
+
+## 7. Pilot (2026-10-30, pre-freeze)
+
+First published-method cell: [`PILOT_20261030.md`](PILOT_20261030.md) (PDF beside it). K_0 n = 9 ran (msolve on the e_i-symmetrised `S_4`, 8/8 verified, S about 1.5e8 against the lab's 36.1 and rho's 5.9, untuned, not a Register-E row); K_0 n = 13 did not complete (one system 5.7e12 instructions); WDSat, Callgrind and msolve 0.6.5 are not available on this host.

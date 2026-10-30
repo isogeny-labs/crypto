@@ -104,6 +104,9 @@
 //! the `ecbench` binary, which those replays never build, and reaches
 //! `ic.pipeline` through `methods::register_binary_plugins`.
 
+#[path = "msolve_s4.rs"]
+mod msolve_s4;
+
 use std::collections::{BTreeMap, HashMap};
 use std::time::Instant;
 
@@ -328,6 +331,9 @@ pub enum Pdp3Engine {
     /// `groebner_decompose` with Boolean matrix-F5: matrix-F4's matrices
     /// less the rows the F5 criterion predicts reduce to zero.
     MatrixF5,
+    /// Published-method pilot: the e_i-symmetrised Semaev S4 solved by external msolve (see
+    /// `msolve_s4.rs`); not a lab engine.
+    MsolveS4,
     /// The root-finding engine of `DecompositionStrategy::PairTable`: a
     /// [`PairSumTable`] of the base's pair sums, probed once per target
     /// (`m = 2`) or once per `R − P_k` (`m = 3`).  No Groebner search, so
@@ -351,6 +357,7 @@ impl Pdp3Engine {
             "f6-ic" => Ok(Self::F6Ic),
             "matrix-f4" => Ok(Self::MatrixF4),
             "matrix-f5" => Ok(Self::MatrixF5),
+            "msolve-s4" => Ok(Self::MsolveS4),
             "rootfind" => Ok(Self::Rootfind),
             "rootfind-window" => Ok(Self::RootfindWindow),
             "rootfind-negfold" => Ok(Self::RootfindNegfold),
@@ -368,6 +375,7 @@ impl Pdp3Engine {
             Self::F6Ic => "f6-ic",
             Self::MatrixF4 => "matrix-f4",
             Self::MatrixF5 => "matrix-f5",
+            Self::MsolveS4 => "msolve-s4",
             Self::Rootfind => "rootfind",
             Self::RootfindWindow => "rootfind-window",
             Self::RootfindNegfold => "rootfind-negfold",
@@ -377,7 +385,7 @@ impl Pdp3Engine {
 
     /// Whether the engine solves an algebraic system at all.
     pub fn is_groebner(self) -> bool {
-        !self.is_rootfind()
+        !self.is_rootfind() && self != Self::MsolveS4
     }
 
     /// Whether the engine builds and probes a pair-sum table (full or
@@ -409,6 +417,7 @@ impl Pdp3Engine {
             Self::InheritedF4 | Self::F6Ic => Some(SolverEngine::InheritedF4 { max_degree }),
             Self::MatrixF4 => Some(SolverEngine::MatrixF4 { max_degree }),
             Self::MatrixF5 => Some(SolverEngine::MatrixF5 { max_degree }),
+            Self::MsolveS4 => None,
             Self::Rootfind
             | Self::RootfindWindow
             | Self::RootfindNegfold
@@ -504,6 +513,9 @@ pub struct Pdp3KoblitzOracle<'i> {
     /// Witnesses the solver returned that did not re-lift through the
     /// framework's sign resolution.  Must stay zero.
     pub unliftable: u64,
+    /// msolve invocations (msolve-s4 engine) and failed invocations.
+    ms_calls: u64,
+    ms_errors: u64,
     /// Pair-table hits whose summands did not re-add to the probed point
     /// in the group.  Must stay zero; a nonzero count would mean the
     /// table and the run's base disagree on a point.
@@ -530,6 +542,8 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             scan_window_len: 0,
             window_div: 0,
             unliftable: 0,
+            ms_calls: 0,
+            ms_errors: 0,
             table_mismatches: 0,
         }
     }
@@ -785,6 +799,18 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             self.pair_table_points = 0;
             self.pair = None;
             self.pair_neg = None;
+        } else if self.engine == Pdp3Engine::MsolveS4 {
+            if self.summands != 3 {
+                return Err("engine=msolve-s4 takes m = 3".into());
+            }
+            if kc.curve.b != F2mElement::one(kc.n) {
+                return Err("engine=msolve-s4: the symmetrised S4 is specialised to b = 1".into());
+            }
+            self.scan_window_len = 0;
+            self.window_div = 0;
+            self.pair_table_points = 0;
+            self.pair = None;
+            self.pair_neg = None;
         } else {
             // A root-finding engine has no Groebner search to bound.  A
             // bound it ignored would be a parameter in the method's
@@ -975,6 +1001,56 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         let view = self.view.as_ref().ok()?;
         let kc = view.curve();
         let target = view.instance().fast.lower(point);
+        if self.engine == Pdp3Engine::MsolveS4 {
+            let crypto_lib::binary_ecc::BinaryPoint::Affine { x: x_r, .. } = &target else {
+                return None;
+            };
+            let msolve = std::env::var("MSOLVE").unwrap_or_else(|_| "/opt/homebrew/bin/msolve".into());
+            let started = Instant::now();
+            self.ms_calls += 1;
+            let tag = format!("t{}", self.ms_calls);
+            let res = msolve_s4::solve_s4(&msolve, kc.n, frob.ell, &kc.curve.irreducible, &kc.curve.b, x_r, &tag);
+            let wall_ns = started.elapsed().as_nanos() as u64;
+            let out = match res {
+                Ok(o) => o,
+                Err(e) => {
+                    eprintln!("msolve-s4: {e}");
+                    self.ms_errors += 1;
+                    return None;
+                }
+            };
+            let mut extra = BTreeMap::new();
+            extra.insert("msolve_calls".into(), 1);
+            extra.insert("msolve_ir".into(), out.ir);
+            extra.insert("extraction_native_ops".into(), out.ext_ops);
+            extra.insert("quotient_dim".into(), out.quotient_dim as u64);
+            extra.insert("gb_len".into(), out.gb_len as u64);
+            let cost = SolverCost {
+                ops: out.ir,
+                op_unit: "msolve instructions retired".into(),
+                wall_ns,
+                peak_bytes: 0,
+                degree_reached: None,
+                solving_degree: None,
+                timed_out: false,
+                extra,
+            };
+            self.totals.absorb(shape, Some(&cost), false);
+            let mut seen: std::collections::HashSet<[u64; 3]> = std::collections::HashSet::new();
+            for r in &out.roots {
+                let mut key = *r;
+                key.sort_unstable();
+                if !seen.insert(key) {
+                    continue;
+                }
+                if let Some(found) = lift_abscissae(ctx.group, fb, ops, &r[..], point) {
+                    return Some(found);
+                }
+                counters.lift_failures += 1;
+                self.unliftable += 1;
+            }
+            return None;
+        }
         let decompose = match self.engine {
             Pdp3Engine::F6Ic => groebner_decompose_f6_ic,
             _ => groebner_decompose,
