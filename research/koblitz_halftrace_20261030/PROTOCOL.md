@@ -97,3 +97,32 @@ warn-and-allow without installation. No shared reservation is claimed. EKS
 submission, successful S3 checkpoint admission and a source-pinned executable
 image remain separate requirements. Local builds and correctness tests are
 development work, not experiment timings.
+
+## Prospective execution record, 2026-10-30
+
+The unchanged workload is now also recorded in `protocol.json`, validated against
+the canonical experiment.protocol/v1 schema and frozen before any scientific data.
+`analyze.sh` only invokes the existing native ecbench comparisons, with fixed
+bootstrap seed/resamples and the three pricing bands; its hash is in that record.
+The protocol's decisive comparison is the cache flag against the preserved
+legacy algorithm in one executable. The separate unmodified-source comparison
+and default-path regression remain open; this record does not silently discharge
+them. The ordinary v1 measurement is non-resumable: interrupted clocks are invalid
+and there are no automatic measurement retries. The source-resume S3 checkpoint
+is a separate pre-launch safety gate, not a claim of computation recovery.
+
+Pin the executable to tested feature commit
+`7c58661935b79153ff74c1208d0592aa56ed04a1`, which already contains these exact spec
+bytes and passed the native cache, ordered-lift and end-to-end checks. The broad
+release run finished with 5447 passes, zero failures and 123 existing ignored
+tests; its only source difference is the previously recorded parity lint cleanup.
+Later main merges preserved the three feature files but exposed an existing
+syntax error in `ecbench/methods.rs`. That failure is retained separately; a run
+of the pinned source does not validate those later merges.
+
+`isolab-experiment.yml` has a checkpoint-only preparation mode. It checks out a
+full immutable preparation SHA, uploads this study's resume/spec/protocol through
+the existing approved upload secret, and explicitly skips every build/experiment
+job. A successful receipt is required before a separate trusted-main scientific
+dispatch. Missing or invalid secrets fail closed. No credential is exported to
+the authoring workspace, Git or the report.

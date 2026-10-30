@@ -11,16 +11,24 @@ nor test elapsed times establish native speedup. No scientific run was launched.
 | Touched-file `rustfmt --check --edition 2021` | passed |
 | `git diff --check` | passed |
 | `ecbench plan --spec research/koblitz_halftrace_20261030/spec.json` | validated 8 workloads, 5 arms, 280 executions; no execution requested |
-| `cargo test --release --lib --locked` | still running at 06:47 UTC; 5,446 parent tests passed, 123 ignored by existing annotations, one pre-existing prime-field isogeny-walk test unfinished; no failures observed |
+| `cargo test --release --lib --locked` | completed: 5,447 parent tests passed, zero failed, 123 existing ignored; full-library-result.txt |
 | Final-source `cargo test --release --lib --locked cached_` | passed: 10 tests including cache, scope and factor-base parity |
 | Final-source `cargo test --release --lib --locked fast_base_lifts_preserve_roots_and_order` | passed: 1 test |
 | Scientific checkpoint / EKS comparison | blocked; checkpoint-upload.txt and [access record](../../../problems/native-koblitz-measurement-access.md) |
 
 The full-suite executable was built before a lint-only change from unsigned
 `% 2` parity checks to `& 1` at two sites. Both final-source filtered runs pass
-after recompiling that change; Clippy also checks the final source. The full suite is not
-reported as passed until its parent process exits successfully. Two nested
-child test summaries in its raw log are not the full-suite result.
+after recompiling that change; Clippy also checks the final source. The final
+parent summary is now retained in full-library-result.txt. Two nested child test
+summaries in its raw log were not treated as the full-suite result.
+
+The later merge with main preserves the feature files. Its repeated locked
+check first found inherited Cargo.lock dependency-reference damage, normalized by
+Cargo, then an unclosed-delimiter error in ecbench/methods.rs that is byte-identical
+to the fetched main tip. Those failures are retained in inherited-lock-failure.txt
+and current-main-build-failure.txt. The original results are not relabelled as a
+pass of this later source. Scientific preparation pins the tested feature source
+specified in the prospective protocol.
 
 Earlier development attempts are retained, including sparse-checkout omissions
 and the first Clippy failure. Tracked fixture files were restored from the
