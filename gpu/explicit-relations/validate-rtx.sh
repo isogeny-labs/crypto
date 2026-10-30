@@ -16,7 +16,14 @@ trap finish EXIT
 git rev-parse HEAD
 sha256sum service.cpp host.hpp curve.cuh device.cuh paper_driver.rs Cargo.toml Cargo.lock ../../src/cryptanalysis/hashed_ecdl.rs > "$out/source.sha256"
 nvidia-smi --query-gpu=name,uuid,driver_version,memory.total,compute_cap --format=csv | tee "$out/gpu.csv"
-grep -Eq 'RTX PRO 6000' "$out/gpu.csv"
+expected_gpu=${ER_EXPECT_GPU:-RTX PRO 6000}
+case "$expected_gpu" in
+    'RTX PRO 6000'|'RTX 5090') ;;
+    *) echo "unsupported sm_120 validation GPU: $expected_gpu" >&2; exit 2 ;;
+esac
+test "$(wc -l < "$out/gpu.csv")" = 2
+grep -Fq -- "$expected_gpu" "$out/gpu.csv"
+grep -Eq ', *12[.]0 *$' "$out/gpu.csv"
 nvcc --version
 c++ --version
 rustc --version
@@ -25,4 +32,4 @@ make test
 make ARCH=sm_120 test-cuda
 cargo clippy --locked --release --manifest-path Cargo.toml --target-dir build/cargo -- -D warnings
 timeout 600 compute-sanitizer --tool memcheck --error-exitcode 86 build/explicit-relations-cuda --self-test
-echo 'RTX PRO 6000 build, host reference, CUDA differential, reduction replay and memcheck passed'
+echo "$expected_gpu sm_120 build, host reference, CUDA differential, reduction replay and memcheck passed"
