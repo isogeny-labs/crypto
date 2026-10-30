@@ -1,0 +1,196 @@
+{
+  "schema": "spot.aws-deployment/v2",
+  "observed_utc": "2026-10-19T07:10:19.210918+00:00",
+  "stack": "spot-experiments",
+  "region": "us-east-2",
+  "stack_status": "UPDATE_COMPLETE",
+  "runtime_sha256": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+  "work_root": "/srv/experiments/spot-worker",
+  "node_project": "/srv/experiments/spot-worker/work",
+  "lifecycle_enabled": true,
+  "ip_cutover_enabled": true,
+  "idle_seconds": 1800,
+  "desired_capacity_managed_by": "lifecycle-only; template DesiredCapacity removed",
+  "desired_capacity": 1,
+  "managed_instances": [
+    {
+      "InstanceId": "i-041ce6f4d176afe48",
+      "InstanceType": "m8i.8xlarge",
+      "AvailabilityZone": "us-east-2b",
+      "AvailabilityZoneId": "use2-az2",
+      "LifecycleState": "InService",
+      "HealthStatus": "Healthy",
+      "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0a663a3e15a051473",
+        "LaunchTemplateName": "Template_mQUD6gyzx0rc",
+        "Version": "15"
+      },
+      "ProtectedFromScaleIn": false
+    }
+  ],
+  "distribution": {
+    "OnDemandAllocationStrategy": "lowest-price",
+    "OnDemandBaseCapacity": 0,
+    "OnDemandPercentageAboveBaseCapacity": 0,
+    "SpotAllocationStrategy": "price-capacity-optimized"
+  },
+  "spot_quota": {
+    "code": "L-34B43A08",
+    "applied_vcpus": 96.0,
+    "minimum_request": {
+      "Id": "2b1830e9af0e45cda1c75d0c2ff1947d43M9Khoh",
+      "Status": "CASE_OPENED",
+      "DesiredValue": 64.0,
+      "CaseId": "179235827800379"
+    }
+  },
+  "bootstrap_failure_then_repair": "AL2023 AMI includes AWS CLI; removed nonexistent awscli2 RPM from package install",
+  "cold_start_amd": {
+    "instance_id": "i-063986fde2f088d28",
+    "instance_type": "m7a.8xlarge",
+    "cloud_init": "done",
+    "recovery_gate": "passed",
+    "services": "all active",
+    "activity": {
+      "Busy": false,
+      "Pending": 0,
+      "Unknown": false
+    }
+  },
+  "rebalance_replacement": {
+    "instance_id": "i-00194ed4cf4e73dbe",
+    "instance_type": "m8i.8xlarge",
+    "cloud_init": "done",
+    "recovery_gate": "passed",
+    "services": "all active"
+  },
+  "lifecycle_status": {
+    "state": "ready",
+    "protected_source_active": true,
+    "endpoint_instance_id": "i-01f85a6c905181498",
+    "controller": {
+      "state": "protected-source-active",
+      "instance": "i-01f85a6c905181498"
+    }
+  },
+  "original_host": {
+    "instance_id": "i-01f85a6c905181498",
+    "ssh_ip": "3.134.144.201",
+    "running_factor_base_jobs": 0,
+    "approved_snapshot_pauses": true,
+    "terminated_or_migrated": false,
+    "completed_factor_base_jobs": 5,
+    "running_diem_pid": 400334
+  },
+  "application_native_checkpoints": "passed: internal-column SIGKILL recovery; real worker termination/replacement; AMD cold-start gate; managed save/replay and scoring deduplication",
+  "live_idle_shutdown": "passed: automatically scaled 1 to 0 at 2026-10-18T22:30:32Z after the replacement became idle around 22:00; original host untouched",
+  "criu": {
+    "packaged_3_17_1": "dump succeeded; disposable restore failed sys_rseq -22",
+    "upstream_4_2_1": "disposable same-host dump/kill/restore passed; counter advanced",
+    "live_experiments": "five original jobs completed normally; remaining Diem generator backed up and copy-restore verified"
+  },
+  "live_criu": {
+    "snapshots": "five approved leave-running snapshots plus scheduled checksummed local generations",
+    "private_store": "/var/lib/spot-criu-managed",
+    "retained_generations_per_pid": 2,
+    "off_host_memory_export": "five authorized private AES256 archives; full download SHA-256 verified",
+    "live_restore": "all five copies restored and ran on separate compatible m8i; copies stopped and validator terminated",
+    "automatic_recovery": true,
+    "recurring_memory_export_enabled": true,
+    "evidence": [
+      "automatic-failover.json",
+      "diem-copy-restore.json",
+      "recurring-private-backups.json"
+    ],
+    "schedule": "OnCalendar=*:0/15",
+    "ownership_keys": [
+      "legacy-owner",
+      "legacy-owner-diem"
+    ],
+    "shared_host_fence": "legacy-owner-host"
+  },
+  "ip_source_protection_enabled": true,
+  "applied_parameters": {
+    "RuntimeDigest": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+    "AllocationId": "eipalloc-00c2a8a867901bf7d",
+    "IdleSeconds": "1800",
+    "Cutover": "true",
+    "ProtectedSource": "i-01f85a6c905181498",
+    "Subnets": "subnet-0761aef3e12b3bdba,subnet-0f7c5dbe095545329,subnet-09342db00f6592d1f",
+    "PreserveHostKeys": "false",
+    "VpcId": "vpc-09e1badf3d477f243",
+    "NodeProject": "/srv/experiments/spot-worker/work",
+    "ImageId": "ami-0d31a22b09ceec4db",
+    "PriceProtectionPercent": "60",
+    "LifecycleEnabled": "true",
+    "HostSecurityGroup": "sg-06e59b5aec8715bf3",
+    "WorkRoot": "/srv/experiments/spot-worker",
+    "AlarmTopicArn": ""
+  },
+  "latest_managed_cold_boot": {
+    "instance_id": "i-041ce6f4d176afe48",
+    "cloud_init": "done",
+    "runtime_in_place": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+    "deployment_method": "idle queue assertion; native recovery gate passed; only spot-experiments restarted",
+    "future_launch_template": "16",
+    "independent_recovery_units": "all active; source protected",
+    "portable_cli": "/usr/local/bin/experiment-runner",
+    "durable_worker_config": true,
+    "live_record_handoff": {
+      "schema": "experiment.cloud-handoff-proof/v1",
+      "record_schema": "experiment.run/v1",
+      "restored_progress": 3,
+      "final_progress": 12,
+      "original_jobs_manifest_removed": true,
+      "launcher_session_not_required": true,
+      "inherited_credentials_not_serialized": true,
+      "worker_iam_and_managed_wake": "passed",
+      "runtime_config_used_without_original_environment": true,
+      "original_source_untouched": true
+    }
+  },
+  "laptop_hooks": {
+    "installer": "prepared and temporary-home tested",
+    "installed_on_laptop": false,
+    "remaining": "laptop execution access or local installer run, plus Codex /hooks trust"
+  },
+  "previous_managed_cold_boot_before_run_records": {
+    "instance_id": "i-0a6466bc0b69106b2",
+    "launch_template_version": "12",
+    "cloud_init": "done",
+    "runtime_at_boot": "36821563a8d73027f3533d05ecb6cfaadaa1b7c6015a8b0d8b9c825aae8d1926",
+    "bootstrap_gates": "passed",
+    "updated_in_place_runtime": "4e41994b108d49cb32b1a0f7fcc441840c0737be6b5ec738ff6e3481a3fa1cd9",
+    "independent_recovery_units": "all active; source protected",
+    "future_launch_template": "14",
+    "clean_standby_activity": {
+      "Expires": {
+        "N": "1792390663"
+      },
+      "Unknown": {
+        "BOOL": false
+      },
+      "Busy": {
+        "BOOL": false
+      },
+      "LastBusy": {
+        "N": "1792390032"
+      },
+      "Id": {
+        "S": "activity#i-0a6466bc0b69106b2"
+      },
+      "Pending": {
+        "N": "0"
+      },
+      "Observed": {
+        "N": "1792390063"
+      }
+    }
+  },
+  "portable_run_records": {
+    "schema": "experiment.run/v1",
+    "deployed": true,
+    "cloud_handoff": "passed",
+    "evidence": "run-records.json"
+  }
+}

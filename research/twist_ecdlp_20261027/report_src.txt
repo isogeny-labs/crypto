@@ -1,0 +1,133 @@
+Scope. Ten experiments (E0-E6, G1-G3) on whether the quadratic twist E' of E/F_q can help solve the ECDLP on E. All computation was PARI/GP 2.15.4 (Python only plotted recorded values). Sizes are toy to 40 bits: odd p <= 20011 (E0-E3, E6, G2, G3 up to 24-bit q), binary m <= 19 (E4), 20-40 bit primes (E5, G1). Operation counts are the primary cost metric; wall times are contention-affected and are not used as evidence. Every number is copied from the experiment's RESULTS.md, results.json or VERIFICATION.json. Nothing here is a solved ECDLP, a leaderboard row, or an improvement over index calculus or rho.
+
+Status rule. SUPPORTED only if the prediction held, the numbers reproduced (originally, after reconciliation, or the mismatch is diagnosed as timing/cosmetic only) and no major/fatal verifier issue is unresolved; REFUTED if the prediction failed robustly; otherwise INCONCLUSIVE with the reason.
+
+FIG
+
+## Summary table
+
+| ID | Status | Key result |
+| E0 | SUPPORTED | 2B=O always; B=O iff E(F_q)[2]=O; 0 violations in 8254 + 34,498 classes |
+| E1 + G3 (joint) | SUPPORTED (exact structure); rate claim INCONCLUSIVE at >= 20 bit | mixed solutions equal the predicted family exactly (0 target mismatches); none for m=2 or n_T=0 |
+| E2 | SUPPORTED | joint E+E' table costs 1.000-1.062 of separate runs; H_idea refuted |
+| E3 | SUPPORTED | F_{p^2} route costs 53.3-2812x more per E-relation than direct |
+| E4 | SUPPORTED | shared K0+K1 base: identical 773,404 K0 relations, 2.0246x the counted solves |
+| E5 | INCONCLUSIVE | Kummer walk 4.6x-6.2x dearer than A0 at I/M=3, but F1/F2 formally fired and the A1 baseline failed; unresolved major stats issue |
+| E6 | SUPPORTED (construction only) | gluing family verified on 221 curves; no-gain is model-derived, H4 unverified |
+| G1 | SUPPORTED | sound negation-map rho N1 solves 100%; K-mix costs 1.287-5.907x N1, no row below 1 |
+| G2 | INCONCLUSIVE | decoupled arm >= 1.0069x baseline, but the bound is an identity of the metric; unresolved major stats issue |
+
+## E0 separation lemma: SUPPORTED
+
+Hypothesis. A+B in E(F_q) with A in E(F_q) and B in the embedded twist group forces 2B=O (true half of the task lemma); B=O holds iff g2=|E(F_q)[2]|=1; coprime odd parts of #E and #E' are neither necessary nor sufficient. Registered as H_sharp against the literal H_literal.
+Prediction. 0 violations of S1-S9 in every tier; the literal lemma fails iff g2>1 (off-diagonal 0); every ordinary binary curve fails, supersingular none; odd p with t=0 all fail; |Hom(E(F_q),E'(F_q))|=1 iff gcd(#E,#E')=1.
+- Operation counts (formula-derived from recorded rows, not instrumented): T1 18,788,752 pair additions and 18,487,504 F_{q^2}-scan ordinate evaluations over 8254 classes; T2 (B-only) 6,365,742 phi(B) candidates and 12,662,488 ordinate evaluations over 34,498 classes; counted-op totals 37,869,808 (T1) and 25,393,972 (T2). Field multiplications not counted.
+- Exhaustive (exact, no sampling intervals): 0 violations in T1 (8254 classes), T2 (34,498 classes), T3 (1448 unreduced curves). 2x2 table T1 6272/0/0/1982, T2 24,748/0/0/9750. Binary supersingular m=8,9 sample: 4000 curves, 0 violations (one-sided 95% bound 7.49e-4).
+- Counterexamples to the literal B=O with coprime odd parts: q=7 curve (0,1) t=-4 (#E=12, #E'=4), q=31, q=127; classes with coprime odd parts and literal lemma failing: 1392 (T1), 6530 (T2), 620 (T3). Odd-p fraction with #E even 0.664553 (329,686 of 496,102).
+- Hom check: gcd=1 iff Hom=1 on 1054 classes; isogeny BFS found 0 neighbours with wrong cardinality and 0 t != 0 classes reaching E'.
+Controls. PC1-PC3 and NC1-NC3 all pass, 2944 rows, 0 fails; an aggregator mutation test turns M1/M2 non-zero.
+Replication. reproduced=true (second full run, results.json identical apart from the later-added ops keys).
+Verdicts. math not refuted (minor); stats not refuted (minor). Caveats: ops are closed-form, not instrumented; "pair additions avoided" is counterfactual; T1 and T2 totals are not like-for-like; T2S near-vacuous; the replicate shows determinism only; the counterexamples are trivial (B is itself a rational 2-torsion point).
+Status. SUPPORTED. Scope: odd p <= 199, binary m <= 10; beyond that the claim rests on the one-line argument pi(A+B)=A-B. For R of odd order the twist part is exactly O.
+
+## E1 + G3 mixed-solution census (joint verdict)
+
+Question. E1 (original census) and G3 (recalibrated rerun, new seed, 13 primes) address one question: in Semaev decompositions of R in E(F_q), do twist-class (mixed) solutions add anything beyond the structural family?
+Hypothesis. Frobenius gives A=B=T in E[2](F_q), so m=2 has no mixed solutions; for m=3 mixed solutions equal the predictor S (needs n_T>0) and none are non-degenerate for n_T=0; the rate is about c*n_T/q relative to E-only.
+Prediction. E1: N_M=S exactly, mixed/E-only <= 5/q (H2), baseline within [0.7,1.4] (H3). G3: same exact claims, plus 20-bit c_hat/c_ref in [0.8,1.25] and a calibrated NC2 gate.
+- E1 measured (592 configs, 91,200 config-target pairs). Operation counts: 414,817,366 S_3 root-set evaluations (m=2 263,795,800; m=3 151,021,566 of which 129,453,766 table builds); brute-force-equivalent 7.37e12 tuples (not run). 0 mismatches observed vs predicted mixed; 41,815,598 non-degenerate E-only solutions with n_T=0 and 0 mixed. The 5/q cutoff fired in 6 of 143 resolvable configs under Wilson intervals; a target-cluster bootstrap leaves 1 of 6 marginal. NC2 literal gate passed in 3 of 16 cells (F6 unmet; 14 of 16 post hoc). Formal outcome INCONCLUSIVE.
+- G3 measured (3312 grid configs, 508,800 targets, 0 truncated; resolution blocks 960,000 targets). Operation counts: 4,170,649,121 S_3 root-set evaluations (953,968,421 table plus 3,216,680,700 per-target). m=2: M_nd=M_deg=0 in 12 strata of 29,600 targets each. m=3, n_T=0: 179,694,796 non-degenerate E-only solutions, 0 mixed (f <= 8.28e-8). n_T>0: target mismatches N_M != S = 0.
+- Rate ratio c_hat/c_ref (95% hierarchical interval): 0.9965 [0.9458, 1.0476] at 12 bit; 0.9935 [0.8302, 1.1412] at 16 bit; 0.8465 [0.2934, 1.4702] at 20 bit (31 mixed); R20 random+farey 1.1265 [0.3288, 1.8424] (1185 mixed); 24 bit unresolved (0 mixed in 720,000 targets, expectation 0.061, because the two factor bases contain no tau-pairs). The E1-literal 5/q test fires in 44 G3 configs (all n_T=3), so 5/q is not a valid bound; the 12-bit excess in E1 is explained by realised composition, c_ref = 1.5 (nW/nE)^2 (#E/q).
+Controls. E1: stage 0 PASS (640+320 rows), PC1 400/400, PC2 400/400, PC3 800/800, NC1 0 mixed in 32 groups, NC3 0 bad of 32. G3: V0 640 rows, PC1 800/800, PC2 600/600, PC3 1200/1200, NC1 480/480 and 840/840, NC3 72 lines 0 bad, calibrated NC2 32/32 cells (max |D| endpoint 0.01443 against margin 0.05), G5 21/21 byte-identical.
+Replication. E1: reproduced=false as recorded; reconciliation diagnosed an incomplete (still-running) replicate with no mismatched number; the full second run in E1-replication is bit-identical on non-timing numbers; reduced run 64 of 64 12-bit files identical. G3: reproduced=true (13/13 subset files byte-identical).
+Verdicts. E1: math not refuted (minor; an independent group-law recount matched exactly), stats refuted (minor; Wilson intervals ignore clustering, NC1 tautological, replications show determinism only). G3: math not refuted (minor), stats refuted (minor): the label prediction_confirmed is too strong for the rate claim; the twistmult stratum falls below c_ref and was excluded; the calibrated NC2 null mostly exercises the rational-root branch.
+Joint status. SUPPORTED for the exact structural claim (decisive in G3, independently recomputed in the E1 and G3 verification). INCONCLUSIVE for the rate claim at >= 2^20 (supported at 12-16 bit with ratio about 0.99, intervals too wide at 20 bit, untested at 24 bit).
+
+## E2 twin-target amortization: SUPPORTED
+
+Hypothesis. H_idea: one summation table serves E and E' at cost(E)(1+eps), eps << 1. H_mech: disjoint key support (mixed pairs have F_{p^2} abscissas), so eps is about 1.
+Prediction. Median eps in [0.95,1.05] per cell, sav in [0,0.02], 0 entries usable by both curves, identical single-curve relation sets, PC1 gate R(mu=3)<=0.65 and R(0.75)>=0.85. Falsifier of H_idea: all cell medians eps >= 0.75.
+- Measured: 63 runs (27 at 22 bit, 27 at 26 bit, 8 at 30 bit, 1 at 32 bit), 0 failed, 0 capped. Operation counts (26 bit, mu=1.5, per half): 186,355 pair steps, 185,745 square roots, 7.07e6 sort comparisons (1.49e7 for the joint array), 180,586 E target additions, probes 3.54e6 standalone vs 3.72e6 joint; rho reference median steps 3555.5 (22 bit), 12,217 (26), 63,310.5 (30), 129,578 (32).
+- eps cell medians: w=0 0.975-1.007; w=0.1 1.073-1.114; w=1 1.091-1.172. sav 0 at w=0 and -0.033 to -0.062 at w>0; best-case joint accounting sav <= 1.6e-4. Distance to rho (relation phase over rho): 8.7-56 (w=0), 88-1215 (w=1).
+Controls. PC1 R(mu=3) 0.552 (22 bit), 0.558 (26 bit); R(0.75) 0.924, 0.935; gate PASS. L1: 58,564 mixed pairs at 22 bit, 0 rational roots, key-half intersection 0. L2: 0/2000 rational sums at two primes, positive control 2000/2000. NC1 14,418 wrong-curve hits, 0 verified; NC2 median hit ratio 1.006, 0/126 with |z|>3; 0 cross-type hits in 63 runs.
+Replication. reproduced=false as recorded (replicate still running). Reconciliation: the completed run is byte-identical for results.csv, summary.csv, analysis.out, L1/L2 and rho files; 78 raw files differ only in wall-clock columns; results.json is identical after the documented cosmetic fix and opcounts step. Diagnosed incomplete run, no scientific difference.
+Verdicts. math not refuted (minor), stats not refuted (minor). Caveats: at w=0, sav=0 and eps about CEp/CE is an accounting identity; PC1 validates the formula, not an independent detector; the grid confirms the cost arithmetic while the content is the lemma checks L1/L2; secondary predictions P1 (at w>0), P2, P4, P6, P7 partly failed through the sort/probe pricing; the rho reference has no negation map.
+Status. SUPPORTED (H_idea refuted, H_mech held). Scope: m=2, prime field, prime order, same-N table sharing, 22-32 bit; extension-field bases untested.
+
+## E3 eigen-decomposition over F_{q^2}: SUPPORTED
+
+Hypothesis. For a target R'=A+B the F_{p^2} route (2m terms, project by (1 plus or minus pi)/2) costs more per useful E-relation than direct m-term Semaev decomposition (H1); needs about 2m terms with only E-type terms useful (H2); every E-part is a direct relation of A (H3); the separation lemma holds for odd #E (H4).
+Prediction. P1 rho_gen >= 2 in every powered cell (falsifier: 99% interval below 1); P2 within 3x of the model in >= 80% of cells; P4 mean j/m2 in [0.35,0.65]; P5/P6 0 exceptions on odd order and > 0 on an even-order curve; P7 solver/table equality and X_4 per-solve time >= 4x D_2.
+- Measured: 36 cells, 33 powered, T=200 targets, p=101-401, N<=40. Operation counts: root-solves D 93,000 vs X 36,296,000 over powered cells (work 258,800 vs 662,348,800); per-relation root-solve ratio 6.66-703, group-sum ratio 93.3-2031; example p=101 N=16: D 168 relations from 1400 root-solves, X 351 from 112,000.
+- rho_gen (cost per E-relation, X over D) 53.3 to 2812 (lowest 99% CI end 27.3); rho_exact 237.8-2812; rho_gen/rho_model 0.705-2.40. Mean j/m2 = 0.442 over 235,155 relations. Lemma: 0 violations in 1,965,600 odd-order decompositions; even-order B != O in 2860 of 655,200, 2B != O never.
+Controls. PC1 0 mismatches in 300 pair sums; PC2 30/30 targets; PC3 24 of 24 cells; NC1 0 violations; NC2 0 of 36 cells with p<0.01; NC3 0 hits.
+Replication. reproduced=true (counts and results.csv bit-identical across two reruns; X_4/D_2 per-solve wall ratio 61.6-119.5 original, 77.9-177.3 replicates).
+Verdicts. math not refuted (minor), stats not refuted (minor). Required corrections: the RESULTS.md Semaev D_2 root-solve counts 2500, 3500, 1500 are inflated 50x by timing repeats (true 50, 70, 30); several controls (P3, P5, NC3, NC2, odd-order H4) cannot fail; the target design (B uniform nonzero) differs from a real ECDLP target (B=O), under which the route is vacuous; the work unit under-charges X; the op-count work ratio equals rho_gen by construction.
+Status. SUPPORTED on toy fields (p <= 401, N <= 40, m=2,3). The headline numbers are unaffected by the one erroneous secondary count.
+
+## E4 Koblitz twist pair: SUPPORTED
+
+Hypothesis. For K0: y^2+xy=x^3+1 and K1: y^2+xy=x^3+x^2+1 over F_{2^m}, a shared x-only F_2-subspace base yields exactly the K0 relations of the E-only base (rational x3 iff same type, Tr(x+1/x)); the K1 half is pure overhead.
+Prediction. 0 cross-type rational pairs, Delta_rel=0, counted-solve ratio about 2 (band [1.6,2.5]), CPU ratio [1.3,2.3], PC1 N_rel ratio [3,5].
+- Measured (m in {11,13,17,19}, 345 V draws). Operation counts: Stage 1 16,069,473 candidate pairs (8,041,383 same-type, 8,028,090 cross-type), 16,154,181 rational triples (formula-exact in 345/345); Stage 2 counted solves on K0 targets 21,361,840 (E-only) vs 43,249,080 (shared), pooled ratio 2.0246 (median 2.0159); K0 relations 773,404 vs 773,404 (Delta 0, 0 mismatching targets, 0 cross); solves per K0 relation 27.62 vs 55.92; cell medians 1.91-2.21.
+- Mixed F_{q^2} sums landing in F_q: 0/600. CPU ratio median 1.592 (secondary; all 42 cells above the NC1 band [0.817,1.240]).
+Controls. PC2 cross fraction 0.4993-0.4998; PC3 pass; PC1 relation ratio 3.92-4.21 and cost-per-relation 0.47-0.51 in all 18 random cells, but 2 of 18 single-draw poly cells fall outside the window (m=13 l=6: 5.275/0.411; m=19 l=8: 5.500/0.370); NC1 identical in 345 draws; NC3 pass.
+Replication. reproduced=false as recorded: one stage-2 cell hit the 900 s timeout under contention (19 of 20 draws). Reconciliation: that cell run alone finished in 4m47s with columns 1-40 identical; all other files identical; reduced replication IDENTICAL.
+Verdicts. math not refuted (minor; independent recomputation of Stage 1 and six Stage-2 cells), stats not refuted (minor). Caveats: the 2.02x counted-solve ratio is an accounting identity (N0V+N1V)/N0V; gating PC1 on the random population is an operationalisation (a strict reading would label the result INCONCLUSIVE); "24 poly cells" in RESULTS.md should read 18.
+Status. SUPPORTED. Scope: Semaev m=2, x-only subspace bases, this curve pair; nothing for m>=3.
+
+## E5 Kummer-line multiplicative walk: INCONCLUSIVE
+
+Hypothesis. An x-only Montgomery multiplicative walk (shared by E and E') is not an improvement over matched additive rho in counted work (H5); exact orbit structure (H1); step counts (H2); the twist gives no cross-curve collision (H3); per-step cost 21.5 M + 12 S + 1 I against 2 M + 1 S + 1 I (H4).
+Prediction. K-pure/A0 steps [0.8,1.3], K-mix/A0 [0.55,0.9], K-mix/A1 [0.75,1.15]; total counted cost above A0 at I/M=3, 10, 30; no ordering across the whole band.
+- Measured (b=20-40 bit, 2 instances per size, GP). Operation counts (b>=28, 272 trials per arm, mean per trial): A0 189,621 steps, 379,242 M, 189,621 S, 189,621 I; K-pure 200,625 steps, 4,314,448 M, 2,408,078 S, 200,625 I; K-mix 152,664 steps, 3,282,009 M, 1,831,815 S, 152,664 I; K-pure on twist 212,539 steps. Per-step cost 21.505 M + 12.003 S + 1.000 I (0.023% from prediction).
+- Step ratios: K-pure/A0 1.058 [0.959, 1.170]; K-mix/A0 0.787 [0.709, 0.872]. Cost ratios (S=0.8 M, b>=28) at I/M=3, 10, 30, 100: K-mix/A0 4.625, 2.526, 1.466, 1.003 [0.904, 1.113]; K-pure/A0 6.221, 3.397, 1.971, 1.349. Twist K-pure over E ratio 1.002 [0.896, 1.114]; 0 cross-curve collisions in 144 trials.
+Controls. Ladder vs ellmul 624,000 tests, 0 mismatches; PC1 SB walks 400/400, but proper-subgroup (S_idx) walk recovery was 165/274 = 60% (below the 98% bar, F1 clause fired; explained post hoc by DP-free cycles at N=138); NC1 0/80; NC2 0 matches; NC4 0/24,000.
+Replication. reproduced=false as recorded. Reconciliation: the replicate skipped cells under a wall-clock rule (nondeterminism in the skip rule, now frozen in skip.list); after the fix two full runs gave 89/89 cell files identical and a byte-identical results.json.
+Verdicts. math not refuted (minor). Stats REFUTED with severity MAJOR (not reconciled): the label prediction_confirmed overstates; F1 and F2 formally triggered under the preregistered rules; the H4 "no ordering" sub-claim is false for K-pure/A0 (dearer at all four I/M); the preregistered A1 baseline failed (solves 114/120 at b28, 9/80 at b32, 0/48 at b36) so F5 is not evaluable; the post-hoc a1c reference degrades at b >= 36; CIs omit instance variance; native work was not priced at 0/0.1/1 GAE (an I/M band was used).
+Status. INCONCLUSIVE. Reason: the headline direction (no improvement over A0) is robust (gap to matched rho 4.6x K-mix, 6.2x K-pure at I/M=3), but registered falsifiers fired and an unresolved major stats issue remains. G1 supplies the missing sound negation-map reference and confirms the direction.
+
+## E6 genus-2 gluing: SUPPORTED (construction only)
+
+Hypothesis. H1-H3: E[2] and E'[2] are isomorphic Galois modules; each non-identity equivariant phi gives C: Y^2=f(a x^2-mu) with Jac(C) (2,2)-isogenous to E x E', charpoly (T^2-tT+p)(T^2+tT+p), #Jac=#E*#E'. H4 (pullback injection, odd parts) is not numerically computed. H5 (no gain) is a cost model only.
+Prediction. P1-P8 (all checks 100%; null hit rates under 3%/1.5%/1%); F6: no-gain falsified in the model only if median c_tie_full >= 1 or the slope >= -0.25.
+- Measured (221 curves, p=101..20011). Operation counts: 2127 candidate root-permutation tuples, 1160 Stage-C records (one hyperellcharpoly call each), 3,272,208 degree-3 polynomial evaluations over F_p, 2,789,872 degree-6 evaluations over F_{p^2} (112 brute-force records); no group operation on Jac(C) or E is executed.
+- Stage A 221/221; B0 221/221; target arm 580/580 on match, nJ=nE*nEt, quotients, nE|nJ; control arm nJ=nE*nEt only 11/580 (all t=0); brute force 112/112. Model c_tie_full median 0.12471 (p=101) to 0.0088727 (p=20011), slope -0.5005; model index-calculus over rho ops 8.0 (p=101) to 112.7 (p=20011), a model and not a measurement.
+Controls. PC1 1300/1300; NC1 0/1300 flagged; NC2 null hits 6/3000, 3/3000, 2/2000, 0/1000, 0/200; NC3 221/221.
+Replication. reproduced=false as recorded (still running). Reconciliation: the full replica is byte-identical in all raw files, summary and opcounts; one driver path defect fixed.
+Verdicts. math not refuted (minor; own scan confirms 2/1/5 gluings per pattern and 34/49/16, 70/105/34 distinct j), stats not refuted (minor). Caveats: f(-mu)=0 cannot occur for the interpolation mu (the preregistered 3/p was wrong; the observed 0 is a theorem); P7 and NC1 are guaranteed; NC2 is mis-targeted (about 4% in-family charpoly coincidences at p=211); lower-median convention; Wilson intervals per record, not per curve.
+Status. SUPPORTED for the construction (H1-H3). H4 unverified, H5 model-only; no genus-2 index calculus or Jacobian arithmetic was run.
+
+## G1 sound negation-map rho baseline: SUPPORTED
+
+Hypothesis. A matched negation-map rho N1 (r=32, 2-cycle plus Brent cycle test, canonical-doubling escape) solves >= 95% (G1-H1); K-mix and K-pure are not cheaper than N1 at any I/M in {3,10,30,100} with native work at 0 (G1-H2); pricing native work at 0.1 and 1 GAE leaves large-I/M cells unresolved (G1-H3).
+Prediction. steps N1/A0 0.80 (0.72-0.92); K-mix/N1 0.98 (0.85-1.12); cost K-mix/N1 5.6, 3.1, 1.8, 1.25 with lower CI limit above 1.
+- Measured (20 instances over b=24-40; N1 trials 240/240/180/120/104, all solved). Operation counts per step (b>=28): N1 2.047 M, 1.031 S, 1.016 I (131,915,962 steps); A0 2.000/1.000/1.000 (96,454,351); K-mix 21.499/11.999/1.000 (76,188,339); K-pure 21.504/12.002/1.000 (103,007,317).
+- Steps N1/A0 0.748 [0.686, 0.814]; K-mix/N1 1.025 [0.944, 1.118]; K-pure/N1 1.422 [1.286, 1.568]. Cost K-mix/N1 (w=0) at I/M=3, 10, 30, 100: 5.907 [5.438, 6.438], 3.235, 1.879, 1.287 [1.185, 1.403]; K-pure/N1 8.193, 4.486, 2.606, 1.785. At w=1 (set B): 1.768, 1.314, 1.084 [0.998, 1.182], 0.984 [0.906, 1.073], so I/M=30 and 100 are unresolved under rule 5a, not a K-mix win.
+Controls. PC1 pass; PC2 0.748 in [0.71, 0.80]; n1sab 2/30, 1/30, 0/30, 0/12 at b24-36; n1c2 fires only at b36; NC2 split-half 0.965-0.989 at b24-36 but 0.872 at b40 (outside [0.9,1.1], reported miss); r=64 steps ratio 0.827 (b36), 1.042 (b40).
+Replication. reproduced=false as recorded. Reconciliation: 64 of 66 raw cells identical; the two NC1 b36 cells stop at the 840 s cap (12/20 and 10/20 trials originally, full 20/20 in the replica with identical prefixes and unchanged verdict); an append bug in output scripts fixed.
+Verdicts. math not refuted (minor: A0 R column on a different normalisation; the K ladder is an upper bound, an ideal chain gives about 1.2 instead of 1.287 at I/M=100; the asymptote is about 1.009, not 1.025), stats not refuted (minor: 4 clusters per b, no positive control on the cost ratio, n1c2 weak below b36).
+Status. SUPPORTED. Distance remaining at the largest I/M with native work at 0: K-mix 1.29x and K-pure 1.79x the matched rho.
+
+## G2 decoupled A/B projection arm: INCONCLUSIVE
+
+Hypothesis. Decoupling the E3 route (project A=(R+pi R)/2 and B=(R-pi R)/2, decompose separately) and adding a same-term-count direct arm D_2m does not change the E3 conclusion: no twist arm beats D_m in cost per independent E-relation, and the projection on class-S targets (R in E(F_p)) is an exact tie.
+Prediction. H1 rho_E(P,S)=1.000; H2 rho_E(P,F)=1+W_T(k)/W_D(j) > 1 (magnitude 1.5-3 for j=k=m, 1.03-1.15 for (m,1)); H4 corrected rho against D_2m does not cross 1; H5 no 99% interval below 1.
+- Measured (15 curves, 110 curve-cells, 200 targets each; 22 powered primary pooled cells). Operation counts (primary curves, family A / B root-solves, work unit = candidate tuples times degree): D_m 192,400 / 148,800; PF(m,1) 198,800 / 151,200; PF(m,m) 448,000 / 643,200; D_2m 43,713,600 / 2,067,200; X 167,270,400 / 528,998,400; loop-vs-formula mismatches 0 of 110.
+- rho_E: class S exactly 1.000 in all 110 curve-cells; PF(m,1) 1.0069 (= 145/144; B, p=101, N=20) to 1.1111; PF(m,m) 2.087 to 8.333; 0 of 22 cells below 1; the pair-count metric is below 1 in 12 of 22 (a relabelling).
+Controls. PC1 0.500/2.000 in 22 of 22; synthetic pcsynth pass; PC4 32 of 32; PC5 0 mismatches over 5 cells; NC1 0 violations over 3000 odd-order targets (368 even-order boundary cases); NC2 0 of 110; NC4 0 hits for B != O.
+Replication. reproduced=false as recorded. Reconciliation: all counts and statistics byte-identical; only the NC3 half-width (0.331 vs 0.312, a timer quantity) and a missing jq-built operation_counts block (now scripted) differ. Diagnosed timing/cosmetic.
+Verdicts. math not refuted (minor). Stats REFUTED with severity MAJOR (not reconciled): rho_E = 1 + W_T/W_D >= 1 is an algebraic identity of the metric (the A-side yield cancels), so the grid cannot falsify it; the positive controls inject factors or use the pair relabelling; the 99% curve-level intervals resample only 2 curves (degenerate); the distance 0.0069 is a unit artefact (1/36 = 0.0278 in unweighted tuples); the "root-solves" column is tuples times 2^(j-1); the H2 magnitude and the H4 not-crossing predictions failed (H4 second rho 0.2066-1.790, below 1 in 10 of 22 cells).
+Status. INCONCLUSIVE. Reason: the headline holds by construction, not by test; the substantive support for "no help on a class-S target" is the B=O lemma (E0), not this grid.
+
+## Overall conclusion (strictly scoped to the sizes tested)
+
+What the twist cannot do. At the sizes tested (toy to 40-bit prime fields, binary m <= 19, m=2,3 decompositions, x-only and Semaev/summation arms): for a target R in E(F_q), any decomposition through twist-class points has twist part B in E(F_q)[2], so B=O for odd-order R and A=R (E0: 0 violations in 44,200 classes; E1/G3: 0 mismatches against the structural predictor over 91,200 and 508,800 targets). Every tested use of the twist cost at least as much as its matched baseline in counted operations and no row went below 1: a joint E+E' table saved nothing (E2, 1.000-1.062); the F_{q^2} route cost 53-2812x more per E-relation (E3); the Koblitz shared base doubled the counted solves for identical relations (E4, 2.0246x); the Kummer x-only walk cost 4.6-6.2x A0 at I/M=3 and 1.29-5.9x the sound negation-map rho (E5, G1; unresolved only under rule 5a pricing at the largest I/M and w=1, never a win); the decoupled projection cost at least 1.0069x direct decomposition with an exact tie on subfield targets (G2, an identity). No twist-based arm is an improvement over the index-calculus baseline or rho here, and E5 and G2 are formally inconclusive.
+
+What the twist can do. It supplies exact verified structure: the separation lemma, a mixed-solution family for n_T>0 at rate about c_ref n_T/q, the Frobenius eigen-decomposition, a genus-2 gluing family with #Jac=#E#E', and a second independent DLP on E' of order n'. These are structure, not speedups; the genus-2 cost comparison is a model only.
+
+Open questions. (1) The mixed-solution rate at 2^20 to 2^24 and for m >= 4 (G3 20-bit intervals span [0.29, 1.47]; 24 bit unresolved). (2) Extension-field factor bases, larger m, and real Semaev/summation solvers (E2, E3, E4 are toy m=2 or 3 designs). (3) A measured genus-2 or Jacobian arm: Cantor arithmetic, a real rho or index-calculus run on Jac(C), and numerical verification of H4. (4) GAE 0/0.1/1 pricing of every arm including rho (E1-E4 and E6 use work units or models; E5 and G1 used an I/M band and a native-work set). (5) Whether a cheaper x-only step (ideal Lucas chain about 22 M-equivalents vs 31 for the ladder; projective or batched inversion) moves the Kummer walk below negation-map rho at large I/M; the K-mix/N1 step-ratio interval [0.944, 1.118] contains 1. (6) A decoupling metric that is not an identity (G2). (7) Replications with different seeds and code, since every replication here is a same-seed determinism check.
+
+## Files
+
+Per experiment: PREREGISTRATION.md, RESULTS.md, results.json, VERIFICATION.json in its directory under twist_ecdlp. Summary graph: summary.svg and summary.png (plot_summary.py). No repository file, benchmark row, leaderboard or PR was touched.

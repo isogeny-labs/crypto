@@ -1,0 +1,34 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Explicit genus-2 infinity chart: domain and DVR}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Object.} For every field $K$ and every $a_3,a_2,a_1,a_0\in K$, put
+\[
+A=K[z,w]/(w^2-zU(z)),\qquad
+U(z)=1+a_3z^2+a_2z^3+a_1z^4+a_0z^5,
+\]
+and let $\mathfrak m$ be the kernel of evaluation at $(0,0)$. The local ring studied here is the explicitly constructed $A_{\mathfrak m}$.
+
+\medskip\noindent\textbf{Checked results.} The pinned Lean sources prove that $W^2-zU(z)$ is Eisenstein at $(z)$ as a polynomial over $K[z]$. An explicit variable swap and the multivariable polynomial equivalence transport irreducibility to $K[z,w]$. Hence $A$ is a domain. A degree argument proves that $w$ survives in $A$; injectivity of localization gives $w\neq0$ in $A_{\mathfrak m}$. The earlier chart proof established that $A_{\mathfrak m}$ is Noetherian and local with maximal ideal $(w)$. Mathlib's Noetherian local domain criterion now proves that $A_{\mathfrak m}$ is a discrete valuation ring and $w$ is an irreducible uniformizer there.
+
+\begin{center}
+\begin{tabular}{p{0.48\linewidth}p{0.37\linewidth}l}\toprule
+Statement & Lean theorem & Status\\\midrule
+Quadratic Eisenstein over $K[z]$ & \texttt{nested\_chart\_irreducible} & Checked\\
+$K[z,w]/(w^2-zU)$ is a domain & \texttt{chart\_ring\_domain} & Checked\\
+$A_{\mathfrak m}$ is a DVR & \texttt{origin\_stalk\_dvr} & Checked\\
+$w$ is its uniformizer & \texttt{stalkW\_irreducible} & Checked\\
+Projective infinity stalk is $A_{\mathfrak m}$ & No theorem & Open\\
+Divisor and $\operatorname{Pic}^0$ transfer & No theorem & Open\\
+Rust law semantic equivalence & No theorem & Open\\\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Scope.} The DVR is the localization of the affine equation. A projective completion and stalk isomorphism remain to be proved before transferring this uniformizer to the smooth projective curve. The principal divisor, Mumford reduction, and $\operatorname{Pic}^0$ steps, as well as Rust semantic correspondence, remain open. This packet changes no target counts, operation costs, or rho ratio.
+
+\medskip\noindent\textbf{Replay.} The formal sources are \texttt{Common22Eisenstein.lean} and \texttt{Common22Domain.lean} under pinned Lean 4.34.1. The build receipt \texttt{domain-dvr-build.log} contains the theorem axiom audits. The standardized data are \texttt{domain-dvr.csv} and \texttt{domain-dvr.json}; the dependency graph is \texttt{domain-dvr.svg}.
+\end{document}

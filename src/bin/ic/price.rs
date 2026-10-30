@@ -349,9 +349,27 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         }
     }
 
-    // Build, at the tier the workflow's own probe budget selects.
+    // Build, at the tier the workflow's own probe budget selects.  Under
+    // `KIC_FREE_RELATIONS=1` the build also hands back the pairs of base
+    // points whose sums share a key, and the relations they make (four
+    // base points summing to `O`, no probe) join the system first; the
+    // harvest and its resolution are charged to the build.
+    let free_on = std::env::var("KIC_FREE_RELATIONS").as_deref() == Ok("1");
+    let mut free = crypto_lib::cryptanalysis::koblitz_index_calculus::FreeRelations::default();
     let pair = if ic.strategy == DecompositionStrategy::PairTable {
-        Some(workflow::build_pair_table(&c, &fb, p).ok_or("field too wide for the pair table")?)
+        if free_on {
+            let (table, dups) = workflow::build_pair_table_harvest(&c, &fb, p)
+                .ok_or("field too wide for the pair table")?;
+            if let Some(dups) = dups {
+                free = table.free_relations(&dups);
+            }
+            Some(table)
+        } else {
+            Some(
+                workflow::build_pair_table(&c, &fb, p)
+                    .ok_or("field too wide for the pair table")?,
+            )
+        }
     } else {
         None
     };
@@ -373,6 +391,9 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
             None
         };
         clock.lap("collect_setup");
+        if let Some(cov) = coverage.as_mut() {
+            cov.add(&free.relations);
+        }
         for u in 0..p.collection.units {
             let aim = coverage
                 .as_ref()
@@ -391,9 +412,11 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
     clock.lap("collect");
 
     // Logs: verify, solve, and extend until determined.
-    let merged: Vec<CollectedRelation> = units
-        .values()
-        .flat_map(|(rels, _, _)| rels.iter().cloned())
+    let merged: Vec<CollectedRelation> = free
+        .relations
+        .iter()
+        .cloned()
+        .chain(units.values().flat_map(|(rels, _, _)| rels.iter().cloned()))
         .collect();
     let mut solver =
         FactorBaseLogSolver::new(&c, &fb, &ic).ok_or("factor base has no projected columns")?;
@@ -535,7 +558,16 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         .iter()
         .map(|(u, (rels, tr, sc))| json!([u, rels.len(), tr, sc]))
         .collect();
-    let counts = json!({
+    let free_counts = free_on.then(|| {
+        json!({
+            "raw_pairs": free.raw_pairs,
+            "same_row_own_orbit": free.same_row_own_orbit,
+            "unresolved": free.unresolved,
+            "trivial_or_repeated": free.trivial_or_repeated,
+            "relations_made": free.relations.len(),
+        })
+    });
+    let mut counts = json!({
         "select": {
             "points": fb.points.len(),
             "signed_orbits": fb.signed_orbits.len(),
@@ -569,6 +601,9 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
             "trials_total": trials.iter().sum::<usize>(),
         },
     });
+    if let Some(f) = free_counts {
+        counts["free_relations"] = f;
+    }
     Ok(Pass {
         ns: clock.ns,
         counts,
@@ -1549,6 +1584,128 @@ mod tests {
                 assert!(first.ns.contains_key(phase), "{phase} was not clocked");
             }
             assert_eq!(first.counts["descent"]["summands"], json!(descent));
+        }
+    }
+
+    /// **`ic.koblitz_descent` is this pipeline.**  On the committed rule v8
+    /// `k0n41` recipe with three seeds, ecbench's library pipeline
+    /// (`ecbench::koblitz_descent::run`, the method's code) and this
+    /// file's single-target pass give the same logarithm, the same
+    /// collection trials, relations, summands scanned and units, the same
+    /// table and the same descent trials — and both give the numbers this
+    /// pass gave before the operation counters were added to the
+    /// arithmetic (`ic price --single-target` on the unmodified binary,
+    /// recorded 2026-10-26), so counting changed no result.
+    #[test]
+    fn the_ecbench_koblitz_descent_pipeline_is_this_pass() {
+        use crypto_lib::cryptanalysis::ecbench::koblitz_descent::{self, DescentParams};
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/research/ic_tool_program/rule/v8/runs/k0n41/T01.params.json"
+        );
+        // seed → (trials, summands scanned, relations, units, descent trials)
+        // from the unmodified binary.
+        let before: [(u64, [u64; 5]); 3] = [
+            (201, [9968, 2_017_897, 86, 16, 49737]),
+            (202, [11837, 2_426_585, 80, 19, 1083]),
+            (203, [10591, 2_017_897, 82, 17, 65897]),
+        ];
+        for (seed, want) in before {
+            let mut p = workflow::load_params(std::path::Path::new(path)).expect("k0n41 params");
+            p.seed = seed;
+            p.factor_base = serde_json::from_value(json!({
+                "mode": "spec", "spec": {"kind": "subgroup_orbits", "points": 6560, "seed": seed}
+            }))
+            .expect("factor base");
+            let c = experiment::curve(41, 0, 1, 1).expect("curve");
+            let (q, expected, record) =
+                workflow::resolve_target(&c, &p.targets[0]).expect("target");
+            let target = Target {
+                q: q.clone(),
+                expected,
+                record,
+            };
+            let pass = one_pass_with(
+                &p,
+                PassTargets::Online {
+                    target: &target,
+                    strict: false,
+                },
+            )
+            .expect("ic price pass");
+            let dp = DescentParams {
+                summands: p.summands,
+                descent_summands: p.descent_summands.unwrap_or(p.summands),
+                collection_aim: p.collection_aim,
+                collection_window: p.collection_window,
+                factor_base_points: 6560,
+                seed,
+                unit_trials: p.collection.unit_trials,
+                units: p.collection.units,
+                max_units: p.collection.max_units,
+                max_trials: p.max_trials,
+            };
+            let out = koblitz_descent::run(&c, &q, &dp).expect("ecbench pipeline");
+            let k = &pass.counts;
+            let got = [
+                out.counts.trials,
+                out.counts.summands_scanned,
+                out.counts.relations_collected as u64,
+                out.counts.units as u64,
+                out.counts.descent_trials as u64,
+            ];
+            let price = [
+                k["collect"]["trials"].as_u64().unwrap(),
+                k["collect"]["summands_scanned"].as_u64().unwrap(),
+                k["collect"]["relations_collected"].as_u64().unwrap(),
+                k["collect"]["units"].as_u64().unwrap(),
+                k["descent"]["trials_total"].as_u64().unwrap(),
+            ];
+            assert_eq!(got, price, "seed {seed}: ecbench pipeline vs ic price pass");
+            assert_eq!(
+                price, want,
+                "seed {seed}: ic price pass vs the unmodified binary"
+            );
+            assert_eq!(
+                pass.recovered,
+                vec![out.recovered.as_ref().map(ToString::to_string)],
+                "seed {seed}"
+            );
+            assert_eq!(
+                out.recovered.as_ref().map(ToString::to_string).as_deref(),
+                Some("291928610698"),
+                "seed {seed}"
+            );
+            assert!(pass.all_verified && out.verified, "seed {seed}");
+            let per_unit: Vec<Value> = out
+                .counts
+                .per_unit
+                .iter()
+                .map(|u| json!([u[0], u[1], u[2], u[3]]))
+                .collect();
+            assert_eq!(
+                json!(per_unit),
+                k["collect"]["per_unit_index_relations_trials_summands"],
+                "seed {seed}"
+            );
+            assert_eq!(
+                json!(out.counts.pair_table_entries),
+                k["build"]["stored_pairs"]
+            );
+            assert_eq!(json!(out.counts.pair_table_tier), k["build"]["tier"]);
+            assert_eq!(json!(out.counts.columns), k["select"]["columns"]);
+            assert_eq!(
+                json!(out.counts.relations_accepted),
+                k["logs"]["relations_accepted"]
+            );
+            assert_eq!(
+                json!(out.counts.solve_attempts),
+                k["logs"]["solve_attempts"]
+            );
+            assert_eq!(
+                serde_json::to_value(out.counts.selection).unwrap(),
+                k["select"]["selection_cost"]
+            );
         }
     }
 }

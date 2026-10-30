@@ -1,0 +1,16 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "BEST2 counted model; NOT NIST GPU cost",
+  "description": "One-target seeded selection model with every candidate add and cycle seek charged. Hashed predicates and generic group arithmetic differ from CUDA. No transfer of its cost ratio to P-256/P-384.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 16, "target_seed": 20261027, "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "plus-model", "role": "baseline", "method": {"id": "rho.plus_model_v1", "params": {"jumps":"256","walks":"64","dp_bits":"8","cap_multiple":"10000"}}},
+    {"name": "best2-model", "role": "candidate", "method": {"id": "rho.best2_model_v1", "params": {"jumps":"256","walks":"64","dp_bits":"8","cap_multiple":"10000"}}},
+    {"name": "plus-aa", "role": "control", "method": {"id": "rho.plus_model_v1", "params": {"jumps":"256","walks":"64","dp_bits":"8","cap_multiple":"10000"}}}
+  ],
+  "measurement": {"rounds":5,"warmup":1,"order":"alternate","seed":20261027,"isolation_required":"L2","timeout_seconds":300}
+}

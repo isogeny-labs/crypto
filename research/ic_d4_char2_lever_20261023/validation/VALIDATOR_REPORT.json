@@ -1,0 +1,831 @@
+{
+ "schema": "validator-report/v1",
+ "id": "VAL-20261028-d4c2lv",
+ "status": "pass",
+ "verdict": "validated-with-caveats",
+ "independent": true,
+ "validator": "Validator subagent (claude-opus-5-5); did not produce the sessions, code or report",
+ "snapshot": {
+  "branch": "claude/ic-d4-char2-lever-20261023",
+  "validated_content_commit": "079e1022a3d7b9fd8895060a68cbd88ab8d55f30",
+  "pr_head_at_validation": "01dbef2b77cd454ab1f285afb8bec3c4c5ad99fc",
+  "pr_head_note": "01dbef2b7 = merge of origin/main + rustfmt/clippy-allow; nothing under research/ic_d4_char2_lever_20261023/ changed. 2ec8a532c (artifact-autofix) later moves results/lever-m12/records.jsonl to the artifact store with the same sha256 c43a5ed8...; hydrate with `tools/artifacts/artifacts.py pull research/ic_d4_char2_lever_20261023` before `validation_gate.py evidence`.",
+  "sessions_measured_at": "d2eec8df3394d38ded8c8f1628b1c219f9647a65"
+ },
+ "method": "records.jsonl read directly by the validator's own script (scratchpad recompute.py, Python stdlib, Decimal/Fraction); cmp-*.json, table-*.tsv and tabulate.sh were not used to compute, only read afterwards as the 'claimed' side.",
+ "raw_data": [
+  {
+   "path": "results/lever-m12/records.jsonl",
+   "sha256": "c43a5ed85d19b6277cbac2a25b6087cc0e616c9544c6310a450cab0d46ee3ef2"
+  },
+  {
+   "path": "results/lever-m12/session.json",
+   "sha256": "b51c35df83ab93d0cd05f5fe7842e1aa851ee2cf6abf53ea086e00d16e3c0412"
+  },
+  {
+   "path": "results/lever-m12/plan.json",
+   "sha256": "144b83ee666388756c963b06da57575e6c62dbf3e2e2b4644a48ee6773d28692"
+  },
+  {
+   "path": "results/lever-m12/host.json",
+   "sha256": "1965dfe88ad7c174e107550fda04bfcba6c90a35506e6e6b353e90230808b172"
+  },
+  {
+   "path": "results/lever-m12/spec.json",
+   "sha256": "371ec4aa9c9a64ec565bfcd0b09172d12b35ad996df26311a568791239f52262"
+  },
+  {
+   "path": "results/lever-m14/records.jsonl",
+   "sha256": "55662a4cad16bc6b18c2fe6eb8804a087cdf65e1d35ddfbf0ffaea0fd6bb1292"
+  },
+  {
+   "path": "results/lever-m14/session.json",
+   "sha256": "4581738f9690972307b0c03e5dc2139653dc52473edb4189168b4dec86817ea1"
+  },
+  {
+   "path": "results/lever-m14/plan.json",
+   "sha256": "de47854f7788b2b9758258e30d61ed8ddc96a9c96d51532970e7730dd6047f1f"
+  },
+  {
+   "path": "results/lever-m14/host.json",
+   "sha256": "299181867cb69ed885cd3d9119c2b8c84ce2b6cbc0bf50ac269533faf48057a8"
+  },
+  {
+   "path": "results/lever-m14/spec.json",
+   "sha256": "eb5716d2eeafc0e6a2c186dc4af14d4451513029f7a8bdb8d51951ddaa3c725b"
+  },
+  {
+   "path": "specs/SPEC-lever-m12.json",
+   "sha256": "371ec4aa9c9a64ec565bfcd0b09172d12b35ad996df26311a568791239f52262"
+  },
+  {
+   "path": "specs/SPEC-lever-m14.json",
+   "sha256": "eb5716d2eeafc0e6a2c186dc4af14d4451513029f7a8bdb8d51951ddaa3c725b"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "8632833b7d8cbfd491eca6b2983831c87a767bce62fe1c3f686e923d9bfb6b21"
+  }
+ ],
+ "raw_data_note": "results/lever-m12/records.jsonl is held in the artifact store from 2ec8a532c on (sha256 pinned here); run `tools/artifacts/artifacts.py pull research/ic_d4_char2_lever_20261023` before the gate.",
+ "supporting_data_git": {
+  "baseline_2026_10_15_m14": "research/gaudry_quartic_d4_char2_20261015/sessions/char2-m14/records.jsonl (ic-frobenius S 5.370113483774137 = ic-base here)",
+  "baseline_2026_10_15_ladder": "research/gaudry_quartic_d4_char2_20261015/sessions/char2-ladder/records.jsonl (m12 t0 44.033807158550495, t1 42.59161661075577 = ic-base here)"
+ },
+ "headline": [
+  {
+   "name": "m12 paired ratio Sum S lever / Sum S base at w=0 GAE (cmp exact)",
+   "claimed": 0.8543049931370235,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m12 paired ratio lever/base at w=0 GAE (REPORT)",
+   "claimed": 0.8543,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 5.8533302118693666e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m12 paired ratio Sum S lever / Sum S base at w=0.1 GAE (cmp exact)",
+   "claimed": 0.8543049931370235,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m12 paired ratio lever/base at w=0.1 GAE (REPORT)",
+   "claimed": 0.8543,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 5.8533302118693666e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m12 paired ratio Sum S lever / Sum S base at w=1 GAE (cmp exact)",
+   "claimed": 0.8543049931370235,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m12 paired ratio lever/base at w=1 GAE (REPORT)",
+   "claimed": 0.8543,
+   "recomputed": 0.8543049931370235,
+   "rel_tol": 5.8533302118693666e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m14 paired ratio Sum S lever / Sum S base at w=0 GAE (cmp exact)",
+   "claimed": 0.8153730005333587,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m14 paired ratio lever/base at w=0 GAE (REPORT)",
+   "claimed": 0.8154,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 6.132572970321314e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m14 paired ratio Sum S lever / Sum S base at w=0.1 GAE (cmp exact)",
+   "claimed": 0.8153730005333587,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m14 paired ratio lever/base at w=0.1 GAE (REPORT)",
+   "claimed": 0.8154,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 6.132572970321314e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m14 paired ratio Sum S lever / Sum S base at w=1 GAE (cmp exact)",
+   "claimed": 0.8153730005333587,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-lever.json ops.ratio_b_over_a"
+  },
+  {
+   "name": "m14 paired ratio lever/base at w=1 GAE (REPORT)",
+   "claimed": 0.8154,
+   "recomputed": 0.8153730005333585,
+   "rel_tol": 6.132572970321314e-05,
+   "claimed_source": "REPORT.md result table / text"
+  },
+  {
+   "name": "m12 A/A ratio ic-base-aa / ic-base at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m12 A/A ratio ic-base-aa / ic-base at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m12 A/A ratio ic-base-aa / ic-base at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m14 A/A ratio ic-base-aa / ic-base at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m14 A/A ratio ic-base-aa / ic-base at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m14 A/A ratio ic-base-aa / ic-base at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-ic-base__ic-base-aa.json"
+  },
+  {
+   "name": "m12 t0 per-target ratio lever/base",
+   "claimed": 0.8543,
+   "recomputed": 0.8543026669426148,
+   "rel_tol": 5.853330211869367e-06,
+   "claimed_source": "REPORT.md (per-target ratios 0.85430, 0.85430, 0.85432)"
+  },
+  {
+   "name": "m12 t1 per-target ratio lever/base",
+   "claimed": 0.8543,
+   "recomputed": 0.854295188806171,
+   "rel_tol": 5.853330211869367e-06,
+   "claimed_source": "REPORT.md (per-target ratios 0.85430, 0.85430, 0.85432)"
+  },
+  {
+   "name": "m12 t2 per-target ratio lever/base",
+   "claimed": 0.85432,
+   "recomputed": 0.8543175334967636,
+   "rel_tol": 5.853193182882292e-06,
+   "claimed_source": "REPORT.md (per-target ratios 0.85430, 0.85430, 0.85432)"
+  },
+  {
+   "name": "m12 per-workload ratio lever/base, sorted #0",
+   "claimed": 0.854295188806171,
+   "recomputed": 0.854295188806171,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json workloads[]"
+  },
+  {
+   "name": "m12 per-workload ratio lever/base, sorted #1",
+   "claimed": 0.8543026669426149,
+   "recomputed": 0.8543026669426148,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json workloads[]"
+  },
+  {
+   "name": "m12 per-workload ratio lever/base, sorted #2",
+   "claimed": 0.8543175334967638,
+   "recomputed": 0.8543175334967636,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-ic-base__ic-lever.json workloads[]"
+  },
+  {
+   "name": "m12 t0 ic-base S = total_gae/sqrt(r)",
+   "claimed": 44.03,
+   "recomputed": 44.033807158550495,
+   "rel_tol": 0.00011357029298205768,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t1 ic-base S = total_gae/sqrt(r)",
+   "claimed": 42.59,
+   "recomputed": 42.59161661075577,
+   "rel_tol": 0.00011741019018548955,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t2 ic-base S = total_gae/sqrt(r)",
+   "claimed": 41.47,
+   "recomputed": 41.46719133860581,
+   "rel_tol": 0.0001205811429949361,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t0 ic-lever S = total_gae/sqrt(r)",
+   "claimed": 37.62,
+   "recomputed": 37.61819889118649,
+   "rel_tol": 0.00013292131844763424,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t1 ic-lever S = total_gae/sqrt(r)",
+   "claimed": 36.39,
+   "recomputed": 36.38581315404565,
+   "rel_tol": 0.00013741412475954933,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t2 ic-lever S = total_gae/sqrt(r)",
+   "claimed": 35.43,
+   "recomputed": 35.42614862543607,
+   "rel_tol": 0.00014113745413491392,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t0 ic-base-aa S = total_gae/sqrt(r)",
+   "claimed": 44.03,
+   "recomputed": 44.033807158550495,
+   "rel_tol": 0.00011357029298205768,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t1 ic-base-aa S = total_gae/sqrt(r)",
+   "claimed": 42.59,
+   "recomputed": 42.59161661075577,
+   "rel_tol": 0.00011741019018548955,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t2 ic-base-aa S = total_gae/sqrt(r)",
+   "claimed": 41.47,
+   "recomputed": 41.46719133860581,
+   "rel_tol": 0.0001205811429949361,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m14 t0 ic-base S = total_gae/sqrt(r)",
+   "claimed": 5.3701,
+   "recomputed": 5.370113483774138,
+   "rel_tol": 9.311744660248413e-06,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m14 t0 ic-lever S = total_gae/sqrt(r)",
+   "claimed": 4.3786,
+   "recomputed": 4.378645544469566,
+   "rel_tol": 1.1420316996300187e-05,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m14 t0 ic-base-aa S = total_gae/sqrt(r)",
+   "claimed": 5.3701,
+   "recomputed": 5.370113483774138,
+   "rel_tol": 9.311744660248413e-06,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t0 trials (identical in ic-base, ic-lever, ic-base-aa)",
+   "claimed": 186121.0,
+   "recomputed": 186121.0,
+   "rel_tol": 0.0,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t1 trials (identical in ic-base, ic-lever, ic-base-aa)",
+   "claimed": 180033.0,
+   "recomputed": 180033.0,
+   "rel_tol": 0.0,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m12 t2 trials (identical in ic-base, ic-lever, ic-base-aa)",
+   "claimed": 175246.0,
+   "recomputed": 175246.0,
+   "rel_tol": 0.0,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m14 t0 trials (identical in ic-base, ic-lever, ic-base-aa)",
+   "claimed": 749350.0,
+   "recomputed": 749350.0,
+   "rel_tol": 0.0,
+   "claimed_source": "REPORT.md result table"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=0 (REPORT)",
+   "claimed": 4.27,
+   "recomputed": 4.268443580131831,
+   "rel_tol": 0.0011710772833723653,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=0 (table-m14.tsv exact)",
+   "claimed": 4.268443580131831,
+   "recomputed": 4.268443580131831,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=0.1 (REPORT)",
+   "claimed": 3.88,
+   "recomputed": 3.8804039666857935,
+   "rel_tol": 0.0012887886597938143,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=0.1 (table-m14.tsv exact)",
+   "claimed": 3.8804039666857935,
+   "recomputed": 3.8804039666857935,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=1 (REPORT)",
+   "claimed": 2.13,
+   "recomputed": 2.1342239439296833,
+   "rel_tol": 0.0023476525821596243,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-base IC/rho at w=1 (table-m14.tsv exact)",
+   "claimed": 2.134223943929683,
+   "recomputed": 2.1342239439296833,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=0 (REPORT)",
+   "claimed": 3.48,
+   "recomputed": 3.480373649539443,
+   "rel_tol": 0.0014369252873563218,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=0 (table-m14.tsv exact)",
+   "claimed": 3.480373649539443,
+   "recomputed": 3.480373649539443,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=0.1 (REPORT)",
+   "claimed": 3.16,
+   "recomputed": 3.163976625598142,
+   "rel_tol": 0.0015824367088607594,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=0.1 (table-m14.tsv exact)",
+   "claimed": 3.1639766255981425,
+   "recomputed": 3.163976625598142,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=1 (REPORT)",
+   "claimed": 1.74,
+   "recomputed": 1.7401885809720843,
+   "rel_tol": 0.0028738505747126436,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m14 ic-lever IC/rho at w=1 (table-m14.tsv exact)",
+   "claimed": 1.740188580972084,
+   "recomputed": 1.7401885809720843,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/table-m14.tsv"
+  },
+  {
+   "name": "m12 t0 ic-base IC/rho at w=0 (REPORT)",
+   "claimed": 47.2,
+   "recomputed": 47.23337296762392,
+   "rel_tol": 0.001059427966101695,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t0 ic-base IC/rho at w=0.1 (REPORT)",
+   "claimed": 42.9,
+   "recomputed": 42.9397677658573,
+   "rel_tol": 0.0011656177156177156,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t0 ic-base IC/rho at w=1 (REPORT)",
+   "claimed": 23.6,
+   "recomputed": 23.617708350739118,
+   "rel_tol": 0.00211885593220339,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t0 ic-lever IC/rho at w=0 (REPORT)",
+   "claimed": 40.4,
+   "recomputed": 40.35159649493633,
+   "rel_tol": 0.0012377475247524752,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t0 ic-lever IC/rho at w=0.1 (REPORT)",
+   "claimed": 36.7,
+   "recomputed": 36.68355812026841,
+   "rel_tol": 0.001362534059945504,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t0 ic-lever IC/rho at w=1 (REPORT)",
+   "claimed": 20.2,
+   "recomputed": 20.176671231109292,
+   "rel_tol": 0.0024754950495049504,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-base IC/rho at w=0 (REPORT)",
+   "claimed": 50.3,
+   "recomputed": 50.29490021849819,
+   "rel_tol": 0.000994135188866799,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-base IC/rho at w=0.1 (REPORT)",
+   "claimed": 45.7,
+   "recomputed": 45.72306029108814,
+   "rel_tol": 0.0010942013129102844,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-base IC/rho at w=1 (REPORT)",
+   "claimed": 25.1,
+   "recomputed": 25.148731942377207,
+   "rel_tol": 0.001992231075697211,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-lever IC/rho at w=0 (REPORT)",
+   "claimed": 43.0,
+   "recomputed": 42.96669127814944,
+   "rel_tol": 0.001162906976744186,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-lever IC/rho at w=0.1 (REPORT)",
+   "claimed": 39.1,
+   "recomputed": 39.06099042417108,
+   "rel_tol": 0.0012789002557544759,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t1 ic-lever IC/rho at w=1 (REPORT)",
+   "claimed": 21.5,
+   "recomputed": 21.48444070294892,
+   "rel_tol": 0.002325813953488372,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-base IC/rho at w=0 (REPORT)",
+   "claimed": 39.9,
+   "recomputed": 39.88396292782186,
+   "rel_tol": 0.0012532581453634085,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-base IC/rho at w=0.1 (REPORT)",
+   "claimed": 36.3,
+   "recomputed": 36.258412242801604,
+   "rel_tol": 0.0013775482093663911,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-base IC/rho at w=1 (REPORT)",
+   "claimed": 19.9,
+   "recomputed": 19.942780473067803,
+   "rel_tol": 0.0025128140703517586,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-lever IC/rho at w=0 (REPORT)",
+   "claimed": 34.1,
+   "recomputed": 34.07356883457313,
+   "rel_tol": 0.0014664222873900293,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-lever IC/rho at w=0.1 (REPORT)",
+   "claimed": 31.0,
+   "recomputed": 30.976197315779125,
+   "rel_tol": 0.0016130645161290323,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 t2 ic-lever IC/rho at w=1 (REPORT)",
+   "claimed": 17.0,
+   "recomputed": 17.037467024818707,
+   "rel_tol": 0.002941470588235294,
+   "claimed_source": "REPORT.md distance table"
+  },
+  {
+   "name": "m12 Sum S ic-lever / Sum S rho at w=0 (cmp)",
+   "claimed": 38.82162355061351,
+   "recomputed": 38.821623550613516,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-rho-neg__ic-lever.json"
+  },
+  {
+   "name": "m12 Sum S ic-base / Sum S rho at w=0 (cmp)",
+   "claimed": 45.44234654190631,
+   "recomputed": 45.44234654190632,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m12-rho-neg__ic-base.json"
+  },
+  {
+   "name": "m14 S ic-lever / S rho at w=0 (cmp)",
+   "claimed": 3.480373649539443,
+   "recomputed": 3.480373649539443,
+   "rel_tol": 1e-12,
+   "claimed_source": "results/cmp-m14-rho-neg__ic-lever.json"
+  },
+  {
+   "name": "m14 ic-base S / floor_s (sqrt(pi/4))",
+   "claimed": 6.06,
+   "recomputed": 6.059524180029443,
+   "rel_tol": 0.0008251650165016502,
+   "claimed_source": "REPORT.md / PROTOCOL.md"
+  },
+  {
+   "name": "m14 ic-lever S / floor_s (sqrt(pi/4))",
+   "claimed": 4.94,
+   "recomputed": 4.940772412475046,
+   "rel_tol": 0.001012246963562753,
+   "claimed_source": "REPORT.md / PROTOCOL.md"
+  }
+ ],
+ "recompute_checks": {
+  "m12": {
+   "n_checks": 222,
+   "failed": []
+  },
+  "m14": {
+   "n_checks": 74,
+   "failed": []
+  }
+ },
+ "gae_band_per_target": {
+  "m12 t0": {
+   "0": {
+    "s_base": 44.033807158550495,
+    "s_lever": 37.61819889118649,
+    "s_aa": 44.033807158550495,
+    "s_rho": 0.9322604843133567,
+    "lever_over_base": 0.8543026669426148,
+    "ic_base_over_rho": 47.23337296762392,
+    "ic_lever_over_rho": 40.35159649493633
+   },
+   "0.1": {
+    "s_base": 44.033807158550495,
+    "s_lever": 37.61819889118649,
+    "s_aa": 44.033807158550495,
+    "s_rho": 1.0254784655254494,
+    "lever_over_base": 0.8543026669426148,
+    "ic_base_over_rho": 42.9397677658573,
+    "ic_lever_over_rho": 36.68355812026841
+   },
+   "1": {
+    "s_base": 44.033807158550495,
+    "s_lever": 37.61819889118649,
+    "s_aa": 44.033807158550495,
+    "s_rho": 1.8644402964342834,
+    "lever_over_base": 0.8543026669426148,
+    "ic_base_over_rho": 23.617708350739118,
+    "ic_lever_over_rho": 20.176671231109292
+   },
+   "unpriced": {
+    "ic-base": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-base-aa": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-lever": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "rho-neg": {
+     "names": [
+      "canonicalisations_uncharged"
+     ],
+     "count": 4945607,
+     "lower_bound": true
+    }
+   }
+  },
+  "m12 t1": {
+   "0": {
+    "s_base": 42.59161661075577,
+    "s_lever": 36.38581315404565,
+    "s_aa": 42.59161661075577,
+    "s_rho": 0.8468376798785417,
+    "lever_over_base": 0.854295188806171,
+    "ic_base_over_rho": 50.29490021849819,
+    "ic_lever_over_rho": 42.96669127814944
+   },
+   "0.1": {
+    "s_base": 42.59161661075577,
+    "s_lever": 36.38581315404565,
+    "s_aa": 42.59161661075577,
+    "s_rho": 0.9315128151878601,
+    "lever_over_base": 0.854295188806171,
+    "ic_base_over_rho": 45.72306029108814,
+    "ic_lever_over_rho": 39.06099042417108
+   },
+   "1": {
+    "s_base": 42.59161661075577,
+    "s_lever": 36.38581315404565,
+    "s_aa": 42.59161661075577,
+    "s_rho": 1.693589032971726,
+    "lever_over_base": 0.854295188806171,
+    "ic_base_over_rho": 25.148731942377207,
+    "ic_lever_over_rho": 21.48444070294892
+   },
+   "unpriced": {
+    "ic-base": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-base-aa": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-lever": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "rho-neg": {
+     "names": [
+      "canonicalisations_uncharged"
+     ],
+     "count": 4492373,
+     "lower_bound": true
+    }
+   }
+  },
+  "m12 t2": {
+   "0": {
+    "s_base": 41.46719133860581,
+    "s_lever": 35.42614862543607,
+    "s_aa": 41.46719133860581,
+    "s_rho": 1.0396958650686021,
+    "lever_over_base": 0.8543175334967636,
+    "ic_base_over_rho": 39.88396292782186,
+    "ic_lever_over_rho": 34.07356883457313
+   },
+   "0.1": {
+    "s_base": 41.46719133860581,
+    "s_lever": 35.42614862543607,
+    "s_aa": 41.46719133860581,
+    "s_rho": 1.1436571204752162,
+    "lever_over_base": 0.8543175334967636,
+    "ic_base_over_rho": 36.258412242801604,
+    "ic_lever_over_rho": 30.976197315779125
+   },
+   "1": {
+    "s_base": 41.46719133860581,
+    "s_lever": 35.42614862543607,
+    "s_aa": 41.46719133860581,
+    "s_rho": 2.0793084191347413,
+    "lever_over_base": 0.8543175334967636,
+    "ic_base_over_rho": 19.942780473067803,
+    "ic_lever_over_rho": 17.037467024818707
+   },
+   "unpriced": {
+    "ic-base": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-base-aa": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-lever": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "rho-neg": {
+     "names": [
+      "canonicalisations_uncharged"
+     ],
+     "count": 5515583,
+     "lower_bound": true
+    }
+   }
+  },
+  "m14 t0": {
+   "0": {
+    "s_base": 5.370113483774138,
+    "s_lever": 4.378645544469566,
+    "s_aa": 5.370113483774138,
+    "s_rho": 1.2580963957846858,
+    "lever_over_base": 0.8153730005333586,
+    "ic_base_over_rho": 4.268443580131831,
+    "ic_lever_over_rho": 3.480373649539443
+   },
+   "0.1": {
+    "s_base": 5.370113483774138,
+    "s_lever": 4.378645544469566,
+    "s_aa": 5.370113483774138,
+    "s_rho": 1.3839057814283926,
+    "lever_over_base": 0.8153730005333586,
+    "ic_base_over_rho": 3.8804039666857935,
+    "ic_lever_over_rho": 3.163976625598142
+   },
+   "1": {
+    "s_base": 5.370113483774138,
+    "s_lever": 4.378645544469566,
+    "s_aa": 5.370113483774138,
+    "s_rho": 2.516190252221755,
+    "lever_over_base": 0.8153730005333586,
+    "ic_base_over_rho": 2.1342239439296833,
+    "ic_lever_over_rho": 1.7401885809720843
+   },
+   "unpriced": {
+    "ic-base": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-base-aa": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "ic-lever": {
+     "names": [],
+     "count": 0,
+     "lower_bound": false
+    },
+    "rho-neg": {
+     "names": [
+      "canonicalisations_uncharged"
+     ],
+     "count": 238801980,
+     "lower_bound": true
+    }
+   }
+  }
+ },
+ "replay_certificate": {
+  "path": "validation/REPLAY_CERTIFICATE.json",
+  "sha256": "05af365c2d690ac933637431f3f2faf153833292bde04a0ab4bae550c6d173a8"
+ },
+ "human_report": "validation/VALIDATOR_REPORT.md"
+}

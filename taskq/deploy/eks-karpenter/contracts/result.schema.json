@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Iso Lab EKS launcher result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "state",
+    "job_name",
+    "job_uid",
+    "pod_uid",
+    "results_uri",
+    "receipt_uri",
+    "request_sha256",
+    "launcher",
+    "exit_code"
+  ],
+  "properties": {
+    "schema": {
+      "const": "isolab.eks.result/v1"
+    },
+    "state": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "launcher_failed",
+        "submission_unknown",
+        "identity_mismatch",
+        "verification_failed",
+        "launcher_timed_out"
+      ]
+    },
+    "job_name": {
+      "type": "string"
+    },
+    "job_uid": {
+      "type": "string"
+    },
+    "pod_uid": {
+      "type": "string"
+    },
+    "results_uri": {
+      "type": "string"
+    },
+    "receipt_uri": {
+      "type": "string"
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "launcher": {
+      "type": "string"
+    },
+    "exit_code": {
+      "type": "integer"
+    },
+    "build": {
+      "additionalProperties": false,
+      "description": "Optional per-run image and native build identity; omission retains the deployed image",
+      "properties": {
+        "ecbench_sha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "image_uri": {
+          "maxLength": 129,
+          "pattern": "^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_revision": {
+          "maxLength": 40,
+          "minLength": 40,
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "image_uri",
+        "source_revision",
+        "ecbench_sha256"
+      ],
+      "type": "object"
+    }
+  }
+}

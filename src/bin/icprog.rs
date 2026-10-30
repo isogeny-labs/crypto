@@ -30,6 +30,10 @@
 //!   §23's `run.py`, `claims.py` and `analyse.py`, ported): its rows on the
 //!   native runner, each row's identities, independent replay and checked
 //!   claim, and the figures read from the checked rows.
+//! - `icprog tournament prepare|run|status|verify|propose`: the IC
+//!   candidate tournament's schema-1 protocol (`tournament.py` 1e5b2774…
+//!   and its `oracle.py`), ported; `verify` re-derives a historical round
+//!   from its committed evidence archive.
 #[path = "icprog/autolab.rs"]
 mod autolab;
 #[path = "icprog/b2.rs"]
@@ -96,6 +100,14 @@ mod sat_source;
 mod stats;
 #[path = "icprog/suite.rs"]
 mod suite;
+#[path = "icprog/tournament.rs"]
+mod tournament;
+#[path = "icprog/tournament_exec.rs"]
+mod tournament_exec;
+#[path = "icprog/tournament_oracle.rs"]
+mod tournament_oracle;
+#[path = "icprog/tournament_store.rs"]
+mod tournament_store;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -123,6 +135,8 @@ enum Round {
     R08,
     R09,
     R10,
+    R11,
+    R12,
 }
 
 #[derive(Clone, Copy, PartialEq, ValueEnum)]
@@ -130,6 +144,10 @@ enum Comparison {
     S23,
     V2,
     V3,
+    V6,
+    V7,
+    V8,
+    V8C,
 }
 
 #[derive(Subcommand)]
@@ -359,7 +377,7 @@ enum Command {
     Rule {
         /// manifest, pin, size, all, reference, claims or analyse.
         step: String,
-        /// Which comparison: ledger §23's (frozen), or the one at baseline v2 or v3.
+        /// Which comparison: ledger §23's (frozen), or the one at baseline v2, v3, v6 or v7.
         #[arg(long, value_enum, default_value = "s23")]
         comparison: Comparison,
         /// The repository checkout (default: the current directory).
@@ -607,12 +625,18 @@ enum Command {
     /// class and 3 outside it, so a chain can check before it starts a
     /// round; `run` refuses outside it.
     HostClass { round: Round },
-    /// One of a round's declared steps, natively (R05, R02b, R06, R07, R08, R09).
+    /// The IC candidate tournament's schema-1 protocol, natively
+    /// (`research/ic_candidate_tournament_20260915/NATIVE_PORT.md`).
+    Tournament {
+        #[command(subcommand)]
+        step: tournament::Step,
+    },
+    /// One of a round's declared steps, natively (R05, R02b, R06, R07, R08, R09, R10, R11, R12).
     Run {
         round: Round,
         /// R05: plan, manifest-resumed, pin, compare, holdout or extend.
         /// R02b and R07: plan, manifest, pin, aa, compare, holdout, extend,
-        /// callgrind or manifest-resumed; R06, R08 and R09 the same but callgrind.
+        /// callgrind or manifest-resumed; R06, R08, R09, R11 and R12 the same but callgrind.
         step: String,
         /// The repository checkout (default: the current directory).
         #[arg(long, default_value = ".")]
@@ -650,6 +674,8 @@ fn round_dir(round: Round, root: &std::path::Path) -> Result<(PathBuf, PathBuf),
         Round::R08 => "R08-scan-fold",
         Round::R09 => "R09-slope-keys",
         Round::R10 => "R10-main-head",
+        Round::R11 => "R11-build-streams",
+        Round::R12 => "R12-admitted-prefetch",
     };
     let round_dir = programme.join("rounds").join(dir);
     Ok((programme, round_dir))
@@ -692,6 +718,8 @@ fn round_spec(round: Round) -> Option<&'static rounds::Spec> {
         Round::R08 => Some(&rounds::r08::SPEC),
         Round::R09 => Some(&rounds::r09::SPEC),
         Round::R10 => Some(&rounds::r10::SPEC),
+        Round::R11 => Some(&rounds::r11::SPEC),
+        Round::R12 => Some(&rounds::r12::SPEC),
     }
 }
 
@@ -792,6 +820,8 @@ fn run(round: Round, step: &str, args: RunArgs) -> Result<String, String> {
         Round::R08 => rounds::r08::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R09 => rounds::r09::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R10 => rounds::r10::run(&ctx, step, &b, &arms, &root, &commits)?,
+        Round::R11 => rounds::r11::run(&ctx, step, &b, &arms, &root, &commits)?,
+        Round::R12 => rounds::r12::run(&ctx, step, &b, &arms, &root, &commits)?,
         Round::R03 => return Err("R03 is complete; its runs are frozen".into()),
     };
     Ok(match doc {
@@ -861,6 +891,10 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         Comparison::S23 => ("research/ic_single_target_20260930", &rule::S23),
         Comparison::V2 => ("research/ic_tool_program/rule/v2", &rule::V2),
         Comparison::V3 => ("research/ic_tool_program/rule/v3", &rule::V3),
+        Comparison::V6 => ("research/ic_tool_program/rule/v6", &rule::V6),
+        Comparison::V7 => ("research/ic_tool_program/rule/v7", &rule::V7),
+        Comparison::V8 => ("research/ic_tool_program/rule/v8", &rule::V8),
+        Comparison::V8C => ("research/ic_tool_program/rule/v8c", &rule::V8C),
     };
     let here = abs(&args.dir.clone().unwrap_or_else(|| root.join(default_dir)))?;
     let comparison = rule::Comparison {
@@ -934,8 +968,25 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         }
         "claims" => comparison.claims(),
         "analyse" => comparison.analyse().map(|doc| json::dumps(&doc, 1)),
+        "matched" => {
+            if args.comparison != Comparison::V8 {
+                return Err("matched reads rule v8 against its control v8c: --comparison v8".into());
+            }
+            let here = comparison.root.join("research/ic_tool_program/rule/v8c");
+            let control = rule::Comparison {
+                root: comparison.root.clone(),
+                git: comparison.git.clone(),
+                runs: here.join("runs"),
+                out: here.clone(),
+                here,
+                constants: &rule::V8C,
+            };
+            comparison
+                .matched(&control)
+                .map(|doc| json::dumps(&doc, 1))
+        }
         other => Err(format!(
-            "unknown step {other:?}: manifest, pin, size, all, reference, claims or analyse"
+            "unknown step {other:?}: manifest, pin, size, all, reference, claims, analyse or matched"
         )),
     }
 }
@@ -951,6 +1002,8 @@ fn analyse(round: Round, root: PathBuf, runs: Option<PathBuf>) -> Result<String,
         Round::R08 => rounds::r08::analyse(&ctx)?,
         Round::R09 => rounds::r09::analyse(&ctx)?,
         Round::R10 => rounds::r10::analyse(&ctx)?,
+        Round::R11 => rounds::r11::analyse(&ctx)?,
+        Round::R12 => rounds::r12::analyse(&ctx)?,
     };
     Ok(json::dumps(&doc, 1))
 }
@@ -1560,6 +1613,7 @@ fn main() -> ExitCode {
             isolate,
         }),
         Command::OrdinaryPreparationAudit { input, out } => ordinary_preparation::run(&input, &out),
+        Command::Tournament { step } => tournament::main(step),
         Command::F5ControlReplayCustody {
             publication,
             registration_sha256,
@@ -1699,7 +1753,9 @@ fn main() -> ExitCode {
             | Round::R07
             | Round::R08
             | Round::R09
-            | Round::R10 => report::r05(&doc),
+            | Round::R10
+            | Round::R11
+            | Round::R12 => report::r05(&doc),
             Round::R03 => Err("R03's tables are in its README, written before icprog".into()),
         }),
         Command::Holdouts {

@@ -1,0 +1,132 @@
+name: Planner-study Lean proofs
+# Builds research/ic_planner_exhaustive_20261026/lean (Band, KeyedInvariance
+# and the generated Certificates; Lean core only, no dependencies). It refuses
+# sorry, admit, native_decide and custom axioms, regenerates Certificates.lean
+# from the committed band sums with the native generator
+# (examples/ic_planner_exhaustive_lean_certs.rs) and requires it unchanged,
+# audits every theorem's axioms (AxiomAudit.lean; only propext, Classical.choice and
+# Quot.sound are allowed), checks the certificate count against
+# certificates.json, and re-checks the environment with leanchecker.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/planner-proofs-lean.yml'
+      - 'research/ic_planner_exhaustive_20261026/lean/**'
+      - 'research/ic_planner_exhaustive_20261026/scripts/lean_certificates.*'
+      - 'examples/ic_planner_exhaustive_lean_certs.rs'
+      - 'src/cryptanalysis/ecc2k130_pyjson.rs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/planner-proofs-lean.yml'
+      - 'research/ic_planner_exhaustive_20261026/lean/**'
+      - 'research/ic_planner_exhaustive_20261026/scripts/lean_certificates.*'
+      - 'examples/ic_planner_exhaustive_lean_certs.rs'
+      - 'src/cryptanalysis/ecc2k130_pyjson.rs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
+    env:
+      LEAN_DIR: research/ic_planner_exhaustive_20261026/lean
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/factor-base/
+            /Cargo.toml
+            /Cargo.lock
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /build.rs
+            /.github/scripts/
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /research/ic_planner_exhaustive_20261026/
+            /research/ic_planner_weight_rule_20261021/analysis/
+            /research/ic_planner_weight_rule_binkob_20261026/analysis/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_planner_exhaustive_20261026/lean
+      - name: Materialize compile-time inputs without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Cache the pinned Lean toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.elan/toolchains
+          key: ${{ runner.os }}-lean-${{ hashFiles('research/ic_planner_exhaustive_20261026/lean/lean-toolchain') }}
+      - name: Install Lean (toolchain pinned by lean-toolchain)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Certificates.lean is regenerated from the committed band sums, unchanged
+        run: |
+          bash research/ic_planner_exhaustive_20261026/scripts/lean_certificates.sh
+          git diff --exit-code -- "$LEAN_DIR/Certificates.lean" "$LEAN_DIR/certificates.json"
+      - name: No sorry, admit, native_decide or custom axioms
+        working-directory: ${{ env.LEAN_DIR }}
+        run: |
+          if grep -nE '\bsorry\b|\badmit\b|native_decide|^axiom ' Band.lean KeyedInvariance.lean Certificates.lean AxiomAudit.lean; then
+            echo "forbidden construct found"; exit 1; fi
+      - name: lake build
+        working-directory: ${{ env.LEAN_DIR }}
+        run: lake build
+      - name: Axiom audit (standard axioms only) and certificate count
+        working-directory: ${{ env.LEAN_DIR }}
+        run: |
+          set -o pipefail
+          lake env lean AxiomAudit.lean | tee /tmp/axioms.txt
+          want=$(jq '.verdicts | length' certificates.json)
+          grep -qx "AXIOM_AUDIT_COUNT|Certificates|$want" /tmp/axioms.txt
+          grep -qxE "AXIOM_AUDIT_COUNT\|Band\|[1-9][0-9]*" /tmp/axioms.txt
+          grep -qxE "AXIOM_AUDIT_COUNT\|KeyedInvariance\|[1-9][0-9]*" /tmp/axioms.txt
+      - name: Keep the audit log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: planner-proofs-axiom-audit
+          path: /tmp/axioms.txt
+          if-no-files-found: ignore
+      - name: leanchecker --fresh
+        working-directory: ${{ env.LEAN_DIR }}
+        run: |
+          lake env leanchecker --fresh Band
+          lake env leanchecker --fresh KeyedInvariance
+          lake env leanchecker --fresh Certificates

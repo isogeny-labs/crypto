@@ -14,10 +14,12 @@
 //!   pqc                                — PQC demos (ML-KEM, ML-DSA, SQIsign, toy Kyber)
 //!   pqc-fast <module> --op ...         — the speed-oriented implementations
 //!   mlwe    <attack>  ...              — ML-KEM / ML-DSA cryptanalysis
+//!   volcano <profile|level1|koblitz-step> — isogeny-volcano descent tools
 
 mod cli_mlwe;
 mod cli_pqc;
 mod cli_pqc_fast;
+mod cli_volcano;
 
 use clap::{Parser, Subcommand};
 use crypto_lib::{
@@ -130,13 +132,28 @@ enum Cmd {
         #[command(subcommand)]
         op: cli_mlwe::MlweOp,
     },
+    /// Isogeny-volcano tools: conductor and level tables, Φ_ℓ(X, j₀) by CRT, and the
+    /// first descending step of a Koblitz curve's volcano over F_(2^n).
+    Volcano {
+        #[command(subcommand)]
+        op: cli_volcano::VolcanoOp,
+    },
     /// Large files (factor bases, relation tables): push to, pull from, and index
     /// the object store. See docs/store/README.md.
     Store(crypto_lib::store::cli::StoreArgs),
+    /// Replayable synthetic ECDLP/PDP training datasets and immutable artifact receipts.
+    Dataset(crypto_lib::ml_dataset::DatasetArgs),
 }
 
 #[derive(Subcommand)]
 enum IsogenyOp {
+    /// Plan, enumerate, resume, verify or solve on an ordinary isogeny class.
+    /// Example: crypto isogeny class build --curve curve.json --out graph.sqlite --steps all
+    #[command(disable_help_flag = true)]
+    Class {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
     /// Map the ℓ-volcano of a small curve.
     /// `<curve>` is a built-in name: `toy-a`, `toy-b`, `toy-j0`.
     Volcano {
@@ -525,9 +542,16 @@ fn main() {
         Cmd::Cryptopals { challenge } => cmd_cryptopals(&challenge),
         Cmd::PqcFast { op } => cli_pqc_fast::run(op),
         Cmd::Mlwe { op } => cli_mlwe::run(op),
+        Cmd::Volcano { op } => cli_volcano::run(op),
         Cmd::Store(args) => {
             if let Err(e) = crypto_lib::store::cli::run(&args) {
                 eprintln!("store: {e}");
+                std::process::exit(1);
+            }
+        }
+        Cmd::Dataset(args) => {
+            if let Err(e) = crypto_lib::ml_dataset::run(&args) {
+                eprintln!("dataset: {e}");
                 std::process::exit(1);
             }
         }
@@ -1122,6 +1146,14 @@ fn cmd_isogeny(op: IsogenyOp) {
     use num_bigint::BigInt;
 
     match op {
+        IsogenyOp::Class { args } => {
+            let (value, code) = match volcano_cli::run(&args) {
+                Ok(result) => result,
+                Err(error) => (serde_json::json!({"status":"ERROR","error":error}), 2),
+            };
+            println!("{}", serde_json::to_string_pretty(&value).unwrap());
+            std::process::exit(code);
+        }
         IsogenyOp::Volcano { curve, ell, depth } => {
             let c = parse_isogeny_curve(&curve);
             let m = map_volcano(&c, ell, depth, 256);

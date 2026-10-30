@@ -1,0 +1,244 @@
+name: Koblitz modular carrier replay
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'research/koblitz_modular_ic_20261018/**'
+      - '.github/workflows/koblitz-modular-carriers.yml'
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-modular-carriers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-modular-carriers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/koblitz_modular_ic_20261018
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Native tests and exact evidence replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/koblitz_modular_ic_20261018
+          manifest="$study/native/Cargo.toml"
+          cargo test --release --locked --manifest-path "$manifest"
+          replay_dir="$(mktemp -d)"
+          cargo run --release --locked --manifest-path "$manifest" -- "$replay_dir"
+          cmp "$study/results.json" "$replay_dir/results.json"
+          for identity in "$study"/identity-n*-t*.json; do
+            cmp "$identity" "$replay_dir/$(basename "$identity")"
+          done
+          cargo run --release --locked --manifest-path "$manifest" -- --cyclic-only "$replay_dir/cyclic-window.json"
+          cmp "$study/cyclic-window.json" "$replay_dir/cyclic-window.json"
+          cargo run --release --locked --manifest-path "$manifest" -- --large-identity "$replay_dir/identity-n131-balanced.json"
+          cmp "$study/identity-n131-balanced.json" "$replay_dir/identity-n131-balanced.json"
+      - name: Replay round 02 and its independent certificate checkers
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/02
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 03 twists, polarization kernels and n5 relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/03
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 04 quotient geometry and direct modular relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/04
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 05 reverse transfer, quotients and interior divisors
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/05
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 06 column images, quotient equations and reverse divisor
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/06
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 07 independent norms, odd reverse divisor and richer relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/07
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 08 line norms and global Kummer charts
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/08
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 09 Frobenius circuits, invariants and bounded controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/09
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 10 F2 equations, saturation and coupled divisor strata
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/10
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 11 local diagonal contacts and saturated graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/11
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 12 SS divisors and actual boundary saturation
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/12
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 13 ordinary fibers, deck images and saturation repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/13
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 14 ordinary images, closed divisors and polarized target
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/14
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          # Frozen rounds pin their original source snapshot; later registrations
+          # and generators intentionally change the current source tree.
+          git fetch --no-tags origin 1f733a2963736514f644aa8cff202d6e507c9dad
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round15-verify-history "$round"
+      - name: Replay round 15 CM carriers, theta descent and new relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/15
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 26b0d6f82349d35bf15b049f345f3ab2ebaa57f4
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 26b0d6f82349d35bf15b049f345f3ab2ebaa57f4
+      - name: Replay round 16 incidence, cover bases and quartic saturation separators
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/16
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin dcc9802e717465708a3e69562f4498bd7046def4
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" dcc9802e717465708a3e69562f4498bd7046def4
+      - name: Replay round 17 integral controls, odd theta lifts and survivor exclusions
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/17
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 76e409c1e31ff5b4a51e901bcda7e44529b732a5
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 76e409c1e31ff5b4a51e901bcda7e44529b732a5
+      - name: Replay round 18 canonical characters, integral correspondences and boundary exclusions
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/18
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin a2b8f27be5fb3faac9362430ef43245b3bce819d
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" a2b8f27be5fb3faac9362430ef43245b3bce819d
+      - name: Replay round 19 controlled poles, mixed sections and coupled elimination
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/19
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 11b2f23f97195b5e3eda5f5764d46a1dd7818f92
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 11b2f23f97195b5e3eda5f5764d46a1dd7818f92
+      - name: Replay round 20 integral recovery, proper source equations and quotient nulls
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/20
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 63bc0895df3d2cbd38e22a3efe828a52a0fad731
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 63bc0895df3d2cbd38e22a3efe828a52a0fad731
+      - name: Replay round 21 complete descent controls and all elliptic source repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/21
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          # Validation logs are published in the artifact store; see round21/RELEASE.md.
+          # Replay uses the committed raw archive; the complete Lean gate below is retained.
+          "$round/REPLAY.sh"
+          git fetch --no-tags origin 69f67409f5fe6b525c23b000edea047dd38fcf83
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" 69f67409f5fe6b525c23b000edea047dd38fcf83
+      - name: Replay round 22 complete augmentation recovery and coupled source bindings
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/22
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+          source_revision=$(jq -r .source_revision "$round/ledger.json")
+          git fetch --no-tags origin "$source_revision"
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" "$source_revision"
+      - name: Install pinned Lean
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check conditional numerical proof and axioms
+        working-directory: research/koblitz_modular_ic_20261018
+        run: |
+          set -euo pipefail
+          lean CyclicWindow.lean | tee /tmp/cyclic-axioms.log
+          ! grep -E 'sorryAx|error:' /tmp/cyclic-axioms.log
+      - name: Build structural proofs and audit transitive axioms
+        run: |
+          tools/lean/proof-gate.sh research/koblitz_modular_ic_20261018/lean
