@@ -235,7 +235,7 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 ## Curve records and factor bases
 
-Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
+Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (31 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
 
 The registry overview below uses current links. Frozen measurement rows retain their original link metadata; refreshing registry links does not change their validation status.
 
@@ -338,6 +338,7 @@ One public target, three paired measured rounds, L0. B2 and B3 use the same pair
 | B2 quartic | 0.761 | 5.513 |
 | 4-sum | 5.524 | 40.027 |
 | B3 two-S3 chain | 7.652 | 55.447 |
+
 ## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle (`mitm:negation_folded=1`) at every size; only N changed. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.
@@ -763,7 +764,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
-- `docs/ic/progress-timeline.json` — sha256 `66e8e1348cc77246…`
+- `docs/ic/progress-timeline.json` — sha256 `de73321e6ff10cf1…`
 - `research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json` — sha256 `0a2b51a5051bd518…`
 - `research/ic_exponent_20260926/analysis.json` — sha256 `744fd51ea01f1046…`
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
@@ -836,7 +837,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
-- `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`
