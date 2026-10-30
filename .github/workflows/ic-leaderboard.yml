@@ -16,6 +16,7 @@ name: ic-leaderboard
 on:
   pull_request:
     paths:
+      - 'benchmarks/20261029-ic-aimed-gather/**'
       - 'AGENTS.md'
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_dashboard_coverage.mjs'
@@ -118,6 +119,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'research/prime_base_oracle_tuning_20261029/**'
+      - 'backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md'
       - 'AGENTS.md'
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_dashboard_coverage.mjs'
@@ -221,7 +224,7 @@ concurrency:
 jobs:
   current:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)

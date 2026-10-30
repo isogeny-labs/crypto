@@ -55,8 +55,33 @@
     "failed_job": 124242175423,
     "observed": "10-minute job was canceled during required artifact restoration before dashboard checks",
     "old_job_timeout_minutes": 10,
-    "new_job_timeout_minutes": 30,
+    "new_job_timeout_minutes": 25,
     "all_other_workflow_values_and_commands_unchanged": true,
-    "no_check_or_input_removed": true
+    "no_check_or_input_removed": true,
+    "initial_30_minute_attempt": "Preserved as history: c2d11046 failed routine 25-minute policy in job124262796536; corrected to policy-compliant25, no exception or gate change."
+  },
+  "trigger_coverage_repair": {
+    "failed_job": 124262797100,
+    "all_observed_missing_paths_now_match": {
+      "pull_request": 2,
+      "push": 100
+    },
+    "added_patterns": {
+      "pull_request": [
+        "benchmarks/20261029-ic-aimed-gather/**"
+      ],
+      "push": [
+        "research/prime_base_oracle_tuning_20261029/**",
+        "backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md"
+      ]
+    },
+    "all_prior_filters_preserved": true,
+    "local_builder_read_set": 223,
+    "full_hosted_read_set": 964,
+    "local_read_set_is_not_full_hosted_replay": true,
+    "budget_tests_passed": 15,
+    "budget_policy_violations": 0,
+    "actionlint": "pass",
+    "artifact_wire_check": "pass"
   }
 }
