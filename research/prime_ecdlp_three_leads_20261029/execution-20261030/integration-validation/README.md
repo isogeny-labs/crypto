@@ -22,18 +22,29 @@ the final affine module builds and kernel-replays against its imports. Local
 size and artifact checks passed on the merge commit. The later handoff commit
 changes only validation metadata and the append-only log.
 
-The existing native validation is running in
-`/workspace/pr2949-integration-20261030/`, tool session `49270`, shell PID
-`14000`. Its exact command script is preserved here. Do not start a duplicate
-while that supervisor or its children are alive. Collect each `.exit`, log and
-timestamp. An absent terminal status is not a pass. The sequence covers three
+The first native validation was interrupted during compilation, with no test
+summary or exit status. Supervisor `14000` is absent, session `49270` is unknown,
+and its Cargo/compiler processes are zombies with Linux wait status 9
+(SIGKILL). The cause is unknown. Its exact 279-byte compiler log and interruption
+record are preserved here; no later validation phase started.
+
+One detached retry was launched after confirming no active Cargo, compiler or
+test process remained. Its scratch directory is
+`/workspace/pr2949-integration-20261030/retry-20261030T0838Z/`, supervisor PID
+`15115`, SID/PGID `15115`, reparented to PID 1. The launch uses `nohup setsid`,
+checks the unchanged source bindings before every command, and records phase
+and supervisor terminal statuses. The exact retry script/bindings and launch
+snapshot are committed separately. Do not start a duplicate while that
+supervisor or its children are alive. Collect each `.exit`, log and timestamp.
+An absent terminal status is not a pass. The sequence covers three
 example suites, strict lint/formatting, compiled CLI refusal at the unchanged
 checkpoint gate, fresh backlog validation, and a fresh library build/run.
 Only the library execution, after compilation, has a 2400-second cap.
 `RAYON_NUM_THREADS=8`, Cargo jobs 2, serial test execution. These are development
 checks, not measured scientific panels.
 
-No fresh native or full-library pass is claimed at this checkpoint. The prior
+No fresh native or full-library pass is claimed at this checkpoint. The retry
+was compiling its first example-test command at the last observation. The prior
 5553-case cap remains historical: 2173 observed passes, zero observed failures,
 47 ignored, one active and 3332 not reached; wrapper exit 124. Its raw log
 remains NOT_UPLOADED. Keep new run logs separate, preserve failures/caps and
@@ -45,6 +56,11 @@ source-object bindings, review any remote head change, and rerun affected checks
 Then update the existing PR and inspect current-head `gate`, `size`, `artifacts`
 and review state. Re-enable auto-merge only after resolution validation and use
 an expected-head guard; no bypass or force push.
+
+GitHub autofix run `41019218473` failed its `Require ANTHROPIC_API_KEY` step
+for this PR and two others. That unavailable service credential does not
+establish a native code failure. No credential or access configuration was
+changed, and the required merge checks remain `gate`, `size`, `artifacts`.
 
 The full G1–G6 research goal remains incomplete: G1–G3/G6 partial, G4/G5 unrun.
 There are no admitted cost, scaling or speedup results. Checkpoint/artifact/lab
