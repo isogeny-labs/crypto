@@ -1,0 +1,56 @@
+{
+  "schema": "proposal-software-validation-plan/v1",
+  "base_commit": "655b690ef56d6869023a41326a127bf319cf4342",
+  "overlay": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/unified-v2-runtime-candidate-05/combined.patch",
+    "sha256": "427f53f66c361a9b8dc2c2648d1b4acca09e30993dc393e21d6bbcaf3467472b"
+  },
+  "scope": "Contextual donor claim reconciliation plus SAT producer and controller unit validation",
+  "snapshot_directory": "/home/ec2-user/ml-dataset-work-20261028/unified-v2-runtime-snapshot-05",
+  "source_binding": "Every copied input matches base Git blob and mode before overlay; final file-set, byte hashes and modes guarded before/after execution",
+  "build_git_dirty": true,
+  "wall_timeout_seconds": 1800,
+  "kill_grace_seconds": 30,
+  "cargo_jobs": 8,
+  "rayon_threads": 8,
+  "test_threads": 1,
+  "shared_target": "/home/ec2-user/crypto-ml-dataset-20261028/target",
+  "admission": "Only after candidate04 phases terminate and any failure is reconciled; exact source guards/archive; serial own Cargo target",
+  "stop_rule": "Run phases sequentially; stop first failing phase and retain immutable evidence. No automatic retry.",
+  "remaining_requirements": [
+    "Owner donor reconciliation",
+    "SAT producer",
+    "Executed native CLI acceptance including startup/restore and all controls",
+    "Full library and PR delivery",
+    "Whole-worker instructions and cloud pilot"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "commands": [
+    [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--lib",
+      "ml_dataset::",
+      "--",
+      "--test-threads=1"
+    ],
+    [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--example",
+      "dataset_startup_cli_fixture",
+      "--",
+      "--test-threads=1"
+    ]
+  ],
+  "phase_order": [
+    "dataset",
+    "fixture"
+  ],
+  "supersedes": "Adds donor3adc85e5 claim checks to04; preserves previous results with their original source scope"
+}
