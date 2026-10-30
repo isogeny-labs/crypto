@@ -7,9 +7,7 @@
 //! Flags (Go `flag` syntax: `-bits 64,256` or `-bits=64,256`):
 //!   -bits LIST  comma-separated field sizes, default "64,256,1024,4096,16384"
 
-use num_bigint::BigUint;
-
-use ecdl_tensor_ic::{gadget_shapes, Arith, NetworkStats};
+use ecdl_tensor_ic::scale::ScaleRow;
 
 const DEFAULT_BITS: &str = "64,256,1024,4096,16384";
 
@@ -87,42 +85,21 @@ fn main() {
             std::process::exit(2);
         }
     };
-    println!(
-        "{:>7} {:>5} {:>4} {:>4} | {:>8} {:>8} {:>8} | {:>7} {:>9}",
-        "b", "t", "n", "L", "mul e/b", "add e/b", "point e/b", "maxdeg", "deg/b^.75"
-    );
+    println!("{}", ScaleRow::header());
     for s in sizes.split(',') {
-        let b: usize = match s.trim().parse::<i64>() {
-            Ok(v) if v >= 4 => v as usize,
-            _ => {
-                println!("bad size: {}", s);
-                continue;
-            }
+        let row = match s.trim().parse::<i64>() {
+            Ok(v) if v >= 4 => ScaleRow::new(v as usize),
+            _ => None,
         };
-        let p: BigUint = (BigUint::from(1u32) << (b - 1)) + 1u32;
-        let ar = Arith::new(&p);
-        let (mul, add, point) = gadget_shapes(&ar);
-        let mut maxdeg = 0usize;
-        for st in [mul, add, point] {
-            if st.max_degree > maxdeg {
-                maxdeg = st.max_degree;
-            }
+        let Some(row) = row else {
+            println!("bad size: {}", s);
+            continue;
+        };
+        for st in [&row.mul, &row.add, &row.point] {
             if !st.is_graph {
-                println!("warning: not a graph at b = {}", b);
+                println!("warning: not a graph at b = {}", row.b);
             }
         }
-        let per = |st: NetworkStats| st.edges as f64 / b as f64;
-        println!(
-            "{:>7} {:>5} {:>4} {:>4} | {:>8.1} {:>8.1} {:>8.1} | {:>7} {:>9.1}",
-            b,
-            ar.t,
-            ar.n,
-            ar.l,
-            per(mul),
-            per(add),
-            per(point),
-            maxdeg,
-            maxdeg as f64 / (b as f64).powf(0.75)
-        );
+        println!("{}", row.line());
     }
 }

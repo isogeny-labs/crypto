@@ -16,6 +16,7 @@ pub mod gadgets;
 pub mod linalg;
 pub mod pointgadget;
 pub mod relation;
+pub mod scale;
 pub mod schedule;
 pub mod solver;
 pub mod tensor;
