@@ -4,13 +4,35 @@ The user requested the largest feasible complete recovery on one RTX PRO
 6000. This ladder measures a bounded operational frontier, not a largest
 possible field, a security claim, or a certified timing advantage.
 
-The active frozen record is `protocol-v2.json`, hash
-`90e8869f3559d11b202fc09ef23ed8bde05bd58d2cd31febc8cef70f2251797f`.
-The preserved version 1 failed before compilation or any measurements when
-two wrapper commands were accidentally joined. Its complete archive and
-deletion receipt are linked from `failed-launch-v1/failure.json`. Version 2
-changes that wrapper newline only; all recovery code, fixtures, analysis,
-limits and stopping rules are unchanged. No failed launch is omitted.
+The initial ladder uses frozen `protocol-v3.json`, hash
+`36c8f17ea57cc552d84b076521f0b344fe2d2aa65cf41aa649228b0f110142b2`.
+Version 1 failed before compilation because two wrapper commands were joined.
+Version 2 passed the recovery/device preflight, then failed while compiling
+the native chart analyzer, before any ladder data. Both archives and deletion
+receipts remain under `failed-launch-v1/` and `failed-launch-v2/`.
+Version 3 repairs the analyzer literal and compiles instruments with Rust
+edition 2021 and warnings denied. The ladder code and inputs are unchanged.
+
+The subsequent indexed-lookup panel is frozen separately in `protocol-v4.json`,
+hash `29ff437233af158c060614d5e660a7b925d01a4edb6826bb0d945fe5cae333a6`.
+It was designed after v3 completed through 52 bits and its first 56-bit cell
+timed out; v3 continues unchanged. The index panel uses48/52/56/58/60-bit
+fixtures, the same two seeds and limits. On48/52bits the retained binary
+search (b) is compared with indexed search (u) and its identical repeat (x),
+with reversed order by seed. Higher rungs use u/x. At most24executions run;
+the first incomplete rung stops the ladder after all its cells are retained.
+Every successful cross-arm certificate must be byte-identical.
+
+The index stores lower-bound offsets for high x bits of the sorted full-point
+table, at most65537u64 entries. Empty buckets, duplicate points, x=0,
+last-field coordinates and infinity are explicitly tested. Infinity uses the
+full-table lookup; finite buckets preserve the lowest original tuple id.
+`ER_QUERY_BINARY_REFERENCE` disables the index; both measured services log
+row counts and admission bytes with `ER_TABLE_DIAGNOSTICS`. Admission bytes
+are a conservative allocation bound, not measured peak device usage.
+[NVIDIA's lower-bound contract](https://github.com/NVIDIA/cccl/blob/main/thrust/thrust/binary_search.h)
+and the existing full-key comparator informed this conventional indexing
+change. No new algorithmic exponent or external-tool superiority is claimed.
 
 ## Implementation and mathematical checks
 
