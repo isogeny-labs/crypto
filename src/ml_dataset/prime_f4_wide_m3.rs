@@ -392,13 +392,8 @@ pub(super) fn solve(
                 .any(|r| r.matches_target == Some(true));
         if let Some(cursor) = extraction.first_verified_cursor {
             let indices = extraction.rows[cursor].indices;
-            push(
-                &mut data,
-                "pdp-witness.json",
-                "independently-verified-pdp",
-                &json!({"summands":indices.map(|i|domain[i].json()),"target":target.json(),"sum":target.json(),"replay_group_add_calls":3}),
-                RESERVE,
-            )?;
+            data.artifacts
+                .push(witness_payload(domain, target, indices)?);
             result.pdp_witness_verified = true;
         }
         if result.stop == "unit_derived" && extraction.rows.iter().any(affine_root) {
@@ -507,6 +502,32 @@ fn extract(
         expired(deadline)
     })
 }
+fn witness_payload(
+    domain: &[Element],
+    target: &Element,
+    indices: [usize; 3],
+) -> Result<ArtifactPayload, String> {
+    let value = json!({"summands":indices.map(|i|domain[i].json()),"target":target.json(),"sum":target.json(),"replay_group_add_calls":3});
+    Ok(ArtifactPayload {
+        path: "pdp-witness.json".into(),
+        role: "independently-verified-pdp".into(),
+        encoding: "json".into(),
+        bytes: encoded(&value, RESERVE)?,
+    })
+}
+trait ExtractionPersistence {
+    fn witness(&mut self, payload: &ArtifactPayload) -> Result<(), String>;
+    fn event(&mut self, event: &Value) -> Result<(), String>;
+}
+struct LiveExtraction;
+impl ExtractionPersistence for LiveExtraction {
+    fn witness(&mut self, payload: &ArtifactPayload) -> Result<(), String> {
+        live_payload(payload)
+    }
+    fn event(&mut self, event: &Value) -> Result<(), String> {
+        live_event(event)
+    }
+}
 fn extract_with_clock(
     input: &PrimeChainInput,
     group: &Group,
@@ -514,6 +535,25 @@ fn extract_with_clock(
     target: &Element,
     limits: &Limits,
     deadline_expired: &mut dyn FnMut() -> bool,
+) -> Result<Extraction, String> {
+    extract_with_persistence(
+        input,
+        group,
+        domain,
+        target,
+        limits,
+        deadline_expired,
+        &mut LiveExtraction,
+    )
+}
+fn extract_with_persistence(
+    input: &PrimeChainInput,
+    group: &Group,
+    domain: &[Element],
+    target: &Element,
+    limits: &Limits,
+    deadline_expired: &mut dyn FnMut() -> bool,
+    persistence: &mut dyn ExtractionPersistence,
 ) -> Result<Extraction, String> {
     let mut out = Extraction {
         schema: "crypto.ml-dataset.wide-prime-f4-m3-extraction/v1".into(),
@@ -611,8 +651,16 @@ fn extract_with_clock(
                 out.witness_equation_replays += 5;
             }
             out.first_verified_cursor = Some(cursor);
+            // Publish the dedicated certificate before another triple can run.
+            // Later canonical staging uses the same compact bounded bytes.
+            let payload = witness_payload(domain, target, indices)?;
+            if let Err(error) = persistence.witness(&payload) {
+                out.persistence_error = Some(error.chars().take(512).collect());
+                out.stop = "observer_failure".into();
+                break;
+            }
         }
-        if let Err(error) = live_event(
+        if let Err(error) = persistence.event(
             &json!({"kind":"wide_prime_f4_m3_group_triple","cursor":cursor,"record":out.rows.last(),"group_adds":out.group_adds,"witness_replay_adds":out.witness_replay_adds,"first_verified_cursor":out.first_verified_cursor}),
         ) {
             out.persistence_error = Some(error.chars().take(512).collect());
@@ -621,7 +669,7 @@ fn extract_with_clock(
         }
     }
     if out.persistence_error.is_none() && out.stop != "complete" {
-        if let Err(error) = live_event(
+        if let Err(error) = persistence.event(
             &json!({"kind":"wide_prime_f4_m3_group_stop","stop":out.stop,"last_record":out.rows.last(),"group_adds":out.group_adds,"witness_replay_adds":out.witness_replay_adds,"first_verified_cursor":out.first_verified_cursor}),
         ) {
             out.persistence_error = Some(error.chars().take(512).collect());
@@ -1711,6 +1759,101 @@ mod tests {
             forged.witness_replay_adds = replay_adds;
             forged.group_adds = 2 + replay_adds;
             assert!(verify_extraction(&input, &forged, &group, &points, &target, &limits).is_err());
+        }
+    }
+    #[test]
+    fn m3_bound_capture_persists_first_certificate_before_later_callback_failure() {
+        struct Sink {
+            emitter: CaptureEmitter,
+            path: PathBuf,
+            fail_later: bool,
+            witness_calls: usize,
+            event_calls: usize,
+        }
+        impl ExtractionPersistence for Sink {
+            fn witness(&mut self, payload: &ArtifactPayload) -> Result<(), String> {
+                self.witness_calls += 1;
+                self.emitter.payload(payload).map_err(|e| e.to_string())
+            }
+            fn event(&mut self, event: &Value) -> Result<(), String> {
+                self.event_calls += 1;
+                if self.fail_later
+                    && event["kind"] == "wide_prime_f4_m3_group_triple"
+                    && event["cursor"] == 1
+                {
+                    assert!(self.path.join("payloads/pdp-witness.json").exists());
+                    return Err("controlled later triple callback failure".into());
+                }
+                self.emitter.event(event).map_err(|e| e.to_string())
+            }
+        }
+        let (cfg, case, context) = fixture_at(false, 61);
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let target = group.mul(&points[0], 3);
+        let input = prime_chain_input(3, &group, &points, &target).unwrap();
+        let limits = Limits::derive(&cfg, &context.launch).unwrap();
+        for refuse_first in [false, true] {
+            let path = std::env::temp_dir().join(format!(
+                "m3-first-certificate-{}-{}-{refuse_first}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            let mut capture = super::super::super::capture::capture_limits(64).unwrap();
+            if refuse_first {
+                capture.max_payload_bytes = 0;
+            }
+            let emitter =
+                CaptureEmitter::create(&path, context.launch.binding.clone(), capture).unwrap();
+            let mut sink = Sink {
+                emitter,
+                path: path.clone(),
+                fail_later: !refuse_first,
+                witness_calls: 0,
+                event_calls: 0,
+            };
+            let output = extract_with_persistence(
+                &input,
+                &group,
+                &points,
+                &target,
+                &limits,
+                &mut || false,
+                &mut sink,
+            )
+            .unwrap();
+            verify_extraction(&input, &output, &group, &points, &target, &limits).unwrap();
+            assert_eq!(output.first_verified_cursor, Some(0));
+            assert_eq!(output.stop, "observer_failure");
+            assert!(output.persistence_error.is_some());
+            assert!(!output.domain_complete);
+            assert_eq!(sink.witness_calls, 1);
+            let canonical = witness_payload(&points, &target, output.rows[0].indices).unwrap();
+            if refuse_first {
+                assert_eq!(output.rows.len(), 1);
+                assert_eq!(sink.event_calls, 0);
+                assert!(!path.join("payloads/pdp-witness.json").exists());
+                assert!(sink.emitter.payload(&canonical).is_err());
+            } else {
+                assert_eq!(output.rows.len(), 2);
+                assert_eq!(sink.event_calls, 2);
+                assert_eq!(
+                    fs::read(path.join("payloads/pdp-witness.json")).unwrap(),
+                    canonical.bytes
+                );
+                let before = fs::read(path.join("events.jsonl")).unwrap();
+                sink.emitter.payload(&canonical).unwrap();
+                assert_eq!(
+                    fs::read(path.join("events.jsonl")).unwrap(),
+                    before,
+                    "identical canonical staging must not double-charge live capture"
+                );
+            }
+            drop(sink);
+            fs::remove_dir_all(path).unwrap();
         }
     }
 }

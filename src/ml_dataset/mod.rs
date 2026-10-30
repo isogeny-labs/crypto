@@ -4720,6 +4720,34 @@ mod tests {
                 );
                 assert!(verify_cell(&forged, true).is_err());
             }
+            let early = altered_cell(
+                &raw,
+                &fixture.0.join("raw-early-certificate"),
+                |path, manifest| {
+                    let nested = "live/payloads/pdp-witness.json";
+                    let bytes = fs::read(dir.join("pdp-witness.json")).unwrap();
+                    storage::write_bytes(
+                        path,
+                        nested,
+                        "producer-role-not-registered",
+                        "json",
+                        &bytes,
+                    )
+                    .unwrap();
+                    let collected = collect_cell_artifacts(path).unwrap();
+                    let certificate = collected.into_iter().find(|a| a.path == nested).unwrap();
+                    assert_eq!(certificate.role, "unregistered-partial-artifact");
+                    assert_eq!(certificate.encoding, "native");
+                    manifest.artifacts.push(certificate);
+                },
+            );
+            verify_cell(&early, true).unwrap();
+            let promoted = altered_cell(
+                &early,
+                &fixture.0.join("early-certificate-promoted"),
+                |_, manifest| manifest.outcome["pdp_witness_verified"] = json!(true),
+            );
+            assert!(verify_cell(&promoted, true).is_err());
             let retained = altered_cell(&dir, &fixture.0.join("censored"), |path, manifest| {
                 manifest.artifacts.push(
                     storage::write_json(path, "result.json", "solver-outcome", &manifest.outcome)

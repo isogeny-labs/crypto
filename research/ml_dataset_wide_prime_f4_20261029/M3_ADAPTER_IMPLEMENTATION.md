@@ -148,3 +148,22 @@ terminal counters exactly. Nonterminal boundary/result differences remain allowe
 Additional tests are authored, not yet executed at this correction's publication.
 The first-match dedicated live-certificate persistence issue remains a separate
 follow-up and is not silently treated as solved by these semantic replay changes.
+
+## Dedicated first-certificate persistence follow-up
+
+A separate source change now uses one bounded compact witness_payload constructor
+for immediate live publication and later canonical staging. After successful
+three-add and affine-equation replay, it publishes the dedicated certificate
+before any subsequent triple. A live refusal preserves the first cursor and
+staged certificate, records the sticky failure and stops further work. Existing
+flush behavior prevents retries after that failure; successful duplicate live
+publication is byte-identical and idempotent in CaptureEmitter.
+
+Authored control wraps the real bound CaptureEmitter, requires the file already
+exist when a later triple callback fails, and checks identical canonical bytes
+and duplicate publication. A real zero-payload admission refusal stops at the
+first verified candidate with no later event submissions. The central control
+calls the actual collector on an early nested live/payloads/pdp-witness.json,
+checks opaque native classification, preserves the censored truncated prefix,
+and rejects a promoted positive outer label. These additional controls have not
+been run by this author. See M3_FIRST_CERTIFICATE_PERSISTENCE.md for the design.
