@@ -78,6 +78,10 @@ requirements. Scientific preparation pins tested source
 `7c58661935b79153ff74c1208d0592aa56ed04a1` and the unchanged spec bytes. It does
 not validate later main merges. The 280 planned executions have zero attempted
 or completed scientific rows; no canonical data export is fabricated.
+The 16:41 UTC upstream integration repaired the previously observed methods.rs
+error, then a fresh check found another upstream parse error in
+binary_semaev_chain_sat.rs. Its source-bound failure is retained separately;
+older passing checks are not presented as a pass of that merged source.
 
 [Implementation and execution-status diagram](pipeline.svg).
 [Printable report](report.pdf), built from [report.typ](report.typ); an

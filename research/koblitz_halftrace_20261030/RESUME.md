@@ -27,11 +27,13 @@ only its prospective records and workflow support. The spec bytes are unchanged.
 ## State
 The original full release suite finished: 5447 passed, zero failed, 123 existing
 ignored. Final-source cache filter (10), ordered-lift test (1), two native E2E
-examples and strict library Clippy passed before the main merges. Current-main
-merge preserves the feature code, but its existing ecbench/methods.rs has unclosed
-delimiters and prevents the repeated checks from compiling. This failure is
-recorded rather than attributed to the cache or hidden. An inherited Cargo.lock
-reference mismatch was normalized by Cargo. No scientific run has
+examples and strict library Clippy passed before the main merges. Upstream
+main53f4b531f fixed the earlier methods.rs parser error and lockfile references.
+Merged it at4790f74f1 while preserving the cache implementation. The new locked
+recheck failed on an unclosed delimiter in binary_semaev_chain_sat.rs, identical
+to upstream; ordered/E2E rechecks were not attempted after compilation failed.
+Separate receipt and source hashes are in development/recheck-20261030T1641Z/.
+No unrelated fix or test suppression was applied. No scientific run has
 started, and no speedup is claimed. Auto-merge is paused for the unresolved P1
 requirement to retain a matched native comparison. Local checkpoint transport
 has no credentials. Checkpoint-only Actions run41082358257 at preparation

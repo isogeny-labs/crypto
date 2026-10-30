@@ -23,8 +23,8 @@ tables are shared by clones. No field-wide table or new Python path is introduce
 The original release suite completed: *5447 passed, zero failed, 123 existing
 ignored*. Final-source cached/ordered tests, both native E2E examples and strict
 library Clippy pass separately. The suite predates only the documented parity
-lint cleanup. Later main merges preserve the feature files but expose an existing
-syntax error in ecbench/methods.rs; their repeated check is blocked. Exact source
+lint cleanup. Later main merges preserve the cache but expose successive upstream
+parser errors; the latest is in binary_semaev_chain_sat.rs. Exact source
 scope and failures are retained under `development/`. Test times are not benchmarks.
 
 The frozen comparison has eight independent one-target workloads, the same

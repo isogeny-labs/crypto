@@ -2,6 +2,8 @@
 
 All commands run at the repository root with Rust 1.99.1. Neither compilation
 nor test elapsed times establish native speedup. No scientific run was launched.
+Unless a later attempt is explicitly named, passing checks below refer to the
+original tested feature source. They do not validate subsequent main merges.
 
 | Check | Result |
 | --- | --- |
@@ -30,6 +32,15 @@ and current-main-build-failure.txt. The original results are not relabelled as a
 pass of this later source. Scientific preparation pins the tested feature source
 specified in the prospective protocol.
 
+At the 16:41 UTC check-in, upstream main53f4b531f had repaired that methods parser
+error and the lockfile references. Merged it normally, preserving both additive
+documentation blocks. The recheck at source4790f74f1 then failed before running
+tests on an unclosed delimiter in binary_semaev_chain_sat.rs, byte-identical to
+upstream. No unrelated source repair or test suppression was applied. The ordered
+and E2E rechecks did not run after that compile failure. See the new immutable
+[receipt](recheck-20261030T1641Z/receipt.json), exact gzip compiler log and source
+hashes; older failure logs and passing results remain unchanged.
+
 Earlier development attempts are retained, including sparse-checkout omissions
 and the first Clippy failure. Tracked fixture files were restored from the
 baseline commit; no tests were disabled or rewritten. Full-tree cargo fmt finds
@@ -40,8 +51,9 @@ changes are included.
 the artifact-store policy's 64 KiB data threshold, so it is ignored and not
 committed. S3 upload is pending the same missing access; no remote manifest is
 invented. `LOCAL_ARCHIVE.sha256` identifies this local snapshot. Short complete
-check logs are retained as loose files; `SHA256SUMS` identifies the final source
-and committed check logs. This is development evidence, not an admitted ecbench
+check logs are retained as loose files; `SHA256SUMS` identifies the original
+tested source and its check logs. Later rechecks have separate source manifests.
+This is development evidence, not an admitted ecbench
 run, replay certificate or performance ledger row. The full-suite archive log
 is an explicitly dated pre-completion snapshot. A separate completed snapshot,
 `checks-complete.tar.xz`, retains the final parent result and later failed checks;
