@@ -1,4 +1,9 @@
-# Continuation validation: proof/scoped checks pass; full library capped incomplete
+# Validation: faade scoped pass/cap; a030 native compilation blocked
+
+**Current sourcea030:** [fresh merged validation](integration-0cc5/README.md)
+has an18-declaration/zero-trusted proof-gate pass and module replay. Native
+checks stopped at inherited compilation error101 before tests; no native pass is claimed. Earlier completed scoped/capped
+records below validate faade only. All old snapshots remain unchanged.
 
 2026-10-30. Source commit `faade165a46fd51e5a0903ba8e4df85a134c68db`.
 [Proof receipt](proof-final-receipt.json) binds final source objects and exact

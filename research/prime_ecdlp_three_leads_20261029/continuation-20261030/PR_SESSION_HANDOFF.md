@@ -147,3 +147,42 @@ collection and fullgoal continuation. New actualscopedresults/remotechanges
 reset unchangedcount0. Bounded4h cadence on unchanged,stopafter3unchanged or
 userstop; merge/closure stops oldPR maintenance. No scientificlaunch/access/
 funding/lease/quota/pool changes. All localnewcommits remain UNPUSHED.
+
+## Update2026-10-30T18:50Z — integrated source, inherited compile failure
+
+Current local source mergea030c1630518564bdb3633815391858b424377ce has
+parents45b53fbc8386d6be13b2f96cc9f805bffe69dd94 and0cc5e0d23a37a502dd363e41d866ec4991d3afb3.
+Onlylog/index conflicted;1022/1140 paragraphs and89/91 links preserved,26
+complete remoteentry groups appended,mainhashed-ECDL/ICrow andlocalPKMrow
+retained. Fallback explanation6530542078 because Copilotcannotaccessprivate
+localhistory. Native/Lean PKMsource andallfrozenstudy evidence unchanged.
+
+Old31539 run TERMINAL124 at17:27:54UTC:5646declared,2208pass,0fail,47ignored,
+1unchangedJVactive,3390notreached. Raw214615bytesSHA25634fdd95ea133361298e8911f9a5899c431a5e9af97b73e7828e1b5289cdf87bd
+NOT_UPLOADED; own finalreceipt validation/native-final-faade. Neverrestartit.
+
+New46238 run TERMINAL101 in FIRSTCOMPILATION; ZERO newtestsran,8laterphases
+notreached,no librarysuite started. Exactreceipts/logs in validation/
+integration-0cc5/native-failure. Unclosed delimiter binary_semaev_chain_sat.rs
+is byteidentical at a030/0cc5/mainparentd4b3,Gitblobcc1d72055ee13acf4941e13162186ffead445904,
+SHA256554203d74681f1c8eed9b9e3ac6c644551bfd48be5dae28a1053494bb5cb3da0.
+Earliercomment6526695631 reportedsamebasefailure; no patcharound/waiver.
+Newchanged Lean gate PASS18declarations/0trusted andmodulekernel replay PASS
+againstimports,not--fresh. Its source/dependency/gateobjects areboundin
+integration-0cc5/proof-receipt.json; reuseonlyif those exactobjects unchanged.
+
+Mainfilepreviewnowhasdifferent repaired-looking blob4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f,
+butexactmaincommit/fullbuildunverified. PR2949 OPEN,head0cc5,nowMERGEABLE=false.
+A NEW Copilot-first mainconflict request willbe posted afterthiscommit.
+Do notedit conflictedfiles whileactive. RequestID/actualcontext recordedin
+new private requestreceipt/preparedsessionentry and automationprompt. Once
+resolveracts,reviewagainstBOTHparents,preserve frozen evidence/allreceipts,
+both loghistories/indexrows; freshaffectednativechecks required afterrepair.
+If noresponse afterreasonablewait orcannotact,explainfallback andordinary
+merge main intoexistinglocalbranch; norebase/force,frozenevidenceconflictstop.
+
+Bothnativejobs areterminal. DoNOTrestartsamesource recipes. Allnewlocal
+commits UNPUSHED pendingrepaired-source qualification. CurrentreportPDF and
+G2recheckare versioned;G2counts notimplemented/priced. Newnamedproblem:
+problems/binary-semaev-chain-sat-merge-delimiter.md. FullG1–G6 unchanged,
+0panels,comparison_admissible=false; no resource/accesschanges. Auto paused.

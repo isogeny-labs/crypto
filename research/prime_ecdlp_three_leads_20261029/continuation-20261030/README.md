@@ -6,8 +6,16 @@ result. The original acceptance criteria in [PKM_GOALS.md](../PKM_GOALS.md)
 remain in force. [Goal state](goal-state.json), [proof map](proof-map.md),
 [diagram](scalar-certificates.svg), and [PDF](report.pdf) accompany this record.
 
-**17:03UTC follow-up:** [23 integrated example tests and all scoped checks pass](validation/scoped-20261030T1703Z/receipt.json).
-The 5646-case library execution is still active; no terminal outcome is claimed.
+**Latest integration,18:37UTC:** [mergea030](validation/integration-0cc5-resolution.json)
+preserves both histories and frozen evidence. Its changed Lean gate passes18
+declarations/zero trusted, with module replay against imports. Fresh native
+validation stopped at inherited compilation error101 before tests; see [current validation](validation/integration-0cc5/README.md)
+and [integration report](integration-20261030T1837Z.pdf). Earlier faade library
+execution capped incomplete at2208pass/0fail/47ignored/1active/3390not reached.
+The [G2 gap recheck](G2_RECHECK_A030.md) is source review, not a counter fix.
+
+**Historical17:03UTC follow-up:** [23 integrated example tests and all scoped checks pass](validation/scoped-20261030T1703Z/receipt.json).
+The 5646-case library execution was then active; its terminal cap is below.
 Those results bind sourcefaade, not newer remote0cc5. [Remote merge review](validation/remote-0cc5-review-snapshot.json)
 preserves all179 earlier study blobs and both parent logs; eight bound
 source/dependency paths changed and need affected validation after integration.

@@ -52,6 +52,14 @@ different acceptance requirements.
 
 ## Resolution and history
 
+2026-10-30T18:45Z: sourcea030 preserves both merge histories, and the changed
+Lean gate passes18 declarations/zero trusted plus module replay. Fresh native
+validation stops at the [inherited chain-SAT delimiter](binary-semaev-chain-sat-merge-delimiter.md)
+before any tests run. New main's file preview contains a repair, but PR2949
+reports conflicts; reviewed resolution and fresh affected validation remain
+required. The G2 accounting gaps are rechecked, not fixed or priced. No new
+scientific panel, count qualification or goal completion is claimed.
+
 2026-10-30T17:03Z follow-up: fresh pinned-source23 example tests, strict lint/
 format, CLI refusal, backlog validation and library build pass; full library
 execution is active, not passed. The [G2 source audit](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_ACCOUNTING_AUDIT.md)

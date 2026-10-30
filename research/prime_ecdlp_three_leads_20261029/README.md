@@ -8,6 +8,11 @@ The requested work is (1) complete and measure symmetric PKM decomposition,
 known-log base on arbitrary targets, with Lean proofs of feasible mathematics.
 Implementation tests and formal proofs are distinct from those scientific panels.
 
+**Latest18:37UTC integration:** [sourcea030 and fresh validation](continuation-20261030/validation/integration-0cc5/README.md)
+preserve both log/index histories. The changed Lean gate passes18 declarations
+with zero trusted exceptions; native compilation stopped at inherited error101, before tests. The
+earlier faade library run capped incomplete; [final receipt](continuation-20261030/validation/native-final-faade/receipt.json).
+
 **2026-10-30 continuation:** [independent scalar replay and five Lean contracts](continuation-20261030/README.md)
 strengthen useful-rank and target-recovery checks. Fresh proof audit passes18
 declarations with zero trusted exceptions; fresh native integration is pending.
