@@ -430,6 +430,26 @@ def curve_traits(ref):
          label="Proved primes in docs/curves/factor-hints.txt", source="docs/curves/factor-hints.txt")
 
 
+def pencil_gate_observations(ref, since):
+    """Copy committed native gate counts; do not derive costs or clock admission."""
+    path = "research/pencil_large_prime_20261029/validation/actual_gate_results_20261030/analysis-receipt.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "pencil-actual-gate-analysis-receipt/v1":
+            continue
+        for field, unit in (
+            ("observed_executions", "execution records including warmups"),
+            ("observed_warmup_executions", "warmup execution records"),
+        ):
+            emit("pencil.p739_gate." + field, record.get(field), date=date,
+                 problem=P_IC, unit=unit, better="neutral",
+                 label="Recorded synthetic p739 gate; no wall-time qualification",
+                 source=f"{path}@{commit}")
+        if record.get("all_expected_records_present") is True:
+            emit("pencil.p739_gate.observed_workloads", record.get("expected_workloads"),
+                 date=date, problem=P_IC, unit="distinct prescribed workloads",
+                 better="neutral", label="Complete 60-target gate inventory; not the 1260-target cohort",
+                 source=f"{path}@{commit}")
 def ic_aimed_gather(ref, since):
     """The aimed-subset gather component (a stage measurement, not a whole-pipeline row):
     the 42-round paired collect-phase ratio main / candidate and the lower end of its
@@ -468,6 +488,7 @@ def main():
 
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
+    pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
 
 if __name__ == "__main__":
