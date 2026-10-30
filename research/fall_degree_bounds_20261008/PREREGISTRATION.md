@@ -652,3 +652,183 @@ whatever `m` and `n` are, at the sizes below.
 - A Spot interruption gets one relaunch from scratch on the same archive.
 
 Nothing from any E12 cell has been computed, and no E12 draw has been generated.
+
+## Amendment 12 (2026-10-27, after E12b r1 and r2 were read; before any draw below): finish E12b cell 3:24:7 On-Demand
+
+**Why.** Both E12b attempts finished 3:30:4, 3:27:5 and 3:24:6, each with all four draws
+at `d_F = 4`. Both were then Spot-reclaimed after draw 0 of 3:24:7, which read `≥ 5`.
+r2 equals r1 on every non-timing field. Amendment 11's one relaunch is used, so 3:24:7 is
+not completed, and the E12b reading cannot be decided (`RESULTS.md`, E12 section).
+The user asked on 2026-10-27 to finish 3:24:7 On-Demand.
+
+**Disclosed before this run:** the 13 r1/r2 draws above, including draw 0 of 3:24:7.
+
+**Run (E12b-OD).**
+- Cell 3:24:7 only (`N = 45`), from scratch: `hky_par newcells`, `cmax = 4`, `keep = 4`,
+  seed 20261012. Same frozen archive `fd-src-371035216942.tgz` (sha256 `4ae808ac…`) and
+  `e12/run_par.sh`, without the Lean step.
+- Host: `ephemeral --on-demand`, m7i.4xlarge or any x86 type with ≥ 16 vCPU and ≥ 32 GB.
+  Counts only; wall time is recorded and not scored.
+- Gates: Amendment 10's gates 0–3 on the exact binary. **Gate 4:** draw 0 must equal the
+  r1/r2 record on every non-timing field; otherwise the run is void.
+- An interruption or failure of any kind ends the run as **not completed**. There is no
+  further relaunch without a new amendment.
+
+**Reading (fixed now).** Amendment 11's E12b rules, with 3:24:7's median taken over the
+four E12b-OD draws and the other three cells as recorded in r2:
+- **"consistent with H_ℓ":** 3:24:7 has median `≥ 5`. The median is `lowerMedian` in
+  `lean/FallDegree/Rule.lean`, the 2nd smallest of 4, with a censored value recorded as the
+  cap plus one. So this needs at least 3 of the 4 draws at `≥ 5`.
+- **"mixed":** otherwise. "`n`-driven" is already excluded.
+
+**Not in scope.** E12a and E12c stay not completed under Amendment 11. Rerunning them
+needs its own amendment.
+
+## Amendment 13 (2026-10-28 UTC, 2026-10-27 Pacific): one new E12a/E12c attempt
+
+**Authorization and disclosure.** The user has now explicitly requested launch of
+the unfinished E12 follow-ups. All earlier E9/E10 results, the E11 engineering
+record, and the interrupted E12 attempts have been read. This amendment is frozen
+and committed before any new draw. It permits one additional from-scratch attempt
+for E12a and E12c only; earlier interruptions and results remain unchanged.
+
+**Scientific contract.** Amendment 11's cells, seed `20261012`, sample counts,
+engines, gates, and reading rules are unchanged. Source remains archive
+`fd-src-371035216942.tgz`, SHA-256
+`4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f`, source commit
+`371035216942660c4615dfbb88d85a14afaf5c16`. Every host verifies the archive before
+extracting it. The original `run_par.sh` and `run_window.sh` execute unchanged.
+
+| Part | Cell | Engine and draws | Host | Hard lifetime |
+| --- | --- | --- | --- | --- |
+| E12a | `3:21:7`, N=42 | `hky_par`, cap 5, first 2 unsatisfiable draws | `r7i.8xlarge`, 32 vCPU, 256 GiB | 48 h |
+| E12c | `4:28:7`, N=84 | `hky_window`, `wide-vars`, `w1x`, 4 draws | `r7i.4xlarge`, 16 vCPU, 128 GiB | 48 h |
+
+**Execution.** Existing ephemeral Spot backend in `us-east-1`, one instance per
+part, concurrent where admitted, no `--keep`, no automatic retry. This uses 48
+vCPUs against the observed 64-vCPU regional standard-Spot quota. Hardware identity,
+source, binary digests, gates, status, and raw outputs are retained. Values are
+exact-computation observations; all times are diagnostic, with no performance or
+statistical comparison. CPU changes cannot justify a speed claim.
+
+**Interruption policy.** These frozen engines have no resumable mid-closure
+checkpoint. The existing runner saves available outputs on exit or interruption;
+this is partial-output preservation, not process recovery. A reclaim, timeout,
+OOM, gate failure, or other failure ends that part as not completed. No further
+relaunch is authorized by this amendment. The command stops ten minutes before
+the hard lifetime to allow uploads; deadline shutdown and the existing reaper
+remain enabled. The user-requested bounded attempt is not replaced by a new
+checkpoint-engine development project.
+
+**Admission.** Run each part's original gates before its cell. E12a still requires
+degree-4 dimensions to equal the E10 records for draws 0 and 1. E12c window failure
+remains inconclusive and cannot certify degree at least 5. A launcher receipt or
+exit code is not evidence of completed draws; full output counts and the original
+gates must be checked before any reading.
+
+**E12b stays pending.** Amendment 12 requires On-Demand. The current role explicitly
+denies it through `SpotOnlyEC2Launch`. The question of a new Spot attempt has been
+put to the user and has not been answered when this amendment is written. E12b is
+not authorized by Amendment 13; any change is recorded separately before launch.
+
+Launch scripts, the resource plan and receipts are stored under
+`e12/continuation-20261028/`. All prior attempts remain separate.
+
+## Amendment 14 (2026-10-28 UTC): E12a pre-execution capacity alternatives
+
+The Amendment 13 E12a submission
+`20261028-020921-fd-e12a-20261028-r3-4358b0` exhausted the configured zones with
+`InsufficientInstanceCapacity` or `Unsupported`. Its durable status is `error`;
+EC2 enumeration found no instance for that job. No solver, gate, or draw ran.
+E12c has been submitted separately and is not relaunched by this amendment.
+
+To fulfill the same user-requested E12a launch, allow at most two additional
+capacity submissions, in this fixed order: `r6a.8xlarge`, then `r6i.8xlarge`.
+Both are x86 hosts with 32 vCPU and 256 GiB. Source archive, seed, two draws,
+degree cap 5, gates, 48-hour lifetime, and scientific readings are unchanged.
+This amendment is committed before either fallback submission.
+
+Each alternative requires the preceding submission's durable `error` status
+to identify a no-Spot-capacity failure and a fresh EC2 check to find no instance
+for it. Preserve every failed submission in a separate receipt. If any instance
+is created, stop trying alternatives; there is only one admitted solver attempt.
+An ambiguous launch, any other error, or a started job's interruption/failure
+does not authorize an alternative. No additional instances beyond this ordered
+list are authorized here. The wrapper enforces separate receipt directories and
+the absence-of-instance check. This infrastructure amendment adds no new draw,
+changes no scientific acceptance rule, and makes no timing comparison.
+
+## Amendment 15 (2026-10-27 Pacific, 2026-10-28 UTC): one E12b Spot continuation
+
+The user explicitly selected one new Spot attempt for E12b after the current
+role denied On-Demand. This supersedes Amendment 12's market requirement for
+this attempt only. The earlier partial results and On-Demand denial stay in the
+record. Current EC2 enumeration finds only the admitted E12a/E12c jobs, and the
+two earlier E12b jobs have durable `interrupted` status. No On-Demand E12b job was
+launched. This amendment is committed and pushed before the new submission.
+
+- **One attempt:** cell `3:24:7` (N=45), from scratch, cap 4, four unsatisfiable
+  draws, seed `20261012`, using the unchanged `e12/run_par.sh` without Lean.
+- **Frozen source:** `fd-src-371035216942.tgz`, SHA-256
+  `4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f`, commit
+  `371035216942660c4615dfbb88d85a14afaf5c16`.
+- **Host and budget:** one `m7i.4xlarge` Spot instance in `us-east-1`, 16 vCPU,
+  64 GiB, maximum lifetime 24 hours, no `--keep`. Together with E12a/E12c this
+  uses 64 vCPU against the observed 64-vCPU quota. Timing remains diagnostic.
+- **Gates:** original gates 0–3 on the exact binary, then Amendment 12's gate 4:
+  draw 0 must equal the r2 reference on every non-timing field. The known timing
+  fields are the top-level and per-degree `secs`; all other fields are compared,
+  including thread count. The r2 reference is
+  `e12/run-b2/out/E_3-24-7.jsonl`, SHA-256
+  `589c5045361c9a9138baecae629ea91512c35a87efbc022f31780d2d3a91574a`.
+  Earlier reconciliation established r1/r2 non-timing equality. Reference bytes
+  and a completion checker travel separately from the frozen source archive and
+  are hashed in the launch receipt. Neither changes the solver.
+- **Completion:** require all four draws numbered 0–3, the expected cell/seed,
+  zero solutions for each, successful cell exit, original gate completion, and
+  gate 4 equality. Missing or failed checks prevent a completed reading even if
+  the original wrapper exits zero. Preserve all raw outputs and checker logs.
+- **Reading:** retain Amendment 12's lower-median rule, substituting these four
+  new Spot draws for the unrun On-Demand draws; the other three cells remain r2.
+  At least three of four draws at `>=5` are required for consistency with H_ell.
+  A partial cell receives no reading. No independent implementation claim is made.
+- **Stopping:** no resumable mid-closure checkpoint and no automatic relaunch.
+  Reclaim, timeout, OOM, gate failure, or another failure ends this attempt as
+  not completed. The command stops ten minutes before the hard deadline for
+  output upload; existing deadline shutdown/reaper protections remain enabled.
+
+Submission uses selection `b-spot` in `e12/continuation-20261028/launch.sh`,
+with a separate receipt directory. This amendment does not relaunch E12a/E12c
+or authorize any further E12b attempt.
+
+## Amendment 16 (2026-10-27 Pacific, 2026-10-28 UTC): persist live E12 output files
+
+The user requested assurance that datasets are persisted to S3. Inspection found
+the existing runner uploads its main log every 15 seconds, but uploads `/work/out`
+only on exit or Spot notice. At inspection E12b already had partial draw data,
+while E12a/E12c's new-cell output files were empty. Immediate file snapshots were
+requested through SSM command `fe4fcb90-c33a-4440-a0cd-de464130bf0c` to protect
+existing bytes before installing a periodic uploader. No solver was restarted.
+
+For the three admitted continuation job IDs, install a low-priority systemd
+oneshot/timer that captures `/work/out` and available host/resource metadata to
+`s3://ephemeral-runs-104186811093-us-east-1/jobs/<job>/snapshots/` about once per
+minute. Each unique archive has a SHA-256 manifest published after S3 verifies
+the archive checksum; `snapshots/latest.json` points to the newest committed
+snapshot. Archive and manifest writes are conditional on absence. The existing
+final upload under `out/` is unchanged and cannot be overwritten by this helper.
+
+The helper validates the local job ID, refuses other jobs, respects its original
+deadline, and uses a lock to prevent overlapping uploads. Failed uploads are
+reported in the existing job log and retried by the timer; this is an artifact
+upload retry, never a solver retry. The timer does not extend instance lifetime.
+No engine, draw, seed, gate, scientific reading, or compute budget changes.
+All timings remain diagnostic; additional file I/O precludes a timing comparison.
+
+Snapshots capture live files and may contain a partial last record. They are not
+atomic solver-memory checkpoints and do not enable mid-closure resume. Each
+saved archive's bytes are independently verifiable; only complete draw records
+and all original gates can support a later scientific reading. Preserve the
+initial snapshots, installation receipts, readback hashes, and uploader source
+under `e12/continuation-20261028/`. The observed bucket lifecycle expires `cache/`
+objects only; it defines no expiration for these `jobs/` keys.

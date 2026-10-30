@@ -6,6 +6,7 @@
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
 #     explicitly build every tracked source owned by it (not only default
 #     targets), then audit every compiled module;
+#     explicitly build every tracked Lean source, then audit every built module;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
 # One frozen historical failed source is checked as an expected-failure target
@@ -55,6 +56,8 @@ discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
   git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -vE '(^|/)tools/(lean/)?selftest/' | xargs -r -n1 dirname | sort -u
+  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -v '^tools/lean/selftest/' \
+    | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
   git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
     d=$(dirname "$f")
@@ -69,6 +72,7 @@ if [ ${#targets[@]} -eq 0 ]; then mapfile -t targets < <(discover); fi
 if [ $list -eq 1 ]; then printf '%s\n' "${targets[@]}"; exit 0; fi
 [ ${#targets[@]} -gt 0 ] || { echo "no Lean targets found" >&2; exit 3; }
 command -v lake > /dev/null || { echo "lake not on PATH (install elan)" >&2; exit 3; }
+command -v python3 > /dev/null || { echo "python3 not on PATH (target path normalization)" >&2; exit 3; }
 
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
@@ -76,7 +80,21 @@ fail=0
 summary=()
 
 run_target() {
-  local t=$1 slug log status
+  local t slug log status
+  if ! t=$(python3 - "$root" "$1" <<'PY'
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1]).resolve()
+target = (root / sys.argv[2]).resolve(strict=True)
+if not target.is_relative_to(root):
+    raise SystemExit("proof target escapes the repository")
+print(target.relative_to(root).as_posix())
+PY
+  ); then
+    echo "FAIL_target_path $1" >&2
+    return 1
+  fi
   slug=$(echo "$t" | tr '/.' '__')
   log="$scratch/$slug"
   mkdir -p "$log"
@@ -190,6 +208,36 @@ run_target() {
         status=FAIL_no_modules
       elif ! (cd "$root/$t" && LEAN_PATH="$aux:${LEAN_PATH:-}" lake env lean --run "$audit" -- ${trust_args[@]+"${trust_args[@]}"} $mods) > "$log/audit.log" 2>&1; then
         status=FAIL_audit
+      local mods f module
+      local -a sources=()
+      # A default target may omit an entire tracked module. The +Module
+      # syntax works in both supported Lake versions; an unregistered source
+      # fails closed rather than silently escaping the axiom audit.
+      while IFS= read -r -d '' f; do
+        case "$f" in
+          *.lean) ;;
+          *) continue ;;
+        esac
+        module=$f
+        [ "$t" = . ] || module=${f#"$t"/}
+        case "$module" in
+          lakefile.lean|AxiomAudit.lean|*/AxiomAudit.lean) continue ;;
+        esac
+        module=${module%.lean}
+        sources+=("+${module//\//.}")
+      done < <(cd "$root" && git ls-files -z -- "$t")
+      if [ ${#sources[@]} -eq 0 ]; then
+        status=FAIL_no_sources
+      elif ! (cd "$root/$t" && lake build "${sources[@]}") > "$log/source-build.log" 2>&1; then
+        status=FAIL_source_build
+      else
+        mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
+          | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
+        if [ -z "$mods" ]; then
+          status=FAIL_no_modules
+        elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+          status=FAIL_audit
+        fi
       fi
     fi
   else
@@ -207,7 +255,7 @@ run_target() {
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
   fi
   # `sorry` that elaborated without being used by a theorem still warns at build time.
-  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log"; then
+  if [ "$status" = PASS ] && grep -q "declaration uses 'sorry'" "$log/build.log" "$log/source-build.log" 2>/dev/null; then
     status=FAIL_sorry_warning
   fi
   echo "$status" > "$log/status"
@@ -218,7 +266,7 @@ run_target() {
   tr=$(grep -o '[0-9]* trusted' "$log/audit.log" 2>/dev/null | grep -o '[0-9]*' || echo 0)
   printf '%-22s %4s thm %3s trusted  %s\n' "$status" "${n:-0}" "${tr:-0}" "$t"
   if [ "$status" != PASS ]; then
-    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" 2>/dev/null | head -5 | sed 's/^/    /'
+    grep -E '^FAIL|error|no theorems' "$log/audit.log" "$log/build.log" "$log/source-build.log" 2>/dev/null | head -5 | sed 's/^/    /'
     return 1
   fi
 }

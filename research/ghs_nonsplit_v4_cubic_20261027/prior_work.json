@@ -1,0 +1,76 @@
+{
+  "schema": "ghs-nonsplit-prior-work-v1",
+  "checked_on": "2026-10-27",
+  "candidate": {
+    "source_order": 4054,
+    "source_a_bitmask": 5522909,
+    "source_b_bitmask": 9159130,
+    "subgroup_prime": 2027,
+    "source_G_bitmasks": [9159131, 11791722],
+    "source_Q_bitmasks": [744530, 10466263]
+  },
+  "labels": {
+    "new_exact_curve": "unverified globally; exact equation not found in checked sources",
+    "new_eligible_family": "unverified globally; earlier even-characteristic cubic classification likely contains this pole orbit",
+    "new_attack_method": "no; classical cover and traced correspondence",
+    "new_to_this_audit": "yes; the prior triangle and Hess screens omitted the quadratic conjugate pole orbit",
+    "measured_vulnerability": "no measured GHS-over-rho advantage at q16; completed Magma attack core is about 225 times the same-runtime average Floyd-rho solve, before source-map cost"
+  },
+  "sources": [
+    {
+      "title": "Elliptic curves with weak coverings over cubic extensions of finite fields with even characteristic",
+      "authors": "Mahoro Shimura, Fumiyuki Momose, Jinhui Chao",
+      "year": 2010,
+      "url": "https://www.u-tokai.ac.jp/uploads/2021/02/about_pdf_annual-report2009_mokuroku-1.pdf",
+      "finding": "Bibliographic record confirms a directly relevant prior cubic even-characteristic classification; full case table not retrieved, so this source prevents a family novelty claim."
+    },
+    {
+      "title": "A classification of elliptic and hyperelliptic curves over finite fields of even characteristic subjected to the cover attack under the isogeny condition",
+      "authors": "Kousuke Murai, Mahoro Shimura, Tsutomu Iijima, Jinhui Chao",
+      "year": 2022,
+      "url": "https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf",
+      "finding": "States a corrected classification under g(C)=d*g(C0); the present cubic elliptic to genus-three construction meets that condition. The one-page abstract does not identify its explicit row."
+    },
+    {
+      "title": "A classification of elliptic curves with respect to the GHS attack in odd characteristic",
+      "authors": "Tsutomu Iijima, Fumiyuki Momose, Jinhui Chao",
+      "year": 2015,
+      "url": "https://eprint.iacr.org/2015/805.pdf",
+      "finding": "Its introduction explicitly reports a three-quarters density in the earlier even-characteristic work. The present three-screen union also tends to three quarters, so its asymptotic density cannot be advertised as novel."
+    },
+    {
+      "title": "Genus 3 curves with many involutions and application to maximal curves in characteristic 2",
+      "authors": "Enric Nart, Christophe Ritzenthaler",
+      "year": 2009,
+      "url": "https://arxiv.org/abs/0905.0546",
+      "finding": "Classifies genus-three covers with a k-rational V4 action. The present V4 is cycled by k-Frobenius, so direct identity of cases has not been established."
+    },
+    {
+      "title": "Cover attacks for elliptic curves with prime order",
+      "year": 2020,
+      "url": "https://arxiv.org/abs/2012.07173",
+      "finding": "A distinct cubic-extension transfer by a (l,l,l)-isogeny to a genus-three Jacobian; it cautions against calling any cubic genus-three route a new attack method."
+    },
+    {
+      "title": "On the discrete logarithm problem for plane curves",
+      "authors": "Claus Diem",
+      "year": 2012,
+      "url": "https://www.numdam.org/articles/10.5802/jtnb.815/",
+      "finding": "Proves expected soft-O(q) DLP cost for nonhyperelliptic genus-three plane quartics over F_q; this is an asymptotic target-side bound, not a measured cost for the q16 source or for every cover in this family."
+    }
+  ],
+  "repository_prior": [
+    {
+      "path": "research/ghs_hess_c_parameter_audit_20261026/EXACT_CUBIC_FAMILY.md",
+      "finding": "Rational-pole Hess product gate and exact product count, distinct from this nonsplit pole screen."
+    },
+    {
+      "path": "research/ghs_twisted_v4_triangle_20261027/REPORT.md",
+      "finding": "Triangle screen. Companion PR #2737 adds the rational-pole Hess overlap; this report reproves that overlap before adding the nonsplit screen."
+    },
+    {
+      "path": "research/ghs_q16_residual_quartic_search_20261027",
+      "finding": "An earlier smooth quartic in the same q16 isogeny class 3.16.a_a_abr was found; its source map had not been evaluated. This candidate is a class rediscovery even if its exact equation differs."
+    }
+  ]
+}
