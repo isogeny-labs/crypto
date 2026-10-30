@@ -1343,18 +1343,9 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_)
-            | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) = self
-        {
-            // Planted targets only on E(F_{p^4}), the tower, the three-leads
-            // study and the hyperelliptic Jacobians: no public-target law yet.
-            return None;
-        }
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
+        if let Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) = self {
+            // Translation, three-leads and hyperelliptic workloads lack a public
+            // target law. Torsion variants retain their implemented law below.
             return None;
         }
         if let Instance::Wide(i) = self {
