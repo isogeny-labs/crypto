@@ -3,11 +3,12 @@ import Mathlib
 /-! Cubic membership is an input-equality control, not a solver-degree theorem. -/
 namespace B3InputBounds
 open Polynomial
+noncomputable section
 variable {R : Type*} [CommRing R] [Nontrivial R]
 def cubic (r s t : R) : R[X] := (X-C r)*(X-C s)*(X-C t)
 def s3 (a b y z : R) : R[X] :=
- (X-C y)^2*C(z^2)-C(2*z)*((X+C y)*(X*C y+C a)+C(2*b))+
- (X*C y-C a)^2-C(4*b)*(X+C y)
+ (X-C y)^2*C (z^2)-C (2*z)*((X+C y)*(X*C y+C a)+C (2*b))+
+ (X*C y-C a)^2-C (4*b)*(X+C y)
 theorem cubic_monic (r s t : R) : (cubic r s t).Monic := by
  unfold cubic
  monicity!
