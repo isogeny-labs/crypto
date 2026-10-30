@@ -12,7 +12,9 @@ Read the [native summary](evidence/prime-terminal/summary.json),
 [byte layouts and reconstruction](PRIME_TERMINAL_FORMAT.json),
 [unified export](experiment-prime-terminal.export.json),
 [S3 objects](evidence/prime-terminal-storage.json), and
-[restored verification](evidence/prime-terminal-publication.json).
+[restored verification](evidence/prime-terminal-publication.json),
+[inspected report](reports/run-20261030T0632Z/report.pdf), and
+[delivery receipts](evidence/prime-terminal-delivery.json).
 R1 and R2 EKS attempts failed before native computation;both are preserved.
 R3 used the established host fallback without IAM or capacity changes.
 

@@ -42,3 +42,18 @@ Data/metricscommit,inspectedreport,support/PR/checkpoint/finalpublication. Earli
 
 ### Errors (what went wrong, how it was handled)
 R1workerfilepermission andR2HeadObject403 occurredbeforeanynativecase. Their immutableprotocol/source/image/job/logrecords retained. R3 native producer andbothreplays completed withoutfailure.
+
+
+## Report and support delivery
+
+### What was done (commands, files, features)
+Data71f819f5647c pushed before report. All126newmetrics match committedsummary. Both reportpages inspected;all6reportfiles and112supportpayloads restored fromS3 andhashverified. Supportarchive retains allfailedversions,threeimagebuildcontexts,source/checkpoint/job/logrecords andhelper scripts.
+
+### Decisions made (and why)
+Seal support onlyafter verification;laterreceipts useprime-terminal-final. Keep allnativebounds andfailurehistory unchanged. Rootlibrary/Cargo inputs unchangedfromd53bd234dd18.
+
+### Open threads (unfinished, pick up next time)
+FinalPR/head/checkpoint/readback;broaderFFD/LFD andelite-base objectives active.
+
+### Errors (what went wrong, how it was handled)
+Bare Git since-date excluded same-day commits before invocationtime,so firstmetricscheck found none. Retained initialexport/checkfailure;explicitUTCmidnight cutoff emits126expectedmetrics. No native computation repeated.
