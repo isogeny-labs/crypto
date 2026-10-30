@@ -1,10 +1,10 @@
 import Mathlib.Logic.Function.Iterate
-import Mathlib.Tactic.Omega
+import Mathlib.Tactic.Ring
 namespace OddDescent44
 
 theorem fivefold_on_half_period {X : Type*} (F : X → X) (p : X) (d : ℕ)
     (h : (F^[2*d]) p=p) : (F^[5*d]) p=(F^[d]) p := by
-  have he : 5*d=d+(2*d)*2 := by omega
+  have he : 5*d=d+(2*d)*2 := by ring
   rw [he, Function.iterate_add_apply, Function.iterate_mul]
   rw [Function.iterate_fixed h 2]
 
