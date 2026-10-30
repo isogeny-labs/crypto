@@ -87,3 +87,14 @@ A subsequent delivery review identified a row/term/degree-cap error-path mismatc
 polynomial parser. The correction is governed by
 [cap-fix-validation-plan.json](cap-fix-validation-plan.json). Earlier-source
 passes above remain intact; they do not establish the follow-up's validation.
+
+Follow-up runtime `d9a69910198d14a829b689253a62a7663b41d753` passed
+**240 dataset tests, 0 failed, 1 ignored**, including all four new cap/error
+regressions, then passed the explicit **360-case endpoint test**. Both phases
+returned exit0 with matching runtime-source readback. See
+[cap-fix-dataset.receipt.json](cap-fix-dataset.receipt.json),
+[cap-fix-endpoint.receipt.json](cap-fix-endpoint.receipt.json), and
+[cap-fix-scoped-readback.json](cap-fix-scoped-readback.json) for their four archived
+logs/receipts and fresh S3 byte comparisons. The follow-up's strict Clippy,
+release build, CLI replay and full library phases remain pending. No additional
+scientific samples or cloud cells were produced.
