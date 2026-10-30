@@ -1,0 +1,189 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-17",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-17.yaml",
+  "card_sha256": "fd570e8d4d0f2b5617c2bb36f8a7de73edc53302d6dd0cc29c4e3c92a943eadd",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-17"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-17/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 8.281,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 8.281,
+      "stderr_sha256": "4dc0b77782bbda8e469851e351f2200cb2fb287e66c887fe3570f9a0c9e520c1",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2656:5",
+        "     |",
+        "2647 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2656 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2657 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-17/b04",
+        "cell",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "3",
+        "--first",
+        "5",
+        "--random",
+        "1",
+        "--planted",
+        "0",
+        "--time-limit",
+        "330",
+        "--job-time",
+        "320"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 236.67,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell4-t5",
+      "index": 3,
+      "outputs": {},
+      "seconds": 236.67,
+      "stderr_sha256": "ca5621035aa1ff5b44c1d4c4ba48b4994a0a975bbbcab903eea736d9b2bc7fda",
+      "stderr_tail": [
+        "cell n=15 l=3 m=4 draw=0 curve d1=9852 d2=16801 a=19593 b=3931 basis=[1, 30005, 26016] setup 0.1s",
+        "cell done in 236.6s"
+      ],
+      "stdout_sha256": "e73db293f4249929529accbfb42046eef4b2b8ca59fdecb16f8e148da1835bcd",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":15,\"l\":3,\"m\":4,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":5,\"nv0\":118,\"elim\":15,\"nv\":103,\"eqs\":120,\"ech_rows\":120,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"not-reached\",\"D\":null,\"D_lb\":4,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":433196,\"matrix_cols\":182208,\"word_ops_last\":298204474130,\"word_ops_total\":298204550621,\"peak_basis_bytes\":2019447832,\"secs\":236.533,\"rss_peak_kb\":2094884,\"degrees\":[{\"d\":2,\"cols\":5357,\"rank\":120,\"target\":5357,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":120,\"products\":0,\"falls\":0,\"word_ops\":76491,\"peak_basis_bytes\":58928,\"rows_total\":120},{\"d\":3,\"cols\":182208,\"rank\":170781,\"target\":182208,\"out\":\"saturated\",\"secs\":236.420,\"seed_rows\":120,\"products\":433076,\"falls\":4225,\"word_ops\":298204474130,\"peak_basis_bytes\":2019447832,\"rows_total\":433196}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-04/card-17/b04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "6119e4973370a6d3b58ebf5765701c9d32be7c12",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-17-b-cell4-t5.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-06-replay-c15-5-3.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-06-replay-c15-5-3.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-06-sigr-c15-5-3.stderr.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/card-06-sigr-c15-5-3.stdout.log",
+    "research/blindspots_20261018/06-signature-gb-trace-replay/raw/receipt-card-06.json",
+    "xamples/blindspots_09_learned_f4.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

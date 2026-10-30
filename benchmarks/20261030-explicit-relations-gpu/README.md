@@ -54,3 +54,15 @@ execution. Both PDF pages were visually inspected after raw commit `84d5159e3635
 These remain unadmitted L0 observations; no cross-version timing advantage,
 matched-rho result or global hardware maximum is inferred. V15 failed source
 checkout before compilation or trials; its failure is preserved separately.
+
+V19 ran on one RTX4090 (24,564MiB). All eight 52-bit-field executions recovered
+and passed fresh certificate replay; all four 63-bit memory/work limits remain
+visible. Twelve slots used251/261 relations versus743/709 for eight slots on
+the two fixed targets. The [two-page V19 report](e2e-v19-report.pdf),
+[SVG](e2e-scaling-v19.svg) and [150-dpi PNG](e2e-scaling-v19.png) preserve all
+12 outcomes. Report pages were inspected after raw commit `e1db39a661f3`;
+these copies are hash-bound. Clocks remain L0 descriptions on fixed inputs;
+intermediate field sizes53–62 were not measured here. External comparison:
+not run in this configuration/admission panel. The original frozen analyzer's
+raw SVG retains an inherited PRO6000 title; this derived report correctly
+labels the actual4090 telemetry without rewriting raw output.
