@@ -1,0 +1,66 @@
+{
+  "controls": [
+    {
+      "mode": "success",
+      "terminal": {
+        "exit_code": 0,
+        "started_at": "2026-10-30T19:38:38Z",
+        "finished_at": "2026-10-30T19:38:39Z",
+        "backend": "development",
+        "wall_valid": false,
+        "phases": {
+          "producer": {
+            "started": true,
+            "exit_code": 0
+          },
+          "replay": {
+            "started": false,
+            "exit_code": 125
+          }
+        }
+      }
+    },
+    {
+      "mode": "failure",
+      "terminal": {
+        "exit_code": 7,
+        "started_at": "2026-10-30T19:38:39Z",
+        "finished_at": "2026-10-30T19:38:39Z",
+        "backend": "development",
+        "wall_valid": false,
+        "phases": {
+          "producer": {
+            "started": true,
+            "exit_code": 7
+          },
+          "replay": {
+            "started": false,
+            "exit_code": 125
+          }
+        }
+      }
+    },
+    {
+      "mode": "signal",
+      "terminal": {
+        "exit_code": 143,
+        "started_at": "2026-10-30T19:38:39Z",
+        "finished_at": "2026-10-30T19:38:39Z",
+        "backend": "development",
+        "wall_valid": false,
+        "phases": {
+          "producer": {
+            "started": true,
+            "exit_code": 143,
+            "interrupted": true
+          },
+          "replay": {
+            "started": false,
+            "exit_code": 125
+          }
+        }
+      }
+    }
+  ],
+  "journal_sha256": "954bf5a0d2b04fe41d142f31da3aa70b31500d771b011da484022ceae1d02540"
+}
