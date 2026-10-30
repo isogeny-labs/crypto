@@ -1,0 +1,21 @@
+{
+  "schema": "ghs-hess-c-parameter-magma/v1",
+  "endpoint": "https://calculator.magma-maths.org/execute",
+  "input_file": "index_548.magma",
+  "input_sha256": "b9bb2e6f31ddbdcd3ea5dac49fa88aabcd541e50c43ca0a0796ccee8c57b0201",
+  "http_status": 200,
+  "response": {
+    "success": false,
+    "stdout": "model_degree 6 genus 3 setup_cpu 0.160\nmap_cpu 0.040\nrational_points 9\nbase_degree 1\nRuntime error: \nField too small with respect to degree. There won't be enough lines to find the \nrequired number of relations.\n\n\n>> print \"index_answer\", x, \"index_cpu\", Cputime(t2);\n                         ^\nUser error: Identifier 'x' has not been declared or assigned\n\n>> assert x*G eq Q;\n          ^\nUser error: Identifier 'x' has not been declared or assigned\n\n>> print \"verified\", x*G eq Q, \"total_cpu\", Cputime(t0);\n                     ^\nUser error: Identifier 'x' has not been declared or assigned\n",
+    "exit_code": 0,
+    "truncated": false,
+    "magma": {
+      "version": "2.30-1",
+      "seed": 1809922287,
+      "time_sec": 0.35,
+      "memory": "32.09MB"
+    },
+    "warnings": [],
+    "error": "An error occurred. See the output for details."
+  }
+}

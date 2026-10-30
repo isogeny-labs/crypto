@@ -1,0 +1,12 @@
+item,status,hypotheses,evidence,next_gate
+actual_curve_affine_chart,previously_checked,Field K,Common22WeightedProjQuotient.affineEquation,none
+affine_y_not_x_only,lean_checked,Field K; p maps to Polynomial.C q under nestedEquiv,WeightedProjYIndependent.affine_ybar_sub_base_ne_zero,none
+nonzero_B_y_not_x_only,lean_checked,Field K; B != 0; p x-only,WeightedProjYIndependent.affine_x_only_sub_B_ybar_ne_zero,none
+source_numerator_not_B_y,lean_checked,Field K; source coefficient B != 0,WeightedProjSourceNonzero.sourceNumerator_sub_B_ybar_ne_zero,none
+source_function_nonzero,lean_checked,Field K; quintic separable; source coefficient B != 0,WeightedProjSourceNonzero.sourceFunction_ne_zero,none
+closed_support_coheight_one,open,all relevant closed supports,none,identify supports with coheight-one points
+all_finite_orders,open,closed supports including degree-two points,none,compute valuations at each support
+infinity_order,open,actual infinity point,none,compute pole order
+principal_divisor,open,finite support and all local orders,none,construct divisor
+pic0_class_equation,open,global divisor and class map,none,prove class equality
+compiled_rust_correspondence,open,all runtime branches and exceptional cases,none,connect source formula to executable

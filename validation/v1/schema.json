@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aburan28/crypto/validation/v1/schema.json",
+  "title": "validation/v1",
+  "description": "One validation record for a measured result, shared by aburan28/crypto, crypto-autoresearcher and cryptanalysis. The vocabulary is defined in crypto-autoresearcher:docs/lab-contract.md, section 5.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema", "claim_tier", "status", "certificate", "reference", "inputs"],
+  "properties": {
+    "schema": {"const": "validation/v1"},
+    "claim_tier": {"enum": ["toy", "medium", "crypto"]},
+    "status": {"enum": ["validated", "pre-gate", "unvalidated", "failed"]},
+    "certificate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["none", "replay", "proof", "solver"]},
+        "digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "verifier": {"type": ["string", "null"], "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "none"}}, "required": ["kind"]},
+          "then": {"properties": {"digest": {"type": "null"}, "verifier": {"type": "null"}}},
+          "else": {
+            "properties": {
+              "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+              "verifier": {"type": "string", "minLength": 1}
+            },
+            "required": ["digest", "verifier"]
+          }
+        }
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "point_sha256", "band"],
+      "properties": {
+        "kind": {"const": "matched-rho"},
+        "point_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "band": {
+          "type": "array",
+          "items": {"enum": ["0", "0.1", "1"]},
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["curve_uid", "code_commit", "seed"],
+      "properties": {
+        "curve_uid": {"type": "string", "pattern": "^urn:ec-(record|candidate):1:sha256:[0-9a-f]{64}$"},
+        "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "seed": {"type": ["string", "integer"]}
+      }
+    }
+  }
+}
