@@ -124,7 +124,7 @@ pub enum Determinism {
 
 /// The determinism the registry gives a resolved method.
 pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
-    if m.id.starts_with("ic.cm_folded_") {
+    if m.id.starts_with("ic.cm_folded_") || m.id == super::aps::ID {
         return Determinism::Never;
     }
     let budget = m

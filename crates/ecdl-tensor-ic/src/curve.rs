@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use rand::rngs::StdRng;
 
-use crate::field::{add_mod, inv_mod, is_prime, mul_mod, pow_mod, rand_below, sub_mod};
+use crate::field::{add_mod, inv_mod, is_prime, mul_mod, pow_mod, rand_below, sqrt_mod, sub_mod};
 use crate::{Error, Result};
 
 /// Curve is y^2 = x^3 + A x + B over F_P, with a group of prime order Order
@@ -76,6 +76,7 @@ impl Curve {
         if t.inf {
             return s;
         }
+        crate::opcount::bump(if s == t { "doubles" } else { "adds" }, 1);
         let p = self.p;
         let lambda = if s.x == t.x {
             if add_mod(s.y, t.y, p) == 0 {
@@ -117,6 +118,31 @@ impl Curve {
                 Some(&y) => y,
                 None => continue,
             };
+            pts.push(Point { x, y, inf: false });
+            if y != 0 {
+                pts.push(Point {
+                    x,
+                    y: p - y,
+                    inf: false,
+                });
+            }
+        }
+        pts
+    }
+
+    /// WindowPoints enumerates the affine points with x < x_bound by taking
+    /// the square root of x^3 + a x + b for each x (Go: WindowPoints). Its cost
+    /// is about x_bound square-root tests, not the size of the group.
+    pub fn window_points(&self, x_bound: u64) -> Vec<Point> {
+        let p = self.p;
+        let x_bound = x_bound.min(p);
+        let mut pts: Vec<Point> = Vec::with_capacity((2 * x_bound) as usize);
+        for x in 0..x_bound {
+            let y = match sqrt_mod(self.rhs(x), p) {
+                Some(y) => y,
+                None => continue,
+            };
+            let y = if y != 0 && y > p - y { p - y } else { y };
             pts.push(Point { x, y, inf: false });
             if y != 0 {
                 pts.push(Point {

@@ -1,0 +1,51 @@
+{
+  "schema": "crypto.isogeny-walk-ic-s3-acceptance/v1",
+  "date_utc": "2026-10-23",
+  "source_revision": "d999810450bd9e9e46cd608d02e5c314c784a02c",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-prime271/20261023T022532Z-8b20a399",
+  "aws_profile": "ecc-challenges-new",
+  "region": "us-east-2",
+  "run_id": "custom-e193cd27a390fe52",
+  "object_count": 4,
+  "completion_marker_bytes": 1787,
+  "binary_sha256": {
+    "isogeny_walk": "d4b291df946c2f4dd3c861275de7f47a309b7c7dd24be1b1b759a26939a8f78a",
+    "ic": "b32c8d0dcdc5eb4874e16d2f893bed8460c65a504b0a01f0ac5ae4f3baac47a3"
+  },
+  "walk": {
+    "command": "isogeny_walk walk --curve custom --p 271 --a 1 --b 19 --order 281 --cofactor 1 --gx 3 --gy 7 --name prime271-a1-b19 --primes 11 --max-curves 16 --max-depth 1 --threads 1 --audit-points 1 --dir /Volumes/T7/codex/isogeny-walk-prime271-acceptance-20261023",
+    "curves": 3,
+    "edges": 2,
+    "failures": 0
+  },
+  "file_sha256": {
+    "curves.yaml": "301e545e6a4e247018a448eae44e03eb4403f5bbc228843e4275db93be53003f",
+    "isogeny_routes.json": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+    "walk.json": "3e24978e7cec5f105bab6716c986e1d30ea20441af56a3bbc5301a870558ea5b"
+  },
+  "s3_checks": {
+    "publish_exit": 0,
+    "head_completion_marker": true,
+    "fresh_fetch_hashes_checked": 3,
+    "download_equals_source_for_all_files": true,
+    "objects_deleted": 4,
+    "prefix_empty_after_cleanup": true
+  },
+  "fetched_verify": {
+    "command": "isogeny_walk verify --curve custom --p 271 --a 1 --b 19 --order 281 --cofactor 1 --gx 3 --gy 7 --audit-points 2 --dir /Volumes/T7/codex/isogeny-walk-prime271-acceptance-20261023-fetched",
+    "result": "pass",
+    "curves_verified": 3,
+    "edges_verified": 2,
+    "audit_points": 2
+  },
+  "ic": {
+    "command": "ic solve-prime-file --input docs/ic/fixtures/prime271_target_input_20261023.json --route-file /Volumes/T7/codex/isogeny-walk-prime271-acceptance-20261023-fetched/isogeny_routes.json --route-id IW1E11h1h1a619f4ab250 --seed 42 --extra-relations 16 --rho-steps 0 --json",
+    "status": "complete",
+    "verified": true,
+    "scalar": "190",
+    "route_hops": 1,
+    "edges_verified": 2,
+    "route_file_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7"
+  },
+  "limit": "One public prime-field curve, one degree-11 walk, one target, one S3 region and account, and one local publisher were exercised. This does not establish exhaustive cryptanalytic capability or large-graph scalability."
+}

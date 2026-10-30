@@ -1,0 +1,11 @@
+{
+  "schema": "bounded-macaulay-large-continuation/v1",
+  "frozen_before_continuations": true,
+  "predecessor": "runs/run-20261018-native-v2",
+  "observation": "n15 finished its row stream and then the independent dense reference refused its 256MiB budget. n17 stopped at its 64MiB trace-file budget and left a complete-row checkpoint.",
+  "work": "Copy pivot journals and checkpoint states to fresh continuation directories, preserving predecessors byte-for-byte. Resume the original degree-4 row streams with independent dense reference disabled ONLY for these large diagnostic passes.",
+  "validation_scope": "n5/n9 controls retain exact independent dense RREF equality. Large passes remain independently unverified and do not satisfy the original frontier closure or certification requirement.",
+  "budgets_unchanged": {"address_space_bytes":536870912,"cache_bytes":1048576,"metadata_bytes":67108864,"pivot_journal_bytes":1073741824,"trace_bytes_per_continuation":67108864,"wall_seconds":120},
+  "arms": ["n15-m4-ell5-first","n15-m4-ell5-min-weight","n17-m4-ell6-first","n17-m4-ell6-min-weight"],
+  "additional_control": "Restart rejects a different row-input SHA256. This checks input identity, not crash durability or arbitrary journal-corruption detection."
+}
