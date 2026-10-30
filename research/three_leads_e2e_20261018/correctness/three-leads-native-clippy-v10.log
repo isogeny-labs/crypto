@@ -1,0 +1,25 @@
+    Checking three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error: manual implementation of `.is_multiple_of()`
+    --> ../../../src/cryptanalysis/three_leads.rs:2683:33
+     |
+2683 |         if r < 5 || exp != 1 || order / r % r == 0 {
+     |                                 ^^^^^^^^^^^^^^^^^^ help: replace with: `(order / r).is_multiple_of(r)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+     = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> analysis.rs:554:21
+    |
+554 |     let mut groups: BTreeMap<(String, String, String), Vec<(&Value, &Value, u64, u64)>> =
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: could not compile `three-leads-study` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `three-leads-study` (bin "three-leads-study") due to 1 previous error
+error: could not compile `three-leads-study` (bin "three-leads-study" test) due to 1 previous error

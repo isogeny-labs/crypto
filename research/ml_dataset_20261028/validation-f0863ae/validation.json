@@ -1,0 +1,54 @@
+{
+  "schema": "crypto.ml-dataset.software-validation/v1",
+  "recorded_utc": "2026-10-28T07:20:44.933022+00:00",
+  "source_commit": "f0863aefd6e1a416929f8acc02283d46f9c69936",
+  "source_hash_readback": "matched",
+  "test_build_toolchain": "rustc1.99.1/cargo1.99.1 x86_64-unknown-linux-gnu",
+  "strict_lint_toolchain": "rustup1.98 resolves rustc1.98.1",
+  "library": {
+    "passed": 5043,
+    "failed": 0,
+    "ignored": 123,
+    "dataset_tests_passed": 71,
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--test-threads=2"
+    ]
+  },
+  "endpoint": {
+    "test_passed": 1,
+    "test_failed": 0,
+    "combinations_checked": 360,
+    "solved_instance_count": null,
+    "note": "Structured outcomes and returned certificates; unsupported/censored outcomes are not solutions."
+  },
+  "strict_clippy": "passed",
+  "changed_file_rustfmt": "passed",
+  "release_build": "passed",
+  "cli_preflight": "passed; no scientific computation",
+  "container_preflight": "passed as UID1000 with network disabled; no scientific computation",
+  "binary_sha256": "8d3853fbaa4cc69423029a7bf5112dca26551350e2b88206e0284902e3fbdc49",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4f40819952d2889e633dd84c07c59e84f9f4183d040773ae65552d98c7263cbc",
+  "image_pushed_and_described": true,
+  "verified_cloud_dataset_cells": 0,
+  "scientific_or_performance_evidence": false,
+  "cloud_blockers": [
+    "Unapplied scoped IAM proposal awaiting user approval",
+    "Reconcile actual EKS resource admission and cumulative output/request caps against existing USD200 total budget"
+  ],
+  "superseded_logs": "Historical development/check attempts only; never evidence that this final source passed.",
+  "artifact_archive": {
+    "remote": "s3://setec-astronomy-artifacts/store",
+    "new_entries": 38,
+    "fresh_get_verified_entries_including_prior_source": 44,
+    "fresh_get_bytes": 29192020,
+    "readback_receipt": "remote-readback.json",
+    "readback_receipt_sha256": "85052546eb2e1b52690f373648f1e7fa54cb9f3f8bafeb52eeed287a457c2b71",
+    "local_cache_reused": false
+  }
+}
