@@ -779,3 +779,26 @@ The initial whole-merge whitespace check also scanned historical SVG/raw
 artifacts imported from main and reported existing trailing spaces. Those
 immutable artifacts are preserved; the corrected check is scoped to this
 change's source and handoff files.
+
+## 2026-10-30T17:54UTC — v11 complete through62bits
+
+### What was done
+Collected12of12verifiedrecoveries, including both61and62-bit targets.
+Archive hash matched; controller/worker0 and podjees49ew9dkfd7deletion verified.
+Uploaded public receipts, retained credential onlyforauthorizednextv13, then
+removedv11privatefiles. Packaged raw hashes, certificate audit and export.
+
+### Decisions made
+Native exactplan audit plus8mutationcontrols passes. Schema/flow/filehashes
+pass. Preserve5canonicalrectangularcoveragefindingsinCHECKER-NOTE.md.
+ClocksremainL0; 62islargestcompleteprescribedrung, nothardwaremaximum.
+Push raw before report. Nextv13pins e9e87ffb8380; widthPR2985is separate.
+
+### Open threads
+Render/inspectv11report and catalog copies, verifycommittedmetrics, runv13
+GPUcorrectness/sanitizers and boundedpanel, then evaluate63-bitfollow-up.
+Fresh RunPod catalog2.49/hour; noold/newtaskpodpresent in readinesslist.
+
+### Errors
+No v11 execution failed. Canonicalchecker assumes rectangulararms×sizes and
+retains5findingsagainstthefrozenstagedplan; no full canonicalpassclaimed.
