@@ -114,3 +114,36 @@ a cheaper or amortised one: many targets sharing a cold setup (the setup is
 per-solve here), or a relation-phase change that does not double the base. The
 Koblitz arm still gets one rerun for admission only; if it lands the same order
 of magnitude it is retired.
+
+## Lever 1: amortising setup across targets, and its ceiling
+
+The profile's second-largest phase is oracle setup at 2,070 GAE, and ecbench's
+cold rule charges it inside every one-target row by design ("each execution is
+a fresh process"; nothing survives). So the amortisation question is not a new
+session: it is the measured phase split with setup divided by the number of
+targets `P` that share it, and it is an **extrapolation from counted phases**,
+not a new measurement.
+
+`S(P) = (2070/P + 5374) / sqrt(562427)`, from the medians above and the curve's
+`r = 562427` (the 1,024 divisor the record uses is `sqrt(r)` = 749.95):
+
+| P (targets sharing one setup) | setup per target | S | vs cold |
+|--:|--:|--:|--:|
+| 1 | 2,070 | 9.93 | 1.00 |
+| 2 | 1,035 | 8.55 | 0.86 |
+| 8 | 259 | 7.51 | 0.76 |
+| 64 | 32 | 7.20 | 0.73 |
+| infinity | 0 | 7.17 | 0.72 |
+
+Two things follow. First, the whole amortisation lever is worth **at most 28%**
+(9.93 -> 7.17): it is real, it is free of new code, and it is bounded above by
+the setup share we already measured. Second, it does **not** change the class of
+the result: at `P -> infinity` the pipeline is still **6.7x** matched rho
+(7.17 against 1.08), and the relation phase alone (5,374 GAE) is 4.7x rho. To
+reach parity the relation phase has to fall by about 7x, which setup
+amortisation cannot touch.
+
+So the order of levers is: amortise setup for the free 28% if and when a shared
+setup method exists (none does today; the cold rule is deliberate), but the only
+lever that can move the class of the result is the relation phase's per-trial
+cost and yield, and the factor-base direction for that is now measured to lose.
