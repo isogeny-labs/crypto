@@ -1,5 +1,34 @@
 # Symbolic signed-graph reduction for pencil relations
 
+## Observed first gate — 30 October 2026
+
+The fresh p739 gate now contains all 60 prescribed workloads, 1,080 execution
+records and 300 measured candidate/reference pairs. All outcomes verified;
+native replay reproduced all 900 measured records. The unchanged native finite
+analyzer admits all 300 pairs in every one of the 36 price cells. Exact ratios,
+summed costs and model boundaries are in the
+[PDF report](validation/accounting/reports/run-20261030T0015Z-finite-costs/report.pdf),
+[graph](validation/accounting/reports/run-20261030T0015Z-finite-costs/cost-grid.svg),
+[CSV](validation/covered_gate_results_20261030/cost-grid-exact.csv) and
+[structured receipt](validation/covered_gate_results_20261030/covered-analysis-receipt.json).
+
+The fresh timing gate was rejected: the 360 pencil records reached L2, while
+the 720 rho/control records were L1 with sub-millisecond solve intervals.
+Qualified paired clocks remain unavailable. The separate computation epoch is
+retained with invalid clocks and is not additional distinct target coverage.
+[Canonical packaging and reconstruction](validation/canonical_gate_export_20261030/receipt.json)
+passed with no findings and `qualified:false`. Frozen v5 remains unchanged;
+the report-provenance correction is explicitly post-data. Raw S3 object versions
+and hashes are in the [locator manifest](validation/actual_gate_results_20261030/versioned-raw-locators.json).
+
+The first gate's approved four-hour envelope and original deadline applied only
+to that gate. Its two infrastructure attempts are terminal. The frozen stop rule
+does not permit extension after the rejected measurement. The upper gate and
+full 1,260-target pencil cohort remain incomplete; a prospective continuation
+must retain the old outcome and resolve its protocol and resource conditions.
+The preparation and implementation sections below retain earlier validation
+history; their original unrun statements do not describe the completed gate.
+
 ## Current native preparation and review tools
 
 The supported preparation, export and report paths are Rust:
@@ -28,9 +57,10 @@ result is never relabelled as a mathematical cohort measurement.
 The user approved the first gate's 25,000,000 coefficient cap and 3,600 seconds
 per execution for all 60 prescribed p739 targets on 29 October 2026. The
 [authorization record](protocol_draft/accounting_amendment_20261029/first_gate_authorization.json)
-limits that approval to the first gate. Cumulative campaign budget, absolute
-deadline and the separately pending infrastructure decisions remain unresolved.
-The amendment remains unfrozen and no fresh pencil cohort has been run.
+limits that approval to the first gate. The later four-hour authorization,
+frozen gate protocols and publication receipts resolved the first-gate execution
+conditions. The full-cohort execution envelope remains unresolved; the current
+observed gate status is recorded above.
 
 ## Implementation and retained validation history
 

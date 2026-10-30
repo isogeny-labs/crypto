@@ -1022,3 +1022,33 @@ corrected history copies actual record identities and retains the rejection.
 Raw TeX failure logs contain native trailing spaces, preserved byte-for-byte.
 Artifact helper index cleanup raced an active parentGit lock after successful
 uploads; no lock was removed, and complete readbacks verified the stored objects.
+
+## 2026-10-30 — Continuation and publication reconciliation
+
+### What was done
+Rechecked the approved controller publication against live CodeBuild: source archive
+0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a
+and version Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg remain selected. Existing fresh gate
+Job fd5e451b-46fa-42f8-9b0c-2e493db90b12 remains terminal failed; no new job was
+submitted. Diem remains deadline-expired, 50/52, with no launcher PID.
+Audited reviewer access to completed leads and prepared a prospective full-cohort
+continuation design preserving 1260 targets, controls and all declared costs.
+
+### Decisions made
+Preserve completed finite observations and rejected clock qualification. The
+continuation design is not frozen or launch-authorized. Later-stage cumulative
+worker budget and absolute deadline remain pending user input. Existing first-gate
+resource limits are unchanged. Review sources are the retained protocols, pinned
+instrument/exporter source, native receipts and deployment review; no new
+mathematical method or literature claim is introduced by this delivery update.
+
+### Open threads
+Finish timing-boundary evidence packet, synchronize current main and verify PR2869
+checks. Full pencil cohort and clock qualification remain open. Preserve direct
+CodeBuild update's recorded CloudFormation parameter drift on future deployments.
+
+### Errors
+Migration receipt remains unreadable (permission denied); no access change was
+attempted. Existing independently retained receipts and live job/project state
+were reconciled. Whole-worktree Git scans are slow on the shared filesystem;
+scoped reads and merge-tree inspection are used without deleting active locks.
