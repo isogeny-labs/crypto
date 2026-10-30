@@ -16,6 +16,7 @@
 /// Arbitrary-precision compact encodings, recursive contraction and reduction.
 pub use hashed_ecdl_tensor as tensor;
 
+#[cfg(test)]
 use std::collections::BTreeMap;
 
 /// Affine coordinates; `None` denotes the identity.
@@ -960,14 +961,17 @@ fn dependency_rows(
         inverse: u64,
         factors: Vec<(usize, u64)>,
     }
-    let mut columns = BTreeMap::<usize, usize>::new();
+    // Elimination traverses the whole directory in column order on every row.
+    // Keep that hot traversal contiguous; provenance indices retain insertion
+    // order even when a new pivot column precedes existing columns.
+    let mut columns = Vec::<(usize, usize)>::new();
     let mut pivots: Vec<Pivot> = Vec::new();
     let mut row = vec![0; width];
     for i in 0..row_count {
         row.fill(0);
         fill_row(i, &mut row);
         let mut factors = Vec::new();
-        for (&col, &index) in &columns {
+        for &(col, index) in &columns {
             let k = row[col];
             if k == 0 {
                 continue;
@@ -1005,7 +1009,11 @@ fn dependency_rows(
                         *a = modulus.mul(*a, inv);
                     }
                 }
-                columns.insert(col, pivots.len());
+                let position = columns.partition_point(|&(existing, _)| existing < col);
+                debug_assert!(columns
+                    .get(position)
+                    .is_none_or(|&(existing, _)| existing != col));
+                columns.insert(position, (col, pivots.len()));
                 pivots.push(Pivot {
                     tail: PivotTail::new(&row[col + 1..]),
                     source: i,
@@ -2385,6 +2393,40 @@ mod tests {
                 }
             }
             None
+        }
+        // Force pivot arrival out of column order. This exercises insertion
+        // before and between existing pivots, while provenance is still in
+        // source-row order. The final row is a known nontrivial combination.
+        for r in [3, 199, 1_099_512_551_701] {
+            for n in 1..13 {
+                for shift in 0..n {
+                    let mut rows: Vec<Vec<u64>> = (0..n)
+                        .rev()
+                        .map(|i| {
+                            (0..n)
+                                .map(|j| {
+                                    if j < i {
+                                        0
+                                    } else if j == i {
+                                        1
+                                    } else {
+                                        (j as u64 + 2) % r
+                                    }
+                                })
+                                .collect()
+                        })
+                        .collect();
+                    rows.rotate_left(shift);
+                    let mut last = vec![0; n];
+                    for (i, row) in rows.iter().enumerate() {
+                        for (value, &entry) in last.iter_mut().zip(row) {
+                            *value = (*value + mulmod((i as u64 + 1) % r, entry, r)) % r;
+                        }
+                    }
+                    rows.push(last);
+                    assert_eq!(dependency(&rows, r), eager(&rows, r));
+                }
+            }
         }
         let mut rng = Rng(321);
         for r in [3, 199, 1_099_512_551_701] {
