@@ -1,82 +1,93 @@
 # Guarded fall-degree exact-pair Lean formalization
 
-- **Status:** open
-- **Kind:** formalization implementation gap
-- **Affected work:** [ordinary guarded three-abscissa proof](../research/guarded_fall_degree_20261028/proofs/universal_five_symmetric_audit.txt), [Lean proof map](../research/guarded_fall_degree_20261028/formal/PROOF_MAP.json)
-- **Next action owner:** current fall-degree formalization task
+- **Status:** resolved for the original prime-field guarded three-abscissa model
+- **Kind:** formalization implementation gap, resolved
+- **Affected work:** [ordinary guarded proof](../research/guarded_fall_degree_20261028/proofs/universal_five_symmetric_audit.txt), [complete Lean proof](../research/guarded_fall_degree_20261028/formal/complete-exact-pair.md), [current proof map](../research/guarded_fall_degree_20261028/formal/PROOF_MAP.json)
+- **Next action owner:** none for the mathematical gap; publication and reproducible checks follow the PR workflow
 - **Last updated:** 2026-10-29
 
 ## Problem
 
-The requested complete Lean proof of the exact ordinary first/last fall pair
-`(4,5)` is not implemented: the degree-five construction and the weighted
-syzygy/Koszul formalization remain missing.
-
-The original target is every unsatisfiable inverse-guarded three-abscissa
+The original blocked goal was the complete Lean proof of the exact ordinary
+first/last pair `(4,5)` for every unsatisfiable inverse-guarded three-abscissa
 short-Weierstrass system over a prime field of characteristic greater than
 three, with a nonsingular curve, rational affine factor-base lifts and target,
-and both signs allowed. No claim is made for another encoding or factor-base
-cardinality. A checked numerical DAG, or a theorem assuming the desired
-degree-five refutation, would not satisfy this acceptance criterion.
+and both signs allowed. It is now proved by
+`GuardedExactPair.exact_pair_prime`, including attainment and minimality.
+
+The generator set and degree conventions are preserved. Neither a numerical
+DAG nor an assumption asserting the desired degree-five refutation is used
+as a substitute for the universal conclusion.
 
 ## Evidence and uncertainty
 
-- **Observed:** the new Lean modules define ordinary filtered closure by
-  finite derivation trees, prove its least-closed-subspace property, formalize
-  the three-point coefficient rigidity argument, and apply the complete
-  separating-space argument to the actual six inputs.
-- **Derived or proved:** `GuardedModel.no_degree_four_refutation` proves
-  `1 ∉ V(F,4)` for every field with `6 != 0` and any three distinct base
-  abscissas. `GuardedModel.lastFall_lower` proves the last-fall lower bound
-  with an explicit unit-ideal hypothesis. Curve nonsingularity and point
-  lifts are not needed for this lower bound.
-- **Derived or proved:** `GuardedModel.pairDifference_derivable` gives an
-  actual degree-four derivation of the quadratic divided difference.
-  `FirstFallCore` proves low-degree top-map injectivity and the explicit
-  homogeneous relation, without pretending to define the Koszul quotient.
-- **Suspected explanation:** none; this is a named missing formalization,
-  not evidence of a mathematical obstruction to the written proof.
-- **Missing capability:** formal monic reduction with the intermediate
-  degree caps, staged resultant extraction, finite-grid inversion, the
-  rational-root/point bridge, and weighted syzygy/Koszul infrastructure.
-- **What this evidence does not establish:** a complete Lean proof of
-  `d_F <= 5`, the first-fall equality, the exact pair, or any transfer to
-  growing bases or Boolean descent. Existing recorded Lean checks remain
-  historical records and are not rewritten as checks of these new statements.
+- **Observed:** the default pinned Lake build checks the final theorem and all
+  dependencies. Exact source hashes, build/audit logs, fresh replay outcomes
+  and library validation are bound by the [versioned full-proof receipt](../research/guarded_fall_degree_20261028/formal/complete-exact-pair-validation/verification.json).
+- **Derived or proved:** `CubicNormalization.monic_normalization` performs
+  actual degree-five closure derivations through explicit cubic rotations
+  and a constructed interpolation inverse. `GuardedReduction` derives the
+  required families from the six original inputs in degree four.
+- **Derived or proved:** `StagedResultant.resultGrid_derivable` extracts the
+  scalar resultant using degree-checked affine-grid shifts;
+  `GridClosure.grid_refutation` derives one using explicit nine-point
+  interpolation and scalar-grid shifts.
+- **Derived or proved:** rational base-point lifts split the first specialized
+  quadratic at explicit field roots, including repeated roots/two-torsion.
+  Polynomial UNSAT makes both second-quadratic values nonzero. The scalar
+  product identity discharges the nonzero-resultant condition. The resulting
+  derivation gives the unit ideal; it is not an extra theorem premise.
+- **Derived or proved:** `GuardedTops` proves actual degrees and top components.
+  `WeightedFirstFall` defines the graded top map and classical degree-specific
+  Koszul combinations, proves minimal first fall four, and verifies a nonzero
+  lift of degree at most three. The existing uniform degree-four obstruction
+  supplies exact last fall five in `GuardedLastFall.exact_last_five`.
+- **Suspected explanation:** none; the implementation gap is closed by the
+  actual checked source chain.
+- **Missing capability:** none for this exact-pair theorem. A general Mathlib
+  resultant API bridge, algebraic-closure converse and abstract quotient
+  isomorphism are unnecessary for the direct proof route.
+- **What this evidence does not establish:** growing-base, characteristic-two
+  or Boolean/Weil-descent formalizations; E12 closure certification; literal
+  standard-curve fixture primality/provenance/UNSAT verification; group-law
+  equivalence between polynomial solutions and signed point decompositions.
+  The exact theorem's UNSAT premise is explicitly polynomial `NoSolution`.
 
-## What would unblock it
+## What unblocked it
 
-- [ ] Formalize degree-preserving monic normalization and each legal
-  multiplication/reduction in the degree-five construction.
-- [ ] Prove the resultant and finite-grid inversion steps in the same
-  polynomial presentation, with no assumed refutation or assumed closure cap.
-- [ ] Connect rational-point unsatisfiability to the algebraic condition used
-  in the upper proof, including repeated roots and two-torsion cases.
-- [ ] Define the weighted leading-form syzygy/Koszul first-fall convention
-  and prove the exact first-fall statement for the six original generators.
-- [ ] Combine the original hypotheses into one faithful exact-pair theorem,
-  build it, audit its transitive axioms and fresh-kernel replay it.
+- [x] Explicit degree-preserving cubic rotation and staged monic normalization,
+  with every intermediate multiplication capped at five.
+- [x] Staged scalar extraction and explicit finite-grid inverse, with no assumed
+  refutation or assumed closure cap.
+- [x] Direct rational-root and polynomial-UNSAT/unit-ideal bridge, including
+  repeated roots and two-torsion. No full group-law formalization is needed
+  for the stated polynomial UNSAT hypothesis.
+- [x] Actual weighted leading forms and graded top-syzygy/Koszul first-fall
+  definition, with exact first fall and a genuine lower-degree lift.
+- [x] One faithful original-hypothesis prime-field theorem with `p>3`; build,
+  transitive axiom audit and versioned fresh-kernel verification records.
 
-These conditions together establish the requested formal result; completing
-only the lower-bound proof does not discharge the original task.
+The final statement has the original curve and rational-target hypotheses.
+A stronger general field theorem also exists; its weaker requirements do not
+change the original wrapper or silently replace its acceptance criterion.
 
-## Next discriminating step
+## Reproduction and recheck
 
-- **Action or proof obligation:** implement monic coefficient reduction as a
-  filtered-closure derivation, proving the transient degree-five cap before
-  composing it into the resultant construction.
-- **Inputs and controls:** the six generators in `GuardedModel.inputs`, the
-  same pinned Lean/Mathlib revisions, and the written proof above. Frozen
-  fixture files are not substitutes for universal hypotheses.
-- **Execution limits and stop condition:** development proof checking only;
-  no scientific sweep, new curve fixtures, or performance claims.
-- **Outcomes and next actions:** a checked reduction lemma unlocks staged
-  normalization; a failed build remains a proof obligation, not evidence
-  against the mathematical theorem.
-- **Recheck trigger:** a new checked upper-bound dependency or complete
-  weighted-syzygy definition.
+- **Action:** run the default pinned Lake build, repository axiom auditor and
+  the per-module fresh replays documented in the full report.
+- **Inputs:** exactly `GuardedModel.inputs`, with indexed-family equality
+  proved by `GuardedExactPair.generator_range`; same original degree model.
+- **Limits:** proof/development verification only; no scientific sweep or
+  performance claim is introduced by this resolution.
+- **Recheck trigger:** a change to theorem hypotheses, generator presentation,
+  source hashes, pinned dependencies or proof-checking tools.
 
 ## Resolution and history
 
-Unresolved. On 2026-10-29 the full uniform degree-four obstruction was
-formalized, replacing the earlier identity-only status for this part.
+- 2026-10-29, earlier update: the complete uniform degree-four obstruction was
+  formalized; the upper and first-fall bridges still remained open. The dated
+  partial reports and receipts are preserved.
+- 2026-10-29, full update: `GuardedExactPair.exact_pair_prime` proves the original
+  exact pair. The source proof map identifies each discharged obligation and
+  the alternative direct constructions that remove unnecessary library bridges.
+  Other polynomial presentations remain separate open work.

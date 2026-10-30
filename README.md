@@ -1,5 +1,14 @@
 # Root-finding decomposition engine in ecbench: results
 
+For the Bochum v0.2 hashed-factor-base algorithm, see the
+[native Rust tensor implementation](docs/hashed-ecdl.md): compact encodings,
+exact contraction, relation collection and certificate replay. Correctness
+controls do not establish the conditional asymptotic bound or a speedup.
+
+The separately scoped [scalar tensor companion](docs/hashed-ecdl.md#scalar-tensor-companion)
+in cryptanalysis adds binary/prime-field coordinate checks and Certicom ECCp-131
+inputs. No Python execution path is introduced here and neither challenge is solved.
+
 **Decision: engineering.** The new oracles verify, replay identically, and
 match the query stream of the existing table/subtract arms; they do not
 change the asymptotic group-operation count of the decomposition, so
