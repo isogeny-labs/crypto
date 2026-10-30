@@ -8682,15 +8682,6 @@ mod neg_strong_tests {
                 .iter()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
                 .collect(),
-#[cfg(test)]
-mod tensor_contraction_tests {
-    use super::*;
-    use crate::cryptanalysis::ecbench::workload::CurveSpec;
-
-    fn method() -> ResolvedMethod {
-        resolve(&MethodSpec {
-            id: "ic.tensor_contraction_v1".into(),
-            params: [("m".to_string(), "2".to_string())].into_iter().collect(),
         })
         .unwrap()
     }
@@ -8740,6 +8731,46 @@ mod tensor_contraction_tests {
                 assert_eq!(a.counters, again.counters);
                 assert_eq!(a.total_gae, again.total_gae);
             }
+        }
+    }
+
+    #[test]
+    fn refuses_other_curves_and_bad_parameters() {
+        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
+        let spec = CurveSpec::PrimeSearch {
+            bits: 14,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        assert!(applicable(&strong, &inst, &facts).is_err());
+        let (inst, facts) = f2m4(4, 1);
+        let bad = method(NEG_STRONG, &[("lanes", "0"), ("dp_bits", "4")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        let bad = method(NEG_STRONG, &[("lanes", "4"), ("dp_bits", "0")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        // No default for the walk's shape.
+        assert!(resolve(&MethodSpec {
+            id: NEG_STRONG.into(),
+            params: BTreeMap::new(),
+        })
+        .is_err());
+    }
+}
+
+#[cfg(test)]
+mod tensor_contraction_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method() -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "ic.tensor_contraction_v1".into(),
+            params: [("m".to_string(), "2".to_string())].into_iter().collect(),
+        })
+        .unwrap()
+    }
+
     #[test]
     fn recovers_known_logs_deterministically_and_charges_every_phase() {
         let spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
@@ -8780,26 +8811,6 @@ mod tensor_contraction_tests {
     }
 
     #[test]
-    fn refuses_other_curves_and_bad_parameters() {
-        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
-        let spec = CurveSpec::PrimeSearch {
-            bits: 14,
-            seed: 59297,
-        };
-        let inst = spec.build().unwrap();
-        let facts = inst.facts(&spec);
-        assert!(applicable(&strong, &inst, &facts).is_err());
-        let (inst, facts) = f2m4(4, 1);
-        let bad = method(NEG_STRONG, &[("lanes", "0"), ("dp_bits", "4")]);
-        assert!(applicable(&bad, &inst, &facts).is_err());
-        let bad = method(NEG_STRONG, &[("lanes", "4"), ("dp_bits", "0")]);
-        assert!(applicable(&bad, &inst, &facts).is_err());
-        // No default for the walk's shape.
-        assert!(resolve(&MethodSpec {
-            id: NEG_STRONG.into(),
-            params: BTreeMap::new(),
-        })
-        .is_err());
     fn needs_m_and_rejects_m_below_two() {
         assert!(resolve(&MethodSpec {
             id: "ic.tensor_contraction_v1".into(),
