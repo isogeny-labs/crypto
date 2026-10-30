@@ -76,6 +76,7 @@ pub mod known_log;
 pub mod koblitz_descent;
 pub mod legacy;
 pub mod methods;
+pub mod orbit_ic;
 pub mod plane_quartic;
 pub mod record;
 pub mod resources;
