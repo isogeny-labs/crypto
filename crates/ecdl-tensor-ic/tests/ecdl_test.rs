@@ -108,7 +108,7 @@ fn random_network(rng: &mut StdRng) -> Network {
         in_: input,
         out,
         f: Rc::new(|x: &[bool]| {
-            if !(x[0] && !x[1]) {
+            if !x[0] || x[1] {
                 Some(vec![x[0] != x[1], x[0] && x[1]])
             } else {
                 None

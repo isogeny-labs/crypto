@@ -96,11 +96,12 @@ impl FactorBase {
         meter.vector(count, "factor-base enumeration")?;
         let inv = inverse(&self.seed.alpha, &self.prime)?;
         let mut points = Vec::new();
+        let mut decoder = curve.decoder()?;
         for t in 0..count {
             meter.charge(1, "inverse-hash enumeration")?;
             let z = &inv * ((BigUint::from(t) + &self.prime - &self.seed.beta) % &self.prime)
                 % &self.prime;
-            if let Some(point) = curve.decode(&z, rng, meter)? {
+            if let Some(point) = decoder.decode(&z, rng, meter)? {
                 if curve.in_subgroup(&point, meter)? {
                     points.push(point);
                 }
@@ -161,8 +162,26 @@ pub fn decompose(
     counter: &mut Counter,
     meter: &mut Meter,
 ) -> Result<Option<Vec<Point>>> {
+    decompose_with(
+        curve,
+        bases,
+        target,
+        |network, work| counter.witness(network, &vec![None; network.edge_count()], work),
+        meter,
+    )
+}
+
+/// Opt-in exact witness backend for the existing point-coordinate language.
+/// Returned interface words receive the same independent point/hash/sum replay.
+pub fn decompose_with(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    mut witness: impl FnMut(&Network, &mut Meter) -> Result<Option<Vec<bool>>>,
+    meter: &mut Meter,
+) -> Result<Option<Vec<Point>>> {
     let network = decomposition_network(curve, bases, target, meter)?;
-    let Some(word) = counter.witness(&network, &vec![None; network.edge_count()], meter)? else {
+    let Some(word) = witness(&network, meter)? else {
         return Ok(None);
     };
     let width = curve.modulus().bits() as usize;
@@ -434,6 +453,63 @@ pub fn solve(
     counter: &mut Counter,
     meter: &mut Meter,
 ) -> Result<Certificate> {
+    solve_using(
+        curve,
+        target,
+        config,
+        rng,
+        &mut |curve, bases, point, work| decompose(curve, bases, point, counter, work),
+        meter,
+    )
+}
+
+/// Opt-in relation oracle. It receives only curve, bases and query point, never
+/// the hidden random relation labels or their RNG. Every supplied witness is
+/// independently checked before it enters the original certificate reduction.
+pub fn solve_with_oracle(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut oracle: impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_using(
+        curve,
+        target,
+        config,
+        rng,
+        &mut |curve, bases, point, work| {
+            let answer = oracle(curve, bases, point, work)?;
+            if let Some(points) = &answer {
+                if points.len() != bases.len() {
+                    return Err(integrity("oracle slot count"));
+                }
+                let mut sum = Point::Infinity;
+                for (base, point) in bases.iter().zip(points) {
+                    if !base.contains(curve, point, work)? {
+                        return Err(integrity("oracle membership replay"));
+                    }
+                    sum = curve.add(&sum, point, work)?;
+                }
+                if &sum != point {
+                    return Err(integrity("oracle sum replay"));
+                }
+            }
+            Ok(answer)
+        },
+        meter,
+    )
+}
+
+fn solve_using(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    oracle: &mut impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
     if config.slots < 2 || config.trials == 0 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("reduction input"));
     }
@@ -496,7 +572,7 @@ pub fn solve(
             let left = curve.mul(curve.generator(), &u, meter)?;
             let right = curve.mul(target, &v, meter)?;
             let point = curve.add(&left, &right, meter)?;
-            if let Some(points) = decompose(curve, &bases, &point, counter, meter)? {
+            if let Some(points) = oracle(curve, &bases, &point, meter)? {
                 let relation = Relation { u, v, points };
                 matrix.push(matrix_row(&relation, &indexes, columns)?);
                 relations.push(relation);
@@ -854,5 +930,70 @@ mod tests {
             ),
             Err(Error::Limit(_))
         ));
+    }
+
+    #[test]
+    fn factor_base_enumeration_reuses_square_root_setup() {
+        struct Nonresidue {
+            calls: usize,
+        }
+        impl RandomSource for Nonresidue {
+            fn fill(&mut self, bytes: &mut [u8]) -> Result<()> {
+                self.calls += 1;
+                bytes.fill(3); // 3 is a quadratic nonresidue modulo 17.
+                Ok(())
+            }
+        }
+        let mut meter = Meter::new(Limits::default());
+        let curve = Curve::new(
+            17u8.into(),
+            2u8.into(),
+            2u8.into(),
+            19u8.into(),
+            Point::Affine {
+                x: 5u8.into(),
+                y: 1u8.into(),
+            },
+            &mut meter,
+        )
+        .unwrap();
+        let base = FactorBase::new(
+            &curve,
+            37u8.into(),
+            37u8.into(),
+            HashSeed {
+                alpha: 1u8.into(),
+                beta: 0u8.into(),
+            },
+            &mut meter,
+        )
+        .unwrap();
+        let mut expected: Vec<_> = (1u8..19)
+            .map(|scalar| {
+                curve
+                    .mul(curve.generator(), &scalar.into(), &mut meter)
+                    .unwrap()
+            })
+            .collect();
+        expected.sort();
+        let mut one_shot = Nonresidue { calls: 0 };
+        let mut decoded = Vec::new();
+        for encoding in 0u8..34 {
+            if let Some(point) = curve
+                .decode(&encoding.into(), &mut one_shot, &mut meter)
+                .unwrap()
+            {
+                decoded.push(point);
+            }
+        }
+        decoded.sort();
+        assert_eq!(decoded, expected);
+        assert_eq!(one_shot.calls, 18);
+        let mut batched = Nonresidue { calls: 0 };
+        assert_eq!(
+            base.enumerate(&curve, &mut batched, &mut meter).unwrap(),
+            expected
+        );
+        assert_eq!(batched.calls, 1, "one setup must serve the entire base");
     }
 }

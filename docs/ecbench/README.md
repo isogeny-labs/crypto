@@ -463,6 +463,7 @@ default; the ids are:
 
 | id | family | what it is |
 |---|---|---|
+| `ic.aps_v1` | ic | bounded APS polynomial instrument, exclusive cold/online wall phases and retained failures; only independent-check group work is priced, so native operation totals remain incomplete |
 | `rho.frozen_reference` | rho | the frozen r-adding walk every ledger row was priced against through §17 (A = 1); the historical "before" mark |
 | `rho.plain` | rho | tuned r-adding walk on points (A = 1), distinguished points, stride starts |
 | `rho.negation` | rho | tuned walk on `{P, −P}` (A = 2), Wiener–Zuccherato look-ahead and cycle escape; the matched reference on a prime curve |
@@ -1777,3 +1778,30 @@ The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbe
 and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
 record the unexecuted integration/session/replay requirements. No model result
 may be multiplied by standalone GPU throughput to claim measured NIST savings.
+
+### Bounded APS instrument (`ic.aps_v1`)
+
+This native method exposes the existing APS zero-sum relation route with six
+encodings, exact/legacy root controls, exhaustive/first-informative recovery
+and certified cubic-orbit line pruning. Every search parameter is explicit;
+planning rejects unsupported combinations and p>65521. It takes the actual
+single target, never its known logarithm.
+
+The cold solver wall interval includes setup and all attempted bases, failed
+sampling/construction/solver work, equation export binding, roots, signed
+recovery and separate ordinary-residue witness/scalar checks. The five online
+phases start before target validation/sampling and sum exactly to their window.
+Final report aggregation/serialization is outside the solver clock. Observer and export
+construction overhead is included and must be assessed with controls.
+
+GAE prices only the independent check's counted group operations. F4/root
+multiplication diagnostics are retained; core group/field work, polynomial
+construction, allocations and hashing remain incompletely counted. Thus S and
+bitop totals are lower bounds, not admissible complete-cost rankings. The method
+is nondeterministic under a cooperative wall deadline; a returned witness is
+not a certificate of enumeration completeness, execution history or cost.
+
+[The instrument study](../../research/aps_measurement_20261029/README.md) has
+control specs and the remaining protocol/export/accounting/launch prerequisites.
+Those specs are development controls, not a frozen held-out scaling experiment.
+No benchmark or EKS job has run; the complete-cost research panel remains open.
