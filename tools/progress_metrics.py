@@ -567,6 +567,22 @@ def koblitz_degree13_divisors(ref, since):
                  source=f"{path}@{commit}")
 
 
+def koblitz_degree13_characters(ref, since):
+    """Fixed source character tests and finite old-line matches; no target rank."""
+    path = "research/koblitz_modular_ic_20261018/rounds/48/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("character_components_tested", "source components", "Degree13 actual diamond characters under retained proper/Picard bridge"),
+            ("old_line_scalar_comparisons", "complete scalar tests", "All eleven multiples in each tested old source line"),
+            ("matched_old_coordinates", "matched source components", "Exact cyclic-line coordinates; independent target rank unevaluated"),
+            ("crossed_source_operator_images", "source operator images", "Full retained crossed operators on a collected class; chosen-model map open"),
+        ):
+            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -650,7 +666,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
@@ -677,6 +693,7 @@ def main():
     koblitz_source_collector(a.ref, a.since)
     koblitz_root_collector(a.ref, a.since)
     koblitz_degree13_divisors(a.ref, a.since)
+    koblitz_degree13_characters(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

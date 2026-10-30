@@ -1,0 +1,311 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 48,
+  "runs": [
+    {
+      "attempt": "cofactor48-shift1-01",
+      "source_revision": "12b4debc8d393bc8d49dcba7e8efb0dde73dce05",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 225,
+      "binary_sha256": "82ac40363fd5e6b44d8e214f5aeb4ec09b397aad1a3942c4e7c89ac9905035ae"
+    },
+    {
+      "attempt": "cofactor48-shift2-01",
+      "source_revision": "12b4debc8d393bc8d49dcba7e8efb0dde73dce05",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 225,
+      "binary_sha256": "2976c725f56b55bda384fb048f0db55525fb19c4693153ff56e61519b91a9744"
+    },
+    {
+      "attempt": "compare48-01",
+      "source_revision": "d08894aa9b6ae82f922b900e715bf06e0553bf61",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 299,
+      "binary_sha256": "bdcea631e666ba22eb60cbf8744f702be6dca0ad3333dc3289d325713f1190c6"
+    },
+    {
+      "attempt": "lean48-01",
+      "kind": "Lean",
+      "stage": "precompiler_launch",
+      "status": "rejected",
+      "wrapper_exit": 1,
+      "compile_exit": null,
+      "audit_exit": null,
+      "compiler_started": false,
+      "source_revision": "12b4debc8d39",
+      "audited_declarations": 0
+    },
+    {
+      "attempt": "lean48-02",
+      "source_revision": "d08894aa9b6ae82f922b900e715bf06e0553bf61",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 1,
+      "audit_log": "AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead\nok    Coordinate48.coordinate_unique  [propext, Classical.choice, Quot.sound]\naudited 1 theorems in [Coordinate48]; 0 failing, 0 trusted (native_decide)\n"
+    },
+    {
+      "attempt": "signed48-shift1-01",
+      "source_revision": "84c0851763e34bc97656e0f902485b25c7dc0121",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 140,
+      "binary_sha256": "aebc4a4ed7325c66bfc5c926306e9a7d665fc53ab682915696335267cd338cae"
+    },
+    {
+      "attempt": "signed48-shift2-01",
+      "source_revision": "84c0851763e34bc97656e0f902485b25c7dc0121",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 140,
+      "binary_sha256": "a9d8f7ce7a4df9f64d81ae48980589f06260c26cf5baa5fe0e5e8aed0f4f024f"
+    },
+    {
+      "attempt": "split48-01",
+      "source_revision": "d08894aa9b6ae82f922b900e715bf06e0553bf61",
+      "kind": "native",
+      "build_exit": 0,
+      "native_exit": 0,
+      "status": "accepted",
+      "full_generator_quotients": 290,
+      "binary_sha256": "699d73e2e450925dc9d1da7b444224f03e915de44c0945b9563e0eed5997331c"
+    }
+  ],
+  "shifted_signed_classes": [
+    {
+      "orbit": 1,
+      "shift": 1,
+      "actual_deck_labels": 10,
+      "signed_class_principal": false,
+      "positive_negative_equal": false,
+      "independent_expression_equal": true,
+      "all_generator_memberships": "checked",
+      "independent_products": "all",
+      "target_factor_evaluated": false
+    },
+    {
+      "orbit": 1,
+      "shift": 2,
+      "actual_deck_labels": 10,
+      "signed_class_principal": false,
+      "positive_negative_equal": false,
+      "independent_expression_equal": true,
+      "all_generator_memberships": "checked",
+      "independent_products": "all",
+      "target_factor_evaluated": false
+    }
+  ],
+  "shifted_cofactors": [
+    {
+      "cofactor": 3721,
+      "cofactor_mod11": 3,
+      "cofactor_class_principal": false,
+      "sixty_one_class_principal": false,
+      "eleven_cofactor_principal": true,
+      "bridge_annihilator_principal": true,
+      "independent_cofactor_expressions_equal": true,
+      "all_generator_memberships": "checked",
+      "independent_products": "all",
+      "intended_sign_factor_evaluated": false
+    },
+    {
+      "cofactor": 3721,
+      "cofactor_mod11": 3,
+      "cofactor_class_principal": false,
+      "sixty_one_class_principal": false,
+      "eleven_cofactor_principal": true,
+      "bridge_annihilator_principal": true,
+      "independent_cofactor_expressions_equal": true,
+      "all_generator_memberships": "checked",
+      "independent_products": "all",
+      "intended_sign_factor_evaluated": false
+    }
+  ],
+  "split": {
+    "gate": true,
+    "quadratic_H_plus_F_equals_four_G": true,
+    "F_G_H_killed_eleven": true,
+    "component7_principal": false,
+    "component8_principal": false,
+    "exact_recovery": true,
+    "character7": "checked",
+    "character8": "checked",
+    "component_annihilators": "checked",
+    "all_generator_quotients": "checked",
+    "independent_products": "all",
+    "chosen_Koblitz_model_map_evaluated": false
+  },
+  "comparison": {
+    "component7_old_coordinate": 1,
+    "component8_old_coordinate": 6,
+    "all_scalar_candidates_per_component": 11,
+    "coordinates_recover": true,
+    "operator7_principal": false,
+    "operator8_principal": false,
+    "full_source_operator_forms": "6F+2TF,3F+9TF",
+    "independent_component_forms": "9P7,9P8",
+    "full_operator_recovery_scalar": 5,
+    "full_operator_recovery": true,
+    "old_nonzero_and_eleven_controls": "pass",
+    "all_generator_quotients": "checked",
+    "independent_products": "all",
+    "chosen_Koblitz_model_map_evaluated": false
+  },
+  "old_line_comparisons": [
+    {
+      "label": "new7-old7-multiple-0",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-0",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-1",
+      "witness_dimension": 1,
+      "equivalent": true
+    },
+    {
+      "label": "new8-old8-multiple-1",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-2",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-2",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-3",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-3",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-4",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-4",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-5",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-5",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-6",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-6",
+      "witness_dimension": 1,
+      "equivalent": true
+    },
+    {
+      "label": "new7-old7-multiple-7",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-7",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-8",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-8",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-9",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-9",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new7-old7-multiple-10",
+      "witness_dimension": 0,
+      "equivalent": false
+    },
+    {
+      "label": "new8-old8-multiple-10",
+      "witness_dimension": 0,
+      "equivalent": false
+    }
+  ],
+  "failed_launches": {
+    "lean48-01": {
+      "status": "rejected",
+      "wrapper_exit": 1,
+      "compiler_started": false,
+      "audit_started": false,
+      "source_revision": "12b4debc8d39",
+      "runner_sha256": "4b6a699e3ecafad12e3330c663c9d8e57f8ae72b87a0e1dbdade983513307763",
+      "retained_runner": "source-data/rejected-runner-lean48-01.sh",
+      "stderr": "cp: cannot stat '/home/ec2-user/crypto-koblitz-r33/research/koblitz_modular_ic_20261018/rounds/48/lean/SourceOrder48.lean': No such file or directory",
+      "raw_receipts": "runs/lean48-01/gate.log",
+      "cause": "lexical runner copy changed47to48before replacing the module name",
+      "mathematical_null": false
+    }
+  },
+  "construction_counts": {
+    "character_components_tested": 2,
+    "old_line_scalar_comparisons": 22,
+    "matched_old_coordinates": 2,
+    "crossed_source_operator_images": 2
+  },
+  "new_class_in_old_tested_component_span": true,
+  "chosen_Koblitz_model_map_evaluated": false,
+  "native_arrays_formalized": false,
+  "proper_geometry_formalized": false,
+  "full_integral_Hom_lattice_recovered": false,
+  "IC_relation_rank": null,
+  "larger_n_transfer": false,
+  "performance_measured": false,
+  "independent_scientific_replay": false,
+  "independent_semantic_review": false
+}
