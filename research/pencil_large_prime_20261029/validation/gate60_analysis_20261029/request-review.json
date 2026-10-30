@@ -1,0 +1,29 @@
+{
+  "schema": "pencil-gate-request-readonly-review/v1",
+  "request": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/request.json",
+    "sha256": "6666abff54704d30ed2abb961476fc068acf30d50a61bccb212869deff4c3362"
+  },
+  "exact_prepared_spec": true,
+  "prepared_spec_sha256": "a2c25a203ad4c39aaea57287e1705dd4b3db394cd10507fff009980ec8634c18",
+  "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+  "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+  "exact_published_base_and_runtime": true,
+  "deadline_unix_seconds": 1793331142,
+  "instance_type": "c8a.2xlarge",
+  "memory": "8Gi",
+  "checkpoint_interval_seconds": 300,
+  "max_restores": 1,
+  "scoped_prepared_receipt": {
+    "path": "scoped-prepared-receipt.json",
+    "sha256": "edd2fa95a8d340885191c388e968e314ef06f5932e45a18d29324cb04248f490"
+  },
+  "source_comparison": {
+    "path": "source-relative-to-instrument.patch",
+    "sha256": "e39f7890c1c0b725e9db601942259b692db79d21d28c68a06a804c4dab52bc1c",
+    "scope": "src, study producer src, Cargo.toml and Cargo.lock",
+    "difference": "Only cfg(test) exact_hash_and_table_semantics assertion rewrite in three_leads_rho_events.rs; production implementation unchanged in these paths"
+  },
+  "solver_executions": 0,
+  "launch_performed": false
+}

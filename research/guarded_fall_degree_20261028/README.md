@@ -2,7 +2,8 @@
 
 This study records ordinary polynomial-ring degree bounds for an explicit
 membership presentation. It contains mathematical derivations, native proof
-replay, historical source snapshots, and a partial Lean proof map. It makes
+replay, historical source snapshots, and a complete Lean proof of the ordinary
+guarded three-abscissa prime-field pair `(4,5)`. It makes
 no timing, ECDLP recovery, sub-rho, or literature-priority claim.
 
 Use `k=F_p`, `p>3`, for the short Weierstrass statements and `k=GF(2^n)`
@@ -76,10 +77,14 @@ lookup size and proof size can be exponential. See the
   arithmetic with strict input binding; no search and no Python execution.
 - [Native binary-field checker](extensions/char2_compute/native/README.txt):
   genuine polynomial-basis `GF(2^m)` arithmetic, not integers modulo `2^m`.
-- [Partial Lean proof map](formal/PROOF_MAP.json): the resultant, guard,
-  missing-root, and related identities are checked under pinned dependencies.
-  The complete filtered-closure and elliptic-curve theorems are **not** Lean
-  formalizations; the map identifies the missing bridges.
+- [Complete Lean exact-pair proof](formal/complete-exact-pair.md):
+  `GuardedExactPair.exact_pair_prime` proves the original prime-field `(4,5)`
+  statement with attainment and minimality. It constructs the degree-five
+  refutation, proves the rationality/unit-ideal bridge, and defines and
+  computes the actual weighted homogeneous-top/Koszul first fall. The
+  [proof map](formal/PROOF_MAP.json) binds the theorem and dependencies to
+  pinned sources and verification receipts. Growing-base, characteristic-two
+  and Boolean results retain their separate formalization status.
 
 From the repository root:
 

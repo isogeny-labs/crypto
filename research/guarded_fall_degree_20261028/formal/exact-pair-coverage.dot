@@ -1,0 +1,16 @@
+digraph coverage {
+  graph [rankdir=TB, bgcolor="white", pad="0.2"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#e0f2e5", color="#237c44"];
+  edge [color="#536573"];
+  closure [label="CHECKED: ordinary filtered closure\nand last-fall/refutation equivalence"];
+  affine [label="CHECKED: affine u-squared coefficient\nand three-point rigidity"];
+  lower [label="CHECKED: actual six inputs\n1 not in V(F,4)"];
+  first [label="CHECKED dependencies:\ntop injectivity + degree-four relation"];
+  upper [label="MISSING: degree-five normalization,\nresultant, grid inversion, point bridge", fillcolor="#fff0dd", color="#aa6600"];
+  koszul [label="MISSING: weighted syzygy\nand Koszul quotient definition", fillcolor="#fff0dd", color="#aa6600"];
+  pair [label="OPEN: complete Lean theorem\nexact first / last pair (4,5)", fillcolor="#fff0dd", color="#aa6600"];
+  closure -> lower; affine -> lower;
+  closure -> upper [style=dashed];
+  first -> koszul [style=dashed];
+  lower -> pair; upper -> pair [style=dashed]; koszul -> pair [style=dashed];
+}
