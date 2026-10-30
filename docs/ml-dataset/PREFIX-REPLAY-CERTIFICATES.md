@@ -40,6 +40,21 @@ stay restricted. An incomplete source remains censored. Each prefix identity
 depends only on the projected mathematical state available before its action.
 Changing a later suffix cannot change those bytes.
 
+```mermaid
+flowchart LR
+    P[Verified public equations and domains] --> S[Check active variables and specialization]
+    E[Retained native events] --> S
+    S --> C[Check both ideal-containment identities]
+    C --> I[Reconstruct legal iterator]
+    I --> F[Causal prefix graph]
+    F --> M[prefix-features.jsonl]
+    C --> R[Restricted certificates and verifier work]
+    E --> A[Observed branch action and source cut]
+    A --> R
+    C --> U[Bounded unknown suffix]
+    U --> R
+```
+
 A static graph plus verified specialized equations, partial bindings and legal
 action domains can support learning repeated algebraic structure and candidate
 ordering. Imitating the current ascending iterator can be trivial; a useful
@@ -82,8 +97,9 @@ verified cloud dataset cells remain zero.
 
 Source `5d4336b45d2` implemented the initial modules and CLI integration; the next
 commit corrects the bounded reader and adds cumulative verifier accounting.
-Validation is in progress. The initial build failed on Rust reader ownership;
-that failure is retained. No passing implementation claim follows yet.
+Sourceadde10cad21 passed29 focused tests and strict maintained Clippy.
+Full-library, actual CLI and combined-current-main validation remain pending.
+The initial build failed on Rust reader ownership; that failure is retained.
 
 `crypto dataset export` now stages `prefix-features.jsonl` alongside static
 `features.jsonl`, with policy `strict-structural-allowlist-v5`. Only those two files
