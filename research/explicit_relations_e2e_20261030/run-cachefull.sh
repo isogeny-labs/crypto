@@ -8,7 +8,6 @@ nvidia-smi -q > "$out/gpu-before.txt"
 cat /proc/cpuinfo > "$out/cpuinfo.txt"
 cat /proc/self/status > "$out/process-status.txt"
 git rev-parse HEAD > "$out/source-commit.txt"
-nvcc -O3 -std=c++17 -arch=sm_120 -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -x cu service.cpp -o build/explicit-relations-right-cache
 bash "$root/gpu/explicit-relations/validate-rtx.sh"
 cd "$root/gpu/explicit-relations"
 make ARCH=sm_120 build/query-wide-check build/query-dense-check build/query-cub-check build/query-persistent-check build/query-right-cache-check

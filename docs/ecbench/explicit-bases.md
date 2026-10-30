@@ -708,3 +708,22 @@ backend and independent scientific audit remain unresolved.
 No new CUDA build has been performed locally. The initial persistent host
 fixture cap error was corrected before this combined protocol. The earlier
 V12 plan and source remain unchanged; supersession is not a failed run.
+
+## 2026-10-30T17:00UTC — v13 launch wiring correction
+
+### What was done
+Removed a duplicate full-cache compile before the launcher enters the CUDA
+source directory. The intended compile remains after validation/build setup.
+Shell syntax and administrative pin checks pass; no v13 GPU was launched.
+
+### Decisions made
+Frozen protocol, analyzer, arms, inputs and bounds remain unchanged. This
+corrects launch wiring only, before affected data. PR2983 records CUDA pending.
+
+### Open threads
+Collect and delete active v11 before v13 CUDA validation and execution.
+
+### Errors
+Static syntax alone missed a valid shell command in the wrong working
+directory. Launch review caught it before deployment. T957 is cancelled and
+cannot reopen; scoped correction is owned by T961.
