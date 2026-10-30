@@ -452,6 +452,27 @@ def koblitz_larger_constructions(ref, since):
                  label="Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
                  source=f"{path}@{commit}")
 
+
+def koblitz_ordinary_orientation(ref, since):
+    """Fixed n5 source-algebra counters; not larger-n Koblitz or IC performance."""
+    path = "research/koblitz_modular_ic_20261018/rounds/44/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts")
+        if not isinstance(counts, dict):
+            continue
+        for key, metric, unit, label in (
+            ("actual_source_blocks", "koblitz_modular.ordinary_source_algebra_blocks", "fixed source blocks",
+             "Actual nonsplit-kernel source checks; proper/moduli interpretation retained, not IC rank"),
+            ("exact_orientation_trace_cases", "koblitz_modular.orientation_trace_cases", "fixed middle cases",
+             "Independent seven-kernel/Tate-twist trace decomposition; not a success distribution"),
+            ("orientation_filter_control_blocks", "koblitz_modular.orientation_filter_control_blocks", "retained controls",
+             "Trace screen against recorded83/284source algebras; not independent collector images"),
+            ("max_actual_source_tuple_degree", "koblitz_modular.max_ordinary_source_tuple_degree", "absolute residue degree",
+             "Largest certified source tuple on fixed n5carrier; not a larger-n Koblitz transfer"),
+        ):
+            emit(metric, counts.get(key), date=date, problem=P_IC, unit=unit,
+                 better="neutral", label=label, source=f"{path}@{commit}")
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -548,6 +569,7 @@ def main():
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
     koblitz_larger_constructions(a.ref, a.since)
+    koblitz_ordinary_orientation(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

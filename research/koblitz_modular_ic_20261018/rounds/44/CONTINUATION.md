@@ -81,3 +81,20 @@ trace alone. Fullsourcefinitealgebra checks still pending. All field/degree
 claims must distinguish base436,kernel2180,source4360(ifcertified), and
 F32component872(ifsource4360). Native point12source120/F32component24 are
 alreadycertified. Globalgoalactive; source gen/check not an attack result.
+
+## Final native outcome15:50UTC
+point436-03terminal124after1200s: both full source geometry stages and full
+original-form Frobenius/period passed; final twisted Frobenius was unfinished.
+resume-twist436-01strictPASSexit0completes ONLY that missing check, copying/
+hashing prior receipts. It checks all10deck comparisons, uniqueFdstep3,
+five-map sign, independent trace1, and reuses actual base generation2180.
+Full source tuple degree4360forbothforms now certified by combined receipts.
+All source scope: six blocks (d12four,d436two), every5equations/eightunits/
+10decksteps, exact Tate11/corruption. Never relabel point436-03aswholepass.
+
+All native/proof handles terminal. Odd02passed2theorems afterOdd01unavailable
+import failure; totalR44elevenauditeddeclarations=7named+4generated,0trusted.
+Source/trace/filter/inverse/period/Frob controls strictpass as indexed in
+results.json. Three capped full436runs remain. No source block regenerated
+for final completion. R44report/render/metadata prepared; finish raw seal,
+S3freshrestore/pinchecks, metrics validation, commit/push/PRupdate. Goalactive.
