@@ -3,6 +3,8 @@ set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 out=${EPHEMERAL_OUT:?output directory required}
 study="$root/research/explicit_relations_e2e_20261030"
+arch=${ER_CUDA_ARCH:-sm_120}
+case "$arch" in sm_120|sm_89) ;; *) echo "unsupported CUDA architecture: $arch" >&2; exit 2 ;; esac
 mkdir -p "$out"
 nvidia-smi -q > "$out/gpu-before.txt"
 cat /proc/cpuinfo > "$out/cpuinfo.txt"
@@ -10,7 +12,7 @@ cat /proc/self/status > "$out/process-status.txt"
 git rev-parse HEAD > "$out/source-commit.txt"
 bash "$root/gpu/explicit-relations/validate-rtx.sh"
 cd "$root/gpu/explicit-relations"
-make ARCH=sm_120 build/query-wide-check build/query-dense-check build/query-cub-check build/query-persistent-check build/query-right-cache-check build/query-filter-check
+make ARCH="$arch" build/query-wide-check build/query-dense-check build/query-cub-check build/query-persistent-check build/query-right-cache-check build/query-filter-check
 build/query-wide-check
 build/query-dense-check
 build/query-cub-check
@@ -22,10 +24,10 @@ for variant in query-check query-compact-check query-wide-check query-dense-chec
     timeout 180 compute-sanitizer --tool "$sanitizer" --error-exitcode 86 "build/$variant" > "$out/$variant-$sanitizer.log" 2>&1
   done
 done
-nvcc -O3 -std=c++17 -arch=sm_120 -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -x cu service.cpp -o build/explicit-relations-dense-cub
-nvcc -O3 -std=c++17 -arch=sm_120 -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -x cu service.cpp -o build/explicit-relations-persistent
-nvcc -O3 -std=c++17 -arch=sm_120 -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -x cu service.cpp -o build/explicit-relations-right-cache
-nvcc -O3 -std=c++17 -arch=sm_120 -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_NEGATIVE_FILTER -x cu service.cpp -o build/explicit-relations-filter
+nvcc -O3 -std=c++17 -arch="$arch" -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -x cu service.cpp -o build/explicit-relations-dense-cub
+nvcc -O3 -std=c++17 -arch="$arch" -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -x cu service.cpp -o build/explicit-relations-persistent
+nvcc -O3 -std=c++17 -arch="$arch" -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -x cu service.cpp -o build/explicit-relations-right-cache
+nvcc -O3 -std=c++17 -arch="$arch" -DER_CUDA -DER_TABLE_DIAGNOSTICS -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_NEGATIVE_FILTER -x cu service.cpp -o build/explicit-relations-filter
 build/explicit-relations-dense-cub --self-test
 build/paper-driver build/explicit-relations-dense-cub --self-test
 build/explicit-relations-persistent --self-test
