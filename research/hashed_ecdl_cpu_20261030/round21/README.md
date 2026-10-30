@@ -4,6 +4,14 @@ This panel preserves the original baseline and all three complete public-point
 fixtures. It isolates the two candidates added after round20 without changing
 round20's frozen inputs. No cloud execution is authorized by these files.
 
+Status: frozen and native-validated, unsubmitted and unexecuted. Protocol hash
+e5723fc0a8377ec9d03637803fc2630b5cb5e8680efa9debda21a13a012db09f.
+The three pinned builds pass 46/46/45 release library tests. All five binary
+hashes verify. The native exporter passes 12 synthetic tests with the historical
+round18 parity test intentionally ignored in this round21 invocation. Strict
+native-tool Clippy and formatting pass. The freeze references the committed
+draft at 960a34911feb; qualification.json records the remaining admission gates.
+
 | Arm | Integrated source | Binary | Batch | Contrast |
 | --- | --- | --- | --- | --- |
 | u | 2bd4588fba603ba1787e1d8ad82f084ef461d7cf | baseline | 64 | Original baseline |

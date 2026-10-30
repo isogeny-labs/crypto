@@ -1,7 +1,11 @@
 # Native CPU panel validation and export
 
-This Rust crate is the active correctness-test and export path for round18 and
-round19 and round20. It replaces the Python execution paths identified in PR2980 review.
+This Rust crate is the active correctness-test and export path for round18,
+round19, round20 and round21. It replaces the Python execution paths identified in PR2980 review.
+
+Round21 support was checked with all 12 synthetic tests using its frozen
+protocol and analyzer, including unknown-study rejection. Logs are in
+../round21/native-tests.log. This does not execute a benchmark or authorize one.
 Historical Python source is preserved byte-for-byte under legacy/ for provenance;
 it is not an execution entry point. The historical validation logs remain as
 recorded, with their Python provenance visible.

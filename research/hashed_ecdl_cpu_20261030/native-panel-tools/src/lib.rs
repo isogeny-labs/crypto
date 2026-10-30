@@ -106,7 +106,7 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
         .and_then(|s| s.to_str())
         .ok_or("invalid study name")?;
     check(
-        matches!(round, "round18" | "round19" | "round20"),
+        matches!(round, "round18" | "round19" | "round20" | "round21"),
         "unsupported study",
     )?;
     let job = format!("hashed-ecdl-cpu-{round}-20261030");
