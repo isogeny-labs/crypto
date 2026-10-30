@@ -509,6 +509,65 @@ mod tests {
             assert_eq!(got.squares, expected.squares);
         }
     }
+
+    #[test]
+    fn bounded_s4_add_allows_large_temporary_support_then_cancels() {
+        let canonical = |range: std::ops::Range<u64>| {
+            let mut terms: Vec<_> = range.map(|m| (mask_from64(m), 1u64)).collect();
+            terms.sort_unstable_by_key(|&(m, _)| {
+                std::cmp::Reverse(mono_key(F2BoolMono::from_mask(m)))
+            });
+            FieldSum(terms)
+        };
+        let a = canonical(0..256);
+        let b = canonical(128..384);
+        assert!(a.0.len() + b.0.len() > SUPPORT);
+        let mut observer = |_| Ok(());
+        let mut gate = Gate {
+            limits: Limits::default(),
+            reserved: Reserved::default(),
+            deadline: deadline(),
+            observer: &mut observer,
+        };
+        let sum = gate.add(&a, &b).unwrap();
+        let mut expected = canonical(0..384).0;
+        expected.retain(|&(m, _)| !(mask_from64(128)..mask_from64(256)).contains(&m));
+        assert_eq!(sum.0.len(), SUPPORT);
+        assert_eq!(sum.0, expected);
+        assert!(gate.add(&a, &canonical(256..512)).is_err());
+    }
+
+    #[test]
+    fn bounded_s4_canonical_coordinates_equal_legacy_builder() {
+        use super::super::{sym_semaev_s4, SymElement};
+        for n in [23, 31, 47, 53, 61] {
+            let irr = find_irreducible(n).unwrap();
+            let st = FieldStructure::new(n, &irr);
+            let domain = [(1u64 << (n - 2)) | 5, (1u64 << (n - 1)) | 3];
+            let constant = F2mElement::from_words(&[domain[0]], n);
+            let delta = F2mElement::from_words(&[domain[0] ^ domain[1]], n);
+            // Independently construct each affine K2 selector through legacy
+            // coordinate APIs, rather than converting the new FieldSum output.
+            let xs: Vec<_> = (0..3)
+                .map(|offset| {
+                    SymElement::from_subspace_vars(std::slice::from_ref(&delta), offset, n, 3)
+                        .add(&SymElement::constant(&constant, n, 3))
+                })
+                .collect();
+            for target in [0, domain[0], 37] {
+                let actual = run(&irr, &domain, target, Limits::default()).unwrap();
+                let target_element = F2mElement::from_words(&[target], n);
+                let expected = sym_semaev_s4(&xs[0], &xs[1], &xs[2], &target_element, &st);
+                assert_eq!(actual.equations.len(), expected.len());
+                for (actual, expected) in actual.equations.iter().zip(&expected) {
+                    assert_eq!(actual.n_vars, expected.n_vars);
+                    let actual_masks: Vec<_> = actual.terms.iter().map(|t| t.mask).collect();
+                    let expected_masks: Vec<_> = expected.terms.iter().map(|t| t.mask).collect();
+                    assert_eq!(actual_masks, expected_masks, "n={n}, target={target}");
+                }
+            }
+        }
+    }
     #[test]
     fn bounded_s4_selector_modulo_padding_and_sparse_controls() {
         for k in [1usize, 2, 3, 4, 5, 64] {
