@@ -12,7 +12,7 @@ Keep resolved and superseded records in the index.
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
-| [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; code implemented | conditional tensor algorithm | general correctness, precision/packing invariants and complexity accounting; bounded controls do not establish the source theorem |
+| [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; checked p/r/hash setup implemented | conditional tensor algorithm | general correctness, precision/packing invariants and complexity accounting; bounded setup controls do not establish the source theorem |
 | [ECDLP dataset worker publication and cumulative admission](ml-ecdlp-dataset-durable-launch.md) | open | first durable native cloud cell and admitted large-corpus launch | approved scoped worker access, real PUT/GET/hash preflight, cumulative budget reservations, fresh restore and independent replay |
 
 | [Guarded fall-degree exact-pair Lean proof](guarded-fall-degree-lean-exact-pair.md) | resolved | the original ordinary guarded three-abscissa prime-field pair `(4,5)` | `GuardedExactPair.exact_pair_prime` proves the full statement; current proof map and versioned verification receipt bind the complete source chain |

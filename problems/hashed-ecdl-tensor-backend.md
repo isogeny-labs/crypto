@@ -4,7 +4,7 @@
 - **Kind:** correctness/complexity validation, conditional external theorem
 - **Affected work:** [native implementation](../docs/hashed-ecdl.md)
 - **Next action owner:** unassigned independent reviewer
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-10-30
 
 ## Problem
 
@@ -67,6 +67,16 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
+through factor-base construction and replay, with an optional explicit fixed
+modulus permitted by source section 3. Official p/r/target and a 132-bit s pass
+preflight under the original two-million-step policy. Six targeted development
+controls cover the 65-bit boundary, missing proofs, limits and fixed-modulus
+replay. See [the additive report](../research/hashed_ecdl_hash_prime_20261030/README.md).
+The default uncertified >u64 AKS path, finite-size contraction guard, independent
+general audit and both challenge solve requirements remain open. This is a
+specific setup fix, without a general fast-primality or runtime claim.
 
 2026-10-30 engineering follow-up: [native exact-primality and witness changes](../research/hashed_ecdl_speed_20261029/README.md)
 pass bounded correctness controls and preserve complete seeded certificates.
