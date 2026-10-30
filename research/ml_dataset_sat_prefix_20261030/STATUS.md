@@ -70,3 +70,16 @@ The installed protocol skill's referenced official schema/checker is absent from
 the inspected local repositories; PROTOCOL-TOOLING.md records the search scope.
 CLI preparation drafts a substantive contract and separates freeze/commit from
 execution. Official schema/export validation remains unavailable, not fabricated.
+
+Protocol tooling availability resolved by fresh upstream lookup: checker, schemas,
+docs and worked example fetched from crypto-autoresearcher commit
+f755085ff951888dbe64682c210c9ef7d167b40c and all Git blob IDs verified. The local
+checkout was stale. CLI author is adapting to the actual schema; no protocol
+validation or generation is implied by retrieval.
+
+## Resume: standalone validation preparation
+
+Consequence full04 is terminal and passed. Dependency inventory02 is retained.
+The unfinished CLI fixture is preserved explicitly as work in progress; its official
+schema adaptation and driver review remain open. Freeze this source before SAT
+attempt02. The shared producer patch remains unapplied pending coordination.

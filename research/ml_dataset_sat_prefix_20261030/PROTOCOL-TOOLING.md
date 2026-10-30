@@ -24,3 +24,20 @@ schema/checker result. Do not invent official validation or unified export
 compatibility. Keep that result unavailable until actual authoritative tooling
 is supplied or located. This does not prevent compilation, unit controls,
 source review, driver implementation or artifact preservation.
+
+## Resolved by pinned upstream retrieval
+
+At2026-10-30T07:18UTC the GitHub connector found the checker on current upstream
+`isogeny-labs/crypto-autoresearcher`. Retrieved all six files at immutable commit
+`f755085ff951888dbe64682c210c9ef7d167b40c`: checker, protocol/export/review schemas,
+protocol documentation and the worked protocol example. Every downloaded byte
+sequence reproduced its Git blob ID; SHA256 inventory is retained in
+upstream-protocol-tooling.json. The scratch tree is
+/home/ec2-user/ml-dataset-work-20261028/protocol-tooling-f755085ff951.
+
+The local absence was caused by stale checkouts and is no longer a tooling
+availability blocker. Adapt draft/exports to these actual schemas; use the
+pinned checker, retain its receipts, and freeze/commit before generation.
+Retrieving the tool does not itself validate any protocol or run.
+
+Source: https://github.com/isogeny-labs/crypto-autoresearcher/blob/f755085ff951888dbe64682c210c9ef7d167b40c/tools/experiment_protocol.py
