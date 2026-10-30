@@ -642,7 +642,7 @@ fn publish_object(
                 .is_some_and(|sha| sha != &artifact.sha256)
         {
             return Err(format!(
-                "{key}: existing remote object has mismatched size or digest; refusing overwrite"
+                "{key}: remote round-trip integrity precheck: existing object has mismatched size or digest; refusing overwrite"
             ));
         }
         roundtrip(store, artifact, root)?;

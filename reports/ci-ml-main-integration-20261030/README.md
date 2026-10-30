@@ -1,0 +1,15 @@
+# Current-main ML integration qualification
+
+Requested outcome: every open PR merged and current main/PR CI passing, with original scientific evidence preserved. This report records actual source-specific validation; the broader objective remains in progress.
+
+The original complete release-library attempt5 failed: 5652 passed, 30 failed, 126 existing ignored. Original raw log remains retained (SHA256 7720ff0a8acdd3939de9ea4b82a15852be46e01d75ea91457ef4d38da338f3e6). Missing sparse runtime inputs were restored from exact current Git blobs. No missing original scientific capture was fabricated.
+
+After real compiler, transport, compatibility and runtime repairs, the freshly rebuilt production ML module passes 339 tests, with zero failures and one original ignored control (5.21s tests). All 30 original whole-library failures then pass against that rebuilt binary (3.31s). The complete no-filter release-library retry6 is running; no whole-library pass is asserted here. Retry2 compiled source but linking failed on disk exhaustion: no tests ran in that attempt. Its failure log/status and lossless cache receipts remain retained.
+
+The native immutable transport returns its actual created-versus-existing boolean. HEAD without a native checksum obtains independently metered full bytes before attesting a digest; a registered expected digest alone never attests remote bytes. The new actual SDK wire controls reject corrupted readback and deny a GET before wire I/O when its budget is exhausted. The old guarded-collision fixture now supplies its real SHA256/metadata and preserves the original two-request charge assertions. Strict destination/owner/budget checks remain.
+
+The export test now expects the existing v5 structural allowlist schema. Existing strict earlier errors retain enough context for original integrity/frozen-cell assertions. The shared circuit bound remains admitted for m2..15; the stale m10 assertion is corrected to the existing exact formula. All old named controls remain; accidental byte-identical duplicate controls do not inflate coverage. The original lease and child handoff tests passed as part of 105 actual production-component controls; no live S3, supervisor deployment or paid experiment qualification is claimed.
+
+New main has explicitly preserved planted-only quartic target policy using an actual2G fixture. That intentional policy supersedes the provisional torsion reachability workaround from the earlier b7 source when current main is integrated. No public-target or transfer result is inferred. Sources reviewed: actual workflow failures, existing original test contracts, qualified source9c and old exact complete modules, current native store interface, operation/budget documentation, and the maintainers' current policy change cc335226196.
+
+Final current-main integration, release library/CLI/lint, review and exact-head required checks remain pending before push/merge. Temporary four Lean compiler static libraries must be restored from their verified gzip originals before final handoff.

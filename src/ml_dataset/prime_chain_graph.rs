@@ -755,6 +755,7 @@ mod tests {
             degree_bound: 2,
             work_limit: 0,
             solver: "f4".into(),
+            factor_base_policy: None,
         };
         let mut case = curves::generate(&config).unwrap();
         case.private_witness = Value::Null;

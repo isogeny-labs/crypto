@@ -1661,14 +1661,15 @@ esac
         let f = Fixture::new(
             r#"case "$2" in
 put-object) echo 'An error occurred (PreconditionFailed)' >&2; exit 1 ;;
-head-object) printf '%s\n' '{"ContentLength":3}' ;;
+head-object) printf '%s\n' '{"ContentLength":3,"Metadata":{"sha256":"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}' ;;
 *) exit 8;; esac"#,
             2,
             0,
         );
         let source = f.root.join("source");
         fs::write(&source, b"abc").unwrap();
-        f.backend.put("object", &source, &"a".repeat(64)).unwrap();
+        let digest = crate::store::hash_file(&source).unwrap().0;
+        assert!(!f.backend.put("object", &source, &digest).unwrap());
         assert_eq!(f.ops(), [Operation::Put, Operation::Head]);
         assert_eq!(f.meter.calls.lock().unwrap()[0].upload_bytes, 3);
     }

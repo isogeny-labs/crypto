@@ -1534,7 +1534,7 @@ mod tests {
         assert_eq!(first["export"]["restricted_target_rows"], 2);
         assert_eq!(
             first["export"]["feature_policy"]["version"],
-            "strict-structural-allowlist-v3"
+            "strict-structural-allowlist-v5"
         );
         let features = fs::read_to_string(out.join("features.jsonl")).unwrap();
         for forbidden in [

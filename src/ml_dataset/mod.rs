@@ -2953,7 +2953,9 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     if replay && complete_factor_base {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
-        curves::verify_factor_base_config(&manifest.config, &public, &base)?;
+        curves::verify_factor_base_config(&manifest.config, &public, &base).map_err(|error| {
+            format!("factor base differs from frozen cell configuration: {error}")
+        })?;
         if has("prime-f4-input.json") && !censored_m3_prefix {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
@@ -6524,87 +6526,6 @@ mod tests {
             .contains("SHA-256"));
         fs::write(f.0.join("protocol.json"), changed).unwrap();
         assert!(bound_run(&f.0).is_err());
-    }
-
-    #[test]
-    fn orphan_root_certificate_is_rejected_even_after_valid_rehash() {
-        let fixture = TempRun::new();
-        let (plan, binding, protocol) = fixture.bound();
-        let dir = fixture.failed_cell(&plan, &binding, &protocol);
-        let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
-        manifest.artifacts.push(
-            storage::write_json(
-                &dir,
-                "root-certificates.json",
-                "prime-root-certificates/v1",
-                &json!({"forged":true}),
-            )
-            .unwrap(),
-        );
-        fs::write(
-            dir.join("manifest.json"),
-            serde_json::to_vec(&manifest).unwrap(),
-        )
-        .unwrap();
-        for replay in [false, true] {
-            assert!(verify_cell(&dir, replay)
-                .unwrap_err()
-                .contains("prime-root certificate lacks"));
-        }
-        assert!(export::export(&fixture.0, &fixture.0.join("export"))
-            .unwrap_err()
-            .contains("prime-root certificate lacks"));
-    }
-
-    #[test]
-    fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
-        for (found, censored, all_queries, status, completed) in [
-            (true, false, false, "verified", true),
-            (true, false, true, "verified", true),
-            (false, false, true, "partial", true),
-            (false, true, false, "budget_exhausted", false),
-        ] {
-            let certificate = json!({"found_pdp":found,"censored":censored,
-                "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
-                "total_operation_count_verified":false});
-            let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
-                "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
-                "trace_complete":false,"scalar_recovered_without_witness":false,
-                "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
-                "pdp_witness_verified":found,"solver_completed":completed,"status":status});
-            verify_prime_root_outcome(&outcome, &certificate).unwrap();
-            for field in [
-                "root_execution_trace_complete_verified",
-                "root_total_operation_count_verified",
-                "trace_complete",
-                "scalar_recovered_without_witness",
-                "scalar_replay_verified",
-                "ecdlp_pipeline_completed",
-            ] {
-                let mut bad = outcome.clone();
-                bad[field] = json!(true);
-                assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
-                    "{field}"
-                );
-            }
-            for (field, value) in [
-                ("pdp_witness_verified", json!(!found)),
-                ("solver_completed", json!(!completed)),
-                ("status", json!("unsupported")),
-                (
-                    "root_certificate_scope",
-                    json!("full execution trace verified"),
-                ),
-            ] {
-                let mut bad = outcome.clone();
-                bad[field] = value;
-                assert!(
-                    verify_prime_root_outcome(&bad, &certificate).is_err(),
-                    "{field}"
-                );
-            }
-        }
     }
 
     #[test]

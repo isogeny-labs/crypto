@@ -866,61 +866,6 @@ mod tests {
         fn new() -> Self {
             Self::with_policies(Vec::new())
         }
-        fn checked_cell(&self, index: u64) -> PathBuf {
-            let dir = self.source.join("cells").join(format!("{index:012}"));
-            fs::create_dir_all(&dir).unwrap();
-            storage::write_json(&dir, "plan.json", "restricted-frozen-plan", &self.plan).unwrap();
-            storage::write_json(&dir, "run.json", "restricted-run-binding", &self.binding).unwrap();
-            storage::write_bytes(
-                &dir,
-                "protocol.json",
-                "restricted-frozen-protocol",
-                "json",
-                &self.protocol,
-            )
-            .unwrap();
-            storage::write_json(
-                &dir,
-                "config.json",
-                "restricted-provenance",
-                &self.plan.cell(index).unwrap(),
-            )
-            .unwrap();
-            storage::write_json(
-                &dir,
-                "attempt.json",
-                "attempt-provenance",
-                &json!({
-                    "schema":"crypto.ml-dataset.attempt/v1", "cell_index":index,
-                    "plan_sha256":self.binding["plan_sha256"], "started_unix_nanos":"1"
-                }),
-            )
-            .unwrap();
-            for path in ["stdout.log", "stderr.log"] {
-                storage::write_bytes(&dir, path, "process-log", "utf8", b"").unwrap();
-            }
-            super::super::telemetry::checked::install_policy(&dir).unwrap();
-            dir
-        }
-        fn seal_checked(&self, dir: &Path, index: u64, outcome: Value) -> CellManifest {
-            storage::write_json(
-                dir,
-                "worker-process.json",
-                "process-provenance",
-                &json!({"software_fixture":true}),
-            )
-            .unwrap();
-            let manifest = CellManifest {
-                schema: "crypto.ml-dataset.cell/v1".into(),
-                cell_index: index,
-                plan_sha256: self.binding["plan_sha256"].as_str().unwrap().into(),
-                config: self.plan.cell(index).unwrap(),
-                outcome,
-                artifacts: super::super::collect_cell_artifacts(dir).unwrap(),
-            };
-            storage::write_json(dir, "manifest.json", "cell-manifest", &manifest).unwrap();
-            manifest
-        }
         fn with_policies(policies: Vec<FactorBasePolicy>) -> Self {
             let root = std::env::temp_dir().join(format!(
                 "crypto-coverage-test-{}-{}",

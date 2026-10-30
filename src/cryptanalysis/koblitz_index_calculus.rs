@@ -9225,7 +9225,7 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
 
 /// The chained-S3 solver of [`sat_decompose_chained_s3`] and its
 /// Frobenius-orbit variants for any summand count `2..=9`, the range the
-/// encoder's identity-pattern mask holds. The `5..=6` entry points keep
+/// encoder's identity-pattern mask holds. The `4..=6` entry points keep
 /// their frozen admission; this one exists for summand sweeps. The same
 /// domain, field-replay and full curve-group checks apply to every model.
 pub fn sat_decompose_chained_s3_any_m(
@@ -9266,7 +9266,7 @@ fn sat_decompose_chained_s3_with_domain(
     frobenius_orbits: bool,
     order_first_pair: bool,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    if !(5..=6).contains(&m) {
+    if !(4..=6).contains(&m) {
         return (
             None,
             ChainS3Stats {
@@ -9299,7 +9299,7 @@ fn sat_decompose_chained_s3_checked(
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
     let mut stats = ChainS3Stats::default();
-    if !(4..=6).contains(&m)
+    if !(2..=9).contains(&m)
         || limits.max_models == 0
         || limits.conflict_budget == 0
         || !kc.curve.is_on_curve(target)

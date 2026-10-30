@@ -276,6 +276,7 @@ impl Store {
         };
         Ok(Self {
             cfg,
+            index_at_open: index.clone(),
             index,
             backend,
         })
@@ -287,6 +288,7 @@ impl Store {
         let index = Index::load(&cfg.index_path)?;
         Ok(Self {
             cfg,
+            index_at_open: index.clone(),
             index,
             backend: Some(backend),
         })
