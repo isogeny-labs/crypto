@@ -14,10 +14,10 @@ use std::time::{Duration, Instant};
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
-#[path = "prime_f4_wide_m3.rs"]
-mod prime_f4_wide_m3;
 #[path = "prime_f4_wide_dynamic.rs"]
 mod prime_f4_wide_dynamic;
+#[path = "prime_f4_wide_m3.rs"]
+mod prime_f4_wide_m3;
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -159,6 +159,25 @@ pub(super) fn live_event(event: &Value) -> Result<(), String> {
     LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
         Some(s) => s.event(event),
         None => Ok(()),
+    })
+}
+/// New bounded profiles require an attempt-bound sink. The caller debits the
+/// buffer's requested storage once and reuses it; this bridge does not reset
+/// budgets or silently downgrade to the legacy allocating event path.
+#[allow(dead_code)] // Dynamic dispatcher remains gated on complete adapter validation.
+pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
+    kind: super::capture::TypedEventKind,
+    payload: &T,
+    buffer: &mut super::capture::TypedEventBuffer,
+) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink
+            .event_typed(kind, payload, buffer)
+            .map_err(|error| error.to_string()),
+        Some(EventSink::Legacy(_)) => {
+            Err("typed solver events require an attempt-bound capture sink".into())
+        }
+        None => Err("typed solver events require an active capture sink".into()),
     })
 }
 pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
@@ -3085,6 +3104,70 @@ fn wide_begin_failure(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn typed_solver_bridge_requires_bound_capture_and_preserves_sticky_failure() {
+        use super::super::capture::{TypedEventBuffer, TypedEventKind};
+        let mut buffer =
+            TypedEventBuffer::try_new(1024, TypedEventBuffer::requested_bytes(1024).unwrap())
+                .unwrap();
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "typed-solver-bridge-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir(&directory).unwrap();
+        let legacy_path = directory.join("legacy.jsonl");
+        LIVE_SINK.with(|slot| {
+            *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
+                directory: directory.clone(),
+                events: File::create(&legacy_path).unwrap(),
+                sequence: 0,
+            }));
+        });
+        let guard = LiveSinkGuard;
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        assert_eq!(fs::metadata(&legacy_path).unwrap().len(), 0);
+        let binding = AttemptBinding {
+            schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+            run_sha256: "1".repeat(64),
+            plan_sha256: "2".repeat(64),
+            protocol_sha256: "3".repeat(64),
+            config_sha256: "4".repeat(64),
+            source_commit: "5".repeat(40),
+            binary_sha256: "6".repeat(64),
+            cell_index: 0,
+            attempt_sha256: "7".repeat(64),
+        };
+        let live = directory.join("bound");
+        let emitter = CaptureEmitter::create(
+            &live,
+            binding,
+            super::super::capture::capture_limits(64).unwrap(),
+        )
+        .unwrap();
+        LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
+        live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).unwrap();
+        let original = fs::read(live.join("events.jsonl")).unwrap();
+        let event: Value = serde_json::from_slice(&original).unwrap();
+        assert_eq!(event["event"]["kind"], "wide_prime_dynamic");
+        assert_eq!(event["event"]["payload"], 7);
+        assert!(live_typed_event(
+            TypedEventKind::WidePrimeDynamic,
+            &"x".repeat(2048),
+            &mut buffer,
+        )
+        .is_err());
+        assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &8u64, &mut buffer).is_err());
+        assert_eq!(fs::read(live.join("events.jsonl")).unwrap(), original);
+        drop(guard);
+        assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+        fs::remove_dir_all(directory).unwrap();
+    }
     #[test]
     fn native_sat_trace_caps_preserve_an_exact_accepted_prefix() {
         let mut log = SatEventLog::default();
