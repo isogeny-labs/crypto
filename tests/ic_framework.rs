@@ -9,18 +9,7 @@ fn ic_binary() -> PathBuf {
     option_env!("CARGO_BIN_EXE_ic")
         .or(option_env!("IC_TEST_BINARY"))
         .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            // Selected-bin unit tests do not get CARGO_BIN_EXE. Full target
-            // builds put the CLI next to deps; the dedicated CI step sets the
-            // exact freshly built path explicitly.
-            std::env::current_exe()
-                .unwrap()
-                .parent()
-                .unwrap()
-                .parent()
-                .unwrap()
-                .join(format!("ic{}", std::env::consts::EXE_SUFFIX))
-        })
+        .expect("CLI contracts require Cargo's integration-test executable or IC_TEST_BINARY pointing to a freshly built ic; see docs/ic/cli-contract-tests.md")
 }
 
 fn path() -> PathBuf {
