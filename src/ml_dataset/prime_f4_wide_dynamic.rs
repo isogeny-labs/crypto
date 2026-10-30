@@ -396,7 +396,7 @@ pub(super) fn build_original_chain(
     Ok(out)
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
 pub(super) struct AffinePoint {
     pub x: u64,
     pub y: u64,
@@ -917,7 +917,8 @@ impl Slots {
         })
     }
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
 enum SmallPoint {
     Infinity,
     Affine(AffinePoint),
@@ -930,6 +931,7 @@ struct GroupWorkspace {
     coordinates: [u64; 28],
     residues: [u64; 29],
     first_certificate: [usize; 15],
+    exceptional: [usize; 15],
     assignments: [Option<u64>; 28],
     sources: [usize; 28],
     transitions: [Option<LinearTransition>; 29],
@@ -957,6 +959,7 @@ impl Workspace {
             coordinates: [0; 28],
             residues: [0; 29],
             first_certificate: [0; 15],
+            exceptional: [0; 15],
             assignments: [None; 28],
             sources: [0; 28],
             transitions: [None; 29],
@@ -980,7 +983,7 @@ pub(super) enum EventPersistence {
 #[derive(Clone, Copy, Debug, serde::Serialize)]
 pub(super) struct PhaseEvent {
     schema: &'static str,
-    source: &'static str,
+    source: PhaseSource,
     global_sequence: usize,
     local_sequence: usize,
     stage: &'static str,
@@ -988,10 +991,20 @@ pub(super) struct PhaseEvent {
     reserved_bytes: u64,
     persistence: EventPersistence,
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+enum PhaseSource {
+    Setup,
+    Native,
+    Linear,
+    Group,
+}
 struct ObserverState {
     acknowledged: usize,
     setup: usize,
     native: usize,
+    linear: usize,
+    group: usize,
     durable: usize,
     pending: Option<PhaseEvent>,
     stop: Option<Stop>,
@@ -1115,10 +1128,11 @@ fn append_observation<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(),
         if state.persistence == EventPersistence::BoundCapture {
             state.durable += 1;
         }
-        if event.source == "setup" {
-            state.setup += 1;
-        } else {
-            state.native += 1;
+        match event.source {
+            PhaseSource::Setup => state.setup += 1,
+            PhaseSource::Native => state.native += 1,
+            PhaseSource::Linear => state.linear += 1,
+            PhaseSource::Group => state.group += 1,
         }
         Ok(())
     })();
@@ -1330,6 +1344,8 @@ pub(super) struct PreparedOriginal {
     original_deadline: Instant,
     m: usize,
     degree_bound: u32,
+    group_control: GroupControl,
+    linear_retained: bool,
 }
 pub(super) struct PrepareFailure {
     pub stop: Stop,
@@ -1394,7 +1410,9 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             + size_of::<NativeMetadata>()
             + size_of::<SetupRecord>()
             + size_of::<[u8; 60]>()
-            + size_of::<[usize; 32]>()) as u64;
+            + size_of::<[usize; 32]>()
+            + size_of::<GroupControl>()
+            + GROUP_SCRATCH_BYTES) as u64;
         {
             let mut ticket = ledger.reserve(fixed * 8, fixed)?;
             ticket.spend(fixed * 8)?;
@@ -1426,6 +1444,8 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             acknowledged: 0,
             setup: 0,
             native: 0,
+            linear: 0,
+            group: 0,
             durable: 0,
             pending: None,
             stop: None,
@@ -1443,7 +1463,7 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             &mut |event| {
                 let row = PhaseEvent {
                     schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
-                    source: "setup",
+                    source: PhaseSource::Setup,
                     global_sequence: observer.acknowledged,
                     local_sequence: observer.setup,
                     stage: match event.stage {
@@ -1535,6 +1555,19 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             original_deadline: limits.original_deadline,
             m: parameters.m,
             degree_bound: limits.degree_bound.min(12),
+            group_control: GroupControl {
+                a: parameters.a,
+                b: parameters.b,
+                target,
+                domain_len: domain.len(),
+                addition_limit: limits.work_limit,
+                tuple_limit: limits.work_limit.min(1024),
+                started: false,
+                additions_reserved: 0,
+                additions_performed: 0,
+                tuples: 0,
+            },
+            linear_retained: false,
         }),
         Err(stop) => Err(PrepareFailure {
             stop,
@@ -1598,7 +1631,7 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
             }
             let row = PhaseEvent {
                 schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
-                source: "native",
+                source: PhaseSource::Native,
                 global_sequence: prepared.observer.acknowledged,
                 local_sequence: event.sequence,
                 stage: stage_name(event.stage),
@@ -2178,6 +2211,839 @@ pub(super) fn extract_reported_linear(phase: &mut NativePhase) -> LinearReport {
         }
         Err(stop) => report.stop = stop,
     }
+    report
+}
+
+// Wire counters/cursors use canonical decimal strings, including values above
+// u64::MAX. Formatting uses caller-admitted fixed scratch, never a String/Value.
+fn serialize_u128_decimal<S: serde::Serializer>(
+    value: &u128,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    let mut digits = [0u8; 40];
+    let mut start = digits.len();
+    let mut value = *value;
+    loop {
+        start -= 1;
+        digits[start] = b'0' + (value % 10) as u8;
+        value /= 10;
+        if value == 0 {
+            break;
+        }
+    }
+    serializer.serialize_str(std::str::from_utf8(&digits[start..]).expect("decimal digits"))
+}
+// Steps 1–3 only: local typed extraction and group prefixes. A computed match
+// stops before independent certificate replay / bound payload publication.
+const GROUP_SCRATCH_BYTES: usize = 2048;
+const GROUP_EVENT_WORK: u64 = 163_880; // <=80*1024 typed bytes + callback81920 + newline40
+#[derive(Clone, Copy)]
+struct GroupControl {
+    a: u64,
+    b: u64,
+    target: AffinePoint,
+    domain_len: usize,
+    addition_limit: u64,
+    tuple_limit: u64,
+    started: bool,
+    additions_reserved: u64,
+    additions_performed: u64,
+    tuples: u64,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum GroupOrigin {
+    ReportedBasisLinearCandidate,
+    ReportedBasisLeafLift,
+    IndependentGroupPrefix,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum GroupStop {
+    IndependentTraversalFinished,
+    PendingCertificate,
+    AlreadyStarted,
+    InvalidDomain,
+    InvalidCandidate,
+    NativeContradiction,
+    OriginalEquationMismatch,
+    TupleLimit,
+    AdditionLimit,
+    CheckWorkLimit,
+    GroupBytes,
+    EventLimit,
+    PersistenceFailure,
+    Deadline,
+    InvalidState,
+}
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub(super) struct GroupReport {
+    pub stop: GroupStop,
+    pub origin: GroupOrigin,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    pub cursor: u128,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    pub independent_visited: u128,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    pub native_lifts_visited: u128,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    pub independent_total: u128,
+    pub completed_prefixes: usize,
+    pub tuple_entered: bool,
+    pub computed_match: bool,
+    pub row_bound: usize,
+    pub tuples_reserved: u64,
+    pub additions_reserved: u64,
+    pub additions_performed: u64,
+    pub checking_reserved_work: u64,
+    pub checking_performed_work: u64,
+    pub group_domain_complete: bool,
+    pub pdp_witness_verified: bool,
+    pub certificate_durably_persisted: bool,
+    pub independent_derivation_verified: bool,
+}
+#[derive(serde::Serialize)]
+struct LinearRecord<'a> {
+    schema: &'static str,
+    report: &'a LinearReport,
+    assignments: &'a [Option<u64>],
+    source_ids: &'a [usize],
+    transitions: &'a [Option<LinearTransition>],
+    unresolved: Unresolved<'a>,
+    residues: &'a [u64],
+}
+struct Unresolved<'a>(&'a [Option<u64>]);
+impl serde::Serialize for Unresolved<'_> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+        for (i, x) in self.0.iter().enumerate() {
+            seq.serialize_element(&x.is_none().then_some(i))?;
+        }
+        seq.end()
+    }
+}
+pub(super) fn retain_linear(phase: &mut NativePhase, report: &LinearReport) -> Result<(), Stop> {
+    let p = &mut phase.prepared;
+    if p.group_control.started {
+        return Err(Stop::InvalidInput);
+    }
+    p.linear_retained = false;
+    let v = 2 * p.m - 2;
+    if report.assignments > v || report.original_equations_checked > v + 1 {
+        return Err(Stop::InvalidInput);
+    }
+    let g = &p.workspace.group;
+    let record = LinearRecord {
+        schema: "crypto.ml-dataset.wide-prime-dynamic-linear/v1",
+        report,
+        assignments: &g.assignments[..v],
+        source_ids: &g.sources[..v],
+        transitions: &g.transitions[..report.assignments],
+        unresolved: Unresolved(&g.assignments[..v]),
+        residues: &g.residues[..report.original_equations_checked],
+    };
+    encode_record(&record, &mut p.slots.buffers[4], &mut p.ledger)?;
+    p.linear_retained = true;
+    Ok(())
+}
+#[derive(serde::Serialize)]
+struct GroupRow<'a> {
+    schema: &'static str,
+    origin: GroupOrigin,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    cursor: u128,
+    indices: &'a [usize],
+    prefixes: &'a [SmallPoint],
+    completed_additions: usize,
+    exceptional_auxiliary_positions: &'a [usize],
+    coordinates: Option<&'a [u64]>,
+    residues: Option<&'a [u64]>,
+    total: Option<&'a SmallPoint>,
+    computed_match: bool,
+    candidate_coordinates_match: bool,
+    complete: bool,
+    tuples_reserved: u64,
+    additions_reserved: u64,
+    additions_performed: u64,
+    checking_reserved_work: u64,
+}
+const _: () = assert!(
+    size_of::<GroupRow<'static>>()
+        + size_of::<LinearRecord<'static>>()
+        + size_of::<MeteredWriter<'static>>()
+        + size_of::<GroupReport>()
+        + size_of::<Ledger>() * 3
+        + size_of::<[u64; 32]>()
+        + size_of::<[usize; 32]>()
+        + size_of::<[u8; 60]>()
+        <= GROUP_SCRATCH_BYTES
+);
+fn group_stop(s: Stop) -> GroupStop {
+    match s {
+        Stop::Deadline => GroupStop::Deadline,
+        Stop::WorkLimit | Stop::TicketExhausted => GroupStop::CheckWorkLimit,
+        Stop::OutputLimit => GroupStop::GroupBytes,
+        Stop::Observer => GroupStop::PersistenceFailure,
+        _ => GroupStop::InvalidState,
+    }
+}
+fn group_charge(l: &mut Ledger, w: u64) -> Result<(), GroupStop> {
+    let mut t = l.reserve(w, 0).map_err(group_stop)?;
+    t.spend(w).map_err(group_stop)
+}
+fn group_validate(
+    c: GroupControl,
+    g: &GroupWorkspace,
+    p: u64,
+    l: &mut Ledger,
+) -> Result<(), GroupStop> {
+    if c.domain_len == 0 || c.domain_len > 64 || c.a >= p || c.b >= p {
+        return Err(GroupStop::InvalidDomain);
+    }
+    group_charge(l, 512)?;
+    if add(
+        mul(4, mul(mul(c.a, c.a, p), c.a, p), p),
+        mul(27, mul(c.b, c.b, p), p),
+        p,
+    ) == 0
+    {
+        return Err(GroupStop::InvalidDomain);
+    }
+    for i in 0..=c.domain_len {
+        group_charge(l, 512)?;
+        let q = if i == c.domain_len {
+            c.target
+        } else {
+            match g.domain[i] {
+                SmallPoint::Affine(q) => q,
+                _ => return Err(GroupStop::InvalidDomain),
+            }
+        };
+        if q.x >= p
+            || q.y >= p
+            || mul(q.y, q.y, p)
+                != add(
+                    add(mul(mul(q.x, q.x, p), q.x, p), mul(c.a, q.x, p), p),
+                    c.b,
+                    p,
+                )
+        {
+            return Err(GroupStop::InvalidDomain);
+        }
+        if i < c.domain_len {
+            let mut opposite = false;
+            for j in 0..c.domain_len {
+                group_charge(l, 64)?;
+                if let SmallPoint::Affine(r) = g.domain[j] {
+                    if j < i && q == r {
+                        return Err(GroupStop::InvalidDomain);
+                    }
+                    opposite |= q.x == r.x && r.y == neg(q.y, p);
+                }
+            }
+            if !opposite {
+                return Err(GroupStop::InvalidDomain);
+            }
+        }
+    }
+    Ok(())
+}
+// Parent tuple admission already paid4096 per operation; this local ledger is
+// exclusively supplied from that reservation, with no second parent debit.
+fn group_add(
+    field: &Fp64Arithmetic,
+    a: u64,
+    left: SmallPoint,
+    right: SmallPoint,
+    l: &mut Ledger,
+) -> Result<SmallPoint, GroupStop> {
+    let mut t = l.reserve(4096, 0).map_err(group_stop)?;
+    t.spend(128).map_err(group_stop)?;
+    let (x, y) = match (left, right) {
+        (SmallPoint::Infinity, q) | (q, SmallPoint::Infinity) => return Ok(q),
+        (SmallPoint::Affine(x), SmallPoint::Affine(y)) => (x, y),
+    };
+    if x.x == y.x && (x.y != y.y || x.y == 0) {
+        return Ok(SmallPoint::Infinity);
+    }
+    t.spend(512).map_err(group_stop)?;
+    let x1 = field.from_u64(x.x);
+    let y1 = field.from_u64(x.y);
+    let x2 = field.from_u64(y.x);
+    let y2 = field.from_u64(y.y);
+    let (num, den) = if x.x == y.x {
+        let xx = field.sqr(x1);
+        (
+            field.add(field.add(field.add(xx, xx), xx), field.from_u64(a)),
+            field.add(y1, y1),
+        )
+    } else {
+        (field.sub(y2, y1), field.sub(x2, x1))
+    };
+    let mut exponent = field.p() - 2;
+    let mut base = den;
+    let mut inverse = field.one();
+    while exponent != 0 {
+        t.spend(48).map_err(group_stop)?;
+        if exponent & 1 != 0 {
+            inverse = field.mul(inverse, base);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            base = field.sqr(base);
+        }
+    }
+    t.spend(256).map_err(group_stop)?;
+    if field.mul(den, inverse) != field.one() {
+        return Err(GroupStop::InvalidDomain);
+    }
+    let slope = field.mul(num, inverse);
+    let nx = field.sub(field.sub(field.sqr(slope), x1), x2);
+    let ny = field.sub(field.mul(slope, field.sub(x1, nx)), y1);
+    Ok(SmallPoint::Affine(AffinePoint {
+        x: field.to_u64(nx),
+        y: field.to_u64(ny),
+    }))
+}
+// Conservative schedule based on actual original supports, paid scan itself.
+fn group_eval_bound(input: &[InputPolynomial], v: usize, l: &mut Ledger) -> Result<u64, GroupStop> {
+    if input.len() != v + 1 || v > 28 {
+        return Err(GroupStop::InvalidState);
+    }
+    let mut bound = 128u64;
+    let mut total = 0usize;
+    for poly in input {
+        if poly.terms.len() > 33 {
+            return Err(GroupStop::InvalidState);
+        }
+        total += poly.terms.len();
+        if total > 677 {
+            return Err(GroupStop::InvalidState);
+        }
+        bound += 32;
+        for term in &poly.terms {
+            group_charge(l, 64 + 16 * v as u64)?;
+            bound += 64 + 32 * v as u64;
+            for &e in term.mono.exponents(v).ok_or(GroupStop::InvalidState)? {
+                if e > 32 {
+                    return Err(GroupStop::InvalidState);
+                }
+                if e != 0 {
+                    bound += 64 + 48 * u64::from(u16::BITS - e.leading_zeros());
+                }
+            }
+        }
+    }
+    Ok(bound)
+}
+fn group_eval(
+    input: &[InputPolynomial],
+    v: usize,
+    p: u64,
+    g: &mut GroupWorkspace,
+    l: &mut Ledger,
+) -> Result<bool, GroupStop> {
+    group_charge(l, 128)?;
+    let mut mismatch = false;
+    for (i, poly) in input.iter().enumerate() {
+        group_charge(l, 32)?;
+        let mut sum = 0;
+        for term in &poly.terms {
+            group_charge(l, 64 + 32 * v as u64)?;
+            if term.coefficient == 0 || term.coefficient >= p {
+                return Err(GroupStop::InvalidState);
+            }
+            let mut value = term.coefficient;
+            for (axis, &e) in term
+                .mono
+                .exponents(v)
+                .ok_or(GroupStop::InvalidState)?
+                .iter()
+                .enumerate()
+            {
+                if e != 0 {
+                    group_charge(l, 64 + 48 * u64::from(u16::BITS - e.leading_zeros()))?;
+                    let mut k = e;
+                    let mut base = g.coordinates[axis];
+                    let mut power = 1;
+                    while k != 0 {
+                        if k & 1 != 0 {
+                            power = ((u128::from(power) * u128::from(base)) % u128::from(p)) as u64;
+                        }
+                        k >>= 1;
+                        if k != 0 {
+                            base = ((u128::from(base) * u128::from(base)) % u128::from(p)) as u64;
+                        }
+                    }
+                    value = ((u128::from(value) * u128::from(power)) % u128::from(p)) as u64;
+                }
+            }
+            sum = ((u128::from(sum) + u128::from(value)) % u128::from(p)) as u64;
+        }
+        g.residues[i] = sum;
+        mismatch |= sum != 0;
+    }
+    l.check().map_err(group_stop)?;
+    Ok(!mismatch)
+}
+fn group_row_bound(
+    m: usize,
+    g: &mut GroupWorkspace,
+    cap: usize,
+    l: &mut Ledger,
+) -> Result<usize, GroupStop> {
+    for i in 0..15 {
+        group_charge(l, 64)?;
+        g.tuple[i] = usize::MAX;
+        g.exceptional[i] = usize::MAX;
+        g.prefix[i] = SmallPoint::Affine(AffinePoint {
+            x: 0x1fff_ffff_ffff_ffff,
+            y: 0x1fff_ffff_ffff_ffff,
+        });
+    }
+    for x in &mut g.coordinates {
+        group_charge(l, 32)?;
+        *x = 0x1fff_ffff_ffff_ffff;
+    }
+    for x in &mut g.residues {
+        group_charge(l, 32)?;
+        *x = 0x1fff_ffff_ffff_ffff;
+    }
+    let row = GroupRow {
+        schema: "crypto.ml-dataset.wide-prime-dynamic-group-row/v1",
+        origin: GroupOrigin::ReportedBasisLinearCandidate,
+        cursor: u128::MAX,
+        indices: &g.tuple[..m],
+        prefixes: &g.prefix[..m - 1],
+        completed_additions: usize::MAX,
+        exceptional_auxiliary_positions: &g.exceptional[..m - 2],
+        coordinates: Some(&g.coordinates[..2 * m - 2]),
+        residues: Some(&g.residues[..2 * m - 1]),
+        total: Some(&g.prefix[0]),
+        computed_match: false,
+        candidate_coordinates_match: false,
+        complete: false,
+        tuples_reserved: u64::MAX,
+        additions_reserved: u64::MAX,
+        additions_performed: u64::MAX,
+        checking_reserved_work: u64::MAX,
+    };
+    let mut count = MeteredWriter {
+        ledger: l,
+        output: None,
+        count: 0,
+        cap: cap.saturating_sub(1),
+        stop: None,
+    };
+    serde_json::to_writer(&mut count, &row)
+        .map_err(|_| group_stop(count.stop.unwrap_or(Stop::Serialization)))?;
+    count.count.checked_add(1).ok_or(GroupStop::InvalidState)
+}
+fn append_group_row(
+    row: &GroupRow<'_>,
+    slot: &mut InputBuffer,
+    bound: usize,
+    l: &mut Ledger,
+) -> Result<(), GroupStop> {
+    let start = slot.bytes.len();
+    let result = (|| {
+        if slot.logical_cap.saturating_sub(start) < bound {
+            return Err(GroupStop::GroupBytes);
+        }
+        let mut count = MeteredWriter {
+            ledger: l,
+            output: None,
+            count: 0,
+            cap: bound - 1,
+            stop: None,
+        };
+        serde_json::to_writer(&mut count, row)
+            .map_err(|_| group_stop(count.stop.unwrap_or(Stop::Serialization)))?;
+        let expected = count.count;
+        let mut writer = MeteredWriter {
+            ledger: l,
+            output: Some(&mut slot.bytes),
+            count: 0,
+            cap: bound - 1,
+            stop: None,
+        };
+        serde_json::to_writer(&mut writer, row)
+            .map_err(|_| group_stop(writer.stop.unwrap_or(Stop::Serialization)))?;
+        if writer.count != expected {
+            return Err(GroupStop::InvalidState);
+        }
+        group_charge(l, 40)?;
+        slot.bytes.push(b'\n');
+        Ok(())
+    })();
+    if result.is_err() {
+        slot.bytes.truncate(start);
+    }
+    result
+}
+fn lift_index(
+    g: &GroupWorkspace,
+    leaf: usize,
+    start: usize,
+    d: usize,
+    l: &mut Ledger,
+) -> Result<Option<usize>, GroupStop> {
+    let x = g.assignments[leaf].ok_or(GroupStop::InvalidCandidate)?;
+    for i in start..d {
+        group_charge(l, 64)?;
+        if matches!(g.domain[i],SmallPoint::Affine(q) if q.x==x) {
+            return Ok(Some(i));
+        }
+    }
+    Ok(None)
+}
+fn start_cursor(
+    g: &mut GroupWorkspace,
+    m: usize,
+    d: usize,
+    origin: GroupOrigin,
+    l: &mut Ledger,
+) -> Result<(), GroupStop> {
+    for leaf in 0..m {
+        group_charge(l, 32)?;
+        let i = if origin == GroupOrigin::ReportedBasisLinearCandidate {
+            lift_index(g, leaf, 0, d, l)?.ok_or(GroupStop::InvalidCandidate)?
+        } else {
+            0
+        };
+        g.cursor[leaf] = i;
+    }
+    group_charge(l, 32 * m as u64)?;
+    g.tuple[..m].copy_from_slice(&g.cursor[..m]);
+    Ok(())
+}
+fn advance_cursor(
+    g: &mut GroupWorkspace,
+    m: usize,
+    d: usize,
+    origin: GroupOrigin,
+    l: &mut Ledger,
+) -> Result<bool, GroupStop> {
+    group_charge(l, 32 * m as u64)?;
+    g.cursor[..m].copy_from_slice(&g.tuple[..m]);
+    for leaf in (0..m).rev() {
+        group_charge(l, 64)?;
+        let next = if origin == GroupOrigin::ReportedBasisLinearCandidate {
+            lift_index(g, leaf, g.cursor[leaf] + 1, d, l)?
+        } else {
+            (g.cursor[leaf] + 1 < d).then_some(g.cursor[leaf] + 1)
+        };
+        if let Some(i) = next {
+            g.cursor[leaf] = i;
+            group_charge(l, 32 * m as u64)?;
+            g.tuple[..m].copy_from_slice(&g.cursor[..m]);
+            return Ok(true);
+        }
+        g.cursor[leaf] = if origin == GroupOrigin::ReportedBasisLinearCandidate {
+            lift_index(g, leaf, 0, d, l)?.ok_or(GroupStop::InvalidCandidate)?
+        } else {
+            0
+        };
+    }
+    Ok(false)
+}
+#[cfg(test)]
+thread_local! {
+    static GROUP_ADDITION_HOOK: std::cell::Cell<Option<fn(u64, usize, &mut Ledger)>> = const { std::cell::Cell::new(None) };
+    static GROUP_CARRY_HOOK: std::cell::Cell<Option<fn(u64, &mut Ledger)>> = const { std::cell::Cell::new(None) };
+}
+pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+    phase: &mut NativePhase,
+    linear: Option<&LinearReport>,
+    forward: &mut F,
+) -> GroupReport {
+    let p = &mut phase.prepared;
+    let mut report = GroupReport {
+        stop: GroupStop::InvalidState,
+        origin: GroupOrigin::IndependentGroupPrefix,
+        cursor: 0,
+        independent_visited: 0,
+        native_lifts_visited: 0,
+        independent_total: 0,
+        completed_prefixes: 0,
+        tuple_entered: false,
+        computed_match: false,
+        row_bound: 0,
+        tuples_reserved: p.group_control.tuples,
+        additions_reserved: p.group_control.additions_reserved,
+        additions_performed: p.group_control.additions_performed,
+        checking_reserved_work: p.checking_reserved_work,
+        checking_performed_work: p.checking_performed_work,
+        group_domain_complete: false,
+        pdp_witness_verified: false,
+        certificate_durably_persisted: false,
+        independent_derivation_verified: false,
+    };
+    if p.group_control.started {
+        report.stop = GroupStop::AlreadyStarted;
+        return report;
+    }
+    p.group_control.started = true;
+    let mut checking = Ledger::new(p.checking_work, 0, p.original_deadline);
+    let result = (|| {
+        if p.observer.stop.is_some() {
+            return Err(GroupStop::PersistenceFailure);
+        }
+        let m = p.m;
+        let v = 2 * m - 2;
+        let d = p.group_control.domain_len;
+        group_validate(
+            p.group_control,
+            &p.workspace.group,
+            p.setup.field.p(),
+            &mut checking,
+        )?;
+        let mut total = 1u128;
+        for _ in 0..m {
+            group_charge(&mut checking, 32)?;
+            total = total
+                .checked_mul(d as u128)
+                .ok_or(GroupStop::InvalidState)?;
+        }
+        report.independent_total = total;
+        let eval = group_eval_bound(&p.input, v, &mut checking)?;
+        report.row_bound = group_row_bound(
+            m,
+            &mut p.workspace.group,
+            p.slots.buffers[5].logical_cap,
+            &mut checking,
+        )?;
+        let tuple_work = (m as u64 - 1)
+            .checked_mul(4096)
+            .and_then(|x| x.checked_add(eval))
+            .and_then(|x| x.checked_add((report.row_bound as u64).checked_mul(80)?))
+            .and_then(|x| x.checked_add(GROUP_EVENT_WORK + 4096 + 40))
+            .ok_or(GroupStop::InvalidState)?;
+        let use_linear = linear
+            .is_some_and(|r| r.candidate_verified_original && r.assignments == v)
+            && p.linear_retained
+            && phase.basis_retained;
+        report.origin = if use_linear {
+            GroupOrigin::ReportedBasisLinearCandidate
+        } else {
+            GroupOrigin::IndependentGroupPrefix
+        };
+        start_cursor(&mut p.workspace.group, m, d, report.origin, &mut checking)?;
+        loop {
+            report.tuple_entered = false;
+            report.completed_prefixes = 0;
+            report.computed_match = false;
+            if p.group_control.tuples >= p.group_control.tuple_limit {
+                return Err(GroupStop::TupleLimit);
+            }
+            checking.check().map_err(group_stop)?;
+            let reserve_add = m as u64 - 1;
+            if p.group_control
+                .addition_limit
+                .saturating_sub(p.group_control.additions_reserved)
+                < reserve_add
+            {
+                return Err(GroupStop::AdditionLimit);
+            }
+            if checking.work_limit.saturating_sub(checking.reserved_work) < tuple_work {
+                return Err(GroupStop::CheckWorkLimit);
+            }
+            if p.slots.buffers[5]
+                .logical_cap
+                .saturating_sub(p.slots.buffers[5].bytes.len())
+                < report.row_bound
+            {
+                return Err(GroupStop::GroupBytes);
+            }
+            if p.observer.acknowledged >= 4096
+                || p.slots.buffers[3]
+                    .logical_cap
+                    .saturating_sub(p.slots.buffers[3].bytes.len())
+                    < 1025
+            {
+                return Err(GroupStop::EventLimit);
+            }
+            {
+                let _ticket = checking.reserve(tuple_work, 0).map_err(group_stop)?;
+            }
+            let mut local = Ledger::new(tuple_work, 0, p.original_deadline);
+            p.group_control.additions_reserved += reserve_add;
+            p.group_control.tuples += 1;
+            report.tuple_entered = true;
+            let mut exceptions = 0;
+            let mut complete = false;
+            let mut all_affine = false;
+            let mut evaluated = false;
+            let mut coords_match = false;
+            let mut sum = SmallPoint::Infinity;
+            let operation = (|| {
+                group_charge(&mut local, 4096)?;
+                for leaf in 0..m {
+                    let index = p.workspace.group.tuple[leaf];
+                    if index >= d {
+                        return Err(GroupStop::InvalidState);
+                    }
+                    let point = p.workspace.group.domain[index];
+                    let SmallPoint::Affine(q) = point else {
+                        return Err(GroupStop::InvalidDomain);
+                    };
+                    p.workspace.group.coordinates[leaf] = q.x;
+                    if leaf == 0 {
+                        sum = point;
+                    } else {
+                        #[cfg(test)]
+                        GROUP_ADDITION_HOOK.with(|hook| {
+                            if let Some(f) = hook.get() {
+                                f(p.group_control.tuples, leaf, &mut local);
+                            }
+                        });
+                        sum = group_add(&p.setup.field, p.group_control.a, sum, point, &mut local)?;
+                        p.group_control.additions_performed += 1;
+                        p.workspace.group.prefix[leaf - 1] = sum;
+                        report.completed_prefixes = leaf;
+                        if leaf < m - 1 {
+                            match sum {
+                                SmallPoint::Infinity => {
+                                    p.workspace.group.exceptional[exceptions] = leaf - 1;
+                                    exceptions += 1;
+                                }
+                                SmallPoint::Affine(q) => {
+                                    p.workspace.group.coordinates[m + leaf - 1] = q.x
+                                }
+                            }
+                        }
+                    }
+                }
+                complete = true;
+                all_affine = exceptions == 0;
+                report.computed_match = sum == SmallPoint::Affine(p.group_control.target);
+                if report.computed_match {
+                    p.workspace.group.first_certificate[..m]
+                        .copy_from_slice(&p.workspace.group.tuple[..m]);
+                }
+                if all_affine {
+                    let zero = group_eval(
+                        &p.input,
+                        v,
+                        p.setup.field.p(),
+                        &mut p.workspace.group,
+                        &mut local,
+                    )?;
+                    evaluated = true;
+                    if zero && phase.report.stop == dynamic::Stop::UnitDerived {
+                        return Err(GroupStop::NativeContradiction);
+                    }
+                    if report.computed_match && !zero {
+                        return Err(GroupStop::OriginalEquationMismatch);
+                    }
+                    coords_match = report.origin == GroupOrigin::IndependentGroupPrefix
+                        || (0..v).all(|i| {
+                            p.workspace.group.assignments[i]
+                                == Some(p.workspace.group.coordinates[i])
+                        });
+                }
+                if report.computed_match {
+                    if report.origin == GroupOrigin::ReportedBasisLinearCandidate && !coords_match {
+                        report.origin = GroupOrigin::ReportedBasisLeafLift;
+                    }
+                }
+                Ok(())
+            })();
+            if complete {
+                match report.origin {
+                    GroupOrigin::IndependentGroupPrefix => report.independent_visited += 1,
+                    GroupOrigin::ReportedBasisLinearCandidate
+                    | GroupOrigin::ReportedBasisLeafLift => report.native_lifts_visited += 1,
+                }
+            }
+            // Inline prefix/counters remain even when original expiry prevents
+            // writing this final partial row. Earlier serialized rows survive.
+            let row_result = (|| {
+                let g = &p.workspace.group;
+                let row = GroupRow {
+                    schema: "crypto.ml-dataset.wide-prime-dynamic-group-row/v1",
+                    origin: report.origin,
+                    cursor: report.cursor,
+                    indices: &g.tuple[..m],
+                    prefixes: &g.prefix[..report.completed_prefixes],
+                    completed_additions: report.completed_prefixes,
+                    exceptional_auxiliary_positions: &g.exceptional[..exceptions],
+                    coordinates: (complete && all_affine).then_some(&g.coordinates[..v]),
+                    residues: evaluated.then_some(&g.residues[..v + 1]),
+                    total: complete.then_some(&sum),
+                    computed_match: report.computed_match,
+                    candidate_coordinates_match: coords_match,
+                    complete,
+                    tuples_reserved: p.group_control.tuples,
+                    additions_reserved: p.group_control.additions_reserved,
+                    additions_performed: p.group_control.additions_performed,
+                    checking_reserved_work: p.checking_reserved_work + checking.reserved_work,
+                };
+                append_group_row(&row, &mut p.slots.buffers[5], report.row_bound, &mut local)?;
+                let event = PhaseEvent {
+                    schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
+                    source: PhaseSource::Group,
+                    global_sequence: p.observer.acknowledged,
+                    local_sequence: p.observer.group,
+                    stage: if complete { "tuple" } else { "partial_tuple" },
+                    reserved_work: p.checking_reserved_work + checking.reserved_work,
+                    reserved_bytes: p.ledger.reserved_bytes,
+                    persistence: p.observer.persistence,
+                };
+                append_observation(
+                    event,
+                    &mut p.observer,
+                    &mut p.slots.buffers[3],
+                    &mut local,
+                    &mut p.capture,
+                    forward,
+                )
+                .map_err(|_| group_stop(p.observer.stop.unwrap_or(Stop::Observer)))?;
+                Ok(())
+            })();
+            checking.performed_work += local.performed_work;
+            operation?;
+            row_result?;
+            if report.computed_match {
+                return Ok(GroupStop::PendingCertificate);
+            }
+            #[cfg(test)]
+            GROUP_CARRY_HOOK.with(|hook| {
+                if let Some(f) = hook.get() {
+                    f(p.group_control.tuples, &mut checking);
+                }
+            });
+            if advance_cursor(&mut p.workspace.group, m, d, report.origin, &mut checking)? {
+                report.cursor += 1;
+                continue;
+            }
+            if report.origin == GroupOrigin::ReportedBasisLinearCandidate {
+                start_cursor(
+                    &mut p.workspace.group,
+                    m,
+                    d,
+                    GroupOrigin::IndependentGroupPrefix,
+                    &mut checking,
+                )?;
+                report.origin = GroupOrigin::IndependentGroupPrefix;
+                report.cursor = 0;
+            } else {
+                return Ok(GroupStop::IndependentTraversalFinished);
+            }
+        }
+    })();
+    p.checking_work -= checking.reserved_work;
+    p.checking_reserved_work += checking.reserved_work;
+    p.checking_performed_work += checking.performed_work;
+    report.stop = match result {
+        Ok(stop) | Err(stop) => stop,
+    };
+    report.tuples_reserved = p.group_control.tuples;
+    report.additions_reserved = p.group_control.additions_reserved;
+    report.additions_performed = p.group_control.additions_performed;
+    report.checking_reserved_work = p.checking_reserved_work;
+    report.checking_performed_work = p.checking_performed_work;
     report
 }
 
@@ -2822,6 +3688,8 @@ mod tests {
             acknowledged: 0,
             setup: 0,
             native: 0,
+            linear: 0,
+            group: 0,
             durable: 0,
             pending: None,
             stop: None,
@@ -2831,7 +3699,7 @@ mod tests {
         };
         let event = PhaseEvent {
             schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
-            source: "native",
+            source: PhaseSource::Native,
             global_sequence: 0,
             local_sequence: 0,
             stage: "begin",
@@ -3452,5 +4320,617 @@ mod tests {
             .assignments
             .iter()
             .all(Option::is_none));
+    }
+    fn group_test_phase(target: AffinePoint) -> NativePhase {
+        let prepared = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 0,
+                b: 7,
+                target_x: target.x,
+                codes: &[6],
+            },
+            target,
+            &[AffinePoint { x: 6, y: 18 }, AffinePoint { x: 6, y: 83 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        invoke_original(prepared, &mut |_, _| Ok(())).unwrap()
+    }
+    #[test]
+    fn group_first_match_stops_pending_without_replay_or_publication() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let native = phase.prepared.observer.native;
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| panic!("local only"));
+        assert_eq!(report.stop, GroupStop::PendingCertificate);
+        assert_eq!(report.origin, GroupOrigin::IndependentGroupPrefix);
+        assert_eq!(report.tuples_reserved, 1);
+        assert_eq!(report.additions_reserved, 3);
+        assert_eq!(report.additions_performed, 3);
+        assert_eq!(report.independent_visited, 1);
+        assert_eq!(report.cursor, 0);
+        assert!(report.computed_match);
+        assert!(
+            !report.pdp_witness_verified
+                && !report.certificate_durably_persisted
+                && !report.group_domain_complete
+        );
+        assert!(phase.prepared.slots.buffers[6].bytes.is_empty());
+        assert_eq!(phase.prepared.observer.native, native);
+        assert_eq!(phase.prepared.observer.group, 1);
+        assert_eq!(
+            run_group_prefixes(&mut phase, None, &mut |_, _| Ok(())).stop,
+            GroupStop::AlreadyStarted
+        );
+        let row: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[5].bytes).unwrap();
+        assert_eq!(row["indices"], serde_json::json!([0, 0, 0, 0]));
+        assert_eq!(row["coordinates"], serde_json::json!([6, 6, 6, 6, 98, 99]));
+        assert_eq!(row["residues"], serde_json::json!([0, 0, 0, 0, 0, 0, 0]));
+    }
+    #[test]
+    fn group_native_lift_requires_retained_linear_and_preserves_origin() {
+        // Injected reported basis isolates lift semantics, not native derivation.
+        let mut phase = linear_test_phase();
+        let linear = extract_reported_linear(&mut phase);
+        retain_linear(&mut phase, &linear).unwrap();
+        let raw: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[4].bytes).unwrap();
+        assert_eq!(raw["assignments"], serde_json::json!([6, 6, 6, 6, 98, 99]));
+        assert_eq!(
+            raw["unresolved"],
+            serde_json::json!([null, null, null, null, null, null])
+        );
+        let report = run_group_prefixes(&mut phase, Some(&linear), &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::PendingCertificate);
+        assert_eq!(report.origin, GroupOrigin::ReportedBasisLinearCandidate);
+        assert_eq!(report.native_lifts_visited, 1);
+        assert_eq!(report.independent_visited, 0);
+        assert_eq!(report.tuples_reserved, 1);
+        assert!(!report.independent_derivation_verified);
+    }
+    #[test]
+    fn group_complete_small_negative_keeps_durable_completeness_false() {
+        // The singleton signed domain contains its own negative, a point of order2.
+        let target = AffinePoint { x: 3, y: 38 };
+        let prepared = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 1,
+                b: 0,
+                target_x: 3,
+                codes: &[0],
+            },
+            target,
+            &[AffinePoint { x: 0, y: 0 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let mut phase = invoke_original(prepared, &mut |_, _| Ok(())).unwrap();
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::IndependentTraversalFinished);
+        assert_eq!(report.independent_total, 1);
+        assert_eq!(report.independent_visited, 1);
+        assert!(
+            !report.computed_match && !report.group_domain_complete && !report.pdp_witness_verified
+        );
+        let row: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[5].bytes).unwrap();
+        assert_eq!(
+            row["exceptional_auxiliary_positions"],
+            serde_json::json!([0])
+        );
+        assert!(row["coordinates"].is_null() && row["residues"].is_null());
+        assert_eq!(row["prefixes"][1]["kind"], "affine");
+        assert_eq!(row["total"]["kind"], "infinity");
+    }
+    #[test]
+    fn group_ordered_prefix_preserves_exceptions_and_nonmatching_residues() {
+        let mut phase = group_test_phase(AffinePoint { x: 63, y: 33 }); //5P, outside signed4P range.
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert!(matches!(
+            report.stop,
+            GroupStop::CheckWorkLimit | GroupStop::IndependentTraversalFinished
+        ));
+        let rows: Vec<serde_json::Value> = phase.prepared.slots.buffers[5]
+            .bytes
+            .split(|&b| b == b'\n')
+            .filter(|b| !b.is_empty())
+            .map(|b| serde_json::from_slice(b).unwrap())
+            .collect();
+        assert!(
+            rows.len() >= 5,
+            "fixed budget must retain exceptional cursor4"
+        );
+        assert_eq!(rows[1]["indices"], serde_json::json!([0, 0, 0, 1]));
+        assert_eq!(rows[4]["indices"], serde_json::json!([0, 1, 0, 0]));
+        assert_eq!(
+            rows[4]["exceptional_auxiliary_positions"],
+            serde_json::json!([0])
+        );
+        assert_eq!(rows[4]["total"]["kind"], "affine");
+        assert!(rows[4]["coordinates"].is_null());
+        assert!(rows[0]["residues"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r.as_u64() != Some(0)));
+    }
+    #[test]
+    fn group_add_differential_true_curve_and_twist_no_wrapped_point_in_producer() {
+        use crate::ecc::{FieldElement, Point};
+        use num_bigint::BigUint;
+        use num_traits::ToPrimitive;
+        let setup = field(101);
+        let convert = |q: SmallPoint| match q {
+            SmallPoint::Infinity => Point::Infinity,
+            SmallPoint::Affine(q) => Point::Affine {
+                x: FieldElement::new(BigUint::from(q.x), BigUint::from(101u64)),
+                y: FieldElement::new(BigUint::from(q.y), BigUint::from(101u64)),
+            },
+        };
+        let back = |q: Point| match q {
+            Point::Infinity => SmallPoint::Infinity,
+            Point::Affine { x, y } => SmallPoint::Affine(AffinePoint {
+                x: x.value.to_u64().unwrap(),
+                y: y.value.to_u64().unwrap(),
+            }),
+        };
+        // 2 is a nonsquare in F101; b56=7*2^3 is the actual quadratic twist.
+        for b in [7, 56] {
+            let mut points = vec![SmallPoint::Infinity];
+            for x in 0..101 {
+                for y in 0..101 {
+                    if mul(y, y, 101) == add(mul(mul(x, x, 101), x, 101), b, 101) {
+                        points.push(SmallPoint::Affine(AffinePoint { x, y }));
+                        if points.len() == 9 {
+                            break;
+                        }
+                    }
+                }
+                if points.len() == 9 {
+                    break;
+                }
+            }
+            let a = FieldElement::new(BigUint::from(0u64), BigUint::from(101u64));
+            for &left in &points {
+                for &right in &points {
+                    let mut l = ledger();
+                    let got = group_add(&setup.field, 0, left, right, &mut l).unwrap();
+                    assert_eq!(got, back(convert(left).add(&convert(right), &a)));
+                    assert_eq!(l.reserved_work, 4096);
+                }
+            }
+        }
+        let zero = SmallPoint::Affine(AffinePoint { x: 0, y: 0 });
+        assert_eq!(
+            group_add(&setup.field, 1, zero, zero, &mut ledger()).unwrap(),
+            SmallPoint::Infinity
+        );
+    }
+    #[test]
+    fn group_row_bound_counting_is_paid_and_exact_one_less_is_rejected() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let mut l = ledger();
+        let cap = phase.prepared.slots.buffers[5].logical_cap;
+        let bound = group_row_bound(4, &mut phase.prepared.workspace.group, cap, &mut l).unwrap();
+        let work = l.reserved_work;
+        assert!(work > bound as u64 * 8);
+        for (w, ok) in [(work, true), (work - 1, false)] {
+            let mut budget = Ledger::new(w, 0, Instant::now() + Duration::from_secs(30));
+            let result = group_row_bound(4, &mut phase.prepared.workspace.group, cap, &mut budget);
+            assert_eq!(result.is_ok(), ok);
+            if !ok {
+                assert_eq!(result, Err(GroupStop::CheckWorkLimit));
+            }
+        }
+        let mut previous = 0;
+        for m in 4..=15 {
+            let b = group_row_bound(m, &mut phase.prepared.workspace.group, cap, &mut ledger())
+                .unwrap();
+            assert!(b > previous);
+            previous = b;
+        }
+    }
+    #[test]
+    fn group_exact_one_less_tuple_work_additions_and_bytes_are_admitted_before_entry() {
+        let mut baseline = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let report = run_group_prefixes(&mut baseline, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::PendingCertificate);
+        let work = report.checking_reserved_work;
+        for (w, expected) in [
+            (work, GroupStop::PendingCertificate),
+            (work - 1, GroupStop::CheckWorkLimit),
+        ] {
+            let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+            phase.prepared.checking_work = w;
+            let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+            assert_eq!(report.stop, expected);
+            if expected != GroupStop::PendingCertificate {
+                assert_eq!(report.tuples_reserved, 0);
+            }
+        }
+        for (g, expected) in [
+            (3, GroupStop::PendingCertificate),
+            (2, GroupStop::AdditionLimit),
+        ] {
+            let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+            phase.prepared.group_control.addition_limit = g;
+            assert_eq!(
+                run_group_prefixes(&mut phase, None, &mut |_, _| Ok(())).stop,
+                expected
+            );
+        }
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let cap = phase.prepared.slots.buffers[5].logical_cap;
+        phase.prepared.slots.buffers[5]
+            .bytes
+            .resize(cap - report.row_bound + 1, b' ');
+        let failed = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(failed.stop, GroupStop::GroupBytes);
+        assert_eq!(failed.tuples_reserved, 0);
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        phase.prepared.slots.buffers[5].logical_cap = report.row_bound;
+        assert_eq!(
+            run_group_prefixes(&mut phase, None, &mut |_, _| Ok(())).stop,
+            GroupStop::PendingCertificate
+        );
+    }
+    #[test]
+    fn group_shared_event_limit_deadline_and_callback_refusal_preserve_pending_match() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        phase.prepared.observer.acknowledged = 4096;
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::EventLimit);
+        assert_eq!(report.tuples_reserved, 0);
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        phase.prepared.original_deadline = Instant::now();
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::Deadline);
+        assert_eq!(report.additions_performed, 0);
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        phase.prepared.observer.persistence = EventPersistence::BoundCapture;
+        let before = phase.prepared.observer.acknowledged;
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Err(()));
+        assert_eq!(report.stop, GroupStop::PersistenceFailure);
+        assert!(report.computed_match && !report.certificate_durably_persisted);
+        assert_eq!(phase.prepared.observer.acknowledged, before);
+        assert!(!phase.prepared.slots.buffers[5].bytes.is_empty());
+    }
+    #[test]
+    fn group_near61_actual_curve_and_quadratic_twist_match_independent_point_oracle() {
+        use crate::ecc::{FieldElement, Point};
+        use num_bigint::BigUint;
+        use num_traits::ToPrimitive;
+        let p = 2_305_843_009_213_693_951u64;
+        let bp = BigUint::from(p);
+        let a = p - 1;
+        let setup = field(p);
+        let sqrt_exponent = BigUint::from((p + 1) / 4);
+        assert_eq!(
+            BigUint::from(p - 1).modpow(&BigUint::from((p - 1) / 2), &bp),
+            BigUint::from(p - 1)
+        );
+        // d=-1 is nonsquare, hence twist a'=d²a=a and b'=d³b=-b.
+        // Fixed x0..15 software fixture; no adaptive resampling if it lacks points.
+        for b in [1, p - 1] {
+            let mut points = vec![SmallPoint::Infinity];
+            for x in 0u64..16 {
+                let bx = BigUint::from(x);
+                let rhs = ((&bx * &bx * &bx) + BigUint::from(a) * &bx + BigUint::from(b)) % &bp;
+                let y = rhs.modpow(&sqrt_exponent, &bp);
+                if (&y * &y) % &bp == rhs {
+                    let y = y.to_u64().unwrap();
+                    points.push(SmallPoint::Affine(AffinePoint { x, y }));
+                    if y != 0 {
+                        points.push(SmallPoint::Affine(AffinePoint { x, y: p - y }));
+                    }
+                }
+            }
+            assert!(
+                points.len() >= 3,
+                "fixed actual curve/twist must contain affine controls"
+            );
+            let coefficient = FieldElement::new(BigUint::from(a), bp.clone());
+            let convert = |q: SmallPoint| match q {
+                SmallPoint::Infinity => Point::Infinity,
+                SmallPoint::Affine(q) => Point::Affine {
+                    x: FieldElement::new(BigUint::from(q.x), bp.clone()),
+                    y: FieldElement::new(BigUint::from(q.y), bp.clone()),
+                },
+            };
+            for &left in &points {
+                for &right in &points {
+                    let reference = convert(left).add(&convert(right), &coefficient);
+                    let expected = match reference {
+                        Point::Infinity => SmallPoint::Infinity,
+                        Point::Affine { x, y } => SmallPoint::Affine(AffinePoint {
+                            x: x.value.to_u64().unwrap(),
+                            y: y.value.to_u64().unwrap(),
+                        }),
+                    };
+                    let mut l = ledger();
+                    let actual = group_add(&setup.field, a, left, right, &mut l).unwrap();
+                    assert_eq!(
+                        actual, expected,
+                        "p={p} a={a} b={b} left={left:?} right={right:?}"
+                    );
+                    assert_eq!(l.reserved_work, 4096);
+                    assert!(l.performed_work <= 4096);
+                }
+            }
+        }
+    }
+    struct GroupHookReset;
+    impl Drop for GroupHookReset {
+        fn drop(&mut self) {
+            GROUP_ADDITION_HOOK.with(|h| h.set(None));
+            GROUP_CARRY_HOOK.with(|h| h.set(None));
+        }
+    }
+    #[test]
+    fn group_controlled_midprefix_expiry_preserves_prior_row_and_reserved_performed_counts() {
+        let target = AffinePoint { x: 63, y: 33 };
+        let mut baseline = group_test_phase(target);
+        baseline.prepared.group_control.tuple_limit = 1;
+        assert_eq!(
+            run_group_prefixes(&mut baseline, None, &mut |_, _| Ok(())).stop,
+            GroupStop::TupleLimit
+        );
+        fn expire(tuple: u64, leaf: usize, l: &mut Ledger) {
+            if tuple == 2 && leaf == 2 {
+                l.deadline = Instant::now();
+            }
+        }
+        let mut phase = group_test_phase(target);
+        let _reset = GroupHookReset;
+        GROUP_ADDITION_HOOK.with(|h| h.set(Some(expire)));
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::Deadline);
+        assert_eq!(report.cursor, 1);
+        assert!(report.tuple_entered);
+        assert_eq!(report.independent_visited, 1);
+        assert_eq!(report.completed_prefixes, 1);
+        assert_eq!(report.tuples_reserved, 2);
+        assert_eq!(report.additions_reserved, 6);
+        assert_eq!(report.additions_performed, 4);
+        assert!(report.checking_performed_work < report.checking_reserved_work);
+        assert_eq!(&phase.prepared.workspace.group.tuple[..4], &[0, 0, 0, 1]);
+        assert_eq!(
+            phase.prepared.workspace.group.prefix[0],
+            SmallPoint::Affine(AffinePoint { x: 98, y: 9 })
+        );
+        assert_eq!(
+            phase.prepared.slots.buffers[5].bytes,
+            baseline.prepared.slots.buffers[5].bytes
+        );
+        assert_eq!(phase.prepared.observer.group, 1);
+        assert!(!report.computed_match && !report.pdp_witness_verified);
+    }
+    #[test]
+    fn group_midcarry_work_refusal_is_transactional_for_tuple_prefix_and_jsonl() {
+        let target = AffinePoint { x: 63, y: 33 };
+        let mut baseline = group_test_phase(target);
+        baseline.prepared.group_control.tuple_limit = 2;
+        assert_eq!(
+            run_group_prefixes(&mut baseline, None, &mut |_, _| Ok(())).stop,
+            GroupStop::TupleLimit
+        );
+        fn refuse(tuple: u64, l: &mut Ledger) {
+            if tuple == 2 {
+                l.work_limit = l.reserved_work + 32 * 4 + 64;
+            }
+        }
+        let mut phase = group_test_phase(target);
+        let _reset = GroupHookReset;
+        GROUP_CARRY_HOOK.with(|h| h.set(Some(refuse)));
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::CheckWorkLimit);
+        assert_eq!(report.cursor, 1);
+        assert_eq!(report.completed_prefixes, 3);
+        assert_eq!(report.independent_visited, 2);
+        assert_eq!(report.additions_reserved, 6);
+        assert_eq!(report.additions_performed, 6);
+        assert_eq!(&phase.prepared.workspace.group.tuple[..4], &[0, 0, 0, 1]);
+        assert_eq!(
+            phase.prepared.workspace.group.prefix[2],
+            SmallPoint::Affine(AffinePoint { x: 98, y: 9 })
+        );
+        assert_eq!(
+            phase.prepared.slots.buffers[5].bytes,
+            baseline.prepared.slots.buffers[5].bytes
+        );
+        // Failure partway through a start/reset also leaves the original tuple intact.
+        let before = phase.prepared.workspace.group.tuple;
+        let mut l = Ledger::new(32 * 2, 0, Instant::now() + Duration::from_secs(30));
+        assert_eq!(
+            start_cursor(
+                &mut phase.prepared.workspace.group,
+                4,
+                2,
+                GroupOrigin::IndependentGroupPrefix,
+                &mut l
+            ),
+            Err(GroupStop::CheckWorkLimit)
+        );
+        assert_eq!(phase.prepared.workspace.group.tuple, before);
+    }
+    #[test]
+    fn group_preserves_earliest_leaf_lift_match_with_different_auxiliary_assignment() {
+        // Valid reported affine root from (++-+), but earlier (+++-) has same
+        // target and different final auxiliary. It remains earliest group witness.
+        let mut phase = group_test_phase(AffinePoint { x: 98, y: 9 });
+        phase.report.stop = dynamic::Stop::WorkLimit;
+        phase.report.basis = linear_test_basis();
+        phase.basis_retained = true;
+        phase.report.basis[5] = linear_test_poly(&[([0, 0, 0, 0, 0, 1], 1), ([0; 6], 95)]);
+        let linear = extract_reported_linear(&mut phase);
+        assert!(linear.candidate_verified_original);
+        retain_linear(&mut phase, &linear).unwrap();
+        let report = run_group_prefixes(&mut phase, Some(&linear), &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::PendingCertificate);
+        assert_eq!(report.origin, GroupOrigin::ReportedBasisLeafLift);
+        assert_eq!(report.cursor, 1);
+        assert_eq!(report.native_lifts_visited, 2);
+        assert_eq!(report.independent_visited, 0);
+        assert_eq!(
+            &phase.prepared.workspace.group.first_certificate[..4],
+            &[0, 0, 0, 1]
+        );
+        let rows: Vec<serde_json::Value> = phase.prepared.slots.buffers[5]
+            .bytes
+            .split(|&b| b == b'\n')
+            .filter(|b| !b.is_empty())
+            .map(|b| serde_json::from_slice(b).unwrap())
+            .collect();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[1]["origin"], "reported_basis_leaf_lift");
+        assert_eq!(rows[1]["computed_match"], true);
+        assert_eq!(rows[1]["candidate_coordinates_match"], false);
+        assert_eq!(rows[1]["coordinates"][5], 99);
+        let retained: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[4].bytes).unwrap();
+        assert_eq!(retained["assignments"][5], 6);
+        assert!(
+            !report.pdp_witness_verified
+                && !report.certificate_durably_persisted
+                && !report.independent_derivation_verified
+        );
+    }
+    #[test]
+    fn group_row_exact_golden_bounds_all_arities_origins_options_and_boolean_widths() {
+        // Independent compact-JSON schema byte counts, including newline.
+        const GOLDEN64: [usize; 12] = [
+            1194, 1382, 1570, 1758, 1946, 2134, 2322, 2510, 2698, 2886, 3074, 3262,
+        ];
+        const GOLDEN32: [usize; 12] = [
+            1124, 1292, 1460, 1628, 1796, 1964, 2132, 2300, 2468, 2636, 2804, 2972,
+        ];
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let cap = phase.prepared.slots.buffers[5].logical_cap;
+        for m in 4..=15 {
+            let bound = group_row_bound(m, &mut phase.prepared.workspace.group, cap, &mut ledger())
+                .unwrap();
+            assert_eq!(
+                bound,
+                if usize::BITS == 64 {
+                    GOLDEN64[m - 4]
+                } else {
+                    GOLDEN32[m - 4]
+                }
+            );
+            let g = &mut phase.prepared.workspace.group;
+            let mut maximum = 0;
+            for origin in [
+                GroupOrigin::ReportedBasisLinearCandidate,
+                GroupOrigin::ReportedBasisLeafLift,
+                GroupOrigin::IndependentGroupPrefix,
+            ] {
+                for flags in 0..128 {
+                    let point = if flags & 64 == 0 {
+                        SmallPoint::Affine(AffinePoint {
+                            x: 0x1fff_ffff_ffff_ffff,
+                            y: 0x1fff_ffff_ffff_ffff,
+                        })
+                    } else {
+                        SmallPoint::Infinity
+                    };
+                    g.prefix.fill(point);
+                    let row = GroupRow {
+                        schema: "crypto.ml-dataset.wide-prime-dynamic-group-row/v1",
+                        origin,
+                        cursor: u128::MAX,
+                        indices: &g.tuple[..m],
+                        prefixes: &g.prefix[..m - 1],
+                        completed_additions: usize::MAX,
+                        exceptional_auxiliary_positions: &g.exceptional[..m - 2],
+                        coordinates: (flags & 8 != 0).then_some(&g.coordinates[..2 * m - 2]),
+                        residues: (flags & 16 != 0).then_some(&g.residues[..2 * m - 1]),
+                        total: (flags & 32 != 0).then_some(&point),
+                        computed_match: flags & 1 != 0,
+                        candidate_coordinates_match: flags & 2 != 0,
+                        complete: flags & 4 != 0,
+                        tuples_reserved: u64::MAX,
+                        additions_reserved: u64::MAX,
+                        additions_performed: u64::MAX,
+                        checking_reserved_work: u64::MAX,
+                    };
+                    let bytes = serde_json::to_vec(&row).unwrap();
+                    maximum = maximum.max(bytes.len() + 1);
+                    assert!(
+                        bytes.len() + 1 <= bound,
+                        "m={m} origin={origin:?} flags={flags}"
+                    );
+                }
+            }
+            assert_eq!(
+                maximum, bound,
+                "the bound must be attained by one serializer width case"
+            );
+        }
+    }
+    #[test]
+    fn group_u128_wire_fields_roundtrip_as_decimal_strings_without_numeric_value_conversion() {
+        #[derive(serde::Deserialize)]
+        struct ReportWire {
+            cursor: String,
+            independent_visited: String,
+            native_lifts_visited: String,
+            independent_total: String,
+        }
+        #[derive(serde::Deserialize)]
+        struct RowWire {
+            cursor: String,
+        }
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let mut report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        report.cursor = u128::MAX;
+        report.independent_visited = u128::from(u64::MAX) + 1;
+        report.native_lifts_visited = 0;
+        report.independent_total = 1u128 << 90;
+        let bytes = serde_json::to_vec(&report).unwrap();
+        let parsed: ReportWire = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(parsed.cursor, "340282366920938463463374607431768211455");
+        assert_eq!(parsed.independent_visited, "18446744073709551616");
+        assert_eq!(parsed.native_lifts_visited, "0");
+        assert_eq!(parsed.independent_total, "1237940039285380274899124224");
+        assert_eq!(parsed.cursor.parse::<u128>().unwrap(), report.cursor);
+        assert_eq!(
+            parsed.independent_visited.parse::<u128>().unwrap(),
+            report.independent_visited
+        );
+        assert_eq!(
+            parsed.independent_total.parse::<u128>().unwrap(),
+            report.independent_total
+        );
+        let g = &phase.prepared.workspace.group;
+        let row = GroupRow {
+            schema: "crypto.ml-dataset.wide-prime-dynamic-group-row/v1",
+            origin: GroupOrigin::IndependentGroupPrefix,
+            cursor: u128::MAX,
+            indices: &g.tuple[..4],
+            prefixes: &g.prefix[..3],
+            completed_additions: 3,
+            exceptional_auxiliary_positions: &[],
+            coordinates: None,
+            residues: None,
+            total: None,
+            computed_match: false,
+            candidate_coordinates_match: false,
+            complete: true,
+            tuples_reserved: 1,
+            additions_reserved: 3,
+            additions_performed: 3,
+            checking_reserved_work: 0,
+        };
+        let parsed: RowWire = serde_json::from_slice(&serde_json::to_vec(&row).unwrap()).unwrap();
+        assert_eq!(parsed.cursor, "340282366920938463463374607431768211455");
+        assert_eq!(parsed.cursor.parse::<u128>().unwrap(), u128::MAX);
     }
 }
