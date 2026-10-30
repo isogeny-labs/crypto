@@ -11,6 +11,7 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
@@ -41,6 +42,7 @@
 //!
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
+pub mod aps;
 pub mod audit;
 pub mod band;
 pub mod best2_model;
