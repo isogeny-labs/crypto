@@ -211,3 +211,21 @@ Normal upstream merge, merged-tree validation, regular PR and applicable checks.
 ### Errors (what went wrong, how it was handled)
 
 No V10 test or Clippy failures. Historical failures, missing sparse-input attempt and startup-label typo remain recorded without rewriting their evidence.
+
+## 2026-10-30 21:00 UTC upstream integration completed
+
+### What was done (commands, files, features)
+
+Committed the tested snapshot ae6ed3e3f3, then normally merged fetched main cc5addeba4dd53edc51f2c0ad9331b3ba0307adc without committing immediately. Git's actual recursive merge completed with no conflicts. All six previously reviewed candidate hashes and the full V10 source checksum list remain identical. The private single-base conflict simulation was conservative: the actual history has multiple merge bases, so its15regions did not require manual edits.
+
+### Decisions made (and why)
+
+Preserve the original private reviews and record the actual clean merge outcome separately. Validate the integrated tree with V11 using the same library, CLI/example and strict Clippy commands, additionally pinning the merge commit in each receipt. No performance measurements are being added.
+
+### Open threads (unfinished, pick up next time)
+
+Commit this merge and its V11 validation driver, run V11, then publish the regular PR and inspect applicable exact-head checks.
+
+### Errors (what went wrong, how it was handled)
+
+The broad preliminary git status scan spent minutes in filesystem access. Stopped only that exact read-only process; the queued single merge then ran and completed. No duplicate merge, rebase, force-push or evidence overwrite occurred.

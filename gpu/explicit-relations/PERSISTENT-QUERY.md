@@ -20,8 +20,9 @@ same exact lower bound to find the minimum duplicate left ID. Separate IDs
 avoid packed-product overflow. The host checks the bounds and independently
 checks the relation. Tables and targets have the same semantics as before.
 
-Each block accumulates its actual valid tuple constructions and adds one
-counter at exit. `visited` records search tuples actually computed, including
+Each block accumulates its actual valid right-side entries processed and adds
+one counter at exit. Uncached entries construct the sum; full-cache entries
+load it. `visited` records search entries actually processed, including
 any speculative work above the final witness. It can depend on scheduling;
 it is neither a deterministic prefix nor a complete arithmetic-operation
 ledger. A complete miss must count every right tuple exactly once. The final
