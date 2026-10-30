@@ -16,6 +16,8 @@ use std::time::{Duration, Instant};
 mod prime_f4_wide;
 #[path = "prime_f4_wide_dynamic.rs"]
 mod prime_f4_wide_dynamic;
+#[path = "prime_f4_wide_dynamic_replay.rs"]
+mod prime_f4_wide_dynamic_replay;
 #[path = "prime_f4_wide_m3.rs"]
 mod prime_f4_wide_m3;
 

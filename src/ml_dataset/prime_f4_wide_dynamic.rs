@@ -1001,6 +1001,7 @@ enum PhaseSource {
 }
 struct ObserverState {
     acknowledged: usize,
+    attempted: usize,
     setup: usize,
     native: usize,
     linear: usize,
@@ -1081,6 +1082,7 @@ fn append_observation<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(),
             return Err(Stop::OutputLimit);
         }
         budget.check()?;
+        state.attempted += 1;
         let cap = slot
             .logical_cap
             .checked_sub(start)
@@ -1346,6 +1348,7 @@ pub(super) struct PreparedOriginal {
     degree_bound: u32,
     group_control: GroupControl,
     linear_retained: bool,
+    step4: Step4State,
 }
 pub(super) struct PrepareFailure {
     pub stop: Stop,
@@ -1413,6 +1416,9 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             + size_of::<[u8; 60]>()
             + size_of::<[usize; 32]>()
             + size_of::<GroupControl>()
+            + size_of::<Step4State>()
+            + size_of::<BoundWitnessPublisher>()
+            + 2 * size_of::<DynamicResult<'static>>()
             + GROUP_SCRATCH_BYTES) as u64;
         {
             let mut ticket = ledger.reserve(fixed * 8, fixed)?;
@@ -1443,6 +1449,7 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
         let mut setup_events = Ledger::new(setup_event_allowance, 0, phase_deadline);
         let mut observer = ObserverState {
             acknowledged: 0,
+            attempted: 0,
             setup: 0,
             native: 0,
             linear: 0,
@@ -1569,6 +1576,7 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
                 tuples: 0,
             },
             linear_retained: false,
+            step4: Step4State::new(limits.original_deadline),
         }),
         Err(stop) => Err(PrepareFailure {
             stop,
@@ -1657,6 +1665,7 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
             Ok(())
         },
     );
+    prepared.step4.observer_performed = observer_budget.performed_work;
     // These are clock-independent and occur BEFORE fallible retention.
     let settled = (|| {
         let native = settle(
@@ -2086,10 +2095,12 @@ pub(super) fn extract_reported_linear(phase: &mut NativePhase) -> LinearReport {
         pdp_witness_verified: false,
     };
     if !phase.basis_retained {
+        prepared.step4.linear_stop = Some(report.stop);
         return report;
     }
     if phase.report.stop == dynamic::Stop::UnitDerived {
         report.stop = LinearStop::NativeUnit;
+        prepared.step4.linear_stop = Some(report.stop);
         return report;
     }
     let v = 2 * prepared.m - 2;
@@ -2213,6 +2224,7 @@ pub(super) fn extract_reported_linear(phase: &mut NativePhase) -> LinearReport {
         }
         Err(stop) => report.stop = stop,
     }
+    prepared.step4.linear_stop = Some(report.stop);
     report
 }
 
@@ -2755,10 +2767,14 @@ thread_local! {
     static GROUP_ADDITION_HOOK: std::cell::Cell<Option<fn(u64, usize, &mut Ledger)>> = const { std::cell::Cell::new(None) };
     static GROUP_CARRY_HOOK: std::cell::Cell<Option<fn(u64, &mut Ledger)>> = const { std::cell::Cell::new(None) };
 }
-pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+fn run_group_internal<
+    F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>,
+    P: WitnessPublisher,
+>(
     phase: &mut NativePhase,
     linear: Option<&LinearReport>,
     forward: &mut F,
+    mut publisher: Option<&mut P>,
 ) -> GroupReport {
     let p = &mut phase.prepared;
     let mut report = GroupReport {
@@ -2782,6 +2798,10 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
         certificate_durably_persisted: false,
         independent_derivation_verified: false,
     };
+    if publisher.is_some() && (!p.step4.prepared || p.step4.failed) {
+        report.stop = GroupStop::InvalidState;
+        return report;
+    }
     if p.group_control.started {
         report.stop = GroupStop::AlreadyStarted;
         return report;
@@ -2836,6 +2856,12 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
             report.tuple_entered = false;
             report.completed_prefixes = 0;
             report.computed_match = false;
+            p.step4.last = LastProgress {
+                initialized: true,
+                origin: Some(report.origin),
+                cursor: report.cursor,
+                ..LastProgress::default()
+            };
             if p.group_control.tuples >= p.group_control.tuple_limit {
                 return Err(GroupStop::TupleLimit);
             }
@@ -2891,6 +2917,7 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                         return Err(GroupStop::InvalidDomain);
                     };
                     p.workspace.group.coordinates[leaf] = q.x;
+                    p.step4.last.coordinate_count = leaf + 1;
                     if leaf == 0 {
                         sum = point;
                     } else {
@@ -2909,6 +2936,7 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                                 SmallPoint::Infinity => {
                                     p.workspace.group.exceptional[exceptions] = leaf - 1;
                                     exceptions += 1;
+                                    p.step4.last.exceptions = exceptions;
                                 }
                                 SmallPoint::Affine(q) => {
                                     p.workspace.group.coordinates[m + leaf - 1] = q.x
@@ -2918,13 +2946,52 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                     }
                 }
                 complete = true;
+                p.step4.last.complete = true;
                 all_affine = exceptions == 0;
                 report.computed_match = sum == SmallPoint::Affine(p.group_control.target);
-                if report.computed_match {
+                if report.computed_match && p.step4.certificate.identity.is_none() {
                     p.workspace.group.first_certificate[..m]
                         .copy_from_slice(&p.workspace.group.tuple[..m]);
+                    let compatible = all_affine
+                        && (0..v).all(|i| {
+                            p.workspace.group.assignments[i]
+                                == Some(p.workspace.group.coordinates[i])
+                        });
+                    let origin = if report.origin == GroupOrigin::IndependentGroupPrefix {
+                        report.origin
+                    } else if compatible {
+                        GroupOrigin::ReportedBasisLinearCandidate
+                    } else {
+                        GroupOrigin::ReportedBasisLeafLift
+                    };
+                    let mut id = FirstIdentity {
+                        origin,
+                        phase: if origin == GroupOrigin::IndependentGroupPrefix {
+                            SearchPhase::IndependentPrefix
+                        } else {
+                            SearchPhase::NativeLifts
+                        },
+                        cursor: report.cursor,
+                        indices: [0; 15],
+                        exception_mask: 0,
+                        coordinates_match: if origin == GroupOrigin::IndependentGroupPrefix {
+                            None
+                        } else {
+                            Some(compatible)
+                        },
+                    };
+                    id.indices[..m].copy_from_slice(&p.workspace.group.tuple[..m]);
+                    for &i in &p.workspace.group.exceptional[..exceptions] {
+                        id.exception_mask |= 1 << i;
+                    }
+                    report.origin = id.origin;
+                    p.step4.last.origin = Some(id.origin);
+                    p.step4.certificate.identity = Some(id);
+                    p.step4.certificate.facts.computed = true;
+                    p.step4.certificate.lifecycle = CertificateLifecycle::ComputedPending;
                 }
                 if all_affine {
+                    p.step4.last.coordinate_count = v;
                     let zero = group_eval(
                         &p.input,
                         v,
@@ -2933,6 +3000,7 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                         &mut local,
                     )?;
                     evaluated = true;
+                    p.step4.last.residue_count = v + 1;
                     if zero && phase.report.stop == dynamic::Stop::UnitDerived {
                         return Err(GroupStop::NativeContradiction);
                     }
@@ -2950,6 +3018,7 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                     && !coords_match
                 {
                     report.origin = GroupOrigin::ReportedBasisLeafLift;
+                    p.step4.last.origin = Some(report.origin);
                 }
                 Ok(())
             })();
@@ -2983,7 +3052,13 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                     additions_performed: p.group_control.additions_performed,
                     checking_reserved_work: p.checking_reserved_work + checking.reserved_work,
                 };
+                let row_start = p.slots.buffers[5].bytes.len();
                 append_group_row(&row, &mut p.slots.buffers[5], report.row_bound, &mut local)?;
+                p.step4.last.row = Some(RowReference {
+                    row_index: p.observer.group as u64,
+                    offset: row_start as u64,
+                    bytes: (p.slots.buffers[5].bytes.len() - row_start) as u64,
+                });
                 let event = PhaseEvent {
                     schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
                     source: PhaseSource::Group,
@@ -3003,13 +3078,29 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                     forward,
                 )
                 .map_err(|_| group_stop(p.observer.stop.unwrap_or(Stop::Observer)))?;
+                p.step4.last.metadata_acknowledged = true;
                 Ok(())
             })();
             checking.performed_work += local.performed_work;
             operation?;
             row_result?;
             if report.computed_match {
-                return Ok(GroupStop::PendingCertificate);
+                if let Some(publisher) = publisher.as_deref_mut() {
+                    complete_match(
+                        p,
+                        phase.report.stop == dynamic::Stop::UnitDerived,
+                        &report,
+                        exceptions,
+                        publisher,
+                        &mut checking,
+                    )?;
+                } else {
+                    return Ok(GroupStop::PendingCertificate);
+                }
+            }
+            // Leaf-lift is certificate provenance, not a third enumeration.
+            if report.origin == GroupOrigin::ReportedBasisLeafLift {
+                report.origin = GroupOrigin::ReportedBasisLinearCandidate;
             }
             #[cfg(test)]
             GROUP_CARRY_HOOK.with(|hook| {
@@ -3047,9 +3138,1519 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
     report.additions_performed = p.group_control.additions_performed;
     report.checking_reserved_work = p.checking_reserved_work;
     report.checking_performed_work = p.checking_performed_work;
+    report.pdp_witness_verified = p.step4.certificate.facts.local_replay_complete;
+    report.certificate_durably_persisted = p.step4.certificate.facts.durable_acknowledged;
+    report.group_domain_complete =
+        publisher.is_some() && report.stop == GroupStop::IndependentTraversalFinished;
+    p.step4.last_report = Some(report);
     report
 }
 
+#[cfg(test)]
+thread_local! {static REPLAY_ADDITION_HOOK:std::cell::Cell<Option<fn(usize,&mut Ledger)>>=const{std::cell::Cell::new(None)};}
+// Step4 independently implemented canonical arithmetic. No Montgomery calls.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+enum SearchPhase {
+    NativeLifts,
+    IndependentPrefix,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+enum ReplayStage {
+    Indices,
+    OnCurve,
+    Group,
+    PrefixCompare,
+    OriginalEquations,
+    Provenance,
+    Serialization,
+    Publication,
+    FinalStaging,
+}
+#[derive(Clone, Copy, Debug, Default, serde::Serialize)]
+struct FirstFacts {
+    computed: bool,
+    local_replay_complete: bool,
+    publication_attempted: bool,
+    durable_acknowledged: bool,
+    final_artifact_registered: bool,
+}
+#[derive(Clone, Copy, Debug, Default, serde::Serialize)]
+struct ReplayProgress {
+    additions_reserved: u64,
+    additions_performed: u64,
+    equation_checks_completed: u16,
+    coordinate_checks_completed: u16,
+    failed_stage: Option<ReplayStage>,
+}
+#[derive(Clone, Copy)]
+struct FirstIdentity {
+    origin: GroupOrigin,
+    phase: SearchPhase,
+    cursor: u128,
+    indices: [usize; 15],
+    exception_mask: u16,
+    coordinates_match: Option<bool>,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+enum CertificateLifecycle {
+    Absent,
+    ComputedPending,
+    ReplayAdmitted,
+    LocallyVerified,
+    Published,
+    Transferred,
+    Failed,
+}
+struct CertificateState {
+    identity: Option<FirstIdentity>,
+    facts: FirstFacts,
+    progress: ReplayProgress,
+    lifecycle: CertificateLifecycle,
+    receipt: Option<crate::ml_dataset::capture::WitnessReceipt>,
+}
+impl Default for CertificateState {
+    fn default() -> Self {
+        Self {
+            identity: None,
+            facts: FirstFacts::default(),
+            progress: ReplayProgress::default(),
+            lifecycle: CertificateLifecycle::Absent,
+            receipt: None,
+        }
+    }
+}
+fn canonical_add(
+    p: u64,
+    a: u64,
+    left: SmallPoint,
+    right: SmallPoint,
+    l: &mut Ledger,
+) -> Result<SmallPoint, GroupStop> {
+    let mut t = l.reserve(4096, 0).map_err(group_stop)?;
+    t.spend(128).map_err(group_stop)?;
+    let (SmallPoint::Affine(q), SmallPoint::Affine(r)) = (left, right) else {
+        return Ok(if matches!(left, SmallPoint::Infinity) {
+            right
+        } else {
+            left
+        });
+    };
+    if q.x == r.x && (q.y != r.y || q.y == 0) {
+        return Ok(SmallPoint::Infinity);
+    }
+    t.spend(512).map_err(group_stop)?;
+    let modulus = u128::from(p);
+    let mul = |x: u64, y: u64| ((u128::from(x) * u128::from(y)) % modulus) as u64;
+    let sub = |x: u64, y: u64| ((u128::from(x) + modulus - u128::from(y)) % modulus) as u64;
+    let (num, den) = if q.x == r.x {
+        (
+            ((3 * u128::from(mul(q.x, q.x)) + u128::from(a)) % modulus) as u64,
+            ((2 * u128::from(q.y)) % modulus) as u64,
+        )
+    } else {
+        (sub(r.y, q.y), sub(r.x, q.x))
+    };
+    let mut power = den;
+    let mut inverse = 1u64;
+    let mut exponent = p - 2;
+    while exponent != 0 {
+        t.spend(48).map_err(group_stop)?;
+        if exponent & 1 != 0 {
+            inverse = mul(inverse, power);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = mul(power, power);
+        }
+    }
+    t.spend(256).map_err(group_stop)?;
+    if mul(den, inverse) != 1 {
+        return Err(GroupStop::InvalidDomain);
+    }
+    let slope = mul(num, inverse);
+    let x = sub(sub(mul(slope, slope), q.x), r.x);
+    let y = sub(mul(slope, sub(q.x, x)), q.y);
+    Ok(SmallPoint::Affine(AffinePoint { x, y }))
+}
+fn replay_on_curve(
+    p: u64,
+    a: u64,
+    b: u64,
+    q: AffinePoint,
+    l: &mut Ledger,
+) -> Result<(), GroupStop> {
+    group_charge(l, 256)?;
+    if p < 3 || p > (1u64 << 61) - 1 || a >= p || b >= p || q.x >= p || q.y >= p {
+        return Err(GroupStop::InvalidDomain);
+    }
+    let modulus = u128::from(p);
+    let x = u128::from(q.x);
+    let y = u128::from(q.y);
+    if y * y % modulus != ((x * x % modulus) * x + u128::from(a) * x + u128::from(b)) % modulus {
+        return Err(GroupStop::InvalidDomain);
+    }
+    Ok(())
+}
+// Stream original equations independently, without invoking group_eval or
+// trusting the producer's residues. Coordinates are reconstructed from replay.
+fn replay_equations(
+    input: &[InputPolynomial],
+    coordinates: &[u64],
+    expected: &[u64],
+    p: u64,
+    l: &mut Ledger,
+    progress: &mut ReplayProgress,
+) -> Result<(), GroupStop> {
+    group_charge(l, 128)?;
+    for (i, poly) in input.iter().enumerate() {
+        group_charge(l, 32)?;
+        let mut residue = 0u64;
+        for term in &poly.terms {
+            group_charge(l, 64 + 32 * coordinates.len() as u64)?;
+            if term.coefficient == 0 || term.coefficient >= p {
+                return Err(GroupStop::InvalidState);
+            }
+            let mut monomial = term.coefficient;
+            for (axis, &exponent) in term
+                .mono
+                .exponents(coordinates.len())
+                .ok_or(GroupStop::InvalidState)?
+                .iter()
+                .enumerate()
+            {
+                if exponent == 0 {
+                    continue;
+                }
+                if exponent > 32 {
+                    return Err(GroupStop::InvalidState);
+                }
+                group_charge(l, 64 + 48 * u64::from(u16::BITS - exponent.leading_zeros()))?;
+                let mut power = 1u64;
+                let mut square = coordinates[axis];
+                let mut bits = exponent;
+                while bits != 0 {
+                    if bits & 1 != 0 {
+                        power = ((u128::from(power) * u128::from(square)) % u128::from(p)) as u64;
+                    }
+                    bits >>= 1;
+                    if bits != 0 {
+                        square = ((u128::from(square) * u128::from(square)) % u128::from(p)) as u64;
+                    }
+                }
+                monomial = ((u128::from(monomial) * u128::from(power)) % u128::from(p)) as u64;
+            }
+            residue = ((u128::from(residue) + u128::from(monomial)) % u128::from(p)) as u64;
+        }
+        group_charge(l, 32)?;
+        if residue != 0 || expected.get(i) != Some(&residue) {
+            return Err(GroupStop::OriginalEquationMismatch);
+        }
+        progress.equation_checks_completed += 1;
+    }
+    Ok(())
+}
+fn replay_match(
+    p: &mut PreparedOriginal,
+    native_unit: bool,
+    identity: FirstIdentity,
+    checking: &mut Ledger,
+    progress: &mut ReplayProgress,
+) -> Result<(), GroupStop> {
+    let m = p.m;
+    let v = 2 * m - 2;
+    let prime = p.setup.field.p();
+    progress.failed_stage = Some(ReplayStage::Indices);
+    if !(4..=15).contains(&m) || p.group_control.domain_len == 0 || p.group_control.domain_len > 64
+    {
+        return Err(GroupStop::InvalidState);
+    }
+    let eval = group_eval_bound(&p.input, v, checking)?;
+    let work = 4096 * m as u64
+        + 256 * (m as u64 + 1)
+        + 128 * m as u64
+        + 128 * (m as u64 - 1)
+        + 64 * v as u64
+        + eval
+        + 32 * (v as u64 + 1);
+    if p.group_control
+        .addition_limit
+        .saturating_sub(p.group_control.additions_reserved)
+        < m as u64
+    {
+        return Err(GroupStop::AdditionLimit);
+    }
+    {
+        let _ticket = checking.reserve(work, 0).map_err(group_stop)?;
+    }
+    p.group_control.additions_reserved += m as u64;
+    progress.additions_reserved += m as u64;
+    let mut local = Ledger::new(work, 0, p.original_deadline);
+    let result = (|| {
+        let mut coordinates = [0u64; 28];
+        let mut sum = SmallPoint::Infinity;
+        let mut mask = 0u16;
+        progress.failed_stage = Some(ReplayStage::OnCurve);
+        replay_on_curve(
+            prime,
+            p.group_control.a,
+            p.group_control.b,
+            p.group_control.target,
+            &mut local,
+        )?;
+        for leaf in 0..m {
+            progress.failed_stage = Some(ReplayStage::Indices);
+            group_charge(&mut local, 128)?;
+            let index = identity.indices[leaf];
+            if index >= p.group_control.domain_len || index != p.workspace.group.tuple[leaf] {
+                return Err(GroupStop::InvalidCandidate);
+            }
+            let SmallPoint::Affine(point) = p.workspace.group.domain[index] else {
+                return Err(GroupStop::InvalidDomain);
+            };
+            progress.failed_stage = Some(ReplayStage::OnCurve);
+            replay_on_curve(
+                prime,
+                p.group_control.a,
+                p.group_control.b,
+                point,
+                &mut local,
+            )?;
+            coordinates[leaf] = point.x;
+            progress.failed_stage = Some(ReplayStage::Group);
+            #[cfg(test)]
+            REPLAY_ADDITION_HOOK.with(|hook| {
+                if let Some(f) = hook.get() {
+                    f(leaf, &mut local);
+                }
+            });
+            sum = canonical_add(
+                prime,
+                p.group_control.a,
+                sum,
+                SmallPoint::Affine(point),
+                &mut local,
+            )?;
+            progress.additions_performed += 1;
+            p.group_control.additions_performed += 1;
+            if leaf != 0 {
+                progress.failed_stage = Some(ReplayStage::PrefixCompare);
+                group_charge(&mut local, 128)?;
+                if p.workspace.group.prefix[leaf - 1] != sum {
+                    return Err(GroupStop::InvalidCandidate);
+                }
+                if leaf < m - 1 {
+                    match sum {
+                        SmallPoint::Infinity => mask |= 1 << (leaf - 1),
+                        SmallPoint::Affine(q) => coordinates[m + leaf - 1] = q.x,
+                    }
+                }
+            }
+        }
+        if sum != SmallPoint::Affine(p.group_control.target) || mask != identity.exception_mask {
+            return Err(GroupStop::InvalidCandidate);
+        }
+        progress.failed_stage = Some(ReplayStage::Provenance);
+        if mask == 0 {
+            let mut candidate_match = true;
+            for (i, &coordinate) in coordinates[..v].iter().enumerate() {
+                group_charge(&mut local, 64)?;
+                if coordinate != p.workspace.group.coordinates[i] {
+                    return Err(GroupStop::InvalidCandidate);
+                }
+                candidate_match &= p.workspace.group.assignments[i] == Some(coordinate);
+                progress.coordinate_checks_completed += 1;
+            }
+            if identity
+                .coordinates_match
+                .is_some_and(|claimed| claimed != candidate_match)
+            {
+                return Err(GroupStop::InvalidCandidate);
+            }
+            progress.failed_stage = Some(ReplayStage::OriginalEquations);
+            replay_equations(
+                &p.input,
+                &coordinates[..v],
+                &p.workspace.group.residues[..v + 1],
+                prime,
+                &mut local,
+                progress,
+            )?;
+            if native_unit {
+                return Err(GroupStop::NativeContradiction);
+            }
+        } else if identity.coordinates_match == Some(true) {
+            return Err(GroupStop::InvalidCandidate);
+        }
+        progress.failed_stage = None;
+        Ok(())
+    })();
+    checking.performed_work += local.performed_work;
+    result
+}
+struct CanonicalPointView(SmallPoint);
+impl serde::Serialize for CanonicalPointView {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        match self.0 {
+            SmallPoint::Infinity => s.serialize_none(),
+            SmallPoint::Affine(q) => {
+                let mut record = s.serialize_struct("Point", 2)?;
+                record.serialize_field("x", &Decimal(q.x))?;
+                record.serialize_field("y", &Decimal(q.y))?;
+                record.end()
+            }
+        }
+    }
+}
+struct SummandsView<'a> {
+    domain: &'a [SmallPoint],
+    indices: &'a [usize],
+}
+impl serde::Serialize for SummandsView<'_> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::{Error, SerializeSeq};
+        let mut seq = s.serialize_seq(Some(self.indices.len()))?;
+        for &i in self.indices {
+            let q = *self
+                .domain
+                .get(i)
+                .ok_or_else(|| S::Error::custom("invalid index"))?;
+            seq.serialize_element(&CanonicalPointView(q))?;
+        }
+        seq.end()
+    }
+}
+struct ExceptionView {
+    mask: u16,
+    m: usize,
+}
+impl serde::Serialize for ExceptionView {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = s.serialize_seq(Some(self.mask.count_ones() as usize))?;
+        for i in 0..self.m - 2 {
+            if self.mask & (1 << i) != 0 {
+                seq.serialize_element(&i)?;
+            }
+        }
+        seq.end()
+    }
+}
+#[derive(serde::Serialize)]
+struct DynamicWitness<'a> {
+    schema: &'static str,
+    summands: SummandsView<'a>,
+    target: CanonicalPointView,
+    sum: CanonicalPointView,
+    replay_group_add_calls: u64,
+    certificate_origin: GroupOrigin,
+    search_phase: SearchPhase,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    source_cursor: u128,
+    tuple_indices: &'a [usize],
+    candidate_coordinates_match: Option<bool>,
+    exceptional_auxiliary_positions: ExceptionView,
+    independent_derivation_verified: bool,
+}
+fn witness_view<'a>(p: &'a PreparedOriginal, id: &'a FirstIdentity) -> DynamicWitness<'a> {
+    DynamicWitness {
+        schema: "restricted-wide-prime-dynamic-witness/v1",
+        summands: SummandsView {
+            domain: &p.workspace.group.domain[..p.group_control.domain_len],
+            indices: &id.indices[..p.m],
+        },
+        target: CanonicalPointView(SmallPoint::Affine(p.group_control.target)),
+        sum: CanonicalPointView(SmallPoint::Affine(p.group_control.target)),
+        replay_group_add_calls: p.m as u64,
+        certificate_origin: id.origin,
+        search_phase: id.phase,
+        source_cursor: id.cursor,
+        tuple_indices: &id.indices[..p.m],
+        candidate_coordinates_match: id.coordinates_match,
+        exceptional_auxiliary_positions: ExceptionView {
+            mask: id.exception_mask,
+            m: p.m,
+        },
+        independent_derivation_verified: false,
+    }
+}
+
+use crate::ml_dataset::capture::{
+    WitnessBudget, WitnessCaptureWorkspace, WitnessCommit, WitnessError, WitnessReceipt,
+};
+use crate::ml_dataset::types::ArtifactPayload;
+
+/// Implementations are trusted capture adapters, never untrusted mathematical
+/// receipt suppliers. Production uses only the bound bridge below.
+pub(super) trait WitnessPublisher {
+    fn prepare(&mut self, budget: &mut WitnessBudget) -> Result<(), WitnessError>;
+    fn publish(
+        &mut self,
+        bytes: &[u8],
+        budget: &mut WitnessBudget,
+        global: &mut usize,
+    ) -> Result<WitnessReceipt, WitnessError>;
+}
+#[derive(Default)]
+pub(super) struct BoundWitnessPublisher {
+    workspace: Option<WitnessCaptureWorkspace>,
+}
+impl WitnessPublisher for BoundWitnessPublisher {
+    fn prepare(&mut self, budget: &mut WitnessBudget) -> Result<(), WitnessError> {
+        if self.workspace.is_some() {
+            return Err(WitnessError::Failed);
+        }
+        self.workspace = Some(super::prepare_bound_witness(budget)?);
+        Ok(())
+    }
+    fn publish(
+        &mut self,
+        bytes: &[u8],
+        budget: &mut WitnessBudget,
+        global: &mut usize,
+    ) -> Result<WitnessReceipt, WitnessError> {
+        super::publish_bound_witness(
+            bytes,
+            self.workspace.as_mut().ok_or(WitnessError::Failed)?,
+            budget,
+            global,
+        )
+    }
+}
+struct Step4State {
+    certificate: CertificateState,
+    budget: WitnessBudget,
+    prepared: bool,
+    failed: bool,
+    final_artifacts: Vec<ArtifactPayload>,
+    transferred: bool,
+    new_payload: usize,
+    last: LastProgress,
+    last_report: Option<GroupReport>,
+    publication_error: Option<WitnessError>,
+    terminal_retained: bool,
+    observer_performed: u64,
+    linear_stop: Option<LinearStop>,
+    final_staging_stop: Option<GroupStop>,
+}
+#[derive(Clone, Copy, Default)]
+struct LastProgress {
+    initialized: bool,
+    origin: Option<GroupOrigin>,
+    cursor: u128,
+    complete: bool,
+    coordinate_count: usize,
+    residue_count: usize,
+    exceptions: usize,
+    row: Option<RowReference>,
+    metadata_acknowledged: bool,
+}
+#[derive(Clone, Copy, serde::Serialize)]
+struct RowReference {
+    row_index: u64,
+    offset: u64,
+    bytes: u64,
+}
+impl Step4State {
+    fn new(deadline: Instant) -> Self {
+        Self {
+            certificate: CertificateState::default(),
+            budget: WitnessBudget::new(0, 0, deadline),
+            prepared: false,
+            failed: false,
+            final_artifacts: Vec::new(),
+            transferred: false,
+            new_payload: 0,
+            last: LastProgress::default(),
+            last_report: None,
+            publication_error: None,
+            terminal_retained: false,
+            observer_performed: 0,
+            linear_stop: None,
+            final_staging_stop: None,
+        }
+    }
+}
+const SLOT_REGISTRY: [(&str, &str, &str); 8] = [
+    (
+        "prime-f4-input.json",
+        "complete-prime-field-polynomial-system",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-setup.json",
+        "restricted-wide-prime-dynamic-setup/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-native.json",
+        "restricted-wide-prime-dynamic-native/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-events.jsonl",
+        "restricted-wide-prime-dynamic-events/v1",
+        "jsonl",
+    ),
+    (
+        "prime-f4-wide-dynamic-linear.json",
+        "restricted-wide-prime-dynamic-linear/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-group.json",
+        "restricted-wide-prime-dynamic-group/v1",
+        "jsonl",
+    ),
+    ("pdp-witness.json", "independently-verified-pdp", "json"),
+    (
+        "prime-f4-wide-dynamic-result.json",
+        "restricted-wide-prime-dynamic-result/v1",
+        "json",
+    ),
+];
+fn admitted_string(s: &str, l: &mut Ledger) -> Result<String, Stop> {
+    let work = 8 * s.len() as u64 + 32;
+    let mut ticket = l.reserve(work, s.len() as u64 + 128)?;
+    let mut out = String::new();
+    out.try_reserve_exact(s.len())
+        .map_err(|_| Stop::Allocation)?;
+    ticket.spend(work)?;
+    out.push_str(s);
+    Ok(out)
+}
+fn witness_error(e: WitnessError) -> GroupStop {
+    match e {
+        WitnessError::Deadline => GroupStop::Deadline,
+        WitnessError::Work => GroupStop::CheckWorkLimit,
+        WitnessError::Storage | WitnessError::Allocation => GroupStop::GroupBytes,
+        WitnessError::EventLimit => GroupStop::EventLimit,
+        _ => GroupStop::PersistenceFailure,
+    }
+}
+// Clock-independent receipt settlement; only the exclusively lent deltas are
+// charged. Even failures close the supply before returning control to parent.
+fn settle_witness(
+    p: &mut PreparedOriginal,
+    l: &mut Ledger,
+    before: (u64, u64, u64),
+) -> Result<(), GroupStop> {
+    let budget = &mut p.step4.budget;
+    budget.release_exclusive_supply();
+    let work = budget
+        .reserved_work
+        .checked_sub(before.0)
+        .ok_or(GroupStop::InvalidState)?;
+    let done = budget
+        .performed_work
+        .checked_sub(before.1)
+        .ok_or(GroupStop::InvalidState)?;
+    let bytes = budget
+        .reserved_bytes
+        .checked_sub(before.2)
+        .ok_or(GroupStop::InvalidState)?;
+    if done > work
+        || work > l.work_limit - l.reserved_work
+        || bytes > p.ledger.bytes_limit - p.ledger.reserved_bytes
+    {
+        return Err(GroupStop::InvalidState);
+    }
+    l.reserved_work += work;
+    l.performed_work += done;
+    p.ledger.reserved_bytes += bytes;
+    Ok(())
+}
+/// Mandatory before native when using step4; the dormant earlier-stage API
+/// remains available for focused construction/native controls.
+pub(super) fn prepare_step4<P: WitnessPublisher>(
+    p: &mut PreparedOriginal,
+    publisher: &mut P,
+) -> Result<(), GroupStop> {
+    if p.step4.prepared || p.step4.failed || p.group_control.started {
+        return Err(GroupStop::InvalidState);
+    }
+    let mut checking = Ledger::new(
+        p.checking_work,
+        p.ledger.bytes_limit - p.ledger.reserved_bytes,
+        p.original_deadline,
+    );
+    let result = (|| {
+        p.step4.final_artifacts = requested_vec(9, &mut checking).map_err(group_stop)?;
+        for (path, role, encoding) in SLOT_REGISTRY {
+            p.step4.final_artifacts.push(ArtifactPayload {
+                path: admitted_string(path, &mut checking).map_err(group_stop)?,
+                role: admitted_string(role, &mut checking).map_err(group_stop)?,
+                encoding: admitted_string(encoding, &mut checking).map_err(group_stop)?,
+                bytes: Vec::new(),
+            });
+        }
+        Ok(())
+    })();
+    p.ledger.reserved_bytes += checking.reserved_bytes;
+    checking.bytes_limit = 0;
+    checking.reserved_bytes = 0;
+    let result = result.and_then(|()| {
+        p.step4
+            .budget
+            .set_exclusive_supply(
+                checking.work_limit - checking.reserved_work,
+                p.ledger.bytes_limit - p.ledger.reserved_bytes,
+            )
+            .map_err(witness_error)?;
+        let before = (
+            p.step4.budget.reserved_work,
+            p.step4.budget.performed_work,
+            p.step4.budget.reserved_bytes,
+        );
+        let result = publisher
+            .prepare(&mut p.step4.budget)
+            .map_err(witness_error);
+        settle_witness(p, &mut checking, before)?;
+        result
+    });
+    p.checking_work -= checking.reserved_work;
+    p.checking_reserved_work += checking.reserved_work;
+    p.checking_performed_work += checking.performed_work;
+    p.step4.prepared = result.is_ok();
+    p.step4.failed = result.is_err();
+    result
+}
+fn complete_match<P: WitnessPublisher>(
+    p: &mut PreparedOriginal,
+    native_unit: bool,
+    report: &GroupReport,
+    exceptions: usize,
+    publisher: &mut P,
+    checking: &mut Ledger,
+) -> Result<(), GroupStop> {
+    if !p.step4.prepared || p.step4.failed {
+        return Err(GroupStop::InvalidState);
+    }
+    let first = !p.step4.certificate.facts.local_replay_complete;
+    if first && p.observer.acknowledged >= 4096 {
+        return Err(GroupStop::EventLimit);
+    }
+    let mut mask = 0u16;
+    for &i in &p.workspace.group.exceptional[..exceptions] {
+        mask |= 1 << i;
+    }
+    let phase = if report.origin == GroupOrigin::IndependentGroupPrefix {
+        SearchPhase::IndependentPrefix
+    } else {
+        SearchPhase::NativeLifts
+    };
+    let mut identity = FirstIdentity {
+        origin: report.origin,
+        phase,
+        cursor: report.cursor,
+        indices: [0; 15],
+        exception_mask: mask,
+        coordinates_match: match report.origin {
+            GroupOrigin::IndependentGroupPrefix => None,
+            GroupOrigin::ReportedBasisLinearCandidate => Some(true),
+            GroupOrigin::ReportedBasisLeafLift => Some(false),
+        },
+    };
+    identity.indices[..p.m].copy_from_slice(&p.workspace.group.tuple[..p.m]);
+    if first {
+        p.workspace.group.first_certificate[..p.m].copy_from_slice(&identity.indices[..p.m]);
+        p.step4.certificate.identity = Some(identity);
+        p.step4.certificate.facts.computed = true;
+        p.step4.certificate.lifecycle = CertificateLifecycle::ComputedPending;
+    }
+    let mut progress = ReplayProgress::default();
+    if first {
+        p.step4.certificate.lifecycle = CertificateLifecycle::ReplayAdmitted;
+    }
+    let replay = replay_match(p, native_unit, identity, checking, &mut progress);
+    if first {
+        p.step4.certificate.progress = progress;
+    }
+    if let Err(e) = replay {
+        p.step4.failed = true;
+        if first {
+            p.step4.certificate.lifecycle = CertificateLifecycle::Failed;
+        }
+        return Err(e);
+    }
+    if !first {
+        return Ok(());
+    }
+    p.step4.certificate.facts.local_replay_complete = true;
+    p.step4.certificate.lifecycle = CertificateLifecycle::LocallyVerified;
+    // Split immutable view fields from the separately owned admitted output.
+    let witness = DynamicWitness {
+        schema: "restricted-wide-prime-dynamic-witness/v1",
+        summands: SummandsView {
+            domain: &p.workspace.group.domain[..p.group_control.domain_len],
+            indices: &identity.indices[..p.m],
+        },
+        target: CanonicalPointView(SmallPoint::Affine(p.group_control.target)),
+        sum: CanonicalPointView(SmallPoint::Affine(p.group_control.target)),
+        replay_group_add_calls: p.m as u64,
+        certificate_origin: identity.origin,
+        search_phase: identity.phase,
+        source_cursor: identity.cursor,
+        tuple_indices: &identity.indices[..p.m],
+        candidate_coordinates_match: identity.coordinates_match,
+        exceptional_auxiliary_positions: ExceptionView {
+            mask: identity.exception_mask,
+            m: p.m,
+        },
+        independent_derivation_verified: false,
+    };
+    if let Err(e) = encode_complete(&witness, &mut p.slots.buffers[6], checking) {
+        p.step4.failed = true;
+        p.step4.certificate.lifecycle = CertificateLifecycle::Failed;
+        p.step4.certificate.progress.failed_stage = Some(ReplayStage::Serialization);
+        return Err(group_stop(e));
+    }
+    p.step4.certificate.facts.publication_attempted = true;
+    p.step4
+        .budget
+        .set_exclusive_supply(
+            checking.work_limit - checking.reserved_work,
+            p.ledger.bytes_limit - p.ledger.reserved_bytes,
+        )
+        .map_err(witness_error)?;
+    let before = (
+        p.step4.budget.reserved_work,
+        p.step4.budget.performed_work,
+        p.step4.budget.reserved_bytes,
+    );
+    let receipt = publisher.publish(
+        &p.slots.buffers[6].bytes,
+        &mut p.step4.budget,
+        &mut p.observer.acknowledged,
+    );
+    if let Ok(ack) = receipt {
+        p.step4.certificate.receipt = Some(ack);
+        p.step4.certificate.facts.durable_acknowledged = true;
+        p.step4.certificate.lifecycle = CertificateLifecycle::Published;
+    }
+    settle_witness(p, checking, before)?;
+    match receipt {
+        Ok(receipt) => {
+            // Trusted bridge already committed and incremented global if new.
+            // No post-ack clock/fallible allocation may revoke this fact.
+            p.step4.certificate.receipt = Some(receipt);
+            p.step4.certificate.facts.durable_acknowledged = true;
+            p.step4.certificate.lifecycle = CertificateLifecycle::Published;
+            if receipt.commit == WitnessCommit::NewCommit {
+                p.step4.new_payload += 1;
+                p.observer.durable += 1;
+            }
+            p.step4.final_artifacts[6].bytes = std::mem::take(&mut p.slots.buffers[6].bytes);
+            p.step4.transferred = true;
+            p.step4.certificate.lifecycle = CertificateLifecycle::Transferred;
+            Ok(())
+        }
+        Err(error) => {
+            p.step4.publication_error = Some(error);
+            p.step4.failed = true;
+            p.step4.certificate.lifecycle = CertificateLifecycle::Failed;
+            p.step4.certificate.progress.failed_stage = Some(ReplayStage::Publication);
+            Err(witness_error(error))
+        }
+    }
+}
+
+pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+    phase: &mut NativePhase,
+    linear: Option<&LinearReport>,
+    forward: &mut F,
+) -> GroupReport {
+    run_group_internal::<F, BoundWitnessPublisher>(phase, linear, forward, None)
+}
+pub(super) fn run_group_step4<
+    F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>,
+    P: WitnessPublisher,
+>(
+    phase: &mut NativePhase,
+    linear: Option<&LinearReport>,
+    forward: &mut F,
+    publisher: &mut P,
+) -> GroupReport {
+    run_group_internal(phase, linear, forward, Some(publisher))
+}
+
+struct HexDigest([u8; 32]);
+impl serde::Serialize for HexDigest {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        let mut bytes = [0u8; 64];
+        for (i, &b) in self.0.iter().enumerate() {
+            bytes[2 * i] = b"0123456789abcdef"[(b >> 4) as usize];
+            bytes[2 * i + 1] = b"0123456789abcdef"[(b & 15) as usize];
+        }
+        s.serialize_str(std::str::from_utf8(&bytes).map_err(serde::ser::Error::custom)?)
+    }
+}
+struct PointSlice<'a>(&'a [SmallPoint]);
+impl serde::Serialize for PointSlice<'_> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = s.serialize_seq(Some(self.0.len()))?;
+        for &p in self.0 {
+            seq.serialize_element(&CanonicalPointView(p))?;
+        }
+        seq.end()
+    }
+}
+#[derive(serde::Serialize)]
+struct ReceiptView {
+    commit: &'static str,
+    payload_sha256: HexDigest,
+    payload_bytes: u64,
+    sequence: Option<u64>,
+    provenance: &'static str,
+}
+fn receipt_view(r: WitnessReceipt) -> ReceiptView {
+    ReceiptView {
+        commit: match r.commit {
+            WitnessCommit::NewCommit => "new_commit",
+            WitnessCommit::AlreadyCommitted => "already_committed",
+        },
+        payload_sha256: HexDigest(r.payload_sha256),
+        payload_bytes: r.payload_bytes,
+        sequence: r.sequence,
+        provenance: match r.provenance {
+            crate::ml_dataset::capture::WitnessProvenance::Dedicated => "dedicated",
+            crate::ml_dataset::capture::WitnessProvenance::LegacyAdopted => "legacy_adopted",
+        },
+    }
+}
+#[derive(serde::Serialize)]
+struct IdentityView<'a> {
+    origin: GroupOrigin,
+    search_phase: SearchPhase,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    source_cursor: u128,
+    tuple_indices: &'a [usize],
+    exceptional_auxiliary_positions: ExceptionView,
+    candidate_coordinates_match: Option<bool>,
+}
+#[derive(serde::Serialize)]
+struct PublicationView {
+    state: &'static str,
+    receipt: Option<ReceiptView>,
+}
+#[derive(serde::Serialize)]
+struct FirstRecord<'a> {
+    lifecycle: CertificateLifecycle,
+    identity: IdentityView<'a>,
+    facts: FirstFacts,
+    replay: ReplayProgress,
+    publication: PublicationView,
+    witness_owner: &'static str,
+    witness_bytes: Option<u64>,
+    witness_sha256: Option<HexDigest>,
+}
+#[derive(serde::Serialize)]
+struct LastState<'a> {
+    phase: SearchPhase,
+    origin: GroupOrigin,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    cursor: u128,
+    tuple_indices: &'a [usize],
+    progress: &'static str,
+    tuple_entered: bool,
+    completed_prefixes: u8,
+    prefix_points: PointSlice<'a>,
+    exceptional_auxiliary_positions: &'a [usize],
+    coordinate_count: u8,
+    coordinates: &'a [u64],
+    residue_count: u8,
+    residues: &'a [u64],
+    computed_match: bool,
+    row: Option<RowReference>,
+    metadata_acknowledged: bool,
+}
+#[derive(serde::Serialize)]
+struct SlotEvidence {
+    index: u8,
+    state: &'static str,
+    bytes: Option<u64>,
+    digest_binding: &'static str,
+    sha256: Option<HexDigest>,
+}
+#[derive(serde::Serialize)]
+struct PoolView {
+    name: &'static str,
+    parent: &'static str,
+    work_limit: u64,
+    reserved_work: u64,
+    performed_work: Option<u64>,
+}
+#[derive(serde::Serialize)]
+struct ByteAccounting {
+    limit: u64,
+    reserved: u64,
+}
+#[derive(serde::Serialize)]
+struct GroupAccounting {
+    addition_limit: u64,
+    additions_reserved: u64,
+    additions_performed: u64,
+    tuple_limit: u64,
+    tuples_reserved: u64,
+}
+#[derive(serde::Serialize)]
+struct TraversalAccounting {
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    native_lifts_visited: u128,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    independent_visited: u128,
+    #[serde(serialize_with = "serialize_u128_decimal")]
+    independent_total: u128,
+}
+#[derive(serde::Serialize)]
+struct EventAccounting {
+    limit: u64,
+    global_acknowledged: u64,
+    setup: u64,
+    native: u64,
+    linear: u64,
+    group: u64,
+    new_payload: u64,
+    attempted: u64,
+    pending: u64,
+}
+#[derive(serde::Serialize)]
+struct Accounting {
+    counter_snapshot_stage: &'static str,
+    pools: [PoolView; 6],
+    requested_bytes: ByteAccounting,
+    group: GroupAccounting,
+    traversal: TraversalAccounting,
+    events: EventAccounting,
+}
+#[derive(serde::Serialize)]
+struct Claims {
+    solver_completed: bool,
+    group_domain_complete: bool,
+    negative_verified: bool,
+    pdp_witness_verified: bool,
+    certificate_durably_persisted: bool,
+    independent_derivation_verified: bool,
+    operation_trajectory_verified: bool,
+}
+#[derive(serde::Serialize)]
+struct DynamicResult<'a> {
+    schema: &'static str,
+    strategy: &'static str,
+    stage: &'static str,
+    disposition: &'static str,
+    cause: &'static str,
+    native_stop: Option<&'static str>,
+    linear_stop: Option<LinearStop>,
+    group_stop: Option<GroupStop>,
+    search_phase: &'static str,
+    accounting: Accounting,
+    source_slots: [SlotEvidence; 7],
+    last_state: Option<LastState<'a>>,
+    first_certificate: Option<FirstRecord<'a>>,
+    claims: Claims,
+}
+// A single exclusively supplied local ledger serves both serialization passes.
+// Atomic slot promotion includes newline; failure never exposes partial JSON.
+fn encode_complete<T: serde::Serialize>(
+    record: &T,
+    slot: &mut InputBuffer,
+    l: &mut Ledger,
+) -> Result<(), Stop> {
+    slot.bytes.clear();
+    let result = (|| {
+        let cap = slot.logical_cap.checked_sub(1).ok_or(Stop::OutputLimit)?;
+        let before = l.reserved_work;
+        let mut count = MeteredWriter {
+            ledger: l,
+            output: None,
+            count: 0,
+            cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut count, record).is_err() {
+            return Err(count.stop.unwrap_or(Stop::Serialization));
+        }
+        let expected = count.count;
+        let cost = l.reserved_work - before;
+        if l.work_limit - l.reserved_work < cost.checked_add(8).ok_or(Stop::ArithmeticOverflow)? {
+            return Err(Stop::WorkLimit);
+        }
+        let write_before = l.reserved_work;
+        let mut writer = MeteredWriter {
+            ledger: l,
+            output: Some(&mut slot.bytes),
+            count: 0,
+            cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut writer, record).is_err() {
+            return Err(writer.stop.unwrap_or(Stop::Serialization));
+        }
+        if writer.count != expected || l.reserved_work - write_before != cost {
+            return Err(Stop::Serialization);
+        }
+        {
+            let mut t = l.reserve(8, 0)?;
+            t.spend(8)?;
+        }
+        slot.bytes.push(b'\n');
+        Ok(())
+    })();
+    if result.is_err() {
+        slot.bytes.clear();
+    }
+    result
+}
+fn group_cause(stop: GroupStop) -> &'static str {
+    match stop {
+        GroupStop::IndependentTraversalFinished => "none",
+        GroupStop::Deadline => "deadline",
+        GroupStop::CheckWorkLimit => "work_limit",
+        GroupStop::AdditionLimit => "addition_limit",
+        GroupStop::TupleLimit => "tuple_limit",
+        GroupStop::GroupBytes => "artifact_bytes",
+        GroupStop::EventLimit => "event_limit",
+        GroupStop::PersistenceFailure => "persistence_failure",
+        GroupStop::NativeContradiction => "native_contradiction",
+        _ => "group_stop",
+    }
+}
+/// Terminal evidence is only a snapshot. Mathematical counters cannot assert
+/// completion of later outer manifest registration or terminal serialization.
+pub(super) fn retain_step4_terminal(phase: &mut NativePhase) -> Result<(), Stop> {
+    let p = &mut phase.prepared;
+    if p.step4.terminal_retained {
+        return Err(Stop::InvalidInput);
+    }
+    let entered_group = p.step4.last_report.is_some();
+    let report = p.step4.last_report.unwrap_or(GroupReport {
+        stop: GroupStop::InvalidState,
+        origin: GroupOrigin::IndependentGroupPrefix,
+        cursor: 0,
+        independent_visited: 0,
+        native_lifts_visited: 0,
+        independent_total: 0,
+        completed_prefixes: 0,
+        tuple_entered: false,
+        computed_match: false,
+        row_bound: 0,
+        tuples_reserved: p.group_control.tuples,
+        additions_reserved: p.group_control.additions_reserved,
+        additions_performed: p.group_control.additions_performed,
+        checking_reserved_work: p.checking_reserved_work,
+        checking_performed_work: p.checking_performed_work,
+        group_domain_complete: false,
+        pdp_witness_verified: false,
+        certificate_durably_persisted: false,
+        independent_derivation_verified: false,
+    });
+    let supply = p.terminal.work_limit - p.terminal.reserved_work;
+    {
+        let _ticket = p.terminal.reserve(supply, 0)?;
+    }
+    let mut local = Ledger::new(supply, 0, p.original_deadline);
+    let terminal_performed_before = p.terminal.performed_work;
+    let result = (|| {
+        // Charged fixed-view reads and scalar snapshot setup. Arrays remain
+        // borrowed, their valid lengths were updated at completed operations.
+        {
+            let mut ticket = local.reserve(4096, 0)?;
+            ticket.spend(4096)?;
+        }
+        let state = &p.step4;
+        let cert = &state.certificate;
+        let g = &p.workspace.group;
+        let first_certificate = cert.identity.as_ref().map(|id| FirstRecord {
+            lifecycle: cert.lifecycle,
+            identity: IdentityView {
+                origin: id.origin,
+                search_phase: id.phase,
+                source_cursor: id.cursor,
+                tuple_indices: &id.indices[..p.m],
+                exceptional_auxiliary_positions: ExceptionView {
+                    mask: id.exception_mask,
+                    m: p.m,
+                },
+                candidate_coordinates_match: id.coordinates_match,
+            },
+            facts: cert.facts,
+            replay: cert.progress,
+            publication: PublicationView {
+                state: if cert.receipt.is_some() {
+                    "acknowledged"
+                } else if matches!(
+                    state.publication_error,
+                    Some(WitnessError::IndeterminateIo(_))
+                ) {
+                    "indeterminate"
+                } else if cert.facts.publication_attempted {
+                    "refused"
+                } else {
+                    "not_attempted"
+                },
+                receipt: cert.receipt.map(receipt_view),
+            },
+            witness_owner: if state.transferred {
+                "final_artifact"
+            } else {
+                "slot6"
+            },
+            witness_bytes: if state.transferred {
+                Some(state.final_artifacts[6].bytes.len() as u64)
+            } else if !p.slots.buffers[6].bytes.is_empty() {
+                Some(p.slots.buffers[6].bytes.len() as u64)
+            } else {
+                None
+            },
+            witness_sha256: cert.receipt.map(|r| HexDigest(r.payload_sha256)),
+        });
+        let last = state.last;
+        let last_state = last.initialized.then(|| LastState {
+            phase: if last.origin == Some(GroupOrigin::IndependentGroupPrefix) {
+                SearchPhase::IndependentPrefix
+            } else {
+                SearchPhase::NativeLifts
+            },
+            origin: last.origin.unwrap_or(report.origin),
+            cursor: last.cursor,
+            tuple_indices: &g.tuple[..p.m],
+            progress: if last.complete {
+                "complete_tuple"
+            } else if report.tuple_entered {
+                "partial_tuple"
+            } else {
+                "before_tuple"
+            },
+            tuple_entered: report.tuple_entered,
+            completed_prefixes: report.completed_prefixes as u8,
+            prefix_points: PointSlice(&g.prefix[..report.completed_prefixes]),
+            exceptional_auxiliary_positions: &g.exceptional[..last.exceptions],
+            coordinate_count: last.coordinate_count as u8,
+            coordinates: &g.coordinates[..last.coordinate_count],
+            residue_count: last.residue_count as u8,
+            residues: &g.residues[..last.residue_count],
+            computed_match: report.computed_match,
+            row: last.row,
+            metadata_acknowledged: last.metadata_acknowledged,
+        });
+        let source_slots = std::array::from_fn(|i| {
+            let transferred = i == 6 && state.transferred;
+            let bytes = if transferred {
+                &state.final_artifacts[6].bytes
+            } else {
+                &p.slots.buffers[i].bytes
+            };
+            let complete = !bytes.is_empty();
+            let receipt = if i == 6 { cert.receipt } else { None };
+            SlotEvidence {
+                index: i as u8,
+                state: if transferred {
+                    "transferred"
+                } else if complete {
+                    "local_complete"
+                } else {
+                    "not_produced"
+                },
+                bytes: complete.then_some(bytes.len() as u64),
+                digest_binding: if receipt.is_some() {
+                    "capture_receipt"
+                } else {
+                    "outer_manifest"
+                },
+                sha256: receipt.map(|r| HexDigest(r.payload_sha256)),
+            }
+        });
+        let settled = &phase.settlement;
+        let observer = &phase.observer_settlement;
+        let record = DynamicResult {
+            schema: "restricted-wide-prime-dynamic-result/v1",
+            strategy: "prime_f4_wide_dynamic",
+            stage: if state.final_staging_stop.is_some() {
+                "final_staging"
+            } else if !entered_group {
+                if state.linear_stop.is_some() {
+                    "linear"
+                } else {
+                    "native"
+                }
+            } else if cert.progress.failed_stage == Some(ReplayStage::Publication) {
+                "publication"
+            } else if cert.progress.failed_stage.is_some() {
+                "certificate_replay"
+            } else {
+                "group"
+            },
+            disposition: if state.failed || state.final_staging_stop.is_some() {
+                "failed"
+            } else if report.group_domain_complete {
+                "complete"
+            } else {
+                "censored"
+            },
+            cause: if let Some(stop) = state.final_staging_stop {
+                if matches!(
+                    state.publication_error,
+                    Some(WitnessError::IndeterminateIo(_))
+                ) {
+                    "indeterminate_io"
+                } else {
+                    group_cause(stop)
+                }
+            } else if !entered_group {
+                if state.linear_stop.is_some() {
+                    "linear_stop"
+                } else {
+                    "native_stop"
+                }
+            } else if matches!(
+                state.publication_error,
+                Some(WitnessError::IndeterminateIo(_))
+            ) {
+                "indeterminate_io"
+            } else {
+                group_cause(report.stop)
+            },
+            native_stop: Some(stop_name(phase.report.stop)),
+            linear_stop: state.linear_stop,
+            group_stop: entered_group.then_some(report.stop),
+            search_phase: if !entered_group {
+                "not_started"
+            } else if report.group_domain_complete {
+                "finished"
+            } else if report.origin == GroupOrigin::IndependentGroupPrefix {
+                "independent_prefix"
+            } else {
+                "native_lifts"
+            },
+            accounting: Accounting {
+                counter_snapshot_stage: "before_terminal_retention",
+                pools: [
+                    PoolView {
+                        name: "algebra",
+                        parent: "root",
+                        work_limit: p.ledger.work_limit,
+                        reserved_work: p.ledger.reserved_work,
+                        performed_work: Some(p.ledger.performed_work),
+                    },
+                    PoolView {
+                        name: "checking",
+                        parent: "root",
+                        work_limit: p.checking_work + p.checking_reserved_work,
+                        reserved_work: p.checking_reserved_work,
+                        performed_work: Some(p.checking_performed_work),
+                    },
+                    PoolView {
+                        name: "native",
+                        parent: "algebra",
+                        work_limit: settled.supplied.work,
+                        reserved_work: settled.consumed.work,
+                        performed_work: None,
+                    },
+                    PoolView {
+                        name: "observer",
+                        parent: "algebra",
+                        work_limit: observer.supplied.work,
+                        reserved_work: observer.consumed.work,
+                        performed_work: Some(state.observer_performed),
+                    },
+                    PoolView {
+                        name: "capture",
+                        parent: "checking",
+                        work_limit: state.budget.reserved_work,
+                        reserved_work: state.budget.reserved_work,
+                        performed_work: Some(state.budget.performed_work),
+                    },
+                    PoolView {
+                        name: "terminal",
+                        parent: "algebra",
+                        work_limit: p.terminal.work_limit,
+                        reserved_work: p.terminal.reserved_work,
+                        performed_work: Some(terminal_performed_before),
+                    },
+                ],
+                requested_bytes: ByteAccounting {
+                    limit: p.ledger.bytes_limit,
+                    reserved: p.ledger.reserved_bytes,
+                },
+                group: GroupAccounting {
+                    addition_limit: p.group_control.addition_limit,
+                    additions_reserved: p.group_control.additions_reserved,
+                    additions_performed: p.group_control.additions_performed,
+                    tuple_limit: p.group_control.tuple_limit,
+                    tuples_reserved: p.group_control.tuples,
+                },
+                traversal: TraversalAccounting {
+                    native_lifts_visited: report.native_lifts_visited,
+                    independent_visited: report.independent_visited,
+                    independent_total: report.independent_total,
+                },
+                events: EventAccounting {
+                    limit: 4096,
+                    global_acknowledged: p.observer.acknowledged as u64,
+                    setup: p.observer.setup as u64,
+                    native: p.observer.native as u64,
+                    linear: p.observer.linear as u64,
+                    group: p.observer.group as u64,
+                    new_payload: state.new_payload as u64,
+                    attempted: p.observer.attempted as u64,
+                    pending: u64::from(p.observer.pending.is_some()),
+                },
+            },
+            source_slots,
+            last_state,
+            first_certificate,
+            claims: Claims {
+                solver_completed: report.group_domain_complete && !state.failed,
+                group_domain_complete: report.group_domain_complete,
+                negative_verified: report.group_domain_complete && !cert.facts.computed,
+                pdp_witness_verified: cert.facts.local_replay_complete,
+                certificate_durably_persisted: cert.facts.durable_acknowledged,
+                independent_derivation_verified: false,
+                operation_trajectory_verified: false,
+            },
+        };
+        // Borrow views from disjoint fields; slot7 is never a source reference.
+        let mut output = InputBuffer {
+            bytes: std::mem::take(&mut p.slots.buffers[7].bytes),
+            logical_cap: 65536,
+        };
+        let result = encode_complete(&record, &mut output, &mut local);
+        p.slots.buffers[7].bytes = output.bytes;
+        result
+    })();
+    p.terminal.performed_work += local.performed_work;
+    p.ledger.performed_work += local.performed_work;
+    p.step4.terminal_retained = result.is_ok();
+    result
+}
+/// Consumes already admitted owners; does not publish or imply registration.
+/// Unacknowledged slot6 is deliberately omitted from the promoted witness role.
+pub(super) fn take_step4_artifacts(p: &mut PreparedOriginal) -> Result<Vec<ArtifactPayload>, Stop> {
+    if !p.step4.prepared || p.step4.final_artifacts.len() != 8 {
+        return Err(Stop::InvalidInput);
+    }
+    for i in 0..8 {
+        if i != 6 {
+            p.step4.final_artifacts[i].bytes = std::mem::take(&mut p.slots.buffers[i].bytes);
+        }
+    }
+    let mut out = std::mem::take(&mut p.step4.final_artifacts);
+    out.retain(|a| !a.bytes.is_empty());
+    Ok(out)
+}
+
+/// Idempotent final staging uses the same byte owner and persistent budget.
+/// Call before terminal sealing and before moving final owners to the parent.
+pub(super) fn confirm_step4_witness<P: WitnessPublisher>(
+    p: &mut PreparedOriginal,
+    publisher: &mut P,
+) -> Result<(), GroupStop> {
+    if !p.step4.certificate.facts.durable_acknowledged {
+        return Ok(());
+    }
+    if !p.step4.transferred || p.step4.final_artifacts.len() != 8 {
+        return Err(GroupStop::InvalidState);
+    }
+    let mut checking = Ledger::new(p.checking_work, 0, p.original_deadline);
+    let result = (|| {
+        p.step4
+            .budget
+            .set_exclusive_supply(
+                checking.work_limit,
+                p.ledger.bytes_limit - p.ledger.reserved_bytes,
+            )
+            .map_err(witness_error)?;
+        let before = (
+            p.step4.budget.reserved_work,
+            p.step4.budget.performed_work,
+            p.step4.budget.reserved_bytes,
+        );
+        let global_before = p.observer.acknowledged;
+        let receipt = publisher.publish(
+            &p.step4.final_artifacts[6].bytes,
+            &mut p.step4.budget,
+            &mut p.observer.acknowledged,
+        );
+        settle_witness(p, &mut checking, before)?;
+        let receipt = receipt.map_err(|e| {
+            p.step4.publication_error = Some(e);
+            witness_error(e)
+        })?;
+        let first = p.step4.certificate.receipt.ok_or(GroupStop::InvalidState)?;
+        if receipt.commit != WitnessCommit::AlreadyCommitted
+            || p.observer.acknowledged != global_before
+            || receipt.payload_sha256 != first.payload_sha256
+            || receipt.payload_bytes != first.payload_bytes
+            || receipt.sequence != first.sequence
+            || receipt.provenance != first.provenance
+        {
+            return Err(GroupStop::PersistenceFailure);
+        }
+        Ok(())
+    })();
+    p.checking_work -= checking.reserved_work;
+    p.checking_reserved_work += checking.reserved_work;
+    p.checking_performed_work += checking.performed_work;
+    if result.is_err() {
+        p.step4.failed = true;
+        p.step4.final_staging_stop = result.as_ref().err().copied();
+    }
+    result
+}
+
+/// Read-only early-failure custody fallback. No new owner/metadata allocation,
+/// no fabricated terminal/group execution and no promoted unpublished witness.
+/// Callback storage/hashing remains the existing outer custody boundary.
+fn visit_slots<F: FnMut(&'static str, &'static str, &'static str, &[u8]) -> Result<(), ()>>(
+    slots: &Slots,
+    mut forward: F,
+) -> Result<(), ()> {
+    for (i, &(path, role, encoding)) in SLOT_REGISTRY.iter().enumerate() {
+        if i == 6 || slots.buffers[i].bytes.is_empty() {
+            continue;
+        }
+        forward(path, role, encoding, &slots.buffers[i].bytes)?;
+    }
+    Ok(())
+}
+pub(super) fn visit_prepare_failure_artifacts<
+    F: FnMut(&'static str, &'static str, &'static str, &[u8]) -> Result<(), ()>,
+>(
+    failure: &PrepareFailure,
+    forward: F,
+) -> Result<(), ()> {
+    if let Some(slots) = &failure.retained_slots {
+        visit_slots(slots, forward)
+    } else {
+        Ok(())
+    }
+}
+pub(super) fn visit_step4_retained_artifacts<
+    F: FnMut(&'static str, &'static str, &'static str, &[u8]) -> Result<(), ()>,
+>(
+    p: &PreparedOriginal,
+    mut forward: F,
+) -> Result<(), ()> {
+    visit_slots(&p.slots, &mut forward)?;
+    if p.step4.certificate.facts.durable_acknowledged {
+        let bytes = if p.step4.transferred {
+            &p.step4.final_artifacts.get(6).ok_or(())?.bytes
+        } else {
+            &p.slots.buffers[6].bytes
+        };
+        if bytes.is_empty() {
+            return Err(());
+        }
+        let (path, role, encoding) = SLOT_REGISTRY[6];
+        forward(path, role, encoding, bytes)?;
+    }
+    Ok(())
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3689,6 +5290,7 @@ mod tests {
         let mut capture = TypedEventBuffer::try_new(CAPTURE_CAP, CAPTURE_CAP + 128).unwrap();
         let mut state = ObserverState {
             acknowledged: 0,
+            attempted: 0,
             setup: 0,
             native: 0,
             linear: 0,
@@ -4662,6 +6264,10 @@ mod tests {
                     let mut l = ledger();
                     let actual = group_add(&setup.field, a, left, right, &mut l).unwrap();
                     assert_eq!(
+                        canonical_add(p, a, left, right, &mut ledger()).unwrap(),
+                        actual
+                    );
+                    assert_eq!(
                         actual, expected,
                         "p={p} a={a} b={b} left={left:?} right={right:?}"
                     );
@@ -4933,5 +6539,857 @@ mod tests {
         let parsed: RowWire = serde_json::from_slice(&serde_json::to_vec(&row).unwrap()).unwrap();
         assert_eq!(parsed.cursor, "340282366920938463463374607431768211455");
         assert_eq!(parsed.cursor.parse::<u128>().unwrap(), u128::MAX);
+    }
+    #[derive(Default)]
+    struct FakeWitness {
+        bytes: Vec<u8>,
+        calls: usize,
+        refuse: bool,
+    }
+    impl WitnessPublisher for FakeWitness {
+        fn prepare(&mut self, _: &mut WitnessBudget) -> Result<(), WitnessError> {
+            Ok(())
+        }
+        fn publish(
+            &mut self,
+            bytes: &[u8],
+            _: &mut WitnessBudget,
+            global: &mut usize,
+        ) -> Result<WitnessReceipt, WitnessError> {
+            self.calls += 1;
+            if self.refuse {
+                return Err(WitnessError::Failed);
+            }
+            let new = self.bytes.is_empty();
+            if new {
+                self.bytes.extend_from_slice(bytes);
+                *global += 1;
+            } else if self.bytes != bytes {
+                return Err(WitnessError::Integrity);
+            }
+            Ok(WitnessReceipt {
+                commit: if new {
+                    WitnessCommit::NewCommit
+                } else {
+                    WitnessCommit::AlreadyCommitted
+                },
+                payload_sha256: crate::hash::sha256(bytes),
+                payload_bytes: bytes.len() as u64,
+                sequence: Some(7),
+                provenance: crate::ml_dataset::capture::WitnessProvenance::Dedicated,
+            })
+        }
+    }
+    fn step4_fixture(target: AffinePoint, publisher: &mut FakeWitness) -> NativePhase {
+        let mut p = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 0,
+                b: 7,
+                target_x: target.x,
+                codes: &[6],
+            },
+            target,
+            &[AffinePoint { x: 6, y: 18 }, AffinePoint { x: 6, y: 83 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        prepare_step4(&mut p, publisher).unwrap();
+        invoke_original(p, &mut |_, _| Ok(())).unwrap()
+    }
+    #[test]
+    fn step4_fresh_canonical_group_arithmetic_and_exact_admission() {
+        for (prime, a, b, points) in [
+            (
+                101,
+                0,
+                7,
+                vec![
+                    AffinePoint { x: 6, y: 18 },
+                    AffinePoint { x: 6, y: 83 },
+                    AffinePoint { x: 98, y: 9 },
+                ],
+            ),
+            (
+                101,
+                0,
+                1,
+                vec![
+                    AffinePoint { x: 0, y: 1 },
+                    AffinePoint { x: 0, y: 100 },
+                    AffinePoint { x: 2, y: 3 },
+                ],
+            ),
+        ] {
+            let f = field(prime);
+            for &q in &points {
+                for &r in &points {
+                    let mut checked = ledger();
+                    replay_on_curve(prime, a, b, q, &mut checked).unwrap();
+                    let expected = group_add(
+                        &f.field,
+                        a,
+                        SmallPoint::Affine(q),
+                        SmallPoint::Affine(r),
+                        &mut ledger(),
+                    )
+                    .unwrap();
+                    let mut exact = Ledger::new(4096, 0, Instant::now() + Duration::from_secs(10));
+                    assert_eq!(
+                        canonical_add(
+                            prime,
+                            a,
+                            SmallPoint::Affine(q),
+                            SmallPoint::Affine(r),
+                            &mut exact
+                        ),
+                        Ok(expected)
+                    );
+                    assert_eq!(exact.reserved_work, 4096);
+                    let mut short = Ledger::new(4095, 0, Instant::now() + Duration::from_secs(10));
+                    assert_eq!(
+                        canonical_add(
+                            prime,
+                            a,
+                            SmallPoint::Affine(q),
+                            SmallPoint::Affine(r),
+                            &mut short
+                        ),
+                        Err(GroupStop::CheckWorkLimit)
+                    );
+                    assert_eq!(short.reserved_work, 0);
+                }
+            }
+        }
+    }
+    #[test]
+    fn step4_first_witness_bytes_survive_later_matches_and_ninth_owner() {
+        let mut publisher = FakeWitness::default();
+        let mut phase = step4_fixture(AffinePoint { x: 98, y: 9 }, &mut publisher);
+        phase.prepared.group_control.tuple_limit = 5;
+        let native = phase.prepared.observer.native;
+        let report = run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        assert_eq!(report.stop, GroupStop::TupleLimit);
+        assert!(report.pdp_witness_verified && report.certificate_durably_persisted);
+        assert_eq!(publisher.calls, 1);
+        assert_eq!(
+            &phase.prepared.step4.certificate.identity.unwrap().indices[..4],
+            &[0, 0, 0, 1]
+        );
+        assert_eq!(
+            phase.prepared.step4.final_artifacts[6].bytes,
+            publisher.bytes
+        );
+        assert!(phase.prepared.slots.buffers[6].bytes.is_empty());
+        let global = phase.prepared.observer.acknowledged;
+        confirm_step4_witness(&mut phase.prepared, &mut publisher).unwrap();
+        assert_eq!(publisher.calls, 2);
+        assert_eq!(phase.prepared.observer.acknowledged, global);
+        assert_eq!(phase.prepared.observer.native, native);
+        retain_step4_terminal(&mut phase).unwrap();
+        let record: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[7].bytes).unwrap();
+        assert_eq!(record["source_slots"].as_array().unwrap().len(), 7);
+        assert_eq!(record["source_slots"][6]["state"], "transferred");
+        assert_eq!(
+            record["source_slots"][0]["digest_binding"],
+            "outer_manifest"
+        );
+        assert!(record["source_slots"][0]["sha256"].is_null());
+        assert_eq!(
+            record["first_certificate"]["facts"]["final_artifact_registered"],
+            false
+        );
+        let pointer = phase.prepared.step4.final_artifacts.as_ptr();
+        let capacity = phase.prepared.step4.final_artifacts.capacity();
+        let mut artifacts = take_step4_artifacts(&mut phase.prepared).unwrap();
+        assert_eq!(artifacts.as_ptr(), pointer);
+        assert!(capacity >= 9);
+        artifacts.push(ArtifactPayload {
+            path: "solver-domain.json".into(),
+            role: "solver-domain".into(),
+            encoding: "json".into(),
+            bytes: b"{}".to_vec(),
+        });
+        assert_eq!(artifacts.as_ptr(), pointer);
+        assert_eq!(artifacts.capacity(), capacity);
+    }
+    #[test]
+    fn step4_publication_refusal_preserves_local_math_and_stops() {
+        let mut publisher = FakeWitness {
+            refuse: true,
+            ..FakeWitness::default()
+        };
+        let mut phase = step4_fixture(AffinePoint { x: 84, y: 12 }, &mut publisher);
+        let report = run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        assert_eq!(report.stop, GroupStop::PersistenceFailure);
+        assert_eq!(report.tuples_reserved, 1);
+        let facts = phase.prepared.step4.certificate.facts;
+        assert!(
+            facts.computed
+                && facts.local_replay_complete
+                && facts.publication_attempted
+                && !facts.durable_acknowledged
+        );
+        assert!(!phase.prepared.step4.transferred);
+        assert_eq!(publisher.calls, 1);
+        let artifacts = take_step4_artifacts(&mut phase.prepared).unwrap();
+        assert!(!artifacts.iter().any(|a| a.path == "pdp-witness.json"));
+    }
+    #[test]
+    fn step4_replay_rejects_tampered_prefix_and_preserves_reservations() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert!(report.computed_match);
+        let id = phase.prepared.step4.certificate.identity.unwrap();
+        phase.prepared.workspace.group.prefix[0] = SmallPoint::Infinity;
+        let mut progress = ReplayProgress::default();
+        let mut checking = ledger();
+        let before = phase.prepared.group_control.additions_reserved;
+        assert_eq!(
+            replay_match(&mut phase.prepared, false, id, &mut checking, &mut progress),
+            Err(GroupStop::InvalidCandidate)
+        );
+        assert_eq!(phase.prepared.group_control.additions_reserved, before + 4);
+        assert_eq!(progress.additions_performed, 2);
+        assert_eq!(progress.failed_stage, Some(ReplayStage::PrefixCompare));
+        assert!(checking.reserved_work > checking.performed_work);
+    }
+    #[test]
+    fn step4_replay_original_equations_and_domain_are_independently_checked() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        let id = phase.prepared.step4.certificate.identity.unwrap();
+        phase.prepared.workspace.group.residues[0] = 1;
+        assert_eq!(
+            replay_match(
+                &mut phase.prepared,
+                false,
+                id,
+                &mut ledger(),
+                &mut ReplayProgress::default()
+            ),
+            Err(GroupStop::OriginalEquationMismatch)
+        );
+        phase.prepared.workspace.group.domain[0] = SmallPoint::Affine(AffinePoint { x: 6, y: 19 });
+        assert_eq!(
+            replay_match(
+                &mut phase.prepared,
+                false,
+                id,
+                &mut ledger(),
+                &mut ReplayProgress::default()
+            ),
+            Err(GroupStop::InvalidDomain)
+        );
+    }
+    #[test]
+    fn step4_terminal_single_ticket_failure_clears_slot_and_keeps_witness() {
+        let mut publisher = FakeWitness::default();
+        let mut phase = step4_fixture(AffinePoint { x: 84, y: 12 }, &mut publisher);
+        phase.prepared.group_control.tuple_limit = 1;
+        run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        let bytes = publisher.bytes.clone();
+        phase.prepared.terminal.work_limit = phase.prepared.terminal.reserved_work + 4097;
+        assert!(retain_step4_terminal(&mut phase).is_err());
+        assert_eq!(
+            phase.prepared.terminal.reserved_work,
+            phase.prepared.terminal.work_limit
+        );
+        assert!(phase.prepared.slots.buffers[7].bytes.is_empty());
+        assert!(phase.prepared.step4.certificate.facts.durable_acknowledged);
+        assert_eq!(phase.prepared.step4.final_artifacts[6].bytes, bytes);
+    }
+    #[test]
+    fn step4_complete_serializer_exact_work_bytes_and_no_partial_promotion() {
+        let record = serde_json::json!({"cursor":"340282366920938463463374607431768211455","verified":false});
+        let mut measured = ledger();
+        let mut slot = InputBuffer::new(1024, &mut ledger()).unwrap();
+        encode_complete(&record, &mut slot, &mut measured).unwrap();
+        let work = measured.reserved_work;
+        let length = slot.bytes.len();
+        for (w, cap, ok) in [
+            (work, length, true),
+            (work - 1, length, false),
+            (work, length - 1, false),
+        ] {
+            let mut budget = Ledger::new(w, 0, Instant::now() + Duration::from_secs(10));
+            let mut output = InputBuffer::new(cap, &mut ledger()).unwrap();
+            assert_eq!(
+                encode_complete(&record, &mut output, &mut budget).is_ok(),
+                ok
+            );
+            if !ok {
+                assert!(output.bytes.is_empty());
+            }
+        }
+    }
+    #[test]
+    fn step4_replay_deadline_and_exact_work_leave_monotone_receipts() {
+        fn prepared() -> NativePhase {
+            let mut p = group_test_phase(AffinePoint { x: 84, y: 12 });
+            run_group_prefixes(&mut p, None, &mut |_, _| Ok(()));
+            p
+        }
+        let mut phase = prepared();
+        let id = phase.prepared.step4.certificate.identity.unwrap();
+        let mut measured = ledger();
+        replay_match(
+            &mut phase.prepared,
+            false,
+            id,
+            &mut measured,
+            &mut ReplayProgress::default(),
+        )
+        .unwrap();
+        let work = measured.reserved_work;
+        for (limit, ok) in [(work, true), (work - 1, false)] {
+            let mut phase = prepared();
+            let mut check = Ledger::new(limit, 0, Instant::now() + Duration::from_secs(10));
+            assert_eq!(
+                replay_match(
+                    &mut phase.prepared,
+                    false,
+                    id,
+                    &mut check,
+                    &mut ReplayProgress::default()
+                )
+                .is_ok(),
+                ok
+            );
+        }
+        fn expire(leaf: usize, l: &mut Ledger) {
+            if leaf == 2 {
+                l.deadline = Instant::now() - Duration::from_secs(1);
+            }
+        }
+        let mut phase = prepared();
+        let rows = phase.prepared.slots.buffers[5].bytes.clone();
+        let mut progress = ReplayProgress::default();
+        let mut check = ledger();
+        REPLAY_ADDITION_HOOK.with(|h| h.set(Some(expire)));
+        let result = replay_match(&mut phase.prepared, false, id, &mut check, &mut progress);
+        REPLAY_ADDITION_HOOK.with(|h| h.set(None));
+        assert_eq!(result, Err(GroupStop::Deadline));
+        assert_eq!(progress.additions_reserved, 4);
+        assert_eq!(progress.additions_performed, 2);
+        assert!(check.reserved_work > check.performed_work);
+        assert_eq!(phase.prepared.slots.buffers[5].bytes, rows);
+    }
+    #[test]
+    fn step4_exceptional_group_witness_and_unit_affine_contradiction() {
+        let mut phase = group_test_phase(AffinePoint { x: 98, y: 9 });
+        let g = &mut phase.prepared.workspace.group;
+        g.tuple[..4].copy_from_slice(&[0, 1, 0, 0]);
+        g.prefix[..3].copy_from_slice(&[
+            SmallPoint::Infinity,
+            SmallPoint::Affine(AffinePoint { x: 6, y: 18 }),
+            SmallPoint::Affine(AffinePoint { x: 98, y: 9 }),
+        ]);
+        let mut id = FirstIdentity {
+            origin: GroupOrigin::IndependentGroupPrefix,
+            phase: SearchPhase::IndependentPrefix,
+            cursor: 4,
+            indices: [0; 15],
+            exception_mask: 1,
+            coordinates_match: None,
+        };
+        id.indices[..4].copy_from_slice(&[0, 1, 0, 0]);
+        let mut progress = ReplayProgress::default();
+        replay_match(&mut phase.prepared, true, id, &mut ledger(), &mut progress).unwrap();
+        assert_eq!(progress.equation_checks_completed, 0);
+        assert_eq!(progress.additions_performed, 4);
+        let mut affine = group_test_phase(AffinePoint { x: 84, y: 12 });
+        run_group_prefixes(&mut affine, None, &mut |_, _| Ok(()));
+        let id = affine.prepared.step4.certificate.identity.unwrap();
+        assert_eq!(
+            replay_match(
+                &mut affine.prepared,
+                true,
+                id,
+                &mut ledger(),
+                &mut ReplayProgress::default()
+            ),
+            Err(GroupStop::NativeContradiction)
+        );
+    }
+    #[test]
+    fn step4_witness_serialization_all_arities_strict_cursor_and_options() {
+        let domain = [SmallPoint::Affine(AffinePoint {
+            x: (1 << 61) - 1,
+            y: (1 << 61) - 1,
+        }); 64];
+        let indices = [63usize; 15];
+        for m in 4..=15 {
+            for origin in [
+                GroupOrigin::ReportedBasisLinearCandidate,
+                GroupOrigin::ReportedBasisLeafLift,
+                GroupOrigin::IndependentGroupPrefix,
+            ] {
+                for relation in [None, Some(false), Some(true)] {
+                    let record = DynamicWitness {
+                        schema: "restricted-wide-prime-dynamic-witness/v1",
+                        summands: SummandsView {
+                            domain: &domain,
+                            indices: &indices[..m],
+                        },
+                        target: CanonicalPointView(domain[0]),
+                        sum: CanonicalPointView(domain[0]),
+                        replay_group_add_calls: m as u64,
+                        certificate_origin: origin,
+                        search_phase: SearchPhase::IndependentPrefix,
+                        source_cursor: u128::MAX,
+                        tuple_indices: &indices[..m],
+                        candidate_coordinates_match: relation,
+                        exceptional_auxiliary_positions: ExceptionView {
+                            mask: (1 << (m - 2)) - 1,
+                            m,
+                        },
+                        independent_derivation_verified: false,
+                    };
+                    let bytes = serde_json::to_vec(&record).unwrap();
+                    assert!(bytes.len() < 4096);
+                    #[derive(serde::Deserialize)]
+                    struct CursorOnly {
+                        source_cursor: String,
+                    }
+                    let decoded: CursorOnly = serde_json::from_slice(&bytes).unwrap();
+                    assert_eq!(decoded.source_cursor, u128::MAX.to_string());
+                    let mut slot = InputBuffer::new(bytes.len() + 1, &mut ledger()).unwrap();
+                    encode_complete(&record, &mut slot, &mut ledger()).unwrap();
+                    assert_eq!(&slot.bytes[..bytes.len()], bytes);
+                    assert_eq!(slot.bytes.last(), Some(&b'\n'));
+                }
+            }
+        }
+    }
+    #[test]
+    fn step4_terminal_max_arity_initialized_arrays_and_nullable_native_work() {
+        let mut publisher = FakeWitness::default();
+        let mut phase = step4_fixture(AffinePoint { x: 84, y: 12 }, &mut publisher);
+        phase.prepared.group_control.tuple_limit = 1;
+        run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        // Serializer-only fixed maxima: not an executed m15 mathematical run.
+        let p = &mut phase.prepared;
+        p.m = 15;
+        p.workspace.group.tuple.fill(63);
+        p.workspace
+            .group
+            .prefix
+            .fill(SmallPoint::Affine(AffinePoint {
+                x: (1 << 61) - 1,
+                y: (1 << 61) - 1,
+            }));
+        p.workspace.group.coordinates.fill((1 << 61) - 1);
+        p.workspace.group.residues.fill((1 << 61) - 1);
+        for i in 0..13 {
+            p.workspace.group.exceptional[i] = i;
+        }
+        let id = p.step4.certificate.identity.as_mut().unwrap();
+        id.indices.fill(63);
+        id.cursor = u128::MAX;
+        id.exception_mask = (1 << 13) - 1;
+        p.step4.last = LastProgress {
+            initialized: true,
+            origin: Some(GroupOrigin::ReportedBasisLinearCandidate),
+            cursor: u128::MAX,
+            complete: true,
+            coordinate_count: 28,
+            residue_count: 29,
+            exceptions: 13,
+            row: Some(RowReference {
+                row_index: u64::MAX,
+                offset: u64::MAX,
+                bytes: u64::MAX,
+            }),
+            metadata_acknowledged: true,
+        };
+        let report = p.step4.last_report.as_mut().unwrap();
+        report.completed_prefixes = 14;
+        report.cursor = u128::MAX;
+        report.native_lifts_visited = u128::MAX;
+        report.independent_visited = u128::MAX;
+        report.independent_total = u128::MAX;
+        retain_step4_terminal(&mut phase).unwrap();
+        let bytes = &phase.prepared.slots.buffers[7].bytes;
+        assert!(bytes.len() <= 65536);
+        let value: serde_json::Value = serde_json::from_slice(bytes).unwrap();
+        assert_eq!(
+            value["last_state"]["prefix_points"]
+                .as_array()
+                .unwrap()
+                .len(),
+            14
+        );
+        assert_eq!(
+            value["last_state"]["coordinates"].as_array().unwrap().len(),
+            28
+        );
+        assert_eq!(
+            value["last_state"]["residues"].as_array().unwrap().len(),
+            29
+        );
+        assert!(value["accounting"]["pools"][2]["performed_work"].is_null());
+        assert_eq!(value["accounting"]["pools"][0]["parent"], "root");
+    }
+    #[test]
+    fn step4_staged_legacy_exhaustion_is_not_completion() {
+        let p = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 1,
+                b: 0,
+                target_x: 3,
+                codes: &[0],
+            },
+            AffinePoint { x: 3, y: 38 },
+            &[AffinePoint { x: 0, y: 0 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let mut phase = invoke_original(p, &mut |_, _| Ok(())).unwrap();
+        let report = run_group_prefixes(&mut phase, None, &mut |_, _| Ok(()));
+        assert_eq!(report.stop, GroupStop::IndependentTraversalFinished);
+        assert!(!report.group_domain_complete);
+    }
+    #[test]
+    fn step4_final_confirmation_failure_does_not_erase_ack_or_claim_complete() {
+        let mut publisher = FakeWitness::default();
+        let mut phase = step4_fixture(AffinePoint { x: 84, y: 12 }, &mut publisher);
+        phase.prepared.group_control.tuple_limit = 1;
+        let report = run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        assert!(report.certificate_durably_persisted);
+        // Inject only terminal completed disposition to test precedence. This
+        // does not claim the bounded execution actually exhausted its domain.
+        let terminal = phase.prepared.step4.last_report.as_mut().unwrap();
+        terminal.stop = GroupStop::IndependentTraversalFinished;
+        terminal.group_domain_complete = true;
+        publisher.refuse = true;
+        assert_eq!(
+            confirm_step4_witness(&mut phase.prepared, &mut publisher),
+            Err(GroupStop::PersistenceFailure)
+        );
+        retain_step4_terminal(&mut phase).unwrap();
+        let v: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[7].bytes).unwrap();
+        assert_eq!(v["stage"], "final_staging");
+        assert_eq!(v["disposition"], "failed");
+        assert_eq!(v["cause"], "persistence_failure");
+        assert_eq!(v["claims"]["solver_completed"], false);
+        assert_eq!(v["claims"]["group_domain_complete"], true);
+        assert_eq!(
+            v["first_certificate"]["facts"]["durable_acknowledged"],
+            true
+        );
+    }
+    #[test]
+    fn step4_pre_group_terminal_and_early_failure_visitors_do_not_execute_group() {
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        phase.basis_retained = false;
+        extract_reported_linear(&mut phase);
+        assert!(!phase.prepared.group_control.started);
+        retain_step4_terminal(&mut phase).unwrap();
+        let v: serde_json::Value =
+            serde_json::from_slice(&phase.prepared.slots.buffers[7].bytes).unwrap();
+        assert_eq!(v["stage"], "linear");
+        assert_eq!(v["search_phase"], "not_started");
+        assert!(v["group_stop"].is_null() && v["last_state"].is_null());
+        assert_eq!(phase.prepared.group_control.tuples, 0);
+        let mut visited = 0;
+        visit_step4_retained_artifacts(&phase.prepared, |path, _, _, bytes| {
+            assert!(!bytes.is_empty());
+            assert_ne!(path, "pdp-witness.json");
+            visited += 1;
+            Ok(())
+        })
+        .unwrap();
+        assert!(visited >= 2);
+        let failure = PrepareFailure {
+            stop: Stop::Deadline,
+            ledger: phase.prepared.ledger,
+            setup_failure: None,
+            retained_slots: Some(phase.prepared.slots),
+        };
+        let mut recovered = 0;
+        visit_prepare_failure_artifacts(&failure, |_, _, _, _| {
+            recovered += 1;
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(recovered, visited);
+        assert_eq!(
+            visit_prepare_failure_artifacts(&failure, |_, _, _, _| Err(())),
+            Err(())
+        );
+    }
+    #[test]
+    fn step4_partial_owner_preparation_preserves_original_slot_custody() {
+        let mut p = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 0,
+                b: 7,
+                target_x: 84,
+                codes: &[6],
+            },
+            AffinePoint { x: 84, y: 12 },
+            &[AffinePoint { x: 6, y: 18 }, AffinePoint { x: 6, y: 83 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let input = p.slots.buffers[0].bytes.clone();
+        p.checking_work = 1;
+        assert!(prepare_step4(&mut p, &mut FakeWitness::default()).is_err());
+        assert!(!p.group_control.started);
+        let mut found = false;
+        visit_step4_retained_artifacts(&p, |path, _, _, bytes| {
+            if path == "prime-f4-input.json" {
+                assert_eq!(bytes, input);
+                found = true;
+            }
+            Ok(())
+        })
+        .unwrap();
+        assert!(found);
+    }
+    #[test]
+    fn step4_terminal_wide_typed_golden() {
+        let indices = [63usize; 15];
+        let points = [SmallPoint::Affine(AffinePoint {
+            x: (1 << 61) - 1,
+            y: (1 << 61) - 1,
+        }); 14];
+        let coordinates = [(1u64 << 61) - 1; 28];
+        let residues = [(1u64 << 61) - 1; 29];
+        let exceptions: [usize; 13] = std::array::from_fn(|i| i);
+        let record = DynamicResult {
+            schema: "restricted-wide-prime-dynamic-result/v1",
+            strategy: "prime_f4_wide_dynamic",
+            stage: "certificate_replay",
+            disposition: "censored",
+            cause: "serialization_failure",
+            native_stop: Some("exponent_overflow"),
+            linear_stop: Some(LinearStop::NonlinearOrUnderdetermined),
+            group_stop: Some(GroupStop::IndependentTraversalFinished),
+            search_phase: "independent_prefix",
+            accounting: Accounting {
+                counter_snapshot_stage: "before_terminal_retention",
+                pools: std::array::from_fn(|i| PoolView {
+                    name: [
+                        "algebra", "checking", "native", "observer", "capture", "terminal",
+                    ][i],
+                    parent: ["root", "root", "algebra", "algebra", "checking", "algebra"][i],
+                    work_limit: u64::MAX,
+                    reserved_work: u64::MAX,
+                    performed_work: if i == 2 { None } else { Some(u64::MAX) },
+                }),
+                requested_bytes: ByteAccounting {
+                    limit: u64::MAX,
+                    reserved: u64::MAX,
+                },
+                group: GroupAccounting {
+                    addition_limit: u64::MAX,
+                    additions_reserved: u64::MAX,
+                    additions_performed: u64::MAX,
+                    tuple_limit: u64::MAX,
+                    tuples_reserved: u64::MAX,
+                },
+                traversal: TraversalAccounting {
+                    native_lifts_visited: u128::MAX,
+                    independent_visited: u128::MAX,
+                    independent_total: u128::MAX,
+                },
+                events: EventAccounting {
+                    limit: u64::MAX,
+                    global_acknowledged: u64::MAX,
+                    setup: u64::MAX,
+                    native: u64::MAX,
+                    linear: u64::MAX,
+                    group: u64::MAX,
+                    new_payload: u64::MAX,
+                    attempted: u64::MAX,
+                    pending: u64::MAX,
+                },
+            },
+            source_slots: std::array::from_fn(|i| SlotEvidence {
+                index: i as u8,
+                state: if i == 6 {
+                    "transferred"
+                } else {
+                    "local_complete"
+                },
+                bytes: Some(u64::MAX),
+                digest_binding: if i == 6 {
+                    "capture_receipt"
+                } else {
+                    "outer_manifest"
+                },
+                sha256: if i == 6 {
+                    Some(HexDigest([255; 32]))
+                } else {
+                    None
+                },
+            }),
+            last_state: Some(LastState {
+                phase: SearchPhase::IndependentPrefix,
+                origin: GroupOrigin::ReportedBasisLinearCandidate,
+                cursor: u128::MAX,
+                tuple_indices: &indices,
+                progress: "complete_tuple",
+                tuple_entered: false,
+                completed_prefixes: 14,
+                prefix_points: PointSlice(&points),
+                exceptional_auxiliary_positions: &exceptions,
+                coordinate_count: 28,
+                coordinates: &coordinates,
+                residue_count: 29,
+                residues: &residues,
+                computed_match: false,
+                row: Some(RowReference {
+                    row_index: u64::MAX,
+                    offset: u64::MAX,
+                    bytes: u64::MAX,
+                }),
+                metadata_acknowledged: false,
+            }),
+            first_certificate: Some(FirstRecord {
+                lifecycle: CertificateLifecycle::ComputedPending,
+                identity: IdentityView {
+                    origin: GroupOrigin::ReportedBasisLinearCandidate,
+                    search_phase: SearchPhase::IndependentPrefix,
+                    source_cursor: u128::MAX,
+                    tuple_indices: &indices,
+                    exceptional_auxiliary_positions: ExceptionView {
+                        mask: (1 << 13) - 1,
+                        m: 15,
+                    },
+                    candidate_coordinates_match: Some(false),
+                },
+                facts: FirstFacts::default(),
+                replay: ReplayProgress {
+                    additions_reserved: u64::MAX,
+                    additions_performed: u64::MAX,
+                    equation_checks_completed: u16::MAX,
+                    coordinate_checks_completed: u16::MAX,
+                    failed_stage: Some(ReplayStage::OriginalEquations),
+                },
+                publication: PublicationView {
+                    state: "acknowledged",
+                    receipt: Some(ReceiptView {
+                        commit: "already_committed",
+                        payload_sha256: HexDigest([255; 32]),
+                        payload_bytes: u64::MAX,
+                        sequence: Some(u64::MAX),
+                        provenance: "dedicated",
+                    }),
+                },
+                witness_owner: "final_artifact",
+                witness_bytes: Some(u64::MAX),
+                witness_sha256: Some(HexDigest([255; 32])),
+            }),
+            claims: Claims {
+                solver_completed: false,
+                group_domain_complete: false,
+                negative_verified: false,
+                pdp_witness_verified: false,
+                certificate_durably_persisted: false,
+                independent_derivation_verified: false,
+                operation_trajectory_verified: false,
+            },
+        };
+        // Wide combinations deliberately exceed semantic caps; this is only a
+        // finite serialization bound, never a purported valid execution.
+        let bytes = serde_json::to_vec(&record).unwrap();
+        assert_eq!(bytes.len() + 1, 6789);
+        assert!(bytes.len() + 1 <= 65536);
+        let mut slot = InputBuffer::new(65536, &mut ledger()).unwrap();
+        let mut meter = ledger();
+        encode_complete(&record, &mut slot, &mut meter).unwrap();
+        assert_eq!(&slot.bytes[..bytes.len()], bytes);
+        assert_eq!(slot.bytes.last(), Some(&b'\n'));
+        // The byte bound does not authorize extra terminal work.
+        let mut short = Ledger::new(
+            meter.reserved_work - 1,
+            0,
+            Instant::now() + Duration::from_secs(10),
+        );
+        assert_eq!(
+            encode_complete(&record, &mut slot, &mut short),
+            Err(Stop::WorkLimit)
+        );
+        assert!(slot.bytes.is_empty());
+    }
+    #[test]
+    fn step4_actual_pre_group_producer_bytes_independently_replay() {
+        use super::super::prime_f4_wide_dynamic_replay as replay;
+        use sha2::{Digest, Sha256};
+        let mut phase = group_test_phase(AffinePoint { x: 84, y: 12 });
+        retain_step4_terminal(&mut phase).unwrap();
+        let domain = [replay::Point { x: 6, y: 18 }, replay::Point { x: 6, y: 83 }];
+        let expected = replay::Expected {
+            p: 101,
+            a: 0,
+            b: 7,
+            m: 4,
+            target: replay::Point { x: 84, y: 12 },
+            domain: &domain,
+            codes: &[6],
+            work_limit: 16384,
+            trace_bytes: 128 * 1024 * 1024,
+            memory_bytes: 256 * 1024 * 1024,
+        };
+        let limits = || replay::ReplayLimits {
+            work: 10_000_000_000,
+            allocation_bytes: 128 * 1024 * 1024,
+            deadline: Instant::now() + Duration::from_secs(20),
+        };
+        let verify = |raw: &[Vec<u8>; 8]| {
+            let slots = std::array::from_fn(|i| {
+                let bytes = &raw[i];
+                (!bytes.is_empty()).then(|| replay::Artifact {
+                    path: SLOT_REGISTRY[i].0,
+                    role: SLOT_REGISTRY[i].1,
+                    encoding: SLOT_REGISTRY[i].2,
+                    bytes,
+                    sha256: Sha256::digest(bytes).into(),
+                })
+            });
+            replay::verify(
+                &expected,
+                &replay::Bundle {
+                    slots,
+                    committed_witness: None,
+                },
+                limits(),
+            )
+        };
+        let raw: [Vec<u8>; 8] =
+            std::array::from_fn(|i| phase.prepared.slots.buffers[i].bytes.clone());
+        let result = verify(&raw).expect("actual pre-group producer output must replay");
+        assert!(result.original_input_verified);
+        assert!(!result.independent_group_domain_complete && !result.first_witness_verified);
+        for field in [
+            "independent_total",
+            "independent_visited",
+            "native_lifts_visited",
+        ] {
+            let mut altered = raw.clone();
+            let mut terminal: serde_json::Value = serde_json::from_slice(&altered[7]).unwrap();
+            terminal["accounting"]["traversal"][field] = serde_json::json!("1");
+            altered[7] = serde_json::to_vec(&terminal).unwrap();
+            assert!(
+                verify(&altered).is_err(),
+                "rehash cannot authorize changed {field}"
+            );
+        }
     }
 }
