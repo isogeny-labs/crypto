@@ -5,6 +5,7 @@
 
 namespace explicit_relations {
 using U = uint64_t;
+constexpr unsigned MAX_SLOTS = 12;
 // Canonical residues, 0 < modulus < 2^63. Every addition is <2*modulus,
 // hence fits u64. Used only for wider hash moduli; curve Montgomery stays
 // on its checked p<2^63 path; this helper retains its narrower bound.
@@ -267,7 +268,7 @@ RF_HD U lookup(const DenseRow *rows, U size, Point point) {
 }
 struct Bases {
   const Point *points;
-  U offset[9];
+  U offset[MAX_SLOTS + 1];
   unsigned slots;
 };
 RF_HD Jac tuple_sum(Curve c, Bases bases, unsigned first, unsigned end, U id) {

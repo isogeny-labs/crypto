@@ -320,6 +320,8 @@ impl SqrtContext {
 /// Explicit CPU reduction memory ceiling; callers must opt in above 512.
 /// Two dense triangular workspaces can require several GiB at this ceiling.
 pub const MAX_COLUMNS: usize = 16384;
+/// Bounded ordered factor-base slots shared with the standalone GPU service.
+pub const MAX_SLOTS: usize = 12;
 /// Bound inverse-hash enumeration, including independent certificate replay.
 pub const MAX_HASH_CANDIDATES: u64 = 1 << 24;
 
@@ -713,7 +715,7 @@ impl DecompositionOracle for Enumerate {
         max_work: u64,
     ) -> Result<Option<Vec<Point>>, Error> {
         if bases.len() < 2
-            || bases.len() > 8
+            || bases.len() > MAX_SLOTS
             || !curve.contains(target)
             || bases.iter().any(|b| {
                 b.iter().any(|&a| a.is_none() || !curve.contains(a))
@@ -760,7 +762,7 @@ impl DecompositionOracle for Enumerate {
 /// Bounded reduction parameters. Bounds make exhaustion explicit.
 #[derive(Clone, Debug)]
 pub struct Config {
-    /// Number of ordered factor-base slots, 2 through 8.
+    /// Number of ordered factor-base slots, 2 through MAX_SLOTS.
     pub m: usize,
     /// Override the Lemma 13 threshold; `None` uses its integer ceiling.
     pub tau: Option<u64>,
@@ -1037,7 +1039,7 @@ fn solve_reduction<const PROFILE: bool>(
     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
         return Err(Error::Invalid("generator or target"));
     }
-    if !(2..=8).contains(&config.m)
+    if !(2..=MAX_SLOTS).contains(&config.m)
         || config.max_trials == 0
         || config.max_trials > 1000
         || config.max_columns == 0
@@ -1398,7 +1400,7 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
             Err(Error::Verification)
         };
     }
-    if !(2..=8).contains(&cert.hashes.len()) {
+    if !(2..=MAX_SLOTS).contains(&cert.hashes.len()) {
         return Err(Error::Verification);
     }
     let bases = enumerate_hash_bases(curve, &cert.hashes)?;
@@ -1443,6 +1445,71 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn twelve_slot_replay_and_bounded_oracle() {
+        let (curve, p) = fixture();
+        let q = curve.mul(p, 42).unwrap();
+        // Public known-answer certificate: each separate slot contains P only.
+        // enc(P)=7, hence (enc(P)+424) mod431=0 is the sole accepted encoding.
+        let hash = HashBase {
+            s: 431,
+            alpha: 1,
+            beta: 424,
+            tau: 1,
+        };
+        assert_eq!(hash.enumerate(&curve).unwrap(), vec![p]);
+        for m in [9, 10, MAX_SLOTS] {
+            let bases = vec![vec![p]; m];
+            let target = curve.mul(p, m as u64).unwrap();
+            assert_eq!(
+                Enumerate.find(&curve, &bases, target, 1).unwrap(),
+                Some(vec![p; m])
+            );
+            assert_eq!(Enumerate.find(&curve, &bases, None, 1).unwrap(), None);
+            let mut relations = vec![
+                Relation {
+                    u: m as u64,
+                    v: 0,
+                    points: vec![p; m]
+                };
+                m + 1
+            ];
+            relations[m].u = (m as u64 + curve.r - 42) % curve.r;
+            relations[m].v = 1;
+            let mut dependency = vec![0; m + 1];
+            dependency[0] = 1;
+            dependency[m] = curve.r - 1;
+            let cert = Certificate {
+                scalar: 42,
+                hashes: vec![hash; m],
+                relations,
+                dependency,
+                trials: 1,
+                attempts: m + 1,
+            };
+            verify(&curve, p, q, &cert).unwrap();
+            let mut bad = cert.clone();
+            bad.relations[0].points.pop();
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+            bad = cert;
+            bad.hashes.resize(MAX_SLOTS + 1, hash);
+            assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+        }
+        let oversized = vec![vec![p]; MAX_SLOTS + 1];
+        assert!(matches!(
+            Enumerate.find(&curve, &oversized, p, 1),
+            Err(Error::Invalid("oracle input"))
+        ));
+        let config = Config {
+            m: MAX_SLOTS + 1,
+            ..Config::default()
+        };
+        assert!(matches!(
+            solve(&curve, p, q, &config),
+            Err(Error::Invalid("reduction bounds"))
+        ));
     }
 
     #[test]

@@ -946,3 +946,145 @@ Refresh this overview again with the actual new validation outcomes.
 ### Errors
 The original introductory source-only status and row-cap/domain descriptions
 had become stale as later PRs landed. Historical entries remain preserved.
+
+## 2026-10-30 20:12 UTC — v13 complete, v15 launched
+
+### What was done
+Collected v13 with all 12 prescribed recoveries, including both 62-bit targets.
+Raw results and source/instrument hashes are in `results-v13`; every certificate
+passed fresh CPU replay and scalar+1 rejection. Archive SHA256 is
+`f00ea3e1ef9d32ebbf2063cb43b99939a42a19f31085c0f1ccb1d32d8e083338`.
+Pod `7tugqyoxyvnikm` was deleted, with a fresh complete provider list confirming
+absence. Schema/file hashes/native strict coverage pass; five canonical
+nonrectangular-coverage findings are retained in CHECKER-NOTE.md.
+
+### Decisions made
+Preserve diagnostic L0 timing scope and every raw row. Both 62-bit cells actually
+cached all right rows; admission estimates are not peak VRAM. V15 launched only
+after v13 collection/deletion, pinned to `23dc8a61ca928e47237f8fb5a3a8d87228649628`
+and frozen protocol `8e079c9e143ddfcb00dcf66a5d5002d22e9ce7722291e14b4f28292c8eee65ad`.
+
+### Open threads
+Publish v13 inspected report after raw commit/push. V15 pod `ndiwvrvehbf4hy`
+started 20:10:04 UTC on one RTX PRO6000 at 2.49/hour; full preflight precedes
+matched 52-bit filter controls and two 63-bit targets. No v15 result yet.
+The full paper GPU tensor backend and matched-rho/external comparisons remain open.
+
+### Errors
+No v13 process failure. Canonical checker assumes rectangular arms by sizes,
+so its five findings remain explicit; no full checker-pass claim is made.
+
+## 2026-10-30 20:14 UTC — v13 report and v15 infrastructure failure
+
+### What was done
+Published v13 raw commit `84d5159e3635` before rendering the two-page report at
+`research/explicit_relations_e2e_20261030/reports/run-20261030T1757Z`.
+Both PDF pages were visually inspected; versioned catalog copies retain hashes.
+V15 stopped with bootstrap exit128 before compilation: partial-clone lazy
+checkout could not fetch Git blob `52a224ca9141900ae3779a85a56f3e810251d6d3`
+(`.artifacts.json`) because the public GitHub fetch requested authentication.
+
+### Decisions made
+Preserve the failed archive and delete the pod; do not label this a recovery
+panel or alter v15's one-attempt contract. Prepare a new frozen infrastructure
+attempt using the same measured source and unchanged instruments, with an
+offline-rehearsed source object pack instead of runtime GitHub lazy fetches.
+
+### Open threads
+Publish v15 failure custody and v16 freeze before another GPU launch. The
+63-bit arithmetic/filter remain unvalidated on GPU; no new recovery data exists.
+
+### Errors
+V15 pod `ndiwvrvehbf4hy` deleted with verified absence; controller1, bootstrap128.
+Failure archive SHA256 `ce7b1a34a7059c30331e4a9f9e3b34473c101be74d51c603cd2fd7db0ebe6554`.
+Typst CLI was absent; the existing Python Typst binding rendered the report.
+Poppler emitted a tagged-metadata warning but rendered both pages successfully.
+
+## 2026-10-30 20:18 UTC — source delivery repaired
+
+### What was done
+V15's zero-trial failure is preserved in `failed-launch-v15`, with its inspected
+one-page report at `reports/run-20261030T2010Z`. V16 is frozen at hash
+`fe424abdd265c0ded0c191edf1c36810d86a87163502a1497c2da43ffece378f`.
+Its source archive retains exact original commit `23dc8a61ca928e47237f8fb5a3a8d87228649628`;
+all 1030 materialized files match original Git blob IDs. S3 readback is byte-identical.
+
+### Decisions made
+Use the verified sparse checkout archive and unchanged run-filter instruments.
+Keep v15's one-attempt contract closed. The owner clarified reporting style:
+lead with completed component work; state concrete dependencies once where
+needed, while retaining exact checks, measured costs and failures.
+
+### Open threads
+Launch v16 after checkpoint, run all preflight checks, then six matched 52-bit
+controls and two 63-bit targets. Update this handoff with actual outcomes.
+
+### Errors
+An administrative catalog-copy script initially used the wrong JSON key;
+corrected to `files`, completed all v13 copies, and verified every catalog hash.
+The first v16 freeze call omitted the required draft freeze object; it was
+rejected before data, then corrected and successfully frozen.
+
+## 2026-10-30 20:21 UTC — cache documentation reconciled
+
+### What was done
+Updated PERSISTENT-QUERY.md and FULL-RIGHT-CACHE.md from pending-validation
+status to the completed v13 checks, exact cache rows and report links.
+V16 source extraction passed and CUDA compilation is underway on pod
+`omb2jpo4ntoq5g`; controller PID1044437 owns collection and deletion.
+
+### Decisions made
+Keep the frozen source and active run unchanged; these edits document completed
+component validation. Timings and memory admission estimates retain their labels.
+
+### Open threads
+V16 device preflight and recovery outcomes; current-head PR2996 checks.
+
+### Errors
+Artifact bot moved the large v13 validation log to its hash-addressed store;
+its commit was fast-forwarded into this branch without changing measured data.
+
+## 2026-10-30 20:27 UTC — twelve-slot implementation prepared
+
+### What was done
+Extended the native reduction/oracle/certificate bounds and GPU service plan
+arrays to12slots, keeping ordinary defaults and row/work/column caps unchanged.
+Added9/10/12slot device boundaries,13slot rejection, CPU service all-target
+checks and public known-answer Rust certificate/wire fixtures. Host C++ syntax
+and expanded all-target service checks pass; Rust/CUDA checks await the next
+separately pinned build. V16 remains on its original source and has begun its
+52-bit recovery controls after passing preflight.
+
+### Decisions made
+Read the supplied paper Section3.2 Lemmas9–10 and Section3.4 Figure2 before
+choosing this extension. More slots can reduce total base columns but change
+coverage and tuple work. ARITY.md records the concrete condition
+L >= max(r^(1/m),10m); automatic thresholds preserve it. Smaller explicit
+thresholds require empirical coverage accounting in a separate frozen panel.
+
+### Open threads
+Measure m10/m12 configurations only after correctness validation and a frozen
+comparison. Continue existing v16 filter/63-bit panel without modification.
+
+### Errors
+No host check failure. New Rust and device tests are not yet executed.
+
+## 2026-10-30 20:31 UTC — arity panel frozen
+
+### What was done
+Prepared/froze v17 at `d0c604c4d92ac0350f935547fe62247083698924c9c9e80eb68ceddbd39cc967`.
+The native instruments compile with warnings denied; shell and schema checks
+pass. ARITY-PANEL.md specifies all12cells, controls, bounds and threshold scope.
+
+### Decisions made
+Use one identical filtered service binary across m8/m10/m12 configurations.
+Compare recovered scalars across arities and certificate bytes only within the
+same arity. Upper-rung m10/m12 solves cap3600s each, preserving all four prescribed
+cells within the18000s worker envelope. Launch only after current v16 closes.
+
+### Open threads
+V16 first63-bit target is running. V17 has no pod/data; source/package preparation
+and fresh preflight remain. New twelve-slot tests still need Rust/device execution.
+
+### Errors
+No new failure. The current shared-host GPU is active; no duplicate task pod.

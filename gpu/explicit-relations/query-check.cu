@@ -297,6 +297,24 @@ int main() {
       if (c.lift(x, 0, q))
         ps.push_back(q);
     }
+    // Exercise every enlarged slot boundary with exact CPU witnesses, tails,
+    // empty reprepare and the same device storage used by each build variant.
+    for (unsigned slots : {9u, 10u, MAX_SLOTS}) {
+      std::vector<std::vector<Point>> bases(slots, {ps[0], ps[1]});
+      Plan p = plan(c, bases, 4096);
+      require(p.slots == slots && p.offsets[slots] == 2 * slots);
+      DeviceBackend device(c, 4096, 17);
+      HostBackend host(c, 4096, 17);
+      device.prepare(p); host.prepare(p);
+      for (Point target : {Point{}, ps[0], ps[1], ps.back()}) {
+        auto got = device.find(target, 8192), expected = host.find(target, 8192);
+        require(got.found == expected.found && got.indices == expected.indices);
+        if (got.found) require(got.indices.size() == slots);
+      }
+      bases.back().clear();
+      device.prepare(plan(c, bases, 4096));
+      require(!device.find(Point{}, 0).found);
+    }
     // Exercise automatic index admission and rebuilding through the public
     // backend, including a table with >=4096 rows and a partial query block.
     Curve wide = curve(65521, 0, 7);

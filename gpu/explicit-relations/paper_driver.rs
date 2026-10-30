@@ -78,7 +78,7 @@ fn decode_certificate(text: &str) -> Result<(Curve, Point, Point, paper::Certifi
     let trials = count(&mut words, 1000)?;
     let attempts = count(&mut words, 20 * (paper::MAX_COLUMNS + 1) * 1000)?;
     tag(&mut words, "hashes")?;
-    let m = count(&mut words, 8)?;
+    let m = count(&mut words, paper::MAX_SLOTS)?;
     let hashes = (0..m)
         .map(|_| {
             Ok(HashBase {
@@ -95,7 +95,7 @@ fn decode_certificate(text: &str) -> Result<(Curve, Point, Point, paper::Certifi
     for _ in 0..n {
         let u = num(&mut words)?;
         let v = num(&mut words)?;
-        let k = count(&mut words, 8)?;
+        let k = count(&mut words, paper::MAX_SLOTS)?;
         let points = (0..k)
             .map(|_| Ok(Some((num(&mut words)?, num(&mut words)?))))
             .collect::<Result<Vec<_>, Error>>()?;
@@ -411,5 +411,58 @@ fn main() {
     if let Err(error) = run() {
         eprintln!("{error}");
         std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod certificate_tests {
+    use super::*;
+
+    #[test]
+    fn twelve_slot_wire_roundtrip_and_excess_count_rejection() {
+        let c = Curve::new(211, 0, 7, 199).unwrap();
+        let p = Some((3, 33));
+        let q = c.mul(p, 42).unwrap();
+        let m = paper::MAX_SLOTS;
+        let mut relations = vec![
+            paper::Relation {
+                u: m as u64,
+                v: 0,
+                points: vec![p; m]
+            };
+            m + 1
+        ];
+        relations[m].u = (m as u64 + c.order() - 42) % c.order();
+        relations[m].v = 1;
+        let mut dependency = vec![0; m + 1];
+        dependency[0] = 1;
+        dependency[m] = c.order() - 1;
+        let cert = paper::Certificate {
+            scalar: 42,
+            hashes: vec![
+                HashBase {
+                    s: 431,
+                    alpha: 1,
+                    beta: 424,
+                    tau: 1
+                };
+                m
+            ],
+            relations,
+            dependency,
+            trials: 1,
+            attempts: m + 1,
+        };
+        let text = encode_certificate(&c, p, q, &cert).unwrap();
+        let (replayed_curve, rp, rq, decoded) = decode_certificate(&text).unwrap();
+        assert_eq!(decoded, cert);
+        paper::verify(&replayed_curve, rp, rq, &decoded).unwrap();
+        assert!(decode_certificate(
+            &text.replace(&format!("hashes {m}\n"), &format!("hashes {}\n", m + 1))
+        )
+        .is_err());
+        let mut excessive = cert;
+        excessive.relations[0].points.push(p);
+        assert!(decode_certificate(&encode_certificate(&c, p, q, &excessive).unwrap()).is_err());
     }
 }

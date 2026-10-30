@@ -70,14 +70,14 @@ inline U product(U a, U b) {
 }
 struct Plan {
   std::vector<Point> points;
-  U offsets[9]{};
+  U offsets[MAX_SLOTS + 1]{};
   unsigned slots = 0, split = 0;
   U left = 0, right = 0;
   Bases view(const Point *p) const {
     Bases b{};
     b.points = p;
     b.slots = slots;
-    std::copy(offsets, offsets + 9, b.offset);
+    std::copy(offsets, offsets + MAX_SLOTS + 1, b.offset);
     return b;
   }
   std::vector<U> indices(U l, U r) const {
@@ -97,7 +97,7 @@ struct Plan {
 };
 inline Plan plan(Curve c, const std::vector<std::vector<Point>> &bases,
                  U max_rows) {
-  if (bases.size() < 2 || bases.size() > 8 || !max_rows)
+  if (bases.size() < 2 || bases.size() > MAX_SLOTS || !max_rows)
     throw std::runtime_error("invalid base slots or row cap");
   Plan p;
   p.slots = (unsigned)bases.size();
