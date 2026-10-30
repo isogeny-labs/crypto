@@ -162,6 +162,10 @@ pub struct Ctx<'a> {
     pub deadline: Option<std::time::Instant>,
     ticks: u64,
     pub phases: BTreeMap<&'static str, u64>,
+    /// `(name, additions, doublings)` per phase in first-seen order.
+    pub phase_ops: Vec<(&'static str, u64, u64)>,
+    mark_adds: u64,
+    mark_doubles: u64,
     pub uncharged: BTreeMap<&'static str, u64>,
 }
 
@@ -176,6 +180,9 @@ impl<'a> Ctx<'a> {
             deadline: None,
             ticks: 0,
             phases: BTreeMap::new(),
+            phase_ops: Vec::new(),
+            mark_adds: 0,
+            mark_doubles: 0,
             uncharged: BTreeMap::new(),
         }
     }
@@ -188,7 +195,20 @@ impl<'a> Ctx<'a> {
     pub fn phase(&mut self, name: &'static str) {
         let t = self.total();
         *self.phases.entry(self.phase).or_insert(0) += t - self.mark;
+        let (da, dd) = (
+            self.ops.adds - self.mark_adds,
+            self.ops.doubles - self.mark_doubles,
+        );
+        match self.phase_ops.iter_mut().find(|(n, _, _)| *n == self.phase) {
+            Some(e) => {
+                e.1 += da;
+                e.2 += dd;
+            }
+            None => self.phase_ops.push((self.phase, da, dd)),
+        }
         self.mark = t;
+        self.mark_adds = self.ops.adds;
+        self.mark_doubles = self.ops.doubles;
         self.phase = name;
     }
 
@@ -341,6 +361,11 @@ pub struct Outcome {
     pub exponentiations: u64,
     pub table_points: u64,
     pub phases: BTreeMap<String, u64>,
+    /// `(name, additions, doublings)` per phase in execution order; the
+    /// phases with work only.
+    pub phase_ops: Vec<(String, u64, u64)>,
+    /// The whole ledger, field operations included.
+    pub group_ops: GroupOps,
     pub uncharged: BTreeMap<String, u64>,
     pub error: Option<String>,
 }
@@ -354,6 +379,13 @@ fn outcome(mut ctx: Ctx, alpha: Option<u64>, table_points: u64, error: Option<St
         doubles: ctx.ops.doubles,
         exponentiations: ctx.smul,
         table_points,
+        phase_ops: ctx
+            .phase_ops
+            .iter()
+            .filter(|(_, a, d)| a + d > 0)
+            .map(|(n, a, d)| (n.to_string(), *a, *d))
+            .collect(),
+        group_ops: ctx.ops,
         phases: ctx
             .phases
             .iter()
@@ -585,6 +617,10 @@ pub fn cheon_pplus1(
     ctx.deadline = deadline;
     if d == 0 || !(n + 1).is_multiple_of(d) || (pows.len() as u64) < 2 * d + 1 {
         return outcome(ctx, None, 0, Some("bad d or too few powers".into()));
+    }
+    // The coefficients below invert (2d)! modulo n, which is zero once 2d >= n.
+    if 2 * d >= n {
+        return outcome(ctx, None, 0, Some("2d must be below n".into()));
     }
     let Some(fac) = distinct_prime_factors(n + 1) else {
         return outcome(ctx, None, 0, Some("n + 1 not factored".into()));

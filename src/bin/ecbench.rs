@@ -554,6 +554,10 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// Name the static-DH oracle of the domain (an arm that queries
+        /// one must; a reference that does not may, to share the domain).
+        #[arg(long)]
+        oracle: Option<String>,
         /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
         /// re-derives records fitted before the version-2 refusals; new
         /// bounds are version 2.
@@ -1819,6 +1823,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 unit,
                 weight,
                 param_rule,
+                oracle,
                 fit_version,
                 out,
             } => {
@@ -1837,6 +1842,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         unit,
                         weight,
                         param_rule,
+                        oracle,
                         fit_version,
                     },
                     audit_refs: &[],
