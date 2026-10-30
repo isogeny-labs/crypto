@@ -42,6 +42,12 @@ R's crossing jets. Ordinary rational rank is insufficient: every denominator,
 
 ## Idea 2: optimize free jets instead of zeroing every derivative
 
+Follow-up: an [analytic degree-zero completion H](../prime_pole_anchor_20261030/README.md)
+now preserves the same nodes and gains one odd-level crossing bit with only
+one extra matrix degree in exact development checks. This advances the
+proposal without running the broader bounded search; its global integration
+and asymptotic improvement remain unproved.
+
 Let C(T) be the source's full nodal polynomial. Search in
 
     W_new(T) = W_base(T) + C(T) H(T).
