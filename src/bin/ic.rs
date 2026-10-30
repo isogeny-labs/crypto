@@ -666,3 +666,7 @@ mod cli_framework_contract_tests;
 #[cfg(test)]
 #[path = "../../tests/ic_progress.rs"]
 mod cli_progress_contract_tests;
+
+#[cfg(test)]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;

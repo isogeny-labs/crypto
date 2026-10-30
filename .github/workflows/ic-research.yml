@@ -47,7 +47,7 @@ jobs:
       - name: Parameter and synthetic pipeline checks
         env:
           IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
-        # These include the same two suites without Cargo building every bin.
+        # Run all three existing suites against the freshly built production CLI.
         run: cargo test --release --bin ic
       - name: Inspect supplied example documents
         run: |
