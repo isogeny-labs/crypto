@@ -18,13 +18,14 @@ theorem seven_sum {b : ℕ} (B : Fin b → E.Point) (v : Coeff b)
   rw [Finset.smul_sum]
   apply Finset.sum_eq_zero
   intro i hi
-  rw [smul_comm]
-  simp [hB i]
+  rw [smul_comm,hB i]
+  exact zsmul_zero (v i)
 
 theorem forward_sum {b : ℕ} (B : Fin b → E.Point) (v : Coeff b) :
     phi (∑ i, v i • B i)=∑ i, v i • phi (B i) := by
   change CM8Dual.forwardHom (∑ i, v i • B i)=_
   simp only [map_sum,map_zsmul]
+  rfl
 
 theorem forward_injective_on_seven (Q R : E.Point)
     (hQ : (7:ℕ) • Q=0) (hR : (7:ℕ) • R=0)
@@ -73,7 +74,7 @@ noncomputable def rowSpan {b : ℕ} (R : Finset (Coeff b)) :
   exact Submodule.span (ZMod 7) (↑(R.image reduce7) : Set (Vec7 b))
 noncomputable def usefulRank {b : ℕ} (L : Submodule (ZMod 7) (Vec7 b))
     (R : Finset (Coeff b)) : ℕ :=
-  Module.finrank (ZMod 7) (L ⊔ rowSpan R)-Module.finrank (ZMod 7) L
+  Module.finrank (ZMod 7) ↥(L ⊔ rowSpan R)-Module.finrank (ZMod 7) ↥L
 
 theorem actual_coefficient_spans_equal {b : ℕ} (V : Finset (Coeff b))
     (B : Fin b → E.Point) (Q : E.Point)
@@ -141,6 +142,21 @@ theorem qualified_span_inclusion {b : ℕ} (V : Finset (Coeff b))
   intro v hv
   simp only [admitted,Finset.mem_filter] at hv ⊢
   exact ⟨hv.1,hcompress v hv.1 hv.2⟩
+
+/-- Actual domain control: the forward map has nonzero rational 2-kernel. -/
+theorem source_kernel_nonzero : K ≠ (0:E.Point) := by decide +kernel
+
+theorem forward_not_globally_injective : ¬ Function.Injective phi := by
+  intro h
+  apply source_kernel_nonzero
+  apply h
+  simpa only [zero_image] using kernel_image
+
+theorem source_kernel_not_seven : (7:ℕ) • K ≠ (0:E.Point) := by decide +kernel
+
+#print axioms source_kernel_nonzero
+#print axioms forward_not_globally_injective
+#print axioms source_kernel_not_seven
 
 #print axioms seven_sum
 #print axioms forward_sum

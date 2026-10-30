@@ -50,3 +50,9 @@ all18previous source-bound polynomial records remain separate unchanged.
 No registry/catalog/benchmark/leaderboard/old frozen input/workflow change.
 Keep all library/naming/registry/coordination/CI/review/integration gates open;
 Conductor127/no lease,no duplicate writer,no rebase/force/merge/auto-merge.
+
+## Retained first attempt and explicit domain controls
+First build failed on zero-action simplification,forward-hom coercion and
+finrank submodule-to-type coercion. Exact source/log retained;no theorem or
+hypothesis weakened. Add actual sourceK=(10,0) nonzero/kernel/not7ann controls
+so the false full-group injectivity claim is explicitly rejected by Lean.
