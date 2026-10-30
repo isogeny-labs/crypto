@@ -630,6 +630,40 @@ closure degree.
 - **Disclosure.** The soundness rule was replaced after the data, because the
   satisfiable branches holding solutions ran out of memory (Amendment 1).
 
+## Invariant guess, eight more draws (2026-10-29): the invariant guess is better (p = 0.031)
+
+`research/dreg_invariant_guess_more_20261029/` (pre-registered on fresh draws
+7–39 of the same seeded sequence; `RESULTS.md`, `results.pdf`).
+
+- **Result.** On the 8 registered unsatisfiable draws, guessing `a₇ + b₇`
+  suffices on 5 and guessing `a₇` on 0.
+  - All 5 discordant draws favour the invariant (one-sided exact sign test
+    p = 0.031).
+  - With the four earlier draws: 6 of 6, p = 0.016, and 7 of 12 draws
+    against 1 of 12.
+- **What it contradicts.** The summand-dimension reading of §12 does not hold
+  at this cell: what governs refutation is the coordinate of `s`, not the
+  dimension of the summands.
+- **What it is.** A measured stage-level improvement in the guess-then-degree-4
+  oracle's guess choice.
+- **What it is not.** No row moves: the guess count at ℓ = 33 is still
+  extrapolated far above the break-even of 6.
+- **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
+## A second invariant guess (2026-10-29): not a substitute for the raw guess on x₃
+
+`research/dreg_invariant_pair_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with a second invariant coordinate of the
+pair, `a₆ + b₆`, on the same 12 draws.
+
+- **Result.** The new arm suffices on 2 of 12 draws, against S3's 7 of 12.
+  - All 5 discordant draws favour S3. The registered two-sided sign test gives
+    p = 0.0625, so the verdict is no detected difference.
+  - It is never better on any draw.
+- **What it means.** One invariant guess per summand pair is the useful part,
+  and the raw guess on the third summand still carries weight.
+- **What it is not.** No row moves.
+
 ## Reproducing
 
 ```sh

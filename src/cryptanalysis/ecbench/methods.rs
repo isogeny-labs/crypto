@@ -150,6 +150,19 @@ const K4_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const THREE_LEADS_PENCIL_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "small_denominator",
+        default: None,
+        help: "fixed symbolic small-base denominator: 2, 4, 8 or 16; no adaptive selection",
+    },
+    ParamDecl {
+        name: "matrix_coefficient_cap",
+        default: None,
+        help:
+            "working and retained coefficient cap, 1000000..25000000; pencil has exactly 16 walks",
+    },
+];
 const THREE_LEADS_RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     name: "trial_cap",
     default: None,
@@ -187,7 +200,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
@@ -439,6 +452,15 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl {
+            id: super::aps::ID,
+            family: "ic",
+            summary: "bounded APS summation-polynomial instrument: exclusive cold/online wall accounting, retained failures, separate affine witness checks; native operation pricing is incomplete",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS,
+        },
+        MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v2",family:"ic",summary:"Point-driven pencil with signed symbolic elimination; cold setup per target; cost remains explicitly incomplete",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
@@ -985,6 +1007,17 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_COUNTED_PARAMS,
         },
         MethodDecl {
+            id: "ic.tensor_contraction_v1",
+            family: "ic",
+            summary: "toy index calculus with m keyed SHA-256 hashed factor bases (|F_i| ≈ (2r)^(1/m)), each relation found by exact sparse tensor contraction of the whole-point network (crates/ecdl-tensor-ic); exponential, about r point additions per relation; contraction rows, factor-base listing and elimination counted unpriced",
+            entry: "ecdl_tensor_ic::Solver with SparseContractor",
+            applies: Applies::PrimeOnly,
+            params: &[
+                ParamDecl { name: "m", default: None, help: "hashed factor bases, at least 2; the relation network has (2m−1)(2b+1) edges" },
+                ParamDecl { name: "max_restarts", default: Some("8"), help: "factor-base redraws before the run counts as exhausted" },
+            ],
+        },
+        MethodDecl {
             id: "ic.known_log_mitm2_v1",
             family: "ic",
             summary: "target-blind seeded known-log signed base, folded two-sum table, injective Q+[a]H queries and immediate scalar recovery; cold construction charged, native work unpriced",
@@ -1308,6 +1341,13 @@ const HYPER_GENUS2_V2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_cal
 /// integer-valued when its default is a canonical integer).  `summands`
 /// also takes `n-1`, which the lexeme rule below leaves alone.
 const INTEGER_PARAMS_WITHOUT_DEFAULT: &[&str] = &[
+    "subset_size",
+    "attempts",
+    "degree",
+    "budget_ms",
+    "sampling_draws",
+    "beta",
+    "lambda",
     "large_primes",
     "max_trials",
     "target_max_attempts",
@@ -2300,6 +2340,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
+        Instance::Prime(i) if id == super::aps::ID => super::aps::applicable(m, i),
         Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_) => {
             jacobian_applicable(id, m.params.get("inner").map(String::as_str), inst, curve)
         }
@@ -2539,6 +2580,32 @@ pub fn solve_measured(
         Some(Err(e)) => rep.online_error = Some(e.to_string()),
         None => rep.online_error = Some("a measurement session was already active".into()),
     }
+    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        if let Some(window) = &mut rep.online {
+            let sum = window
+                .phases_ns
+                .values()
+                .try_fold(0u64, |total, ns| total.checked_add(*ns));
+            if sum != Some(window.wall_ns) {
+                return Err("pencil online phase sum differs from window".into());
+            }
+            window.start_event = "source target validity check after target-blind curve, base and empty solver setup".into();
+            window.stop_event = if rep.recovered.is_some() {
+                "first source multiplication check completed inside pencil core"
+            } else {
+                "pencil coefficient cap or walk exhaustion; no verified solution"
+            }
+            .into();
+            window.mapping = "query: target validation, labels, source query and transfer, plus intervening control bookkeeping; PDP: point-driven sieve; relation check: polynomial, point and Jacobian checks; descent: signed graph and residual elimination; recovery check: first source multiplication. Additional adapter verification is outside online and charged in cold group counts.".into();
+            if let Some(reason) = window.zero_phases.get_mut("target_relation_check") {
+                *reason = "no sieve candidate reached the separate polynomial, point and Jacobian verification stage".into();
+            }
+        }
+    } else if m.id.starts_with("rho.three_leads_") && rep.recovered.is_none() {
+        if let Some(window) = &mut rep.online {
+            window.stop_event = "rho cap exhausted; no verified solution".into();
+        }
+    }
     Ok(rep)
 }
 
@@ -2587,6 +2654,12 @@ fn solve_inner(
         ));
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == super::aps::ID => {
+            super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == "ic.tensor_contraction_v1" => {
+            solve_tensor_contraction(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Prime(i), _)
             if m.id == "ic.known_log_mitm2_v1" || m.id == "ic.known_log_ksum_v1" =>
         {
@@ -5038,6 +5111,143 @@ fn solve_known_log<G: CountedGroup>(
     })
 }
 
+/// The phases of `ic.tensor_contraction_v1`, in the order the solver enters
+/// them (`ecdl_tensor_ic::opcount`).
+const TENSOR_PHASES: [&str; 6] = [
+    "setup",
+    "factor_base",
+    "relation_target",
+    "relation_search",
+    "linear_algebra",
+    "recovery_check",
+];
+
+/// `ic.tensor_contraction_v1`: the toy tensor-contraction index calculus of
+/// `crates/ecdl-tensor-ic` on a prime-order curve.  Every non-trivial point
+/// addition and doubling the solver performs is charged, phase by phase,
+/// from the crate's tally; contraction rows, factor-base listing (the toy
+/// enumerates the group) and elimination multiplications are counted
+/// `_uncharged`.  The solver checks `[ξ]P = Q` itself (charged in
+/// `recovery_check`) and redraws its factor bases on failure.
+fn solve_tensor_contraction(
+    m: &ResolvedMethod,
+    inst: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use ecdl_tensor_ic::{opcount, Curve as TCurve, Point as TPoint, Solver, SparseContractor};
+
+    let fb_count = usize::try_from(param_u64(m, "m")?).map_err(|_| "m exceeds usize")?;
+    if fb_count < 2 {
+        return Err("ic.tensor_contraction_v1 needs m ≥ 2".into());
+    }
+    let max_restarts =
+        usize::try_from(param_u64(m, "max_restarts")?).map_err(|_| "max_restarts exceeds usize")?;
+    if max_restarts == 0 {
+        return Err("ic.tensor_contraction_v1 needs max_restarts ≥ 1".into());
+    }
+    if inst.cofactor != 1 || inst.group_order != inst.r {
+        return Err(format!(
+            "ic.tensor_contraction_v1 needs a prime-order curve (cofactor 1); {} has cofactor {}",
+            inst.name, inst.cofactor
+        ));
+    }
+    let curve = TCurve {
+        p: inst.curve.p,
+        a: inst.curve.a,
+        b: inst.curve.b,
+        order: inst.r,
+        g: TPoint {
+            x: inst.generator.0,
+            y: inst.generator.1,
+            inf: false,
+        },
+    };
+    let q = TPoint {
+        x: target.x,
+        y: target.y,
+        inf: target.infinity,
+    };
+    let mut solver = Solver::new(
+        curve,
+        fb_count,
+        Box::new(SparseContractor::default()),
+        StdRng::seed_from_u64(seed),
+    );
+    solver.max_restarts = max_restarts;
+    let started = Instant::now();
+    opcount::start();
+    let (result, stats) = solver.solve_with_stats(q);
+    let tally = opcount::take();
+    let wall = started.elapsed().as_nanos() as u64;
+
+    let mut phases = Vec::with_capacity(TENSOR_PHASES.len());
+    let mut charged = 0usize;
+    for name in TENSOR_PHASES {
+        let mut get = |k: &str| match tally.get(&format!("{name}.{k}")) {
+            Some(&n) => {
+                charged += 1;
+                n
+            }
+            None => 0,
+        };
+        let ops = GroupOps {
+            adds: get("adds"),
+            doubles: get("doubles"),
+            ..GroupOps::default()
+        };
+        phases.push(ops_phase(name, ops));
+    }
+    let mut counters: BTreeMap<String, u64> = tally
+        .iter()
+        .filter(|(k, _)| k.ends_with("_uncharged"))
+        .map(|(k, v)| (k.clone(), *v))
+        .collect();
+    // Every tally entry is either charged above or kept as unpriced work.
+    if charged + counters.len() != tally.len() {
+        return Err(format!(
+            "ic.tensor_contraction_v1: tally has entries outside the known phases: {:?}",
+            tally.keys().collect::<Vec<_>>()
+        ));
+    }
+    for (key, value) in [
+        ("factor_base_size", stats.factor_base_size),
+        ("relations", stats.relations),
+        ("attempts", stats.attempts),
+        ("restarts", stats.restarts),
+        ("network_edges", stats.network.edges),
+        ("network_vertices", stats.network.vertices),
+        ("network_max_degree", stats.network.max_degree),
+    ] {
+        counters.insert(key.into(), value as u64);
+    }
+    let (recovered, error) = match result {
+        Ok(xi) => (Some(u128::from(xi)), None),
+        Err(e) => (None, Some(e.to_string())),
+    };
+    Ok(SolveReport {
+        recovered,
+        exhausted: recovered.is_none(),
+        total_gae: phases.iter().map(|p| p.gae).sum(),
+        phases,
+        automorphisms_used: 1,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        solve_wall_ns: wall,
+        detail: json!({
+            "implementation": "crates/ecdl-tensor-ic (Rust port of the Go ecdltensor prototype)",
+            "factor_base": "m keyed SHA-256 membership predicates, listed by enumerating the group (toy shortcut)",
+            "relation_network": "whole-point network, (2m−1)(2b+1) edges; counted by SparseContractor, witness by self-reduction",
+            "linear_algebra": "dense left kernel mod r",
+            "charged": "every non-trivial point addition and doubling (neither input O), including those evaluated inside the contraction",
+            "error": error,
+            "cost_scope": "cold, one target; no [Ope26] solver, every counter exponential",
+        }),
+        ..Default::default()
+    })
+}
+
 fn pipeline_spec(m: &ResolvedMethod, seed: u64) -> Result<(PipelineSpec, String, String), String> {
     let (fb_name, fb_params) = Params::parse_spec(&m.params["factor_base"])?;
     let (or_name, or_params) = Params::parse_spec(&m.params["oracle"])?;
@@ -5071,6 +5281,9 @@ fn prime_base_for<'a>(
 ) -> Result<Box<dyn FactorBaseBuilder<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'a>, String>
 {
     Ok(match fb_name {
+        "explicit-x" => {
+            Box::new(crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase)
+        }
         "prime-abscissa" => Box::new(PrimeAbscissaBase { instance: inst }),
         "prime-projected-abscissa" => Box::new(PrimeProjectedAbscissaBase { instance: inst }),
         "glv-orbit" => Box::new(GlvOrbitBase { instance: inst }),
@@ -5311,6 +5524,7 @@ fn solve_ic_f2m4(
         frobenius,
         sparsest: flag("sparsest")?,
         replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
     };
     let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
     oracle.charge_unsolved = flag("charge_unsolved")?;
@@ -5439,6 +5653,11 @@ fn binary_base_for<'a>(
     inst: &'a BinaryInstance,
 ) -> Result<Box<dyn FactorBaseBuilder<BinaryGroup<'a>> + 'a>, String> {
     Ok(match fb_name {
+        "explicit-x" => Box::new(
+            crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
+                instance: inst,
+            },
+        ),
         "binary-subspace" => Box::new(BinarySubspaceBase { instance: inst }),
         "koblitz-orbit" => Box::new(KoblitzOrbitBase { instance: inst }),
         "compact-orbit-scan" => Box::new(CompactOrbitScanBase { instance: inst }),
@@ -6140,11 +6359,13 @@ pub fn dump_factor_base(
     match &inst {
         Instance::Prime(i) => {
             let abscissa = PrimeAbscissaBase { instance: i };
+            let explicit = crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
             let projected = PrimeProjectedAbscissaBase { instance: i };
             let orbit = GlvOrbitBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
+                "explicit-x" => &explicit,
                 "prime-abscissa" => &abscissa,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
@@ -6186,12 +6407,16 @@ pub fn dump_factor_base(
         Instance::Binary(i) => {
             let g = BinaryGroup(&i.fast);
             let subspace = BinarySubspaceBase { instance: i };
+            let explicit = crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
+                instance: i,
+            };
             let orbit = KoblitzOrbitBase { instance: i };
             let compact = CompactOrbitScanBase { instance: i };
             let cyclotomic = CyclotomicBase { instance: i };
             let onb_weight = OnbWeightBase { instance: i };
             let plugin_base = binary_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<BinaryGroup> = match name.as_str() {
+                "explicit-x" => &explicit,
                 "binary-subspace" => &subspace,
                 "koblitz-orbit" => &orbit,
                 "compact-orbit-scan" => &compact,
@@ -8242,5 +8467,81 @@ mod accounting_tests {
         assert!(strong.is_ok(), "{strong:?}");
         let wordram = plan_arm(kob, "rho.signed_frobenius_strong_wordram", json!({}));
         assert!(wordram.is_ok(), "{wordram:?}");
+    }
+}
+
+#[cfg(test)]
+mod tensor_contraction_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method() -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "ic.tensor_contraction_v1".into(),
+            params: [("m".to_string(), "2".to_string())].into_iter().collect(),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn recovers_known_logs_deterministically_and_charges_every_phase() {
+        let spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let m = method();
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Prime(pi) = &inst else {
+            unreachable!()
+        };
+        for (k, seed) in [(5u64, 1u64), (pi.r - 2, 2)] {
+            let t = pi
+                .curve
+                .mul(&mut GroupOps::default(), pi.generator_point(), k);
+            let target = [format!("0x{:x}", t.x), format!("0x{:x}", t.y)];
+            let rep = solve(&m, &inst, &facts, &target, seed).unwrap();
+            assert_eq!(rep.recovered, Some(u128::from(k)));
+            let names: Vec<&str> = rep.phases.iter().map(|p| p.name.as_str()).collect();
+            assert_eq!(names, TENSOR_PHASES);
+            assert_eq!(rep.total_gae, rep.phases.iter().map(|p| p.gae).sum::<f64>());
+            for ph in ["relation_target", "relation_search", "recovery_check"] {
+                assert!(
+                    rep.phases.iter().any(|p| p.name == ph && p.gae > 0.0),
+                    "{ph}"
+                );
+            }
+            for label in [
+                "factor_base.fb_points_listed_uncharged",
+                "relation_search.contraction_rows_uncharged",
+                "linear_algebra.linalg_mulmod_uncharged",
+            ] {
+                assert!(rep.unpriced.iter().any(|u| u == label), "{label}");
+            }
+            let again = solve(&m, &inst, &facts, &target, seed).unwrap();
+            assert_eq!(rep.counters, again.counters);
+            assert_eq!(rep.total_gae, again.total_gae);
+        }
+    }
+
+    #[test]
+    fn needs_m_and_rejects_m_below_two() {
+        assert!(resolve(&MethodSpec {
+            id: "ic.tensor_contraction_v1".into(),
+            params: BTreeMap::new(),
+        })
+        .is_err());
+        let spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Prime(pi) = &inst else {
+            unreachable!()
+        };
+        let t = pi
+            .curve
+            .mul(&mut GroupOps::default(), pi.generator_point(), 3);
+        let mut m = method();
+        m.params.insert("m".into(), "1".into());
+        let target = [format!("0x{:x}", t.x), format!("0x{:x}", t.y)];
+        let err = solve(&m, &inst, &facts, &target, 1).unwrap_err();
+        assert!(err.contains("m ≥ 2"), "{err}");
     }
 }

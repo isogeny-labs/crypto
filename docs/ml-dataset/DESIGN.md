@@ -44,8 +44,12 @@ No manufactured `solved`, instruction-count, first-fall, or last-fall labels.
 
 The [prime-chain ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md) specifies
 a concrete lossless equation graph and causal decision-prefix view, including
-exact wide integers and independent replay prerequisites. It is a design
-extension; the existing exporter does not implement that projection yet.
+exact wide integers and independent replay prerequisites. The static prime-chain
+graph is now implemented in the native exporter, with current validation status
+recorded in [remaining coverage](REMAINING-COVERAGE.md). The new
+[prefix certificate implementation](PREFIX-REPLAY-CERTIFICATES.md) adds bounded
+semantic replay and observed recursive branch examples; its validation is still
+in progress. Intra-F4 decision views and trained models remain open obligations.
 
 Start with supervised cost/routing baselines, graph encoders, and sequence models
 of solver events. Train branching/reduction policies only after deterministic
@@ -173,6 +177,15 @@ SAT timeout is `unknown`, never UNSAT. An UNSAT label must say whether it is
 solver-reported or independently proof-checked.
 
 ## Measurement contract
+
+The current native F4 row-reduction multiplication counter is process-wide by
+default (`src/cryptanalysis/f4_fp.rs::FIELD_OPS`); each report takes a difference
+over its call. Concurrent calls can include one another's work. Preserve counter
+mode and process concurrency in restricted measurement provenance, and require
+one active solve per process or independently verified attribution before using
+these deltas as per-instance cost labels. Nested/inclusive counters cannot be
+summed into exclusive phase totals. These are counted row-reduction operations,
+not complete field-operation totals or retired CPU instructions.
 
 Use a typed counter vector: group additions/doublings, field add/mul/square/inv,
 polynomial operations, matrix rows/columns/nonzeros/rank/XOR-word operations,

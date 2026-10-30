@@ -1,0 +1,23 @@
+{
+  "schema": "software-restore-fixture/v1",
+  "purpose": "Fresh S3 download, native semantic replay, and path-independent training-view export from retained fixtures",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "independent_reviewer": false,
+  "worker_iam_test": false,
+  "dataset_publication_restore_command_test": false,
+  "binary_source_commit": "06773dcf28f1d77fd43341b7959b7571fa1abbd0",
+  "binary_sha256": "6b3c5204a2fe04c15168288ce7b24b8080a0a4cf21a924225b6a9021af3d7b92",
+  "input_archive_sha256": "937e0c59108d438807c25ecb938903889cd36a7553ad968ff9a1811a1fb2221f",
+  "expected_export_archive_sha256": "3717c79150da85a365ca088caea70a2a81080ca7917735f287a52a5c3bf1c614",
+  "remote": "s3://setec-astronomy-artifacts/store",
+  "shards": [62, 63],
+  "n": 7,
+  "m": 3,
+  "twists": [false, true],
+  "commands": ["verify curve", "export curve", "retry curve export", "verify twist", "export twist", "retry twist export", "reject retained rehashed algebraic corruption"],
+  "checks": ["three fresh downloads and SHA256 checks", "native semantic verification", "static and prefix feature bytes equal previous frozen export", "all exported artifact hashes and sizes", "v5 model-input allowlist", "immutable export retry", "input inventory unchanged", "negative control rejected for prime-chain domain mismatch"],
+  "stop_on_failure": true,
+  "automatic_retries": false,
+  "claim_limits": ["premerge binary only", "retained toy software fixtures", "controller S3 identity only", "not an independent scientific review", "not a new cloud corpus", "no exact fall-degree or total-instruction claim"]
+}

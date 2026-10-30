@@ -370,9 +370,10 @@ crypto dataset export --out /work/restored-dataset \
   --destination /work/dataset-training-001
 ```
 
-Export replays sealed cells and writes `features.jsonl`,
-`restricted/targets.jsonl`, `restricted/index.jsonl` and `manifest.json`.
-It performs no remote download. Only `features.jsonl` is model input; targets
+Export replays sealed cells and writes `features.jsonl`, `prefix-features.jsonl`,
+`restricted/targets.jsonl`, `restricted/index.jsonl`,
+`restricted/prefix-records.jsonl` and `manifest.json`.
+It performs no remote download. Only the two feature files are model input; targets
 contain known-answer and recovered scalars, solver labels and certificate
 references, while the restricted index retains source manifests and artifact
 references. Keep the restricted directory access controls when copying it.
@@ -398,17 +399,31 @@ Use a separate destination outside the source tree. Export refuses the source
 root, its ancestors and paths inside `cells/`, and rejects symlink ancestors.
 Exports are immutable snapshots: identical retries verify existing bytes; a
 changed source or export policy requires a fresh destination. The current
-policy is `strict-structural-allowlist-v3`; its domain-aware feature identities
+policy is `strict-structural-allowlist-v5`; its domain-aware feature identities
 must not be mixed with earlier export identities without regeneration.
 
 Prime-chain recursive events and termination records stay in restricted
-artifacts/provenance. Implementing their writer does not add a public equation
-graph to `features.jsonl`; that requires a separately reviewed structural
-projection. A future decision-prefix view must remove future bases, branches,
-lift results and other information unavailable at its declared decision time.
+artifacts/provenance. The v4 exporter adds a `prime-chain-graph/v1` static equation
+graph for eligible replayed prime/F4/m3..15 cells, with lossless decimal values,
+shared finite/symbolic domains and signed-point incidence. Its inverse decoder
+must recover the exact reconstructed input before publication. Missing input or
+a graph-size refusal retains restricted provenance with no generic feature
+fallback; malformed input fails export. Earlier v3 snapshots stay unchanged.
+Source `1565b1fecd7` passed full-library, strict-lint and actual-CLI checks; see
+[retained software evidence](../../research/ml_dataset_20261028/validation-prime-graph-20261029/README.md).
+The new v5 prefix path is implemented with validation in progress. It certifies
+both polynomial-ideal containments, reconstructs recursive specializations and
+legal iterators, and projects the state before each observed branch. It excludes
+future bases, branches, lift results and source identifiers. Restricted prefix
+records retain explicit certificates, observed actions, joins, cuts and bounded
+unknown suffixes. The public action domain describes the remaining iterator;
+labels do not establish an optimal policy. Root completeness and semantic state
+certificates do not verify all native operations, a complete Groebner basis or
+instruction totals. See [contract and limits](PREFIX-REPLAY-CERTIFICATES.md).
 
-The current export is a structural routing view. Sequential equation or solver
-policy views still need a separate projection of admissible prefix states.
+The current source contains structural routing inputs, static prime-chain
+equations and this separate causal recursive prefix path. Broader sequential
+solver policy views, held-out training and efficacy validation remain open.
 Keep answers, future pivots, recovered logs, construction seeds and
 future conflict clauses in the target/restricted partition. Group equivalent
 presentations, signs, Frobenius orbits, generators, twists and related cases in
