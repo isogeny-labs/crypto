@@ -1336,3 +1336,21 @@ Prospective implementation requires software equivalence fixtures with both mete
 ### Errors
 
 A combined read-only source lookup used the historical worktree for the newer pencil path and reported file not found; the pencil source was inspected in its actual current worktree. No data or scientific result changed.
+
+## 2026-10-30T04:49Z — Isolated early-rejection implementation and software validation
+
+### What was done
+
+Implemented a separate prospective crate in research/pencil_early_rejection_20261030, preserving the frozen native solver SHA e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df. Its helper extraction/reorder is independently source-reviewed; default ecbench integration and frozen source remain unchanged. Five selected tests passed in debug and release, with twelve inherited solver-path tests filtered. Strict Clippy and fmt passed. The bounded F19 fixtures explicitly distinguish 612 ordinary-origin and 470 exceptional-only invocations, with 826 accepted and 256 rejected cases. These are software coverage counts, not target/cohort results.
+
+### Decisions made
+
+Retained source-bound baseline helper, source-fork correspondence, both arithmetic/semantic meters, exact rejected counter deltas, selected graph-cap parity and singular-polynomial branch labeling. Preserved independent proof of at most two rejected complements per valid smooth-quintic sieve and 32 across sixteen walks; it is not a runtime estimate. No solver trial, rho trial, cohort, cloud launch or prospective scientific admission occurred. PR #2932 merged with its checks complete.
+
+### Open threads
+
+Publish neutral software-validation PDF/SVG/JSON and implementation PR. Full pencil cohort and timing requirements remain incomplete and subject to the failed upper-gate stop rule and future prospective admission. This instrument has not executed solve_one. T-885 is the separately claimed software-validation task; its heartbeat maintains coordination only, with no experiment budget/deadline change.
+
+### Errors
+
+Retained initial fixture failures, source-fidelity/Clippy development failures, and the origin-coverage review correction. The report's first render lacked a math-font package; failed logs retained before presentation correction. Prior T-826 lease was reconciled as failed and not revived; new software work was attached to T-885. A later check reports an exclusive reservation by this same claimed task; current fenced ownership is retained rather than creating a duplicate owner.
