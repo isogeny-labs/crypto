@@ -44,6 +44,53 @@ pub fn inv_mod(a: u64, m: u64) -> u64 {
     pow_mod(a, m - 2, m)
 }
 
+/// Returns y with y^2 = a mod p, where p is an odd prime, via Tonelli-Shanks.
+/// `None` is Go's `ok == false`: a is a non-residue.
+pub fn sqrt_mod(a: u64, p: u64) -> Option<u64> {
+    let a = a % p;
+    if a == 0 {
+        return Some(0);
+    }
+    if pow_mod(a, (p - 1) / 2, p) != 1 {
+        return None;
+    }
+    if p % 4 == 3 {
+        return Some(pow_mod(a, (p + 1) / 4, p));
+    }
+    let (mut q, mut s) = (p - 1, 0i32);
+    while q % 2 == 0 {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pow_mod(z, (p - 1) / 2, p) != p - 1 {
+        z += 1;
+    }
+    let mut m = s;
+    let mut c = pow_mod(z, q, p);
+    let mut t = pow_mod(a, q, p);
+    let mut r = pow_mod(a, q.div_ceil(2), p);
+    while t != 1 {
+        let mut i = 0i32;
+        let mut t2 = t;
+        while t2 != 1 {
+            t2 = mul_mod(t2, t2, p);
+            i += 1;
+        }
+        let mut b = c;
+        let mut j = 0i32;
+        while j + 1 < m - i {
+            b = mul_mod(b, b, p);
+            j += 1;
+        }
+        m = i;
+        c = mul_mod(b, b, p);
+        t = mul_mod(t, c, p);
+        r = mul_mod(r, b, p);
+    }
+    Some(r)
+}
+
 /// Deterministic Miller-Rabin test for 64-bit integers.
 pub fn is_prime(n: u64) -> bool {
     if n < 2 {

@@ -1,7 +1,8 @@
 # Native hashed-ECDL performance comparison
 
-Status: blocked on existing S3 checkpoint transport and authenticated native
-Iso Lab execution/image route. User request: speed up Certicom challenge work.
+Status: S3 checkpoint upload/readback verified on 2026-10-30. Native Iso Lab
+image/execution, profiling and the admitted comparison remain pending.
+User request: speed up Certicom challenge work.
 
 The code and bounded correctness receipt are in crypto PR #2891 and its paired
 cryptanalysis change. The implementation alone does not complete the requested
@@ -9,10 +10,10 @@ performance iteration. Follow research/hashed_ecdl_speed_20261029/PROTOCOL.md
 without weakening its baseline/candidate, full-panel, holdout, accounting or
 admission requirements. S3 push/gate failed; no experiment has been launched.
 
-Next action: use the existing authenticated runner supplied by the user, push
-the complete resume checkpoint and pass its gate, obtain a digest-pinned image
-for the native tensor binaries, profile, then run the frozen A/A and matched
-A/B panel with replay and durable S3 evidence. Retain all failed runs. Do not
+Next action: verify the native image/submission route, restore/pass the gate on
+the execution host, obtain a digest-pinned native tensor image, profile, then run
+the frozen A/A and matched A/B panel with replay and durable S3 evidence.
+Retain all failed runs. Do not
 use the deployed ecbench fixture or unisolated local timing as a replacement.
 Both challenge solves and the independent general audit remain open.
 
@@ -24,3 +25,10 @@ Manual panel preparation is implemented; no scientific panel was executed.
 The checkpoint gate still reports missing upload transport. Native image
 construction, profiling, phase accounting and admitted matched measurements
 remain pending, with frozen evidence and solve/audit requirements unchanged.
+
+2026-10-30 03:13 UTC update: checkpoint upload succeeded. Downloaded archive,
+resume notes, all five payload files, both release binaries and 76 source Git
+blobs verified; the checkpoint gate passed. This supersedes the earlier upload
+blocker, preserving its historical failures. See
+[the immutable S3 receipt](../docs/hashed-ecdl-s3-checkpoint.md).
+Image/execution and measurement admission remain separate requirements.

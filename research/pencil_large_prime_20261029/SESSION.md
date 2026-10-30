@@ -1270,3 +1270,107 @@ The solver-free actual upper-gate packaging check rejected version1 because anal
 
 ### Upper-gate submission
 After corrected frozenprotocol and reviews were committed asf6c80df6e and pushed, submitted the exact reviewed request once. Runpencil-p186379-20261030-b1; controllerbuild3071de75-eb33-43ca-ba92-b44fd357c7de; nativecanonicalrequestdaf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a; internaldeadline03:28:20Z unchanged. Initial durable state is provisioning with0restores and no benchmark job. This is a submission/infrastructure receipt, not a completed mathematical result. SourcePR2912 merged; protocolPR2913 open with auto-merge enabled. No remaining-cohort launch is authorized by this gate submission.
+
+### Native observation reports
+Added a separate presentation-only native renderer for dynamic workload counts and incomplete outcomes; historical60-target renderer unchanged. Hash-bound native analysis becomes exactJSON/CSV, editableSVG/TeX andPDF. Eight tests, strictClippy andformatting pass; independentreviewc290a14f... inspected4PDFpages/2SVGs. Allmissingfixture0/18records and36nullcells; mixedsoftwarefixture18records,2completecells/34null. These are software examples, not empirical results. The renderer does not authenticate upstream pricing/admission or qualify timing. Uppergate is still running, attempt0/0restores, with generation1committed and readback verified; no result ratio yet.
+
+### Finite-cost graph and standalone provenance
+Added a separate36-cell ratioSVG with algorithm-only/calibration-inclusive series, explicit unavailable values, exact-fraction metadata and a shared axis. JSON/CSV remain exact; plotcoordinates are labelled visual approximations. Added visible title/run/scope to prevent standalone fixture misidentification. Final9tests, strictClippy andformatting pass; independentreviewaeded733... verified unchanged numericalprojection and visually inspected native raster. Root installed native librsvg2-tools2.59.2 and independently inspected the graph. Priorv2 andv3 softwarefixture packets remain separate; no experimental ratio is inferred. ProtocolPR2913 merged; reportdelivery continues on codex/pencil-observation-report-20261030.
+
+## 2026-10-30T03:33Z — Upper-gate terminal checkpoint reconciliation
+
+### What was done
+
+Observed native upper gate pencil-p186379-20261030-b1 fail with `original UTC deadline expired` at the unchanged 03:28:20 UTC deadline; controller failure receipt at 03:28:28 and CodeBuild terminal at 03:28:38.987. Downloaded version-pinned generation 6 archive read-only and checked SHA-256 and 528281600-byte size. Independent audit verified all seven extracted files against its manifest. Preserved raw checkpoint/session and controller receipts plus source-bound terminal semantics review. No restore, duplicate payload, solver replay or new cohort launch. Renderer PR #2917 merged with applicable checks passing.
+
+### Decisions made
+
+Retain all 18 planned slots: checkpoint has two reference/control warmups, zero measured observations, sixteen missing slots and zero of five measured pairs. All 36 ratios remain null. Embedded session is an unfinished checkpoint snapshot, not a fabricated terminal session. Original 10800 worker-second ceiling and 05:05:50 outer expiry remain unchanged. Native source review and frozen protocol govern interpretation; operational deadline failure is not a mathematical conclusion.
+
+### Open threads
+
+Publish native partial analysis, canonical shortfall findings, PDF and graph after this raw evidence commit. Upper gate is incomplete, so the remaining full cohort has not been admitted. Exact final worker duration/termination is not established by the stale supervisor receipt. Direct Kubernetes readback timed out; retain this gap rather than inferring a verified shutdown from controller completion.
+
+### Errors
+
+Native controller recorded deadline expiration and a last-contact error that the supervisor container could not be found. Supervisor receipt still says running with an earlier timestamp and null exit code. The controller's terminal state and stale supervisor status are both preserved unchanged. No IAM or RBAC expansion attempted.
+
+### 2026-10-30T03:37Z — Additive shutdown reconciliation
+
+AWS DescribeInstances now reports the exact bound worker instance i-027be1b63d0a94827 as terminated, with launch 02:47:55 UTC and transition reason timestamp 03:30:41 UTC. Saved response and readback timestamp unchanged. This resolves the live-worker existence question; it does not establish exact active payload time or repair the stale supervisor receipt. The report will bind this additive resource observation without converting infrastructure lifetime into algorithm costs. Two artifact-check invocations initially used the wrong path/missing base argument; the corrected tools/artifacts/artifacts.py check HEAD~1 HEAD passed.
+
+## 2026-10-30T03:42Z — Native partial analysis and observation report
+
+### What was done
+
+Retained the native analysis, original-plan execution history, partial canonical export, resource sidecars, editable coverage diagram, exact CSV/JSON and three-page PDF. Native analysis exits 0; canonical packaging exits 1 with five completeness findings; checking exits 1 with six findings. Independent review checked source/file bindings and every PDF page. Kept the first report and added a worker-terminal update after the separate EC2 readback. Raw records were committed/pushed before reports.
+
+### Decisions made
+
+All ratios remain null; no missing pencil work is treated as zero cost or a completed failure row. No numerical or scientific conclusion follows from the operational deadline. Current report is the worker-terminal-update artifact. Timestamp companion receives an additive provenance binding; old reports/reviews are unchanged.
+
+### Open threads
+
+PR delivery and applicable CI. Upper gate and full continuation remain incomplete. Exact active payload seconds remain unknown. Coordination heartbeats only were renewed for publication after the prior keeper ended; experiment deadlines, request and budget were not extended.
+
+### Errors
+
+Expected canonical incompleteness is retained as findings rather than suppressed. A background heartbeat launch did not survive the command session; verified it was absent before starting the same finite coordination loop in a managed exec session, with successful fenced heartbeats.
+
+## 2026-10-30T04:30Z — Completion boundary and source-only rejection proposal
+
+### What was done
+
+Reconciled the retained published weighted-law implementation/source audit and two 1260-target paired cohorts, and signed-label Kummer cohort. These records support their scoped implementation/finite-cost results; they do not close the separate universal compiled-law/Pic0 proof or pencil timing/cohort requirements. PR #2927 merged; two nonblocking ecbench jobs were still running at the merge readback.
+
+Reviewed the pencil candidate-verification order against native_solver.rs and retained an unapplied patch, algebraic proof, standardized proposal JSON, independent static review, editable control-flow SVG and inspected two-page PDF in proposals/root_count_rejection_20261030. The proposed length guard precedes complement construction; the prior lambda-zero sieve call establishes the needed divisibility. Independent review found no defect under the bounded valid-input assumptions.
+
+### Decisions made
+
+No frozen runtime source was changed and no experiment/test/solver was run. The proposed new instrument is not observationally identical: skipped rejected candidates change arithmetic, semantic events, allocations and possible diagnostics. The packet records exact symbolic per-rejection event deltas, not measured savings, aggregate cost ratios, or a speedup. Existing incomplete-gate stopping rules remain binding.
+
+### Open threads
+
+Prospective implementation requires software equivalence fixtures with both meters enabled and correct modulus bindings, then independent review and a new instrument identity. Any new measurement requires a prospective known-data protocol and valid resource admission. Full pencil workload matrix and timing requirements remain incomplete; no resampling, reduced denominator or automatic gate retry.
+
+### Errors
+
+A combined read-only source lookup used the historical worktree for the newer pencil path and reported file not found; the pencil source was inspected in its actual current worktree. No data or scientific result changed.
+
+## 2026-10-30T04:49Z — Isolated early-rejection implementation and software validation
+
+### What was done
+
+Implemented a separate prospective crate in research/pencil_early_rejection_20261030, preserving the frozen native solver SHA e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df. Its helper extraction/reorder is independently source-reviewed; default ecbench integration and frozen source remain unchanged. Five selected tests passed in debug and release, with twelve inherited solver-path tests filtered. Strict Clippy and fmt passed. The bounded F19 fixtures explicitly distinguish 612 ordinary-origin and 470 exceptional-only invocations, with 826 accepted and 256 rejected cases. These are software coverage counts, not target/cohort results.
+
+### Decisions made
+
+Retained source-bound baseline helper, source-fork correspondence, both arithmetic/semantic meters, exact rejected counter deltas, selected graph-cap parity and singular-polynomial branch labeling. Preserved independent proof of at most two rejected complements per valid smooth-quintic sieve and 32 across sixteen walks; it is not a runtime estimate. No solver trial, rho trial, cohort, cloud launch or prospective scientific admission occurred. PR #2932 merged with its checks complete.
+
+### Open threads
+
+Publish neutral software-validation PDF/SVG/JSON and implementation PR. Full pencil cohort and timing requirements remain incomplete and subject to the failed upper-gate stop rule and future prospective admission. This instrument has not executed solve_one. T-885 is the separately claimed software-validation task; its heartbeat maintains coordination only, with no experiment budget/deadline change.
+
+### Errors
+
+Retained initial fixture failures, source-fidelity/Clippy development failures, and the origin-coverage review correction. The report's first render lacked a math-font package; failed logs retained before presentation correction. Prior T-826 lease was reconciled as failed and not revived; new software work was attached to T-885. A later check reports an exclusive reservation by this same claimed task; current fenced ownership is retained rather than creating a duplicate owner.
+
+## 2026-10-30T05:02Z — Prospective software CI and timing source review
+
+### What was done
+
+Added a scoped PR/main/merge-group workflow for the isolated early-rejection crate. It selects exactly five equivalence tests, runs debug and release, and checks formatting/Clippy; inherited solver and rho tests remain unexecuted. The workflow includes the producer and engine source dependencies in sparse checkout. Independent read-only timing review inspected record.rs, pencil.rs, three_leads.rs, native_solver.rs and the canonical exporter.
+
+### Decisions made
+
+Keep scientific execution separate from software CI. Preserve old timing fields: a future instrument needs an immediate-return cold interval, separate instrumentation closure and completion, explicit adapter verification/calibration/report durations, and arm-specific online phase validation. The existing target hooks already delimit online work. Inline meter overhead cannot be inferred by subtracting enclosing and enclosed clocks. No changed timing source, new estimand, qualified clock, trial or resource extension follows from this review.
+
+### Open threads
+
+PR2935 CI and merge remain pending. Full pencil cohort and timing are incomplete. All retained rho/control intervals are below the existing 1 ms floor; endpoint correction alone cannot qualify them. A future timing design must resolve individual-call measurement without presenting repeated-call blocks as equivalent latency. The original resource deadline and failed upper-gate stopping rule remain unchanged.
+
+### Errors
+
+The general Rust CI scope skips this standalone crate, motivating explicit software-only CI. No scientific run was retried. The implementation packet's ignored Cargo.lock was explicitly committed, and the oversized retained attempt3 log was published and remotely verified in the required artifact store before PR creation.
+
+CI review addendum: the broad initial artifact-wiring match suggested credentialed hydration of logs that tests do not read. Independent review identified the PR-head script/credential exposure. The final workflow instead checks out only source/provenance/manifests and runs from the root with an explicit manifest path; it uses no secrets, artifact tooling or result downloads. YAML/Bash syntax and the exact five-test/zero-benchmark listing passed; independent final source/dependency review found no concrete blocker. The repository wiring check is separately required before publication.
