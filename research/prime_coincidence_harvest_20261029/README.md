@@ -158,3 +158,9 @@ The curve generators differ, so this is statistical agreement, not a replication
 - `report.pdf`: this README.
 
 ![Figure 2. Slope of ln κ on ln N with 95% intervals for the six real combinations and the controls, against the break-even exponents. Triangles: slopes predicted from the integer count. Source: slopes.svg.](slopes.svg)
+
+## 7. Addendum 1 (review fixes; [`AMENDMENT-1.md`](AMENDMENT-1.md))
+
+- **Raw rows are committed.** `main/main-16.tsv` … `main-32.tsv` are the original per-curve rows, byte for byte (`shasum -a 256 -c main/SHA256SUMS` passes). They are data files over 64 KiB, so the repository's artifact bot moves them to the store and leaves the `.artifacts.json` manifest. This supersedes the sentence in §3 that says they are not committed.
+- **`analyze` refuses an incomplete ladder.** It now fails, with no reading and nonzero exit, unless all five registered rungs, both θ values (at least 40 curves each) and every required series are present. [`check-refusal.sh`](check-refusal.sh) confirms three refusals (the pilot TSVs filtered to θ index 0, the pilot without 32 bits, and the 32-bit rung alone), [`audits/refusal.txt`](audits/refusal.txt). The selftest has an 11th check ([`audits/selftest-amendment-1.txt`](audits/selftest-amendment-1.txt)).
+- **No evidence changed.** On the complete ladder the amended binary reproduces `analysis/analysis.json` byte for byte, and the reading is still `SUB_BREAK_EVEN_AT_SCALE`. The registered source hash in `REGISTRATION.sha256` is the pre-amendment one; the amended hashes are in `REGISTRATION-AMENDMENT-1.sha256`.

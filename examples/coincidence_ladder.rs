@@ -990,8 +990,44 @@ fn class_of(lo: f64, hi: f64) -> &'static str {
     }
 }
 
+/// The rungs PROTOCOL.md section 4 registers, and the fewest curves a cell may
+/// have (the pilot size, below which no cell is sized).
+const REGISTERED_RUNGS: [u32; 5] = [16, 20, 24, 28, 32];
+const MIN_CURVES: usize = 40;
+
+/// Refuse any input that is not a complete ladder: every registered rung, both
+/// theta values and at least `min_curves` curves in every (rung, theta) cell.
+fn validate(recs: &[Rec], rungs: &[u32], min_curves: usize) -> Result<(), String> {
+    if let Some(r) = recs.iter().find(|r| r.theta >= THETAS.len()) {
+        return Err(format!(
+            "record with theta index {} (bits {})",
+            r.theta, r.bits
+        ));
+    }
+    let mut seen: Vec<u32> = recs.iter().map(|r| r.bits).collect();
+    seen.sort_unstable();
+    seen.dedup();
+    if seen != rungs {
+        return Err(format!(
+            "rungs present {seen:?}, registered {rungs:?}: no reading is made"
+        ));
+    }
+    for &b in rungs {
+        for (ti, theta) in THETAS.iter().enumerate() {
+            let n = recs.iter().filter(|r| r.bits == b && r.theta == ti).count();
+            if n < min_curves {
+                return Err(format!(
+                    "bits {b} theta {theta}: {n} curves, at least {min_curves} required: no reading is made"
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 fn cmd_analyze(paths: &[String]) -> Result<(), String> {
     let recs = load(paths)?;
+    validate(&recs, &REGISTERED_RUNGS, MIN_CURVES)?;
     let mut bits: Vec<u32> = recs.iter().map(|r| r.bits).collect();
     bits.sort_unstable();
     bits.dedup();
@@ -1016,9 +1052,6 @@ fn cmd_analyze(paths: &[String]) -> Result<(), String> {
                     .collect()
             })
             .collect();
-        if rungs.iter().any(Vec::is_empty) {
-            continue;
-        }
         let ln_r: Vec<Vec<f64>> = rungs
             .iter()
             .map(|rs| rs.iter().map(|r| (r.n as f64).ln()).collect())
@@ -1068,16 +1101,9 @@ fn cmd_analyze(paths: &[String]) -> Result<(), String> {
         }
         for (g, name) in GEOMS.iter().enumerate() {
             let Some(v) = &vals[g] else {
-                if !first {
-                    out.push_str(",\n");
-                }
-                first = false;
-                let _ = write!(
-                    out,
-                    "  {{\"theta\":{},\"geometry\":\"{name}\",\"status\":\"infeasible\"}}",
-                    theta
-                );
-                continue;
+                return Err(format!(
+                    "theta {theta} geometry {name}: series infeasible or incomplete: no reading is made"
+                ));
             };
             let mut cells = Vec::new();
             for (i, rs) in rungs.iter().enumerate() {
@@ -1155,7 +1181,7 @@ fn cmd_analyze(paths: &[String]) -> Result<(), String> {
         }
     }
     out.push_str("\n ],\n");
-    out.push_str(&gates(&summary));
+    out.push_str(&gates(&summary)?);
     out.push_str("\n}");
     println!("{out}");
     Ok(())
@@ -1171,7 +1197,7 @@ struct Summary {
 }
 
 /// The calibration gates and the registered reading (PROTOCOL.md section 7).
-fn gates(s: &[Summary]) -> String {
+fn gates(s: &[Summary]) -> Result<String, String> {
     let of = |g: usize| s.iter().filter(move |x| x.geom == g);
     let null_like: Vec<&Summary> = of(3).chain(of(7)).collect();
     let null_excl = null_like
@@ -1187,6 +1213,20 @@ fn gates(s: &[Summary]) -> String {
         .collect();
     let g3 = !pl_err.is_empty() && pl_err.iter().all(|e| *e <= 0.03);
     let real: Vec<&Summary> = of(0).chain(of(1)).chain(of(2)).collect();
+    // PROTOCOL.md section 7: six real slopes, four null-type, two Z/N, four plant.
+    let counts = [
+        ("real-geometry", real.len(), 6),
+        ("null-type", null_like.len(), 4),
+        ("Z/N", zn_err.len(), 2),
+        ("plant", pl_err.len(), 4),
+    ];
+    for (what, got, want) in counts {
+        if got != want {
+            return Err(format!(
+                "{what} slopes: {got} present, {want} required: no reading is made"
+            ));
+        }
+    }
     let alive = real.iter().any(|x| class_of(x.lo, x.hi) == "ALIVE");
     let sub = !real.is_empty() && real.iter().all(|x| x.hi < DELTA_STAR[2]);
     let max_hi = real.iter().map(|x| x.hi).fold(f64::NEG_INFINITY, f64::max);
@@ -1199,14 +1239,14 @@ fn gates(s: &[Summary]) -> String {
     } else {
         "INCONCLUSIVE"
     };
-    format!(
+    Ok(format!(
         " \"gates\":{{\"g1_null_slopes_excluding_zero\":{null_excl},\"g1_of\":{},\"g1_pass\":{g1},\"g2_zn_slope_errors\":{:?},\"g2_pass\":{g2},\"g3_plant_slope_errors\":{:?},\"g3_pass\":{g3}}},\n \"real_geometry_max_upper\":{},\n \"delta_star\":{:?},\n \"reading\":\"{reading}\"",
         null_like.len(),
         zn_err,
         pl_err,
         json_f(max_hi),
         DELTA_STAR
-    )
+    ))
 }
 
 // ------------------------------------------------------------------- stage 1
@@ -1415,6 +1455,34 @@ fn cmd_selftest() -> Result<(), String> {
     check(
         ok,
         "weighted plant: group coincidences >= formal row coincidences",
+        &mut fails,
+    );
+    // analyze refuses an incomplete ladder
+    let mut text = String::new();
+    for bits in [10u32, 12] {
+        for c in 0..3 {
+            for line in census_one(bits, 7, c, [true, true], false)? {
+                text.push_str(&line);
+                text.push('\n');
+            }
+        }
+    }
+    let full = parse_recs(&text);
+    let theta0: Vec<Rec> = parse_recs(&text)
+        .into_iter()
+        .filter(|r| r.theta == 0)
+        .collect();
+    let no12: Vec<Rec> = parse_recs(&text)
+        .into_iter()
+        .filter(|r| r.bits == 10)
+        .collect();
+    check(
+        validate(&full, &[10, 12], 3).is_ok()
+            && validate(&theta0, &[10, 12], 3).is_err()
+            && validate(&no12, &[10, 12], 3).is_err()
+            && validate(&full, &[10, 12], 4).is_err()
+            && validate(&full, &[10, 12, 14], 3).is_err(),
+        "validate refuses a missing theta, rung or curve count",
         &mut fails,
     );
     // determinism of a whole job
