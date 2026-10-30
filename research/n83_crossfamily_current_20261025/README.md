@@ -97,19 +97,32 @@ raw receipts, and archives them even when a stage fails. The dispatch output
 and source bundle both belong outside the repository. Stage and collect require
 the configured RunPod key and SSH public-key access to the account's Pods.
 
+### Lower-cost RunPod Tier 1 allocation
+
+The [Ada 2000 allocation protocol](RUNPOD_ADA2000_PROTOCOL.md) retains this
+sealed workload and the two-machine verification gate with a $0.25/hour
+per-Pod rate ceiling and $3.10 six-hour projection cap. It is a separate
+hardware profile in `allocate_runpod.py`; the original RTX 4090 profile
+remains unchanged. This profile needs separate spend approval and an
+authenticated local controller before `--execute`.
+
 ### AWS Spot Tier 1 alternative
 
 `plan_aws_spot.py` checks an exact-source, two-instance Tier 1 alternative
 before any AWS mutation. It requires two separately identified `g5g.4xlarge`
 ARM64 Spot instances, each exposing 16 vCPUs and 32 GiB RAM, in
-`us-east-1d`. This same-zone placement follows the practical cloud-instance
+`us-west-2c`. This same-zone placement follows the practical cloud-instance
 Tier 1 contract; it does not establish physical host isolation. The six-hour
 maximum bid is $0.27 per instance-hour. At those bids, two 50 GB gp3 root
 volumes and a $0.05 S3 allowance, its six-hour projection is $3.37 under a
 $4.20 allocation cap. This projection is not a guaranteed account billing
-ceiling. On 2026-10-26 the AWS API returned G/VT Spot quota 64 vCPUs, a
-$3.10 projection at quoted rates, and placement score 9 for two units in
-`us-east-1d`. Prices and scores must be rechecked before allocation. The gp3
+ceiling. On 2026-10-27 the AWS API returned G/VT Spot quota 32 vCPUs, a
+$3.25 projection at the $0.2592 hourly quote, and placement score 9 for two
+units in `us-west-2c`. Prices and scores must be rechecked before allocation.
+The source bucket remains in `us-east-1`; its presigned transfer URLs and
+versioned collection use that bucket region while EC2 and the local deletion
+guard use `us-west-2`. The west-region revision is recorded in
+[`AWS_WEST2_ADDENDUM.md`](AWS_WEST2_ADDENDUM.md). The gp3
 rate and meaning of placement scores follow [AWS EBS pricing](https://aws.amazon.com/ebs/pricing/)
 and [AWS Spot placement guidance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-sps-works.html).
 `allocate_aws.py` refreshes this plan from the provider immediately before
@@ -123,8 +136,10 @@ and uploads raw results and a status archive. `collect_aws.py` downloads exact
 S3 object versions and checks archive bytes; `aggregate_aws.py` replays both
 strata, binds the EC2 API snapshot to the host receipts, and applies the sealed
 selector. Missing, partial, noisy, or failed pairs remain bounded unknown.
-An allocation requires separate spend approval. The bid projection is not a
-guaranteed account billing ceiling if both deletion guards fail.
+The earlier east-region allocation attempt was refused by its placement gate
+before any instance was launched. The west-region allocation requires approval
+of this revised region and source head. The bid projection is not a guaranteed
+account billing ceiling if both deletion guards fail.
 
 ```sh
 python3 -m research.n83_crossfamily_current_20261025.plan_aws_spot \
