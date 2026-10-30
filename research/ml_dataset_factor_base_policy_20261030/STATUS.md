@@ -52,3 +52,10 @@ Inventory04 binds2732 inputs/253944747bytes, including Git modes; all explicit
 bytes and modes rechecked. Inventory SHA256
 068fa314f1ec00a81572def5332e17ed86dc876c13156f376aeae135a87cefac.
 No library implementation changed after dataset04. Clippy03 is next after freeze.
+
+Independent closeout: solver03 resolves both PKM height and unsupported-profile
+findings; subgroup02 resolves interrupted-role and orphan-output findings. Both
+reviews report no remaining scoped source blockers. Ten solver plus three central
+companion tests and ten subgroup tests remain unexecuted. Complete unified
+integration proposal and bounded software CLI acceptance plan are in preparation.
+Frozen source contracts precede any live integration. No active Cargo process.
