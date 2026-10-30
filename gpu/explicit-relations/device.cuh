@@ -162,9 +162,25 @@ __global__ void build_partial(Curve c, Bases b, unsigned first, unsigned end,
   if (id < count)
     points[id] = point;
 }
+#ifdef ER_RIGHT_FULL_CACHE
+#if defined(ER_QUERY_CACHED)
+#error "full and partial right caches are distinct experimental variants"
+#endif
+__global__ void build_right_cache(Curve c, Bases b, unsigned split, U count,
+                                 CachedPoint *out) {
+  U id = U(blockIdx.x) * BLOCK + threadIdx.x;
+  Jac sum = id < count ? tuple_sum(c, b, split, b.slots, id) : Jac{};
+  Point point = normalize_block(c, sum);
+  if (id < count)
+    out[id] = CachedPoint::from(point);
+}
+#endif
 struct RightPartials {
   const Point *first = nullptr, *second = nullptr;
   U second_size = 0;
+#ifdef ER_RIGHT_FULL_CACHE
+  const CachedPoint *full = nullptr;
+#endif
 };
 // A radix encoding preserves the existing right-then-left witness order.
 // Reserve UINT64_MAX for no match; fall back to the separate array when the
@@ -212,6 +228,10 @@ __global__ void build_prefix(const TableRow *rows, U size, U bins, unsigned shif
   U bucket = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (bucket > bins)
     return;
+  if (bucket == bins) {
+    offsets[bucket] = size;
+    return; // The conceptual x=2^63 endpoint has no compact u64 key.
+  }
   Point key{bucket << shift, 0, false};
   U lo = 0, hi = size;
   while (lo < hi) {
@@ -243,6 +263,11 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
   Jac sum;
   if (local < count) {
     U id = start + local;
+#ifdef ER_RIGHT_FULL_CACHE
+    if (partials.full) {
+      sum = c.jac(partials.full[id].point());
+    } else
+#endif
     if (partials.first) {
       sum = c.mixed(sum, partials.first[id / partials.second_size]);
       sum = c.mixed(sum, partials.second[id % partials.second_size]);
@@ -288,6 +313,11 @@ __global__ void search_right_persistent(
     U id = active ? start + threadIdx.x : 0;
     Jac sum;
     if (active) {
+#ifdef ER_RIGHT_FULL_CACHE
+      if (partials.full) {
+        sum = c.jac(partials.full[id].point());
+      } else
+#endif
       if (partials.first) {
         sum = c.mixed(sum, partials.first[id / partials.second_size]);
         sum = c.mixed(sum, partials.second[id % partials.second_size]);
@@ -325,6 +355,11 @@ __global__ void resolve_persistent_winner(
     return; // Uniform; previous kernel completed on the same stream.
   Jac sum;
   if (!threadIdx.x) {
+#ifdef ER_RIGHT_FULL_CACHE
+    if (partials.full) {
+      sum = c.jac(partials.full[id].point());
+    } else
+#endif
     if (partials.first) {
       sum = c.mixed(sum, partials.first[id / partials.second_size]);
       sum = c.mixed(sum, partials.second[id % partials.second_size]);
@@ -368,7 +403,8 @@ __global__ void hash_base_wide(Curve c, U modulus, U inv, U beta, U tau,
   if (t >= tau)
     return;
   U v = t >= beta ? t - beta : modulus - (beta - t);
-  U z = hash_mul63(inv, v, modulus);
+  U z = modulus < (U(1) << 63) ? hash_mul63(inv, v, modulus)
+                                     : hash_mul64(inv, v, modulus);
   Point q;
   if (z < 2 * c.f.p)
     c.lift(z / 2, z & 1, q);
@@ -399,6 +435,10 @@ class DeviceBackend {
   thrust::device_vector<U> matches;
   thrust::device_vector<U> prefixes;
   thrust::device_vector<Point> right_first, right_second;
+#ifdef ER_RIGHT_FULL_CACHE
+  thrust::device_vector<CachedPoint> right_full;
+  U right_cache_limit = UINT64_MAX;
+#endif
   unsigned prefix_shift = 0;
   thrust::device_vector<unsigned long long> winner;
   void admission(U bytes) {
@@ -426,8 +466,13 @@ class DeviceBackend {
   }
 
 public:
-  DeviceBackend(Curve curve, U max_rows, U batch)
+  DeviceBackend(Curve curve, U max_rows, U batch, U full_cache_limit = UINT64_MAX)
       : c(curve), cap(max_rows), chunk(batch) {
+#ifdef ER_RIGHT_FULL_CACHE
+    right_cache_limit = full_cache_limit;
+#else
+    (void)full_cache_limit;
+#endif
     if (!cap || !chunk || chunk > cap)
       throw std::runtime_error("invalid GPU row/chunk caps");
     blocks(cap);
@@ -446,6 +491,13 @@ public:
 #endif
 #endif
   }
+  U cached_right_rows() const {
+#ifdef ER_RIGHT_FULL_CACHE
+    return right_full.size();
+#else
+    return 0;
+#endif
+  }
   void prepare(const Plan &next) {
     rows.clear();
     rows.shrink_to_fit();
@@ -461,6 +513,10 @@ public:
     right_first.shrink_to_fit();
     right_second.clear();
     right_second.shrink_to_fit();
+#ifdef ER_RIGHT_FULL_CACHE
+    right_full.clear();
+    right_full.shrink_to_fit();
+#endif
     p = next;
 #ifdef ER_DENSE_ROWS
     if (p.left > (U(1) << 32))
@@ -517,16 +573,29 @@ public:
               (packed ? 0 : product(chunk, sizeof(U))) + result_words * sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
               product(first_count + second_count, sizeof(Point));
+    [[maybe_unused]] U full_count = 0;
+#ifdef ER_RIGHT_FULL_CACHE
+    size_t free_bytes = 0, total_bytes = 0;
+    cuda_check(cudaMemGetInfo(&free_bytes, &total_bytes));
+    const U retained = bytes - sort_bytes;
+    if (right_cache_fits(p.right, retained, free_bytes, right_cache_limit)) {
+      full_count = p.right;
+      // Sort scratch is released before the full cache is allocated. Charge
+      // the greater phase peak, rather than simultaneously-live storage.
+      bytes = std::max(bytes, retained + product(full_count, sizeof(CachedPoint)));
+    }
+#endif
 #ifdef ER_TABLE_DIAGNOSTICS
     std::fprintf(stderr,
                  "TABLE left=%llu right=%llu bins=%llu admission_bytes=%llu "
                  "partial_first=%llu partial_second=%llu row_width=%u "
-                 "sort_bytes=%llu sort_queried=%u\n",
+                 "sort_bytes=%llu sort_queried=%u right_cache_rows=%llu\n",
                  (unsigned long long)p.left, (unsigned long long)p.right,
                  (unsigned long long)bins, (unsigned long long)bytes,
                  (unsigned long long)first_count,
                  (unsigned long long)second_count, unsigned(sizeof(DeviceRow)),
-                 (unsigned long long)sort_bytes, queried_sort);
+                 (unsigned long long)sort_bytes, queried_sort,
+                 (unsigned long long)full_count);
 #endif
     admission(bytes);
     points.assign(p.points.begin(), p.points.end());
@@ -569,6 +638,15 @@ public:
       }
       cuda_check(cudaDeviceSynchronize());
     }
+#ifdef ER_RIGHT_FULL_CACHE
+    if (full_count) {
+      right_full.resize(full_count);
+      build_right_cache<<<blocks(full_count), BLOCK>>>(
+          c, p.view(data(points)), p.split, full_count, data(right_full));
+      cuda_check(cudaGetLastError());
+      cuda_check(cudaDeviceSynchronize());
+    }
+#endif
   }
   Result find(Point target, U max_work) {
     if (!c.on_curve(target))
@@ -579,6 +657,10 @@ public:
     RightPartials partials;
     if (!right_first.empty())
       partials = {data(right_first), data(right_second), right_second.size()};
+#ifdef ER_RIGHT_FULL_CACHE
+    if (!right_full.empty())
+      partials.full = data(right_full);
+#endif
 #ifdef ER_QUERY_PERSISTENT
     if (p.right) {
       cuda_check(cudaMemsetAsync(data(winner), 0xff, 2 * sizeof(U)));
