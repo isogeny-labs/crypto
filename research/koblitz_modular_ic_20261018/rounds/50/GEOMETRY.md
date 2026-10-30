@@ -38,22 +38,25 @@ must supply those normal rings and maps. The next divisor calculation
 then locates zeros and poles of the original rational coordinate formulas
 on these normal charts.
 
-## A prepared intermediate-ring lead
+## The checked integral-v intermediate ring
 
 R27 CM and R34 LOCAL_GEOMETRY already identify the degree16 extension of
 the elliptic base v²+v+u³+u=0 and the genus31 sign quotient. Those are retained
 results, not newly discovered covers. A useful new input representation
-would retain the known integral function v before asking for full integral
-closure. Test the scaled triangular relation
+retains the known integral function v before asking for full integral
+closure. RELATIVE50 checks the scaled triangular relation
 
     A(t_integral/u^4)+B(t_integral/u^4)*v=0
 
 for polynomial coefficients and monic degree16 in t_integral. Together
-with the monic quadratic base relation, this would give an explicit rank32
+with the monic quadratic base relation, this gives an explicit rank32
 intermediate algebra over F2[u]. Its map to the plane model is finite and
 birational because v=A/B in the already certified field, and v is integral
 by its base equation. Its normalization is consequently the same integral
-closure. This is a structural route to remove known nonnormality before
-the generic normalizer; it requires its own native input and complete
-checks before use. No normalization run or runtime comparison is recorded
-for this intermediate representation here.
+closure. The accepted relative50-01 run also checks both plane norm products,
+twelve overlap products and the inverse-unit maps. BOUNDARY50 separates two
+actual degree2 refined points above the same degree2 plane point, proving
+the inclusion is strict. LOCAL50 computes the exact128-dimensional cyclic
+defect block and its saturation exponent8; see LOCAL-GEOMETRY.md for the
+module presentation and CRT argument. These steps remove and measure actual
+nonnormality before the remaining normalization calculation.
