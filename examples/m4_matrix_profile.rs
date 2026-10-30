@@ -31,6 +31,9 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
 use num_bigint::BigUint;
 use serde_json::Value;
 
+/// Same as `closure_refutation_scan`: run the closure to saturation.
+const CLOSURE_ROUNDS: u32 = 1_000_000;
+
 fn monomials_up_to(n_vars: u64, d: u32) -> f64 {
     let (mut total, mut binom) = (0f64, 1f64);
     for i in 0..=d as u64 {
@@ -114,11 +117,11 @@ fn main() {
                     None
                 };
                 trace_closure(true);
-                let Some((b, total, base, pre)) = ReducedBasis::closed_full_split(
+                let Some((mut b, total, base, pre)) = ReducedBasis::closed_full_split(
                     &sys.equations,
                     sys.n_vars,
                     d,
-                    d,
+                    CLOSURE_ROUNDS,
                     Some(sub_vars),
                 ) else {
                     eprintln!("degree {d}: over the F4 size caps");

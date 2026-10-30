@@ -4,12 +4,14 @@
 solver and no speed claim and moves no ECC2K-130 cost. Rho stays `2^60.81`. Counted metrics only
 (host load 20 to 70). Not a performance result: no `benchmarks/README.md` row.
 
-**Status: the new profile runs are NOT done.** The owner's S3 rule (`scripts/checkpoint.sh gate` before any
-run) could not be completed from this session: the upload to S3 was refused by the session's network
-policy (auto-mode classifier, "Command Network Lists"). `RESUME.md` is written and passes the local
-check; nothing was uploaded and no run was started. Everything below is derived from the 1561 *recorded*
-closure rows already committed, plus the instrumentation, which compiles and is ready to run
-(`examples/m4_matrix_profile.rs`). Rows marked "pending" need those runs.
+**Status: the profile runs are done** (34 rows: m = 4, five cells, degrees 3 and 4, satisfiable and
+unsatisfiable draws; `data/profile_*.jsonl`, `profile_table.py`, `data/profile_table.{json,md}`). The owner's S3
+gate (`scripts/checkpoint.sh gate`) was run by the user from their terminal, because this session's network
+policy refused the upload; it passed (`20261030T173312Z-50092387d985`). **Instrumentation check:** the profiler's
+counted word ops equal the recorded ones on every row that has a recorded counterpart (29 of 29 exact, 0
+mismatches, including degree 4 at 124k to 150k columns; 5 rows are draws with no recorded row). Peak RSS was not
+captured (`time -l` is blocked by the sandbox); the model estimate `0.59 * 3 c^2 / 8` is 5.0 GB at the largest
+cell (150k columns), and no run was killed. Not run: (6,54) at degree 4 (342k columns, 25.8 GB, over the 16 GiB limit).
 
 ## 1. Fitted w (recorded data, no new runs)
 
@@ -65,56 +67,94 @@ term. `l = 34` for every row but the w=1 floor.
 The interval is the bootstrap of `(a, w)` only; it does not include the extrapolation error or the
 conversion range (-10.5 to -7.7 bits, a further +/-1.5).
 
-## 3. Can a structured / block-Wiedemann elimination push w below 2? (estimate; nothing implemented)
+## 3. The matrix as an object (measured, m = 4, 34 runs)
 
-What the recorded data already say about the matrix:
+Columns are monomials in the `N = 2n + 4l` coordinate variables. "Subspace columns" are monomials supported only
+on the first `m l` subspace coordinates (the factor-of-linear-forms reading, stated explicitly; every column is a
+monomial in coordinate variables). `rank` is the saturated closure basis; `XL rank` is the plain echelon basis;
+`rho` is the mean weight of the unreduced Macaulay input rows; `E = rows_in / C(N, <=D-2)`.
 
-- **The closure basis is not sparse in any useful sense and not low rank.** At the cells that matter
-  (m=4, l = 5 and 6, degree 4) the saturated closure rank is **62% to 75% of the columns**
-  (`closure_rank / columns`: 0.63 at N=54, 0.72 to 0.75 at N=42 to 44), and the closure inserts 3.2 to
-  4.0 products per column. A Krylov method applied to the closure's matrix has nothing to exploit; the
-  closure *is* the dense elimination.
-- **The plain XL matrix is low rank**: `xl_rank / columns` falls from 0.49 (794 columns) to 0.087
-  (N=44) and 0.069 (N=54, 342k columns). It is also the only sparse object (rows are one generator times
-  one monomial).
-- **But plain XL needs more degree.** At the cells where the closure refutes at degree 4, plain XL
-  refuted at 4 in **0 of 16** committed draws (it is at least 5). So a Wiedemann route pays at least one
-  extra degree: at `N = 394`, `C(N, <=6) / C(N, <=5)` is about 2^6.0 more columns.
+| cell (n, l, N) | D | draw | cols | closure rank / cols | XL rank / cols | input rows (E) | rho | subspace cols d2 / d3 / d4 | closure pivots per block d1,d2,d3,d4 | closure nnz per entry | rounds | closure ops | Macaulay (base) ops |
+|---|--:|:-:|--:|--:|--:|--:|--:|---|---|--:|--:|--:|--:|
+| (11,5,42) | 3 | S | 5922 | 0.269 | 0.083 | 495 | 44 | 22% / 7.4% / | 1, 58, 1532 | 0.80% | 2 | 8.1e6 | 3.9e5 |
+| (11,5,42) | 4 | S | 124314 | **0.765** | 0.087 | 10890 (12.0) | 52 | 22% / 9.9% / 4.3% | 3, 233, 6099, 88770 | 1.14% | 13 | 3.2e11 | 2.4e8 |
+| (11,5,42) | 4 | U | 123814 | 0 (refuted) | 0.087 | 10890 | 55 | | | | 6 | 1.2e11 | 2.4e8 |
+| (12,5,44) | 4 | S | 149905 | **0.684** | 0.086 | 12972 (13.1) | 60 | 20% / 8.6% / 3.5% | 3, 228, 6181, 96126 | 0.98% | 14 | 2.9e11 | 3.6e8 |
+| (12,5,44) | 4 | U | 149986 | 0 (refuted) | 0.086 | 12972 | 61 | | | | 9 | 6.2e11 | 3.5e8 |
+| (13,4,42) | 4 | S | 124314 | **1.000** | 0.102 | 12870 (14.2) | 54 | 14% / 4.9% / 1.6% | 21, 837, 11478, 111930 | 0.009% | 8 | 6.1e11 | 2.9e8 |
+| (13,4,42) | 4 | U | 124314 | 0 (refuted) | 0.102 | 12870 | 56 | | | | 5 | 7.2e11 | 2.9e8 |
+| (12,3,36) | 4 | S | 66712 | **1.000** | 0.131 | 8892 (13.3) | 40 | 10.5% / 3.1% / 0.8% | 26, 618, 7139, 58905 | 0.005% | 4 | 5.1e10 | 1.0e8 |
+| (12,3,36) | 4 | U | 66712 | 0 (refuted) | 0.131 | 8892 | 39 | | | | 3 | 3.4e10 | 1.0e8 |
+| (15,6,54) | 3 | S | 11662 | 0.236 | 0.073 | 855 | 70 | 19% / 10.4% / | 1, 77, 2670 | 0.71% | 2 | 2.7e7 | 2.3e6 |
 
-Price of that route, as a bound that uses no assumption about the kernel: a Krylov method needs at least
-about `r/64` block iterations, each at least `nnz >= rows_in >= r` word operations, so
-`cost >= r^2 / 64`. At `D' = 6` there are `c = C(394, <=6) = 2^42` columns, so with rank `r = c 2^-s`
-the bound is `2^(78 - 2s)` word ops. The measured fraction at N=54 is `2^-3.9` (s = 3.9); even a
-hypothetical `s = 10` (a further `2^-6` below that, optimistic) gives an oracle of `2^58`, a total of
-`34 + 58 = 2^92`, about **+31** over rho in word-op units (about +23 after the -8.4 conversion), and that
-is before the row weight is counted. The row weight (`rho`, terms per Macaulay row) multiplies `nnz`
-and is the **pending** input (`input.lead_weight_sum`). At the measured-trend `s` of 4 to 7 the bound
-is `2^(78-8..14) = 2^64..70`, i.e. +37 to +43 in word-op units before `rho`.
+(Complete table, every draw: `data/profile_table.md`. The rank is the closure rank; at degree 3 every cell gives
+0.24 to 0.34 for `l >= 4` and 0.69 to 0.74 at `l = 3`.)
 
-The bound `r^2/64` is generous: the sparse input has `nnz = rows_in * rho >= r * rho` with
-`rows_in = E * C(N, <=D'-2)` for `E` generators, so the real figure is `(r/64) * rows_in * rho`. With the
-`s = 4` to `7` trend that is about `2^(35..38 - 6) * 2^38 * E rho` words, which is above the +30
-crossing in rho-step units for any `E rho >= 2^4`, but `E` and `rho` are not yet measured here, so
-this is **an estimate that the profile run must confirm, not a result**. What the recorded data do
-settle: the closure matrix is dense with rank 0.6 to 0.75 of the columns, so no Krylov method helps
-*there*; any gain below `w = 2` would have to come from the plain XL matrix at one more degree, from the
-rank fraction (a polynomial factor `2^-s`, not an exponent) and from the row weight. A structured
-elimination is therefore a constant-factor lever of order `2s` bits at the cost of one extra degree (+12
-bits at w=2), not a route to w below 2; this statement is conditional on the pending profile.
+Reading.
+- **The closure basis is high rank.** A satisfiable draw's saturated degree-4 closure has rank 0.68 to 0.77 of the
+  columns at `l = 5` and **1.000 at `l = 3, 4`** (every column pivots, 111,930 of 111,930 in the top block). It
+  is not low rank. (At rank = columns the reduced basis is nearly the identity, 0.005% to 0.009% nonzeros: the
+  cost is in the elimination that gets there, not in the final matrix; at `l = 5` the basis has 1% density.) (An earlier version of this note quoted 0.63 to 0.75 from the recorded rows; the profile
+  runs give 0.68 to 1.00, so that figure was a lower bound for the cells it covered, not a property of the matrix.)
+  The unsatisfiable draws collapse to the single row `1`.
+- **The Macaulay input is sparse and low rank, the closure is not.** Input rows weigh `rho` = 32 to 78 terms
+  (grows with `n` and `l`; `rho / n` = 3.3 to 5.0), `E = 12` to 14 generators (about `n + 1`), plain XL rank is 0.07 to 0.13 of the columns and
+  the rows are full rank (rank = rows_in). At `l = 5` the closure rows have 24 to 27 times the weight
+  (about 1% of the columns, 1,400 terms against 55): fill-in.
+- **The closure is over 99.7% of the work.** At degree 4 the plain Macaulay reduction costs 1.0e8 to 3.6e8 word
+  operations and the closure 3.2e10 to 7.2e11, a factor of 340 to 2500. This is where an exponent has to be
+  found, not in the elimination of the Macaulay matrix.
+- **Subspace columns are 22% of the degree-2 columns, falling to 1.6% to 4.3% at degree 4.** Almost every column
+  touches an intermediate-point coordinate, so the "products of linear forms in the subspace" structure is
+  confined to the low blocks and does not describe the matrix where its mass is (d4 holds about 90% of the columns).
 
-## 4. Matrix profile per degree block (pending)
+## 3a. Can a structured / block-Wiedemann elimination push w below 2? (measured inputs, extrapolated cost; nothing implemented)
 
-`examples/m4_matrix_profile.rs` (instrumentation in `src/cryptanalysis/inherited_f4/profile.rs`, read-only;
-the only change to shared code is a thread-local trace call in `ReducedBasis::close`) prints, per draw and
-degree: input Macaulay profile (`--input`), plain XL echelon profile, saturated-closure profile, base vs
-closure word ops and per-round products. Per degree block `d` of columns: columns, subspace-only columns
-(monomials in the first `m*l` coordinate variables only, the "products of linear forms" reading, stated
-explicitly: every column is a monomial in coordinate variables, so the informative split is subspace
-coordinates vs the `(m-2)n` intermediate-point coordinates), pivots per block (rank profile), nonzeros
-(density) and row weight by leading degree. Planned cells (all under 16 GiB; closure memory
-`0.59 * 3 c^2 / 8`): m=4 (l, N) = (3, 36), (4, 42), (5, 42), (5, 44) at degree 3 and 4, (6, 54) at degree 3
-only (degree 4 is 25.8 GB on the large host and is not rerun); first check that the instrumented word ops
-equal the recorded ones on the same draws.
+A Krylov / block-Wiedemann solve of the plain XL matrix of `r` independent rows and `nnz = r rho` entries costs
+about `2 (r / 64) nnz` word operations (block width 64, two sided; the iteration count is the dimension, so the rank
+fraction does not help). Measured inputs, degree 4, unsatisfiable draws (plain XL does **not** refute here):
+
+| cell | rows r | rho | nnz | Krylov `2(r/64)nnz` | dense Macaulay reduction | closure (what refutes) |
+|---|--:|--:|--:|--:|--:|--:|
+| (11,5,42) | 10776 | 55 | 5.97e5 | 2.0e8 | 2.4e8 | 1.2e11 |
+| (12,5,44) | 12843 | 61 | 7.91e5 | 3.2e8 | 3.5e8 | 6.2e11 |
+| (13,4,42) | 12728 | 56 | 7.16e5 | 2.8e8 | 2.9e8 | 7.2e11 |
+| (12,3,36) | 8746 | 39 | 3.5e5 | 9.5e7 | 1.0e8 | 3.4e10 |
+
+- **At the measured sizes a sparse solver gains nothing over the dense Four Russians reduction of the same
+  matrix** (ratio 0.8 to 1.0): at `r` = 9 to 13 thousand the two costs are equal. The sparse gain only appears
+  in the growth rate, `r^2 rho` against `cols^w`, and `r` is `cols / 2^3` to `cols / 2^3.5` here.
+- **The route only pays if plain XL refutes**, which it does not at the degree where the closure does: 0 of 136
+  committed unsatisfiable draws (m = 3 and 4) refuted under plain XL at degree 4, against 126 under the closure.
+  Plain XL is therefore at least one degree behind the closure (degree 5 plain XL is unmeasured: the 10
+  m = 4 rows at degree 5 are all satisfiable and cannot refute).
+
+Extrapolation to the real row (`n = 131, l = 34, N = 398`, `E = n + 1 = 132`, `rho = 4 n` to `6.4 n` (measured `rho / n` is 3.3 to 5.0; the top end is a hedge); `rows = E C(N, <=D'-2)`, `cost = 2 (rows/64) rows rho`):
+
+| plain-XL degree D' | rows | columns | Krylov word ops | oracle after conv (-8.4) | row, bits over rho |
+|---|--:|--:|--:|--:|--:|
+| 6 (closure degree 5 plus the measured one-degree lag) | 2^37.0 | 2^42.3 | 2^78.0 to 2^78.7 | 2^69.6 to 2^70.3 | **+42.8 to +43.5** (+51.2 to +51.9 with no conversion) |
+| 5 (only if plain XL refuted at the closure's degree, contradicted by the 0 / 136) | 2^30.4 | 2^36.3 | 2^64.8 to 2^65.5 | 2^56.4 to 2^57.1 | +29.6 to +30.3 (+38.0 to +38.7 with no conversion) |
+
+Total uses the same pricing as section 2: `log2(2^(34 + oracle) + 2^70)` against rho `2^60.81`. The conversion
+(-8.4, `k_conversion_20261018`) was measured for the Four Russians kernel; a sparse matrix-vector kernel is
+cache-unfriendly and its Ir per word operation was not measured, so the "no conversion" column is the safer
+pricing. The conversion range (-10.5 to -7.7) moves the D' = 6 row by about 2 bits.
+
+What this says. A structured elimination lowers the D = 5 row from **+61.5 (dense, fitted w) to about +43**, an
+18-bit gain, but not through a lower exponent: the Krylov cost is `rows^2 rho / 32` with `rows = cols / 2^5.3`, so
+it is an exponent 2 in `rows` with a constant. It does not reach w below 2 in the sense of a better exponent, and
+it stays above the +30 line unless plain XL refuted at the closure's degree, which the data contradict.
+
+## 4. Matrix profile per degree block
+
+Section 3 is the table. Method: `examples/m4_matrix_profile.rs` (instrumentation in
+`src/cryptanalysis/inherited_f4/profile.rs`, read-only; the one change to shared code is a thread-local trace call
+in `ReducedBasis::close`) replays the committed draws as `dreg_closure` does, with the same saturating closure
+(`1_000_000` rounds, as `closure_refutation_scan`) and `F4_F2_MAX_ROWS = F4_F2_MAX_COLS = 5e7`; it prints per
+draw and degree the input Macaulay profile, the plain XL echelon profile and the saturated closure profile per
+degree block, the per-round products and the base vs closure word ops. A first batch with `rounds = degree`
+stopped before saturating at degree 4; it was discarded and every cell rerun with the saturating rounds.
 
 ## 5. Decision (F1 rule)
 
@@ -125,8 +165,13 @@ degree curiosity and do not rent memory.
   +30 crossing at w about 1.8 by 0.7 to 1.0 in w, which at 36 bits of log-columns is 25 to 36 bits.
 - Repriced D = 5 row: **+61.5 bits (bootstrap 55.8 to 64.0), degree-4 proxy +52.2 (49.5 to 53.7)**, against
   the review's +37 to +49 bracket, which assumed w in 2 to 2.33 with no intercept.
-- The decision holds under every pricing in section 2 except w <= 1.8, which no measurement supports and
-  Section 3 gives no route to.
+- The decision holds under every pricing in section 2 except w <= 1.8, which no measurement supports.
+- **The structured route (section 3a) does not change it.** Block Wiedemann on the plain XL matrix prices the row
+  at about **+43** (+51 with no conversion) if plain XL needs one degree more than the closure, as measured (0 of
+  136 refutations at the closure's degree). It reaches the +30 line (+29.6 to +30.3) only under the assumption
+  that plain XL refutes at the closure's own degree, which the data contradict, and then only with the Four
+  Russians conversion applied to a sparse kernel it was not measured for. The measured Krylov cost at degree 4
+  equals the dense Macaulay reduction (ratio 0.8 to 1.0), so there is no gain at the sizes that exist.
 
 **Decision: downgrade the (4,6) cell to "degree curiosity"; do not rent memory for it.** This is a
 statement about the price of the algorithm at a fitted w; it does not say the degree stays 5, and it is
@@ -134,5 +179,6 @@ not a measured row at `n = 131`.
 
 ## Files
 
-`fit_w.py`, `reprice.py`, `plot.py`, `data/` (harvest, `fit_w.json`, `reprice.json`),
-`w_fit_and_reprice.{png,svg}`, `report.pdf`.
+`fit_w.py`, `reprice.py`, `plot.py`, `profile_table.py`, `plot_profile.py`, `data/` (harvest, `fit_w.json`,
+`reprice.json`, `profile_*.jsonl` and `.log` per cell, `profile_table.{json,md}`), `w_fit_and_reprice.{png,svg}`,
+`matrix_profile.{png,svg}`, `report.pdf`.

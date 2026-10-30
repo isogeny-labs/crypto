@@ -192,10 +192,11 @@ pub fn macaulay_input_profile(
 }
 
 impl ReducedBasis {
-    /// Profile of this basis.  Only for a root basis (no specialisation):
-    /// every row is then in the current layout.
-    pub fn profile(&self, subspace_vars: u32) -> MatrixProfile {
-        assert!(self.history.is_empty(), "profile reads a root basis");
+    /// Profile of this basis.  Rows are first brought into the current
+    /// layout (a closed basis has lazily extended rows); that bookkeeping
+    /// is charged to a scratch cost and does not touch the closure's own.
+    pub fn profile(&mut self, subspace_vars: u32) -> MatrixProfile {
+        self.materialise_all(&mut InheritCost::default());
         let mut prof = MatrixProfile::new(
             self.columns.len() as u64,
             self.rows.len() as u64,
