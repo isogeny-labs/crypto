@@ -129,6 +129,13 @@ class FrozenEngineeringComponent(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
                 builder.f4_fp_ic_component()
 
+    def test_corrupt_frozen_ratio_fails_closed(self):
+        bad = copy.deepcopy(builder.f4_fp_ic_component())
+        bad["dlp"][0]["s_ratio"] += 1
+        with patch.object(builder, "load", return_value=bad):
+            with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
+                builder.f4_fp_ic_component()
+
 
 if __name__ == "__main__":
     unittest.main()

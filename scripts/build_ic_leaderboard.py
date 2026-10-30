@@ -1502,12 +1502,19 @@ def f4_fp_ic_component() -> dict:
     """Carry the frozen engineering result without promoting it to a gate verdict."""
     study = load(SOURCES["f4_fp_ic_effect"])
     rows = study.get("dlp")
+    expected = {(53, 1), (53, 2), (101, 1), (101, 2)}
     if (study.get("class") != "engineering" or not isinstance(rows, list)
-            or len(rows) != 4 or len({(r.get("p"), r.get("seed")) for r in rows}) != 4
+            or len(rows) != 4 or not all(isinstance(r, dict) for r in rows)
+            or {(r.get("p"), r.get("seed")) for r in rows} != expected
             or not all(r.get("solved") == [True, True]
                        and r.get("correct") == [True, True]
                        and r.get("s_before", 0) > r.get("s_after", 0) > 0
-                       and r.get("relations", 0) > 0 for r in rows)):
+                       and r.get("rho_s_mean", 0) > 0
+                       and r.get("relations", 0) > 0
+                       and math.isclose(r.get("s_ratio", 0), r["s_before"] / r["s_after"], rel_tol=1e-12)
+                       and math.isclose(r.get("s_over_rho_before", 0), r["s_before"] / r["rho_s_mean"], rel_tol=1e-12)
+                       and math.isclose(r.get("s_over_rho_after", 0), r["s_after"] / r["rho_s_mean"], rel_tol=1e-12)
+                       for r in rows)):
         raise SystemExit("f4_fp engineering summary is incomplete or inconsistent")
     return study
 
