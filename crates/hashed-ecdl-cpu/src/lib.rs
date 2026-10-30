@@ -254,17 +254,20 @@ impl DecompositionOracle for CachedMitm {
         if (p.prefix.len() + p.suffix.rows) as u64 > max_work {
             return Err(Error::Limit("CPU decomposition work; not nonexistence"));
         }
-        for (batch_index, points) in p.prefix.chunks(self.batch).enumerate() {
+        // Grow batches geometrically, avoiding unused residuals when an early
+        // prefix matches. The configured batch remains the maximum; batch=1
+        // keeps its independent per-residual inversion behavior.
+        let mut start = 0;
+        let mut batch = 1;
+        while start < p.prefix.len() {
+            let end = start + batch.min(p.prefix.len() - start);
+            let points = &p.prefix[start..end];
             self.stats.query_inversions += self.scratch.subtract(curve, target, points);
             for (offset, residual) in self.scratch.output.iter().enumerate() {
                 self.stats.probed_rows += 1;
                 if let Some(id) = p.suffix.find(*residual) {
                     let mut tuple = vec![None; bases.len()];
-                    decode(
-                        &bases[..p.split],
-                        batch_index * self.batch + offset,
-                        &mut tuple[..p.split],
-                    );
+                    decode(&bases[..p.split], start + offset, &mut tuple[..p.split]);
                     decode(&bases[p.split..], id, &mut tuple[p.split..]);
                     // Keep a checked group replay at the public oracle boundary.
                     let sum = tuple.iter().try_fold(None, |s, &q| curve.add(s, q))?;
@@ -274,6 +277,8 @@ impl DecompositionOracle for CachedMitm {
                     return Ok(Some(tuple));
                 }
             }
+            start = end;
+            batch = batch.saturating_mul(2).min(self.batch);
         }
         Ok(None)
     }
