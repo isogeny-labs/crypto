@@ -3637,6 +3637,7 @@ struct Step4State {
     last_report: Option<GroupReport>,
     publication_error: Option<WitnessError>,
     terminal_retained: bool,
+    sealed_outcome: Option<OutcomeFacts>,
     observer_performed: u64,
     linear_stop: Option<LinearStop>,
     final_staging_stop: Option<GroupStop>,
@@ -3673,6 +3674,7 @@ impl Step4State {
             last_report: None,
             publication_error: None,
             terminal_retained: false,
+            sealed_outcome: None,
             observer_performed: 0,
             linear_stop: None,
             final_staging_stop: None,
@@ -4142,15 +4144,45 @@ struct Accounting {
     traversal: TraversalAccounting,
     events: EventAccounting,
 }
-#[derive(serde::Serialize)]
-struct Claims {
-    solver_completed: bool,
-    group_domain_complete: bool,
-    negative_verified: bool,
-    pdp_witness_verified: bool,
-    certificate_durably_persisted: bool,
-    independent_derivation_verified: bool,
-    operation_trajectory_verified: bool,
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+pub(super) struct Claims {
+    pub solver_completed: bool,
+    pub group_domain_complete: bool,
+    pub negative_verified: bool,
+    pub pdp_witness_verified: bool,
+    pub certificate_durably_persisted: bool,
+    pub independent_derivation_verified: bool,
+    pub operation_trajectory_verified: bool,
+}
+fn step4_claims(p: &PreparedOriginal) -> Claims {
+    let state = &p.step4;
+    let complete = state.last_report.is_some_and(|r| r.group_domain_complete);
+    let facts = &state.certificate.facts;
+    Claims {
+        solver_completed: complete && !state.failed,
+        group_domain_complete: complete,
+        negative_verified: complete && !facts.computed,
+        pdp_witness_verified: facts.local_replay_complete,
+        certificate_durably_persisted: facts.durable_acknowledged,
+        independent_derivation_verified: false,
+        operation_trajectory_verified: false,
+    }
+}
+/// Reported producer facts for parent outcome construction, not independent
+/// verification. Only available after a complete terminal artifact was retained.
+/// Call before moving artifact owners out of the prepared phase.
+#[derive(Clone, Copy, Debug)]
+pub(super) struct OutcomeFacts {
+    pub claims: Claims,
+    pub native_backend_invoked: bool,
+    pub native_statistics_complete: bool,
+}
+pub(super) fn step4_outcome(phase: &NativePhase) -> Result<OutcomeFacts, Stop> {
+    let p = &phase.prepared;
+    if !p.step4.terminal_retained || p.slots.buffers[7].bytes.is_empty() {
+        return Err(Stop::InvalidInput);
+    }
+    p.step4.sealed_outcome.ok_or(Stop::InvalidInput)
 }
 #[derive(serde::Serialize)]
 struct DynamicResult<'a> {
@@ -4242,6 +4274,11 @@ pub(super) fn retain_step4_terminal(phase: &mut NativePhase) -> Result<(), Stop>
     if p.step4.terminal_retained {
         return Err(Stop::InvalidInput);
     }
+    let outcome = OutcomeFacts {
+        claims: step4_claims(p),
+        native_backend_invoked: phase.report.native_backend_invoked,
+        native_statistics_complete: phase.report.native_statistics_complete,
+    };
     let entered_group = p.step4.last_report.is_some();
     let report = p.step4.last_report.unwrap_or(GroupReport {
         stop: GroupStop::InvalidState,
@@ -4519,15 +4556,7 @@ pub(super) fn retain_step4_terminal(phase: &mut NativePhase) -> Result<(), Stop>
             source_slots,
             last_state,
             first_certificate,
-            claims: Claims {
-                solver_completed: report.group_domain_complete && !state.failed,
-                group_domain_complete: report.group_domain_complete,
-                negative_verified: report.group_domain_complete && !cert.facts.computed,
-                pdp_witness_verified: cert.facts.local_replay_complete,
-                certificate_durably_persisted: cert.facts.durable_acknowledged,
-                independent_derivation_verified: false,
-                operation_trajectory_verified: false,
-            },
+            claims: outcome.claims,
         };
         // Borrow views from disjoint fields; slot7 is never a source reference.
         let mut output = InputBuffer {
@@ -4541,6 +4570,7 @@ pub(super) fn retain_step4_terminal(phase: &mut NativePhase) -> Result<(), Stop>
     p.terminal.performed_work += local.performed_work;
     p.ledger.performed_work += local.performed_work;
     p.step4.terminal_retained = result.is_ok();
+    p.step4.sealed_outcome = result.is_ok().then_some(outcome);
     result
 }
 /// Consumes already admitted owners; does not publish or imply registration.
@@ -6818,6 +6848,7 @@ mod tests {
             phase.prepared.terminal.reserved_work,
             phase.prepared.terminal.work_limit
         );
+        assert_eq!(step4_outcome(&phase).unwrap_err(), Stop::InvalidInput);
         assert!(phase.prepared.slots.buffers[7].bytes.is_empty());
         assert!(phase.prepared.step4.certificate.facts.durable_acknowledged);
         assert_eq!(phase.prepared.step4.final_artifacts[6].bytes, bytes);
@@ -7102,6 +7133,10 @@ mod tests {
         assert_eq!(v["cause"], "persistence_failure");
         assert_eq!(v["claims"]["solver_completed"], false);
         assert_eq!(v["claims"]["group_domain_complete"], true);
+        let reported = step4_outcome(&phase).unwrap();
+        assert!(!reported.claims.solver_completed);
+        assert!(reported.claims.certificate_durably_persisted);
+        assert_eq!(serde_json::to_value(reported.claims).unwrap(), v["claims"]);
         assert_eq!(
             v["first_certificate"]["facts"]["durable_acknowledged"],
             true
@@ -7579,6 +7614,13 @@ mod tests {
             let confirmation = confirm_step4_witness(&mut phase.prepared, &mut publisher);
             assert!(confirmation.is_ok(), "confirmation={confirmation:?}; remaining before={before_confirmation}; report={report:?}");
             retain_step4_terminal(&mut phase).unwrap();
+            let reported = step4_outcome(&phase).unwrap();
+            let terminal: serde_json::Value =
+                serde_json::from_slice(&phase.prepared.slots.buffers[7].bytes).unwrap();
+            assert_eq!(
+                serde_json::to_value(reported.claims).unwrap(),
+                terminal["claims"]
+            );
             let mut parent = crate::ml_dataset::types::SolverData {
                 outcome: serde_json::json!({
                     "strategy": super::super::DYNAMIC_STRATEGY,
@@ -7587,6 +7629,7 @@ mod tests {
                 }),
                 artifacts: take_step4_artifacts(&mut phase.prepared).unwrap(),
             };
+            assert_eq!(step4_outcome(&phase).unwrap_err(), Stop::InvalidInput);
             assert!(super::super::retains_canonical_artifacts(&parent));
             let allocations: Vec<_> = parent.artifacts.iter().map(|a| a.bytes.as_ptr()).collect();
             super::super::flush_prime_chain_payloads(&mut parent);
@@ -7752,6 +7795,30 @@ mod tests {
                 )
             };
             let file_verified = check_files(&file_artifacts).unwrap();
+            assert_eq!(
+                reported.claims.solver_completed,
+                file_verified.solver_completed_verified
+            );
+            assert_eq!(
+                reported.claims.negative_verified,
+                file_verified.negative_verified
+            );
+            assert_eq!(
+                reported.claims.pdp_witness_verified,
+                file_verified.first_witness_verified
+            );
+            assert_eq!(
+                reported.claims.certificate_durably_persisted,
+                file_verified.witness_capture_committed
+            );
+            assert_eq!(
+                reported.native_backend_invoked,
+                file_verified.native_backend_invoked_reported
+            );
+            assert_eq!(
+                reported.native_statistics_complete,
+                file_verified.native_statistics_complete_reported
+            );
             assert!(
                 file_verified.first_witness_verified && file_verified.witness_capture_committed
             );
