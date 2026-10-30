@@ -912,3 +912,31 @@ pub fn decomposition_network_derived(
     encoder.hash_member(curve, &a2, &bases[1].prime, &bases[1].seed.alpha, &bases[1].seed.beta, &bases[1].threshold, meter)?;
     encoder.finish(meter)
 }
+
+/// Scalar-parameter decomposition: k free, A1 = k*G (on-curve by construction),
+/// A2 = T - A1. k -> k*G is a bijection on the prime-order subgroup, so the
+/// exact count is unchanged, and no curve-validity check is needed at all.
+pub fn decomposition_network_scalar(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<Network> {
+    if bases.len() != 2 || !curve.in_subgroup(target, meter)? {
+        return Err(invalid("scalar decomposition arity or target"));
+    }
+    let order_bits = curve.order().bits() as usize;
+    let mut encoder = Encoder::new();
+    let k = encoder.input_word(order_bits, meter)?;
+    encoder.mark_interface(&k, meter)?;
+    let order = Encoder::constant(order_bits, curve.order())?;
+    let below = encoder.less_than(&k, &order, meter)?;
+    encoder.assert_equal(&below, &Encoder::constant(1, &BigUint::one())?, meter)?;
+    let a1 = encoder.scalar_mul_program(curve, &k, curve.generator(), meter)?;
+    encoder.hash_member(curve, &a1, &bases[0].prime, &bases[0].seed.alpha, &bases[0].seed.beta, &bases[0].threshold, meter)?;
+    let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
+    let target_words = Encoder::constant_point(curve, target)?;
+    let a2 = encoder.point_add_program_raw(curve, &target_words, &neg_a1, meter)?;
+    encoder.hash_member(curve, &a2, &bases[1].prime, &bases[1].seed.alpha, &bases[1].seed.beta, &bases[1].threshold, meter)?;
+    encoder.finish(meter)
+}
