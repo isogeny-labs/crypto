@@ -16,6 +16,8 @@ use std::time::{Duration, Instant};
 mod prime_f4_wide;
 #[path = "prime_f4_wide_m3.rs"]
 mod prime_f4_wide_m3;
+#[path = "prime_f4_wide_dynamic.rs"]
+mod prime_f4_wide_dynamic;
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
