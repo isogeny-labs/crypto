@@ -135,3 +135,7 @@ Publication update (2026-10-30): both combined native panels pass40core,5runner,
 [root union receipt](root-union-complete.txt) records5430passes with actual exit0.
 The [publication manifest](sources-merged-peer.sha256) matches all26 actual
 merged peer files. Earlier PDF/manifests/transcripts remain historical snapshots.
+
+The subsequent advanced-base [complete root receipt](advanced-root-complete.txt)
+also records5430passes, actual exit0, covering the updated path dependency.
+All26 native publication files remain unchanged and match the merged peer.
