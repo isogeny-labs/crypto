@@ -42,6 +42,7 @@ fn point_bucket(mut key: u64, mask: usize) -> usize {
 struct Suffix {
     slots: Vec<(u64, usize)>,
     rows: usize,
+    unique: usize,
 }
 impl Suffix {
     fn new(points: Vec<Point>) -> Result<Self, Error> {
@@ -49,6 +50,7 @@ impl Suffix {
             return Ok(Self {
                 slots: vec![],
                 rows: 0,
+                unique: 0,
             });
         }
         let size = points
@@ -64,6 +66,7 @@ impl Suffix {
         let mut out = Self {
             slots,
             rows: points.len(),
+            unique: 0,
         };
         // Tuple order is lexicographic: retain the first ID on duplicate sums.
         for (id, point) in points.into_iter().enumerate() {
@@ -76,6 +79,7 @@ impl Suffix {
                 }
                 if entry.0 == u64::MAX {
                     *entry = (key, id);
+                    out.unique += 1;
                     break;
                 }
                 i = (i + 1) & (size - 1);
@@ -254,17 +258,21 @@ impl DecompositionOracle for CachedMitm {
         if (p.prefix.len() + p.suffix.rows) as u64 > max_work {
             return Err(Error::Limit("CPU decomposition work; not nonexistence"));
         }
-        for (batch_index, points) in p.prefix.chunks(self.batch).enumerate() {
+        // A density heuristic changes scheduling only, never search order.
+        // Sparse suffix coverage retains full batches; dense suffix
+        // coverage starts small to avoid computing unused residuals.
+        let dense = (p.suffix.unique as u128) * 8 >= u128::from(curve.order());
+        let mut start = 0;
+        let mut batch = if dense { 1 } else { self.batch };
+        while start < p.prefix.len() {
+            let end = start + batch.min(p.prefix.len() - start);
+            let points = &p.prefix[start..end];
             self.stats.query_inversions += self.scratch.subtract(curve, target, points);
             for (offset, residual) in self.scratch.output.iter().enumerate() {
                 self.stats.probed_rows += 1;
                 if let Some(id) = p.suffix.find(*residual) {
                     let mut tuple = vec![None; bases.len()];
-                    decode(
-                        &bases[..p.split],
-                        batch_index * self.batch + offset,
-                        &mut tuple[..p.split],
-                    );
+                    decode(&bases[..p.split], start + offset, &mut tuple[..p.split]);
                     decode(&bases[p.split..], id, &mut tuple[p.split..]);
                     // Keep a checked group replay at the public oracle boundary.
                     let sum = tuple.iter().try_fold(None, |s, &q| curve.add(s, q))?;
@@ -274,6 +282,8 @@ impl DecompositionOracle for CachedMitm {
                     return Ok(Some(tuple));
                 }
             }
+            start = end;
+            batch = batch.saturating_mul(2).min(self.batch);
         }
         Ok(None)
     }
@@ -430,6 +440,13 @@ mod tests {
         input.extend_from_slice(&points[..50]);
         let index = Suffix::new(input.clone()).unwrap();
         assert_eq!(index.rows, input.len());
+        assert_eq!(
+            index.unique,
+            input
+                .iter()
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+        );
         for &point in &points {
             assert_eq!(index.find(point), input.iter().position(|&x| x == point));
         }

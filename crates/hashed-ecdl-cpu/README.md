@@ -33,7 +33,11 @@ suffix index. Thus duplicate sums still produce exactly the original oracle's
 first full tuple, making whole certificates directly comparable.
 
 Compute target-minus-prefix residuals with Montgomery batch inversion. `batch=1`
-is the per-residual inversion control. The first match in a batch wins; all
+is the per-residual inversion control. If distinct suffix sums cover at least
+one eighth of the group, batches grow geometrically from one up to the configured
+maximum; otherwise full batches are used immediately. This scheduling heuristic
+does not assume an early match or change exhaustive negative answers.
+The first match in a batch wins; all
 arithmetic already performed in that batch is charged. Every returned witness
 is replayed using the independent checked group operations.
 
