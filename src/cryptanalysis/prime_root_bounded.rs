@@ -319,20 +319,60 @@ impl Producer<'_> {
         quotient.trim();
         Ok((quotient, remainder))
     }
+    fn power_modulus(&mut self, modulus: &Poly17) -> Result<Poly17> {
+        self.gate.charge(2 * COPY_WORK)?;
+        if modulus.len == 0 {
+            return Err(Stop::InvalidInput);
+        }
+        let mut monic = *modulus;
+        let leading = monic.coefficients[monic.len as usize - 1];
+        if leading != 1 {
+            let inverse = self.inverse(leading)?;
+            for coefficient in &mut monic.coefficients[..monic.len as usize] {
+                *coefficient = self.mul(*coefficient, inverse)?;
+            }
+        }
+        Ok(monic)
+    }
+    // Powering requires only a remainder; no quotient or inverse per reduction.
+    fn reduce_monic(&mut self, value: &mut Poly17, modulus: &Poly17) -> Result<()> {
+        self.gate.charge(COPY_WORK)?;
+        if modulus.len == 0 || modulus.coefficients[modulus.len as usize - 1] != 1 {
+            return Err(Stop::InvalidInput);
+        }
+        while value.len >= modulus.len {
+            self.gate.charge(COPY_WORK)?;
+            let high = value.len as usize - 1;
+            let coefficient = value.coefficients[high];
+            let shift = (value.len - modulus.len) as usize;
+            for j in 0..modulus.len as usize - 1 {
+                let product = self.mul(coefficient, modulus.coefficients[j])?;
+                value.coefficients[shift + j] = self.sub(value.coefficients[shift + j], product)?;
+            }
+            value.coefficients[high] = 0;
+            value.trim();
+        }
+        Ok(())
+    }
     fn power(&mut self, base: &Poly17, mut exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
-        let mut b = self.division(base, modulus)?.1;
-        let mut acc = self.division(&Poly17::constant(1), modulus)?.1;
+        let monic = self.power_modulus(modulus)?;
+        let mut b = *base;
+        self.reduce_monic(&mut b, &monic)?;
+        let mut acc = Poly17::constant(1);
+        self.reduce_monic(&mut acc, &monic)?;
         while exponent != 0 {
             self.gate.charge(4 * COPY_WORK)?;
             if exponent & 1 != 0 {
-                let product = self.product(&acc, &b)?;
-                acc = self.division(&product, modulus)?.1;
+                let mut product = self.product(&acc, &b)?;
+                self.reduce_monic(&mut product, &monic)?;
+                acc = product;
             }
             exponent >>= 1;
             if exponent != 0 {
-                let product = self.product(&b, &b)?;
-                b = self.division(&product, modulus)?.1;
+                let mut product = self.product(&b, &b)?;
+                self.reduce_monic(&mut product, &monic)?;
+                b = product;
             }
         }
         Ok(acc)
@@ -637,12 +677,13 @@ impl Replay {
         z.len = n as u8;
         // Output-diagonal order differs from producer's input-row order.
         for k in 0..n {
-            for i in 0..usize::from(x.len) {
+            self.gate.charge(32)?;
+            let start = (k + 1).saturating_sub(usize::from(y.len));
+            let end = usize::from(x.len).min(k + 1);
+            for i in start..end {
                 self.gate.charge(32)?;
-                if k >= i && k - i < usize::from(y.len) {
-                    let v = self.times(x.coefficients[i], y.coefficients[k - i])?;
-                    z.coefficients[k] = self.plus(z.coefficients[k], v)?;
-                }
+                let v = self.times(x.coefficients[i], y.coefficients[k - i])?;
+                z.coefficients[k] = self.plus(z.coefficients[k], v)?;
             }
         }
         z.trim();
@@ -671,17 +712,58 @@ impl Replay {
         r.trim();
         Ok(r)
     }
+    fn normalized_modulus(&mut self, modulus: &Poly17) -> Result<Poly17> {
+        self.gate.charge(2 * COPY_WORK)?;
+        if modulus.len == 0 {
+            return Err(Stop::InvalidCertificate);
+        }
+        let mut result = *modulus;
+        let lead = result.coefficients[usize::from(result.len) - 1];
+        if lead != 1 {
+            let reciprocal = self.reciprocal(lead)?;
+            for index in 0..usize::from(result.len) {
+                result.coefficients[index] = self.times(result.coefficients[index], reciprocal)?;
+            }
+        }
+        Ok(result)
+    }
+    fn cancel_monic(&mut self, numerator: &mut Poly17, denominator: &Poly17) -> Result<()> {
+        self.gate.charge(COPY_WORK)?;
+        let divisor_len = usize::from(denominator.len);
+        if divisor_len == 0 || denominator.coefficients[divisor_len - 1] != 1 {
+            return Err(Stop::InvalidCertificate);
+        }
+        // Independent descending-index traversal rather than producer trim loop.
+        for high in (divisor_len - 1..usize::from(numerator.len)).rev() {
+            self.gate.charge(COPY_WORK)?;
+            let factor = numerator.coefficients[high];
+            let offset = high + 1 - divisor_len;
+            for low in 0..divisor_len - 1 {
+                let term = self.times(factor, denominator.coefficients[low])?;
+                numerator.coefficients[offset + low] =
+                    self.minus(numerator.coefficients[offset + low], term)?;
+            }
+            numerator.coefficients[high] = 0;
+        }
+        numerator.trim();
+        Ok(())
+    }
     fn modular_power(&mut self, base: Poly17, exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
-        let base = self.remainder(base, modulus)?;
-        let mut acc = self.remainder(Poly17::constant(1), modulus)?;
+        let monic = self.normalized_modulus(modulus)?;
+        let mut base = base;
+        self.cancel_monic(&mut base, &monic)?;
+        let mut acc = Poly17::constant(1);
+        self.cancel_monic(&mut acc, &monic)?;
         for bit in (0..64 - exponent.leading_zeros()).rev() {
             self.gate.charge(4 * COPY_WORK)?;
-            let square = self.convolution(&acc, &acc)?;
-            acc = self.remainder(square, modulus)?;
+            let mut square = self.convolution(&acc, &acc)?;
+            self.cancel_monic(&mut square, &monic)?;
+            acc = square;
             if exponent & (1u64 << bit) != 0 {
-                let product = self.convolution(&acc, &base)?;
-                acc = self.remainder(product, modulus)?;
+                let mut product = self.convolution(&acc, &base)?;
+                self.cancel_monic(&mut product, &monic)?;
+                acc = product;
             }
         }
         Ok(acc)
@@ -1105,6 +1187,76 @@ mod tests {
         assert!(check(&f, &report, &events).unwrap().finite_complete);
     }
     #[test]
+    fn bounded_prime_roots_monic_remainders_match_general_division() {
+        for p in [7, 140737488355213, (1u64 << 61) - 1] {
+            let field = field(p);
+            for degree in [0usize, 1, 8] {
+                for leading in [1, p - 2] {
+                    let mut coefficients = [0u64; 9];
+                    for (index, value) in coefficients[..degree].iter_mut().enumerate() {
+                        *value = (index as u64 + 2) % p;
+                    }
+                    coefficients[degree] = leading;
+                    let divisor =
+                        Poly17::from_coefficients(&field, &coefficients[..degree + 1]).unwrap();
+                    for numerator_len in [0usize, 1, 5, 17] {
+                        let numerator: [u64; 17] = std::array::from_fn(|i| (3 * i as u64 + 1) % p);
+                        let numerator =
+                            Poly17::from_coefficients(&field, &numerator[..numerator_len]).unwrap();
+                        let mut observer = |_: &BoundedRootEvent| Ok(());
+                        let mut producer = Producer {
+                            p,
+                            gate: Gate::new(budget(), deadline()),
+                            observer: &mut observer,
+                            unacknowledged: None,
+                            pending: [Poly17::ZERO; 8],
+                            pending_len: 0,
+                            roots: [0; 8],
+                            root_count: 0,
+                        };
+                        producer.gate.admit().unwrap();
+                        let expected = producer.division(&numerator, &divisor).unwrap().1;
+                        let monic = producer.power_modulus(&divisor).unwrap();
+                        let mut actual = numerator;
+                        producer.reduce_monic(&mut actual, &monic).unwrap();
+                        assert_eq!(
+                            actual, expected,
+                            "producer p={p} degree={degree} length={numerator_len}"
+                        );
+                        let mut replay =
+                            Replay::new(&field, &[1, 1], 42, budget(), budget(), deadline())
+                                .unwrap();
+                        let reference = replay.remainder(numerator, &divisor).unwrap();
+                        let normalized = replay.normalized_modulus(&divisor).unwrap();
+                        let mut checked = numerator;
+                        replay.cancel_monic(&mut checked, &normalized).unwrap();
+                        assert_eq!(checked, reference);
+                        assert_eq!(checked, expected);
+                        assert!(matches!(
+                            producer.power_modulus(&Poly17::ZERO),
+                            Err(Stop::InvalidInput)
+                        ));
+                        assert!(matches!(
+                            replay.normalized_modulus(&Poly17::ZERO),
+                            Err(Stop::InvalidCertificate)
+                        ));
+                        if degree == 0 {
+                            assert_eq!(
+                                producer.power(&numerator, 0, &divisor).unwrap(),
+                                Poly17::ZERO
+                            );
+                            assert_eq!(
+                                replay.modular_power(numerator, 0, &divisor).unwrap(),
+                                Poly17::ZERO
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn bounded_prime_roots_fixed_wide_nonmonic_repeated_and_degree_eight() {
         for p in [140737488355213, 9007199254740881, (1u64 << 61) - 1] {
             for roots in [
@@ -1122,9 +1274,11 @@ mod tests {
                 assert_eq!(
                     report.stop,
                     Stop::Complete,
-                    "p={p} degree={} stop={:?}",
+                    "p={p} degree={} stop={:?} metrics={:?} last_event={:?}",
                     roots.len(),
-                    report.stop
+                    report.stop,
+                    report.metrics,
+                    events.last()
                 );
                 let mut expected = roots.to_vec();
                 expected.sort_unstable();
@@ -1132,7 +1286,13 @@ mod tests {
                 assert_eq!(&report.roots[..usize::from(report.root_count)], expected);
                 assert!(report.metrics.arithmetic_invoked);
                 assert!(report.metrics.splits > 0);
-                let checked = check(&f, &report, &events).unwrap();
+                let checked = check(&f, &report, &events).unwrap_or_else(|stop| {
+                    panic!(
+                        "replay p={p} degree={} stop={stop:?} producer_metrics={:?}",
+                        roots.len(),
+                        report.metrics
+                    )
+                });
                 assert!(checked.finite_complete);
                 let split_events = events
                     .iter()
