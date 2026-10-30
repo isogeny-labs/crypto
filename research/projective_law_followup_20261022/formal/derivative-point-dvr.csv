@@ -1,0 +1,11 @@
+item,status,scope,assumptions,source_sha256,dependency_or_gate
+pointEval_qAt,checked,difference quotient at rational point,field K and point equation,0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197,q_a(a)=f'(a)
+stalkQ_unit,checked,affine point localization,field K and point equation and f'(a)≠0,0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197,residue of q_a nonzero
+maximalIdeal_eq_span_y_sub_y,checked,principal local maximal ideal,field K and point equation and f'(a)≠0,0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197,curve relation and q_a unit
+point_local_dvr,checked,actual affine localization,separable quintic and point equation and f'(a)≠0,0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197,domain and principal maximal ideal
+projective_point_dvr,checked,actual weighted-Proj point stalk,separable quintic and point equation and f'(a)≠0,0e9a8e7a31ab5dc8564b13611683989880dee03428be5e4b9e690fac6d969197,checked stalk equivalence
+both_partials_zero_DVR,refuted,arbitrary rational point,separability alone,,F2 f=X5+X3+1 point (0 1) singular
+smooth_point_disjunction,open,uniform theorem for both pointwise cases,separable quintic and point equation and either partial nonzero,,combine checked parameter cases
+common22_formula_norm_transport,open,proof-side common 2+2 expression,actual projective DVR,,map numerator and factors into stalk
+global_principal_divisor_Pic0,open,global genus-two divisor law,all local multiplicities,,sum finite and infinity orders
+compiled_Rust_semantics,open,compiled complete law,formal global law,,link Rust branches to proof-side hypotheses

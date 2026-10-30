@@ -1,0 +1,15 @@
+// Published Hess c=1 genus formula: one witness for every predicted stratum.
+SetSeed(20261027);
+K<w> := GF(4096);
+k<a> := GF(16);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..11]]>;
+print "field_moduli", MinimalPolynomial(w), MinimalPolynomial(a);
+for entry in [<14,3>,<63,4>,<372,1>] do
+    b := entry[1];
+    E := EllipticCurve([K|1,fromint(32),0,0,fromint(b)]);
+    g := WeilDescentGenus(E,k,K!1);
+    print "control_b", b, "source_order", #E, "expected_genus", entry[2],
+          "magma_genus", g;
+    assert g eq entry[2];
+end for;

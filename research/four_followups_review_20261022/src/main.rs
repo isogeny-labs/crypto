@@ -1,0 +1,1217 @@
+//! Native, source-linked normalization of four independently verified studies.
+//! This is a reporting converter, not a collector or a substitute for source validators.
+
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs::{self, File};
+use std::io::{BufRead, BufReader, Write};
+use std::path::{Path, PathBuf};
+
+type Row = BTreeMap<String, String>;
+
+const GRID_FIELDS: &[&str] = &[
+    "lead",
+    "arm",
+    "slice",
+    "targets",
+    "verified",
+    "candidate_failures",
+    "rho_failures",
+    "S_per_M",
+    "I_per_M",
+    "native_GAE_per_logical",
+    "candidate_GAE",
+    "external_GAE",
+    "rho_GAE",
+    "candidate_over_external",
+    "candidate_over_rho",
+    "baseline_GAE",
+    "candidate_over_baseline",
+    "status",
+    "source_grid",
+];
+const TARGET_FIELDS: &[&str] = &[
+    "lead",
+    "arm",
+    "bits",
+    "p",
+    "target_index",
+    "workload_id",
+    "source_verified",
+    "candidate_dlp_verified",
+    "rho_verified",
+    "candidate_GAE",
+    "rho_GAE",
+    "candidate_over_rho",
+    "coordinate_nonzero_matches",
+    "coordinate_zero_outputs",
+    "coordinate_failures",
+    "signed_recover_verified",
+    "recover_method",
+    "recover_record",
+    "status",
+    "source_record",
+    "failure",
+    "solver_mode",
+    "order",
+];
+const PENCIL_COVERAGE_FIELDS: &[&str] = &[
+    "bits",
+    "p",
+    "target_index",
+    "workload_id",
+    "coverage_status",
+    "verified_candidate_rows",
+    "cap_rows",
+    "verified_candidate_arms",
+    "capped_arms",
+    "source_records",
+];
+const PENCIL: &[(u64, u32)] = &[
+    (739, 16),
+    (1151, 16),
+    (1187, 16),
+    (3371, 20),
+    (3527, 20),
+    (3931, 20),
+    (11731, 24),
+    (11887, 24),
+    (12143, 24),
+    (48383, 28),
+];
+
+fn root() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .ancestors()
+        .nth(2)
+        .unwrap()
+        .to_path_buf()
+}
+fn s(v: &Value) -> String {
+    match v {
+        Value::Null => String::new(),
+        Value::Bool(true) => "True".into(),
+        Value::Bool(false) => "False".into(),
+        Value::String(x) => x.clone(),
+        _ => v.to_string(),
+    }
+}
+fn js<'a>(v: &'a Value, key: &str) -> &'a Value {
+    v.get(key).unwrap_or(&Value::Null)
+}
+fn put(row: &mut Row, key: &str, value: impl ToString) {
+    row.insert(key.into(), value.to_string());
+}
+fn row(pairs: &[(&str, String)]) -> Row {
+    pairs
+        .iter()
+        .map(|(k, v)| (k.to_string(), v.clone()))
+        .collect()
+}
+fn val<'a>(r: &'a Row, key: &str) -> &'a str {
+    r.get(key).map(String::as_str).unwrap_or("")
+}
+fn num(s: &str) -> f64 {
+    s.parse().unwrap_or_else(|_| panic!("invalid number: {s}"))
+}
+fn close(a: f64, b: f64) {
+    assert!(
+        (a - b).abs() <= 1e-9 * a.abs().max(b.abs()).max(1.0),
+        "{a} != {b}"
+    );
+}
+
+fn csv_line(line: &str) -> Vec<String> {
+    let mut fields = Vec::new();
+    let mut value = String::new();
+    let mut quoted = false;
+    let mut chars = line.trim_end_matches('\r').chars().peekable();
+    while let Some(ch) = chars.next() {
+        match ch {
+            '"' if quoted && chars.peek() == Some(&'"') => {
+                value.push('"');
+                chars.next();
+            }
+            '"' => quoted = !quoted,
+            ',' if !quoted => {
+                fields.push(std::mem::take(&mut value));
+            }
+            _ => value.push(ch),
+        }
+    }
+    assert!(!quoted, "unterminated quoted CSV field");
+    fields.push(value);
+    fields
+}
+fn read_csv(path: &Path) -> Vec<Row> {
+    let mut iter =
+        BufReader::new(File::open(path).unwrap_or_else(|e| panic!("{}: {e}", path.display())))
+            .lines();
+    let head = csv_line(&iter.next().unwrap().unwrap());
+    iter.map(|line| {
+        let values = csv_line(&line.unwrap());
+        assert_eq!(values.len(), head.len(), "{}", path.display());
+        head.iter().cloned().zip(values).collect()
+    })
+    .collect()
+}
+fn escape_csv(x: &str) -> String {
+    if x.contains([',', '"', '\n', '\r']) {
+        format!("\"{}\"", x.replace('"', "\"\""))
+    } else {
+        x.into()
+    }
+}
+fn write_csv(path: &Path, fields: &[&str], rows: &[Row]) {
+    let mut out = File::create(path).unwrap();
+    writeln!(out, "{}", fields.join(",")).unwrap();
+    for row in rows {
+        let values: Vec<_> = fields
+            .iter()
+            .map(|field| escape_csv(val(row, field)))
+            .collect();
+        writeln!(out, "{}", values.join(",")).unwrap();
+    }
+}
+fn read_jsonl(path: &Path) -> Vec<Value> {
+    BufReader::new(File::open(path).unwrap())
+        .lines()
+        .map(|line| serde_json::from_str(&line.unwrap()).unwrap())
+        .collect()
+}
+
+fn price_rows(repo: &Path) -> Vec<Row> {
+    let mut out = Vec::new();
+    let sources = [
+        (
+            "factor_base",
+            "full_16",
+            "research/four_followups_20261021/results/matched/price-grid.csv",
+            "fb1-j16",
+        ),
+        (
+            "factor_base",
+            "full_8",
+            "research/four_followups_20261021/results/matched/price-grid.csv",
+            "fb1-j8",
+        ),
+        (
+            "factor_base",
+            "full_32",
+            "research/four_followups_20261021/results/matched/price-grid.csv",
+            "fb1-j32",
+        ),
+        (
+            "factor_base",
+            "half_16",
+            "research/four_followups_20261021/results/matched/price-grid.csv",
+            "fb2-j16",
+        ),
+        (
+            "factor_base",
+            "quarter_16",
+            "research/four_followups_20261021/results/matched/price-grid.csv",
+            "fb4-j16",
+        ),
+        (
+            "projective_law",
+            "wrapper",
+            "research/projective_law_followup_20261022/results/price-grid-projective.csv",
+            "",
+        ),
+        (
+            "projective_law",
+            "retained_state",
+            "research/projective_law_followup_20261022/results/price-grid-state.csv",
+            "",
+        ),
+    ];
+    for (lead, arm, source, source_arm) in sources {
+        for old in read_csv(&repo.join(source)) {
+            if !source_arm.is_empty() && val(&old, "arm") != source_arm {
+                continue;
+            }
+            let candidate = num(val(&old, "candidate_GAE"));
+            close(
+                candidate / num(val(&old, "rho_GAE")),
+                num(val(&old, "candidate_over_rho")),
+            );
+            close(
+                candidate / num(val(&old, "external_GAE")),
+                num(val(&old, "candidate_over_external")),
+            );
+            let mut r = Row::new();
+            for key in GRID_FIELDS {
+                put(&mut r, key, val(&old, key));
+            }
+            for key in [
+                "targets",
+                "verified",
+                "S_per_M",
+                "I_per_M",
+                "native_GAE_per_logical",
+                "candidate_GAE",
+                "external_GAE",
+                "rho_GAE",
+                "candidate_over_external",
+                "candidate_over_rho",
+            ] {
+                put(&mut r, key, val(&old, key));
+            }
+            put(
+                &mut r,
+                "candidate_failures",
+                if val(&old, "candidate_failures").is_empty() {
+                    val(&old, "failures")
+                } else {
+                    val(&old, "candidate_failures")
+                },
+            );
+            put(
+                &mut r,
+                "rho_failures",
+                if val(&old, "rho_failures").is_empty() {
+                    val(&old, "failures")
+                } else {
+                    val(&old, "rho_failures")
+                },
+            );
+            for (k, v) in [
+                ("lead", lead),
+                ("arm", arm),
+                ("source_grid", source),
+                ("status", "priced_source_verified"),
+            ] {
+                put(&mut r, k, v);
+            }
+            out.push(r);
+        }
+    }
+    let kummer_source =
+        "research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv";
+    let mut kummer_rows = 0;
+    for old in read_csv(&repo.join(kummer_source)) {
+        assert_eq!(val(&old, "arm"), "uncached");
+        let candidate = num(val(&old, "candidate_cold_GAE"));
+        let rho = num(val(&old, "rho_GAE"));
+        close(candidate / rho, num(val(&old, "candidate_cold_over_rho")));
+        let slice = val(&old, "slice");
+        let slice = slice.strip_prefix("bits").unwrap_or(slice);
+        let mut r = Row::new();
+        for key in [
+            "targets",
+            "S_per_M",
+            "I_per_M",
+            "native_GAE_per_logical",
+            "rho_GAE",
+        ] {
+            put(&mut r, key, val(&old, key));
+        }
+        put(&mut r, "lead", "kummer_walk");
+        put(&mut r, "arm", "differential_uncached");
+        put(&mut r, "slice", slice);
+        put(&mut r, "verified", val(&old, "targets"));
+        put(&mut r, "candidate_failures", "0");
+        put(&mut r, "rho_failures", "0");
+        put(&mut r, "candidate_GAE", val(&old, "candidate_cold_GAE"));
+        put(
+            &mut r,
+            "candidate_over_rho",
+            val(&old, "candidate_cold_over_rho"),
+        );
+        put(&mut r, "status", "priced_source_verified_same_process");
+        put(&mut r, "source_grid", kummer_source);
+        out.push(r);
+        kummer_rows += 1;
+    }
+    assert_eq!(kummer_rows, 288);
+    for (p, _bits) in PENCIL {
+        let source = format!("research/pencil_sparse_20261022/results/p{p}-peel-vs-online.csv");
+        for old in read_csv(&repo.join(&source)) {
+            let base = num(val(&old, "baseline_GAE"));
+            let cand = num(val(&old, "candidate_GAE"));
+            let rho = num(val(&old, "rho_GAE"));
+            close(cand / base, num(val(&old, "candidate_over_baseline")));
+            close(base / rho, num(val(&old, "baseline_over_rho")));
+            close(cand / rho, num(val(&old, "candidate_over_rho")));
+            for (arm, price, over_rho, over_base) in [
+                ("online_identity", "baseline_GAE", "baseline_over_rho", ""),
+                (
+                    "degree_peel",
+                    "candidate_GAE",
+                    "candidate_over_rho",
+                    "candidate_over_baseline",
+                ),
+            ] {
+                let mut r = Row::new();
+                for key in [
+                    "targets",
+                    "S_per_M",
+                    "I_per_M",
+                    "native_GAE_per_logical",
+                    "rho_GAE",
+                    "baseline_GAE",
+                ] {
+                    put(&mut r, key, val(&old, key));
+                }
+                put(&mut r, "verified", val(&old, "targets"));
+                put(&mut r, "candidate_failures", "0");
+                put(&mut r, "rho_failures", "0");
+                put(&mut r, "lead", "pencil_collector");
+                put(&mut r, "arm", arm);
+                put(&mut r, "slice", format!("p{p}"));
+                put(&mut r, "candidate_GAE", val(&old, price));
+                put(&mut r, "candidate_over_rho", val(&old, over_rho));
+                put(
+                    &mut r,
+                    "candidate_over_baseline",
+                    if over_base.is_empty() {
+                        "1"
+                    } else {
+                        val(&old, over_base)
+                    },
+                );
+                put(&mut r, "status", "priced_source_verified");
+                put(&mut r, "source_grid", &source);
+                out.push(r);
+            }
+        }
+    }
+    let markowitz_source = "research/pencil_markowitz_20261022/results/p739-markowitz-vs-peel.csv";
+    let mut markowitz_rows = 0;
+    for old in read_csv(&repo.join(markowitz_source)) {
+        assert_eq!(val(&old, "p"), "739");
+        assert_eq!(val(&old, "targets"), "60");
+        let base = num(val(&old, "baseline_GAE"));
+        let cand = num(val(&old, "candidate_GAE"));
+        let rho = num(val(&old, "rho_GAE"));
+        close(cand / base, num(val(&old, "candidate_over_baseline")));
+        close(cand / rho, num(val(&old, "candidate_over_rho")));
+        let mut r = Row::new();
+        for key in [
+            "targets",
+            "S_per_M",
+            "I_per_M",
+            "native_GAE_per_logical",
+            "candidate_GAE",
+            "rho_GAE",
+            "baseline_GAE",
+            "candidate_over_baseline",
+            "candidate_over_rho",
+        ] {
+            put(&mut r, key, val(&old, key));
+        }
+        put(&mut r, "lead", "pencil_collector");
+        put(&mut r, "arm", "markowitz_priority");
+        put(&mut r, "slice", "p739");
+        put(&mut r, "verified", "60");
+        put(&mut r, "candidate_failures", "0");
+        put(&mut r, "rho_failures", "0");
+        put(&mut r, "status", "priced_source_verified");
+        put(&mut r, "source_grid", markowitz_source);
+        out.push(r);
+        markowitz_rows += 1;
+    }
+    assert_eq!(markowitz_rows, 36);
+    for bits in [16, 20, 24, 28, 32, 36, 40] {
+        out.push(row(&[
+            ("lead", "kummer_walk".into()),
+            ("arm", "coordinate_identity_gate".into()),
+            ("slice", bits.to_string()),
+            ("targets", "180".into()),
+            ("verified", "180".into()),
+            ("candidate_failures", "0".into()),
+            (
+                "status",
+                "coordinate_and_recover_gate_no_dlp_collector".into(),
+            ),
+            (
+                "source_grid",
+                format!("research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"),
+            ),
+        ]));
+    }
+    assert_eq!(out.len(), 3067);
+    out
+}
+
+fn priced_target(source: &Value, lead: &str, arm: &str, p_key: &str, path: &str) -> Row {
+    let verified = if source.get("candidate_verified").is_some() {
+        js(source, "candidate_verified")
+    } else {
+        js(source, "verified")
+    };
+    row(&[
+        ("lead", lead.into()),
+        ("arm", arm.into()),
+        ("bits", s(js(source, "bits"))),
+        ("p", s(js(source, p_key))),
+        ("target_index", s(js(source, "target_index"))),
+        ("workload_id", s(js(source, "workload_id"))),
+        ("source_verified", s(verified)),
+        ("candidate_dlp_verified", s(verified)),
+        (
+            "rho_verified",
+            if source.get("rho_verified").is_some() {
+                s(js(source, "rho_verified"))
+            } else {
+                s(verified)
+            },
+        ),
+        ("candidate_GAE", s(js(source, "candidate_GAE"))),
+        ("rho_GAE", s(js(source, "rho_GAE"))),
+        ("candidate_over_rho", s(js(source, "candidate_over_rho"))),
+        ("status", "priced_source_verified".into()),
+        (
+            "source_record",
+            if source.get("raw_record").is_some() {
+                s(js(source, "raw_record"))
+            } else {
+                path.into()
+            },
+        ),
+    ])
+}
+
+fn target_rows(repo: &Path) -> Vec<Row> {
+    let mut out = Vec::new();
+    let factor = "research/four_followups_20261021/results/matched/targets.jsonl";
+    for source in read_jsonl(&repo.join(factor)) {
+        let arm = match js(&source, "arm").as_str().unwrap() {
+            "fb1-j16" => "full_16",
+            "fb1-j8" => "full_8",
+            "fb1-j32" => "full_32",
+            "fb2-j16" => "half_16",
+            "fb4-j16" => "quarter_16",
+            _ => panic!("unknown factor arm"),
+        };
+        out.push(priced_target(
+            &source,
+            "factor_base",
+            arm,
+            "curve_p",
+            factor,
+        ));
+    }
+    for (arm, path) in [
+        (
+            "wrapper",
+            "research/projective_law_followup_20261022/results/targets-projective.jsonl",
+        ),
+        (
+            "retained_state",
+            "research/projective_law_followup_20261022/results/targets-state.jsonl",
+        ),
+    ] {
+        for source in read_jsonl(&repo.join(path)) {
+            out.push(priced_target(&source, "projective_law", arm, "p", path));
+        }
+    }
+    let mut pencil_cap_rho = BTreeMap::new();
+    for path in [
+        "research/pencil_sparse_20261022/results/price-grid.csv",
+        "research/pencil_markowitz_20261022/results/price-grid.csv",
+    ] {
+        for old in read_csv(&repo.join(path)) {
+            if val(&old, "status") != "incomplete"
+                || (
+                    val(&old, "S_per_M"),
+                    val(&old, "I_per_M"),
+                    val(&old, "native_GAE_per_logical"),
+                ) != ("0.5", "10", "0.1")
+            {
+                continue;
+            }
+            assert!(val(&old, "pencil_GAE").is_empty());
+            let rho = val(&old, "rho_GAE");
+            assert!(num(rho) > 0.0);
+            assert!(pencil_cap_rho
+                .insert(val(&old, "raw_path").to_string(), rho.to_string())
+                .is_none());
+        }
+    }
+    assert_eq!(pencil_cap_rho.len(), 4);
+    let pencil = "research/pencil_sparse_20261022/results/targets.jsonl";
+    for source in read_jsonl(&repo.join(pencil)) {
+        let verified = js(&source, "candidate_verified").as_bool().unwrap();
+        let priced = js(&source, "representative");
+        let mut r = row(&[
+            ("lead", "pencil_collector".into()),
+            (
+                "arm",
+                format!(
+                    "{}_{}",
+                    s(js(&source, "solver_mode")),
+                    s(js(&source, "order"))
+                ),
+            ),
+            ("bits", s(js(&source, "bits"))),
+            ("p", s(js(&source, "curve_p"))),
+            ("target_index", s(js(&source, "target_index"))),
+            ("workload_id", s(js(&source, "workload_id"))),
+            ("source_verified", s(js(&source, "rho_verified"))),
+            (
+                "candidate_dlp_verified",
+                s(js(&source, "candidate_verified")),
+            ),
+            ("rho_verified", s(js(&source, "rho_verified"))),
+            ("candidate_GAE", s(js(priced, "pencil_GAE"))),
+            (
+                "rho_GAE",
+                if verified {
+                    s(js(priced, "rho_GAE"))
+                } else {
+                    pencil_cap_rho
+                        .get(&s(js(&source, "raw_path")))
+                        .unwrap()
+                        .clone()
+                },
+            ),
+            ("candidate_over_rho", s(js(priced, "pencil_over_rho"))),
+            (
+                "status",
+                if verified {
+                    "priced_source_verified".into()
+                } else {
+                    "incomplete_cap_unpriced".into()
+                },
+            ),
+            ("source_record", s(js(&source, "raw_path"))),
+            ("failure", s(js(&source, "failure"))),
+            ("solver_mode", s(js(&source, "solver_mode"))),
+            ("order", s(js(&source, "order"))),
+        ]);
+        if !verified {
+            assert!(val(&r, "candidate_GAE").is_empty());
+        }
+        out.push(std::mem::take(&mut r));
+    }
+    let markowitz = "research/pencil_markowitz_20261022/results/targets.jsonl";
+    let mut markowitz_target_rows = 0;
+    for source in read_jsonl(&repo.join(markowitz)) {
+        if js(&source, "solver_mode").as_str() != Some("markowitz") {
+            continue;
+        }
+        let verified = js(&source, "candidate_verified").as_bool().unwrap();
+        let priced = js(&source, "representative");
+        let r = row(&[
+            ("lead", "pencil_collector".into()),
+            ("arm", "markowitz_priority".into()),
+            ("bits", s(js(&source, "bits"))),
+            ("p", s(js(&source, "curve_p"))),
+            ("target_index", s(js(&source, "target_index"))),
+            ("workload_id", s(js(&source, "workload_id"))),
+            ("source_verified", s(js(&source, "rho_verified"))),
+            (
+                "candidate_dlp_verified",
+                s(js(&source, "candidate_verified")),
+            ),
+            ("rho_verified", s(js(&source, "rho_verified"))),
+            ("candidate_GAE", s(js(priced, "pencil_GAE"))),
+            (
+                "rho_GAE",
+                if verified {
+                    s(js(priced, "rho_GAE"))
+                } else {
+                    pencil_cap_rho
+                        .get(&s(js(&source, "raw_path")))
+                        .unwrap()
+                        .clone()
+                },
+            ),
+            ("candidate_over_rho", s(js(priced, "pencil_over_rho"))),
+            (
+                "status",
+                if verified {
+                    "priced_source_verified".into()
+                } else {
+                    "incomplete_cap_unpriced".into()
+                },
+            ),
+            ("source_record", s(js(&source, "raw_path"))),
+            ("failure", s(js(&source, "failure"))),
+            ("solver_mode", s(js(&source, "solver_mode"))),
+            ("order", s(js(&source, "order"))),
+        ]);
+        if !verified {
+            assert!(val(&r, "candidate_GAE").is_empty());
+        }
+        out.push(r);
+        markowitz_target_rows += 1;
+    }
+    assert_eq!(markowitz_target_rows, 61);
+    let kummer_price =
+        "research/kummer_differential_collector_20261022/results/paired/analysis/target-price.csv";
+    let kummer_prices = read_csv(&repo.join(kummer_price));
+    assert_eq!(kummer_prices.len(), 45360);
+    let mut kummer_target_keys = BTreeSet::new();
+    for old in kummer_prices {
+        if (
+            val(&old, "S_per_M"),
+            val(&old, "I_per_M"),
+            val(&old, "native_GAE_per_logical"),
+        ) != ("0.5", "10", "0.1")
+        {
+            continue;
+        }
+        assert_eq!(val(&old, "arm"), "uncached");
+        assert_eq!(val(&old, "candidate_verified"), "true");
+        assert_eq!(val(&old, "rho_verified"), "true");
+        close(
+            num(val(&old, "candidate_cold_GAE")) / num(val(&old, "rho_GAE")),
+            num(val(&old, "candidate_cold_over_rho")),
+        );
+        let key = (
+            val(&old, "bits").to_string(),
+            val(&old, "p").to_string(),
+            val(&old, "target_index").to_string(),
+            val(&old, "workload_id").to_string(),
+        );
+        assert!(kummer_target_keys.insert(key));
+        out.push(row(&[
+            ("lead", "kummer_walk".into()),
+            ("arm", "differential_uncached".into()),
+            ("bits", val(&old, "bits").into()),
+            ("p", val(&old, "p").into()),
+            ("target_index", val(&old, "target_index").into()),
+            ("workload_id", val(&old, "workload_id").into()),
+            ("source_verified", "True".into()),
+            ("candidate_dlp_verified", "True".into()),
+            ("rho_verified", "True".into()),
+            ("candidate_GAE", val(&old, "candidate_cold_GAE").into()),
+            ("rho_GAE", val(&old, "rho_GAE").into()),
+            (
+                "candidate_over_rho",
+                val(&old, "candidate_cold_over_rho").into(),
+            ),
+            ("status", "priced_source_verified_same_process".into()),
+            ("source_record", kummer_price.into()),
+        ]));
+    }
+    assert_eq!(kummer_target_keys.len(), 1260);
+    for bits in [16, 20, 24, 28, 32, 36, 40] {
+        let path = format!("research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl");
+        let recover_path =
+            format!("research/kummer_recover_20261022/results/recover-target-{bits}.jsonl");
+        let recover: BTreeMap<(String, String), Value> = read_jsonl(&repo.join(&recover_path))
+            .into_iter()
+            .map(|v| ((s(js(&v, "p")), s(js(&v, "target_index"))), v))
+            .collect();
+        for source in read_jsonl(&repo.join(&path)) {
+            let signed = &recover[&(s(js(&source, "p")), s(js(&source, "target_index")))];
+            assert_eq!(js(signed, "workload_id"), js(&source, "workload_id"));
+            let cases = js(&source, "cases").as_array().unwrap();
+            let passed = cases
+                .iter()
+                .filter(|v| js(v, "coordinate_status") == "pass")
+                .count();
+            let zero = cases
+                .iter()
+                .filter(|v| js(v, "coordinate_status") == "zero_output")
+                .count();
+            let failures = cases.len() - passed - zero;
+            assert_eq!(
+                cases.len(),
+                js(&source, "case_count").as_u64().unwrap() as usize
+            );
+            out.push(row(&[
+                ("lead", "kummer_walk".into()),
+                ("arm", "coordinate_identity_gate".into()),
+                ("bits", bits.to_string()),
+                ("p", s(js(&source, "p"))),
+                ("target_index", s(js(&source, "target_index"))),
+                ("workload_id", s(js(&source, "workload_id"))),
+                (
+                    "source_verified",
+                    if js(&source, "all_source_checks") == true
+                        && js(&source, "source_scalar_verified") == true
+                    {
+                        "True".into()
+                    } else {
+                        "False".into()
+                    },
+                ),
+                ("coordinate_nonzero_matches", passed.to_string()),
+                ("coordinate_zero_outputs", zero.to_string()),
+                ("coordinate_failures", failures.to_string()),
+                (
+                    "signed_recover_verified",
+                    if js(signed, "correct") == true && js(signed, "source_scalar_verified") == true
+                    {
+                        "True".into()
+                    } else {
+                        "False".into()
+                    },
+                ),
+                ("recover_method", s(js(signed, "status"))),
+                ("recover_record", recover_path.clone()),
+                (
+                    "status",
+                    "coordinate_and_recover_gate_no_dlp_collector".into(),
+                ),
+                ("source_record", path.clone()),
+            ]));
+        }
+    }
+    assert_eq!(out.len(), 12850);
+    out
+}
+
+fn pencil_coverage_rows(
+    keys: &BTreeMap<(String, String, String), BTreeSet<String>>,
+    targets: &[Row],
+) -> Vec<Row> {
+    let mut indexed: BTreeMap<(String, String, String), Vec<&Row>> = BTreeMap::new();
+    for target in targets
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector")
+    {
+        let key = (
+            val(target, "bits").to_string(),
+            val(target, "p").to_string(),
+            val(target, "target_index").to_string(),
+        );
+        assert!(keys.contains_key(&key));
+        indexed.entry(key).or_default().push(target);
+    }
+    let mut counts = BTreeMap::new();
+    let mut out = Vec::new();
+    for (key, ids) in keys {
+        assert_eq!(ids.len(), 1);
+        let observations = indexed.get(key).map(Vec::as_slice).unwrap_or(&[]);
+        let verified = observations
+            .iter()
+            .filter(|r| val(r, "candidate_dlp_verified") == "True")
+            .count();
+        let capped = observations
+            .iter()
+            .filter(|r| val(r, "status") == "incomplete_cap_unpriced")
+            .count();
+        assert_eq!(observations.len(), verified + capped);
+        let status = if verified > 0 {
+            "verified_candidate_present"
+        } else if capped > 0 {
+            "cap_without_verified_candidate"
+        } else {
+            "no_indexed_pencil_record"
+        };
+        *counts.entry(status).or_insert(0usize) += 1;
+        let distinct = |field: &str, predicate: &dyn Fn(&Row) -> bool| {
+            observations
+                .iter()
+                .filter(|r| predicate(r))
+                .map(|r| val(r, field).to_string())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>()
+                .join(";")
+        };
+        out.push(row(&[
+            ("bits", key.0.clone()),
+            ("p", key.1.clone()),
+            ("target_index", key.2.clone()),
+            ("workload_id", ids.iter().next().unwrap().clone()),
+            ("coverage_status", status.into()),
+            ("verified_candidate_rows", verified.to_string()),
+            ("cap_rows", capped.to_string()),
+            (
+                "verified_candidate_arms",
+                distinct("arm", &|r| val(r, "candidate_dlp_verified") == "True"),
+            ),
+            (
+                "capped_arms",
+                distinct("arm", &|r| val(r, "status") == "incomplete_cap_unpriced"),
+            ),
+            ("source_records", distinct("source_record", &|_| true)),
+        ]));
+    }
+    assert_eq!(out.len(), 1260);
+    assert_eq!(counts.get("verified_candidate_present"), Some(&543));
+    assert_eq!(counts.get("cap_without_verified_candidate"), Some(&1));
+    assert_eq!(counts.get("no_indexed_pencil_record"), Some(&716));
+    out
+}
+
+fn main() {
+    let repo = root();
+    let here = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let out = here.join("results");
+    fs::create_dir_all(&out).unwrap();
+    let kummer_gate_path =
+        repo.join("research/kummer_differential_collector_20261022/VALIDATION.json");
+    let kummer_gate: Value = serde_json::from_str(
+        &fs::read_to_string(&kummer_gate_path)
+            .unwrap_or_else(|e| panic!("{}: {e}", kummer_gate_path.display())),
+    )
+    .unwrap();
+    assert_eq!(kummer_gate["schema"], "validation-gate/v1");
+    assert_eq!(kummer_gate["rho_reference"]["same_binary_or_process"], true);
+    assert_eq!(kummer_gate["rho_reference"]["matches_protocol"], true);
+    let markowitz_gate_path = repo.join("research/pencil_markowitz_20261022/VALIDATION.json");
+    let markowitz_gate: Value = serde_json::from_str(
+        &fs::read_to_string(&markowitz_gate_path)
+            .unwrap_or_else(|e| panic!("{}: {e}", markowitz_gate_path.display())),
+    )
+    .unwrap();
+    assert_eq!(markowitz_gate["schema"], "validation-gate/v1");
+    assert_eq!(
+        markowitz_gate["rho_reference"]["same_binary_or_process"],
+        true
+    );
+    assert_eq!(markowitz_gate["rho_reference"]["matches_protocol"], true);
+    let grids = price_rows(&repo);
+    let targets = target_rows(&repo);
+    let peel: Vec<_> = grids
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector" && val(r, "arm") == "degree_peel")
+        .collect();
+    assert_eq!(peel.len(), 360);
+    assert_eq!(
+        peel.iter()
+            .filter(|r| num(val(r, "candidate_over_baseline")) < 1.0)
+            .count(),
+        240
+    );
+    assert_eq!(
+        peel.iter()
+            .filter(|r| num(val(r, "candidate_over_baseline")) > 1.0)
+            .count(),
+        120
+    );
+    assert_eq!(
+        peel.iter()
+            .filter(|r| num(val(r, "candidate_over_rho")) < 1.0)
+            .count(),
+        0
+    );
+    let markowitz: Vec<_> = grids
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector" && val(r, "arm") == "markowitz_priority")
+        .collect();
+    assert_eq!(markowitz.len(), 36);
+    assert_eq!(
+        markowitz
+            .iter()
+            .filter(|r| num(val(r, "candidate_over_baseline")) < 1.0)
+            .count(),
+        0
+    );
+    assert_eq!(
+        markowitz
+            .iter()
+            .filter(|r| num(val(r, "candidate_over_rho")) < 1.0)
+            .count(),
+        0
+    );
+    let mut keys: BTreeMap<(String, String, String), BTreeSet<String>> = BTreeMap::new();
+    let mut pencil_verified = BTreeSet::new();
+    let mut pencil_present = BTreeSet::new();
+    let mut pencil_rows = 0;
+    let mut pencil_complete_rows = 0;
+    let mut pencil_cap_rows = 0;
+    let mut zero = 0;
+    let mut coordinate_fail = 0;
+    let mut observation_ids = BTreeSet::new();
+    for r in &targets {
+        let key = (
+            val(r, "bits").to_string(),
+            val(r, "p").to_string(),
+            val(r, "target_index").to_string(),
+        );
+        keys.entry(key.clone())
+            .or_default()
+            .insert(val(r, "workload_id").into());
+        assert!(
+            observation_ids.insert((
+                val(r, "lead").to_string(),
+                val(r, "arm").to_string(),
+                val(r, "bits").to_string(),
+                val(r, "p").to_string(),
+                val(r, "target_index").to_string(),
+                val(r, "workload_id").to_string(),
+                val(r, "source_record").to_string(),
+            )),
+            "duplicate standardized observation identity"
+        );
+        assert_eq!(val(r, "source_verified").to_lowercase(), "true");
+        if val(r, "lead") == "pencil_collector" {
+            pencil_rows += 1;
+            pencil_present.insert(key.clone());
+            if val(r, "candidate_dlp_verified") == "True" {
+                pencil_verified.insert(key);
+                pencil_complete_rows += 1;
+            } else {
+                assert_eq!(val(r, "status"), "incomplete_cap_unpriced");
+                assert!(val(r, "candidate_GAE").is_empty());
+                assert!(val(r, "candidate_over_rho").is_empty());
+                assert!(num(val(r, "rho_GAE")) > 0.0);
+                pencil_cap_rows += 1;
+            }
+        }
+        if val(r, "arm") == "coordinate_identity_gate" {
+            zero += num(val(r, "coordinate_zero_outputs")) as usize;
+            coordinate_fail += num(val(r, "coordinate_failures")) as usize;
+            assert_eq!(val(r, "signed_recover_verified").to_lowercase(), "true");
+        }
+        if !val(r, "candidate_GAE").is_empty() {
+            close(
+                num(val(r, "candidate_GAE")) / num(val(r, "rho_GAE")),
+                num(val(r, "candidate_over_rho")),
+            );
+        }
+    }
+    assert_eq!(keys.len(), 1260);
+    assert!(keys.values().all(|v| v.len() == 1));
+    assert_eq!(
+        (pencil_rows, pencil_present.len(), pencil_verified.len()),
+        (1510, 544, 543)
+    );
+    assert_eq!((pencil_complete_rows, pencil_cap_rows), (1506, 4));
+    assert_eq!((zero, coordinate_fail), (7, 0));
+    let pencil_coverage = pencil_coverage_rows(&keys, &targets);
+    write_csv(&out.join("standard-cost-grid.csv"), GRID_FIELDS, &grids);
+    write_csv(&out.join("standard-targets.csv"), TARGET_FIELDS, &targets);
+    write_csv(
+        &out.join("pencil-coverage.csv"),
+        PENCIL_COVERAGE_FIELDS,
+        &pencil_coverage,
+    );
+    let mut representative = Vec::new();
+    for r in &grids {
+        if val(r, "status") != "priced_source_verified"
+            && val(r, "status") != "priced_source_verified_same_process"
+        {
+            continue;
+        }
+        if (
+            val(r, "S_per_M"),
+            val(r, "I_per_M"),
+            val(r, "native_GAE_per_logical"),
+        ) != ("0.5", "10", "0.1")
+        {
+            continue;
+        }
+        representative.push(json!({
+            "lead": val(r, "lead"), "arm": val(r, "arm"), "slice": val(r, "slice"),
+            "targets": num(val(r, "targets")) as usize,
+            "candidate_over_rho": num(val(r, "candidate_over_rho")),
+            "candidate_over_external": if val(r, "candidate_over_external").is_empty() { Value::Null } else { json!(num(val(r, "candidate_over_external"))) },
+            "candidate_GAE": num(val(r, "candidate_GAE")),
+            "rho_GAE": num(val(r, "rho_GAE")), "source_grid": val(r, "source_grid"),
+        }));
+    }
+    let summary = json!({
+        "schema": "four-followups-review/v1", "price_unit": "GAE",
+        "representative_price": {"S_per_M": 0.5, "I_per_M": 10, "native_GAE_per_logical": 0.1},
+        "scope": "Frozen 21-model, 1,260-public-target cohort; 60 targets/model; seven order sizes.",
+        "rows": grids.len(), "representative_rows": representative,
+        "target_rows": targets.len(), "distinct_target_keys": keys.len(),
+        "pencil_coverage": {"rows": pencil_coverage.len(), "verified_candidate_targets": 543, "cap_without_verified_candidate_targets": 1, "no_indexed_pencil_record_targets": 716, "source": "research/four_followups_review_20261022/results/pencil-coverage.csv"},
+        "requirements": [
+            {"lead":"factor_base","status":"verified_complete_for_five_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/four_followups_20261021/REPORT.md"},
+            {"lead":"projective_law","status":"verified_complete_for_two_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"proof_scope":"exact_integer_polynomial_certificates_plus_written_divisor_arguments_for_reachable_1plus1_1plus2_2plus2_branches_on_the_implemented_mapped_family_of_smooth_monic_quintics_with_zero_x4_coefficient_over_odd_characteristic_fields_with_valid_reduced_inputs_and_nonzero_weights;faithful_mechanized_theorem_and_independent_mathematical_review_not_recorded","proof_source":"research/projective_law_followup_20261022/PROOF_AUDIT.md","source":"research/projective_law_followup_20261022/REPORT.md"},
+            {"lead":"pencil_collector","status":"partial","candidate_distinct_targets":543,"rho_distinct_targets":544,"failed_distinct_targets":1,"open_distinct_targets":717,"remaining":"717 original target workloads have no completed candidate solve; one p=186379 target has four replayed cap attempts across online, peel, and Markowitz methods, each with null candidate cost and source-verified rho.","source":"research/pencil_markowitz_20261022/REPORT.md"},
+            {"lead":"kummer_walk","status":"verified_complete_for_uncached_differential_collector","coordinate_label_cases":8820,"nonzero_matches":8813,"zero_outputs":7,"wrong_nonzero_outputs":0,"candidate_dlp_targets":1260,"rho_targets":1260,"signed_recoveries_verified":1260,"zero_coordinate_repairs_verified":175,"source":"research/kummer_differential_collector_20261022/MATCHED_REPORT.md"},
+        ],
+    });
+    fs::write(
+        out.join("summary.json"),
+        format!("{}\n", serde_json::to_string_pretty(&summary).unwrap()),
+    )
+    .unwrap();
+    draw_graphs(here, &grids);
+    draw_pencil_coverage(here, &pencil_coverage);
+    println!(
+        "wrote {} normalized price rows and {} target rows",
+        grids.len(),
+        targets.len()
+    );
+}
+
+fn draw_pencil_coverage(here: &Path, rows: &[Row]) {
+    let mut by_bits: BTreeMap<u32, [usize; 3]> = BTreeMap::new();
+    for row in rows {
+        let slot = match val(row, "coverage_status") {
+            "verified_candidate_present" => 0,
+            "cap_without_verified_candidate" => 1,
+            "no_indexed_pencil_record" => 2,
+            other => panic!("unknown pencil coverage status: {other}"),
+        };
+        by_bits.entry(num(val(row, "bits")) as u32).or_default()[slot] += 1;
+    }
+    assert_eq!(by_bits.len(), 7);
+    assert!(by_bits
+        .values()
+        .all(|counts| counts.iter().sum::<usize>() == 180));
+    let mut svg = vec![
+        r#"<svg xmlns="http://www.w3.org/2000/svg" width="920" height="390" viewBox="0 0 920 390">"#.to_string(),
+        r#"<rect width="100%" height="100%" fill="white"/>"#.into(),
+        r#"<text x="85" y="29" font-family="sans-serif" font-size="17">Indexed pencil outcomes on the frozen 1,260 targets</text>"#.into(),
+    ];
+    for (i, (bits, counts)) in by_bits.iter().enumerate() {
+        let yy = 63 + i * 39;
+        svg.push(format!(r#"<text x="72" y="{}" text-anchor="end" font-family="sans-serif" font-size="13">{bits} bits</text>"#, yy + 16));
+        let mut xx = 85.0;
+        for (count, color) in counts.iter().zip(["#1764aa", "#c5761b", "#d9dfe4"]) {
+            let width = *count as f64 * 3.4;
+            if *count > 0 {
+                svg.push(format!(
+                    r#"<rect x="{xx:.1}" y="{yy}" width="{width:.1}" height="23" fill="{color}"/>"#
+                ));
+            }
+            xx += width;
+        }
+        svg.push(format!(r#"<text x="710" y="{}" font-family="sans-serif" font-size="12">{} verified · {} cap · {} no record</text>"#, yy + 16, counts[0], counts[1], counts[2]));
+    }
+    svg.push(r#"<text x="85" y="355" font-family="sans-serif" font-size="11">Each bar is 180 public targets. “No record” means absent from the integrated pencil studies.</text>"#.into());
+    svg.push("</svg>".into());
+    fs::write(
+        here.join("pencil-coverage.svg"),
+        format!("{}\n", svg.join("\n")),
+    )
+    .unwrap();
+}
+
+fn draw_graphs(here: &Path, grids: &[Row]) {
+    let arms = [
+        ("full_16", "#1764aa"),
+        ("full_8", "#16a0a0"),
+        ("full_32", "#3946a5"),
+        ("half_16", "#b2691b"),
+        ("quarter_16", "#a03543"),
+        ("wrapper", "#75832a"),
+        ("retained_state", "#8647a3"),
+        ("differential_uncached", "#202020"),
+    ];
+    let x = |bits: f64| 90.0 + (bits - 16.0) / 24.0 * 600.0;
+    let y = |ratio: f64| 465.0 - ratio.log10() / 2.0 * 425.0;
+    let mut svg = vec![r#"<svg xmlns="http://www.w3.org/2000/svg" width="920" height="560" viewBox="0 0 920 560">"#.to_string(),
+        r#"<rect width="100%" height="100%" fill="white"/>"#.into(),
+        r#"<text x="90" y="25" font-size="17" font-family="sans-serif">Cold candidate / matched rho, representative price</text>"#.into()];
+    for ratio in [1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0] {
+        let yy = y(ratio);
+        svg.push(format!(
+            r##"<line x1="90" y1="{yy:.1}" x2="690" y2="{yy:.1}" stroke="#d8dfe7"/>"##
+        ));
+        svg.push(format!(r#"<text x="78" y="{:.1}" text-anchor="end" font-size="12" font-family="sans-serif">{ratio}</text>"#, yy+4.0));
+    }
+    for bits in [16, 20, 24, 28, 32, 36, 40] {
+        let xx = x(bits as f64);
+        svg.push(format!(
+            r##"<line x1="{xx:.1}" y1="40" x2="{xx:.1}" y2="465" stroke="#e9edf1"/>"##
+        ));
+        svg.push(format!(r#"<text x="{xx:.1}" y="487" text-anchor="middle" font-size="12" font-family="sans-serif">{bits}</text>"#));
+    }
+    for (i, (arm, color)) in arms.iter().enumerate() {
+        let mut data: Vec<_> = grids
+            .iter()
+            .filter(|r| {
+                val(r, "arm") == *arm
+                    && val(r, "slice") != "all"
+                    && val(r, "S_per_M") == "0.5"
+                    && val(r, "I_per_M") == "10"
+                    && val(r, "native_GAE_per_logical") == "0.1"
+            })
+            .collect();
+        data.sort_by_key(|r| val(r, "slice").parse::<u32>().unwrap());
+        assert_eq!(data.len(), 7);
+        let points = data
+            .iter()
+            .map(|r| {
+                format!(
+                    "{:.1},{:.1}",
+                    x(num(val(r, "slice"))),
+                    y(num(val(r, "candidate_over_rho")))
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(" ");
+        svg.push(format!(
+            r#"<polyline points="{points}" fill="none" stroke="{color}" stroke-width="2.4"/>"#
+        ));
+        for r in data {
+            svg.push(format!(
+                r#"<circle cx="{:.1}" cy="{:.1}" r="3.5" fill="{color}"/>"#,
+                x(num(val(r, "slice"))),
+                y(num(val(r, "candidate_over_rho")))
+            ));
+        }
+        svg.push(format!(
+            r#"<line x1="715" y1="{}" x2="743" y2="{}" stroke="{color}" stroke-width="3"/>"#,
+            75 + i * 27,
+            75 + i * 27
+        ));
+        let label = if *arm == "differential_uncached" {
+            "Kummer uncached"
+        } else {
+            arm
+        };
+        svg.push(format!(
+            r#"<text x="753" y="{}" font-size="13" font-family="sans-serif">{label}</text>"#,
+            79 + i * 27
+        ));
+    }
+    svg.push(r#"<text x="390" y="518" text-anchor="middle" font-size="13" font-family="sans-serif">Order bits</text>"#.into());
+    svg.push(r#"<text x="90" y="544" font-size="11" font-family="sans-serif">Full cold operation prices; all answers source checked. Source: standard-cost-grid.csv.</text>"#.into());
+    svg.push("</svg>".into());
+    fs::write(
+        here.join("cost-ratios.svg"),
+        format!("{}\n", svg.join("\n")),
+    )
+    .unwrap();
+
+    let py = |ratio: f64| 270.0 - (ratio - 0.2) * 215.0;
+    let pencil: Vec<_> = grids
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector" && val(r, "arm") == "degree_peel")
+        .collect();
+    assert_eq!(pencil.len(), 360);
+    let mut psvg = vec![r#"<svg xmlns="http://www.w3.org/2000/svg" width="920" height="355" viewBox="0 0 920 355">"#.to_string(),
+        r#"<rect width="100%" height="100%" fill="white"/>"#.into(),
+        r#"<text x="100" y="27" font-family="sans-serif" font-size="17">Degree-peel / matched online: 36-cell range and native price</text>"#.into()];
+    for ratio in [0.2, 0.5, 1.0, 1.2] {
+        let yy = py(ratio);
+        psvg.push(format!(
+            r##"<line x1="100" y1="{yy:.1}" x2="815" y2="{yy:.1}" stroke="#d8dfe7"/>"##
+        ));
+        let label = if ratio == 1.0 {
+            "1.0".to_string()
+        } else {
+            ratio.to_string()
+        };
+        psvg.push(format!(r#"<text x="88" y="{:.1}" text-anchor="end" font-family="sans-serif" font-size="12">{label}</text>"#, yy+4.0));
+    }
+    for (i, (p, _)) in PENCIL.iter().enumerate() {
+        let slice = format!("p{p}");
+        let data: Vec<_> = pencil.iter().filter(|r| val(r, "slice") == slice).collect();
+        assert_eq!(data.len(), 36);
+        let ratios: Vec<_> = data
+            .iter()
+            .map(|r| num(val(r, "candidate_over_baseline")))
+            .collect();
+        let low = ratios.iter().copied().fold(f64::INFINITY, f64::min);
+        let high = ratios.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+        let native = data
+            .iter()
+            .find(|r| {
+                val(r, "S_per_M") == "0.5"
+                    && val(r, "I_per_M") == "10"
+                    && val(r, "native_GAE_per_logical") == "0.1"
+            })
+            .unwrap();
+        let xx = 100 + i * 76;
+        psvg.push(format!(r##"<line x1="{xx}" y1="{:.1}" x2="{xx}" y2="{:.1}" stroke="#426b9d" stroke-width="4"/>"##, py(low), py(high)));
+        psvg.push(format!(
+            r##"<circle cx="{xx}" cy="{:.1}" r="5" fill="#bd5b24"/>"##,
+            py(num(val(native, "candidate_over_baseline")))
+        ));
+        psvg.push(format!(r#"<text x="{xx}" y="304" text-anchor="middle" font-family="sans-serif" font-size="11">{p}</text>"#));
+    }
+    psvg.push(r#"<text x="460" y="329" text-anchor="middle" font-family="sans-serif" font-size="12">Curve prime p; last column is one target, others are 60 targets</text>"#.into());
+    psvg.push("</svg>".into());
+    fs::write(
+        here.join("pencil-ratios.svg"),
+        format!("{}\n", psvg.join("\n")),
+    )
+    .unwrap();
+}
