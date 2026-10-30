@@ -105,7 +105,10 @@ source `113526b5770` passed 236 dataset tests, with 0 failures and 1 ignored;
 this includes both subsequently added certificate/cap regression tests.
 The same combined runtime then passed the full release library suite
 (5,441 passed, 0 failed, 123 ignored) and the explicitly selected 360-case
-endpoint integration test. Combined lint and release CLI validation remain pending.
+endpoint integration test. Combined strict maintained Clippy, release CLI build
+and all four retained curve/twist export/retry commands also passed. Each phase
+has an exit-zero receipt with matching runtime-source readback. These checks
+validate bounded software behavior and add no scientific samples or cloud cells.
 The initial build failed on Rust reader ownership; that failure is retained.
 
 `crypto dataset export` now stages `prefix-features.jsonl` alongside static

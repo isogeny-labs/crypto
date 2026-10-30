@@ -22,8 +22,14 @@ both added regression tests, with exit code 0 and matching runtime-source
 readback. The combined full release library suite subsequently passed
 **5,441 tests, 0 failed, 123 ignored**, with exit0 and matching runtime-source
 readback; see [full-library.receipt.json](full-library.receipt.json). Maintained
-Clippy and combined release CLI replay are the remaining phases in
-[combined-validation-plan.json](combined-validation-plan.json).
+Clippy, release CLI build and all four combined-binary export/retry commands also
+passed with exit 0 and matching runtime-source readback. The final
+[pipeline receipt](pipeline.receipt.json) records completion of
+[combined-validation-plan.json](combined-validation-plan.json). See
+[clippy.receipt.json](clippy.receipt.json), [build.receipt.json](build.receipt.json)
+and [cli.receipt.json](cli.receipt.json). Public feature identities, restricted
+label joins, immutable retries, artifact readback and unchanged input inventories
+passed on the retained curve/twist fixtures.
 The ignored test subsequently passed all **360 endpoint combinations** when run
 explicitly against the same combined-source binary (one test, zero failures,
 exit0). Its binary hash matched before/after and runtime-source readback matched.
@@ -35,8 +41,7 @@ structured outcomes and returned solution certificates; unsupported/capped cells
 remain non-solutions. It does not exercise supervised wide-F4 admission or the
 entire requested size/arity cross-product. Its separate
 [endpoint artifact index](endpoint-store-index.json) avoids concurrent writes
-with the running full-suite archiver.
-The pipeline continues with lint, build and CLI only if preceding phases pass.
+with the full-suite archiver. All pipeline phases are now terminal and passed.
 
 Initial source5d4336b45d2 failed compilation because of
 a bounded-reader ownership error; its log and exit101 receipt are retained.
@@ -71,3 +76,9 @@ Scientific samples added:0. Verified cloud dataset cells:0. No trained model,
 exact fall degree, native full-trace replay, whole-solver instruction total or
 new ECDLP result is established. The original objective remains in
 [remaining coverage](../../../docs/ml-dataset/REMAINING-COVERAGE.md).
+
+Final pipeline archival is recorded in [final-readback.json](final-readback.json):
+41 immutable objects, 89,046,821 bytes, each with a fresh S3 download and byte
+comparison. This includes the combined binary, CLI output archive, all phase
+logs/receipts and terminal pipeline log/receipt. The endpoint and portability
+fixture indexes are separate and retain their own readback records.
