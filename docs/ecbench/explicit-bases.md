@@ -1,9 +1,19 @@
 # Explicit x-coordinate factor bases and GPU relation finding
 
-Source implementation, 2026-10-29. Compilation, executable tests, device
-validation and performance measurements are pending. This change stops before
-opening a PR, as requested. The EKS image must eventually be built from the
-merged `crypto` `main` commit.
+Current status, 2026-10-30: the explicit-x plug-in and standalone CUDA service
+have been delivered in PRs. The [v11 panel](../../research/explicit_relations_e2e_20261030/reports/run-20261030T1550Z/report.typ)
+completed all 12 prescribed executions, including both fixed 62-bit targets,
+on one RunPod RTX PRO 6000 with fresh certificate replay. This is a bounded
+result for the recorded inputs and source, not a hardware maximum or a
+certified speedup. [GPU build and usage](../../gpu/explicit-relations/README.md)
+distinguish that validated configuration from the separate 63-bit arithmetic
+and negative-filter extensions, whose GPU validation remains pending.
+
+The ecbench x-list plug-in is CPU-compatible; the GPU pipeline uses the
+standalone service and paper driver. No root crypto/plugin build was performed
+on this disk-constrained workspace. RunPod execution superseded the initial
+source-only handoff below. Any future EKS image must be built from the merged
+`crypto/main` commit and verified separately.
 
 ## Exact x lists in ecbench
 
@@ -84,7 +94,11 @@ validate dimensions in `1..=30` before narrowing to `u32`, rejecting values
 such as `4294967299` that previously wrapped to 3. Its regression tests are
 retained along with the new x-list tests.
 
-## Source-only validation and builder handoff
+## Original source-only validation and builder handoff (2026-10-29)
+
+This dated handoff records the initial local state. Subsequent RunPod evidence
+is linked above and in the timestamped entries below; it does not retroactively
+turn the initial static checks into executable validation.
 
 Static checks: Rust formatting/parser checks, C++ `-fsyntax-only` with warnings
 as errors, diff whitespace checks and scoped curve-name lint. These do not
@@ -908,3 +922,27 @@ when the first rung succeeds; a valid first-rung stop is itself accepted.
 ### Errors
 The old regression-control assumption was the error; exact plan validation
 already recognized first-rung stops. No recorded data was changed.
+
+## 2026-10-30T19:45UTC — current usage documentation
+
+### What was done
+Replaced the stale opening statement that PR creation and all device validation
+were pending with the published v11 result and exact source boundary. Dated the
+original source-only handoff, updated the implemented field/hash domain and
+2^32 service cap, and added the dense-CUB service build target used by v11.
+
+### Decisions made
+Keep current source support separate from measured scale: both62-bit targets
+are verified, while63-bit and negative-filter GPU validation are pending.
+Link the reports, implementation arguments and frozen v15 plan. Preserve the
+GPU service versus CPU ecbench plug-in distinction and the root-build constraint.
+These are documentation corrections, not new performance evidence.
+
+### Open threads
+V13 final62-bit target remains active. Collect and publish its raw/report,
+then execute the separately frozen v15 probe after verified GPU deletion.
+Refresh this overview again with the actual new validation outcomes.
+
+### Errors
+The original introductory source-only status and row-cap/domain descriptions
+had become stale as later PRs landed. Historical entries remain preserved.
