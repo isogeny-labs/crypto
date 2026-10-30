@@ -38,7 +38,6 @@ jobs:
             research/ecbench_accounting_v2_20261023/analysis
             scripts/ic_audit
             tools/artifacts
-      - name: Pull store data this workflow reads (tools/artifacts)
             .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
@@ -47,7 +46,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic
         run: |
           if ! command -v aws >/dev/null; then
             python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
@@ -60,7 +58,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_accounting_v2_20261023
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic research/ecbench_accounting_v2_20261023
       - name: The check catches a tampered row and a missing row
         run: bash scripts/ic_audit/test_check_board_recompute.sh
       - name: Every board row recomputes from raw records
