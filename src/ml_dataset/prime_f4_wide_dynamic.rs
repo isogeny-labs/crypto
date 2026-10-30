@@ -1,7 +1,7 @@
 //! Admitted original S3-chain construction. Not a dispatched solver profile.
 //!
 //! The caller owns field setup, public/domain validation and all later phases.
-//! This child deliberately has no group search, native invocation or JSON tree.
+//! This child has no group search, runtime dispatch or intermediate JSON tree.
 #![allow(dead_code)] // Incremental private foundation; activation has separate gates.
 
 use crate::cryptanalysis::f4_tower_generic::dynamic::{CanonicalTerm, InputPolynomial, Mono28};
@@ -16,7 +16,8 @@ const MAX_K: usize = 32;
 const MAX_TERMS: usize = 33;
 const COPY_WORK: u64 = 8 * (size_of::<CanonicalTerm>().div_ceil(8) as u64 + 1);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
 pub(super) enum Stop {
     InvalidInput,
     WorkLimit,
@@ -27,6 +28,8 @@ pub(super) enum Stop {
     TicketExhausted,
     OutputLimit,
     Serialization,
+    Observer,
+    Setup,
 }
 
 /// One pool of the parent attempt. Callers retain it across all invocations.
@@ -807,6 +810,878 @@ pub(super) fn encode_input(
     result
 }
 
+// Native execution is a private phase, not dispatcher activation.
+use super::super::capture::TypedEventBuffer;
+use crate::cryptanalysis::f4_tower_generic::dynamic;
+use crate::cryptanalysis::fp_backend::{FieldSetup, FieldSetupFailure, FieldSetupStage};
+use std::time::Duration;
+const TERMINAL_WORK: u64 = 262_144;
+const CALLBACK_WORK: u64 = 81_920; // two bounded capture passes, <=1024 bytes each
+const CAPTURE_CAP: u64 = 1024;
+
+#[derive(Clone, Copy)]
+pub(super) struct AttemptLimits {
+    pub work_limit: u64,
+    pub memory_bytes: u64,
+    pub trace_bytes: u64,
+    pub degree_bound: u32,
+    pub original_deadline: Instant,
+}
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub(super) struct Supply {
+    pub work: u64,
+    pub bytes: u64,
+}
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub(super) struct Settlement {
+    pub supplied: Supply,
+    pub consumed: Supply,
+}
+struct Escrow {
+    supplied: Supply,
+    settled: bool,
+}
+impl Escrow {
+    fn new(supplied: Supply) -> Self {
+        Self {
+            supplied,
+            settled: false,
+        }
+    }
+}
+/// Borrowing the owner exclusively prevents concurrent spending of this escrow.
+/// Settlement intentionally has no clock check: expired work is still charged.
+fn settle(
+    ledger: &mut Ledger,
+    escrow: &mut Escrow,
+    consumed: Supply,
+    performed: u64,
+) -> Result<Settlement, Stop> {
+    if escrow.settled {
+        return Err(Stop::InvalidInput);
+    }
+    let supplied = escrow.supplied;
+    if consumed.work > supplied.work || consumed.bytes > supplied.bytes || performed > consumed.work
+    {
+        return Err(Stop::InvalidInput);
+    }
+    let w = ledger
+        .reserved_work
+        .checked_add(consumed.work)
+        .ok_or(Stop::ArithmeticOverflow)?;
+    let b = ledger
+        .reserved_bytes
+        .checked_add(consumed.bytes)
+        .ok_or(Stop::ArithmeticOverflow)?;
+    let done = ledger
+        .performed_work
+        .checked_add(performed)
+        .ok_or(Stop::ArithmeticOverflow)?;
+    if w > ledger.work_limit || b > ledger.bytes_limit {
+        return Err(Stop::InvalidInput);
+    }
+    ledger.reserved_work = w;
+    ledger.reserved_bytes = b;
+    ledger.performed_work = done;
+    escrow.settled = true;
+    Ok(Settlement { supplied, consumed })
+}
+fn remaining(ledger: &Ledger) -> Supply {
+    Supply {
+        work: ledger.work_limit - ledger.reserved_work,
+        bytes: ledger.bytes_limit - ledger.reserved_bytes,
+    }
+}
+
+struct Slots {
+    buffers: [InputBuffer; 8],
+}
+impl Slots {
+    fn new(e: usize, ledger: &mut Ledger) -> Result<Self, Stop> {
+        if e <= 4 * 65536 || e > 4 * 1024 * 1024 {
+            return Err(Stop::InvalidInput);
+        }
+        let a = e - 65536 - 4096;
+        let caps = [a / 3, 4096, a / 4, a / 12, a / 12, a / 6, a / 12, 65536];
+        Ok(Self {
+            buffers: [
+                InputBuffer::new(caps[0], ledger)?,
+                InputBuffer::new(caps[1], ledger)?,
+                InputBuffer::new(caps[2], ledger)?,
+                InputBuffer::new(caps[3], ledger)?,
+                InputBuffer::new(caps[4], ledger)?,
+                InputBuffer::new(caps[5], ledger)?,
+                InputBuffer::new(caps[6], ledger)?,
+                InputBuffer::new(caps[7], ledger)?,
+            ],
+        })
+    }
+}
+#[derive(Clone, Copy)]
+enum SmallPoint {
+    Infinity,
+    Affine(AffinePoint),
+}
+struct GroupWorkspace {
+    domain: [SmallPoint; 64],
+    cursor: [usize; 15],
+    tuple: [usize; 15],
+    prefix: [SmallPoint; 15],
+    coordinates: [u64; 28],
+    residues: [u64; 29],
+    first_certificate: [usize; 15],
+    assignments: [Option<u64>; 28],
+    sources: [usize; 28],
+    transitions: [usize; 29],
+}
+struct Workspace {
+    linear_left: Vec<CanonicalTerm>,
+    linear_right: Vec<CanonicalTerm>,
+    group: GroupWorkspace,
+}
+impl Workspace {
+    fn new(domain: &[AffinePoint], ledger: &mut Ledger) -> Result<Self, Stop> {
+        if domain.len() > 64 {
+            return Err(Stop::InvalidInput);
+        }
+        let size = size_of::<GroupWorkspace>() as u64;
+        {
+            let mut t = ledger.reserve(size * 8, size)?;
+            t.spend(size * 8)?;
+        }
+        let mut group = GroupWorkspace {
+            domain: [SmallPoint::Infinity; 64],
+            cursor: [0; 15],
+            tuple: [0; 15],
+            prefix: [SmallPoint::Infinity; 15],
+            coordinates: [0; 28],
+            residues: [0; 29],
+            first_certificate: [0; 15],
+            assignments: [None; 28],
+            sources: [0; 28],
+            transitions: [0; 29],
+        };
+        for (i, &point) in domain.iter().enumerate() {
+            group.domain[i] = SmallPoint::Affine(point);
+        }
+        Ok(Self {
+            linear_left: requested_vec(8192, ledger)?,
+            linear_right: requested_vec(8192, ledger)?,
+            group,
+        })
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum EventPersistence {
+    LocalOnly,
+    BoundCapture,
+}
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub(super) struct PhaseEvent {
+    schema: &'static str,
+    source: &'static str,
+    global_sequence: usize,
+    local_sequence: usize,
+    stage: &'static str,
+    reserved_work: u64,
+    reserved_bytes: u64,
+    persistence: EventPersistence,
+}
+struct ObserverState {
+    acknowledged: usize,
+    setup: usize,
+    native: usize,
+    durable: usize,
+    pending: Option<PhaseEvent>,
+    stop: Option<Stop>,
+    last_native: Supply,
+    persistence: EventPersistence,
+}
+fn encode_record<T: serde::Serialize>(
+    record: &T,
+    slot: &mut InputBuffer,
+    ledger: &mut Ledger,
+) -> Result<(), Stop> {
+    slot.bytes.clear();
+    let result = (|| {
+        let mut count = MeteredWriter {
+            ledger,
+            output: None,
+            count: 0,
+            cap: slot.logical_cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut count, record).is_err() {
+            return Err(count.stop.unwrap_or(Stop::Serialization));
+        }
+        let expected = count.count;
+        let mut writer = MeteredWriter {
+            ledger,
+            output: Some(&mut slot.bytes),
+            count: 0,
+            cap: slot.logical_cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut writer, record).is_err() {
+            return Err(writer.stop.unwrap_or(Stop::Serialization));
+        }
+        if writer.count != expected {
+            return Err(Stop::Serialization);
+        }
+        ledger.check()?;
+        Ok(())
+    })();
+    if result.is_err() {
+        slot.bytes.clear();
+    }
+    result
+}
+fn append_observation<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+    event: PhaseEvent,
+    state: &mut ObserverState,
+    slot: &mut InputBuffer,
+    budget: &mut Ledger,
+    capture: &mut TypedEventBuffer,
+    forward: &mut F,
+) -> Result<(), ()> {
+    let start = slot.bytes.len();
+    let result = (|| {
+        if state.stop.is_some() || state.acknowledged >= 4096 {
+            return Err(Stop::OutputLimit);
+        }
+        budget.check()?;
+        let cap = slot
+            .logical_cap
+            .checked_sub(start)
+            .and_then(|n| n.checked_sub(1))
+            .ok_or(Stop::OutputLimit)?;
+        let mut count = MeteredWriter {
+            ledger: budget,
+            output: None,
+            count: 0,
+            cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut count, &event).is_err() {
+            return Err(count.stop.unwrap_or(Stop::Serialization));
+        }
+        let expected = count.count;
+        let mut writer = MeteredWriter {
+            ledger: budget,
+            output: Some(&mut slot.bytes),
+            count: 0,
+            cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut writer, &event).is_err() {
+            return Err(writer.stop.unwrap_or(Stop::Serialization));
+        }
+        if writer.count != expected {
+            return Err(Stop::Serialization);
+        }
+        {
+            let mut t = budget.reserve(40, 0)?;
+            t.spend(40)?;
+        }
+        slot.bytes.push(b'\n');
+        if state.persistence == EventPersistence::BoundCapture {
+            // This is consumed once before entering caller serialization; the
+            // callback must use this exact1024-byte admitted typed buffer.
+            let mut t = budget.reserve(CALLBACK_WORK, 0)?;
+            t.spend(CALLBACK_WORK)?;
+            forward(&event, capture).map_err(|_| Stop::Observer)?;
+        }
+        // NO deadline check after durable acknowledgement. Native checks after
+        // its callback and must count this already committed row before expiry.
+        state.acknowledged += 1;
+        if state.persistence == EventPersistence::BoundCapture {
+            state.durable += 1;
+        }
+        if event.source == "setup" {
+            state.setup += 1;
+        } else {
+            state.native += 1;
+        }
+        Ok(())
+    })();
+    if let Err(stop) = result {
+        slot.bytes.truncate(start);
+        state.pending = Some(event);
+        state.stop = Some(stop);
+        Err(())
+    } else {
+        Ok(())
+    }
+}
+fn stage_name(stage: dynamic::Stage) -> &'static str {
+    match stage {
+        dynamic::Stage::Begin => "begin",
+        dynamic::Stage::Initial => "initial",
+        dynamic::Stage::Basis => "basis",
+        dynamic::Stage::Batch => "batch",
+        dynamic::Stage::Terminal => "terminal",
+    }
+}
+fn stop_name(stop: dynamic::Stop) -> &'static str {
+    match stop {
+        dynamic::Stop::Complete => "complete",
+        dynamic::Stop::UnitDerived => "unit_derived",
+        dynamic::Stop::PairDegreeLimit => "pair_degree_limit",
+        dynamic::Stop::WorkLimit => "work_limit",
+        dynamic::Stop::StorageLimit => "storage_limit",
+        dynamic::Stop::RowLimit => "row_limit",
+        dynamic::Stop::ColumnLimit => "column_limit",
+        dynamic::Stop::BasisLimit => "basis_limit",
+        dynamic::Stop::PairLimit => "pair_limit",
+        dynamic::Stop::StepLimit => "step_limit",
+        dynamic::Stop::EventLimit => "event_limit",
+        dynamic::Stop::ExponentOverflow => "exponent_overflow",
+        dynamic::Stop::Allocation => "allocation",
+        dynamic::Stop::Deadline => "deadline",
+        dynamic::Stop::Observer => "observer",
+        dynamic::Stop::InvalidInput => "invalid_input",
+    }
+}
+#[derive(serde::Serialize)]
+struct NativeLimitRecord {
+    work: u64,
+    bytes: u64,
+    rows: usize,
+    columns: usize,
+    basis: usize,
+    pairs: usize,
+    steps: usize,
+    events: usize,
+    max_pair_degree: u32,
+}
+impl From<&dynamic::Limits> for NativeLimitRecord {
+    fn from(l: &dynamic::Limits) -> Self {
+        Self {
+            work: l.work,
+            bytes: l.bytes,
+            rows: l.rows,
+            columns: l.columns,
+            basis: l.basis,
+            pairs: l.pairs,
+            steps: l.steps,
+            events: l.events,
+            max_pair_degree: l.max_pair_degree,
+        }
+    }
+}
+#[derive(serde::Serialize)]
+struct NativeMetadata {
+    schema: &'static str,
+    m: usize,
+    variables: usize,
+    stop: &'static str,
+    supplied: Supply,
+    consumed: Supply,
+    limits: NativeLimitRecord,
+    acknowledged_events: usize,
+    native_backend_invoked: bool,
+    native_statistics_complete: bool,
+    matrix_rows_reduced: u64,
+    pivot_updates: u64,
+    pairs_pending: usize,
+    pairs_selected_unfinished: usize,
+    maximum_rows_admitted: usize,
+    maximum_columns_admitted: usize,
+    maximum_pending_pairs: usize,
+    completed_steps: usize,
+    maximum_input_degree: u32,
+    maximum_processed_row_degree: u32,
+    basis_retained: bool,
+    basis_retention_stop: Option<Stop>,
+    native_basis_derivation_verified: bool,
+    independent_derivation_verified: bool,
+    linear_extraction_complete: bool,
+    group_domain_complete: bool,
+    pdp_witness_verified: bool,
+    exhaustive_no_decomposition: bool,
+    solver_completed: bool,
+    exact_instruction_count_verified: bool,
+    full_execution_trace_verified: bool,
+    fall_degree_verified: bool,
+}
+impl NativeMetadata {
+    fn new(
+        m: usize,
+        r: &dynamic::Report,
+        limits: &dynamic::Limits,
+        retained: bool,
+        stop: Option<Stop>,
+    ) -> Self {
+        Self {
+            schema: "crypto.ml-dataset.wide-prime-dynamic-native/v1",
+            m,
+            variables: 2 * m - 2,
+            stop: stop_name(r.stop),
+            supplied: Supply {
+                work: limits.work,
+                bytes: limits.bytes,
+            },
+            limits: NativeLimitRecord::from(limits),
+            consumed: Supply {
+                work: r.reserved.work,
+                bytes: r.reserved.bytes,
+            },
+            acknowledged_events: r.acknowledged_events,
+            native_backend_invoked: r.native_backend_invoked,
+            native_statistics_complete: r.native_statistics_complete,
+            matrix_rows_reduced: r.matrix_rows_reduced,
+            pivot_updates: r.pivot_updates,
+            pairs_pending: r.pairs_pending,
+            pairs_selected_unfinished: r.pairs_selected_unfinished,
+            maximum_rows_admitted: r.maximum_rows_admitted,
+            maximum_columns_admitted: r.maximum_columns_admitted,
+            maximum_pending_pairs: r.maximum_pending_pairs,
+            completed_steps: r.completed_steps,
+            maximum_input_degree: r.maximum_input_degree,
+            maximum_processed_row_degree: r.maximum_processed_row_degree,
+            basis_retained: retained,
+            basis_retention_stop: stop,
+            native_basis_derivation_verified: false,
+            independent_derivation_verified: false,
+            linear_extraction_complete: false,
+            group_domain_complete: false,
+            pdp_witness_verified: false,
+            exhaustive_no_decomposition: false,
+            solver_completed: false,
+            exact_instruction_count_verified: false,
+            full_execution_trace_verified: false,
+            fall_degree_verified: false,
+        }
+    }
+}
+struct NativeRecord<'a> {
+    metadata: NativeMetadata,
+    basis: Option<&'a [InputPolynomial]>,
+}
+impl serde::Serialize for NativeRecord<'_> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        let mut out = s.serialize_struct("NativeRecord", 2)?;
+        out.serialize_field("metadata", &self.metadata)?;
+        if let Some(basis) = self.basis {
+            let v = self.metadata.variables;
+            out.serialize_field(
+                "basis",
+                &Sequence {
+                    len: basis.len(),
+                    item: |i: usize| {
+                        let p = &basis[i];
+                        Sequence {
+                            len: p.terms.len(),
+                            item: move |j: usize| TermView {
+                                exponents: p.terms[j].mono.exponents(v).expect("native valid V"),
+                                coefficient: Decimal(p.terms[j].coefficient),
+                            },
+                        }
+                    },
+                },
+            )?;
+        } else {
+            out.serialize_field("basis", &Option::<u8>::None)?;
+        }
+        out.end()
+    }
+}
+#[derive(serde::Serialize)]
+struct SetupRecord {
+    schema: &'static str,
+    modulus: Decimal,
+    prime_verified: bool,
+    reserved_work: u64,
+    reserved_bytes: u64,
+    acknowledged_events: usize,
+}
+pub(super) struct PreparedOriginal {
+    setup: FieldSetup,
+    input: Vec<InputPolynomial>,
+    slots: Slots,
+    workspace: Workspace,
+    capture: TypedEventBuffer,
+    ledger: Ledger,
+    checking_work: u64,
+    terminal: Ledger,
+    observer: ObserverState,
+    phase_deadline: Instant,
+    original_deadline: Instant,
+    m: usize,
+    degree_bound: u32,
+}
+pub(super) struct PrepareFailure {
+    pub stop: Stop,
+    pub ledger: Ledger,
+    pub setup_failure: Option<FieldSetupFailure>,
+    retained_slots: Option<Slots>,
+}
+impl std::fmt::Debug for PrepareFailure {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PrepareFailure")
+            .field("stop", &self.stop)
+            .field("ledger", &self.ledger)
+            .field("setup_failure", &self.setup_failure)
+            .field("retained_slots", &self.retained_slots.is_some())
+            .finish()
+    }
+}
+/// Public/group validation is the caller's precondition; the serializer enforces
+/// canonical dimensions/domain coverage. This private API never activates CLI.
+pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+    p: u64,
+    parameters: Parameters<'_>,
+    target: AffinePoint,
+    domain: &[AffinePoint],
+    limits: AttemptLimits,
+    persistence: EventPersistence,
+    forward: &mut F,
+) -> Result<PreparedOriginal, PrepareFailure> {
+    let phase_deadline = limits
+        .original_deadline
+        .min(Instant::now() + Duration::from_secs(5));
+    let w = match limits.work_limit.checked_mul(1024) {
+        Some(w) => w.min(16_777_216),
+        None => {
+            return Err(PrepareFailure {
+                stop: Stop::ArithmeticOverflow,
+                ledger: Ledger::new(0, 0, phase_deadline),
+                setup_failure: None,
+                retained_slots: None,
+            })
+        }
+    };
+    let algebra = w * 3 / 4;
+    let mut ledger = Ledger::new(
+        algebra,
+        (limits.memory_bytes / 4).min(64 * 1024 * 1024),
+        phase_deadline,
+    );
+    let mut setup_failure = None;
+    let mut retained_slots = None;
+    let result = (|| {
+        if w == 0
+            || ledger.bytes_limit == 0
+            || !(4..=15).contains(&parameters.m)
+            || domain.is_empty()
+            || domain.len() > 64
+        {
+            return Err(Stop::InvalidInput);
+        }
+        let fixed = (size_of::<ObserverState>()
+            + size_of::<PhaseEvent>()
+            + size_of::<NativeMetadata>()
+            + size_of::<SetupRecord>()
+            + size_of::<[u8; 60]>()
+            + size_of::<[usize; 32]>()) as u64;
+        {
+            let mut ticket = ledger.reserve(fixed * 8, fixed)?;
+            ticket.spend(fixed * 8)?;
+        }
+        let e = usize::try_from((limits.trace_bytes / 32).min(4 * 1024 * 1024))
+            .map_err(|_| Stop::ArithmeticOverflow)?;
+        retained_slots = Some(Slots::new(e, &mut ledger)?);
+        let slots = retained_slots.as_mut().expect("slots admitted");
+        let workspace = Workspace::new(domain, &mut ledger)?;
+        let admitted =
+            TypedEventBuffer::requested_bytes(CAPTURE_CAP).map_err(|_| Stop::StorageLimit)?;
+        {
+            let _ = ledger.reserve(0, admitted)?;
+        }
+        let mut capture =
+            TypedEventBuffer::try_new(CAPTURE_CAP, admitted).map_err(|_| Stop::Allocation)?;
+        // Terminal allowance is consumed once. Its own ticket uses ONLY the
+        // original process deadline, never extends native/phase execution.
+        {
+            let _ = ledger.reserve(TERMINAL_WORK, 0)?;
+        }
+        let terminal = Ledger::new(TERMINAL_WORK, 0, limits.original_deadline);
+        let setup_event_allowance = 2 * (CALLBACK_WORK + 16_384);
+        {
+            let _ = ledger.reserve(setup_event_allowance, 0)?;
+        }
+        let mut setup_events = Ledger::new(setup_event_allowance, 0, phase_deadline);
+        let mut observer = ObserverState {
+            acknowledged: 0,
+            setup: 0,
+            native: 0,
+            durable: 0,
+            pending: None,
+            stop: None,
+            last_native: Supply { work: 0, bytes: 0 },
+            persistence,
+        };
+        let supplied = remaining(&ledger);
+        let mut setup_escrow = Escrow::new(supplied);
+        let setup_result = Fp64Arithmetic::try_new(
+            p,
+            supplied.work,
+            supplied.bytes,
+            phase_deadline,
+            &mut |event| {
+                let row = PhaseEvent {
+                    schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
+                    source: "setup",
+                    global_sequence: observer.acknowledged,
+                    local_sequence: observer.setup,
+                    stage: match event.stage {
+                        FieldSetupStage::Admitted => "admitted",
+                        FieldSetupStage::Complete => "complete",
+                    },
+                    reserved_work: event.reserved_work,
+                    reserved_bytes: event.reserved_bytes,
+                    persistence,
+                };
+                append_observation(
+                    row,
+                    &mut observer,
+                    &mut slots.buffers[3],
+                    &mut setup_events,
+                    &mut capture,
+                    forward,
+                )
+            },
+        );
+        ledger.performed_work = ledger
+            .performed_work
+            .checked_add(setup_events.performed_work)
+            .ok_or(Stop::ArithmeticOverflow)?;
+        let setup = match setup_result {
+            Ok(setup) => {
+                settle(
+                    &mut ledger,
+                    &mut setup_escrow,
+                    Supply {
+                        work: setup.reserved_work,
+                        bytes: setup.reserved_bytes,
+                    },
+                    0,
+                )?;
+                setup
+            }
+            Err(failure) => {
+                settle(
+                    &mut ledger,
+                    &mut setup_escrow,
+                    Supply {
+                        work: failure.reserved_work,
+                        bytes: failure.reserved_bytes,
+                    },
+                    0,
+                )?;
+                setup_failure = Some(failure);
+                return Err(Stop::Setup);
+            }
+        };
+        let input = build_original_chain(&setup.field, parameters, &mut ledger)?;
+        let view = ChainInputView {
+            field: &setup.field,
+            parameters,
+            target,
+            signed_domain: domain,
+            polynomials: &input,
+        };
+        encode_input(&view, &mut slots.buffers[0], &mut ledger)?;
+        encode_record(
+            &SetupRecord {
+                schema: "crypto.ml-dataset.wide-prime-dynamic-setup/v1",
+                modulus: Decimal(p),
+                prime_verified: setup.prime_verified,
+                reserved_work: setup.reserved_work,
+                reserved_bytes: setup.reserved_bytes,
+                acknowledged_events: observer.setup,
+            },
+            &mut slots.buffers[1],
+            &mut ledger,
+        )?;
+        Ok((setup, input, workspace, capture, terminal, observer))
+    })();
+    match result {
+        Ok((setup, input, workspace, capture, terminal, observer)) => Ok(PreparedOriginal {
+            setup,
+            input,
+            slots: retained_slots.take().expect("slots admitted"),
+            workspace,
+            capture,
+            ledger,
+            checking_work: w - algebra,
+            terminal,
+            observer,
+            phase_deadline,
+            original_deadline: limits.original_deadline,
+            m: parameters.m,
+            degree_bound: limits.degree_bound.min(12),
+        }),
+        Err(stop) => Err(PrepareFailure {
+            stop,
+            ledger,
+            setup_failure,
+            retained_slots,
+        }),
+    }
+}
+pub(super) struct NativePhase {
+    pub prepared: PreparedOriginal,
+    pub report: dynamic::Report,
+    pub settlement: Settlement,
+    pub observer_settlement: Settlement,
+    pub basis_retained: bool,
+    pub retention_stop: Option<Stop>,
+    pub diagnostic_stop: Option<Stop>,
+    pub independent_derivation_verified: bool,
+}
+pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
+    mut prepared: PreparedOriginal,
+    forward: &mut F,
+) -> Result<NativePhase, PrepareFailure> {
+    // All data-sized storage was admitted by prepare. No parent access escapes
+    // while the native and callback allowances are exclusively loaned below.
+    let available = remaining(&prepared.ledger);
+    let observer_supply = Supply {
+        work: available.work / 4,
+        bytes: 0,
+    };
+    let native_supply = Supply {
+        work: available.work - observer_supply.work,
+        bytes: available.bytes,
+    };
+    let mut native_escrow = Escrow::new(native_supply);
+    let mut observer_escrow = Escrow::new(observer_supply);
+    let mut observer_budget = Ledger::new(observer_supply.work, 0, prepared.phase_deadline);
+    let native_limits = dynamic::Limits {
+        work: native_supply.work,
+        bytes: native_supply.bytes,
+        events: 4096 - prepared.observer.acknowledged,
+        max_pair_degree: prepared.degree_bound,
+        ..dynamic::Limits::default()
+    };
+    let report = dynamic::run(
+        &prepared.setup.field,
+        (2 * prepared.m - 2) as u8,
+        &prepared.input,
+        &native_limits,
+        prepared.phase_deadline,
+        &mut |event| {
+            if event.sequence != prepared.observer.native
+                || event.reserved.work < prepared.observer.last_native.work
+                || event.reserved.bytes < prepared.observer.last_native.bytes
+                || event.reserved.work > native_supply.work
+                || event.reserved.bytes > native_supply.bytes
+            {
+                prepared.observer.stop = Some(Stop::InvalidInput);
+                return Err(());
+            }
+            let row = PhaseEvent {
+                schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
+                source: "native",
+                global_sequence: prepared.observer.acknowledged,
+                local_sequence: event.sequence,
+                stage: stage_name(event.stage),
+                reserved_work: event.reserved.work,
+                reserved_bytes: event.reserved.bytes,
+                persistence: prepared.observer.persistence,
+            };
+            append_observation(
+                row,
+                &mut prepared.observer,
+                &mut prepared.slots.buffers[3],
+                &mut observer_budget,
+                &mut prepared.capture,
+                forward,
+            )?;
+            prepared.observer.last_native = Supply {
+                work: event.reserved.work,
+                bytes: event.reserved.bytes,
+            };
+            Ok(())
+        },
+    );
+    // These are clock-independent and occur BEFORE fallible retention.
+    let settled = (|| {
+        let native = settle(
+            &mut prepared.ledger,
+            &mut native_escrow,
+            Supply {
+                work: report.reserved.work,
+                bytes: report.reserved.bytes,
+            },
+            0,
+        )?;
+        let observer = settle(
+            &mut prepared.ledger,
+            &mut observer_escrow,
+            Supply {
+                work: observer_budget.reserved_work,
+                bytes: 0,
+            },
+            observer_budget.performed_work,
+        )?;
+        if report.acknowledged_events != prepared.observer.native {
+            return Err(Stop::InvalidInput);
+        }
+        Ok((native, observer))
+    })();
+    let (settlement, observer_settlement) = match settled {
+        Ok(v) => v,
+        Err(stop) => {
+            return Err(PrepareFailure {
+                stop,
+                ledger: prepared.ledger,
+                setup_failure: None,
+                retained_slots: Some(prepared.slots),
+            })
+        }
+    };
+    // Borrow canonical basis directly; never apply input's677-term cap here.
+    let retention = (|| {
+        for p in &report.basis {
+            for chunk in p.terms.chunks(128) {
+                let work = chunk.len() as u64 * (8 * (2 * prepared.m - 2) as u64 + 32);
+                let mut t = prepared.ledger.reserve(work, 0)?;
+                t.spend(work)?;
+            }
+        }
+        let record = NativeRecord {
+            metadata: NativeMetadata::new(prepared.m, &report, &native_limits, true, None),
+            basis: Some(&report.basis),
+        };
+        encode_record(
+            &record,
+            &mut prepared.slots.buffers[2],
+            &mut prepared.ledger,
+        )
+    })();
+    let retention_stop = retention.err();
+    let diagnostic_stop = if let Some(stop) = retention_stop {
+        let record = NativeRecord {
+            metadata: NativeMetadata::new(prepared.m, &report, &native_limits, false, Some(stop)),
+            basis: None,
+        };
+        encode_record(
+            &record,
+            &mut prepared.slots.buffers[2],
+            &mut prepared.terminal,
+        )
+        .err()
+    } else {
+        None
+    };
+    // Terminal budget was already charged in prepare; performed tariff only.
+    prepared.ledger.performed_work += prepared.terminal.performed_work;
+    Ok(NativePhase {
+        prepared,
+        report,
+        settlement,
+        observer_settlement,
+        basis_retained: retention_stop.is_none(),
+        retention_stop,
+        diagnostic_stop,
+        independent_derivation_verified: false,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1261,5 +2136,386 @@ mod tests {
         let value: serde_json::Value = serde_json::from_slice(output.bytes()).unwrap();
         assert_eq!(value["polynomials"].as_array().unwrap().len(), 29);
         assert_eq!(value["signed_factor_base"].as_array().unwrap().len(), 64);
+    }
+    fn phase_limits() -> AttemptLimits {
+        AttemptLimits {
+            work_limit: 16384,
+            memory_bytes: 256 * 1024 * 1024,
+            trace_bytes: 128 * 1024 * 1024,
+            degree_bound: 12,
+            original_deadline: Instant::now() + Duration::from_secs(30),
+        }
+    }
+    fn prepared_small() -> PreparedOriginal {
+        prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 1,
+                b: 2,
+                target_x: 1,
+                codes: &[1],
+            },
+            AffinePoint { x: 1, y: 2 },
+            &[AffinePoint { x: 1, y: 2 }, AffinePoint { x: 1, y: 99 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| panic!("local-only must not claim or invoke durable capture"),
+        )
+        .unwrap()
+    }
+    #[test]
+    fn native_original_chain_runs_and_settles_once_without_promoting_derivation() {
+        let prepared = prepared_small();
+        let before_work = prepared.ledger.reserved_work;
+        let before_bytes = prepared.ledger.reserved_bytes;
+        let phase = invoke_original(prepared, &mut |_, _| panic!("local-only")).unwrap();
+        assert!(phase.report.native_backend_invoked);
+        assert_eq!(
+            phase.report.acknowledged_events,
+            phase.prepared.observer.native
+        );
+        assert_eq!(phase.prepared.observer.durable, 0);
+        assert!(!phase.independent_derivation_verified);
+        assert!(
+            phase.prepared.ledger.reserved_work
+                >= before_work
+                    + phase.settlement.consumed.work
+                    + phase.observer_settlement.consumed.work
+        );
+        assert_eq!(
+            phase.prepared.ledger.reserved_bytes,
+            before_bytes + phase.settlement.consumed.bytes
+        );
+        assert!(phase.prepared.workspace.linear_left.capacity() >= 8192);
+        assert!(phase.prepared.workspace.linear_right.capacity() >= 8192);
+        assert!(phase.prepared.slots.buffers[6].bytes().is_empty());
+        assert!(phase.prepared.slots.buffers[6].logical_cap > 0);
+        assert_eq!(phase.prepared.checking_work, 16_777_216 / 4);
+        assert!(phase.prepared.ledger.performed_work <= phase.prepared.ledger.reserved_work);
+    }
+    #[test]
+    fn escrow_settlement_survives_deadline_and_rejects_double_or_overclaimed_receipts() {
+        let mut ledger = Ledger::new(100, 100, Instant::now());
+        let supply = Supply {
+            work: 50,
+            bytes: 50,
+        };
+        let mut escrow = Escrow::new(supply);
+        settle(
+            &mut ledger,
+            &mut escrow,
+            Supply {
+                work: 20,
+                bytes: 30,
+            },
+            10,
+        )
+        .unwrap();
+        assert_eq!((ledger.reserved_work, ledger.reserved_bytes), (20, 30));
+        assert_eq!(
+            settle(
+                &mut ledger,
+                &mut escrow,
+                Supply {
+                    work: 20,
+                    bytes: 30
+                },
+                10
+            )
+            .unwrap_err(),
+            Stop::InvalidInput
+        );
+        let mut bad = Escrow::new(supply);
+        assert_eq!(
+            settle(&mut ledger, &mut bad, Supply { work: 51, bytes: 0 }, 0).unwrap_err(),
+            Stop::InvalidInput
+        );
+        assert_eq!((ledger.reserved_work, ledger.reserved_bytes), (20, 30));
+        let mut second = Escrow::new(remaining(&ledger));
+        settle(
+            &mut ledger,
+            &mut second,
+            Supply {
+                work: 80,
+                bytes: 70,
+            },
+            0,
+        )
+        .unwrap();
+        assert_eq!((ledger.reserved_work, ledger.reserved_bytes), (100, 100));
+    }
+    #[test]
+    fn native_deadline_settles_before_original_deadline_metadata_fallback() {
+        let mut prepared = prepared_small();
+        prepared.phase_deadline = Instant::now();
+        prepared.ledger.deadline = prepared.phase_deadline;
+        let phase = invoke_original(prepared, &mut |_, _| Ok(())).unwrap();
+        assert_eq!(phase.report.stop, dynamic::Stop::Deadline);
+        assert!(!phase.report.native_backend_invoked);
+        assert!(!phase.basis_retained);
+        assert_eq!(phase.retention_stop, Some(Stop::Deadline));
+        assert_eq!(phase.diagnostic_stop, None);
+        let value: serde_json::Value =
+            serde_json::from_slice(phase.prepared.slots.buffers[2].bytes()).unwrap();
+        assert_eq!(value["metadata"]["stop"], "deadline");
+        assert_eq!(value["metadata"]["basis_retained"], false);
+        assert_eq!(value["metadata"]["independent_derivation_verified"], false);
+        assert!(value["basis"].is_null());
+    }
+    #[test]
+    fn native_preparation_storage_or_input_refusal_has_no_native_result() {
+        let mut limits = phase_limits();
+        limits.memory_bytes = 1024;
+        let result = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 1,
+                b: 2,
+                target_x: 1,
+                codes: &[1],
+            },
+            AffinePoint { x: 1, y: 2 },
+            &[AffinePoint { x: 1, y: 2 }],
+            limits,
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        );
+        assert!(matches!(
+            result,
+            Err(PrepareFailure {
+                stop: Stop::StorageLimit,
+                ..
+            })
+        ));
+        let result = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 1,
+                b: 2,
+                target_x: 1,
+                codes: &[1],
+            },
+            AffinePoint { x: 2, y: 2 },
+            &[AffinePoint { x: 1, y: 2 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        );
+        let failure = match result {
+            Err(f) => f,
+            Ok(_) => panic!("mismatched target admitted"),
+        };
+        assert_eq!(failure.stop, Stop::InvalidInput);
+        assert!(failure.ledger.reserved_work >= 131072);
+        assert!(!failure.retained_slots.unwrap().buffers[3]
+            .bytes()
+            .is_empty());
+    }
+    #[test]
+    fn observer_acknowledgement_survives_post_capture_expiry_and_refusal_rolls_back() {
+        let mut outer = ledger();
+        let mut slot = InputBuffer::new(4096, &mut outer).unwrap();
+        let mut capture = TypedEventBuffer::try_new(CAPTURE_CAP, CAPTURE_CAP + 128).unwrap();
+        let mut state = ObserverState {
+            acknowledged: 0,
+            setup: 0,
+            native: 0,
+            durable: 0,
+            pending: None,
+            stop: None,
+            last_native: Supply { work: 0, bytes: 0 },
+            persistence: EventPersistence::BoundCapture,
+        };
+        let event = PhaseEvent {
+            schema: "crypto.ml-dataset.wide-prime-dynamic-event/v1",
+            source: "native",
+            global_sequence: 0,
+            local_sequence: 0,
+            stage: "begin",
+            reserved_work: 16,
+            reserved_bytes: 256,
+            persistence: EventPersistence::BoundCapture,
+        };
+        let deadline = Instant::now() + Duration::from_millis(10);
+        let mut budget = Ledger::new(1_000_000, 0, deadline);
+        append_observation(
+            event,
+            &mut state,
+            &mut slot,
+            &mut budget,
+            &mut capture,
+            &mut |_, _| {
+                while Instant::now() < deadline {
+                    std::hint::spin_loop();
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!((state.acknowledged, state.durable), (1, 1));
+        assert_eq!(budget.check(), Err(Stop::Deadline));
+        let kept = slot.bytes().len();
+        let mut budget = Ledger::new(1_000_000, 0, Instant::now() + Duration::from_secs(1));
+        let next = PhaseEvent {
+            global_sequence: 1,
+            local_sequence: 1,
+            ..event
+        };
+        assert!(append_observation(
+            next,
+            &mut state,
+            &mut slot,
+            &mut budget,
+            &mut capture,
+            &mut |_, _| Err(())
+        )
+        .is_err());
+        assert_eq!(slot.bytes().len(), kept);
+        assert_eq!((state.acknowledged, state.durable), (1, 1));
+        assert_eq!(state.stop, Some(Stop::Observer));
+        assert!(state.pending.is_some());
+    }
+    #[test]
+    fn shared_observer_count_includes_setup_and_never_resets_for_native() {
+        let mut prepared = prepared_small();
+        assert_eq!(prepared.observer.setup, 2);
+        prepared.observer.acknowledged = 4096;
+        let phase = invoke_original(prepared, &mut |_, _| Ok(())).unwrap();
+        assert_eq!(phase.report.stop, dynamic::Stop::EventLimit);
+        assert_eq!(phase.report.acknowledged_events, 0);
+        assert_eq!(phase.prepared.observer.acknowledged, 4096);
+    }
+    /// Explicit long panel: all432 cases are attempted; ignored/unrun is NOT coverage.
+    #[test]
+    #[ignore = "explicit original-chain432-case software gate; invoke separately with --ignored --exact --nocapture"]
+    fn dynamic_original_chain_all_arity_twist_432_case_panel() {
+        use num_traits::ToPrimitive;
+        let mut failures = Vec::new();
+        let mut attempted = 0;
+        for n in [47, 53, 61] {
+            for twist in [false, true] {
+                for m in 4..=15 {
+                    let cfg = super::super::CaseConfig {
+                        family: "prime".into(),
+                        n,
+                        m,
+                        twist,
+                        curve_seed: 7,
+                        generator_index: 1,
+                        key_index: 1,
+                        seed: 42,
+                        factor_base_size: 8,
+                        degree_bound: 12,
+                        work_limit: 16384,
+                        solver: "f4".into(),
+                    };
+                    let mut case = match super::super::curves::generate(&cfg) {
+                        Ok(case) => case,
+                        Err(error) => {
+                            attempted += 6;
+                            failures.push(format!("all six fixed targets failed generation n{n} twist{twist} m{m}: {error}"));
+                            continue;
+                        }
+                    };
+                    case.private_witness = serde_json::Value::Null;
+                    let group = super::super::Group::read(&case).unwrap();
+                    let generator = group.point(&case.public_instance["generator"]).unwrap();
+                    let super::super::Group::Prime(curve) = &group else {
+                        panic!("wrong curve family")
+                    };
+                    let affine = |point: &super::super::Element| match point {
+                        super::super::Element::Prime(crate::ecc::Point::Affine { x, y }) => {
+                            Some(AffinePoint {
+                                x: x.value.to_u64().unwrap(),
+                                y: y.value.to_u64().unwrap(),
+                            })
+                        }
+                        _ => None,
+                    };
+                    for k in [1usize, 2] {
+                        for target_kind in 0..3 {
+                            attempted += 1;
+                            let bound = 2 * k * m + 1;
+                            let preconditions = (1..=bound)
+                                .all(|i| group.mul(&generator, i as u64) != group.zero());
+                            let p2 = group.mul(&generator, 2);
+                            let mut signed = vec![generator.clone(), group.neg(&generator)];
+                            if k == 2 {
+                                signed.push(p2.clone());
+                                signed.push(group.neg(&p2));
+                            }
+                            let signed: Option<Vec<_>> = signed.iter().map(&affine).collect();
+                            let Some(signed) = signed else {
+                                failures.push(format!("n{n} twist{twist} m{m} K{k} target{target_kind}: nonaffine domain"));
+                                continue;
+                            };
+                            let mut codes: Vec<_> = signed.iter().map(|p| p.x).collect();
+                            codes.sort_unstable();
+                            codes.dedup();
+                            if !preconditions || codes.len() != k {
+                                failures.push(format!("n{n} twist{twist} m{m} K{k} target{target_kind}: failed fixed preconditions"));
+                                continue;
+                            }
+                            let multiplier = match target_kind {
+                                0 => k * m,
+                                1 => k * m + 1,
+                                _ => k * (m - 2),
+                            };
+                            let Some(target) = affine(&group.mul(&generator, multiplier as u64))
+                            else {
+                                failures.push(format!(
+                                    "nonaffine fixed target n{n} twist{twist} m{m} K{k}"
+                                ));
+                                continue;
+                            };
+                            let params = Parameters {
+                                m,
+                                a: curve.a.to_u64().unwrap(),
+                                b: curve.b.to_u64().unwrap(),
+                                target_x: target.x,
+                                codes: &codes,
+                            };
+                            let prepared = prepare_original(
+                                curve.p.to_u64().unwrap(),
+                                params,
+                                target,
+                                &signed,
+                                phase_limits(),
+                                EventPersistence::LocalOnly,
+                                &mut |_, _| Ok(()),
+                            );
+                            let phase =
+                                prepared.and_then(|p| invoke_original(p, &mut |_, _| Ok(())));
+                            match phase {
+                                Err(error) => {
+                                    eprintln!("native_case n={n} twist={twist} m={m} K={k} target={target_kind} error={error:?}");
+                                    failures.push(format!("preparation/integration n{n} twist{twist} m{m} K{k} target{target_kind}: {:?}",error.stop));
+                                }
+                                Ok(phase) => {
+                                    let useful = phase.report.matrix_rows_reduced > 0
+                                        && phase.report.pivot_updates > 0;
+                                    eprintln!("native_case n={n} twist={twist} m={m} K={k} target={target_kind} stop={:?} invoked={} rows={} pivots={} useful={} retained={} retention={:?} work={} bytes={} input_sha256={}",phase.report.stop,phase.report.native_backend_invoked,phase.report.matrix_rows_reduced,phase.report.pivot_updates,useful,phase.basis_retained,phase.retention_stop,phase.prepared.ledger.reserved_work,phase.prepared.ledger.reserved_bytes,super::super::super::digest(phase.prepared.slots.buffers[0].bytes()));
+                                    if !phase.report.native_backend_invoked || !useful {
+                                        failures.push(format!("useful native gate n{n} twist{twist} m{m} K{k} target{target_kind}"));
+                                    }
+                                    if phase.independent_derivation_verified {
+                                        failures.push("forbidden derivation promotion".into());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(attempted, 432);
+        assert!(
+            failures.is_empty(),
+            "all432 fixed cells retained; {} failed gates: {failures:?}",
+            failures.len()
+        );
     }
 }
