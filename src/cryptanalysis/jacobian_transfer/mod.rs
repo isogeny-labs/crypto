@@ -1053,9 +1053,15 @@ impl TransferFile {
         })
     }
 
-    /// Pretty JSON with a trailing newline, as committed.
+    /// Plain, one-space-indented JSON with a trailing newline, as committed.
+    /// At 20,592 curves, two-space indentation alone puts this generated
+    /// catalog over GitHub's 100 MiB blob limit. Keep every field and line
+    /// break while retaining a format that Git can delta-compress.
     pub fn to_json(&self) -> String {
-        let mut s = serde_json::to_string_pretty(self).expect("serialisable");
+        let formatter = serde_json::ser::PrettyFormatter::with_indent(b" ");
+        let mut serializer = serde_json::Serializer::with_formatter(Vec::new(), formatter);
+        self.serialize(&mut serializer).expect("serialisable");
+        let mut s = String::from_utf8(serializer.into_inner()).expect("JSON is UTF-8");
         s.push('\n');
         s
     }

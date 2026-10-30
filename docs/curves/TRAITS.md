@@ -168,6 +168,21 @@ secp256k1.
   `|Δ| < 2^80`; an open walk is lengthened to the next such order) (a floor this way needs no point over an extension
   at all), and a resolved level outside them stops the build.
 
+- on a prime-field curve with `p < 2^63`, a level still open at
+  `ℓ ≤ 19` is settled by **descending walks**
+  ([`walk.rs`](../../src/cryptanalysis/curve_traits/walk.rs),
+  `height_above_floor`; Kohel, Fouquet–Morain). With `ℓ | v`, every vertex
+  of the `ℓ`-volcano above the floor has `ℓ + 1` rational `ℓ`-isogenies
+  and a floor vertex exactly one. Below the crater one edge goes up and
+  `ℓ` go down, so a walk on `j`-invariants that never steps back along
+  the edge it arrived by keeps going down once it has. From each rational
+  neighbour of `j(E)` (roots of `Φ_ℓ(j, Y)` in `GF(p)`, `Φ_2` to `Φ_19`)
+  the walk runs until a vertex with a single rational `ℓ`-isogeny; the
+  shortest such walk has length exactly the height `h` above the floor,
+  and the level is `depth − h`. A level above the bound the other tests
+  reached stops the build. The test compares it with a breadth-first
+  search of the `Φ_ℓ` graph in PARI/GP on 40 random curves.
+
 - a **stored level certificate**
   ([`level-certificates.json`](level-certificates.json)), where one exists,
   before any search: the points the depth-1 point test would look for,
@@ -271,9 +286,8 @@ certify its coordinates or group order.
 
 In the regenerated file (20,639 registry curves and 176 source curves: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is proved for 19,876 curves and probable
-for 915; 17 are bounded (open volcano levels on curves added since the last
-level work), 6 remain unknown because a 125- to 153-digit composite of `Δ`
+degree-263 descendant), `End(E)` is proved for 19,893 curves and probable
+for 915; none is bounded, 6 remain unknown because a 125- to 153-digit composite of `Δ`
 is unsplit, and one record is not applicable. Of the 1,371
 curves over `GF(p^k)`, `k > 1`, 1,365 have a certified order (9 by generator,
 1,356 by point orders: 530 proved, 826 probable); one is bounded (its point
