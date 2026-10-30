@@ -18,7 +18,7 @@ ax.set_yticks([0,6,12,18]);ax.legend(ncols=2)
 fig.text(.12,.015,"One fixed E/F17 of order19; 400 complete models. Development checks, no scaling or timing.",fontsize=8)
 fig.tight_layout(rect=(0,.05,1,1));fig.savefig(HERE/"model-census.svg");fig.savefig(HERE/"model-census.png",dpi=150);plt.close(fig)
 fig,ax=plt.subplots(figsize=(9,4.5));ax.axis("off")
-boxes=[(.02,.62,.28,.25,"REVIEWED DERIVATIONS\nRationality, coverage, setup\nOdd prime whole-order E/Fp","#DFEDF4"),(.36,.62,.27,.25,"WORKING BASELINE\nComplete IC on E/F17\nPDP loop: p(p-1)","#E8EEF0"),(.70,.62,.28,.25,"MISSING RESULT\nImplicit relation cost/yield\nProved sub-exponential bounds","#F8E1CC"),(.20,.13,.73,.25,"CONDITIONAL REDUCTION ONLY\nCoverage and setup are bounded; cheap relation finding is unresolved.\nSmall final quotient degree does not prove cheap initial elimination.\nCurrent implementation is exponential.","#F8E1CC")]
+boxes=[(.02,.62,.28,.25,"REVIEWED DERIVATIONS\nRationality, coverage, setup\nOdd prime whole-order E/Fp","#DFEDF4"),(.36,.62,.27,.25,"WORKING BASELINE\nComplete IC on E/F17\nPDP loop: p(p-1)","#E8EEF0"),(.70,.62,.28,.25,"NORM-CANDIDATE GAP\nInitial implicit elimination\nProved cost/yield bound","#F8E1CC"),(.20,.13,.73,.25,"NORM CANDIDATE: CONDITIONAL REDUCTION\nIts initial elimination cost is unresolved.\nThe separate existing tensor theorem chain is reviewed in the text.\nOur coefficient baseline is exponential.","#F8E1CC")]
 for x,y,w,h,t,c in boxes:
  ax.add_patch(plt.Rectangle((x,y),w,h,facecolor=c,edgecolor="#444"));ax.text(x+w/2,y+h/2,t,ha="center",va="center",fontsize=9)
 for a,b in [((.30,.745),(.36,.745)),((.63,.745),(.70,.745)),((.84,.62),(.84,.38))]:ax.annotate("",xy=b,xytext=a,arrowprops={"arrowstyle":"->","lw":1.5})

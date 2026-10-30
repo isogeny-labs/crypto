@@ -2,6 +2,8 @@
 
 2026-10-29. **Decision report and stored-evidence audit; no new ECDLP algorithm, solver run, or speedup is established.**
 
+**2026-10-30 update:** This is the initial dated snapshot. The [continuation](continuation/README.md) adds actual tiny-curve unknown solving and a substantial prior-art correction: recent public preprints claim sub-exponential prime-field ECDLP through Boolean tensor contraction. Their decisive proof received scoped independent review. The initial audit did not include them; the selection below is not a complete current-literature assessment. No original sub-exponential algorithm is claimed by this work.
+
 My selection is **growing-arity divisor-coefficient decomposition with shared quotient-and-remainder membership towers**. Graeffe terminal membership is retained as a comparator, not the preferred encoding. This advances `LEAD-ICP-shared-coefficient-membership`, the symmetric PKM work and the P-256 cubic-divisor continuation. The five-point Graeffe version already exists as `IDEA-20261029-3d0e71`; neither that construction, Riemann-Roch decomposition, root-squaring, shared remainder membership nor PKM factor bases is newly invented here. Generalizing them to odd arity is a standard composition, not a novelty claim. The missing research contribution is a uniform, complete solver bound as arity and depth grow.
 
 I cannot honestly deliver the requested novel sub-exponential algorithm: its essential complexity lemma remains unproved, and there is no positive measured scaling evidence for it. The choice below is a research judgment about where to spend one opportunity, not a claim that the opportunity succeeds.

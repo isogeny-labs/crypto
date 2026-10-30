@@ -10,5 +10,6 @@ mkdir -p "$out"
 g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror "$here/reviews/verify_records.cpp" -o "$out/verify_records"
 "$out/verify_records" "$here/solver/checks"
 bash "$here/canonical/unbound-check/check.sh" "$out/staircase"
-echo 'PASS continuation hashes, independent fixed records and retained staircase'
-echo 'No scientific timing, asymptotic validation or sub-exponential solver established'
+bash "$here/tensor-review/check_hermite.sh" "$out/hermite"
+echo 'PASS continuation hashes, independent fixed records, staircase and Hermite replay'
+echo 'No scientific timing or original sub-exponential algorithm established by these checks'

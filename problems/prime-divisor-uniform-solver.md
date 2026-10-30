@@ -56,6 +56,12 @@ precomputation advantage or fixed-size speed claim.
 - **Not established:** novelty, a sufficient efficient solver, auxiliary-pipeline
   implementation, growing-size cost, a rho win, or exhaustive historical review.
   Specific strategy obstructions in the notes are not universal lower bounds.
+- **Concurrent prior art:** the continuation's [tensor review](../research/prime_one_shot_20261029/continuation/tensor-review/README.md)
+  identifies an existing claimed sub-exponential ECDLP theorem chain and records
+  scoped proof checks without a concrete gap found. It is not an original
+  algorithm from this session and does not prove the proposed norm-system
+  certificate-degree bound. The initial focused audit omitted those manuscripts;
+  that prior-art assessment is explicitly corrected.
 
 ## What would unblock it
 

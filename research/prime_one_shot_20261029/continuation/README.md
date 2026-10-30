@@ -1,6 +1,20 @@
-# Continuation: actual solving and a sharper prime-field reduction
+# Prime-field continuation: checked baselines, reductions and recent tensor prior art
 
-2026-10-30 UTC. The requested sub-exponential algorithm has **not** been achieved. This continuation moves beyond supplied witnesses: it implements a complete small-curve direct index-calculus solver and derives supporting rationality, coverage, recovery and auxiliary-curve construction bounds. The current decomposition code remains exponential. No new speedup, growing-size experiment, formal proof-assistant certificate, or certified novelty claim is made.
+2026-10-30 UTC. The requested **original** sub-exponential algorithm has **not** been achieved. This continuation moves beyond supplied witnesses: it implements a complete small-curve direct index-calculus solver and derives supporting rationality, coverage, recovery and auxiliary-curve construction bounds. The current norm-coefficient PDP remains exponential. No new speedup, growing-size experiment, formal proof-assistant certificate, or certified novelty claim is made.
+
+## Current prior art changes the assessment
+
+The initial focused audit missed two recent public manuscripts. Version0.2 of A Subexponential Time Algorithm for Elliptic Curve Discrete Logarithm claims expected classical bit time
+
+    2^{O(b/(log b)^(1/4))}, b=ceil(log2 p),
+
+through compact Boolean tensor encodings and independent affine-hash factor bases. Its reduction is conditional on a contraction theorem stated and proved in AppendixD of The Exponential Time Hypothesis is False. All setup, failed queries, seed restarts and linear algebra are charged. This is materially stronger prior art than an unproved factor-base proposal. It is not an algorithm invented in this session.
+
+[tensor-review/](tensor-review/README.md) pins the manuscripts and records the checks. Two independent within-session readings of the full decisive contraction proof found no concrete gap in its recurrence or local precision algebra. The parent also checked the compact multiplication construction, point cases, hash coverage, recovery and cost balance in the ECDLP reduction. These are scoped proof readings; general implementation correctness and the full manuscript claims are not certified by them. Public source labels alone are not endorsement.
+
+The tensor theorem chain is now the best-supported existing claimed sub-exponential route identified in this review. The original norm/divisor choice remains an unproved research candidate. Transcribing or renaming the tensor algorithm would not meet the user's strict novelty requirement. An original algorithm remains unachieved, and the prior-art correction is explicit rather than presenting the earlier partial audit as exhaustive.
+
+New bounded development evidence includes an independent native GMP reconstruction unit:72 cases,308 Cauchy charts,8832 node errors,1152 final errors and four negative controls pass, with exact replay. The existing native tensor crate also builds under an official unprivileged Rust toolchain and passes all34 release correctness tests. These are fixed implementation/lemma checks; they do not certify the complete theorem or general recursive implementation, and no challenge logarithm or performance claim follows.
 
 ## What now runs without a witness
 
@@ -67,7 +81,7 @@ and dense linear algebra at most
 
     2^(6 sqrt(n)+O(log n)) bit-polynomial factors.
 
-With finite per-base call caps, per-call operation caps, verification and restarts, a proved uniform oracle bound C(n)=exp(o(n)) would therefore give a complete sub-exponential algorithm in this family. The inability to recognize a good sampled base need not itself cause an unbounded run. But **no computable sub-exponential cap with a proved sufficient verified yield is supplied here**. Call count is not runtime; the implemented oracle instead has an explicit p^2 loop. These supporting bounds do not prove sub-exponential ECDLP for all prime fields, P-256 or secp256k1.
+With finite per-base call caps, per-call operation caps, verification and restarts, a proved uniform oracle bound C(n)=exp(o(n)) would therefore give a complete sub-exponential algorithm in this family. The inability to recognize a good sampled base need not itself cause an unbounded run. But **no computable sub-exponential cap with a proved sufficient verified yield is supplied for this norm-system procedure**. Call count is not runtime; the implemented oracle instead has an explicit p^2 loop. These supporting bounds do not prove sub-exponential ECDLP for all prime fields, P-256 or secp256k1.
 
 The earlier wording made complete fast refutation sound necessary. It is only sufficient. [selective-oracle-contract.md](theory/selective-oracle-contract.md) gives a weaker, independently checked route: a capped, label-free procedure may return no relation found, provided its verified success probability is bounded below by a known exp(-o(n)) on a constant fraction of sampled bases. In particular, a known exp(o(n)) average time to the first verified relation on covered targets suffices, using a fixed cap and the proved coverage bound. Uncovered targets need no fast refutation. This correction broadens the solver search without weakening correctness or omitting failed-call cost; the needed cost/success bound remains unproved.
 
@@ -116,8 +130,8 @@ Several parallel tooling/research turns were interrupted by automatic content fi
 
 ## Recheck the retained evidence
 
-From the repository root, run bash research/prime_one_shot_20261029/continuation/check.sh. It checks the source/artifact hashes, the solver's frozen manifest, independent native record replay and the retained CAS staircase. The solver and canonical directories contain their separate generation/reproduction commands. No compiler, backend binary or credential is committed. The plot/PDF renderer performs layout only. The source register and reviews identify exactly which literature and derivations were checked; none is an exhaustive novelty certificate.
+From the repository root, run bash research/prime_one_shot_20261029/continuation/check.sh. It checks the source/artifact hashes, the solver's frozen manifest, independent native record replay, the retained CAS staircase and all regenerated Hermite-unit table hashes. Large raw tables use the normal artifact store; the replay does not require downloading them. The solver and canonical directories contain their separate generation/reproduction commands. No compiler, backend binary or credential is committed. The plot/PDF renderer performs layout only. The source register and reviews identify exactly which literature and derivations were checked; none is an exhaustive novelty certificate.
 
 ## Status against the original request
 
-The research objective remains open. This continuation supplies an actual complete tiny-curve IC baseline, complete rational model-set checks, independent record replay, canonical external imports and stronger supporting probability and setup bounds. It does **not** supply the requested novel sub-exponential oracle, a sufficient solving-cost/yield bound, an implemented auxiliary-curve pipeline, or an exhaustive historical-corpus review. The precise unresolved requirement and discriminating next step are tracked in [the problem record](../../../problems/prime-divisor-uniform-solver.md). There is no claim that work continues unattended after this turn unless a named running job remains active.
+The objective of producing an original sub-exponential algorithm remains open. This continuation identifies an existing explicit claimed sub-exponential theorem chain, records scoped proof checks and bounded native tests, and corrects the initial prior-art assessment. It also supplies the complete tiny-curve norm/IC baseline and supporting probability/setup proofs. It does **not** establish novelty, certify the general tensor implementation, prove sufficient cost/yield for the norm-system candidate, implement its auxiliary pipeline, or exhaust every historical experiment. The precise unresolved requirement and discriminating next step are tracked in [the problem record](../../../problems/prime-divisor-uniform-solver.md). There is no claim that work continues unattended after this turn unless a named running job remains active.

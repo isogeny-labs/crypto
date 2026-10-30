@@ -45,12 +45,44 @@
       "url": "https://github.com/algebraic-solving/msolve",
       "sha256": "4fd7b11055cbd583ba8cc48e91e53f1c1cc7e2193065498a9b0ebef02a97cb89",
       "scope": "Collected expanded monomials required; v0.11.0 inspected, not built or benchmarked."
+    },
+    {
+      "title": "Bochum ECDLP preprint v0.2",
+      "url": "https://raw.githubusercontent.com/bochum-crypto/subexponential-ecdl/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f/subexponential-ecdl.pdf",
+      "sha256": "82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11",
+      "scope": "Theorems2-4, Fourier/modular/point encodings, sections3.2-3.5 coverage/recovery/complete cost. Existing claimed algorithm; not session novelty."
+    },
+    {
+      "title": "The Exponential Time Hypothesis is False, October25 manuscript",
+      "url": "https://raw.githubusercontent.com/openai/math/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/paper.pdf",
+      "sha256": "5b1612dc2eebb2cad5b4cbe62d1fed2982f01ab1908c26f70010a651487e8123",
+      "scope": "D.1 and fullD.4 independently read for cost/precision; no concrete scoped gap found, not global institutional/formal certification."
     }
   ],
   "independent_primary_readers": "Primary modular and Schoof literature checked by modular_curve_sources; proof/source scopes recorded in reviews/. Not external peer review or a formal certificate.",
   "backend": "Native Debian msolve0.7.5-1, package hashes in canonical/backend/packages.json; no fastest-backend claim.",
   "scientific_solver_experiments": 0,
   "local_native_development_only": true,
-  "full_library_check": "cargo unavailable; no Rust library source changed",
-  "cloud_execution": "EKS readiness run40979213857 terminal cancelled,0steps; no scientific execution"
+  "full_library_check": "Official unprivileged Rust1.78 installed later; existing tensor crate release suite34/0/0 passes. Root library suite not run; no Rust library source changed by this study.",
+  "cloud_execution": "EKS readiness run40979213857 terminal cancelled,0steps; no scientific execution",
+  "prior_art_correction": "Initial focused audit omitted these recent preprints. Existing claimed subexponential tensor route identified and scoped proof reviews recorded; no original algorithm achieved.",
+  "native_existing_tensor_crate_validation": {
+    "source_revision": "6b6f42a2de5f1ddbbc2cb4bbf0a3fe072248d248",
+    "tree": "712d83360e07bf9fe321c11d3367653949bd9af7",
+    "source_files_blob_checked": 24,
+    "library_tests_passed": 34,
+    "failed": 0,
+    "test_exit": 0,
+    "toolchain": "official Rust1.78.0 minimal",
+    "scope": "existing fixed release tests, not scientific timing or asymptotic certification"
+  },
+  "native_hermite_unit": {
+    "cases": 72,
+    "cauchy_charts": 308,
+    "node_errors_checked": 8832,
+    "final_errors_checked": 1152,
+    "negative_controls": 4,
+    "complete_contraction": false,
+    "scope": "fixed exact scalar-coordinate lemma unit, final tables replayed by hash"
+  }
 }
