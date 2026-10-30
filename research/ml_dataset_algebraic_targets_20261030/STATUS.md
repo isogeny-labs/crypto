@@ -1,3 +1,10 @@
+## Documentation conflict resolution
+
+The independently reviewed log-relocation-proof-01.json preserves every historical
+entry and resolves the daily-log conflict against inspected main 4ffe3a190db0.
+Only the final 50 branch-added log lines move beside the earlier 196-line block.
+No later main runtime is imported or claimed validated by pipeline05.
+
 # Current merged-source validation: all phases passed
 
 Pipeline05 completed2026-10-30T16:06:37Z at sourcea5343597d83545e660497748cd22d6856e0c3060.
