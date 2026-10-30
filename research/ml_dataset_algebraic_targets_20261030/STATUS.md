@@ -70,3 +70,9 @@ Validation now includes254 scoped dataset tests, strict maintained Clippy, the
 release binary build, actual curve/twist export-and-retry CLI checks, corruption
 rejection and full library tests. These receipts cover this isolated runtime;
 they do not claim validation of later changes on main. Verified cloud cells remain0.
+
+PR2964 is open with auto-merge enabled at head01f8b4f704db. Newer main conflicts
+only in the shared session log according to merge-tree preview. Checkpoint07 has
+a valid6d391aa194df bundle but inconsistent later metadata; preserve its coherence
+audit and supersede with a stable-head checkpoint. Earlier coherent checkpoints
+and pushed Git commits remain available. No source or validation evidence was lost.
