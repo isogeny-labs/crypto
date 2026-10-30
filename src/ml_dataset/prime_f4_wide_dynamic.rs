@@ -1365,6 +1365,7 @@ impl std::fmt::Debug for PrepareFailure {
 }
 /// Public/group validation is the caller's precondition; the serializer enforces
 /// canonical dimensions/domain coverage. This private API never activates CLI.
+#[allow(clippy::result_large_err)] // Preserve admitted partial state without an error-path allocation.
 pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
     p: u64,
     parameters: Parameters<'_>,
@@ -1587,6 +1588,7 @@ pub(super) struct NativePhase {
     pub diagnostic_stop: Option<Stop>,
     pub independent_derivation_verified: bool,
 }
+#[allow(clippy::result_large_err)] // Preserve admitted partial state without an error-path allocation.
 pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Result<(), ()>>(
     mut prepared: PreparedOriginal,
     forward: &mut F,
@@ -2943,10 +2945,11 @@ pub(super) fn run_group_prefixes<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) ->
                                 == Some(p.workspace.group.coordinates[i])
                         });
                 }
-                if report.computed_match {
-                    if report.origin == GroupOrigin::ReportedBasisLinearCandidate && !coords_match {
-                        report.origin = GroupOrigin::ReportedBasisLeafLift;
-                    }
+                if report.computed_match
+                    && report.origin == GroupOrigin::ReportedBasisLinearCandidate
+                    && !coords_match
+                {
+                    report.origin = GroupOrigin::ReportedBasisLeafLift;
                 }
                 Ok(())
             })();
@@ -3801,6 +3804,7 @@ mod tests {
     /// Explicit long panel: all432 cases are attempted; ignored/unrun is NOT coverage.
     #[test]
     #[ignore = "explicit original-chain432-case software gate; invoke separately with --ignored --exact --nocapture"]
+    #[allow(clippy::result_large_err)] // Exercise the allocation-free partial-state API unchanged.
     fn dynamic_original_chain_all_arity_twist_432_case_panel() {
         use num_traits::ToPrimitive;
         let source = std::env::var("ML_DYNAMIC_PANEL_SOURCE_COMMIT")
@@ -4863,10 +4867,7 @@ mod tests {
                     };
                     let bytes = serde_json::to_vec(&row).unwrap();
                     maximum = maximum.max(bytes.len() + 1);
-                    assert!(
-                        bytes.len() + 1 <= bound,
-                        "m={m} origin={origin:?} flags={flags}"
-                    );
+                    assert!(bytes.len() < bound, "m={m} origin={origin:?} flags={flags}");
                 }
             }
             assert_eq!(
