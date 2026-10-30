@@ -1126,3 +1126,29 @@ Publish completed audits in a follow-upPR because2869 has merged. Remaining
 Initial enrollment checker ignored future execution keys and returned success
 for nonbijective diagnostic output. Corrected version fails closed; both versions
 and their validation evidence are preserved.
+
+## 2026-10-30 — Cross-session checker independent review
+
+### What was done
+Implemented a native offline comparator for the retained computation/fresh
+sessions. Independent source review identified six acceptance gaps plus an archive
+length check. Corrected source joins every record to its plan, checks unique exact
+measured replay membership, traverses unmatched array elements, verifies actual
+warmup/measured counts and fixed gate dimensions, uses checked timestamp arithmetic,
+and binds archive length. Reviewer found the corrected scope clean;13tests pass.
+
+### Decisions made
+Claim only deterministic solver/outcome/operation-accounting consistency. Timing,
+observed resource/environment/isolation fields remain explicit exclusions. Preserve
+failed initial runs and historicalv1 source/output. No instrument, raw record,
+frozen protocol or scientific execution changed. Link reports from the study index.
+
+### Open threads
+Final packet hash/visual checks and follow-upPR publication. Native full-cohort
+aggregation/enrollment admission and later-stage resources still require completion.
+PR2869 factor-base CLI CI passed; harness unit-test job remained live at this entry.
+
+### Errors
+First comparator run encountered decimal-string seeds in records. Subsequent review
+found plan-binding/replay uniqueness/array traversal/count/timestamp/report-dimension
+gaps; all were corrected before claiming a reviewed consistency result.
