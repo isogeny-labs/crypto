@@ -1,0 +1,483 @@
+{
+  "date_utc": "2026-10-29",
+  "client_date": "2026-10-28 America/Los_Angeles",
+  "performance_measured": false,
+  "new_IC_relation_rank_claim": false,
+  "full_F2_modular_factor_transfer": false,
+  "merge_authorized": false,
+  "generic_checker_available": false,
+  "schema": "koblitz.round27/proper-models-and-torsion-v1",
+  "round": 27,
+  "complete_divisors": {
+    "accepted": true,
+    "transported_charts": 20,
+    "lambda_pole_degree": 64,
+    "lambda_extra_zero_degree": 14,
+    "nu_pole_degree": 132,
+    "S_pole_degree": 308,
+    "N_pole_degree": 462,
+    "original_coordinate_and_registered_divisors_complete_under_written_DVR_bridge": true
+  },
+  "complete_RR": {
+    "accepted": true,
+    "divisor_degree": 128,
+    "source_genus": 61,
+    "sections": 68,
+    "candidate_monomials": 1568,
+    "independent_O_jet_coefficients": 129,
+    "charts_independently_reconstructed": 20,
+    "sigma_trace_rank": 34,
+    "quotient_genus": 31,
+    "quotient_divisor_degree": 64,
+    "quotient_sections": 34,
+    "complete_serialized_exports": true,
+    "bulk_list_exports_rejected": true
+  },
+  "projective_models": {
+    "accepted": true,
+    "source_coordinates": 68,
+    "source_products": 2346,
+    "source_multiplication_rank": 196,
+    "source_quadrics": 2150,
+    "quotient_coordinates": 34,
+    "quotient_products": 595,
+    "quotient_multiplication_rank": 98,
+    "quotient_quadrics": 497,
+    "all_kernel_vectors_and_pivots_recombined": true,
+    "prime_saturated_new_ideals_under_written_RR_and_Prop11_bridge": true,
+    "old_coupled_ideal_saturation_proved": false
+  },
+  "actual_torsion": {
+    "accepted": true,
+    "exact_order": 11,
+    "diamond_eigenvalue_mod11": 6,
+    "actual_nonprincipal_divisor_from_full_RR": true,
+    "full_membership_rank": 68,
+    "kernel_dimension": 0,
+    "moved_divisor_positive_degree": 64,
+    "principal_presentation_determinant": 1477212,
+    "desired_CM_sign_projection_verified": false
+  },
+  "mixed_polarized_carrier": {
+    "dimension": 24,
+    "polarization_type_ones": 18,
+    "polarization_type_fives": 6,
+    "polarization_degree": 244140625,
+    "classification": "written geometric deduction from checked etale cyclic10 tower and standard Prym/duality theorems",
+    "explicit_integral_correspondence": "(1-T^5)*(5-(1+T^2+T^4+T^6+T^8))",
+    "pseudo_idempotent_scalar": 10,
+    "actual_nonzero_11_class_lies_in_carrier_under_written_bridge": true,
+    "explicit_theta_sections": false,
+    "old_det19_embedding_constructed": false
+  },
+  "cusp_reverse": {
+    "accepted": true,
+    "arbitrary_formal_cusp_coefficients": true,
+    "prime_to_11_recovery_scalar": 134292,
+    "matrix_rows": 5,
+    "matrix_columns": 5,
+    "all_entries_integral_and_products_checked": true,
+    "arbitrary_ordinary_divisor_evaluator": false
+  },
+  "node187": {
+    "accepted": true,
+    "actual_Miller_functions_with_conjugates": 80,
+    "graphs": 4,
+    "coefficient_conjugates_each": 5,
+    "proper_chart_group_law_lifts": 2,
+    "local_nilpotent_unit_certificate": true,
+    "original_global_h_power_membership": false,
+    "complete_simultaneous_arc_constructed": false
+  },
+  "low_genus": {
+    "accepted": true,
+    "particular_quotient_genera_excluded_under_modular_bridge": [
+      7,
+      13
+    ],
+    "target_Weil_degree": 8,
+    "irreducible_and_non_even": true,
+    "other_low_genus_carriers_excluded": false
+  },
+  "RR_F32_map_system": {
+    "equations": 455,
+    "binary_coefficient_terms": 646907,
+    "invariant_and_trace_preimage_sections_each": 34,
+    "all_source_jet_checks": 910,
+    "control_failures": 0,
+    "coefficient_field_size": 32,
+    "both_ordinary_signs": true,
+    "nonconstant_invariant_adjustments_included": true,
+    "solver_run": "mapsolve27-02",
+    "solver_exit": 14,
+    "solver_outcome": "4GiB virtual memory cap; no map or unit certificate",
+    "universal_nonexistence_proved": false
+  },
+  "proof": {
+    "named_theorems": 35,
+    "audited_declarations": 35,
+    "failing": 0,
+    "trusted_native": 0,
+    "accepted_run": "lean09",
+    "lean": "4.34.1",
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+    "proper_geometry_formalized": false
+  },
+  "runs": [
+    {
+      "id": "action27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "ACTION27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "cusp27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "CUSP27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "direct27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "DIRECT27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "direct27-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "DIRECT27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "io27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "IO27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "lambda14-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "LAMBDA14_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "laurent27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "LAURENT27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "laurent27-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "LAURENT27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "laurent27-corrupt-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "LAURENT27_ALL_CHECKS_PASS"
+      ],
+      "status": "expected_rejection"
+    },
+    {
+      "id": "lean01",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean02",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean03",
+      "stage": "proof",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 18
+    },
+    {
+      "id": "lean04",
+      "stage": "proof",
+      "compile_exit": null,
+      "audit_exit": null,
+      "status": "gate_blocked_before_compiler"
+    },
+    {
+      "id": "lean05",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean06",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean07",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean08",
+      "stage": "proof",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "proof_or_runtime_failure"
+    },
+    {
+      "id": "lean09",
+      "stage": "proof",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 35
+    },
+    {
+      "id": "lowgenus27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "LOWGENUS27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "mapbuild27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "MAPBUILD27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "mapbuild27-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "MAPBUILD27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "mapsolve27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "mapsolve27-02",
+      "stage": "native",
+      "exit": 14,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [],
+      "status": "resource_limit"
+    },
+    {
+      "id": "move27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "MOVE27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "node27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "NODE27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "norm27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "NORM27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "quadrics27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "QUADRICS27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "quadrics27-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "QUADRICS27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "quadrics27-03",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "QUADRICS27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "reverse27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [
+        "REVERSE27_ALL_CHECKS_PASS"
+      ],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "reverse27-02",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "REVERSE27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "rr27-01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": true,
+      "markers": [],
+      "status": "implementation_rejection"
+    },
+    {
+      "id": "rr27-02",
+      "stage": "native",
+      "exit": null,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "RR27_ALL_CHECKS_PASS"
+      ],
+      "status": "wrapper_evidence_incomplete"
+    },
+    {
+      "id": "rr27-export01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "RR27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    },
+    {
+      "id": "rr27-o01",
+      "stage": "native",
+      "exit": 0,
+      "build_exit": null,
+      "singular_errors": false,
+      "markers": [
+        "RR27_ALL_CHECKS_PASS"
+      ],
+      "status": "accepted"
+    }
+  ],
+  "flow": {
+    "native_accepted": 15,
+    "native_implementation_rejection": 8,
+    "native_expected_rejection": 1,
+    "proof_proof_or_runtime_failure": 6,
+    "proof_accepted": 2,
+    "proof_gate_blocked_before_compiler": 1,
+    "native_resource_limit": 1,
+    "native_wrapper_evidence_incomplete": 1
+  }
+}
