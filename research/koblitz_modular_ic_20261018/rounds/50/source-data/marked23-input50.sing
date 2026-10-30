@@ -1,0 +1,97 @@
+ring marked23Work50=(2,x),(y),dp;short=0;poly f23=y^7 + (x^5 - x^4 + x^3 + 4*x^2 + 3)*y^6 + (x^7 + 3*x^5 + x^4 + 5*x^3 + 7*x^2 - 4*x + 3)*y^5 + (2*x^7 + 3*x^5 - x^4 - 2*x^3 - x^2 - 8*x + 1)*y^4
+		+ (x^7 - 4*x^6 - 5*x^5 - 6*x^4 - 6*x^3 - 2*x^2 - 3*x)*y^3 - (3*x^6 - 5*x^4 - 3*x^3 - 3*x^2 - 2*x)*y^2 + (3*x^5 + 4*x^4 + x)*y - x^2*(x+1)^2;
+LIB "primdec.lib";
+option(redSB);short=0;
+if(lead(f23)!=y^7){ERROR("MARK23_MONIC_SOURCE");quit;}
+list components23=minAssGTZ(ideal(f23));
+if(size(components23)!=1){ERROR("MARK23_SOURCE_NOT_PRIME");quit;}
+ideal sourceStd23=std(ideal(f23));ideal componentStd23=std(components23[1]);
+if(size(sourceStd23)!=1 || size(componentStd23)!=1 || sourceStd23[1]!=componentStd23[1] || vdim(sourceStd23)!=7){ERROR("MARK23_SOURCE_PRIME_EQUALITY");quit;}
+print("MARK23_STAGE actual_source_prime=true generic_degree=7 inverses_begin=true");
+link inverseOut23="ASCII:w marked23-inverses50.sing";open(inverseOut23);
+write(inverseOut23,"ideal inverseInputs23;ideal inverseValues23;ideal bezoutF23;ideal bezoutA23;");
+int inverseCount23=0;
+proc mr23(poly a){return(reduce(a,sourceStd23));}
+proc mi23(poly a){
+ a=mr23(a);
+ if(a==0){ERROR("MARK23_ZERO_INVERSE");return(poly(0));}
+ poly r0=f23;poly r1=a;poly x0=1;poly x1=0;poly y0=0;poly y1=1;
+ poly rr;poly qq;poly ff;poly nx;poly ny;number lc;int oldDegree;
+ while(r1!=0){
+  rr=r0;qq=0;
+  while(rr!=0 && deg(rr)>=deg(r1)){
+   oldDegree=deg(rr);ff=(leadcoef(rr)/leadcoef(r1))*y^(deg(rr)-deg(r1));
+   qq=qq+ff;rr=rr+ff*r1;
+   if(rr!=0 && deg(rr)>=oldDegree){ERROR("MARK23_DIVISION_DEGREE");return(poly(0));}
+  }
+  if(r0!=qq*r1+rr){ERROR("MARK23_DIVISION_PRODUCT");return(poly(0));}
+  nx=x0+qq*x1;ny=y0+qq*y1;
+  if(rr!=nx*f23+ny*a){ERROR("MARK23_BEZOUT_STEP");return(poly(0));}
+  if(rr!=0){lc=leadcoef(rr);rr=rr/lc;nx=nx/lc;ny=ny/lc;}
+  r0=r1;r1=rr;x0=x1;x1=nx;y0=y1;y1=ny;
+ }
+ if(r0==0 || deg(r0)!=0){ERROR("MARK23_INVERSE_GCD");return(poly(0));}
+ lc=leadcoef(r0);x0=x0/lc;y0=y0/lc;
+ poly result=mr23(y0);
+ if(x0*f23+y0*a!=1 || mr23(a*result)!=1 || mr23(a*(result+1))==1){ERROR("MARK23_FULL_INVERSE_PRODUCT");return(poly(0));}
+ inverseCount23++;
+ write(inverseOut23,"inverseInputs23["+string(inverseCount23)+"]="+string(a)+";inverseValues23["+string(inverseCount23)+"]="+string(result)+";bezoutF23["+string(inverseCount23)+"]="+string(x0)+";bezoutA23["+string(inverseCount23)+"]="+string(y0)+";");
+ return(result);
+}
+poly r23=mr23((x^2+x+y+1)*mi23(x^2+x*y));
+poly s23=mr23((x+y+1)*mi23(x));
+poly c23=mr23(s23*(r23+1));poly b23=mr23(r23*c23);poly a123=1+c23;
+if(mr23(r23*(x^2+x*y)+x^2+x+y+1)!=0 || mr23(s23*x+x+y+1)!=0){ERROR("MARK23_SOURCE_COORDINATE_PRODUCTS");quit;}
+poly recoveredR23=mr23(b23*mi23(c23));poly recoveredS23=mr23(c23*mi23(r23+1));
+poly recoveredX23=mr23((r23+s23)*mi23(mr23(r23*s23+1)));
+poly recoveredY23=mr23((s23+1)*recoveredX23+1);
+if(recoveredR23!=r23 || recoveredS23!=s23 || recoveredX23!=x || recoveredY23!=y){ERROR("MARK23_INVERSE_COORDINATES");quit;}
+poly discriminant23=mr23(b23^3*(b23+c23*(1+c23)^3));
+if(discriminant23==0){ERROR("MARK23_SINGULAR_TATE_CURVE");quit;}
+link fieldOut23="ASCII:w marked23-field50.sing";open(fieldOut23);
+write(fieldOut23,"ring marked23Certificate50=(2,x),(y),dp;short=0;poly f23="+string(f23)+";poly r23="+string(r23)+";poly s23="+string(s23)+";poly b23="+string(b23)+";poly c23="+string(c23)+";poly discriminant23="+string(discriminant23)+";");close(fieldOut23);
+print("MARK23_STAGE inverse_coordinates_checked=true discriminant_nonzero=true field_exported=true point_order_begin=true");
+proc pointResidual23(list pt){
+ if(pt[1]==1){return(poly(0));}
+ poly xx=pt[2];poly yy=pt[3];
+ return(mr23(yy^2+a123*xx*yy+b23*yy+xx^3+b23*xx^2));
+}
+proc add23(list left,list right){
+ if(pointResidual23(left)!=0 || pointResidual23(right)!=0){ERROR("MARK23_POINT_INPUT_RESIDUAL");return(list());}
+ if(left[1]==1){return(right);}if(right[1]==1){return(left);}
+ poly xx=left[2];poly yy=left[3];poly xxx=right[2];poly yyy=right[3];poly slope;poly intercept;poly denominator;
+ if(xx==xxx){
+  if(yy!=yyy){
+   if(mr23(yy+yyy+a123*xx+b23)!=0){ERROR("MARK23_SAME_X_NOT_INVERSE");return(list());}
+   return(list(1,poly(0),poly(0)));
+  }
+  denominator=mr23(a123*xx+b23);
+  if(denominator==0){return(list(1,poly(0),poly(0)));}
+  slope=mr23((xx^2+a123*yy)*mi23(denominator));
+ }else{slope=mr23((yy+yyy)*mi23(xx+xxx));}
+ intercept=mr23(yy+slope*xx);
+ poly outX=mr23(slope^2+a123*slope+b23+xx+xxx);
+ poly outY=mr23((slope+a123)*outX+intercept+b23);
+ list answer=list(0,outX,outY);
+ if(pointResidual23(answer)!=0){ERROR("MARK23_POINT_OUTPUT_RESIDUAL");return(list());}
+ return(answer);
+}
+list p23=list(0,poly(0),poly(0));list infinity23=list(1,poly(0),poly(0));
+if(pointResidual23(p23)!=0 || pointResidual23(list(0,poly(0),poly(1)))==0){ERROR("MARK23_POINT_CONTROLS");quit;}
+list two23=add23(p23,p23);list three23=add23(two23,p23);
+if(size(two23)!=3 || two23[1]!=0 || two23[2]!=b23 || two23[3]!=mr23(b23*c23) || size(three23)!=3 || three23[1]!=0 || three23[2]!=c23 || three23[3]!=mr23(b23+c23)){ERROR("MARK23_TATE_2P_3P");quit;}
+link pointOut23="ASCII:w marked23-points50.sing";open(pointOut23);
+write(pointOut23,"list prefixPoints23;");
+list accumulator23=infinity23;int bit23=16;int residue23=23;int prefix23=0;int step23=0;
+while(bit23>0){
+ accumulator23=add23(accumulator23,accumulator23);prefix23=2*prefix23;
+ if(residue23>=bit23){accumulator23=add23(accumulator23,p23);residue23=residue23-bit23;prefix23++;}
+ if(size(accumulator23)!=3 || pointResidual23(accumulator23)!=0){ERROR("MARK23_SCALAR_PREFIX");quit;}
+ step23++;write(pointOut23,"prefixPoints23["+string(step23)+"]=list("+string(accumulator23[1])+",poly("+string(accumulator23[2])+"),poly("+string(accumulator23[3])+"));");
+ print("MARK23_SCALAR_PREFIX scalar="+string(prefix23)+" infinity="+string(accumulator23[1]));
+ bit23=bit23 div 2;
+}
+close(pointOut23);close(inverseOut23);
+if(prefix23!=23 || residue23!=0 || accumulator23[1]!=1){ERROR("MARK23_ORDER_NOT_23");quit;}
+print("MARK23_50_RESULT prime_generic_degree=7 inverse_coordinates=true nonsingular_Tate_curve=true point_exact_order=23 checked_prefixes=5 QR7_extension_not_yet_computed=true");
+print("MARK23_50_ALL_CHECKS_PASS");quit;
