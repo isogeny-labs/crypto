@@ -3587,6 +3587,7 @@ use crate::ml_dataset::types::ArtifactPayload;
 /// receipt suppliers. Production uses only the bound bridge below.
 pub(super) trait WitnessPublisher {
     fn prepare(&mut self, budget: &mut WitnessBudget) -> Result<(), WitnessError>;
+    fn confirmation_work(&self, bytes: usize) -> Result<u64, WitnessError>;
     fn publish(
         &mut self,
         bytes: &[u8],
@@ -3599,6 +3600,10 @@ pub(super) struct BoundWitnessPublisher {
     workspace: Option<WitnessCaptureWorkspace>,
 }
 impl WitnessPublisher for BoundWitnessPublisher {
+    fn confirmation_work(&self, bytes: usize) -> Result<u64, WitnessError> {
+        crate::ml_dataset::capture::witness_confirmation_work(bytes)
+    }
+
     fn prepare(&mut self, budget: &mut WitnessBudget) -> Result<(), WitnessError> {
         if self.workspace.is_some() {
             return Err(WitnessError::Failed);
@@ -3946,6 +3951,16 @@ fn complete_match<P: WitnessPublisher>(
             p.step4.final_artifacts[6].bytes = std::mem::take(&mut p.slots.buffers[6].bytes);
             p.step4.transferred = true;
             p.step4.certificate.lifecycle = CertificateLifecycle::Transferred;
+            // Keep final readback inside the ORIGINAL parent remainder. Only
+            // shrink this traversal ledger: the parent's unspent work remains
+            // available to confirm_step4_witness after traversal settles.
+            let held = publisher
+                .confirmation_work(p.step4.final_artifacts[6].bytes.len())
+                .map_err(witness_error)?;
+            if held > checking.work_limit - checking.reserved_work {
+                return Err(GroupStop::CheckWorkLimit);
+            }
+            checking.work_limit -= held;
             Ok(())
         }
         Err(error) => {
@@ -6547,6 +6562,10 @@ mod tests {
         refuse: bool,
     }
     impl WitnessPublisher for FakeWitness {
+        fn confirmation_work(&self, _: usize) -> Result<u64, WitnessError> {
+            Ok(0)
+        }
+
         fn prepare(&mut self, _: &mut WitnessBudget) -> Result<(), WitnessError> {
             Ok(())
         }
@@ -7556,7 +7575,9 @@ mod tests {
                 report.pdp_witness_verified && report.certificate_durably_persisted,
                 "real bound publication did not complete: {report:?}"
             );
-            confirm_step4_witness(&mut phase.prepared, &mut publisher).unwrap();
+            let before_confirmation = phase.prepared.checking_work;
+            let confirmation = confirm_step4_witness(&mut phase.prepared, &mut publisher);
+            assert!(confirmation.is_ok(), "confirmation={confirmation:?}; remaining before={before_confirmation}; report={report:?}");
             retain_step4_terminal(&mut phase).unwrap();
             visit_step4_retained_artifacts(&phase.prepared, |path, role, encoding, bytes| {
                 if path == "pdp-witness.json" {

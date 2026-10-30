@@ -641,6 +641,15 @@ fn witness_hash_work(n: usize) -> Result<u64, WitnessError> {
         .and_then(|x| x.checked_add(1024))
         .ok_or(WitnessError::Work)
 }
+/// Admission cost of confirming an already committed witness. The caller may
+/// hold this within its original allowance while continuing other work.
+pub(super) fn witness_confirmation_work(n: usize) -> Result<u64, WitnessError> {
+    witness_hash_work(n)?
+        .checked_mul(2)
+        .and_then(|x| x.checked_add((n as u64).checked_mul(16)?))
+        .and_then(|x| x.checked_add(8192))
+        .ok_or(WitnessError::Work)
+}
 fn witness_hex(digest: &[u8; 32]) -> [u8; 64] {
     let mut hex = [0; 64];
     let alphabet = b"0123456789abcdef";
@@ -2987,6 +2996,38 @@ mod tests {
                 .is_err());
             assert!(!f.live().join(WITNESS_PATH).exists());
             assert_eq!(e.head.event_count, 0);
+        }
+    }
+    #[test]
+    fn witness_confirmation_quote_matches_exact_admission_boundary() {
+        for short in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            let payload = witness_payload();
+            let first = e
+                .publish_first_witness(&payload.bytes, &mut w, &mut b, &mut global)
+                .unwrap();
+            assert_eq!(first.commit, WitnessCommit::NewCommit);
+            let quoted = witness_confirmation_work(payload.bytes.len()).unwrap();
+            let before = b.reserved_work;
+            b.set_exclusive_supply(quoted - u64::from(short), 0)
+                .unwrap();
+            let result = e.publish_first_witness(&payload.bytes, &mut w, &mut b, &mut global);
+            b.release_exclusive_supply();
+            assert_eq!(global, 1);
+            assert!(b.reserved_work - before <= quoted);
+            if short {
+                assert_eq!(result.unwrap_err(), WitnessError::Work);
+            } else {
+                let receipt = result.unwrap();
+                assert_eq!(receipt.commit, WitnessCommit::AlreadyCommitted);
+                assert_eq!(receipt.payload_sha256, first.payload_sha256);
+                assert_eq!(receipt.sequence, first.sequence);
+                assert_eq!(b.reserved_work - before, quoted);
+            }
         }
     }
     #[test]
