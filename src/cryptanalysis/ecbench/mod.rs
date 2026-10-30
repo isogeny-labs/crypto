@@ -55,6 +55,7 @@ pub mod compare;
 pub mod conductor_gap;
 pub mod cover_quartic;
 pub mod db;
+pub mod diagnostics;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;
