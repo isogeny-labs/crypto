@@ -1316,3 +1316,23 @@ PR delivery and applicable CI. Upper gate and full continuation remain incomplet
 ### Errors
 
 Expected canonical incompleteness is retained as findings rather than suppressed. A background heartbeat launch did not survive the command session; verified it was absent before starting the same finite coordination loop in a managed exec session, with successful fenced heartbeats.
+
+## 2026-10-30T04:30Z — Completion boundary and source-only rejection proposal
+
+### What was done
+
+Reconciled the retained published weighted-law implementation/source audit and two 1260-target paired cohorts, and signed-label Kummer cohort. These records support their scoped implementation/finite-cost results; they do not close the separate universal compiled-law/Pic0 proof or pencil timing/cohort requirements. PR #2927 merged; two nonblocking ecbench jobs were still running at the merge readback.
+
+Reviewed the pencil candidate-verification order against native_solver.rs and retained an unapplied patch, algebraic proof, standardized proposal JSON, independent static review, editable control-flow SVG and inspected two-page PDF in proposals/root_count_rejection_20261030. The proposed length guard precedes complement construction; the prior lambda-zero sieve call establishes the needed divisibility. Independent review found no defect under the bounded valid-input assumptions.
+
+### Decisions made
+
+No frozen runtime source was changed and no experiment/test/solver was run. The proposed new instrument is not observationally identical: skipped rejected candidates change arithmetic, semantic events, allocations and possible diagnostics. The packet records exact symbolic per-rejection event deltas, not measured savings, aggregate cost ratios, or a speedup. Existing incomplete-gate stopping rules remain binding.
+
+### Open threads
+
+Prospective implementation requires software equivalence fixtures with both meters enabled and correct modulus bindings, then independent review and a new instrument identity. Any new measurement requires a prospective known-data protocol and valid resource admission. Full pencil workload matrix and timing requirements remain incomplete; no resampling, reduced denominator or automatic gate retry.
+
+### Errors
+
+A combined read-only source lookup used the historical worktree for the newer pencil path and reported file not found; the pencil source was inspected in its actual current worktree. No data or scientific result changed.
