@@ -1,4 +1,4 @@
-# Continuation validation: proof and scoped checks pass; library run active
+# Continuation validation: proof/scoped checks pass; full library capped incomplete
 
 2026-10-30. Source commit `faade165a46fd51e5a0903ba8e4df85a134c68db`.
 [Proof receipt](proof-final-receipt.json) binds final source objects and exact
@@ -9,7 +9,7 @@ At17:03UTC the [fresh scoped receipt](scoped-20261030T1703Z/receipt.json) record
 actual checkpoint-refusal message/expected exit1, backlog build/validate and
 library build passes. It binds17 clean committed objects and six binary hashes.
 The library declares5646 tests and remains active from16:47:54UTC, with a
-40-minute execution cap. Final outcomes/digest/size remain pending termination.
+40-minute execution cap. Its terminal outcome is now recorded separately below.
 Remote0cc5 changes eight original bound paths; this receipt does not validate
 that integration. The launch description below is historical, not current phase.
 
@@ -71,3 +71,15 @@ It is preserved as an exact JSON text capture in lean-attempt3.log.json; UTF-8
 encoding its text field reconstructs every original byte. This is neither
 compression nor a workaround for the artifact size threshold. The raw file
 remains outside Git at its recorded path/hash.
+
+## Terminal pinned-source collection at18:29UTC
+
+[Final native receipt](native-final-faade/receipt.json):5646 declared,2208passes,
+0observed failures,47ignored,1unchangedJVcase active at cap,3390not reached.
+Execution16:47:54–17:27:54UTC,wrapper/supervisor124,Cargoexitunknown,null;
+no final suite summary/full pass. Raw214615bytes SHA256
+`34fdd95ea133361298e8911f9a5899c431a5e9af97b73e7828e1b5289cdf87bd`
+is NOT_UPLOADED with bounded excerpt. All17bindings/sixbinaryhashes verified.
+Earlier running snapshots and both earlier capped receipts remain unchanged.
+Remote0cc5 integration still needs fresh affected checks, including the
+changed Lean gate. No bound source was edited while the old run was active.

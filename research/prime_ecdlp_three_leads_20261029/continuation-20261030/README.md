@@ -137,3 +137,14 @@ figures stay unchanged: there is no admitted numeric result, new curve or
 isogeny edge. This round's explanatory diagram records the new checker path.
 No benchmark entry or plot implies a speed result. Software integration and
 proof-audit success do not complete G1–G6.
+
+## Terminal collection at18:29UTC
+
+The [final pinned-source receipt](validation/native-final-faade/receipt.json)
+records the40-minute cap:2208passes,0failures,47ignored,1JVcase active and
+3390not reached among5646. Wrapper/supervisor124 is not Cargoexit; no full
+library pass exists. The214615-byte raw log is NOT_UPLOADED with new SHA256
+`34fdd95ea133361298e8911f9a5899c431a5e9af97b73e7828e1b5289cdf87bd`.
+All17source bindings and six binaries still match. Earlier running snapshots
+and reports remain dated history. Newer remote0cc5 still needs integration
+and fresh affected validation; scientificG1–G6 status remains unchanged.
