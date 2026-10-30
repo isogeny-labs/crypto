@@ -1,7 +1,8 @@
 # CPU arithmetic comparison, round19
 
-Prepared and frozen before performance execution. No cloud upload, job,
-measurement rows or performance result exists for this panel.
+Frozen before submission. The single authorized job expired without a node
+assignment: zero benchmark executions and no measurement rows or certificates.
+The terminal outcome is retained in outcome.json and terminal-status.json.
 
 The protocol keeps the original baseline, all three complete fixtures, one
 software thread, all setup and discarded trials, reduction, both independent
@@ -59,10 +60,21 @@ and uses a fixed six-arm rotation with alternating reversal. Each cell has a
 Check the exact intended job name before any later submission to prevent
 duplicate execution. Export only after all cells and returned manifests pass.
 
-Execution is held while the account-spending concern is addressed. No staging
-or cloud-submission helper is included to accidentally create a job or upload.
-Once a run is admitted, retain its actual terminal outcome and publish raw
-evidence before a separately scoped report.
+The single bounded attempt was submitted at 2026-10-30 21:32:54 UTC as
+hashed-ecdl-cpu-round19-20261030, UID e8ae4f11-53d1-4994-b2c0-a858eafc2417.
+It reached DeadlineExceeded at 21:37:54 UTC and terminal Failed at 21:37:55.
+The pod remained Pending without a node: one current node conflicted with pod
+anti-affinity, two with node affinity/selector, and two with untolerated taints.
+No retry or deadline extension was submitted. The 180 planned executions did
+not start; this panel is invalid under its frozen missing-cell/deadline rule.
+
+The native runner and binary bytes were unchanged. Thin shell orchestration
+used the image's AWS CLI and its existing scoped job role to download inputs
+and upload outputs, with AWS_MAX_ATTEMPTS=1. submission-request.json retains
+the exact argv and envelope. staged-input.sha256 binds every uploaded file.
+terminal-s3-list.json records no output objects; terminal-logs.json contains
+empty logs. There is no success export, timing comparison or certificate claim.
+The separately published report is ../reports/round19/report.pdf.
 
 ## References and handoff
 
@@ -71,7 +83,8 @@ projective-relations rationale were reviewed. The arithmetic uses the standard
 [EFD Jacobian coordinate identity](https://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian.html).
 No new group formula is introduced. T-1014 owns this preparation directory;
 it does not reserve the shared implementation or the future report directory.
-The initial draft validator rejected a missing freeze block; that schema issue
+T-1019 owns the subsequent single execution and report. The initial draft
+validator rejected a missing freeze block; that schema issue
 was corrected before freezing. The committed protocol passes validation.
 
 ## Native validation/export migration
