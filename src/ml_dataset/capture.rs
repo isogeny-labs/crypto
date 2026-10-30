@@ -952,10 +952,10 @@ impl CaptureEmitter {
         let hex_str = std::str::from_utf8(&hex).map_err(|_| WitnessError::Encoding)?;
         let previous = self.payloads.get(WITNESS_PATH);
         if self.witness.committed || previous.is_some() {
-            if self.witness.committed {
-                if self.witness.digest != digest || self.witness.length != bytes.len() as u64 {
-                    return Err(WitnessError::Identity);
-                }
+            if self.witness.committed
+                && (self.witness.digest != digest || self.witness.length != bytes.len() as u64)
+            {
+                return Err(WitnessError::Identity);
             }
             if let Some(p) = previous {
                 if p.role != WITNESS_ROLE

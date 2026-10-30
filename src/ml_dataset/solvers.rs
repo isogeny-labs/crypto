@@ -84,6 +84,7 @@ struct LiveSink {
     events: File,
     sequence: u64,
 }
+#[allow(clippy::large_enum_variant)] // Keep the bounded sink inline without an additional heap allocation.
 enum EventSink {
     Legacy(LiveSink),
     Bound(CaptureEmitter),
