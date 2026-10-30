@@ -263,7 +263,7 @@ fn enumerate_slots(
     Ok((out, meter.used, meter.curve_additions, meter.square_roots))
 }
 
-/// The union of `slots` affine-hashed bases, one column per point.
+/// The union of `slots` affine-hashed bases with signed entries sharing a column.
 pub struct HashedAffineBase<'i> {
     pub instance: &'i PrimeInstance,
 }
@@ -275,7 +275,7 @@ impl FactorBaseBuilder<PrimeCurve> for HashedAffineBase<'_> {
 
     fn describe(&self, params: &Params) -> String {
         format!(
-            "union of {} independent affine-hashed slot bases, one column per point",
+            "union of {} independent affine-hashed slot bases with one column per negation orbit",
             params.get("slots").unwrap_or("2")
         )
     }
@@ -315,10 +315,25 @@ impl FactorBaseBuilder<PrimeCurve> for HashedAffineBase<'_> {
         ops.adds = ops.adds.saturating_add(additions);
         let starting_wall = std::time::Instant::now();
         let mut fb = FactorBase::empty(self.describe(params));
-        fb.columns = slots.iter().map(Vec::len).sum();
         fb.points = slots.into_iter().flatten().collect();
-        fb.col_of = (0..fb.points.len()).collect();
-        fb.coef_of = vec![1; fb.points.len()];
+        if ctx.r < 2 {
+            return Err("hashed-affine requires a nontrivial prime-order subgroup".into());
+        }
+        let mut orbit_columns: FastMap<usize> = fast_map(fb.points.len());
+        for point in &fb.points {
+            let point_key = self.instance.curve.key(point);
+            let negative_key = self.instance.curve.key(&self.instance.curve.neg(*point));
+            let representative = point_key.min(negative_key);
+            let next_column = orbit_columns.len();
+            let column = *orbit_columns.entry(representative).or_insert(next_column);
+            fb.col_of.push(column);
+            fb.coef_of.push(if point_key == representative {
+                1
+            } else {
+                ctx.r - 1
+            });
+        }
+        fb.columns = orbit_columns.len();
         let mut point_index = fast_map(fb.points.len());
         let mut x_index: FastMap<Vec<usize>> = fast_map(fb.points.len());
         for (i, point) in fb.points.iter().enumerate() {
@@ -327,18 +342,34 @@ impl FactorBaseBuilder<PrimeCurve> for HashedAffineBase<'_> {
                 .or_insert(i);
             x_index.entry(point.x).or_default().push(i);
         }
+        let negative_points: Vec<_> = fb
+            .points
+            .iter()
+            .map(|point| self.instance.curve.neg(*point))
+            .collect();
+        for (i, negative) in negative_points.into_iter().enumerate() {
+            let key = self.instance.curve.key(&negative);
+            if point_index.contains_key(&key) {
+                continue;
+            }
+            let index = fb.points.len();
+            point_index.insert(key, index);
+            x_index.entry(negative.x).or_default().push(index);
+            fb.points.push(negative);
+            fb.col_of.push(fb.col_of[i]);
+            fb.coef_of
+                .push(if fb.coef_of[i] == 1 { ctx.r - 1 } else { 1 });
+        }
         fb.neg_index = fb
             .points
             .iter()
-            .enumerate()
-            .map(|(i, point)| {
-                let neg = self.instance.curve.neg(*point);
+            .map(|point| {
                 point_index
-                    .get(&self.instance.curve.key(&neg))
+                    .get(&self.instance.curve.key(&self.instance.curve.neg(*point)))
                     .copied()
-                    .unwrap_or(i)
             })
-            .collect();
+            .collect::<Option<Vec<_>>>()
+            .ok_or_else(|| "hashed-affine factor base is not closed under negation".to_string())?;
         fb.abscissae = x_index.len();
         fb.abscissa_list = x_index.keys().copied().collect();
         fb.abscissa_list.sort_unstable();
@@ -420,7 +451,7 @@ impl DecompositionOracle<PrimeCurve> for HashedTensorOracle {
         let (slots, steps, additions, square_roots) = enumerate_slots(&curve, &spec, &limits)?;
         ops.adds = ops.adds.saturating_add(additions);
         let all: Vec<PrimePoint> = slots.iter().flatten().copied().collect();
-        if all != fb.points {
+        if all.len() > fb.points.len() || all.as_slice() != &fb.points[..all.len()] {
             return Err(
                 "hashed-tensor requires `hashed-affine` with identical slots, seed, tau and s"
                     .into(),

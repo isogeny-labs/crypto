@@ -82,7 +82,7 @@ pub struct Meter {
     pub used: u64,
     /// Affine curve additions charged (`curve addition`).
     pub curve_additions: u64,
-    /// Square-root extractions charged (`Tonelli-Shanks`).
+    /// Square-root extraction requests, counted once per `SquareRootContext::root` call.
     pub square_roots: u64,
 }
 impl Meter {
@@ -99,8 +99,6 @@ impl Meter {
     pub fn charge(&mut self, n: u64, phase: &str) -> Result<()> {
         if phase == "curve addition" {
             self.curve_additions = self.curve_additions.saturating_add(n);
-        } else if phase == "Tonelli-Shanks" {
-            self.square_roots = self.square_roots.saturating_add(n);
         }
         self.used = self
             .used
