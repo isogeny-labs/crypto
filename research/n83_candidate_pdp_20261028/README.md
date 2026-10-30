@@ -1,7 +1,27 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: hybrid quartic closure
+## Latest: prime m2 first-fall certificates
+
+All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown.
+
+Each strict witness has a degree-at-most17 derivation and degree16 normal form
+outside the complete lower filtered space V16. The stored sparse factors and
+tensor circuit reconstruct the exact witness; no polynomial coefficient is sampled.
+
+These are source-bound certificates using native exact arithmetic and a written rank/Koszul/filtered-space argument; independent scientific review and full algebraic formalization remain pending. The original-top regularity is still42. No elite-base or performance gain is established.
+
+Read the [native summary](evidence/prime-first-fall/summary.json),
+[algebraic argument](PRIME_FIRST_FALL_DESIGN.md),
+[byte layouts and reconstruction](PRIME_FIRST_FALL_FORMAT.json),
+[unified export](experiment-prime-first-fall.export.json),
+[S3 objects](evidence/prime-first-fall-storage.json), and
+[restored verification](evidence/prime-first-fall-publication.json).
+The earlier FFD>=5 records are preserved as historical lower bounds.
+Actual point manifests, targets, original equations and the fixed-base regularity
+view are unchanged. Each point base remains fixed across m2–9.
+
+## Earlier: hybrid quartic closure
 
 12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0.
 

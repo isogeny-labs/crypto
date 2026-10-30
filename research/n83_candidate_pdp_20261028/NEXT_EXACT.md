@@ -209,3 +209,21 @@ attempted. See DEGREE4_QUARTIC_DESIGN.md, DEGREE4_QUARTIC_FORMAT.json,
 evidence/degree4-quartic/summary.json and experiment-degree4-quartic.export.json.
 Original fixed-base regularity values and all older datasets are preserved.
 Where work remains pending, continue the exact saved hybrid basis and queue under a new frozen contract. Where full V4 completes without a global upper, a larger closure or a separate ideal certificate is still required. Preserve all prefixes and caps.
+
+
+## 2026-10-30: prime m2 highest-form FFD and strict filtered witnesses
+
+All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown.
+
+These are source-bound certificates using native exact arithmetic and a written rank/Koszul/filtered-space argument; independent scientific review and full algebraic formalization remain pending. The original-top regularity is still42. No elite-base or performance gain is established.
+
+All71 raw payloads matched before/after S3 replay. The native controls retain36
+expanded polynomial comparisons,including12 exceptional-target cases,and12
+small dense-closure comparisons. All six production functionals were nonzero.
+Zero would have remained inconclusive for the affine test.
+
+Next examine whether terminal-relation annihilators can extend highest-form
+upper certificates to the retained higher-m prime systems; that extension has
+not been executed or certified. Exact prime LFD still needs an independent
+upper certificate. The saved binary quartic frontier and held-out elite-base
+selection remain open. Do not rerun this completed six-case panel.

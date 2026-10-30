@@ -158,3 +158,15 @@ and [restored checks](../research/n83_candidate_pdp_20261028/evidence/degree4-qu
 Only a verified unit or exhaustive affine ideal equality can certify global
 upper4 under this protocol. Prime/higher-m global LFD, independent review and
 held-out matched elite-base selection remain separate unresolved requirements.
+
+
+## Prime m2 first-fall certificates,2026-10-30
+
+All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown.
+
+These are source-bound certificates using native exact arithmetic and a written rank/Koszul/filtered-space argument; independent scientific review and full algebraic formalization remain pending. The original-top regularity is still42. No elite-base or performance gain is established.
+
+See [native results](../research/n83_candidate_pdp_20261028/evidence/prime-first-fall/summary.json)
+and [the source-bound proof argument](../research/n83_candidate_pdp_20261028/PRIME_FIRST_FALL_DESIGN.md).
+Prime global LFD upper/exact,higher-m FFD/LFD,the pending binary quartic closure,
+and independent held-out elite-base selection remain unresolved.
