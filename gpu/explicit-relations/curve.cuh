@@ -1,13 +1,14 @@
 // Public-input arithmetic for explicit signed relation finding. Reuses the
-// repository's Montgomery Fp64 implementation; 5 <= p < 2^62, p prime.
+// repository's Montgomery Fp64 implementation; 5 <= p < 2^63, p prime.
 #pragma once
 #include "../rootfind/fp64.cuh"
 
 namespace explicit_relations {
 using U = uint64_t;
+constexpr unsigned MAX_SLOTS = 12;
 // Canonical residues, 0 < modulus < 2^63. Every addition is <2*modulus,
 // hence fits u64. Used only for wider hash moduli; curve Montgomery stays
-// on its established p<2^62 path.
+// on its checked p<2^63 path; this helper retains its narrower bound.
 RF_HD U hash_mul63(U a, U b, U modulus) {
   U result = 0;
   while (b) {
@@ -19,6 +20,17 @@ RF_HD U hash_mul63(U a, U b, U modulus) {
     a += a;
     if (a >= modulus)
       a -= modulus;
+    b >>= 1;
+  }
+  return result;
+}
+// Overflow-safe canonical multiplication for any nonzero u64 modulus.
+RF_HD U hash_mul64(U a, U b, U modulus) {
+  U result = 0;
+  while (b) {
+    if (b & 1)
+      result = result >= modulus - a ? result - (modulus - a) : result + a;
+    a = a >= modulus - a ? a - (modulus - a) : a + a;
     b >>= 1;
   }
   return result;
@@ -198,8 +210,8 @@ struct RowLess {
 };
 // Exact point compression on one validated odd-prime curve (SEC 1 section
 // 2.3.3): the two roots y and p-y have opposite parity. Infinity is key zero;
-// finite keys are 2*(x+1)+(y&1). The service requires p<2^62, so keys and the
-// prefix endpoint at x=2^62 fit u64. This is not a fingerprint and must never
+// finite keys are 2*(x+1)+(y&1). The service requires p<2^63, so all finite keys fit u64.
+// The terminal prefix offset is written as table size, without encoding 2^63. This is not a fingerprint and must never
 // be used to compare arbitrary off-curve coordinates or different curves.
 RF_HD U point_key(Point p) {
   return p.inf ? 0 : ((p.x + 1) << 1) | (p.y & 1);
@@ -256,7 +268,7 @@ RF_HD U lookup(const DenseRow *rows, U size, Point point) {
 }
 struct Bases {
   const Point *points;
-  U offset[9];
+  U offset[MAX_SLOTS + 1];
   unsigned slots;
 };
 RF_HD Jac tuple_sum(Curve c, Bases bases, unsigned first, unsigned end, U id) {

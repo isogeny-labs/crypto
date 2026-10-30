@@ -3643,8 +3643,6 @@ fn load_hash_input(
     }
 }
 
-// One value exists per CLI invocation, so boxing the large hasher states would
-// only add an indirection to every update.
 #[allow(clippy::large_enum_variant)]
 enum StreamingHash {
     Md(Merkle64),

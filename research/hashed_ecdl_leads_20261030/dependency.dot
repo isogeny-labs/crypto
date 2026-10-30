@@ -1,0 +1,19 @@
+digraph Program {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.3", ranksep="0.45", fontname="Helvetica", label="ECDLP research: evidence and next decisions | 2026-10-30\nArrows are dependencies; no measured speedup or verified new transfer", labelloc=t, fontsize=17];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, margin="0.16,0.12", color="#546477"];
+  edge [fontname="Helvetica", fontsize=10, color="#64748b"];
+  sources [label="Published counting / tensor claims\nSource-pinned; independent full audit open", fillcolor="#e4edf8"];
+  bridge [label="1. General implicit-entry bridge\nDescriptions + evaluation + precision + bit cost", fillcolor="#fff0ce"];
+  theorem [label="Conditional asymptotic ECDL route\nNo local general proof or practical crossover", fillcolor="#fff0ce"];
+  code [label="Delivered native reference\nEncoder, exact replay, strict input, setup reuse", fillcolor="#deefe4"];
+  finite [label="2. Delivered finite solvers\nSelectors / support / width / partial relations", fillcolor="#deefe4"];
+  gates [label="Frozen workload + admitted complete costs\nFailed trials / rank / memory / strongest rho", fillcolor="#fff0ce"];
+  decision [label="Next empirical decision\nImprovement / null / unknown with evidence", fillcolor="#e4edf8"];
+  algebra [label="4-5. Prime algebraic track\nReference arm + shared-membership proof", fillcolor="#ece6f6"];
+  special [label="6. Binary / geometric track\nExact family, map, subgroup, useful rank", fillcolor="#ece6f6"];
+  sources -> bridge -> theorem;
+  code -> finite -> gates -> decision;
+  bridge -> code [style=dashed, label="audit invariants"];
+  algebra -> gates [style=dashed, label="own protocol"];
+  special -> gates [style=dashed, label="own protocol"];
+}

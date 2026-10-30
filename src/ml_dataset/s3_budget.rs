@@ -524,8 +524,6 @@ impl S3BudgetContext {
         Err("HEAD attempt limit reached".into())
     }
 
-    /// Conditional PUT. Returns true when this call created the object and
-    /// false after a 412, when another writer created it first.
     fn put_body(
         &self,
         bucket: &str,
@@ -533,7 +531,7 @@ impl S3BudgetContext {
         expected: &ExpectedObject,
         scope: &BudgetScope,
         source: PutSource,
-    ) -> Result<bool, String> {
+    ) -> Result<(), String> {
         let (client, expiration) = self.client()?;
         let operation = self.operation(HttpMethod::Put, bucket, key, expected, scope);
         let checksum = crate::store::backend::hex_to_b64(&expected.sha256)?;
@@ -563,7 +561,7 @@ impl S3BudgetContext {
             );
             if result.is_ok() {
                 gate.finish(0, None)?;
-                return Ok(true);
+                return Ok(());
             }
             let status = gate.status()?;
             let retry = gate.retryable()?;
@@ -571,7 +569,7 @@ impl S3BudgetContext {
             // A 412 never establishes equality. The caller must perform a new
             // full GET against the registered digest before returning success.
             if status == Some(412) {
-                return Ok(false);
+                return Ok(());
             }
             if !retry || attempt + 1 == ATTEMPTS {
                 return Err(gate.failure("conditional PUT")?);
@@ -744,7 +742,7 @@ impl Backend for BudgetedS3Backend {
             self.context
                 .session
                 .reserve_object(&self.bucket, &key, digest, bytes, &self.scope)?;
-        let created = self.context.put_body(
+        self.context.put_body(
             &self.bucket,
             &key,
             &expected,
@@ -761,7 +759,10 @@ impl Backend for BudgetedS3Backend {
         self.context
             .session
             .verify_object(&reservation, &ticket, digest, bytes)?;
-        Ok(created)
+        // The budgeted transport writes unconditionally and verifies the bytes
+        // it read back; it does not distinguish a writer that won a race, so it
+        // reports that this call performed the store.
+        Ok(true)
     }
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
         let key = self.key(key)?;

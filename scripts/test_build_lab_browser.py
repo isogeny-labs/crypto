@@ -1,5 +1,6 @@
-"""Focused controls for sparse-safe lab-browser source discovery."""
+"""Focused controls for sparse-safe sources and exact cover joins."""
 
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -106,6 +107,26 @@ class RepositoryInputsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             with self.assertRaisesRegex(RuntimeError, "cannot enumerate committed"):
                 browser.RepositoryInputs(root)
+
+
+class CoverJoinTests(unittest.TestCase):
+    def test_older_catalog_keeps_new_model_visible_as_unassessed(self):
+        curves = [
+            {"slug": "icv1-a", "model_json": '{"model":"a"}'},
+            {"slug": "icv1-b", "model_json": '{"model":"b"}'},
+        ]
+        report = {"schema_version": "curve-covers/v1", "registry_sha256": "a" * 64,
+                  "curves": [{"slug": "icv1-a", "model_sha256":
+                              hashlib.sha256(curves[0]["model_json"].encode()).hexdigest()}]}
+        with mock.patch.object(browser, "sha256_file", return_value="b" * 64):
+            self.assertEqual(browser.attach_covers(curves, report), {"icv1-a"})
+            self.assertEqual(curves[0]["hyperelliptic_cover"], report["curves"][0])
+            self.assertIsNone(curves[1]["hyperelliptic_cover"])
+            bad = {**report, "curves": [{**report["curves"][0], "model_sha256": "0" * 64}]}
+            with self.assertRaisesRegex(ValueError, "cover model digest mismatch"):
+                browser.attach_covers(curves, bad)
+            with self.assertRaisesRegex(ValueError, "current cover report must have one finding"):
+                browser.attach_covers(curves, {**report, "registry_sha256": "b" * 64})
 
 
 if __name__ == "__main__":
