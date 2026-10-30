@@ -8,6 +8,11 @@ The requested work is (1) complete and measure symmetric PKM decomposition,
 known-log base on arbitrary targets, with Lean proofs of feasible mathematics.
 Implementation tests and formal proofs are distinct from those scientific panels.
 
+**2026-10-30 continuation:** [independent scalar replay and five Lean contracts](continuation-20261030/README.md)
+strengthen useful-rank and target-recovery checks. Fresh proof audit passes18
+declarations with zero trusted exceptions; fresh native integration is pending.
+G1–G3/G6 remain partial and G4/G5 unrun; no performance comparison is admitted.
+
 The research ranking remains: **symmetric PKM for a possible algebraic exponent
 improvement; five-sum for demonstrated generic implementation progress; Hecke
 for exploratory relation structure.** None currently establishes a sub-rho
