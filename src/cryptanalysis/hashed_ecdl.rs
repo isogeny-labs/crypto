@@ -103,7 +103,7 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 // Extended Euclid (HAC 2.107/2.142), for nonzero residues modulo a
 // validated prime below 2^62 (including hash moduli). Public research
 // inputs: variable time. Signed intermediates fit within i128.
-fn inverse(a: u64, p: u64) -> u64 {
+pub(crate) fn inverse(a: u64, p: u64) -> u64 {
     debug_assert!(a > 0 && a < p && p < (1 << 62));
     let (mut r, mut next) = (p, a);
     let (mut t, mut next_t) = (0i128, 1i128);
@@ -183,8 +183,8 @@ pub const MAX_COLUMNS: usize = 16384;
 pub const MAX_HASH_CANDIDATES: u64 = 1 << 24;
 
 /// Validated short-Weierstrass curve of odd prime cardinality, cofactor one.
-/// The tiny constructor counts points; the scalable constructor proves order
-/// from a nonzero torsion witness and the Hasse interval.
+/// The tiny constructor counts points or finds an order witness; the scalable
+/// constructor proves order from a supplied witness and the Hasse interval.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Curve {
     p: u64,
@@ -249,6 +249,32 @@ impl Curve {
         if a >= p || b >= p || (4 * a * a % p * a + 27 * b * b) % p == 0 {
             return Err(Error::Invalid("noncanonical or singular curve"));
         }
+        let radius = floor_sqrt(4 * p);
+        if p >= 1024 && (p + 1 - radius).div_ceil(r) == 1 && (p + 1 + radius) / r == 1 {
+            // The same exact certificate as with_order_witness, discovering
+            // a public point rather than enumerating every x in the field.
+            // Prime r and a nonidentity r-torsion point prove r divides #E;
+            // the unique multiple in the Hasse interval proves #E = r.
+            let curve = Self {
+                p,
+                a,
+                b,
+                r,
+                roots: Vec::new(),
+            };
+            let witness = (0..p).find_map(|x| curve.decode(2 * x));
+            if witness.is_some() && curve.mul(witness, r)?.is_none() {
+                return Ok(curve);
+            }
+            return Err(Error::Invalid(
+                "declared order is not the full curve cardinality",
+            ));
+        }
+        Self::counted(p, a, b, r)
+    }
+
+    // Parameters must already have passed primality and nonsingularity checks.
+    fn counted(p: u64, a: u64, b: u64, r: u64) -> Result<Self, Error> {
         let mut roots = vec![None; p as usize];
         // y^2 advances by 2*y+1. The smaller root is in 0..=p/2,
         // so this fills exactly the same canonical table with no divisions.
@@ -1043,7 +1069,11 @@ mod tests {
     #[test]
     fn finite_difference_constructor_matches_exhaustive_reference() {
         for (p, a, b, r) in [(17, 2, 2, 19), (211, 0, 7, 199), (65521, 65518, 3, 65563)] {
-            let curve = Curve::new(p, a, b, r).unwrap();
+            let curve = Curve::counted(p, a, b, r).unwrap();
+            let automatic = Curve::new(p, a, b, r).unwrap();
+            for z in 0..2 * p {
+                assert_eq!(automatic.decode(z), curve.decode(z));
+            }
             let mut roots = vec![None; p as usize];
             for y in 0..p {
                 roots[(y * y % p) as usize].get_or_insert(y);

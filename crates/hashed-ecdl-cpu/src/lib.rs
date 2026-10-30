@@ -212,18 +212,11 @@ fn mul(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 fn sub(a: u64, b: u64, p: u64) -> u64 {
-    (a + p - b) % p
-}
-fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
-    let mut out = 1;
-    while n != 0 {
-        if n & 1 != 0 {
-            out = mul(out, a, p);
-        }
-        a = mul(a, a, p);
-        n >>= 1;
+    if a >= b {
+        a - b
+    } else {
+        p - (b - a)
     }
-    out
 }
 #[derive(Default)]
 struct Scratch {
@@ -280,7 +273,7 @@ impl Scratch {
         if !active {
             return 0;
         }
-        let mut inverse = pow(product, p - 2, p);
+        let mut inverse = paper::inverse(product, p);
         for i in (0..points.len()).rev() {
             let den = self.denominators[i];
             if den == 0 {

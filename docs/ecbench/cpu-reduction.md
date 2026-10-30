@@ -73,3 +73,36 @@ both failures. Successful runs used per-object short-lived URLs and standard
 Python archive transport; all research computation and analysis stayed native.
 The larger ladder encountered an existing exclusive CPU allocation; its queued
 state is tracked separately and no other workload was stopped or changed.
+
+## 2026-10-29 22:34 PDT: further 10x iteration
+
+### What was done
+
+T-892 reserved the shared reduction after its previous reservation was clear.
+The arithmetic candidate (Euclidean inverses, finite-difference constructor,
+fixed-base scalar tables) passed 24 release tests, strict Clippy and format
+checks. The full certificates still match all three archived baseline outputs.
+A new frozen [screen](../../research/hashed_ecdl_cpu_20261030/round3/README.md)
+completed all 120 executions on EKS and its export passed file verification.
+Its report was rendered and inspected. Baseline is optimized commit 2bd4588fba60.
+
+### Decisions made
+
+Recorded L0 median ratios were 2.003, 2.814 and 2.554. The further 10x goal
+remains active and unverified. Do not compare absolute durations across the
+previous AMD host and this Intel host. Keep all setup and replay costs charged.
+The next candidate extends the existing order-witness proof to automatic small
+curve construction and removes division/exponentiation from residual arithmetic.
+It passes the 24-test suite but is not measured by the completed screen.
+
+### Open threads
+
+Freeze and execute a fresh comparison for that next candidate against the same
+optimized baseline. Strict-isolation confirmation, independent review and the
+20–40-bit CPU ladder remain outstanding. No CPU job remains running from round3.
+
+### Errors
+
+The downloaded archive retains its `work/results` parent; the initial copy used
+`results` and failed without changing evidence. Corrected the local copy path.
+The job itself completed successfully with no missing or failed cells.
