@@ -588,21 +588,197 @@
    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
    "replay": "all",
    "expect": "drift",
-   "reason": "8 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
-   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   "reason": "Current pinned native binary reproduces32/40 eligible records; exactly8 sealed records differ only in phase counts. Every identity and detail is pinned; the original expectation and evidence remain preserved. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "8 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 4,
+     "record_id": "ECR1hb30daa2f0ebf",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 9,
+     "record_id": "ECR1h15f9a18d5126",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1h7b2189b2e2f9",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 19,
+     "record_id": "ECR1h7ac07bcbe012",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 24,
+     "record_id": "ECR1h21b77bd73641",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 29,
+     "record_id": "ECR1h8f684f4cb463",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 34,
+     "record_id": "ECR1h1428a4defe17",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 39,
+     "record_id": "ECR1h33b11fa4aefb",
+     "detail": "differs in phase counts"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "d9f767bc1e508d1098bc1faf6838247e9f3d55a602844be4a7fe829e64ced7d7",
+    "replayed": 40,
+    "reproduced": 32,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt with actual exit1 from phase counts only; final all-session/current-source verification remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0018.native-audit.json.gz"
+   }
   },
   {
    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
    "replay": "all",
    "expect": "drift",
-   "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
-   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   "reason": "Current pinned native binary reproduces8/24 eligible records; exactly16 sealed records differ only in phase counts. Every identity and detail is pinned; the original expectation and evidence remain preserved. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R19",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 1,
+     "record_id": "ECR1hf933221b0462",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 2,
+     "record_id": "ECR1h2c64790ea266",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 4,
+     "record_id": "ECR1hb1c19e72be25",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 5,
+     "record_id": "ECR1hbaaa56f463ae",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 7,
+     "record_id": "ECR1h135e3ff5d897",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 8,
+     "record_id": "ECR1h146e1c05e418",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 10,
+     "record_id": "ECR1h29d0be066602",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 11,
+     "record_id": "ECR1h2ed3372cfa09",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 13,
+     "record_id": "ECR1hf4acb9641377",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 14,
+     "record_id": "ECR1hbc00736c35a4",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 16,
+     "record_id": "ECR1hb6d700dfa8cd",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 17,
+     "record_id": "ECR1h815890e4159b",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 19,
+     "record_id": "ECR1h7dd7aaf8d810",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 20,
+     "record_id": "ECR1h986844ecb357",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 22,
+     "record_id": "ECR1he9b9044bab56",
+     "detail": "differs in phase counts"
+    },
+    {
+     "seq": 23,
+     "record_id": "ECR1hfa63b94779dd",
+     "detail": "differs in phase counts"
+    }
+   ],
+   "current_replay_evidence": {
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "native_receipt_sha256": "dd796d56e9033e37ee7d8d55e59a2fa62b819650bc6eca3fafcd72c15a6b3015",
+    "replayed": 24,
+    "reproduced": 8,
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "status": "Observed complete native receipt with actual exit1 from phase counts only; final all-session/current-source verification remains pending.",
+    "receipt": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0019.native-audit.json.gz"
+   }
   },
   {
    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/X19",
    "replay": "all",
    "expect": "identical",
-   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "zero_replay_probe": {
+    "schema": "ic-static-zero-replay/v1",
+    "session_id": "ECBS1h9453f8e9b41e",
+    "records": 4,
+    "planned_executions": 4,
+    "verified_records": 0,
+    "files": {
+     "host.json": "19665073449c01791efd4e403963ea16ee4e22915e30d874f1b49de55a86365d",
+     "plan.json": "ca08a03ae34528191bdd9649c54187ef09095fcfffcef1955e8706efd2c6c513",
+     "records.jsonl": "d8ed4827910c4e3e05e269e99363ef12b25ac4c0f0a920973f0031f020beb795",
+     "session.json": "035b48dc8d6b95727754b776d28320c5324af5dfe43bec0d49b9f9617fa36408",
+     "spec.json": "320ce8249dd94b9ec6fe9bbb234a23cf97a518d8aecd9e655f896867d306ff60"
+    },
+    "reason": "All four original X19 outcomes are host timeouts with deterministic=false. The existing native registry excludes these from replay; the positive-replay probe reports0 candidates with every static check true. Static integrity only; no reproduced replay or solved scalar is claimed.",
+    "evidence": {
+     "path": "reports/ci-repair-integration-20261029/replay-expectation-evidence/X19-static-zero-native-probe.json",
+     "sha256": "a8adcb5d4290b0930df822281197b79d0df055b0fc0af2723d7a9c7da620f585",
+     "auditor_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646"
+    }
+   }
   },
   {
    "dir": "research/bitop_ladder_20261019/sessions/holdout-P16",
@@ -1079,9 +1255,7 @@
  "pinned_drift_completion": {
   "status": "partial; final all115 native verification pending",
   "unpinned_historical_drift": [
-   "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
-   "research/f4_f5_f6_cross_family_20261011/sessions/R13",
-   "research/f4_f5_f6_cross_family_20261011/sessions/R19"
+   "research/f6_ic_ecbench_ladder_20261005/sessions/n23"
   ],
   "requirement": "Set require_pinned_drift true only after actual native receipts determine every remaining historical expectation."
  }

@@ -28,11 +28,14 @@ def valid_native($binary):
     "replay of seq \(.seq): \(.detail)"];
 
 # Only an explicitly pinned historical negative may have no eligible replays.
-# These IDs are audit.rs's FAILED_OUTCOME_REPLAY_EXEMPT, not a new exemption.
+# The first three IDs are audit.rs's FAILED_OUTCOME_REPLAY_EXEMPT. X19's
+# four host timeouts are excluded by the ordinary native replay predicate.
+# No new record or outcome is exempted by this metadata validator.
 def valid_zero_pin:
   type == "object" and .schema == "ic-static-zero-replay/v1" and
   (.session_id as $sid |
-    ["ECBS1hedc734e1870d","ECBS1h4c7b9db8a389","ECBS1h302934ff99ed"] | index($sid) != null) and
+    ["ECBS1hedc734e1870d","ECBS1h4c7b9db8a389","ECBS1h302934ff99ed",
+     "ECBS1h9453f8e9b41e"] | index($sid) != null) and
   (.records | type == "number" and . > 0 and . == floor) and
   .planned_executions == .records and .verified_records == 0 and
   (.reason | type == "string" and length > 0) and

@@ -34,6 +34,7 @@ for name in session.json spec.json plan.json host.json records.jsonl; do
 done
 jq -n --arg binary "$(sha256sum "$0"|cut -d' ' -f1)" --arg selection "$selection" \
   --arg zero "${METADATA_ZERO:-0}" \
+  --arg zero_sid "${METADATA_ZERO_SESSION_ID:-ECBS1h302934ff99ed}" \
   --argjson files "$files" --argjson candidates "$candidates" \
   --argjson seqs "$(printf '%s\n' "${seqs[@]}"|jq -s .)" '
   {schema:"ecbench.audit/v1",session_status:"complete",session_id:"metadata-control",
@@ -42,7 +43,7 @@ jq -n --arg binary "$(sha256sum "$0"|cut -d' ' -f1)" --arg selection "$selection
    replay_selection:$selection,replay_candidates:$candidates,
    replays:[$seqs[]|{seq:.,record_id:("metadata-"+tostring),reproduced:true,detail:"identical"}]} |
   if $zero == "1" then
-    .session_id="ECBS1h302934ff99ed" | .records=3 | .planned_executions=3 |
+    .session_id=$zero_sid | .records=3 | .planned_executions=3 |
     .verified_records=0 | .regraded=true | .replays=[] | .replay_candidates=0 |
     del(.replay_selection) |
     .checks=(["arms","env_class","executions","executions_planned","host_hash","plan_hash",
@@ -285,4 +286,20 @@ cp positive-records.jsonl research/study/session/records.jsonl
 fail bash "$here/replay_partition.sh" ./fake-native "$tmp/zero-positive-proposal/0" 0 4
 jq 'del(.sessions[0].zero_replay_probe)' zero-good-plan.json > "$REPLAY_PLAN"
 fail bash "$here/replay_partition.sh" ./fake-native "$tmp/positive-proposal-zero-native/0" 0 4
+# X19 is also static-only under the existing registry: host timeouts, not
+# newly exempted exhausted outcomes. Its exact ID still needs an explicit pin.
+export METADATA_ZERO_SESSION_ID=ECBS1h9453f8e9b41e
+jq -c --arg sid "$METADATA_ZERO_SESSION_ID" '.session_id=$sid |
+  .outcome.status="timeout" | .cost.deterministic=false' positive-records.jsonl \
+  > research/study/session/records.jsonl
+fail bash "$here/replay_partition.sh" ./fake-native "$tmp/unmarked-timeout/0" 0 4
+./fake-native verify --dir research/study/session --replay 1 --out timeout-probe.json
+jq --slurpfile probe timeout-probe.json '.sessions[0].zero_replay_probe =
+  ($probe[0] | {schema:"ic-static-zero-replay/v1",session_id,records,planned_executions,
+    verified_records,files,reason:"Synthetic timeout metadata control; not research evidence"})' \
+  "$REPLAY_PLAN" > timeout-plan.json
+export REPLAY_PLAN="$tmp/timeout-plan.json"
+for p in 0 1 2 3; do pass bash "$here/replay_partition.sh" ./fake-native "$tmp/timeout/$p" "$p" 4; done
+pass bash "$here/check_replay_partitions.sh" ./fake-native "$tmp/timeout" 4
+pass bash "$here/replay_plan.sh" ./fake-native "$tmp/timeout-serial"
 echo "partition metadata controls: $controls passed"
