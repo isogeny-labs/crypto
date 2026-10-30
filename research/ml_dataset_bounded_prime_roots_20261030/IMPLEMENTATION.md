@@ -38,3 +38,14 @@ that metric with the recorded Split event count and require a nonzero count.
 This reports checked replay splits; it does not certify the producer's complete
 operation trajectory. Source formatting and diff checks are separate from
 runtime validation, which remains queued behind the combined regression suite.
+
+The same review identified expiry between event reservation and callback entry.
+The emitter now rechecks the original deadline before constructing/counting the
+event and calling the observer. A deterministic control expires the deadline
+between preparation and emission and requires zero callbacks/attempts. The wide
+fixed-root panel now covers every degree2 through8, without altered ceilings or
+seeds. A caller-ledger control subtracts the first call's work, field, storage,
+event and split consumption before a second call under the same deadline; its
+remaining work forces censorship before any second callback. These tests are
+newly authored, not yet executed. Remaining review coverage suggestions and
+runtime acceptance still need reconciliation before declaring validation done.

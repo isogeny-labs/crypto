@@ -226,6 +226,7 @@ impl Producer<'_> {
         Ok(())
     }
     fn emit(&mut self, kind: EventKind) -> Result<()> {
+        self.gate.clock()?;
         let event = BoundedRootEvent {
             sequence: self.gate.metrics.acknowledged_events,
             kind,
@@ -1108,6 +1109,11 @@ mod tests {
         for p in [140737488355213, 9007199254740881, (1u64 << 61) - 1] {
             for roots in [
                 &[0, 1][..],
+                &[0, 1, 2][..],
+                &[0, 1, 2, 3][..],
+                &[0, 1, 2, 3, 4][..],
+                &[0, 1, 2, 3, 4, 5][..],
+                &[0, 1, 2, 3, 4, 5, 6][..],
                 &[2, 2, 3, 5][..],
                 &[0, 1, 2, 3, 4, 5, 6, 7][..],
             ] {
@@ -1142,6 +1148,82 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn bounded_prime_roots_expiry_between_event_reservation_and_callback() {
+        let mut calls = 0;
+        let mut observer = |_: &BoundedRootEvent| {
+            calls += 1;
+            Ok(())
+        };
+        let mut producer = Producer {
+            p: 7,
+            gate: Gate::new(budget(), deadline()),
+            observer: &mut observer,
+            unacknowledged: None,
+            pending: [Poly17::ZERO; 8],
+            pending_len: 0,
+            roots: [0; 8],
+            root_count: 0,
+        };
+        producer.gate.admit().unwrap();
+        producer.prepare_event().unwrap();
+        producer.gate.deadline = Instant::now() - Duration::from_secs(1);
+        assert_eq!(
+            producer.emit(EventKind::Begin {
+                p: 7,
+                polynomial: Poly17::constant(1),
+                seed: 42,
+            }),
+            Err(Stop::Deadline)
+        );
+        assert_eq!(producer.gate.metrics.attempted_events, 0);
+        assert_eq!(producer.gate.metrics.acknowledged_events, 0);
+        assert!(producer.unacknowledged.is_none());
+        assert_eq!(calls, 0);
+    }
+
+    #[test]
+    fn bounded_prime_roots_caller_preserves_cumulative_work_balance() {
+        let f = [16, 1];
+        let (baseline, _) = run(&f, 17, budget());
+        assert_eq!(baseline.stop, Stop::Complete);
+        let field = field(17);
+        let original_deadline = deadline();
+        let total_work = baseline.metrics.work + 4096;
+        let mut remaining = budget();
+        remaining.work = total_work;
+        remaining.bytes = 2 * STORAGE_BYTES;
+        let first = solve_bounded(
+            &field,
+            &f,
+            42,
+            remaining,
+            original_deadline,
+            &mut |_| Ok(()),
+        );
+        assert_eq!(first.stop, Stop::Complete);
+        remaining.work -= first.metrics.work;
+        remaining.field_work -= first.metrics.field_work;
+        remaining.bytes -= first.metrics.bytes;
+        remaining.events -= first.metrics.attempted_events;
+        remaining.split_attempts -= first.metrics.splits;
+        assert_eq!(remaining.work, 4096);
+        let mut callbacks = 0;
+        let second = solve_bounded(&field, &f, 42, remaining, original_deadline, &mut |_| {
+            callbacks += 1;
+            Ok(())
+        });
+        assert_eq!(second.stop, Stop::WorkLimit);
+        assert!(!second.root_set_complete());
+        assert_eq!(second.root_count, 0);
+        assert_eq!(callbacks, 0);
+        assert_eq!(first.metrics.work + second.metrics.work, total_work);
+        assert_eq!(
+            first.metrics.bytes + second.metrics.bytes,
+            2 * STORAGE_BYTES
+        );
+    }
+
     #[test]
     fn bounded_prime_roots_split_refusal_and_exact_resource_boundaries() {
         let f = polynomial(&[1, 2, 3], 17, 3);
