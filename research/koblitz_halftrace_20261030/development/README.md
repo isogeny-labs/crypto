@@ -12,12 +12,13 @@ nor test elapsed times establish native speedup. No scientific run was launched.
 | `git diff --check` | passed |
 | `ecbench plan --spec research/koblitz_halftrace_20261030/spec.json` | validated 8 workloads, 5 arms, 280 executions; no execution requested |
 | `cargo test --release --lib --locked` | still running at 06:47 UTC; 5,446 parent tests passed, 123 ignored by existing annotations, one pre-existing prime-field isogeny-walk test unfinished; no failures observed |
-| Final-source `cargo test --release --lib --locked cached_` | recompilation in progress at 06:47 UTC |
+| Final-source `cargo test --release --lib --locked cached_` | passed: 10 tests including cache, scope and factor-base parity |
+| Final-source `cargo test --release --lib --locked fast_base_lifts_preserve_roots_and_order` | passed: 1 test |
 | Scientific checkpoint / EKS comparison | blocked; checkpoint-upload.txt and [access record](../../../problems/native-koblitz-measurement-access.md) |
 
 The full-suite executable was built before a lint-only change from unsigned
-`% 2` parity checks to `& 1` at two sites. The final-source filtered run recompiles
-that change; Clippy has already checked the final source. The full suite is not
+`% 2` parity checks to `& 1` at two sites. Both final-source filtered runs pass
+after recompiling that change; Clippy also checks the final source. The full suite is not
 reported as passed until its parent process exits successfully. Two nested
 child test summaries in its raw log are not the full-suite result.
 
@@ -34,4 +35,5 @@ invented. `LOCAL_ARCHIVE.sha256` identifies this local snapshot. Short complete
 check logs are retained as loose files; `SHA256SUMS` identifies the final source
 and committed check logs. This is development evidence, not an admitted ecbench
 run, replay certificate or performance ledger row. The full-suite archive log
-is explicitly a snapshot if its process is still active.
+is explicitly a snapshot if its process is still active. Readable short
+transcripts normalize trailing blank lines; exact raw bytes stay in the archive.
