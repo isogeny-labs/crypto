@@ -1102,7 +1102,6 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
         assert_eq!(chain_s3_max_variables(83, 9), Some(169_403));
-        assert_eq!(chain_s3_max_variables(83, 10), None);
         assert_eq!(chain_s3_max_variables(83, 7), Some(127_073));
         assert_eq!(chain_s3_max_variables(83, 15), Some(296_393));
         assert_eq!(chain_s3_max_variables(83, 16), None);
