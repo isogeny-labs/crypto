@@ -396,6 +396,43 @@ mod tests {
         }
     }
     #[test]
+    fn complete_certificates_match_frozen_preoptimization_records() {
+        let records = [
+            include_str!(
+                "../../../research/hashed_ecdl_cpu_20261030/panel2/results/cert-v-0-1.txt"
+            ),
+            include_str!(
+                "../../../research/hashed_ecdl_cpu_20261030/panel2/results/cert-v-1-1.txt"
+            ),
+            include_str!(
+                "../../../research/hashed_ecdl_cpu_20261030/panel2/results/cert-v-2-1.txt"
+            ),
+        ];
+        for (case, &(p, a, b, r, generator, m, tau, scalar)) in [
+            (211, 0, 7, 199, Some((3, 33)), 3, 40, 42),
+            (65521, 65518, 3, 65563, Some((0, 64894)), 3, 80, 45678),
+            (65521, 65518, 3, 65563, Some((0, 64894)), 4, 64, 54321),
+        ]
+        .iter()
+        .enumerate()
+        {
+            let c = Curve::new(p, a, b, r).unwrap();
+            let q = c.mul(generator, scalar).unwrap();
+            let config = paper::Config {
+                m,
+                tau: Some(tau),
+                seed: 111 * (case as u64 + 1),
+                max_trials: 16,
+                max_work: 1_000_000,
+                ..Default::default()
+            };
+            let mut oracle = CachedMitm::new(1_000_000, 64).unwrap();
+            let cert = paper::solve_with_oracle(&c, generator, q, &config, &mut oracle).unwrap();
+            assert_eq!(format!("{cert:?}\n"), records[case]);
+            paper::verify(&c, generator, q, &cert).unwrap();
+        }
+    }
+    #[test]
     fn caps_and_bad_bases_fail_closed() {
         let (c, p) = fixture();
         let mut oracle = CachedMitm::new(2, 1).unwrap();

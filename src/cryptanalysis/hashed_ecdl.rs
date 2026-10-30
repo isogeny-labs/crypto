@@ -100,6 +100,35 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 
+// Extended Euclid (HAC 2.107/2.142), for nonzero residues modulo a
+// validated prime below 2^62 (including hash moduli). Public research
+// inputs: variable time. Signed intermediates fit within i128.
+fn inverse(a: u64, p: u64) -> u64 {
+    debug_assert!(a > 0 && a < p && p < (1 << 62));
+    let (mut r, mut next) = (p, a);
+    let (mut t, mut next_t) = (0i128, 1i128);
+    while next != 0 {
+        let q = r / next;
+        (r, next) = (next, r - q * next);
+        (t, next_t) = (next_t, t - i128::from(q) * next_t);
+    }
+    debug_assert_eq!(r, 1);
+    if t < 0 {
+        (t + i128::from(p)) as u64
+    } else {
+        t as u64
+    }
+}
+
+fn addmod(a: u64, b: u64, p: u64) -> u64 {
+    let sum = a + b;
+    if sum >= p {
+        sum - p
+    } else {
+        sum
+    }
+}
+
 fn floor_sqrt(n: u64) -> u64 {
     let (mut lo, mut hi) = (0u64, 1u64 << 32);
     while lo + 1 < hi {
@@ -221,18 +250,29 @@ impl Curve {
             return Err(Error::Invalid("noncanonical or singular curve"));
         }
         let mut roots = vec![None; p as usize];
-        for y in 0..p {
-            roots[(y * y % p) as usize].get_or_insert(y);
+        // y^2 advances by 2*y+1. The smaller root is in 0..=p/2,
+        // so this fills exactly the same canonical table with no divisions.
+        let (mut square, mut delta) = (0, 1);
+        for y in 0..=p / 2 {
+            roots[square as usize] = Some(y);
+            square = addmod(square, delta, p);
+            delta = addmod(delta, 2, p);
         }
         let curve = Self { p, a, b, r, roots };
-        let count = 1
-            + (0..p)
-                .map(|x| match curve.roots[curve.rhs(x) as usize] {
-                    None => 0,
-                    Some(0) => 1,
-                    Some(_) => 2,
-                })
-                .sum::<u64>();
+        // Finite differences of x^3+a*x+b: first difference at zero
+        // is 1+a, second is 6, and the third difference is constant 6.
+        let (mut rhs, mut first, mut second) = (b, (1 + a) % p, 6 % p);
+        let mut count = 1;
+        for _ in 0..p {
+            count += match curve.roots[rhs as usize] {
+                None => 0,
+                Some(0) => 1,
+                Some(_) => 2,
+            };
+            rhs = addmod(rhs, first, p);
+            first = addmod(first, second, p);
+            second = addmod(second, 6 % p, p);
+        }
         if count != r {
             return Err(Error::Invalid(
                 "declared order is not the full curve cardinality",
@@ -313,7 +353,7 @@ impl Curve {
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
-        let slope = mulmod(num, pow(den, p - 2, p), p);
+        let slope = mulmod(num, inverse(den, p), p);
         let nx = sub(sub(mulmod(slope, slope, p), x, p), xx, p);
         Some((nx, sub(mulmod(slope, sub(x, nx, p), p), y, p)))
     }
@@ -378,7 +418,7 @@ impl HashBase {
         if self.tau > MAX_HASH_CANDIDATES {
             return Err(Error::Limit("inverse-hash candidate bound"));
         }
-        let inv = pow(self.alpha, self.s - 2, self.s);
+        let inv = inverse(self.alpha, self.s);
         let mut points = Vec::new();
         for t in 0..self.tau {
             let z = mulmod(inv, sub(t, self.beta, self.s), self.s);
@@ -620,7 +660,7 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 return Some(combination);
             }
             Some(col) => {
-                let inv = pow(row[col], r - 2, r);
+                let inv = inverse(row[col], r);
                 for a in &mut row[col..] {
                     *a = mulmod(*a, inv, r);
                 }
@@ -643,7 +683,7 @@ fn extract(relations: &[Relation], coeff: &[u64], r: u64) -> Option<u64> {
         u = (u + mulmod(c, rel.u, r)) % r;
         v = (v + mulmod(c, rel.v, r)) % r;
     }
-    (v != 0).then(|| mulmod(sub(0, u, r), pow(v, r - 2, r), r))
+    (v != 0).then(|| mulmod(sub(0, u, r), inverse(v, r), r))
 }
 
 /// Run Figure 2 with the bounded generic enumeration backend.
@@ -735,6 +775,9 @@ pub fn solve_with_oracle_profile(
     }
     let mut rng = Rng(config.seed);
     let mut attempts = 0;
+    let stage = Instant::now();
+    let fixed = FixedPair::new(curve, p, q);
+    stats.targets += stage.elapsed();
     for trial in 1..=config.max_trials {
         let stage = Instant::now();
         let hashes: Vec<_> = (0..config.m)
@@ -770,7 +813,7 @@ pub fn solve_with_oracle_profile(
             attempts += 1;
             let stage = Instant::now();
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
-            let target = curve.add_valid(curve.mul(p, u)?, curve.mul(q, v)?);
+            let target = fixed.evaluate(curve, u, v);
             stats.targets += stage.elapsed();
             let stage = Instant::now();
             let found = oracle.find(curve, &bases, target, config.max_work);
@@ -778,7 +821,7 @@ pub fn solve_with_oracle_profile(
             if let Some(points) = found? {
                 let stage = Instant::now();
                 let rel = Relation { u, v, points };
-                check_relation(curve, p, q, &bases, &rel)?;
+                check_relation(curve, &fixed, &bases, &rel)?;
                 relations.push(rel);
                 stats.targets += stage.elapsed();
                 if relations.len() == n + 1 {
@@ -813,10 +856,52 @@ pub fn solve_with_oracle_profile(
     ))
 }
 
+// Fixed-base radix-16 multiplication. Constructed inside each solve/replay,
+// never shared between targets or excluded from the complete timing interval.
+// A replay constructs its own tables and still checks every relation.
+struct FixedPair {
+    p: Vec<[Point; 16]>,
+    q: Vec<[Point; 16]>,
+}
+impl FixedPair {
+    fn new(curve: &Curve, p: Point, q: Point) -> Self {
+        let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
+        let table = |mut base| {
+            let mut out = Vec::with_capacity(windows);
+            for window in 0..windows {
+                let mut row = [None; 16];
+                row[1] = base;
+                for digit in 2..16 {
+                    row[digit] = curve.add_valid(row[digit - 1], base);
+                }
+                if window + 1 < windows {
+                    base = curve.add_valid(row[15], base);
+                }
+                out.push(row);
+            }
+            out
+        };
+        Self {
+            p: table(p),
+            q: table(q),
+        }
+    }
+    fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
+        debug_assert!(u < curve.r && v < curve.r);
+        let mut out = None;
+        for (p, q) in self.p.iter().zip(&self.q) {
+            out = curve.add_valid(out, p[(u & 15) as usize]);
+            out = curve.add_valid(out, q[(v & 15) as usize]);
+            u >>= 4;
+            v >>= 4;
+        }
+        out
+    }
+}
+
 fn check_relation(
     curve: &Curve,
-    p: Point,
-    q: Point,
+    fixed: &FixedPair,
     bases: &[Vec<Point>],
     rel: &Relation,
 ) -> Result<(), Error> {
@@ -830,7 +915,7 @@ fn check_relation(
         }
         sum = curve.add_valid(sum, point);
     }
-    if sum != curve.add_valid(curve.mul(p, rel.u)?, curve.mul(q, rel.v)?) {
+    if sum != fixed.evaluate(curve, rel.u, rel.v) {
         return Err(Error::Verification);
     }
     Ok(())
@@ -874,8 +959,9 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
     {
         return Err(Error::Verification);
     }
+    let fixed = FixedPair::new(curve, p, q);
     for rel in &cert.relations {
-        check_relation(curve, p, q, &bases, rel)?;
+        check_relation(curve, &fixed, &bases, rel)?;
     }
     // A relation has exactly one entry per slot. Replay the dependency in
     // O(m * relations) space/time for entries, without a dense N-by-N matrix.
@@ -904,6 +990,76 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn euclidean_inverses_match_fermat_reference() {
+        for p in [5, 17, 211, 65521] {
+            for a in 1..p {
+                assert_eq!(inverse(a, p), pow(a, p - 2, p));
+            }
+        }
+        for p in [1_099_511_627_563, 2_305_843_009_213_693_951] {
+            let mut rng = Rng(0x12345678);
+            for a in [1, 2, p / 2, p - 2, p - 1]
+                .into_iter()
+                .chain((0..4096).map(|_| 1 + rng.below(p - 1)))
+            {
+                assert_eq!(inverse(a, p), pow(a, p - 2, p));
+            }
+        }
+    }
+
+    #[test]
+    fn fixed_pair_matches_independent_binary_multiplication() {
+        for (p, a, b, r, generator) in [
+            (211, 0, 7, 199, Some((3, 33))),
+            (
+                1_099_511_627_563,
+                1_099_511_627_560,
+                56,
+                1_099_512_551_701,
+                Some((1, 15_267_301_451)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, generator).unwrap();
+            let mut rng = Rng(123);
+            for target in [None, generator, c.mul(generator, 42).unwrap()] {
+                let fixed = FixedPair::new(&c, generator, target);
+                for (u, v) in [(0, 0), (0, r - 1), (r - 1, 0), (r - 1, r - 1)]
+                    .into_iter()
+                    .chain((0..4096).map(|_| (rng.below(r), rng.below(r))))
+                {
+                    assert_eq!(
+                        fixed.evaluate(&c, u, v),
+                        c.add(c.mul(generator, u).unwrap(), c.mul(target, v).unwrap())
+                            .unwrap()
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn finite_difference_constructor_matches_exhaustive_reference() {
+        for (p, a, b, r) in [(17, 2, 2, 19), (211, 0, 7, 199), (65521, 65518, 3, 65563)] {
+            let curve = Curve::new(p, a, b, r).unwrap();
+            let mut roots = vec![None; p as usize];
+            for y in 0..p {
+                roots[(y * y % p) as usize].get_or_insert(y);
+            }
+            assert_eq!(curve.roots, roots);
+            let count = 1
+                + (0..p)
+                    .map(|x| match roots[curve.rhs(x) as usize] {
+                        None => 0,
+                        Some(0) => 1,
+                        Some(_) => 2,
+                    })
+                    .sum::<u64>();
+            assert_eq!(count, r);
+            assert!(Curve::new(p, a, b, r + 2).is_err());
+        }
     }
 
     #[test]
