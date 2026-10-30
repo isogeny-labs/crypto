@@ -29,3 +29,14 @@ User was asked for the name/host of an existing authenticated checkpoint/lab
 runner, without requesting credentials. Benchmark and profiling obligations
 remain pending. Local implementation, builds and regression controls continue
 as development work, without a runtime speedup claim.
+
+## Candidate development build
+
+Same release and line-tables-only settings as the preserved baseline. Saved
+candidate binary SHA-256:
+`84276e2c508d5889abd101798dd4fd966140332148204ab4d98c556e0b86ac48`.
+Path `/tmp/hashed-ecdl-speed-candidate/hashed-ecdl`; NOT_UPLOADED to S3.
+The current source identity is pinned in native-sources.sha256. The candidate
+build transcript is development-candidate-build.txt. No timed A/A or A/B was run.
+Conductor scope check exits 127 because the CLI is unavailable; the repository's
+documented warn-and-allow development fallback applies, with no reservation.
