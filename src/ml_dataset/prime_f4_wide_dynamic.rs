@@ -3283,7 +3283,7 @@ fn replay_on_curve(
     l: &mut Ledger,
 ) -> Result<(), GroupStop> {
     group_charge(l, 256)?;
-    if p < 3 || p > (1u64 << 61) - 1 || a >= p || b >= p || q.x >= p || q.y >= p {
+    if !(3..=(1u64 << 61) - 1).contains(&p) || a >= p || b >= p || q.x >= p || q.y >= p {
         return Err(GroupStop::InvalidDomain);
     }
     let modulus = u128::from(p);
@@ -7310,7 +7310,7 @@ mod tests {
         // finite serialization bound, never a purported valid execution.
         let bytes = serde_json::to_vec(&record).unwrap();
         assert_eq!(bytes.len() + 1, 6789);
-        assert!(bytes.len() + 1 <= 65536);
+        assert!(bytes.len() < 65536);
         let mut slot = InputBuffer::new(65536, &mut ledger()).unwrap();
         let mut meter = ledger();
         encode_complete(&record, &mut slot, &mut meter).unwrap();
@@ -7391,5 +7391,78 @@ mod tests {
                 "rehash cannot authorize changed {field}"
             );
         }
+    }
+    #[test]
+    fn step4_actual_positive_producer_bytes_independently_replay() {
+        use super::super::prime_f4_wide_dynamic_replay as replay;
+        use sha2::{Digest, Sha256};
+        // Mock publication tests wire compatibility; actual filesystem custody
+        // is covered by the dedicated capture tests, not this mock receipt.
+        let mut publisher = FakeWitness::default();
+        let mut phase = step4_fixture(AffinePoint { x: 84, y: 12 }, &mut publisher);
+        let report = run_group_step4(&mut phase, None, &mut |_, _| Ok(()), &mut publisher);
+        assert!(report.pdp_witness_verified && report.certificate_durably_persisted);
+        confirm_step4_witness(&mut phase.prepared, &mut publisher).unwrap();
+        retain_step4_terminal(&mut phase).unwrap();
+        let raw: [Vec<u8>; 8] = std::array::from_fn(|i| {
+            if i == 6 {
+                phase.prepared.step4.final_artifacts[6].bytes.clone()
+            } else {
+                phase.prepared.slots.buffers[i].bytes.clone()
+            }
+        });
+        let domain = [replay::Point { x: 6, y: 18 }, replay::Point { x: 6, y: 83 }];
+        let expected = replay::Expected {
+            p: 101,
+            a: 0,
+            b: 7,
+            m: 4,
+            target: replay::Point { x: 84, y: 12 },
+            domain: &domain,
+            codes: &[6],
+            work_limit: 16384,
+            trace_bytes: 128 * 1024 * 1024,
+            memory_bytes: 256 * 1024 * 1024,
+        };
+        let verify = |raw: &[Vec<u8>; 8], sequence: u64| {
+            let slots = std::array::from_fn(|i| {
+                let bytes = &raw[i];
+                (!bytes.is_empty()).then(|| replay::Artifact {
+                    path: SLOT_REGISTRY[i].0,
+                    role: SLOT_REGISTRY[i].1,
+                    encoding: SLOT_REGISTRY[i].2,
+                    bytes,
+                    sha256: Sha256::digest(bytes).into(),
+                })
+            });
+            let committed = replay::CapturedWitness {
+                bytes: &publisher.bytes,
+                sha256: Sha256::digest(&publisher.bytes).into(),
+                original_sequence: sequence,
+            };
+            replay::verify(
+                &expected,
+                &replay::Bundle {
+                    slots,
+                    committed_witness: Some(committed),
+                },
+                replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 * 1024 * 1024,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+        };
+        let verified = verify(&raw, 7).expect("actual positive producer output must replay");
+        assert!(verified.first_witness_verified && verified.witness_capture_committed);
+        assert!(
+            !verified.independent_derivation_verified && !verified.operation_trajectory_verified
+        );
+        assert!(verify(&raw, 8).is_err());
+        let mut altered = raw.clone();
+        let mut terminal: serde_json::Value = serde_json::from_slice(&altered[7]).unwrap();
+        terminal["accounting"]["group"]["additions_performed"] = serde_json::json!(0);
+        altered[7] = serde_json::to_vec(&terminal).unwrap();
+        assert!(verify(&altered, 7).is_err());
     }
 }

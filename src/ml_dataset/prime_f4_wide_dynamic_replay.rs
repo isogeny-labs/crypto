@@ -357,7 +357,7 @@ fn pow(mut x: u64, mut e: u64, p: u64, b: &mut Budget) -> R<u64> {
     Ok(r)
 }
 fn prime(p: u64, b: &mut Budget) -> R<bool> {
-    if !(5..=(1u64 << 61) - 1).contains(&p) || p % 2 == 0 {
+    if !(5..=(1u64 << 61) - 1).contains(&p) || p.is_multiple_of(2) {
         return Ok(false);
     }
     let s = (p - 1).trailing_zeros();
@@ -1560,14 +1560,12 @@ fn lines<'a>(
         return Err(Error::Shape);
     }
     let mut offset = 0;
-    let mut count = 0;
-    for line in bytes.split_inclusive(|x| *x == b'\n') {
+    for (count, line) in bytes.split_inclusive(|x| *x == b'\n').enumerate() {
         if count >= cap || line.len() == 1 {
             return Err(Error::Shape);
         }
         visit(line, offset)?;
         offset += line.len();
-        count += 1
     }
     Ok(())
 }
@@ -1616,10 +1614,8 @@ fn groups(
         let f = row(&j, e, orig, assigned, native, b)?;
         let independent = f.origin == Origin::Independent;
         if independent {
-            if !state.independent_started {
-                if state.native != state.native_total.unwrap_or(0) {
-                    return Err(Error::Claim);
-                }
+            if !state.independent_started && state.native != state.native_total.unwrap_or(0) {
+                return Err(Error::Claim);
             }
             state.independent_started = true;
             if f.cursor != state.independent {
