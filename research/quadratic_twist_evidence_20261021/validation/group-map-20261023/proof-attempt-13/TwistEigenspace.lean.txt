@@ -1,0 +1,157 @@
+import TwistGroupMap
+
+/-! Exact Frobenius eigenspaces for the explicit short-model twist image. -/
+namespace TwistEigenspace
+
+open WeierstrassCurve.Affine TwistEmbedding TwistGroupMap
+
+variable {k K : Type*} [Field k] [Fintype k] [Field K] [Algebra k K]
+  [DecidableEq k] [DecidableEq K]
+
+omit [DecidableEq k] [DecidableEq K] in
+theorem frobenius_fixed_iff (z : K) :
+    FiniteField.frobeniusAlgHom k K z = z ↔ ∃ x : k, algebraMap k K x = z := by
+  constructor
+  · intro hz
+    let p : Polynomial k := Polynomial.X ^ Fintype.card k - Polynomial.X
+    have hp : p.roots.card = p.natDegree := by
+      rw [FiniteField.X_pow_card_sub_X_natDegree_eq k Fintype.one_lt_card,
+        FiniteField.roots_X_pow_card_sub_X]
+      simp
+    have hm := Polynomial.roots_map_of_injective_of_card_eq_natDegree
+      (p := p) (algebraMap k K).injective hp
+    have hzroot : z ∈ (p.map (algebraMap k K)).roots := by
+      rw [Polynomial.mem_roots]
+      · simpa [p, Polynomial.IsRoot, FiniteField.coe_frobeniusAlgHom] using
+          sub_eq_zero.mpr hz
+      · simpa [p] using
+          FiniteField.X_pow_card_sub_X_ne_zero K (p := Fintype.card k) Fintype.one_lt_card
+    rw [← hm, FiniteField.roots_X_pow_card_sub_X] at hzroot
+    obtain ⟨x, _, hx⟩ := Multiset.mem_map.mp hzroot
+    exact ⟨x, hx⟩
+  · rintro ⟨x, rfl⟩
+    simp
+
+omit [Fintype k] [DecidableEq k] [DecidableEq K] in
+theorem twist_delta (a b d : k) :
+    (twist a b d).Δ = d ^ 6 * (short a b).Δ := by
+  simp only [twist, short, WeierstrassCurve.Δ, WeierstrassCurve.b₂,
+    WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈]
+  ring
+
+omit [Fintype k] [DecidableEq k] [DecidableEq K] in
+theorem twist_elliptic (a b d : k) [(short a b).IsElliptic] (hd : d ≠ 0) :
+    (twist a b d).IsElliptic := by
+  constructor
+  rw [twist_delta]
+  exact isUnit_iff_ne_zero.mpr
+    (mul_ne_zero (pow_ne_zero 6 hd) (WeierstrassCurve.isUnit_Δ (short a b)).ne_zero)
+
+omit [DecidableEq k] in
+/-- Every actual minus point is an explicit rational twist image, not just conversely. -/
+theorem lift_range_iff_neg (a b d : k) [(short a b).IsElliptic]
+    (hchar : ringChar k ≠ 2) (hd : ¬IsSquare d)
+    (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (Q : ((short a b).baseChange K).Point) :
+    (∃ P : (twist a b d).Point, lift a b d (nonsquare_ne_zero hd) u hu P = Q) ↔
+      FrobeniusBridge.curveFrobenius (short a b) Q = -Q := by
+  constructor
+  · rintro ⟨P, rfl⟩
+    exact frobenius_lift_neg a b d hchar hd u hu P
+  · intro hneg
+    have hd0 := nonsquare_ne_zero hd
+    have hdK : algebraMap k K d ≠ 0 := (map_ne_zero (algebraMap k K)).mpr hd0
+    have hu0 : u ≠ 0 := by
+      intro hz
+      exact hdK (by simpa [hz] using hu.symm)
+    let : (twist a b d).IsElliptic := twist_elliptic a b d hd0
+    cases Q with
+    | zero => exact ⟨0, rfl⟩
+    | some x y h =>
+      simp only [FrobeniusBridge.curveFrobenius, Point.map_some,
+        Point.neg_some, Point.some.injEq] at hneg
+      have hx : FiniteField.frobeniusAlgHom k K x = x := hneg.1
+      have hy : FiniteField.frobeniusAlgHom k K y = -y := by
+        simpa [negY, short, WeierstrassCurve.baseChange, WeierstrassCurve.map] using hneg.2
+      obtain ⟨X, hX⟩ := (frobenius_fixed_iff (k := k) (algebraMap k K d * x)).mp (by simp [map_mul, hx])
+      obtain ⟨Y, hY⟩ := (frobenius_fixed_iff (k := k) (algebraMap k K d * u * y)).mp (by
+        simp [map_mul, frobenius_root_neg hchar hd hu, hy])
+      have he : (twist a b d).Equation X Y := by
+        rw [equation_iff]
+        simp only [twist, short, zero_mul, add_zero]
+        apply (algebraMap k K).injective
+        simp only [map_pow, map_mul, map_add, hX, hY]
+        have hcurve := h.1
+        rw [equation_iff] at hcurve
+        simp only [short, WeierstrassCurve.baseChange, WeierstrassCurve.map,
+          map_zero, zero_mul, add_zero] at hcurve
+        linear_combination (algebraMap k K d) ^ 3 * hcurve +
+          (algebraMap k K d) ^ 2 * y ^ 2 * hu
+      refine ⟨Point.some X Y ((equation_iff_nonsingular_of_Δ_ne_zero
+        (WeierstrassCurve.isUnit_Δ (twist a b d)).ne_zero).mp he), ?_⟩
+      simp only [lift, Point.some.injEq]
+      constructor
+      · rw [hX]
+        field_simp
+      · rw [hY]
+        field_simp
+
+theorem rational_range_iff_fixed (W : WeierstrassCurve.Affine k) [W.IsElliptic]
+    (Q : (W.baseChange K).Point) :
+    (∃ A : (W.baseChange k).Point, FrobeniusBridge.rationalLift W A = Q) ↔
+      FrobeniusBridge.curveFrobenius W Q = Q := by
+  constructor
+  · rintro ⟨A, rfl⟩
+    exact FrobeniusBridge.frobenius_fixes_rational W A
+  · intro hfix
+    cases Q with
+    | zero => exact ⟨0, rfl⟩
+    | some x y h =>
+      simp only [FrobeniusBridge.curveFrobenius, Point.map_some, Point.some.injEq] at hfix
+      obtain ⟨X, hX⟩ := (frobenius_fixed_iff (k := k) x).mp hfix.1
+      obtain ⟨Y, hY⟩ := (frobenius_fixed_iff (k := k) y).mp hfix.2
+      have hn : (W.baseChange k).Nonsingular X Y :=
+        (W.baseChange_nonsingular (f := Algebra.ofId k K)
+          (Algebra.ofId k K).injective X Y).mp (by simpa only [Algebra.ofId_apply, hX, hY] using h)
+      refine ⟨Point.some X Y hn, ?_⟩
+      change Point.some _ _ _ = Point.some _ _ _
+      rw [Point.some.injEq]
+      exact ⟨hX, hY⟩
+
+omit [DecidableEq k] in
+/-- The actual minus eigenspace as an additive subgroup. -/
+def minus (W : WeierstrassCurve.Affine k) : AddSubgroup (W.baseChange K).Point where
+  carrier := {Q | FrobeniusBridge.curveFrobenius W Q = -Q}
+  zero_mem' := by simp
+  add_mem' := by
+    intro P Q hP hQ
+    simp only [Set.mem_ofPred_eq] at hP hQ ⊢
+    simp only [map_add, hP, hQ, neg_add]
+  neg_mem' := by
+    intro P hP
+    simp only [Set.mem_ofPred_eq] at hP ⊢
+    simp only [map_neg, hP]
+
+/-- An actual group isomorphism onto all Frobenius-negated points. -/
+noncomputable def liftEquivMinus (a b d : k) [(short a b).IsElliptic]
+    (hchar : ringChar k ≠ 2) (hd : ¬IsSquare d)
+    (u : K) (hu : u ^ 2 = algebraMap k K d) :
+    (twist a b d).Point ≃+ minus (K := K) (short a b) :=
+  AddEquiv.ofBijective
+    ((liftHom a b d (nonsquare_ne_zero hd) u hu).codRestrict
+      (minus (short a b)) (fun P => frobenius_lift_neg a b d hchar hd u hu P))
+    ⟨by
+      intro P Q hPQ
+      exact lift_injective a b d (nonsquare_ne_zero hd) u hu (congrArg Subtype.val hPQ),
+     by
+      rintro ⟨Q, hQ⟩
+      obtain ⟨P, hP⟩ := (lift_range_iff_neg a b d hchar hd u hu Q).mpr hQ
+      exact ⟨P, Subtype.ext hP⟩⟩
+
+#print axioms frobenius_fixed_iff
+#print axioms twist_delta
+#print axioms twist_elliptic
+#print axioms lift_range_iff_neg
+#print axioms rational_range_iff_fixed
+
+end TwistEigenspace

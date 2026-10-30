@@ -1,0 +1,44 @@
+TwistEmbedding.lean:18:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.nonsquare_ne_zero`:
+  [Fintype k]
+  [DecidableEq k]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype k] [DecidableEq k] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:22:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.frobenius_root_neg`:
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:35:0: warning: automatically included section variable(s) unused in theorem `TwistEmbedding.twist_image_equation`:
+  [Fintype k]
+  [DecidableEq k]
+  [DecidableEq K]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype k] [DecidableEq k] [DecidableEq K] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+TwistEmbedding.lean:48:24: warning: This simp argument is unused:
+  mul_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [twist, short, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, zero_mul, add_zero,
+    zero_add] at h ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+TwistEmbedding.lean:48:44: warning: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [twist, short, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, zero_mul, mul_zero,
+    add_zero] at h ⊢
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'TwistEmbedding.nonsquare_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_root_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.twist_image_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.frobenius_lift_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.lift_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.rational_twist_relation_two_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+'TwistEmbedding.rational_twist_relation_odd' depends on axioms: [propext, Classical.choice, Quot.sound]

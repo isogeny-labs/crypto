@@ -1,0 +1,62 @@
+// Metadata-only negative control: remove one exact map membership.
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("../../../../", import.meta.url));
+const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "twist-membership-control-"));
+const linkEntries = (source, destination, excluded) => {
+  fs.mkdirSync(destination, { recursive: true });
+  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+    if (!excluded.has(entry.name)) {
+      fs.symlinkSync(path.join(source, entry.name), path.join(destination, entry.name));
+    }
+  }
+};
+
+try {
+  linkEntries(root, fixture, new Set(["docs"]));
+  linkEntries(path.join(root, "docs"), path.join(fixture, "docs"), new Set(["curves"]));
+  linkEntries(
+    path.join(root, "docs", "curves"),
+    path.join(fixture, "docs", "curves"),
+    new Set(["cover-transfer-assessments.json"]),
+  );
+  const assessmentPath = path.join("docs", "curves", "cover-transfer-assessments.json");
+  const assessment = JSON.parse(fs.readFileSync(path.join(root, assessmentPath), "utf8"));
+  const selected = assessment.memberships.map_base.find(
+    (group) => group.profile_id === "map.odd-extension-quadratic.direct",
+  );
+  if (selected == null || selected.members.length !== 2287) {
+    throw new Error("positive fixture has an unexpected extension profile");
+  }
+  const removed = selected.members.pop();
+  fs.writeFileSync(path.join(fixture, assessmentPath), JSON.stringify(assessment));
+
+  let receipt;
+  try {
+    execFileSync(process.execPath, [
+      path.join(root, "research/cover_transfer_assessment_20261013/verify_assessment.mjs"),
+      fixture,
+    ], { cwd: root, encoding: "utf8", maxBuffer: 20_000_000 });
+    throw new Error("verifier accepted an assessment missing an exact map member");
+  } catch (error) {
+    if (error.status !== 1 || typeof error.stdout !== "string") throw error;
+    receipt = JSON.parse(error.stdout);
+    if (!receipt.problems.some((problem) => /membership|map coverage|base profile/u.test(problem))) {
+      throw new Error("verifier failed without detecting the removed membership");
+    }
+  }
+  console.log(JSON.stringify({
+    status: "rejected_missing_map_membership",
+    removed_map_uid: removed,
+    verifier_exit: 1,
+    problem_count: receipt.problem_count,
+    problems: receipt.problems,
+  }, null, 2));
+} finally {
+  // This directory contains only this control's symlinks and altered copy.
+  fs.rmSync(fixture, { recursive: true, force: true });
+}

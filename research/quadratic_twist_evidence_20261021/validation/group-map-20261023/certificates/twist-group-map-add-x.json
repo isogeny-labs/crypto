@@ -1,0 +1,214 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1he0c463dc2e585208",
+  "statement": {
+    "name": "twist-group-map-add-x",
+    "source": "research/quadratic_twist_evidence_20261021/lean/TwistGroupMap.lean:TwistGroupMap.cleared_addX_identity; polynomial part only; actual field and point claims checked by Lean",
+    "variables": [
+      "d",
+      "u",
+      "x1",
+      "x2",
+      "l"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "d"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "l"
+                        },
+                        {
+                          "op": "var",
+                          "args": "l"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "u"
+                          },
+                          {
+                            "op": "var",
+                            "args": "u"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "x1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "u"
+                      },
+                      {
+                        "op": "var",
+                        "args": "u"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "x2"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "u"
+                  },
+                  {
+                    "op": "var",
+                    "args": "u"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "l"
+                          },
+                          {
+                            "op": "var",
+                            "args": "l"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "neg",
+                        "args": {
+                          "op": "var",
+                          "args": "x1"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "var",
+                      "args": "x2"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "u"
+                  },
+                  {
+                    "op": "var",
+                    "args": "u"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "l"
+            },
+            {
+              "op": "var",
+              "args": "l"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261023,
+  "value_digest": "c58769c3cebb24675cd0fc42fd896bdea3888eea2c4e4a0b816a9b80e98e2963",
+  "independence": "Native IDC1 replay plus 16 independent-seed points; no performance claim",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/quadratic_twist_evidence_20261021/lean/TwistGroupMap.lean",
+    "sha256": "b7105277cbda68880f2cb40385a3e15b03fa44f1e3a9af4ef2b82daffc8ce173"
+  }
+}

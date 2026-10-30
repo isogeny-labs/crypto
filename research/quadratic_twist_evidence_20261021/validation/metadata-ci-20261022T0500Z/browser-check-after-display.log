@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 829, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 804, in main
+    fresh = build()
+            ^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 737, in build
+    sessions, methods, fbs, yields = ecbench_sessions(by_slug, source)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 416, in ecbench_sessions
+    s = load_file(session_path, source)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 287, in load_file
+    return json.loads(source.read_text(path))
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 282, in read_text
+    return self.read_bytes(path).decode("utf-8", errors)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 278, in read_bytes
+    with self.open_binary(path) as fh:
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 275, in open_binary
+    raise OSError(f"cannot read sparse input HEAD:{relative}: {detail}")
+OSError: cannot read sparse input HEAD:research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/session.json: fatal: git cat-file HEAD:research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/session.json: bad file

@@ -1,0 +1,120 @@
+\documentclass[10pt]{article}
+\usepackage[margin=.7in]{geometry}
+\usepackage{graphicx,booktabs,hyperref,amsmath}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Quadratic twists: native replay and checked implications}
+\author{Reproducible correctness study}
+\date{21 October 2026}
+\begin{document}
+\maketitle
+\vspace{-1em}
+\textbf{Outcome.} The complete finite workload now executes in C++17. All
+434 deterministic output fields agree with the frozen historical results,
+including newly collected IC matrices and their attempt counts. The historical
+Python archive is unchanged. Fourteen Lean group/ring statements pass the
+repository proof gate, with zero trusted native proofs. Universal geometric
+bridges remain partial; no general hardness or speedup conclusion is drawn.
+
+\begin{center}\includegraphics[width=\linewidth]{coverage.pdf}\end{center}
+\small Recorded counters, run \texttt{run-20261021T150125Z}. Exact census counts;
+no statistical error bar or extrapolation. The host is uncontrolled Linux
+x86-64, GCC 14.2.0 and OpenSSL 3.5.7. UTC boundaries are provenance, not admitted
+algorithm timings.\normalsize
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Replayed workload & Recorded count \\\midrule
+Nonsingular models, primes 5, 7, 11, 13, 17, 19 & 942 \\
+Ordered S3 triples & 4,188,162 \\
+Ordered S4 quadruples, primes 5 and 7 & 113,342 \\
+Extension points & 260,064 \\
+Twist group-law identities & 289,440 \\
+Scalar transport checks & 94,176 \\
+Common odd-prime cases & 274 \\
+Complete toy IC logarithms & 81 \\
+Bilinearity identities & 3,219 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All four trace-zero fixtures, the subfield example and four transported
+relation histograms match. The original 12 seeded associativity samples per
+model outside prime 5 remain samples, not exhaustive proofs. Process timing,
+source provenance and SymPy version fields are excluded from mathematical
+parity. C++ integer-seeded MT19937 reproduces the original integer draws; exact
+sparse polynomial expansion over $\mathbb Z$ replaces SymPy.
+
+\newpage
+\section*{Independent verification and controls}
+The separate tuple-based auditor verifies 84 newly emitted IC matrices: three
+headline runs and the 81 all-log runs. It independently recomputes the pairings,
+field logarithms, scalars and ranks. Corrupting a new relation or removing a
+log certificate is rejected. Changing the historical census counter is also
+rejected. Existing source-corruption and false historical-relation controls remain.
+
+Before registering the subfield target in a simple polynomial basis, the new
+basis checker verifies 2,401 elements, 2,475 points and 2,025 group-map identities.
+Here $u^2=3$, $v^2=1+u$, $w=v$, $u=w^2-1$, and
+$w^4+5w^2+5=0$. The model catalog has 1,921 exact ICV1 models and 27 selected
+EC1 subgroup representations. An unselected generator is left unknown.
+The normalization of $c y^2=x^3+ax+b$ is explicit:
+$(x,y)\mapsto(cx,c^2y)$ on the monic model with coefficients $c^2a,c^3b$.
+No base-field log transfer is inferred from a shared model or $j$-invariant.
+
+\section*{Proofs and experimentally discriminated claims}
+The Lean module proves the mixed-relation implication: if an additive
+endomorphism fixes $A$ and $A+B$ and negates $B$, then $2B=0$.
+Coprime annihilators force $B=0$, proving the odd-order consequence.
+The finite coprime-order homomorphism theorem, trace/anti-trace identities,
+common odd-order divisor implication, three ring identities, affine twist-map
+and monic-normalization equations, and algebraic embedding-degree-two
+implication are also checked. All hypotheses are explicit in the proof map.
+
+The three identities are registered as \texttt{IDC1h07a9b2e6b0a3a9d3},
+\texttt{IDC1h98f781bdd4756596}, and \texttt{IDC1hfb8edf881dcde851}.
+Their records name the exact checked Lean source. Native certificate replay uses
+32 derived points and 16 extra points and rejects false identities. Point
+evaluation alone is weaker than the accompanying universal ring proofs.
+
+The valid-point census retains a nonzero 2-torsion exception. S3/S4 conditions
+are preserved under the geometric twist map, and the matched transported
+relation histograms agree in four fixtures. All 81 pairing/IC logarithms are
+recovered. A smooth or anomalous twist does not force the same original order
+or a nonzero rational homomorphic transfer. The subfield fixture's order-three
+target remains outside the smaller rational group. The restricted relation
+family has rank 5 of 6 despite 272 smooth relations from 2,448 candidates;
+a broader seeded family reaches full rank. These findings have their exact
+finite scope, not an asymptotic interpretation.
+
+\section*{Remaining obligations and provenance}
+Formal elliptic-curve/Frobenius instantiation, rational-eigenspace
+identification, general summation-polynomial lifting, Weil-pairing
+nondegeneracy and the full reduction, and universal trace-zero geometry remain
+open bridges. General GHS construction and general ECDLP hardness are not
+established. Invalid-curve attacks are outside scope. Conductor's shared tool
+and task state remain unavailable. Rust and Lean are now installed; current
+repository checks are recorded separately in \path{validation/}.
+
+The original archive, import report, native source snapshots, failed first
+port comparison and failed first proof build remain available. No benchmark
+or leaderboard row or IC/rho cost graph is promoted. This new graph extends
+study coverage; earlier reports stay attached to their original records.
+
+\section*{Reproduce and inspect}
+\begin{verbatim}
+study=research/quadratic_twist_evidence_20261021
+bash "$study/run-native.sh" /tmp/twist-native-fresh
+bash "$study/test-native.sh" /tmp/twist-native-fresh /tmp/controls-fresh
+tools/lean/proof-gate.sh --out /tmp/proofs "$study/lean"
+\end{verbatim}
+Sources and receipts: \path{native/runs/run-20261021T150125Z/},
+\path{native/controls-20261021T150300Z/}, \path{certificates/},
+\path{lean/README.md}, and \path{validation/lean-gate/}.
+The source-linked Markdown report contains the complete requirement map,
+artifact links and canonical-graph disposition. Historical primary references
+remain in the archived report: Semaev (ePrint 2004/031), Gorla--Massierer
+(arXiv 1405.1059), Menezes--Okamoto--Vanstone, and Gaudry--Hess--Smart.
+\end{document}

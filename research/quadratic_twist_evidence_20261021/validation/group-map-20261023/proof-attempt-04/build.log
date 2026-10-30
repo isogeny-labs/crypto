@@ -1,0 +1,65 @@
+ℹ [1161/1283] Replayed TwistProof
+info: TwistProof.lean:124:0: 'TwistProof.mixed_relation_two_torsion' depends on axioms: [propext]
+info: TwistProof.lean:125:0: 'TwistProof.coprime_annihilators' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:126:0: 'TwistProof.mixed_relation_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:127:0: 'TwistProof.finite_hom_coprime' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:128:0: 'TwistProof.trace_antitrace_sum' depends on axioms: [propext]
+info: TwistProof.lean:129:0: 'TwistProof.trace_fixed' does not depend on any axioms
+info: TwistProof.lean:130:0: 'TwistProof.antitrace_negated' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistProof.lean:131:0: 'TwistProof.common_order_divides_q_plus_one' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:132:0: 'TwistProof.symmetric_s3' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:133:0: 'TwistProof.vieta_twist_cancellation' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:134:0: 'TwistProof.twist_equation_identity' depends on axioms: [propext, Quot.sound]
+info: TwistProof.lean:135:0: 'TwistProof.twist_affine_map' depends on axioms: [propext]
+info: TwistProof.lean:136:0: 'TwistProof.monic_normalization' depends on axioms: [propext]
+info: TwistProof.lean:137:0: 'TwistProof.embedding_degree_two' depends on axioms: [propext, Quot.sound]
+ℹ [2023/2028] Replayed FrobeniusBridge
+info: FrobeniusBridge.lean:54:0: 'FrobeniusBridge.frobenius_fixes_rational' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: FrobeniusBridge.lean:55:0: 'FrobeniusBridge.rational_mixed_two_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: FrobeniusBridge.lean:56:0: 'FrobeniusBridge.rational_mixed_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: FrobeniusBridge.lean:57:0: 'FrobeniusBridge.rational_relation_has_zero_twist_term' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [2025/2028] Replayed TwistEmbedding
+warning: TwistEmbedding.lean:144:0: automatically included section variable(s) unused in theorem `TwistEmbedding.frobenius_sum_lift_neg`:
+  [DecidableEq k]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq k] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: TwistEmbedding.lean:176:0: 'TwistEmbedding.nonsquare_ne_zero' depends on axioms: [propext, Quot.sound]
+info: TwistEmbedding.lean:177:0: 'TwistEmbedding.frobenius_root_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:178:0: 'TwistEmbedding.twist_image_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:179:0: 'TwistEmbedding.frobenius_lift_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:180:0: 'TwistEmbedding.lift_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:181:0: 'TwistEmbedding.rational_twist_relation_two_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:182:0: 'TwistEmbedding.rational_twist_relation_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:183:0: 'TwistEmbedding.frobenius_sum_lift_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:184:0: 'TwistEmbedding.rational_twist_sum_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistEmbedding.lean:185:0: 'TwistEmbedding.cleared_monic_twist_identity' depends on axioms: [propext, Quot.sound]
+✖ [2027/2028] Building TwistGroupMap (1.8s)
+trace: .> LEAN_PATH=/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean /workspace/twist-tooling/elan/toolchains/leanprover--lean4---v4.34.1/bin/lean /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/TwistGroupMap.lean -o /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean/TwistGroupMap.olean -i /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/lib/lean/TwistGroupMap.ilean -c /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/ir/TwistGroupMap.c --setup /workspace/crypto-next/research/quadratic_twist_evidence_20261021/lean/.lake/build/ir/TwistGroupMap.setup.json --json
+error: TwistGroupMap.lean:39:20: linarith failed to find a contradiction
+F : Type u_1
+inst✝¹ : Field F
+inst✝ : DecidableEq F
+a b d u x₁ x₂ y₁ y₂ : F
+hd : d ≠ 0
+hu : u ^ 2 = d
+hu0 : u ≠ 0
+hdu : d * u ≠ 0
+hx : x₁ / d = x₂ / d ↔ x₁ = x₂
+hy : y₁ / (d * u) = -(y₂ / (d * u)) ↔ y₁ = -y₂
+hxx : x₁ = x₂
+hyy : ¬y₁ = -y₂
+hn : 3 * (x₁ / d) ^ 2 + a = (3 * x₁ ^ 2 + d ^ 2 * a) / d ^ 2
+he : y₁ / (d * u) - -(y₁ / (d * u)) = (y₁ - -y₁) / (d * u)
+⊢ False
+failed
+error: TwistGroupMap.lean:97:2: expected checkColGt
+info: TwistGroupMap.lean:140:0: 'TwistGroupMap.slope_scale' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: TwistGroupMap.lean:141:0: 'TwistGroupMap.addX_scale' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistGroupMap.lean:142:0: 'TwistGroupMap.addY_scale' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: TwistGroupMap.lean:143:0: 'TwistGroupMap.mapped_slope_scale' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: TwistGroupMap.lean:144:0: 'TwistGroupMap.lift_add' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- TwistGroupMap
+error: build failed

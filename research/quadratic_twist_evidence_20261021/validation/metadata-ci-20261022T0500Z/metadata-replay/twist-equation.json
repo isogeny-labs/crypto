@@ -1,0 +1,208 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hfb8edf881dcde851",
+  "statement": {
+    "name": "twist-equation",
+    "source": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean:TwistProof.twist_equation_identity; exact Z coefficient cancellation also checked by native/full.cpp",
+    "variables": [
+      "u",
+      "d",
+      "x",
+      "a",
+      "b"
+    ],
+    "degree_bound": 5,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "d"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "x"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "a"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "d"
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "b"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261021,
+  "value_digest": "5763ba62c3c4d9c4cfc8a9f0f3adc230a53a05db5eda9ed5c736a5ef9649bfd7",
+  "independence": "Issued and checked with the repository native backend; extra checker seed 2381, 16 points. Same-host checks, not an independent-host claim.",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean",
+    "sha256": "3e9a6ed8e870265b362352cfec51ef743ca4a191efc896849158f8c9486f7939"
+  }
+}

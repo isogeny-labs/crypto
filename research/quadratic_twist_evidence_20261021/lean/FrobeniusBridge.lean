@@ -1,0 +1,59 @@
+import TwistProof
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+import Mathlib.FieldTheory.Finite.Basic
+
+/-! The actual q-power Frobenius on nonsingular elliptic-curve points.
+The remaining twist-to-minus-eigenspace identification is stated separately
+as a hypothesis, rather than silently assuming a complete geometric bridge. -/
+namespace FrobeniusBridge
+
+open WeierstrassCurve.Affine
+
+variable {k K : Type*} [Field k] [Fintype k] [Field K] [Algebra k K]
+  [DecidableEq k] [DecidableEq K]
+
+noncomputable def curveFrobenius (W : WeierstrassCurve.Affine k) :
+    (W.baseChange K).Point →+ (W.baseChange K).Point :=
+  Point.map (W' := W) (S := k) (FiniteField.frobeniusAlgHom k K)
+
+noncomputable def rationalLift (W : WeierstrassCurve.Affine k) :
+    (W.baseChange k).Point →+ (W.baseChange K).Point :=
+  Point.baseChange k K
+
+theorem frobenius_fixes_rational (W : WeierstrassCurve.Affine k) [W.IsElliptic]
+    (P : (W.baseChange k).Point) :
+    curveFrobenius (K := K) W (rationalLift (K := K) W P) = rationalLift (K := K) W P := by
+  exact Point.map_baseChange (W' := W) (FiniteField.frobeniusAlgHom k K) P
+
+theorem rational_mixed_two_torsion (W : WeierstrassCurve.Affine k) [W.IsElliptic]
+    (A R : (W.baseChange k).Point) (B : (W.baseChange K).Point)
+    (hB : curveFrobenius (K := K) W B = -B)
+    (hrel : rationalLift (K := K) W A + B = rationalLift (K := K) W R) : 2 • B = 0 := by
+  apply TwistProof.mixed_relation_two_torsion (curveFrobenius (K := K) W) (rationalLift (K := K) W A) B
+  · exact frobenius_fixes_rational W A
+  · exact hB
+  · rw [hrel]
+    exact frobenius_fixes_rational W R
+
+theorem rational_mixed_odd (W : WeierstrassCurve.Affine k) [W.IsElliptic]
+    (A R : (W.baseChange k).Point) (B : (W.baseChange K).Point)
+    (r : ℕ) (hodd : Nat.Coprime 2 r) (hr : r • B = 0)
+    (hB : curveFrobenius (K := K) W B = -B)
+    (hrel : rationalLift (K := K) W A + B = rationalLift (K := K) W R) : B = 0 :=
+  TwistProof.coprime_annihilators B 2 r hodd (rational_mixed_two_torsion W A R B hB hrel) hr
+
+theorem rational_relation_has_zero_twist_term (W : WeierstrassCurve.Affine k) [W.IsElliptic]
+    (A R : (W.baseChange k).Point) (B : (W.baseChange K).Point)
+    (r : ℕ) (hodd : Nat.Coprime 2 r) (hr : r • B = 0)
+    (hB : curveFrobenius (K := K) W B = -B)
+    (hrel : rationalLift (K := K) W A + B = rationalLift (K := K) W R) :
+    B = 0 ∧ rationalLift (K := K) W A = rationalLift (K := K) W R := by
+  have hz := rational_mixed_odd W A R B r hodd hr hB hrel
+  exact ⟨hz, by simpa only [hz, add_zero] using hrel⟩
+
+#print axioms frobenius_fixes_rational
+#print axioms rational_mixed_two_torsion
+#print axioms rational_mixed_odd
+#print axioms rational_relation_has_zero_twist_term
+
+end FrobeniusBridge

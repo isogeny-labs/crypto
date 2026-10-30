@@ -254,6 +254,79 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+def twist_known_roots(ref):
+    """Emit recorded counts only; these request vectors are not attack-speed metrics."""
+    path = "research/quadratic_twist_evidence_20261021/native/known-roots-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    emit("ic.twist.known_roots.verified_targets", d["verified"], date="2026-10-25",
+         problem=P_IC, unit="verified separate recoveries", better="higher", source=path)
+    for arm in ("reference", "known_roots"):
+        for role in ("main", "twist"):
+            value = d["first_policy_target"][arm][role]["cold"]["membership_evals"]
+            emit(f"ic.twist.known_roots.{arm}.{role}.prefix_target1.membership_evals",
+                 value, date="2026-10-25", problem=P_IC, unit="membership evaluations",
+                 better="lower", label="F43 prefix/Q=P cold membership requests; unpriced", source=path)
+
+
+def twist_signed_cache(ref):
+    """Emit recorded request counts only, with no implied attack-speed ranking."""
+    path = "research/quadratic_twist_evidence_20261021/native/signed-cache-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    emit("ic.twist.signed_cache.verified_targets", d["verified"], date="2026-10-25",
+         problem=P_IC, unit="verified separate recoveries", better="higher", source=path)
+    for arm in ("reference", "signed_cache"):
+        for role in ("main", "twist"):
+            value = d["first_policy_target"][arm][role]["cold"]["point_add_requests"]
+            emit(f"ic.twist.signed_cache.{arm}.{role}.prefix_target1.point_add_requests",
+                 value, date="2026-10-25", problem=P_IC, unit="point-add requests",
+                 better="lower", label="F43 prefix/Q=P cold point requests; unpriced", source=path)
+
+
+def twist_direct_sign(ref):
+    """Emit exact component counts; no claim of an overall cost ranking."""
+    path = "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    emit("ic.twist.direct_sign.verified_targets", d["verified"], date="2026-10-25",
+         problem=P_IC, unit="verified separate recoveries", better="higher", source=path)
+    for arm in ("binary", "cached", "direct"):
+        for role in ("main", "twist"):
+            for key in ("point_add_requests", "point_negations"):
+                value = d["first_policy_target"][arm][role]["cold"][key]
+                emit(f"ic.twist.direct_sign.{arm}.{role}.prefix_target1.{key}", value,
+                     date="2026-10-25", problem=P_IC, unit=key, better="lower",
+                     label="F43 prefix/Q=P cold component; unpriced", source=path)
+
+
+
+def twist_cm8_transfer(ref):
+    """Exact committed finite audit counts; no general or cost extrapolation."""
+    path = "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    for key in ("verified", "addition_pairs", "joint_original", "joint_reduced",
+                "matched_degree_equal", "matched_degree_different"):
+        emit(f"ic.twist.cm8_transfer.{key}", d[key], date="2026-10-25",
+             problem=P_IC, unit="finite audit count", better="higher",
+             label="F13 finite audit; no cost or generalization", source=path)
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -472,6 +545,10 @@ def ic_aimed_gather(ref, since):
 
 def main():
     a = args()
+    twist_known_roots(a.ref)
+    twist_signed_cache(a.ref)
+    twist_direct_sign(a.ref)
+    twist_cm8_transfer(a.ref)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)

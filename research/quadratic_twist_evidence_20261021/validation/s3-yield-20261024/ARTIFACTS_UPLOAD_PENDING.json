@@ -1,0 +1,45 @@
+{
+  "schema": "research-artifact-upload-pending/v1",
+  "run": "s3-yield-20261024",
+  "state": "blocked-awaiting-explicit-user-approval",
+  "uploaded": false,
+  "total_bytes": 684341,
+  "destination": "s3://setec-astronomy-artifacts/store",
+  "decision_source": "automatic approval review",
+  "reason": "Specific payload and external S3 destination were not explicitly authorized; review flagged possible non-public research data.",
+  "contents": "Synthetic finite-curve correctness evidence, native/Lean validation transcripts, rendered report and figures. No chat transcripts or credentials are included.",
+  "payloads": [
+    {
+      "path": "research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/runs.tar.xz",
+      "sha256": "faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212",
+      "bytes": 85956,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/fa/faf8f283b7a47662b2f7cd4cd3fa7c24e39da82e9e0ed3edd62e4f09ab51b212"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/report.pdf",
+      "sha256": "c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184",
+      "bytes": 363795,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/c6/c69b4e343009e3d09576fb0c0ecf4745c556a33d339e0681ca3487e8c2baa184"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/bridge.png",
+      "sha256": "de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000",
+      "bytes": 137156,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/de/de3809423fac606635b345ce15ee18651a4f5bb7f3d71b783e5819932df2b000"
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/profiles.png",
+      "sha256": "7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52",
+      "bytes": 97434,
+      "intended_object": "s3://setec-astronomy-artifacts/store/sha256/7d/7dbceeae51109caddd24cab8d4eb1aacf1012d71017f343e6ab47e9a1bbc2a52"
+    }
+  ],
+  "cli_ready": true,
+  "credential_readiness": "No credential use or upload attempted after review rejection; remote verification remains unperformed.",
+  "tool": {
+    "repository": "aburan28/crypto",
+    "path": "tools/artifacts/artifacts.py",
+    "git_blob": "4f134496957ccf88d909f5f0b6f000317fa06fad"
+  },
+  "after_approval": "Use the repository artifact tool to upload exactly these immutable bytes, verify remote hashes, create genuine .artifacts.json hydration manifests, and update publication status. Do not treat intended_object as evidence the object exists."
+}

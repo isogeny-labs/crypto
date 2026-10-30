@@ -1,0 +1,10 @@
+digraph route {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",label="PROPOSED route: exact models registered; map and subgroup checks pending",labelloc=t];
+ node [shape=box,fontname="Helvetica",fontsize=10,style="rounded"];
+ edge [style=dashed,fontname="Helvetica",fontsize=9];
+ e [label="icv1-fp4-t0-6bee67e0\nF13 / a1,b4\nE: source"];
+ h [label="icv1-fp4-t0-bb514d71\nF13 / a4,b7\nH: intermediate"];
+ t [label="icv1-fp4-t0-097da6b6\nF13 / a4,b6\nT: d2 monic twist"];
+ e->h [label="Degree2 candidate\nKernel x=10"];
+ h->t [label="Scaling u5\nDegree1 candidate"];
+}

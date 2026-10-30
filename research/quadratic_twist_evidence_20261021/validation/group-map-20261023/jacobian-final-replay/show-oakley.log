@@ -1,0 +1,56 @@
+icv1-f2m155-tm414891960790832521345347-b865721c  [Oakley Group 3]
+  ICV1:f2m-155-dea39df2:-414891960790832521345347:45671926166590716193865565914344635196769237316:0x61a2976b585b70cc897ad03a7f74a4ecc23bf4a:unk:unk:r:b865721c660a
+  family binary  field binary (degree 155, 155.0 bits)  trace -414891960790832521345347
+  subgroup r: 151.4 bits [largest_prime_of_order]  rho reference: 2^90.4
+  verdict boundary
+  #    route                    genus     dest log2     total     ratio transport         class             evidence
+   0   ghs_weil_descent         16             96.0      96.0      -5.6 size_admits       boundary          exact_invariant
+        GHS descent to Jac(C)/GF(2^31), N = 5 * 31
+        audit_curve_magic_number=5  base_degree=31  cover_degree_log2=5  magic_number=5  mmt_condition_8=true  relative_degree=5  relative_trace_b_zero=false  trace_a=0  type_i=false
+        solver EngeGaudrySmoothness (leading term 2^74.3, exponent ratio +1.5); search none, transfer 2^18.9
+        - GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here
+   1   ghs_isogeny_extension    2              48.8     143.8     -53.4 too_small         not_carried       heuristic
+        isogenous curve with magic number <= 2 over the same tower, descent to Jac(C)/GF(2^31)
+        base_degree=31  direct_descent_exists=true  direct_magic_number=5  isogenous_candidate_expected=false  log2_candidate_curves=31.0  log2_expected_isogenous_candidates=-50.208  log2_isogeny_class_size=74.792  relative_degree=5  target_annihilator_degree=1  target_magic_number_bound=2  target_needs_mmt_condition_8=false
+        solver HyperellipticIndexCalculus (leading term 2^32.0, exponent ratio +43.7); search 2^143.8, transfer 2^15.9
+        - heuristic: counts curves whose sqrt(b') has a small Frobenius annihilator and assumes isogeny classes are random of size sqrt(|t^2-4q|)/pi; no isogenous curve is exhibited
+        - fewer than one such isogenous curve is expected in the class; the route is priced for the record
+   2   ghs_weil_descent         33554432      142.8     142.8     -52.4 size_admits       boundary          exact_invariant
+        GHS descent to Jac(C)/GF(2^5), N = 31 * 5
+        audit_curve_magic_number=26  base_degree=5  cover_degree_log2=26  magic_number=26  mmt_condition_8=true  relative_degree=31  relative_trace_b_zero=false  trace_a=0  type_i=false
+        solver RhoOnJacobian (leading term 2^75.7, exponent ratio +0.0); search none, transfer 2^39.9
+        - GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here
+   3   ghs_isogeny_extension    2              18.6     169.8     -79.4 too_small         not_carried       heuristic
+        isogenous curve with magic number <= 2 over the same tower, descent to Jac(C)/GF(2^5)
+        base_degree=5  direct_descent_exists=true  direct_magic_number=26  isogenous_candidate_expected=false  log2_candidate_curves=5.0  log2_expected_isogenous_candidates=-76.208  log2_isogeny_class_size=74.792  relative_degree=31  target_annihilator_degree=1  target_magic_number_bound=2  target_needs_mmt_condition_8=false
+        solver HyperellipticIndexCalculus (leading term 2^6.0, exponent ratio +69.7); search 2^169.8, transfer 2^15.9
+        - heuristic: counts curves whose sqrt(b') has a small Frobenius annihilator and assumes isogeny classes are random of size sqrt(|t^2-4q|)/pi; no isogenous curve is exhibited
+        - fewer than one such isogenous curve is expected in the class; the route is priced for the record
+   4   ghs_isogeny_extension    65536         121.7     121.7     -31.3 size_admits       boundary          heuristic
+        isogenous curve with magic number <= 17 over the same tower, descent to Jac(C)/GF(2^5)
+        base_degree=5  direct_descent_exists=true  direct_magic_number=26  isogenous_candidate_expected=true  log2_candidate_curves=84.322  log2_expected_isogenous_candidates=3.114  log2_isogeny_class_size=74.792  relative_degree=31  target_annihilator_degree=16  target_magic_number_bound=17  target_needs_mmt_condition_8=false
+        solver RhoOnJacobian (leading term 2^75.7, exponent ratio +0.0); search 2^90.5, transfer 2^30.9
+        - heuristic: counts curves whose sqrt(b') has a small Frobenius annihilator and assumes isogeny classes are random of size sqrt(|t^2-4q|)/pi; no isogenous curve is exhibited
+        - at least one such isogenous curve is expected; the search cost prices a random walk in the class until one is hit
+   5   ghs_weil_descent         2^125         373.8     373.8    -283.4 size_admits       boundary          exact_invariant
+        GHS descent to Jac(C)/GF(2^1), N = 155 * 1
+        audit_curve_magic_number=126  base_degree=1  cover_degree_log2=126  magic_number=126  mmt_condition_8=true  relative_degree=155  relative_trace_b_zero=false  trace_a=0  type_i=false
+        solver RhoOnJacobian (leading term 2^75.7, exponent ratio +0.0); search none, transfer 2^139.9
+        - GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here
+   6   ghs_isogeny_extension    2              10.9     173.8     -83.4 too_small         not_carried       heuristic
+        isogenous curve with magic number <= 2 over the same tower, descent to Jac(C)/GF(2^1)
+        base_degree=1  direct_descent_exists=true  direct_magic_number=126  isogenous_candidate_expected=false  log2_candidate_curves=1.0  log2_expected_isogenous_candidates=-80.208  log2_isogeny_class_size=74.792  relative_degree=155  target_annihilator_degree=1  target_magic_number_bound=2  target_needs_mmt_condition_8=false
+        solver HyperellipticIndexCalculus (leading term 2^2.0, exponent ratio +73.7); search 2^173.8, transfer 2^15.9
+        - heuristic: counts curves whose sqrt(b') has a small Frobenius annihilator and assumes isogeny classes are random of size sqrt(|t^2-4q|)/pi; no isogenous curve is exhibited
+        - fewer than one such isogenous curve is expected in the class; the route is priced for the record
+   7   ghs_isogeny_extension    2^74          254.1     254.1    -163.7 size_admits       boundary          heuristic
+        isogenous curve with magic number <= 75 over the same tower, descent to Jac(C)/GF(2^1)
+        base_degree=1  direct_descent_exists=true  direct_magic_number=126  isogenous_candidate_expected=true  log2_candidate_curves=82.299  log2_expected_isogenous_candidates=1.091  log2_isogeny_class_size=74.792  relative_degree=155  target_annihilator_degree=74  target_magic_number_bound=75  target_needs_mmt_condition_8=false
+        solver RhoOnJacobian (leading term 2^75.7, exponent ratio +0.0); search 2^92.5, transfer 2^88.9
+        - heuristic: counts curves whose sqrt(b') has a small Frobenius annihilator and assumes isogeny classes are random of size sqrt(|t^2-4q|)/pi; no isogenous curve is exhibited
+        - at least one such isogenous curve is expected; the search cost prices a random walk in the class until one is hit
+  *8   same_field_cover         3              95.5      95.5      -5.1 carried_if_coprime_to_degree boundary          construction
+        same-field genus-3 cover H -> E of degree 3 over GF(2^155) (ordinary_binary_cubic_pullback)
+        construction="docs/curves/COVERS.md ordinary binary"  map_degree=3
+        solver RhoOnJacobian (leading term 2^75.7, exponent ratio +0.0); search none, transfer 2^16.4
+        - the Jacobian over the same field is larger than E: index calculus there is q^(4/3) against rho's q^(1/2)
