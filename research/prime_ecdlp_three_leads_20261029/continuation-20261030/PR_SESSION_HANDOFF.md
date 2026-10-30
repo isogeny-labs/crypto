@@ -224,3 +224,15 @@ SHAguard beforeauto/merge. FullG1–G6partial/unrun,0panels,admissionfalse.
 G2lost-count emissions/ownershipstillopen aftercurrentdelivery,no metrics
 or funding/access/resourcechanges. NewrepairreportMD/TypstPDF inspectedboth
 pages;earlierreportsfrozen. Currentproblemstatusrepairmerged/validationpending.
+
+### Repaired-source collection schedule
+
+Existing automation6ae43610206c819191f9555f72e5a160 updated/enabled for21:21UTC
+to COLLECT EXISTING49719run and continue fullgoal. Newactualfallback/merge/
+launch resetsunchangedcount0. Futureunchangedchecks use4h andstopafter3.
+Atlastcheckelapsed14:40 sourcecompiler/cargo/supervisorlive,no terminalpass.
+CurrentMathlibHEAD d13f23b723b8a846827a245b89c10fc7d3f11612 trackedclean,
+Lean4.34.1(commit5045d0056413266e57c625dcd7c365b10e377c52) verified; exact
+formalidentitymetadata recorded,notnewproof/nativevalidation. Sourceb022,
+recipemetadata c71e30719,reportmetadata30c6f9140 plus laterhandoff remain
+UNPUSHED. Localwhitespace/size/artifact checks passagainstmaincc5,notCI.
