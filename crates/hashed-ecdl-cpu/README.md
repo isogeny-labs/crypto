@@ -27,22 +27,31 @@ are admission limits, not evidence that all admitted instances are feasible.
 
 For each new curve/base set, choose a contiguous split minimizing the combined
 prefix/suffix tuple counts, subject to `max_rows`. Build both sum tables once,
-sort suffix sums by full point and tuple index, and retain the tables across
-queries. Visit prefix tuples lexicographically and select the smallest matching
+index suffix sums by exact compressed point keys, and retain the tables across
+queries. The open-addressed index keeps the first tuple ID for duplicate sums. Visit prefix tuples lexicographically and select the smallest matching
 suffix index. Thus duplicate sums still produce exactly the original oracle's
 first full tuple, making whole certificates directly comparable.
 
 Compute target-minus-prefix residuals with Montgomery batch inversion. `batch=1`
-is the per-residual inversion control. The first match in a batch wins; all
+is the per-residual inversion control. If distinct suffix sums cover at least
+one eighth of the group, batches grow geometrically from one up to the configured
+maximum; otherwise full batches are used immediately. This scheduling heuristic
+does not assume an early match or change exhaustive negative answers.
+The first match in a batch wins; all
 arithmetic already performed in that batch is charged. Every returned witness
-is replayed using the independent checked group operations.
+is replayed by a checked projective sum: validate every point, accumulate, then
+compare directly with the affine target using cross multiplication, avoiding
+the final inversion. Full certificate verification independently checks all relations
+using the shared affine group operations.
 
 `max_rows` and `max_work` cap the combined *retained tuple count*, checked before
 preparation and again on warm queries. They do not cap total RSS, arithmetic or
 wall time. The original exhaustive oracle uses a different work unit.
 Preparation also stores the original bases and four curve parameters and uses
 temporary sum vectors; queries use O(batch) scratch. `peak_table_bytes` counts only retained
-sum-table capacities, excluding these other allocations. All counters include
+prefix capacity and suffix slot capacity (including empty slots), excluding these
+other allocations. Suffix slots use at most half occupancy; their count is the
+next power of two above twice the suffix tuple count. All counters include
 discarded trials. `clear()` drops tables without resetting cumulative counters.
 
 This is generic decomposition (bounded by square-root group-order methods;

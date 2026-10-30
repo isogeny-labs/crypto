@@ -81,17 +81,58 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
         (u128::from(a) * u128::from(b) % u128::from(p)) as u64
     }
 }
-fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
-    let mut r = 1;
-    while n != 0 {
-        if n & 1 != 0 {
-            r = mulmod(r, a, p);
-        }
-        a = mulmod(a, a, p);
-        n >>= 1;
-    }
-    r
+// Reciprocal reduction amortizes division across products (HAC 14.3.3).
+// This ceiling-reciprocal variant is restricted to canonical 32-bit residues.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Modulus {
+    p: u64,
+    reciprocal: u64,
 }
+impl Modulus {
+    fn new(p: u64) -> Self {
+        assert!(p > 1);
+        Self {
+            p,
+            reciprocal: if p <= u64::from(u32::MAX) {
+                u64::MAX / p + 1
+            } else {
+                0
+            },
+        }
+    }
+    fn mul(self, a: u64, b: u64) -> u64 {
+        debug_assert!(a < self.p && b < self.p);
+        if self.reciprocal == 0 {
+            return mulmod(a, b, self.p);
+        }
+        let x = a * b;
+        // With R=ceil(2^64/p), floor(xR/2^64) is floor(x/p) or one
+        // larger, since x<2^64. The wrapped residual is either in [0,p)
+        // or [2^64-p,2^64). These intervals are disjoint for p<2^32.
+        let q = ((u128::from(x) * u128::from(self.reciprocal)) >> 64) as u64;
+        let residual = x.wrapping_sub(q.wrapping_mul(self.p));
+        if residual >= self.p {
+            residual.wrapping_add(self.p)
+        } else {
+            residual
+        }
+    }
+    fn pow(self, mut a: u64, mut n: u64) -> u64 {
+        let mut r = 1;
+        while n != 0 {
+            if n & 1 != 0 {
+                r = self.mul(r, a);
+            }
+            a = self.mul(a, a);
+            n >>= 1;
+        }
+        r
+    }
+}
+fn pow(a: u64, n: u64, p: u64) -> u64 {
+    Modulus::new(p).pow(a, n)
+}
+
 fn sub(a: u64, b: u64, p: u64) -> u64 {
     if a >= b {
         a - b
@@ -182,6 +223,7 @@ fn sqrtmod(a: u64, p: u64) -> Option<u64> {
 // candidate root, residual and Legendre test; the final square is checked.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct SqrtContext {
+    modulus: Modulus,
     m: u32,
     q: u64,
     c: u64,
@@ -198,22 +240,27 @@ impl SqrtContext {
                 .expect("validated odd prime has a quadratic nonresidue");
             pow(z, q, p)
         };
-        Self { m, q, c }
+        Self {
+            modulus: Modulus::new(p),
+            m,
+            q,
+            c,
+        }
     }
     fn root(&self, a: u64, p: u64) -> Option<u64> {
         if a == 0 {
             return Some(0);
         }
         if self.m == 1 {
-            let x = pow(a, (p + 1) / 4, p);
-            return (mulmod(x, x, p) == a).then_some(x);
+            let x = self.modulus.pow(a, (p + 1) / 4);
+            return (self.modulus.mul(x, x) == a).then_some(x);
         }
-        let w = pow(a, self.q / 2, p);
-        let mut x = mulmod(w, a, p);
-        let mut t = mulmod(w, x, p);
+        let w = self.modulus.pow(a, self.q / 2);
+        let mut x = self.modulus.mul(w, a);
+        let mut t = self.modulus.mul(w, x);
         let mut legendre = t;
         for _ in 1..self.m {
-            legendre = mulmod(legendre, legendre, p);
+            legendre = self.modulus.mul(legendre, legendre);
         }
         if legendre != 1 {
             return None;
@@ -222,7 +269,7 @@ impl SqrtContext {
         while t != 1 {
             let (mut power, mut i) = (t, 0);
             while power != 1 && i < m {
-                power = mulmod(power, power, p);
+                power = self.modulus.mul(power, power);
                 i += 1;
             }
             if i == m {
@@ -230,14 +277,14 @@ impl SqrtContext {
             }
             let mut b = c;
             for _ in 0..m - i - 1 {
-                b = mulmod(b, b, p);
+                b = self.modulus.mul(b, b);
             }
-            x = mulmod(x, b, p);
-            c = mulmod(b, b, p);
-            t = mulmod(t, c, p);
+            x = self.modulus.mul(x, b);
+            c = self.modulus.mul(b, b);
+            t = self.modulus.mul(t, c);
             m = i;
         }
-        (mulmod(x, x, p) == a).then_some(x)
+        (self.modulus.mul(x, x) == a).then_some(x)
     }
 }
 
@@ -715,12 +762,60 @@ fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>,
         .collect()
 }
 
+// Store sparse pivot tails only when their payload is no larger than dense.
+// Pivot traversal and normalization stay unchanged, preserving the first
+// dependent row and its exact recovered coefficients.
+enum PivotTail {
+    Sparse(Vec<(usize, u64)>),
+    Dense(Vec<u64>),
+}
+impl PivotTail {
+    fn new(row: &[u64]) -> Self {
+        let nonzero = row.iter().filter(|&&x| x != 0).count();
+        if nonzero * std::mem::size_of::<(usize, u64)>() <= std::mem::size_of_val(row) {
+            let mut entries = Vec::with_capacity(nonzero);
+            entries.extend(row.iter().copied().enumerate().filter(|&(_, x)| x != 0));
+            Self::Sparse(entries)
+        } else {
+            Self::Dense(row.to_vec())
+        }
+    }
+    fn subtract_from(&self, row: &mut [u64], k: u64, modulus: Modulus) {
+        let r = modulus.p;
+        let update = |a: &mut u64, b| {
+            if b != 0 {
+                let product = if k == 1 {
+                    b
+                } else if b == 1 {
+                    k
+                } else {
+                    modulus.mul(k, b)
+                };
+                *a = sub(*a, product, r);
+            }
+        };
+        match self {
+            Self::Sparse(entries) => {
+                for &(i, b) in entries {
+                    update(&mut row[i], b);
+                }
+            }
+            Self::Dense(entries) => {
+                for (a, &b) in row.iter_mut().zip(entries) {
+                    update(a, b);
+                }
+            }
+        }
+    }
+}
+
 // First row dependency, independent of u/v. Keep elimination factors instead
 // of updating a full provenance vector at every pivot; reconstruct once by
 // triangular back-substitution when the first dependent row is reached.
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
+    let modulus = Modulus::new(r);
     struct Pivot {
-        row: Vec<u64>,
+        tail: PivotTail,
         source: usize,
         inverse: u64,
         factors: Vec<(usize, u64)>,
@@ -736,9 +831,10 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 continue;
             }
             factors.push((index, k));
-            for (a, &b) in row[col..].iter_mut().zip(&pivots[index].row[col..]) {
-                *a = sub(*a, mulmod(k, b, r), r);
-            }
+            row[col] = 0; // the normalized pivot entry is exactly one
+            pivots[index]
+                .tail
+                .subtract_from(&mut row[col + 1..], k, modulus);
         }
         match row.iter().position(|&a| a != 0) {
             None => {
@@ -750,11 +846,11 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 }
                 for j in (0..pivots.len()).rev() {
                     let pivot = &pivots[j];
-                    let k = mulmod(weights[j], pivot.inverse, r);
+                    let k = modulus.mul(weights[j], pivot.inverse);
                     combination[pivot.source] = k;
                     if k != 0 {
                         for &(ancestor, factor) in &pivot.factors {
-                            weights[ancestor] = sub(weights[ancestor], mulmod(k, factor, r), r);
+                            weights[ancestor] = sub(weights[ancestor], modulus.mul(k, factor), r);
                         }
                     }
                 }
@@ -762,12 +858,14 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
             }
             Some(col) => {
                 let inv = inverse(row[col], r);
-                for a in &mut row[col..] {
-                    *a = mulmod(*a, inv, r);
+                for a in &mut row[col + 1..] {
+                    if *a != 0 && inv != 1 {
+                        *a = modulus.mul(*a, inv);
+                    }
                 }
                 columns.insert(col, pivots.len());
                 pivots.push(Pivot {
-                    row,
+                    tail: PivotTail::new(&row[col + 1..]),
                     source: i,
                     inverse: inv,
                     factors,
@@ -957,46 +1055,155 @@ pub fn solve_with_oracle_profile(
     ))
 }
 
+// Jacobian coordinates x=X/Z^2, y=Y/Z^3; Z=0 is the identity.
+// EFD madd-2004-hmv and standard Jacobian doubling, with explicit equal,
+// inverse and identity cases. Variable time on public research inputs.
+#[derive(Clone, Copy)]
+struct Jacobian {
+    x: u64,
+    y: u64,
+    z: u64,
+}
+impl Jacobian {
+    fn from_affine(point: Point) -> Self {
+        point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
+    }
+    fn affine(self, modulus: Modulus) -> Point {
+        if self.z == 0 {
+            return None;
+        }
+        let iz = inverse(self.z, modulus.p);
+        let iz2 = modulus.mul(iz, iz);
+        Some((
+            modulus.mul(self.x, iz2),
+            modulus.mul(self.y, modulus.mul(iz, iz2)),
+        ))
+    }
+    fn batch_affine(points: &[Self], modulus: Modulus) -> Vec<Point> {
+        let mut prefix = Vec::with_capacity(points.len());
+        let mut product = 1;
+        for point in points {
+            prefix.push(product);
+            if point.z != 0 {
+                product = modulus.mul(product, point.z);
+            }
+        }
+        let mut inv = inverse(product, modulus.p);
+        let mut out = vec![None; points.len()];
+        for (i, point) in points.iter().enumerate().rev() {
+            if point.z == 0 {
+                continue;
+            }
+            let iz = modulus.mul(inv, prefix[i]);
+            inv = modulus.mul(inv, point.z);
+            let iz2 = modulus.mul(iz, iz);
+            out[i] = Some((
+                modulus.mul(point.x, iz2),
+                modulus.mul(point.y, modulus.mul(iz, iz2)),
+            ));
+        }
+        out
+    }
+    fn double(self, a: u64, modulus: Modulus) -> Self {
+        if self.z == 0 || self.y == 0 {
+            return Self::from_affine(None);
+        }
+        let p = modulus.p;
+        let mul = |x, y| modulus.mul(x, y);
+        let twice = |x| addmod(x, x, p);
+        let xx = mul(self.x, self.x);
+        let yy = mul(self.y, self.y);
+        let yyyy = mul(yy, yy);
+        let zz = mul(self.z, self.z);
+        let s = twice(twice(mul(self.x, yy)));
+        let m = addmod(addmod(twice(xx), xx, p), mul(a, mul(zz, zz)), p);
+        let x = sub(mul(m, m), twice(s), p);
+        let y = sub(mul(m, sub(s, x, p)), twice(twice(twice(yyyy))), p);
+        Self {
+            x,
+            y,
+            z: twice(mul(self.y, self.z)),
+        }
+    }
+    fn add_affine(self, point: Point, a: u64, modulus: Modulus) -> Self {
+        let Some((x, y)) = point else {
+            return self;
+        };
+        if self.z == 0 {
+            return Self::from_affine(point);
+        }
+        let p = modulus.p;
+        let mul = |x, y| modulus.mul(x, y);
+        let z2 = mul(self.z, self.z);
+        let h = sub(mul(x, z2), self.x, p);
+        let r = sub(mul(y, mul(z2, self.z)), self.y, p);
+        if h == 0 {
+            return if r == 0 {
+                self.double(a, modulus)
+            } else {
+                Self::from_affine(None)
+            };
+        }
+        let hh = mul(h, h);
+        let hhh = mul(hh, h);
+        let v = mul(self.x, hh);
+        let nx = sub(sub(mul(r, r), addmod(v, v, p), p), hhh, p);
+        let ny = sub(mul(r, sub(v, nx, p)), mul(self.y, hhh), p);
+        Self {
+            x: nx,
+            y: ny,
+            z: mul(self.z, h),
+        }
+    }
+}
+
 // Fixed-base radix-16 multiplication. Constructed inside each solve/replay,
 // never shared between targets or excluded from the complete timing interval.
 // A replay constructs its own tables and still checks every relation.
 struct FixedPair {
+    modulus: Modulus,
     p: Vec<[Point; 16]>,
     q: Vec<[Point; 16]>,
 }
 impl FixedPair {
     fn new(curve: &Curve, p: Point, q: Point) -> Self {
         let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
+        let modulus = Modulus::new(curve.p);
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
             for window in 0..windows {
-                let mut row = [None; 16];
-                row[1] = base;
-                for digit in 2..16 {
-                    row[digit] = curve.add_valid(row[digit - 1], base);
+                let mut row = [Jacobian::from_affine(None); 17];
+                row[1] = Jacobian::from_affine(base);
+                for digit in 2..17 {
+                    row[digit] = row[digit - 1].add_affine(base, curve.a, modulus);
                 }
+                // Include 16*base in the same inversion for the next window.
+                let affine = Jacobian::batch_affine(&row, modulus);
+                let mut table_row = [None; 16];
+                table_row.copy_from_slice(&affine[..16]);
                 if window + 1 < windows {
-                    base = curve.add_valid(row[15], base);
+                    base = affine[16];
                 }
-                out.push(row);
+                out.push(table_row);
             }
             out
         };
         Self {
+            modulus: Modulus::new(curve.p),
             p: table(p),
             q: table(q),
         }
     }
     fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
         debug_assert!(u < curve.r && v < curve.r);
-        let mut out = None;
+        let mut out = Jacobian::from_affine(None);
         for (p, q) in self.p.iter().zip(&self.q) {
-            out = curve.add_valid(out, p[(u & 15) as usize]);
-            out = curve.add_valid(out, q[(v & 15) as usize]);
+            out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
+            out = out.add_affine(q[(v & 15) as usize], curve.a, self.modulus);
             u >>= 4;
             v >>= 4;
         }
-        out
+        out.affine(self.modulus)
     }
 }
 
@@ -1091,6 +1298,87 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
+        let (curve, generator) = fixture();
+        let modulus = Modulus::new(curve.p);
+        let points: Vec<_> = (0..curve.r)
+            .map(|k| curve.mul(generator, k).unwrap())
+            .collect();
+        for (i, &point) in points.iter().enumerate() {
+            let z = (i as u64 % (curve.p - 1)) + 1;
+            let projective = point.map_or(Jacobian::from_affine(None), |(x, y)| {
+                let z2 = modulus.mul(z, z);
+                Jacobian {
+                    x: modulus.mul(x, z2),
+                    y: modulus.mul(y, modulus.mul(z, z2)),
+                    z,
+                }
+            });
+            assert_eq!(projective.affine(modulus), point);
+            assert_eq!(
+                Jacobian::batch_affine(
+                    &[
+                        Jacobian::from_affine(None),
+                        projective,
+                        projective.double(curve.a, modulus)
+                    ],
+                    modulus
+                ),
+                vec![None, point, curve.add(point, point).unwrap()]
+            );
+            for &other in &points {
+                assert_eq!(
+                    projective
+                        .add_affine(other, curve.a, modulus)
+                        .affine(modulus),
+                    curve.add(point, other).unwrap()
+                );
+            }
+        }
+        // A point with y=0 doubles to identity, including a nonunit scale.
+        let m = Modulus::new(7);
+        assert_eq!(Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m), None);
+    }
+
+    #[test]
+    fn reciprocal_products_match_wide_remainders() {
+        let reference =
+            |a: u64, b: u64, p: u64| (u128::from(a) * u128::from(b) % u128::from(p)) as u64;
+        for p in 2..256 {
+            let m = Modulus::new(p);
+            for a in 0..p {
+                for b in 0..p {
+                    assert_eq!(m.mul(a, b), reference(a, b, p));
+                }
+            }
+        }
+        let mut rng = Rng(0x126799);
+        for p in [
+            65521,
+            65536,
+            65563,
+            (1 << 31) - 1,
+            1 << 31,
+            (1 << 32) - 5,
+            (1 << 32) - 1,
+            1 << 32,
+            (1 << 40) + 87,
+            u64::MAX,
+        ] {
+            let m = Modulus::new(p);
+            for a in [0, 1, p / 2, p - 2, p - 1] {
+                for b in [0, 1, p / 2, p - 2, p - 1] {
+                    assert_eq!(m.mul(a, b), reference(a, b, p));
+                }
+            }
+            for _ in 0..10000 {
+                let (a, b) = (rng.below(p), rng.below(p));
+                assert_eq!(m.mul(a, b), reference(a, b, p));
+            }
+        }
     }
 
     #[test]
@@ -1281,10 +1569,22 @@ mod tests {
         let mut rng = Rng(321);
         for r in [3, 199, 1_099_512_551_701] {
             for n in 1..25 {
-                let rows: Vec<Vec<u64>> = (0..n + 1)
-                    .map(|_| (0..n).map(|_| rng.below(r)).collect())
-                    .collect();
-                assert_eq!(dependency(&rows, r), eager(&rows, r));
+                for density in [1, 2, 8, 32] {
+                    let rows: Vec<Vec<u64>> = (0..n + 1)
+                        .map(|_| {
+                            (0..n)
+                                .map(|_| {
+                                    if rng.below(density) == 0 {
+                                        rng.below(r)
+                                    } else {
+                                        0
+                                    }
+                                })
+                                .collect()
+                        })
+                        .collect();
+                    assert_eq!(dependency(&rows, r), eager(&rows, r));
+                }
             }
         }
     }
