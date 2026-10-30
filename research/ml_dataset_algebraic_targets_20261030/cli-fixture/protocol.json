@@ -1,0 +1,52 @@
+{
+  "schema": "software-cli-fixture/v1",
+  "purpose": "Actual native v6 export, deterministic re-export and direct identity replay on retained curve/twist software fixtures",
+  "n": 7,
+  "m": 3,
+  "shards": [
+    62,
+    63
+  ],
+  "source_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "input_archive_sha256": "937e0c59108d438807c25ecb938903889cd36a7553ad968ff9a1811a1fb2221f",
+  "reference_archive_sha256": "d9de8a9e690728de95584ad807b97331c645a9c6b8c4319bff46e5845f92ae9d",
+  "reference_features": [
+    {
+      "path": "export-62/features.jsonl",
+      "sha256": "d1ec48de1993f9911d8c48bd86e97275ec2078425b87b8144dfd586061c1e46d"
+    },
+    {
+      "path": "export-62/prefix-features.jsonl",
+      "sha256": "9e957fb13ab37879f85bb52d971a88546acff46bcffb459ff737a4d533c6ce27"
+    },
+    {
+      "path": "export-63/features.jsonl",
+      "sha256": "38177f32bd7d2677df94d97664620d7ca0e24cfc84685c4904e0af34e9437ca2"
+    },
+    {
+      "path": "export-63/prefix-features.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "commands": [
+    "export curve",
+    "immutable curve retry",
+    "export twist",
+    "immutable twist retry",
+    "reject rehashed changed consequence by deterministic regeneration"
+  ],
+  "checks": [
+    "source/reference identity",
+    "v6 three-file allowlist",
+    "all artifact hashes/sizes",
+    "all feature identities",
+    "algebraic joins and outcome counts",
+    "no target/proof/provenance in public inputs",
+    "static and branch feature bytes equal frozen reference",
+    "source inventory unchanged"
+  ],
+  "independent_implementation": false,
+  "standalone_external_consequence_record_verifier": false,
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}
