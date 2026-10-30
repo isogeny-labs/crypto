@@ -1,9 +1,7 @@
-# Lead 3: Weil descent at field degree n = 3 (INTERIM note; usage limit reached before the p = 8209 rows and the PDF)
+# Lead 3: Weil descent at field degree n = 3 (final)
 
-Status: **partial**. Data for p = 271..4099 (arm P), 271..2083 (arms M, J) is committed under `data/`; the p = 8209 run was
-still in flight, and the PDF/SVG, `benchmarks/` row and the final fit including p = 8209 are NOT done. Nothing pushed.
-This is a replication plus range extension of `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` section 11 (esp. 11.7, 11.9, 11.15, 11.19),
-which already ran this instrument (`gaudry_cubic`) at p <= 2083.
+Status: complete for the frozen protocol (arm P p=271..8209, 5 seeds; arms M, J p=271..2083, 3 seeds). Section 5 supersedes the exponents in section 2 (which were fit before p=8209 finished). Graph `fig_n3_cost.svg/png`, PDF `NOTE.pdf`. No `benchmarks/` row: the gate there needs a replay certificate, validator report and matched-rho `VALIDATION.json`, and this is a counted-op exponent study with no speedup claim. Nothing pushed.
+This is a replication plus range extension of `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` section 11 (esp. 11.7, 11.9, 11.15, 11.19), which already ran this instrument (`gaudry_cubic`) at p <= 2083.
 
 ## 1. Literature (step 1)
 - Gaudry-Diem index calculus on E(F_{q^n}): factor base {P : x(P) in F_q} (~q/2 points), relations R = +-P_1 +- ... +- P_n via the Weil-restricted
@@ -49,8 +47,8 @@ Price band (AGENTS.md 5a; unpriced hash probes: IC 3 per residual, rho 1 per ste
 - Theory: n = 3 is the smallest degree where a sub-rho exponent exists (n^{4/9} vs n^{1/2}) and only with m = 3 plus double large primes; m = 2 cannot beat rho.
 - Measured: the 2LP arm's relation phase scales as n^{0.42} (below rho) but is 1.8e3x rho at 2^36 and, with the measured LA exponent 0.51, never crosses rho even in extrapolation; at the theoretical 4/9 for both phases the crossover is ~2^230. n = 3 is a *cheaper instrument than n = 4* (Groebner solve per residual ~9e5 Fp muls vs the S_5 solve; k = 4 plain LA reaches 0.52x rho per RESEARCH_RESIDUAL_WALKS 11.19 but its relation phase is ~4e8x rho) but it yields no improvement over rho at any reachable size; consistent with the repo's section 11.15. No new claim beyond section 11.
 
-## 4. Not done
-p = 8209 rows (run `armP_p8209`, in flight at stop; `data/armP_p8209.log`), final fit with them, SVG/PNG/PDF (`plot_n3.py` written, not run), `benchmarks/` row, Conductor check, cleanup of the scratch crate/target (`/private/tmp/claude-501/.../scratchpad/{n3crate,target}`).
+## 4. Limits
+Conductor claim was not made (hooks let edits through; no registered control plane in this session). Rho is one walk per instance, pooled S_rho 1.336 +- 0.104. Extrapolations of 140-190 bits are indicative only. The two-phase projection depends on the LA exponent 0.505 +- 0.011 (OLS) / [0.482, 0.525] (bootstrap).
 Reproduce: scratch crate `#[path]`-includes unmodified `gaudry_cubic.rs`/`residual_walk.rs` with no-op `jv_bitops` hook stubs and the FxHasher part of `fx_hash.rs`; commands in `PROTOCOL.md`; `fit_n3 out.json P=... M=... J=...`.
 
 ## 5. Addendum: p = 8209 finished; refit over p = 271..8209 (arm P), full output in `fit_output.md`, rows in `results.json`
@@ -59,4 +57,4 @@ total 1.61e9 counted ops = 1,618x pooled rho (down from 3,535x at p=271); dense 
 Refit exponents (6 sizes): 2lp total 0.425 [0.416,0.434]; 2lp relation phase 0.425, LA phase 0.505 [0.482,0.525] (consistent with rho's 0.5 and now close to theory's 4/9 only at the lower CI end);
 dense relation 0.333 / LA 0.894. Two-phase projection for 2lp: minimum 1.5x rho at log2 n ~ 226, first below 1: none; theory-exponent crossover log2 n ~ 230.
 So with the LA exponent at 0.505 the 2lp method approaches parity with rho near 2^226 but a +-0.02 uncertainty on the LA exponent decides whether it ever crosses: **verdict unchanged: no reachable sub-rho point; asymptotically marginal.**
-Still not done: graph/PDF, benchmarks row, Conductor check, scratch cleanup.
+Graph: `fig_n3_cost.svg` (left: total cost over rho per arm; right: relation vs LA phase vs rho). Rendered `NOTE.pdf` from `report.typ`.
