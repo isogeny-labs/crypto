@@ -6,7 +6,13 @@ result. The original acceptance criteria in [PKM_GOALS.md](../PKM_GOALS.md)
 remain in force. [Goal state](goal-state.json), [proof map](proof-map.md),
 [diagram](scalar-certificates.svg), and [PDF](report.pdf) accompany this record.
 
-**Latest integration,18:37UTC:** [mergea030](validation/integration-0cc5-resolution.json)
+**Latest20:04UTC:** [repaired main b022](validation/main-cc5addeba-resolution.json)
+preserves both histories and the prepared handoff once. A [new native run](validation/repaired-main-cc5addeba/README.md)
+is compiling, not passed. Formal objects exactly match the passing18/zero-trusted
+audit; no redundant formal run is claimed. [Current report](repair-20261030T2004Z.md)
+and [PDF](repair-20261030T2004Z.pdf) preserve all earlier reports and failures.
+
+**Historical integration,18:37UTC:** [mergea030](validation/integration-0cc5-resolution.json)
 preserves both histories and frozen evidence. Its changed Lean gate passes18
 declarations/zero trusted, with module replay against imports. Fresh native
 validation stopped at inherited compilation error101 before tests; see [current validation](validation/integration-0cc5/README.md)

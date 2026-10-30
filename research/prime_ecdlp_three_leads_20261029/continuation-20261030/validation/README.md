@@ -1,6 +1,11 @@
 # Validation: faade scoped pass/cap; a030 native compilation blocked
 
-**Current sourcea030:** [fresh merged validation](integration-0cc5/README.md)
+**Latest repaired sourceb022:** [new native validation](repaired-main-cc5addeba/README.md)
+is compiling, not passed. The changed source incorporates main's delimiter
+repair; both older runs remain terminal and immutable. Exact unchanged formal
+source/gate objects retain their18-declaration/zero-trusted proof evidence.
+
+**Earlier sourcea030:** [fresh merged validation](integration-0cc5/README.md)
 has an18-declaration/zero-trusted proof-gate pass and module replay. Native
 checks stopped at inherited compilation error101 before tests; no native pass is claimed. Earlier completed scoped/capped
 records below validate faade only. All old snapshots remain unchanged.

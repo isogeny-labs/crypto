@@ -1,6 +1,6 @@
 # Inherited native compilation error blocks PKM integration validation
 
-- **Status:** upstream repair observed; integration/validation blocked
+- **Status:** repair merged locally; fresh native validation pending
 - **Kind:** inherited software build failure and merge conflict
 - **Affected work:** [PKM G1–G6 continuation](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/README.md)
 - **Next action owner:** PR integration lane; native chain-SAT maintainer
@@ -45,3 +45,17 @@ preview is not a compilation pass.
 
 This is a software-validation blocker. It establishes no negative mathematical
 conclusion about symmetric PKM. All G1–G6 scientific requirements remain open.
+
+## Repaired main merged at20:01UTC
+
+Local mergeb022566e incorporates maincc5addeba4dd53edc51f2c0ad9331b3ba0307adc
+and exact repairedblob4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f. Onlyordinary
+log/index conflicts were resolved,with all1535/1681 paragraphs and92/90 parent
+links preserved; preparedrequesthandoff appendedonce. No underlying frozen
+evidence or nativePKMsource changed. Copilot noresponse afteroveronehour and
+no visibleactivebranchrun; fallback rationalecomment6532293763.
+
+New source-pinned native49719 is compiling,notpassed,with own recipe/bindings
+under continuation validation/repaired-main-cc5addeba. Earlier compilation
+failure101 and all not-reached phases remain immutable. Do not declare this
+build problem resolved until affected compilation/checks qualify actualsource.

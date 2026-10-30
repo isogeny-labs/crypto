@@ -186,3 +186,41 @@ commits UNPUSHED pendingrepaired-source qualification. CurrentreportPDF and
 G2recheckare versioned;G2counts notimplemented/priced. Newnamedproblem:
 problems/binary-semaev-chain-sat-merge-delimiter.md. FullG1–G6 unchanged,
 0panels,comparison_admissible=false; no resource/accesschanges. Auto paused.
+
+## Update2026-10-30T20:04Z — repaired main merged; NEW validation49719 running
+
+Copilot6531034718 had no response/head activity afteroveronehour; branch
+in-progressActionsquery empty. Fallback explanation6532293763 preceded
+ordinarymainmerge. Newsourceb022566e0c6723fef4695a59e054ae4fbdcd1fd0 has
+parents270456262cfda552e339c80b02c83d9174344581 andmaincc5addeba4dd53edc51f2c0ad9331b3ba0307adc.
+Onlylog/index conflicted:ALL1535/1681 paragraphs preserved,14complete remote
+entrygroups,left exactprefix;all92/90links(now93),mainhashedECDL/PQC/local
+PKM/JV/basebuildrows preserved. Prepared18:54 requestsession APPENDEDONCE.
+No upstreamPKMstudy/legacycontrolchange,nofrozenconflict or side-selection.
+Mainchain-SATfixedblob4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f included;
+JVsource568a67fb3a7e4067036c7b5985648c477a46290d stillunchanged.
+
+NEW DETACHED RUN: /workspace/pkm-scalar-certificates-20261030/repaired-main-cc5addeba/,
+supervisor49719,parent1,SID/PGID49719,nointeractiveexecsession. At20:05:56UTC
+Cargo50095/rustc50109live,andstilllive at20:11in firstexamplecompilation.
+NO PHASE PASS yet. Recipe/bindings committed inc71e30719 under validation/
+repaired-main-cc5addeba; checks17sourceobjects/trackedcleanliness beforeeach
+phase. DoNOT duplicate,restartold31539/46238 recipes,editboundsource or
+chasemainwhileactive. Collectactualprocess/children,allphase terminals/logs
+and supervisor.exit/finished. Missingterminal is incomplete; read actualnew
+counts andbinarypaths,notold5646/stalebinaries. Preservecaps/failures,no
+skip/ignore/waiver;log>64KiB outofGit,finalhash/bytes/excerpt/NOT_UPLOADED.
+
+Formal tools/leanb53b7f1eac6e4688f782c7e83d87fd9847867020 andproject
+1c366822536c08b212a7d36045580ee715f327a0 EXACTLYequal passing18/zero-trusted
+audit/module-replayobjects. No newformalrunclaimed;importsnot--fresh.
+Equivalence in validation/main-cc5addeba-resolution.json,notnativeproof.
+
+Earlier sourcefaade scoped23pass/fullcap andsourcea030 compiler101/zero
+testsremainimmutable,pinnedtoOWNsource. AllnewcommitsstillUNPUSHED pending
+newsourcequalification. Nextnormalpush/update onlyafteractualoutcomes,source/
+binarybindings,finallocalpolicies;exacthead3CIgates/reviews/resolvedthreads/
+SHAguard beforeauto/merge. FullG1–G6partial/unrun,0panels,admissionfalse.
+G2lost-count emissions/ownershipstillopen aftercurrentdelivery,no metrics
+or funding/access/resourcechanges. NewrepairreportMD/TypstPDF inspectedboth
+pages;earlierreportsfrozen. Currentproblemstatusrepairmerged/validationpending.
