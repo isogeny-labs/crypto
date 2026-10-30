@@ -1065,3 +1065,10 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
 - `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
   replay of the committed draws before scoring.
+
+## A second invariant guess on the pair (2026-10-29)
+
+- Replacing the raw guess `c₇` by `a₆ + b₆` at (22, 8) lets degree 4 refute on
+  every branch of 2 of 12 draws, against 7 of 12 for S3. That is no detected
+  difference at the registered two-sided threshold (p = 0.0625), and the new
+  arm is never better (`research/dreg_invariant_pair_guess_20261029/RESULTS.md`).
