@@ -1,3 +1,18 @@
+# Current merged-source validation: all phases passed
+
+Pipeline05 completed2026-10-30T16:06:37Z at sourcea5343597d83545e660497748cd22d6856e0c3060.
+264 dataset tests passed; strict maintained Clippy and release CLI build passed.
+Retained curve/twist CLI exports/retries, artifact/feature joins and semantic
+corruption rejection passed. Full library suite:5537 passed,0 failed,123 ignored.
+Every phase passed source preflight and readback. Logs/receipts, native binary and
+CLI artifacts have fresh S3 download comparisons in attempt-05-readback.json.
+
+This validates the merged source, not later main changes. Historical failures
+and earlier isolated results below remain retained. Verified cloud cells0; no
+ML efficacy, whole-worker instruction or exact fall-degree conclusion.
+
+## Historical development and validation
+
 # Implementation status
 
 The native polynomial identity verifier, bounded consequence channel and v6

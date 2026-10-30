@@ -528,3 +528,14 @@ not establish worker access or replace a real producer-to-S3-to-consumer replay.
 The first durable producer cell must be restored into an isolated directory and
 checked by both the native producer and that independent consumer before any
 broader scientific claim or training acceptance.
+
+
+## Merged polynomial-consequence validation, 2026-10-30
+
+PR2964's merged sourcea5343597d835 passed264 dataset tests, strict maintained
+Clippy, release binary build, retained curve/twist CLI exports/retries and full
+serialized library tests (5537 passed,0failed,123ignored). Source checks before
+and after every phase matched inventory03. The14 phase/pipeline/binary/CLI
+artifacts have fresh S3 readback records in
+research/ml_dataset_algebraic_targets_20261030/attempt-05-readback.json.
+These are software checks on retained synthetic fixtures; cloudcells remain0.
