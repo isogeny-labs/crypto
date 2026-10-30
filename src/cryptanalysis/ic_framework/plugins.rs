@@ -570,10 +570,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         params: &Params,
         _ops: &mut GroupOps,
     ) -> Result<FactorBase<FastPoint>, String> {
-        let dim = params.u64("dimension")? as u32;
-        if dim == 0 || dim > 30 {
+        let dim = params.u64("dimension")?;
+        if !(1..=30).contains(&dim) {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
         }
+        // Validate before narrowing: e.g. 2^32 + 3 must not become dimension 3.
+        let dim = dim as u32;
         let select = params.get("select").unwrap_or("prefix");
         if select != "prefix" && params.get("basis").is_some() {
             return Err("`select` and an explicit `basis` are mutually exclusive".into());
@@ -4335,9 +4337,23 @@ mod explicit_subspace_tests {
             "binary-subspace:dimension=3,basis=1;2;3",
             "binary-subspace:dimension=3,basis=1;2",
             "binary-subspace:dimension=3,basis=1;2;128",
+            "binary-subspace:dimension=3,basis=1;2;0",
+            "binary-subspace:dimension=3,basis=1;2;2",
+            "binary-subspace:dimension=3,basis=1;2;",
+            "binary-subspace:dimension=3,basis=1;2;0xg",
+            "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+            "binary-subspace:dimension=3,basis=1;2;4,select=gated-rank",
+            "binary-subspace:dimension=4294967299,basis=1;2;4",
+            "binary-subspace:dimension=4294967299",
+            "binary-subspace:dimension=0,basis=1",
+            "binary-subspace:dimension=31,basis=1",
+            "binary-subspace:dimension=18446744073709551615,basis=1",
         ] {
             let (_, bad) = Params::parse_spec(recipe).unwrap();
-            assert!(builder.build(&ctx, &bad, &mut GroupOps::default()).is_err());
+            assert!(
+                builder.build(&ctx, &bad, &mut GroupOps::default()).is_err(),
+                "accepted invalid recipe: {recipe}"
+            );
         }
     }
 }
