@@ -79,6 +79,17 @@
      "value": 1.356
     },
     {
+     "anchor": "#ic-tournament-round-0026",
+     "class": "engineering",
+     "date": "2026-10-28",
+     "detail": "Native fixed-support pilot, one public target per cold job. The selected batch16 configuration costs 0.630 [0.578, 0.676] of its same-fixture incumbent in Valgrind Ir, yet 11.524 [10.718, 13.016] times its matched worker rho across five cells. Best per-cell paired IC/rho is 10.658 at icv1-f2m19-t797-b6cf2467. This worker rho is not globally qualified; no curve-addition conversion or scaling result is available.",
+     "label": "Native tournament round 0026, batch16, best cell icv1-f2m19-t797-b6cf2467",
+     "reference": "matched",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md",
+     "unit": "Valgrind Ir",
+     "value": 10.657953188446204
+    },
+    {
      "anchor": "#koblitz-descent-20260930",
      "class": "accounting",
      "date": "2026-10-01",
@@ -165,17 +176,6 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     },
     {
-     "date": "2026-10-20",
-     "value": 1236267.0,
-     "reference": "matched",
-     "unit": "F_p multiplications",
-     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
-     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
-     "class": "engineering",
-     "anchor": "#rho-parity-ledger",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
-    },
-    {
      "date": "2026-10-16",
      "value": 55.36777360324759,
      "reference": "matched",
@@ -249,6 +249,17 @@
      "class": "engineering",
      "anchor": "#n83-tier1-finalist-20261017",
      "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_finalist_results_20261017/RESULT.md"
+    },
+    {
+     "date": "2026-10-20",
+     "value": 1236267.0,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     }
    ],
    "role": "emphasis"
@@ -498,6 +509,59 @@
      "class": "accounting",
      "anchor": "#ic-pkm-tower-prime-20261011",
      "source": "https://github.com/aburan28/crypto/blob/main/research/pkm_tower_ecbench_20261011/RESULT.md"
+     "anchor": "#three-leads-e2e-0",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965\u20132.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Binary subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.0157697282272515
+    },
+    {
+     "anchor": "#three-leads-e2e-1",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079\u20132.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Odd subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.228297313380844
+    },
+    {
+     "anchor": "#three-leads-e2e-2",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304\u20138.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh PKM fixed fibers",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 7.711609480964212
+    },
+    {
+     "anchor": "#three-leads-e2e-3",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614\u20136.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, field cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.254596361178383
+    },
+    {
+     "anchor": "#three-leads-e2e-4",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295\u20137.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, subgroup cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.392179273237021
     },
     {
      "date": "2026-10-20",
@@ -509,6 +573,39 @@
      "class": "accounting",
      "anchor": "#lab-ecbench-all",
      "source": "https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md"
+    },
+    {
+     "date": "2026-10-28",
+     "value": 13.13874215708955,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC, k = 4 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9",
+     "detail": "ic-ksum4 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): 13.14x; 13.30x at w = 0.1, 14.02x at w = 1. Was 95.2x (ic-pair, same session). Fitted alpha 0.521 [0.506, 0.538] on 20-32 bits against ic-pair 0.620 [0.586, 0.650]. Generic: still 10.4x BSGS, the family's limit. Largest size measured; the ratio is smallest at 20 bits (5.29x). Lookups unpriced.",
+     "class": "engineering",
+     "anchor": "#prime-ksum-table-20261028",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_table_20261028/README.md"
+    },
+    {
+     "date": "2026-10-29",
+     "value": 9.673619712313917,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC, generic decomposition track, k = 5 sum table (one probe a target), 40-bit a = -3 curve icv1-fp40-tm924137-0ecaaeb9",
+     "detail": "ic-ksum5 / rho-neg mean S at w = 0 on the frontier campaign's 40-bit curve and test targets (16 x 2 runs, every run verified, replay-all audited): 9.67x; 9.74x at w = 0.1, 10.01x at w = 1. Was 13.14x (ic-ksum4, same session, reproducing #2808 run for run). Below ic-ksum4 across the band at 24-48 bits; fitted alpha 0.547 [0.543, 0.554] on 36-48 bits against 0.565 [0.560, 0.571]. 11.0x rho at 48 bits. Track: generic decomposition (bounded by sqrt(r); cannot beat rho); not ranked against Table B (different curves). Still 7.6x BSGS, the family's limit. Lookups unpriced.",
+     "class": "engineering",
+     "anchor": "#prime-ksum-k5-20261028",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_k5_20261028/README.md"
+    },
+    {
+     "date": "2026-10-29",
+     "value": 4.907654380168118,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime-field IC, generic decomposition track, k = 4 sum table vs the mitm incumbent on its 20-bit holdout curve icv1-fp20-tm565-6d7d1d32",
+     "detail": "ksum4 / rho-neg mean S at w = 0 on prime_base_oracle_tuning_20261029's 20-bit holdout curve and targets, same session as the incumbent recipe (48 x 2 runs per arm, every run verified, replay-all audited; inc and rho-neg reproduce the incumbent's recorded means exactly): 4.91x. Was 7.75x (mitm negation-folded N 45, the incumbent). ksum5 / inc 0.70 / 0.45 / 0.33 / 0.22 at 20 / 24 / 28 / 32 bits, below 1 at every band weight; ksum4 vs ksum5 unresolved at 20 and 24 bits. Track: generic decomposition (bounded by sqrt(r); cannot beat rho). Same host only (unqualified; second-host replay owed). Lookups unpriced.",
+     "class": "engineering",
+     "anchor": "#prime-ksum-vs-incumbent-20261029",
+     "source": "https://github.com/isogeny-labs/crypto/blob/main/research/prime_ksum_vs_incumbent_20261029/README.md"
     }
    ],
    "role": "context"
@@ -528,7 +625,7 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md",
      "unit": "Callgrind Ir diagnostic",
-     "value": 3.6445922113828733
+     "value": 3.6445922113828737
     },
     {
      "anchor": "#n37-online-ir-20261004",
@@ -669,7 +766,7 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n37_native_residual_rho_20261005/RESULT.md",
      "unit": "unisolated native batch CPU diagnostic",
-     "value": 10.766848430462483
+     "value": 10.766848430462485
     }
    ],
    "role": "context"
@@ -753,7 +850,7 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated online wall diagnostic",
-     "value": 0.19586704770931318
+     "value": 0.1958670477093132
     },
     {
      "anchor": "#n41-n53-base-size-cold-20261004",
@@ -1032,8 +1129,27 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
     }
    ]
+  },
+  {
+   "barrier_test": true,
+   "id": "genus2-kummer-matched-gae",
+   "label": "Elliptic curve over Fp\u00b2, genus-2 Kummer transfer, complete cold counted GAE",
+   "note": "The signed differential quotient collector and source-negation rho ran on the same 1,260 public targets in one process. Cold setup is charged per target. This is a modeled operation-cost comparison, not calibrated wall time.",
+   "points": [
+    {
+     "date": "2026-10-22",
+     "value": 14.356662,
+     "reference": "matched",
+     "label": "Uncached signed Kummer differential collector vs source-negation rho, 1,260 targets",
+     "detail": "Complete cold ratio at M + 0.5S + 10I and native logical operation = 0.1 GAE. Across 36 pooled price cells the ratio is 8.959687\u201355.935424; 0 cells below rho. All 1,260 scalar recoveries and same-process rho controls are independently source-verified. Every 45,360 target/cell comparison is a loss. The arbitrary-jump signed-label sidecar remains unimplemented.",
+     "class": "engineering",
+     "anchor": "#kummer-matched-20261022",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/MATCHED_REPORT.md"
+    }
+   ],
+   "role": "context"
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-27"
+ "updated": "2026-10-29"
 }

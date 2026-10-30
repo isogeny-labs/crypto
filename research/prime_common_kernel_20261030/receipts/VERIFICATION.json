@@ -1,0 +1,51 @@
+{
+  "checked_at_utc": "2026-10-30T06:53:30Z",
+  "research_goal": "Essentially novel classical sub-exponential ECDLP over prime fields",
+  "research_goal_achieved": false,
+  "performance_claim": false,
+  "native_units": {
+    "exact_exterior_and_boolean_controls": "PASS, parent and independent strict replays",
+    "actual_cauchy_parity_kernel": "PASS, normalized ranks 6,14,30,62 at L=4,8,16,32",
+    "syndrome_operator_unit": "PASS, 30796 operator pairs; strict and ASan/UBSan outputs agree",
+    "independent_a3_specialization": "PASS, 33 assertions, seven frozen outputs, both crossing blocks checked"
+  },
+  "lean": {
+    "toolchain": "leanprover/lean4:v4.35.0",
+    "crypto_lean_revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "mathlib_revision": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+    "explicitly_named_declarations": 20,
+    "automatically_audited_declarations": 23,
+    "generated_congruence_lemmas_included_in_audit": 3,
+    "actual_repository_project_gates": {
+      "lean-gauges": "PASS,3",
+      "lean-exterior": "PASS,7",
+      "lean-coded": "PASS,9 including3 generated",
+      "lean-packing": "PASS,4"
+    },
+    "fresh_import_inclusive_replays": "PASS for all four projects; original logs retained",
+    "allowed_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
+    "native_trusted": 0,
+    "full_contraction_or_ecdlp_theorem": false
+  },
+  "current_rust_source_base": "aaab886ec25b8cd5a54c97ca75c916b5f7dbb0ef",
+  "current_affected_rust_tests": {
+    "ecbench": {"exit": 0, "passed": 395, "failed": 0, "ignored": 1},
+    "aps_single_relation": {"exit": 0, "passed": 34, "failed": 0, "ignored": 0},
+    "fresh_single_green_full_suite_claim": false
+  },
+  "preserved_failures": [
+    "Initial native strict indentation errors",
+    "Noncanonical GMP rational-factor crash, diagnosed with ASan and corrected",
+    "Lean elaboration failures and wrong-working-directory audit attempt",
+    "Actual-repository gate before Git staging: FAIL_no_sources",
+    "Current Rust first compile: two tracked include_str fixtures absent from sparse worktree",
+    "Original previous-stage full-library exit101 retained separately"
+  ],
+  "formalization_limits": "Exact proof-map.md plus each project's PROOF_MAP.md",
+  "unresolved": [
+    "Common sparse factorization with complete recursive costs",
+    "General native contraction implementation and proof-to-code audit",
+    "Essentially novel prime-field ECDLP algorithm",
+    "Exhaustive historical six-repository review and complete novelty search"
+  ]
+}

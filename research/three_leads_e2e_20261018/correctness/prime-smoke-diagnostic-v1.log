@@ -1,0 +1,24 @@
+   Compiling three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+    Finished `release` profile [optimized] target(s) in 2.63s
+     Running unittests ../../../src/cryptanalysis/three_leads.rs (research/three_leads_e2e_20261018/native/target/release/deps/three_leads_engine-3f8fa87ffdf4b291)
+
+running 1 test
+test tests::prime_tower_s3_and_diagnostic_table_separation ... FAILED
+
+failures:
+
+---- tests::prime_tower_s3_and_diagnostic_table_separation stdout ----
+
+thread 'tests::prime_tower_s3_and_diagnostic_table_separation' (141) panicked at ../../../src/cryptanalysis/three_leads.rs:734:141:
+assertion `left == right` failed: inst=StudyInstance { curve: Elliptic { f: Field { p: 73, n: 1, modulus: 0, counts: Cell { value: Counts { m: 8280, s: 9811, i: 563, field_adds: 9536, bit_ops: 0, ec_adds: 392, jac_adds: 0, sqrt_calls: 412 } }, as_basis: OnceCell(<uninit>), tables: None }, c: [3, 2, 0, 1], binary: false }, order: 70, r: 7, h: 10, generator: Point { x: 54, y: 25, inf: false }, family: "pkm_kummer", parameter: 2, evidence: Object {"test": Bool(true)} } detail={"base_seed":19,"family":"pkm_kummer","h":10,"oracle":"semaev","parameter":2,"projected_columns":2,"r":7,"random_base":false,"raw_factor_base":[{"inf":false,"x":1,"y":15},{"inf":false,"x":1,"y":58},{"inf":false,"x":46,"y":7},{"inf":false,"x":46,"y":66},{"inf":false,"x":72,"y":0}],"root_call_definition":"one quadratic or S3 polynomial; decomposition calls reported separately"} native={"base_columns": 2, "base_signed_points": 5, "decomposition_calls": 10000, "linear_rank": 0, "oracle_inversions": 30000, "oracle_muls": 733262, "oracle_squares": 824385, "random_restarts": 2592, "relations": 0, "repeated_relation_targets": 0, "rng_draws_uncharged": 5218, "root_calls": 30000, "scalar_adds_uncharged": 20000, "scalar_inversions_uncharged": 0, "scalar_muls_uncharged": 0, "table_probes_uncharged": 10000}
+  left: None
+ right: Some(4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::prime_tower_s3_and_diagnostic_table_separation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

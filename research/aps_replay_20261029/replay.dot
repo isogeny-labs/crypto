@@ -1,0 +1,26 @@
+digraph replay {
+  graph [rankdir=TB, bgcolor="white", pad=0.18, nodesep=0.28, ranksep=0.32,
+         label="APS public-fixture replay: mathematical checks; no cost attestation", labelloc=t,
+         fontname="Helvetica", fontsize=13];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4ff", color="#315277",
+        fontname="Helvetica", fontsize=10, margin="0.13,0.09"];
+  edge [color="#52677f", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+  input [label="Existing producer JSON\nBind receipt to exact input SHA-256"];
+  schema [label="Strict bounded parsing\nSchema / unknown fields / duplicate keys / caps"];
+  instance [label="Fixed public fixture + model + ICV1\nCanonical G,Q; curve and subgroup checks"];
+  sampling [label="Replay seed and retries\nRejected draws, labels, Montgomery sign convention, orbits"];
+  backend [label="Separate existing BigUint point arithmetic\nAffine add / double / known-scalar multiplication", fillcolor="#eaf5ee"];
+  full [label="Reported complete\nEnumerate allowed tuples and all sign classes\nRequire exact coordinate-set equality"];
+  partial [label="Reported partial\nCheck every emitted tuple\nKeep enumeration partial"];
+  witness [label="Signed point sum = O; recompute A and B\nRequire B != 0, d = -A/B and dG = Q\nCheck outcome and retry termination"];
+  receipt [label="Hash-bound replay receipt\nWitness / exact-set / sampling checks\nCosts and execution history explicitly unattested", fillcolor="#fff3da"];
+  failure [label="Any failed check: reject", fillcolor="#fdeaea", color="#a95050"];
+  input -> schema -> instance -> sampling -> backend;
+  backend -> full;
+  backend -> partial;
+  full -> witness;
+  partial -> witness;
+  witness -> receipt;
+  schema -> failure [style=dashed];
+  witness -> failure [style=dashed];
+}
