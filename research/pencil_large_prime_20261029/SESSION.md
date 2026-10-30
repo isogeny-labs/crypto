@@ -960,3 +960,31 @@ Native receipt observer session71729 waits on the replacement (read-only), while
 
 ### Errors
 The first runtime publication's bytes-only audit missed executable permission metadata. The correction and original failure are both retained. A retry-draft schema field was initially misplaced; its failed check and corrected validation statement are preserved in the protocol amendment rather than represented as an uninterrupted pass.
+
+## 2026-10-30 — Gate observations retained after measurement rejection
+
+### What was done
+Reconciled terminal replacement build9b9db044 and downloaded exact versioned
+computation/fresh artifacts. Both separate epochs contain1080 verified records
+and900 reproduced measured replays. Fresh native analysis includes all60 targets,
+180warmups and300measured pairs. Raw object versions, hashes and size bindings are
+retained in validation/actual_gate_results_20261030. A neutral one-page PDF, SVG,
+JSON and CSV snapshot is under validation/accounting/reports/run-20261030T0015Z-gate-observations.
+
+### Decisions made
+Fresh pencil360 records reachedL2; rho/control720 records wereL1 because each
+solve interval was below1ms. The fresh job exited42, controllerFAILED. Preserve
+all records, no paired-clock qualification, no measurement retry. Initial finite
+prices remain null pending independent coverage binding. Frozenv5 stays immutable;
+four report-provenance metadata defects receive an explicit post-data erratum.
+No budget reset, new generator or third infrastructure attempt occurred.
+
+### Open threads
+Independent finite coverage binding and strict native erratum admission are being
+reviewed. The1260-target pencil objective remains incomplete; this60-target gate
+cannot substitute for it. PR2869 artifacts workflow needs its standard data pull.
+
+### Errors
+Frozen metadata used incompatible build receipt, omitted binary sizes, stale
+duplicate analyzer hashes and prefixed source keys. Predata source/binary manifests
+resolve the intended identities but do not turn a later correction into preregistration.
