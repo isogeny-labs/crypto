@@ -127,6 +127,9 @@
 //! - G. Bard, *Algebraic Cryptanalysis*, Springer 2009, ch. 13 — the
 //!   Boolean-ring representation.
 
+#[path = "koblitz_s4_bounded.rs"]
+pub mod bounded_s4;
+
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::inherited_f4::{ChildSystem, InheritCost, ReducedBasis};
