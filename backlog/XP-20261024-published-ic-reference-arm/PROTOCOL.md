@@ -30,13 +30,23 @@ of FGHR (`binary_semaev_s4.rs`, `symmetrized_semaev.rs`, to be extended to m = 4
 
 | id | family | sizes | m or n | base | symmetry | solver |
 |:--|:--|:--|:--|:--|:--|:--|
-| B3-F4 | binary random and K_0 | n in {13,15,18,19,21,23,24,27,37} | m = 3 | standard random subspace `V ∋ 1`, `l = ceil((n+1)/3)` | FGHR T-symmetrised `S_4` | msolve F4 |
+| B3-F4 | binary random and K_0 | n in {13,15,18,19,21,23,24,27,37} | m = 3 | standard random subspace `V ∋ 1`, `l = ceil((n+1)/3)` | `e_i`-symmetrised (`S_3` only) `S_4`; see the D6a note below | msolve F4 |
 | B3-SAT | same | same | m = 3 | same | same | WDSat |
-| B4-F4 | same | n in {13,15,18,19,21,23,24,27} (n=37 only if M-cost allows) | m = 4 | `l = ceil((n+1)/4)` | FGHR `S_5` (T plus the symmetric group in the invariants) | msolve F4 |
+| B4-F4 | same | n in {13,15,18,19,21,23,24,27} (n=37 only if M-cost allows) | m = 4 | `l = ceil((n+1)/4)` | `e_i`-symmetrised (`S_4` only) `S_5`; see the D6a note below | msolve F4 |
 | B4-SAT | same | same | m = 4 | same | same | WDSat |
-| K3, K4 | Koblitz K_0/K_1 | n in {41,43,45,47,53,57,59,61} | m in {3,4} | (i) standard random `V`; (ii) Frobenius-invariant `V` (labelled second base, `x^n-1` root space, as `koblitz_symmetrised::divisor_for_dimension`) | FGHR T; plus Frobenius invariants only for base (ii) | msolve; WDSat |
+| K3, K4 | Koblitz K_0/K_1 | n in {41,43,45,47,53,57,59,61} | m in {3,4} | (i) standard random `V`; (ii) Frobenius-invariant `V` (labelled second base, `x^n-1` root space, as `koblitz_symmetrised::divisor_for_dimension`) | `e_i` (`S_m`) only; plus Frobenius invariants only for base (ii) | msolve; WDSat |
 | P4 | `E(F_{p^4})` | p in {29, 37, 73, 97} (+ 269, 1009 oracle-only) | n = 4 | `{P : x(P) in F_p}` | FGHR `D_4` (`gaudry_quartic_d4`); second arm Joux-Vitse `(n-1)`-decomposition (`jv_quartic.rs`) | msolve |
 | P5 | `E(F_{p^5})` | p to be chosen at freeze, instance generated and pinned in `docs/ic/calibration.json` | n = 5 | `{x in F_p}` | Joux-Vitse `(n-1)`-decomposition (`joux_vitse.rs`, `jv_quintic.rs`, `jv_quintic_edwards.rs`: the published method for small-degree extensions); Gaudry/FGHR `S_6` only if a published `n = 5` symmetrisation is adopted at freeze (no code) | msolve |
+
+**Amendment D6a (2026-10-30, pre-freeze, follow-up A of `PILOT_20261030.md`).** Sections 1 and 2 disagreed
+(`e_i`-symmetrised vs "FGHR T-symmetrised"). Resolved for the Weierstrass x-base: on `y^2 + xy = x^3 + a x^2 + b` the
+2-torsion point `T = (0, sqrt(b))` acts on abscissae by `x -> sqrt(b)/x` (checked on all 507 affine points of `K_0`, n = 9),
+and an `F_2`-subspace `V ∋ 1` is not stable under it (n = 9, `V = <1, z, z^2, z^3>`: 1 of 15 nonzero elements maps
+into `V`). The `T`-action therefore does not act on the factor base `{P : x(P) in V}` and `T`-invariants cannot be
+used with it; the reference for B3/B4/K3/K4 is the `S_m`-symmetrisation alone (`e_i`). The characteristic-2 published
+use of 2-torsion invariants is on a different curve model and coordinate where `T` acts by a translation preserving `V`
+(Galbraith-Gebregiyorgis 2014 use binary Edwards curves; the exact action is to be verified against the paper before use).
+That is a separate, labelled arm with its own curve model, not part of this card's reference until implemented.
 
 Per cell: 8 targets, planted logarithm, `[d]G = Q` verified; 2 independent seeds for the
 instance subspace `V` (the base is part of the draw).

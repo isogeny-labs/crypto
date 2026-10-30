@@ -516,6 +516,8 @@ pub struct Pdp3KoblitzOracle<'i> {
     /// msolve invocations (msolve-s4 engine) and failed invocations.
     ms_calls: u64,
     ms_errors: u64,
+    /// Tuning of the msolve-s4 engine (`form=e|x`, `spec=k`).
+    ms_tune: msolve_s4::Tune,
     /// Pair-table hits whose summands did not re-add to the probed point
     /// in the group.  Must stay zero; a nonzero count would mean the
     /// table and the run's base disagree on a point.
@@ -544,6 +546,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             unliftable: 0,
             ms_calls: 0,
             ms_errors: 0,
+            ms_tune: msolve_s4::Tune::default(),
             table_mismatches: 0,
         }
     }
@@ -804,8 +807,19 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 return Err("engine=msolve-s4 takes m = 3".into());
             }
             if kc.curve.b != F2mElement::one(kc.n) {
-                return Err("engine=msolve-s4: the symmetrised S4 is specialised to b = 1".into());
+                return Err("engine=msolve-s4: b != 1 is not yet validated in ecbench (the general-b S4 is, by probe; PILOT_20261030 section 9)".into());
             }
+            // Tuning parity (PROTOCOL section 6): system form and hybrid specialisation.
+            // Absent keys keep the pilot's arm (e-form, no specialisation), so its method id is unchanged.
+            self.ms_tune.x_form = match params.get("form") {
+                None | Some("e") => false,
+                Some("x") => true,
+                Some(other) => return Err(format!("engine=msolve-s4: form `{other}` is not e or x")),
+            };
+            self.ms_tune.spec = match params.get("spec") {
+                None => 0,
+                Some(k) => k.parse().map_err(|_| format!("spec `{k}` is not a number"))?,
+            };
             self.scan_window_len = 0;
             self.window_div = 0;
             self.pair_table_points = 0;
@@ -1009,7 +1023,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             let started = Instant::now();
             self.ms_calls += 1;
             let tag = format!("t{}", self.ms_calls);
-            let res = msolve_s4::solve_s4(&msolve, kc.n, frob.ell, &kc.curve.irreducible, &kc.curve.b, x_r, &tag);
+            let res = msolve_s4::solve_s4(&msolve, kc.n, frob.ell, &kc.curve.irreducible, &kc.curve.b, x_r, &tag, self.ms_tune);
             let wall_ns = started.elapsed().as_nanos() as u64;
             let out = match res {
                 Ok(o) => o,
@@ -1020,7 +1034,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
                 }
             };
             let mut extra = BTreeMap::new();
-            extra.insert("msolve_calls".into(), 1);
+            extra.insert("msolve_calls".into(), out.calls);
+            extra.insert("refuted_by_substitution".into(), out.refuted_by_substitution);
             extra.insert("msolve_ir".into(), out.ir);
             extra.insert("extraction_native_ops".into(), out.ext_ops);
             extra.insert("quotient_dim".into(), out.quotient_dim as u64);

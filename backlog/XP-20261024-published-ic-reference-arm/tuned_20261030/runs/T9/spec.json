@@ -1,0 +1,83 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "followup-A n9 T9: rho, lab inherited-f4, tuned msolve-s4 l sweep (x-form, hybrid spec)",
+ "description": "Follow-up A of PILOT_20261030: tuning parity for the published arm (PROTOCOL section 6). Same instance, targets and session law as pilot D9. Counted S; instruction pricing from the per-child shim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 9
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-negation",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation",
+    "params": {}
+   }
+  },
+  {
+   "name": "inherited-f4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l3-s0",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=3",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=0",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l4-s4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=4",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=4",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l5-s7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=7",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

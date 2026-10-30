@@ -1,0 +1,59 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "followup-A n13 T13: rho, lab inherited-f4 and tuned msolve-s4 (x-form, l=5, spec=5)",
+ "description": "Follow-up A of PILOT_20261030: tuned published arm at K_0 n=13, interleaved with the lab arm; same instance, targets and session law as pilot B13r. Instruction pricing from the per-child shim plus msolve instructions.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 13
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-negation",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation",
+    "params": {}
+   }
+  },
+  {
+   "name": "inherited-f4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+     "max_trials": "200000"
+    }
+   }
+  },
+  {
+   "name": "msolve-x-l5-s5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-standard-subspace:dimension=5",
+     "oracle": "pdp3-binary:m=3,engine=msolve-s4,form=x,spec=5",
+     "max_trials": "200000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

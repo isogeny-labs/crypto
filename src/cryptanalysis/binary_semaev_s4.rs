@@ -44,15 +44,15 @@
 //!
 //! ## Curve support
 //!
-//! The symmetrised form implemented here is specialised to `b = 1`,
-//! i.e. the Koblitz curve `E: y² + xy = x³ + x² + 1`, which is the
-//! curve the reference corpus in
-//! `research/ec-index-calculus-review/` was generated on.  `S₄` does
-//! not depend on `a₂`, but it *does* depend on `b`, and the `b`-powers
-//! are folded into the constants below — a general-`b` form has to be
-//! re-derived from `Res_X(S₃(X₁,X₂,X), S₃(X₃,x_R,X))` and then
-//! re-symmetrised.  [`weil_descend_s4`] rejects `b ≠ 1` rather than
-//! silently returning the wrong system.
+//! `S₄` does not depend on `a₂`, but it does depend on `b`.  The form
+//! below is the general-`b` one, derived as
+//! `Res_X(S₃(X₁,X₂,X), S₃(X₃,x_R,X))` with `S₃ = (Σ X_iX_j)² + X₁X₂X₃ + b`,
+//! reduced mod 2 and re-symmetrised in `e₁, e₂, e₃` (sympy, 2026-10-30,
+//! published-IC reference arm follow-up A; checked to vanish on 1797
+//! planted sums `P₁ + P₂ + P₃` over six random-`b` curves, `a ∈ {0, 1}`).
+//! At `b = 1` it is term for term the Koblitz form this module shipped
+//! before (the curve the reference corpus in
+//! `research/ec-index-calculus-review/` was generated on).
 //!
 //! ## References
 //!
@@ -798,10 +798,7 @@ impl S4System {
 ///
 /// Returns both halves of the model; see [`S4System`].
 ///
-/// # Panics
-///
-/// If `b ≠ 1`.  The symmetrised form is specialised to the Koblitz
-/// curve `y² + xy = x³ + x² + 1`; see the module docs.
+/// Any `b` (see the module docs for the general-`b` form).
 pub fn weil_descend_s4(
     n: u32,
     l: u32,
@@ -810,12 +807,6 @@ pub fn weil_descend_s4(
     x_r: &F2mElement,
 ) -> S4System {
     assert!(l >= 1 && l <= n, "subspace dimension l must lie in 1..=n");
-    assert!(
-        *b == F2mElement::one(n),
-        "the symmetrised S₄ implemented here is specialised to b = 1 \
-         (the Koblitz curve y² + xy = x³ + x² + 1); general b must be \
-         re-derived — see the module documentation"
-    );
 
     // ── half 1: the correspondence e_i = σ_i(X₁, X₂, X₃) ────────────
     // X_i lives in the subspace, so it has exactly l free bits.
@@ -861,7 +852,6 @@ pub fn descend_symmetrised_s4_e_only(
     x_r: &F2mElement,
 ) -> Vec<AnfPoly> {
     assert!(l >= 1 && l <= n, "subspace dimension l must lie in 1..=n");
-    assert_eq!(*b, F2mElement::one(n), "symmetrised S4 needs b = 1");
     // Each e_i becomes a free symbolic element whose coefficients are
     // the fresh e-variables.
     let mut offset = 0u32;
@@ -880,10 +870,12 @@ pub fn descend_symmetrised_s4_e_only(
     let xr3 = xr2.mul(&xr1, irr);
     let xr4 = xr2.square(irr);
 
-    // The symmetrised fourth summation polynomial for b = 1:
+    // The symmetrised fourth summation polynomial (general b):
     //
-    //   f₃ = x_R⁴ + e₁⁴ + e₃⁴ + e₂⁴x_R⁴ + e₃³x_R + e₃e₂²x_R³
-    //        + e₃e₁²x_R + e₃x_R³ + e₁²e₃²x_R² + e₃²x_R⁴ + e₃² + e₂²x_R²
+    //   f₃ = b²x_R⁴ + b²e₁⁴ + e₃⁴ + e₂⁴x_R⁴ + e₃³x_R + e₃e₂²x_R³
+    //        + b e₃e₁²x_R + b e₃x_R³ + e₁²e₃²x_R² + e₃²x_R⁴ + b e₃² + b e₂²x_R²
+    //
+    // (at b = 1 every b drops out).
     //
     // Note how few real multiplications this needs: every `pow` with an
     // even exponent is a relocation, and every x_R power is a known
@@ -901,22 +893,26 @@ pub fn descend_symmetrised_s4_e_only(
     let e3_e2_2 = e3.mul(&e2_2);
     let e3_e1_2 = e3.mul(&e1_2);
     let e1_2_e3_2 = e1_2.mul(&e3_2);
-    let xr4_sym = AnfF2m::from_const(&xr4, n);
     let one = F2mElement::one(n);
+    let b2 = b.square(irr);
+    let xr4_sym = AnfF2m::from_const(&b2.mul(&xr4, irr), n);
+    let b_xr1 = b.mul(&xr1, irr);
+    let b_xr2 = b.mul(&xr2, irr);
+    let b_xr3 = b.mul(&xr3, irr);
 
     let terms: [(&AnfF2m, &F2mElement); 12] = [
-        (&xr4_sym, &one),   // x_R⁴
-        (&e1_4, &one),      // e₁⁴
-        (&e3_4, &one),      // e₃⁴
-        (&e2_4, &xr4),      // e₂⁴ x_R⁴
-        (&e3_3, &xr1),      // e₃³ x_R
-        (&e3_e2_2, &xr3),   // e₃ e₂² x_R³
-        (&e3_e1_2, &xr1),   // e₃ e₁² x_R
-        (e3, &xr3),         // e₃ x_R³
-        (&e1_2_e3_2, &xr2), // e₁² e₃² x_R²
-        (&e3_2, &xr4),      // e₃² x_R⁴
-        (&e3_2, &one),      // e₃²
-        (&e2_2, &xr2),      // e₂² x_R²
+        (&xr4_sym, &one),     // b² x_R⁴
+        (&e1_4, &b2),         // b² e₁⁴
+        (&e3_4, &one),        // e₃⁴
+        (&e2_4, &xr4),        // e₂⁴ x_R⁴
+        (&e3_3, &xr1),        // e₃³ x_R
+        (&e3_e2_2, &xr3),     // e₃ e₂² x_R³
+        (&e3_e1_2, &b_xr1),   // b e₃ e₁² x_R
+        (e3, &b_xr3),         // b e₃ x_R³
+        (&e1_2_e3_2, &xr2),   // e₁² e₃² x_R²
+        (&e3_2, &xr4),        // e₃² x_R⁴
+        (&e3_2, b),           // b e₃²
+        (&e2_2, &b_xr2),      // b e₂² x_R²
     ];
 
     // One reduction, at the end.
@@ -929,14 +925,27 @@ pub fn descend_symmetrised_s4_e_only(
     semaev
 }
 
-/// Evaluate the symmetrised `f₃` directly over `F_{2ⁿ}`, for cross-
-/// checking the descended system.  This is the same twelve-term
-/// expression, with everything a concrete field element.
+/// Evaluate the symmetrised `f₃` for `b = 1` directly over `F_{2ⁿ}`
+/// (see [`symmetrised_s4_eval_b`]).
 pub fn symmetrised_s4_eval(
     e1: &F2mElement,
     e2: &F2mElement,
     e3: &F2mElement,
     x_r: &F2mElement,
+    irr: &IrreduciblePoly,
+) -> F2mElement {
+    symmetrised_s4_eval_b(e1, e2, e3, x_r, &F2mElement::one(x_r.m_value()), irr)
+}
+
+/// Evaluate the general-`b` symmetrised `f₃` directly over `F_{2ⁿ}`, for
+/// cross-checking the descended system.  This is the same twelve-term
+/// expression, with everything a concrete field element.
+pub fn symmetrised_s4_eval_b(
+    e1: &F2mElement,
+    e2: &F2mElement,
+    e3: &F2mElement,
+    x_r: &F2mElement,
+    b: &F2mElement,
     irr: &IrreduciblePoly,
 ) -> F2mElement {
     let sq = |z: &F2mElement| z.square(irr);
@@ -947,18 +956,19 @@ pub fn symmetrised_s4_eval(
     let xr3 = xr2.mul(x_r, irr);
     let xr4 = sq(&xr2);
 
-    let mut acc = xr4.clone();
-    acc = acc.add(&e1_4);
+    let b2 = sq(b);
+    let mut acc = b2.mul(&xr4, irr);
+    acc = acc.add(&b2.mul(&e1_4, irr));
     acc = acc.add(&e3_4);
     acc = acc.add(&e2_4.mul(&xr4, irr));
     acc = acc.add(&e3_3.mul(x_r, irr));
     acc = acc.add(&e3.mul(&e2_2, irr).mul(&xr3, irr));
-    acc = acc.add(&e3.mul(&e1_2, irr).mul(x_r, irr));
-    acc = acc.add(&e3.mul(&xr3, irr));
+    acc = acc.add(&b.mul(&e3.mul(&e1_2, irr).mul(x_r, irr), irr));
+    acc = acc.add(&b.mul(&e3.mul(&xr3, irr), irr));
     acc = acc.add(&e1_2.mul(&e3_2, irr).mul(&xr2, irr));
     acc = acc.add(&e3_2.mul(&xr4, irr));
-    acc = acc.add(&e3_2);
-    acc = acc.add(&e2_2.mul(&xr2, irr));
+    acc = acc.add(&b.mul(&e3_2, irr));
+    acc = acc.add(&b.mul(&e2_2.mul(&xr2, irr), irr));
     acc
 }
 
@@ -1147,12 +1157,26 @@ mod tests {
 
     /// A curve other than `b = 1` must be refused, not silently
     /// mis-descended.
+    /// General `b`: the descended system, evaluated at the bits of
+    /// `(e₁, e₂, e₃)` of three subspace elements, is the bit vector of the
+    /// directly evaluated general-`b` `f₃`.
     #[test]
-    #[should_panic(expected = "specialised to b = 1")]
-    fn general_b_is_rejected() {
-        let (n, l, irr, x_r, _) = corpus_n19l6();
-        let b = F2mElement::from_bit_positions(&[1], n);
-        let _ = weil_descend_s4(n, l, &irr, &b, &x_r);
+    fn general_b_descent_matches_direct_evaluation() {
+        let (n, l, irr, x_r, xs) = corpus_n19l6();
+        let b = F2mElement::from_bit_positions(&[1, 4, 7], n);
+        let sys = weil_descend_s4(n, l, &irr, &b, &x_r);
+        let (e1, e2, e3) = elementary_symmetric_3(&xs[0], &xs[1], &xs[2], &irr);
+        let bit = |z: &F2mElement, k: u32| (z.raw_bits()[(k / 64) as usize] >> (k % 64)) & 1 == 1;
+        let mut assignment = vec![false; sys.n_e_vars() as usize];
+        for (i, e) in [&e1, &e2, &e3].iter().enumerate() {
+            for d in 0..e_len(i + 1, l) {
+                assignment[sys.e_var(i, d) as usize] = bit(e, d as u32);
+            }
+        }
+        let direct = symmetrised_s4_eval_b(&e1, &e2, &e3, &x_r, &b, &irr);
+        for (k, eq) in sys.semaev.iter().enumerate() {
+            assert_eq!(eq.eval(&assignment), bit(&direct, k as u32), "bit {k}");
+        }
     }
 
     // ── The merged and gathered sums against the old toggles ────────

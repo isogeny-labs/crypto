@@ -16,6 +16,7 @@ use std::collections::{BTreeSet, HashSet};
 use std::path::PathBuf;
 use std::process::Command;
 
+
 use crypto_lib::binary_ecc::{F2mElement, IrreduciblePoly};
 use crypto_lib::cryptanalysis::binary_semaev_s4::{weil_descend_s4, AnfPoly};
 
@@ -34,6 +35,22 @@ pub struct MsolveOutcome {
     pub ext_ops: u64,
     pub n_vars: usize,
     pub n_eqs: usize,
+    /// msolve processes run (`2^spec` minus the subsystems refuted before msolve).
+    pub calls: u64,
+    /// Subsystems refuted by the substitution alone (a constant 1 equation), no msolve call.
+    pub refuted_by_substitution: u64,
+}
+
+/// Tuning of the published arm (tuning parity, PROTOCOL section 6): the system form and the
+/// hybrid specialisation (Bettale-Faugere-Perret: fix `spec` unknowns, solve the `2^spec`
+/// specialised systems).  Both are spec parameters so they enter the method identity.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Tune {
+    /// `true`: substitute `e_i = sigma_i(x)` and solve over the `3l` x-bits only.
+    pub x_form: bool,
+    /// Number of x-bits fixed by exhaustive enumeration (the last `spec` x-variables,
+    /// i.e. the high bits of `X_3`, then `X_2`).
+    pub spec: u32,
 }
 
 fn render(poly: &AnfPoly, name: &dyn Fn(u32) -> String) -> String {
@@ -200,35 +217,35 @@ fn apply(cols: &[u128], v: u128, ops: &mut u64) -> u128 {
     r
 }
 
-/// Solve the descended, symmetrised `S_4` system for target abscissa `x_r`.
-pub fn solve_s4(
-    msolve: &str,
-    n: u32,
-    l: u32,
-    irr: &IrreduciblePoly,
-    b: &F2mElement,
-    x_r: &F2mElement,
-    tag: &str,
-) -> Result<MsolveOutcome, String> {
+/// Substitute fixed values into an ANF: `fixed[v] = Some(b)` sets variable `v` to `b`.
+fn substitute(poly: &AnfPoly, fixed: &[Option<bool>]) -> AnfPoly {
+    let mut out = AnfPoly::zero();
+    for mono in poly.monomials() {
+        let mut keep = true;
+        let mut rest = AnfPoly::one();
+        for &v in mono {
+            match fixed[v as usize] {
+                Some(false) => {
+                    keep = false;
+                    break;
+                }
+                Some(true) => {}
+                None => rest = rest.mul(&AnfPoly::var(v)),
+            }
+        }
+        if keep {
+            out.xor_assign(&rest);
+        }
+    }
+    out
+}
+
+/// The descended system as ANFs over one numbering: x-bits `0..3l`, then (e-form) the e-variables.
+fn build_system(n: u32, l: u32, irr: &IrreduciblePoly, b: &F2mElement, x_r: &F2mElement, x_form: bool) -> (Vec<AnfPoly>, u32, u32) {
     let sys = weil_descend_s4(n, l, irr, b, x_r);
     let nx = sys.n_x_vars();
-    // `MSOLVE_S4_FORM=x` substitutes e_i = sigma_i(x) into the descended S_4 and solves over the
-    // 3l x-bits alone (higher degree, fewer unknowns); the default keeps the e variables and the
-    // correspondence equations (quadratic descended system + cubic correspondence, 3l + 6l - 3 unknowns).
-    let x_only = std::env::var("MSOLVE_S4_FORM").map(|v| v == "x").unwrap_or(false);
-    let ne = if x_only { 0 } else { sys.n_e_vars() };
-    let nv = (nx + ne) as usize;
-    if nv > 64 {
-        return Err(format!("{nv} unknowns exceed the 64-variable mask"));
-    }
-    let names: Vec<String> = (0..nx)
-        .map(|i| format!("x{i}"))
-        .chain((0..ne).map(|i| format!("e{i}")))
-        .collect();
-    let name = |v: u32| names[v as usize].clone();
-    let mut eqs: Vec<String> = Vec::new();
-    // correspondence e_{i,d} + sigma_{i,d}(x) = 0, and the n descended S_4 equations over e.
-    if x_only {
+    let mut polys = Vec::new();
+    if x_form {
         let mut emap: Vec<AnfPoly> = vec![AnfPoly::zero(); sys.n_e_vars() as usize];
         for (i, row) in sys.correspondence.iter().enumerate() {
             for (d, sigma) in row.iter().enumerate() {
@@ -245,46 +262,115 @@ pub fn solve_s4(
                 acc.xor_assign(&prod);
             }
             if !acc.is_zero() {
-                eqs.push(render(&acc, &name));
+                polys.push(acc);
             }
         }
+        return (polys, nx, 0);
     }
+    let ne = sys.n_e_vars();
     for (i, row) in sys.correspondence.iter().enumerate() {
-        if x_only {
-            break;
-        }
         for (d, sigma) in row.iter().enumerate() {
-            let ev = nx + sys.e_var(i, d);
-            let mut s = format!("{}", names[ev as usize]);
-            if !sigma.is_zero() {
-                s = format!("{}+{}", s, render(sigma, &name));
-            }
-            eqs.push(s);
+            let mut eq = AnfPoly::var(nx + sys.e_var(i, d));
+            eq.xor_assign(sigma);
+            polys.push(eq);
         }
     }
     for f in &sys.semaev {
-        if x_only || f.is_zero() {
-            continue;
+        if !f.is_zero() {
+            polys.push(shift(f, nx));
         }
-        eqs.push(render(&shift(f, nx), &name));
     }
-    let n_eqs_core = eqs.len();
-    for v in 0..nv {
-        eqs.push(format!("{0}^2+{0}", names[v]));
+    (polys, nx, ne)
+}
+
+/// Solve the descended, symmetrised `S_4` system for target abscissa `x_r` with tuning `tune`.
+pub fn solve_s4(
+    msolve: &str,
+    n: u32,
+    l: u32,
+    irr: &IrreduciblePoly,
+    b: &F2mElement,
+    x_r: &F2mElement,
+    tag: &str,
+    tune: Tune,
+) -> Result<MsolveOutcome, String> {
+    let (polys, nx, ne) = build_system(n, l, irr, b, x_r, tune.x_form);
+    let nv = (nx + ne) as usize;
+    if tune.spec > nx {
+        return Err(format!("spec={} exceeds the {nx} x-bits", tune.spec));
     }
-    let input = format!("{}\n2\n{}\n", names.join(","), eqs.join(",\n"));
-    let (text, ir) = run_msolve(msolve, &input, tag)?;
-    let gb = parse_gb(&text, &names)?;
     let mut out = MsolveOutcome {
-        ir,
-        gb_len: gb.len(),
-        n_vars: nv,
-        n_eqs: n_eqs_core,
+        n_vars: nv - tune.spec as usize,
+        n_eqs: polys.len(),
         ..Default::default()
     };
+    let fixed_vars: Vec<u32> = (nx - tune.spec..nx).collect();
+    for a in 0u64..(1u64 << tune.spec) {
+        let mut fixed = vec![None; nv];
+        for (k, &v) in fixed_vars.iter().enumerate() {
+            fixed[v as usize] = Some((a >> k) & 1 == 1);
+        }
+        let sub: Vec<AnfPoly> = if tune.spec == 0 {
+            polys.clone()
+        } else {
+            polys.iter().map(|p| substitute(p, &fixed)).filter(|p| !p.is_zero()).collect()
+        };
+        if sub.iter().any(|p| p.monomials().count() == 1 && p.has_constant()) {
+            out.refuted_by_substitution += 1;
+            continue;
+        }
+        // Free variables, renumbered compactly; x-bits keep their original index for the roots.
+        let free: Vec<u32> = (0..nv as u32).filter(|&v| fixed[v as usize].is_none()).collect();
+        let mut renum = vec![u32::MAX; nv];
+        for (i, &v) in free.iter().enumerate() {
+            renum[v as usize] = i as u32;
+        }
+        let names: Vec<String> = free
+            .iter()
+            .map(|&v| if v < nx { format!("x{v}") } else { format!("e{}", v - nx) })
+            .collect();
+        let name = |v: u32| names[renum[v as usize] as usize].clone();
+        let mut eqs: Vec<String> = sub.iter().map(|p| render(p, &name)).collect();
+        for nm in &names {
+            eqs.push(format!("{0}^2+{0}", nm));
+        }
+        let input = format!("{}\n2\n{}\n", names.join(","), eqs.join(",\n"));
+        let (text, ir) = run_msolve(msolve, &input, &format!("{tag}s{a}"))?;
+        out.calls += 1;
+        out.ir += ir;
+        let gb = parse_gb(&text, &names)?;
+        out.gb_len += gb.len();
+        let x_of: Vec<Option<u32>> = free.iter().map(|&v| if v < nx { Some(v) } else { None }).collect();
+        let roots = extract_roots(&gb, &x_of, &mut out.ext_ops)?;
+        out.quotient_dim += roots.len();
+        for free_bits in roots {
+            let mut xs = [0u64; 3];
+            for (k, &v) in fixed_vars.iter().enumerate() {
+                if (a >> k) & 1 == 1 {
+                    xs[(v / l) as usize] |= 1 << (v % l);
+                }
+            }
+            for (v, bit) in free_bits {
+                if bit {
+                    xs[(v / l) as usize] |= 1 << (v % l);
+                }
+            }
+            out.roots.push(xs);
+        }
+    }
+    Ok(out)
+}
+
+/// Roots of the radical zero-dimensional ideal with reduced basis `gb` over variables
+/// `0..x_of.len()`: every F_2-point, as (original x index, bit) for the variables with `x_of = Some`.
+fn extract_roots(gb: &[(u64, BTreeSet<u64>)], x_of: &[Option<u32>], ops: &mut u64) -> Result<Vec<Vec<(u32, bool)>>, String> {
+    let nv = x_of.len();
+    if nv > 64 {
+        return Err(format!("{nv} unknowns exceed the 64-variable mask"));
+    }
     // Unit ideal: a constant leads.
     if gb.iter().any(|(l, _)| *l == 0) {
-        return Ok(out);
+        return Ok(Vec::new());
     }
     // Standard monomials (squarefree, not divisible by a lead), by closure from 1.
     let leads: Vec<u64> = gb.iter().map(|(l, _)| *l).collect();
@@ -311,16 +397,16 @@ pub fn solve_s4(
         }
     }
     let d = basis.len();
-    out.quotient_dim = d;
     let index: std::collections::HashMap<u64, usize> =
         basis.iter().enumerate().map(|(i, &m)| (m, i)).collect();
-    let mut ops = 0u64;
-    // Multiplication matrices (columns) of the x-variables.
+    // Multiplication matrices (columns) of every variable (e-variables are functions of the
+    // x-bits, so splitting on all of them gives the same points; x-bits alone may not
+    // separate when some x-bits are fixed, so all free variables are used).
     let mut cols: Vec<Vec<u128>> = Vec::new();
-    for v in 0..nx as usize {
+    for v in 0..nv {
         let mut c = vec![0u128; d];
         for (j, &bm) in basis.iter().enumerate() {
-            let nf = normal_form(bm | (1u64 << v), &gb, &mut ops)?;
+            let nf = normal_form(bm | (1u64 << v), gb, ops)?;
             let mut col = 0u128;
             for m in nf {
                 let k = *index
@@ -332,12 +418,11 @@ pub fn solve_s4(
         }
         cols.push(c);
     }
-    // Joint eigenspace splitting over all x-variables.
     let mut spaces: Vec<Vecs> = vec![(0..d).map(|i| 1u128 << i).collect()];
-    for v in 0..nx as usize {
+    for v in 0..nv {
         let mut next: Vec<Vecs> = Vec::new();
         for u in &spaces {
-            let im: Vec<u128> = u.iter().map(|&w| apply(&cols[v], w, &mut ops)).collect();
+            let im: Vec<u128> = u.iter().map(|&w| apply(&cols[v], w, ops)).collect();
             let ker: Vec<u128> = u.iter().zip(&im).map(|(&w, &mw)| w ^ mw).collect();
             for part in [span_basis(&im), span_basis(&ker)] {
                 if !part.is_empty() {
@@ -347,28 +432,30 @@ pub fn solve_s4(
         }
         spaces = next;
     }
+    let mut roots = Vec::new();
     for u in &spaces {
         if u.len() != 1 {
             return Err(format!("joint eigenspace of dimension {} after splitting", u.len()));
         }
         let w = u[0];
-        let mut xs = [0u64; 3];
-        for v in 0..nx as usize {
-            let mw = apply(&cols[v], w, &mut ops);
+        let mut pt = Vec::new();
+        for v in 0..nv {
+            let mw = apply(&cols[v], w, ops);
             let bit = if mw == w {
-                1u64
+                true
             } else if mw == 0 {
-                0
+                false
             } else {
                 return Err("multiplication matrix not idempotent on a joint eigenvector".into());
             };
-            xs[v / l as usize] |= bit << (v % l as usize);
+            if let Some(xv) = x_of[v] {
+                pt.push((xv, bit));
+            }
         }
-        out.roots.push(xs);
+        roots.push(pt);
     }
-    out.ext_ops = ops;
-    if out.roots.len() != d {
-        return Err(format!("{} joint eigenvectors for a quotient of dimension {d}", out.roots.len()));
+    if roots.len() != d {
+        return Err(format!("{} joint eigenvectors for a quotient of dimension {d}", roots.len()));
     }
-    Ok(out)
+    Ok(roots)
 }

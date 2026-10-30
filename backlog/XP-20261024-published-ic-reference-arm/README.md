@@ -1,9 +1,11 @@
 # XP-20261024-published-ic-reference-arm
 
-**Status: blocked** (the arm is specified, not built; one smoke run exists, see
-[`SMOKE_20261024.md`](SMOKE_20261024.md)). Labels: *recorded* (cited file), *derived*
-(arithmetic shown), *predicted* (stated before a run). Nothing here is a measurement of a
-full reference-arm solve.
+**Status: pre-freeze pilots** (PROTOCOL still DRAFT). [`PILOT_20261030.md`](PILOT_20261030.md): untuned msolve arm
+at K_0 n = 9, then (section 9, follow-up A) a tuned arm (x-form, hybrid specialisation, `l` sweep) at K_0 n = 9 and n = 13,
+8/8 verified each: the best tuned published arm costs at least 17x (n = 9) and 19x (n = 13) the lab arm in instructions retired
+(whole run 74x and 76x); the cross-unit control failure is diagnosed (native word-XOR counter covers ~5 % of the solver).
+None of it is a Register-E row. Smoke run: [`SMOKE_20261024.md`](SMOKE_20261024.md). Labels: *recorded* (cited file),
+*derived* (arithmetic shown), *predicted* (stated before a run).
 
 Files: this README, [`PROTOCOL.md`](PROTOCOL.md) (**DRAFT**, not frozen),
 [`INVENTORY.md`](INVENTORY.md) (what exists, what must be built, costs),
