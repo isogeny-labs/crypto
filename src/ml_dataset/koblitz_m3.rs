@@ -22,6 +22,8 @@ pub(super) enum Stop {
     Additions,
     Observer,
     NativeFailure,
+    Allocation,
+    Serialization,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -495,6 +497,280 @@ where
     }
 }
 
+const INPUT_BYTE_CAP: usize = 64 * 1024;
+
+#[derive(serde::Serialize)]
+struct InputView<'a> {
+    schema: &'static str,
+    binding: &'a super::super::capture::AttemptBinding,
+    public_sha256: &'a str,
+    factor_base_sha256: &'a str,
+    field_degree: u32,
+    irreducible_low_terms: &'a [u32],
+    curve_a: u64,
+    curve_b: u64,
+    target: (u64, u64),
+    codes: [u64; 2],
+    signed_domain: [(u64, u64); 4],
+    selector_offsets: [u8; 3],
+    n_vars: usize,
+    equations: &'a [crate::cryptanalysis::pq_groebner_f2::F2BoolPoly],
+    native_work_limit: u64,
+    memory_limit: u64,
+    trace_limit: u64,
+    addition_limit: u64,
+}
+
+struct InputWriter<'a> {
+    bytes: Vec<u8>,
+    capacity: usize,
+    budget: &'a mut Budget,
+}
+impl std::io::Write for InputWriter<'_> {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() > self.capacity.saturating_sub(self.bytes.len()) {
+            let _ = self.budget.fail::<()>(Stop::Trace);
+            return Err(std::io::Error::other("Koblitz input serialization cap"));
+        }
+        self.budget
+            .reserve_trace(bytes.len() as u64, Instant::now())
+            .map_err(|s| std::io::Error::other(format!("Koblitz input ledger: {s:?}")))?;
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+/// Only successful bounded serialization plus persistence can create this token.
+/// Its exclusive budget borrow prevents substituting a fresh phase allowance.
+pub(super) struct PersistedInput<'a> {
+    output: &'a crate::cryptanalysis::koblitz_groebner::bounded_s4::Output,
+    budget: &'a mut Budget,
+    bytes: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub(super) struct PersistenceFailure {
+    pub reason: String,
+    pub bytes: Vec<u8>,
+    pub serialized_complete: bool,
+}
+impl From<String> for PersistenceFailure {
+    fn from(reason: String) -> Self {
+        Self {
+            reason,
+            bytes: Vec::new(),
+            serialized_complete: false,
+        }
+    }
+}
+impl From<&str> for PersistenceFailure {
+    fn from(reason: &str) -> Self {
+        reason.to_owned().into()
+    }
+}
+
+pub(super) fn persist_original<'a, F>(
+    original: &MathInput,
+    output: &'a crate::cryptanalysis::koblitz_groebner::bounded_s4::Output,
+    budget: &'a mut Budget,
+    binding: &super::super::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    forward: &mut F,
+) -> Result<PersistedInput<'a>, PersistenceFailure>
+where
+    F: FnMut(&[u8], &mut Budget) -> Result<(), String>,
+{
+    use num_traits::ToPrimitive;
+    budget
+        .check(Instant::now())
+        .map_err(|s| format!("input admission: {s:?}"))?;
+    if budget.phase != Phase::Constructed {
+        let _ = budget.fail::<()>(Stop::Phase);
+        return Err("original construction has not completed".into());
+    }
+    let valid = binding
+        .validate()
+        .and_then(|_| crate::store::index::validate_sha256(public_sha256))
+        .and_then(|_| crate::store::index::validate_sha256(factor_base_sha256));
+    if let Err(error) = valid {
+        let _ = budget.fail::<()>(Stop::Serialization);
+        return Err(error.into());
+    }
+    if output.n_vars != 3
+        || output.equations.len() != original.curve.m as usize
+        || output
+            .equations
+            .iter()
+            .any(|p| p.n_vars != 3 || p.terms.len() > 8 || p.terms.iter().any(|t| t.mask > 7))
+    {
+        let _ = budget.fail::<()>(Stop::Serialization);
+        return Err("original equations exceed two-code shape".into());
+    }
+    let view = InputView {
+        schema: "crypto.ml-dataset.koblitz-m3-input/v1",
+        binding,
+        public_sha256,
+        factor_base_sha256,
+        field_degree: original.curve.m,
+        irreducible_low_terms: &original.curve.irreducible.low_terms,
+        curve_a: original
+            .curve
+            .a
+            .to_biguint()
+            .to_u64()
+            .ok_or("curve a exceeds u64")?,
+        curve_b: 1,
+        target: original.target,
+        codes: original.codes,
+        signed_domain: original.signed,
+        selector_offsets: [0, 1, 2],
+        n_vars: 3,
+        equations: &output.equations,
+        native_work_limit: budget.native_work_limit,
+        memory_limit: budget.memory_limit,
+        trace_limit: budget.trace_limit,
+        addition_limit: budget.addition_limit,
+    };
+    let capacity = (budget.trace_limit - budget.trace_bytes).min(INPUT_BYTE_CAP as u64) as usize;
+    budget
+        .reserve_bytes(capacity as u64, Instant::now())
+        .map_err(|s| format!("input buffer: {s:?}"))?;
+    let mut bytes = Vec::new();
+    if bytes.try_reserve_exact(capacity).is_err() {
+        let _ = budget.fail::<()>(Stop::Allocation);
+        return Err("input buffer allocation failed".into());
+    }
+    let mut writer = InputWriter {
+        bytes,
+        capacity,
+        budget,
+    };
+    if let Err(error) = serde_json::to_writer(&mut writer, &view) {
+        let _ = writer.budget.fail::<()>(Stop::Serialization);
+        return Err(PersistenceFailure {
+            reason: error.to_string(),
+            bytes: writer.bytes,
+            serialized_complete: false,
+        });
+    }
+    let InputWriter { bytes, budget, .. } = writer;
+    if let Err(error) = forward(&bytes, budget) {
+        let _ = budget.observer_failed();
+        return Err(PersistenceFailure {
+            reason: error,
+            bytes,
+            serialized_complete: true,
+        });
+    }
+    if let Err(stop) = budget.check(Instant::now()) {
+        return Err(PersistenceFailure {
+            reason: format!("input persistence: {stop:?}"),
+            bytes,
+            serialized_complete: true,
+        });
+    }
+    Ok(PersistedInput {
+        output,
+        budget,
+        bytes,
+    })
+}
+
+pub(super) struct MatrixStep {
+    pub original_bytes: Vec<u8>,
+    pub report: Option<crate::cryptanalysis::koblitz_groebner::bounded_matrix::Report>,
+    pub adapter_stop: Option<Stop>,
+}
+
+pub(super) fn matrix_step<F>(
+    input: PersistedInput<'_>,
+    engine: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Engine,
+    degree: u32,
+    forward: &mut F,
+) -> MatrixStep
+where
+    F: FnMut(
+        &crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event,
+        &mut Budget,
+    ) -> Result<(), ()>,
+{
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    let PersistedInput {
+        output,
+        budget,
+        bytes,
+    } = input;
+    let limits = match budget.begin_native(true, Instant::now()) {
+        Ok(limits) => limits,
+        Err(stop) => {
+            return MatrixStep {
+                original_bytes: bytes,
+                report: None,
+                adapter_stop: Some(stop),
+            }
+        }
+    };
+    let deadline = budget.deadline;
+    let native_limits = native::Limits {
+        work: limits.work,
+        bytes: limits.bytes,
+        main_rows: native::MAX_ROWS as u64,
+        events: native::MAX_EVENTS,
+    };
+    let observer = |event: &native::Event| {
+        budget
+            .observe(
+                Reservation {
+                    work: event.reserved.work,
+                    bytes: event.reserved.bytes,
+                },
+                Instant::now(),
+            )
+            .map_err(|_| ())?;
+        if forward(event, budget).is_err() {
+            let _ = budget.observer_failed();
+            return Err(());
+        }
+        budget.check(Instant::now()).map_err(|_| ())
+    };
+    let report = match engine {
+        native::Engine::F4Macaulay => native::matrix_f4_f2_bounded(
+            &output.equations,
+            output.n_vars,
+            degree,
+            native_limits,
+            deadline,
+            observer,
+        ),
+        native::Engine::F5KoszulFrobenius => {
+            crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2_bounded(
+                &output.equations,
+                output.n_vars,
+                degree,
+                native_limits,
+                deadline,
+                observer,
+            )
+        }
+    };
+    let adapter_stop = if report.stop == native::Stop::Complete && report.native_step_complete {
+        budget.finish_native(Instant::now()).err()
+    } else {
+        let stop = budget.stopped;
+        let _ = budget.fail::<()>(Stop::NativeFailure);
+        stop
+    };
+    MatrixStep {
+        original_bytes: bytes,
+        report: Some(report),
+        adapter_stop,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -956,7 +1232,7 @@ mod construction_tests {
     use crate::cryptanalysis::koblitz_groebner::bounded_s4 as native;
     use crate::ml_dataset::{curves, types::CaseConfig};
 
-    fn fixture() -> MathInput {
+    pub(super) fn fixture() -> MathInput {
         let config = CaseConfig {
             family: "koblitz".into(),
             n: 23,
@@ -973,7 +1249,7 @@ mod construction_tests {
         };
         original_math(&config, &curves::generate(&config).unwrap()).unwrap()
     }
-    fn budget() -> Budget {
+    pub(super) fn budget() -> Budget {
         let now = Instant::now();
         Budget::new(
             16384,
@@ -1064,5 +1340,186 @@ mod construction_tests {
         assert!(result.native_failure.is_none());
         assert_eq!(result.adapter_stop, Some(Stop::Deadline));
         assert_eq!(expired.native, Reservation::default());
+    }
+}
+
+#[cfg(test)]
+mod matrix_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
+    use crate::ml_dataset::capture::AttemptBinding;
+    fn binding() -> AttemptBinding {
+        AttemptBinding {
+            schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+            run_sha256: "1".repeat(64),
+            plan_sha256: "2".repeat(64),
+            protocol_sha256: "3".repeat(64),
+            config_sha256: "4".repeat(64),
+            source_commit: "5".repeat(40),
+            binary_sha256: "6".repeat(64),
+            cell_index: 0,
+            attempt_sha256: "7".repeat(64),
+        }
+    }
+    #[test]
+    fn both_named_matrix_engines_require_persisted_original_and_keep_native_reports() {
+        for engine in [
+            native::Engine::F4Macaulay,
+            native::Engine::F5KoszulFrobenius,
+        ] {
+            let original = construction_tests::fixture();
+            let mut budget = construction_tests::budget();
+            let construction = construct_original(&original, &mut budget, &mut |_, _| Ok(()));
+            let output = construction.output.unwrap();
+            let constructed_work = budget.native.work;
+            let mut persisted = false;
+            let input = persist_original(
+                &original,
+                &output,
+                &mut budget,
+                &binding(),
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |bytes, _| {
+                    let value: serde_json::Value = serde_json::from_slice(bytes).unwrap();
+                    assert_eq!(value["schema"], "crypto.ml-dataset.koblitz-m3-input/v1");
+                    assert_eq!(
+                        value["equations"],
+                        serde_json::to_value(&output.equations).unwrap()
+                    );
+                    persisted = true;
+                    Ok(())
+                },
+            )
+            .unwrap();
+            let mut events = 0;
+            let result = matrix_step(input, engine, 3, &mut |_, _| {
+                assert!(persisted);
+                events += 1;
+                Ok(())
+            });
+            assert_eq!(result.adapter_stop, None);
+            let report = result.report.unwrap();
+            assert_eq!(report.engine, engine);
+            assert_eq!(report.stop, native::Stop::Complete);
+            assert!(report.backend_invoked && report.native_step_complete);
+            assert!(report.counters.nonempty_rows > 0);
+            assert!(report.counters.reduction_word_xors > 0);
+            assert!(events > 0);
+            assert!(!result.original_bytes.is_empty());
+            assert_eq!(budget.native.work, constructed_work + report.reserved.work);
+        }
+    }
+    #[test]
+    fn failed_input_flush_retains_complete_bytes_and_prevents_matrix_admission() {
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        let error = persist_original(
+            &original,
+            &output,
+            &mut budget,
+            &binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |_, _| Err("selected I/O failure".into()),
+        )
+        .err()
+        .unwrap();
+        assert_eq!(error.reason, "selected I/O failure");
+        assert!(error.serialized_complete);
+        let value: serde_json::Value = serde_json::from_slice(&error.bytes).unwrap();
+        assert_eq!(
+            value["equations"],
+            serde_json::to_value(&output.equations).unwrap()
+        );
+        assert_eq!(
+            budget.begin_native(true, Instant::now()),
+            Err(Stop::Observer)
+        );
+    }
+    #[test]
+    fn exact_input_trace_cap_passes_and_one_less_never_reaches_sink() {
+        let original = construction_tests::fixture();
+        let mut baseline = construction_tests::budget();
+        let output = construct_original(&original, &mut baseline, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        // Fix the serialized trace limit to a stable value; consume all but the
+        // exact payload allowance before serialization in the two controls.
+        let token = persist_original(
+            &original,
+            &output,
+            &mut baseline,
+            &binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let length = token.bytes.len() as u64;
+        drop(token);
+        for short in [false, true] {
+            let mut budget = construction_tests::budget();
+            let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+                .output
+                .unwrap();
+            budget
+                .reserve_trace(
+                    budget.trace_limit - length + u64::from(short),
+                    Instant::now(),
+                )
+                .unwrap();
+            let mut called = false;
+            let result = persist_original(
+                &original,
+                &output,
+                &mut budget,
+                &binding(),
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &mut |_, _| {
+                    called = true;
+                    Ok(())
+                },
+            );
+            if short {
+                let error = result.err().unwrap();
+                assert!(!error.serialized_complete);
+                assert!(!called);
+                assert_eq!(budget.stopped, Some(Stop::Trace));
+            } else {
+                assert!(result.is_ok());
+                assert!(called);
+            }
+        }
+    }
+    #[test]
+    fn matrix_callback_failure_retains_input_and_seals_budget() {
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        let token = persist_original(
+            &original,
+            &output,
+            &mut budget,
+            &binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let result = matrix_step(token, native::Engine::F4Macaulay, 3, &mut |_, _| Err(()));
+        assert_eq!(result.report.unwrap().stop, native::Stop::Observer);
+        assert_eq!(result.adapter_stop, Some(Stop::Observer));
+        assert!(!result.original_bytes.is_empty());
+        assert_eq!(
+            budget.begin_extraction(true, Instant::now()),
+            Err(Stop::Observer)
+        );
     }
 }

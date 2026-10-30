@@ -251,3 +251,38 @@ These are structural limits; they do not replace the remaining complete setup
 accounting. Three bridge controls exercise actual construction and cumulative
 headroom, one-less native work, callback refusal, swallowed trace-cap errors,
 and an already expired construction deadline before any native invocation.
+
+## Input persistence and named matrix bridge
+
+`persist_original` serializes an explicit borrowed InputView through a fallible
+writer, with at most64KiB of pre-admitted buffer capacity. Every emitted byte is
+charged against the shared trace allowance before appending. It records the
+attempt binding, original public/factor-base digest strings, actual curve/field,
+target, sorted codes and signed domain, selector offsets, equations and original
+resource ceilings. Integer coordinates are exact u64 JSON integers; downstream
+consumers must not decode them through floating-point numbers. The caller must
+bind digest strings to original files; format validation alone is not provenance
+validation. A strict historical input decoder and semantic replay remain pending.
+
+Only successful serialization, a successful persistence callback and a final
+ledger check produce PersistedInput. This token borrows both the exact native
+output and the same ledger exclusively. The runtime callback must publish the
+reserved koblitz-m3-input.json role through bound capture; its actual binding is
+an outer integration requirement. Unit controls inject callback failures.
+
+A failed callback returns the complete serialized bytes for parent retention;
+a serialization cap returns its bounded incomplete prefix marked incomplete.
+Neither case grants a matrix token. The original native equations remain owned
+by the construction caller. A successful token is consumed by matrix_step,
+which invokes the selected existing bounded F4 or F5 engine with remaining work,
+remaining memory, the original deadline, max488 main row attempts and4096 events.
+Each callback shares the same ledger and sticky-failure behavior. Native report,
+precise stop, actual engine identity and criterion status remain intact. Returned
+original bytes survive matrix failure. These steps do not claim a complete
+Groebner basis, recursive solver, or exhaustive PDP verdict.
+
+New software controls exercise both named engines on original S4 equations,
+nonempty native row/reduction work, cumulative reservations, exact/one-less input
+trace capacity, input I/O failure with byte retention, and matrix observer
+failure with no later extraction admission. They do not replace the independent
+signed-domain replay and frozen matrix-control panel required before activation.
