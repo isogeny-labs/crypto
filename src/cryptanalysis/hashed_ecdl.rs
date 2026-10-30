@@ -1,15 +1,19 @@
 //! Executable reference for §3 of Bochum's *Subexponential ECDL*, v0.2.
 //!
 //! This implements affine-hashed factor bases and the index-calculus reduction,
-//! **not** the compact Boolean tensor encoding or the assumed fast contraction
-//! algorithm. The default oracle enumerates group decompositions (generic
+//! with a separate complete tensor implementation exported as [`tensor`].
+//! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
 //! performance claim is made. Only small, cofactor-one prime-field curves are
 //! supported. All returned answers carry a replayable algebraic certificate.
 //!
 //! Source: <https://github.com/bochum-crypto/subexponential-ecdl>, commit
 //! `1ee44e562b1b9a50ea339f3b8f81112b5a24b96f`, §3.2–3.5, Figure 2.
-//! Kept byte-identical in crypto and cryptanalysis's Rust binding.
+//! The default CPU reduction matches cryptanalysis's Rust binding. Crypto also
+//! exposes an optional base-construction hook for its standalone GPU adapter.
+
+/// Arbitrary-precision compact encodings, recursive contraction and reduction.
+pub use hashed_ecdl_tensor as tensor;
 
 use std::collections::BTreeMap;
 
@@ -34,6 +38,7 @@ impl std::fmt::Display for Error {
 }
 impl std::error::Error for Error {}
 
+#[clippy::msrv = "1.78"]
 fn prime(n: u64) -> bool {
     n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0)
 }
@@ -67,6 +72,7 @@ pub struct Curve {
 
 impl Curve {
     /// Check primality, nonsingularity, and the exact prime group order.
+    #[clippy::msrv = "1.78"]
     pub fn new(p: u64, a: u64, b: u64, r: u64) -> Result<Self, Error> {
         if !(5..=65521).contains(&p) || !(3..=131044).contains(&r) || !prime(p) || !prime(r) {
             return Err(Error::Invalid(
@@ -100,6 +106,10 @@ impl Curve {
     /// Prime field modulus.
     pub fn modulus(&self) -> u64 {
         self.p
+    }
+    /// Canonical short-Weierstrass coefficients `(a, b)` for external backends.
+    pub fn coefficients(&self) -> (u64, u64) {
+        (self.a, self.b)
     }
     /// Verified full group cardinality.
     pub fn order(&self) -> u64 {
@@ -240,6 +250,19 @@ impl HashBase {
 /// generator, or target logarithm. `None` must certify exhaustive nonexistence;
 /// a resource limit must return `Error::Limit` instead.
 pub trait DecompositionOracle {
+    /// Construct exactly the sorted signed bases defined by these hashes.
+    /// The default retains CPU enumeration; accelerators may override it.
+    /// Returned points are checked before use, and certificate replay always
+    /// reconstructs the complete bases independently on the CPU. Completeness
+    /// is part of the backend contract; a truncated search must return a limit.
+    fn enumerate_bases(
+        &mut self,
+        curve: &Curve,
+        hashes: &[HashBase],
+    ) -> Result<Vec<Vec<Point>>, Error> {
+        hashes.iter().map(|h| h.enumerate(curve)).collect()
+    }
+
     /// Find an ordered slot-specific decomposition of `target`.
     fn find(
         &mut self,
@@ -508,10 +531,18 @@ pub fn solve_with_oracle(
                 tau,
             })
             .collect();
-        let bases: Vec<_> = hashes
-            .iter()
-            .map(|h| h.enumerate(curve))
-            .collect::<Result<_, _>>()?;
+        let bases = oracle.enumerate_bases(curve, &hashes)?;
+        if bases.len() != hashes.len()
+            || bases.iter().zip(&hashes).any(|(base, h)| {
+                base.windows(2).any(|w| w[0] >= w[1])
+                    || base.iter().any(|&point| match curve.encode(point) {
+                        Ok(z) => (h.alpha * z + h.beta) % h.s >= h.tau,
+                        Err(_) => true,
+                    })
+            })
+        {
+            return Err(Error::Verification);
+        }
         let n: usize = bases.iter().map(Vec::len).sum();
         if n > config.max_columns {
             return Err(Error::Limit("dense relation matrix columns"));
@@ -642,6 +673,35 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn rejects_corrupt_accelerated_base_before_relation_queries() {
+        struct BadBase;
+        impl DecompositionOracle for BadBase {
+            fn enumerate_bases(
+                &mut self,
+                _: &Curve,
+                hashes: &[HashBase],
+            ) -> Result<Vec<Vec<Point>>, Error> {
+                Ok(vec![vec![None]; hashes.len()])
+            }
+            fn find(
+                &mut self,
+                _: &Curve,
+                _: &[Vec<Point>],
+                _: Point,
+                _: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                panic!("invalid base reached relation oracle")
+            }
+        }
+        let (c, p) = fixture();
+        let q = c.mul(p, 42).unwrap();
+        assert_eq!(
+            solve_with_oracle(&c, p, q, &Config::default(), &mut BadBase),
+            Err(Error::Verification)
+        );
     }
 
     #[test]
