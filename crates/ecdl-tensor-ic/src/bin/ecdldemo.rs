@@ -10,6 +10,7 @@
 //!   -q          suppress progress output
 //!   -gadgets    use low-degree arithmetic gadgets (slow; keep -bits small)
 //!   -window K   with -gadgets: constrain x < p>>K in every factor base (0 = off)
+//!   -mitm       find relations by meeting in the middle (~sqrt(2r) additions per attempt)
 
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -28,6 +29,7 @@ struct Flags {
     quiet: bool,
     gadgets: bool,
     window: i64,
+    mitm: bool,
 }
 
 /// Marker error text for -h / -help (Go: flag.ErrHelp).
@@ -39,6 +41,8 @@ fn usage() {
     eprintln!("    \tfield size b in bits (4..26) (default 14)");
     eprintln!("  -gadgets");
     eprintln!("    \tuse low-degree arithmetic gadgets (slow; keep -bits small)");
+    eprintln!("  -mitm");
+    eprintln!("    \tfind relations by meeting in the middle (~sqrt(2r) additions per attempt)");
     eprintln!("  -m int");
     eprintln!("    \tnumber of factor bases (default 2)");
     eprintln!("  -q\tsuppress progress output");
@@ -103,6 +107,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
         quiet: false,
         gadgets: false,
         window: 0,
+        mitm: false,
     };
     let mut i = 0;
     while i < args.len() {
@@ -128,17 +133,17 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
             None => (name, None),
         };
         match name {
-            "q" | "gadgets" => {
+            "q" | "gadgets" | "mitm" => {
                 let v = match inline {
                     None => true,
                     Some(v) => parse_bool(&v).ok_or_else(|| {
                         format!("invalid boolean value {:?} for -{}: parse error", v, name)
                     })?,
                 };
-                if name == "q" {
-                    f.quiet = v;
-                } else {
-                    f.gadgets = v;
+                match name {
+                    "q" => f.quiet = v,
+                    "gadgets" => f.gadgets = v,
+                    _ => f.mitm = v,
                 }
             }
             "bits" | "m" | "seed" | "window" => {
@@ -240,14 +245,19 @@ fn main() {
         s.counter = Box::new(DFSCounter);
         s.window_bits = usize::try_from(flags.window).unwrap_or(0);
     }
+    s.mitm = flags.mitm;
     if !flags.quiet {
         s.logf = Some(Box::new(|msg: &str| eprintln!("{}", msg)));
     }
     let (got, st) = s.solve(q).unwrap_or_else(|e| fatal(e));
-    println!(
-        "network: {} edges, {} vertices, max degree {}, graph={}",
-        st.network.edges, st.network.vertices, st.network.max_degree, st.network.is_graph
-    );
+    if st.network.edges == 0 {
+        println!("network: meet-in-the-middle (no contraction)");
+    } else {
+        println!(
+            "network: {} edges, {} vertices, max degree {}, graph={}",
+            st.network.edges, st.network.vertices, st.network.max_degree, st.network.is_graph
+        );
+    }
     println!(
         "N = {}, relations = {}, attempts = {}, restarts = {}, time = {}",
         st.factor_base_size,
