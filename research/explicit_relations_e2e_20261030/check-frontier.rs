@@ -10,7 +10,7 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
         4 => vec![48, 52, 56, 58, 60],
         5 | 7 | 8 => vec![52, 56, 58, 60],
         9 | 11 | 12 | 13 => vec![52, 61, 62],
-        14 | 15 => vec![52, 63],
+        14 | 15 | 16 => vec![52, 63],
         _ => return Err("version has no completed frontier contract".into()),
     };
     let mut lines = raw.lines();
