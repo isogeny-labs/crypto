@@ -1024,3 +1024,22 @@ An administrative catalog-copy script initially used the wrong JSON key;
 corrected to `files`, completed all v13 copies, and verified every catalog hash.
 The first v16 freeze call omitted the required draft freeze object; it was
 rejected before data, then corrected and successfully frozen.
+
+## 2026-10-30 20:21 UTC — cache documentation reconciled
+
+### What was done
+Updated PERSISTENT-QUERY.md and FULL-RIGHT-CACHE.md from pending-validation
+status to the completed v13 checks, exact cache rows and report links.
+V16 source extraction passed and CUDA compilation is underway on pod
+`omb2jpo4ntoq5g`; controller PID1044437 owns collection and deletion.
+
+### Decisions made
+Keep the frozen source and active run unchanged; these edits document completed
+component validation. Timings and memory admission estimates retain their labels.
+
+### Open threads
+V16 device preflight and recovery outcomes; current-head PR2996 checks.
+
+### Errors
+Artifact bot moved the large v13 validation log to its hash-addressed store;
+its commit was fast-forwarded into this branch without changing measured data.
