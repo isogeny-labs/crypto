@@ -69,3 +69,10 @@ $(OUT)/explicit-relations-persistent: service.cpp device.cuh host.hpp curve.cuh 
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -x cu service.cpp -o $@
 $(OUT)/query-persistent-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_PERSISTENT_BLOCK_LIMIT=2 query-check.cu -o $@
+
+.PHONY: cuda-right-cache
+cuda-right-cache: $(OUT)/explicit-relations-right-cache
+$(OUT)/explicit-relations-right-cache: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -x cu service.cpp -o $@
+$(OUT)/query-right-cache-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_PERSISTENT_BLOCK_LIMIT=2 query-check.cu -o $@

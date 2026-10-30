@@ -672,3 +672,58 @@ A default-ref diagnostic invocation completed successfully within55s. Moving
 the script outside sparse checkout first lacked its repository selector;
 PM_REPO_PATH fixed that administrative invocation. No metrics source change
 was made, and no failed invocation is treated as a pass.
+
+## 2026-10-30T16:51Z — exact full-right reuse and separate controls
+
+### What was done
+
+V11 live logs show both61-bit targets verified:1123.455s and1405.366s total,
+with full exact values pending final archive collection. Its first62-bit case
+is running. Added an optional16-byte exact affine right-sum cache, constructed
+once per bases after sort scratch is freed. The selected phase peak preserves
+the existing25%free-memory rule; insufficient cache capacity selects an
+explicit uncached fallback. Host round-trip, admission-boundary/overflow and
+syntax checks pass. CUDA validation remains pending.
+
+### Decisions made
+
+Read NVIDIA memory optimization guidance before implementation; sources and
+lifetime argument are in FULL-RIGHT-CACHE.md. Preserve v5's partial-cache loss.
+V12 was never executed. V13 retains b/u persistent-query andu/v full-cache
+controls, withv/x repeat at52bits, then probes the larger frontier once. It
+requires the intended cache mode for every successful52-bit control. Frozen
+hash9ab5b955afbc2ba7f9878793a8012b0b740b29fa5107c40b5d8adb23fb012413.
+Native instruments typecheck and schema/freeze checks pass; no new data yet.
+
+### Open threads
+
+Collect/publish/delete v11 before any new GPU. V13 is the next panel; v12 must
+not launch. Preserve every failure/fallback and charge full construction.
+Run all new device differentials and sanitizers before data, then collect,
+strictly audit, export, report and deliver exact current-head CI. GPU tensor
+backend and independent scientific audit remain unresolved.
+
+### Errors
+
+No new CUDA build has been performed locally. The initial persistent host
+fixture cap error was corrected before this combined protocol. The earlier
+V12 plan and source remain unchanged; supersession is not a failed run.
+
+## 2026-10-30T17:00UTC — v13 launch wiring correction
+
+### What was done
+Removed a duplicate full-cache compile before the launcher enters the CUDA
+source directory. The intended compile remains after validation/build setup.
+Shell syntax and administrative pin checks pass; no v13 GPU was launched.
+
+### Decisions made
+Frozen protocol, analyzer, arms, inputs and bounds remain unchanged. This
+corrects launch wiring only, before affected data. PR2983 records CUDA pending.
+
+### Open threads
+Collect and delete active v11 before v13 CUDA validation and execution.
+
+### Errors
+Static syntax alone missed a valid shell command in the wrong working
+directory. Launch review caught it before deployment. T957 is cancelled and
+cannot reopen; scoped correction is owned by T961.
