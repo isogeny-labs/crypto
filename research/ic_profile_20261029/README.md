@@ -147,3 +147,26 @@ So the order of levers is: amortise setup for the free 28% if and when a shared
 setup method exists (none does today; the cold rule is deliberate), but the only
 lever that can move the class of the result is the relation phase's per-trial
 cost and yield, and the factor-base direction for that is now measured to lose.
+
+## The factor-base axis is closed
+
+A four-size sweep in one session (8 targets x 5 rounds, 240/240 verified, same
+main image and host) settles the local shape of the one lever that was left:
+
+| factor base | S median |
+|:--|--:|
+| 32 | 11.226 |
+| **45** | **9.929** |
+| 56 | 10.099 |
+| 64 | 10.794 |
+
+N=45 is a local optimum and every neighbour loses. Together with the paired
+N=64 result this closes the factor-base direction at 20 bits: the setup cost
+grows faster than the relation cost falls past 45. Summary in
+[`prime/session-sweep-20261030.json`](prime/session-sweep-20261030.json).
+
+So the cheap levers are exhausted: setup amortisation caps at 28% and 6.7x rho,
+and no base size beats the baseline. A real speedup has to come from the
+relation phase itself — a different decomposition oracle, or a relation search
+that raises the 0.73% yield without doubling setup — not from tuning this one.
+
