@@ -503,3 +503,816 @@ parent audit overhead as the remaining accounting boundary work. Per-arm
 process RSS is already available. EXECUTION_NEXT_STEP.json preserves these
 findings and the unchanged upper gate; it is not an executable protocol.
 A fresh isolab Job listing had no active Jobs; no submission was made.
+
+## 2026-10-29 common cold-cost observations (T-820)
+
+Implemented optional child/record method_call_wall_ns around methods::solve,
+preserving the legacy solve timer. It includes method setup, internal checks
+and report construction. Parent mathematical verification has its own
+parent_audit_verification_ns observation and does not inherit child L2.
+Older records deserialize with the fields absent; absent fields are omitted
+on serialization. Runner censoring still removes accepted results and audit
+measurements for watchdog-expired output. TIMING_CONTRACT.json defines scopes.
+
+Validation in progress: rustfmt and scoped diff checks pass. The initial
+release test invocation used a wrong exact module filter and ran zero tests;
+this is not a regression pass. Corrected build/test is live in exec session
+82538, log /tmp/pencil-common-cold-test-recheck.log. Run the runner watchdog
+regression and required root library suite after focused validation and final
+source edits. No experimental data, timing ratio or cohort was produced.
+
+Read-only archive verification matched SHA256
+550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339,
+1260 distinct workload IDs,21 curves with60 targets each, and all1260
+archived algorithm seeds. Planner currently includes warmups in seed index;
+T-821 implements an opt-in measured-index policy preserving legacy plans.
+Native workload ID/coordinate parity still requires the compiled plan check.
+
+Corrected focused cold-boundary test completed:1 passed,0 failed. Retained
+as cold-boundary-test.log. T-821 implementation is complete: opt-in
+measurement.algorithm_seed_round=measured_index preserves the first archived
+seed despite warmups; default absolute is omitted from serialization.
+Checked references: docs/ecbench/README.md seed pairing contract and
+https://serde.rs/field-attrs.html. Added legacy identity and paired seed
+regressions; these have not yet been reported as passed.
+Combined required root suite is live in exec session8835, log
+/tmp/pencil-cold-seed-root-tests.log. Do not start a duplicate suite.
+Current code changes remain uncommitted pending validation. No new cohort.
+
+## 2026-10-29 paired diagnostics and archive parity preparation
+
+PR2860 merged at f680bd28038f0cc9a15fe351f506967303b03355; last read still
+had the ecbench harness check running. Current uncommitted work is on
+codex/pencil-timing-export-20261029.
+
+Full release library suite finished:5154 passed,1 failed,123 ignored. Both
+seed-policy regressions and the watchdog regression passed. GPU capsule test
+failed on its lock; same compiled binary serial recheck passed1/1. Preserve
+initial failure, not a clean full-suite label. The later addition of optional
+time.online_clock_diagnostics is compiled by the native build but needs its
+updated regression rerun. Root suite handle8835 is terminal(exit101); recheck
+86880 is terminal(exit0). Native ecbench build is still live in handle13328,
+log /tmp/pencil-native-ecbench-build.log; do not duplicate it.
+
+Standalone paired_export uses common cold and explicit-clean online clocks,
+retains absent/failing pairs and independent memory/audit observations, and
+supports candidate/rho plus shared rho/rho_AA in three arms.8 tests passed;
+paired_export/cargo-test.log is retained. All qualified ratios stay null until
+reviewed A/A evidence for these exact windows exists. No cohort was processed.
+
+prepare_native_parity.py reproducibly extracts seven original specifications
+and a205402-byte projection of1260 archived identities/coordinates/seeds,
+without planted answers. Preparation reproduced expected-workloads.jsonl
+byte-for-byte. Its check mode invokes only ecbench plan --doc; native parity
+is pending the build. These archived specs are validation inputs, not the
+new executable protocol. No cloud jobs or experiments launched.
+
+Native build13328 completed(exit0). Run-free native parity29938 completed
+(exit0), comparing all1260 archived workload IDs,targets,target seeds/indices
+and first algorithm seeds exactly. Retained native_parity/result.json, all
+seven raw plans, and a payload hash manifest. No solver was run. Binary hash
+0da4de11053815be21549e3d0af14efcf303fa65af2bc7f38403e87ba5bacfc1.
+This is a local dirty-source validation build, not the pinned experiment image.
+Updated ecbench regression suite remains live:11411,
+/tmp/pencil-final-ecbench-tests.log. It covers the later online diagnostics
+field and runs ecbench tests serially. Do not duplicate.
+
+PR2860 lab parity was canceled after checkout exhausted its10-minute limit;
+no parity script ran. Post-merge main run40909710263 at
+17805c0db9bd92e8b1cfd10c5c10130c36aad3ce passed all three parity scripts.
+Harness unit tests passed and integration tests were still running at last
+read. No unsupported source repair or retry performed.
+
+## 2026-10-29 timing and input validation completion
+
+### What was done
+Final ecbench module suite: 287 passed, 0 failed, 1 ignored. Plan-aware paired exporter: 12 passed. All 1,260 archived inputs and first measured seeds match the native prepared plans. These plans contain 22,680 executions (18,900 measured, 3,780 warmups); none was executed by planning. Logs and native plans are retained.
+
+### Decisions made
+Research scope is public synthetic mathematics. Known-answer checks are correctness controls; no deployed-key recovery claims. Standard A/A direction is rho_AA/rho with the frozen operational tolerance [0.90,1.10], not a confidence interval.
+
+### Open threads
+Commit/source/image identity, complete frozen protocol, staged EKS gate, full cohort, independent review and measured reports remain.
+
+### Errors
+The earlier full-library run had one GPU test-lock failure (5,154 passed, 1 failed, 123 ignored); its same-binary serial recheck passed. Preserve both logs.
+
+## 2026-10-29 launch contract reconciliation
+
+### What was done
+Published timing/input packet in PR2869 at3d99a998514c81a4095105ac71eb6df335bc55a2. Draft protocol passed canonical semantic validator with zero findings. Both gate native plans reproduce61 workload objects and all1098 scheduled stream seeds from the full cohort; planning executes no solvers.
+
+### Decisions made
+Preserve required8Gi memory envelope: deployed recovery controller currently hardcodes4Gi in both phases, so repair under separate T832 before launch. Retain computation and fresh measurement epochs separately.
+
+### Open threads
+Build-only GitHub dispatch for source3d99a998, exact controller memory propagation, scoped publication credentials, protocol freeze and staged cohort execution. No experiment job submitted.
+
+### Errors
+Local staticmusl build failed because x86_64-linux-musl-gcc is absent; raw log retained. No compiler substitution or experimental-result claim.
+
+## 2026-10-29 static build verification
+
+### What was done
+Existing GitHub run40919051188 completed successfully. Downloaded artifact12918062407; binary SHA256 matches build-info. Static binary reproduces all1260 archived workload identities, coordinates and seeds, and all9 prepared plans exactly (7 cohort,2 gates). Receipts in static_build_validation/.
+
+### Decisions made
+Retain instrument source3d99a998 unchanged. Plan validation executes no solvers and supplies no measured cost ratio. Controller/runtime bundle manifests also verified offline; no deployment.
+
+### Open threads
+PR2869 merge conflict, pending scoped infrastructure authorization, immutable image/runtime identities, protocol freeze, staged gate, full cohort and independent review.
+
+### Errors
+An initial fetch command used the artifact directory and correctly failed because it is not a Git repository; retried in the source worktree.
+
+## 2026-10-29 counted-cost integration
+
+### What was done
+Integrated candidate outer validation, tracked sets, native collection/polynomial and kernel observations, matched rho collection counters, and draft exact Rust price/importer module. Initial combined producer suite failed one replay check (38 passed,1 failed,1 ignored): independent RandomState hash seeds produced94 vs82 key comparisons. Structured failure receipt is retained. Pinned synthetic collision hashing explicitly before cohort data; integrated suite then43 passed,0 failed,1 ignored, and its process-exclusive test separately passed1/1. Original-versus-observed mathematical trace and all legacy native counters matched across five seeds and caps0,1,200 in the development parity harness. First parity command selected zero tests; both that log and corrected exact-test log are retained.
+
+### Decisions made
+Preserve original36-cell grid and old results. Name atomic-scalar/disjoint-logical model amendment; scalar inverse price is the native logical coefficient, not base-field inversion price. Allocation/RSS remain separate observations. New hash policy changes table layout/runtime and requires source/toolchain/binary pinning. Static binary3d99 remains historical for this accounting batch; do not relabel it.
+
+### Open threads
+Engine geometry/adapter semantic coverage, full source validation, importer/export identity and independent review, new binary/image, frozen amended protocol, pending scoped infrastructure authorizations, full cohort and measured reports. No new cohort execution or qualified ratio.
+
+### Errors
+Randomized hash-table comparison counts broke exact counter replay; fixed by explicit pinned instrument policy. A broad parity test-name filter selected zero tests; corrected exact test ran and passed. Conductor scope expansion rejected a malformed scopes request without mutation; separate nonoverlapping T838/T839 reservations were obtained. T826 bounded keeper expired and was reconciled/reclaimed once; current keeper renews the new fence.
+
+## 2026-10-29T18:22Z — Importer integration validation
+
+### What was done
+The current integrated native-price importer passed11 unit tests with exit0; doc tests selected0. The receipt identifies the exact command and honestly records structured transcription rather than a saved full stdout log. The separate root release suite remains live with5397 tests selected; no terminal result claimed.
+
+### Decisions made
+Continue mathematical research on public synthetic known-answer fixtures only. The finite algorithm accounting grid excludes no work silently: reporting and infrastructure remain separate measured resources. The missing walk-label generation event is delegated as an isolated software correction while the release suite finishes.
+
+### Open threads
+Executable analyzer integration and independent review, direct label-generation observations, final source validation and delivery, instrument/protocol pinning, existing pending infrastructure authorization, full pencil cohort and neutral reports remain.
+
+### Errors
+No importer test failure. No new experiment, duplicate generator, or infrastructure mutation.
+
+## 2026-10-29T18:25Z — Executable analyzer integrated; review corrections open
+
+### What was done
+Integrated native analyze_pair executable and current mapping contract into the independent native_price crate. Root validation passed16 tests with exit0; the actual --mapping CLI emitted its source-bound JSON contract. Preserved isolated passing logs and initial corrected lint failure. Independent review identified weak cross-arm session/binary/seed binding, early error on missing failed-record modulus fields, and unchecked calibration component totals. Corrections are delegated before price admission.
+
+### Decisions made
+Retain all36 price cells with unknown values for missing/censored evidence. Do not treat software fixture ratios as observations. Root release invocation remains live; its compiled source has not been changed by nested independent analyzer integration. The walk-label instrumentation patch remains isolated pending its terminal receipt.
+
+### Open threads
+Integrate reviewed fixes and label counter; validate final source; commit/update PR; pin final binary/protocol; complete authorized cohort and independent reports. Existing infrastructure authorization questions remain pending.
+
+### Errors
+Initial analyzer software tests did not cover the three independent-review findings; their passing result does not discharge those findings. No cohort, cloud job, or administrator operation occurred.
+
+## 2026-10-29T18:28Z — Root release validation passed before label-counter increment
+
+### What was done
+Existing full-root release invocation exited0:5274 passed,0 failed,123 ignored of5397 selected; outer test time537.33s. Retained stdout/stderr/command/start/finish/exit receipts under validation/accounting/full-root-release-lib-20261029T1800Z. Applied isolated reviewed walk_label_calls patch afterward; integrated producer suite is now running.
+
+### Decisions made
+The full-root pass describes the prior instrument source; it does not automatically validate the later label-counter increment. Keep exact source boundaries and validate final source before delivery.
+
+### Open threads
+Producer test result, analyzer independent-review fixes, final validation and PR delivery; original cohort and reports remain required.
+
+### Errors
+No failure in full-root release invocation. No experiment launched.
+
+## 2026-10-29T18:30Z — Review corrections verified and final release run started
+
+### What was done
+Integrated analyzer corrections: root19 tests passed,0 failed. Independent targeted rereview confirmed the three reported findings closed. Label-counter producer suite passed44,0failed,1ignored. Final root release invocation82954 started once on final dependency sources; no terminal result yet.
+
+### Decisions made
+Do not promote targeted rereview into full semantic-coverage certification. Preserve earlier analyzer findings and corrected expected-error wording test failure. The initial final-source manifest omitted untracked source modules; a supplemental complete manifest is being prepared with end-of-run hash verification, without changing source or restarting the test.
+
+### Open threads
+Final release result, whole coverage/analysis completeness, standardized cohort aggregation, PR delivery, final instrument/protocol pins, authorized cohort and independent reports.
+
+### Errors
+Initial source manifest relied on tracked differences and omitted untracked modules; explicitly correct its coverage before claiming source binding.
+
+## 2026-10-29T18:35Z — Finite source audit and remote artifact check
+
+### What was done
+Independent nine-category source audit found three remaining groups: scalar Ring primality validation, successful associative-entry visits/fresh initialization, and selected length/empty predicates. Retained full report in validation/accounting/finite-coverage-audit.md and delegated consolidated isolated corrections. Current PR2869 headad958 has an artifacts CI failure: isolab-experiment.yml lacks generated store-pull wiring for three directories; minimal fix is being investigated. Other remote checks remain successful or pending, not all passed.
+
+### Decisions made
+Do not admit measured prices before the concrete asymmetries are fixed and independently rechecked. Preserve base and scalar primality domains. Reuse actual paired_export plan validator/A-A policy for aggregate analysis, with per-target five-stream acceptance, rather than the draft outline's looser aggregate reading.
+
+### Open threads
+Consolidated source fixes, native aggregator, running release-suite receipt, minimal workflow repair, final validation/delivery and remaining original cohort/report requirements.
+
+### Errors
+Broader independent audit found missing work after focused tests passed; tests alone did not establish complete semantic coverage. Current-head artifact workflow failed its store wiring check. No experiment or duplicate job launched.
+
+## 2026-10-29T18:42Z — Consolidated corrections staged; workflow repair applied
+
+### What was done
+Consolidated isolated producer patch addresses the three audit groups;48 tests passed with1 ignored, plus2 focused engine regressions passed. Retained source manifest, exact site mapping, passing raw logs and initial corrected compile failure under validation/accounting/consolidated-fixes. Scalar-domain analyzer increment is integrated; producer patch awaits running root-suite terminal receipt. Applied T844 workflow repair: generated pull lists expanded and named source checkout hydrates through trusted control tooling, with secrets confined to the pull step. Parse/idempotence checks passed; exact full wiring check still live.
+
+### Decisions made
+Preserve existing test/source boundaries. Do not claim isolated producer fixes integrated or complete. Reconciled expired T839 lease and reclaimed attempt2; existing T841 lease remains the root-owned geometry reservation. T844 renewed by bounded keeper.
+
+### Open threads
+Root82954 terminal/hash receipt; integrate consolidated source; finish native aggregate and review; final validation/PR update; pending original instrument/protocol/cloud/cohort/report requirements.
+
+### Errors
+Source correction's initial generated struct literal had duplicate fields; isolated build failure retained and fixed. No new experiment or infrastructure mutation.
+
+## 2026-10-29T18:48:46.400458+00:00 — Consolidated integration and cohort analyzer validation
+
+### What was done
+Prior root suite exited0 with5275passed/0failed/123ignored; all20 bound source files unchanged. Then integrated consolidated producer corrections. Root producer48passed/0failed/1ignored, separately strict isolation1passed. Native pair/cohort analyzer root28passed; actual prepared-plan parser check retains1260workloads/6300pairs/22680slots/3780warmups with0observed records and null ratios. Independent aggregator source review found no new concrete blocker.
+
+### Decisions made
+Operation-count aggregation remains separate from timing qualification and provided digests do not authenticate or freeze a protocol. Keep all prior software failures and source boundaries. Pipeline coverage correction recheck is assigned to an agent who did not implement those corrections.
+
+### Open threads
+Root Clippy10122 and independent producer correction review pending; final consolidated-source release validation, scoped commit/PR update, final image/protocol bindings, pending infrastructure authorization and complete original cohort/report requirements.
+
+### Errors
+Rustfmt found only native_price module order; corrected, retained failure output and passing recheck. Workflow exact wiring and pinned actionlint checks now pass. No experiment execution or measured ratio.
+
+## 2026-10-29T19:05:26.234789+00:00 — Mathematical scope and finite source audit
+
+### What was done
+Reconciled the existing release test (session15062), active study keeper and Diem receipt. Diem remains deadline-expired with50/52 durable records and no pending launcher. Independent nine-category source audit reports no remaining concrete omission within the declared finite model. Updated current implementation state.
+
+### Decisions made
+User clarified mathematical research, not key recovery. Use public synthetic known-answer fixtures and neutral correctness/cost reports. Preserve source-review versus binary/protocol admission distinction; no new execution or cloud mutation.
+
+### Open threads
+Final release run, PDF/graph/standardized review packet, scoped PR update, final binary/protocol binding and original approved cohort requirements. Daily shared log remains reserved by another task; pending entry stays in study scope.
+
+### Errors
+A status read used the wrong stdout suffix; corrected to .stdout.log. No source or evidence was changed by that failed read.
+
+## 2026-10-29T19:09:49.028795+00:00 — Final source validation completed
+
+### What was done
+Existing release run15062 finished with5277passed/0failed/123ignored, exit0; all20 bound source files unchanged. Final producer strict-isolation test separately passed1/0. Independent finite source audit now includes the final source-hash assertion.
+
+### Decisions made
+Publish these as software/accounting validation of public synthetic mathematical workloads. Fresh cohort measurements remain0 and cost ratios remain null. Historical failed attempts and prior source-specific runs stay retained.
+
+### Open threads
+Finish report packet and scoped commit/PR update; exact-head remote checks; final binary/protocol bindings and original cohort requirements.
+
+### Errors
+No final validation failure. Prior failures remain in the validation directory.
+
+## 2026-10-29T19:16:33.495968+00:00 — Validated source delivered; static instrument build started
+
+### What was done
+Pushed source/accounting/report commit543a54b4b to PR2869 and updated its description. Auto-merge remains enabled. Reconciled bot child7d7f5495c: only three root stdout logs moved into the artifact store, with manifest/ignore additions. Fast-forwarded the local branch. After checking existing terminal dispatches, dispatched exactly one static build40938439022 on the feature branch with source543a54b4b.
+
+### Decisions made
+Keep source, workflow and binary identities distinct. The main-only experiment job is ineligible on this feature branch; no cohort or image publication authorized by this build. Preserve every prior failed attempt.
+
+### Open threads
+Build40938439022, exact-child CI, artifact readback, protocol accounting amendment and actual prior gate-cap authorization; final image/runtime/budget bindings and original cohort requirements remain.
+
+### Errors
+Explicit branch fetch populated FETCH_HEAD without a remote-tracking ref; initial origin/branch lookup failed. Inspected the exact downloaded commit and API file list, then fast-forwarded by immutable SHA. No duplicate dispatch.
+
+## 2026-10-29T19:23:36.209698+00:00 — Pre-data accounting amendment and CI correction
+
+### What was done
+Created separate accounting_amendment_20261029 draft: canonical checker exit0/zero findings and10 preservation checks pass. All3 artifact-store stdout logs freshly hydrated and match manifest hashes/sizes. Rust1.98 remote Clippy found manual_hash_one in a new hash-equivalence test; replaced manual hash construction with equivalent hash_one assertion. Non-test prefix is byte-identical; correction validation is running separately.
+
+### Decisions made
+Keep static build40938439022 source543a54b4b intact; its runtime source is unchanged by the test-only correction. Historical p739 gate is10m coefficients and3600seconds for the gate command; current unfrozen draft25m/per-execution envelope is not established authorization. Requested the missing resource-envelope choice, cumulative budget and absolute deadline; no experiment admitted.
+
+### Open threads
+Static build, Rust1.98 maintained Clippy and required corrected-source release suite; commit/push corrected test after validation. Final binary/image/review binding and resource/infrastructure answers remain prerequisites for the original full cohort.
+
+### Errors
+Canonical amendment initial check found a missing derived formula; corrected and retained the initial output. Historical protocol path guessed under current study did not exist; authoritative external Markowitz protocol supplied exact original limits. Migration receipt required read-only sudo access; inspected metadata successfully.
+
+## 2026-10-29T19:32:11.621081+00:00 — Native analysis binaries bound
+
+### What was done
+Built both native analysis executables with locked offline Rust1.99.1 release settings; source13files match543a54b4b. Actual prepared-plan-only CLI check reproduces1260workloads/6300pairs/22680slots with0observations and36null ratios. Independent check verified both executable hashes/sizes and bound the build receipt in the unfrozen accounting amendment; canonical validation exit0/zero findings.
+
+### Decisions made
+Analysis binary identity remains distinct from the still-running static empirical instrument40938439022. No cohort execution or approval inferred. Preserve old amendment/check receipts as pre-analysis-binding files.
+
+### Open threads
+Commit the new analysis binding after current Git sparse materialization completes; corrected-source Clippy and release tests; static instrument binary/parity; unanswered resource/infrastructure requirements and full prescribed cohort.
+
+### Errors
+Initial maintained Clippy found tracked fixture files missing from sparse checkout, not further introduced source errors. Existing materialization PID2082656 is live in an NFS wait; do not duplicate or classify it terminal. T839 attempt3 lease renewed through keeper37385.
+
+## 2026-10-29T19:36:31.667686+00:00 — Static instrument verified against archived cohort
+
+### What was done
+GitHub build40938439022 completed successfully; experiment job skipped. Downloaded artifact12926168934. Binary SHAa1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab matches build-info source543a54b4b/Rust1.99.1/musl. ELF has no interpreter or needed-library entries. Native plan-only check matched all1260 archived workload identities/coordinates/first streams and all9 prepared plans byte-for-byte. Receipts retained under validation/instrument_build_40938439022.
+
+### Decisions made
+Bind the actual new empirical instrument into the unfrozen amendment, separate from completed native analysis binaries. No solver execution, image publication, resource approval, or performance ratio follows from plan parity. Preserve old static build as historical evidence.
+
+### Open threads
+Final binding validation, existing EFS-blocked sparse materialization and CI correction validation, then scoped delivery; runtime/image/review/resource authorization and original full cohort requirements remain.
+
+### Errors
+file identifies the PIE as dynamically linked; direct readelf inspection shows no interpreter or NEEDED libraries. Retained full ELF headers rather than relying on file wording.
+
+## 2026-10-29 — Canonical packaging and explicit execution history
+
+### What was done
+Added study-local canonical_export/package.py to package existing native outputs, raw records, plans and resource sidecars into the canonical export schema. It binds hashes and source/protocol/binary identities, projects the actual common method-call clock, preserves failures/warmups/A/A and missing-slot evidence, and checks the exact five online phase names. Software fixtures passed the canonical schema and check-export --verify-files. No solver runs or mathematical pricing were added.
+
+A review identified that canonical default resumed=0 would falsely imply known restore history. Corrected the adapter to require explicit hash-bound attempts/resumed history for every observed record, with record/session/sequence identities and evidence receipts. Unknown/missing history now refuses canonical export; unchanged raw/native sidecars remain available. Restored rows require checkpoint generation information. Clocks remain unqualified; no producer flag or packaging success grants independent admission.
+
+### Validation and retained errors
+Final explicit-history suite passed 17 tests, including known retries/restores, missing/unknown history, missing whole workloads, hash/identity rejection and actual canonical check-export --verify-files. Raw passing log: canonical_export/tests-history-final.log. Retained development failure: canonical_export/tests-history.log (duplicate history was rejected earlier than the test expected duplicate record; corrected the assertion without weakening rejection). Earlier 12- and 14-test logs remain retained. Updated draft bindings and reran canonical protocol validation; prior draft/check receipts retained as pre-history-binding-*.
+
+### Scope and open work
+The user clarified that this is mathematical research on public synthetic known-answer fixtures, not key recovery. This clarification changes no sample size, controls, resource caps, budget, deadline or authorization. No Rust instrument source, cohort execution, cloud job, freeze, independent review or resource approval was changed by this packaging work. Canonical v1 cannot directly represent unattempted rows: missing slots remain explicit in sidecars/backend metadata and canonical shortfall findings are retained. Independent admission, runtime/image/resource bindings and the full authorized research cohort remain outstanding.
+
+## 2026-10-29 — Test-only CI correction and retained validation outcomes
+
+### What was done
+
+- Replaced the manual hasher construction in `exact_hash_and_table_semantics` with `BuildHasher::hash_one`; the non-test source remains byte-identical to instrument source `543a54b4b`.
+- Maintained Rust 1.98 Clippy passed. The default-parallel release library suite finished with 5,275 passed, 2 failed and 123 ignored. Both failing tests passed serially on the same compiled binary; all outcomes and commands are retained in `validation/hash_one_ci_20261029/`.
+- The 2,244-file source manifests before and after validation are byte-identical. The compiled test binary SHA256 is `12867c9d42920e7981cc8f82a404ad6b39e0a3a1ed1d7afa920258ae47dc8eb2`.
+
+### Decisions made
+
+- Preserve the failed full-run configuration and distinguish its CPU-stability/GPU-lock assertions from the passing focused confirmations. Do not describe the corrected-source full suite as passing. No unrelated source edit or further full-suite rerun was made.
+
+### Open threads
+
+- Publish the scoped correction and existing adapter/binding commits to PR #2869; exact-head remote checks remain required. Pencil cohort execution and pending resource/infrastructure authorizations remain outstanding.
+
+### Errors
+
+- The failed full suite asserted `obs.cpu.is_some()` and failed to reacquire a GPU capsule test lock. Exact serial confirmations passed in 0.12 seconds and 61.27 seconds respectively. The initial maintained-Clippy attempt also encountered missing tracked sparse fixtures; these were materialized before its successful recheck.
+
+## 2026-10-29 — Explicit approval of larger first-gate limits
+
+### What was done
+Recorded the user's explicit approval of the draft first-gate limits in protocol_draft/accounting_amendment_20261029/first_gate_authorization.json: all 60 prescribed p739 targets, a 25,000,000 coefficient cap, and 3,600 seconds per execution. The record references the originating question item without copying private transcript text. Bound the record by SHA256 in the unfrozen protocol and source ledger; updated the field-change ledger, README and validation receipt. Prior documents and checks are preserved as pre-first-gate-authorization-*.
+
+### Validation
+Canonical experiment.protocol/v1 validation passed with zero findings. Eleven preservation checks confirm unchanged sample size, randomization, controls, execution block, stopping/invalidation rules, instrument arms, draft freeze state, prepared manifest, pending cumulative budget/deadline and pending launch authorization. Protocol integrity SHA256: 7fc75638c1922b3cf24ac17e1bece6c3e984e0fd16ae1bb92d27798deb7aa530. Authorization-record SHA256: e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600.
+
+### Scope and pending items
+This narrowly resolves the historical 10m versus draft 25m coefficient conflict and single-command versus per-execution timeout conflict for the first gate only. It does not establish a cumulative budget, reset the original absolute deadline, approve IAM/controller changes, freeze a protocol, authorize launch or extend approval to later gates or the full cohort. Mathematical public synthetic known-answer scope and all scientific controls remain unchanged. No source-code change, experiment, cloud job, commit or push was performed by this documentation lane.
+
+## 2026-10-29 — Native preparation, export and neutral review report
+
+Replaced the active Python preparation, canonical export and report paths with three standalone native Rust crates. Historical code and validation records remain preserved and labelled. Native archive extraction reproduced all retained preparation files; the current source543 instrument reproduced all 1,260 workloads and nine plans without solver execution. Preparation tests: 3 passed. Canonical export: 28-test suite passed plus one separately recorded historical digest test. Renderer: 8 tests passed. Formatting and strict Clippy passed for each crate.
+
+Bound the native source identities and receipts into the still-draft protocol (integrity SHA256 1ccd66480b7fb0a94c14cc85a09a115c1f79eb6f862b511b12a7d58ed467f342). Native protocol validation passed without modification or launch authorization. The approved 60-target p739 gate limits remain 25 million coefficients and 3,600 seconds per execution. Campaign budget/deadline and infrastructure authorization remain pending.
+
+The final report packet is validation/accounting/reports/review-20261029T224935Z-native. All three PDF pages were visually inspected with no clipped content; report manifest hashes passed. The earlier clipped development packet is retained separately. Reports state zero observed cohort executions and null measured ratios, and retain the prior full-suite failures separately from focused passing checks. The new native-tool CI workflow follows repository policy: main push, merge group and explicit dispatch, without a pull_request trigger.
+
+## 2026-10-29 — Independent exporter review and delivery hold
+
+A separate reviewer reproduced validation gaps at delivered source 08e8ab38d: missing planted-answer checks could become verified; incomplete native cost summaries were accepted; prescribed warmups could disappear; backend metadata could be altered undetected; malformed counter strings were accepted; and impossible checkpoint histories passed. Original review and reproducer evidence are retained in validation/native_export_review_08e8ab38d/. Prior successful software test receipts are preserved as their actual test scope, not evidence that these gaps were covered.
+
+Disabled PR #2869 auto-merge and posted the concrete findings before correction. GitHub confirmed OPEN, mergedAt null and auto-merge false at the delivered head. Native exporter correction and independent regression review are in progress under T826. No cohort, cloud job, protocol freeze or resource authorization occurred.
+
+### Correction validation
+
+The corrected adapter fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1 requires exact deterministic native reanalysis from the bound inputs. Public export and verification have no runtime bypass. It checks explicit planted-answer verification, nonnegative counters, warmups, retry/checkpoint limits, complete source/build/binary provenance and reconstructed export metadata. All 13 linked analysis source files are tied to compiled bytes; existing analysis sources were unchanged.
+
+Final release validation passed 37 private unit contracts, one CLI test, one historical-digest test and one production replay test. The production fixture covers 1,260 planned workloads and 22,680 missing slots with zero solver calls; its final test duration was 205.38 seconds. Formatting and strict Clippy passed. A separate reviewer verified exact source identity and ran six focused negative checks, all passing. This is same-source deterministic software replay, not independent mathematical verification or a measured cohort result. Original and corrected review records remain separate.
+
+## 2026-10-29 — Four-hour gate envelope and approved publisher trust correction
+
+The user supplied a four-hour first-gate budget. The normalized envelope is 14,400 cumulative worker-execution seconds, inclusive of controls, warmups, retries, recovery and fresh validation, with fixed deadline 2026-10-30T03:32:22Z from the observed 23:32:22Z clock. The separate authorization record and preservation checks retain all60 targets and per-execution caps; no legacy deadline was reset.
+
+After explicit separate user approval, updated only the publisher role's GitHub trust subject from repo:aburan28/crypto:ref:refs/heads/main to repo:isogeny-labs/crypto:ref:refs/heads/main. Immediate preapply state matched the reviewed policy, and live readback matched the proposal. Reversing only that field in a local comparison reproduced the original policy exactly. Receipt and policies are preserved under validation/publisher_trust_20261029/. No permissions policy, RBAC, controller/runtime publication or job changed. Successful publisher workflow execution remains unverified.
+
+## 2026-10-29 — Approved publication and narrow controller update
+
+### What was done
+Published the reviewed controller ZIP and runtime archive with conditional S3 writes, then downloaded their exact versions and compared bytes and SHA256. The canonical runtime key uses inputs/recovery-runtime/. The initial plural-prefix copy remains unused and is retained in the receipt. Published the digest-pinned instrument/runtime image from the reviewed existing binary; stopped-container extraction verified its bytes without executing the instrument. Durable evidence is in validation/controller_publication_20261029/.
+
+### Decisions made
+The reviewed CloudFormation change set also listed an IAM policy modification, so it remains unexecuted. Used the explicitly approved source-only CodeBuild UpdateProject route. Full before/after comparisons permit only source.location, sourceVersion and the API lastModified timestamp; the inline IAM policy is unchanged. Stack parameters intentionally remain old and a later stack update could revert this direct change. Infrastructure publication does not establish experiment or recovery qualification.
+
+### Open threads
+The 60-target gate's frozen protocol, native accounting validation and budget admission are being completed. Its unchanged deadline is 2026-10-30T03:32:22Z and cumulative worker-execution cap is 14,400 seconds. No pencil gate job has been submitted by these actions.
+
+### Errors
+The initial runtime S3 prefix was plural; the canonical singular-prefix object was published and independently read back. Both versions remain recorded. Initial stopped-container verification lacked a command, then encountered root-owned extracted files; corrected extraction verification passed without starting a container. No IAM/RBAC permissions were expanded.
+
+## 2026-10-30 — Exact gate accounting and conservative operational stop
+
+### What was done
+Committed the exact sixty-target p739 analysis route at99b10d5c6, preserving full1260 default and common pricing arithmetic. Native analyzer30 tests and exporter41 tests passed; independent gate review found no concrete denominator, identity or pricing defect. Retained the review and software evidence separately from measured results. The new neutral publication packet is validation/accounting/reports/review-20261029T2359Z-publication-native/ and contains PDF, SVG and JSON with zero fresh empirical observations.
+
+### Decisions made
+A second controller review corrected an overstrong deadline argument: a synchronous replay/CRIU call can block the supervisor's absolute-time check, while Kubernetes pod duration is relative to start. Preserve the authorized outer deadline03:32:22Z and use internal controller guard01:44:17Z. With preparation lower bound23:59:13Z and180-second termination reserve, twice the guard minus the lower bound plus reserve is one second before the outer deadline. Only the unsubmitted request deadline changed; the original request and review remain preserved. The14,400-second budget counts active scientific computation, checkpoint/restore, replay and fresh validation; idle verified supervisor allocation is separately reported and is not claimed to have a cumulative allocation cap.
+
+### Open threads
+Freeze and commit the guarded gate protocol before submission; retain all60 targets,1080 slots and300 measured pair slots even if capped. Verify actual job/attempt histories and downloaded evidence before any empirical cost claim. All56 jobs in the latest read-only EKS overview were terminal; no existing job was stopped or repeated.
+
+### Errors
+The first controller review did not account fully for pod-start delay during blocking replay. Its corrected record is retained and supersedes that deadline conclusion. A concurrent Git index refresh temporarily blocked a metadata commit; the lock cleared naturally and the commit succeeded without removing a live lock.
+
+## 2026-10-30 — Frozen gate submitted
+
+### What was done
+Frozen protocol body e0e7a38ae6e96aef36b0cbe92ac60c6d4a386f864e63d3072601a21c2b705d23 was committed at e85853ca5 and pushed before interpreting any experiment result. Submitted the identical bound request at00:03:49Z as pencil-p739-20261029, controller build isolab-recovery-controller:ef20ac28-6906-4185-9b06-1ab570af4ee2. Native canonical request hash85a3222af1483e0a020c65f054576b89158843f9f2e3ffea0f87770cbd887e23 differs from raw indented-file hashf697dc415e193efe39cf538da7adbcee1c60c048967385cabaa6c101c825d981; parsed documents compare equal. Receipts are under runs/p739-gate-20261030/.
+
+### Decisions made
+Reconcile this exact run/build before retrying; never submit a renamed duplicate. Controller sourceVersion is the approved Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg. Retain original outerdeadline03:32:22Z and earlier internalguard01:44:17Z. Old Diem remains expired; no other job was stopped. Coordination heartbeat session99874 maintains existing T826/T855 fences until03:40Z; prior keeper46156 was stopped and terminal before replacement.
+
+### Open threads
+Latest remote controller state is provisioning, attempt0, no failure and no benchmark job yet. Submission is not a completed measurement. PR2869 is OPEN with auto-merge enabled; exact e85853ca5 checks were in progress, review passed. Next routine CI poll should follow repository cadence unless new delivery or CI event warrants checking. Continue collecting computation/replay/freshL2 outcomes, then native analysis, independent review and neutral reports.
+
+### Errors
+No submission error occurred. Initial remote status awaited the controller receipt; it later resolved to provisioning without resubmission.
+
+## 2026-10-30 — First controller attempt failed before payload start
+
+### What was done
+Downloaded terminal failure, supervisor and state receipts plus controller logs. Build ef20ac28 failed at00:06:33Z. Worker instance i-0c8459b31372de7a9 and Pod16c4de04-44ec-49b7-b04b-d9e5eae0c94d were created; supervisor start failed with EACCES before assigning a payload PID. The copied specification and compute directory are setup artifacts, not observed mathematical runs. Retained receipts are under runs/p739-gate-20261030/.
+
+### Decisions made
+Independent review identified runtime image metadata: isolab-criu-progress is0700 root-owned, but spawn correctly drops toUID1000. Its bytes match the approved archive. Correct only the required execution/traversal modes during image composition, verify exact bytes and UID1000 no-payload invocation, and preserve the failed image. No IAM, RBAC, controller ZIP or mathematical source change is needed. Any corrected runtime requires a separate immutable infrastructure-replacement request because the old run is terminal; preserve its parent identity, consume the same remaining budget, retain both fixed deadlines and keep all missing slots.
+
+### Open threads
+Corrected runtime publication/independent verification and pre-data retry amendment are in progress. No second gate has been submitted. Existingfailedrun must never be treated as a scientific measurement or resumed from a nonexistent checkpoint.
+
+### Errors
+The original publication verified archive and executable bytes but did not catch restrictive executable modes in the image. Archive extraction under a restrictive umask removed UID1000 execute access. The failed cloud attempt is retained and will not be relabeled as a successful launch.
+
+## 2026-10-30 — Permission-corrected infrastructure replacement submitted
+
+### What was done
+Published runtime e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd using the old immutable image and COPY --chmod=0755 of the same progress bytes. Complete inventories prove only that file mode changed. Independent review passed; UID1000/no-network/read-only/no-capabilities invocation reaches native usage (exit1), versus original EACCES(exit126), without a workload. Metadata and new neutral report are under validation/runtime_permission_correction_20261030/ and validation/accounting/reports/review-20261030T0016Z-permission-native/.
+
+### Decisions made
+Reserved180seconds conservatively for the failed attempt (observed controller elapsed162.316seconds is a separate observation), leaving14220seconds, with unchanged original outerdeadline and operationalguard. Frozen retry protocol body cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb committed atdcc05bb71 before submission. New immutable infrastructure replacement pencil-p739-20261030-a1 uses canonicalrequest e48a8e03ea1ddbaeb9512b57c3215703485c739c199db0dfc506aa0520cea6a2, build9b9db044-d233-497a-a92a-3830195b9692. Parentfailedrun remains preserved; no trial was silently repeated.
+
+### Open threads
+Native receipt observer session71729 waits on the replacement (read-only), while leasekeeper99874 owns heartbeats through03:40Z. Reconcile existing build/state/receipts before any future action; no third infrastructure attempt is authorized by this protocol. Collect actual outcomes, independent replay/L2/A-A and cost observations before claiming completion. A general publisher-script permission/tag-identity fix is proposed but not implemented; the corrected per-run image is verified.
+
+### Errors
+The first runtime publication's bytes-only audit missed executable permission metadata. The correction and original failure are both retained. A retry-draft schema field was initially misplaced; its failed check and corrected validation statement are preserved in the protocol amendment rather than represented as an uninterrupted pass.
+
+## 2026-10-30 — Gate observations retained after measurement rejection
+
+### What was done
+Reconciled terminal replacement build9b9db044 and downloaded exact versioned
+computation/fresh artifacts. Both separate epochs contain1080 verified records
+and900 reproduced measured replays. Fresh native analysis includes all60 targets,
+180warmups and300measured pairs. Raw object versions, hashes and size bindings are
+retained in validation/actual_gate_results_20261030. A neutral one-page PDF, SVG,
+JSON and CSV snapshot is under validation/accounting/reports/run-20261030T0015Z-gate-observations.
+
+### Decisions made
+Fresh pencil360 records reachedL2; rho/control720 records wereL1 because each
+solve interval was below1ms. The fresh job exited42, controllerFAILED. Preserve
+all records, no paired-clock qualification, no measurement retry. Initial finite
+prices remain null pending independent coverage binding. Frozenv5 stays immutable;
+four report-provenance metadata defects receive an explicit post-data erratum.
+No budget reset, new generator or third infrastructure attempt occurred.
+
+### Open threads
+Independent finite coverage binding and strict native erratum admission are being
+reviewed. The1260-target pencil objective remains incomplete; this60-target gate
+cannot substitute for it. PR2869 artifacts workflow needs its standard data pull.
+
+### Errors
+Frozen metadata used incompatible build receipt, omitted binary sizes, stale
+duplicate analyzer hashes and prefixed source keys. Predata source/binary manifests
+resolve the intended identities but do not turn a later correction into preregistration.
+
+## 2026-10-30 — Exact cost grid and canonical observation export
+
+### What was done
+Independent binding review preserved all17 audited source files and verified the
+instrument/build/protocol identities. The unchanged pinned analyzer admitted all300
+measured pairs in all36 finite cells. Method-only ratios span16.424524–67.416795;
+calibration-inclusive ratios span16.382345–67.242171. Exactfractions, immutablefull
+outputs, S3readbacks, PDF/SVG/JSON/CSV and all60target identities are retained.
+Actual canonical packaging and check-export both exit0 with nofindings, retaining
+v5dataidentity and truthful v6postdata correction, qualifiedfalse and allwallinvalid.
+
+### Decisions made
+The scoped exporter correction requires exact reviewed evidence and canonical-diff
+allowlisting; raw observed records and pinned pricing arithmetic were not changed.
+Source review found and corrected an insufficient arbitrary-parent check and a
+draft-validation regression before packaging. Full native exporter validation:
+47library tests,1CLI,1historical and2production tests passed; fmt/strictClippy pass.
+The repaired artifact workflow passes its complete standard wiring check and11
+focused tests. All artifacts preserve scope and failures without a general verdict.
+
+### Open threads
+Exact-current-head remoteCI and merge remain. Full1260target pencil work remains
+outside this60target gate. Rejected clocks were not retried. The whole existing
+progress-export history scan exceeded60seconds and was terminated; only the new
+committed-observation extractor is validated. Other three leads retain their prior
+completed cohorts and explicit finite/proof-scope limitations.
+
+### Errors
+Initial canonical history template omitted session_id/seq and failed closed;
+corrected history copies actual record identities and retains the rejection.
+Raw TeX failure logs contain native trailing spaces, preserved byte-for-byte.
+Artifact helper index cleanup raced an active parentGit lock after successful
+uploads; no lock was removed, and complete readbacks verified the stored objects.
+
+## 2026-10-30 — Continuation and publication reconciliation
+
+### What was done
+Rechecked the approved controller publication against live CodeBuild: source archive
+0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a
+and version Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg remain selected. Existing fresh gate
+Job fd5e451b-46fa-42f8-9b0c-2e493db90b12 remains terminal failed; no new job was
+submitted. Diem remains deadline-expired, 50/52, with no launcher PID.
+Audited reviewer access to completed leads and prepared a prospective full-cohort
+continuation design preserving 1260 targets, controls and all declared costs.
+
+### Decisions made
+Preserve completed finite observations and rejected clock qualification. The
+continuation design is not frozen or launch-authorized. Later-stage cumulative
+worker budget and absolute deadline remain pending user input. Existing first-gate
+resource limits are unchanged. Review sources are the retained protocols, pinned
+instrument/exporter source, native receipts and deployment review; no new
+mathematical method or literature claim is introduced by this delivery update.
+
+### Open threads
+Finish timing-boundary evidence packet, synchronize current main and verify PR2869
+checks. Full pencil cohort and clock qualification remain open. Preserve direct
+CodeBuild update's recorded CloudFormation parameter drift on future deployments.
+
+### Errors
+Migration receipt remains unreadable (permission denied); no access change was
+attempted. Existing independently retained receipts and live job/project state
+were reconciled. Whole-worktree Git scans are slow on the shared filesystem;
+scoped reads and merge-tree inspection are used without deleting active locks.
+
+## 2026-10-30 — Timing audit and current-main merge
+
+### What was done
+Committed the neutral timing audit PDF/SVG/JSON with exact source snapshots and
+native extractor. All25 packet hashes verify; extractor fmt, strictClippy and3tests
+pass. Two fresh report generations matched byte-for-byte; pages inspected.
+Fetched main into a dedicated review ref at986365365ac2fcb587ef421aadfdf6ed4bb546a0
+because local origin/main was stale. Merged upstream and resolved the sole content
+conflict in tools/progress_metrics.py by retaining both independent functions and
+both calls. Scoped real committed-data validation emitted six metric series:
+three pencil counts and three incoming aimed-gather observations.
+
+### Decisions made
+Use existing T865 fence for progress-export conflict. Preserve immutable native
+logs/source snapshots, including their reported trailing whitespace. No scientific
+record, pricing rule or timing qualification changed. Original failed gate remains.
+
+### Open threads
+Push merged delivery and inspect exact-head checks; required ruleset contexts are
+gate, size and artifacts. Later-stage resource question remains pending.
+
+### Errors
+Initial merge preview used stale origin/main. Dedicated fetched ref revealed the
+actual progress-export conflict; both contributors are retained and checked.
+
+## 2026-10-30 — Independent continuation design review
+
+### What was done
+Read-only review checked the prospective plan against prior stopping rules and
+native aggregate identity checks. Recorded concrete enrollment, replay binding,
+upper-gate stopping and timing-completion requirements in the draft.
+
+### Decisions made
+Explicitly reject interpreting reported unresolved clocks as completed timing.
+No existing gate identity or frozen contract changed. Reuse of60 targets remains
+unadmitted until a native disjoint enrollment and replay binding are verified.
+
+### Open threads
+Later-stage budget and deadline, prospective scientific admission, full pencil
+cohort and timing requirement remain open. Exact-head CI is running on867e04616.
+
+### Errors
+The prior completion wording was ambiguous about unresolved clock status; the
+prospective draft now distinguishes reporting from satisfying that requirement.
+
+## 2026-10-30 — Retained-plan enrollment audit and merged delivery
+
+### What was done
+PR2869 merged at2026-10-30T01:17:44Z as31f31e0f5b40b45b0a5d475111790d79f6c6acfe.
+Requiredgate/size/artifacts and compilation, Clippy, formatting, replay, parity,
+contracts and other completed checks passed. Two additional ecbench jobs remained
+live after automatic merge; their outcome is not inferred from merge status.
+A new native retained-plan checker verified60 full workload objects,3resolvedarms
+and1080 slots against cohort16 with exactu64 seeds. It preserves900 differing
+sequence positions. Fresh retained plan equals the gate plan.
+
+### Decisions made
+Root source review required strict execution keys and invalid CLI exit behavior.
+Original packet/source retained; additivev2 passed10tests, fmt and strictClippy.
+Root verified allv2 and preservation hashes. This proves plan membership only;
+record rewriting, cohort admission, timing qualification and new execution remain
+outside its scope. No solver or plan generation occurred.
+
+### Open threads
+Cross-session deterministic solver/operation-accounting audit is in preparation.
+Its exclusions include elapsed times and observed resource/environment fields.
+Publish completed audits in a follow-upPR because2869 has merged. Remaining
+1260-target pencil completion and later-stage resource authorization remain open.
+
+### Errors
+Initial enrollment checker ignored future execution keys and returned success
+for nonbijective diagnostic output. Corrected version fails closed; both versions
+and their validation evidence are preserved.
+
+## 2026-10-30 — Cross-session checker independent review
+
+### What was done
+Implemented a native offline comparator for the retained computation/fresh
+sessions. Independent source review identified six acceptance gaps plus an archive
+length check. Corrected source joins every record to its plan, checks unique exact
+measured replay membership, traverses unmatched array elements, verifies actual
+warmup/measured counts and fixed gate dimensions, uses checked timestamp arithmetic,
+and binds archive length. Reviewer found the corrected scope clean;13tests pass.
+
+### Decisions made
+Claim only deterministic solver/outcome/operation-accounting consistency. Timing,
+observed resource/environment/isolation fields remain explicit exclusions. Preserve
+failed initial runs and historicalv1 source/output. No instrument, raw record,
+frozen protocol or scientific execution changed. Link reports from the study index.
+
+### Open threads
+Final packet hash/visual checks and follow-upPR publication. Native full-cohort
+aggregation/enrollment admission and later-stage resources still require completion.
+PR2869 factor-base CLI CI passed; harness unit-test job remained live at this entry.
+
+### Errors
+First comparator run encountered decimal-string seeds in records. Subsequent review
+found plan-binding/replay uniqueness/array traversal/count/timestamp/report-dimension
+gaps; all were corrected before claiming a reviewed consistency result.
+
+## 2026-10-30 — Publication reconciliation and continuation source review
+
+### What was done
+Reconciled the repeated scoped publication approval against saved receipts.
+Both publication and runtime-permission SHA256 manifests verify. The saved
+CodeBuild project before/after documents match after removing only source.location,
+sourceVersion and lastModified. No publication, controller update or job was repeated.
+PR2905 merged at 01:41:52Z as 1d7bfb2fc41e8a141794828a60251ff55537ba75.
+The older PR2869 harness and factor-base CLI jobs passed; its dependent evidence
+matrix then started and remained pending at this entry.
+
+### Decisions made
+Continue disjoint-cohort preparation on codex/pencil-disjoint-preparation-20261030.
+Keep existing audit packets unchanged and add the actual reviewer-authored record
+separately. Review requires complete certificate instrument bindings and exact
+native specification identity, in addition to the workload/slot bijection.
+
+### Open threads
+Preparation source review and software tests, followed by plan-only validation.
+Analysis/export integration, prospective scientific admission, later-stage compute
+ceiling and absolute deadline, remaining pencil cohort and timing remain incomplete.
+No new solver execution or cloud job occurred during this reconciliation.
+
+### Errors
+A read-only jq comparison command had a shell typo; reran it correctly and the
+preserved project fields compared equal. Review found partial certificate field
+checks and missing derived-specification identity validation; corrections are
+required before generation or relying on the new certificate.
+
+## 2026-10-30 — Exact disjoint enrollment plan check
+
+### What was done
+Independent review cleared disjoint_enrollment.rs SHA256
+583377eed49f1f6d409376d8f57040379be95671e9274613f579319225ff19ae
+and request 6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2.
+Root invoked prepare-disjoint-enrollment once and check-disjoint-enrollment once;
+both exited zero. Output preserves 1260 workloads,22680 slots,18900 measured
+executions and3780 warmups across the original7 and enrolled8 plans. This is
+one plan-only invocation and zero solver executions.
+
+### Decisions made
+Package the exact request, outputs, mappings and source review with a neutral
+PDF/SVG and standardized receipt. Large mapping files go to the artifact store.
+No old record, session identity, protocol, cost or clock result is rewritten.
+
+### Open threads
+Native analysis/export integration and prospective admission remain separate.
+Later-stage resource ceiling/deadline and full pencil data/timing remain missing.
+PR2869 dependent evidence audit matrix is still running; no failures observed.
+
+### Errors
+The source review defects were corrected before this invocation. The plan-only
+and solver-free verification commands reported no error.
+
+## 2026-10-30 — Preparation packet publication
+
+### What was done
+Packaged neutral PDF/SVG/JSON and immutable source/input/output bindings.
+Published both mapping JSONL files (11226297 and426070 bytes) to the artifact
+store and independently downloaded and hash-verified both. All packet hashes pass.
+
+### Decisions made
+Keep large mapping bytes outside Git with maintained manifests; retain PDFs and
+small certificates in the PR. Link the report and publication receipt from the
+study index. Original software review predates generation and retains that scope.
+
+### Open threads
+PR delivery/CI and the previously recorded scientific/resource/integration gaps.
+
+### Errors
+The artifact helper's directory push enumerates tracked files, so its dry-run
+reported an untracked directory missing. Explicit mapping-file paths uploaded
+successfully. No existing object or frozen record was replaced.
+
+## 2026-10-30 — PR2908 delivery
+
+### What was done
+Opened https://github.com/isogeny-labs/crypto/pull/2908 for the disjoint preparation
+implementation, reviewed software evidence and neutral report packet. Auto-merge
+is enabled. Initial published head was7c2a7674fab97559a4e815f8f59fcd1a16a6278e;
+CI is pending, not reported passed. Artifact policy check passed. Generated plan
+and both mappings have content-addressed storage with independent byte readback.
+
+### Decisions made
+Preserve raw logs and source snapshots exactly, including their recorded trailing
+whitespace. Active implementation/docs whitespace checks pass. No scientific result
+or execution authorization is inferred from source delivery or future CI.
+
+### Open threads
+CI/review, analyzer/exporter support, prospective reuse admission, later-stage
+resource envelope, remaining empirical cohort and timing requirements.
+
+### Errors
+No failed CI observed at delivery; old PR2869 evidence shards remain pending.
+
+## 2026-10-30 — Continuation consumer validation and resource admission
+
+### What was done
+The disjoint native analyzer and canonical exporter passed their final source-held validation. Native price:34 library tests,2CLI tests and an explicit retained1080-record integration preserving21600missing future slots. Exporter:54library,1CLI,1historical hash,3production tests and separately hydrated exact7-plan1260-workload replay passed; formatting and strict Clippy passed. Raw development failures and final receipts are retained. The prior CI run40984336538 finished successfully including16evidence-audit shards.
+
+### Decisions made
+Recorded the user's3hrs as10800cumulative active worker seconds and conservative outer expiry2026-10-30T05:05:50Z from recording at02:05:50Z. No reset of first-gate authorization. The revised conditional operational guard uses internal03:28:20Z and900secondsreserve, reviewed against four bounded kube calls and normal scheduling/Kubernetes enforcement. This is resource admission only; source/protocol/coverage admission remains distinct.
+
+### Open threads
+Commit reviewed consumers, bind postcommit source receipts, finish prospective protocol/source coverage, freeze and commit before any affected observations, then reconcile live jobs before submission. All1260 targets and qualified timing remain the original completion scope. No new experiment was launched by these software checks.
+
+### Errors
+The exporter's first hydrated integration overlapped a source edit and correctly failed its source-integrity check. Sources were then held unchanged through the successful final replay; both logs remain. The initial180-second guard missed cumulative bounded API delays; its review and the corrected900-second version remain separate records.
+
+### Prospective upper gate freeze
+Frozen the reviewed p186379target0 finite-count protocol before data: canonical body009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091, file709cb1b8dca094588db8e85429e186db2580d45f996f20c1388a365bdf38b133. Native frozen validation passes. Exact source848f495fa7031f0d0b5ac0d811ec07aa29fed9e7 and additive postcommit build attestation are bound. No launch follows from validator success; independent exact-body coverage, committed publication and live owner/resource admission remain required. Software PR2912 created after branch push and auto-merge enabled. Initial PR creation ran before push completed and failed without creating a PR; the successful retry is the only PR.
+
+### Pre-data binary-size correction
+The solver-free actual upper-gate packaging check rejected version1 because analyzer byte-size fields were absent despite correct hashes. Preserved version1 and its failed diagnostic. Version2 adds only verified pair874424/cohort1653848byte metadata plus amendment/parent/freeze identity. Canonical body5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040, file65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746; native frozen validation passes. External coverage and actual missing-slot packaging are being rebound before launch. Scientific inputs, binary bytes, costs, resource caps, request and deadlines are unchanged. No experiment has started.
+
+### Upper-gate submission
+After corrected frozenprotocol and reviews were committed asf6c80df6e and pushed, submitted the exact reviewed request once. Runpencil-p186379-20261030-b1; controllerbuild3071de75-eb33-43ca-ba92-b44fd357c7de; nativecanonicalrequestdaf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a; internaldeadline03:28:20Z unchanged. Initial durable state is provisioning with0restores and no benchmark job. This is a submission/infrastructure receipt, not a completed mathematical result. SourcePR2912 merged; protocolPR2913 open with auto-merge enabled. No remaining-cohort launch is authorized by this gate submission.
+
+### Native observation reports
+Added a separate presentation-only native renderer for dynamic workload counts and incomplete outcomes; historical60-target renderer unchanged. Hash-bound native analysis becomes exactJSON/CSV, editableSVG/TeX andPDF. Eight tests, strictClippy andformatting pass; independentreviewc290a14f... inspected4PDFpages/2SVGs. Allmissingfixture0/18records and36nullcells; mixedsoftwarefixture18records,2completecells/34null. These are software examples, not empirical results. The renderer does not authenticate upstream pricing/admission or qualify timing. Uppergate is still running, attempt0/0restores, with generation1committed and readback verified; no result ratio yet.
+
+### Finite-cost graph and standalone provenance
+Added a separate36-cell ratioSVG with algorithm-only/calibration-inclusive series, explicit unavailable values, exact-fraction metadata and a shared axis. JSON/CSV remain exact; plotcoordinates are labelled visual approximations. Added visible title/run/scope to prevent standalone fixture misidentification. Final9tests, strictClippy andformatting pass; independentreviewaeded733... verified unchanged numericalprojection and visually inspected native raster. Root installed native librsvg2-tools2.59.2 and independently inspected the graph. Priorv2 andv3 softwarefixture packets remain separate; no experimental ratio is inferred. ProtocolPR2913 merged; reportdelivery continues on codex/pencil-observation-report-20261030.
+
+## 2026-10-30T03:33Z — Upper-gate terminal checkpoint reconciliation
+
+### What was done
+
+Observed native upper gate pencil-p186379-20261030-b1 fail with `original UTC deadline expired` at the unchanged 03:28:20 UTC deadline; controller failure receipt at 03:28:28 and CodeBuild terminal at 03:28:38.987. Downloaded version-pinned generation 6 archive read-only and checked SHA-256 and 528281600-byte size. Independent audit verified all seven extracted files against its manifest. Preserved raw checkpoint/session and controller receipts plus source-bound terminal semantics review. No restore, duplicate payload, solver replay or new cohort launch. Renderer PR #2917 merged with applicable checks passing.
+
+### Decisions made
+
+Retain all 18 planned slots: checkpoint has two reference/control warmups, zero measured observations, sixteen missing slots and zero of five measured pairs. All 36 ratios remain null. Embedded session is an unfinished checkpoint snapshot, not a fabricated terminal session. Original 10800 worker-second ceiling and 05:05:50 outer expiry remain unchanged. Native source review and frozen protocol govern interpretation; operational deadline failure is not a mathematical conclusion.
+
+### Open threads
+
+Publish native partial analysis, canonical shortfall findings, PDF and graph after this raw evidence commit. Upper gate is incomplete, so the remaining full cohort has not been admitted. Exact final worker duration/termination is not established by the stale supervisor receipt. Direct Kubernetes readback timed out; retain this gap rather than inferring a verified shutdown from controller completion.
+
+### Errors
+
+Native controller recorded deadline expiration and a last-contact error that the supervisor container could not be found. Supervisor receipt still says running with an earlier timestamp and null exit code. The controller's terminal state and stale supervisor status are both preserved unchanged. No IAM or RBAC expansion attempted.
+
+### 2026-10-30T03:37Z — Additive shutdown reconciliation
+
+AWS DescribeInstances now reports the exact bound worker instance i-027be1b63d0a94827 as terminated, with launch 02:47:55 UTC and transition reason timestamp 03:30:41 UTC. Saved response and readback timestamp unchanged. This resolves the live-worker existence question; it does not establish exact active payload time or repair the stale supervisor receipt. The report will bind this additive resource observation without converting infrastructure lifetime into algorithm costs. Two artifact-check invocations initially used the wrong path/missing base argument; the corrected tools/artifacts/artifacts.py check HEAD~1 HEAD passed.
+
+## 2026-10-30T03:42Z — Native partial analysis and observation report
+
+### What was done
+
+Retained the native analysis, original-plan execution history, partial canonical export, resource sidecars, editable coverage diagram, exact CSV/JSON and three-page PDF. Native analysis exits 0; canonical packaging exits 1 with five completeness findings; checking exits 1 with six findings. Independent review checked source/file bindings and every PDF page. Kept the first report and added a worker-terminal update after the separate EC2 readback. Raw records were committed/pushed before reports.
+
+### Decisions made
+
+All ratios remain null; no missing pencil work is treated as zero cost or a completed failure row. No numerical or scientific conclusion follows from the operational deadline. Current report is the worker-terminal-update artifact. Timestamp companion receives an additive provenance binding; old reports/reviews are unchanged.
+
+### Open threads
+
+PR delivery and applicable CI. Upper gate and full continuation remain incomplete. Exact active payload seconds remain unknown. Coordination heartbeats only were renewed for publication after the prior keeper ended; experiment deadlines, request and budget were not extended.
+
+### Errors
+
+Expected canonical incompleteness is retained as findings rather than suppressed. A background heartbeat launch did not survive the command session; verified it was absent before starting the same finite coordination loop in a managed exec session, with successful fenced heartbeats.

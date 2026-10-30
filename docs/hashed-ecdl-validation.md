@@ -78,3 +78,14 @@ The compact encoder, fast contraction backend, general-size fields and fixed
 cofactor extension remain unimplemented. Full conditional asymptotic
 replication is unresolved in the [canonical problem record](../problems/hashed-ecdl-tensor-backend.md).
 Hosted gates and merge status are reported by the PR separately.
+
+## Historical receipt; tensor follow-up
+
+The source hashes and outcomes above describe the first bounded reference.
+PR2878 merged as `055c5035be0e36ccf557a0b887dd51c08155e795` at
+2026-10-29T20:56:14Z. Its optional crypto clippy check identified two
+manual-is-multiple-of warnings; the follow-up preserves Rust1.78 with supported
+outer MSRV annotations and rechecks strict lint. The new compact encoder,
+contraction backend and tensor reduction have a separate
+[current validation receipt](hashed-ecdl-tensor-validation.md). The earlier
+capped trace remains incomplete evidence, with its original hash and scope.
