@@ -245,3 +245,13 @@ objects in validation/repaired-main-cc5addeba/examples-pass-20261030T2025Z/.
 No oldbinaries/receipts reused. Clippywasactive20:25; remainingphases/library
 stillpending. DoNOTrepeattheseexamplesonunchangedsource. Nextscheduled21:21
 collection can retain its time; newactualphaseprogress resetsunchanged0.
+
+### Update20:29UTC — all repaired-source scoped checks PASS
+
+Existing49719:23examples,strictclippy/rustfmt,CLIbuild andEXPECTEDexit1+
+checkpoint-refusalMESSAGE,backlogbuild/validate PASS. New immutable
+validation/repaired-main-cc5addeba/scoped-pass-20261030T2029Z/receipt.json
+binds17cleanobjects and5ACTUALcurrentbinaries(3tests+CLI+backlog). No stale
+libtestbinaryhashed; libraryBUILDactive since~20:27,Cargo54125/rustc54133.
+Libraryexecution notstarted at20:29,declaredcountunknown. DoNOTrepeatthese
+unchangedscopedchecks. Collectexistingjob/libraryoutcome at21:21scheduled.
