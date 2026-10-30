@@ -1,0 +1,174 @@
+{
+  "job": {
+    "created_at": "2026-10-28T05:58:19Z",
+    "job_name": "ml-dataset-4c94f1d-pilot-001-20261028",
+    "state": "failed",
+    "status": {
+      "conditions": [
+        {
+          "lastProbeTime": "2026-10-28T05:59:19Z",
+          "lastTransitionTime": "2026-10-28T05:59:19Z",
+          "message": "Job has reached the specified backoff limit",
+          "reason": "BackoffLimitExceeded",
+          "status": "True",
+          "type": "FailureTarget"
+        },
+        {
+          "lastProbeTime": "2026-10-28T05:59:19Z",
+          "lastTransitionTime": "2026-10-28T05:59:19Z",
+          "message": "Job has reached the specified backoff limit",
+          "reason": "BackoffLimitExceeded",
+          "status": "True",
+          "type": "Failed"
+        }
+      ],
+      "failed": 1,
+      "ready": 0,
+      "startTime": "2026-10-28T05:58:19Z",
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "1793f99b-4782-4b6f-8199-2170ccda9d8e"
+  },
+  "pods": [
+    {
+      "name": "ml-dataset-4c94f1d-pilot-001-20261028-sw9xs",
+      "node": "ip-10-84-175-108.us-east-2.compute.internal",
+      "status": {
+        "allocatedResources": {
+          "cpu": "2",
+          "ephemeral-storage": "10Gi",
+          "memory": "4Gi"
+        },
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T05:59:18Z",
+            "observedGeneration": 1,
+            "status": "False",
+            "type": "PodReadyToStartContainers"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T05:59:06Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "Initialized"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T05:59:17Z",
+            "observedGeneration": 1,
+            "reason": "PodFailed",
+            "status": "False",
+            "type": "Ready"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T05:59:17Z",
+            "observedGeneration": 1,
+            "reason": "PodFailed",
+            "status": "False",
+            "type": "ContainersReady"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T05:59:06Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodScheduled"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "allocatedResources": {
+              "cpu": "2",
+              "ephemeral-storage": "10Gi",
+              "memory": "4Gi"
+            },
+            "containerID": "containerd://f976d537b6a1445fb31c2f47fef1650cf9ee436bd9ce470c3e2f4431e06a96c1",
+            "image": "sha256:251c79d8c3bb81fce2428fd6d47ce68bc3e36ee2de94f529ea43bc83a82b6e45",
+            "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c1c439c2a19f6d93b162ed0d3fb6a4f71a9783337796ccf8f0c4d150a62ff4b1",
+            "lastState": {},
+            "name": "task",
+            "ready": false,
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "ephemeral-storage": "10Gi",
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "2",
+                "ephemeral-storage": "10Gi",
+                "memory": "4Gi"
+              }
+            },
+            "restartCount": 0,
+            "started": false,
+            "state": {
+              "terminated": {
+                "containerID": "containerd://f976d537b6a1445fb31c2f47fef1650cf9ee436bd9ce470c3e2f4431e06a96c1",
+                "exitCode": 1,
+                "finishedAt": "2026-10-28T05:59:10Z",
+                "reason": "Error",
+                "startedAt": "2026-10-28T05:59:10Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 1000,
+                "supplementalGroups": [
+                  1000
+                ],
+                "uid": 1000
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/work",
+                "name": "work"
+              },
+              {
+                "mountPath": "/tmp",
+                "name": "tmp"
+              },
+              {
+                "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                "name": "aws-iam-token",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ],
+        "hostIP": "10.84.175.108",
+        "hostIPs": [
+          {
+            "ip": "10.84.175.108"
+          }
+        ],
+        "observedGeneration": 1,
+        "phase": "Failed",
+        "podIP": "10.84.185.171",
+        "podIPs": [
+          {
+            "ip": "10.84.185.171"
+          }
+        ],
+        "qosClass": "Guaranteed",
+        "resources": {
+          "requests": {
+            "memory": "4Gi"
+          }
+        },
+        "startTime": "2026-10-28T05:59:06Z"
+      },
+      "uid": "e6a11061-5ec0-4724-bdaf-3d7fc71e0d2e"
+    }
+  ],
+  "schema": "crypto.ml-dataset.launch-terminal/v1",
+  "terminal_observation": "Failed before cleanup; cleanup raced with scheduling. Job status retained, but workload stderr was lost when cleanup deleted the completed pod. No S3 catalog or lab results were observed.",
+  "local_reproduction": "Same digest-pinned UID1000 image cannot read /opt/ml-dataset/pilot-plan.json: Permission denied (os error13). Docker COPY preserved owner-only mode. Verified locally with an impossible /proc output path, so no scientific worker could run.",
+  "configuration_issue": "Service returns legacy isolab-results bucket. Next attempt explicitly overrides ISOLAB_RESULTS_URI to approved setec bucket, preserving unique job prefix and separate Kubernetes UID receipt."
+}

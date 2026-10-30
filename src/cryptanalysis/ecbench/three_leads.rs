@@ -4,13 +4,18 @@ use super::methods::{PhaseRecord, ResolvedMethod, SolveReport};
 use super::workload::{CurveFacts, CurveSpec};
 use crate::cryptanalysis::curve_id;
 use crate::cryptanalysis::ic_boundary::FieldOps;
+use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::three_leads::{
     self as engine, Counts, NativePhase, Outcome, Point, StudyInstance,
 };
 use num_bigint::BigUint;
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::time::Instant;
+
+#[path = "pencil.rs"]
+mod pencil;
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -111,6 +116,11 @@ pub fn solve(
     target: Point,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        return pencil::solve(m, inst, target, seed);
+    }
+    let adapter_start = Instant::now();
+    let geometry_start = engine::geometry_events::snapshot();
     let cap = m
         .params
         .get("trial_cap")
@@ -162,6 +172,10 @@ pub fn solve(
             return Err("the semaev arm uses the odd-characteristic quadratic; choose linearized or subtract for binary".into());
         }
     }
+    let rho_online = matches!(
+        m.id.as_str(),
+        "rho.three_leads_plain_v1" | "rho.three_leads_negation_v1" | "rho.three_leads_jacobian_v1"
+    );
     let mut out: Outcome = match m.id.as_str() {
         "ic.three_leads_decomposition_v2" => engine::solve_subfield_or_pkm_v2(
             inst,
@@ -174,6 +188,21 @@ pub fn solve(
                 .parse()
                 .map_err(|_| "invalid base_seed")?,
         ),
+        "ic.three_leads_genus2_choice2_v1" => {
+            crate::cryptanalysis::three_leads_followup::solve_genus2_choice2(
+                inst, target, seed, cap,
+            )
+        }
+        "ic.three_leads_genus2_projective_chart_v1" => {
+            crate::cryptanalysis::three_leads_followup::solve_genus2_projective(
+                inst, target, seed, cap,
+            )
+        }
+        "ic.three_leads_genus2_target_rank_v1" => {
+            crate::cryptanalysis::three_leads_followup::solve_genus2_target_rank(
+                inst, target, seed, cap,
+            )
+        }
         "ic.three_leads_genus2_v2" => engine::solve_genus2_v2(
             inst,
             target,
@@ -182,9 +211,17 @@ pub fn solve(
             m.params["independent"] == "1",
             m.params["unique_relations"] == "1",
         ),
-        "rho.three_leads_plain_v1" => engine::solve_rho(inst, target, seed, cap, false, false),
-        "rho.three_leads_negation_v1" => engine::solve_rho(inst, target, seed, cap, true, false),
-        "rho.three_leads_jacobian_v1" => engine::solve_rho(inst, target, seed, cap, true, true),
+        "rho.three_leads_plain_v1"
+        | "rho.three_leads_negation_v1"
+        | "rho.three_leads_jacobian_v1" => engine::solve_rho_with_target_hook(
+            inst,
+            target,
+            seed,
+            cap,
+            m.id != "rho.three_leads_plain_v1",
+            m.id == "rho.three_leads_jacobian_v1",
+            || measurement::begin_online(Phase::RhoSolve),
+        ),
         "ic.three_leads_genus2_v1" => engine::solve_genus2(
             inst,
             target,
@@ -211,9 +248,11 @@ pub fn solve(
             ))
         }
     };
+    let geometry_after_solver = engine::geometry_events::snapshot();
     // Independent post-solver verification is part of the charged cold solve.
     // The ecbench parent then verifies the returned scalar a second time.
     if let Some(k) = out.recovered {
+        let _verification_phase = rho_online.then(|| measurement::scope(Phase::RecoveryCheck));
         let verifier = inst.fresh();
         let got = verifier.curve.mul(verifier.generator, k);
         if got != target {
@@ -226,13 +265,19 @@ pub fn solve(
             counts: c,
         });
     }
+    if rho_online {
+        measurement::end_online();
+    }
     // This is an operation-count conversion, not a host-time calibration.
     // The complete twelve-cell band is derived from the retained primitives.
+    let geometry_after_verification = engine::geometry_events::snapshot();
     let instrument = inst.fresh();
     let twice = instrument.curve.mul(instrument.generator, 2);
+    let calibration_preparation = instrument.curve.f.counts();
     instrument.curve.f.reset();
     let _ = instrument.curve.add(instrument.generator, twice);
     let price = instrument.curve.f.counts();
+    let geometry_after_calibration = engine::geometry_events::snapshot();
     let unit = arithmetic(price);
     if unit <= 0.0 {
         return Err("source addition price is zero".into());
@@ -257,6 +302,7 @@ pub fn solve(
                 ("field_squarings".into(), p.counts.s),
                 ("field_inversions".into(), p.counts.i),
             ]),
+            work_native: BTreeMap::new(),
         })
         .collect();
     let unpriced = out
@@ -266,7 +312,7 @@ pub fn solve(
         .map(|(k, _)| k.clone())
         .collect();
     let detail = json!({"engine":out.detail,"study_family":inst.family,"arithmetic_price":{"square_per_multiply":0.75,"inversion_per_multiply":10,"source_addition":price,"meaning":"declared operation-count conversion; not a wall-time price"},"native_phases":out.phases,"verification":"solver has no planted scalar; fresh source kP checked here and again by ecbench parent"});
-    Ok(SolveReport {
+    let mut report = SolveReport {
         recovered: out.recovered.map(u128::from),
         exhausted: out.exhausted,
         phases,
@@ -291,7 +337,40 @@ pub fn solve(
             sqrs: out.counts.s,
             invs: out.counts.i,
         }),
-    })
+    };
+    let geometry_end = engine::geometry_events::snapshot();
+    report.detail["adapter_accounting"] = json!({
+        "schema":"pencil-adapter-accounting/v1-draft",
+        "geometry":engine::geometry_events::partition(geometry_start, &[
+            ("solver_including_cold_setup",geometry_after_solver),
+            ("additional_source_verification",geometry_after_verification),
+            ("source_unit_calibration",geometry_after_calibration),
+            ("report_assembly",geometry_end),
+        ]).ok_or("invalid adapter geometry partition")?,
+        "source_unit_calibration_arithmetic":{
+            "preparation":calibration_preparation,"addition":price,
+            "total":calibration_preparation+price,
+            "included_in_legacy_group_total":false
+        },
+        "adapter_elapsed_ns_before_accounting_attachment":adapter_start.elapsed().as_nanos(),
+        "coverage_complete":false,
+        "report_allocation_and_serialization_counted":false,
+        "partition_policy":"whole geometry is total; named segments partition it and must not be added again",
+        "accounting_attachment_is_observer_overhead":true
+    });
+    let accounting_replay = json!({
+        "geometry":report.detail["adapter_accounting"]["geometry"],
+        "calibration":report.detail["adapter_accounting"]["source_unit_calibration_arithmetic"]
+    });
+    let accounting_hash =
+        Sha256::digest(serde_json::to_vec(&accounting_replay).map_err(|e| e.to_string())?);
+    for i in 0..4 {
+        let word = u64::from_be_bytes(accounting_hash[i * 8..i * 8 + 8].try_into().unwrap());
+        report
+            .counters
+            .insert(format!("adapter_accounting_sha256_word_{i}"), word);
+    }
+    Ok(report)
 }
 
 #[cfg(test)]

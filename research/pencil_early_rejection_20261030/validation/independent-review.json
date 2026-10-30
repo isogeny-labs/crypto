@@ -1,0 +1,111 @@
+{
+  "schema": "pencil-early-rejection-independent-code-review/v1",
+  "reviewed_at_utc": "2026-10-30T04:44:07Z",
+  "reviewer_role": "independent read-only source and recorded-software-evidence review",
+  "subject": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_early_rejection_20261030",
+    "status": "prospective isolated software instrument; no cohort, target solve, benchmark, or cloud execution reviewed",
+    "baseline_native_solver_sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+    "fork_native_solver_sha256": "6a8041b6ec015590d0f0ae105a483e4a4f0fb45357a2fd591ec9424542bf51d3",
+    "equivalence_tests_sha256": "9b0ca3a2175128a2309977988c7abb84e0a735472c357d109c7d72a4679a363c",
+    "baseline_helper_sha256": "b0e8fcb9cc5e678594e2ec6ff6f093318ecc21eed66ce66206b490f9bf69cc47",
+    "source_manifest_sha256": "546895a4dc17ed48c63a6aa52a833da9c074c2141509bb7fde8c985918393098",
+    "dependency_manifest_sha256": "4fe7d814ccc466c99b6dfb99f8b8a7f42ebacca8554ab73c41a5cafd8f3bc898",
+    "readme_sha256": "d00edc9d4c0e97ce403b610d8de5478614465bd145c7fd611801e0ba6cf86696"
+  },
+  "source_fidelity": {
+    "frozen_copy_equals_current_default_solver": true,
+    "current_default_solver_unchanged_sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+    "runtime_diff_sha256": "add795e791c98560ef99100ed2d6fa67dad2e3230a96b85d51aea3ce3311cca2",
+    "runtime_diff_lines": 65,
+    "runtime_diff_hunks": [
+      "original candidate-verification closure replaced by verify_candidate call",
+      "verify_candidate helper and cfg(test) test module appended"
+    ],
+    "review_result": "Outside helper extraction, moving the existing final-bucket length guard before complement, and cfg(test) hooks, no runtime source difference was found.",
+    "baseline_helper_binding": "The source-bound test extracts the original closure from the pinned baseline and compares it with frozen_helper modulo whitespace; independent textual diff found the same two declared hunks.",
+    "dependency_bindings_rehashed": 17,
+    "dependency_binding_mismatches": 0,
+    "study_source_bindings_rehashed": 12,
+    "study_source_binding_mismatches": 0
+  },
+  "semantic_review": {
+    "rejected_path": "For final bucket lengths other than three, the fork retains the existing one-visit/one-predicate guard and returns None before complement. It does not reach graph insertion.",
+    "accepted_path": "For length three, the original complement, quotient/root checks, y checks, Jacobian sum check, point construction, and graph input are retained.",
+    "phase_partition": "The helper remains inside the existing candidate_verification measured closure; the recorded phase test checks its arithmetic and symbolic snapshot attribution.",
+    "meters": {
+      "rejected_fixture_lengths": [0, 1, 2, 4, 5],
+      "removed_base_multiplications": 24,
+      "removed_base_additions": 30,
+      "removed_base_inversions": 0,
+      "removed_collection_entry_visits": 78,
+      "removed_collection_elements_copied": 4,
+      "removed_collection_elements_initialized": 18,
+      "removed_collection_comparisons": 27,
+      "new_rejected_path_entry_visits": 1,
+      "new_rejected_path_comparisons": 1,
+      "group_counter_delta": 0
+    },
+    "graph_scope": "Accepted fixture outputs are passed into identical frozen graph code and produce equal selected cap results. Rejected helpers have no graph parameter and return before relation insertion. This is source-bound selected-case parity, not a proof of all graph states or cap boundaries."
+  },
+  "geometry_fixture": {
+    "field": "F_19",
+    "curve_source": "Scholten::new(19), smooth quintic fixture",
+    "inventory": "complete bounded ordered rational-point-pair inventory for this fixture",
+    "classification": "Exceptional lambdas are independently reconstructed at u(x)=0 from q0 and slope 2v. Ordinary origins are independently reconstructed from pre-append rational-point lambda counts at u(x)!=0. Every candidate is asserted to have exactly one origin.",
+    "ordinary_origin_candidates": 612,
+    "exceptional_only_origin_candidates": 470,
+    "exceptional_accepted": 214,
+    "exceptional_rejected": 256,
+    "accepted_total": 826,
+    "origin_coverage_asserted": true,
+    "all_lambda_fixture": "A separate singular polynomial exercises the all-lambda software branch and is explicitly excluded from the smooth-domain equivalence claim."
+  },
+  "recorded_validation": {
+    "debug_selected_tests": {
+      "log_sha256": "95fb00bd7e5be1dc8ff9fa805c48de6185fc8b66a0d0106ac182bea7e4023ebe",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 12,
+      "solver_or_cohort_calls_in_selected_test_source": 0
+    },
+    "release_selected_tests": {
+      "log_sha256": "2eb0f12a85978abed27624c3396543375883001889d63a8e545df87a633af424",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 12,
+      "finished_seconds": 0.02
+    },
+    "strict_clippy_log_sha256": "9ef6e5edb733298bf92a6ff92a5077cd9a5b1f5fa9db7d49fd6ef8405864015d",
+    "fmt_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained_failures": [
+      "attempt1 fixture failures",
+      "attempt3 source-fidelity failure",
+      "attempt3 strict-Clippy unnecessary-unwrap failure",
+      "pre-origin-review passing logs superseded by stronger origin-classified fixtures"
+    ],
+    "reporting_assessment": "The README states that only five selected tests ran, twelve inherited tests were filtered, no solve_one/cohort was executed, and no performance result follows. Those statements match the recorded logs and selected test source."
+  },
+  "review_finding_history": [
+    {
+      "finding": "The first passing geometry test incremented its ordinary counter for every combined candidate and only tracked the presence of exceptional denominators, so it did not prove distinct ordinary and exceptional candidate-origin coverage.",
+      "status": "resolved",
+      "resolution": "The final test independently reconstructs both origin sets, asserts disjoint origin membership for every candidate, traverses the complete bounded F_19 inventory, and records nonzero ordinary, exceptional accepted, and exceptional rejected counts."
+    },
+    {
+      "finding": "Graph wording could be read as global state equivalence.",
+      "status": "resolved",
+      "resolution": "README now limits the result to source-bound selected accepted rows and a synthetic working-cap case, explicitly excluding a general graph-state or all-cap-boundaries proof."
+    }
+  ],
+  "open_findings": [],
+  "limitations": [
+    "No solve_one call, target cohort, ecbench arm, performance measurement, allocation equivalence, interruption equivalence, deadline equivalence, or cloud execution was reviewed or performed.",
+    "The equivalence argument is conditional on normalized residues and p<=2^63; the retained public solve_one API does not itself enforce that narrower proof domain.",
+    "The selected fixture tests do not execute the twelve inherited tests; the filtering and its reason are explicit.",
+    "The empty formatter log is consistent with a quiet successful fmt --check invocation but is not a separate machine-readable exit receipt.",
+    "Future execution must bind the complete fork and dependency sources prospectively and use a separately frozen protocol. Existing observations cannot be retrospectively repriced.",
+    "This review establishes scoped software/source fidelity only. It is not scientific admission, a speedup, a finite-cost ratio, or an end-to-end result."
+  ],
+  "conclusion": "No remaining concrete source or scoped validation defect was found after the candidate-origin coverage correction. The isolated fork is ready for protocol/source-freeze review, but it has not produced an experimental result."
+}

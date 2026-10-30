@@ -1,0 +1,17 @@
+{
+  "schema": "pencil-native-review-report-validation/v1",
+  "scope": "Native renderer software fixtures only; includes actual pdflatex render and historical validation-scope preservation",
+  "tests_passed": 8,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "source_sha256": "80762786c36dcb56a3148b38e70974375432425f240087af786d65f10cceeeba",
+  "test_log_sha256": "092f5825bd54dc00bfdebbf2bde5de85f26cadf4dc3770ec48fc651037085b5b",
+  "clippy_log_sha256": "d4dc1c7ad052333276468b4ebba557612f67959847fc5ca4175e5db1f4ee3f07",
+  "clippy_exit_code": 0,
+  "empirical_targets": 0,
+  "independent_review": false,
+  "command": "cargo +1.99.1 test --release --locked --offline --manifest-path research/pencil_large_prime_20261029/native_review_report/Cargo.toml",
+  "test_log": "tests-layout.log",
+  "clippy_log": "clippy-layout.log",
+  "layout_correction": "Native TeX ragged-right/sloppy wrapping prevents long evidence path clipping; previous development PDF preserved"
+}
