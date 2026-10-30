@@ -1,20 +1,22 @@
-# Factor-base policy implementation in progress
+# Factor-base standalone source frozen for first validation
 
-Contract8eddc0107ffa was committed before source edits. Native constructor/replayer
-and v2 plan APIs are being implemented in separate delegated scopes. Twelve
-plan tests are authored and independently source-reviewed, not executed.
-No new native compilation or runtime validation has occurred.
+Contract8eddc0107ffa preceded code changes. Plan module7f99becc19a9 preserves v1
+serialization/hash/index behavior and adds strict v2 policy axes. Native
+constructor/replayer and curve refactor passed independent source review at the
+hashes in native-source-review.json. Twelve plan and nine native policy tests are
+authored, not yet executed. Full v2 CLI/export integration is still pending.
 
-The exact dependency inventory contains2722 files/253892127bytes;2647 absent
-files were restored after Git-blob/SHA checks, with no overwritten files.
-The validation runner requires a final frozen source and rejects ignored or
-untracked build inputs. Parent consequence full05 owns the shared target.
+Dependency inventory02 explicitly checks2731 files/253915749bytes, including
+nine historical golden/provenance files. All earlier materialization/checkpoint
+artifacts are retained with fresh S3 comparisons. Consequence pipeline05 is now
+terminal, exit0, with5537 passed/0failed/123ignored and matching source checks;
+shared target may be reused for this separately frozen standalone phase.
 
-Source checkpoint01 freshly downloaded and Git-bundle verified committed
-contract8eddc0107ffa; partial worktree material is WIP, not a source validation
-receipt. Inventory and historical curve/twist fixture custody are separate.
+The4096-byte minimum policy reserves4096 terminal bytes and therefore cannot
+commit a candidate; it may retain a typed empty capped result. Counter units are
+scoped admissions/calls, not retired instructions or complete native execution.
+V2 worker admission must bind expected policy and replay the restricted transcript,
+not merely accept a mathematically closed point population.
 
-All CLI paths and solver/export/launch bindings in INTEGRATION-MAP.md remain
-required. Shared mod.rs/solvers.rs are heldT887; no external coordination message
-has been sent without permission. Existing v1 workflows remain the only wired
-CLI plan format. Cloud dataset cells0; full original corpus goal active.
+No new factor-base source has compiled or executed yet. Current CLI still uses
+v1 plans. Full original corpus goal remains active; verifiedcloudcells0.
