@@ -621,6 +621,9 @@ pub enum Targets {
     /// `R = Q + [k]G`: no scalar multiplication, for a base with a known
     /// column logarithm (`generator_orbit=1`). `TargetSource::StrideGenerator`.
     StrideGenerator,
+    /// `StrideRenew` probing the repeat guard only on targets that
+    /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
+    StrideRenewDeferredGuard,
 }
 
 impl Targets {
@@ -639,6 +642,7 @@ impl Targets {
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
             Targets::StrideGenerator => "stride-generator",
+            Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
         }
     }
 
@@ -657,8 +661,9 @@ impl Targets {
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             "stride-generator" => Ok(Targets::StrideGenerator),
+            "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride or stride-renew"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }

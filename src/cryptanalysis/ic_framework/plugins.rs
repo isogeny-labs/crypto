@@ -61,8 +61,8 @@ use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup
 use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
-    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, OracleCounters, PairTable, PrimeCurve,
-    PrimeInstance, PrimePoint, Relation,
+    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -555,6 +555,13 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
                 "basis",
                 "optional explicit full-rank polynomial-basis words separated by semicolons",
             ),
+            (
+                "select",
+                "optional subspace selection: `prefix` (default, <1, z, ...>), `strict4e` (sieve-built subspace with every abscissa in 4E; Koblitz a=0, odd n, h=4 only) or `gated-rank` (best of `candidates` draws by the rank-aware key); excludes `basis`",
+            ),
+            ("seed", "seed of `select` (default 1); deterministic per seed"),
+            ("candidates", "`select=gated-rank` only: sieve draws (default 16)"),
+            ("m", "`select=gated-rank` only: summands of the ceiling (default 3)"),
         ]
     }
 
@@ -564,9 +571,53 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         params: &Params,
         _ops: &mut GroupOps,
     ) -> Result<FactorBase<FastPoint>, String> {
-        let dim = params.u64("dimension")? as u32;
-        if dim == 0 || dim > 30 {
+        let dim = params.u64("dimension")?;
+        if !(1..=30).contains(&dim) {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
+        }
+        // Validate before narrowing: e.g. 2^32 + 3 must not become dimension 3.
+        let dim = dim as u32;
+        let select = params.get("select").unwrap_or("prefix");
+        if select != "prefix" && params.get("basis").is_some() {
+            return Err("`select` and an explicit `basis` are mutually exclusive".into());
+        }
+        if matches!(select, "strict4e" | "gated-rank") {
+            use crate::cryptanalysis::ic_framework::subspace_select as ss;
+            if let Some(why) = ss::strict4e_refusal(self.instance) {
+                return Err(format!("select={select} refused: {why}"));
+            }
+            if dim >= self.instance.n {
+                return Err(format!("subspace dimension {dim} must be below n"));
+            }
+            let seed = params.u64_or("seed", 1)?;
+            let start = Instant::now();
+            let map = ss::X4Map::build(self.instance);
+            let sel = if select == "strict4e" {
+                ss::strict4e_sieve(&map, dim, seed)?
+            } else {
+                let k = params.u64_or("candidates", 16)? as u32;
+                let m = params.u64_or("m", 3)? as u32;
+                ss::gated_rank_select(self.instance, &map, dim, seed, k, m)?.0
+            };
+            let mut fb = binary_subspace_factor_base(self.instance, &sel.basis);
+            // Unpriced native work of the selection (AGENTS.md section 5a).
+            fb.cost.count(
+                "strict4e_membership_tests_uncharged",
+                1u64 << self.instance.n,
+            );
+            fb.cost
+                .count("strict4e_sieve_lookups_uncharged", sel.lookups);
+            fb.cost.count("strict4e_x4_in_span", sel.x4_in_span);
+            fb.cost.count("strict4e_span_nonzero", sel.span_nonzero);
+            fb.cost
+                .count("strict4e_fallback_steps", u64::from(sel.fallback_steps));
+            fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
+            return Ok(fb);
+        }
+        if select != "prefix" {
+            return Err(format!(
+                "unknown select `{select}`; try prefix, strict4e or gated-rank"
+            ));
         }
         let basis: Vec<u64> = if let Some(text) = params.get("basis") {
             let basis: Vec<u64> = text
@@ -2160,6 +2211,76 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
     ) -> Option<Vec<usize>> {
         let table = self.table.as_ref()?;
         decompose_mitm(ctx.group, fb, table, self.m, ops, counters, point)
+    }
+}
+
+/// One probe per target into a table of every signed `k`-sum of the base
+/// ([`KSumTable`]): the `mitm` lever pushed from pairs to triples or
+/// quadruples, trading a smaller base for a larger table.
+pub struct KSumOracle {
+    k: u32,
+    table: Option<KSumTable>,
+}
+
+impl KSumOracle {
+    pub fn new(k: u32) -> Self {
+        Self { k, table: None }
+    }
+}
+
+impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
+    fn name(&self) -> &str {
+        "ksum"
+    }
+
+    fn summands(&self) -> u32 {
+        self.k
+    }
+
+    fn describe(&self, _params: &Params) -> String {
+        format!(
+            "a table of every signed {}-sum of the base, built with the negation fold and probed once per target",
+            self.k
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[("m", "summands, 3, 4 or 5")]
+    }
+
+    fn prepare(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        _params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let table = KSumTable::build_negation_folded(ctx.group, fb, self.k)?;
+        // The table's construction is part of the pipeline's cost.
+        ops.merge(table.build_ops);
+        self.table = Some(table);
+        Ok(())
+    }
+
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        table_counted(
+            self.table
+                .as_ref()
+                .map(KSumTable::work_counters)
+                .unwrap_or_default(),
+        )
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: G::Elt,
+    ) -> Option<Vec<usize>> {
+        let table = self.table.as_ref()?;
+        table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
     }
 }
 
@@ -4335,9 +4456,23 @@ mod explicit_subspace_tests {
             "binary-subspace:dimension=3,basis=1;2;3",
             "binary-subspace:dimension=3,basis=1;2",
             "binary-subspace:dimension=3,basis=1;2;128",
+            "binary-subspace:dimension=3,basis=1;2;0",
+            "binary-subspace:dimension=3,basis=1;2;2",
+            "binary-subspace:dimension=3,basis=1;2;",
+            "binary-subspace:dimension=3,basis=1;2;0xg",
+            "binary-subspace:dimension=3,basis=1;2;4,select=strict4e",
+            "binary-subspace:dimension=3,basis=1;2;4,select=gated-rank",
+            "binary-subspace:dimension=4294967299,basis=1;2;4",
+            "binary-subspace:dimension=4294967299",
+            "binary-subspace:dimension=0,basis=1",
+            "binary-subspace:dimension=31,basis=1",
+            "binary-subspace:dimension=18446744073709551615,basis=1",
         ] {
             let (_, bad) = Params::parse_spec(recipe).unwrap();
-            assert!(builder.build(&ctx, &bad, &mut GroupOps::default()).is_err());
+            assert!(
+                builder.build(&ctx, &bad, &mut GroupOps::default()).is_err(),
+                "accepted invalid recipe: {recipe}"
+            );
         }
     }
 }

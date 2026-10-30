@@ -1,0 +1,96 @@
+// All arithmetic is native. The original source ring r precedes this block.
+proc inv31(poly a,ideal q){
+ ideal z=q,a;
+ if(std(z)[1]!=1){ERROR("REVERSE31_NONUNIT");}
+ matrix w=lift(z,ideal(1));poly v=reduce(w[ncols(w),1],q);
+ // lift is a column matrix with one row per generator.
+ v=reduce(w[nrows(w),1],q);
+ if(reduce(a*v+1,q)!=0){ERROR("REVERSE31_INVERSE_CERTIFICATE");}
+ return(v);
+}
+proc add31(list p,list q,number bb,number aa){
+ if(size(p)==0){return(q);} if(size(q)==0){return(p);}
+ number x=p[1];number y=p[2];number z=q[1];number w=q[2];number m;
+ if(x==z){
+  if(y+w==aa*x+bb && y!=w){return(list());}
+  if(y!=w){ERROR("TATE31_UNEXPECTED_EQUAL_X");}
+  if(aa*x+bb==0){return(list());}
+  m=(x^2+aa*y)/(aa*x+bb);
+ }else{m=(y+w)/(x+z);}
+ number rx=m^2+aa*m+bb+x+z;
+ number ry=(m+aa)*rx+y+m*x+bb;
+ if(ry^2+aa*rx*ry+bb*ry+rx^3+bb*rx^2!=0){ERROR("TATE31_GROUP_CURVE");}
+ return(list(rx,ry));
+}
+proc source31(poly bb,poly cc,poly ll,poly nv,ideal q){
+ map ev=r,nv,ll,bb,cc;
+ ideal residual=ev(original);ideal units=ev(registered);int i;
+ for(i=1;i<=5;i++){if(reduce(residual[i],q)!=0){ERROR("REVERSE31_ORIGINAL_RESIDUAL_"+string(i));}}
+ for(i=1;i<=8;i++){poly unused=inv31(units[i],q);}
+}
+proc diamond31(list p,ideal q){
+ poly b=p[1];poly c=p[2];poly l=p[3];poly n=p[4];poly a=1+c;
+ poly s=reduce(b*inv31(c,q)+a,q);poly v=reduce(s*(a+s),q);
+ poly u=reduce(b*c*inv31(v,q),q);poly iu=inv31(u,q);
+ return(list(reduce(v*iu^2,q),reduce(1+a*iu,q),
+   reduce((l+s)*iu,q),reduce((l*b+n+b*c)*iu^3,q)));
+}
+list midTriple31=triple30(midX31,midY31);
+number B31=1/midTriple31[1];
+list ks31=kernels30(B31,7);poly K31=choose30(B31,ks31,midTriple31[2]);
+list roots31=linearRoots30(secondKernel31);
+if(size(roots31)!=5){ERROR("REVERSE31_NOT_FIVE_GENERATORS");}
+int i31;int twist31;int step31;int passed31;int rejected31;
+for(i31=1;i31<=5;i31++){
+ number rr31=roots31[i31];number x231=rr31^2+B31/rr31^2;
+ number vv31=rr31+x231;
+ if(rr31==0 || vv31==0){ERROR("REVERSE31_NORMALIZATION_DENOMINATOR");}
+ number uu31=rr31/vv31;number bb31=vv31^3/rr31^2;number cc31=x231/rr31;
+ number aa31=1+cc31;
+ if(uu31*aa31!=1 || bb31*uu31^3!=rr31){ERROR("REVERSE31_NORMALIZATION_IDENTITY");}
+ poly G31=subst(K31,X,uu31^2*X+rr31)/uu31^6;
+ if(deg(G31)!=3 || leadcoef(G31)!=1){ERROR("REVERSE31_CUBIC_DEGREE");}
+ number g231=number((jet(G31,2)-jet(G31,1))/X^2);
+ number g131=number((jet(G31,1)-jet(G31,0))/X);
+ number g031=number(subst(G31,X,0));
+ list p31=list(number(0),number(0));list sum31;int k31;
+ for(k31=1;k31<=11;k31++){
+  sum31=add31(sum31,p31,bb31,aa31);
+  if(k31<11 && size(sum31)==0){ERROR("REVERSE31_EARLY_TATE_ORDER");}
+ }
+ if(size(sum31)!=0){ERROR("REVERSE31_TATE_ORDER11");}
+ for(twist31=0;twist31<=1;twist31++){
+  poly L31=Z^2+aa31*Z+bb31+g231+twist31*aa31^2;
+  ideal q31=std(ideal(L31,T^2+T+1));
+  poly ll31=Z+twist31*aa31*T;
+  poly nv31=(g131+bb31*Z)/aa31+twist31*bb31*T;
+  if(reduce(nv31^2+bb31*nv31+g031,q31)!=0){ERROR("REVERSE31_QR_CONSTANT");}
+  if(reduce(bb31+ll31^2+aa31*ll31+g231,q31)!=0){ERROR("REVERSE31_QR_QUADRATIC");}
+  list point31=list(poly(bb31),poly(cc31),ll31,nv31);list current31=point31;
+  for(step31=0;step31<10;step31++){
+   source31(current31[1],current31[2],current31[3],current31[4],q31);
+   if(step31==5){
+    if(current31[1]!=point31[1] || current31[2]!=point31[2] ||
+       reduce(current31[3]+point31[3]+aa31,q31)!=0 ||
+       reduce(current31[4]+point31[4]+bb31,q31)!=0){ERROR("REVERSE31_DIAMOND_FIFTH");}
+   }
+   current31=diamond31(current31,q31);
+  }
+  for(k31=1;k31<=4;k31++){if(reduce(current31[k31]+point31[k31],q31)!=0){ERROR("REVERSE31_DIAMOND_TENTH");}}
+  map bad31=r,nv31+1,ll31,bb31,cc31;ideal corrupt31=bad31(original);int badcount31;
+  for(k31=1;k31<=5;k31++){if(reduce(corrupt31[k31],q31)!=0){badcount31++;}}
+  if(badcount31==0){ERROR("REVERSE31_CORRUPTED_NU_ACCEPTED");} rejected31++;
+  // Split type of the actual quadratic, not the auxiliary T extension.
+  poly zz31=Z;
+  for(k31=0;k31<sourceDegree30;k31++){zz31=reduce(zz31^2,std(ideal(L31)));}
+  int split31=(zz31==Z);
+  print("REVERSE31_POINT root="+string(i31)+" twist="+string(twist31)+" split="+string(split31));
+  print("REVERSE31_L");L31;print("REVERSE31_b");bb31;print("REVERSE31_c");cc31;
+  print("REVERSE31_lambda");ll31;print("REVERSE31_nu");nv31;
+  passed31++;
+ }
+}
+if(passed31!=10 || rejected31!=10){ERROR("REVERSE31_INCOMPLETE_CASES");}
+print("REVERSE31_TEN_POINT_ALGEBRAS_AND_CONTROLS_PASS");
+print("REVERSE31_SCOPE originalfiveequations/eightunits/order11/diamond; noPicardimageclaim");
+print("REVERSE31_ALL_CHECKS_PASS");quit;
