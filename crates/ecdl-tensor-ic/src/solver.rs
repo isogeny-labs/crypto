@@ -11,7 +11,9 @@ use crate::field::{add_mod, inv_mod, mul_mod, rand_below, sub_mod};
 use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
 use crate::linalg::left_kernel_vector;
 use crate::pointgadget::gadget_relation_network;
-use crate::relation::{new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases};
+use crate::relation::{
+    mitm_find_relation, new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases,
+};
 use crate::tensor::{find_witness, Counter, Network, NetworkStats};
 use crate::{Error, Result};
 
@@ -55,6 +57,11 @@ pub struct Solver {
     /// WindowBits > 0 (with `gadgets`) adds the coordinate window x < p >> k
     /// to every factor base; see `new_windowed_factor_bases`.
     pub window_bits: usize,
+    /// Mitm finds relations by meeting in the middle (`mitm_find_relation`)
+    /// instead of contracting the network forward. It performs about
+    /// sqrt(2r) point additions per attempt instead of r and does not use the
+    /// counter.
+    pub mitm: bool,
     /// Logf, if set, receives progress messages (already formatted; Go passes
     /// format + args).
     pub logf: Option<Box<dyn Fn(&str)>>,
@@ -74,6 +81,7 @@ impl Solver {
             max_restarts: 0,
             gadgets: false,
             window_bits: 0,
+            mitm: false,
             logf: None,
             arith: None,
         }
@@ -222,6 +230,27 @@ impl Solver {
         r: Point,
     ) -> Result<(Option<Relation>, NetworkStats)> {
         let c = self.curve;
+        if self.mitm {
+            let pts = match mitm_find_relation(&c, fb, r) {
+                None => return Ok((None, NetworkStats::default())),
+                Some(pts) => pts,
+            };
+            let mut rel = Relation::default();
+            let mut sum = INFINITY;
+            for (i, pt) in pts.iter().enumerate() {
+                if !c.on_curve(*pt) || !fb.member(i, *pt) {
+                    return Err(Error::new("ecdl: mitm returned an invalid witness"));
+                }
+                rel.points.push(*pt);
+                sum = c.add(sum, *pt);
+            }
+            if sum != r {
+                return Err(Error::new(
+                    "ecdl: mitm returned a witness that does not sum to the target",
+                ));
+            }
+            return Ok((Some(rel), NetworkStats::default()));
+        }
         let net: Network;
         let a: Vec<Vec<usize>>;
         let decode: Box<dyn Fn(&[bool]) -> Option<Point>>;
