@@ -27,3 +27,18 @@ Build/test R2 image,freeze amendment,round-trip source/checkpoint,submit R2 once
 
 ### Errors (what went wrong, how it was handled)
 Root-owned mode600 COPY files were unreadable by PodUID1000;native controls alone had not exercised worker readability. New runtime control checks it explicitly. No IAM/bucket policy or capacity changes.
+
+
+## 2026-10-30T06:34:44.463279+00:00 — Full R3 panel and restored replay complete
+
+### What was done (commands, files, features)
+All42producer,fresh and S3-restored replays pass;269rawpayloads verify before/after. FFD upper bounds{'17': 42};affine degrees{'16': 42};zero exactFFD ornewLFDcertificates. Index19datasets/70hashes. Original48regularityrows/basebindingsunchanged.
+
+### Decisions made (and why)
+Keep upperFFD distinct from exactFFD and affine strictness. Preserve bothEKSfailures anduseR3hostfallbackwithoutIAM/capacitychanges. No native retry needed.
+
+### Open threads (unfinished, pick up next time)
+Data/metricscommit,inspectedreport,support/PR/checkpoint/finalpublication. Earlier-syzygy exclusion,strictlower-spacenonmembership,globalLFDupper,binaryquarticfrontier andelite-base selectionremainopen.
+
+### Errors (what went wrong, how it was handled)
+R1workerfilepermission andR2HeadObject403 occurredbeforeanynativecase. Their immutableprotocol/source/image/job/logrecords retained. R3 native producer andbothreplays completed withoutfailure.

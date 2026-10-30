@@ -170,3 +170,15 @@ See [native results](../research/n83_candidate_pdp_20261028/evidence/prime-first
 and [the source-bound proof argument](../research/n83_candidate_pdp_20261028/PRIME_FIRST_FALL_DESIGN.md).
 Prime global LFD upper/exact,higher-m FFD/LFD,the pending binary quartic closure,
 and independent held-out elite-base selection remain unresolved.
+
+
+## Higher-m prime terminal certificate panel,2026-10-30
+
+All42 retained prime m3–9 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified.
+
+The stored affine consequences have derivations of degree at most17 and degree at most16. Other chain equations may derive them earlier;nonmembership inV16 is not checked. All original bases,targets,equations and regularity values remain unchanged. No elite-base or performance gain follows;independent scientific review and full algebraic formalization remain pending.
+
+See [native summary](../research/n83_candidate_pdp_20261028/evidence/prime-terminal/summary.json).
+Earlier-syzygy exclusion and strict affine nonmembership remain distinct
+obligations. EKS permission/source403 failures are retained as infrastructure
+outcomes;R3 full panel completed on the established host.

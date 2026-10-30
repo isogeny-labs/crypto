@@ -1,7 +1,22 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: prime m2 first-fall certificates
+## Latest: higher-m prime terminal certificates
+
+All42 retained prime m3–9 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified.
+
+The stored affine consequences have derivations of degree at most17 and degree at most16. Other chain equations may derive them earlier;nonmembership inV16 is not checked. All original bases,targets,equations and regularity values remain unchanged. No elite-base or performance gain follows;independent scientific review and full algebraic formalization remain pending.
+
+Read the [native summary](evidence/prime-terminal/summary.json),
+[nontriviality argument](PRIME_TERMINAL_DESIGN.md),
+[byte layouts and reconstruction](PRIME_TERMINAL_FORMAT.json),
+[unified export](experiment-prime-terminal.export.json),
+[S3 objects](evidence/prime-terminal-storage.json), and
+[restored verification](evidence/prime-terminal-publication.json).
+R1 and R2 EKS attempts failed before native computation;both are preserved.
+R3 used the established host fallback without IAM or capacity changes.
+
+## Earlier: prime m2 first-fall certificates
 
 All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown.
 

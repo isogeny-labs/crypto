@@ -227,3 +227,18 @@ upper certificates to the retained higher-m prime systems; that extension has
 not been executed or certified. Exact prime LFD still needs an independent
 upper certificate. The saved binary quartic frontier and held-out elite-base
 selection remain open. Do not rerun this completed six-case panel.
+
+
+## 2026-10-30: higher-m prime terminal upper certificates
+
+All42 retained prime m3–9 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified.
+
+The stored affine consequences have derivations of degree at most17 and degree at most16. Other chain equations may derive them earlier;nonmembership inV16 is not checked. All original bases,targets,equations and regularity values remain unchanged. No elite-base or performance gain follows;independent scientific review and full algebraic formalization remain pending.
+
+The nontriviality projection keeps the last selector block and kills all other
+variables. It preserves H but kills every original top generator. Next distinguish
+this upper certificate from exact first-fall degree by testing earlier syzygies
+modulo Koszul relations. An affine last-fall lower bound additionally needs a
+functional annihilating the complete lower filtered space,not merely this
+terminal relation. Binary quartic closure and held-out elite-base selection
+remain open. Do not repeat the completed42case producer.
