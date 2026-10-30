@@ -1374,3 +1374,57 @@ PR2935 CI and merge remain pending. Full pencil cohort and timing are incomplete
 The general Rust CI scope skips this standalone crate, motivating explicit software-only CI. No scientific run was retried. The implementation packet's ignored Cargo.lock was explicitly committed, and the oversized retained attempt3 log was published and remotely verified in the required artifact store before PR creation.
 
 CI review addendum: the broad initial artifact-wiring match suggested credentialed hydration of logs that tests do not read. Independent review identified the PR-head script/credential exposure. The final workflow instead checks out only source/provenance/manifests and runs from the root with an explicit manifest path; it uses no secrets, artifact tooling or result downloads. YAML/Bash syntax and the exact five-test/zero-benchmark listing passed; independent final source/dependency review found no concrete blocker. The repository wiring check is separately required before publication.
+
+## 2026-10-30T05:38Z — Six-hour replacement gate preparation
+
+### What was done
+
+Recorded the renewed six-hour active-worker ceiling and conservative absolute expiry 2026-10-30T11:17:54Z; request c1 retains the reviewed conditional cutoff08:10:24Z and unchanged scientific instrument543a54b. Reconciled Diem as expired50/52 with no pending launcher, prior b1 terminal failure, unchanged reviewed controller deployment and absent c1 controller receipt. PR2935 merged at05:17:48Z after source-only CI passed. Independent review and59 release-library tests passed the native consumer's narrow unknown-runtime gate exception; strict Clippy/fmt passed. Original failed frozen validation remains retained. Corrected immutable protocol body18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9 froze05:37:28Z and passed native validation.
+
+### Decisions made
+
+Runtime estimate remains unknown;21600 seconds is a resource ceiling, not an estimated duration. New acceptance is restricted to the exact18-execution finite-count characterization gate. Clocks stay diagnostic. The earlier draft review is superseded only for freeze suitability by additive independent review. Draft/preparation status fields remain historical preparation state; any execution admission is external, exact-file-bound, and separate from mechanical freeze. No scientific payload has launched at this entry. The original1260-target objective and15 independent gate replay requirement remain unchanged.
+
+### Open threads
+
+Complete exact-body finite-coverage review, commit/publish freeze and source, retain current cloud reconciliation and separately admit the exact request before submission. Gate completion, independent replay/review, a separate cohort admission and full cohort remain pending. The daily shared log is reserved by T828, so this project handoff is retained here without editing that reserved file.
+
+### Errors
+
+Initial frozen validation rejected the honest null estimate. A scoped, fail-closed native admission exception resolves that software blocker without manufacturing an estimate. Conductor scope add replaces the reservation list; restored all three T891 scopes after detecting the native-only list. Reading the migration receipt as the ordinary user was denied; approved read-only sudo access succeeded. No duplicate migration recovery or scientific generator was started.
+
+## 2026-10-30T05:42Z — Exact c1 replacement submitted once
+
+### What was done
+
+Published frozen protocol/source/reviews at64fbfaf8a7389b71a8ca8ec7500d21a5ca6b5719 and opened regular PR2943 with auto-merge enabled. Independent final admission review checked exact committed files, approved client/controller/images, zero active controller builds/jobs and absent c1 state. Issued external execution-admission SHA5b6c92fe9e1e1329cc14351fc81a7e7bfb40b5502d2aa16ece5cd3513dfd1bfd. Submitted exact request once with the reviewed ac7 client; CodeBuild returned isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0 and request identity92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907. Receipt retained. Initial remote status is awaiting_controller_receipt, not a completed execution.
+
+### Decisions made
+
+No second submission on pending state. Preserve request cutoff08:10:24Z, outer expiry11:17:54Z and cumulative21600 active-worker seconds from05:17:54Z. Exact frozen design and external execution permission are separate; no remaining-cohort admission or timing qualification. Raw Cargo-log terminal blank lines retained rather than changing reviewed hashes; source whitespace check passed.
+
+### Open threads
+
+Monitor this controller/build/request identity, retain actual worker/epoch receipts and full costs, then package and independently review complete or incomplete output. All1260-target completion remains unresolved. PR2943 checks are in progress; native canonical-export and preparation jobs have passed.
+
+### Errors
+
+No submission error. GitHub push warned about existing historical large blobs; scoped artifact check reports no new data files committed. No history rewrite or unrelated cleanup performed.
+
+## 2026-10-30T05:47Z — Running-worker reconciliation and export handoff
+
+### What was done
+
+Re-polled exact c1 controller and EC2 worker: phase running, attempt0, instance i-04d58c2b309fb6549, Pod UID3a7ab215-49d1-4982-8c78-5a0c71646842, no restores/failure. EC2 describes the c8a.2xlarge instance as running with launch05:42:33UTC. Retained source-checked C1_EVIDENCE_HANDOFF.md for native analysis, canonical export and neutral PDF/SVG/CSV/JSON. PR2943 headc91c99d has no failed checks; artifacts,size,validation-gate remain in progress.
+
+### Decisions made
+
+All c1 records, attempt history and resources must derive from actual c1 immutable receipts. Preserve computation/fresh epochs separately; canonical accounting recomputation does not satisfy the15 independent scientific replays. Unobserved rows and costs remain absent/null. The old b1 packet is a shape example only. No additional scientific execution or request submission occurred.
+
+### Open threads
+
+Wait for exact live controller progress/checkpoints/terminal outcome, then ingest and verify raw artifacts. Keep both original cutoff and campaign expiry. Full cohort remains incomplete and conditionally admitted only after complete gate/replay/review. Required CI remains pending.
+
+### Errors
+
+Source review caught a handoff command using a directory for the canonical export --out argument. Corrected to C1_EXPORT.json and matched check-export path before use; analyzer stdout and renderer directory semantics separately verified. No scientific data or source code changed.
