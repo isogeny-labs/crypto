@@ -228,6 +228,10 @@ __global__ void build_prefix(const TableRow *rows, U size, U bins, unsigned shif
   U bucket = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (bucket > bins)
     return;
+  if (bucket == bins) {
+    offsets[bucket] = size;
+    return; // The conceptual x=2^63 endpoint has no compact u64 key.
+  }
   Point key{bucket << shift, 0, false};
   U lo = 0, hi = size;
   while (lo < hi) {
@@ -399,7 +403,8 @@ __global__ void hash_base_wide(Curve c, U modulus, U inv, U beta, U tau,
   if (t >= tau)
     return;
   U v = t >= beta ? t - beta : modulus - (beta - t);
-  U z = hash_mul63(inv, v, modulus);
+  U z = modulus < (U(1) << 63) ? hash_mul63(inv, v, modulus)
+                                     : hash_mul64(inv, v, modulus);
   Point q;
   if (z < 2 * c.f.p)
     c.lift(z / 2, z & 1, q);
