@@ -1,0 +1,111 @@
+name: phase-paired native replay
+
+# Native (Rust-only) paired fixed-budget comparison of Frobenius phase as solver
+# unknowns against representatives only. Modelled on n37-frobenius-fold-gate.yml:
+# frozen lockfile, rustfmt, release build, independent replay compared byte for
+# byte with the committed output.
+#
+# The path filter is deliberately narrow: only this study's own files. It does not
+# list src/**, Cargo.toml or other shared paths, because a broad filter starves the
+# runners (crypto PR #1624). A change to shared code is checked by running this
+# workflow by hand (workflow_dispatch).
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/phase-paired-native.yml'
+      - 'examples/phase_paired_fixed_budget.rs'
+      - 'examples/phase_paired_replay.rs'
+      - 'research/phase_paired_native_20261026/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same pull request cancels the run for the older commit.
+concurrency:
+  group: phase-paired-native-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/factor-base
+            Cargo.toml
+            Cargo.lock
+            tools/volcano-cli/
+            isogeny_algos/
+            src
+            examples/phase_paired_fixed_budget.rs
+            examples/phase_paired_replay.rs
+            docs/curves/registry.json
+            docs/curves/standards/parameters.json
+            docs/ecbench/schema.sql
+            docs/ic/calibration.json
+            docs/ic/boundary_targets.json
+            research/phase_paired_native_20261026
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/phase_paired_native_20261026
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Check frozen inputs, receipts and formatting
+        run: |
+          cd research/phase_paired_native_20261026
+          sha256sum --check SHA256SUMS
+          cd -
+          rustfmt --edition 2021 --check examples/phase_paired_fixed_budget.rs examples/phase_paired_replay.rs
+      - name: Build producer and replay (locked)
+        run: cargo build --release --locked --example phase_paired_fixed_budget --example phase_paired_replay
+      - name: Unit tests (planted witnesses, phase selector, lambda coefficients, tampered receipts)
+        run: cargo test --release --locked --example phase_paired_fixed_budget --example phase_paired_replay
+      - name: Structural gate without a solver (exhaustive pair matching, sealed brute force)
+        run: |
+          d=research/phase_paired_native_20261026
+          target/release/examples/phase_paired_fixed_budget gate --sealed "$d/fixtures/witness_sealed.json"
+      - name: Independent replay of the committed receipts, compared with the committed output
+        run: |
+          d=research/phase_paired_native_20261026
+          target/release/examples/phase_paired_replay "$d/results/receipts_n13.jsonl" "$RUNNER_TEMP/replay.json" --sealed "$d/fixtures/witness_sealed.json"
+          cmp "$RUNNER_TEMP/replay.json" "$d/results/replay_n13.json"
+      - name: Re-run one cheap attempt and compare its deterministic counters (informational)
+        continue-on-error: true
+        run: |
+          d=research/phase_paired_native_20261026
+          bash "$d/determinism_check.sh"
+      - name: Retain replay output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-paired-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/replay.json
+          if-no-files-found: warn
+          retention-days: 30

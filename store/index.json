@@ -128,6 +128,41 @@
       "bytes": 16851506,
       "description": "K4250 wide3 N83 independently replayed ordered factor base",
       "provenance": "construct:83:1:4250 source SHA-256 4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507"
+    "evidence/koblitz_modular_ic_20261018/round21-validation-runs.tar.xz": {
+      "sha256": "e9c89a33a4cf96ae075e015e02829d0ad40165634c0317d40d5c2091ed576fa2",
+      "bytes": 14861500,
+      "description": "Round21 complete validation, failed attempts, fresh extraction and strict native replay",
+      "provenance": "remote=s3://setec-astronomy-artifacts/store; R21 archive-validation.sh: deterministic tar mtime 2026-10-24 00:00:00Z, owner/group0, GNU, xz -6 -T1; see rounds/21/ARCHIVE_VALIDATION.txt"
+    },
+    "evidence/twist-index-calculus/20261023-image-base-runs.tar.xz": {
+      "sha256": "1e0a2139c9a32571a9476e4b9579f73da91e93e4a8cc7c2143d2bf4536c36038",
+      "bytes": 28241048,
+      "description": "Complete 189-case twist image controls, 21-case doubling control, paired end-to-end timings and independent signed-relation audits",
+      "provenance": "Deterministic tar.xz of frozen study runs; SHA-256 1e0a2139c9a32571a9476e4b9579f73da91e93e4a8cc7c2143d2bf4536c36038"
+    },
+    "evidence/twist-index-calculus/20261024-joint-image-runs.tar.xz": {
+      "sha256": "54b31b3d73602d7758dad263939bdfdcbd8c305df2299fe7beb498029090b729",
+      "bytes": 1153392456,
+      "description": "Complete finite joint-image checkpoint: all 43 reconciled raw run directories, including failures and interrupted attempts; no complete-cost claim",
+      "provenance": "pack-complete-checkpoint-level1.sh; fresh extraction/native cmp of all files and byte-identical repack; source 30d6ac05a94679c97e035ea33df118bba2b66b35; SHA-256 54b31b3d73602d7758dad263939bdfdcbd8c305df2299fe7beb498029090b729",
+      "superseded": [
+        {
+          "sha256": "f4ddf5ce185d0866ff02e7a4e4085065e59756cf86798aaff85f7a8398eaa39c",
+          "bytes": 542528576
+        }
+      ]
+    },
+    "factor-base-traces/historical-20261015/all-384.zip": {
+      "sha256": "531fd60acf09a591c097608f5496b8b5dc4551621b1a2d462a4dcffc6fdc1b85",
+      "bytes": 2462002,
+      "description": "Exact historical ordered representatives and signed lookup caches; not a new research run",
+      "provenance": "Frozen PR 1898 results/generic.json SHA256 07ee0c22dcb48969581739bdc91e4ff6c78a4ad86d52ba6792d773fa3778e248; additive native import"
+    },
+    "factor-base-traces/historical-20261015/registered-20261016.zip": {
+      "sha256": "923579b932103882f85b4475118a5edc7404fa4138823c1bdd59a633ca6f9c9c",
+      "bytes": 2462662,
+      "description": "Public PR 1898 historical points and lookup caches with registered ICV1 model metadata",
+      "provenance": "Public GitHub source archive blob 1bcddc5fb363a0f9813b9f5fffff79d8454fbe18 at PR 1898 merge 1f7e567ab4adad212253d2b56c906c5342dbec3e; frozen generic source SHA256 07ee0c22dcb48969581739bdc91e4ff6c78a4ad86d52ba6792d773fa3778e248; point/order/cache bytes unchanged; new immutable object only, no replacement"
     },
     "factor-bases/icv1-f2m11-t67-05f5aa36/FB1h5862f57f8b31.json": {
       "sha256": "861f6cc20ba939db435cd220411cfe86eb1722d12e04456494130745340c7d80",
@@ -208,6 +243,24 @@
         "k23-cyc-w1"
       ],
       "provenance": "ecbench fb --curve '{\"kind\":\"koblitz\",\"a\":1,\"n\":23}' --factor-base 'cyclotomic:w=1' (commit 0f0db951ad)"
+    },
+    "factor-bases/icv1-f2m23-tm5197-1f85e9e1/FB1h190e12c73911.json": {
+      "sha256": "ed9a5869390a7a965f1f241e3ae7f94e72f902774805fbc4369704c26551ef09",
+      "bytes": 5586,
+      "description": "ecbench dump of onb-weight on icv1-f2m23-tm5197-1f85e9e1",
+      "provenance": "ecbench fb (FBM1 production 20261013)"
+    },
+    "factor-bases/icv1-f2m23-tm5197-1f85e9e1/FB1ha5d7f603afe2.json": {
+      "sha256": "48c4d496e41cc30540d08561a1a86c9af61830a02e4e3605055af847cf3e5f2f",
+      "bytes": 18898,
+      "description": "ecbench dump of onb-weight on icv1-f2m23-tm5197-1f85e9e1",
+      "provenance": "ecbench fb (FBM1 production 20261013)"
+    },
+    "factor-bases/icv1-f2m23-tm5197-1f85e9e1/FB1hc9acff86c891.json": {
+      "sha256": "acb73f1f6261b0bc0661cebe80aed176908076be428ac824eab7eb5e808ef20f",
+      "bytes": 5608,
+      "description": "ecbench dump of onb-weight:w=1,columns=8",
+      "provenance": "ecbench fb onb-weight FBM1 production"
     },
     "factor-bases/icv1-fp20-t727-cd198a38/FB1h4b3725c0aa92.json": {
       "sha256": "4e3787c54b9eed6a7c13b9aa4e97b7a4b91073bb1e21599f1619dc7332b838c0",

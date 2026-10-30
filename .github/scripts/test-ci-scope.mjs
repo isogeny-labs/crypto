@@ -4,10 +4,44 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { classify, embeddedInputs, materializeInputs, scopes, select } from './ci-scope.mjs';
+import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select } from './ci-scope.mjs';
+
+test('a cold root checkout resolves path crates and their embedded inputs', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-path-crates-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('Cargo.toml', '[package]\nname = "checkout-control"\nversion = "0.1.0"\nedition = "2021"\n[dependencies]\nfactor-base = { path = "tools/factor-base" }\nvolcano-cli = { path = "tools/volcano-cli" }\n');
+    write('src/lib.rs', 'pub fn control() {}\n');
+    write('tools/factor-base/Cargo.toml', '[package]\nname = "factor-base"\nversion = "0.1.0"\nedition = "2021"\n');
+    write('tools/factor-base/src/lib.rs', 'pub const DATA: &str = include_str!("../fixture.json");\n');
+    write('tools/factor-base/fixture.json', '{}\n');
+    write('tools/volcano-cli/Cargo.toml', '[package]\nname = "volcano-cli"\nversion = "0.1.0"\nedition = "2021"\n[dependencies]\nisogeny_algos = { path = "../../isogeny_algos" }\n');
+    write('tools/volcano-cli/src/lib.rs', 'pub fn control() {}\n');
+    write('isogeny_algos/Cargo.toml', '[package]\nname = "isogeny_algos"\nversion = "0.1.0"\nedition = "2021"\n');
+    write('isogeny_algos/src/lib.rs', 'pub fn control() {}\n');
+    write('tools/factor-base/archive/raw.jsonl', '{"unrelated": true}\n');
+    write('tools/factor-base/archive/scratch.rs', 'compile_error!("archived source is not a crate target");\n');
+    git('add', '.'); git('commit', '-qm', 'path crate control');
+    git('sparse-checkout', 'set', '--no-cone', '/Cargo.toml', '/src/');
+    const metadata = () => execFileSync('cargo', ['metadata', '--offline', '--format-version', '1'], { cwd, encoding: 'utf8', stdio: 'pipe' });
+    assert.throws(metadata, /factor-base/);
+    materializeInputs(cwd);
+    for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs',
+      'tools/factor-base/fixture.json', 'tools/volcano-cli/Cargo.toml',
+      'tools/volcano-cli/src/lib.rs', 'isogeny_algos/Cargo.toml', 'isogeny_algos/src/lib.rs']) {
+      assert.equal(existsSync(path.join(cwd, file)), true, file);
+    }
+    const root = JSON.parse(metadata()).packages.find(pkg => pkg.name === 'checkout-control');
+    assert.equal(root.dependencies.find(dep => dep.name === 'factor-base').path, path.join(cwd, 'tools/factor-base'));
+    assert.equal(existsSync(path.join(cwd, 'tools/factor-base/archive/raw.jsonl')), false);
+    assert.equal(existsSync(path.join(cwd, 'tools/factor-base/archive/scratch.rs')), false);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
 
 test('prose does not run compilers, profiling or CodeQL', () => {
-  for (const file of ['README.md', 'AGENTS.md', 'docs/ecbench/README.md',
+  for (const file of ['AGENTS.md', 'docs/ecbench/README.md',
     'examples/README.md', 'research/ecbench_example/REPORT.md']) {
     assert.ok(Object.values(classify([file])).every(value => !value), file);
   }
@@ -34,6 +68,8 @@ test('crates and languages select their own checks', () => {
     assert.equal(classify([file]).release_cuda, true, file);
   }
   assert.equal(classify(['ecc2k130/benchmarks/old/probe.cu']).release_cuda, false);
+  assert.equal(classify(['ecc2k130/README.md']).release_native, true);
+  assert.equal(classify(['ecc2k130/README.md']).release_cuda, false);
   assert.equal(classify(['ecc2k130/aws/README.md']).release_native, false);
 });
 
@@ -50,11 +86,30 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   assert.equal(classify(['docs/bounds/records/record.json']).ecbench_replay, true);
   assert.equal(classify(['research/ecbench_example/sessions/one/records.jsonl']).ecbench_replay, true);
   assert.equal(classify(['research/ecbench_example/sessions/one/README.md']).ecbench_replay, true);
+  assert.equal(classify(['research/pkm_example_ecbench_20261016/sessions/one/session.json']).ecbench_replay, true);
+  assert.equal(classify(['research/isogeny_example/interrupted/run1/records.jsonl']).ecbench_replay, true);
+  assert.equal(classify(['research/isogeny_example/README.md']).ecbench_replay, false);
+  // Sessions outside research/ (SHF-20261028-0f3f64, PPN-6).
+  for (const file of ['taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/session.json',
+    'taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/records.jsonl',
+    'experiments/example/session/records.jsonl.gz', 'experiments/example/session/ecbench_records.jsonl.gz']) {
+    assert.equal(classify([file]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['taskq/deploy/eks-karpenter/validation/README.md']).ecbench_replay, false);
+  assert.equal(classify(['taskq/deploy/example/session.json.bak']).ecbench_replay, false);
+  for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
+    'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
+    assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/factor_base_shape_leads_20261018/README.md']).ecbench_replay, false);
   assert.equal(classify(['research/fixture.json'], new Set(['research/fixture.json'])).rust_root, true);
 });
 
-test('isogeny release inputs select the Rust package lane', () => {
+test('staged Rust release inputs select the Rust package lane', () => {
   const inputs = [
+    'README.md',
+    'LICENSE',
+    'LICENSE.md',
     'tools/isogeny-cli/Cargo.toml',
     'tools/isogeny-cli/Cargo.lock',
     'tools/isogeny-cli/build.rs',
@@ -65,6 +120,8 @@ test('isogeny release inputs select the Rust package lane', () => {
     'isogeny_algos/src/field.rs',
     'docs/curves/registry.json',
     'docs/curves/standards/coverage.json',
+    'docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json',
+    'docs/ecdlp-audit/execution-boundary.svg',
     'research/p192_p224_hundred_large_prime_isogenies_20261010/PROTOCOL.md',
     'research/p192_p224_large_degree_isogenies_20261009/PROTOCOL.md',
     'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
@@ -78,6 +135,24 @@ test('isogeny release inputs select the Rust package lane', () => {
   }
   // Unrelated isogeny research reports do not invoke the release builder.
   assert.equal(classify(['research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md']).release_rust, false);
+  const attributes = classify(['.gitattributes']);
+  assert.equal(attributes.release_rust, true);
+  assert.equal(attributes.release_native, true);
+  assert.equal(attributes.release_cuda, true);
+});
+
+test('volcano-cli, a path dependency of the root crate, selects the root lanes', () => {
+  for (const file of ['tools/volcano-cli/Cargo.toml', 'tools/volcano-cli/Cargo.lock', 'tools/volcano-cli/src/main.rs']) {
+    const result = classify([file]);
+    assert.equal(result.rust_root, true, file);
+    assert.equal(result.release_rust, true, file);
+    assert.equal(result.ecbench_replay, true, file);
+    assert.equal(result.release_native, false, file);
+    assert.equal(result.release_cuda, false, file);
+  }
+  assert.equal(classify(['isogeny_algos/src/lib.rs']).rust_root, true);
+  assert.equal(classify(['tools/volcano-cli/README.md']).rust_root, false);
+  assert.equal(classify(['tools/volcano-cli/README.md']).release_rust, true);
 });
 
 test('real git diffs include renames, deletes, unusual names and over 300 files', () => {
@@ -194,5 +269,48 @@ test('external Rust path modules and includes are followed recursively', () => {
       assert.deepEqual(select({ event: 'pull_request', base: deletionBase, cwd }), Object.fromEntries(scopes.map(key => [key, true])));
       write(relative, saved); git('add', '.'); git('commit', '-qm', `restore ${file}`);
     }
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+test('shared factor-base crate selects root compilation and release checks', () => {
+  for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs', 'tools/factor-base/src/store.rs']) {
+    const scope = classify([file]);
+    assert.equal(scope.rust_root, true, file);
+    assert.equal(scope.release_rust, true, file);
+    assert.equal(scope.ecbench_replay, true, file);
+  }
+});
+
+test('path dependencies of the root crate are materialized, transitively', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-pathdeps-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nhelper = { path = "tools/helper" }\nserde = "1"\n');
+    write('src/lib.rs', '// maintained\n');
+    write('tools/helper/Cargo.toml', '[package]\nname="helper"\nversion="0.1.0"\n[dependencies]\ninner = { version = "0.1", path = "../../inner" }\n');
+    write('tools/helper/src/lib.rs', 'include!("body.inc");\n');
+    write('tools/helper/src/body.inc', '#[path = "support.rs"]\nmod support;\n');
+    write('tools/helper/src/support.rs', 'pub const DATA: &str = include_str!("nested.json");\n');
+    write('tools/helper/src/nested.json', '{}\n');
+    write('tools/helper/archive/raw.jsonl', '{"unrelated": true}\n');
+    write('inner/Cargo.toml', '[package]\nname="inner"\nversion="0.1.0"\n');
+    write('inner/src/lib.rs', 'pub const DATA: &str = include_str!("../fixture.json");\n');
+    write('inner/fixture.json', '{}\n');
+    write('tools/other/Cargo.toml', '[package]\nname="other"\nversion="0.1.0"\n');
+    git('add', '.'); git('commit', '-qm', 'base');
+    git('sparse-checkout', 'set', '--no-cone', '/src/', '/Cargo.toml');
+    assert.equal(existsSync(path.join(cwd, 'tools/helper/Cargo.toml')), false);
+    assert.deepEqual([...pathDependencyDirs(cwd)], ['tools/helper', 'inner']);
+    materializeInputs(cwd);
+    for (const file of ['tools/helper/Cargo.toml', 'tools/helper/src/lib.rs', 'tools/helper/src/body.inc',
+      'tools/helper/src/support.rs', 'tools/helper/src/nested.json', 'inner/Cargo.toml', 'inner/src/lib.rs', 'inner/fixture.json']) {
+      assert.equal(existsSync(path.join(cwd, file)), true, file);
+    }
+    assert.equal(existsSync(path.join(cwd, 'tools/other/Cargo.toml')), false);
+    assert.equal(existsSync(path.join(cwd, 'tools/helper/archive/raw.jsonl')), false);
+    write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nup = { path = "../up" }\n');
+    assert.throws(() => pathDependencyDirs(cwd), /escapes the checkout/);
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
