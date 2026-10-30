@@ -14,6 +14,8 @@ use std::time::{Duration, Instant};
 
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
+#[path = "prime_f4_wide_m3.rs"]
+mod prime_f4_wide_m3;
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -331,7 +333,7 @@ pub fn capabilities() -> Value {
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 only","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 or m3","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
@@ -1700,9 +1702,12 @@ const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached"
 fn retains_canonical_artifacts(data: &SolverData) -> bool {
     data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
         || data.outcome["strategy"] == prime_f4_wide::STRATEGY
+        || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
 }
 fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
-    if data.outcome["strategy"] == prime_f4_wide::STRATEGY {
+    if data.outcome["strategy"] == prime_f4_wide::STRATEGY
+        || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+    {
         data.outcome["solver_completed"] = json!(false);
         data.outcome["status"] = json!("partial");
         if data.outcome.get("live_persistence_errors").is_some() {
@@ -2244,6 +2249,12 @@ fn prime_f4(
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
+    if config.m == 3
+        && context.is_some()
+        && matches!(group, Group::Prime(curve) if curve.p.to_u64().is_some_and(|p| p >= 1u64 << 32))
+    {
+        return prime_f4_wide_m3::solve(config, group, domain, target, context);
+    }
     if config.m != 2 {
         return prime_f4_chain(
             config,
@@ -3008,14 +3019,25 @@ pub(super) fn verify_prime_root_artifact(
     Ok(())
 }
 
+/// Explicit result of the profile verifier; only a validated censored prefix
+/// may bypass later mathematical parsing of incomplete bytes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum WidePrimeReplay {
+    Ordinary,
+    CensoredM3Prefix,
+}
 /// Semantic wide-prime replay, independent of native basis derivation.
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
     outcome: &Value,
     artifacts: &[super::types::Artifact],
-) -> Result<(), String> {
-    prime_f4_wide::verify(dir, config, outcome, artifacts)
+) -> Result<WidePrimeReplay, String> {
+    let disposition = prime_f4_wide_m3::verify(dir, config, outcome, artifacts)?;
+    if disposition == WidePrimeReplay::Ordinary {
+        prime_f4_wide::verify(dir, config, outcome, artifacts)?;
+    }
+    Ok(disposition)
 }
 
 fn wide_begin_failure(
@@ -3027,7 +3049,7 @@ fn wide_begin_failure(
     let Some(context) = context else {
         return Err(error);
     };
-    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
+    if config.family != "prime" || config.solver != "f4" || !matches!(config.m, 2 | 3) {
         return Err(error);
     }
     let group = Group::read(case)?;
@@ -3038,6 +3060,16 @@ fn wide_begin_failure(
         return Err(error);
     }
     let target = group.point(&case.public_instance["target"])?;
+    if config.m == 3 {
+        return prime_f4_wide_m3::begin_failure(
+            config,
+            &group,
+            &domain(&group, case)?,
+            &target,
+            context,
+            &error,
+        );
+    }
     prime_f4_wide::begin_failure(
         config,
         &group,

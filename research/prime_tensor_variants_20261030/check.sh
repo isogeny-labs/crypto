@@ -7,6 +7,7 @@ out=${1:-/tmp/prime-ternary-development-check}
 mkdir -p "$out/packet" "$out/onelevel"
 (cd "$here" && sha256sum --quiet -c source-manifest.sha256)
 (cd "$here/identity" && sha256sum --quiet -c source-pins.sha256)
+bash "$here/verify-stored-bindings.sh"
 g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror \
     "$here/packet-unit/packet_unit.cpp" -o "$out/packet/packet_unit"
 g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror \
