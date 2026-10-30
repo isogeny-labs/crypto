@@ -168,16 +168,19 @@ fn main() {
     }
     if args.iter().any(|a| a == "--check-fast") {
         for simple in [false, true] {
+            fp61_fast::check_small(simple, false, false, true);
+        }
+        for simple in [false, true] {
             for derived in [false, true] {
                 for program in [false, true] {
-                    fp61_fast::check_small(simple, derived, program);
+                    fp61_fast::check_small(simple, derived, program, false);
                 }
             }
         }
         return;
     }
     if args.iter().any(|a| a == "--p61-fast") {
-        fp61_fast::run((1u128 << 61) - 1, false, false, false);
+        fp61_fast::run((1u128 << 61) - 1, false, false, false, false);
         return;
     }
     if let Some(pos) = args.iter().position(|a| a == "--fp-fast") {
@@ -185,7 +188,8 @@ fn main() {
         let simple = args.iter().any(|a| a == "--simple");
         let program = args.iter().any(|a| a == "--program");
         let derived = args.iter().any(|a| a == "--derived");
-        fp61_fast::run(p, simple, program, derived);
+        let scalar = args.iter().any(|a| a == "--scalar");
+        fp61_fast::run(p, simple, program, derived, scalar);
         return;
     }
     if let Some(pos) = args.iter().position(|a| a == "--fp") {

@@ -204,7 +204,7 @@ fn big(x: u128) -> BigUint {
     BigUint::from(x)
 }
 
-pub fn run(p: u128, simple: bool, program: bool, derived: bool) {
+pub fn run(p: u128, simple: bool, program: bool, derived: bool, scalar: bool) {
     println!("=== Fp instance: p = {p} ({} bits)", 128 - p.leading_zeros());
     let t0 = std::time::Instant::now();
     let Some((coeff, r, (gx, gy))) = prime_order_curve(p) else {
@@ -268,7 +268,9 @@ pub fn run(p: u128, simple: bool, program: bool, derived: bool) {
     let g = Point::Affine { x: big(gx), y: big(gy) };
     let target = curve.mul(&g, &big(2), &mut meter).expect("2G");
     let t0 = std::time::Instant::now();
-    let net_result = if derived {
+    let net_result = if scalar {
+        hashed_ecdl_tensor_fast::reduction::decomposition_network_scalar(&curve, &bases, &target, &mut meter)
+    } else if derived {
         hashed_ecdl_tensor_fast::reduction::decomposition_network_derived(&curve, &bases, &target, program, &mut meter)
     } else if program {
         hashed_ecdl_tensor_fast::reduction::decomposition_network_program(&curve, &bases, &target, &mut meter)
@@ -288,7 +290,7 @@ pub fn run(p: u128, simple: bool, program: bool, derived: bool) {
     }
 }
 
-pub fn check_small(simple: bool, derived: bool, program: bool) {
+pub fn check_small(simple: bool, derived: bool, program: bool, scalar: bool) {
     use hashed_ecdl_tensor_fast::arithmetic::Seeded as FSeeded;
     use hashed_ecdl_tensor_fast::contraction::Counter as FCounter;
     use hashed_ecdl_tensor_fast::curve::{Curve as FCurve, Point as FPoint};
@@ -334,7 +336,11 @@ pub fn check_small(simple: bool, derived: bool, program: bool) {
         let b1 = mk(0, &mut meter);
         let b2 = mk(1, &mut meter);
         let target = curve.mul(&fpt(Some(g)), &fbig(2), &mut meter).expect("target");
-        let net = if derived {
+        let net = if scalar {
+            hashed_ecdl_tensor_fast::reduction::decomposition_network_scalar(
+                &curve, &[b1.clone(), b2.clone()], &target, &mut meter,
+            ).expect("scalar net")
+        } else if derived {
             hashed_ecdl_tensor_fast::reduction::decomposition_network_derived(
                 &curve,
                 &[b1.clone(), b2.clone()],
@@ -363,7 +369,7 @@ pub fn check_small(simple: bool, derived: bool, program: bool) {
         let mut counter = FCounter::default();
         let count = counter.count(&net, &vec![None; net.edge_count()], &mut meter).unwrap();
         println!(
-            "   bits={bits} simple={simple} derived={derived} program={program} |F1|={} |F2|={} brute={} network={} agree={} backend={:?}",
+            "   bits={bits} simple={simple} derived={derived} program={program} scalar={scalar} |F1|={} |F2|={} brute={} network={} agree={} backend={:?}",
             pts1.len(), pts2.len(), brute, count, count == brute,
             counter.statistics.last_backend
         );

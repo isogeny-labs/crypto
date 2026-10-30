@@ -166,3 +166,21 @@ Cumulative structural change: 493124 -> 31865 edges (15.5x smaller).
 --check-fast: 16/16 combinations agree with brute force on cofactor-one
 fixtures. A separate cofactor-two regression checks the projected derived
 encoding and its expected non-parsimonious witness count.
+
+=== scalar-parameter decomposition (structurally removes validity)
+Interface is k with A1 = k*G by a double-and-add programme circuit, A2 = T - A1.
+k -> k*G is a bijection on the prime-order subgroup, so the exact count is
+unchanged. A1 is on-curve by construction; A2 is on-curve by the group law.
+No curve-validity check remains.
+
+61-bit, simple seeds:
+mode                         edges   verts  degree  interface
+faithful, two free points    118163  25219  520     246
+faithful, derived            94788   20746  520     123
+programme, derived           31865   5307   520     123
+scalar (k*G)                 9203    1227   247     61
+
+Cumulative structural change: 493124 -> 9203 edges (53.6x smaller),
+interface 246 -> 61 (4x), degree 520 -> 247. No runtime gain is claimed.
+--check-fast: 20/20 combinations agree with brute force on cofactor-one
+fixtures. Cofactor-two derived projection is covered by the separate regression.
