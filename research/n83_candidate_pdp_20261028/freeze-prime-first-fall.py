@@ -7,6 +7,7 @@ sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 p = json.loads((s / 'protocol-hilbert-v2.json').read_text())
 for key in ('freeze', 'amendments'):
     p.pop(key, None)
+p['amendments'] = []
 commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
 binary = s / 'target/release/prime_first_fall'
 p.update(protocol_id='N83-PRIME-FIRST-FALL-20261030', version=1, created='2026-10-30',
