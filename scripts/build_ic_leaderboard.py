@@ -80,6 +80,8 @@ SOURCES = {
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
+    "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
+    "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -1040,6 +1042,50 @@ def postgb_linear_stage_component() -> dict:
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["postgb_linear_stage"],
             "validation": ("validated: replay certificate, validator report and the matched rho reference "
                            f"with the §5a band ({study}/validation/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def ic_cover_weakclass_component() -> dict:
+    """Hilbert early stop in the Joux-Vitse cover IC on the weak class, from
+    research/ic_cover_weakclass_20261023: per-p mean S of the full-F4 arm (A)
+    and the Hilbert arm (B), the paired S_A/S_B, and S over the negation-map
+    rho reference added for validation, copied from the study's summary.json
+    (made from its run records) and validation/rho-neg.json. A component
+    improvement in the linear-algebra stage; these curves have no row in
+    tables A-C. Its standing comes from the study's VALIDATION.json."""
+    d = load(SOURCES["ic_cover_weakclass"])
+    rho = load(SOURCES["ic_cover_weakclass_rho_neg"])
+    study = "research/ic_cover_weakclass_20261023"
+    per_p = {row["p"]: row for row in d["per_p"]}
+    rows = []
+    for p in sorted(per_p):
+        cells = [c for c in d["cells"] if c["p"] == p]
+        for c in cells:
+            a, b = c["A"], c["B"]
+            if not (a["solved"] and b["solved"] and a["correct"] and b["correct"]
+                    and a["mismatches"] == 0 and b["mismatches"] == 0
+                    and a["digest"] == b["digest"]
+                    and a["residuals"] == b["residuals"] and a["relations"] == b["relations"]):
+                raise SystemExit(f"{SOURCES['ic_cover_weakclass']}: p={p} seed={c['seed']} "
+                                 "failed the equal-relations or verification gate")
+        base = statistics.fmean(c["A"]["S"] for c in cells)
+        lever = statistics.fmean(c["B"]["S"] for c in cells)
+        r = rho["per_p"][str(p)]
+        band = lambda s: [s / (r["s_rho"] * (1 + 2 * w * r["steps_per_op"]))
+                          for w in (0.0, 0.1, 1.0)]
+        rows.append({"p": p, "cells": len(cells), "base": base, "lever": lever,
+                     "ratio": per_p[p]["ratio_S_A_over_S_B"]["mean"],
+                     "ratio_min": per_p[p]["ratio_S_A_over_S_B"]["min"],
+                     "ratio_max": per_p[p]["ratio_S_A_over_S_B"]["max"],
+                     "before": band(base), "after": band(lever)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "slope": d["slope_A"][0], "slope_engineer": d["slope_B"][0],
+            "class": "engineering",
+            "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["ic_cover_weakclass"],
+            "validation": ("validated with caveats: replay certificate, validator report and the "
+                           "negation-map rho reference with the §5a band "
+                           f"({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -2142,6 +2188,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
+        "ic_cover_weakclass_component": ic_cover_weakclass_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -2441,6 +2488,28 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    cw = doc["ic_cover_weakclass_component"]
+    L += ["## Component improvement: Hilbert early stop in the Joux–Vitse cover IC (2026-10-28, engineering)", "",
+          "On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–503), the Hilbert stop "
+          "certifies the leading forms are a regular sequence and drops every pending F4 pair the complete "
+          "intersection's Hilbert function proves reduces to zero; the reduced basis is unchanged. The baseline "
+          "arm reproduces the recorded S; every cell has equal residuals, relations, decompositions and relation "
+          "digest, every logarithm is verified, and A/A is 1.000. The as-found form (B0) is a relabelling: S fell "
+          "2.53–2.64× while the emitted native-ops counter rose 8.3–8.5×. Counted F_p multiplications only "
+          f"(`{cw['unit']}`), a lower bound: the F4 driver's pair selection, matrix assembly and table lookups are "
+          "unpriced, and the IC side's unpriced work is not emitted. These curves have no row in tables A–C. "
+          f"The log–log slope of S/rho over p is {cw['slope']:.2f} (full F4) and {cw['slope_engineer']:.2f} "
+          "(Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a "
+          "gate, and no cross-method rank is claimed.", "",
+          "| p | cells | S before → after | S_A/S_B | IC ÷ rho-neg after (w = 0 / 0.1 / 1) | IC ÷ rho-neg before |",
+          "|---:|--:|:--|:--|:--|:--|"]
+    for r in cw["rows"]:
+        band = " / ".join(f"{x:.1f}" for x in r["after"])
+        before = " / ".join(f"{x:.1f}" for x in r["before"])
+        L.append(f"| {r['p']} | {r['cells']} | {r['base']:.4g} → {r['lever']:.4g} | "
+                 f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
+    L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
+              f"[data](../../{cw['source']}).", "", cw["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -3474,6 +3543,33 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    cw = doc["ic_cover_weakclass_component"]
+    P.append('<section class="panel" id="ic-cover-weakclass-hilbert"><h2>Component improvement · Hilbert early '
+             'stop in the Joux–Vitse cover IC <span class="chip">engineering</span></h2>'
+             '<p>On the weak class (<code>jv_cover --exp dlp</code>, six-quadric cover over <code>F<sub>p</sub></code>, '
+             'p = 53–503), the Hilbert stop certifies the leading forms are a regular sequence and drops every '
+             'pending F4 pair the complete intersection\'s Hilbert function proves reduces to zero; the reduced '
+             'basis is unchanged. The baseline arm reproduces the recorded S; every cell has equal residuals, '
+             'relations, decompositions and relation digest, every logarithm is verified, and A/A is 1.000. The '
+             'as-found form (B0) is a relabelling: S fell 2.53–2.64× while the emitted native-ops counter rose '
+             f'8.3–8.5×. Counted F<sub>p</sub> multiplications only ({esc(cw["unit"])}), a lower bound: the F4 '
+             'driver\'s pair selection, matrix assembly and table lookups are unpriced, and the IC side\'s unpriced '
+             'work is not emitted. These curves have no row in tables A–C. '
+             f'The log–log slope of S/rho over p is {cw["slope"]:.2f} (full F4) and {cw["slope_engineer"]:.2f} '
+             '(Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a '
+             'gate, and no cross-method rank is claimed.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>cells</th><th>S before → after</th>'
+             '<th>S<sub>A</sub>/S<sub>B</sub></th><th>IC ÷ rho-neg after (w = 0 / 0.1 / 1)</th>'
+             '<th>IC ÷ rho-neg before</th></tr></thead><tbody>')
+    for r in cw["rows"]:
+        band = " / ".join(f"{x:.1f}" for x in r["after"])
+        before = " / ".join(f"{x:.1f}" for x in r["before"])
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["cells"]}</td><td>{r["base"]:.4g} → {r["lever"]:.4g}</td>'
+                 f'<td><b>{r["ratio"]:.3f}</b> [{r["ratio_min"]:.3f}, {r["ratio_max"]:.3f}]</td>'
+                 f'<td>{band}</td><td>{before}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
+             f'<p class="muted">{esc(cw["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
