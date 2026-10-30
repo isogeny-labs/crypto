@@ -1,0 +1,26 @@
+card_id: CARD-n83-msweep-20261024-reference
+relay_verbatim: not_checkable   # check-relay reported relay_verbatim=false only because "no receipt: the card never ran"; no card receipt exists, so there is nothing to recompute against (applicable=true, missing_lines=[])
+outcome: not_complete   # the executor reported the run still in progress; no completion notice, exit status or tool output was relayed
+stopped_at_step: run-reference
+recommendation: wait_for_completion_notice   # no stop condition has been reported; re-assess once the tool exits and a receipt exists
+execution_class: not_determinable   # 1 of 1 command started per the executor; no receipt; no exit status
+per_command:
+  run-reference:
+    on_disk: in_progress_or_unknown
+    evidence:
+      - executor report: background task b0aqt5zwc started, output file empty, no completion notice, no exit status, no IMPEDIMENT line
+      - raw/reference holds 1 *.json file (rho_a.receipt.json, its status key is PASS_VERIFIED_PUBLIC_TARGET, not process_cap), 0 files with status process_cap; subdirectory ic_root11_k1107 holds only an empty targets_result.jsonl
+      - all raw/reference files carry mtime 2026-10-24 08:18, the same minute this assessment was made; no run_reference.sh, task_card.py, koblitz_orbit_dlp_fast or n83_rho_optimization_eval process was visible in ps at that time
+      - receipts/ directory does not exist, so the card's reference.stdout and reference.stderr were not created
+checks:
+  card_receipt_exists: false
+  receipts_dir_exists: false
+  relay_checked_by_tool: "python3 tools/task_card.py check-relay ... --report ...reference.report.txt exited 1: relay_verbatim=false, verify_findings=[no receipt: the card never ran]"
+  report_file_written_exactly: true
+  only_card_argv_ran: not_determinable from disk (no receipt)
+  write_scope: not_checked beyond raw/reference and cards/ listing
+reasons:
+  - "The executor reported no result, so whether the run executed as specified cannot be stated; no receipt exists and exit codes cannot be checked."
+  - "The relay carries no tool output, so verbatim relay is not checkable; it is not assumed."
+  - "Counts taken by the director from disk: 1 *.json file under raw/reference, 0 with status process_cap."
+interpretation: not_assessed
