@@ -3176,3 +3176,34 @@ the one the curve allows: the order-24 walk is the matched reference, and agains
 further from rho (a reference correction).  The order-24 base fold then brings the modelled `S₅`-based
 handover from `2^{146}` to `≈ 2^{140}`–`2^{144}`: **engineering on the `j = 0` / `S₅` line, a model,
 not an improvement of the baseline**, which (E24, E25, E31 on the `V₄` line) sits `≈ 2^{50}` earlier.
+
+### 9.28 E30 pre-registration: "invariants", lite — an accounting audit of trivial `F_{p⁴}` products
+
+*Registered 2026-10-30, before any E30 code.*  **What survives of the draft:** E30 ("invariants") had a full
+version with a Stage B and a "lite" version that changed only counters or accounting; its draft touched
+`gaudry_quartic.rs` and predicted that the lite version would move E25's distance to rho by only `≈ 0.6 %`.
+Only the lite version is to run, as an accounting correction.  **What cannot be reconstructed:** which
+counter the draft changed.  The note does not say, and no draft file survives.  So E30 is pre-registered here
+as a minimal, honest accounting audit in the same place (`gaudry_quartic.rs`'s `F_{p⁴}` counters) and on the
+same object (the `V₄` invariant system and the walks), not as the lost draft.
+
+**The audit.**  `Fp4::mul` charges a full product (`19`, or `13` with E27's products) whatever its operands.
+Some operands are structurally trivial, and a counted implementation would not pay for them: the factor `1`
+(`v4_system` evaluates the `30` invariant coefficients as `Σ_j c_j z_R^j` from `z_R^0 = 1`, and `Fp4::pow`
+starts from `1`), the factor `0`, and factors in `F_p` (a scaling, `4`, as `Fp4::scale` is charged).  E30
+re-prices exactly these products: `0` when an operand is `0` or `1`, `4` when an operand lies in `F_p`, the
+full product otherwise.  Nothing is computed differently; recorded counts are unchanged (the audit is a
+separate counter of the difference).  **Class, fixed in advance: accounting.**  Whatever it moves is not an
+improvement of the index calculus.
+
+**Protocol.**  E25's ten curves, both arms, E31's solver A with E27's products (the §9.25 baseline): the
+pipeline rerun with the audit counter on, every other field required to equal E27's records; the matched
+`⟨±ψ⟩` and negation walks (E25's seeds) re-priced the same way, serially.  Report `S`, the walk, and the
+distance to rho at `0`, `0.1` and `1` GAE, before and after the audit.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.110 | replay | every field of the §9.25 Karatsuba records reproduced; the audit changes only its own counter | any other field differs |
+| G2.111 | IC side | `S` falls by `[0.01 %, 1 %]` (trivial products in the invariant system's evaluation and in powering) | outside |
+| G2.112 | walk | the `⟨±ψ⟩` walk's cost falls by `[0 %, 1 %]` on E25's curves (its `ψ` multipliers are not expected in `F_p`) | outside |
+| G2.113 | distance | `S/rho` moves by less than `1 %` at every weight on every row (red team's estimate for the lost draft: `≈ 0.6 %`) | `≥ 1 %` on any row |
