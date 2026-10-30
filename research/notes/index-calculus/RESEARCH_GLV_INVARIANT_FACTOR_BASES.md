@@ -3113,3 +3113,66 @@ that line's modelled cost by `≈ 2×` against its own matched walk, and leaves 
 behind the `V₄` line: **class engineering on the `D₄`/`τ_T` line, not an improvement of the baseline**,
 and since A2 is a model, not a measured `S` either.  A Stage B would be justified only if A2 put the line
 within reach of E31 A, which the derivation says it cannot.
+
+### 9.27 E29 pre-registration: the order-24 twist action on E18's `j = 0` line (kill test, Stage R, Stage A only)
+
+*Registered 2026-10-30, before any E29 code.*  **What E29 is, reconstructed.**  The draft is lost; the red
+team's surviving findings: a twist construction whose draft predicted a handover `n* ≈ 2^{139}`–`2^{144}`
+(against E24's `2^{90.1}`), so it cannot beat the baseline; only Stage R and Stage A should run, after a cheap
+kill test — does `ψ_p`, the endomorphism derived from the `p`-power Frobenius, have order `24` on E18's
+curves?  The red team noted that E18's eight prime orders are `≡ 1 (mod 24)` (also mod `16` and `48`;
+`n mod 96 ∈ {1, 49}`), which allows it but does not prove it.  The lane
+`research/twist_index_calculus_20261020/` built the object on canonical quartic twists
+`y² = x³ + b₀t³` (`Twist24Instance`, `rho_twist24`, `run_k4_twist24`): the transported Frobenius
+`ψ(x, y) = (h²x^p, h³y^p)`, `ψ⁴ = −1`, with the cubic automorphism `ι` a signed action of order `24`.
+E29 measures what that action does to **E18's `ψ` arm** (§9.3: `r_ψ = 0.138` against the order-6 walk,
+handover `2^{146.0}`).  Derived before code:
+
+1. **`ψ_p` exists on every E18 curve.**  `E_b : y² = x³ + b` over `F_{p⁴}`, `p ≡ 1 (mod 12)`; Frobenius maps
+   `E_b` to `E_{b^p}`, isomorphic to `E_b` because `b^{p−1}` is a sixth power (`12 | p − 1`).  With
+   `u = b^{−(p−1)/6}`, `ψ_p(x, y) = (u²x^p, u³y^p)` is an endomorphism of `E_b` over `F_{p⁴}` and
+   `ψ_p⁴ = (ζ²x, ζ³y)`, `ζ = N(u) = χ₆(b)⁻¹`: **`ord ψ_p = 4·ord χ₆(b)`**, `24` exactly when `b` is
+   neither a square nor a cube.  The group `⟨ψ_p, Aut E⟩` has order `24` on every curve (`ψ_p⁴ ∈ Aut E`,
+   `ψ_p^j ∉ Aut E` for `j = 1, 2, 3`), and it acts faithfully on `⟨G⟩` (a non-trivial element minus `1` has
+   degree `≤ (1 + p^{3/2})² < n`), so as a cyclic group of order `24`.
+2. **It does not keep E18's base** unless `u² ∈ F_p`; but each E18 curve is `F_{p⁴}`-isomorphic to a
+   canonical model `y² = x³ + b₀t³` with the same prime order (E18's `p = 241, 337` orders equal the lane's
+   `(241, 49)`, `(337, 100)`), where `h² ∈ F_p` and the line `x ∈ F_p` is kept.  Rho and the base can both
+   use the order-24 action on that model, and an attacker maps to it at the cost of one isomorphism.
+3. **What it moves.**  Against E18's order-6 `⟨±ψ⟩` walk, an order-24 walk takes `√4 = 2×` fewer steps
+   but pays a costlier class representative (three Frobenius images and twelve candidates): derived
+   `F_p`-multiplication ratio `[1.3, 2.0]`.  On the base, columns `÷ 4` (`12` abscissae a column against
+   `3`), the linear algebra `÷ ≈ 16`, so `r_24 ≈ r_ψ · (rho ratio)/16`, and §11.16's handover moves by
+   `(cols ÷ 4)` against `(S_rho ÷ ratio)`: `n* ÷ (4/ratio)⁴`, i.e. `2^{146.0} → ≈ 2^{140}`–`2^{144}` (the
+   draft's band).  The order-24 walk alone (no base fold) moves E18's `ψ` handover *later* by
+   `4·log₂(ratio)` bits.
+
+**Protocol.**  E18's eight `ψ` curves (`generate_psi_instance(p, 1)`, `p = 241, 337, 541, 601, 733, 769, 997,
+1069`).  **Kill test (first, per curve):** on E18's own model compute `ψ_p` as above; check on points that it
+maps `E` to `E`; find `λ_p` with `ψ_p(G) = [λ_p]G` among the 24th roots of unity mod `n`; record `ord λ_p`,
+`ord χ₆(b)`, `|⟨λ_p, λ_ω, −1⟩|`, and whether `u² ∈ F_p`; find `b₀` with `#(y² = x³ + b₀t³) = n`.
+**Kill:** `|⟨λ_p, λ_ω, −1⟩| < 24` on a curve (that curve leaves E29), or no curve passes (E29 stops).
+**Stage R** (the matched reference, retrospective): on the canonical model of each passing curve, `16`
+order-6 `⟨±ψ⟩` walks (`rho4_folded`, `Psi`) and `16` order-24 walks (`rho_twist24`), the same seeds, both in
+E18's arithmetic (schoolbook) and in E27's products (Karatsuba; unbatched, as `rho_twist24` is serial),
+the `[d]G` check excluded from both.  First on `p = 241` alone (the red team's one-curve kill budget),
+then on the rest.  **Stage A** (the base fold): the lane's `run_k4_twist24` (E18's exact oracle, one
+stream, three arms flat / cubic `= E18's ψ fold` / twist24, Wiedemann to the verified log) on the canonical
+models at `p = 241, 337, 541`, `16` walks each fold; `r = LA / rho` per arm; §11.16's handover from the
+twist24 arm's own constants (`y`, `cols/p`, `r`, `S_rho`) with §11.17's `C₄ = 1.213·10¹²`.  **No Stage B**
+(no `S₅` solve).  Host: the 4-vCPU container, operation counts only.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.104 | kill test | `|⟨λ_p, λ_ω, −1⟩| = 24` on all eight curves; `ord λ_p = 4·ord χ₆(b)`; a canonical `b₀` of the same order exists for every curve; `u² ∉ F_p` on E18's model (E18's base not kept) | a group of order `< 24` (**kill** for that curve), or any other item |
+| G2.105 | Stage R steps | order-6 / order-24 walk steps, pooled per curve, in `[1.7, 2.3]` | outside |
+| G2.106 | Stage R cost | order-6 / order-24 walk `F_p` multiplications in `[1.3, 2.0]` on every curve, in both arithmetics | outside |
+| G2.107 | E18's `ψ` arm re-read | `r_ψ` against the order-24 walk `= 0.138 × (G2.106 ratio)` and its handover later by `4·log₂(ratio)` bits — a reference correction, reported as such | — (derived from G2.106) |
+| G2.108 | Stage A | cubic / twist24 columns `4.00`; LA ratio in `[10, 22]`; `r_24` (twist24 arm against the order-24 walk) in `[0.01, 0.06]`; log recovered on every arm | outside, or any log not recovered |
+| G2.109 | handover (model) | from Stage A's twist24 constants, `n* ∈ [2^{139}, 2^{144}]`; above E24's `2^{90.1}` by `≥ 2^{45}` | outside the band |
+
+**What it would say.**  If G2.104–G2.109 hold, E18's `j = 0` rows were measured against a walk weaker than
+the one the curve allows: the order-24 walk is the matched reference, and against it E18's `ψ` arm stands
+further from rho (a reference correction).  The order-24 base fold then brings the modelled `S₅`-based
+handover from `2^{146}` to `≈ 2^{140}`–`2^{144}`: **engineering on the `j = 0` / `S₅` line, a model,
+not an improvement of the baseline**, which (E24, E25, E31 on the `V₄` line) sits `≈ 2^{50}` earlier.
