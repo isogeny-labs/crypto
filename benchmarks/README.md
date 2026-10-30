@@ -45,6 +45,17 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
+has documentary browsing copies (0.040s / 0.170s / 0.458s; n=1 per phase,
+shared host, no admitted performance comparison). It remains outside the
+admitted table because no matched rho reference or timing validation exists.
+
+The [29 October strict-splitting self-test planning record](20261029-strict-elkies-preflight/)
+has documentary PDF/graph copies (0.005s / 0.004s / 0.024s, n=1 per
+phase, shared host). It remains outside the admitted table: these are
+planning controls with no validated performance comparison or matched rho.
+
+
 The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
 records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
 and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
@@ -187,6 +198,7 @@ admitted table under the validation gate.
 | 2026-10-14 | [`20261014-ic-improve-04-genus3-2lp`](20261014-ic-improve-04-genus3-2lp/) | genus-3 hyperelliptic IC after the cubic GHS transfer (split arm): double large primes against the full-factor-base incumbent, Rust port, paired on instance/target/seed, q = 2^10–2^20, 3 curves per size; F_q-mult-equivalent counted cost | ADVANCES (exponent and constant): IC-2LP q^1.385 [1.379, 1.391] vs incumbent q^1.910 [1.904, 1.913] over 2^10–2^18 (Δ −0.525 [−0.529, −0.521]); paired ratio 0.620 at 2^10 → 0.036 [0.035, 0.036] at 2^18; tuned 1LP q^1.446; IC-2LP local exponent rises to 1.46 at 2^20 (linear algebra q^1.52), not 4/3; port reproduces item 7 Python on 42/42 solves | 4-core shared, single thread, 3 GB cap, counted unit | [`research/ic_improve_20261014/04-genus3-2lp`](../research/ic_improve_20261014/04-genus3-2lp/README.md) |
 | 2026-10-11 | [`20261011-groebner-vs-msolve-singular-polybori`](20261011-groebner-vs-msolve-singular-polybori/) | `f4_fp` and the inherited-F4 / F6-IC decomposition oracle against msolve 0.6.5, Singular 4.3.2 and PolyBoRi on identical exported systems (Magma scripts included, not run) | F_p: same reduced basis as Singular on 13/13 systems; msolve 1-thread 12–24× faster than ours on square generic systems (quad_n9: 246 ms vs 5 693 ms), level on overdetermined ones. Boolean n = 17, 8 targets: ours decides in 7–24 ms per target, msolve 42.7–46.5 s and PolyBoRi 40.4–52.3 s for the full basis, Singular > 120 s; verdicts agree | 4 vCPU Xeon 2.10 GHz, shared, L0 | [`research/gb_cas_comparison_20261011`](../research/gb_cas_comparison_20261011/) (PR #1675), run-20261011T1806Z |
 | 2026-10-11 | [`20261011-inherited-f4-eager-rewrite`](20261011-inherited-f4-eager-rewrite/) | inherited F4 eager rewrite of kept rows against lazy rows (`KIC_F4_EAGER=0`), same binary, `f6_ic_probe` | lazy/eager median ratio: K₀/2²³ dim 8 inherited F4 1.40, F6-IC 1.62; K₀/2³¹ dim 9 1.48 and 1.53; counters and verdicts identical | 4 vCPU Xeon 2.10 GHz, shared, L0 | [`research/inherited_f4_eager_rewrite_20261011`](../research/inherited_f4_eager_rewrite_20261011/) (PR #1671), run-20261011T1657Z |
+| 2026-10-22 | [`20261022-ecbench-harness-overhead`](20261022-ecbench-harness-overhead/) | ecbench harness overhead: `docs/curves/registry.json` (4.7 MB) parsed once per process instead of on every registry lookup, and `GenericOutcome::count` allocating a counter key only on first use; old binary (main 412b60289) vs this change, `smoke-prime-20` (every method, 20-bit prime-order curve) and `generic-32` (rho, BSGS, kangaroo, 32-bit), 3 alternated sessions per binary; one binary per change for attribution | timed solve window 0.03–0.07× at 20 bits (≈4 ms of old-binary overhead inside a 0.3 ms solve) and 0.64–0.81× at 32 bits for every rho, BSGS and kangaroo arm; measured child 0.75–0.85×; `ic.pipeline` solve 0.96×; 2,376 records identical outside timing, 1,044 cross-binary replays reproduced, §5a band identical — engineering, no counted result changes; old solve wall times on small curves carry the offset | Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU cloud container, `--cpus auto --allow-busy` (below L2) | [`research/ecbench_overhead_review_20261022`](../research/ecbench_overhead_review_20261022/README.md) ([PDF](20261022-ecbench-harness-overhead/REPORT.pdf)) |
 
 ## Studies awaiting benchmark admission
 
