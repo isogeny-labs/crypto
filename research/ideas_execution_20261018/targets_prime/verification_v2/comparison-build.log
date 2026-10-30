@@ -1,0 +1,13 @@
+research/ideas_execution_20261018/targets_prime/verification_v2/compare_replication.cpp: In function ‘int main(int, char**)’:
+research/ideas_execution_20261018/targets_prime/verification_v2/compare_replication.cpp:14:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   14 |  if(argc!=5)throw std::runtime_error("usage: compare ORIGINAL_RESULTS NEW_RESULTS CANDIDATE_TRACE OUTPUT.json");auto old=load(argv[1]),current=load(argv[2]);if(old.size()!=24||current.size()!=24)throw std::runtime_error("24-fixture population mismatch");
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/compare_replication.cpp:14:113: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   14 |  if(argc!=5)throw std::runtime_error("usage: compare ORIGINAL_RESULTS NEW_RESULTS CANDIDATE_TRACE OUTPUT.json");auto old=load(argv[1]),current=load(argv[2]);if(old.size()!=24||current.size()!=24)throw std::runtime_error("24-fixture population mismatch");
+      |                                                                                                                 ^~~~
+research/ideas_execution_20261018/targets_prime/verification_v2/compare_replication.cpp:22:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   22 |  if(std::filesystem::exists(argv[4]))throw std::runtime_error("comparison output exists");std::ofstream out(argv[4]);out<<result.dump(2)<<"\n";if(!out)throw std::runtime_error("comparison output failure");std::cout<<"Compared24 fixture identities; changed="<<changed<<", original/new hits="<<old_hits<<"/"<<new_hits<<", original/new rho="<<old_rho<<"/"<<new_rho<<"\n";return 0;
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/compare_replication.cpp:22:91: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   22 |  if(std::filesystem::exists(argv[4]))throw std::runtime_error("comparison output exists");std::ofstream out(argv[4]);out<<result.dump(2)<<"\n";if(!out)throw std::runtime_error("comparison output failure");std::cout<<"Compared24 fixture identities; changed="<<changed<<", original/new hits="<<old_hits<<"/"<<new_hits<<", original/new rho="<<old_rho<<"/"<<new_rho<<"\n";return 0;
+      |                                                                                           ^~~
