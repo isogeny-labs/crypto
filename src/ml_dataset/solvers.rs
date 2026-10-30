@@ -3008,6 +3008,46 @@ pub(super) fn verify_prime_root_artifact(
     Ok(())
 }
 
+/// Semantic wide-prime replay, independent of native basis derivation.
+pub(super) fn verify_prime_f4_wide(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<(), String> {
+    prime_f4_wide::verify(dir, config, outcome, artifacts)
+}
+
+fn wide_begin_failure(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: Option<&super::execution::SolverExecutionContext>,
+    error: String,
+) -> Result<SolverData, String> {
+    let Some(context) = context else {
+        return Err(error);
+    };
+    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
+        return Err(error);
+    }
+    let group = Group::read(case)?;
+    let Group::Prime(curve) = &group else {
+        return Err(error);
+    };
+    if curve.p.to_u64().is_none_or(|p| p < 1u64 << 32) {
+        return Err(error);
+    }
+    let target = group.point(&case.public_instance["target"])?;
+    prime_f4_wide::begin_failure(
+        config,
+        &group,
+        &domain(&group, case)?,
+        &target,
+        context,
+        &error,
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -4276,44 +4316,4 @@ mod tests {
         assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
         fs::remove_dir_all(dir).unwrap();
     }
-}
-
-/// Semantic wide-prime replay, independent of native basis derivation.
-pub(super) fn verify_prime_f4_wide(
-    dir: &Path,
-    config: &CaseConfig,
-    outcome: &Value,
-    artifacts: &[super::types::Artifact],
-) -> Result<(), String> {
-    prime_f4_wide::verify(dir, config, outcome, artifacts)
-}
-
-fn wide_begin_failure(
-    config: &CaseConfig,
-    case: &CaseData,
-    context: Option<&super::execution::SolverExecutionContext>,
-    error: String,
-) -> Result<SolverData, String> {
-    let Some(context) = context else {
-        return Err(error);
-    };
-    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
-        return Err(error);
-    }
-    let group = Group::read(case)?;
-    let Group::Prime(curve) = &group else {
-        return Err(error);
-    };
-    if curve.p.to_u64().is_none_or(|p| p < 1u64 << 32) {
-        return Err(error);
-    }
-    let target = group.point(&case.public_instance["target"])?;
-    prime_f4_wide::begin_failure(
-        config,
-        &group,
-        &domain(&group, case)?,
-        &target,
-        context,
-        &error,
-    )
 }
