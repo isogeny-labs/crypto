@@ -41,13 +41,16 @@ fixed initialization seeds, and no hyperparameter selection. Average exact
 degree squared error within its group; average one-sided squared lower-bound
 violation within the censored group; give those two group losses equal weight.
 
-Use a fixed five-fold split of exact rows: SHA-256 of the fixed byte tag `n83-radix-neural-fold-v1` concatenated with
-the JSON serialization of radix parts; interpret the first eight digest bytes
-big-endian modulo five. In each fold, withhold the
-exact labels in that fold, train on the other exact rows and all censored
-rows, and report held-out exact MAE beside an intercept-only comparator
-optimized under the same grouped objective. This small, related set supports
-only an exploratory within-census estimate, not generalization to new curves,
+Use a fixed five-fold split of exact rows: SHA-256 of the fixed byte tag
+`n83-radix-neural-fold-v1` concatenated with the JSON serialization of radix
+parts; interpret the first eight digest bytes big-endian modulo five. In each
+fold, withhold the exact labels in that fold, train on the other exact rows
+and all censored rows, and report held-out exact MAE beside an intercept-only
+comparator optimized under the same grouped objective. The constant is the exact minimizer
+of that convex objective, found by 128 bisections over the observed exact/bound
+range expanded by one on each side; the search bracket includes the maximum
+certified bound (134,217,729). A unit test checks this high-bound case. This
+small, related set supports only an exploratory within-census estimate, not generalization to new curves,
 families, m values, or factor-base point sets.
 
 Then fit one model on all 3,010 rows and score the same census. For every

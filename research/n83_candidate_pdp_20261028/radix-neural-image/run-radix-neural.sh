@@ -3,8 +3,8 @@ set -eu
 ROOT=/opt/n83-radix-neural
 OUT=/work/results
 EXPECTED_MANIFEST=5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78
-EXPECTED_BINARY=1957a04d748ad087c2ca2e1cd6c63b9c4bc57e5a557dd4140282f68f2fff6bd7
-EXPECTED_SOURCE=937110e442b09ab3d4a1eeb5d469e9598992334fc0d2d1c56738c9ddb5e26366
+EXPECTED_BINARY=c363e53c2db69630714a13169253fabdff76272f9391c00094074dbb4f8dda83
+EXPECTED_SOURCE=a94eba7295c755a1ebf2cc1452704992de8965e1e8c95cec75ae14852d9b1b5c
 mkdir -p "$OUT"
 PROTOCOL_SHA=${1:-}
 if [ "${1:-}" != "--validate-only" ]; then
@@ -39,7 +39,7 @@ python3 - "$OUT" "$PROTOCOL_SHA" <<'PY'
 import hashlib,json,pathlib,sys
 out=pathlib.Path(sys.argv[1])
 files={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.iterdir()) if p.is_file() and p.name!='run-manifest.json'}
-record={'schema':'n83.radix-neural-run/v1','protocol_sha256':sys.argv[2],'input_manifest_sha256':'5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78','case_count':3010,'case_sha256_verified':3010,'binary_sha256':'1957a04d748ad087c2ca2e1cd6c63b9c4bc57e5a557dd4140282f68f2fff6bd7','source_sha256':'937110e442b09ab3d4a1eeb5d469e9598992334fc0d2d1c56738c9ddb5e26366','files':files}
+record={'schema':'n83.radix-neural-run/v1','protocol_sha256':sys.argv[2],'input_manifest_sha256':'5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78','case_count':3010,'case_sha256_verified':3010,'binary_sha256':'c363e53c2db69630714a13169253fabdff76272f9391c00094074dbb4f8dda83','source_sha256':'a94eba7295c755a1ebf2cc1452704992de8965e1e8c95cec75ae14852d9b1b5c','files':files}
 (out/'run-manifest.json').write_text(json.dumps(record,indent=2)+'\n')
 PY
 aws s3 sync "$OUT" "$ISOLAB_RESULTS_URI" --region us-east-2 --only-show-errors

@@ -104,9 +104,20 @@ fn backprop(n:&Net,c:&([f64;INPUT],[f64;HIDDEN],[f64;HIDDEN]),d:f64,w:f64,g:&mut
     for j in 0..HIDDEN { g[k]+=w*d*a[j];k+=1; }
     g[k]+=w*d;
 }
+fn baseline_score(mid:f64,exact:&[&Row],cens:&[&Row])->f64 {
+    0.5*exact.iter().map(|r|mid-r.exact.unwrap()).sum::<f64>()/exact.len() as f64
+      +0.5*cens.iter().map(|r|(mid-r.lower).min(0.0)).sum::<f64>()/cens.len() as f64
+}
 fn baseline(exact:&[&Row],cens:&[&Row])->f64 {
-    let (mut lo,mut hi)=(0.0,200.0);
-    for _ in 0..80 { let mid=(lo+hi)/2.0; let g=0.5*exact.iter().map(|r|mid-r.exact.unwrap()).sum::<f64>()/exact.len() as f64+0.5*cens.iter().map(|r|(mid-r.lower).min(0.0)).sum::<f64>()/cens.len() as f64; if g>0.0 {hi=mid}else{lo=mid} }
+    assert!(!exact.is_empty() && !cens.is_empty());
+    let lo0=exact.iter().map(|r|r.exact.unwrap()).chain(cens.iter().map(|r|r.lower)).fold(f64::INFINITY,f64::min);
+    let hi0=exact.iter().map(|r|r.exact.unwrap()).chain(cens.iter().map(|r|r.lower)).fold(f64::NEG_INFINITY,f64::max);
+    // The derivative is nonpositive below every observation and positive above
+    // every one-sided bound. Bracket from the observed range, not a fixed cap.
+    let (mut lo,mut hi)=(lo0-1.0,hi0+1.0);
+    assert!(baseline_score(lo,exact,cens)<=0.0);
+    assert!(baseline_score(hi,exact,cens)>=0.0);
+    for _ in 0..128 { let mid=(lo+hi)/2.0; if baseline_score(mid,exact,cens)>0.0 {hi=mid}else{lo=mid} }
     (lo+hi)/2.0
 }
 fn main() {
@@ -130,4 +141,19 @@ fn main() {
     fs::write(out.join("predictions.json"),serde_json::to_vec_pretty(&preds).unwrap()).unwrap();
     fs::write(out.join("model.json"),serde_json::to_vec_pretty(&json!({"architecture":{"inputs":INPUT,"hidden":HIDDEN,"activation":"tanh","output":"linear"},"epochs":EPOCHS,"seed":20261030,"features":["part_count","socle_degree","largest_part","smallest_part","unit_parts","parts_ge_5"],"parameters":pack(&model),"feature_mean":model.mean,"feature_scale":model.scale,"target_mean":model.ymean,"target_scale":model.yscale})).unwrap()).unwrap();
     fs::write(out.join("metrics.json"),serde_json::to_vec_pretty(&json!({"schema":"n83.radix-neural-results/v1","rows":rows.len(),"exact":35,"lower_bound_only":2975,"cv":metrics,"full_training_loss":loss,"model_flagged_censored_below_42":lead,"flagged_candidates_contradicted_by_certified_lower_bound":contradicted,"censored_bound_violations":bound_violations,"lowest_exact_degree":42,"interpretation":"Exploratory model only. Any flagged row is checked against the exact retained certificate. No new factor base or point set is searched."})).unwrap()).unwrap();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn row(exact:Option<f64>,lower:f64)->Row { Row{id:0,parts:vec![1],x:[0.0;INPUT],exact,lower} }
+    #[test]
+    fn censored_constant_bracket_covers_large_certified_bounds() {
+        let a=row(Some(42.0),42.0); let b=row(Some(44.0),44.0);
+        let c=row(None,43.0); let d=row(None,134_217_729.0);
+        let ex=vec![&a,&b]; let ce=vec![&c,&d];
+        let x=baseline(&ex,&ce);
+        assert!(x>200.0 && x<134_217_729.0);
+        assert!(baseline_score(x,&ex,&ce).abs()<1e-6);
+    }
 }
