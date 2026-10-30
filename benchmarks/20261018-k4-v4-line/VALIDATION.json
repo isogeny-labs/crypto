@@ -1,0 +1,36 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "38e79979222ac2b853449bf406e7106f33afbb837bcfc1116ef88736aed34d02"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "efbd37a4543d9a8d8fe23394b34b9edabb11342edd23b31439946d299f03d323"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "Named by the protocol (RESEARCH_GLV_INVARIANT_FACTOR_BASES.md section 9.5 item 6 for E19, registered in 99e0a521b before code 4e5810598; section 9.13 for E24, registered in 9896027ed before code 854acdbc6): every phase priced in F_p multiplications against the matched negation walk on the same curve, 16 negation and 16 unfolded walks per curve, all run and all verified; S / rho = total F_p multiplications / mean F_p multiplications of the 16 negation walks (set-up included). Strongest available: on all 22 curves j(E) lies outside F_{p^2} (checked independently of the repository code; the generators also reject j in F_{p^2}), so no Frobenius-type endomorphism is defined over F_{p^4} and Aut(E) = {±1}: negation is the strongest fold. Unpriced native work, read from quartic_folds.rs, klein_v4.rs, d4_weighted_s5.rs and gaudry_quartic.rs: both arms charge F_p multiplications only; the index calculus leaves unpriced its Macaulay-matrix entry traffic (emitted as macaulay_entries), the solve's F_p inversions (not emitted; at most one per pivot row, far fewer than the entries) and its F_p additions; the walks leave unpriced each step's hash-table lookup and insert, partition hashes and comparisons (emitted as steps). Band (AGENTS.md section 5a, as the protocol states it): S(g) = F_p multiplications + g * GAE * native operations, one native operation per Macaulay entry or walk step, GAE = the curve's measured F_p multiplications per affine addition (97.0 on every record), g = 0, 0.1, 1; native work is unpriced on both arms, so the three values differ. gae_band holds the medians over the 12 E24 curves of S_IC(g) and of the negation walk's S_rho(g) (per-curve values for E19 and E24: validator-report.json gae_band_rows). Order across the band: the negation walk is below the index calculus on every E19 and E24 curve at all three prices (E24 S / rho from 1.31e4-1.69e5 at g = 0 to 7.57e4-1.18e6 at g = 1; E19 from 2.57e6-8.75e6 to 2.90e6-1.34e7), so rho is ranked ahead everywhere; E24 is below E19 at every matched (p, seed) at every price, by 35-240x at g = 0, 19-132x at g = 0.1 and 6.5-45x at g = 1 (the note's section 9.19 records this band). The claims are checked against the note's additive errata (section 9.19) where it supersedes sections 9.6 and 9.14.",
+  "unit": "F_p multiplications: both arms counted by the same Fp4 type (an F_{p^4} multiplication 19, an inversion 40), the solve's F_p multiplications counted directly, the Wiedemann matrix at 16 per multiplication mod n; walk set-up included",
+  "binary_or_process": "examples/quartic_pipeline_d4 (E19) and examples/quartic_pipeline_v4 (E24): one process per (p, seed) runs the index calculus and then, inside quartic_folds::collect_and_solve -> rho4_folded, the 16 negation and 16 unfolded walks on the same instance and counters. Recorded binaries 4e5810598 (E19) and 854acdbc6 (E24); replayed from edea86713 (sha256 2be98ac0780263f3492a11556036729fe27a4fed31583b9578ebef0f2b383065 and 940318da1d59cd2399808f44030b34a72e5d5a9f745ad15d6e2c3d6d8e06789c) with every deterministic counter identical.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "order_holds_across_band": true,
+  "gae_band": {
+   "0": {
+    "ic": 118130089107.5,
+    "rho": 2743142.90625
+   },
+   "0.1": {
+    "ic": 239170525961.90002,
+    "rho": 2979310.625
+   },
+   "1": {
+    "ic": 1328534457651.5,
+    "rho": 5104820.09375
+   }
+  }
+ }
+}

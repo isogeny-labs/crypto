@@ -235,7 +235,7 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 ## Curve records and factor bases
 
-Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
+Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (31 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
 
 The registry overview below uses current links. Frozen measurement rows retain their original link metadata; refreshing registry links does not change their validation status.
 
@@ -460,16 +460,6 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
-## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC
-
-Component speed-up, class engineering: `f4_fp` before and after #1717 in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same seeds and the same relations, every DLP solved and verified by both builds (`research/f4_fp_ic_effect_20261018`, run-20261018T1548Z). It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
-
-| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 53 | 1 | 31 | 4734 | 936.9 | 5.05 | 4297 | 850 |
-| 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
-| 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
-| 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
 Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
@@ -785,7 +775,9 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
-- `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/glv_k4_pipeline_d4_20261017/summary.json` — sha256 `369769457fdf5657…`
+- `research/glv_gls_v4_20261018/summary.json` — sha256 `c8de6d58008176d6…`
+- `research/e31_chain_solve_20261024/summary.json` — sha256 `0ebac1878e112a7d…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
@@ -836,7 +828,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
-- `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`
@@ -921,3 +913,57 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_aa_v1.json` — sha256 `8f306ff8388bddaf…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_v1.json` — sha256 `0e21b267b9612dcc…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_aa_v1.json` — sha256 `0e21b267b9612dcc…`
+## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C
+
+Before: E19: tau_T line, weighted D4 solve (degree 26, quotient 512). After: E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64). Both end to end over F_p^4 (10 and 12 curves, every logarithm verified), every phase charged in F_p multiplications against 16 matched negation walks per curve. Handover from each pipeline's own constants: 2^116.7 → 2^90.1 (extrapolated). Class: engineering, a constant; every row still 1.31e+04–1.69e+05× slower than rho. Read the [report](../../research/glv_k4_pipeline_d4_20261017/REPORT.pdf) and [summary](../../research/glv_k4_pipeline_d4_20261017/summary.json).
+
+| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |
+|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 20.9 | 7.08e+06–8.75e+06 | — | — | 1.37e+09–1.37e+09 | — |
+| 101 | 24.6 | 5.85e+06–6.33e+06 | 3.43e+04–1.69e+05 | 37–170 | 1.39e+09–1.39e+09 | 1.62e+06–1.62e+06 |
+| 149 | 26.9 | 3.40e+06–4.09e+06 | 3.80e+04–5.54e+04 | 61–108 | 1.40e+09–1.40e+09 | 1.63e+06–1.63e+06 |
+| 197 | 28.5 | 2.83e+06–4.91e+06 | 5.44e+04–1.40e+05 | 35–52 | 1.41e+09–1.41e+09 | 1.64e+06–1.65e+06 |
+| 269 | 30.3 | 2.57e+06–5.51e+06 | 2.30e+04–2.34e+04 | 110–240 | 1.41e+09–1.41e+09 | 1.65e+06–1.65e+06 |
+| 397 | 32.5 | — | 1.31e+04–1.58e+04 | — | — | 1.66e+06–1.66e+06 |
+| 521 | 34.1 | — | 1.88e+04–2.15e+04 | — | — | 1.66e+06–1.66e+06 |
+
+**The GLS endomorphism on the V₄ line (E25).** Before: arm A: the V4-folded base on the same GLS curve (4 points a column). After: arm B: the same points folded by <V4, psi> (8 points a column), against the matched <±psi> walk. Same curve, base and target stream (10 GLS curves, h = 16, every logarithm verified); handover from each arm's own constants 2^93.2 → 2^88.0 (extrapolated). Class: engineering, a constant, on this family only. Read the [report](../../research/glv_gls_v4_20261018/REPORT.pdf) and [summary](../../research/glv_gls_v4_20261018/summary.json).
+
+| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |
+|--:|--:|--:|:--|--:|--:|--:|
+| 101 | 2 | 22.6 | 14 / 7 | 2.11 | 6.02e+04 | 2.93e+04 |
+| 101 | 1 | 22.6 | 10 / 5 | 1.94 | 1.53e+05 | 6.77e+04 |
+| 149 | 2 | 24.9 | 14 / 7 | 1.77 | 1.58e+05 | 7.01e+04 |
+| 149 | 1 | 24.9 | 10 / 5 | 2.67 | 8.31e+05 | 2.65e+05 |
+| 197 | 2 | 26.5 | 30 / 15 | 1.69 | 3.97e+04 | 2.62e+04 |
+| 197 | 1 | 26.5 | 22 / 11 | 1.35 | 7.71e+04 | 6.11e+04 |
+| 269 | 2 | 28.3 | 40 / 20 | 2.02 | 2.24e+04 | 1.56e+04 |
+| 269 | 1 | 28.3 | 30 / 15 | 1.74 | 7.45e+04 | 4.84e+04 |
+| 397 | 1 | 30.5 | 60 / 30 | 1.72 | 1.99e+04 | 1.13e+04 |
+| 397 | 2 | 30.5 | 48 / 24 | 2.32 | 3.38e+04 | 1.71e+04 |
+
+The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call 2.62–2.69× (A) and 4.99–5.32× (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is 2.50–2.56× at 0 GAE, 1.39–1.43× at 0.1 and 1.034–1.053× at 1 (ahead across the §5a band under the registered model). B is 4.53–4.76× at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A 4.42e+03–2.79e+05× at 0 GAE (E25 1.13e+04–7.07e+05×); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24). Read the [report](../../research/e31_chain_solve_20261024/REPORT.pdf), [summary](../../research/e31_chain_solve_20261024/summary.json) and [validation](../../benchmarks/20261024-e31-chain-solve/VALIDATION.json).
+
+| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |
+|--:|--:|:--|--:|--:|--:|:--|--:|--:|
+| 101 | 1 | A | 6.76e+10 | 2.71e+10 | 1.49e+10 | 2.50, 1.39, 1.034 | 4.53 | 5.27e+04 |
+| 101 | 1 | B | 3.48e+10 | 1.39e+10 | 7.63e+09 | 2.51, 1.40, 1.036 | 4.57 | 2.70e+04 |
+| 101 | 2 | A | 2.47e+10 | 9.87e+09 | 5.42e+09 | 2.50, 1.40, 1.035 | 4.56 | 2.47e+04 |
+| 101 | 2 | B | 1.17e+10 | 4.68e+09 | 2.58e+09 | 2.50, 1.39, 1.034 | 4.54 | 1.17e+04 |
+| 149 | 1 | A | 5.83e+11 | 2.30e+11 | 1.25e+11 | 2.53, 1.41, 1.043 | 4.66 | 2.79e+05 |
+| 149 | 1 | B | 2.19e+11 | 8.64e+10 | 4.70e+10 | 2.53, 1.41, 1.042 | 4.65 | 1.05e+05 |
+| 149 | 2 | A | 1.01e+11 | 3.98e+10 | 2.17e+10 | 2.53, 1.41, 1.042 | 4.64 | 4.92e+04 |
+| 149 | 2 | B | 5.67e+10 | 2.25e+10 | 1.23e+10 | 2.52, 1.41, 1.041 | 4.62 | 2.78e+04 |
+| 197 | 1 | A | 8.53e+10 | 3.35e+10 | 1.83e+10 | 2.54, 1.42, 1.046 | 4.67 | 3.24e+04 |
+| 197 | 1 | B | 6.32e+10 | 2.49e+10 | 1.36e+10 | 2.54, 1.42, 1.045 | 4.66 | 2.40e+04 |
+| 197 | 2 | A | 4.39e+10 | 1.72e+10 | 9.37e+09 | 2.55, 1.42, 1.046 | 4.68 | 1.74e+04 |
+| 197 | 2 | B | 2.59e+10 | 1.02e+10 | 5.53e+09 | 2.55, 1.42, 1.046 | 4.68 | 1.03e+04 |
+| 269 | 1 | A | 1.37e+11 | 5.36e+10 | 2.90e+10 | 2.56, 1.42, 1.049 | 4.73 | 3.29e+04 |
+| 269 | 1 | B | 7.88e+10 | 3.09e+10 | 1.67e+10 | 2.55, 1.42, 1.049 | 4.72 | 1.90e+04 |
+| 269 | 2 | A | 5.10e+10 | 1.99e+10 | 1.07e+10 | 2.56, 1.42, 1.050 | 4.76 | 1.23e+04 |
+| 269 | 2 | B | 2.52e+10 | 9.83e+09 | 5.30e+09 | 2.56, 1.42, 1.050 | 4.75 | 6.09e+03 |
+| 397 | 1 | A | 7.19e+10 | 2.81e+10 | 1.52e+10 | 2.56, 1.43, 1.053 | 4.72 | 7.62e+03 |
+| 397 | 1 | B | 4.17e+10 | 1.63e+10 | 8.82e+09 | 2.56, 1.43, 1.053 | 4.73 | 4.42e+03 |
+| 397 | 2 | A | 1.31e+11 | 5.15e+10 | 2.79e+10 | 2.55, 1.42, 1.052 | 4.70 | 1.56e+04 |
+| 397 | 2 | B | 5.65e+10 | 2.22e+10 | 1.20e+10 | 2.55, 1.42, 1.052 | 4.70 | 6.71e+03 |
+

@@ -245,6 +245,7 @@ pub mod jv_quintic;
 pub mod jv_quintic_edwards;
 pub mod jv_rho_strong;
 pub mod jv_sieve;
+pub mod klein_v4;
 pub mod koblitz_bench;
 pub mod koblitz_factor_base_search;
 pub mod koblitz_fast;

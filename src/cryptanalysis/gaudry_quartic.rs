@@ -57,10 +57,106 @@ pub struct Fp4 {
     pub p: u64,
     pub c: u64,
     muls: Cell<u64>,
+    /// E27 (§9.25): products by the Karatsuba tower (`13`) instead of the
+    /// schoolbook (`19`).  The result is the same element either way.
+    karatsuba: bool,
+    /// `F_p` inversions performed by [`Fp4::inv`] (E27's bound on what a
+    /// batched inversion could still save).
+    fp_invs: Cell<u64>,
+}
+
+/// Process-wide default for [`Fp4::new`]: `false` keeps every count this
+/// repository recorded before E27; E27's drivers switch it on.
+static KARATSUBA_DEFAULT: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Every [`Fp4`] built after this call multiplies by the Karatsuba tower
+/// (`true`) or the schoolbook (`false`).
+pub fn set_karatsuba_default(on: bool) {
+    KARATSUBA_DEFAULT.store(on, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// `F_p` inversions performed by every [`Fp4::inv`] in the process (E27's
+/// IC-side bound on what batching could still save).
+static FP_INVERSIONS_TOTAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+pub fn fp_inversions_total() -> u64 {
+    FP_INVERSIONS_TOTAL.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn reset_fp_inversions_total() {
+    FP_INVERSIONS_TOTAL.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// E30 (§9.28): the audit of structurally trivial `F_{p⁴}` products.  When
+/// on, every product whose operand is `0` or `1` (re-priced `0`) or lies in
+/// `F_p` (re-priced `4`, a scaling) adds the difference from its charged cost
+/// to a process-wide counter.  Recorded counts never change.
+static AUDIT_ON: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static AUDIT_SAVINGS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+pub fn set_trivial_product_audit(on: bool) {
+    AUDIT_ON.store(on, std::sync::atomic::Ordering::SeqCst);
+}
+
+pub fn trivial_product_audit() -> bool {
+    AUDIT_ON.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn trivial_product_savings() -> u64 {
+    AUDIT_SAVINGS.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn reset_trivial_product_savings() {
+    AUDIT_SAVINGS.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// What the audit re-prices one product at, given its charged cost.
+pub fn audited_product_cost(a: &E4, b: &E4, charged: u64) -> u64 {
+    let unit = |x: &E4| x.is_zero() || *x == E4::ONE;
+    if unit(a) || unit(b) {
+        0
+    } else if a.in_fp() || b.in_fp() {
+        4.min(charged)
+    } else {
+        charged
+    }
+}
+
+pub fn karatsuba_default() -> bool {
+    KARATSUBA_DEFAULT.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+/// Montgomery's simultaneous inversion of nonzero elements of `F_p`:
+/// `3(m − 1)` products and one inversion, which is charged `16` as in
+/// [`Fp4::inv`].  Returns the inverses and the cost.
+pub fn batch_inv_fp(ds: &[u64], p: u64) -> (Vec<u64>, u64) {
+    let m = ds.len();
+    if m == 0 {
+        return (Vec::new(), 0);
+    }
+    let mut prefix = Vec::with_capacity(m);
+    let mut acc = 1u64;
+    for (i, &d) in ds.iter().enumerate() {
+        assert!(d != 0, "inverse of zero in F_p");
+        acc = if i == 0 { d } else { mm(acc, d, p) };
+        prefix.push(acc);
+    }
+    let mut inv = inv_mod(acc, p);
+    let mut out = vec![0u64; m];
+    for i in (1..m).rev() {
+        out[i] = mm(inv, prefix[i - 1], p);
+        inv = mm(inv, ds[i], p);
+    }
+    out[0] = inv;
+    (out, 3 * (m as u64 - 1) + 16)
 }
 
 impl Fp4 {
     pub fn new(p: u64) -> Fp4 {
+        Fp4::with_arith(p, karatsuba_default())
+    }
+    /// `F_{p⁴}` with the product chosen explicitly (E27).
+    pub fn with_arith(p: u64, karatsuba: bool) -> Fp4 {
         assert!(
             p % 4 == 1,
             "t⁴ − c is irreducible over F_p only when p ≡ 1 (mod 4)"
@@ -72,13 +168,25 @@ impl Fp4 {
             p,
             c,
             muls: Cell::new(0),
+            karatsuba,
+            fp_invs: Cell::new(0),
         }
+    }
+    pub fn is_karatsuba(&self) -> bool {
+        self.karatsuba
+    }
+    /// Charge `k` `F_p` multiplications (a batch's share, E27).
+    pub fn charge(&self, k: u64) {
+        self.count(k);
     }
     fn count(&self, k: u64) {
         self.muls.set(self.muls.get() + k);
     }
     pub fn muls(&self) -> u64 {
         self.muls.get()
+    }
+    pub fn fp_inversions(&self) -> u64 {
+        self.fp_invs.get()
     }
     pub fn reset_muls(&self) {
         self.muls.set(0);
@@ -128,8 +236,55 @@ impl Fp4 {
         self.count(4 + degree as u64);
         E4(out)
     }
-    /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions.
+    /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions; or, in
+    /// Karatsuba mode, [`Fp4::mul_karatsuba`] (`13`).
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
+        if AUDIT_ON.load(std::sync::atomic::Ordering::Relaxed) {
+            let charged = if self.karatsuba { 13 } else { 19 };
+            let saved = charged - audited_product_cost(a, b, charged);
+            if saved > 0 {
+                AUDIT_SAVINGS.fetch_add(saved, std::sync::atomic::Ordering::Relaxed);
+            }
+        }
+        if self.karatsuba {
+            return self.mul_karatsuba(a, b);
+        }
+        self.mul_schoolbook(a, b)
+    }
+    /// Karatsuba over the tower `F_{p²}[t]/(t² − s)`, `F_p[s]/(s² − c)`:
+    /// `a = A + Bt`, `A = a₀ + a₂s`, `B = a₁ + a₃s`.  `AC`, `BD` and
+    /// `(A + B)(C + D)` cost `3` products and `1` reduction by `c` each;
+    /// `BD·s` one more reduction.  Thirteen `F_p` multiplications, each one
+    /// performed and charged.
+    pub fn mul_karatsuba(&self, a: &E4, b: &E4) -> E4 {
+        let p = self.p;
+        let c = self.c;
+        self.count(13);
+        // (x0 + x1 s)(y0 + y1 s) in F_p[s]/(s² − c): 4 multiplications.
+        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
+            let v0 = mm(x0, y0, p);
+            let v1 = mm(x1, y1, p);
+            let mid = mm(am(x0, x1, p), am(y0, y1, p), p);
+            (am(v0, mm(c, v1, p), p), sm(sm(mid, v0, p), v1, p))
+        };
+        let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
+        let (b0, b1, b2, b3) = (b.0[0], b.0[1], b.0[2], b.0[3]);
+        // A = (a0, a2), B = (a1, a3); C = (b0, b2), D = (b1, b3).
+        let (ac0, ac1) = m2(a0, a2, b0, b2);
+        let (bd0, bd1) = m2(a1, a3, b1, b3);
+        let (s0, s1) = m2(am(a0, a1, p), am(a2, a3, p), am(b0, b1, p), am(b2, b3, p));
+        // BD·s = c·bd1 + bd0·s.
+        let (bds0, bds1) = (mm(c, bd1, p), bd0);
+        // even part AC + BD s; odd part (A+B)(C+D) − AC − BD.
+        let e0 = am(ac0, bds0, p);
+        let e1 = am(ac1, bds1, p);
+        let o0 = sm(sm(s0, ac0, p), bd0, p);
+        let o1 = sm(sm(s1, ac1, p), bd1, p);
+        // element = e0 + o0 t + e1 t² + o1 t³.
+        E4([e0, o0, e1, o1])
+    }
+    /// The schoolbook product, whatever the mode (E27's reference).
+    pub fn mul_schoolbook(&self, a: &E4, b: &E4) -> E4 {
         let p = self.p;
         self.count(19);
         let mut d = [0u64; 7];
@@ -154,6 +309,17 @@ impl Fp4 {
     /// of `30` for `Fp3::inv` implies (it performs `14`): `40` in all, the
     /// figure §11.16's `97` per addition rests on.
     pub fn inv(&self, a: &E4) -> E4 {
+        let norm = self.inv_norm(a);
+        let dinv = inv_mod(norm.d, self.p);
+        self.count(16);
+        self.fp_invs.set(self.fp_invs.get() + 1);
+        FP_INVERSIONS_TOTAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.inv_finish(a, &norm, dinv)
+    }
+    /// The first half of [`Fp4::inv`]: the norm `n = A² − sB²` to `F_{p²}`
+    /// and its norm `d ∈ F_p` (`12` multiplications charged).  E27 batches
+    /// the inversions of the `d`'s across walks.
+    pub fn inv_norm(&self, a: &E4) -> InvNorm {
         let p = self.p;
         let c = self.c;
         let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
@@ -164,23 +330,31 @@ impl Fp4 {
                 am(x01, x01, p),
             )
         };
-        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
-            (
-                am(mm(x0, y0, p), mm(c, mm(x1, y1, p), p), p),
-                am(mm(x0, y1, p), mm(x1, y0, p), p),
-            )
-        };
         let (aa0, aa1) = sqr(a0, a2);
         let (bb0, bb1) = sqr(a1, a3);
         // s·B² = c·bb1 + bb0·s.
         let (n0, n1) = (sm(aa0, mm(c, bb1, p), p), sm(aa1, bb0, p));
         let d = sm(mm(n0, n0, p), mm(c, mm(n1, n1, p), p), p);
         assert!(d != 0, "inverse of zero in F_p⁴");
-        let dinv = inv_mod(d, p);
-        let (i0, i1) = (mm(n0, dinv, p), (p - mm(n1, dinv, p)) % p);
+        self.count(12);
+        InvNorm { n0, n1, d }
+    }
+    /// The second half of [`Fp4::inv`], given `d⁻¹` (`12` multiplications
+    /// charged; the inversion of `d` is the caller's).
+    pub fn inv_finish(&self, a: &E4, norm: &InvNorm, dinv: u64) -> E4 {
+        let p = self.p;
+        let c = self.c;
+        let (a0, a1, a2, a3) = (a.0[0], a.0[1], a.0[2], a.0[3]);
+        let m2 = |x0: u64, x1: u64, y0: u64, y1: u64| -> (u64, u64) {
+            (
+                am(mm(x0, y0, p), mm(c, mm(x1, y1, p), p), p),
+                am(mm(x0, y1, p), mm(x1, y0, p), p),
+            )
+        };
+        let (i0, i1) = (mm(norm.n0, dinv, p), (p - mm(norm.n1, dinv, p)) % p);
         let (x0, x2) = m2(a0, a2, i0, i1);
         let (y0, y2) = m2(a1, a3, i0, i1);
-        self.count(40);
+        self.count(12);
         E4([x0, (p - y0) % p, x2, (p - y2) % p])
     }
     pub fn pow(&self, a: &E4, mut e: u128) -> E4 {
@@ -245,7 +419,42 @@ impl Fp4 {
     }
 }
 
+/// The norm data of one inversion in flight ([`Fp4::inv_norm`]).
+#[derive(Clone, Copy, Debug)]
+pub struct InvNorm {
+    pub n0: u64,
+    pub n1: u64,
+    pub d: u64,
+}
+
 // ── The curve `y² = x³ + a x + b` over `F_{p⁴}` ─────────────────────────
+
+/// An affine addition split at its inversion, so that the inversions of
+/// many additions can be batched (E27, §9.25).  [`Curve4::add_begin`]
+/// performs everything before the inversion, [`Curve4::add_end`] the rest;
+/// together they perform and charge exactly what [`Curve4::add`] does,
+/// except the `F_p` inversion, which the batch charges.
+#[derive(Clone, Copy, Debug)]
+pub enum AddJob {
+    Done(Pt4),
+    Pending {
+        p1: Pt4,
+        p2: Pt4,
+        num: E4,
+        den: E4,
+        norm: InvNorm,
+    },
+}
+
+impl AddJob {
+    /// The `F_p` element whose inverse the batch must supply.
+    pub fn norm(&self) -> Option<u64> {
+        match self {
+            AddJob::Done(_) => None,
+            AddJob::Pending { norm, .. } => Some(norm.d),
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Pt4 {
@@ -349,6 +558,59 @@ impl Curve4 {
             inf: false,
         }
     }
+    /// [`Curve4::add`] up to its inversion (E27).
+    pub fn add_begin(&self, p1: &Pt4, p2: &Pt4) -> AddJob {
+        let f = &self.f;
+        self.ops.set(self.ops.get() + 1);
+        if p1.inf {
+            return AddJob::Done(*p2);
+        }
+        if p2.inf {
+            return AddJob::Done(*p1);
+        }
+        let (num, den) = if p1.x == p2.x {
+            if p1.y != p2.y || p1.y.is_zero() {
+                return AddJob::Done(Pt4::INF);
+            }
+            let x2 = f.sq(&p1.x);
+            let num = f.add(&f.add(&f.add(&x2, &x2), &x2), &self.a);
+            (num, f.add(&p1.y, &p1.y))
+        } else {
+            (f.sub(&p2.y, &p1.y), f.sub(&p2.x, &p1.x))
+        };
+        AddJob::Pending {
+            p1: *p1,
+            p2: *p2,
+            num,
+            den,
+            norm: f.inv_norm(&den),
+        }
+    }
+    /// [`Curve4::add`] after its inversion, given the inverse of the job's
+    /// norm (E27).
+    pub fn add_end(&self, job: &AddJob, dinv: Option<u64>) -> Pt4 {
+        let f = &self.f;
+        match job {
+            AddJob::Done(pt) => *pt,
+            AddJob::Pending {
+                p1,
+                p2,
+                num,
+                den,
+                norm,
+            } => {
+                let inv = f.inv_finish(den, norm, dinv.expect("a pending job's inverse"));
+                let lambda = f.mul(num, &inv);
+                let x3 = f.sub(&f.sub(&f.sq(&lambda), &p1.x), &p2.x);
+                let y3 = f.sub(&f.mul(&lambda, &f.sub(&p1.x, &x3)), &p1.y);
+                Pt4 {
+                    x: x3,
+                    y: y3,
+                    inf: false,
+                }
+            }
+        }
+    }
     pub fn sub(&self, p1: &Pt4, p2: &Pt4) -> Pt4 {
         self.add(p1, &self.neg(p2))
     }
@@ -357,8 +619,12 @@ impl Curve4 {
     }
     /// A fresh curve with its own counters, for a worker thread.
     pub fn with_params(p: u64, a: E4, b: E4) -> Curve4 {
+        Curve4::with_params_arith(p, a, b, karatsuba_default())
+    }
+    /// [`Curve4::with_params`] with the `F_{p⁴}` product chosen (E27).
+    pub fn with_params_arith(p: u64, a: E4, b: E4, karatsuba: bool) -> Curve4 {
         Curve4 {
-            f: Fp4::new(p),
+            f: Fp4::with_arith(p, karatsuba),
             a,
             b,
             ops: Cell::new(0),

@@ -78,6 +78,9 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
+    "glv_gls": "research/glv_gls_v4_20261018/summary.json",
+    "glv_e31": "research/e31_chain_solve_20261024/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
@@ -853,6 +856,50 @@ def lazy_members_component() -> dict:
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
+
+def k4_v4_component() -> dict:
+    """The k = 4 decomposition oracle on its own family: E19 (the tau_T line,
+    weighted D4 solve) as the before figure and E24 (the full-2-torsion V4
+    line and its invariant solve) as the after, end to end on curves over
+    F_{p^4} with rational 2-torsion, copied from the study's summary.json
+    (written by examples/glv_invariant_experiment_tables.rs --k4-summary from
+    the raw records). A solver speed-up on curves no table A-C row prices:
+    it moves no row there."""
+    sm = load(SOURCES["glv_k4"])
+    if (sm.get("schema") != "crypto.glv_k4_pipeline_summary/v1"
+            or sm.get("all_verified") is not True
+            or sm.get("class") != "engineering"):
+        raise SystemExit("review the k = 4 V4-line summary before updating the leaderboard")
+    gls = load(SOURCES["glv_gls"])
+    if (gls.get("schema") != "crypto.glv_gls_v4_summary/v1"
+            or gls.get("all_verified") is not True
+            or gls.get("class") != "engineering"):
+        raise SystemExit("review the E25 GLS summary before updating the leaderboard")
+    e31 = load(SOURCES["glv_e31"])
+    e2e = e31.get("end_to_end", {})
+    if (e31.get("experiment") != "E31"
+            or e31.get("class") != "engineering (phase speed-up)"
+            or e2e.get("all_correct") is not True
+            or e2e.get("all_replay_fields_identical") is not True
+            or e2e.get("rho_ahead_every_row_every_weight") is not True):
+        raise SystemExit("review the E31 chain-solve summary before updating the leaderboard")
+    return {**sm, "source": SOURCES["glv_k4"],
+            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
+            "gls": {**gls, "source": SOURCES["glv_gls"],
+                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"},
+            "e31": {"source": SOURCES["glv_e31"],
+                    "report": "research/e31_chain_solve_20261024/REPORT.pdf",
+                    "validation": "benchmarks/20261024-e31-chain-solve/VALIDATION.json",
+                    "e25_over_a": e2e["E25_over_A_range_by_weight"],
+                    "e25_over_b": e2e["E25_over_B_range_by_weight"],
+                    "s_over_rho_e25": e2e["S_over_rho_E25_range_by_weight"],
+                    "s_over_rho_a": e2e["S_over_rho_A_range_by_weight"],
+                    "s_over_rho_b": e2e["S_over_rho_B_range_by_weight"],
+                    "per_call_a": e31["stage_a"]["existing_over_A_range"],
+                    "per_call_b": e31["stage_a"]["existing_over_B_range"],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "log2_n", "S_E25", "S_A", "S_B",
+                                                "E25_over_A", "E25_over_B", "S_over_rho_A")}
+                             for z in e2e["rows"]]}}
 
 def postgb_linear_stage_component() -> dict:
     """The linear stage after F4 across Gröbner-basis corpora, from
@@ -1914,6 +1961,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
@@ -2884,6 +2932,51 @@ def markdown(doc: dict) -> str:
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+    k = doc["k4_v4_component"]
+
+    def rr(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    L += ["## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C", "",
+          f"Before: {k['before']}. After: {k['after']}. Both end to end over F_p^4 "
+          f"({k['e19_curves']} and {k['e24_curves']} curves, every logarithm verified), every phase "
+          "charged in F_p multiplications against 16 matched negation walks per curve. "
+          f"Handover from each pipeline's own constants: 2^{k['e19_handover_log2_n']:.1f} → "
+          f"2^{k['e24_handover_log2_n']:.1f} (extrapolated). Class: {k['class']}, a constant; "
+          f"every row still {rr(k['e24_s_over_rho_all'])}× slower than rho. "
+          f"Read the [report](../../{k['report']}) and [summary](../../{k['source']}).", "",
+          "| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |",
+          "|--:|--:|--:|--:|--:|--:|--:|"]
+    for z in k["rows"]:
+        L.append(f"| {z['p']} | {z['log2_n']:.1f} | {rr(z['e19_s_over_rho'])} | {rr(z['e24_s_over_rho'])} | "
+                 f"{rr(z['e19_over_e24_by_seed'], '{:.0f}')} | {rr(z['e19_c_median'])} | {rr(z['e24_c_median'])} |")
+    L.append("")
+    g = k["gls"]
+    L += [f"**The GLS endomorphism on the V₄ line (E25).** Before: {g['before']}. After: {g['after']}. "
+          f"Same curve, base and target stream ({g['curves']} GLS curves, h = 16, every logarithm verified); "
+          f"handover from each arm's own constants 2^{g['handover_log2_n_a']:.1f} → 2^{g['handover_log2_n_b']:.1f} "
+          f"(extrapolated). Class: {g['class']}, a constant, on this family only. "
+          f"Read the [report](../../{g['report']}) and [summary](../../{g['source']}).", "",
+          "| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |",
+          "|--:|--:|--:|:--|--:|--:|--:|"]
+    for z in g["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['log2_n']:.1f} | {z['columns'][0]} / {z['columns'][1]} | "
+                 f"{z['s_a_over_s_b']:.2f} | {z['s_a_over_rho_negation']:.2e} | {z['s_b_over_rho_psi']:.2e} |")
+    L.append("")
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    L += [("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                      a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                      r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|:--|--:|--:|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_E25']:.2e} | {z['S_A']:.2e} | {z['S_B']:.2e} | "
+                 f"{z['E25_over_A'][0]:.2f}, {z['E25_over_A'][1]:.2f}, {z['E25_over_A'][2]:.3f} | "
+                 f"{z['E25_over_B'][0]:.2f} | {z['S_over_rho_A'][0]:.2e} |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -4005,6 +4098,55 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    k = doc["k4_v4_component"]
+
+    def rh(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    P.append('<section id="k4-v4-line"><h2>k = 4 decomposition oracle on curves with rational 2-torsion, '
+             'outside tables A–C</h2>'
+             f'<p>Before: {esc(k["before"])}. After: {esc(k["after"])}. Both end to end over '
+             f'F<sub>p⁴</sub> ({k["e19_curves"]} and {k["e24_curves"]} curves, every logarithm verified), '
+             'every phase charged in F<sub>p</sub> multiplications against 16 matched negation walks per curve. '
+             f'Handover from each pipeline&rsquo;s own constants: 2<sup>{k["e19_handover_log2_n"]:.1f}</sup> &rarr; '
+             f'2<sup>{k["e24_handover_log2_n"]:.1f}</sup> (extrapolated). Class: {esc(k["class"])}, a constant; '
+             f'every row still {rh(k["e24_s_over_rho_all"])}&times; slower than rho.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>log2 n</th><th>E19 S/rho</th>'
+             '<th>E24 S/rho</th><th>E19 / E24 (by seed)</th><th>E19 C per call</th><th>E24 C per call</th>'
+             '</tr></thead><tbody>')
+    for z in k["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["log2_n"]:.1f}</td><td>{rh(z["e19_s_over_rho"])}</td>'
+                 f'<td>{rh(z["e24_s_over_rho"])}</td><td>{rh(z["e19_over_e24_by_seed"], "{:.0f}")}</td>'
+                 f'<td>{rh(z["e19_c_median"])}</td><td>{rh(z["e24_c_median"])}</td></tr>')
+    g = k["gls"]
+    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary')
+             + f'<h3>The GLS endomorphism on the V₄ line (E25)</h3><p>Before: {esc(g["before"])}. '
+             f'After: {esc(g["after"])}. Same curve, base and target stream ({g["curves"]} GLS curves, '
+             f'h = 16, every logarithm verified); handover from each arm&rsquo;s own constants '
+             f'2<sup>{g["handover_log2_n_a"]:.1f}</sup> &rarr; 2<sup>{g["handover_log2_n_b"]:.1f}</sup> '
+             f'(extrapolated). Class: {esc(g["class"])}, a constant, on this family only.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>log2 n</th><th>cols A / B</th>'
+             '<th>S_A / S_B</th><th>S_A / rho (negation)</th><th>S_B / rho (±ψ)</th></tr></thead><tbody>')
+    for z in g["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["log2_n"]:.1f}</td>'
+                 f'<td>{z["columns"][0]} / {z["columns"][1]}</td><td>{z["s_a_over_s_b"]:.2f}</td>'
+                 f'<td>{z["s_a_over_rho_negation"]:.2e}</td><td>{z["s_b_over_rho_psi"]:.2e}</td></tr>')
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary')
+             + '<h3>The chain solve (E31)</h3><p>' + esc(("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(
+                 pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                 a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                 r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S E25</th><th>S A</th>'
+             '<th>S B</th><th>E25 / A (0, 0.1, 1 GAE)</th><th>E25 / B (0 GAE)</th><th>S_A / rho (0 GAE)</th>'
+             '</tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_E25"]:.2e}</td>'
+                 f'<td>{z["S_A"]:.2e}</td><td>{z["S_B"]:.2e}</td><td>{z["E25_over_A"][0]:.2f}, '
+                 f'{z["E25_over_A"][1]:.2f}, {z["E25_over_A"][2]:.3f}</td><td>{z["E25_over_B"][0]:.2f}</td>'
+                 f'<td>{z["S_over_rho_A"][0]:.2e}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + '</section>')
     b = doc["bitop_prime_ladder"]
     t = bitop_text(b)
     P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'
