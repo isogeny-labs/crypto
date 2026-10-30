@@ -1145,7 +1145,7 @@ ControllerPID1255083,exec30852,admin/home/ec2-user/ecbench-e2e-20261030-v19. Do 
 ### Errors
 V17balanceandV18capacityrefusals retained separately. PR2996auditshard8failedonunrelatedpencil_large_primecheckpointg9missinghost.json; no repairorclaimofallCIgreen.
 
-### 2026-10-30 21:53 UTC — verified 4090 results and smaller-base preparation
+### 2026-10-30 21:49 UTC — verified 4090 results and smaller-base preparation
 
 What was done: V19 raw results committed e1db39a661f3; inspected two-page report
 861a7fd27a89. Eight 52-bit recoveries replayed and four 63-bit memory/work limits
