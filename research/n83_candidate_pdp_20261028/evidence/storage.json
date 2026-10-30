@@ -1,0 +1,14 @@
+{
+ "schema": "n83.candidate-storage/v1",
+ "raw_uri": "s3://setec-astronomy-artifacts/runs/n83-candidate-spike40-e27-20261028-r1/local/",
+ "frozen_source_uri": "s3://setec-astronomy-artifacts/runs/n83-candidate-spike40-e27-20261028-r1/source/frozen-source.tar.xz",
+ "frozen_source_sha256": "71188aa2faa4db605022e77cdcf1e95a6c579d33f59402e37cf676a8a5e7e1ab",
+ "frozen_source_commit": "62daaba01cf",
+ "data_layout": "data/index.json binds three manifests, each binding128 zstd point shards and JSON receipts",
+ "metadata_archive": "base-run-metadata.tar.xz",
+ "metadata_archive_contents": "All raw run files except data/; includes executable, protocol, controls, host, logs, terminal, development validation, full original manifest",
+ "reconstruction": "Extract metadata archive, then put the preserved data directory under data/; sha256sum -c manifest.sha256 checks the complete original run",
+ "point_payload_store": "Per-family .artifacts.json maps each shard to store/sha256/<first2>/<sha256> in setec-astronomy-artifacts",
+ "format": "FORMAT.json",
+ "retention": "Original raw directory remains intact. All failures and partial uploader diagnostics preserved."
+}

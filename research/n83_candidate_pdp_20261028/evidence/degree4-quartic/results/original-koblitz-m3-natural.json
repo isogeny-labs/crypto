@@ -1,0 +1,769 @@
+{
+  "assignments_checked": 0,
+  "complete_v4_normal_forms": false,
+  "contains_one": false,
+  "exhaustive_affine_completion": null,
+  "independent_review": false,
+  "inherited_last_fall_lower_bound": 4,
+  "input_binding": {
+    "arm": "original-koblitz",
+    "complete_v3_rank": 36159,
+    "dataset": "original",
+    "directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/inputs/original-koblitz/koblitz-m3-natural",
+    "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+    "family": "koblitz",
+    "id": "koblitz-m3-natural",
+    "input_json_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+    "key": "original-koblitz-m3-natural",
+    "parent_files": {
+      "basis.rows.u64le": {
+        "bytes": 3011772444,
+        "sha256": "b98cac40571cb424905f798b470ec427e31b506c23650bf08a3e2031bc4a84b6"
+      },
+      "closure_state.json": {
+        "bytes": 244,
+        "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+      },
+      "operations.jsonl": {
+        "bytes": 13924190,
+        "sha256": "e7d9fa3674d1445e2b169278a211c4d3cfa15d695508c05e7d4d849b35d48637"
+      },
+      "result.json": {
+        "bytes": 36748,
+        "sha256": "3a04b8222f8a1669673b95df0e8d7c58a1bf83264ef1ef7407e52276c814fc78"
+      }
+    },
+    "parent_state": {
+      "complete": false,
+      "max_operations": 131072,
+      "max_rows": 32768,
+      "next_source": {
+        "parent": 13674,
+        "variable": 2
+      },
+      "pending_candidates": 3442,
+      "processed_candidates": 46416,
+      "rank": 32768,
+      "stop_reason": "row_cap"
+    },
+    "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-natural",
+    "propagation_case": {
+      "arm": "original-koblitz",
+      "complete_v3_rank": 36159,
+      "dataset": "original",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/inputs/original-koblitz/koblitz-m3-natural",
+      "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+      "family": "koblitz",
+      "id": "koblitz-m3-natural",
+      "input_json_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+      "key": "original-koblitz-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "b98cac40571cb424905f798b470ec427e31b506c23650bf08a3e2031bc4a84b6"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 13924190,
+          "sha256": "e7d9fa3674d1445e2b169278a211c4d3cfa15d695508c05e7d4d849b35d48637"
+        },
+        "result.json": {
+          "bytes": 36748,
+          "sha256": "3a04b8222f8a1669673b95df0e8d7c58a1bf83264ef1ef7407e52276c814fc78"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "19023a4b96ba4a4c448e2c81ffd90588543c6ebe57626cdfac1618cece39e0ea"
+        },
+        "result.json": {
+          "bytes": 37859,
+          "sha256": "32339ba00fd212533b395b4ff7bbb44b6ce598659909601f572d1463eb640607"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5567401,
+          "sha256": "cb1d59ddbe24051c2c99a28043f3435a1b240c027033571102ea1f1342923855"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "513b96c7192651e99b89e95a37a912d68cc28c74d2f82fade87921f231b2340e"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-natural",
+      "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+        "result_sha256": "cea998fe74fbd0f13a4c07802ec6b8437267d26026aeb9df2eed5d8bf6590f8a",
+        "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/v2/original-koblitz/koblitz-m3-natural",
+      "witness_case": {
+        "arm": "original-koblitz",
+        "complete_v3_rank": 36159,
+        "dataset": "original",
+        "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/original-koblitz/koblitz-m3-natural",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "family": "koblitz",
+        "id": "koblitz-m3-natural",
+        "input_json_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+        "key": "original-koblitz-m3-natural",
+        "parent_files": {
+          "basis.rows.u64le": {
+            "bytes": 3011772444,
+            "sha256": "b98cac40571cb424905f798b470ec427e31b506c23650bf08a3e2031bc4a84b6"
+          },
+          "closure_state.json": {
+            "bytes": 244,
+            "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+          },
+          "operations.jsonl": {
+            "bytes": 13924190,
+            "sha256": "e7d9fa3674d1445e2b169278a211c4d3cfa15d695508c05e7d4d849b35d48637"
+          },
+          "result.json": {
+            "bytes": 36748,
+            "sha256": "3a04b8222f8a1669673b95df0e8d7c58a1bf83264ef1ef7407e52276c814fc78"
+          }
+        },
+        "parent_state": {
+          "complete": false,
+          "max_operations": 131072,
+          "max_rows": 32768,
+          "next_source": {
+            "parent": 13674,
+            "variable": 2
+          },
+          "pending_candidates": 3442,
+          "processed_candidates": 46416,
+          "rank": 32768,
+          "stop_reason": "row_cap"
+        },
+        "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-natural",
+        "suffix_files": {
+          "closure_state.json": {
+            "bytes": 208,
+            "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+          },
+          "continuation.json": {
+            "bytes": 981,
+            "sha256": "19023a4b96ba4a4c448e2c81ffd90588543c6ebe57626cdfac1618cece39e0ea"
+          },
+          "result.json": {
+            "bytes": 37859,
+            "sha256": "32339ba00fd212533b395b4ff7bbb44b6ce598659909601f572d1463eb640607"
+          },
+          "suffix.operations.jsonl": {
+            "bytes": 5567401,
+            "sha256": "cb1d59ddbe24051c2c99a28043f3435a1b240c027033571102ea1f1342923855"
+          },
+          "suffix.rows.u64le": {
+            "bytes": 311673636,
+            "sha256": "513b96c7192651e99b89e95a37a912d68cc28c74d2f82fade87921f231b2340e"
+          }
+        },
+        "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-natural",
+        "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+        "target_kind": "natural",
+        "v2": {
+          "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+          "result_sha256": "cea998fe74fbd0f13a4c07802ec6b8437267d26026aeb9df2eed5d8bf6590f8a",
+          "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d"
+        },
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/original-koblitz/koblitz-m3-natural"
+      },
+      "witness_files": {
+        "U.normal.fieldpoly": {
+          "bytes": 5697139,
+          "sha256": "e7827d93b29e941ac1a7a841a3033d0fc45965c20ee2ce2bed19f622ee96b998"
+        },
+        "U.ordinary.fieldpoly": {
+          "bytes": 7235545,
+          "sha256": "a8fbd79cefbd117aadfc1599a17ac42cf64020126230747a395b3e009c2c9779"
+        },
+        "X0.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "762f30ac2361f924701877e2198f0e0aa69a197ae55c41eda3e5eed42e2a6cc3"
+        },
+        "X0.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "4652152363056bd3edc66e63afc9ed31ef88710a5701362bc756458803c26775"
+        },
+        "X1.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "1a35acb73212472232ba0380566bf903244a3f3d4480047ed1f1a9e64533ffd2"
+        },
+        "X1.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "e2503ce40b3e551e635f96c4dacb1bde5434b1bcee019bd8fc541b5155db8d86"
+        },
+        "candidates.jsonl": {
+          "bytes": 95557,
+          "sha256": "805044a5d6ca73a47b132088cf62a4493e514533566ff12ba870e54449c9ca9d"
+        },
+        "candidates.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "f40a377e9ef1b1a000cd78bcede43cc133d122a553c953795b3edfc88a94e0cf"
+        },
+        "family.json": {
+          "bytes": 13368,
+          "sha256": "78e3039f3dd6460d408264551ca9e3ab28a816d9d0eb22e7a19b7f7e5acf0410"
+        },
+        "partial-083.json": {
+          "bytes": 91,
+          "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+        },
+        "partial-166.json": {
+          "bytes": 93,
+          "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+        },
+        "partial-249.json": {
+          "bytes": 93,
+          "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+        },
+        "remainders.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "f21451ccddfaa82fc87f4e0f72d0dff71e91ef6bf140a2b6024de875359927f1"
+        },
+        "result.json": {
+          "bytes": 18685,
+          "sha256": "7644592d1d5cc61393cca017bf06f6030fda001541b96f80fa6b3951e24afac5"
+        },
+        "source.fieldpoly": {
+          "bytes": 1501129,
+          "sha256": "fc856e6708ce157da3eba42411cef2d533e45f2e44947ae5a538ea86f4ac4382"
+        }
+      },
+      "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/original-koblitz-m3-natural"
+    },
+    "propagation_files": {
+      "added.rows.u64le": {
+        "bytes": 22886132,
+        "sha256": "b96a48df5cd5e6a999c0b2acfe1ad1d6bb2be4a31bffc28f6139f004a5b64974"
+      },
+      "affine.json": {
+        "bytes": 1629,
+        "sha256": "13775189aef5a6e0888a7036ccea4049b60fc88807b57b3382c770a9bdc7bd87"
+      },
+      "operations.jsonl": {
+        "bytes": 113608,
+        "sha256": "d647788de2485c5fd7751814eec4605b1bcde424b90e1cf9f7369ab3854603ca"
+      },
+      "pending.json": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "progress.jsonl": {
+        "bytes": 470,
+        "sha256": "b66c3c38818319cc2b0a2a6fe400362ebd14c2ccd866d46bfbd4c17729233b8a"
+      },
+      "propagation.json": {
+        "bytes": 1045,
+        "sha256": "503262f3593a4e50e81331b580d76b471e2d128ae2b131cf2d695114e800cd09"
+      },
+      "result.json": {
+        "bytes": 9732,
+        "sha256": "fcca390a2d3887f485ff04cb372152c4664ed28a3e439b1ef429cd860e95cf9d"
+      },
+      "state.json": {
+        "bytes": 453,
+        "sha256": "2613d59c8efc4355fad3e6db1f7ef74d0dd62e749951e2a7ff0849d56c1decad"
+      }
+    },
+    "propagationdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/cases/original-koblitz-m3-natural",
+    "suffix_files": {
+      "closure_state.json": {
+        "bytes": 208,
+        "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+      },
+      "continuation.json": {
+        "bytes": 981,
+        "sha256": "19023a4b96ba4a4c448e2c81ffd90588543c6ebe57626cdfac1618cece39e0ea"
+      },
+      "result.json": {
+        "bytes": 37859,
+        "sha256": "32339ba00fd212533b395b4ff7bbb44b6ce598659909601f572d1463eb640607"
+      },
+      "suffix.operations.jsonl": {
+        "bytes": 5567401,
+        "sha256": "cb1d59ddbe24051c2c99a28043f3435a1b240c027033571102ea1f1342923855"
+      },
+      "suffix.rows.u64le": {
+        "bytes": 311673636,
+        "sha256": "513b96c7192651e99b89e95a37a912d68cc28c74d2f82fade87921f231b2340e"
+      }
+    },
+    "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-natural",
+    "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+    "target_kind": "natural",
+    "v2": {
+      "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+      "result_sha256": "cea998fe74fbd0f13a4c07802ec6b8437267d26026aeb9df2eed5d8bf6590f8a",
+      "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d"
+    },
+    "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/v2/original-koblitz/koblitz-m3-natural",
+    "witness_case": {
+      "arm": "original-koblitz",
+      "complete_v3_rank": 36159,
+      "dataset": "original",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/original-koblitz/koblitz-m3-natural",
+      "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+      "family": "koblitz",
+      "id": "koblitz-m3-natural",
+      "input_json_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+      "key": "original-koblitz-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "b98cac40571cb424905f798b470ec427e31b506c23650bf08a3e2031bc4a84b6"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 13924190,
+          "sha256": "e7d9fa3674d1445e2b169278a211c4d3cfa15d695508c05e7d4d849b35d48637"
+        },
+        "result.json": {
+          "bytes": 36748,
+          "sha256": "3a04b8222f8a1669673b95df0e8d7c58a1bf83264ef1ef7407e52276c814fc78"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/original-koblitz-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d3c835ca74832c430a76ffb86222d61fe320c646a7cd658609b8923cae79d22b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "19023a4b96ba4a4c448e2c81ffd90588543c6ebe57626cdfac1618cece39e0ea"
+        },
+        "result.json": {
+          "bytes": 37859,
+          "sha256": "32339ba00fd212533b395b4ff7bbb44b6ce598659909601f572d1463eb640607"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5567401,
+          "sha256": "cb1d59ddbe24051c2c99a28043f3435a1b240c027033571102ea1f1342923855"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 311673636,
+          "sha256": "513b96c7192651e99b89e95a37a912d68cc28c74d2f82fade87921f231b2340e"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/original-koblitz-m3-natural",
+      "system_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "afcef2633cbff9537342dd2109ebfcb12195a8248d7d242f8da4a405b9284ab1",
+        "result_sha256": "cea998fe74fbd0f13a4c07802ec6b8437267d26026aeb9df2eed5d8bf6590f8a",
+        "rows_sha256": "dcda434f2e51c7ff1432a8113c4f6041bf62259a9f09743cd03ebc992421ba2d"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/original-koblitz/koblitz-m3-natural"
+    },
+    "witness_files": {
+      "U.normal.fieldpoly": {
+        "bytes": 5697139,
+        "sha256": "e7827d93b29e941ac1a7a841a3033d0fc45965c20ee2ce2bed19f622ee96b998"
+      },
+      "U.ordinary.fieldpoly": {
+        "bytes": 7235545,
+        "sha256": "a8fbd79cefbd117aadfc1599a17ac42cf64020126230747a395b3e009c2c9779"
+      },
+      "X0.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "762f30ac2361f924701877e2198f0e0aa69a197ae55c41eda3e5eed42e2a6cc3"
+      },
+      "X0.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "4652152363056bd3edc66e63afc9ed31ef88710a5701362bc756458803c26775"
+      },
+      "X1.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "1a35acb73212472232ba0380566bf903244a3f3d4480047ed1f1a9e64533ffd2"
+      },
+      "X1.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "e2503ce40b3e551e635f96c4dacb1bde5434b1bcee019bd8fc541b5155db8d86"
+      },
+      "candidates.jsonl": {
+        "bytes": 95557,
+        "sha256": "805044a5d6ca73a47b132088cf62a4493e514533566ff12ba870e54449c9ca9d"
+      },
+      "candidates.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "f40a377e9ef1b1a000cd78bcede43cc133d122a553c953795b3edfc88a94e0cf"
+      },
+      "family.json": {
+        "bytes": 13368,
+        "sha256": "78e3039f3dd6460d408264551ca9e3ab28a816d9d0eb22e7a19b7f7e5acf0410"
+      },
+      "partial-083.json": {
+        "bytes": 91,
+        "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+      },
+      "partial-166.json": {
+        "bytes": 93,
+        "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+      },
+      "partial-249.json": {
+        "bytes": 93,
+        "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+      },
+      "remainders.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "f21451ccddfaa82fc87f4e0f72d0dff71e91ef6bf140a2b6024de875359927f1"
+      },
+      "result.json": {
+        "bytes": 18685,
+        "sha256": "7644592d1d5cc61393cca017bf06f6030fda001541b96f80fa6b3951e24afac5"
+      },
+      "source.fieldpoly": {
+        "bytes": 1501129,
+        "sha256": "fc856e6708ce157da3eba42411cef2d533e45f2e44947ae5a538ea86f4ac4382"
+      }
+    },
+    "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/original-koblitz-m3-natural"
+  },
+  "key": "original-koblitz-m3-natural",
+  "last_fall_degree": null,
+  "last_fall_lower_bound": 4,
+  "last_fall_upper_bound": null,
+  "linear_rank": 1,
+  "membership_degree_bound": 4,
+  "propagation_parent_result_sha256": "fcca390a2d3887f485ff04cb372152c4664ed28a3e439b1ef429cd860e95cf9d",
+  "schema": "n83.degree-four-quartic/v1",
+  "state": {
+    "added_rows": 4302,
+    "added_rows_by_degree": [
+      0,
+      0,
+      0,
+      0,
+      4302
+    ],
+    "attempted_products": 4303,
+    "blocked_candidate": {
+      "quartic_nonzeros": 544793,
+      "record_bytes": 2271100,
+      "reduction_complete": true,
+      "remainder_sha256": "bd93b33dc6347ad76b72797c63796c17f91690284fcd4fc539f469b4e3559312",
+      "source_kind": "initial_added",
+      "source_row": 36228,
+      "stop_reason": "basis_payload_cap",
+      "variable": 17,
+      "xor_basis_rows": [
+        37920,
+        37173,
+        36924,
+        36457,
+        36671,
+        36422,
+        37914,
+        37167,
+        36918,
+        36669,
+        36420,
+        36667,
+        36418,
+        37932,
+        37185,
+        36936,
+        36444,
+        36942,
+        36707,
+        36959,
+        36710,
+        37938,
+        37726,
+        36730,
+        36977,
+        36728,
+        37224,
+        36975,
+        36477,
+        37455,
+        37206,
+        36956,
+        36706,
+        36471,
+        36455,
+        36961,
+        36712,
+        40671,
+        38434,
+        36960,
+        36711,
+        40669,
+        38677,
+        38455,
+        38206,
+        37970,
+        37721,
+        36725,
+        40676,
+        38436,
+        38218,
+        37720,
+        37222,
+        36727,
+        40706,
+        38216,
+        37967,
+        37220,
+        36971,
+        40705,
+        38215,
+        37966,
+        36721,
+        36472,
+        40704,
+        37218,
+        40454,
+        40205,
+        39956,
+        39707,
+        38960,
+        38711,
+        38462,
+        37964,
+        37217,
+        36968,
+        40407,
+        40204,
+        39955,
+        39706,
+        39457,
+        39208,
+        38710,
+        38461,
+        38212,
+        37714,
+        37216,
+        36718,
+        40156,
+        39456,
+        39207,
+        38958,
+        37713,
+        37464,
+        36468,
+        39905,
+        39704,
+        39206,
+        38957,
+        38708,
+        38459,
+        38210,
+        37961,
+        37712,
+        36716,
+        39654,
+        39454,
+        38707,
+        38458,
+        38209,
+        37960,
+        37711,
+        36964,
+        36715,
+        38472,
+        38223,
+        37725,
+        37476,
+        37227,
+        36483,
+        39155,
+        37958,
+        37460,
+        37211,
+        36962,
+        36464,
+        38704,
+        38221,
+        37723,
+        37225,
+        36486,
+        38454,
+        37971,
+        37722,
+        37473,
+        37231,
+        36733,
+        38453,
+        37724,
+        37478,
+        36980,
+        36731,
+        36482,
+        37727,
+        37483,
+        37234,
+        36736,
+        37953,
+        37232,
+        36734,
+        37454,
+        36981,
+        37057,
+        37700,
+        37203,
+        36953,
+        36808,
+        36454,
+        37040,
+        36791,
+        36542,
+        40703,
+        40652,
+        40648,
+        40677,
+        40696,
+        40695,
+        40694,
+        40693,
+        40691,
+        40689,
+        40651,
+        40453,
+        40399,
+        40400,
+        40447,
+        40445,
+        40444,
+        40410,
+        40402,
+        40154,
+        40152,
+        40151,
+        40197,
+        40192,
+        40191,
+        40153,
+        40159,
+        39901,
+        39902,
+        39949,
+        39947,
+        39941,
+        39703,
+        39681,
+        39696,
+        39695,
+        39694,
+        39657,
+        39404,
+        39432,
+        39449,
+        39447,
+        39446,
+        39203,
+        39183,
+        39201,
+        39199,
+        39197,
+        39196,
+        39181,
+        39433,
+        38951,
+        38950,
+        38949,
+        38948,
+        38946,
+        38945,
+        38717,
+        38701,
+        38698,
+        38967,
+        38469,
+        38452,
+        38450,
+        38448,
+        38721,
+        38475,
+        38200,
+        38198,
+        37975,
+        37977,
+        38225,
+        37976,
+        37728,
+        37702,
+        38196,
+        37981,
+        37554,
+        37451,
+        37730,
+        37305,
+        37450,
+        37482,
+        37233,
+        36951,
+        36452,
+        40702,
+        40657,
+        40675,
+        40678,
+        40708
+      ]
+    },
+    "complete_v3_rows": 36159,
+    "complete_v4_normal_forms": false,
+    "completed_products": 4302,
+    "initial_rows": 36408,
+    "max_new_basis_payload_bytes": 2147483648,
+    "max_new_rows": 16384,
+    "max_product_attempts": 131072,
+    "max_quartic_nonzeros": 1048576,
+    "new_basis_payload_bytes": 2146309384,
+    "next_source": [
+      36228,
+      17,
+      "initial_added"
+    ],
+    "peak_quartic_nonzeros": 739766,
+    "pending_products": 5916918,
+    "rank": 40710,
+    "stop_reason": "basis_payload_cap",
+    "zero_remainders": 0
+  },
+  "upper_bound_argument": "No global upper certificate. Neither complete V4 nor a cap implies a global upper or lower5.",
+  "working_degree": 4
+}

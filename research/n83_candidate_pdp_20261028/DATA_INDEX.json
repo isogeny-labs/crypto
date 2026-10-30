@@ -1,0 +1,627 @@
+{
+  "schema": "n83.data-navigation/v1",
+  "path_base": "research/n83_candidate_pdp_20261028",
+  "entries": [
+    {
+      "id": "original-fixed-points",
+      "contains": "Actual affine points; one immutable2^27-candidate base per curve reused across m2..9",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "../n83_fixed_factor_base_20261028/data/index.json",
+          "bytes": 1330,
+          "sha256": "9698cd5023a491a8ba239f4e13d9c326eb3509d5010972f21d29a5de56df3b4a"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "../n83_fixed_factor_base_20261028/README.md",
+          "bytes": 3253,
+          "sha256": "1b493d6bf5c453b43b1e5c4f36a322ac5cf24604f2ab39cd1bc84ad6d9f37a9d"
+        }
+      ]
+    },
+    {
+      "id": "fixed-base-solver-sweep",
+      "contains": "48 saved systems and96 solver attempts; timeouts/memory limits are not degrees",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "../n83_fixed_degree_sweep_20261028/evidence/results.json",
+          "bytes": 525451,
+          "sha256": "5a97962a1ccb10b8edfebf344e1cd19408f481d9d507fdb56da0100ee1e515cd"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "../n83_fixed_degree_sweep_20261028/README.md",
+          "bytes": 3633,
+          "sha256": "79b854c23f0168ff2ae5f94d615be5af43e9dd8dc7ac2576215642bf304a1e72"
+        },
+        {
+          "kind": "storage",
+          "path": "../n83_fixed_degree_sweep_20261028/evidence/storage.json",
+          "bytes": 389,
+          "sha256": "26c497ee472e4f41ae98340586c40af07aaf2142f7d145f3fd8849de9955716a"
+        }
+      ]
+    },
+    {
+      "id": "original-fall-catalog",
+      "contains": "Original fixed-base FFD and V2 evidence; exact values remain distinct from lower bounds",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "../n83_fixed_fall_catalog_20261028/evidence/summary.json",
+          "bytes": 401313,
+          "sha256": "d52e568bba11829ce01928c85a525e06e496de3392e96417d1c3d5a1f9cbe911"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "../n83_fixed_fall_catalog_20261028/FORMAT.json",
+          "bytes": 2611,
+          "sha256": "a3ba5a12ad08df3b67940efee21b065735f9d3eab82ddf2c9b7af8b6a1f427d6"
+        }
+      ]
+    },
+    {
+      "id": "original-top-certificates",
+      "contains": "Historical original highest-form certificates retained; later m2 and binary-chain results tighten these",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "../n83_top_quotient_20261028/evidence/summary.json",
+          "bytes": 21413,
+          "sha256": "355d6508549d76e99d75d8842494d45f47b514c28e80df114efb017ce69c469c"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "../n83_top_quotient_20261028/FORMAT.json",
+          "bytes": 1601,
+          "sha256": "047e7c29a8cc4a4dc7e7dac50e897041c890e9ff50a53b21c899c6db17c31164"
+        }
+      ]
+    },
+    {
+      "id": "spike40-fixed-points",
+      "contains": "Actual affine points with selector positions0..25,40; binary record stores selector index",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "data/index.json",
+          "bytes": 1601,
+          "sha256": "f4e459edb00c3b7a96380cb495d87f4006ea0b6b6d42842c61b87679e4a0680c"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "FORMAT.json",
+          "bytes": 1535,
+          "sha256": "baea1b3362eccacf7af41132f4a7dc571e783f861e557b46c811d61ac2c3befd"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/storage.json",
+          "bytes": 1165,
+          "sha256": "bf59ce573d9175593f80071bd3a058b9888bc875c4e1446c28e7e2b70852f117"
+        }
+      ]
+    },
+    {
+      "id": "paired-pdp",
+      "contains": "Baseline/spike40 saved systems, FFD and complete V2; planted targets share low26 support",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/pdp/paired-summary.json",
+          "bytes": 76032,
+          "sha256": "c7ceea343a726760abd0160533787a5c632d503a217712ec65896c4ae87e43b2"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "PDP_FORMAT.json",
+          "bytes": 2544,
+          "sha256": "ee682ed4b42dd345461dadcdcd25b5e9ffcc4fdc1671a117760d2ec92002a58e"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/pdp-storage.json",
+          "bytes": 1130,
+          "sha256": "8eb40ddfbcc839325ec8ceff7339d87493df8badd7f506a6da89763b39233d46"
+        }
+      ]
+    },
+    {
+      "id": "m2-lfd",
+      "contains": "Eight binary/Koblitz cases: baseline LFD2 and spike40 LFD3",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree3/summary.json",
+          "bytes": 7778,
+          "sha256": "132db22c86f161faeecde4ac6299b2a9bdb06b200c2b69f99e1a68b3547f152c"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE3_FORMAT.json",
+          "bytes": 3145,
+          "sha256": "aff9b5c4edc09f19ba4011cf68644a50c13ea6bf8cf92c2483815701ad41f031"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree3-storage.json",
+          "bytes": 2552,
+          "sha256": "39d99a3de8d8e0319a61e250fc61ed8e74b62b6ae54646f6c754a9c673550b24"
+        }
+      ]
+    },
+    {
+      "id": "paired-top-certificates",
+      "contains": "Historical96-case top-form certificates and16 prime graded isomorphisms; later bounds retained separately",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/top/verified-summary.json",
+          "bytes": 67067,
+          "sha256": "e5d21073073f2d6e568235aa9387323afbdf9383fec2f3e7678b545f0582bd74"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "TOP_FORMAT.json",
+          "bytes": 2444,
+          "sha256": "fa8f9f1c8007f3d3431d56ecd81c29e3bae19c449b660fe94f4dc21402427540"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/top-storage.json",
+          "bytes": 818,
+          "sha256": "463d97eff05dca4e2642dd68a45276f67133b93e9ed91234a481ccb315733229"
+        }
+      ]
+    },
+    {
+      "id": "prime-m2-hilbert",
+      "contains": "Six retained identities with exact original-top vanishing degree42; failed r1 remains preserved separately",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/hilbert/verified-summary.json",
+          "bytes": 3930,
+          "sha256": "74f2c4839a6c02a3238e4713e093802ca19c1b4289005ddda672b07ac8e47824"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "HILBERT_FORMAT_V2.json",
+          "bytes": 1618,
+          "sha256": "40f745126f07a2c2e1c61298c7ff986f545645245b353c9135d79217f8c2dc7a"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/hilbert-storage.json",
+          "bytes": 1162,
+          "sha256": "1d8847bb26640285df9d56bc0314296c89945af65122a0511f36aa081c654a04"
+        }
+      ]
+    },
+    {
+      "id": "binary-m2-regularity",
+      "contains": "Twelve retained identities with exact original-top vanishing degree28; Hilbert arrays are bounds",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/binary-pair/verified-summary.json",
+          "bytes": 7964,
+          "sha256": "5e2ea21a677eb727d512a4c252ff361ef722f41f5c9948403cd87e9cb9a698a4"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "BINARY_PAIR_FORMAT.json",
+          "bytes": 3155,
+          "sha256": "ad8aae058b40b5c86d5cfea98c12f7674ed654c5b80bb8122f07bda2cb9c051a"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/binary-pair-storage.json",
+          "bytes": 802,
+          "sha256": "addbb85b85098d9c448d5411bc580d8fc60eb0ca156b5c9c1a2dbe20414e9d8f"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-to-m9-regularity",
+      "contains": "Historical84 disjoint-component intervals preserved; later chain-exact certificates determine these degrees",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/chain/verified-summary.json",
+          "bytes": 57138,
+          "sha256": "cbb43da58ac2309683f6ce7edc547520cad266c6944e14e913614fdfc626fefc"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "CHAIN_FORMAT.json",
+          "bytes": 3458,
+          "sha256": "08a4a943e15d29dc1c6fd1877a06a9723d8a25437ada4a76c7daebbd229c2b34"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/chain-storage.json",
+          "bytes": 796,
+          "sha256": "71227d16e2ecf04ac84ac4ed21d93cdb185d9d2774aa3661e58e0522be44a75d"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-lfd-capped",
+      "contains": "Twelve retained identities; LFD>=3,32768 admitted rows each, incomplete V3, no global upper certificate",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree3-m3/summary.json",
+          "bytes": 16341,
+          "sha256": "d86518c7cfcadf0dd486f8d7fa716473bf5e5f398d789e881b1ee56329aed414"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE3_M3_FORMAT.json",
+          "bytes": 3428,
+          "sha256": "0a3119dde4719f3a7e4ce83378f328cd03e086c109197f5a1e7e5b0aede3ed6f"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree3-m3-storage.json",
+          "bytes": 888,
+          "sha256": "a28f63a0e49dc7e7065a1ac59d2f062f3ce8dcbe25a00c73cc1d6149af41d2e0"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-lfd-continuation",
+      "contains": "Twelve retained m3 identities; 12 complete V3 spaces; inherited LFD>=3, global upper and exact unknown",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree3-continuation/summary.json",
+          "bytes": 30582,
+          "sha256": "6b38006e3bcba14f14e1f63c5b8f2a34566a91d493919310d3d9210234f1dc3c"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE3_CONTINUATION_FORMAT.json",
+          "bytes": 4222,
+          "sha256": "bf299c07013b7c155b7e0939b8d313635b09c276f18893cfe9121a506ca23dc1"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree3-continuation-storage.json",
+          "bytes": 1336,
+          "sha256": "183c67574d0f1ad8c6c59b55bdfa40329b5478a7e3cb462b3a93644bc1e239e3"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/degree3-continuation-publication.json",
+          "bytes": 8958,
+          "sha256": "cd6275929f39def0f63314737fb76c5dad54380d19adcca8fbe648f34c2a10d6"
+        }
+      ]
+    },
+    {
+      "id": "binary-chain-exact",
+      "contains": "84 unchanged binary/Koblitz m3..9 inputs: exact original-top degrees via overlap proof; independent scientific review pending",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/chain-exact/verified-summary.json",
+          "bytes": 61009,
+          "sha256": "8a51341c1522652c74df5c9c0ac1dedc66b654777ba153c7d61fdab718174423"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "CHAIN_EXACT_FORMAT.json",
+          "bytes": 3923,
+          "sha256": "ecbf33d403d66512e6e4b79885de637c65d9bf73c08332b1c04223d5993e5140"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/chain-exact-storage.json",
+          "bytes": 834,
+          "sha256": "c9486b74eab598e25d6dd75b2dcee10d81da4ba855a70274dfef6209250203c4"
+        },
+        {
+          "kind": "proof",
+          "path": "CHAIN_EXACT_DESIGN.md",
+          "bytes": 8578,
+          "sha256": "70d1f9eadc5c50db48c0ab69877000fca3081d28c2057cd9ba8327bd3aa14924"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-strict-degree4",
+      "contains": "12 unchanged m3 identities; 249 strict degree4 witnesses each, LFD>=4, exact/global upper unknown; producer/fresh/S3-restored checks pass; independent review pending",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree4-witness/summary.json",
+          "bytes": 10584,
+          "sha256": "5bc5c40345eb6abd28e8be090e73c0b876f487c0e78358ec3c57b36898fa78f4"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE4_WITNESS_FORMAT.json",
+          "bytes": 5053,
+          "sha256": "840a916eae27e0991be0b8ebe0846288aede2f7a50c1fb1471cd69fcbe45d7ce"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree4-witness-storage.json",
+          "bytes": 1514,
+          "sha256": "15437eded1031334aceb2992b91221e283519deb00e8be59ccebb244b3028752"
+        },
+        {
+          "kind": "proof",
+          "path": "DEGREE4_WITNESS_DESIGN.md",
+          "bytes": 5534,
+          "sha256": "3a324fee964b156522bb0ed485beb266cad688c717d20f8b86db3f3f581648a6"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/degree4-witness-publication.json",
+          "bytes": 6531,
+          "sha256": "a7f5910702f523bd13cc39cdb2d7ee1a3e8b2d4a8919c48f6f1a787980ba4c7f"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-degree4-propagation",
+      "contains": "12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0. Lower4 is inherited from the strict witness dataset. A restricted queue stall or cap gives no higher-fall bound and no global upper. Unrestricted V4 was not computed. Counts do not rank factor-base quality; independent scientific review remains pending.",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree4-propagation/summary.json",
+          "bytes": 14281,
+          "sha256": "79216fe4673e2e4702ae50c34991b452e8f953379410e5f9071ec98904456729"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE4_PROPAGATION_FORMAT.json",
+          "bytes": 5096,
+          "sha256": "8ee0cbb69b0cdf3f58388890ef39d9aeb8ee7fe9500d6c41d1a7612c0ee7553f"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree4-propagation-storage.json",
+          "bytes": 1899,
+          "sha256": "70abaf01fc362b646fbb92b1e20d38f6b7b674ddaad5aafaedd49506a6ab3316"
+        },
+        {
+          "kind": "proof",
+          "path": "DEGREE4_PROPAGATION_DESIGN.md",
+          "bytes": 5562,
+          "sha256": "86d84129db86ee3f9b00d12599a984161429fbd4a4b7d5040e87897857d6ff6a"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/degree4-propagation-publication.json",
+          "bytes": 7071,
+          "sha256": "c6ab0ad5b84f24d28332e49ef9072280b68551378a69cf74617083a3889df502"
+        }
+      ]
+    },
+    {
+      "id": "binary-m3-degree4-quartic",
+      "contains": "12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0. Lower4 is inherited from the strict witness dataset. Complete V4 normal forms and a global LFD upper certificate are distinct claims. A cap gives no full-closure conclusion or higher-fall bound. Counts do not rank factor-base quality; independent scientific review remains pending.",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/degree4-quartic/summary.json",
+          "bytes": 57635,
+          "sha256": "88a707a859dbb94368f96c97994c7f26124d14f47f08be7a1e287f2ff6b88977"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "DEGREE4_QUARTIC_FORMAT.json",
+          "bytes": 6433,
+          "sha256": "426e3a5ae1262c99f859b4f250df55885fef7feac42c2341ab38bf2caf93d048"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/degree4-quartic-storage.json",
+          "bytes": 2258,
+          "sha256": "28f44024b7e561ded855e23273bd5ab95a8f8b7765e0284efe56de9d08c79640"
+        },
+        {
+          "kind": "proof",
+          "path": "DEGREE4_QUARTIC_DESIGN.md",
+          "bytes": 6158,
+          "sha256": "25ae54bf0e2605f82a622bfebc7f84d363f1ec5af3a4d1b55fcd28be8990c22a"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/degree4-quartic-publication.json",
+          "bytes": 7907,
+          "sha256": "426703316aecf54c457c1cb7add09abcd2d46a3de528a9572f4288bb19b74347"
+        }
+      ]
+    },
+    {
+      "id": "prime-m2-first-fall",
+      "contains": "All six retained prime m2 original/baseline/spike40 planted/natural systems have highest-form **FFD = 17** and a strict filtered witness giving **LFD >= 17**. All six producer, fresh-process and S3-restored checks passed. Global upper and exact LFD remain unknown. These are source-bound certificates using native exact arithmetic and a written rank/Koszul/filtered-space argument; independent scientific review and full algebraic formalization remain pending. The original-top regularity is still42. No elite-base or performance gain is established.",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/prime-first-fall/summary.json",
+          "bytes": 4230,
+          "sha256": "f81be9e6771ce656442e92a32f9b8b585f76d5fe2df65bd7fdf858aff57cb5d5"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "PRIME_FIRST_FALL_FORMAT.json",
+          "bytes": 4731,
+          "sha256": "1cd1788489c44def12a15282d30e52a0b9ad081f77cd27a86acd55e7de7cf6e7"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/prime-first-fall-storage.json",
+          "bytes": 855,
+          "sha256": "42d807fe44f3edf046afb2ade85bdadf489bbd7d626de84cfce90a701b3e7576"
+        },
+        {
+          "kind": "proof",
+          "path": "PRIME_FIRST_FALL_DESIGN.md",
+          "bytes": 7339,
+          "sha256": "2a878df654bc92c0e42ef8d80a8a4582808816d140f0915c2f684496bf9f5516"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/prime-first-fall-publication.json",
+          "bytes": 1186,
+          "sha256": "b6ed0352782736e9f829851c8b096f212c5b3659b99c8759288facbdb6c81a95"
+        }
+      ]
+    },
+    {
+      "id": "prime-higher-m-terminal",
+      "contains": "All42 retained prime m3\u20139 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified. The stored affine consequences have derivations of degree at most17 and degree at most16. Other chain equations may derive them earlier;nonmembership inV16 is not checked. All original bases,targets,equations and regularity values remain unchanged. No elite-base or performance gain follows;independent scientific review and full algebraic formalization remain pending.",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/prime-terminal/summary.json",
+          "bytes": 30431,
+          "sha256": "042fdda5e6a54cf53f39e30791eb64670eb3ea7fe2a551d8d14367d0ba729c2d"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "PRIME_TERMINAL_FORMAT.json",
+          "bytes": 2054,
+          "sha256": "151db3a9ec61634be5a5916157245a44babcdbfcebfe7c547ba77e13b5c2c343"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/prime-terminal-storage.json",
+          "bytes": 1962,
+          "sha256": "bb80c098cbb4d1be1faa9ca49a8fec932822b01ae130388b057ff9e173e9cc5a"
+        },
+        {
+          "kind": "proof",
+          "path": "PRIME_TERMINAL_DESIGN.md",
+          "bytes": 4446,
+          "sha256": "578e360e2eb5109e32047f2824309b8f078d308f925abd00699727664bcba846"
+        },
+        {
+          "kind": "publication",
+          "path": "evidence/prime-terminal-publication.json",
+          "bytes": 1066,
+          "sha256": "3b439e95741851c44107c8786b85874bc05b0726f4951ddc8d0c2f7564e30567"
+        }
+      ]
+    },
+    {
+      "id": "prime-linear",
+      "contains": "All42 higher-m prime input checks; seven shared projected degree-five maps and six covering projections. Successful injection certifies lowerFFD6, deficient projection inconclusive; no newLFD.",
+      "files": [
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/prime-linear/summary.json",
+          "bytes": 17997,
+          "sha256": "e211915ba8d53baff3a37495e7f046845a90114150112b694ef3fc9b7168de09"
+        },
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/prime-linear/combined-bounds.json",
+          "bytes": 16369,
+          "sha256": "8085b363adfb9450821e943302fc456698b9f822e231f16967f05bb212b468f7"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "PRIME_LINEAR_FORMAT.json",
+          "bytes": 2254,
+          "sha256": "799acb7e014aac2af5eef4cd5ecb7f960d9f9b099cc654f7e20cc04d0911f62e"
+        },
+        {
+          "kind": "format_or_readme",
+          "path": "PRIME_LINEAR_DESIGN.md",
+          "bytes": 4601,
+          "sha256": "04f877c9b23f7bea1d92a580afed90f38e0d65ce36097d799b7e017d2ba296ab"
+        },
+        {
+          "kind": "storage",
+          "path": "evidence/prime-linear-storage.json",
+          "bytes": 1459,
+          "sha256": "b30b99dfc6ba4a50f244c1e7b291950b450dea479cec03e3d884af156d76f42c"
+        },
+        {
+          "kind": "summary_or_index",
+          "path": "evidence/prime-linear-publication.json",
+          "bytes": 764,
+          "sha256": "62ec39e58a1beb51121a83c9b5c72136f56ee6456953deb53961cb0ff2d9dc04"
+        }
+      ]
+    },
+    {
+      "id": "prime-quadratic-development",
+      "contains": "Development-only quadratic-domain layout, small-prime controls and executable; NO n83 production results or stronger bounds.",
+      "files": [
+        {
+          "path": "validation-prime-quadratic-development/summary.json",
+          "kind": "summary_or_index",
+          "bytes": 2618,
+          "sha256": "3f2a11a68862a74f532d8360ef4838b226314f914608f90ae162404b1ea5dc29"
+        },
+        {
+          "path": "validation-prime-quadratic-development/FORMAT.json",
+          "kind": "format_or_readme",
+          "bytes": 1643,
+          "sha256": "1e0d52dbcee5a30f3f36afe30e4d715d670dd3786b72d1bf5cb640965f0e8d64"
+        },
+        {
+          "path": "PRIME_QUADRATIC_DESIGN.md",
+          "kind": "format_or_readme",
+          "bytes": 4337,
+          "sha256": "a15157da2c835d2a84982563e7f07e1267edcb3834b44a5840251cd92510e931"
+        },
+        {
+          "path": "evidence/prime-quadratic-development-storage.json",
+          "kind": "storage",
+          "bytes": 1019,
+          "sha256": "fe1e809427e767636c1588448e5b1d83c58587ec9e24bce5ddd73a8410a9a0ad"
+        }
+      ]
+    }
+  ],
+  "semantics": [
+    "Factor bases contain actual points, not sampled planted tuples",
+    "Factor-base manifests are fixed across m within each family/candidate",
+    "First fall, last fall, solving degree and original-top vanishing degree are distinct",
+    "All earlier datasets and failed attempts remain; later bounds do not overwrite earlier evidence",
+    "No universal FFD/LFD or elite-base conclusion; independent scientific review remains pending"
+  ],
+  "latest_dataset": "prime-higher-m-terminal",
+  "views": [
+    {
+      "path": "FIXED_BASE_REGULARITY.json",
+      "bytes": 35635,
+      "sha256": "882079a892fb7d3dca09205082f87991d452535c2f55bbe22a608c6ea7c5de36",
+      "contains": "Source-joined view of the 48 original fixed-base systems; exact values, intervals and positive-dimensional quotients remain distinct"
+    },
+    {
+      "path": "FIXED_BASE_REGULARITY.csv",
+      "bytes": 14236,
+      "sha256": "b7fbd3439f15020ab94d09adb30683e4dfdf187fdacd6c6b856caf8b4a2803d8",
+      "contains": "Source-joined view of the 48 original fixed-base systems; exact values, intervals and positive-dimensional quotients remain distinct"
+    }
+  ],
+  "latest_fixed_base_regularity_view": {
+    "json": "FIXED_BASE_REGULARITY_V2.json",
+    "csv": "FIXED_BASE_REGULARITY_V2.csv",
+    "prior_view_retained": "FIXED_BASE_REGULARITY.json",
+    "files": [
+      {
+        "path": "FIXED_BASE_REGULARITY_V2.json",
+        "bytes": 35809,
+        "sha256": "5d3a747d2b8d90652676b0b9a80e76fce7ab766a4864246af6c9dc1574d1f37e"
+      },
+      {
+        "path": "FIXED_BASE_REGULARITY_V2.csv",
+        "bytes": 14124,
+        "sha256": "ae52848b740f9daa93620a6f6737a628bf78ad8ec1b5dac6233924b909bbd0f2"
+      }
+    ]
+  }
+}

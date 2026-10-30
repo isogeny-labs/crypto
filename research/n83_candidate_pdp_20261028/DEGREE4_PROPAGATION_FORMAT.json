@@ -1,0 +1,73 @@
+{
+  "schema": "n83.degree-four-propagation-format/v1",
+  "scope": "Restricted propagation of verified V4 consequences in a degree3 workspace; immutable V3 and witness parents are required",
+  "layout": {
+    "protocol-degree4-propagation.json": "Frozen source/binary, all12 retained cases, limits and three parent archives",
+    "case-specs/KEY.json": "Exact frozen case; witness_case is the unchanged preceding witness case, witness_files binds all15 saved witness payloads",
+    "inputs/ARM/ID/": "Byte-identical original input.json and system.sing",
+    "v2/ARM/ID/": "Complete saved V2 basis, operation trace and result",
+    "cases/KEY/added.rows.u64le": "Only new independent rows, in global insertion-ID order after complete V3",
+    "cases/KEY/operations.jsonl": "Every attempted witness insertion or allowed variable multiplication, including zero reductions",
+    "cases/KEY/progress.jsonl": "Append-only deterministic summaries every128 operations and at termination; no clock claims",
+    "cases/KEY/state.json": "First stopping boundary, caps, rank, seed counts, degree counts and restricted-queue status",
+    "cases/KEY/pending.json": "Entire remaining FIFO queue, including every unprocessed source",
+    "cases/KEY/affine.json": "Unit row, linear constraints, free variables and every exhaustively checked assignment, including failed equation IDs",
+    "cases/KEY/propagation.json": "Mathematical outcome before external input bindings",
+    "cases/KEY/result.json": "Outcome plus frozen input/witness bindings and inherited lower4 provenance",
+    "controls/": "Positive xyz+1 and negative xyz fixtures, tiny-space checks, production-style traces and replay records",
+    "summary.json": "Native per-case status join; failed or unattempted cases do not acquire numerical conclusions",
+    "status/summary-after-KEY.json": "Write-once cumulative summary after each attempted case",
+    "logs/,replay/,host.txt,terminal.json": "Actual process outcomes, non-secret host and diagnostic launcher boundaries",
+    "manifest.sha256": "SHA256 of every final raw payload except this inventory",
+    "uploader.stop": "Terminal marker: request background uploader exit and wait for any active upload before final manifest/upload; prevents concurrent final writers"
+  },
+  "added_rows_binary": {
+    "magic": "N83F4S1\n",
+    "header_bytes": 44,
+    "header_after_magic": [
+      "variables:u32le",
+      "columns:u64le",
+      "words_per_row:u64le",
+      "complete_v3_parent_rows:u64le",
+      "planned_seed_count:u64le"
+    ],
+    "production": {
+      "variables": 164,
+      "columns": 735295,
+      "words_per_row": 11489,
+      "bytes_per_row": 91912,
+      "planned_seeds": 249
+    },
+    "rows": "LSB-first bits in little-endian u64 words; unused final-word bits zero; only inserted nonzero rows are stored",
+    "columns": "Same graded colex squarefree columns through degree3 as DEGREE4_WITNESS_FORMAT.json",
+    "ids": "Global row ID equals complete V3 rank plus this file's zero-based row index",
+    "partial": "Header does not assert completion. Truncated/interrupted traces retain admitted prefixes but require explicit prefix verification before any claim"
+  },
+  "operations": {
+    "step": "Zero-based new-operation index in this phase",
+    "source": "Either witness_candidate:i, matching the saved249-row order, or parent:GLOBAL_ROW_ID plus variable:ZERO_BASED_INDEX",
+    "source_row_sha256": "Hash of the dense candidate before reduction",
+    "xor_basis_rows": "Ordered global reducer IDs; IDs may refer to complete V3 parents or earlier new rows",
+    "remainder_sha256": "Hash of the complete dense remainder, including zero",
+    "remainder_degree": "Stored multilinear degree; zero polynomial encoded0",
+    "inserted_row": "Global inserted row ID or null when remainder is zero",
+    "membership_degree_bound": "Always4; this is distinct from working_degree3"
+  },
+  "limits": {
+    "total_rows": 65536,
+    "new_operations": 262144,
+    "affine_free_variables": 12,
+    "seconds_per_producer_or_replay": 1800,
+    "virtual_memory_bytes": 8589934592
+  },
+  "stopping": "First unit certificate, restricted queue exhaustion, row cap or operation cap; unit takes precedence when coincident. All cases attempted without automatic retry.",
+  "claims": {
+    "upper_four": "Only verified1 in V4 or exhaustive affine completion of the original ideal; valid even if the restricted queue remains pending",
+    "exact_four": "Upper4 plus the separately replayed inherited strict degree4 witness",
+    "inherited_lower": "Original strict witness proves lower4; propagation ranks are not new strict degree5 evidence",
+    "null": "Unknown exact/global upper LFD is JSON null, not zero or infinity; omitted from numeric export measurements",
+    "queue": "restricted_queue_exhausted never asserts unrestricted V4 computation or global stabilization",
+    "independence": "Coordinate witnesses and repeated retained natural inputs are not independent statistical draws",
+    "review": "Producer and replay verification do not constitute independent scientific review"
+  }
+}

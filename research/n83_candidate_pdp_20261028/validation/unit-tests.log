@@ -1,0 +1,49 @@
+   Compiling libc v0.2.191
+   Compiling version_check v0.9.5
+   Compiling find-msvc-tools v0.1.15
+   Compiling shlex v2.0.1
+   Compiling pkg-config v0.3.34
+   Compiling typenum v1.20.1
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling zstd-safe v7.3.0
+   Compiling serde_json v1.0.154
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.2.17
+   Compiling generic-array v0.14.7
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling jobserver v0.1.35
+   Compiling cc v1.10.0
+   Compiling zstd-sys v2.1.2+zstd.1.5.7
+   Compiling zstd v0.13.3
+   Compiling n83-candidate-pdp v0.1.0 (/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028)
+    Finished `release` profile [optimized] target(s) in 36.88s
+     Running unittests src/bin/factor_base.rs (/home/ec2-user/n83-candidate-recovery/target/release/deps/factor_base-31bbc5fb982177f5)
+
+running 4 tests
+test tests::positive_and_negative_controls ... ok
+test field::tests::arithmetic_reference_and_boundaries ... ok
+test tests::shard_boundaries_and_encoding ... ok
+test field::tests::all_sqrt_classes_and_binary_linear_map ... FAILED
+
+failures:
+
+---- field::tests::all_sqrt_classes_and_binary_linear_map stdout ----
+
+thread 'field::tests::all_sqrt_classes_and_binary_linear_map' (1511391) panicked at src/bin/../field.rs:355:21:
+assertion `left == right` failed
+  left: 5886121698486377233884574
+ right: 1
+
+
+failures:
+    field::tests::all_sqrt_classes_and_binary_linear_map
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `--bin factor_base`
