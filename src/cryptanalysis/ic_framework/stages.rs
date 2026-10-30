@@ -624,6 +624,9 @@ pub enum Targets {
     /// `Stride` with a new stride after every relation.  See
     /// `TargetSource::StrideRenew`.
     StrideRenew,
+    /// `StrideRenew` probing the repeat guard only on targets that
+    /// decompose.  See `TargetSource::StrideRenewDeferredGuard`.
+    StrideRenewDeferredGuard,
 }
 
 impl Targets {
@@ -652,6 +655,7 @@ impl Targets {
             Targets::Residual => "residual",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
+            Targets::StrideRenewDeferredGuard => "stride-renew-deferred-guard",
         }
     }
 
@@ -680,8 +684,10 @@ impl Targets {
             "residual" => Ok(Targets::Residual),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
+            "stride-renew-deferred-guard" => Ok(Targets::StrideRenewDeferredGuard),
             other => Err(format!(
                 "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16/64/256/1024, walk-prime-batch-4/8/16/24/32/48/64/128/256/512/1024, residual, stride or stride-renew"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride, stride-renew or stride-renew-deferred-guard"
             )),
         }
     }

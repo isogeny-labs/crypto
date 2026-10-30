@@ -1,0 +1,80 @@
+scope: bounded native DEVELOPMENT unknown-coefficient correctness; not timing/scaling
+platform: Linux x86_64
+compiler: g++ (Debian 14.2.0-19) 14.2.0
+
+protocol: PROTOCOL.md, written before first native correctness execution
+original_90_case_protocol_before_addendum_sha256: 0ac7a84b8e7ac222f30eef2dc046e4a616e4952a4c8f629608c200e728394ef2
+current_protocol_with_direct_addendum_sha256: 4d3b0e880387a42a3d231d78c1c3b5aee6bafe6bb4efacdc17aeb967505ee09b
+
+command:
+bash research/prime_one_shot_20261029/continuation/solver/check.sh /tmp/unknown-norm-development-check
+build_flags: -std=c++17 -O2 -Wall -Wextra -Wpedantic -Werror
+build_exit: 0
+run_exit: 0
+complete_model_set_comparisons: 90
+SAT_cases: 42
+UNSAT_cases: 48
+canonical_models: 400
+coefficient_pairs_per_case: 272
+negative_cli_checks: 18
+solver_source_witness_inputs: 0
+timing_or_scaling_measurements: 0
+elapsed_timings: not collected
+
+repeat_command:
+bash research/prime_one_shot_20261029/continuation/solver/check.sh /tmp/unknown-norm-development-repeat
+repeat_exit: 0
+repeat_stdout_comparison: byte-identical
+repeat_retained_model_and_case_files: checks.tsv,candidate-models.tsv,oracle-models.tsv,targets.txt byte-identical
+
+identities: checks/build.sha256 contains source/binary hashes from the retained strict build.
+binaries: /tmp/unknown-norm-development-check/{norm_solver,point_oracle}, not committed.
+
+No source summands or generation scalars are passed to the candidate solver. Its
+O(p^2) coefficient census and root scan are explicit exponential correctness
+references; no sub-exponential algorithm or performance result is established.
+
+UNSAT qualification:
+t3,c1 has six empty-after-target-exclusion cases, six nonempty-chart UNSAT
+cases, and six SAT cases. checks.tsv explicitly retains the usable-abscissa
+count so empty charts are not presented as hard natural refutations.
+
+
+Direct mixed-target IC stage (addendum frozen before direct checks):
+command:
+bash research/prime_one_shot_20261029/continuation/solver/check_direct.sh /tmp/direct-ic-development-check
+strict_build_exit: 0
+run_exit: 0
+internal_point_only_targets_verified: 18
+separate_executable_point_only_targets_verified: 18
+expected_scalar_arguments_to_solver: 0
+known_FB_logs: 0
+rank_kernel_controls: 0,1,2,3 pass
+zero_denominator_synthetic_control: rejection pass
+natural_zero_denominator_batches_in_retained_panels: 0
+direct_negative_CLI_controls: 4 pass
+final_internal_C_rank_counts: rank1=2, rank2=10, rank3=6
+internal_cold_setup_per_solve: 289 curve-pair checks,9 canonical membership tests
+internal_attempts: 230
+internal_identity_misses: 13
+internal_PDP_misses: 145
+internal_accepted_rows: 72
+internal_PDP_calls_including_misses: 217
+internal_coefficient_pairs: 59024
+internal_rng_words: 460
+
+repeat_command:
+bash research/prime_one_shot_20261029/continuation/solver/check_direct.sh /tmp/direct-ic-development-repeat
+repeat_exit: 0
+repeat_stdout: byte-identical
+repeat_direct_checks_cli_relations_kernels_and_selftest_log: byte-identical
+direct_source_binary_identities: checks/direct-build.sha256
+direct_binary: /tmp/direct-ic-development-check/direct_ic, not committed
+
+An initial direct-stage compile failed because main used Point without its
+namespace qualifier. initial-direct-build-failure.log preserves that failure.
+Qualifying reference::Point fixed it without changing or weakening strict flags.
+
+Phase counters retain all attempts and misses, plus explicit setup, group calls
+and modular reduction diagnostics. They are not a unified complete GAE/field-op
+price, exclude no failed attempts, and establish no comparative runtime result.

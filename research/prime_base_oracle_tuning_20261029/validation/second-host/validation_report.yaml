@@ -1,0 +1,136 @@
+validation_report:
+  id: VAL-20261029-7ff9db
+  task_id: "none issued (main-session task card, 2026-10-29: independently validate the second-host replay of holdout-P20, PROTOCOL.md section 13)"
+  subject: research/prime_base_oracle_tuning_20261029/second-host/ (producer account second-host/README.md, not taken on trust)
+  snapshot:
+    branch: claude/pbo-xhost-leaderboard-20261029
+    commit: 1e7b2b7ed20dcfccaf6f9454281f042508a7d2bd
+    study_dir_clean_against_commit: true
+    note: >-
+      The producer's evidence is committed at 1e7b2b7ed. Other files in the shared work tree
+      (.github/workflows/ic-leaderboard.yml, docs/session-logs/2026-10-29.md,
+      scripts/build_ic_leaderboard.py) were modified by another session while this validation ran;
+      none is in the study directory and none was used as evidence.
+  run_ids:
+    - ECBS1h517504d65837  # second host, isolab-eks c8a.2xlarge, L2, 2016 records
+    - ECBS1h685271327a8a  # original holdout-P20, 1008 records
+  artifact_checks:
+    - check: S3 results re-downloaded into an empty scratch directory and compared byte for byte with second-host/eks-results/
+      result: 20 of 20 files identical (19 SHA256SUMS entries plus SHA256SUMS); sha256sum -c 19/19 OK
+      receipt: validation/second-host/provenance-checks.txt
+    - check: S3 object timestamps against the session clock
+      result: session ran 03:18:55Z to 03:19:33Z; worker upload 03:19:55Z; launcher copy 03:20:06Z; no later object; one job under runs/ matches pbo|xhost|holdout
+    - check: launcher receipts (s3 .../launcher/7569b7f7-...)
+      result: download-hashes.txt 19/19 OK; request.json and original-request.json sha256 cc72e6be...8944ff = launch/validated-request.json = result.json request_sha256; image isolab/tasks@sha256:67eea58f...
+    - check: artifact-store pointers (artifacts.py verify --remote)
+      result: 5 of 5 pointer files hydrated with the manifest sha256 and present in the store at the manifest size (holdout-P20 records.jsonl 9754f196..., second-host records.jsonl a9bce342..., audit.stdout, run.stderr, second_host_ratios.png)
+    - check: spec identity
+      result: >-
+        second-host spec = input-spec.json = request.json job.spec = validated-request.json job.spec.
+        Against the frozen specs/holdout-P20.json (sha256 e5f640d0..., = original session spec, FROZEN.sha256 12/12 OK)
+        exactly three fields differ: label, measurement.rounds 2 -> 5, measurement.isolation_required L0 -> L2.
+        The README says two; the label change is descriptive and enters only spec_id.
+    - check: seed law (spec.rs plan + canonical.rs derive_u64; algorithm-seed derivation identical at 0e124fb1 and cb2ec687)
+      result: validator's own re-derivation reproduces 1008/1008 original and 2016/2016 second-host algorithm seeds
+      receipt: validation/second-host/seed-law.json
+    - check: env class distinctness
+      result: >-
+        distinct host class: original GenuineIntel Xeon @ 2.10GHz (6/207/2), KVM, kernel 6.18.44-fc-v185; second host
+        AuthenticAMD EPYC 9R45 (26/2/1), Amazon EC2 c8a.2xlarge, kernel 6.18.54-121.166.amzn2023. The ids
+        ECBENV3hc4d998f5ae3f and ECBENV2h3a51beea0bc2 come from different class-id schemes, so the host facts, not the ids, carry the distinctness.
+        (The local host now hashes to ECBENV3h13e37662a118; it differs from the original class only by node mem_total_kib.)
+    - check: binaries
+      result: >-
+        original bf5eec6d... (source 0e124fb1, src/ unchanged to the measurement worktree 7df34ba6); second host
+        583e62f0... (source cb2ec687 per the image's build-info.json, built 2026-10-19; not rebuilt by the validator).
+        188 commits touch src/cryptanalysis/ecbench between them.
+  metric_recomputations:
+    - name: record-by-record match (validator's own compare_records.py; producer's match_records.py not read)
+      result: >-
+        1008/1008 original records partnered by (arm, workload_id, round, warmup); 0 seed mismatches; 1008/1008 identical
+        on the strict field set (arm, role, round, warmup, algorithm_seed, method, workload, outcome status/recovered/matches_target,
+        cost, boundaries, counters, phases without wall_ns/work_native, factor_base, field_ops, solver, detail, unpriced_counts);
+        priced_S identical at w = 0, 0.1, 1 on every pair; 0 uncounted unpriced counters; 0 calibration-pinned records.
+        Full leaf diff: only identity, isolation.*, time.* and wall-clock fields differ; original-only fields are the bitop/v1 work
+        block, phases[].work_native, allocator and time.solve. No field band.rs, compare.rs or the outcome reads differs.
+      receipt: validation/second-host/record-compare.json
+    - name: local ecbench verify --replay-all of the second-host session (binary bf5eec6d, original host class)
+      result: ok; 2016/2016 records verified; 1680/1680 measured replays identical; 0 problems; 12/12 checks true; session files unchanged
+      receipt: validation/second-host/verify-second-host-session.audit.json (sha256 48cce122...)
+    - name: local ecbench verify --replay-all of the original session (fresh, this snapshot)
+      result: ok; 1008/1008 verified; 672/672 replays identical
+      receipt: validation/second-host/verify-original-session.audit.json (sha256 08687504...)
+    - name: second-host compare and band re-run with the local binary
+      result: 12/12 producer compare JSON files and band.md byte-identical
+      receipt: validation/second-host/compare/byte-compare.txt
+    - name: paired ratio sums, stdlib recompute vs ecbench compare (second host, 240 pairs)
+      result: agree to <= 9e-16 relative at every weight; sel/inc 0.8364 [0.806, 0.866] / 0.8166 [0.786, 0.847] / 0.7461 [0.714, 0.779] at w = 0 / 0.1 / 1; sel/rho-neg 7.95 / 8.24 / 9.62
+    - name: original 96-pair band from the second host's rounds 1-2
+      result: equal to the original's arm means and paired ratio sums exactly (the values pinned in VALIDATION.json gae_band and paired_ratio_sums)
+  control_checks:
+    - inc-aa/inc = 1.0 exactly at w = 0, 0.1, 1 over 240 pairs (ecbench compare and stdlib)
+    - rho-neg-aa/rho-neg = 1.0 exactly at w = 0, 0.1, 1 over 240 pairs (validator-run compares; the producer did not run these)
+    - "[d]G = Q under the validator's own affine arithmetic: 2016/2016 second-host and 1008/1008 original verified records; p = 803441, r = 804007 prime, [r]G = O, all 48 targets and G on y^2 = x^3 + 232725x + 341758"
+    - L2 gate 2016/2016 executions at L2 (wall times are host observations, not compared and not a claim)
+  heuristic_validation_checks:
+    - not applicable: a deterministic replay of counted operations; no heuristic prediction is tested by this round
+  cost_model_checks:
+    - unit declared (ecbench GAE / sqrt(r)) with unpriced native work priced at w = 0, 0.1, 1 on every arm, rho included; C = 0 (no calibration pins)
+    - memory reported beside time: mean peak RSS sel/inc 0.999 on both hosts (no time-memory trade); RSS is a host observation and differs between hosts
+    - bitop/v1 work is not covered by the second-host replay (fields absent in the older build)
+  proof_architecture_checks: []
+  null_object_and_ladder:
+    - The A/A arms are the null objects of the paired ratio and read exactly 1.000; no correlation or bias statistic is reported by this round.
+    - No extrapolated speedup is claimed by this round; the row's ratio is measured at the instance scale (one 20-bit curve).
+  verdict: passed
+  verdict_scope: >-
+    The second-host re-execution is admissible evidence that every original holdout-P20 record reproduces on another
+    host class and ecbench build in every counted, band-priced and outcome field. This meets the PROTOCOL.md section 13
+    second-host replay requirement in substance. It is not evidence about any hypothesis, does not demonstrate a speedup
+    beyond the already-validated counted ratio, and does not itself authorize promotion (Coordinator decision).
+  limitations:
+    - "Form: a new session from the frozen spec matched record by record, plus a local verify of the new session; not an `ecbench verify --replay-all` receipt of the original session's bytes produced on the second host. `ecbench claim build --independent-receipt` (vs_rho) would need that form."
+    - Not an independent implementation; both hosts ran ecbench. The validator's [d]G = Q check and stdlib recompute are the implementation-independent checks.
+    - The second-host binary's source revision (cb2ec687) is attested by its image, not rebuilt.
+    - bitop/v1 work and phase work_native are not reproduced (absent in the older build); wall times are not compared.
+    - Rounds 3-5 (144 extra target-round pairs per arm, same curve, new seeds) are post-freeze data; consistent with the frozen 96-pair reading, not a replacement for it.
+    - One 20-bit curve; no curve-to-curve, other-size or exponent claim.
+    - second-host/README.md says two spec fields changed; three did (label as well). Descriptive only.
+  artifact_paths:
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/replay-certificate.json  # sha256 5a39b0defe4d556d0c204b145824be42da32c7e2239e135aa57561e29fc31981
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/record-compare.json
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/compare_records.py
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/seed-law.json
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/seed_law.py
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/verify-second-host-session.audit.json
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/verify-second-host-session.log
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/verify-original-session.audit.json
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/verify-original-session.log
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/second-host-session-files.before.sha256
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/compare/  # 15 compare JSON, band JSON/md, commands.log, byte-compare.txt
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/provenance-checks.txt
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/build_certificate.py
+    - research/prime_base_oracle_tuning_20261029/validation/second-host/SHA256SUMS
+  review_attestation:
+    joints_owned: [second-host replay admissibility for row icv1-fp20-tm565-6d7d1d32 (PROTOCOL.md section 13)]
+    blind_from_respected: "not a blind task; second-host/tools/match_records.py deliberately not read; second-host/analysis/match-original.json read only after the validator's own comparison was complete"
+    read_sibling_reports: "no same-round reviewer report exists; prior-round validator outputs (replay-certificate.json, validator-report.json, validation/compare/commands.log, validation/band/commands.log) read for pinned values and command form"
+    sources_read:
+      - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+      - /home/user/crypto-autoresearcher/agents/validator.md
+      - AGENTS.md (heading list; "Standing workflow rules" lines 49-125); /home/user/crypto/AGENTS.md section 12 (lines 1460-1487)
+      - docs/VALIDATION_GATE.md (origin/main)
+      - backlog/XP-20261016-prime-base-oracle-tuning/PROTOCOL.md (origin/main; sections 4.4, 6, 7, 12, 13, 14)
+      - /home/user/crypto/.agents/skills/ecbench-independent-runner/SKILL.md
+      - src/cryptanalysis/ecbench/spec.rs (HEAD and diff cb2ec687..0e124fb1), band.rs, record.rs (counts), compare.rs (match_pairs), canonical.rs (derive_u64) at 0e124fb1
+      - study VALIDATION.json, replay-certificate.json (first 150 lines), validator-report.json (keys, raw_data head, limitations), README.md (grep), host/commit.txt, host/ecbench.sha256, select/FROZEN.sha256, specs/holdout-P20.json
+      - sessions/holdout-P20/{session.json, host.json, spec.json, records.jsonl}
+      - second-host/README.md, second-host/analysis/{band.md, compare-*.json, match-original.json}, second-host/figures/plot.py
+      - second-host/eks-results/{SHA256SUMS, build-info.json, binary.sha256, runner-identity.json, job-exit.json, l2-gate.json, pod-cpuset.txt, audit.stderr, audit.json, control-comparison.json (verdict), run.stderr (head/tail), process-status.txt (head), input-spec.json, session/*}
+      - second-host/launch/{request.json, validated-request.json, result.json, launch.log}
+      - analysis/compare-P20-{inc__sel,rho-neg__sel}-w{0,0.1,1}.json (ratio and bootstrap interval)
+      - benchmarks/20261029-prime-fb-size-20bit/{VALIDATION.json, validator-report.json (diff against the study copy)}
+      - scripts/validation_gate.py (lines 114-247); scripts/build_ic_leaderboard.py (another session's uncommitted diff, read for format compatibility only)
+      - tools/artifacts/artifacts.py (pull and verify)
+      - S3 results prefix and launcher receipts for pbo-p20-xhost-20261029
+    verdict: holds

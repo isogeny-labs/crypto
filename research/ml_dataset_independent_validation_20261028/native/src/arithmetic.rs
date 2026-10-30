@@ -17,9 +17,9 @@ use std::collections::BTreeSet;
 const SCALAR: &str = "restricted-independent-scalar-label";
 const PDP: &str = "independently-verified-pdp";
 const PRIME_BASES: [u64; 12] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
-type Point = Option<(u64, u64)>;
+pub(crate) type Point = Option<(u64, u64)>;
 
-fn decimal(value: &Value, name: &str) -> Result<u64> {
+pub(crate) fn decimal(value: &Value, name: &str) -> Result<u64> {
     let text = value
         .as_str()
         .with_context(|| format!("{name} must be a decimal string"))?;
@@ -156,18 +156,18 @@ fn is_irreducible(polynomial: u64, degree: u32) -> bool {
 }
 
 #[derive(Clone, Debug)]
-enum Field {
+pub(crate) enum Field {
     Prime { p: u64 },
     Binary { degree: u32, polynomial: u64 },
 }
 
 impl Field {
-    fn prime(p: u64) -> Result<Self> {
+    pub(crate) fn prime(p: u64) -> Result<Self> {
         ensure!(p > 3 && is_prime(p), "invalid prime-field modulus");
         Ok(Self::Prime { p })
     }
 
-    fn binary(degree: u32, terms: &[u32]) -> Result<Self> {
+    pub(crate) fn binary(degree: u32, terms: &[u32]) -> Result<Self> {
         ensure!((1..=61).contains(&degree), "invalid binary degree");
         ensure!(terms.len() <= degree as usize, "too many polynomial terms");
         let mut polynomial = 1u64 << degree;
@@ -186,36 +186,36 @@ impl Field {
         Ok(Self::Binary { degree, polynomial })
     }
 
-    fn q(&self) -> u64 {
+    pub(crate) fn q(&self) -> u64 {
         match *self {
             Self::Prime { p } => p,
             Self::Binary { degree, .. } => 1u64 << degree,
         }
     }
 
-    fn binary_model(&self) -> bool {
+    pub(crate) fn binary_model(&self) -> bool {
         matches!(self, Self::Binary { .. })
     }
 
-    fn add(&self, left: u64, right: u64) -> u64 {
+    pub(crate) fn add(&self, left: u64, right: u64) -> u64 {
         match *self {
             Self::Prime { p } => add_mod(left, right, p),
             Self::Binary { .. } => left ^ right,
         }
     }
 
-    fn neg(&self, value: u64) -> u64 {
+    pub(crate) fn neg(&self, value: u64) -> u64 {
         match *self {
             Self::Prime { p } if value != 0 => p - value,
             _ => value,
         }
     }
 
-    fn sub(&self, left: u64, right: u64) -> u64 {
+    pub(crate) fn sub(&self, left: u64, right: u64) -> u64 {
         self.add(left, self.neg(right))
     }
 
-    fn mul(&self, left: u64, right: u64) -> u64 {
+    pub(crate) fn mul(&self, left: u64, right: u64) -> u64 {
         debug_assert!(left < self.q() && right < self.q());
         match *self {
             Self::Prime { p } => mul_mod(left, right, p),
@@ -235,7 +235,7 @@ impl Field {
         result
     }
 
-    fn inverse(&self, value: u64) -> Result<u64> {
+    pub(crate) fn inverse(&self, value: u64) -> Result<u64> {
         ensure!(value != 0 && value < self.q(), "invalid inverse operand");
         // Field validity was established independently before using Fermat.
         Ok(self.pow(value, self.q() - 2))
@@ -257,10 +257,10 @@ impl Field {
 }
 
 #[derive(Clone, Debug)]
-struct Curve {
-    field: Field,
-    a: u64,
-    b: u64,
+pub(crate) struct Curve {
+    pub(crate) field: Field,
+    pub(crate) a: u64,
+    pub(crate) b: u64,
 }
 
 impl Curve {
@@ -299,7 +299,7 @@ impl Curve {
         }
     }
 
-    fn point(&self, value: &Value, name: &str, finite: bool) -> Result<Point> {
+    pub(crate) fn point(&self, value: &Value, name: &str, finite: bool) -> Result<Point> {
         if value.is_null() {
             ensure!(!finite, "{name} must be finite");
             return Ok(None);
@@ -319,7 +319,7 @@ impl Curve {
         Ok(point)
     }
 
-    fn neg(&self, point: Point) -> Result<Point> {
+    pub(crate) fn neg(&self, point: Point) -> Result<Point> {
         ensure!(self.on_curve(point), "cannot negate off-curve point");
         Ok(point.map(|(x, y)| {
             (
@@ -333,7 +333,7 @@ impl Curve {
         }))
     }
 
-    fn add(&self, left: Point, right: Point) -> Result<Point> {
+    pub(crate) fn add(&self, left: Point, right: Point) -> Result<Point> {
         ensure!(
             self.on_curve(left) && self.on_curve(right),
             "cannot add off-curve points"
@@ -382,16 +382,16 @@ impl Curve {
     }
 }
 
-struct PublicCurve {
-    curve: Curve,
+pub(crate) struct PublicCurve {
+    pub(crate) curve: Curve,
     generator: Point,
-    target: Point,
+    pub(crate) target: Point,
     declared_order: u64,
     arity: usize,
     twist_validated: bool,
 }
 
-fn public_curve(public: &Value, config: &Value) -> Result<PublicCurve> {
+pub(crate) fn public_curve(public: &Value, config: &Value) -> Result<PublicCurve> {
     ensure!(
         public.is_object() && config.is_object(),
         "public/config must be objects"

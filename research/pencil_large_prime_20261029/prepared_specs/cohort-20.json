@@ -1,0 +1,95 @@
+{
+  "arms": [
+    {
+      "name": "pencil",
+      "role": "candidate",
+      "method": {
+        "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+        "params": {
+          "small_denominator": "8",
+          "matrix_coefficient_cap": "25000000"
+        }
+      }
+    },
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "403100"
+        }
+      }
+    },
+    {
+      "name": "rho_AA",
+      "role": "control",
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "403100"
+        }
+      }
+    }
+  ],
+  "description": "Prepared specification; execution requires a frozen experiment protocol and admission. Public synthetic archived targets; fixed denominator8 selected before symbolic cohort observations. Cold/online clocks, failures and memory retained; no full-price GAE claim.",
+  "label": "pencil-symbolic-paired-20",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 5,
+    "seed": 2026101801,
+    "timeout_seconds": 3600,
+    "warmup": 1,
+    "algorithm_seed_round": "measured_index"
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 9527263,
+        "b": 3530983,
+        "family": "scholten",
+        "group_order": 11365616,
+        "gx": 3788128,
+        "gy": 1005502,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 3371,
+        "parameter": 0,
+        "r": 710351
+      },
+      {
+        "a": 2233623,
+        "b": 3116489,
+        "family": "scholten",
+        "group_order": 12439408,
+        "gx": 9778563,
+        "gy": 2738584,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 3527,
+        "parameter": 0,
+        "r": 777463
+      },
+      {
+        "a": 6140486,
+        "b": 986453,
+        "family": "scholten",
+        "group_order": 15446512,
+        "gx": 5559718,
+        "gy": 5303172,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 3931,
+        "parameter": 0,
+        "r": 965407
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

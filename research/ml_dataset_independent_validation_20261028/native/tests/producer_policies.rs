@@ -229,7 +229,19 @@ fn pinned_producer_policy_cells_audit_replay_and_export() {
             record["producer_training_export_equivalence_verified"],
             false
         );
-        assert_eq!(record["labels"]["root_sets_independently_verified"], false);
+        assert_eq!(
+            record["labels"]["root_sets_independently_verified"],
+            record["labels"]["root_certificate_arithmetic"]["all_supplied_root_sets_verified"]
+                == true
+        );
+        assert_ne!(
+            record["labels"]["root_certificate_arithmetic"]["execution_trace_complete_verified"],
+            true
+        );
+        assert_ne!(
+            record["labels"]["root_certificate_arithmetic"]["total_operation_count_verified"],
+            true
+        );
         let features = serde_json::to_string(&record["features"]).unwrap();
         for forbidden in [
             "sampling_seed",
@@ -238,6 +250,7 @@ fn pinned_producer_policy_cells_audit_replay_and_export() {
             "construction_candidates",
             "scalar",
             "outcome",
+            "root_certificate_arithmetic",
         ] {
             assert!(!features.contains(forbidden), "leaked {forbidden}");
         }
@@ -298,7 +311,13 @@ fn pinned_producer_policy_cells_audit_replay_and_export() {
     report["producer_source_commit"] =
         common::load(&source.join("run.json")).unwrap()["source_commit"].clone();
     assert_eq!(report["producer_source_commit"], PRODUCER_COMMIT);
-    report["root_artifact_cells_preserved_without_independent_root_claim"] = json!(root_records);
+    report["root_artifact_cells_audited"] = json!(root_records);
+    assert!(
+        report["completed_distinct_root_sets_checked"]
+            .as_u64()
+            .unwrap()
+            > 0
+    );
     report["unsupported_feature_rows"] = json!(excluded);
     report["static_view_sha256"] = json!(common::hash_file(&export).unwrap());
     report["rehashed_policy_seed_status_substitutions_rejected"] = json!(true);
