@@ -279,13 +279,32 @@ impl DecompositionOracle for CachedMitm {
     }
 }
 
-fn mul(a: u64, b: u64, p: u64) -> u64 {
+// Same bounded ceiling-reciprocal reduction as the checked paper module.
+// Kept private here because the shared module's API is owned by another lane.
+// R=ceil(2^64/p); for x<2^64, floor(xR/2^64) overestimates floor(x/p)
+// by at most one. For p<2^32, a wrapped negative residual is >=p.
+fn reciprocal(p: u64) -> u64 {
     if p <= u32::MAX as u64 {
-        a * b % p
+        u64::MAX / p + 1
     } else {
-        ((a as u128 * b as u128) % p as u128) as u64
+        0
     }
 }
+fn mul(a: u64, b: u64, p: u64, reciprocal: u64) -> u64 {
+    debug_assert!(a < p && b < p && p > 1);
+    if reciprocal == 0 {
+        return ((a as u128 * b as u128) % p as u128) as u64;
+    }
+    let x = a * b;
+    let q = ((x as u128 * reciprocal as u128) >> 64) as u64;
+    let r = x.wrapping_sub(q.wrapping_mul(p));
+    if r >= p {
+        r.wrapping_add(p)
+    } else {
+        r
+    }
+}
+
 fn sub(a: u64, b: u64, p: u64) -> u64 {
     if a >= b {
         a - b
@@ -314,6 +333,8 @@ impl Scratch {
             }
             return 0;
         };
+        let reciprocal = reciprocal(p);
+        let mul = |a, b| mul(a, b, p, reciprocal);
         self.prefix.clear();
         self.denominators.clear();
         self.numerators.clear();
@@ -327,11 +348,11 @@ impl Scratch {
                 }
                 Some((xx, yy)) => {
                     let yy = sub(0, yy, p);
-                    if x == xx && (y + yy).is_multiple_of(p) {
+                    if x == xx && (y + yy == 0 || y + yy == p) {
                         self.output[i] = None;
                         (0, 0)
                     } else if x == xx {
-                        ((3 * mul(x, x, p) + curve.coefficients().0) % p, 2 * y % p)
+                        ((3 * mul(x, x) + curve.coefficients().0) % p, 2 * y % p)
                     } else {
                         (sub(yy, y, p), sub(xx, x, p))
                     }
@@ -341,7 +362,7 @@ impl Scratch {
             self.denominators.push(den);
             self.numerators.push(num);
             if den != 0 {
-                product = mul(product, den, p);
+                product = mul(product, den);
                 active = true;
             }
         }
@@ -354,12 +375,12 @@ impl Scratch {
             if den == 0 {
                 continue;
             }
-            let iz = mul(inverse, self.prefix[i], p);
-            inverse = mul(inverse, den, p);
-            let slope = mul(self.numerators[i], iz, p);
+            let iz = mul(inverse, self.prefix[i]);
+            inverse = mul(inverse, den);
+            let slope = mul(self.numerators[i], iz);
             let xx = points[i].unwrap().0;
-            let nx = sub(sub(mul(slope, slope, p), x, p), xx, p);
-            self.output[i] = Some((nx, sub(mul(slope, sub(x, nx, p), p), y, p)));
+            let nx = sub(sub(mul(slope, slope), x, p), xx, p);
+            self.output[i] = Some((nx, sub(mul(slope, sub(x, nx, p)), y, p)));
         }
         1
     }
@@ -371,6 +392,36 @@ mod tests {
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
     }
+    #[test]
+    fn residual_multiplication_matches_independent_remainder() {
+        for p in (2..128).chain([
+            65521,
+            65563,
+            (1 << 32) - 5,
+            (1 << 32) - 1,
+            1 << 32,
+            (1 << 40) + 87,
+        ]) {
+            let reciprocal = reciprocal(p);
+            let residues: Vec<_> = if p < 128 {
+                (0..p).collect()
+            } else {
+                (0..128)
+                    .map(|x| (x * 7919) % p)
+                    .chain([p - 1, p - 2, p / 2])
+                    .collect()
+            };
+            for &a in &residues {
+                for &b in &residues {
+                    assert_eq!(
+                        mul(a, b, p, reciprocal),
+                        ((a as u128 * b as u128) % p as u128) as u64
+                    );
+                }
+            }
+        }
+    }
+
     #[test]
     fn suffix_index_preserves_duplicates_identity_and_collision_chains() {
         let (c, p) = fixture();
