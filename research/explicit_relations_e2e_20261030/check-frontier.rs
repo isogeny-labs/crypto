@@ -10,6 +10,7 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
         4 => vec![48, 52, 56, 58, 60],
         5 | 7 | 8 => vec![52, 56, 58, 60],
         9 | 11 | 12 | 13 => vec![52, 61, 62],
+        14 => vec![52, 63],
         _ => return Err("version has no completed frontier contract".into()),
     };
     let mut lines = raw.lines();
@@ -72,8 +73,8 @@ fn check(raw: &str, version: u32) -> Result<(), String> {
             .get(bits)
             .ok_or("premature truncation without recorded stopping condition")?;
         let arms: &[&str] = match version {
-            11 | 13 if *bits == 52 => &["b", "u", "v", "x"],
-            11 | 13 => &["v"],
+            11 | 13 | 14 if *bits == 52 => &["b", "u", "v", "x"],
+            11 | 13 | 14 => &["v"],
             3 if *bits <= 24 => &["h", "u", "x"],
             3 => &["u", "x"],
             _ if *bits <= 52 => &["b", "u", "x"],
