@@ -238,6 +238,9 @@ enum Cmd {
     },
     /// Run a session.
     Run {
+        /// Explicit diagnostic launch provenance (producer activation pending).
+        #[arg(long)]
+        diagnostic_launch: Option<PathBuf>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -1234,6 +1237,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Run {
+            diagnostic_launch,
             spec: path,
             out,
             cpus,
@@ -1256,6 +1260,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 req = isolation::CpuRequest::None;
             }
             let opts = runner::RunOptions {
+                diagnostic_launch: diagnostic_launch
+                    .as_deref()
+                    .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
+                    .transpose()?,
                 cpus: req,
                 lock_path: lock,
                 wait_for_lock: wait,
@@ -2192,6 +2200,7 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
         diagnostics: None,
+        diagnostic_lifecycle: None,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
         target_seed: w.target_seed,
