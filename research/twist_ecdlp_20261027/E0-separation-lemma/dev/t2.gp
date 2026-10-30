@@ -1,0 +1,17 @@
+default(parisizemax,2000000000);
+g=ffprimroot(ffgen(3^2,'w)); one=g^0;
+print((0*one).pol, " ", type((0*one).pol), " ", Vec((0*one).pol));
+print((2*one).pol, " ", Vec((2*one).pol), " ", type(Vec((2*one).pol)[1]));
+z=(2+g); print(z.pol, " ", Vec(z.pol), " ", type(Vec(z.pol)[1]));
+E=ellinit([0,1,0,2,1]*one); print(E.disc, " ", ellcard(E));
+print(ellordinate(E,one));
+G=ffprimroot(ffgen(2^4,'z)); o=G^0; 
+E2=ellinit([1,G,0,0,G^3]); print(ellcard(E2), ellordinate(E2,0*o));
+print((0*o).pol, Vec(G.pol), type(Vec(G.pol)[1]));
+M=Map(); mapput(M,5,1); mapput(M,7,2); print(Mat(M)); print(Vec(M));
+print(ellorder(E2,[0*o,sqrt(G^3)],20));
+print(factor('x^2+'x+G^3));
+Eint=ellinit([0,1,0,2,1],3); print(Eint, " ", #ellinit([0,0,0,0,0]*Mod(1,3)));
+print(polrootsmod('x^3+x^2+2*'x+1,3));
+print(ellneg(E2,[0*o,sqrt(G^3)]));
+print(ellgroup(E2));

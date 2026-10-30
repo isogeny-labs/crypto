@@ -21,3 +21,14 @@ The session counts, entries, frontiers, and timing verdicts are unchanged.
 The current lock SHA-256 is
 `9a93e4224835be898394bd1284966db738282a85f431c26aea55731575600f9c`.
 This revision records report provenance only; it contains no fresh solver run.
+
+## Complete archived outputs restored (2026-10-28)
+
+All five original report outputs now accompany this lock. Their bytes match
+the unchanged lock and snapshot 91424ecf8cc7db04e7c4a2805c9001a02a6106ca.
+The original leaderboard JSON uses its existing content-addressed object;
+the other outputs reuse their original Git blobs. The historical checker
+reads this complete archive while continuing to verify current scientific
+session inputs against the old lock. Current report revisions keep their
+own provenance. A native reproduction at the pinned snapshot passes without
+a solver run or any timing-reproduction claim.

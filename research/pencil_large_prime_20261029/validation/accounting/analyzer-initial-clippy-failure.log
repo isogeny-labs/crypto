@@ -1,0 +1,33 @@
+    Checking pencil-accounting-price-draft v0.1.0 (/home/ec2-user/pencil-accounting-review-20261029/native_price)
+error: length comparison to zero
+   --> src/analyzer.rs:145:16
+    |
+145 |               || row["uncovered_sites"]
+    |  ________________^
+146 | |                 .as_array()
+147 | |                 .ok_or("uncovered sites missing")?
+148 | |                 .len()
+149 | |                 != 0
+    | |____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#len_zero
+    = note: `-D clippy::len-zero` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::len_zero)]`
+help: using `!is_empty` is clearer and more explicit
+    |
+145 ~             || !row["uncovered_sites"]
+146 +                 .as_array()
+147 +                 .ok_or("uncovered sites missing")?.is_empty()
+    |
+
+error: could not compile `pencil-accounting-price-draft` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: length comparison to zero
+   --> src/analyzer.rs:553:17
+    |
+553 |         assert!(out["coverage_blockers"].as_array().unwrap().len() > 0);
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: using `!is_empty` is clearer and more explicit: `!out["coverage_blockers"].as_array().unwrap().is_empty()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#len_zero
+
+error: could not compile `pencil-accounting-price-draft` (lib test) due to 2 previous errors
