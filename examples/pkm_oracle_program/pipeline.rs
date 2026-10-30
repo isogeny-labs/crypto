@@ -338,6 +338,8 @@ pub(super) struct Certificate {
     rows_checked: usize,
     scalar_verified: bool,
     rank: usize,
+    recovery_weights: Option<super::rank_reference::Combination>,
+    ambiguity_kernel: Option<Vec<u64>>,
     scope: &'static str,
 }
 
@@ -351,7 +353,11 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         return Err("toy DLP binding/admission mismatch".into());
     }
     let mut curve = reference::Curve::new(&r.oracle);
-    let mut matrix = Elimination::new(r.order, base.len() + 1);
+    let variables = base.len() + 1;
+    let mut coefficients = super::rank_reference::Space::new(r.order, variables)?;
+    let mut augmented = super::rank_reference::Space::new(r.order, variables + 1)?;
+    let mut target_unit = vec![0; variables];
+    target_unit[variables - 1] = 1;
     let mut original = Vec::new();
     let mut checked = 0;
     let mut seed = r.seed;
@@ -362,7 +368,7 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         return Err("query cap exceeded".into());
     }
     for query in queries {
-        if matrix.target().is_some() {
+        if coefficients.contains(&target_unit)? {
             return Err("queries continue after scalar recovery".into());
         }
         let a = next(&mut seed) % r.order;
@@ -398,26 +404,48 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
                 if lhs != curve.mul(Some(r.generator), a) {
                     return Err("original relation does not hold on curve".into());
                 }
-                useful += usize::from(matrix.insert(row.clone())?);
+                useful += usize::from(coefficients.insert(&row[..variables])?);
+                augmented.insert(&row)?;
+                if augmented.rank() != coefficients.rank() {
+                    return Err("independently detected inconsistent scalar rows".into());
+                }
                 original.push(row);
             }
         } else if !query["oracle"].is_null() {
             return Err("identity attempt must not carry an oracle answer".into());
         }
-        if query["rank_after"] != matrix.rows.len() || query["useful_rows"] != useful {
+        if query["rank_after"] != coefficients.rank() || query["useful_rows"] != useful {
             return Err("rank/yield recomputation mismatch".into());
         }
     }
-    if record["original_rows"] != serde_json::to_value(&original).map_err(|e| e.to_string())?
-        || record["final_rref"] != serde_json::to_value(&matrix.rows).map_err(|e| e.to_string())?
-    {
+    if record["original_rows"] != serde_json::to_value(&original).map_err(|e| e.to_string())? {
         return Err("retained relation matrix mismatch".into());
     }
+    let declared_rref: Vec<(usize, Vec<u64>)> =
+        serde_json::from_value(record["final_rref"].clone()).map_err(|e| e.to_string())?;
+    augmented.verify_rref(&declared_rref, coefficients.rank())?;
     let answer: Option<u64> =
         serde_json::from_value(record["recovered"].clone()).map_err(|e| e.to_string())?;
-    if answer != matrix.target() || answer.is_some_and(|k| k >= r.order) {
+    let determined = coefficients.contains(&target_unit)?;
+    if answer.is_some() != determined || answer.is_some_and(|k| k >= r.order) {
         return Err("recovery certificate mismatch".into());
     }
+    let (recovery_weights, ambiguity_kernel) = if let Some(k) = answer {
+        let mut equation = target_unit.clone();
+        equation.push(k);
+        let weights = augmented
+            .representation(&equation)?
+            .ok_or("recovered scalar equation is not implied by original rows")?;
+        augmented.verify_combination(&original, &weights, &equation)?;
+        (Some(weights), None)
+    } else {
+        let kernel = coefficients
+            .ambiguity(variables - 1)?
+            .ok_or("unknown result has no target ambiguity")?;
+        let rows: Vec<Vec<u64>> = original.iter().map(|r| r[..variables].to_vec()).collect();
+        coefficients.verify_kernel(&rows, variables - 1, &kernel)?;
+        (None, Some(kernel))
+    };
     if answer.is_none() && queries.len() != r.max_queries {
         return Err("truncated query stream is not a query-cap result".into());
     }
@@ -448,7 +476,7 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
     {
         return Err("scalar verification/status mismatch".into());
     }
-    Ok(Certificate{schema:"pkm.toy-dlp-replay/v1",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:matrix.rows.len(),scope:"independent affine row/scalar equations; rank recomputed with producer elimination; no independent cost admission"})
+    Ok(Certificate{schema:"pkm.toy-dlp-replay/v2",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:coefficients.rank(),recovery_weights,ambiguity_kernel,scope:"independent affine equations and rightmost-pivot scalar row-space/rank replay; original-row recovery combination or target-changing kernel witness; no complete cost admission"})
 }
 
 #[cfg(test)]
@@ -481,12 +509,35 @@ mod tests {
         assert!(result.scalar_verified);
         assert!(!result.comparison_admissible);
         let record = serde_json::to_value(&result).unwrap();
-        assert!(replay(&request, &record).unwrap().scalar_verified);
+        let certificate = replay(&request, &record).unwrap();
+        assert!(certificate.scalar_verified);
+        assert!(certificate.recovery_weights.is_some());
+        assert!(certificate.ambiguity_kernel.is_none());
+        let mut equation = vec![0; result.factor_base.len() + 2];
+        equation[result.factor_base.len()] = 1;
+        equation[result.factor_base.len() + 1] = result.recovered.unwrap();
+        super::super::rank_reference::Space::new(request.order, equation.len())
+            .unwrap()
+            .verify_combination(
+                &result.original_rows,
+                certificate.recovery_weights.as_ref().unwrap(),
+                &equation,
+            )
+            .unwrap();
         let mut bad = record.clone();
         bad["recovered"] = serde_json::json!(3);
         assert!(replay(&request, &bad).is_err());
-        let mut bad = record;
+        let mut bad = record.clone();
         bad["queries"][0]["a"] = serde_json::json!(19);
+        assert!(replay(&request, &bad).is_err());
+        let mut bad = record.clone();
+        bad["queries"][0]["rank_after"] = serde_json::json!(999);
+        assert!(replay(&request, &bad).is_err());
+        let mut bad = record;
+        let row = bad["final_rref"][0][1].as_array_mut().unwrap();
+        for value in row {
+            *value = serde_json::json!((value.as_u64().unwrap() * 2) % request.order);
+        }
         assert!(replay(&request, &bad).is_err());
     }
     #[test]
@@ -504,7 +555,19 @@ mod tests {
         let result = run(&request).unwrap();
         assert_eq!(result.recovered, None);
         assert_eq!(result.status, "unknown_query_cap");
-        replay(&request, &serde_json::to_value(&result).unwrap()).unwrap();
+        let certificate = replay(&request, &serde_json::to_value(&result).unwrap()).unwrap();
+        assert!(certificate.recovery_weights.is_none());
+        let kernel = certificate.ambiguity_kernel.unwrap();
+        let vars = result.factor_base.len() + 1;
+        let original: Vec<Vec<u64>> = result
+            .original_rows
+            .iter()
+            .map(|r| r[..vars].to_vec())
+            .collect();
+        super::super::rank_reference::Space::new(request.order, vars)
+            .unwrap()
+            .verify_kernel(&original, vars - 1, &kernel)
+            .unwrap();
         request.order = 17;
         assert!(run(&request).is_err());
     }

@@ -5,6 +5,8 @@
 mod algebra;
 #[path = "pkm_oracle_program/pipeline.rs"]
 mod pipeline;
+#[path = "pkm_oracle_program/rank_reference.rs"]
+mod rank_reference;
 #[path = "pkm_oracle_program/reference.rs"]
 mod reference;
 
