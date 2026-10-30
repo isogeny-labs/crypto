@@ -41,13 +41,12 @@ and the device rate. The port's README says so in its first line.
 
 ```sh
 git checkout 37d76b61ad4399c376dc5ac97321ee9e49e66747
-mkdir -p research/certicom131_cuda_port_20261023/build
-make -C research/certicom131_cuda_port_20261023 cuda-run SMARCH=sm_120
+make -C research/certicom131_cuda_port_20261023 build/cudashim.h cuda-run SMARCH=sm_120
 ```
 
-The explicit directory setup is required on a clean checkout: `cuda-run`
-writes `build/walk_cuda` but does not depend on the Makefile target that creates
-`build/`.
+The first Make target creates `build/` on a clean checkout before `cuda-run`
+writes `build/walk_cuda`; `cuda-run` does not depend on that directory-creating
+target itself.
 
 `cuda-run` builds with `nvcc -O3 -arch=sm_120` and then runs
 `build/walk_cuda --threads 65536 --steps 8`. Inside that process, in this

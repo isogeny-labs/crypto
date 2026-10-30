@@ -39,7 +39,7 @@
     "notes": "Cap: exactly one GPU, one container, one working tree. No core-hour estimate is given because no rate has ever been measured on a device; the one-hour wall estimate covers the nvcc build, the host gate and two short launches, and is bounded by run.timeout_per_shard_s."
   },
   "run": {
-    "argv": ["make", "-C", "research/certicom131_cuda_port_20261023", "cuda-run", "SMARCH=sm_120"],
+    "argv": ["make", "-C", "research/certicom131_cuda_port_20261023", "build/cudashim.h", "cuda-run", "SMARCH=sm_120"],
     "env": {},
     "timeout_per_shard_s": 1800
   },
