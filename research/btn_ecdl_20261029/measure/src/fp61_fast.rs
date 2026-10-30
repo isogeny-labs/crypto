@@ -293,7 +293,8 @@ pub fn check_small(simple: bool, derived: bool, program: bool) {
     use hashed_ecdl_tensor_fast::contraction::Counter as FCounter;
     use hashed_ecdl_tensor_fast::curve::{Curve as FCurve, Point as FPoint};
     use hashed_ecdl_tensor_fast::reduction::{
-        decomposition_network as fnet, FactorBase as FBase, HashSeed as FSeed,
+        decomposition_network as fnet, decomposition_network_program as fnet_program,
+        FactorBase as FBase, HashSeed as FSeed,
     };
     use hashed_ecdl_tensor_fast::{BigUint as FBig, Limits as FLimits, Meter as FMeter};
 
@@ -337,6 +338,9 @@ pub fn check_small(simple: bool, derived: bool, program: bool) {
             hashed_ecdl_tensor_fast::reduction::decomposition_network_derived(
                 &curve, &[b1.clone(), b2.clone()], &target, program, &mut meter,
             ).expect("derived net")
+        } else if program {
+            fnet_program(&curve, &[b1.clone(), b2.clone()], &target, &mut meter)
+                .expect("program net")
         } else {
             fnet(&curve, &[b1.clone(), b2.clone()], &target, &mut meter).expect("net")
         };

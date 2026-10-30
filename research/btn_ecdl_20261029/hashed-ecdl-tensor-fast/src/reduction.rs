@@ -798,7 +798,7 @@ mod tests {
                 .len(),
             2
         );
-        let bases = vec![base.clone(), base];
+        let bases = vec![base.clone(), base.clone()];
         let points = decompose(
             &curve,
             &bases,
@@ -815,6 +815,33 @@ mod tests {
             curve.add(&points[0], &points[1], &mut meter).unwrap(),
             *curve.generator()
         );
+
+        let enumerated = base
+            .enumerate(&curve, &mut Seeded(3), &mut meter)
+            .unwrap();
+        let mut brute = BigUint::zero();
+        for a in &enumerated {
+            for b in &enumerated {
+                if curve.add(a, b, &mut meter).unwrap() == *curve.generator() {
+                    brute += BigUint::one();
+                }
+            }
+        }
+        for program in [false, true] {
+            let net = decomposition_network_derived(
+                &curve,
+                &[base.clone(), base.clone()],
+                curve.generator(),
+                program,
+                &mut meter,
+            )
+            .unwrap();
+            let mut counter = Counter::default();
+            let count = counter
+                .count(&net, &vec![None; net.edge_count()], &mut meter)
+                .unwrap();
+            assert_eq!(count, brute * curve.cofactor().clone());
+        }
     }
 
     #[test]
@@ -885,9 +912,11 @@ pub fn decomposition_network_program(
     encoder.finish(meter)
 }
 
-/// Derived-parameter decomposition: A1 free and validated, A2 = T - A1.
-/// (A1,A2) -> A1 is a bijection on solutions, so the exact count is unchanged,
-/// while only one curve-validity check is needed and the interface halves.
+/// Derived-parameter decomposition: A1 is selected and A2 = T - A1.
+/// For a nontrivial cofactor, the free curve point is projected into the
+/// certified subgroup before membership is checked. Projection can have
+/// multiple preimages, so witness assignments need not be parsimonious.
+/// The satisfying projections are exactly the subgroup decompositions.
 pub fn decomposition_network_derived(
     curve: &Curve,
     bases: &[FactorBase],
@@ -899,7 +928,12 @@ pub fn decomposition_network_derived(
         return Err(invalid("derived decomposition arity or target"));
     }
     let mut encoder = Encoder::new();
-    let (a1, _a1_square) = encoder.input_point_with_square(curve, meter)?;
+    let a1 = if curve.cofactor().is_one() {
+        encoder.input_point_with_square(curve, meter)?.0
+    } else {
+        let source = encoder.input_point(curve, true, meter)?;
+        encoder.clear_cofactor(curve, &source, meter)?
+    };
     encoder.hash_member(curve, &a1, &bases[0].prime, &bases[0].seed.alpha, &bases[0].seed.beta, &bases[0].threshold, meter)?;
     encoder.mark_point_interface(&a1, meter)?;
     let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
