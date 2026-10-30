@@ -14,6 +14,8 @@ $(OUT)/explicit-relations-host: service.cpp host.hpp curve.cuh ../rootfind/fp64.
 	$(CXX) $(CXXFLAGS) -Wno-unknown-pragmas service.cpp -o $@
 $(OUT)/explicit-relations-cuda: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -x cu service.cpp -o $@
+$(OUT)/query-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) query-check.cu -o $@
 $(OUT)/paper-driver: paper_driver.rs Cargo.toml Cargo.lock ../../src/cryptanalysis/hashed_ecdl.rs ../../crates/hashed-ecdl-tensor/Cargo.toml $(wildcard ../../crates/hashed-ecdl-tensor/src/*.rs ../../crates/hashed-ecdl-tensor/src/contraction/*.rs) | $(OUT)
 	$(CARGO) build --locked --release --manifest-path Cargo.toml --target-dir $(OUT)/cargo
 	cp $(OUT)/cargo/release/paper-driver $@
@@ -23,8 +25,9 @@ test: host
 	$(CARGO) test --locked --release --manifest-path Cargo.toml --target-dir $(OUT)/cargo
 	$(OUT)/explicit-relations-host --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-host --self-test
-test-cuda: all
+test-cuda: all $(OUT)/query-check
 	$(OUT)/explicit-relations-cuda --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-cuda --self-test
+	$(OUT)/query-check
 clean:
 	rm -rf $(OUT)

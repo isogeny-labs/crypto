@@ -104,6 +104,13 @@ __global__ void build_left(Curve c, Bases b, unsigned split, U count,
   if (id < count)
     rows[id] = {point, id};
 }
+// A radix encoding preserves the existing right-then-left witness order.
+// Reserve UINT64_MAX for no match; fall back to the separate array when the
+// full batch cannot be encoded without overflow (including non-service users).
+inline bool packed_winner_fits(U left, U count) {
+  return left && count <= UINT64_MAX / left;
+}
+template <bool Packed>
 __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
                              U start, U count, const Row *left, U left_size,
                              U *matches, unsigned long long *winner) {
@@ -118,9 +125,12 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
   Point residual = normalize_block(c, sum);
   if (local < count) {
     U l = lookup(left, left_size, residual);
-    matches[local] = l;
-    if (l != UINT64_MAX)
-      atomicMin(winner, (unsigned long long)local);
+    if constexpr (!Packed)
+      matches[local] = l;
+    if (l != UINT64_MAX) {
+      U key = Packed ? local * left_size + l : local;
+      atomicMin(winner, (unsigned long long)key);
+    }
   }
 }
 __global__ void lift_x(Curve c, const U *xs, U n, Point *out) {
@@ -158,6 +168,7 @@ class DeviceBackend {
   Curve c;
   Plan p;
   U cap, chunk;
+  bool packed = false;
   thrust::device_vector<Point> points;
   thrust::device_vector<Row> rows;
   thrust::device_vector<U> matches;
@@ -204,14 +215,19 @@ public:
     winner.clear();
     winner.shrink_to_fit();
     p = next;
+    packed = packed_winner_fits(p.left, std::min(chunk, p.right));
+#ifdef ER_QUERY_REFERENCE
+    packed = false;
+#endif
     // 3 row buffers cover the retained table and conservative sort scratch.
     U bytes = product(p.left, 3 * sizeof(Row)) +
               product(p.points.size(), sizeof(Point)) +
-              product(chunk, sizeof(U)) + sizeof(U);
+              (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U);
     admission(bytes);
     points.assign(p.points.begin(), p.points.end());
     rows.resize(p.left);
-    matches.resize(chunk);
+    if (!packed)
+      matches.resize(chunk);
     winner.resize(1);
     if (p.left) {
       build_left<<<blocks(p.left), BLOCK>>>(c, p.view(data(points)), p.split,
@@ -230,19 +246,35 @@ public:
     for (U start = 0; start < p.right;) {
       U n = std::min(chunk, p.right - start);
       unsigned long long best = UINT64_MAX;
+#if defined(ER_QUERY_REFERENCE) || defined(ER_QUERY_PACKED_ONLY)
       cuda_check(cudaMemcpy(data(winner), &best, sizeof(best),
                             cudaMemcpyHostToDevice));
-      search_right<<<blocks(n), BLOCK>>>(c, p.view(data(points)), p.split,
-                                         target, start, n, data(rows), p.left,
-                                         data(matches), data(winner));
+#else
+      // Same default stream as the search and blocking readback: no host
+      // upload/staging is needed, and the reset completes before the search.
+      cuda_check(cudaMemsetAsync(data(winner), 0xff, sizeof(best)));
+#endif
+      if (packed)
+        search_right<true><<<blocks(n), BLOCK>>>(
+            c, p.view(data(points)), p.split, target, start, n, data(rows),
+            p.left, nullptr, data(winner));
+      else
+        search_right<false><<<blocks(n), BLOCK>>>(
+            c, p.view(data(points)), p.split, target, start, n, data(rows),
+            p.left, data(matches), data(winner));
       cuda_check(cudaGetLastError());
       cuda_check(cudaMemcpy(&best, data(winner), sizeof(best),
                             cudaMemcpyDeviceToHost));
       r.visited += n;
       if (best != UINT64_MAX) {
         U l;
-        cuda_check(cudaMemcpy(&l, data(matches) + best, sizeof(l),
-                              cudaMemcpyDeviceToHost));
+        if (packed) {
+          l = best % p.left;
+          best /= p.left;
+        } else {
+          cuda_check(cudaMemcpy(&l, data(matches) + best, sizeof(l),
+                                cudaMemcpyDeviceToHost));
+        }
         r.found = true;
         r.indices = p.indices(l, start + best);
         break;
