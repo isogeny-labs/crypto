@@ -129,10 +129,11 @@ api_url=$($aws lambda get-function-url-config --function-name "$name-api" --quer
 
 # ---------------------------------------------------------------- schema and data
 admin() { # admin <event json>
-  local out; out=$(mktemp)
-  $aws lambda invoke --function-name "$name-admin" --cli-read-timeout 900 --cli-binary-format raw-in-base64-out \
-    --payload "$1" "$out" --query FunctionError --output text >&2
-  cat "$out"; echo; rm -f "$out"
+  local out ev; out=$(mktemp); ev=$(mktemp)
+  printf '%s' "$1" > "$ev"   # fileb:// sends the bytes as-is under AWS CLI v1 and v2
+  $aws lambda invoke --function-name "$name-admin" --cli-read-timeout 900 \
+    --payload "fileb://$ev" "$out" --query FunctionError --output text >&2
+  cat "$out"; echo; rm -f "$out" "$ev"
 }
 log "migrate";         admin '{"action":"migrate"}'
 log "login roles";     admin '{"action":"bootstrap_roles"}'
