@@ -45,3 +45,38 @@ acknowledgment. The user already authorized coordination with all three tasks.
 No new messaging permission is requested. Remaining ignored432-case/360-cell
 panels and full native workflow/controls/API/export/whole-worker/cloud gates are
 explicitly preserved. Verified cloud cells0.
+
+Update 2026-10-30T20:45Z (new evidence; historical entries retained):
+
+Native SAT worker/collector/replay/export integration now passes all four fixed
+policy/twist occurrences at64MiB trace allowance. The original1MiB StreamByteLimit
+case is retained as an explicit negative with checked committed prefix. Combined
+dataset suite479passed0failed2ignored,terminal0 and both sourceguards true on06
+manifest429a112f91b6fc3ab1128d7286f48515de37614588f347412819766e1e967427.
+This also includes the preserved3adc85e5 donor invocation/statistics claim repairs.
+Receipt: validation/combined-dataset-04.receipt.json.
+
+Controller/custody suite26passed0failed0ignored,terminal0 and both guards true on08
+manifest8246660c0e6e3a1eafad89c1e606ac33d9c785745e71f1ad8b4872fd10b0b63c.
+All25 library overlay records exactly match06. The six new component tests cover
+nine fixed copied-cell mutations, two-level resealing, unchanged originals,
+prerequisite failures, and pre-write hard-link rejection. Receipt:
+validation/combined-fixture-02.receipt.json, committed741cfbbd4355.
+Complete08overlay5989a510aaa3008e62536c8bf84f571729ef98820b2e655667c6a88ab734f75f
+is archived with candidate/source inventory and fresh readback. Helper inclusion
+is test-only; actual16-slot CLI control workflow remains the next integration.
+
+Full-library combined-full-01 is running on08 under committed plan01. Its build
+completed and5853 tests were discovered; terminal result and source readback are
+pending. Do not infer a full-library pass from focused suites. Source checkpoint17
+contains741cfbbd and has verified freshGET/bundle/metadata readback; see
+validation/source-checkpoint-17-readback.json.
+
+A separate saved controller patch rejects unsolicited signal status -1 as an
+expected negative: validation/native-command-outcome-01.patch, SHA4aa8bbb7ab1e52da1e4ce47152dbf19ed4517055b23034bbd233664a8aeee530.
+Its regression is authored but uncompiled, and it is not part of the26-test result.
+It must be integrated before actual copied negative commands are qualified.
+
+Donor HEAD3adc85e5 was rechecked unchanged at20:26Z; T887 remains claimed andT977
+proposed without acknowledgment. No shared source or reservation changed. This
+committed handoff update is not a direct-message delivery receipt.
