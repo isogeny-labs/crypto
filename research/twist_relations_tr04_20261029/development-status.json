@@ -1,9 +1,9 @@
 {
   "schema": "tr04.development-status/v1",
   "base_revision": "24def3ae4dfe94bbbee5f30245847b372d02fa70",
-  "implementation": "locally committed; root-library validation completed; source publication pending",
+  "implementation": "published in PR2890; reviewed artifact-routing defect corrected without a new run",
   "protocol": "frozen",
-  "primary_research_execution": "not_attempted",
+  "primary_research_execution": "not_attempted: workflow preflight failed checkpoint upload before fields",
   "native_development": {
     "schema": "tr04.development-validation/v1",
     "started_at": "2026-10-29T18:11:16Z",
@@ -66,7 +66,6 @@
   "physical_runtime_admitted": false,
   "primitive_work_counters_independently_recomputed": false,
   "remaining": [
-    "source publication",
     "checkpoint, store and runner readiness",
     "actual authorized primary census and collection",
     "durable artifact-store publication of oversized root-validation archive"
@@ -86,5 +85,17 @@
   },
   "protocol_version": 3,
   "protocol_history": "versions/README.md",
-  "full_schema_preflight_gate": true
+  "full_schema_preflight_gate": true,
+  "workflow_attempt": {
+    "run_id": 40973940936,
+    "attempt": 1,
+    "source": "85fc870c96a3ea707afe11e06cf884eba6f957ce",
+    "conclusion": "failure",
+    "checkpoint_exit": 1,
+    "primary_field_attempts": 0,
+    "completed_rows": 0,
+    "missing_rows": 27,
+    "report": "reports/run-20261029T233325Z/README.md",
+    "retry_submitted": false
+  }
 }

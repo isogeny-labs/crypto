@@ -24,8 +24,11 @@ counter independence and physical runtime admission remain explicitly unset.
 
 **Current status:** protocol frozen before primary data; root-library validation
 completed on source `445d84bf7` with 5,389 passed, zero failed and Cargo exit 0.
-Publication is pending. Native checks and the documented development
-preflight pass. The workflow retains source, checkpoint and transport gates.
+Published in PR #2890. Native checks and the documented development
+preflight pass. The actual workflow attempt failed its checkpoint upload gate
+before any primary field execution; no retry was submitted. The retained
+[failure report](../../research/twist_relations_tr04_20261029/reports/run-20261029T233325Z/README.md)
+records every missing output. Source, checkpoint and transport gates remain.
 No TR-04 scientific run, finite-census result or runtime gain
 is recorded. See the study README for remaining prerequisites. Existing
 TR01-03 evidence and commands below retain their own scope.

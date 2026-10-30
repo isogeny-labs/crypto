@@ -69,7 +69,11 @@ checks, native-source reuse proof and the intentional superseded compilation.
 It establishes no actual remote upload or download.
 
 Runtime planning and protocol freeze are now complete. Remaining prerequisites
-are final review and source publication,
-then the authorized supported checkpoint-gated execution and collection.
+include checkpoint transport and primary execution. Source publication and
+collection of the first failed workflow attempt are complete; its
+[failure report](reports/run-20261029T233325Z/README.md) records checkpoint
+exit 1 before any field starts. A separate reviewed artifact-pattern defect
+is corrected and regression-checked without a rerun. Primary coverage and
+durable experiment delivery remain unverified.
 Nothing in these development checks establishes all 531 primary dispositions,
 27 completed export rows, a new scalar-preserving map, or a runtime gain.

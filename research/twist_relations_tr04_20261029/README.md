@@ -1,6 +1,11 @@
 # TR-04 exhaustive bounded relation finding
 
 **State: protocol version3 frozen; primary research execution not yet started.**
+Published in [PR #2890](https://github.com/isogeny-labs/crypto/pull/2890).
+[Workflow attempt 1](reports/run-20261029T233325Z/README.md) failed its
+checkpoint gate before any field execution. No relation/rank/work data exists;
+all 27 expected research rows remain missing. The separate artifact-routing
+review defect is repaired without retrying the workflow.
 The active [protocol](protocol.json) was frozen at 2026-10-29T23:15:13Z against
 code commit `f270363df37a17b30210a4671cd31c03d3c20b3a`. Its canonical SHA-256 is
 `a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce`.
@@ -57,7 +62,8 @@ The existing registered native workflow is extended with a checkpoint-gated
 `tr04` suite and field-sharded matrix on the documented `crypto-eks-linux`
 ARC EKS Spot pool. Actual source/workflow/runner identities, checkpoint
 receipts, partial records, control results and export flow must be retained.
-Runner/secret readiness is unverified until that preflight succeeds. No new
+The actual first preflight found no checkpoint upload transport and failed
+closed. Runner/store readiness remains unverified. No new
 runner, credential, IAM policy, capacity or funding state is introduced.
 
 The existing store credential bindings are required before primary execution;

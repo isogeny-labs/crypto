@@ -396,7 +396,7 @@ jobs:
       - name: Download all field artifacts from this run and attempt
         uses: actions/download-artifact@v4
         with:
-          pattern: tr04-p*-${{ github.run_id }}-${{ github.run_attempt }}
+          pattern: tr04-p[0-9]*-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/tr04-inputs
       - name: Summarize all declared shards, including absent or failed inputs
         id: aggregate
