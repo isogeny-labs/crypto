@@ -568,3 +568,71 @@ processes. Persistent cat-file reads now preserve exact git-show bytes,
 missing-source behavior and cleanup. Default command with --since2026-10-01
 passed in24.17s; HEAD export also passed within55s with675records. The prior
 runtime limitation is resolved for these observed checks, not hidden.
+
+## 2026-10-30T15:49Z — 61-bit result and queried-sort follow-up
+
+### What was done
+
+V9 completed with eight executions: seven verified recoveries and one explicit
+memory refusal. The 61-bit seed202 recovery took1537.918072841s including fresh
+verification (L0 diagnostic). Seed101 refused admission at85969611408bytes;
+62-bit cells were unattempted by the frozen stopping rule. Raw artifacts and
+strict eight-mutation audit are committed in6e850f7dfc14. Pod nd5qev6envru7z
+was deleted and its absence was independently rechecked before continuation.
+PR2896 merged; remaining changes will be delivered in a follow-up PR.
+
+### Decisions made
+
+V10 remains frozen but unexecuted. V11 retains separate four-arm52-bit controls
+for exact12-byte rows and queried CUB DeviceMergeSort scratch, then probes the
+same two61/62-bit targets once. NVIDIA CCCL3.2 dispatch source confirms null
+scratch sizing includes keys, partitions and virtual shared memory. The same
+25%free-memory reserve remains. No default backend promotion or certified
+speedup claim is made. Protocol hash:
+0f916e48bea43b0b7dabb85bc8cb50fe0d31c2a268aa89c016e1df6b46a0a09e.
+
+### Open threads
+
+Commit/push v11 before launch; checkpoint; validate CUDA and all sanitizer
+controls on one RTX PRO6000, then collect every outcome and verify deletion.
+V9's largest complete prescribed rung is52bits, with one61-bit recovery;
+the separate v8 panel completed both60-bit targets. Absolute hardware maximum
+and the paper's conditional tensor backend remain unresolved.
+
+### Errors
+
+No v11 GPU execution yet. Local host syntax, shell syntax and both native
+metadata compiles passed; local root/plugin builds remain prohibited by the
+user's disk constraint. The standard dated log is absent in this sparse
+branch; this existing scoped project handoff preserves the required headings.
+
+## 2026-10-30T15:54Z — v9 report and v11 execution
+
+### What was done
+
+Published a separate two-page v9 observation report, preserving the earlier
+seven-page v1-v8 report. Both new pages were visually inspected; SVG/PNG/PDF
+catalog copies are hash-bound and explicitly unadmitted. The post-run strict
+checker now recognizes v11's four-arm52-bit and v-only61/62-bit contract;
+existing v9 positive and eight mutation controls still pass.
+
+### Decisions made
+
+V11 source d44b59149f468357e86186f956ecb7e323f38915 was pushed and checkpointed
+before pod jees49ew9dkfd7 launched15:50:53UTC at2.49USD/hour inUS-NE-1. It is
+one RTX PRO6000 with97887MiB reported by nvidia-smi, CUDA13.2.51, Rust1.88.0.
+Controller exec90595 collects and deletes with its18300s bound. New PR2971
+is open with auto-merge enabled; PR2896 is merged. GPU preflight is in progress.
+
+### Open threads
+
+Collect/audit/export every v11 outcome, verify deletion, remove private request
+and credential, publish raw data before its report, and recheck exact-head CI.
+The protocol is unchanged after launch. No v11 recovery claim yet.
+
+### Errors
+
+The first report render interpreted an unescaped less-than sign as a Typst
+label; corrected to code markup and both final pages rendered and inspected.
+CUDA emits ignored defaulted-constructor annotation warnings; no failure has
+been observed so far. PR attachment tool calls remain pending in the app.

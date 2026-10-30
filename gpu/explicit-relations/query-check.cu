@@ -156,6 +156,12 @@ static void wide_prefix_boundaries() {
 }
 int main() {
   try {
+#ifdef ER_CUB_SORT
+    require(merge_sort_bytes(0) == 0);
+    for (U count : {(U(1) << 31) - 1, U(1) << 31,
+                    (U(1) << 31) + 1, U(1) << 32})
+      require(merge_sort_bytes(count) >= count * sizeof(DeviceRow));
+#endif
     prefix_boundaries();
     compact_boundaries<CompactRow, CompactRowLess>();
     compact_boundaries<DenseRow, DenseRowLess>();
