@@ -1,4 +1,4 @@
-import Mathlib.Algebra.Ring.Hom.Basic
+import Mathlib.Algebra.Ring.Hom.Defs
 namespace Separation50
 /-- Two evaluations agreeing on a subring but separating x exclude x from
 that subring's image. -/
