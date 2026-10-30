@@ -31,6 +31,10 @@ name = "crypto"
 path = "src/main.rs"
 
 [[bin]]
+name = "n83-exclusion-audit"
+path = "research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs"
+
+[[bin]]
 name = "ecdlp-audit"
 path = "src/bin/ecdlp_audit.rs"
 
@@ -172,6 +176,8 @@ redis-native-tls = ["redis/tls-native-tls"]
 # (`pq_groebner_f2::Mask`).  Off by default: the 64-bit build, its counters
 # and its frozen benchmarks are unchanged.
 wide-vars = []
+# Explicit selected-bin CLI contracts; production builds keep their behavior.
+ic-cli-contracts = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []

@@ -114,3 +114,39 @@ a cheaper or amortised one: many targets sharing a cold setup (the setup is
 per-solve here), or a relation-phase change that does not double the base. The
 Koblitz arm still gets one rerun for admission only; if it lands the same order
 of magnitude it is retired.
+
+## Lever 1: amortising setup across targets, and its ceiling
+
+The profile's second-largest phase is oracle setup at 2,070 GAE, and ecbench's
+cold rule charges it inside every one-target row by design ("each execution is
+a fresh process"; nothing survives). So the amortisation question is not a new
+session: it is the measured phase split with setup divided by the number of
+targets `P` that share it, and it is an **extrapolation from counted phases**,
+not a new measurement.
+
+`S(P) = (2070/P + 5374) / sqrt(562427)`, using the stated `r = 562427`
+and the saved phase medians: 5,348 GAE for relations plus 26 GAE for verification
+give the 5,374 GAE per-target term. The normaliser is `sqrt(r) = 749.9513`.
+This component-median model assumes unchanged per-target work and no extra
+sharing overhead; it is not a measured multi-target pipeline.
+
+| P (targets sharing one setup) | setup per target | S | vs cold |
+|--:|--:|--:|--:|
+| 1 | 2,070 | 9.93 | 1.00 |
+| 2 | 1,035 | 8.55 | 0.86 |
+| 8 | 259 | 7.51 | 0.76 |
+| 64 | 32 | 7.21 | 0.73 |
+| infinity | 0 | 7.17 | 0.72 |
+
+Within this model, removing setup saves **at most 27.8%** (9.93 -> 7.17),
+the saved setup share. A real shared-setup implementation and its costs have
+not been measured. At `P -> infinity`, the modelled total is still about
+**6.7x** matched rho (`7.1658 / 1.077 = 6.6535`, using the saved rho median).
+The relation phase alone is 5,348 GAE, about **6.6x** rho; adding verification
+gives the 5,374 GAE term. Matching rho still requires a substantial reduction
+in per-target relation cost, which setup amortisation cannot supply.
+
+Amortising setup is therefore a bounded hypothetical saving if a shared method
+is implemented and costed; none exists today, and the cold rule is deliberate.
+The model continues to identify relation per-trial cost and yield as the
+dominant remaining work. The factor-base direction above was measured to lose.
