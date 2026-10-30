@@ -3095,6 +3095,116 @@ pub(super) enum WidePrimeReplay {
     CensoredM3Prefix,
 }
 /// Semantic wide-prime replay, independent of native basis derivation.
+// Original-input construction is separate from profile dispatch. The versioned
+// solver identifier is deliberately NOT yet accepted by production plan/CLI.
+#[allow(dead_code)]
+const DYNAMIC_PROFILE: &str = "f4-wide-dynamic-v1";
+#[allow(dead_code)]
+struct DynamicOriginal {
+    p: u64,
+    a: u64,
+    b: u64,
+    m: usize,
+    target: prime_f4_wide_dynamic_replay::Point,
+    domain: Vec<prime_f4_wide_dynamic_replay::Point>,
+    codes: Vec<u64>,
+    work_limit: u64,
+    memory_bytes: u64,
+    trace_bytes: u64,
+}
+#[allow(dead_code)]
+impl DynamicOriginal {
+    fn expected(&self) -> prime_f4_wide_dynamic_replay::Expected<'_> {
+        prime_f4_wide_dynamic_replay::Expected {
+            p: self.p,
+            a: self.a,
+            b: self.b,
+            m: self.m,
+            target: self.target,
+            domain: &self.domain,
+            codes: &self.codes,
+            work_limit: self.work_limit,
+            memory_bytes: self.memory_bytes,
+            trace_bytes: self.trace_bytes,
+        }
+    }
+}
+/// The parent must first authenticate config and execution limits against the
+/// original run. This independently validates/reconstructs public mathematical
+/// inputs; it never consults private_witness or any solver-produced input file.
+#[allow(dead_code)]
+fn dynamic_original(
+    config: &CaseConfig,
+    case: &CaseData,
+    memory_bytes: u64,
+    trace_bytes: u64,
+) -> Result<DynamicOriginal, String> {
+    use prime_f4_wide_dynamic_replay::Point as ReplayPoint;
+    if config.solver != DYNAMIC_PROFILE
+        || config.family != "prime"
+        || !(33..=61).contains(&config.n)
+        || !(4..=15).contains(&config.m)
+        || config.degree_bound != 12
+        || config.work_limit == 0
+        || memory_bytes == 0
+        || trace_bytes == 0
+    {
+        return Err("configuration is outside the frozen dynamic profile".into());
+    }
+    let public = &case.public_instance;
+    if public["family"] != config.family
+        || public["n"] != json!(config.n)
+        || public["m"] != json!(config.m)
+        || public["twist"] != json!(config.twist)
+        || case.factor_base["requested_size"] != json!(config.factor_base_size)
+    {
+        return Err("dynamic public inputs differ from original configuration".into());
+    }
+    curves::verify_public(public)?;
+    curves::verify_factor_base(public, &case.factor_base)?;
+    let group = Group::read(case)?;
+    let Group::Prime(curve) = &group else {
+        return Err("dynamic profile requires a prime curve".into());
+    };
+    let p = curve.p.to_u64().ok_or("dynamic modulus exceeds u64")?;
+    if 64 - p.leading_zeros() != config.n {
+        return Err("dynamic modulus width differs from original configuration".into());
+    }
+    let point = |element: &Element| -> Result<ReplayPoint, String> {
+        match element {
+            Element::Prime(Point::Affine { x, y }) => Ok(ReplayPoint {
+                x: x.value.to_u64().ok_or("dynamic x exceeds u64")?,
+                y: y.value.to_u64().ok_or("dynamic y exceeds u64")?,
+            }),
+            _ => Err("dynamic original point must be affine over the prime field".into()),
+        }
+    };
+    let target = point(&group.point(&public["target"])?)?;
+    let signed = domain(&group, case)?;
+    if signed.is_empty() || signed.len() > 64 {
+        return Err("dynamic signed domain exceeds original profile capacity".into());
+    }
+    let domain = signed.iter().map(point).collect::<Result<Vec<_>, _>>()?;
+    let mut codes: Vec<_> = domain.iter().map(|q| q.x).collect();
+    codes.sort_unstable();
+    codes.dedup();
+    if codes.is_empty() || codes.len() > 32 {
+        return Err("dynamic x domain exceeds original profile capacity".into());
+    }
+    Ok(DynamicOriginal {
+        p,
+        a: curve.a.to_u64().ok_or("dynamic a exceeds u64")?,
+        b: curve.b.to_u64().ok_or("dynamic b exceeds u64")?,
+        m: config.m,
+        target,
+        domain,
+        codes,
+        work_limit: config.work_limit,
+        memory_bytes,
+        trace_bytes,
+    })
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
@@ -3151,6 +3261,97 @@ fn wide_begin_failure(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn dynamic_original_uses_verified_public_inputs_at_requested_boundaries() {
+        for n in [47, 61] {
+            for m in [4, 15] {
+                for twist in [false, true] {
+                    let config = CaseConfig {
+                        family: "prime".into(),
+                        n,
+                        m,
+                        twist,
+                        curve_seed: 7,
+                        generator_index: 1,
+                        key_index: 1,
+                        seed: 42,
+                        factor_base_size: 2,
+                        degree_bound: 12,
+                        work_limit: 16384,
+                        solver: DYNAMIC_PROFILE.into(),
+                    };
+                    let mut case = curves::generate(&config).unwrap();
+                    case.private_witness = json!({"must_not_be_consulted":true});
+                    let original = dynamic_original(&config, &case, 256 << 20, 128 << 20).unwrap();
+                    let expected = original.expected();
+                    assert_eq!(expected.m, m);
+                    assert_eq!(expected.work_limit, config.work_limit);
+                    assert_eq!(expected.memory_bytes, 256 << 20);
+                    assert_eq!(expected.trace_bytes, 128 << 20);
+                    assert_eq!(
+                        expected.target.x.to_string(),
+                        case.public_instance["target"]["x"].as_str().unwrap()
+                    );
+                    assert_eq!(
+                        expected.target.y.to_string(),
+                        case.public_instance["target"]["y"].as_str().unwrap()
+                    );
+                    assert!(expected.codes.windows(2).all(|w| w[0] < w[1]));
+                    for q in expected.domain {
+                        assert!(expected.codes.contains(&q.x));
+                        let negative_y = if q.y == 0 { 0 } else { expected.p - q.y };
+                        assert!(expected
+                            .domain
+                            .iter()
+                            .any(|r| r.x == q.x && r.y == negative_y));
+                    }
+                    if n == 61 {
+                        assert_eq!(expected.p, (1u64 << 61) - 1);
+                    }
+                    let mut changed = config.clone();
+                    changed.factor_base_size += 1;
+                    assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+                    changed = config.clone();
+                    changed.twist = !changed.twist;
+                    assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+                    let mut corrupted = case.clone();
+                    corrupted.factor_base["points"][0]["x"] = json!(expected.p.to_string());
+                    assert!(dynamic_original(&config, &corrupted, 256 << 20, 128 << 20).is_err());
+                }
+            }
+        }
+    }
+    #[test]
+    fn dynamic_original_rejects_unbound_or_different_profile_limits() {
+        let config = CaseConfig {
+            family: "prime".into(),
+            n: 47,
+            m: 4,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 2,
+            degree_bound: 12,
+            work_limit: 16384,
+            solver: DYNAMIC_PROFILE.into(),
+        };
+        let case = curves::generate(&config).unwrap();
+        for mutation in 0..4 {
+            let mut changed = config.clone();
+            match mutation {
+                0 => changed.solver = "f4".into(),
+                1 => changed.degree_bound = 8,
+                2 => changed.work_limit = 0,
+                _ => changed.m = 3,
+            }
+            assert!(dynamic_original(&changed, &case, 256 << 20, 128 << 20).is_err());
+        }
+        assert!(dynamic_original(&config, &case, 0, 128 << 20).is_err());
+        assert!(dynamic_original(&config, &case, 256 << 20, 0).is_err());
+    }
+
     #[test]
     fn typed_solver_bridge_requires_bound_capture_and_preserves_sticky_failure() {
         use super::super::capture::{TypedEventBuffer, TypedEventKind};
