@@ -1,0 +1,289 @@
+{
+  "schema": "hashed-native-ecbench-plan/v1",
+  "spec_id": "ECS1h8d78081e210f",
+  "spec_sha256": "8d78081e210f2cdae127ebc6563e6ac8c147934b95101c04d7176366a0c0c573",
+  "executions": 1728,
+  "workloads": 32,
+  "curves": [
+    {
+      "automorphisms_available": 2,
+      "cofactor": 1,
+      "construction": "roster_prime_instance(10)",
+      "curve_uid": "urn:ec-record:1:sha256:cf15d87ab724c8d1fc74d88af320937e4c1cc7e706d4e0e8a0d11734831342a3",
+      "ec1": "EC1P10Cfphcf15d87ab724",
+      "family": "prime",
+      "field_bits": 10,
+      "field_degree": null,
+      "generator": [
+        "0x2",
+        "0x336"
+      ],
+      "group_order": 823,
+      "icv1": "ICV1:fp-827:5:823:463:unk:unk:r:192cb216d592",
+      "r": 823,
+      "registered": true,
+      "slug": "icv1-fp10-t5-192cb216"
+    },
+    {
+      "automorphisms_available": 2,
+      "cofactor": 1,
+      "construction": "roster_prime_instance(12)",
+      "curve_uid": "urn:ec-record:1:sha256:e249b36f57ee347ccac32df31968fd6aa04c2e9161b023388a77b2e82c974d4a",
+      "ec1": "EC1P12Cfphe249b36f57ee",
+      "family": "prime",
+      "field_bits": 12,
+      "field_degree": null,
+      "generator": [
+        "0x6",
+        "0xf"
+      ],
+      "group_order": 3889,
+      "icv1": "ICV1:fp-3907:19:3889:3239:unk:unk:r:d4a315df72ed",
+      "r": 3889,
+      "registered": true,
+      "slug": "icv1-fp12-t19-d4a315df"
+    },
+    {
+      "automorphisms_available": 2,
+      "cofactor": 1,
+      "construction": "roster_prime_instance(14)",
+      "curve_uid": "urn:ec-record:1:sha256:4f360f746508dc06057c047d86463d426d802a68c7d719cc464b309780e4b2e4",
+      "ec1": "EC1P14Cfph4f360f746508",
+      "family": "prime",
+      "field_bits": 14,
+      "field_degree": null,
+      "generator": [
+        "0x6",
+        "0x3d1f"
+      ],
+      "group_order": 16231,
+      "icv1": "ICV1:fp-16187:-43:16231:12429:unk:unk:r:158b69140d4b",
+      "r": 16231,
+      "registered": true,
+      "slug": "icv1-fp14-tm43-158b6914"
+    },
+    {
+      "automorphisms_available": 2,
+      "cofactor": 1,
+      "construction": "roster_prime_instance(16)",
+      "curve_uid": "urn:ec-record:1:sha256:25cb80ed53b2ef56b40393ed5c53f586b07b919cfa6250d138c946abd917f6b3",
+      "ec1": "EC1P16Cfph25cb80ed53b2",
+      "family": "prime",
+      "field_bits": 16,
+      "field_degree": null,
+      "generator": [
+        "0x1",
+        "0x3b3d"
+      ],
+      "group_order": 65003,
+      "icv1": "ICV1:fp-65353:351:65003:20412:unk:unk:r:d433f24edf51",
+      "r": 65003,
+      "registered": true,
+      "slug": "icv1-fp16-t351-d433f24e"
+    }
+  ],
+  "arms": [
+    {
+      "method": {
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
+        "family": "rho",
+        "id": "rho.negation",
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "params": {
+          "cap_multiple": "64"
+        }
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
+        "family": "rho",
+        "id": "rho.negation",
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "params": {
+          "cap_multiple": "64"
+        }
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "entry": "ic_boundary::rho_walk_with_policy(NegationClasses, RhoWalk::negation(), WalkPolicy::v2())",
+        "family": "rho",
+        "id": "rho.negation_v2",
+        "method_id": "ECM1h0de59de796c1",
+        "method_sha256": "0de59de796c18afbb1ba6506d1c97d352a176c54d1272de4aed5f8e158f6ef1b",
+        "params": {
+          "cap_multiple": "64"
+        }
+      },
+      "name": "rho-neg-v2",
+      "role": "control"
+    },
+    {
+      "method": {
+        "entry": "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+        "family": "ic",
+        "id": "ic.hashed_native_v1",
+        "method_id": "ECM1h0dca15498cab",
+        "method_sha256": "0dca15498cab18fe68dd2482035bed9abd86d17a21d9d1984074fe785470124b",
+        "params": {
+          "attempts": "4096",
+          "backend": "source",
+          "bits": "1000000",
+          "cache_entries": "4096",
+          "columns": "4096",
+          "derive_last": "1",
+          "m": "2",
+          "outer_multiplier": "2",
+          "rank": "16",
+          "slices": "16",
+          "smallest_first": "1",
+          "steps": "5000000",
+          "threshold": "32",
+          "trials": "16",
+          "vector": "2000000"
+        }
+      },
+      "name": "native-source",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "entry": "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+        "family": "ic",
+        "id": "ic.hashed_native_v1",
+        "method_id": "ECM1h67a96d218635",
+        "method_sha256": "67a96d21863561c0f99f928a3fd5f66b72bd9da9cd70d88e47d8f8dc739c802b",
+        "params": {
+          "attempts": "4096",
+          "backend": "selectors",
+          "bits": "1000000",
+          "cache_entries": "4096",
+          "columns": "4096",
+          "derive_last": "1",
+          "m": "2",
+          "outer_multiplier": "2",
+          "rank": "16",
+          "slices": "16",
+          "smallest_first": "1",
+          "steps": "5000000",
+          "threshold": "32",
+          "trials": "16",
+          "vector": "2000000"
+        }
+      },
+      "name": "native-selectors",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+        "family": "ic",
+        "id": "ic.hashed_native_v1",
+        "method_id": "ECM1h67a96d218635",
+        "method_sha256": "67a96d21863561c0f99f928a3fd5f66b72bd9da9cd70d88e47d8f8dc739c802b",
+        "params": {
+          "attempts": "4096",
+          "backend": "selectors",
+          "bits": "1000000",
+          "cache_entries": "4096",
+          "columns": "4096",
+          "derive_last": "1",
+          "m": "2",
+          "outer_multiplier": "2",
+          "rank": "16",
+          "slices": "16",
+          "smallest_first": "1",
+          "steps": "5000000",
+          "threshold": "32",
+          "trials": "16",
+          "vector": "2000000"
+        }
+      },
+      "name": "native-selectors-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "entry": "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+        "family": "ic",
+        "id": "ic.hashed_native_v1",
+        "method_id": "ECM1h947ce1a5f163",
+        "method_sha256": "947ce1a5f1632e98ddddadc16df98ec8a22e1c4e4a7e2a03d4e8ee8874d45879",
+        "params": {
+          "attempts": "4096",
+          "backend": "width",
+          "bits": "1000000",
+          "cache_entries": "4096",
+          "columns": "4096",
+          "derive_last": "1",
+          "m": "2",
+          "outer_multiplier": "2",
+          "rank": "16",
+          "slices": "16",
+          "smallest_first": "1",
+          "steps": "5000000",
+          "threshold": "32",
+          "trials": "16",
+          "vector": "2000000"
+        }
+      },
+      "name": "native-width",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+        "family": "ic",
+        "id": "ic.hashed_native_v1",
+        "method_id": "ECM1h174583c6903a",
+        "method_sha256": "174583c6903a1af9d87af0fe765282d7181d0e176135b8445f2fb995d39a99ca",
+        "params": {
+          "attempts": "4096",
+          "backend": "partial",
+          "bits": "1000000",
+          "cache_entries": "4096",
+          "columns": "4096",
+          "derive_last": "1",
+          "m": "2",
+          "outer_multiplier": "2",
+          "rank": "16",
+          "slices": "16",
+          "smallest_first": "1",
+          "steps": "5000000",
+          "threshold": "32",
+          "trials": "16",
+          "vector": "2000000"
+        }
+      },
+      "name": "native-partial",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1he27eac0cec8f",
+        "method_sha256": "e27eac0cec8ff07239a1f060c559401b3c290c2eeb0c5b8965784888c9152bdc",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "mitm:negation_folded=1",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-mitm",
+      "role": "baseline"
+    }
+  ]
+}

@@ -78,6 +78,19 @@ the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
 
+2026-10-30 native ECBench integration: the
+[new study](../research/hashed_ecdl_ecbench_20261030/README.md) supplies an actual
+native source/selector/width/partial adapter, scoped prime-group/phase
+observation and exact success/exhaustion replay controls. The registered
+10/12/14/16-bit public-target plan remains pre-data. A main-only temporary-OIDC
+checkpoint/readback workflow is implemented; actual current-source S3 write,
+native image/execution admission and the scientific session remain unverified.
+The current local SDK reports NoCredentials; that does not establish the
+configured GitHub role's S3 authorization. Mock transport and development
+successes do not close this execution requirement or the general audit.
+The original frozen A/B/profiling, complete binary/schoolbook pipelines and
+both challenge scalar requirements remain open. No runtime gain is claimed.
+
 2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
 through factor-base construction and replay, with an optional explicit fixed
 modulus permitted by source section 3. Official p/r/target and a 132-bit s pass

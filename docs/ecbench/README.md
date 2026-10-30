@@ -419,6 +419,33 @@ L3 needs a lab host, which `isolab` prepares (§9).
 
 ## 7. The unit, and what each method is charged
 
+`ic.hashed_native_v1` invokes `crates/hashed-ecdl-tensor` on cofactor-one
+prime curves. Its `source`, `selectors`, `width` and `partial` backends use
+the actual native reduction/oracles. A scoped single-thread observer charges
+every checked native point-addition call (including identities/inverses);
+equal nonidentity inputs are labelled doubles. Scalar multiplication expands
+into those calls and is not charged a second time. Pairwise controls match
+the `CountedGroup` unit. Cold setup, bases, network construction, contraction,
+witness/row checks, elimination and internal recovery replay are included.
+
+Per-phase `native_meter_attempts_uncharged` counts attempted diagnostic meter
+charges, including exhausted attempts. Selector/cache/witness counters remain
+diagnostics. These do not inventory or calibrate all native arithmetic, so
+native S is a lower bound and cannot support a full cost ranking, even if an
+illustrative 0/0.1/1 band is stable. Clocks measure the instrumented solver;
+observer overhead is not calibrated away. Process/harness overhead and the
+runner's independent scalar check remain separately recorded.
+
+The native online window starts with the first labelled relation query after
+initial bases are ready; earlier curve/target validation remains cold setup.
+Later base retries stay online. Partial-base/collector initialization is in
+the cold base stage. Every canonical online phase is present, with explicit
+reasons for zero stages. A resource limit produces `exhausted`, never a zero
+witness count or a fast success. An outer killed child can have missing native
+counters; it is incomplete and cannot be ranked. The adapter does not support
+131-bit or binary challenge workloads. See
+[the bounded feasibility protocol](../../research/hashed_ecdl_ecbench_20261030/README.md).
+
 > **Every record is also priced in `bitop/v1`** (`docs/units/BITOPS.md`):
 > two-input gates per primitive, under frozen formulas, with nothing left
 > unpriced or converted by a host. It is the unit in which methods,

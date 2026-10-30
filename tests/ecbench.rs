@@ -56,6 +56,99 @@ fn lock(dir: &Path) -> String {
 }
 
 #[test]
+fn native_hashed_library_solves_replays_and_preserves_exhausted_rows() {
+    let dir = scratch("native-hashed");
+    let spec = dir.join("spec.json");
+    let mut params = serde_json::json!({
+        "backend":"selectors", "m":"2", "trials":"32", "columns":"128",
+        "steps":"20000000", "vector":"2000000", "bits":"1000000",
+        "threshold":"11", "derive_last":"1", "smallest_first":"1",
+        "cache_entries":"4096", "rank":"16", "slices":"16",
+        "outer_multiplier":"1", "attempts":"128"
+    });
+    let mut arms = vec![serde_json::json!({
+        "name":"rho", "role":"reference", "method":{"id":"rho.negation"}
+    })];
+    for (name, backend, steps) in [
+        ("selectors", "selectors", "20000000"),
+        ("selectors-aa", "selectors", "20000000"),
+        ("partial", "partial", "20000000"),
+        ("exhausted", "width", "0"),
+    ] {
+        params["backend"] = backend.into();
+        params["steps"] = steps.into();
+        arms.push(serde_json::json!({"name":name,"role":if name.ends_with("aa") {"control"} else {"candidate"},
+            "method":{"id":"ic.hashed_native_v1","params":params}}));
+    }
+    let doc = serde_json::json!({
+        "schema":"ecbench.spec/v1", "label":"native adapter correctness test; no performance claim",
+        "workloads":{"curves":[{"kind":"prime_explicit","p":5,"a":2,"b":1,
+            "group_order":7,"r":7,"gx":0,"gy":1}],"targets_per_curve":2,"target_seed":20261030},
+        "arms":arms,
+        "measurement":{"rounds":1,"warmup":0,"seed":701,"isolation_required":"L0","timeout_seconds":30}
+    });
+    std::fs::write(&spec, serde_json::to_vec_pretty(&doc).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "native run failed: {err}");
+    let records = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut solved = 0;
+    let mut exhausted = 0;
+    for line in records.lines() {
+        let row: Value = serde_json::from_str(line).unwrap();
+        if row["method"]["id"] != "ic.hashed_native_v1" {
+            continue;
+        }
+        if row["method"]["params"]["steps"] == "0" {
+            assert_eq!(row["outcome"]["status"], "exhausted");
+            exhausted += 1;
+        } else {
+            assert_eq!(row["outcome"]["status"], "verified");
+            assert_eq!(row["detail"]["implementation"], "crates/hashed-ecdl-tensor");
+            let online = &row["online"];
+            assert_eq!(
+                online["phases_ns"]
+                    .as_object()
+                    .unwrap()
+                    .values()
+                    .map(|v| v.as_u64().unwrap())
+                    .sum::<u64>(),
+                online["wall_ns"].as_u64().unwrap()
+            );
+            solved += 1;
+        }
+    }
+    assert_eq!((solved, exhausted), (6, 2));
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "native exact replay failed: {err}\n{stdout}");
+    let audit: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(audit["ok"], true);
+    assert_eq!(audit["replays"].as_array().unwrap().len(), 10);
+    assert!(audit["replays"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|r| r["reproduced"] == true));
+}
+
+#[test]
 fn known_log_public_targets_are_verified_replayed_and_counted_by_phase() {
     let dir = scratch("known-log-public");
     let spec = dir.join("spec.json");

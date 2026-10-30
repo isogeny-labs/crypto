@@ -1036,6 +1036,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_COUNTED_PARAMS,
         },
         MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
+        },
+        MethodDecl {
             id: "ic.tensor_contraction_v1",
             family: "ic",
             summary: "toy index calculus with m keyed SHA-256 hashed factor bases (|F_i| ≈ (2r)^(1/m)), each relation found by exact sparse tensor contraction of the whole-point network (crates/ecdl-tensor-ic); exponential, about r point additions per relation; contraction rows, factor-base listing and elimination counted unpriced",
@@ -2702,6 +2710,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Prime(i), _) if m.id == super::aps::ID => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
@@ -8679,15 +8690,6 @@ mod neg_strong_tests {
                 .iter()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
                 .collect(),
-#[cfg(test)]
-mod tensor_contraction_tests {
-    use super::*;
-    use crate::cryptanalysis::ecbench::workload::CurveSpec;
-
-    fn method() -> ResolvedMethod {
-        resolve(&MethodSpec {
-            id: "ic.tensor_contraction_v1".into(),
-            params: [("m".to_string(), "2".to_string())].into_iter().collect(),
         })
         .unwrap()
     }
@@ -8737,6 +8739,46 @@ mod tensor_contraction_tests {
                 assert_eq!(a.counters, again.counters);
                 assert_eq!(a.total_gae, again.total_gae);
             }
+        }
+    }
+
+    #[test]
+    fn refuses_other_curves_and_bad_parameters() {
+        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
+        let spec = CurveSpec::PrimeSearch {
+            bits: 14,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        assert!(applicable(&strong, &inst, &facts).is_err());
+        let (inst, facts) = f2m4(4, 1);
+        let bad = method(NEG_STRONG, &[("lanes", "0"), ("dp_bits", "4")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        let bad = method(NEG_STRONG, &[("lanes", "4"), ("dp_bits", "0")]);
+        assert!(applicable(&bad, &inst, &facts).is_err());
+        // No default for the walk's shape.
+        assert!(resolve(&MethodSpec {
+            id: NEG_STRONG.into(),
+            params: BTreeMap::new(),
+        })
+        .is_err());
+    }
+}
+
+#[cfg(test)]
+mod tensor_contraction_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method() -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "ic.tensor_contraction_v1".into(),
+            params: [("m".to_string(), "2".to_string())].into_iter().collect(),
+        })
+        .unwrap()
+    }
+
     #[test]
     fn recovers_known_logs_deterministically_and_charges_every_phase() {
         let spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
@@ -8777,26 +8819,6 @@ mod tensor_contraction_tests {
     }
 
     #[test]
-    fn refuses_other_curves_and_bad_parameters() {
-        let strong = method(NEG_STRONG, &[("lanes", "8"), ("dp_bits", "auto")]);
-        let spec = CurveSpec::PrimeSearch {
-            bits: 14,
-            seed: 59297,
-        };
-        let inst = spec.build().unwrap();
-        let facts = inst.facts(&spec);
-        assert!(applicable(&strong, &inst, &facts).is_err());
-        let (inst, facts) = f2m4(4, 1);
-        let bad = method(NEG_STRONG, &[("lanes", "0"), ("dp_bits", "4")]);
-        assert!(applicable(&bad, &inst, &facts).is_err());
-        let bad = method(NEG_STRONG, &[("lanes", "4"), ("dp_bits", "0")]);
-        assert!(applicable(&bad, &inst, &facts).is_err());
-        // No default for the walk's shape.
-        assert!(resolve(&MethodSpec {
-            id: NEG_STRONG.into(),
-            params: BTreeMap::new(),
-        })
-        .is_err());
     fn needs_m_and_rejects_m_below_two() {
         assert!(resolve(&MethodSpec {
             id: "ic.tensor_contraction_v1".into(),

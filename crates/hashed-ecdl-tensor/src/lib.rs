@@ -20,6 +20,7 @@ pub mod curve;
 pub mod encoding;
 pub mod factoring;
 pub mod finite;
+pub mod metrics;
 pub mod network;
 pub mod partial;
 pub mod primality;
@@ -102,6 +103,7 @@ impl Meter {
         if phase == "curve addition" {
             self.curve_additions = self.curve_additions.saturating_add(n);
         }
+        crate::metrics::work(n)?;
         self.used = self
             .used
             .checked_add(n)
