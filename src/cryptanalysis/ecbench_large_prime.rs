@@ -31,6 +31,7 @@ use crate::cryptanalysis::residual_walk::is_prime_u64;
 use crate::cryptanalysis::semaev_decomp::Gf2;
 
 pub mod orbit;
+pub mod trace_line;
 use orbit::{LambdaPowers, RelationFrame};
 
 pub const MANIFEST_SCHEMA: &str = "ecbench.curve-corpus/v1";
@@ -401,7 +402,7 @@ pub fn independent_verify(
     Ok(())
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RelationClass {
     Full,
@@ -409,7 +410,7 @@ pub enum RelationClass {
     DoubleLargePrime,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PartialRelation {
     pub trial: u64,
     pub a: u64,
@@ -482,9 +483,19 @@ impl LargePrimeGraph {
 }
 
 /// Optional instrumentation of a [`solve_with_options`] call.  The default
-/// adds nothing to a report, so `solve` output is unchanged.
+/// adds nothing to a report, so `solve` output is unchanged (`charge_checks`
+/// is an accounting rule, not instrumentation, and is off by default).
 #[derive(Clone, Debug, Default)]
 pub struct SolveOptions {
+    /// Explicit nested binary basis for abscissae. `None` preserves the
+    /// historical polynomial-prefix base and its sealed replay records.
+    pub abscissa_basis: Option<Vec<u64>>,
+    /// The `_v2` accounting (`ic.large_prime_v2`): the target's `[r]Q`
+    /// subgroup-membership check and the final `[d]G = Q` check are counted
+    /// scalar multiplications in the verification phase.  Off, they are not
+    /// charged (the membership check runs on a ledger nobody reads, the final
+    /// check is the runner's), which is the first rule.
+    pub charge_checks: bool,
     /// Hash every accepted decomposition `(trial, a, b, raw terms)` in order
     /// into [`FilterPipelineReport::stream`], so two arms can be shown to have
     /// seen the same relation stream.
@@ -554,6 +565,20 @@ pub struct SolveCounters {
     pub lp_merge_ops_uncharged: u64,
     pub row_ops_uncharged: u64,
     pub lp_pivots: u64,
+    /// Scalar multiplications the `_v2` accounting charges to the
+    /// verification phase beyond the relation witness checks: the target's
+    /// `[r]Q` membership check and the final `[d]G = Q`.  Zero (and absent
+    /// from the report) for the first rule.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub membership_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks_failed: u64,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -731,6 +756,10 @@ pub struct RankTrajectory {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct LargePrimeReport {
+    /// Present only for explicit-base runs; relation_samples then retains
+    /// every accepted relation, rather than just the first twelve.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace_evidence: Option<trace_line::Evidence>,
     pub recovered: Option<u64>,
     pub exhausted: bool,
     pub verified_fast: bool,
@@ -785,6 +814,7 @@ fn build_factor_base(
     envelope_dimension: u32,
     orbit: Option<&OrbitPlan>,
     fault: Option<TableFault>,
+    basis: Option<&[u64]>,
     ops: &mut GroupOps,
 ) -> Result<FactorBase, String> {
     if small_dimension > envelope_dimension || envelope_dimension > instance.n {
@@ -793,23 +823,27 @@ fn build_factor_base(
     if envelope_dimension >= 63 {
         return Err("factor-base envelope does not fit a word".into());
     }
+    if let Some(basis) = basis {
+        trace_line::validate_basis(instance, basis, envelope_dimension)?;
+    }
     let small_x = 1u64 << small_dimension;
     let envelope_x = 1u64 << envelope_dimension;
     let group = BinaryGroup(&instance.fast);
     let mut raw = Vec::new();
     let mut keys: BTreeMap<u64, bool> = BTreeMap::new();
     let mut points_by_key: BTreeMap<u64, FastPoint> = BTreeMap::new();
-    for x in 0..envelope_x {
+    for index in 0..envelope_x {
+        let x = basis.map_or(index, |basis| trace_line::expand(basis, index));
         for p in instance.points_with_x(x) {
             let projected = group.mul(ops, p, instance.cofactor);
             if !projected.infinity {
                 let (c, _) = canonical(&instance.fast, projected);
                 keys.entry(c.pack())
-                    .and_modify(|s| *s |= x < small_x)
-                    .or_insert(x < small_x);
+                    .and_modify(|s| *s |= index < small_x)
+                    .or_insert(index < small_x);
                 points_by_key.entry(c.pack()).or_insert(c);
             }
-            raw.push((p, projected, x < small_x));
+            raw.push((p, projected, index < small_x));
         }
     }
     let r = instance.r;
@@ -1212,6 +1246,47 @@ pub fn solve_candidate(
     solve_with_verification(instance, target, config, false, SolveOptions::default())
 }
 
+/// [`solve_candidate`] under the `_v2` accounting (`ic.large_prime_v2`):
+/// the target's `[r]Q` subgroup-membership check, which the first rule runs
+/// on a ledger nobody reads, and the final `[d]G = Q` check, which it
+/// leaves to the runner, are counted scalar multiplications in the
+/// verification phase.  The search is the same.
+pub fn solve_candidate_v2(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(
+        instance,
+        target,
+        config,
+        false,
+        SolveOptions {
+            charge_checks: true,
+            ..Default::default()
+        },
+    )
+}
+
+/// An explicit-base candidate; the ecbench runner performs scalar verification.
+pub fn solve_candidate_with_basis(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+    basis: Vec<u64>,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(
+        instance,
+        target,
+        config,
+        false,
+        SolveOptions {
+            abscissa_basis: Some(basis),
+            ..Default::default()
+        },
+    )
+}
+
 /// CPU time consumed by this process so far, in nanoseconds; 0 where the
 /// clock is unavailable.  The collector is single-threaded, so this is the
 /// collector's own CPU time.
@@ -1609,7 +1684,17 @@ fn solve_with_verification(
     if config.max_large_primes > 2 {
         return Err("max_large_primes must be 0, 1, or 2".into());
     }
-    if !instance.fast.is_on_curve(target) || !instance.fast.mul_u64(target, instance.r).infinity {
+    let charge_checks = options.charge_checks;
+    let group = BinaryGroup(&instance.fast);
+    let mut verify_ops = GroupOps::default();
+    let mut membership_checks = 0u64;
+    let in_subgroup = if charge_checks {
+        membership_checks = 1;
+        instance.fast.is_on_curve(target) && group.mul(&mut verify_ops, target, instance.r).infinity
+    } else {
+        instance.fast.is_on_curve(target) && instance.fast.mul_u64(target, instance.r).infinity
+    };
+    if !in_subgroup {
         return Err("target is not a point in the configured prime-order subgroup".into());
     }
     let start = Instant::now();
@@ -1631,7 +1716,6 @@ fn solve_with_verification(
     } else {
         None
     };
-    let group = BinaryGroup(&instance.fast);
     let mut phase_group_ops = BTreeMap::new();
 
     let mut fb_ops = GroupOps::default();
@@ -1641,6 +1725,7 @@ fn solve_with_verification(
         config.envelope_dimension,
         orbit_plan.as_ref(),
         options.table_fault,
+        options.abscissa_basis.as_deref(),
         &mut fb_ops,
     )?;
     if base.small_columns == 0 {
@@ -1661,6 +1746,7 @@ fn solve_with_verification(
             config.envelope_dimension,
             None,
             None,
+            options.abscissa_basis.as_deref(),
             &mut plain_ops,
         )?;
         let aligned = plain.atoms.len() == base.atoms.len()
@@ -1696,10 +1782,10 @@ fn solve_with_verification(
     let mut eliminator = LargePrimeEliminator::new(base.small_columns + 1, instance.r);
     let mut rng = SplitMix64(config.seed ^ 0x4a6f_7578_4c50_7631);
     let mut rel_ops = GroupOps::default();
-    let mut verify_ops = GroupOps::default();
     let mut counters = SolveCounters {
         combination_states_uncharged: decomposer.report.left_states
             + decomposer.report.right_states,
+        membership_checks,
         ..Default::default()
     };
     let mut samples = Vec::new();
@@ -1789,7 +1875,7 @@ fn solve_with_verification(
         }
         cols.sort_unstable();
         let rhs = mod_mul(instance.cofactor % instance.r, a, instance.r);
-        if samples.len() < 12 {
+        if samples.len() < 12 || options.abscissa_basis.is_some() {
             samples.push(PartialRelation {
                 trial,
                 a,
@@ -1880,6 +1966,14 @@ fn solve_with_verification(
     if let Some(report) = &filter_pipeline {
         counters.lp_merge_ops_uncharged = report.filter.merges as u64;
     }
+    if charge_checks {
+        if let Some(d) = recovered {
+            counters.final_checks = 1;
+            if group.mul(&mut verify_ops, instance.generator, d) != target {
+                counters.final_checks_failed = 1;
+            }
+        }
+    }
     phase_group_ops.insert("relations".into(), rel_ops);
     phase_group_ops.insert("verification".into(), verify_ops);
     let verified_fast = verify_candidate
@@ -1887,6 +1981,12 @@ fn solve_with_verification(
     let verified_independent = verify_candidate
         && recovered.is_some_and(|d| independent_verify(instance, target, d).is_ok());
     Ok(LargePrimeReport {
+        trace_evidence: options.abscissa_basis.map(|basis| trace_line::Evidence {
+            basis,
+            atoms: base.atoms.iter().map(|a| (a.raw.x, a.raw.y)).collect(),
+            columns: base.column_points.iter().map(|p| (p.x, p.y)).collect(),
+            small_columns: base.small_columns,
+        }),
         recovered,
         exhausted: recovered.is_none(),
         verified_fast,

@@ -673,6 +673,9 @@ def candidate_identities(source: RepositoryInputs) -> list[dict]:
             # The canonical leaderboard is required input even after it grows
             # beyond the cap for incidental text files. Otherwise published
             # IC1 identities disappear from search without a source change.
+            # The core leaderboard is already a required, fully parsed input
+            # to build(). Its growth must not hide IDs named only there. Keep
+            # the bound for the general research-note/candidate scan.
             if path != LEADERBOARD and source.size(path) > MAX_SCAN_BYTES:
                 continue
             text = source.read_text(path, errors="replace")

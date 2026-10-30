@@ -1,0 +1,32 @@
+{
+  "validator_binary_sha256": "492a6ed4cadb8ee4397391af5e0fd08ba40eb95f9cca183137cc957d24f4fd7e",
+  "command": "backlog validate --all --root <checkout> --merged-into origin/main",
+  "validated_cards": 53,
+  "failed_cards": 0,
+  "card_provenance": {
+    "XP-20261027-nist-best2-seeded-validation": {
+      "status": "blocked",
+      "only_card_change": "outputs.verify template",
+      "protocol_git_blob": "4c6410df1f41beddc6ccc81bd437b2708aa5fad5",
+      "verifier_argv": [
+        "target/release/ecbench",
+        "verify",
+        "--dir",
+        "{out}",
+        "--replay",
+        "12"
+      ]
+    },
+    "XP-20261027-volcano-unknown-log-pilot": {
+      "status": "blocked",
+      "only_card_change": "outputs.verify template",
+      "protocol_git_blob": "b8631dedbf745ddb033b543aa485c447a8d4e888",
+      "verifier_argv": [
+        "/work/validated-development-receipt/build/verify",
+        "research/volcano_ic_recovery_20261027/public_source_case.json",
+        "research/volcano_ic_recovery_20261027/pilot_config.json",
+        "{out}/records.private.jsonl"
+      ]
+    }
+  }
+}

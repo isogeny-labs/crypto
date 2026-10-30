@@ -1,0 +1,30 @@
+module
+
+public import Mathlib.Data.Nat.Choose.Lucas
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+
+public section
+
+namespace NatParityProbe
+
+theorem choose_pow_two_digit (n i : Nat) :
+    (n.choose (2 ^ i) : ZMod 2) = ((n / 2 ^ i : Nat) : ZMod 2) := by
+  letI : Fact (Nat.Prime 2) := ⟨by decide⟩
+  induction i generalizing n with
+  | zero => simp
+  | succ i ih =>
+    have h : (n.choose (2 ^ (i + 1)) : ZMod 2) =
+        (((n % 2).choose (2 ^ (i + 1) % 2) *
+          (n / 2).choose (2 ^ (i + 1) / 2) : Nat) : ZMod 2) := by
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr
+        (Choose.choose_modEq_choose_mod_mul_choose_div_nat (p := 2))
+    have hr : 2 ^ (i + 1) % 2 = 0 := by simp [pow_succ]
+    have hq : 2 ^ (i + 1) / 2 = 2 ^ i := by simp [pow_succ]
+    rw [hr, hq, Nat.choose_zero_right, one_mul] at h
+    rw [h, ih]
+    congr 1
+    rw [Nat.div_div_eq_div_mul, pow_succ']
+
+#print axioms choose_pow_two_digit
+
+end NatParityProbe

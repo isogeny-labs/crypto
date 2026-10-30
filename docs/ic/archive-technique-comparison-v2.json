@@ -1,0 +1,41 @@
+{
+  "schema": "archive-ic-technique-comparison/v2",
+  "status": "frozen_before_measurement",
+  "purpose": "paired symmetry and relation-strategy ablations; correctness and collection screening, not total-runtime selection",
+  "base_selection_protocol": {
+    "path": "docs/ic/archive-comparison-v1.json",
+    "sha256": "496d12d9f96583befb26118a144c01bd9f40870d58366a9e5cf74c45badf6420",
+    "inherit": ["binary_candidates", "prime_candidates", "regularity", "discovery", "confirmation"],
+    "immutable": true
+  },
+  "curve_source_revision": "62d79e4cc2b6fc82cdbe07b9d6e04fa6782bc614",
+  "curves": [
+    {"constructor": "roster_prime_instance", "bits": 16},
+    {"constructor": "generate_cm_instance", "family": "j0", "bits": 16, "seed": 73021, "max_cofactor": 8},
+    {"constructor": "generate_cm_instance", "family": "j1728", "bits": 16, "seed": 73021, "max_cofactor": 8},
+    {"constructor": "koblitz_instance", "a": 1, "degree": 11},
+    {"constructor": "koblitz_instance", "a": 1, "degree": 17},
+    {"constructor": "random_binary_instance", "degree": 17, "seed": 73021, "max_cofactor": 8},
+    {"constructor": "random_binary_instance", "degree": 16, "seed": 73021, "max_cofactor": 8}
+  ],
+  "identity_gate": "before discovery seal full CurveSpecs, EC1/ICV1 identities, archive manifests, native control point/column/coefficient maps, public targets, runner source revision and binary hashes together with both protocol hashes",
+  "archive": {"bucket": "setec-astronomy-artifacts", "prefix": "factor-bases/factory/v1", "max_candidates": 4096, "shard_points": 1024, "point_set_mutation": "forbidden"},
+  "ablations": [
+    {"name": "negation", "pair": ["none", "negation"], "oracles": ["subtract", "mitm:m=3"], "match": "identical archive manifest, point order, oracle and target"},
+    {"name": "frobenius_columns", "pair": ["negation", "frobenius"], "oracles": ["subtract", "mitm:m=3"], "only_if": "certified Koblitz instance and signed-orbit-closed archive", "match": "identical archive manifest, point order, oracle and target"},
+    {"name": "cubic_columns", "pair": ["negation", "cubic"], "oracles": ["subtract", "mitm:m=3"], "only_if": "verified j0 subgroup action", "match": "identical archive manifest, point order, oracle and target"},
+    {"name": "quartic_columns", "pair": ["negation", "quartic"], "oracles": ["subtract", "mitm:m=3"], "only_if": "verified j1728 subgroup action", "match": "identical archive manifest, point order, oracle and target"},
+    {"name": "frobenius_pair_table", "symmetry": "frobenius", "oracles": ["mitm:m=3", "mitm-frobenius-counted:m=3"], "only_if": "certified Koblitz instance and signed-orbit-closed archive", "match": "identical archive, quotient columns and target"},
+    {"name": "large_prime_residuals", "symmetry": "frobenius", "oracle": "mitm-frobenius-counted:m=3", "large_primes": [0, 1, 2], "lp_domain_factor": 3, "lp_raw_x_cap": 4096, "only_if": "certified Koblitz instance, signed-orbit-closed archive and a unit point in each column", "match": "identical archive, quotient columns, target and residual-domain construction; 0 is the direct control"},
+    {"name": "torsion_coordinate_control", "factor_bases": ["koblitz-orbit:divisor=0;1,projected=1", "koblitz-symmetrised:divisor=0;1,projected=1"], "oracle": "mitm-frobenius-counted:m=3", "only_if": "both exact native bases construct on the imported Koblitz instance", "match": "same curve, divisor, public target and oracle; record the different exact point sets and column counts; descriptive only"}
+  ],
+  "pipeline": {"targets": "random", "linalg": "incremental-gauss-full-rank-checked", "audit_rank": true, "max_trials": 100000, "rho_runs": 0},
+  "metrics": ["completion", "trials_to_verified_full_rank", "required_rank", "verified_independent_rows", "rank_fraction", "dependent_rows", "duplicate_rows", "partials_by_residual_count", "completed_merged_relations", "residual_pivots", "setup_and_online_counts", "unpriced_work", "peak_memory", "regularity_when_supported"],
+  "rank_rule": "only fully eliminated group-valid equations count; rank_fraction=rank/(columns+1); raw rank/yield across different column counts is descriptive, never a standalone win",
+  "resources": {"threads": 1, "memory_bytes": 2147483648, "per_cell_seconds": 600, "max_total_cpu_hours": 12, "cell_order": "freeze lexicographic curve identity, manifest hash, ablation name, workload seed and variant order before discovery; A/B order alternates by workload seed parity"},
+  "selection": {"within_ablation_only": true, "control_retained": true, "max_finalists_per_curve_and_ablation": 2, "discovery_rule": "complete valid pairs only; increasing aggregate trials-to-full-rank ratio then manifest SHA256; freeze finalist hashes before opening confirmation", "confirmation_gate": "all 8 pairs complete and valid; fewer trials in at least 7 of 8; aggregate candidate/control trials <= 0.90; report as collection screening only", "torsion_coordinate_control": "descriptive; no finalist promotion", "unknown_or_censored": "retain exact failure, unsupported, timeout, exhaustion or memory status; ineligible as wins"},
+  "regularity_rule": "inherited v1 metric only where an exact encoding exists; table symmetry or residual merging does not itself measure regularity",
+  "unsupported_extensions": ["generic prime/binary large-prime residual collectors", "raw torsion-coset archives", "GLS or other extension-field archive codecs", "isogeny/cover transfer adapters", "native subgroup scalars wider than u64"],
+  "total_runtime_winner": null,
+  "speedup_claim": "requires separate paired ecbench one-public-target protocol with complete cost, matched strongest rho and independent replay"
+}

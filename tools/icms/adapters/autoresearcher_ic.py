@@ -15,7 +15,10 @@ What this adapter has to be honest about, each recorded in the output:
 * Its rho is a Teske r-adding walk with no negation map, one run, counted in
   walk plus setup operations: ``rho.plain`` (A = 1), never a matched or
   strong reference.  Against the negation walk it flatters IC by sqrt(2)
-  (audit X03).
+  (audit X03).  The solver's own default has been the negation walk since
+  2026-10-20, so the adapter asks for ``--rho-walk plain`` and refuses output
+  whose ``rho.walk`` is anything else; the matched negation reference is
+  ecbench's ``rho.negation``.
 * ``count.s3_solves`` and ``count.group_additions`` are separate units and
   are never summed into one total; the field operations of the linear
   algebra are in neither.
@@ -129,7 +132,7 @@ class AutoresearcherIc:
         if "table_arity" in (dec.get("params") or {}):
             argv += ["--table-arity", str(dec["params"]["table_arity"])]
         if (spec.get("reference") or {}).get("rho"):
-            argv.append("--rho")
+            argv += ["--rho", "--rho-walk", "plain"]
         env = dict(spec["execution"].get("env") or {})
         env["PYTHONPATH"] = os.path.join(root, "src")
         return {"argv": argv, "cwd": root, "env": env}
@@ -196,6 +199,9 @@ class AutoresearcherIc:
                             "native": {"la_ops": ic.get("la_ops"), "la_pivot": ic.get("la_pivot")}},
         }
         reference = None
+        if rho is not None and rho.get("walk", "plain") != "plain":
+            return {"outcome": {"status": "error", "verified": False,
+                                "reason": f"the solver ran the {rho['walk']} rho walk; this adapter labels only rho.plain"}}
         if rho is not None:
             reference = {"id": "rho.plain", "method": "Teske r-adding walk, no negation map, one run",
                          "verified": rho.get("verified"), "group_ops": rho.get("group_ops"), "walk_ops": rho.get("walk_ops"),
