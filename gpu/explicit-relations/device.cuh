@@ -253,6 +253,18 @@ __global__ void hash_base(Curve c, Fp64Ctx h, U inv, U beta, U tau,
     c.lift(z / 2, z & 1, q);
   out[t] = q;
 }
+__global__ void hash_base_wide(Curve c, U modulus, U inv, U beta, U tau,
+                               Point *out) {
+  U t = U(blockIdx.x) * BLOCK + threadIdx.x;
+  if (t >= tau)
+    return;
+  U v = t >= beta ? t - beta : modulus - (beta - t);
+  U z = hash_mul63(inv, v, modulus);
+  Point q;
+  if (z < 2 * c.f.p)
+    c.lift(z / 2, z & 1, q);
+  out[t] = q;
+}
 struct IsInfinity {
   RF_HD bool operator()(Point p) const { return p.inf; }
 };
@@ -475,10 +487,15 @@ public:
   }
   std::vector<Point> hash(U s, U alpha, U beta, U tau) {
     admission(product(tau, 3 * sizeof(Point)));
-    Fp64Ctx h = fp64_ctx_new(s);
-    U inv = fp64_to_mont(h, modpow(alpha, s - 2, s));
+    U canonical_inv = modpow(alpha, s - 2, s);
     thrust::device_vector<Point> out(tau);
-    hash_base<<<blocks(tau), BLOCK>>>(c, h, inv, beta, tau, data(out));
+    if (s < (U(1) << 62)) {
+      Fp64Ctx h = fp64_ctx_new(s);
+      U inv = fp64_to_mont(h, canonical_inv);
+      hash_base<<<blocks(tau), BLOCK>>>(c, h, inv, beta, tau, data(out));
+    } else {
+      hash_base_wide<<<blocks(tau), BLOCK>>>(c, s, canonical_inv, beta, tau, data(out));
+    }
     cuda_check(cudaGetLastError());
     return compact(out);
   }

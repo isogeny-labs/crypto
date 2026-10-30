@@ -142,10 +142,10 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 }
 
 // Extended Euclid (HAC 2.107/2.142), for nonzero residues modulo a
-// validated prime below 2^62 (including hash moduli). Public research
+// validated prime below 2^63 (including hash moduli). Public research
 // inputs: variable time. Signed intermediates fit within i128.
 pub(crate) fn inverse(a: u64, p: u64) -> u64 {
-    debug_assert!(a > 0 && a < p && p < (1 << 62));
+    debug_assert!(a > 0 && a < p && p < (1 << 63));
     let (mut r, mut next) = (p, a);
     let (mut t, mut next_t) = (0i128, 1i128);
     while next != 0 {
@@ -319,8 +319,8 @@ impl Curve {
         r: u64,
         generator: Point,
     ) -> Result<Self, Error> {
-        if !(5..(1u64 << 60)).contains(&p)
-            || !(3..(1u64 << 61)).contains(&r)
+        if !(5..(1u64 << 62)).contains(&p)
+            || !(3..(1u64 << 63)).contains(&r)
             || !prime(p)
             || !prime(r)
             || a >= p
@@ -534,7 +534,7 @@ impl Curve {
 /// One affine hash and its threshold, defining a slot-specific factor base.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HashBase {
-    /// Prime hash modulus, in `[2p,4p]`.
+    /// Prime hash modulus, in `[2p,4p]` and strictly below `2^63`.
     pub s: u64,
     /// Nonzero multiplier modulo `s`.
     pub alpha: u64,
@@ -546,7 +546,8 @@ pub struct HashBase {
 
 impl HashBase {
     fn validate(&self, curve: &Curve) -> Result<(), Error> {
-        if self.s < 2 * curve.p
+        if self.s >= (1u64 << 63)
+            || self.s < 2 * curve.p
             || self.s > 4 * curve.p
             || !prime(self.s)
             || self.alpha == 0
@@ -950,7 +951,9 @@ pub fn solve_with_oracle_profile(
             attempts: 0,
         });
     }
-    let s = (2 * curve.p..=4 * curve.p).find(|&s| prime(s)).unwrap();
+    let s = (2 * curve.p..=(4 * curve.p).min((1u64 << 63) - 1))
+        .find(|&s| prime(s))
+        .ok_or(Error::Limit("no supported hash prime below 2^63"))?;
     // Binary search and saturating products avoid both a sqrt(r) setup loop
     // and overflow for large exponents; only comparison against r matters.
     let (mut lower, mut root) = (0, curve.r);
@@ -1388,7 +1391,12 @@ mod tests {
                 assert_eq!(inverse(a, p), pow(a, p - 2, p));
             }
         }
-        for p in [1_099_511_627_563, 2_305_843_009_213_693_951] {
+        for p in [
+            1_099_511_627_563,
+            2_305_843_009_213_693_951,
+            9_223_372_036_854_775_783,
+        ] {
+            assert!(prime(p));
             let mut rng = Rng(0x12345678);
             for a in [1, 2, p / 2, p - 2, p - 1]
                 .into_iter()

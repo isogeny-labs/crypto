@@ -5,6 +5,24 @@
 
 namespace explicit_relations {
 using U = uint64_t;
+// Canonical residues, 0 < modulus < 2^63. Every addition is <2*modulus,
+// hence fits u64. Used only for wider hash moduli; curve Montgomery stays
+// on its established p<2^62 path.
+RF_HD U hash_mul63(U a, U b, U modulus) {
+  U result = 0;
+  while (b) {
+    if (b & 1) {
+      result += a;
+      if (result >= modulus)
+        result -= modulus;
+    }
+    a += a;
+    if (a >= modulus)
+      a -= modulus;
+    b >>= 1;
+  }
+  return result;
+}
 struct Point {
   U x = 0, y = 0;
   bool inf = true;
