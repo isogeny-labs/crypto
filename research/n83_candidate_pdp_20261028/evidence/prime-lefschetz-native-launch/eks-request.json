@@ -1,0 +1,13 @@
+{
+  "job_name": "n83-native-lefschetz-20261030-r2",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+  "command": [
+    "bash",
+    "-lc",
+    "set -euo pipefail; export AWS_DEFAULT_REGION=us-east-2 AWS_MAX_ATTEMPTS=2 AWS_RETRY_MODE=standard N83_RUN_BACKEND=eks; mkdir -p /work/n83-native; aws s3 cp s3://setec-astronomy-artifacts/runs/n83-prime-lefschetz-native-20261030-r2/protocol.json /work/n83-native/protocol.json --only-show-errors; echo 'b3227ac416130577bd6c9fde87d8313a6090786673822749f0d1b78028fcf533  /work/n83-native/protocol.json' | sha256sum -c -; timeout --signal=TERM --kill-after=10 720 bash /opt/n83/run-prime-lefschetz-native.sh /usr/local/bin/prime_source_audit /usr/local/bin/prime_lefschetz_native /work/n83-native/raw s3://setec-astronomy-artifacts/runs/n83-prime-lefschetz-native-20261030-r2/raw/ /work/n83-native/protocol.json"
+  ],
+  "cpu": 2,
+  "memory": "3Gi",
+  "seconds": 900,
+  "retries": 0
+}
