@@ -1,0 +1,68 @@
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/scratch/subexponential-ecdl/strict-input-merged-native)
+    Finished `release` profile [optimized] target(s) in 8.55s
+     Running unittests src/lib.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_tensor-3825d88d6fdc6fb0)
+
+running 34 tests
+test arithmetic::tests::limits_do_not_turn_unknown_primes_into_true_or_false ... ok
+test contraction::deformation::tests::packet_entries_keep_creation_time_representatives ... ok
+test contraction::packing::tests::conditional_expectations_do_not_assume_disjoint_ports ... ok
+test arithmetic::tests::exact_small_primality_and_square_roots ... ok
+test contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match ... ok
+test arithmetic::tests::aks_cyclic_identity_and_large_prime_path ... ok
+test contraction::recursive::tests::tapered_hermite_recovers_the_constant_without_rounding ... ok
+test contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials ... ok
+test contraction::tests::counts_and_prefix_witnesses_match_truth_tables ... ok
+test contraction::tests::functional_derived_interfaces_match_prefixes_for_all_output_pins ... ok
+test contraction::tests::functional_input_witness_preserves_prefix_order_without_recounts ... ok
+test contraction::tests::functional_leaf_count_equals_complete_edge_enumeration ... ok
+test contraction::tests::functional_witness_aliases_empty_unsat_and_limits_are_exact ... ok
+test curve::tests::prime_order_certificate_and_point_encoding ... ok
+test contraction::recursive::tests::forced_small_packet_recursion_matches_independent_direct_contraction ... ok
+test encoding::tests::hash_membership_and_cofactor_clear_are_coordinate_predicates ... ok
+test encoding::tests::modular_words_are_canonical_and_invalid_inputs_have_no_witness ... ok
+test contraction::recursive::coupled_controls::coupled_nested_contraction_preserves_old_packet_creation_precision ... ok
+test encoding::tests::ripple_arithmetic_and_shared_word_copies ... ok
+test network::tests::incomplete_graphs_and_duplicate_interfaces_are_rejected ... ok
+test network::tests::parallel_edges_pins_and_isolated_scalars ... ok
+test primality::tests::bounded_primality_matches_independent_sieve_and_handles_u64_edges ... ok
+test primality::tests::challenge_proofs_verify_in_any_order_with_exact_u64_leaves ... ok
+test primality::tests::forged_and_incomplete_pocklington_proofs_are_rejected ... ok
+test primality::tests::official_curve_and_target_validate_within_original_budget ... ok
+test encoding::tests::fourier_products_match_independent_integer_products_and_size_bounds ... ok
+test reduction::tests::exhausted_tensor_work_is_unknown_and_identity_has_an_exact_certificate ... ok
+test encoding::tests::point_network_handles_every_pair_and_rejects_counterfeit_outputs ... ok
+test reduction::tests::inverse_hash_enumeration_matches_independent_subgroup_scan ... ok
+test ring::tests::creation_precision_lifts_are_not_silently_ring_homomorphisms ... ok
+test ring::tests::units_and_interpolation_over_nonfields ... ok
+test reduction::tests::cofactor_tensor_projection_finds_only_subgroup_points ... ok
+test contraction::recursive::coupled_controls::coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes ... ok
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage has been running for over 60 seconds
+test reduction::tests::tensor_relation_pipeline_recovers_and_replays_without_scalar_leakage ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 182.06s
+
+     Running unittests src/bin/hashed-ecdl.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl-2c8de4135ca4b745)
+
+running 5 tests
+test tests::input_reader_preserves_io_errors ... ok
+test tests::strict_json_problem_rejects_duplicates_even_after_null ... ok
+test tests::strict_json_problem_keeps_optional_defaults_and_required_target ... ok
+test tests::strict_json_receipt_rejects_duplicate_fields_and_nested_problems ... ok
+test tests::input_limit_applies_to_bytes_read_from_a_stream ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/strict_json.rs (crates/hashed-ecdl-tensor/target/release/deps/strict_json-169e5fa6a6824dcc)
+
+running 3 tests
+test strict_json_point_forms_reject_duplicate_variants_and_coordinates ... ok
+test strict_json_records_keep_required_fields_and_reject_unknown_fields ... ok
+test strict_json_rejects_duplicate_certificate_fields_and_nested_records ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hashed_ecdl_tensor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
