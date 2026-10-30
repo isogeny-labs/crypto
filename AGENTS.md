@@ -28,6 +28,20 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 # Agent instructions
 
+## Research progress and communication
+
+Owner instruction, 2026-10-30. Lead with what was derived, implemented,
+improved, or checked, and report it at that scope. A completed component is
+progress. State a material remaining dependency once, with the next technical
+step, and continue authorized work.
+
+Do not append an overall ECDLP verdict or a rho comparison to routine results,
+reports, or handoffs. Use those comparisons for an explicitly scoped evaluation,
+a required comparison table, or a specific factual correction. Exact checks,
+assumptions, measured costs, and actual failures provide the necessary context.
+This rule replaces older instructions that discount component progress or
+require routine overall-goal disclaimers.
+
 ## Literature first
 
 Owner instruction (2026-10-19): check relevant literature before doing any work.
@@ -78,11 +92,11 @@ implementing, running experiments, or making recommendations.
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
   and fix failures first.
-- **Claim hygiene** (see `docs/ic/boundary_targets.json`): public synthetic
-  / known-answer fixtures only; fail-closed evidence; no key-recovery,
-  asymptotic sub-rho, or deployed-curve-security claims; multi-target and
-  amortized results stay secondary; ledger rows promote only with complete
-  measurement fields and independent replay.
+- **Evidence scope** (see `docs/ic/boundary_targets.json`): use public synthetic
+  / known-answer fixtures and describe the domain and behavior actually checked.
+  Support recovery, complexity, and security conclusions with evidence for the
+  particular claim. Multi-target and amortized results stay secondary; ledger
+  rows promote only with complete measurement fields and independent replay.
 - **Beat the fastest external tool, and show it** (owner's rule,
   2026-10-16; details in §15): our implementations should be faster than
   every other implementation of the same computation. Every speed result
@@ -128,11 +142,10 @@ implementing, running experiments, or making recommendations.
 Owner's rule, 2026-10-15. It replaces any earlier wording that treats only
 beating rho, or only an "advance", as success.
 
-The long-term goal is an index calculus that beats Pollard rho. That will
-not come from one breakthrough. It comes from many measured improvements,
-each building on the last, until the gap closes. So **the success criterion
-is a verified, measured improvement over the current index-calculus
-baseline. Every such improvement is a success and is reported as one.**
+Verified, measured improvements accumulate toward the long-term index-calculus
+objective. **Each improvement over the named baseline is a success at the
+scope measured and is reported as one.** Constructions, identities, and
+descriptive investigations report their own technical outcomes and next steps.
 
 - **Baseline.** For each curve and size, the baseline is the best current
   verified index-calculus pipeline, frozen with its protocol, receipts and
@@ -152,12 +165,11 @@ baseline. Every such improvement is a success and is reported as one.**
 - **Ratchet.** Each landed improvement becomes the new baseline. Record it
   with its delta, so progress is cumulative and visible across the
   sequence.
-- **Distance to rho.** Report the gap to the matched rho on every row,
-  and to precomputation rho (Bernstein–Lange) where setup is excluded. The
-  gap is the distance remaining, not a pass/fail gate. Not beating rho
-  never makes an improvement a failure. A claim to *beat* rho still needs
-  every reference rule: an end-to-end cold `S` below the matched rho's,
-  robust at growing `n`, independently replayed.
+- **Comparison scope.** Include matched rho and precomputation references
+  where the pipeline comparison or frozen protocol calls for them. Component
+  work uses the matched reference for that component. A claim to beat rho uses
+  the complete accounting, growing-size checks, and independent replay for
+  that comparison.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
@@ -178,15 +190,14 @@ baseline and its own ratchet under the success criterion above.
   computing group sums or differences, and testing them against the base or a
   table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
   and large primes on a pair table. Such an oracle runs identically on a
-  random base, so it is a generic algorithm bounded by √r. Improvements in
-  this track are successes under the 2026-10-15 criterion. They are labelled
-  "generic decomposition (bounded by √r; cannot beat rho)" and are never
-  described as algebraic progress.
+  random base. Label this track "generic decomposition" and document the
+  applicable generic-group bounds with their assumptions in its method
+  description. Improvements in this track count against its own baseline.
 
 Arms of the two tracks may be ranked against each other on the same
 instances, in the same unit and across the §5a band. A gain in one track
-never ratchets the other track's baseline. Each row reports its distance to
-matched rho. Per-oracle classification:
+never ratchets the other track's baseline. Include matched rho in tables whose
+protocol calls for that comparison. Per-oracle classification:
 `research/prime_ic_program_20261029/ruling/classification.json`, column C.
 
 ## Pointers
@@ -449,6 +460,9 @@ resume the effort are checked into S3**, and kept current while it runs.
 
 A checkpoint is a safety net, not the record: the spec, protocol and results
 still land in a PR under the rules above.
+Switching runtimes when a budget runs out (Claude Code ↔ Codex):
+[docs/runtime-relay.md](docs/runtime-relay.md); on a pending `.resume/HANDOFF.md`, run
+`python3 scripts/relay.py accept` first.
 
 ## Research searches must leave visual reports
 
@@ -516,8 +530,8 @@ and `aburan28/ml-cryptanalysis`:
   category) and the PDF.
 - Claims follow the repository's evidence rules: every number cites a
   committed artefact in this repository or a sibling (prefix the path with
-  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a stage
-  diagnostic is never reported as a speedup; every end-to-end row has
+  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a component
+  speedup names the measured component and interval; every end-to-end row has
   verified answers; each change is classed as advance, engineering,
   relabelling or accounting. A draft is not submitted, posted or cleared for
   either until its README says so, and its README names the novelty audit
@@ -781,24 +795,24 @@ a downstream claim cannot silently treat them as accepted evidence.
 
 For performance changes, the existing frozen-suite, full-cost, matched-rho,
 and scoreboard requirements in sections 1–8 still apply. A PR that reports
-only a stage measurement must label it a stage diagnostic and leave
-end-to-end cost and speedup unset. Open or update the PR as part of the
-iteration and stop there; the merge automation of the default workflow above
-merges it once its evidence, review, and CI gates are satisfied.
+only a stage measurement reports that stage's cost or speedup, with its
+matched interval, and leaves unmeasured end-to-end fields unset. Open or update
+the PR as part of the iteration and stop there; the merge automation of the
+default workflow above merges it once its evidence, review, and CI gates are
+satisfied.
 
 ## The rule: boundary, table, ratio
 
-Any thread that claims to improve an attack must express its progress as
-a **ratio to a boundary**, reported in a **single table** whose rows are
-variants and whose columns are one unit.  A thread that cannot state its
-boundary has not started; a thread whose ratio to the boundary is flat
-has not progressed, however much its constants moved.
+For a quantitative performance comparison, report candidate and matched
+reference costs in the same unit, with their ratio and correctness checks.
+Include a proved lower bound when it informs that comparison. Recognize
+constant-factor, component, construction, and whole-pipeline improvements at
+their respective scopes; a flat ratio to a lower bound does not erase them.
 
 ### 1. State the boundary before measuring
 
-A **boundary** is a quantity that the method under study cannot cross,
-derived rather than measured.  It comes in two kinds, and a thread
-normally has one of each:
+A comparison can use a proved lower bound and a measured reference. They
+answer different questions:
 
 - A **floor**: a lower bound from a counting or generic-group argument.
   Example from `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md`: a generic algorithm's
@@ -811,9 +825,10 @@ normally has one of each:
   For the discrete logarithm that is Pollard rho, run on the same group,
   with the same operation accounting.
 
-Write both into the note *before* optimising, with the formula for the
-floor and the measured value of the reference.  A boundary chosen after
-the fact is not a boundary.
+Name the reference and any applicable floor before measuring the comparison.
+State the floor's assumptions and use the reference for the actual component
+or pipeline being measured. A new construction can proceed while its cost
+analysis is being developed.
 
 ### 2. Report one table, one unit
 
@@ -832,26 +847,19 @@ linear algebra, and any work an oracle does per call.  Convert foreign
 units with a measured conversion factor and record it, for instance the
 63 field multiplications per curve addition measured on `F_{p³}`.
 
-**End-to-end speed is the measure of speed.**  `S` is defined over the
-*whole* method, cold, from setup to the recovered logarithm; a number
-that prices only one phase — the relation search, the decomposition
-oracle, a single solver call, the linear algebra — is a stage
-diagnostic, never a speed.  "Faster than rho" means the method's `S`
-column, with every phase inside it, sits below rho's, robustly, at
-growing `n` — nothing less earns the phrase.  Quoting a phase crossover
-as a method crossover is the §5 mistake, and the residual-walk thread is
-the worked case: its relation phase crosses rho near `2^{96}` in
-isolation while the whole method never does, because the linear algebra
-it left out decides the exponent (§11.6–11.7).  Equivalently, the only
-admissible speed ratio is §8's
-`speedup = baseline_total_operations / candidate_total_operations`;
-a ratio taken over any smaller slice of the pipeline is labelled a stage
-diagnostic and may not be reported as a speedup.
+**Name the measured interval.** For a cold end-to-end comparison, `S` covers
+setup through the recovered logarithm and the ratio is
+`speedup = baseline_total_operations / candidate_total_operations`.
+For a component comparison, use the same component interval in both arms and
+report the ratio as that component's speedup. A relation search, decomposition
+oracle, solver, or linear-algebra improvement is a valid scoped result.
+Leave unmeasured pipeline costs unset. An explicit comparison against rho
+includes the full method at growing sizes under the reference rules.
 
 The table must carry a **ratio column** against each boundary, and a
 correctness column.  A row without a verified answer is not a result.
 
-### 3. Progress is the ratio, not the constant
+### 3. Describe what improved
 
 Classify every change, in the note, as one of:
 
@@ -891,10 +899,10 @@ relations.
 
 ### 5. Separate the phases, and price all of them
 
-An exponent claim covers the whole method or it is not an exponent
-claim.  Price each phase against the boundary separately and say which
-one dominates, at what size.  Fit exponents over at least four sizes and
-report the fit next to the prediction.
+State whether an exponent describes a component or the whole method. For a
+whole-method claim, account for every phase and identify which dominates at
+each size. Fit empirical exponents over at least four sizes and report the fit
+next to the prediction; distinguish a derived bound from a fitted exponent.
 
 This is where the residual-walk thread went wrong once and had to be
 corrected: three rounds priced the relation phase, quoted a crossover
@@ -1110,7 +1118,7 @@ system shape, solving degree, Macaulay and SAT figures), which the
 `ecbench` database exposes as the `ic_yield` view. It is how a reader
 gets from a number on the scoreboard to the curve, algorithm and
 evidence behind it, and how a candidate combination is informed: a
-yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
+yield describes a stage, while whole-pipeline `S` compares complete solves.
 
 - **Generated, never edited.** `docs/browser/data.json` is written by
   `python3 scripts/build_lab_browser.py` from committed files only (the
