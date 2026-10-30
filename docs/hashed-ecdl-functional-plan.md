@@ -96,7 +96,7 @@ have identical bytes at these two bases.
 | Rejection actually skips inputs | Verified in the fixed native fixture: exhaustive witness search visits 17 inputs; pruning visits 2 and records one rejected block. Both return `[true, false, false, false, false]`. Counting retains all 16 successful assignments, visits 17 inputs and returns exactly 16. These are regression assertions, not runtime measurements. |
 | Input and binding integration | Verified in cryptanalysis: 5 runner, 3 strict-JSON, 20 binding-unit, 19 FFI-parity and 14 documentation tests pass. |
 | Formatting, strict Clippy, Rust 1.78 | Verified for both native crate copies and cryptanalysis binding checks. |
-| Broad crypto root library suite | Pending at this report revision; command and final outcome will be recorded before delivery. |
+| Broad crypto root library suite | Initial parallel run: 5,401 passed, 29 failed, 123 ignored (exit 101). All 29 failures subsequently passed on targeted retries with the same release binary after restoring tracked runtime fixtures and using sequential execution. This does not establish a clean full parallel run. See the preserved raw log and recovery transcript. |
 | Runtime / larger ECDLP improvement | Not measured. Preparation overhead, low-pruning cases and ordering tradeoffs require a matched experiment before making a speed claim. |
 
 The native default remains exact. `functional_pruning = false` restores
@@ -148,6 +148,17 @@ software checks. The root build initially lacked sparse local dependencies;
 the binding build initially lacked `cuda/ca_device.cuh`. The required paths
 were materialized before retrying, without changing their contents.
 
+The broad root run finished all 5,553 cases. Its 29 failures include missing
+tracked runtime fixtures and three assertions that passed when run alone:
+the F4 Hilbert-stop cost assertion, allocator metadata and host-capsule check.
+Those three failures were not reproduced in isolation; their cause remains
+unresolved. After restoring the runtime fixtures, an exact sequential retry
+of all 29 cases passed 28 and exposed one more missing historical session.
+Restoring that tracked study and retrying its one failed case passed. No source
+changes, disabled tests or exclusions were used. A clean full parallel root
+suite remains unverified; the original failure is retained rather than
+reclassified as a passing run.
+
 ### Source and visual evidence
 
 The following SHA-256 digests agree across the two modified native copies:
@@ -159,9 +170,25 @@ The following SHA-256 digests agree across the two modified native copies:
 | `src/reduction.rs` | `43f1b2f5c7768d8bd5921698f8375cc3a4b85962395e21209fcc2b8347f47dba` |
 
 See the [validation transcript](hashed-ecdl-functional-validation.txt),
+[compressed complete root test log](hashed-ecdl-functional-root-tests.log.xz),
 [editable diagram](hashed-ecdl-functional-pruning.svg),
 [rendering source](hashed-ecdl-functional-pruning.typ) and
 [inspected one-page PDF](hashed-ecdl-functional-pruning.pdf).
+
+The complete root log is stored under its SHA-256 in the repository artifact
+store, with its pointer in `docs/.artifacts.json`. Hydrate it with
+`python3 tools/artifacts/artifacts.py pull docs/hashed-ecdl-functional-root-tests.log.xz`.
+The 80,320-byte compressed object has SHA-256
+`73d7c10554f63add39cbb7bb651675a27392ad339553b145f1c50d56c165cc98`;
+the 503,849-byte uncompressed log has SHA-256
+`978ab375720353a81580dec0b99f262c0e13f324fdd727698b510c55a5d6aace`.
+Remote HEAD verification passed; an independent S3 download matched the
+compressed bytes and its decompressed output matched the original log.
+
+The paired [cryptanalysis PR #1307](https://github.com/isogeny-labs/cryptanalysis/pull/1307)
+merged as `0fd71e100cef049176895395d7ecd0bda780f55b`. Its five returned
+pull-request workflow runs completed successfully on head
+`c46fa4ade7904390ea25f5daa17f5583388c64a6`.
 
 The existing IC scoreboard and leaderboard were checked for relevant hashed
 ECDL/functional entries. No validated runtime or curve-coverage result is

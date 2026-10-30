@@ -257,11 +257,15 @@ Sparse-checkout failures before materialization (not solver failures):
 
 Broad crypto root command:
 CARGO_BUILD_JOBS=2 cargo test --release --lib
-Final outcome to be recorded before delivery.
+Final outcome: exit 101; 5401 passed, 29 failed, 123 ignored.
+All 29 failures passed targeted retries with the same release binary after
+restoring tracked runtime fixtures and using sequential execution (28 + 1).
+The full parallel run remains failed; it was not rerun or relabelled green.
+Complete raw output: hashed-ecdl-functional-root-tests.log.xz (xz compressed).
 
 The preceding logs describe the first validation pass. A later diagnostic-only
 correction avoids counting a block jump that skips zero remaining inputs.
-Final native and binding rerun transcripts follow below when complete.
+Final native and binding rerun transcripts follow below.
 
 Final source validation after the diagnostic-only correction:
 network.rs SHA-256: 55accd8c18a9c94cdeee19568da1517b9fca7b0661044eef3b4dde8feaf388a0
@@ -564,3 +568,143 @@ error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/re
 error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
 error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
 error: couldn't read `/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)
+
+Broad-root runtime failure diagnosis and recovery:
+The first three isolated reproductions below identify omitted tracked device
+source and historical records. Three other failures (F4 Hilbert-stop counters,
+allocator metadata and host capsule) passed in isolation with unchanged code;
+the original parallel-run failures are retained, not reclassified as passes.
+
+running 1 test
+
+thread 'cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic' (3007673) panicked at src/cryptanalysis/certicom_dlp/device_tests.rs:32:18:
+tracked gpu/certicom source must be materialized
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.02s
+
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means' (3007681) panicked at src/cryptanalysis/ecbench/band.rs:338:81:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ic_planner_validation_20261020/sessions/r24/records.jsonl: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.01s
+
+
+running 1 test
+
+thread 'cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload' (3007679) panicked at src/cryptanalysis/ecbench/bounds.rs:2379:43:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.02s
+
+
+running 1 test
+test cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 1.20s
+
+
+running 2 tests
+test cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds ... ok
+test cryptanalysis::ecbench::record::allocator_tests::the_child_prepares_the_allocator_before_the_solve_and_says_so ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 5551 filtered out; finished in 9.58s
+
+
+Restored the required tracked runtime inputs (device emulator, historical
+ecbench session records/verdicts, frozen chain constants, parameter files,
+work fixtures and planner references). No source changes or test exclusions.
+Reran the 29 failed tests exactly, sequentially, with the same release binary:
+awk '/^test .* \.\.\. FAILED$/ {print $2}' /tmp/hashed-tensor-root-final-tests.log | sort -u > /tmp/hashed-tensor-root-failed-tests.txt
+xargs -r target/release/deps/crypto_lib-cd696b7f650051ce --exact --test-threads=1 --nocapture < /tmp/hashed-tensor-root-failed-tests.txt
+The first recovery run found one further missing historical session. After
+restoring that study's tracked inputs, reran only that remaining failed test.
+
+running 29 tests
+test cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures ... ok
+test cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic ... ok
+test cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver ... ok
+test cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed ... ok
+test cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means ... ok
+test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... ok
+test cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible ... ok
+test cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too ... ok
+test cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples ... ok
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ...
+thread 'cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version' (3043380) panicked at src/cryptanalysis/ecbench/bounds.rs:2435:38:
+called `Result::unwrap()` on an `Err` value: "/home/ec2-user/crypto-hashed-tensor-functional-20261030/research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/session.json: No such file or directory (os error 2)"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band ... ok
+test cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2 ... ok
+test cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload ... ok
+test cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup ... ok
+test cryptanalysis::ecbench::gpu::lock_and_capsule_tests::a_gpu_stage_writes_a_host_capsule_the_receipt_binds ... ok
+test cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files ... ok
+test cryptanalysis::ecbench::record::allocator_tests::the_child_prepares_the_allocator_before_the_solve_and_says_so ... ok
+test cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks ... ok
+test cryptanalysis::f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+test cryptanalysis::ic_framework::planner::tests::every_cited_file_exists ... ok
+test cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42 ... ok
+test ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused - should panic ...
+thread 'ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused' (3044767) panicked at src/ecc/cryptopro_b_point.rs:601:13:
+assertion `left == right` failed: step 1: domain a does not compose
+  left: [3222, 0, 0, 9223372036854775808]
+ right: [4489424403059221815, 13107566178433889240, 9589934799479419441, 4053450176749327814]
+ok
+test ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares ... ok
+test ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors ... ok
+test ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused ... ok
+test ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path ... ok
+test ecc::endo_generic_chain_set::tests::tampered_sets_are_refused ... ok
+
+failures:
+
+failures:
+    cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version
+
+test result: FAILED. 28 passed; 1 failed; 0 ignored; 0 measured; 5524 filtered out; finished in 53.29s
+
+
+running 1 test
+test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5552 filtered out; finished in 0.11s
+
+
+Final broad-root result (original parallel run, exit 101):
+test result: FAILED. 5401 passed; 29 failed; 123 ignored; 0 measured; 0 filtered out; finished in 508.64s
+All 29 failed cases subsequently passed targeted retries as recorded above.
+No complete parallel rerun was performed. The F4 cost assertion, allocator
+metadata and host-capsule assertion passed in isolation; cause unresolved.
+Raw log: docs/hashed-ecdl-functional-root-tests.log.xz, artifact-store pointer
+in docs/.artifacts.json. Compressed bytes 80320; uncompressed bytes 503849.
+Compressed SHA-256: 73d7c10554f63add39cbb7bb651675a27392ad339553b145f1c50d56c165cc98
+Uncompressed SHA-256: 978ab375720353a81580dec0b99f262c0e13f324fdd727698b510c55a5d6aace
+Artifact verification: repository verify --remote returned 1 hydrated entry,
+0 problems. A fresh aws s3 cp download matched the compressed artifact with
+cmp, and its decompressed output matched the complete original log with cmp.
