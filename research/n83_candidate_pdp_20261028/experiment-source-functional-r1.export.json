@@ -1,0 +1,4378 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_source_functional.rs",
+      "sha256": "56347f621119c908cfd4fb8217dff4625d192ab9ab787f35185a578481b7f576",
+      "bytes": 16703,
+      "kind": "analysis"
+    },
+    "outputs": [
+      {
+        "path": "evidence/source-functional-r1/outcome.json",
+        "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+        "bytes": 683,
+        "kind": "raw"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "d0f98fafe1df2b06ad5df6ca6f033178cfa7dc02",
+      "binary_sha256": "33fddf1d09fcf1e313d2ddbf897992e9ec67112716677c1583e276dcbb194eda",
+      "image_digest": "sha256:e7e7f92f5038302fd3ab4fc63e9071bc4faa1fda6d8b4aeb45d7614307cd42d0"
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "d0f98fafe1df2b06ad5df6ca6f033178cfa7dc02",
+      "binary_sha256": "33fddf1d09fcf1e313d2ddbf897992e9ec67112716677c1583e276dcbb194eda",
+      "image_digest": "sha256:e7e7f92f5038302fd3ab4fc63e9071bc4faa1fda6d8b4aeb45d7614307cd42d0"
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "d0f98fafe1df2b06ad5df6ca6f033178cfa7dc02",
+      "binary_sha256": "33fddf1d09fcf1e313d2ddbf897992e9ec67112716677c1583e276dcbb194eda",
+      "image_digest": "sha256:e7e7f92f5038302fd3ab4fc63e9071bc4faa1fda6d8b4aeb45d7614307cd42d0"
+    }
+  ],
+  "backend": "isolab-k8s",
+  "created": "2026-10-30T20:01:22.722115+00:00",
+  "export_id": "N83-SOURCE-FUNCTIONAL-20261030-R1",
+  "files": [
+    {
+      "path": "evidence/source-functional-r1/outcome.json",
+      "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+      "bytes": 683,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+      "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+      "bytes": 198,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+      "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+      "bytes": 135,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-request.json",
+      "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+      "bytes": 858,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+      "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+      "bytes": 2031,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+      "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+      "bytes": 2031,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+      "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+      "bytes": 2031,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+      "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+      "bytes": 1569,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/source-functional-r1/source-functional-submission.json",
+      "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+      "bytes": 1735,
+      "kind": "raw"
+    }
+  ],
+  "flow": {
+    "planned": 42,
+    "attempted": 42,
+    "completed": 0,
+    "not_completed": 42,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": [
+      {
+        "rule": "Incomplete phases do not establish a complete panel.",
+        "run_ids": [
+          "original-prime-m3-planted",
+          "original-prime-m3-natural",
+          "original-prime-m4-planted",
+          "original-prime-m4-natural",
+          "original-prime-m5-planted",
+          "original-prime-m5-natural",
+          "original-prime-m6-planted",
+          "original-prime-m6-natural",
+          "original-prime-m7-planted",
+          "original-prime-m7-natural",
+          "original-prime-m8-planted",
+          "original-prime-m8-natural",
+          "original-prime-m9-planted",
+          "original-prime-m9-natural",
+          "baseline-prime-m3-planted",
+          "baseline-prime-m3-natural",
+          "baseline-prime-m4-planted",
+          "baseline-prime-m4-natural",
+          "baseline-prime-m5-planted",
+          "baseline-prime-m5-natural",
+          "baseline-prime-m6-planted",
+          "baseline-prime-m6-natural",
+          "baseline-prime-m7-planted",
+          "baseline-prime-m7-natural",
+          "baseline-prime-m8-planted",
+          "baseline-prime-m8-natural",
+          "baseline-prime-m9-planted",
+          "baseline-prime-m9-natural",
+          "spike40-prime-m3-planted",
+          "spike40-prime-m3-natural",
+          "spike40-prime-m4-planted",
+          "spike40-prime-m4-natural",
+          "spike40-prime-m5-planted",
+          "spike40-prime-m5-natural",
+          "spike40-prime-m6-planted",
+          "spike40-prime-m6-natural",
+          "spike40-prime-m7-planted",
+          "spike40-prime-m7-natural",
+          "spike40-prime-m8-planted",
+          "spike40-prime-m8-natural",
+          "spike40-prime-m9-planted",
+          "spike40-prime-m9-natural"
+        ]
+      }
+    ]
+  },
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "executor",
+      "text": "One EKS Job,42 planned case slots,no arithmetic result. Infrastructure outcome is not a mathematical refutation."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "T-987",
+    "role": "executor"
+  },
+  "protocol": {
+    "path": "protocol-source-functional.json",
+    "sha256": "d36d0986cb5a88406cbf9a7107f16eed8f5eb3bd971dffc93149ff718a215596",
+    "protocol_id": "N83-SOURCE-FUNCTIONAL-20261030",
+    "version": 1
+  },
+  "reviews_dir": "reviews-source-functional-r1",
+  "runs": [
+    {
+      "run_id": "original-prime-m3-planted",
+      "arm": "original",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m3-natural",
+      "arm": "original",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m4-planted",
+      "arm": "original",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m4-natural",
+      "arm": "original",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m5-planted",
+      "arm": "original",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m5-natural",
+      "arm": "original",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m6-planted",
+      "arm": "original",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m6-natural",
+      "arm": "original",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m7-planted",
+      "arm": "original",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m7-natural",
+      "arm": "original",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m8-planted",
+      "arm": "original",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m8-natural",
+      "arm": "original",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m9-planted",
+      "arm": "original",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "original-prime-m9-natural",
+      "arm": "original",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m3-planted",
+      "arm": "baseline",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m3-natural",
+      "arm": "baseline",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m4-planted",
+      "arm": "baseline",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m4-natural",
+      "arm": "baseline",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m5-planted",
+      "arm": "baseline",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m5-natural",
+      "arm": "baseline",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m6-planted",
+      "arm": "baseline",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m6-natural",
+      "arm": "baseline",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m7-planted",
+      "arm": "baseline",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m7-natural",
+      "arm": "baseline",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m8-planted",
+      "arm": "baseline",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m8-natural",
+      "arm": "baseline",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m9-planted",
+      "arm": "baseline",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "baseline-prime-m9-natural",
+      "arm": "baseline",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m3-planted",
+      "arm": "spike40",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m3-natural",
+      "arm": "spike40",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m4-planted",
+      "arm": "spike40",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m4-natural",
+      "arm": "spike40",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m5-planted",
+      "arm": "spike40",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m5-natural",
+      "arm": "spike40",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m6-planted",
+      "arm": "spike40",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m6-natural",
+      "arm": "spike40",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m7-planted",
+      "arm": "spike40",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m7-natural",
+      "arm": "spike40",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m8-planted",
+      "arm": "spike40",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m8-natural",
+      "arm": "spike40",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m9-planted",
+      "arm": "spike40",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    },
+    {
+      "run_id": "spike40-prime-m9-natural",
+      "arm": "spike40",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "published_arithmetic_records": 0
+        }
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": [
+          "Unschedulable Pod; job DeadlineExceeded"
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "No arithmetic result; retained terminal infrastructure status"
+      },
+      "exclusion": {
+        "excluded": true,
+        "rule": "Incomplete phases do not establish a complete panel."
+      },
+      "artifacts": [
+        {
+          "path": "evidence/source-functional-r1/outcome.json",
+          "sha256": "52aa90e4b81f0a64915c20f772815e09d255d6d73ce627c4ba51e4ce53182cd4",
+          "bytes": 683,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-final-s3-list.json",
+          "sha256": "437da96946619fd3ec3e5a9b077d389ff6abfc8b3ac5d1467016a30f1fbe8048",
+          "bytes": 198,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-r1-logs.json",
+          "sha256": "872f9c1acf0eb8572eff1efc381e30e77f1da368ae26e267ef6edcac0fda3c80",
+          "bytes": 135,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-request.json",
+          "sha256": "7b723f564a823d747881c3701cda808feb451fb1ab3020d37b66630beaf40a9c",
+          "bytes": 858,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1950.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1953.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-1958.json",
+          "sha256": "3cbe9b12929bfebd85e2030f64febc7ddd4c354ae1fc598306f30220af911552",
+          "bytes": 2031,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-status-terminal-check.json",
+          "sha256": "f94e12f729c308bdcae32b27844f038774e51022fce75932a5f38738e63795f7",
+          "bytes": 1569,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/source-functional-r1/source-functional-submission.json",
+          "sha256": "9f1a6c7c580e97bf8bda689548a5b3c10ce3e1712c260e552b984bee6d3d961b",
+          "bytes": 1735,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T20:01:17.503131+00:00",
+      "worker": null,
+      "backend_ref": "n83-source-functional-20261030-r1"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "d0f98fafe1df2b06ad5df6ca6f033178cfa7dc02",
+    "dirty": false
+  },
+  "backend_record": {
+    "terminal": {
+      "schema": "n83.source-functional-infrastructure-outcome/v1",
+      "run_id": "n83-source-functional-20261030-r1",
+      "job_state": "failed",
+      "job_uid": "d237cd1a-a995-4e9c-b00f-665676c3bb73",
+      "reason": "DeadlineExceeded",
+      "observed_at": "2026-10-30T20:01:17.503131+00:00",
+      "submitted_jobs": 1,
+      "planned_case_slots": 42,
+      "completed_arithmetic_records": 0,
+      "raw_objects": 0,
+      "worker_start_observed": false,
+      "worker_execution_never_started_proven": null,
+      "retries": 0,
+      "degree_claim": null,
+      "interpretation": "Last observed Pod unscheduled. Terminal status retains no Pod. Empty logs and raw S3 listing; infrastructure failure is not a mathematical refutation."
+    }
+  }
+}
