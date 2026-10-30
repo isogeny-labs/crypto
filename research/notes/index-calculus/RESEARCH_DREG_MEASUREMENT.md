@@ -1042,3 +1042,26 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   lower the MutantXL closure degree.
 - At (21, 7), degree 4 of the quadratic arms is unmeasured: a sparse run
   capped at 10⁹ entries. A lower degree there is not excluded.
+
+## Linear guesses (2026-10-29)
+
+- `examples/dreg_linear_guess.rs` specialises the chained system with fixed
+  variables and linear substitutions `x_j := x_i + c`. `--check` evaluates
+  every specialised equation against the original at 4,096 random points of
+  the guessed subspace.
+- `examples/dreg_chain_solutions.rs` lists every solution of an m = 3 draw
+  and checks it against the system. That is what makes a refutation of a
+  satisfiable branch checkable.
+- At (22, 8), a guess on `a₇ + b₇` refutes at degree 4 on more draws than a
+  guess on `a₇` (2 against 1 of 4;
+  `research/dreg_invariant_guess_20261029/RESULTS.md`).
+- Branches that hold a solution cannot refute, and at this size they ran
+  past 16 GB.
+
+## Invariant guesses on fresh draws (2026-10-29)
+
+- On 8 fresh (22, 8) draws, a guess on `a₇ + b₇` lets degree 4 refute on every
+  branch of 5 draws, and a guess on `a₇` on none (p = 0.031, pre-registered;
+  `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
+- `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
+  replay of the committed draws before scoring.
