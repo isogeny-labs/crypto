@@ -172,9 +172,11 @@ pending. Additional imported capabilities and their limits are:
   zero twist branch examples. These checks added no scientific samples.
   Combined dataset tests passed; full-library and combined CLI validation are
   still pending. Three failed combined attempts document sparse-checkout
-  omissions and a corrected restoration-helper bug. The ignored test is the
-  360-cell endpoint integration sweep; this scoped pass does not claim that
-  sweep was re-executed on the combined revision.
+  omissions and a corrected restoration-helper bug. The initially ignored
+  360-cell endpoint integration sweep was subsequently run explicitly and
+  passed on the combined revision, with matching binary hashes and source
+  readback. Its bounded outcome checks do not imply support or a solution for
+  every adapter/parameter pair.
 
 See [prefix software evidence](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md)
 for exact revisions, retained failures and S3 readback. None of these imported

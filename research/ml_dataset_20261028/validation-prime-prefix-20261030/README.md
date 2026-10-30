@@ -1,6 +1,6 @@
 # Prime-chain causal replay software evidence
 
-Current source `adde10cad21b8179ec358af81827eb76073abdaa` passed29 focused release
+Initial validated prefix source `adde10cad21b8179ec358af81827eb76073abdaa` passed29 focused release
 library tests (0failed,0ignored), including the existing exporter checks and new
 certificate/root/replay tests. Strict maintained Clippy also passed on that source.
 Source `06773dcf28f` passed the release CLI build and four actual export/retry
@@ -21,8 +21,18 @@ retained. Attempt four passed **236 dataset tests, 0 failed, 1 ignored**, includ
 both added regression tests, with exit code 0 and matching runtime-source
 readback. Full-library validation, maintained Clippy and combined release CLI
 replay are the next phases in [combined-validation-plan.json](combined-validation-plan.json).
-The ignored test is the separately runnable 360-cell endpoint integration sweep;
-its earlier-source results do not establish execution on this combined revision.
+The ignored test subsequently passed all **360 endpoint combinations** when run
+explicitly against the same combined-source binary (one test, zero failures,
+exit0). Its binary hash matched before/after and runtime-source readback matched.
+See [endpoint-validation-plan.json](endpoint-validation-plan.json) and
+[endpoint-validation.receipt.json](endpoint-validation.receipt.json). It covers
+n23/61, all three families, both twists, m2/4/15 and ten adapters with a four-point
+factor base, work limit64, degree bound2 and private witness removed. It checks
+structured outcomes and returned solution certificates; unsupported/capped cells
+remain non-solutions. It does not exercise supervised wide-F4 admission or the
+entire requested size/arity cross-product. Its separate
+[endpoint artifact index](endpoint-store-index.json) avoids concurrent writes
+with the running full-suite archiver.
 The full serialized suite is running under the finite plan, followed by lint,
 build and CLI only if preceding phases pass.
 
