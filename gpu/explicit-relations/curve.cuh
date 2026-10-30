@@ -205,6 +205,36 @@ RF_HD U lookup(const CompactRow *rows, U size, Point point) {
   }
   return lo < size && rows[lo].key == key ? rows[lo].id : UINT64_MAX;
 }
+// Three naturally aligned 32-bit words: no unaligned 64-bit loads. The
+// exact 64-bit point key is split into halves; tuple IDs are bounded by
+// left_rows<=2^32 before construction. UINT32_MAX is a valid tuple ID,
+// distinct from the widened UINT64_MAX missing-result sentinel.
+struct DenseRow {
+  uint32_t key_lo = 0, key_hi = 0, id = 0;
+  RF_HD DenseRow() = default;
+  RF_HD DenseRow(U key, U tuple_id)
+      : key_lo(uint32_t(key)), key_hi(uint32_t(key >> 32)),
+        id(uint32_t(tuple_id)) {}
+  RF_HD U key() const { return U(key_lo) | (U(key_hi) << 32); }
+};
+static_assert(sizeof(DenseRow) == 12 && alignof(DenseRow) == 4,
+              "dense rows require three naturally aligned u32 words");
+struct DenseRowLess {
+  RF_HD bool operator()(const DenseRow &a, const DenseRow &b) const {
+    return a.key() < b.key() || (a.key() == b.key() && a.id < b.id);
+  }
+};
+RF_HD U lookup(const DenseRow *rows, U size, Point point) {
+  U key = point_key(point), lo = 0, hi = size;
+  while (lo < hi) {
+    U mid = lo + (hi - lo) / 2;
+    if (rows[mid].key() < key)
+      lo = mid + 1;
+    else
+      hi = mid;
+  }
+  return lo < size && rows[lo].key() == key ? U(rows[lo].id) : UINT64_MAX;
+}
 struct Bases {
   const Point *points;
   U offset[9];

@@ -97,7 +97,11 @@ __device__ Point normalize_block(Curve c, Jac p) {
   return c.affine(p, tree[BLOCK + t]);
 #endif
 }
-#ifdef ER_COMPACT_ROWS
+#if defined(ER_DENSE_ROWS)
+using DeviceRow = DenseRow;
+using DeviceRowLess = DenseRowLess;
+RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
+#elif defined(ER_COMPACT_ROWS)
 using DeviceRow = CompactRow;
 using DeviceRowLess = CompactRowLess;
 RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
@@ -111,6 +115,9 @@ RF_HD bool row_less_key(const Row &row, Point key) {
 }
 RF_HD bool row_less_key(const CompactRow &row, Point key) {
   return row.key < point_key(key);
+}
+RF_HD bool row_less_key(const DenseRow &row, Point key) {
+  return row.key() < point_key(key);
 }
 __global__ void build_left(Curve c, Bases b, unsigned split, U count,
                            DeviceRow *rows) {
@@ -334,6 +341,10 @@ public:
     right_second.clear();
     right_second.shrink_to_fit();
     p = next;
+#ifdef ER_DENSE_ROWS
+    if (p.left > (U(1) << 32))
+      throw std::runtime_error("LIMIT dense tuple ID capacity");
+#endif
     packed = packed_winner_fits(p.left, std::min(chunk, p.right));
 #ifdef ER_QUERY_REFERENCE
     packed = false;

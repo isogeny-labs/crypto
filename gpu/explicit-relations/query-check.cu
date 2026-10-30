@@ -43,6 +43,7 @@ static void prefix_boundaries() {
   for (size_t i = 0; i < queries.size(); ++i)
     require(got[i] == lookup(rows.data(), rows.size(), queries[i]));
 }
+template <class TableRow, class Less>
 static void compact_boundaries() {
   Curve c = curve(65521, 0, 7);
   std::vector<Row> full{{Point{}, 7}, {Point{}, 3}};
@@ -56,16 +57,18 @@ static void compact_boundaries() {
     for (Point point : {q, c.neg(q)}) {
       queries.push_back(point);
       if (x % 13 == 0 || x < 2 || x > c.f.p - 8)
-        for (U id : {U(9), U(2)})
+        for (U id : {U(9), U(2), U(UINT32_MAX)})
           full.push_back({point, id});
+      else if (x % 17 == 0)
+        full.push_back({point, U(UINT32_MAX)});
     }
   }
   std::sort(full.begin(), full.end(), RowLess{});
-  std::vector<CompactRow> rows;
+  std::vector<TableRow> rows;
   for (const auto &row : full)
     rows.push_back({point_key(row.point), row.id});
-  std::sort(rows.begin(), rows.end(), CompactRowLess{});
-  thrust::device_vector<CompactRow> device_rows(rows.begin(), rows.end());
+  std::sort(rows.begin(), rows.end(), Less{});
+  thrust::device_vector<TableRow> device_rows(rows.begin(), rows.end());
   thrust::device_vector<Point> device_queries(queries.begin(), queries.end());
   thrust::device_vector<U> prefixes(1025), answers(queries.size());
   build_prefix<<<5, BLOCK>>>(data(device_rows), rows.size(), 1024, 6,
@@ -154,7 +157,10 @@ static void wide_prefix_boundaries() {
 int main() {
   try {
     prefix_boundaries();
-    compact_boundaries();
+    compact_boundaries<CompactRow, CompactRowLess>();
+    compact_boundaries<DenseRow, DenseRowLess>();
+    require(DenseRow((U(1) << 63) + 1, UINT32_MAX).key() == (U(1) << 63) + 1);
+    require(U(DenseRow(0, UINT32_MAX).id) != UINT64_MAX);
     wide_prefix_boundaries();
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
@@ -163,6 +169,19 @@ int main() {
     require(packed_winner_fits(U(1) << 32, (U(1) << 32) - 1));
     require(!packed_winner_fits(U(1) << 32, U(1) << 32));
     Curve c = curve(97, 0, 7);
+#ifdef ER_DENSE_ROWS
+    DeviceBackend guarded(c, 1, 1);
+    Plan oversized;
+    oversized.left = (U(1) << 32) + 1;
+    bool rejected = false;
+    try { guarded.prepare(oversized); }
+    catch (const std::runtime_error &e) {
+      rejected = std::string(e.what()) == "LIMIT dense tuple ID capacity";
+    }
+    require(rejected);
+    guarded.prepare(Plan{});
+    require(!guarded.find(Point{}, 0).found);
+#endif
     std::vector<Point> ps;
     for (U x = 0; x < 97; ++x) {
       Point q;
