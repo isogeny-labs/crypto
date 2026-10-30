@@ -140,3 +140,72 @@ These results cover the standalone service and driver. Root crypto library
 tests and ecbench integration tests are separate checks and have not been
 run by this cloud build. GPU device tests, Compute Sanitizer and performance
 comparisons remain pending. No EKS image or GPU deployment was produced.
+
+## RTX PRO 6000 device validation on RunPod
+
+The owner selected RunPod after the AWS quota block. This run supersedes the
+pending device status above; the earlier failed launches and CPU-only records
+remain historical evidence. PR #2889 merged as
+`21f663511f140bb9c4649e9b98a6678297582063`. The run used its pinned source
+`05d292935cc9d74f57d6322f601ee0e1c88e3084`; executable sources in the standalone
+service, driver, field header, reference module and tensor dependency are
+unchanged in that merge commit.
+
+RunPod pod `09ollojw9j8vbo`, named `explicit-x-pr2889-05d2929-20261029`, was
+created at `2026-10-29T23:57:14.413Z` in Secure Cloud `EUR-IS-2`. The account
+was reconciled before submission; unrelated pods were not used or changed.
+The controller allowed one GPU, a 40-minute worker timeout, and a 45-minute
+wall deadline with deletion on completion or failure. The observed compute
+rate was $2.49/hour; this is a provider rate, not a billing receipt.
+
+| Identity | Observed value |
+| --- | --- |
+| GPU | NVIDIA RTX PRO 6000 Blackwell Server Edition |
+| Device UUID | `GPU-cb3aa7f7-3a3f-39c2-c3cf-d221e0698fa4` |
+| Device memory / compute capability | 97,887 MiB / 12.0 |
+| Driver / CUDA compiler | 595.91.07 / 13.2.51 |
+| C++ / Rust | Ubuntu GCC 13.3.0 / Rust 1.88.0 |
+| CUDA image | `nvidia/cuda@sha256:d266e59b88c295bc5fa0e4cef9064eaff84939381b09e2c3d76a5532a303e42d` |
+
+The image digest was resolved from NVIDIA's public CUDA 13.2.0 development
+image. RunPod's live GPU catalog and [official API v2 documentation](https://docs.runpod.io/api-reference-v2/overview)
+were checked for GPU identity, CUDA placement constraints, current rate,
+pod reconciliation, log collection and deletion. No credential was sent to
+the pod or included in the evidence archive.
+
+The worker ran `bash gpu/explicit-relations/validate-rtx.sh` with
+`EPHEMERAL_OUT=/results`. The bootstrap, validator and controller all exited
+zero. The command compiled and executed the CUDA service on the device.
+
+| Check | Observed result |
+| --- | --- |
+| `make test`: standalone Rust unit tests | 10 passed, zero failed |
+| Host service arithmetic, explicit lifts, signed hash bases and relation tests | Passed |
+| Host driver oracle differential, deterministic replay and complete bounded reduction certificates | Passed |
+| `make ARCH=sm_120 test-cuda`: device service tests | Passed |
+| CUDA driver hash inventories, all-target CPU oracle differential and reduction/certificate replay | Passed |
+| Standalone release Clippy with `-D warnings` | Passed |
+| `compute-sanitizer --tool memcheck --error-exitcode 86 build/explicit-relations-cuda --self-test` | Passed, `ERROR SUMMARY: 0 errors` |
+| Result collection and pod deletion | Archive recovered; provider list confirmed the pod absent |
+
+Raw evidence, launch scripts, pinned request, sanitized pod receipt and
+deletion receipt are retained at
+`s3://setec-astronomy-artifacts/validation/ecbench-explicit-x/runpod-09ollojw9j8vbo/`.
+The local copy is `/home/ec2-user/ecbench-runpod-20261029/`.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `results.tgz` | `26ebf7132441afa2be4c0727c8d536d6230d631b4fa53d0ecea1edcffe0ad48a` |
+| Raw provider log stream, `logs-final.sse` | `2125c099f49e24475c0215c707b491ad57bf6007229643622a4e2160d26ce872` |
+| `validation.log` inside the archive | `050c01dded6a8cb1c44ad9483d5fd5c61586d5ee072c2b47c977d47f8e2764f6` |
+| Host service binary | `0510bc8f1bccd81edd730e9deb46b4ebd1eff67423053c7449476f66997f5dd8` |
+| CUDA service binary | `76ceaa94a78e5d20f29154cd7767f5b3fa313278ed6006eda1123d5289b4790a` |
+| Rust driver binary | `76b782b4d8791ae9878f988ceb7bfb59010f176889a3b38bb5b28d3c35881b7c` |
+
+This is correctness validation on the included public fixtures, not a timed
+comparison or an asymptotic result. It does not cover the root crypto library
+and ecbench integration suites, sanitizer racecheck/synccheck, wider-field
+paper reductions, or a GPU port of the separate tensor backend. The bounded
+driver still requires `p <= 65521`, cofactor one and at most 512 columns.
+No EKS image was built. The RunPod pod has been deleted; no continuing GPU
+service is implied by this successful execution.
