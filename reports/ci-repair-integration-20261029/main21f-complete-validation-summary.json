@@ -1,0 +1,94 @@
+{
+  "observed_at": "2026-10-30T03:48:48.339610+00:00",
+  "library": {
+    "actual_source": "0312cb6e663f93e658ebd82c1beb2ba74ffb827a",
+    "tested": 5396,
+    "failed": 0,
+    "ignored_existing": 123,
+    "total": 5519,
+    "test_seconds": 1697.37,
+    "cargo_exit_code": 0,
+    "command_seconds": 1698,
+    "source_comparison_to": "f04b49bff31e5769e9610cf9b2bc7dbeb89f10dd",
+    "rust_cargo_path_dependency_and_alias_changes": []
+  },
+  "dataset": {
+    "actual_source": "0312cb6e663f93e658ebd82c1beb2ba74ffb827a",
+    "tested": 216,
+    "failed": 0,
+    "ignored_existing": 1,
+    "cargo_exit_code": 0
+  },
+  "native": {
+    "actual_source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "session_count": 115,
+    "eligible_replays": 25181,
+    "reproduced": 25061,
+    "exact_pinned_drift": 120,
+    "static_only_zero_candidates": [
+      {
+        "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n7",
+        "session_id": "ECBS1h302934ff99ed"
+      },
+      {
+        "dir": "research/f4_f5_f6_cross_family_20261011/sessions/X19",
+        "session_id": "ECBS1h9453f8e9b41e"
+      }
+    ],
+    "checker_exit": 0,
+    "all_historical_pins_mandatory": true,
+    "qualifies_new_native_source": false,
+    "new_current_source_native_verification": "Pending separate current-source hosted replay. Counts/answers only; no timing or scientific advance claimed."
+  },
+  "metadata_controls": {
+    "ordinary": 30,
+    "partition": 145,
+    "scientific_evidence": false
+  },
+  "logs": [
+    {
+      "file": "main21f-full-library.log.gz",
+      "bytes": 483095,
+      "sha256": "f29af8ffcfa2dc3a877970ac966d398598c8b7b50c54f58f085a4053b435763a",
+      "gzip_bytes": 91506,
+      "gzip_sha256": "63306df88ad4e5d6af53f2181abb9137bba5e9f34ee76dcdd598b4e60c55ccfe"
+    },
+    {
+      "file": "main21f-dataset-tests.log.gz",
+      "bytes": 22982,
+      "sha256": "1548ed85b5022660ea145e43e6855dbbce49084d003582c004bf926f5b6fefb3",
+      "gzip_bytes": 5774,
+      "gzip_sha256": "bc28240486a3787379e2c7b8c2bd9c500e3828f247ed2f77dafaac05d6ad103d"
+    },
+    {
+      "file": "main21f-initial-enospc-link.log.gz",
+      "bytes": 7941,
+      "sha256": "3e7d5df4026adc367ece55686629afea384dd67f02ccc725f57f4cedc6f1908a",
+      "gzip_bytes": 4073,
+      "gzip_sha256": "24620b1ffc8b82548cfd2fb6348c2fe44fd81269ed9d63e6883fa1e03495ae59"
+    },
+    {
+      "file": "final-pinned-replay-metadata-controls.log.gz",
+      "bytes": 36,
+      "sha256": "75be979b051bf2aaacf69c2932351f7b6659cfcf3588c939c0d594cd046317d6",
+      "gzip_bytes": 56,
+      "gzip_sha256": "53f79be16a0cc5da0bea334647518dd7bfc38caea0fbd984b170b8d7b15c73e9"
+    },
+    {
+      "file": "final-pinned-partition-metadata-controls.log.gz",
+      "bytes": 40,
+      "sha256": "b320451ec8692ada3f9089d8b0494e39b03aa3945d2f2c8ee8681e169dd24ea6",
+      "gzip_bytes": 60,
+      "gzip_sha256": "ba644efc08e233804464a33dac5aedb33bc406a80509ebbd7f7e3c5a154462b4"
+    },
+    {
+      "file": "all115-final-mandatory-pins-check.log.gz",
+      "bytes": 13055,
+      "sha256": "8e96ffde91f37e607c419519c7a9dafbb3a49cabc13a0d2a534a80781d8dcb1e",
+      "gzip_bytes": 1006,
+      "gzip_sha256": "482dccd7f61f469c28538ca2fded397922bff341a768a930846cc97b390ad762"
+    }
+  ],
+  "retained_failures": "Initial interrupted compile and real ENOSPC link are preserved separately; no tests or successful exit invented for either."
+}
