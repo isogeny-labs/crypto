@@ -260,6 +260,18 @@ impl Store {
             backend,
         })
     }
+    /// Open with a caller-owned backend, preserving the index/cache semantics.
+    /// Dataset publication uses this to install its admitted native transport;
+    /// the default store factory remains unchanged.
+    pub fn open_with_backend(cfg: Config, backend: Box<dyn Backend>) -> Result<Self, String> {
+        let index = Index::load(&cfg.index_path)?;
+        Ok(Self {
+            cfg,
+            index,
+            backend: Some(backend),
+        })
+    }
+
     pub fn open(cfg: Config) -> Result<Self, String> {
         let index = Index::load(&cfg.index_path)?;
         let backend = make_backend(&cfg);

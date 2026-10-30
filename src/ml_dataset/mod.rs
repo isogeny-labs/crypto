@@ -2,6 +2,7 @@
 pub mod budget;
 pub mod capture;
 pub mod curves;
+mod execution;
 pub mod export;
 pub mod factor_bases;
 pub mod live;
@@ -9,18 +10,26 @@ pub mod relations;
 pub mod report;
 pub mod restore;
 pub mod snapshot;
+pub mod s3_budget;
 pub mod solvers;
+mod startup_gate;
 pub mod storage;
 pub mod telemetry;
 pub mod types;
 
+use budget::{
+    BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, LaunchBinding,
+    LaunchRequest, OwnerIdentity, Resources, RunBinding, WorkerGrant,
+};
 use clap::{Args, Subcommand};
+use s3_budget::S3BudgetContext;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use types::{Artifact, CaseConfig, FactorBasePolicy};
 
@@ -32,6 +41,16 @@ pub struct DatasetArgs {
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
+    /// Validate a delivered launch grant and start the frozen bounded worker.
+    Start {
+        #[arg(long)]
+        resume: bool,
+    },
+    /// Inspect or reserve cumulative campaign allocations; admission is not launch authorization.
+    Budget {
+        #[command(subcommand)]
+        command: BudgetCommand,
+    },
     /// Freeze a deterministic cross-product; planning performs no cryptography.
     Plan(PlanArgs),
     /// Execute a bounded number of cells, preserving failures and resuming verified cells.
@@ -68,6 +87,7 @@ pub enum DatasetCommand {
         remote: Option<String>,
         #[command(flatten)]
         budget: live::BudgetArgs,
+        budget: BudgetArgs,
     },
     /// Show actual method support and instrumentation limits.
     Capabilities,
@@ -102,6 +122,7 @@ pub enum DatasetCommand {
     SnapshotWorker {
         #[arg(long)]
         request: PathBuf,
+        budget: BudgetArgs,
     },
     /// Preserve an interrupted attempt after proving no matching worker remains.
     Reconcile {
@@ -118,6 +139,106 @@ pub enum DatasetCommand {
         config: PathBuf,
         #[arg(long)]
         out: PathBuf,
+    },
+}
+
+#[derive(Clone, Default, Args)]
+pub struct BudgetArgs {
+    #[arg(long)]
+    pub budget_policy: Option<PathBuf>,
+    #[arg(long)]
+    pub budget_grant: Option<PathBuf>,
+    /// Existing durable journal; normal commands never create a fresh balance.
+    #[arg(long)]
+    pub budget_state: Option<PathBuf>,
+    /// Exact Job/Pod UID identity document bound by the grant.
+    #[arg(long)]
+    pub budget_owner: Option<PathBuf>,
+}
+
+#[derive(Subcommand)]
+pub enum BudgetCommand {
+    /// Read-only hypothetical admission. No allocation, local directory or cloud request is made.
+    Admit {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Durably allocate one disjoint worker grant, without launching or contacting S3.
+    Reserve {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        /// Create the single authoritative campaign ledger; never use for lost-state recovery.
+        #[arg(long)]
+        create_ledger: bool,
+    },
+    /// Reserve an ownerless launch envelope before submission; dry-run is strictly read-only.
+    ReserveLaunch {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long, conflicts_with_all = ["out", "create_ledger"])]
+        dry_run: bool,
+        #[arg(long, required_unless_present = "dry_run")]
+        out: Option<PathBuf>,
+        /// First initialization only; never recreate a lost allocator.
+        #[arg(long)]
+        create_ledger: bool,
+    },
+    /// Bind a retained launch reservation to reconciled owner evidence; no cloud submission.
+    BindLaunch {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
+        #[arg(long)]
+        binding: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Activate a grant once with a charged conditional S3 PUT and verified GET.
+    Activate {
+        #[command(flatten)]
+        budget: BudgetArgs,
+        /// Retry an existing pending activation using its original journal nonce.
+        #[arg(long)]
+        resume: bool,
+    },
+    /// Fetch one known object with exact digest/length and charged S3 requests; no LIST.
+    Fetch {
+        #[command(flatten)]
+        budget: BudgetArgs,
+        #[arg(long)]
+        remote: String,
+        #[arg(long)]
+        key: String,
+        #[arg(long)]
+        sha256: String,
+        #[arg(long)]
+        bytes: u64,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Inspect the authoritative local campaign ledger without contacting S3.
+    Status {
+        #[arg(long)]
+        policy: PathBuf,
+        #[arg(long)]
+        ledger: PathBuf,
     },
 }
 
@@ -195,6 +316,10 @@ pub struct GenerateArgs {
     /// Bound each snapshot helper; the solver deadline remains independently enforced.
     #[arg(long, default_value_t = 120)]
     pub snapshot_timeout_seconds: u64,
+    pub budget: BudgetArgs,
+    /// Finite Resources reservation charged once per cell, with requests spent inside it.
+    #[arg(long)]
+    pub budget_cell_envelope: Option<PathBuf>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -237,6 +362,14 @@ fn nonempty_policy_axis<'de, D: serde::Deserializer<'de>>(
 }
 
 impl DatasetPlan {
+    /// Existing run/grant identity: compact serialization of this typed plan
+    /// in struct field order, not generic canonical JSON or the saved file bytes.
+    fn binding_sha256(&self) -> Result<String, String> {
+        Ok(digest(
+            &serde_json::to_vec(self).map_err(|e| e.to_string())?,
+        ))
+    }
+
     pub fn validate(&self) -> Result<(), String> {
         let policy_plan = match self.schema.as_str() {
             "crypto.ml-dataset.plan/v1" if self.factor_base_policies.is_empty() => false,
@@ -436,8 +569,454 @@ pub fn digest(bytes: &[u8]) -> String {
     crate::utils::encoding::to_hex(&crate::hash::sha256(bytes))
 }
 
+fn budget_inputs(
+    args: &BudgetArgs,
+) -> Result<Option<(CampaignPolicy, WorkerGrant, OwnerIdentity, &Path)>, String> {
+    match (
+        &args.budget_policy,
+        &args.budget_grant,
+        &args.budget_owner,
+        &args.budget_state,
+    ) {
+        (None, None, None, None) => Ok(None),
+        (Some(policy), Some(grant), Some(owner), Some(state)) => Ok(Some((
+            read_json(policy)?,
+            read_json(grant)?,
+            read_json(owner)?,
+            state,
+        ))),
+        _ => Err(
+            "budget-policy, budget-grant, budget-owner and budget-state must be supplied together"
+                .into(),
+        ),
+    }
+}
+
+fn validate_budget_actor(session: &BudgetSession) -> Result<(), String> {
+    let source = generation_source()?;
+    let binary = crate::store::hash_file(&std::env::current_exe().map_err(|e| e.to_string())?)?.0;
+    let binding = &session.grant().request.binding;
+    if binding.source_commit != source || binding.binary_sha256 != binary {
+        return Err("current executor source/binary differs from budget grant".into());
+    }
+    Ok(())
+}
+
+fn open_budget(args: &BudgetArgs) -> Result<Option<Arc<BudgetSession>>, String> {
+    let Some((policy, grant, owner, state)) = budget_inputs(args)? else {
+        return Ok(None);
+    };
+    let session = Arc::new(BudgetSession::open(state, &policy, &grant, &owner)?);
+    session.require_active()?;
+    validate_budget_actor(&session)?;
+    Ok(Some(session))
+}
+
+/// Actor identity is checked before creating the transport. Imported data keep
+/// their original producer identity; the grant binds this reader/publisher.
+pub(super) fn validate_budget_run(session: &BudgetSession, root: &Path) -> Result<(), String> {
+    let (plan, producer, plan_sha) = bound_run(root)?;
+    let protocol_sha = plan
+        .protocol_sha256
+        .ok_or("budgeted run lacks frozen protocol")?;
+    let actor = &session.grant().request.binding;
+    session.validate_binding(&RunBinding {
+        source_commit: actor.source_commit.clone(),
+        binary_sha256: actor.binary_sha256.clone(),
+        plan_sha256: plan_sha,
+        protocol_sha256: protocol_sha,
+        shard_index: producer["shard_index"]
+            .as_u64()
+            .ok_or("missing run shard")?,
+        shard_count: producer["shard_count"]
+            .as_u64()
+            .ok_or("missing run shard count")?,
+    })
+}
+
+fn configured_remote(remote: Option<&str>) -> Result<crate::store::backend::RemoteSpec, String> {
+    if let Some(remote) = remote {
+        return crate::store::backend::RemoteSpec::parse(remote);
+    }
+    crate::store::Config::discover()?
+        .remote
+        .ok_or_else(|| "explicit S3 or file remote required".to_string())
+}
+
+fn require_remote_budget(
+    remote: &crate::store::backend::RemoteSpec,
+    session: Option<&Arc<BudgetSession>>,
+) -> Result<(), String> {
+    if matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) && session.is_none() {
+        return Err("dataset S3 operations require policy/grant/owner and an existing activated budget journal".into());
+    }
+    Ok(())
+}
+
+fn budget_transport(
+    session: Option<Arc<BudgetSession>>,
+) -> Result<Option<Arc<S3BudgetContext>>, String> {
+    session.map(S3BudgetContext::from_env).transpose()
+}
+
+fn save_budget_checkpoint(root: &Path, session: &BudgetSession) -> Result<Artifact, String> {
+    let directory = checked_directory(&root.join("budget-checkpoints"), true)?;
+    let nonce = unix_nanos()?;
+    let filename = format!("{}-{nonce}.sqlite", session.grant().request.grant_id);
+    let checkpoint = session.checkpoint(&directory.join(&filename))?;
+    let snapshot = session.snapshot()?;
+    storage::write_json(
+        &directory,
+        &format!("{filename}.json"),
+        "restricted-budget-audit-checkpoint",
+        &json!({"checkpoint":checkpoint,"snapshot":snapshot,
+            "local_byte_allocation_is_hard_write_limit":false,"account_wide_billing_cutoff":false}),
+    )?;
+    let (sha256, bytes) = crate::store::hash_file(&directory.join(&filename))?;
+    Ok(Artifact {
+        path: format!("budget-checkpoints/{filename}"),
+        role: "restricted-budget-audit-database".into(),
+        encoding: "sqlite".into(),
+        sha256,
+        bytes,
+    })
+}
+
+fn finalize_budget(
+    root: &Path,
+    context: Option<&Arc<S3BudgetContext>>,
+    remote: Option<&crate::store::backend::RemoteSpec>,
+    publish: bool,
+) -> Result<(), String> {
+    let Some(context) = context else {
+        return Ok(());
+    };
+    let checkpoint = save_budget_checkpoint(root, context.session())?;
+    if publish {
+        let remote = remote.ok_or("budget checkpoint requires an explicit remote")?;
+        if matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) {
+            let mut cfg = crate::store::Config::discover()?;
+            cfg.remote = Some(remote.clone());
+            cfg.index_path = root.join("store-index.json");
+            let result = storage::publish_budget_checkpoint(root, &checkpoint, cfg, context);
+            // Retain even failed/unknown checkpoint publication attempts. This
+            // final local copy is not recursively uploaded or called remote.
+            let retained = save_budget_checkpoint(root, context.session());
+            result?;
+            retained?;
+        }
+    }
+    Ok(())
+}
+
+fn combine_finalization<T>(
+    result: Result<T, String>,
+    finalization: Result<(), String>,
+) -> Result<T, String> {
+    match (result, finalization) {
+        (Ok(value), Ok(())) => Ok(value),
+        (Err(error), Ok(())) => Err(error),
+        (Ok(_), Err(error)) => Err(format!(
+            "budget finalization failed; retained journal remains charged: {error}"
+        )),
+        (Err(error), Err(final_error)) => Err(format!(
+            "{error}; budget finalization also failed: {final_error}"
+        )),
+    }
+}
+
+fn cell_budget_scope(
+    context: Option<&Arc<S3BudgetContext>>,
+    envelope: Option<&Resources>,
+    plan: &str,
+    index: u64,
+) -> Result<BudgetScope, String> {
+    let Some(context) = context else {
+        return Ok(BudgetScope::Work);
+    };
+    // A minimum control allowance is protected before starting more work.
+    // Actual metadata/checkpoint sizes are admitted again before transmission;
+    // this is not a claim that polling bounds all local writes or artifact counts.
+    context
+        .session()
+        .finalization_remaining()?
+        .checked_sub(&Resources {
+            output_bytes: 64 * 1024,
+            put_attempts: 2,
+            read_attempts: 4,
+            download_bytes: 256 * 1024,
+            ..Resources::default()
+        })?;
+    let id = format!("cell-{plan}-{index}");
+    context.session().reserve_cell(
+        &id,
+        envelope.ok_or("budgeted generation requires --budget-cell-envelope")?,
+    )?;
+    Ok(BudgetScope::Cell(id))
+}
+
+fn write_budget_receipt<T: Serialize>(
+    out: &Path,
+    role: &str,
+    value: &T,
+) -> Result<Artifact, String> {
+    let parent = out
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or(Path::new("."));
+    let parent = checked_directory(parent, true)?;
+    let filename = out
+        .file_name()
+        .and_then(|s| s.to_str())
+        .ok_or("invalid budget receipt filename")?;
+    storage::write_json(&parent, filename, role, value)
+}
+
+fn run_budget_command(command: &BudgetCommand) -> Result<Value, String> {
+    match command {
+        BudgetCommand::Admit {
+            policy,
+            ledger,
+            request,
+            dry_run,
+        } => {
+            if !dry_run {
+                return Err(
+                    "budget admit requires --dry-run; use budget reserve for explicit allocation"
+                        .into(),
+                );
+            }
+            let report =
+                CampaignLedger::dry_admit(ledger, &read_json(policy)?, &read_json(request)?)?;
+            serde_json::to_value(report).map_err(|e| e.to_string())
+        }
+        BudgetCommand::Reserve {
+            policy,
+            ledger,
+            request,
+            out,
+            create_ledger,
+        } => {
+            let policy: CampaignPolicy = read_json(policy)?;
+            let request: GrantRequest = read_json(request)?;
+            let ledger = if *create_ledger {
+                CampaignLedger::create(ledger, &policy)?
+            } else {
+                CampaignLedger::open(ledger, &policy)?
+            };
+            let snapshot = ledger.snapshot()?;
+            if snapshot["launches"].get(&request.grant_id).is_some() {
+                return Err("grant ID belongs to a launch reservation; use bind-launch to preserve its binding evidence".into());
+            }
+            let previous = snapshot["grants"][&request.grant_id].clone();
+            let grant = if previous.is_null() {
+                ledger.reserve(&request)?
+            } else {
+                let grant: WorkerGrant =
+                    serde_json::from_value(previous).map_err(|e| e.to_string())?;
+                if grant.request != request {
+                    return Err("issued grant ID cannot be repointed to a different request".into());
+                }
+                grant
+            };
+            let parent = out
+                .parent()
+                .filter(|p| !p.as_os_str().is_empty())
+                .unwrap_or(Path::new("."));
+            let parent = checked_directory(parent, true)?;
+            let filename = out
+                .file_name()
+                .and_then(|s| s.to_str())
+                .ok_or("invalid grant filename")?;
+            let artifact = storage::write_json(
+                &parent,
+                filename,
+                "restricted-campaign-budget-grant",
+                &grant,
+            )?;
+            Ok(
+                json!({"grant":grant,"artifact":artifact,"campaign":ledger.snapshot()?,"cloud_requests":0,"launched":false}),
+            )
+        }
+        BudgetCommand::ReserveLaunch {
+            policy,
+            ledger,
+            request,
+            dry_run,
+            out,
+            create_ledger,
+        } => {
+            // Enforce the same constraints for direct native callers as clap.
+            // Check before reading inputs or opening/creating allocator state.
+            if *dry_run && (out.is_some() || *create_ledger) {
+                return Err(
+                    "reserve-launch --dry-run conflicts with --out and --create-ledger".into(),
+                );
+            }
+            if !*dry_run && out.is_none() {
+                return Err("reserve-launch requires --out unless --dry-run is set".into());
+            }
+            let policy: CampaignPolicy = read_json(policy)?;
+            let request: LaunchRequest = read_json(request)?;
+            if *dry_run {
+                return serde_json::to_value(CampaignLedger::dry_admit_launch(
+                    ledger, &policy, &request,
+                )?)
+                .map_err(|e| e.to_string());
+            }
+            let out = out.as_ref().ok_or("reserve-launch requires --out")?;
+            let ledger = if *create_ledger {
+                CampaignLedger::create(ledger, &policy)?
+            } else {
+                CampaignLedger::open(ledger, &policy)?
+            };
+            // Commit before exporting. An output failure retains the complete
+            // reservation; exact retries recover it without another allocation.
+            let reservation = ledger.reserve_launch(&request)?;
+            let reservation_sha256 = reservation.sha256()?;
+            let artifact =
+                write_budget_receipt(out, "restricted-campaign-launch-reservation", &reservation)?;
+            Ok(
+                json!({"reservation":reservation,"reservation_sha256":reservation_sha256,
+                "artifact":artifact,"campaign":ledger.snapshot()?,"cloud_requests":0,
+                "launched":false,"worker_grant_issued":false}),
+            )
+        }
+        BudgetCommand::BindLaunch {
+            policy,
+            ledger,
+            binding,
+            out,
+        } => {
+            let policy: CampaignPolicy = read_json(policy)?;
+            let binding: LaunchBinding = read_json(binding)?;
+            // Binding never initializes an allocator or creates new allowance.
+            let ledger = CampaignLedger::open(ledger, &policy)?;
+            let grant = ledger.bind_launch(&binding)?;
+            let grant_sha256 = grant.sha256()?;
+            let artifact = write_budget_receipt(out, "restricted-campaign-budget-grant", &grant)?;
+            Ok(
+                json!({"grant":grant,"grant_sha256":grant_sha256,"binding":binding,
+                "artifact":artifact,"campaign":ledger.snapshot()?,
+                "cloud_requests":0,"launched":false}),
+            )
+        }
+        BudgetCommand::Activate { budget, resume } => {
+            let (policy, grant, owner, state) =
+                budget_inputs(budget)?.ok_or("activation requires all budget inputs")?;
+            let session = Arc::new(if *resume {
+                BudgetSession::open(state, &policy, &grant, &owner)?
+            } else {
+                BudgetSession::create(state, &policy, &grant, &owner)?
+            });
+            validate_budget_actor(&session)?;
+            let context = S3BudgetContext::from_env(session.clone())?;
+            let activation = context.activate();
+            let parent = state
+                .parent()
+                .filter(|p| !p.as_os_str().is_empty())
+                .unwrap_or(Path::new("."));
+            let checkpoint = save_budget_checkpoint(parent, &session);
+            activation?;
+            Ok(
+                json!({"activated":true,"checkpoint":checkpoint?,"budget":session.snapshot()?,"launched":false}),
+            )
+        }
+        BudgetCommand::Fetch {
+            budget,
+            remote,
+            key,
+            sha256,
+            bytes,
+            out,
+        } => {
+            crate::store::index::validate_sha256(sha256)?;
+            if *bytes > 1024 * 1024 * 1024 {
+                return Err("budget fetch exceeds the 1 GiB single-object limit".into());
+            }
+            let remote = crate::store::backend::RemoteSpec::parse(remote)?;
+            if !matches!(remote, crate::store::backend::RemoteSpec::S3 { .. }) {
+                return Err("budget fetch requires an explicit S3 remote".into());
+            }
+            let session =
+                open_budget(budget)?.ok_or("budget fetch requires an active bound session")?;
+            let context = S3BudgetContext::from_env(session)?;
+            fetch_budget_object(&context, &remote, key, sha256, *bytes, out)
+        }
+        BudgetCommand::Status { policy, ledger } => {
+            CampaignLedger::open(ledger, &read_json(policy)?)?.snapshot()
+        }
+    }
+}
+
+fn fetch_budget_object(
+    context: &Arc<S3BudgetContext>,
+    remote: &crate::store::backend::RemoteSpec,
+    key: &str,
+    sha256: &str,
+    bytes: u64,
+    out: &Path,
+) -> Result<Value, String> {
+    let parent = checked_directory(
+        out.parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or(Path::new(".")),
+        true,
+    )?;
+    let name = out
+        .file_name()
+        .and_then(|v| v.to_str())
+        .ok_or("invalid fetch destination")?;
+    let destination = storage::contained_path(&parent, name, false)?;
+    if fs::symlink_metadata(&destination).is_ok() {
+        return Err("fetch destination exists; use a fresh path for a new readback".into());
+    }
+    let partial = parent.join(format!(
+        ".budget-fetch-{}-{}",
+        std::process::id(),
+        unix_nanos()?
+    ));
+    let artifact = Artifact {
+        path: name.into(),
+        role: "budgeted-exact-object-download".into(),
+        encoding: "native".into(),
+        sha256: sha256.into(),
+        bytes,
+    };
+    let result = (|| {
+        storage::expect_remote_object(Some(context), remote, key, &artifact, BudgetScope::Work)?;
+        let mut cfg = crate::store::Config::discover()?;
+        cfg.remote = Some(remote.clone());
+        cfg.index_path = parent.join("budget-fetch-unused-index.json");
+        let store = storage::dataset_store(cfg, Some(context), BudgetScope::Work)?;
+        store.remote()?.get(key, &partial)?;
+        storage::check_file(&partial, sha256, bytes)?;
+        File::open(&partial)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| e.to_string())?;
+        fs::hard_link(&partial, &destination)
+            .map_err(|e| format!("activate verified fetch without overwrite: {e}"))?;
+        storage::sync_directory(&parent)?;
+        fs::remove_file(&partial).map_err(|e| e.to_string())?;
+        Ok(
+            json!({"schema":"crypto.ml-dataset.budget-fetch/v1","remote":remote.display(),"object_key":key,
+            "destination":destination,"sha256":sha256,"bytes":bytes,"fresh_readback_verified":true,
+            "listing_performed":false,"remote_object_written":false}),
+        )
+    })();
+    combine_finalization(result, finalize_budget(&parent, Some(context), None, false))
+}
+
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
+        DatasetCommand::Start { resume } => {
+            let outcome = startup_gate::start(*resume).map_err(|e| e.to_string())?;
+            println!(
+                "{}",
+                serde_json::to_string(&outcome).map_err(|e| e.to_string())?
+            );
+        }
+        DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
             let factor_base_policies: Vec<FactorBasePolicy> = a
                 .factor_base_policies
@@ -486,7 +1065,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             let artifact = storage::write_json(parent, name, "frozen-plan", &plan)?;
             println!(
                 "{}",
-                json!({"plan":a.out,"sha256":artifact.sha256,"planned_cells":plan.cell_count()?,
+                json!({"plan":a.out,"sha256":artifact.sha256,"plan_sha256":plan.binding_sha256()?,"planned_cells":plan.cell_count()?,
                 "generated_cells":0,"twists_included":true})
             );
         }
@@ -509,6 +1088,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 "source_commit":source,"source_dirty":false,
                 "binary_sha256":crate::store::hash_file(&std::env::current_exe().map_err(|e|e.to_string())?)?.0,
                 "plan_file_sha256":crate::store::hash_file(plan)?.0,
+                "plan_sha256":parsed.binding_sha256()?,
                 "protocol_file_sha256":digest(&protocol_bytes),
                 "planned_cells":parsed.cell_count()?,"generated_cells":0,
                 "lab_receipt_uri":receipt_uri,"cloud_permissions_checked":false,
@@ -536,7 +1116,31 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             verify_run(out, true)?;
             for dir in completed_cells(out)? {
                 publish_cell(out, &dir, remote.as_deref(), &budget)?;
+            let session = open_budget(budget)?;
+            let remote = configured_remote(remote.as_deref())?;
+            require_remote_budget(&remote, session.as_ref())?;
+            if let Some(session) = &session {
+                validate_budget_run(session, out)?;
             }
+            let context = budget_transport(session)?;
+            let _lease = Lease::acquire(out)?;
+            let result = (|| {
+                verify_run(out, true)?;
+                for dir in completed_cells(out)? {
+                    publish_cell(
+                        out,
+                        &dir,
+                        Some(&remote.display()),
+                        context.as_ref(),
+                        BudgetScope::Work,
+                    )?;
+                }
+                Ok(())
+            })();
+            combine_finalization(
+                result,
+                finalize_budget(out, context.as_ref(), Some(&remote), true),
+            )?;
         }
         DatasetCommand::Capabilities => println!("{}", solvers::capabilities()),
         DatasetCommand::Export { out, destination } => {
@@ -569,6 +1173,13 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         DatasetCommand::BudgetInit { policy } => println!("{}", budget::initialize(policy)?),
         DatasetCommand::BudgetAllocate(args) => println!("{}", live::allocate(args)?),
         DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
+            let session = open_budget(budget)?;
+            let context = budget_transport(session)?;
+            let result =
+                restore::restore_budgeted(receipt, out, remote.as_deref(), context.as_ref());
+            let finalized = finalize_budget(out, context.as_ref(), None, false);
+            println!("{}", combine_finalization(result, finalized)?);
+        }
         DatasetCommand::Reconcile { out, cell, reason } => reconcile(out, *cell, reason)?,
     }
     Ok(())
@@ -711,9 +1322,67 @@ struct CellManifest {
     artifacts: Vec<Artifact>,
 }
 
+const CAPTURE_CONTEXT: [(&str, &str); 2] = [
+    ("capture-binding.json", "partial-capture-binding"),
+    ("capture-limits.json", "partial-capture-limits"),
+];
+
+fn admit_capture_context(
+    dir: &Path,
+) -> Result<Option<(capture::AttemptBinding, capture::CaptureLimits)>, String> {
+    let present = CAPTURE_CONTEXT
+        .iter()
+        .any(|(path, _)| fs::symlink_metadata(dir.join(path)).is_ok());
+    if !present {
+        return Ok(None);
+    }
+    if !telemetry::checked::policy_present(dir)? {
+        return Err("bound capture requires the frozen checked measurement policy".into());
+    }
+    let binding: capture::AttemptBinding =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[0].0, false)?)?;
+    let limits: capture::CaptureLimits =
+        read_json(&storage::contained_path(dir, CAPTURE_CONTEXT[1].0, false)?)?;
+    if binding != capture::AttemptBinding::from_cell_files(dir)? {
+        return Err("capture binding differs from original attempt".into());
+    }
+    let run: Value = read_json(&dir.join("run.json"))?;
+    let trace_mib = run["trace_mib"]
+        .as_u64()
+        .ok_or("capture run lacks frozen trace_mib")?;
+    if limits != capture::capture_limits(trace_mib)? {
+        return Err("capture limits differ from frozen run allowance".into());
+    }
+    Ok(Some((binding, limits)))
+}
+
+fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), String> {
+    let admitted = admit_capture_context(dir)?.is_some();
+    for (path, role) in CAPTURE_CONTEXT {
+        let matching: Vec<_> = artifacts
+            .iter()
+            .filter(|a| a.path == path || a.role == role)
+            .collect();
+        if admitted {
+            if matching.len() != 1
+                || matching[0].path != path
+                || matching[0].role != role
+                || matching[0].encoding != "json"
+            {
+                return Err("capture context manifest identity/role/encoding mismatch".into());
+            }
+        } else if !matching.is_empty() {
+            return Err("capture context manifest has no admitted original files".into());
+        }
+    }
+    Ok(())
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let mut registry = Vec::<Artifact>::new();
+    let capture_context = admit_capture_context(&out)?;
+    let execution_context = execution::admit(&out)?;
     if telemetry::checked::policy_present(&out)? {
         capture::AttemptBinding::from_cell_files(&out)?;
         if read_json::<CaseConfig>(&out.join("config.json"))? != *config {
@@ -766,6 +1435,22 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 )
             } else {
                 solvers::solve_with_event_sink(config, &case, &out.join("live"))
+            if let Some((binding, limits)) = &capture_context {
+                solvers::solve_with_bound_event_sink_context(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    binding.clone(),
+                    limits.clone(),
+                    execution_context.as_ref(),
+                )
+            } else {
+                solvers::solve_with_event_sink_context(
+                    config,
+                    &case,
+                    &out.join("live"),
+                    execution_context.as_ref(),
+                )
             }
         })?;
         let mut names = BTreeSet::new();
@@ -787,6 +1472,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 "host.json",
                 "worker-artifacts.json",
                 "measurement-policy.json",
+                "capture-binding.json",
+                "capture-limits.json",
+                execution::PATH,
             ]
             .contains(&artifact.path.as_str())
                 || artifact.path.starts_with("publication/")
@@ -870,6 +1558,9 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "attempt.json" | "worker-process.json" => ("process-provenance", "json"),
                 "host.json" => ("host-measurement-context", "json"),
                 "worker-artifacts.json" => ("artifact-registry", "json"),
+                "capture-binding.json" => ("partial-capture-binding", "json"),
+                "capture-limits.json" => ("partial-capture-limits", "json"),
+                execution::PATH => (execution::ROLE, "json"),
                 "stdout.log" | "stderr.log" => ("process-log", "utf8"),
                 _ => ("unregistered-partial-artifact", "native"),
             }
@@ -943,6 +1634,32 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let binary_sha = crate::store::hash_file(&exe)?.0;
+    let session = open_budget(&a.budget)?;
+    let remote = if a.publish {
+        Some(configured_remote(a.remote.as_deref())?)
+    } else {
+        None
+    };
+    if let Some(remote) = &remote {
+        require_remote_budget(remote, session.as_ref())?;
+    }
+    if a.publish
+        && std::env::var("ISOLAB_RESULTS_URI").is_ok_and(|uri| !uri.is_empty())
+        && session.is_none()
+    {
+        return Err("S3 lab receipt routing requires an active budget even when the data remote is a file backend".into());
+    }
+    let envelope: Option<Resources> = a
+        .budget_cell_envelope
+        .as_ref()
+        .map(|path| read_json(path))
+        .transpose()?;
+    if session.is_some() && envelope.is_none() {
+        return Err("budgeted generation requires a finite --budget-cell-envelope".into());
+    }
+    if session.is_none() && envelope.is_some() {
+        return Err("cell envelope requires a bound budget session".into());
+    }
     let _lease = Lease::acquire(&a.out)?;
     let out = checked_directory(&a.out, false)?;
     let budget_policy_sha256 = {
@@ -979,9 +1696,22 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let canonical = serde_json::to_vec(&plan).map_err(|e| e.to_string())?;
     let plan_sha = digest(&canonical);
     let mut binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
+    let plan_sha = plan.binding_sha256()?;
+    if let Some(session) = &session {
+        session.validate_binding(&RunBinding {
+            source_commit: source.into(),
+            binary_sha256: binary_sha.clone(),
+            plan_sha256: plan_sha.clone(),
+            protocol_sha256: digest(&protocol),
+            shard_index: a.shard_index,
+            shard_count: a.shard_count,
+        })?;
+    }
+    let context = budget_transport(session)?;
+    let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
-        "trace_mib":a.trace_mib,"output_budget_scope":"all_cell_files_before_manifest_seal",
+        "trace_mib":a.trace_mib,"execution_context_required":cfg!(target_os = "linux"),"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
     if a.publish {
         binding["partial_capture"] = json!({
@@ -1083,30 +1813,26 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             .checked_mul(1024 * 1024)
             .ok_or("memory limit overflow")?;
         #[cfg(target_os = "linux")]
+    let result = (|| {
+        storage::write_json(&out, "run.json", "run-binding", &binding)?;
+        storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
+        storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
+        let cells = checked_directory(&out.join("cells"), true)?;
+        let mut attempted = 0;
+        for index in (a.shard_index..plan.cell_count()?)
+            .step_by(usize::try_from(a.shard_count).map_err(|_| "shard count too large")?)
         {
-            use std::os::unix::process::CommandExt;
-            let parent = std::process::id();
-            // Limit the child only. Kill it if its supervising process vanishes.
-            unsafe {
-                command.pre_exec(move || {
-                    if libc::setpgid(0, 0) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    if libc::getppid() as u32 != parent {
-                        return Err(std::io::Error::other("supervisor exited"));
-                    }
-                    let limit = libc::rlimit {
-                        rlim_cur: memory,
-                        rlim_max: memory,
-                    };
-                    if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    Ok(())
-                });
+            let config = plan.cell(index)?;
+            let dir = cells.join(format!("{index:012}"));
+            if dir.join("manifest.json").exists() {
+                verify_resumed_cell(&dir, &binding, &config, index, &plan_sha)?;
+                if a.publish {
+                    let scope =
+                        cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
+                    publish_cell(&out, &dir, a.remote.as_deref(), context.as_ref(), scope)?;
+                    finalize_budget(&out, context.as_ref(), remote.as_ref(), true)?;
+                }
+                continue;
             }
         }
         #[cfg(all(unix, not(target_os = "linux")))]
@@ -1148,12 +1874,112 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             let bytes = tree_bytes_while_running(&dir)?;
             if start.elapsed() >= Duration::from_secs(a.seconds_per_case) {
                 stop_reason = Some("timeout");
+            if attempted >= a.max_cases {
+                break;
             }
-            if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
-                stop_reason = Some("trace_budget_exhausted");
+            // An unfinished attempt is retained under its original directory. Retrying
+            // requires explicit reconciliation; no surviving child is duplicated.
+            if dir.exists() {
+                return Err(format!(
+                    "cell {index} has an incomplete attempt; reconcile it before retrying"
+                ));
             }
-            if stop_reason.is_some() {
-                break child.stop()?;
+            let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
+            fs::create_dir(&dir).map_err(|e| e.to_string())?;
+            sync_dir(&cells)?;
+            storage::write_json(&dir, "run.json", "restricted-run-binding", &binding)?;
+            storage::write_json(&dir, "plan.json", "restricted-frozen-plan", &plan)?;
+            storage::write_bytes(
+                &dir,
+                "protocol.json",
+                "restricted-frozen-protocol",
+                "json",
+                &protocol,
+            )?;
+            storage::write_json(&dir, "config.json", "restricted-provenance", &config)?;
+            storage::write_json(
+                &dir,
+                "host.json",
+                "host-measurement-context",
+                &host_context(),
+            )?;
+            storage::write_json(
+                &dir,
+                "attempt.json",
+                "attempt-provenance",
+                &json!({
+            "schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan_sha,
+            "supervisor_pid":std::process::id(),"started_unix_nanos":unix_nanos()?.to_string(),
+            "status":"attempt_started"}),
+            )?;
+            telemetry::checked::install_policy(&dir)?;
+            let capture_binding = capture::AttemptBinding::from_cell_files(&dir)?;
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &capture_binding,
+            )?;
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &capture::capture_limits(a.trace_mib)?,
+            )?;
+            let stdout = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(dir.join("stdout.log"))
+                .map_err(|e| e.to_string())?;
+            let stderr = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(dir.join("stderr.log"))
+                .map_err(|e| e.to_string())?;
+            let mut command = Command::new(&exe);
+            command
+                .args(["dataset", "worker", "--config"])
+                .arg(dir.join("config.json"))
+                .arg("--out")
+                .arg(&dir)
+                .env("RAYON_NUM_THREADS", "1")
+                .stdout(Stdio::from(stdout))
+                .stderr(Stdio::from(stderr));
+            let memory = a
+                .memory_mib
+                .checked_mul(1024 * 1024)
+                .ok_or("memory limit overflow")?;
+            #[cfg(target_os = "linux")]
+            {
+                use std::os::unix::process::CommandExt;
+                let parent = std::process::id();
+                // Limit the child only. Kill it if its supervising process vanishes.
+                unsafe {
+                    command.pre_exec(move || {
+                        if libc::setpgid(0, 0) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        if libc::getppid() as u32 != parent {
+                            return Err(std::io::Error::other("supervisor exited"));
+                        }
+                        let limit = libc::rlimit {
+                            rlim_cur: memory,
+                            rlim_max: memory,
+                        };
+                        if libc::setrlimit(libc::RLIMIT_AS, &limit) != 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        Ok(())
+                    });
+                }
+            }
+            #[cfg(all(unix, not(target_os = "linux")))]
+            {
+                use std::os::unix::process::CommandExt;
+                command.process_group(0);
             }
             std::thread::sleep(Duration::from_millis(100));
         };
@@ -1214,6 +2040,64 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 json!({"status":"worker_failed","exit_code":exit.code(),"solver_completed":false});
         }
         outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
+            let launch_context = if cfg!(target_os = "linux") {
+                Some(execution::create(&dir)?)
+            } else {
+                None
+            };
+            let start = Instant::now();
+            let mut child = SupervisedChild {
+                child: command.spawn().map_err(|e| e.to_string())?,
+                finished: false,
+            };
+            storage::write_json(
+                &dir,
+                "worker-process.json",
+                "process-provenance",
+                &json!({
+            "worker_pid":child.child.id(),"supervisor_pid":std::process::id(),
+            "output":dir,"process_group":child.child.id()}),
+            )?;
+            let mut stop_reason = None;
+            let exit = loop {
+                let polled = child.poll()?;
+                // A successful exit observed at/after the original deadline is
+                // conservatively censored, even if it occurred between polls.
+                let expired = if let Some(launch) = &launch_context {
+                    execution::deadline_expired(
+                        launch.deadline_monotonic_ns,
+                        execution::monotonic_ns()?,
+                    )
+                } else {
+                    start.elapsed() >= Duration::from_secs(a.seconds_per_case)
+                };
+                if expired {
+                    stop_reason = Some("timeout");
+                }
+                if let Some(status) = polled {
+                    break status;
+                }
+                let bytes = tree_bytes_while_running(&dir)?;
+                if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
+                    stop_reason = Some("trace_budget_exhausted");
+                }
+                if stop_reason.is_some() {
+                    break child.stop()?;
+                }
+                std::thread::sleep(Duration::from_millis(100));
+            };
+            let final_bytes = tree_bytes_while_running(&dir)?;
+            if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
+                stop_reason = Some("trace_budget_exhausted");
+            }
+            let mut outcome: Value = if dir.join("result.json").exists() {
+                read_json(&dir.join("result.json"))?
+            } else {
+                json!({"status":"worker_failed","solver_completed":false})
+            };
+            outcome =
+                execution::terminal_outcome(outcome, stop_reason, exit.success(), exit.code());
+            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":"whole_worker_not_counted; see phase telemetry for available hardware counts","memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
@@ -1260,6 +2144,42 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     }
     println!("{}", verify_run(&out, true)?);
     Ok(())
+            let artifacts = collect_cell_artifacts(&dir)?;
+            let manifest = CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan_sha.clone(),
+                config,
+                outcome,
+                artifacts,
+            };
+            storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest)?;
+            verify_cell(&dir, true)?;
+            if a.publish {
+                publish_cell(&out, &dir, a.remote.as_deref(), context.as_ref(), scope)?;
+            }
+            finalize_budget(&out, context.as_ref(), remote.as_ref(), a.publish)?;
+            attempted += 1;
+            let manifest_bytes = crate::store::hash_file(&dir.join("manifest.json"))?.1;
+            let publication_bytes = if dir.join("publication").exists() {
+                tree_bytes_while_running(&dir.join("publication"))?
+            } else {
+                0
+            };
+            println!(
+                "{}",
+                json!({"cell_index":index,"outcome":manifest.outcome,"durable_remote":a.publish,
+            "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
+            "publication_metadata_bytes":publication_bytes})
+            );
+        }
+        println!("{}", verify_run(&out, true)?);
+        Ok(())
+    })();
+    combine_finalization(
+        result,
+        finalize_budget(&out, context.as_ref(), remote.as_ref(), a.publish),
+    )
 }
 
 fn tree_files(root: &Path) -> Result<Vec<PathBuf>, String> {
@@ -1542,7 +2462,7 @@ fn bound_run(root: &Path) -> Result<(DatasetPlan, Value, String), String> {
     let plan: DatasetPlan = read_json(&root.join("plan.json"))?;
     plan.validate()?;
     verify_protocol(&plan, &read_json_bytes(&root.join("protocol.json"))?)?;
-    let hash = digest(&serde_json::to_vec(&plan).map_err(|e| e.to_string())?);
+    let hash = plan.binding_sha256()?;
     let binding: Value = read_json(&root.join("run.json"))?;
     if binding["schema"] != "crypto.ml-dataset.run/v1" || binding["plan_sha256"] != hash {
         return Err("run/plan digest mismatch".into());
@@ -1787,10 +2707,32 @@ fn cell_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
 /// mathematical replay remains the separate `replay` gate below.
 fn verify_prime_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
     verify_root_outcome(outcome, certificate, solvers::PRIME_ROOT_CERTIFICATE_SCOPE)
+    verify_root_outcome(outcome, certificate, solvers::PRIME_ROOT_CERTIFICATE_SCOPE)?;
+    let queries = certificate["queries"]
+        .as_array()
+        .ok_or("prime-root certificate lacks query records")?;
+    let work = certificate["charged_work"]
+        .as_u64()
+        .ok_or("prime-root certificate lacks aggregate work")?;
+    let (events, bytes) = solvers::prime_root_trace_totals(certificate)?;
+    for (key, expected) in [
+        ("aggregate_root_field_and_group_work", work),
+        ("root_solver_calls", queries.len() as u64),
+        ("acknowledged_native_events", events),
+        ("acknowledged_native_event_bytes", bytes),
+    ] {
+        if outcome["counters"][key].as_u64() != Some(expected) {
+            return Err(format!(
+                "prime-root outcome aggregate counter differs: {key}"
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn verify_binary_root_outcome(outcome: &Value, certificate: &Value) -> Result<(), String> {
     verify_root_outcome(outcome, certificate, solvers::BINARY_ROOT_CERTIFICATE_SCOPE)?;
+    let (events, bytes) = solvers::binary_root_trace_totals(certificate)?;
     if certificate["schema"] != "ml-dataset.binary-root-certificates/v1"
         || certificate["distinct_root_certificates_verified"] != true
         || outcome["counters"]["aggregate_root_primitive_and_group_work"].as_u64()
@@ -1809,8 +2751,108 @@ fn verify_binary_root_outcome(outcome: &Value, certificate: &Value) -> Result<()
         if certificate[key].as_u64().is_none()
             || outcome["counters"][key].as_u64() != certificate[key].as_u64()
         {
+    for (key, expected) in [
+        ("acknowledged_native_events", events),
+        ("acknowledged_native_event_bytes", bytes),
+    ] {
+        if outcome["counters"][key].as_u64() != Some(expected) {
             return Err("binary-root outcome aggregate event labels differ".into());
         }
+    }
+    Ok(())
+}
+
+fn is_root_auxiliary(artifact: &Artifact) -> bool {
+    matches!(
+        artifact.role.as_str(),
+        "native-prime-root-call"
+            | "native-prime-root-intermediate-state"
+            | "native-binary-root-call"
+            | "native-binary-root-intermediate-state"
+    ) || artifact.path.starts_with("root-call-")
+        || artifact.path.starts_with("root-state-")
+        || artifact.path.starts_with("binary-root-call-")
+        || artifact.path.starts_with("binary-root-state-")
+}
+
+/// Bind the duplicated call/state files to the certificate's supplied events.
+/// This does not assert that the native execution emitted every possible event.
+fn verify_root_auxiliary_artifacts(
+    dir: &Path,
+    artifacts: &[Artifact],
+    certificate: &Value,
+    binary: bool,
+    replay: bool,
+) -> Result<(), String> {
+    let family = if binary { "binary" } else { "prime" };
+    let file_prefix = if binary { "binary-root" } else { "root" };
+    let call_role = format!("native-{family}-root-call");
+    let state_role = format!("native-{family}-root-intermediate-state");
+    let mut supplied = BTreeMap::new();
+    for artifact in artifacts.iter().filter(|a| is_root_auxiliary(a)) {
+        if supplied.insert(artifact.path.as_str(), artifact).is_some() {
+            return Err(format!("duplicate {family} root auxiliary path"));
+        }
+    }
+    let mut check = |name: String, role: &str, expected: &Value| -> Result<(), String> {
+        let artifact = supplied
+            .remove(name.as_str())
+            .ok_or_else(|| format!("missing {family} root auxiliary artifact: {name}"))?;
+        if artifact.role != role || artifact.encoding != "json" {
+            return Err(format!(
+                "{family} root auxiliary role or encoding differs: {name}"
+            ));
+        }
+        if replay && read_json::<Value>(&dir.join(&artifact.path))? != *expected {
+            return Err(format!("{family} root auxiliary payload differs: {name}"));
+        }
+        Ok(())
+    };
+    let mut event_sequence = 0u64;
+    for (index, query) in certificate["queries"]
+        .as_array()
+        .ok_or("missing root queries")?
+        .iter()
+        .enumerate()
+    {
+        check(
+            format!("{file_prefix}-call-{index:04}.json"),
+            &call_role,
+            query,
+        )?;
+        let fixed_x = query["fixed_x"]
+            .as_str()
+            .ok_or("root query lacks fixed x")?;
+        for event in query["report"]["events"]
+            .as_array()
+            .ok_or("root report lacks acknowledged events")?
+        {
+            event_sequence = event_sequence
+                .checked_add(1)
+                .ok_or("root event sequence overflow")?;
+            let selected = if binary {
+                matches!(
+                    event["kind"].as_str(),
+                    Some("normalized" | "trace_end" | "half_trace_end" | "matrix_end")
+                )
+            } else {
+                matches!(event["kind"].as_str(), Some("power_end" | "gcd_end"))
+            };
+            if selected {
+                let expected = json!({"schema":format!("ml-dataset.{family}-root-event/v1"), "call_index":index,
+                    "fixed_x":fixed_x, "native":event});
+                check(
+                    format!("{file_prefix}-state-{index:04}-{event_sequence:06}.json"),
+                    &state_role,
+                    &expected,
+                )?;
+            }
+        }
+    }
+    if !supplied.is_empty() {
+        return Err(format!(
+            "unexpected or duplicate {family} root auxiliary artifact"
+        ));
     }
     Ok(())
 }
@@ -1949,6 +2991,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     }
     storage::verify_manifest(dir, &manifest.artifacts)?;
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
+    verify_capture_context(dir, &manifest.artifacts)?;
+    execution::verify(dir, &manifest.artifacts)?;
+    let wide_prime_replay = solvers::verify_prime_f4_wide(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     for required in [
         "config.json",
         "run.json",
@@ -1974,6 +3024,27 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
     verify_generic_filter_artifacts(dir, &manifest, complete_factor_base)?;
+    // Reserved native artifacts cannot evade replay by losing their role and
+    // outcome fields together. Legacy root-polynomials.json is not a native
+    // root-set certificate and remains compatible with its historical scope.
+    if manifest.artifacts.iter().any(|a| {
+        a.path == "prime-root-certificates.json"
+            && (a.role != "prime-root-certificates/v1" || a.encoding != "json")
+    }) {
+        return Err("prime-root certificate lacks its reserved JSON role".into());
+    }
+    if manifest.artifacts.iter().any(|a| {
+        a.path == "binary-root-certificates.json"
+            && (a.role != "binary-root-certificates/v1" || a.encoding != "json")
+    }) {
+        return Err("binary-root certificate lacks its reserved JSON role".into());
+    }
+    let native_root_artifacts = manifest.artifacts.iter().any(|a| {
+        matches!(
+            a.path.as_str(),
+            "prime-root-certificates.json" | "binary-root-certificates.json"
+        ) || is_root_auxiliary(a)
+    });
     let root_certificates: Vec<_> = manifest
         .artifacts
         .iter()
@@ -1988,11 +3059,26 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     ]
     .iter()
     .any(|name| manifest.outcome.get(*name).is_some())
+            matches!(
+                a.role.as_str(),
+                "prime-root-certificates/v1" | "binary-root-certificates/v1"
+            )
+        })
+        .collect();
+    if (native_root_artifacts
+        || [
+            "root_certificate_scope",
+            "root_execution_trace_complete_verified",
+            "root_total_operation_count_verified",
+        ]
+        .iter()
+        .any(|name| manifest.outcome.get(*name).is_some()))
         && root_certificates.is_empty()
     {
         return Err("root outcome lacks its distinct-root certificate artifact".into());
     }
     let binary_root = manifest.config.family != "prime";
+    let binary_root = matches!(manifest.config.family.as_str(), "binary" | "koblitz");
     let expected_root_role = if binary_root {
         "binary-root-certificates/v1"
     } else {
@@ -2002,12 +3088,24 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         && (!complete_factor_base
             || manifest.config.solver != "root"
             || !["prime", "binary", "koblitz"].contains(&manifest.config.family.as_str())
+            || !matches!(
+                manifest.config.family.as_str(),
+                "prime" | "binary" | "koblitz"
+            )
             || manifest.config.m != 2
             || root_certificates.len() != 1
             || root_certificates[0].role != expected_root_role
             || root_certificates[0].encoding != "json")
     {
         return Err("prime-root certificate lacks its unique public prime/root/m2 domain".into());
+        let kind = if binary_root {
+            "binary-root"
+        } else {
+            "prime-root"
+        };
+        return Err(format!(
+            "{kind} certificate lacks its unique public family/root/m2 domain"
+        ));
     }
     let root_certificate: Option<Value> = root_certificates
         .first()
@@ -2018,6 +3116,36 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             verify_binary_root_outcome(&manifest.outcome, certificate)?;
         } else {
             verify_prime_root_outcome(&manifest.outcome, certificate)?;
+        }
+        verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, binary_root, false)?;
+    }
+    let censored_m3_prefix = wide_prime_replay == solvers::WidePrimeReplay::CensoredM3Prefix;
+    let prime_chain_declared = !censored_m3_prefix
+        && manifest.outcome["strategy"] == "prime-affine-s3-chain-f4-visitor/v1";
+    let prime_chain_input_expected = !censored_m3_prefix
+        && manifest.config.family == "prime"
+        && manifest.config.solver == "f4"
+        && (3..=15).contains(&manifest.config.m)
+        && (has("prime-f4-input.json")
+            || has("prime-f4-chain-result.json")
+            || has("prime-f4-chain-events.jsonl")
+            || manifest.outcome["native_backend_invoked"] == true
+            || manifest.outcome["pdp_witness_verified"] == true
+            || manifest.outcome["solver_completed"] == true);
+    if prime_chain_declared || prime_chain_input_expected {
+        if !has("prime-f4-input.json") {
+            return Err("prime affine-chain strategy lacks its equation/domain artifact".into());
+        }
+        if !complete_factor_base {
+            return Err("prime affine-chain strategy lacks public instance or factor base".into());
+        }
+        if manifest.config.family != "prime"
+            || manifest.config.solver != "f4"
+            || !(3..=15).contains(&manifest.config.m)
+        {
+            return Err(
+                "prime affine-chain strategy differs from frozen cell configuration".into(),
+            );
         }
     }
     if manifest.outcome["known_answer_verified"] == true && !complete_known_answer {
@@ -2055,6 +3183,34 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         for artifact in &manifest.artifacts {
             if artifact.role == "binary-root-certificates/v1" {
                 solvers::verify_binary_root_artifact(
+        curves::verify_factor_base(&public, &base)?;
+        if has("prime-f4-input.json") && !censored_m3_prefix {
+            let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
+            // The m=2 reference uses the same filename with a legacy schema.
+            // A declared chain may not evade reconstruction by changing schema.
+            if prime_chain_declared
+                || prime_chain_input_expected
+                || input["schema"] == "ml-dataset.prime-f4-chain-input/v1"
+                || input["strategy"] == "prime-affine-s3-chain-f4-visitor/v1"
+            {
+                if manifest.config.family != "prime"
+                    || manifest.config.solver != "f4"
+                    || !(3..=15).contains(&manifest.config.m)
+                    || public["family"].as_str() != Some(manifest.config.family.as_str())
+                    || public["m"].as_u64() != Some(manifest.config.m as u64)
+                    || public["n"].as_u64() != Some(u64::from(manifest.config.n))
+                    || public["twist"].as_bool() != Some(manifest.config.twist)
+                {
+                    return Err(
+                        "prime affine-chain input differs from frozen cell configuration".into(),
+                    );
+                }
+                solvers::verify_prime_f4_chain_input(&public, &base, &input)?;
+            }
+        }
+        for artifact in &manifest.artifacts {
+            if artifact.role == "prime-root-certificates/v1" {
+                solvers::verify_prime_root_artifact(
                     &public,
                     &base,
                     &manifest.config,
@@ -2072,6 +3228,29 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                         .as_ref()
                         .ok_or("missing parsed root certificate")?,
                 )?;
+                        .ok_or("missing parsed root certificate")?,
+                )?;
+                verify_root_auxiliary_artifacts(
+                    dir,
+                    &manifest.artifacts,
+                    root_certificate
+                        .as_ref()
+                        .ok_or("missing parsed root certificate")?,
+                    false,
+                    true,
+                )?;
+            }
+            if artifact.role == "binary-root-certificates/v1" {
+                let certificate = root_certificate
+                    .as_ref()
+                    .ok_or("missing parsed root certificate")?;
+                solvers::verify_binary_root_artifact(
+                    &public,
+                    &base,
+                    &manifest.config,
+                    certificate,
+                )?;
+                verify_root_auxiliary_artifacts(dir, &manifest.artifacts, certificate, true, true)?;
             }
             if artifact.role == "restricted-large-prime-membership-provenance" {
                 relations::verify_membership_provenance(
@@ -2368,6 +3547,8 @@ fn publish_cell(
     dir: &Path,
     remote: Option<&str>,
     budget: &Option<std::sync::Arc<budget::BudgetSession>>,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
 ) -> Result<(), String> {
     let manifest = verify_cell(dir, true)?;
     let path = dir.join("manifest.json");
@@ -2387,12 +3568,18 @@ fn publish_cell(
     let namespace = publication_namespace(&read_json(&dir.join("run.json"))?, manifest.cell_index)?;
     live::require_budget(&cfg, budget)?;
     let receipt = storage::publish_guarded(
+    if let Some(context) = budget {
+        validate_budget_run(context.session(), dir)?;
+    }
+    let receipt = storage::publish_budgeted(
         dir,
         &manifest.artifacts,
         &manifest_artifact,
         cfg,
         &namespace,
         live::guard(budget, crate::store::backend::Phase::Finalize),
+        budget,
+        scope,
     )?;
     let receipt_file = storage::write_json(
         root,
@@ -2418,6 +3605,7 @@ fn publish_lab_receipt(
     root: &Path,
     artifact: &Artifact,
     budget: &Option<std::sync::Arc<budget::BudgetSession>>,
+    budget: Option<&Arc<S3BudgetContext>>,
 ) -> Result<(), String> {
     let Some(uri) = std::env::var("ISOLAB_RESULTS_URI")
         .ok()
@@ -2426,6 +3614,17 @@ fn publish_lab_receipt(
         return Ok(());
     };
     let remote = lab_receipt_remote(&uri)?;
+    publish_lab_receipt_to(root, artifact, &remote, budget)
+}
+
+fn publish_lab_receipt_to(
+    root: &Path,
+    artifact: &Artifact,
+    remote: &crate::store::backend::RemoteSpec,
+    budget: Option<&Arc<S3BudgetContext>>,
+) -> Result<(), String> {
+    let remote = lab_receipt_remote(&remote.display())?;
+    let uri = remote.display();
     let mut cfg = crate::store::Config::discover()?;
     cfg.remote = Some(remote);
     cfg.index_path = root.join("store-index.json");
@@ -2434,8 +3633,16 @@ fn publish_lab_receipt(
         Some(guard) => crate::store::Store::open_guarded(cfg, guard)?,
         None => crate::store::Store::open(cfg)?,
     };
+    let store = storage::dataset_store(cfg, budget, BudgetScope::Finalization)?;
     let backend = store.remote()?;
     let key = format!("dataset-receipts/{}.json", artifact.sha256);
+    storage::reserve_remote_output(
+        budget,
+        store.cfg.remote.as_ref().expect("validated remote"),
+        &key,
+        artifact,
+        BudgetScope::Finalization,
+    )?;
     storage::verify_manifest(root, std::slice::from_ref(artifact))?;
     storage::prepare_s3_publication(
         backend,
@@ -2461,6 +3668,12 @@ fn publish_lab_receipt(
     if crate::store::hash_file(&temporary)? != (artifact.sha256.clone(), artifact.bytes) {
         return Err("lab receipt remote readback mismatch".into());
     }
+    storage::verify_remote_output(
+        budget,
+        store.cfg.remote.as_ref().expect("validated remote"),
+        &key,
+        BudgetScope::Finalization,
+    )?;
     fs::remove_file(&temporary).map_err(|e| e.to_string())?;
     storage::write_json(
         root,
@@ -2482,9 +3695,479 @@ fn lab_receipt_remote(uri: &str) -> Result<crate::store::backend::RemoteSpec, St
     Ok(remote)
 }
 
+#[cfg(all(test, target_os = "linux"))]
+pub(super) mod budget_test_support {
+    use super::*;
+    use aws_smithy_runtime_api::client::http::{
+        HttpClient, HttpConnector, HttpConnectorFuture, HttpConnectorSettings, SharedHttpClient,
+        SharedHttpConnector,
+    };
+    use aws_smithy_runtime_api::client::orchestrator::{HttpRequest, HttpResponse};
+    use aws_smithy_runtime_api::client::runtime_components::RuntimeComponents;
+    use aws_smithy_types::body::SdkBody;
+    use std::sync::Mutex;
+
+    /// Full SDK serializer/interceptor/connector path, with no sockets or AWS.
+    /// Missing keys deliberately return403, exercising immutable PUT fallback.
+    #[derive(Clone)]
+    pub struct MemoryWire {
+        session: Arc<BudgetSession>,
+        objects: Arc<Mutex<BTreeMap<String, Vec<u8>>>>,
+        pub calls: Arc<Mutex<Vec<(String, String)>>>,
+        pub fail_next_get: Arc<Mutex<bool>>,
+    }
+    impl std::fmt::Debug for MemoryWire {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("MemoryWire(no network)")
+        }
+    }
+
+    fn plan() -> DatasetPlan {
+        DatasetPlan {
+            schema: "crypto.ml-dataset.plan/v1".into(),
+            field_sizes: vec![23, 31],
+            arities: vec![2, 15],
+            families: vec!["koblitz".into(), "binary".into(), "prime".into()],
+            solvers: vec!["enumerate".into(), "sat".into()],
+            curve_seeds: 2,
+            generators: 2,
+            keys: 3,
+            seed: 19,
+            factor_base_size: 4,
+            degree_bound: 3,
+            work_limit: 100,
+            twists: true,
+            protocol_sha256: None,
+            split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
+    impl HttpClient for MemoryWire {
+        fn http_connector(
+            &self,
+            _: &HttpConnectorSettings,
+            _: &RuntimeComponents,
+        ) -> SharedHttpConnector {
+            SharedHttpConnector::new(self.clone())
+        }
+    }
+    impl HttpConnector for MemoryWire {
+        fn call(&self, request: HttpRequest) -> HttpConnectorFuture {
+            let method = request.method().to_owned();
+            let uri = request.uri().to_string();
+            let uri = uri.split('?').next().unwrap().to_owned();
+            let charged = self.session.snapshot().unwrap()["charged_attempts"]
+                .as_u64()
+                .unwrap();
+            let mut calls = self.calls.lock().unwrap();
+            assert!(
+                charged > calls.len() as u64,
+                "HTTP reached memory wire before durable debit"
+            );
+            calls.push((method.clone(), uri.clone()));
+            drop(calls);
+            if method == "PUT" {
+                assert_eq!(request.headers().get("if-none-match"), Some("*"));
+            }
+            let objects = self.objects.clone();
+            let fail_next_get = self.fail_next_get.clone();
+            HttpConnectorFuture::new(async move {
+                let incoming = aws_smithy_types::byte_stream::ByteStream::new(request.into_body())
+                    .collect()
+                    .await
+                    .expect("collect offline SDK request")
+                    .into_bytes()
+                    .to_vec();
+                let mut objects = objects.lock().unwrap();
+                let (status, body, length) = match method.as_str() {
+                    "PUT" => {
+                        if let std::collections::btree_map::Entry::Vacant(entry) =
+                            objects.entry(uri)
+                        {
+                            entry.insert(incoming);
+                            (200, Vec::new(), 0)
+                        } else {
+                            (412, Vec::new(), 0)
+                        }
+                    }
+                    "HEAD" => match objects.get(&uri) {
+                        Some(bytes) => (200, Vec::new(), bytes.len()),
+                        None => (403, Vec::new(), 0),
+                    },
+                    "GET" if std::mem::take(&mut *fail_next_get.lock().unwrap()) => {
+                        (403, Vec::new(), 0)
+                    }
+                    "GET" => match objects.get(&uri) {
+                        Some(bytes) => (200, bytes.clone(), bytes.len()),
+                        None => (403, Vec::new(), 0),
+                    },
+                    _ => panic!("unexpected offline request method {method}"),
+                };
+                let mut response =
+                    HttpResponse::new(status.try_into().unwrap(), SdkBody::from(body));
+                response
+                    .headers_mut()
+                    .insert("content-length", length.to_string());
+                response
+                    .headers_mut()
+                    .insert("x-amz-request-id", "offline-integration");
+                Ok(response)
+            })
+        }
+    }
+    pub fn context(root: &Path, binding: Option<RunBinding>) -> (Arc<S3BudgetContext>, MemoryWire) {
+        let (mut policy, mut request) = budget::test_policy_request(root);
+        policy.caps.output_bytes = 16 * 1024 * 1024;
+        policy.caps.download_bytes = 256 * 1024 * 1024;
+        policy.caps.put_attempts = 10_000;
+        policy.caps.read_attempts = 20_000;
+        request.resources.output_bytes = 8 * 1024 * 1024;
+        request.resources.download_bytes = 128 * 1024 * 1024;
+        request.resources.put_attempts = 4000;
+        request.resources.read_attempts = 10000;
+        request.finalization.output_bytes = 4 * 1024 * 1024;
+        request.finalization.download_bytes = 64 * 1024 * 1024;
+        request.finalization.put_attempts = 2000;
+        request.finalization.read_attempts = 5000;
+        if let Some(binding) = binding {
+            request.binding = binding;
+        }
+        let ledger = CampaignLedger::create(&root.join("campaign.sqlite"), &policy).unwrap();
+        let grant = ledger.reserve(&request).unwrap();
+        let session = Arc::new(
+            BudgetSession::create(&root.join("worker.sqlite"), &policy, &grant, &request.owner)
+                .unwrap(),
+        );
+        let wire = MemoryWire {
+            session: session.clone(),
+            objects: Arc::new(Mutex::new(BTreeMap::new())),
+            calls: Arc::new(Mutex::new(Vec::new())),
+            fail_next_get: Arc::new(Mutex::new(false)),
+        };
+        let context = S3BudgetContext::test_context(session, SharedHttpClient::new(wire.clone()));
+        context.activate().unwrap();
+        (context, wire)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn parse_budget_test_args(args: &[&str]) -> Result<BudgetCommand, clap::Error> {
+        use clap::Parser;
+        #[derive(Parser)]
+        struct TestCli {
+            #[command(flatten)]
+            dataset: DatasetArgs,
+        }
+        let cli = TestCli::try_parse_from(args)?;
+        let DatasetCommand::Budget { command } = cli.dataset.command else {
+            panic!("wrong CLI route")
+        };
+        Ok(command)
+    }
+
+    #[test]
+    fn launch_cli_requires_output_and_rejects_mutating_dry_run_flags() {
+        let base = [
+            "test",
+            "budget",
+            "reserve-launch",
+            "--policy",
+            "policy.json",
+            "--ledger",
+            "campaign.sqlite",
+            "--request",
+            "request.json",
+        ];
+        let invalid: &[&[&str]] = &[
+            &[],
+            &["--create-ledger"],
+            &["--dry-run", "--out", "reservation.json"],
+            &["--dry-run", "--create-ledger"],
+        ];
+        for suffix in invalid {
+            let mut args = base.to_vec();
+            args.extend_from_slice(suffix);
+            assert!(
+                parse_budget_test_args(&args).is_err(),
+                "accepted {suffix:?}"
+            );
+        }
+        let mut args = base.to_vec();
+        args.push("--dry-run");
+        assert!(matches!(
+            parse_budget_test_args(&args).unwrap(),
+            BudgetCommand::ReserveLaunch {
+                dry_run: true,
+                out: None,
+                create_ledger: false,
+                ..
+            }
+        ));
+        let mut args = base.to_vec();
+        args.extend_from_slice(&["--out", "reservation.json", "--create-ledger"]);
+        assert!(matches!(
+            parse_budget_test_args(&args).unwrap(),
+            BudgetCommand::ReserveLaunch {
+                dry_run: false,
+                out: Some(_),
+                create_ledger: true,
+                ..
+            }
+        ));
+        assert!(parse_budget_test_args(&[
+            "test",
+            "budget",
+            "bind-launch",
+            "--policy",
+            "policy.json",
+            "--ledger",
+            "campaign.sqlite",
+            "--binding",
+            "binding.json",
+            "--out",
+            "grant.json",
+            "--create-ledger",
+        ])
+        .is_err());
+        // Direct native callers cannot bypass clap's read-only constraints.
+        let invalid = BudgetCommand::ReserveLaunch {
+            policy: PathBuf::from("not-read-policy.json"),
+            ledger: PathBuf::from("not-created-ledger.sqlite"),
+            request: PathBuf::from("not-read-request.json"),
+            dry_run: true,
+            out: Some(PathBuf::from("not-written-reservation.json")),
+            create_ledger: false,
+        };
+        assert!(run_budget_command(&invalid)
+            .unwrap_err()
+            .contains("conflicts"));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn launch_cli_preserves_binding_origin_and_reexports_identical_receipts() {
+        let temp = TempRun::new();
+        let (policy, direct) = budget::test_policy_request(&temp.0);
+        let request = LaunchRequest {
+            schema: budget::LAUNCH_REQUEST_SCHEMA.into(),
+            launch_id: direct.grant_id.clone(),
+            target: budget::LaunchTarget {
+                cluster_identity: "arn:aws:eks:us-east-2:104186811093:cluster/offline-test".into(),
+                namespace: "isolab".into(),
+                job_name: "offline-launch-test".into(),
+            },
+            worker_journal_path: direct.worker_journal_path.clone(),
+            binding: direct.binding.clone(),
+            expires_unix_seconds: direct.expires_unix_seconds,
+            resource_envelope_sha256: direct.resource_envelope_sha256.clone(),
+            resources: direct.resources.clone(),
+            finalization: direct.finalization.clone(),
+            credential_role_arn: direct.credential_role_arn.clone(),
+        };
+        let policy_path = temp.0.join("policy.json");
+        let request_path = temp.0.join("launch-request.json");
+        let direct_path = temp.0.join("direct-request.json");
+        let ledger_path = temp.0.join("campaign.sqlite");
+        let reservation_path = temp.0.join("reservation.json");
+        fs::write(&policy_path, serde_json::to_vec(&policy).unwrap()).unwrap();
+        fs::write(&request_path, serde_json::to_vec(&request).unwrap()).unwrap();
+        fs::write(&direct_path, serde_json::to_vec(&direct).unwrap()).unwrap();
+        let reserved = run_budget_command(
+            &parse_budget_test_args(&[
+                "test",
+                "budget",
+                "reserve-launch",
+                "--policy",
+                policy_path.to_str().unwrap(),
+                "--ledger",
+                ledger_path.to_str().unwrap(),
+                "--request",
+                request_path.to_str().unwrap(),
+                "--out",
+                reservation_path.to_str().unwrap(),
+                "--create-ledger",
+            ])
+            .unwrap(),
+        )
+        .unwrap();
+        let reservation: budget::LaunchReservation = read_json(&reservation_path).unwrap();
+        assert_eq!(
+            reserved["reservation_sha256"],
+            reservation.sha256().unwrap()
+        );
+        assert_ne!(
+            reserved["reservation_sha256"],
+            reserved["artifact"]["sha256"]
+        );
+        assert_eq!(reserved["campaign"]["pending_launch_count"], 1);
+        assert_eq!(reserved["cloud_requests"], 0);
+        assert_eq!(reserved["worker_grant_issued"], false);
+        let direct_out = temp.0.join("must-not-issue-direct.json");
+        let reject_direct = || {
+            let before = crate::store::hash_file(&ledger_path).unwrap();
+            let error = run_budget_command(&BudgetCommand::Reserve {
+                policy: policy_path.clone(),
+                ledger: ledger_path.clone(),
+                request: direct_path.clone(),
+                out: direct_out.clone(),
+                create_ledger: false,
+            })
+            .unwrap_err();
+            assert!(error.contains("use bind-launch"), "{error}");
+            assert!(!direct_out.exists());
+            assert_eq!(crate::store::hash_file(&ledger_path).unwrap(), before);
+        };
+        reject_direct();
+        let binding = LaunchBinding {
+            schema: budget::LAUNCH_BINDING_SCHEMA.into(),
+            launch_id: request.launch_id,
+            reservation_sha256: reservation.sha256().unwrap(),
+            observed_target: request.target,
+            owner: direct.owner,
+            observation_evidence_sha256: "e".repeat(64),
+        };
+        let binding_path = temp.0.join("binding.json");
+        let grant_path = temp.0.join("grant.json");
+        fs::write(&binding_path, serde_json::to_vec(&binding).unwrap()).unwrap();
+        let bind = parse_budget_test_args(&[
+            "test",
+            "budget",
+            "bind-launch",
+            "--policy",
+            policy_path.to_str().unwrap(),
+            "--ledger",
+            ledger_path.to_str().unwrap(),
+            "--binding",
+            binding_path.to_str().unwrap(),
+            "--out",
+            grant_path.to_str().unwrap(),
+        ])
+        .unwrap();
+        let bound = run_budget_command(&bind).unwrap();
+        assert_eq!(
+            bound["grant"]["schema"],
+            "crypto.ml-dataset.budget-grant/v1"
+        );
+        assert_eq!(bound["campaign"]["bound_launch_count"], 1);
+        assert_eq!(bound["campaign"]["pending_launch_count"], 0);
+        assert_eq!(bound["binding"], serde_json::to_value(&binding).unwrap());
+        assert_eq!(
+            reserved["campaign"]["prior_and_allocated"],
+            bound["campaign"]["prior_and_allocated"]
+        );
+        // Even an exact v1 grant request must retain its launch route and evidence.
+        assert_eq!(
+            bound["grant"]["request"],
+            read_json::<Value>(&direct_path).unwrap()
+        );
+        reject_direct();
+        let before = crate::store::hash_file(&ledger_path).unwrap();
+        let again = run_budget_command(&bind).unwrap();
+        assert_eq!(again, bound);
+        assert_eq!(crate::store::hash_file(&ledger_path).unwrap(), before);
+        let written: WorkerGrant = read_json(&grant_path).unwrap();
+        assert_eq!(bound["grant_sha256"], written.sha256().unwrap());
+        assert_ne!(bound["grant_sha256"], bound["artifact"]["sha256"]);
+        assert_eq!(serde_json::to_value(written).unwrap(), bound["grant"]);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn budget_cli_dry_admission_is_read_only_and_reserve_reexports_same_grant() {
+        use clap::Parser;
+        #[derive(Parser)]
+        struct TestCli {
+            #[command(flatten)]
+            dataset: DatasetArgs,
+        }
+        let temp = TempRun::new();
+        let (policy, request) = budget::test_policy_request(&temp.0);
+        let policy_file = temp.0.join("policy.json");
+        let request_file = temp.0.join("request.json");
+        fs::write(&policy_file, serde_json::to_vec(&policy).unwrap()).unwrap();
+        fs::write(&request_file, serde_json::to_vec(&request).unwrap()).unwrap();
+        let ledger = temp.0.join("campaign.sqlite");
+        let cli = TestCli::try_parse_from([
+            "test",
+            "budget",
+            "admit",
+            "--policy",
+            policy_file.to_str().unwrap(),
+            "--ledger",
+            ledger.to_str().unwrap(),
+            "--request",
+            request_file.to_str().unwrap(),
+            "--dry-run",
+        ])
+        .unwrap();
+        let DatasetCommand::Budget { command } = cli.dataset.command else {
+            panic!("wrong CLI route")
+        };
+        let before = tree_files(&temp.0).unwrap();
+        let report = run_budget_command(&command).unwrap();
+        assert_eq!(report["dry_run"], true);
+        assert_eq!(report["admitted"], true);
+        assert!(!ledger.exists());
+        assert_eq!(tree_files(&temp.0).unwrap(), before);
+        let grant_file = temp.0.join("grant.json");
+        let reservation = BudgetCommand::Reserve {
+            policy: policy_file.clone(),
+            ledger: ledger.clone(),
+            request: request_file.clone(),
+            out: grant_file.clone(),
+            create_ledger: true,
+        };
+        let first = run_budget_command(&reservation).unwrap();
+        let before = crate::store::hash_file(&ledger).unwrap();
+        let report = run_budget_command(&command).unwrap();
+        assert_eq!(report["admitted"], false);
+        assert_eq!(crate::store::hash_file(&ledger).unwrap(), before);
+        let second = run_budget_command(&BudgetCommand::Reserve {
+            policy: policy_file,
+            ledger: ledger.clone(),
+            request: request_file,
+            out: grant_file,
+            create_ledger: false,
+        })
+        .unwrap();
+        assert_eq!(first["grant"], second["grant"]);
+        assert_eq!(crate::store::hash_file(&ledger).unwrap(), before);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn budget_cell_resume_reuses_reservation_and_missing_budget_has_no_s3_fallback() {
+        let temp = TempRun::new();
+        let (context, wire) = budget_test_support::context(&temp.0, None);
+        let envelope = Resources {
+            output_bytes: 4096,
+            put_attempts: 3,
+            read_attempts: 20,
+            download_bytes: 65536,
+            ..Resources::default()
+        };
+        let first = cell_budget_scope(Some(&context), Some(&envelope), &"c".repeat(64), 0).unwrap();
+        let before = context.session().snapshot().unwrap();
+        let again = cell_budget_scope(Some(&context), Some(&envelope), &"c".repeat(64), 0).unwrap();
+        assert_eq!(first, again);
+        assert_eq!(before, context.session().snapshot().unwrap());
+        assert_eq!(wire.calls.lock().unwrap().len(), 2);
+        let mut cfg = crate::store::Config::discover().unwrap();
+        cfg.remote = Some(
+            crate::store::backend::RemoteSpec::parse(
+                "s3://setec-astronomy-artifacts/ml-dataset/test",
+            )
+            .unwrap(),
+        );
+        cfg.index_path = temp.0.join("unbudgeted-index.json");
+        assert!(storage::dataset_store(cfg, None, BudgetScope::Work)
+            .err()
+            .unwrap()
+            .contains("active bound budget"));
+        assert!(!temp.0.join("unbudgeted-index.json").exists());
+        assert_eq!(wire.calls.lock().unwrap().len(), 2);
+    }
     #[test]
     fn lab_receipt_routing_rejects_legacy_bucket_before_generation() {
         assert!(
@@ -2517,7 +4200,6 @@ mod tests {
             twists: true,
             protocol_sha256: None,
             split_rule: "curve-twist-component-sha256-v1".into(),
-            factor_base_policies: Vec::new(),
         }
     }
     #[test]
@@ -2731,6 +4413,2313 @@ mod tests {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
         }
+    }
+
+    #[test]
+    fn orphan_root_certificate_is_rejected_even_after_valid_rehash() {
+        let fixture = TempRun::new();
+        let (plan, binding, protocol) = fixture.bound();
+        let dir = fixture.failed_cell(&plan, &binding, &protocol);
+        let mut manifest: CellManifest = read_json(&dir.join("manifest.json")).unwrap();
+        manifest.artifacts.push(
+            storage::write_json(
+                &dir,
+                "root-certificates.json",
+                "prime-root-certificates/v1",
+                &json!({"forged":true}),
+            )
+            .unwrap(),
+        );
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        for replay in [false, true] {
+            assert!(verify_cell(&dir, replay)
+                .unwrap_err()
+                .contains("prime-root certificate lacks"));
+        }
+        assert!(export::export(&fixture.0, &fixture.0.join("export"))
+            .unwrap_err()
+            .contains("prime-root certificate lacks"));
+    }
+
+    #[test]
+    fn prime_root_outcome_contract_covers_found_exhausted_and_censored() {
+        for (found, censored, all_queries, status, completed) in [
+            (true, false, false, "verified", true),
+            (true, false, true, "verified", true),
+            (false, false, true, "partial", true),
+            (false, true, false, "budget_exhausted", false),
+        ] {
+            let certificate = json!({"found_pdp":found,"censored":censored,
+                "queries":[],"charged_work":0,
+                "root_queries_completed":all_queries,"execution_trace_complete_verified":false,
+                "total_operation_count_verified":false});
+            let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+                "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+                "trace_complete":false,"scalar_recovered_without_witness":false,
+                "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+                "pdp_witness_verified":found,"solver_completed":completed,"status":status,"counters":{
+                    "aggregate_root_field_and_group_work":0,"root_solver_calls":0,
+                    "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
+            verify_prime_root_outcome(&outcome, &certificate).unwrap();
+            for field in [
+                "root_execution_trace_complete_verified",
+                "root_total_operation_count_verified",
+                "trace_complete",
+                "scalar_recovered_without_witness",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = json!(true);
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+            for (field, value) in [
+                ("pdp_witness_verified", json!(!found)),
+                ("solver_completed", json!(!completed)),
+                ("status", json!("unsupported")),
+                (
+                    "root_certificate_scope",
+                    json!("full execution trace verified"),
+                ),
+            ] {
+                let mut bad = outcome.clone();
+                bad[field] = value;
+                assert!(
+                    verify_prime_root_outcome(&bad, &certificate).is_err(),
+                    "{field}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_certificates_replay_both_twists_and_reject_rehashed_tampering() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 100_000);
+            let manifest = verify_cell(&dir, true).unwrap();
+            assert_eq!(manifest.outcome["pdp_witness_verified"], true);
+            let root = manifest
+                .artifacts
+                .iter()
+                .find(|a| a.role == "prime-root-certificates/v1")
+                .unwrap();
+            let bad = altered_cell(&dir, &fixture.0.join("bad-root"), |path, _| {
+                alter_json(&path.join(&root.path), |certificate| {
+                    let query = certificate["queries"]
+                        .as_array_mut()
+                        .unwrap()
+                        .iter_mut()
+                        .find(|q| {
+                            q["report"]["roots"]
+                                .as_array()
+                                .is_some_and(|r| !r.is_empty())
+                        })
+                        .unwrap();
+                    query["report"]["roots"].as_array_mut().unwrap().pop();
+                });
+            });
+            verify_cell(&bad, false).unwrap();
+            assert!(verify_cell(&bad, true).is_err());
+            let bad = altered_cell(&dir, &fixture.0.join("bad-query"), |path, _| {
+                alter_json(&path.join(&root.path), |certificate| {
+                    let length = certificate["queries"][0]["fixed_x"].as_str().unwrap().len();
+                    certificate["queries"][0]["fixed_x"] = json!("x".repeat(length));
+                });
+            });
+            verify_cell(&bad, false).unwrap();
+            assert!(verify_cell(&bad, true)
+                .unwrap_err()
+                .contains("root query identity"));
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_requires_unique_role_and_encoding_bound_certificate() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 100_000);
+            for mutation in [
+                "missing",
+                "missing_and_stripped",
+                "wrong_role_and_stripped",
+                "duplicate",
+                "wrong_role",
+                "wrong_encoding",
+                "wrong_solver",
+            ] {
+                let bad = altered_cell(&dir, &fixture.0.join(mutation), |path, manifest| {
+                    let index = manifest
+                        .artifacts
+                        .iter()
+                        .position(|a| a.role == "prime-root-certificates/v1")
+                        .unwrap();
+                    match mutation {
+                        "missing" | "missing_and_stripped" => {
+                            manifest.artifacts.remove(index);
+                        }
+                        "duplicate" => {
+                            let mut extra = manifest.artifacts[index].clone();
+                            extra.path = "duplicate-root.json".into();
+                            fs::copy(
+                                path.join(&manifest.artifacts[index].path),
+                                path.join(&extra.path),
+                            )
+                            .unwrap();
+                            manifest.artifacts.push(extra);
+                        }
+                        "wrong_role" | "wrong_role_and_stripped" => {
+                            manifest.artifacts[index].role = "unverified-root-summary".into()
+                        }
+                        "wrong_encoding" => manifest.artifacts[index].encoding = "jsonl".into(),
+                        "wrong_solver" => {
+                            let mut plan: DatasetPlan = read_json(&path.join("plan.json")).unwrap();
+                            plan.solvers = vec!["enumerate".into()];
+                            manifest.config = plan.cell(manifest.cell_index).unwrap();
+                            manifest.plan_sha256 = plan.binding_sha256().unwrap();
+                            let mut binding: Value = read_json(&path.join("run.json")).unwrap();
+                            binding["plan_sha256"] = json!(manifest.plan_sha256);
+                            fs::write(path.join("plan.json"), serde_json::to_vec(&plan).unwrap())
+                                .unwrap();
+                            fs::write(path.join("run.json"), serde_json::to_vec(&binding).unwrap())
+                                .unwrap();
+                            fs::write(
+                                path.join("config.json"),
+                                serde_json::to_vec(&manifest.config).unwrap(),
+                            )
+                            .unwrap();
+                        }
+                        _ => unreachable!(),
+                    }
+                    if mutation.ends_with("_stripped") {
+                        for key in [
+                            "root_certificate_scope",
+                            "root_execution_trace_complete_verified",
+                            "root_total_operation_count_verified",
+                        ] {
+                            manifest.outcome.as_object_mut().unwrap().remove(key);
+                        }
+                    }
+                });
+                for replay in [false, true] {
+                    let error = verify_cell(&bad, replay).unwrap_err();
+                    assert!(
+                        error.contains("root outcome lacks")
+                            || error.contains("prime-root certificate lacks"),
+                        "{mutation}/{replay}: {error}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_aggregate_labels_match_acknowledged_certificate_records() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 100_000);
+            for key in [
+                "aggregate_root_field_and_group_work",
+                "root_solver_calls",
+                "acknowledged_native_events",
+                "acknowledged_native_event_bytes",
+            ] {
+                let bad = altered_cell(&dir, &fixture.0.join(key), |_, manifest| {
+                    let value = manifest.outcome["counters"][key].as_u64().unwrap();
+                    manifest.outcome["counters"][key] = json!(value + 1);
+                });
+                for replay in [false, true] {
+                    assert!(
+                        verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("prime-root outcome aggregate counter"),
+                        "{key}/{replay}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_auxiliary_payloads_match_certificate_calls_and_states() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture_at_size(&fixture, twist, 100_000, 11);
+            let manifest = verify_cell(&dir, true).unwrap();
+            for role in [
+                "native-prime-root-call",
+                "native-prime-root-intermediate-state",
+            ] {
+                let artifact = manifest.artifacts.iter().find(|a| a.role == role).unwrap();
+                for mutation in ["identity", "native_payload"] {
+                    let bad = altered_cell(
+                        &dir,
+                        &fixture.0.join(format!("{role}-{mutation}")),
+                        |path, _| {
+                            alter_json(&path.join(&artifact.path), |payload| {
+                                if mutation == "identity" {
+                                    payload["call_index"] = json!(999);
+                                } else if role == "native-prime-root-call" {
+                                    payload["report"]["polynomial"] = json!([0]);
+                                } else {
+                                    assert!(matches!(
+                                        payload["native"]["kind"].as_str(),
+                                        Some("power_end" | "gcd_end")
+                                    ));
+                                    payload["native"]["value"] = json!([999_999]);
+                                }
+                            });
+                        },
+                    );
+                    // These are rehashed, independently saved payloads; the
+                    // aggregate certificate and its arithmetic are unchanged.
+                    verify_cell(&bad, false).unwrap();
+                    assert!(verify_cell(&bad, true)
+                        .unwrap_err()
+                        .contains("prime root auxiliary payload differs"));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_auxiliaries_require_unique_expected_paths_roles_and_encodings() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture_at_size(&fixture, twist, 100_000, 11);
+            for role in [
+                "native-prime-root-call",
+                "native-prime-root-intermediate-state",
+            ] {
+                for mutation in [
+                    "missing",
+                    "duplicate",
+                    "wrong_role",
+                    "wrong_encoding",
+                    "wrong_path",
+                ] {
+                    let bad = altered_cell(
+                        &dir,
+                        &fixture.0.join(format!("{role}-{mutation}")),
+                        |path, manifest| {
+                            let index = manifest
+                                .artifacts
+                                .iter()
+                                .position(|a| a.role == role)
+                                .unwrap();
+                            match mutation {
+                                "missing" => {
+                                    manifest.artifacts.remove(index);
+                                }
+                                "duplicate" => {
+                                    let mut extra = manifest.artifacts[index].clone();
+                                    extra.path = "duplicate-root-auxiliary.json".into();
+                                    fs::copy(
+                                        path.join(&manifest.artifacts[index].path),
+                                        path.join(&extra.path),
+                                    )
+                                    .unwrap();
+                                    manifest.artifacts.push(extra);
+                                }
+                                "wrong_role" => {
+                                    manifest.artifacts[index].role =
+                                        "unregistered-partial-artifact".into();
+                                }
+                                "wrong_encoding" => {
+                                    manifest.artifacts[index].encoding = "jsonl".into()
+                                }
+                                "wrong_path" => {
+                                    let old = path.join(&manifest.artifacts[index].path);
+                                    manifest.artifacts[index].path =
+                                        "renamed-root-auxiliary.json".into();
+                                    fs::rename(old, path.join(&manifest.artifacts[index].path))
+                                        .unwrap();
+                                }
+                                _ => unreachable!(),
+                            }
+                        },
+                    );
+                    for replay in [false, true] {
+                        let error = verify_cell(&bad, replay).unwrap_err();
+                        assert!(
+                            error.contains("prime root auxiliary"),
+                            "{role}/{mutation}/{replay}: {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_prime_root_completed_queries_reject_byte_flag_and_extra_event_tampering() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 100_000);
+            for mutation in [
+                "flag_true",
+                "flag_missing",
+                "flag_nonboolean",
+                "extra_event_field",
+            ] {
+                let bad = altered_cell(&dir, &fixture.0.join(mutation), |path, _| {
+                    alter_json(&path.join("prime-root-certificates.json"), |certificate| {
+                        let query = &mut certificate["queries"][0];
+                        assert_eq!(query["report"]["stop"], "complete");
+                        assert_eq!(query["trace_byte_cap_reached"], false);
+                        match mutation {
+                            "flag_true" => query["trace_byte_cap_reached"] = json!(true),
+                            "flag_missing" => {
+                                query
+                                    .as_object_mut()
+                                    .unwrap()
+                                    .remove("trace_byte_cap_reached");
+                            }
+                            "flag_nonboolean" => query["trace_byte_cap_reached"] = json!("false"),
+                            "extra_event_field" => {
+                                query["report"]["events"][0]["unaccounted_payload"] =
+                                    json!("unexpected");
+                            }
+                            _ => unreachable!(),
+                        }
+                    });
+                });
+                for replay in [false, true] {
+                    let error = verify_cell(&bad, replay).unwrap_err();
+                    assert!(
+                        error.contains("byte-cap flag") || error.contains("unknown field"),
+                        "{mutation}/{replay}: {error}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn legacy_prime_root_summary_remains_compatible_without_native_claims() {
+        let fixture = TempRun::new();
+        let dir = prime_root_cell_fixture(&fixture, false, 100_000);
+        let legacy = altered_cell(&dir, &fixture.0.join("legacy-root"), |path, manifest| {
+            let certificate: Value = read_json(&path.join("prime-root-certificates.json")).unwrap();
+            manifest.artifacts.retain(|a| {
+                !matches!(
+                    a.role.as_str(),
+                    "prime-root-certificates/v1"
+                        | "native-prime-root-call"
+                        | "native-prime-root-intermediate-state"
+                )
+            });
+            for key in [
+                "root_certificate_scope",
+                "root_execution_trace_complete_verified",
+                "root_total_operation_count_verified",
+            ] {
+                manifest.outcome.as_object_mut().unwrap().remove(key);
+            }
+            let rows: Vec<_> = certificate["queries"].as_array().unwrap().iter().map(|q| json!({
+                "kind":"root_result", "fixed_x":q["fixed_x"], "coefficients_constant_first":q["coefficients_constant_first"],
+                "all_returned_roots":q["report"]["roots"], "checks":q["checks"]})).collect();
+            manifest.artifacts.push(
+                storage::write_json(
+                    path,
+                    "root-polynomials.json",
+                    "native-univariate-inputs-roots-and-group-lifts",
+                    &json!(rows),
+                )
+                .unwrap(),
+            );
+        });
+        verify_cell(&legacy, false).unwrap();
+        verify_cell(&legacy, true).unwrap();
+    }
+
+    #[test]
+    fn stored_prime_root_censoring_cannot_be_promoted_by_rehashed_outcomes() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = prime_root_cell_fixture(&fixture, twist, 1);
+            let original = verify_cell(&dir, true).unwrap();
+            assert_eq!(original.outcome["status"], "budget_exhausted");
+            for (field, value) in [
+                ("root_execution_trace_complete_verified", json!(true)),
+                ("root_total_operation_count_verified", json!(true)),
+                ("trace_complete", json!(true)),
+                ("solver_completed", json!(true)),
+                ("pdp_witness_verified", json!(true)),
+                ("scalar_recovered_without_witness", json!(true)),
+                ("scalar_replay_verified", json!(true)),
+                ("ecdlp_pipeline_completed", json!(true)),
+                (
+                    "root_certificate_scope",
+                    json!("full execution trace verified"),
+                ),
+                ("status", json!("verified")),
+            ] {
+                let bad = altered_cell(&dir, &fixture.0.join(field), |_, manifest| {
+                    manifest.outcome[field] = value;
+                });
+                for replay in [false, true] {
+                    assert!(
+                        verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("prime-root outcome labels"),
+                        "{field}/{replay}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// A real constructed curve/base and native solver certificate. Plant only
+    /// a public sum; neither a construction scalar nor a witness reaches solve.
+    fn prime_f4_cell_fixture(fixture: &TempRun, m: usize, twist: bool) -> PathBuf {
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![7];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 8;
+        plan.work_limit = 10_000;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..m {
+            let summand = if i < 2 || i % 2 == 1 {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+        let solved = solvers::solve(&config, &case).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"], true,
+            "{}",
+            solved.outcome
+        );
+
+        let dir = fixture.0.join(format!("cell-m{m}-twist{twist}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &json!({"software_test":true}))
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    fn wide_prime_f4_cell_fixture(fixture: &TempRun, twist: bool) -> PathBuf {
+        wide_prime_f4_cell_fixture_kind(fixture, twist, false)
+    }
+    fn wide_prime_f4_cell_fixture_kind(fixture: &TempRun, twist: bool, negative: bool) -> PathBuf {
+        let m = 2;
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![61];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 8;
+        plan.work_limit = 50_000;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(512);
+        binding["trace_mib"] = json!(64);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..if negative { 3 } else { m } {
+            let summand = if negative || i < 2 || i % 2 == 1 {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture
+            .0
+            .join(format!("cell-wide-f4-twist{twist}-negative{negative}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_context(&config, &case, Some(&context)).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"], !negative,
+            "{}",
+            solved.outcome
+        );
+        assert_eq!(
+            solved.outcome["native_backend_invoked"], true,
+            "{}",
+            solved.outcome
+        );
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    fn wide_prime_f4_m3_cell_fixture_kind(
+        fixture: &TempRun,
+        twist: bool,
+        negative: bool,
+    ) -> PathBuf {
+        let m = 3;
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![61];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 8;
+        plan.work_limit = 50_000;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(512);
+        binding["trace_mib"] = json!(64);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..if negative { 4 } else { m } {
+            let summand = if negative || i < m {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture
+            .0
+            .join(format!("cell-wide-f4-m3-twist{twist}-negative{negative}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_context(&config, &case, Some(&context)).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"], !negative,
+            "{}",
+            solved.outcome
+        );
+        assert_eq!(
+            solved.outcome["native_backend_invoked"], true,
+            "{}",
+            solved.outcome
+        );
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    #[test]
+    fn wide_prime_m3_central_rehashed_tamper_and_censoring() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = wide_prime_f4_m3_cell_fixture_kind(&fixture, twist, false);
+            let negative = wide_prime_f4_m3_cell_fixture_kind(&fixture, twist, true);
+            assert_eq!(
+                verify_cell(&negative, true).unwrap().outcome["exhaustive_no_decomposition"],
+                true
+            );
+            for (label, file, key, value) in [
+                ("public-m", "public.json", "m", json!(2)),
+                (
+                    "aux-domain",
+                    "prime-f4-input.json",
+                    "domains",
+                    json!([[1], [1], [1], [1]]),
+                ),
+                (
+                    "prefix-claim",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "domain_complete",
+                    json!(false),
+                ),
+                (
+                    "counter",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "group_adds",
+                    json!(0),
+                ),
+                (
+                    "first-certificate",
+                    "prime-f4-wide-m3-group-extraction.json",
+                    "first_verified_cursor",
+                    json!(7),
+                ),
+                (
+                    "derivation",
+                    "prime-f4-wide-m3-result.json",
+                    "native_basis_derivation_verified",
+                    json!(true),
+                ),
+            ] {
+                let changed = altered_cell(&dir, &fixture.0.join(label), |path, manifest| {
+                    let mut data: Value = read_json(&path.join(file)).unwrap();
+                    data[key] = value;
+                    let index = manifest
+                        .artifacts
+                        .iter()
+                        .position(|a| a.path == file)
+                        .unwrap();
+                    let role = manifest.artifacts[index].role.clone();
+                    fs::remove_file(path.join(file)).unwrap();
+                    manifest.artifacts[index] =
+                        storage::write_json(path, file, &role, &data).unwrap();
+                });
+                assert!(verify_cell(&changed, true).is_err(), "{label}");
+            }
+            for missing in [
+                "public.json",
+                "factor-base.json",
+                "prime-f4-wide-m3-result.json",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("missing-{missing}")),
+                    |_, manifest| manifest.artifacts.retain(|a| a.path != missing),
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            let omitted = altered_cell(
+                &dir,
+                &fixture.0.join("combined-omission"),
+                |path, manifest| {
+                    for name in [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-m3-result.json",
+                        "prime-f4-wide-m3-events.jsonl",
+                        "prime-f4-wide-m3-group-extraction.json",
+                    ] {
+                        manifest.artifacts.retain(|a| a.path != name);
+                        fs::remove_file(path.join(name)).unwrap();
+                    }
+                    manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                },
+            );
+            assert!(verify_cell(&omitted, true).is_err());
+            let raw = altered_cell(
+                &dir,
+                &fixture.0.join("raw-censored-prefix"),
+                |path, manifest| {
+                    let paths = [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-m3-result.json",
+                        "prime-f4-wide-m3-events.jsonl",
+                        "prime-f4-wide-m3-group-extraction.json",
+                        "pdp-witness.json",
+                        "solver-domain.json",
+                    ];
+                    for name in paths {
+                        manifest.artifacts.retain(|a| a.path != name);
+                        if path.join(name).exists() {
+                            fs::remove_file(path.join(name)).unwrap();
+                        }
+                    }
+                    manifest.artifacts.push(
+                        storage::write_bytes(
+                            path,
+                            "prime-f4-input.json",
+                            "unregistered-partial-artifact",
+                            "native",
+                            b"{\"schema\":",
+                        )
+                        .unwrap(),
+                    );
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            verify_cell(&raw, true).unwrap();
+            for key in [
+                "solver_completed",
+                "group_domain_complete",
+                "group_prefix_complete",
+                "group_infinity_prefixes_covered",
+                "first_certificate_retained",
+            ] {
+                let forged = altered_cell(
+                    &raw,
+                    &fixture.0.join(format!("raw-promoted-{key}")),
+                    |_, manifest| manifest.outcome[key] = json!(true),
+                );
+                assert!(verify_cell(&forged, true).is_err());
+            }
+            let early = altered_cell(
+                &raw,
+                &fixture.0.join("raw-early-certificate"),
+                |path, manifest| {
+                    let nested = "live/payloads/pdp-witness.json";
+                    let bytes = fs::read(dir.join("pdp-witness.json")).unwrap();
+                    storage::write_bytes(
+                        path,
+                        nested,
+                        "producer-role-not-registered",
+                        "json",
+                        &bytes,
+                    )
+                    .unwrap();
+                    let collected = collect_cell_artifacts(path).unwrap();
+                    let certificate = collected.into_iter().find(|a| a.path == nested).unwrap();
+                    assert_eq!(certificate.role, "unregistered-partial-artifact");
+                    assert_eq!(certificate.encoding, "native");
+                    manifest.artifacts.push(certificate);
+                },
+            );
+            verify_cell(&early, true).unwrap();
+            let promoted = altered_cell(
+                &early,
+                &fixture.0.join("early-certificate-promoted"),
+                |_, manifest| manifest.outcome["pdp_witness_verified"] = json!(true),
+            );
+            assert!(verify_cell(&promoted, true).is_err());
+            let retained = altered_cell(&dir, &fixture.0.join("censored"), |path, manifest| {
+                manifest.artifacts.push(
+                    storage::write_json(path, "result.json", "solver-outcome", &manifest.outcome)
+                        .unwrap(),
+                );
+                manifest.outcome = json!({"status":"timeout","solver_completed":false});
+            });
+            verify_cell(&retained, true).unwrap();
+            for stop in ["missing_execution_context", "profile_admission"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("false-admission-{stop}")),
+                    |path, manifest| {
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            value["stop"] = json!(stop);
+                            value["native_statistics_complete"] = json!(false);
+                        });
+                        manifest.outcome["termination"] = json!(stop);
+                        manifest.outcome["native_statistics_complete"] = json!(false);
+                        manifest.outcome["algebra_completed"] = json!(false);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for (field, counter, limit_key) in [
+                ("work_reserved", "native_work_reserved", "work"),
+                (
+                    "bytes_reserved",
+                    "native_cumulative_bytes_reserved",
+                    "bytes",
+                ),
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("terminal-{field}")),
+                    |path, manifest| {
+                        let events =
+                            fs::read_to_string(path.join("prime-f4-wide-m3-events.jsonl")).unwrap();
+                        let terminal: Value =
+                            serde_json::from_str(events.lines().last().unwrap()).unwrap();
+                        assert_eq!(terminal["boundary"], "terminal");
+                        let mut new_count = 0;
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            let old = value[field].as_u64().unwrap();
+                            new_count = old + 1;
+                            assert!(new_count <= value["limits"][limit_key].as_u64().unwrap());
+                            value[field] = json!(new_count);
+                        });
+                        manifest.outcome["counters"][counter] = json!(new_count);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for kind in [
+                "points",
+                "negation_closed",
+                "repetitions_allowed",
+                "role",
+                "missing",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("solver-domain-{kind}")),
+                    |path, manifest| {
+                        if kind == "missing" {
+                            manifest
+                                .artifacts
+                                .retain(|a| a.path != "solver-domain.json");
+                        } else if kind == "role" {
+                            manifest
+                                .artifacts
+                                .iter_mut()
+                                .find(|a| a.path == "solver-domain.json")
+                                .unwrap()
+                                .role = "incorrect-role".into();
+                        } else {
+                            alter_json(&path.join("solver-domain.json"), |value| {
+                                if kind == "points" {
+                                    value["points"].as_array_mut().unwrap().swap(0, 1);
+                                } else {
+                                    value[kind] = json!(false);
+                                }
+                            });
+                        }
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for key in [
+                "native_work_reserved",
+                "native_cumulative_bytes_reserved",
+                "acknowledged_native_boundaries",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("counter-{key}")),
+                    |_, manifest| {
+                        let old = manifest.outcome["counters"][key].as_u64().unwrap();
+                        manifest.outcome["counters"][key] = json!(old + 1);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+                let changed = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("retained-counter-{key}")),
+                    |path, _| {
+                        alter_json(&path.join("result.json"), |value| {
+                            let old = value["counters"][key].as_u64().unwrap();
+                            value["counters"][key] = json!(old + 1);
+                        });
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for key in [
+                "trace_complete",
+                "scalar_replay_verified",
+                "extraction_complete",
+            ] {
+                let changed = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("outer-{key}")),
+                    |_, manifest| manifest.outcome[key] = json!(true),
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            let changed = altered_cell(
+                &retained,
+                &fixture.0.join("retained-false-proof"),
+                |path, manifest| {
+                    let mut data: Value = read_json(&path.join("result.json")).unwrap();
+                    data["last_fall_degree"] = json!(5);
+                    let index = manifest
+                        .artifacts
+                        .iter()
+                        .position(|a| a.path == "result.json")
+                        .unwrap();
+                    fs::remove_file(path.join("result.json")).unwrap();
+                    manifest.artifacts[index] =
+                        storage::write_json(path, "result.json", "solver-outcome", &data).unwrap();
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+            for file in ["prime-f4-input.json", "prime-f4-wide-m3-events.jsonl"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("oversize-{file}")),
+                    |path, manifest| {
+                        let index = manifest
+                            .artifacts
+                            .iter()
+                            .position(|a| a.path == file)
+                            .unwrap();
+                        let a = manifest.artifacts[index].clone();
+                        let mut bytes = fs::read(path.join(file)).unwrap();
+                        bytes.extend(vec![b' '; 2 * 1024 * 1024 + 1]);
+                        fs::remove_file(path.join(file)).unwrap();
+                        manifest.artifacts[index] =
+                            storage::write_bytes(path, file, &a.role, &a.encoding, &bytes).unwrap();
+                        manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn wide_prime_f4_central_replay_and_rehashed_tamper_both_twists() {
+        for twist in [false, true] {
+            let fixture = TempRun::new();
+            let dir = wide_prime_f4_cell_fixture(&fixture, twist);
+            verify_cell(&dir, true).unwrap();
+            let negative = wide_prime_f4_cell_fixture_kind(&fixture, twist, true);
+            let negative_manifest = verify_cell(&negative, true).unwrap();
+            assert_eq!(negative_manifest.outcome["status"], "partial");
+            assert_eq!(
+                negative_manifest.outcome["exhaustive_no_decomposition"],
+                true
+            );
+            let mislabeled = altered_cell(
+                &negative,
+                &fixture.0.join("negative-mislabeled-verified"),
+                |_, manifest| manifest.outcome["status"] = json!("verified"),
+            );
+            assert!(verify_cell(&mislabeled, true).is_err());
+            let retained = altered_cell(
+                &dir,
+                &fixture.0.join("retained-censored"),
+                |path, manifest| {
+                    let record = storage::write_json(
+                        path,
+                        "result.json",
+                        "solver-outcome",
+                        &manifest.outcome,
+                    )
+                    .unwrap();
+                    manifest.artifacts.push(record);
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            for flag in [
+                "native_backend_invoked",
+                "algebra_completed",
+                "native_statistics_complete",
+                "extraction_complete",
+            ] {
+                let bad = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("outer-censored-{flag}")),
+                    |_, manifest| manifest.outcome[flag] = json!(true),
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "outer censored outcome accepted {flag}"
+                );
+            }
+            // First prove the unchanged registered producer result is valid
+            // beneath outer censorship; each following failure is nonvacuous.
+            verify_cell(&retained, true).unwrap();
+            for field in [
+                "trace_complete",
+                "first_fall_degree",
+                "last_fall_degree",
+                "retired_hardware_instructions",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let bad = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("retained-forbidden-{field}")),
+                    |path, _| {
+                        alter_json(&path.join("result.json"), |v| {
+                            v[field] = if [
+                                "first_fall_degree",
+                                "last_fall_degree",
+                                "retired_hardware_instructions",
+                            ]
+                            .contains(&field)
+                            {
+                                json!(5)
+                            } else {
+                                json!(true)
+                            }
+                        })
+                    },
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "retained result accepted {field}"
+                );
+            }
+            let unbound_retained = altered_cell(
+                &retained,
+                &fixture.0.join("retained-unbound"),
+                |_, manifest| manifest.artifacts.retain(|a| a.path != "result.json"),
+            );
+            assert!(verify_cell(&unbound_retained, true).is_err());
+            let partial = altered_cell(
+                &dir,
+                &fixture.0.join("partial-censored"),
+                |path, manifest| {
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                    for artifact in &mut manifest.artifacts {
+                        if [
+                            "prime-f4-input.json",
+                            "prime-f4-wide-result.json",
+                            "prime-f4-wide-events.jsonl",
+                            "prime-f4-root-extraction.json",
+                        ]
+                        .contains(&artifact.path.as_str())
+                        {
+                            artifact.role = "unregistered-partial-artifact".into();
+                            artifact.encoding = "native".into();
+                        }
+                    }
+                    fs::write(path.join("prime-f4-wide-result.json"), b"{incomplete").unwrap();
+                },
+            );
+            verify_cell(&partial, true).unwrap();
+            for claim in [
+                "native_backend_invoked",
+                "extraction_complete",
+                "exhaustive_no_decomposition",
+                "solver_completed",
+            ] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("all-omitted-{claim}")),
+                    |path, manifest| {
+                        for name in [
+                            "prime-f4-input.json",
+                            "prime-f4-wide-result.json",
+                            "prime-f4-wide-events.jsonl",
+                            "prime-f4-root-extraction.json",
+                        ] {
+                            fs::remove_file(path.join(name)).unwrap();
+                            manifest.artifacts.retain(|a| a.path != name);
+                        }
+                        manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                        manifest.outcome[claim] = json!(true);
+                    },
+                );
+                assert!(
+                    verify_cell(&bad, true).is_err(),
+                    "stripped artifacts accepted {claim}"
+                );
+            }
+            let presolver = altered_cell(
+                &dir,
+                &fixture.0.join("presolver-censored"),
+                |path, manifest| {
+                    for name in [
+                        "prime-f4-input.json",
+                        "prime-f4-wide-result.json",
+                        "prime-f4-wide-events.jsonl",
+                        "prime-f4-root-extraction.json",
+                    ] {
+                        fs::remove_file(path.join(name)).unwrap();
+                        manifest.artifacts.retain(|a| a.path != name);
+                    }
+                    manifest.outcome = json!({"status":"timeout","solver_completed":false});
+                },
+            );
+            verify_cell(&presolver, true).unwrap();
+            let setup_error = altered_cell(
+                &presolver,
+                &fixture.0.join("presolver-error"),
+                |path, manifest| {
+                    for name in ["pdp-witness.json", "solver-domain.json"] {
+                        fs::remove_file(path.join(name)).unwrap();
+                        manifest.artifacts.retain(|a| a.path != name);
+                    }
+                    manifest.outcome = json!({"status":"error","reason":"fixed software fixture: curve setup failed","solver_completed":false,"scalar_recovered_without_witness":false,"known_answer_verified":false,"factor_base_verified":false});
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "result.json",
+                            "solver-outcome",
+                            &manifest.outcome,
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            verify_cell(&setup_error, true).unwrap();
+            let hidden = altered_cell(
+                &dir,
+                &fixture.0.join("completed-relabeled-error"),
+                |path, manifest| {
+                    manifest.outcome = json!({"status":"error","reason":"fabricated","solver_completed":false,"scalar_recovered_without_witness":false});
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "result.json",
+                            "solver-outcome",
+                            &manifest.outcome,
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            assert!(verify_cell(&hidden, true).is_err());
+
+            for forbidden in [
+                "trace_complete",
+                "first_fall_degree",
+                "last_fall_degree",
+                "retired_hardware_instructions",
+                "scalar_replay_verified",
+                "ecdlp_pipeline_completed",
+            ] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("forbidden-{forbidden}")),
+                    |_, manifest| {
+                        manifest.outcome[forbidden] = if [
+                            "first_fall_degree",
+                            "last_fall_degree",
+                            "retired_hardware_instructions",
+                        ]
+                        .contains(&forbidden)
+                        {
+                            json!(5)
+                        } else {
+                            json!(true)
+                        }
+                    },
+                );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {forbidden}");
+                let bad_partial = altered_cell(
+                    &partial,
+                    &fixture.0.join(format!("partial-forbidden-{forbidden}")),
+                    |_, manifest| manifest.outcome[forbidden] = json!(true),
+                );
+                assert!(verify_cell(&bad_partial, true).is_err());
+            }
+            for mutation in ["public-m", "omit-public", "omit-base"] {
+                let bad =
+                    altered_cell(
+                        &dir,
+                        &fixture.0.join(mutation),
+                        |path, manifest| match mutation {
+                            "public-m" => {
+                                alter_json(&path.join("public.json"), |v| v["m"] = json!(3))
+                            }
+                            "omit-public" => manifest.artifacts.retain(|a| a.path != "public.json"),
+                            "omit-base" => {
+                                manifest.artifacts.retain(|a| a.path != "factor-base.json")
+                            }
+                            _ => unreachable!(),
+                        },
+                    );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {mutation}");
+            }
+            for extra in [0usize, 1] {
+                let padded = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("aggregate-pad-{extra}")),
+                    |path, manifest| {
+                        let record: Value =
+                            read_json(&path.join("prime-f4-wide-result.json")).unwrap();
+                        let cap = record["limits"]["encoded_bytes"].as_u64().unwrap() as usize;
+                        let total: usize = manifest
+                            .artifacts
+                            .iter()
+                            .filter(|a| {
+                                [
+                                    "prime-f4-input.json",
+                                    "prime-f4-wide-result.json",
+                                    "prime-f4-wide-events.jsonl",
+                                    "prime-f4-root-extraction.json",
+                                    "pdp-witness.json",
+                                ]
+                                .contains(&a.path.as_str())
+                            })
+                            .map(|a| a.bytes as usize)
+                            .sum();
+                        let mut bytes = fs::read(path.join("prime-f4-wide-result.json")).unwrap();
+                        bytes.extend(std::iter::repeat_n(b' ', cap - total + extra));
+                        fs::write(path.join("prime-f4-wide-result.json"), bytes).unwrap();
+                    },
+                );
+                assert_eq!(
+                    verify_cell(&padded, true).is_ok(),
+                    extra == 0,
+                    "aggregate boundary{extra}"
+                );
+            }
+            for excess in [false, true] {
+                let bad = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("event-padding-{excess}")),
+                    |path, _| {
+                        let record: Value =
+                            read_json(&path.join("prime-f4-wide-result.json")).unwrap();
+                        let cap = (record["limits"]["encoded_bytes"].as_u64().unwrap() / 8)
+                            .min(256 * 1024) as usize;
+                        let mut bytes = fs::read(path.join("prime-f4-wide-events.jsonl")).unwrap();
+                        let count = if excess { cap + 1 - bytes.len() } else { 1 };
+                        bytes.extend(std::iter::repeat_n(b'\n', count));
+                        fs::write(path.join("prime-f4-wide-events.jsonl"), bytes).unwrap();
+                    },
+                );
+                assert!(verify_cell(&bad, true).is_err());
+            }
+            for mutation in [
+                "equation", "limit", "basis", "counter", "outcome", "deadline", "unknown", "omit",
+                "relocate", "encoding",
+            ] {
+                let bad =
+                    altered_cell(
+                        &dir,
+                        &fixture.0.join(mutation),
+                        |path, manifest| match mutation {
+                            "equation" => alter_json(&path.join("prime-f4-input.json"), |v| {
+                                v["polynomials"][0][0]["coefficient"] = json!("2305843009213693951")
+                            }),
+                            "limit" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["limits"]["work"] = json!(1)
+                            }),
+                            "basis" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["native_basis_derivation_verified"] = json!(true)
+                            }),
+                            "counter" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["acknowledged_events"] = json!(999999)
+                            }),
+                            "outcome" => {
+                                manifest.outcome["total_operation_count_verified"] = json!(true)
+                            }
+                            "deadline" => alter_json(&path.join(execution::PATH), |v| {
+                                v["deadline_monotonic_ns"] = json!(0)
+                            }),
+                            "unknown" => alter_json(&path.join("prime-f4-wide-result.json"), |v| {
+                                v["extra"] = json!(true)
+                            }),
+                            "omit" => manifest
+                                .artifacts
+                                .retain(|a| a.path != "prime-f4-wide-result.json"),
+                            "relocate" => {
+                                let a = manifest
+                                    .artifacts
+                                    .iter_mut()
+                                    .find(|a| a.path == "prime-f4-wide-result.json")
+                                    .unwrap();
+                                fs::rename(path.join(&a.path), path.join("relocated.json"))
+                                    .unwrap();
+                                a.path = "relocated.json".into();
+                            }
+                            "encoding" => {
+                                manifest
+                                    .artifacts
+                                    .iter_mut()
+                                    .find(|a| a.path == "prime-f4-wide-result.json")
+                                    .unwrap()
+                                    .encoding = "native".into()
+                            }
+                            _ => unreachable!(),
+                        },
+                    );
+                assert!(verify_cell(&bad, true).is_err(), "accepted {mutation}");
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_replays_odd_even_families_twists_and_rejects_rehashed_roots() {
+        for family in ["binary", "koblitz"] {
+            for n in [11, 12] {
+                for twist in [false, true] {
+                    let fixture = TempRun::new();
+                    let dir = root_cell_fixture(&fixture, family, twist, 100_000, n);
+                    let manifest = verify_cell(&dir, true).unwrap();
+                    assert_eq!(manifest.outcome["pdp_witness_verified"], true);
+                    assert!(manifest
+                        .artifacts
+                        .iter()
+                        .any(|a| a.role == "native-binary-root-intermediate-state"));
+                    let bad = altered_cell(&dir, &fixture.0.join("bad-roots"), |path, _| {
+                        alter_json(&path.join("binary-root-certificates.json"), |certificate| {
+                            let query = certificate["queries"]
+                                .as_array_mut()
+                                .unwrap()
+                                .iter_mut()
+                                .find(|q| !q["report"]["roots"].as_array().unwrap().is_empty())
+                                .unwrap();
+                            query["report"]["roots"].as_array_mut().unwrap().pop();
+                        });
+                    });
+                    verify_cell(&bad, false).unwrap();
+                    assert!(verify_cell(&bad, true).is_err());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_requires_unique_bound_certificate_even_when_labels_are_stripped() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let dir = root_cell_fixture(&fixture, family, twist, 100_000, 12);
+                for mutation in [
+                    "missing",
+                    "missing_and_stripped",
+                    "wrong_role_and_stripped",
+                    "wrong_encoding",
+                    "duplicate",
+                    "wrong_family_role",
+                    "wrong_solver",
+                ] {
+                    let bad = altered_cell(&dir, &fixture.0.join(mutation), |path, manifest| {
+                        let index = manifest
+                            .artifacts
+                            .iter()
+                            .position(|a| a.role == "binary-root-certificates/v1")
+                            .unwrap();
+                        match mutation {
+                            "missing" | "missing_and_stripped" => {
+                                manifest.artifacts.remove(index);
+                            }
+                            "wrong_role_and_stripped" => {
+                                manifest.artifacts[index].role =
+                                    "unregistered-partial-artifact".into()
+                            }
+                            "wrong_encoding" => manifest.artifacts[index].encoding = "jsonl".into(),
+                            "duplicate" => {
+                                let mut extra = manifest.artifacts[index].clone();
+                                extra.path = "duplicate-binary-root.json".into();
+                                fs::copy(
+                                    path.join(&manifest.artifacts[index].path),
+                                    path.join(&extra.path),
+                                )
+                                .unwrap();
+                                manifest.artifacts.push(extra);
+                            }
+                            "wrong_family_role" => {
+                                manifest.artifacts[index].role = "prime-root-certificates/v1".into()
+                            }
+                            "wrong_solver" => {
+                                let mut plan: DatasetPlan =
+                                    read_json(&path.join("plan.json")).unwrap();
+                                plan.solvers = vec!["enumerate".into()];
+                                manifest.config = plan.cell(manifest.cell_index).unwrap();
+                                manifest.plan_sha256 = plan.binding_sha256().unwrap();
+                                let mut binding: Value = read_json(&path.join("run.json")).unwrap();
+                                binding["plan_sha256"] = json!(manifest.plan_sha256);
+                                fs::write(
+                                    path.join("plan.json"),
+                                    serde_json::to_vec(&plan).unwrap(),
+                                )
+                                .unwrap();
+                                fs::write(
+                                    path.join("run.json"),
+                                    serde_json::to_vec(&binding).unwrap(),
+                                )
+                                .unwrap();
+                                fs::write(
+                                    path.join("config.json"),
+                                    serde_json::to_vec(&manifest.config).unwrap(),
+                                )
+                                .unwrap();
+                            }
+                            _ => unreachable!(),
+                        }
+                        if mutation.ends_with("_stripped") {
+                            for key in [
+                                "root_certificate_scope",
+                                "root_execution_trace_complete_verified",
+                                "root_total_operation_count_verified",
+                            ] {
+                                manifest.outcome.as_object_mut().unwrap().remove(key);
+                            }
+                        }
+                    });
+                    for replay in [false, true] {
+                        let error = verify_cell(&bad, replay).unwrap_err();
+                        assert!(
+                            error.contains("root outcome lacks")
+                                || error.contains("binary-root certificate lacks"),
+                            "{family}/{twist}/{mutation}/{replay}: {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_auxiliaries_bind_payloads_roles_encodings_and_inventory() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let dir = root_cell_fixture(&fixture, family, twist, 100_000, 12);
+                for role in [
+                    "native-binary-root-call",
+                    "native-binary-root-intermediate-state",
+                ] {
+                    for mutation in [
+                        "identity",
+                        "native_payload",
+                        "missing",
+                        "duplicate",
+                        "wrong_role",
+                        "wrong_encoding",
+                        "wrong_path",
+                    ] {
+                        let bad = altered_cell(
+                            &dir,
+                            &fixture.0.join(format!("{role}-{mutation}")),
+                            |path, manifest| {
+                                let index = manifest
+                                    .artifacts
+                                    .iter()
+                                    .position(|a| a.role == role)
+                                    .unwrap();
+                                match mutation {
+                                    "identity" | "native_payload" => {
+                                        alter_json(
+                                            &path.join(&manifest.artifacts[index].path),
+                                            |payload| {
+                                                if mutation == "identity" {
+                                                    payload["call_index"] = json!(999);
+                                                } else if role == "native-binary-root-call" {
+                                                    payload["report"]["polynomial"] =
+                                                        json!([999_999]);
+                                                } else {
+                                                    payload["native"] = json!({"kind":"normalized", "argument":999_999});
+                                                }
+                                            },
+                                        );
+                                    }
+                                    "missing" => {
+                                        manifest.artifacts.remove(index);
+                                    }
+                                    "duplicate" => {
+                                        let mut extra = manifest.artifacts[index].clone();
+                                        extra.path = "duplicate-binary-auxiliary.json".into();
+                                        fs::copy(
+                                            path.join(&manifest.artifacts[index].path),
+                                            path.join(&extra.path),
+                                        )
+                                        .unwrap();
+                                        manifest.artifacts.push(extra);
+                                    }
+                                    "wrong_role" => {
+                                        manifest.artifacts[index].role =
+                                            "unregistered-partial-artifact".into()
+                                    }
+                                    "wrong_encoding" => {
+                                        manifest.artifacts[index].encoding = "jsonl".into()
+                                    }
+                                    "wrong_path" => {
+                                        let old = path.join(&manifest.artifacts[index].path);
+                                        manifest.artifacts[index].path =
+                                            "renamed-binary-auxiliary.json".into();
+                                        fs::rename(old, path.join(&manifest.artifacts[index].path))
+                                            .unwrap();
+                                    }
+                                    _ => unreachable!(),
+                                }
+                            },
+                        );
+                        if matches!(mutation, "identity" | "native_payload") {
+                            verify_cell(&bad, false).unwrap();
+                        } else {
+                            assert!(verify_cell(&bad, false)
+                                .unwrap_err()
+                                .contains("binary root auxiliary"));
+                        }
+                        assert!(verify_cell(&bad, true)
+                            .unwrap_err()
+                            .contains("binary root auxiliary"));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn stored_binary_root_caps_censoring_and_outcome_labels_survive_rehashed_tampering() {
+        for family in ["binary", "koblitz"] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let complete = root_cell_fixture(&fixture, family, twist, 100_000, 11);
+                for mutation in [
+                    "byte_flag",
+                    "missing_byte_flag",
+                    "extra_event_field",
+                    "event_cap",
+                    "byte_cap",
+                    "joint_event_count",
+                    "joint_event_bytes",
+                ] {
+                    let bad =
+                        altered_cell(&complete, &fixture.0.join(mutation), |path, manifest| {
+                            alter_json(
+                                &path.join("binary-root-certificates.json"),
+                                |certificate| {
+                                    assert_eq!(
+                                        certificate["queries"][0]["report"]["stop"],
+                                        "complete"
+                                    );
+                                    match mutation {
+                                        "byte_flag" => {
+                                            certificate["queries"][0]["trace_byte_cap_reached"] =
+                                                json!(true)
+                                        }
+                                        "missing_byte_flag" => {
+                                            certificate["queries"][0]
+                                                .as_object_mut()
+                                                .unwrap()
+                                                .remove("trace_byte_cap_reached");
+                                        }
+                                        "extra_event_field" => {
+                                            certificate["queries"][0]["report"]["events"][0]
+                                                ["unaccounted_payload"] = json!("extra")
+                                        }
+                                        "event_cap" | "byte_cap" => {
+                                            let key = if mutation == "event_cap" {
+                                                "event_cap"
+                                            } else {
+                                                "event_byte_cap"
+                                            };
+                                            certificate[key] =
+                                                json!(certificate[key].as_u64().unwrap() + 1);
+                                        }
+                                        "joint_event_count" | "joint_event_bytes" => {
+                                            let key = if mutation == "joint_event_count" {
+                                                "acknowledged_native_events"
+                                            } else {
+                                                "acknowledged_native_event_bytes"
+                                            };
+                                            certificate[key] =
+                                                json!(certificate[key].as_u64().unwrap() + 1);
+                                            manifest.outcome["counters"][key] =
+                                                certificate[key].clone();
+                                        }
+                                        _ => unreachable!(),
+                                    }
+                                },
+                            );
+                        });
+                    for replay in [false, true] {
+                        assert!(
+                            verify_cell(&bad, replay).is_err(),
+                            "{family}/{twist}/{mutation}/{replay}"
+                        );
+                    }
+                }
+                for key in [
+                    "aggregate_root_primitive_and_group_work",
+                    "root_solver_calls",
+                    "acknowledged_native_events",
+                    "acknowledged_native_event_bytes",
+                ] {
+                    let bad = altered_cell(&complete, &fixture.0.join(key), |_, manifest| {
+                        manifest.outcome["counters"][key] =
+                            json!(manifest.outcome["counters"][key].as_u64().unwrap() + 1);
+                    });
+                    for replay in [false, true] {
+                        assert!(verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("binary-root outcome aggregate"));
+                    }
+                }
+                let censored = root_cell_fixture(&fixture, family, twist, 1, 11);
+                assert_eq!(
+                    verify_cell(&censored, true).unwrap().outcome["status"],
+                    "budget_exhausted"
+                );
+                for (field, value) in [
+                    ("root_execution_trace_complete_verified", json!(true)),
+                    ("root_total_operation_count_verified", json!(true)),
+                    ("trace_complete", json!(true)),
+                    ("solver_completed", json!(true)),
+                    ("pdp_witness_verified", json!(true)),
+                    ("scalar_recovered_without_witness", json!(true)),
+                    ("scalar_replay_verified", json!(true)),
+                    ("ecdlp_pipeline_completed", json!(true)),
+                    ("status", json!("verified")),
+                ] {
+                    let bad = altered_cell(&censored, &fixture.0.join(field), |_, manifest| {
+                        manifest.outcome[field] = value;
+                    });
+                    for replay in [false, true] {
+                        assert!(verify_cell(&bad, replay)
+                            .unwrap_err()
+                            .contains("root outcome labels"));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn legacy_binary_root_summaries_remain_compatible_without_native_claims() {
+        for family in ["binary", "koblitz"] {
+            let fixture = TempRun::new();
+            let dir = root_cell_fixture(&fixture, family, false, 100_000, 11);
+            let legacy = altered_cell(
+                &dir,
+                &fixture.0.join("legacy-binary-root"),
+                |path, manifest| {
+                    let certificate: Value =
+                        read_json(&path.join("binary-root-certificates.json")).unwrap();
+                    manifest.artifacts.retain(|a| {
+                        !matches!(
+                            a.role.as_str(),
+                            "binary-root-certificates/v1"
+                                | "native-binary-root-call"
+                                | "native-binary-root-intermediate-state"
+                        )
+                    });
+                    for key in [
+                        "root_certificate_scope",
+                        "root_execution_trace_complete_verified",
+                        "root_total_operation_count_verified",
+                    ] {
+                        manifest.outcome.as_object_mut().unwrap().remove(key);
+                    }
+                    let rows: Vec<_> = certificate["queries"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|q| {
+                            json!({
+                    "kind":"root_result", "fixed_x":q["fixed_x"],
+                    "coefficients_constant_first":q["coefficients_constant_first"],
+                    "all_returned_roots":q["report"]["roots"], "checks":q["checks"]})
+                        })
+                        .collect();
+                    manifest.artifacts.push(
+                        storage::write_json(
+                            path,
+                            "root-polynomials.json",
+                            "native-univariate-inputs-roots-and-group-lifts",
+                            &json!(rows),
+                        )
+                        .unwrap(),
+                    );
+                },
+            );
+            verify_cell(&legacy, false).unwrap();
+            verify_cell(&legacy, true).unwrap();
+        }
+    }
+
+    /// A real constructed curve/base and native solver certificate. Plant only
+    /// a public sum; neither a construction scalar nor a witness reaches solve.
+    fn prime_root_cell_fixture(fixture: &TempRun, twist: bool, work_limit: u64) -> PathBuf {
+        prime_root_cell_fixture_at_size(fixture, twist, work_limit, 7)
+    }
+
+    fn prime_root_cell_fixture_at_size(
+        fixture: &TempRun,
+        twist: bool,
+        work_limit: u64,
+        field_size: u32,
+    ) -> PathBuf {
+        root_cell_fixture(fixture, "prime", twist, work_limit, field_size)
+    }
+
+    fn root_cell_fixture(
+        fixture: &TempRun,
+        family: &str,
+        twist: bool,
+        work_limit: u64,
+        field_size: u32,
+    ) -> PathBuf {
+        let m = 2;
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.families = vec![family.into()];
+        plan.field_sizes = vec![field_size];
+        plan.arities = vec![m];
+        plan.solvers = vec!["root".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = if family == "prime" { 2 } else { 8 };
+        plan.degree_bound = 8;
+        plan.work_limit = work_limit;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = if family == "prime" {
+            curves::point_words(&case.factor_base["points"][0]).unwrap()
+        } else {
+            case.factor_base["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| curves::point_words(p).unwrap())
+                .min_by_key(|p| p.expect("affine factor-base point").0)
+                .unwrap()
+        };
+        let mut sum = None;
+        // Prefixes alternate P,2P,P,2P,... and are affine for odd prime r.
+        // This constructs a group witness independently of S3 equations.
+        for i in 0..m {
+            let summand = if i < 2 || i % 2 == 1 {
+                point
+            } else {
+                arithmetic.neg(point)
+            };
+            sum = arithmetic.reference_add(sum, summand);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+        let solved = solvers::solve(&config, &case).unwrap();
+        assert_eq!(
+            solved.outcome["pdp_witness_verified"],
+            work_limit == 100_000,
+            "{}",
+            solved.outcome
+        );
+
+        let dir = fixture.0.join(format!(
+            "cell-root-{family}-n{field_size}-twist{twist}-work{work_limit}"
+        ));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &json!({"software_test":true}))
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    /// Re-seal deliberately changed bytes, so replay failures cannot be
+    /// explained merely by stale hashes or lengths in the artifact manifest.
+    fn altered_cell(
+        source: &Path,
+        destination: &Path,
+        edit: impl FnOnce(&Path, &mut CellManifest),
+    ) -> PathBuf {
+        fs::create_dir(destination).unwrap();
+        let mut manifest: CellManifest = read_json(&source.join("manifest.json")).unwrap();
+        for artifact in &manifest.artifacts {
+            let path = destination.join(&artifact.path);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::copy(source.join(&artifact.path), path).unwrap();
+        }
+        edit(destination, &mut manifest);
+        for artifact in &mut manifest.artifacts {
+            (artifact.sha256, artifact.bytes) =
+                crate::store::hash_file(&destination.join(&artifact.path)).unwrap();
+        }
+        fs::write(
+            destination.join("manifest.json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        storage::verify_manifest(destination, &manifest.artifacts).unwrap();
+        destination.to_owned()
+    }
+
+    fn alter_json(path: &Path, edit: impl FnOnce(&mut Value)) {
+        let mut value: Value = read_json(path).unwrap();
+        edit(&mut value);
+        fs::write(path, serde_json::to_vec(&value).unwrap()).unwrap();
+    }
+
+    #[test]
+    fn central_prime_f4_replays_generated_m3_m4_and_legacy_m2_cells() {
+        for m in [2, 3, 4] {
+            for twist in [false, true] {
+                let fixture = TempRun::new();
+                let dir = prime_f4_cell_fixture(&fixture, m, twist);
+                let replayed = verify_cell(&dir, true).unwrap();
+                assert_eq!(replayed.outcome["pdp_witness_verified"], true);
+                let input: Value = read_json(&dir.join("prime-f4-input.json")).unwrap();
+                if m == 2 {
+                    assert!(input.get("schema").is_none());
+                    assert!(input.get("strategy").is_none());
+                } else {
+                    assert_eq!(input["schema"], "ml-dataset.prime-f4-chain-input/v1");
+                    assert_eq!(replayed.outcome["exhaustive_no_decomposition"], false);
+                }
+                let bad = altered_cell(&dir, &fixture.0.join("bad-certificate"), |dir, _| {
+                    alter_json(&dir.join("pdp-witness.json"), |witness| {
+                        witness["summands"][0] = Value::Null
+                    });
+                });
+                verify_cell(&bad, false).unwrap();
+                assert!(verify_cell(&bad, true).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn central_prime_chain_rejects_rehashed_equation_domain_and_schema_tampering() {
+        let fixture = TempRun::new();
+        let source = prime_f4_cell_fixture(&fixture, 3, false);
+        for mutation in [
+            "coefficient",
+            "leaf-domain",
+            "auxiliary-domain",
+            "membership",
+            "roles",
+            "schema-removed",
+            "schema-changed",
+            "strategy-removed",
+            "strategy-changed",
+        ] {
+            let bad = altered_cell(&source, &fixture.0.join(mutation), |dir, manifest| {
+                // The frozen configuration still identifies a chain when the
+                // mutable outcome declaration has been stripped as well.
+                manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                alter_json(&dir.join("prime-f4-input.json"), |input| match mutation {
+                    "coefficient" => input["polynomials"][0][0]["coefficient"] = json!("0"),
+                    "leaf-domain" => input["domains"][0] = Value::Null,
+                    "auxiliary-domain" => input["domains"][3] = input["domains"][0].clone(),
+                    "membership" => input["membership_variables"][0] = json!(3),
+                    "roles" => input["variable_roles"][3]["role"] = json!("factor_base_leaf"),
+                    "schema-removed" => {
+                        input.as_object_mut().unwrap().remove("schema");
+                    }
+                    "schema-changed" => input["schema"] = json!("legacy-reference"),
+                    "strategy-removed" => {
+                        input.as_object_mut().unwrap().remove("strategy");
+                    }
+                    "strategy-changed" => input["strategy"] = json!("legacy-reference"),
+                    _ => unreachable!(),
+                });
+            });
+            verify_cell(&bad, false).unwrap();
+            let error = verify_cell(&bad, true).unwrap_err();
+            assert!(
+                error.contains("prime F4 chain input differs"),
+                "{mutation}: {error}"
+            );
+        }
+    }
+
+    #[test]
+    fn central_prime_chain_binds_reconstructed_input_to_frozen_cell_configuration() {
+        let first = TempRun::new();
+        let second = TempRun::new();
+        let m3 = prime_f4_cell_fixture(&first, 3, false);
+        let m4 = prime_f4_cell_fixture(&second, 4, false);
+        // Transplant valid m4 public algebra and a valid m4 group certificate
+        // into a frozen m3 cell. Neither artifact's own replay is sufficient.
+        let bad = altered_cell(&m3, &first.0.join("valid-other-arity"), |dir, _| {
+            for path in ["public.json", "prime-f4-input.json", "pdp-witness.json"] {
+                fs::copy(m4.join(path), dir.join(path)).unwrap();
+            }
+        });
+        verify_cell(&bad, false).unwrap();
+        assert!(verify_cell(&bad, true)
+            .unwrap_err()
+            .contains("frozen cell configuration"));
+
+        let changed_config = altered_cell(&m3, &first.0.join("changed-config"), |dir, manifest| {
+            manifest.config.m = 4;
+            fs::write(
+                dir.join("config.json"),
+                serde_json::to_vec(&manifest.config).unwrap(),
+            )
+            .unwrap();
+        });
+        assert!(verify_cell(&changed_config, true)
+            .unwrap_err()
+            .contains("frozen plan"));
+    }
+
+    #[test]
+    fn central_prime_chain_requires_artifacts_even_when_strategy_is_stripped() {
+        let fixture = TempRun::new();
+        let source = prime_f4_cell_fixture(&fixture, 3, false);
+        for (label, path) in [
+            ("missing-input", "prime-f4-input.json"),
+            ("missing-public", "public.json"),
+            ("missing-base", "factor-base.json"),
+            ("missing-certificate", "pdp-witness.json"),
+        ] {
+            let bad = altered_cell(&source, &fixture.0.join(label), |dir, manifest| {
+                manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                manifest.artifacts.retain(|artifact| artifact.path != path);
+                fs::remove_file(dir.join(path)).unwrap();
+            });
+            assert!(verify_cell(&bad, false).is_err(), "{label}");
+            assert!(verify_cell(&bad, true).is_err(), "{label}");
+        }
+        // Every individual execution indicator must survive loss of the
+        // mutable strategy and all three named equation/trace artifacts.
+        for indicator in [
+            "native_backend_invoked",
+            "pdp_witness_verified",
+            "solver_completed",
+        ] {
+            let bad = altered_cell(&source, &fixture.0.join(indicator), |dir, manifest| {
+                manifest.outcome = json!({"status":"partial"});
+                manifest.outcome[indicator] = json!(true);
+                for path in [
+                    "prime-f4-input.json",
+                    "prime-f4-chain-result.json",
+                    "prime-f4-chain-events.jsonl",
+                ] {
+                    manifest.artifacts.retain(|artifact| artifact.path != path);
+                    fs::remove_file(dir.join(path)).unwrap();
+                }
+            });
+            assert!(
+                verify_cell(&bad, true)
+                    .unwrap_err()
+                    .contains("equation/domain artifact"),
+                "{indicator}"
+            );
+        }
+
+        let early = TempRun::new();
+        let (mut plan, mut binding, protocol) = early.bound();
+        plan.arities = vec![3];
+        plan.solvers = vec!["f4".into()];
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        let dir = early.failed_cell(&plan, &binding, &protocol);
+        verify_cell(&dir, true).unwrap();
+        let unsupported = altered_cell(&dir, &early.0.join("early-unsupported"), |_, manifest| {
+            manifest.outcome = json!({"status":"unsupported", "native_backend_invoked":false,
+                "pdp_witness_verified":false,"solver_completed":false,
+                "reason":"constructor stopped before producing an algebraic input"});
+        });
+        verify_cell(&unsupported, true).unwrap();
+    }
+
+    #[test]
+    fn native_plan_binding_ignores_file_format_and_key_order_but_preserves_content() {
+        let fixture = TempRun::new();
+        let (plan, binding, _) = fixture.bound();
+        // Freeze the pre-existing generation contract independently of the
+        // helper now shared by Plan, Preflight, generation and reader replay.
+        let compact = serde_json::to_vec(&plan).unwrap();
+        let expected = digest(&compact);
+        assert_eq!(binding["plan_sha256"], expected);
+        let pretty = fs::read(fixture.0.join("plan.json")).unwrap();
+        let object = serde_json::to_value(&plan).unwrap();
+        let reversed_members: Vec<String> = object
+            .as_object()
+            .unwrap()
+            .iter()
+            .rev()
+            .map(|(key, value)| {
+                format!(
+                    "{}:{}",
+                    serde_json::to_string(key).unwrap(),
+                    serde_json::to_string(value).unwrap()
+                )
+            })
+            .collect();
+        let reordered = format!("{{{}}}\n", reversed_members.join(",")).into_bytes();
+        let mut file_hashes = BTreeSet::new();
+        for bytes in [pretty, compact, reordered] {
+            let path = fixture.0.join("plan.json");
+            fs::write(&path, &bytes).unwrap();
+            let parsed: DatasetPlan = read_json(&path).unwrap();
+            parsed.validate().unwrap();
+            file_hashes.insert(crate::store::hash_file(&path).unwrap().0);
+            assert_eq!(parsed.binding_sha256().unwrap(), expected);
+            // Existing run records retain the original generation binding;
+            // all equivalent file presentations must still verify against it.
+            let (_, saved_binding, replayed_hash) = bound_run(&fixture.0).unwrap();
+            assert_eq!(saved_binding, binding);
+            assert_eq!(replayed_hash, expected);
+        }
+        assert_eq!(file_hashes.len(), 3);
+        let mut changed = plan;
+        changed.keys += 1;
+        changed.validate().unwrap();
+        assert_ne!(changed.binding_sha256().unwrap(), expected);
+        fs::write(
+            fixture.0.join("plan.json"),
+            serde_json::to_vec(&changed).unwrap(),
+        )
+        .unwrap();
+        assert!(bound_run(&fixture.0).is_err());
     }
 
     #[test]

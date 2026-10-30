@@ -10,9 +10,12 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{self, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
+use super::budget::BudgetScope;
+use super::s3_budget::S3BudgetContext;
 use super::types::Artifact;
 use crate::hash::sha256::Sha256;
 use crate::store::backend::{object_key, Backend, Meta, RemoteSpec, SINGLE_PUT_MAX};
@@ -21,6 +24,131 @@ use crate::store::{hash_file, Config, PushMeta, Store};
 
 const RECEIPT_SCHEMA: &str = "ml-dataset.publication/v1";
 static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
+/// Every dataset S3 store uses the accounting transport, including nested
+/// Store::push requests. The ordinary AWS CLI backend is never a fallback.
+pub(super) fn dataset_store(
+    cfg: Config,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
+) -> Result<Store, String> {
+    match cfg.remote.as_ref() {
+        Some(RemoteSpec::S3 { .. }) => super::s3_budget::open_store(
+            cfg,
+            budget
+                .ok_or("dataset S3 operations require an active bound budget session")?
+                .clone(),
+            scope,
+        ),
+        _ => Store::open(cfg),
+    }
+}
+
+pub(super) fn expect_remote_object(
+    budget: Option<&Arc<S3BudgetContext>>,
+    remote: &RemoteSpec,
+    key: &str,
+    artifact: &Artifact,
+    scope: BudgetScope,
+) -> Result<(), String> {
+    if let RemoteSpec::S3 { bucket, prefix } = remote {
+        let full_key = if prefix.is_empty() {
+            key.to_owned()
+        } else {
+            format!("{prefix}/{key}")
+        };
+        budget
+            .ok_or("dataset S3 object requires an active bound budget session")?
+            .expect_object(bucket, &full_key, &artifact.sha256, artifact.bytes, scope)?;
+    }
+    Ok(())
+}
+
+pub(super) fn reserve_remote_output(
+    budget: Option<&Arc<S3BudgetContext>>,
+    remote: &RemoteSpec,
+    key: &str,
+    artifact: &Artifact,
+    scope: BudgetScope,
+) -> Result<(), String> {
+    expect_remote_object(budget, remote, key, artifact, scope.clone())?;
+    if let RemoteSpec::S3 { bucket, prefix } = remote {
+        let key = if prefix.is_empty() {
+            key.to_owned()
+        } else {
+            format!("{prefix}/{key}")
+        };
+        budget
+            .ok_or("S3 output requires a budget")?
+            .session()
+            .reserve_object(bucket, &key, &artifact.sha256, artifact.bytes, &scope)?;
+    }
+    Ok(())
+}
+
+pub(super) fn verify_remote_output(
+    budget: Option<&Arc<S3BudgetContext>>,
+    remote: &RemoteSpec,
+    key: &str,
+    scope: BudgetScope,
+) -> Result<(), String> {
+    if let RemoteSpec::S3 { bucket, prefix } = remote {
+        let key = if prefix.is_empty() {
+            key.to_owned()
+        } else {
+            format!("{prefix}/{key}")
+        };
+        budget
+            .ok_or("S3 output verification requires a budget")?
+            .verify_registered(bucket, &key, scope)?;
+    }
+    Ok(())
+}
+
+/// Audit checkpoints are independent immutable control objects. They never
+/// change an existing cell completion or catalog receipt on a later grant.
+pub(super) fn publish_budget_checkpoint(
+    root: &Path,
+    artifact: &Artifact,
+    cfg: Config,
+    budget: &Arc<S3BudgetContext>,
+) -> Result<Artifact, String> {
+    let remote = cfg
+        .remote
+        .clone()
+        .ok_or("budget checkpoint has no remote")?;
+    let key = format!("budget-checkpoints/{}.sqlite", artifact.sha256);
+    reserve_remote_output(
+        Some(budget),
+        &remote,
+        &key,
+        artifact,
+        BudgetScope::Finalization,
+    )?;
+    let store = dataset_store(cfg, Some(budget), BudgetScope::Finalization)?;
+    verify_manifest(root, std::slice::from_ref(artifact))?;
+    prepare_s3_publication(
+        store.remote()?,
+        &remote,
+        &key,
+        &root.join(&artifact.path),
+        artifact,
+        root,
+    )?;
+    let temp = TempFile::new(root)?;
+    store.remote()?.get(&key, &temp.path)?;
+    check_file(&temp.path, &artifact.sha256, artifact.bytes)?;
+    verify_remote_output(Some(budget), &remote, &key, BudgetScope::Finalization)?;
+    write_json(
+        root,
+        &format!("budget-checkpoints/verified-{}.json", artifact.sha256),
+        "restricted-budget-checkpoint-readback",
+        &serde_json::json!({
+            "remote":remote.display(),"object_key":key,"sha256":artifact.sha256,"bytes":artifact.bytes,
+            "roundtrip_verified":true,"journal_scope":"prefix before checkpoint publication requests",
+            "account_wide_billing_cutoff":false}),
+    )
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -387,10 +515,11 @@ fn publication_head(
         Ok(meta) => Ok(meta),
         Err(error)
             if matches!(remote, Some(RemoteSpec::S3 { bucket, .. }) if bucket == "setec-astronomy-artifacts")
-                && error.starts_with("aws head-object failed")
-                && (error.contains("(403)")
-                    || error.contains("(Forbidden)")
-                    || error.contains("(AccessDenied)")) =>
+                && ((error.starts_with("aws head-object failed")
+                    && (error.contains("(403)")
+                        || error.contains("(Forbidden)")
+                        || error.contains("(AccessDenied)")))
+                    || error.starts_with(super::s3_budget::AMBIGUOUS_HEAD_DENIED)) =>
         {
             if artifact.bytes > SINGLE_PUT_MAX {
                 return Err("HEAD-denied publication exceeds immutable single-PUT limit".into());
@@ -467,6 +596,8 @@ fn publish_object(
     root: &Path,
     artifact: &Artifact,
     namespace: &str,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
 ) -> Result<PublishedObject, String> {
     if matches!(store.cfg.remote, Some(RemoteSpec::S3 { .. })) && artifact.bytes > SINGLE_PUT_MAX {
         return Err(format!("dataset S3 artifacts must be chunked to at most {SINGLE_PUT_MAX} bytes for immutable conditional PUT"));
@@ -476,6 +607,17 @@ fn publish_object(
     let name = format!("{namespace}/{}", artifact.path);
     validate_name(&name)?;
     let key = object_key(&artifact.sha256)?;
+    reserve_remote_output(
+        budget,
+        store
+            .cfg
+            .remote
+            .as_ref()
+            .ok_or("missing publication remote")?,
+        &key,
+        artifact,
+        scope.clone(),
+    )?;
     if let Some(existing) = store.index.get(&name) {
         if existing.sha256 != artifact.sha256 || existing.bytes != artifact.bytes {
             return Err(format!(
@@ -537,6 +679,16 @@ fn publish_object(
         return Err(format!("{name}: source changed during publication"));
     }
     roundtrip(store, artifact, root)?;
+    verify_remote_output(
+        budget,
+        store
+            .cfg
+            .remote
+            .as_ref()
+            .ok_or("missing publication remote")?,
+        &key,
+        scope,
+    )?;
     File::open(&store.cfg.index_path)
         .and_then(|file| file.sync_all())
         .map_err(|e| format!("sync store index {}: {e}", store.cfg.index_path.display()))?;
@@ -571,6 +723,7 @@ fn publish_catalog(
     root: &Path,
     receipt: &PublishReceipt,
     store: &Store,
+    budget: Option<&Arc<S3BudgetContext>>,
 ) -> Result<CatalogLocator, String> {
     let key = catalog_key(&receipt.namespace, &receipt.manifest_sha256)?;
     let mut portable = receipt.clone();
@@ -583,6 +736,13 @@ fn publish_catalog(
         &portable,
     )?;
     let source = contained_path(root, &artifact.path, false)?;
+    reserve_remote_output(
+        budget,
+        store.cfg.remote.as_ref().ok_or("missing catalog remote")?,
+        &key,
+        &artifact,
+        BudgetScope::Finalization,
+    )?;
     match store.cfg.remote.as_ref() {
         Some(RemoteSpec::Dir(directory)) => {
             // DirBackend::put replaces existing names. Use the same synced,
@@ -618,6 +778,12 @@ fn publish_catalog(
     store.remote()?.get(&key, &temp.path)?;
     check_file(&temp.path, &artifact.sha256, artifact.bytes)
         .map_err(|e| format!("catalog remote round-trip failed: {e}"))?;
+    verify_remote_output(
+        budget,
+        store.cfg.remote.as_ref().ok_or("missing catalog remote")?,
+        &key,
+        BudgetScope::Finalization,
+    )?;
     let confirmation = write_json(
         root,
         &format!("publication/catalog-verified-{receipt_id}.json"),
@@ -662,12 +828,26 @@ pub fn publish(
 /// Dataset supervisors pass one cumulative admission session through every
 /// object, verification read, completion marker and catalog operation.
 pub fn publish_guarded(
+    publish_budgeted(
+        root,
+        artifacts,
+        manifest,
+        cfg,
+        namespace,
+        None,
+        BudgetScope::Work,
+    )
+}
+
+pub fn publish_budgeted(
     root: &Path,
     artifacts: &[Artifact],
     manifest: &Artifact,
     cfg: Config,
     namespace: &str,
     guard: Option<crate::store::backend::S3Guard>,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
 ) -> Result<PublishReceipt, String> {
     validate_name(namespace)?;
     catalog_key(namespace, &manifest.sha256)?;
@@ -702,6 +882,7 @@ pub fn publish_guarded(
         Some(guard) => Store::open_guarded(cfg, guard)?,
         None => Store::open(cfg)?,
     };
+    let mut store = dataset_store(cfg.clone(), budget, scope.clone())?;
     // Validate all logical names/conflicts before causing any remote writes.
     for artifact in &all {
         let name = format!("{namespace}/{}", artifact.path);
@@ -716,7 +897,14 @@ pub fn publish_guarded(
     }
     let mut objects = Vec::with_capacity(all.len());
     for artifact in &all {
-        objects.push(publish_object(&mut store, &root, artifact, namespace)?);
+        objects.push(publish_object(
+            &mut store,
+            &root,
+            artifact,
+            namespace,
+            budget,
+            scope.clone(),
+        )?);
     }
     let record = CompletionRecord {
         schema: RECEIPT_SCHEMA.into(),
@@ -730,7 +918,17 @@ pub fn publish_guarded(
     let receipt_id = digest(&serde_json::to_vec(&record).map_err(|e| e.to_string())?);
     let receipt_path = format!("publication/{receipt_id}.json");
     let receipt = write_json(&root, &receipt_path, "publication_completion", &record)?;
-    let completion = publish_object(&mut store, &root, &receipt, namespace)?;
+    // Reopen after the work store persisted its index. Completion/catalog
+    // requests consume the protected finalization partition of the same grant.
+    let mut final_store = dataset_store(cfg, budget, BudgetScope::Finalization)?;
+    let completion = publish_object(
+        &mut final_store,
+        &root,
+        &receipt,
+        namespace,
+        budget,
+        BudgetScope::Finalization,
+    )?;
     let confirmation = write_json(
         &root,
         &format!("publication/verified-{receipt_id}.json"),
@@ -754,7 +952,7 @@ pub fn publish_guarded(
         index_path,
         catalog: None,
     };
-    receipt.catalog = Some(publish_catalog(&root, &receipt, &store)?);
+    receipt.catalog = Some(publish_catalog(&root, &receipt, &final_store, budget)?);
     Ok(receipt)
 }
 
@@ -875,6 +1073,104 @@ mod tests {
             bucket: "setec-astronomy-artifacts".into(),
             prefix: "ml-dataset/test".into(),
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn native_budgeted_publication_resume_catalog_lab_receipt_and_fetch_share_debits() {
+        let f = Fixture::new();
+        let (context, wire) = super::super::budget_test_support::context(&f.0, None);
+        let (artifacts, manifest) = f.shard();
+        let mut cfg = f.cfg();
+        cfg.remote = Some(dataset_s3_remote());
+        let first = publish_budgeted(
+            &f.0,
+            &artifacts,
+            &manifest,
+            cfg.clone(),
+            "datasets/test",
+            Some(&context),
+            BudgetScope::Work,
+        )
+        .unwrap();
+        let calls = wire.calls.lock().unwrap().clone();
+        assert!(calls.windows(3).any(|rows| rows[0].0 == "HEAD"
+            && rows[1].0 == "GET"
+            && rows[2].0 == "PUT"
+            && rows[0].1 == rows[1].1
+            && rows[1].1 == rows[2].1));
+        let before = context.session().snapshot().unwrap();
+        assert!(before["verified_unique_output_bytes"].as_u64().unwrap() > 0);
+        let second = publish_budgeted(
+            &f.0,
+            &artifacts,
+            &manifest,
+            cfg.clone(),
+            "datasets/test",
+            Some(&context),
+            BudgetScope::Work,
+        )
+        .unwrap();
+        let after = context.session().snapshot().unwrap();
+        assert_eq!(first.catalog, second.catalog);
+        assert_eq!(
+            before["reserved_unique_output_bytes"],
+            after["reserved_unique_output_bytes"]
+        );
+        assert_eq!(before["put_attempts"], after["put_attempts"]);
+        assert!(after["get_attempts"].as_u64().unwrap() > before["get_attempts"].as_u64().unwrap());
+        let receipt = write_json(
+            &f.0,
+            "portable-receipt.json",
+            "restricted-publication-receipt",
+            &second,
+        )
+        .unwrap();
+        let lab = RemoteSpec::parse("s3://setec-astronomy-artifacts/ml-dataset/test/lab").unwrap();
+        super::super::publish_lab_receipt_to(&f.0, &receipt, &lab, Some(&context)).unwrap();
+        assert!(wire
+            .calls
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|(method, key)| method == "PUT" && key.contains("/lab/dataset-receipts/")));
+        let catalog = first.catalog.unwrap();
+        let fetched = f.0.join("fetched-catalog.json");
+        super::super::fetch_budget_object(
+            &context,
+            &dataset_s3_remote(),
+            &catalog.key,
+            &catalog.sha256,
+            catalog.bytes,
+            &fetched,
+        )
+        .unwrap();
+        check_file(&fetched, &catalog.sha256, catalog.bytes).unwrap();
+        let portable: PublishReceipt = serde_json::from_slice(&fs::read(fetched).unwrap()).unwrap();
+        assert_eq!(portable.manifest_sha256, manifest.sha256);
+        assert!(portable.catalog.is_none());
+        super::super::finalize_budget(&f.0, Some(&context), Some(&dataset_s3_remote()), true)
+            .unwrap();
+        assert!(wire
+            .calls
+            .lock()
+            .unwrap()
+            .iter()
+            .any(|(method, key)| method == "PUT" && key.contains("/budget-checkpoints/")));
+        let snapshot = context.session().snapshot().unwrap();
+        assert_eq!(
+            snapshot["charged_attempts"].as_u64().unwrap(),
+            wire.calls.lock().unwrap().len() as u64
+        );
+        assert!(
+            snapshot["finalization_charged"]["put_attempts"]
+                .as_u64()
+                .unwrap()
+                >= 4
+        );
+        assert!(!snapshot["local_byte_allocation_is_hard_write_limit"]
+            .as_bool()
+            .unwrap());
     }
 
     #[test]
@@ -1273,7 +1569,15 @@ mod tests {
         let f = Fixture::new();
         let (artifacts, manifest) = f.shard();
         let mut store = Store::open(f.cfg()).unwrap();
-        publish_object(&mut store, &f.0, &artifacts[0], "datasets/test").unwrap();
+        publish_object(
+            &mut store,
+            &f.0,
+            &artifacts[0],
+            "datasets/test",
+            None,
+            BudgetScope::Work,
+        )
+        .unwrap();
         assert_eq!(store.index.entries.len(), 1);
         assert!(!f.0.join("publication").exists());
         let receipt = publish(&f.0, &artifacts, &manifest, f.cfg(), "datasets/test").unwrap();
