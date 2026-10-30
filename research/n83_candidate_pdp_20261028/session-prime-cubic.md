@@ -11,3 +11,7 @@ Archive and restore source,test executables,all fixtures/logs;run restored contr
 
 ## Errors
 First test version did not emit independent algebra matrices; retained its source/log and added explicit fixture retention before the final test run. Expected panic logs come from malformed-journal rejection controls,not failed tests. Unused-code warnings are expected because production entry points are not enabled. No new infrastructure submission or n83 cubic production occurred.
+
+
+## Publication and next candidate
+Source2475a71af651 pushed. S3 source archive88payloads restored;all28tests pass again and manifest unchanged. Retained restored fixtures separately. Development and candidate-search one-page PDFs rendered and visually inspected. Lundqvist–Nicklasson1604.06820Theorem2.7/Section3 supports the selector-block SLP fact. PRIME_LEFSCHETZ_CANDIDATE.md records an unvalidated no-truncation/regular-sequence route that may avoid huge direct cubic maps;no new bound claimed. Final delivery bundle and metadata publication preserve all controls,logs,reports and source.

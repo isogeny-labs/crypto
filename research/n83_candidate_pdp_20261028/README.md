@@ -1,6 +1,12 @@
 # n83 spike40 factor bases and matched PDP work
 
 
+## New development: cubic coefficient controls
+
+The separate cubic implementation passes28 test invocations and S3-restored replay. It retains six small-prime dense/sparse matrices, terminal positive controls, a seven-selector annihilator, explicit triple coverage and all four bounded-journal cap fixtures. This is development only: no n83 cubic run and no new bound. See [control summary](validation-prime-cubic-development/summary.json), [format](PRIME_CUBIC_FORMAT.json), [custody](evidence/prime-cubic-development-storage.json), and [inspected report](reports/development-20261030T1600Z-prime-cubic/report.pdf).
+
+A [Lefschetz-based candidate argument](PRIME_LEFSCHETZ_CANDIDATE.md) records a possible alternative to large cubic matrices and its required checks. It is unvalidated; current bounds are unchanged.
+
 ## Latest: higher-m prime quadratic exclusion
 
 All 42 retained prime m3–9 cases now have the conditional interval **7 ≤ FFD ≤ 17**. Seven shared degree-six coefficient maps are full rank; all seven producers, fresh replays and S3-restored replays passed, as did assembly of all 42 exact source identities. The written pair-covering argument gives lower7, joined to the historical upper17 only after source and factor-base hashes match. Independent scientific review and formalization remain pending. Exact FFD, new LFD, solving degree and elite-base improvement remain unresolved.
