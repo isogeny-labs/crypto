@@ -1102,3 +1102,17 @@ Run V17 on one GPU after fresh absence/capacity/checkpoint gate; collect final o
 
 ### Errors
 Cause of provider disappearance unknown; no result archive exists. V16 is closed as interrupted, not silently retried.
+
+## 2026-10-30T21:00Z — V17 allocation refused
+
+### What was done
+Created one V17 allocation request after checkpoint gate and fresh inventory/capacity checks. RunPod returned HTTP402 Payment Required: account balance too low. Complete reconciliation found zero matching pods; controller91. Zero experimental trials started. Recorded sanitized response, request template and source/protocol/collection hashes in launch-refused-v17.
+
+### Decisions made
+No blind POST retry and no payment changes. User notified that top-up is required. No new run report required for a refused allocation with no run directory; V16 report rendered and its one page inspected.
+
+### Open threads
+After account funding, reconcile live inventory and prepare a fresh bounded attempt with new signed artifact URLs. Twelve-slot device/Rust validation and the full arity panel remain queued.
+
+### Errors
+HTTP402 is an external funding dependency; no GPU allocated.
