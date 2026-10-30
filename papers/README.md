@@ -5,6 +5,7 @@ directory per paper.
 
 | directory | title | status |
 |---|---|---|
+| [nist-expanded-cutoff-20261030/](nist-expanded-cutoff-20261030/) | Cutoff Sensitivity of Strict Splitting Counts: An Exact Extension to 5000 on the Fixed Curve Cohort | anonymous exact-reanalysis report; full 100--5000 sweep independently verified; only 32 of 4901 integer cutoffs separate; random-curve baseline and historical/weakness conclusions remain open; not submitted |
 | [nist-strict-splitting-20261029/](nist-strict-splitting-20261029/) | Strict Splitting Counts in Reconstructed Elliptic-Curve Candidate Streams: An Exact Reproduction and Its Limits | anonymous ePrint-style replication draft; previously reported empirical separator reproduced on 21 choices; historical use and weakness unproved; not submitted |
 | [norm-rootfinding/](norm-rootfinding/) | Exact Norm-Based Search for Constrained Roots over Finite Fields: Predicates, Circuit Representations, and Bounded Evidence | research draft, anonymized, not submitted or cleared; exact component proofs, native coordinate profile and UNKNOWN hard search; no qualified speedup |
 | [`ecdlp-six-month-portfolio/`](ecdlp-six-month-portfolio/) | A Six-Month ECDLP Research Programme: Implementations, Experiments, Structural Leads, and Evidence | research draft, anonymized, not submitted; 19-repository retrospective with pinned evidence and explicit coverage limits |

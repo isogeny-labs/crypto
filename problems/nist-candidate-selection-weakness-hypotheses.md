@@ -4,12 +4,35 @@
 - **Kind:** unknown selection cause; missing applicable attack construction and validation
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-29
-- **Latest search:** [29 October verified strict-splitting separator](../research/nist_skip_criterion_20261025/strict_elkies_20261029/REPORT.md)
+- **Last updated:** 2026-10-30
+- **Latest search:** [30 October verified expanded-cutoff reanalysis](../research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/RESULTS.md)
 
 ## Problem
 
-**Latest result, 29 October afternoon:** an externally reported empirical
+**Latest result, 30 October:** the complete100--5000integer cutoff reanalysis
+retains all21rows and independently reconstructs all five native output files.
+Joint strict separation occurs only at691--718and769--772:32of4901integer
+positions (0.6529%), with no successful cutoff above772. Including ramified
+primes produces zero joint-success cutoffs. P224has positive margin at3957
+positions (80.7386%); the other paired fields have positive coverage7.6311%
+to20.7713%. These are descriptive within-cohort grid fractions, not random-
+curve probabilities or comparisons of statistical significance between fields.
+
+The requested100--5000label family allows29of4480assignments; the old2--2000
+family allows23. They share22, with7new-only and1old-only assignment because
+the requested range removes cutoffs below100. Their supplementary2--5000
+union has30successful assignments. All calibration remains retrospective and
+restricted to these declared families. Three corrupted outputs are correctly
+refused. The local exact reanalysis uses the existing-results development
+exception documented before execution; no S3 checkpoint or remote custody is
+claimed. The raw176member archive is delivered locally with full hash readback.
+
+This establishes cutoff sensitivity, not the historical selector or an ECDLP
+advantage. The60000accepted random-curve baseline and broader69position
+classification remain open, and the original visit/acceptance record is absent.
+No new curve, point count, DLP or performance measurement was run.
+
+**Prior result, 29 October afternoon:** an externally reported empirical
 criterion reproduces exactly. Count odd primes ell≤691 with strictly positive
 Frobenius-discriminant character. Within each paired field, every publication
 has a smaller count than every omission. The published/omitted ranges are
