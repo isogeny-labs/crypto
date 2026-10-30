@@ -60,6 +60,16 @@ Actual rational/subgroup point counts remain distinct from recipe order or
 input count. See the [literature integration](../../research/hexagon_cscc_20261030/README.md)
 for prior art and the distinction from multiplicative-field factor bases.
 
+The [three structured prime examples](examples/prime-structured.json) form an
+array for the offline `batch` command:
+
+```sh
+$FB batch tools/factor-base/examples/prime-structured.json /tmp/prime-bases /tmp/prime-bases-receipt.json
+```
+
+Use fresh output/receipt paths. Every row must have `status: built`; `batch`
+retains a failed row rather than turning a construction failure into success.
+
 For every candidate x, the generator solves the curve equation, stores both
 rational signs, checks the curve equation again, and retains only points with
 `[r]P = O`. It never silently cofactor-projects a point away from its x-coordinate

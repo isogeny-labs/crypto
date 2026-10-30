@@ -8,19 +8,20 @@ job, curve claim, speedup claim or formal-proof promotion is recorded.
 
 | Command / control | Observed result | Raw output |
 | --- | --- | --- |
-| `cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml` | 40 library tests, 3 existing runner tests and 1 new factoring CLI test pass | `checks/tensor-tests.txt` |
+| `cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml` | 40 library tests, 3 existing runner tests and 1 new factoring CLI test pass | `checks/tensor-tests.txt.gz` |
 | Tensor `cargo clippy --locked --all-targets -- -D warnings` | Pass | `checks/tensor-clippy.txt` |
 | `cargo +1.78.0 check --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets` | Pass on the declared minimum toolchain | `checks/tensor-msrv.txt` |
-| `cargo test --release --locked --manifest-path tools/factor-base/Cargo.toml` | 22 pass, 1 pre-existing fixture writer ignored | `checks/factory-tests.txt` |
+| `cargo test --release --locked --manifest-path tools/factor-base/Cargo.toml` | 22 pass, 1 pre-existing fixture writer ignored | `checks/factory-tests.txt.gz` |
 | Factory strict Clippy | Pass | `checks/factory-clippy.txt` |
-| `cargo test --locked --manifest-path tools/complexity-catalog/Cargo.toml` | 5 pass: complete inventory, source metadata/coverage rejection, path resolution and two finite construction controls | `checks/catalog-tests.txt` |
+| `cargo test --locked --manifest-path tools/complexity-catalog/Cargo.toml` | 5 pass: complete inventory, source metadata/coverage rejection, path resolution and two finite construction controls | `checks/catalog-tests.txt.gz` |
 | Catalog strict Clippy | Pass | `checks/catalog-clippy.txt` |
 | Factory `verify` on all six frozen manifests | All replay; same native implementation | `checks/frozen-archives.txt` |
 | Factory `replay` on frozen binary evaluation receipt | Semantic digest `d54ee493f3d99a33616de283b55a9c0dd93f48c01bb90278d84a0064aa5dde07` reproduced | `checks/frozen-replay.txt` |
 | Report rendering | Seven current Typst pages; all text bounds within pages; every page inspected and no clipped source entries | `report.typ`, `report.pdf`, `integration.svg` |
 
 The primary development compiler is Rust 1.99.1 on Linux x86_64. Formatting
-and `git diff --check` are checked separately before publication. Source hashes
+and `git diff --check` are checked separately before publication. Verbatim logs
+with trailing blank lines are stored losslessly as deterministic gzip. Source hashes
 are in `sources.sha256`. This hash list binds selected files; it is not a
 general mathematical or execution-proof certificate.
 
@@ -89,7 +90,7 @@ recovered; completed output files were inspected before deciding what to rerun.
 
 ## Sibling and formal-check limits
 
-Cryptanalysis's new tensor files and exports match this change byte-for-byte;
+Cryptanalysis's four new tensor source/test files match this change byte-for-byte;
 eight pre-existing differences in other tensor files remain untouched. Its
 component checks are retained in `cryptanalysis:docs/ic/hexagon-cscc-20261030/`.
 Crypto Autoresearcher ingests 22 Hexagon notes plus the direct PKM review and
@@ -100,3 +101,51 @@ No source Lean development, general contraction proof, new asymptotic theorem,
 subexponential weighted implementation or fast Subset Sum/3SUM engine was
 independently verified or completed here. Those source claims and implementation
 gaps remain explicit in the catalog and existing tensor audit problem record.
+
+## Integration with current upstream
+
+Merged main `3b34d504b` into the feature source. The two module export
+conflicts retain both additions, the general audit retains both history
+paragraphs, and both complete parent journals remain ordered subsequences.
+No frozen evidence conflict was resolved or rewritten. Independent main
+changes are not claimed as part of this implementation.
+
+The combined tensor package passes 75 tests: 50 library, eight runner and
+17 integration tests. All-target strict Clippy, formatting and Rust 1.78
+checks pass (`checks/tensor-integrated-*`). Catalog formatting, strict Clippy
+and all five tests pass against the combined tree (`checks/catalog-integrated-*`).
+The standalone factory's source, manifest and lock are unchanged by the merge;
+its earlier 22-test and archive replay outputs remain applicable. Selected
+current source hashes are refreshed in `sources.sha256`.
+
+The broad root run remains tied to initial source checkpoint `333a4d55b` in a
+separate detached worktree. It is not represented as a check of the subsequently
+merged main. Its runtime-input failures and any follow-up observations are
+retained separately; no complete root pass is claimed here.
+
+Cryptanalysis integrates both its bindings package (88 tests) and the newly
+landed suite dependency (34 tests), with both Clippy/MSRV checks passing.
+The new four files are identical across those two copies and crypto; existing
+other differences remain. Its PR is https://github.com/isogeny-labs/cryptanalysis/pull/1320.
+Knowledge intake is https://github.com/isogeny-labs/crypto-autoresearcher/pull/2767.
+
+The three committed structured prime examples also build through the native
+CLI batch interface and verify through the archive interface; outputs and the
+raw batch receipt are retained as `checks/prime-example-cli*`. Diagnostic wall
+times in that receipt are unqualified and support no performance claim.
+
+## Broad-check publication checkpoint
+
+`checks/root-library-progress.json` binds an incomplete raw-output snapshot
+(`root-library-progress.txt.gz`) to source `333a4d55b` and records that the
+5,553-test broad panel is still running. It is not a successful full-suite
+receipt and is not substituted for validation of the later integrated source.
+
+The first follow-up passes the five CPU-emulator tests and exposes 13 further
+missing archive inputs. After restoring 87 unchanged tracked files, the second
+passes 13 and exposes five more missing inputs; restoring those files makes
+all remaining five pass. Thus all 18 originally observed runtime-input failures
+have a successful unchanged-source follow-up. Raw failed follow-ups, passing
+outputs and materialized path lists are retained as `checks/crypto-root-*`.
+No source, assertion, timeout or limit was changed to obtain these passes.
+The complete original broad run remains pending at this publication checkpoint.
