@@ -43,6 +43,31 @@ improved algorithm is established by posing this problem.
 - **Not established:** actual realization of that counterfamily by repacked
   Cauchy networks, impossibility of a different common kernel, better basis or
   cancellation, complete graph packing, or an improved ECDLP algorithm.
+- **Further exact controls:** a physical-coordinate substitution is not a
+  general Boolean-index gauge: the actual multilinear-extension kernels
+  have a checked `4 versus6` composition counterexample. True group-local
+  gauges preserve flattening determinantal ideals. An exterior lift has a
+  genuine composition law, but retains its one-particle passive crossings;
+  squarefree update enumeration alone retains the square-root count.
+  [Follow-up with exact native controls](../research/prime_common_kernel_20261030/README.md).
+  These close specific shortcuts, not the common-kernel problem.
+- **Positive coded identity, scoped selector failure:** distinct binary
+  syndromes yield one projector that exactly eliminates mismatched operator
+  pairs. The underlying general projection laws are Lean checked. Its
+  explicit Lagrange selector has crossing block
+  `2^(2a+2)(cI+4D)` with `c` odd, leaving exponentially many nonzero Smith
+  directions where the proposed weighted linear-mode template has only
+  `O(a^2)` terms. The rank/valuation and density analysis is written and
+  independently reviewed, with separate native implementations of the a3
+  specialization. Binary-code instantiation and the Kronecker-product bridge
+  remain unformalized. This rejects that selector, not other common kernels.
+- **Exact-filter density bound:** over a field, exact unequal-pair
+  annihilation plus injective matched maps makes the error-image assembly
+  injective, so `(u+1)dimC<=dimV` for `u+1` labels. This is a general
+  linear-algebra bound for that precise template, not a runtime lower bound
+  or a universal quantum-code bound. [Proof and scope](../research/prime_common_kernel_20261030/reviews/exact-filter-packing.md).
+  Singular matched maps remain outside the hypotheses; the source's local
+  Cauchy maps are partial translations, so that distinction is substantive.
 
 ## What would unblock it
 
@@ -74,17 +99,28 @@ not a demonstrated runtime or algorithm.
   before trying a relation search or fitting timing exponents.
 - **Controls:** distinguish consistent conjugation of the old matrix from
   resetting it to a new product kernel; check the actual matrix/tensor identity,
-  not only shared origin or sample agreement.
+  not only shared origin or sample agreement. For linear changes distinguish
+  physical port coordinates from the full Boolean index space. For exterior
+  lifts display the complete grouping signs and ambient intermediate modes;
+  a one-particle composition law does not supply the child identity.
 - **Limits:** mathematical construction and native development checks first.
   Performance work requires a prospective protocol and the existing EKS rules.
 - **Outcomes:** a complete identity plus charged density supports a global
   theorem attempt; a counterexample closes only that proposed representation.
   A failed data-only bridge does not close all common-kernel constructions.
 - **Recheck trigger:** a new invariant kernel, congruent-jet transform or
-  uniformly cheaper moment representation with complete entry costs.
+  uniformly cheaper moment representation with complete entry costs. A new
+  coded/operator proposal must control the rank and valuations of its actual
+  Boolean column forms; a short scalar operator sum alone is insufficient.
+  An exact-filter successor must also charge the packing factor or exhibit
+  explicitly which injectivity/cross-annihilation assumption it avoids while
+  preserving the same common jets. Avoiding an assumption is not itself a
+  proof of a faster factorization.
 
 ## Resolution and history
 
 Unresolved. The 2026-10-30 analysis removes a suspected interpolation obstacle,
 charges the actual simultaneous density and supplies a counterfamily to a
 generic repacking shortcut. It does not construct the missing common kernel.
+The further gauge/exterior controls preserve this unresolved status. Their
+exact finite disagreements are algebraic and make no timing inference.
