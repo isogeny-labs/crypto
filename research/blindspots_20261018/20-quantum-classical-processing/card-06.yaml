@@ -1,0 +1,69 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-20-06
+experiment_id: BLINDSPOT-20
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/20-quantum-classical-processing/raw/receipt-card-06.json
+binds:
+  - {path: examples/blindspots_20_quantum_classical.rs, sha256: a2e9f4a1f2529af28a1e191cc2383e6233f157f999dcf2ac240921520511e30a}
+  - {path: src/cryptanalysis/quantum_estimator.rs, sha256: a1b692ac5f618543de69089044350bfb1f37f9269ea121f2f80d5f419f6b3d6f}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-20/card-06]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -o, target/blindspots-20/card-06/b20, examples/blindspots_20_quantum_classical.rs]
+    timeout_seconds: 180
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/20-quantum-classical-processing/raw/card-06-build.stdout.log
+    stderr: research/blindspots_20261018/20-quantum-classical-processing/raw/card-06-build.stderr.log
+  - id: selftest
+    argv: [prlimit, --as=4294967296, target/blindspots-20/card-06/b20, --mode, selftest]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-06.jsonl
+    stderr: research/blindspots_20261018/20-quantum-classical-processing/raw/selftest-card-06.log
+  - id: lat-m12
+    argv: [prlimit, --as=4294967296, target/blindspots-20/card-06/b20, "--mode", "lattice", "--m", "12", "--sigma", "4,7", "--s", "2,3", "--extra", "3", "--trials", "400", "--seed", "6"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m12.jsonl
+    stderr: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m12.log
+  - id: lat-m16
+    argv: [prlimit, --as=4294967296, target/blindspots-20/card-06/b20, "--mode", "lattice", "--m", "16", "--sigma", "4,7", "--s", "2,3", "--extra", "3", "--trials", "400", "--seed", "7"]
+    timeout_seconds: 200
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m16.jsonl
+    stderr: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m16.log
+  - id: lat-m20
+    argv: [prlimit, --as=4294967296, target/blindspots-20/card-06/b20, "--mode", "lattice", "--m", "20", "--sigma", "4", "--s", "2,3", "--extra", "3", "--trials", "400", "--seed", "8"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    env: {RAYON_NUM_THREADS: "1", OMP_NUM_THREADS: "1"}
+    stdout: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m20.jsonl
+    stderr: research/blindspots_20261018/20-quantum-classical-processing/raw/lattice-m20.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-20/card-06/b20]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-20/card-06]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-20
+background: false
+write_scope:
+  - research/blindspots_20261018/20-quantum-classical-processing/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."
