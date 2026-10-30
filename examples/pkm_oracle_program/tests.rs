@@ -66,11 +66,16 @@ fn all_presentations_agree_on_supported_two_sum_sets() {
     r.t = 2;
     r.g = 1;
     r.zeta = 4;
+    r.target = Point { x: 6, y: 3 };
     let mut sets = Vec::new();
     for arm in [Arm::PlainChain, Arm::PlainS5, Arm::SymmetricS5] {
         r.arm = arm;
         let result = run(&r).unwrap();
         assert!(result.complete);
+        assert!(
+            !result.witnesses.is_empty(),
+            "positive presentation control must extract a witness"
+        );
         replay(&r, &serde_json::to_value(&result).unwrap()).unwrap();
         sets.push(result.witnesses);
     }

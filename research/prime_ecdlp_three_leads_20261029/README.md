@@ -133,7 +133,7 @@ The user activated the full PKM improvement goal. The additive
 [execution prerequisites](execution-20261030/README.md) provide complete-set
 collection, an independent bounded reference, explicit accounting gaps and a
 tiny cold relation/LA/recovery control. The new structural chain-order lemma
-raises the scoped project audit to11 declarations with zero trusted exceptions.
+raises the scoped project audit to13 declarations with zero trusted exceptions.
 The [goal status](execution-20261030/goal-state.json) keeps all scientific
 acceptance requirements and the [specific obstruction](../../problems/symmetric-pkm-complete-cost.md)
 visible. See the versioned validation receipt for actual native test outcomes.

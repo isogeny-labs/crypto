@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Release suite JV isogeny-walk budget](release-suite-jv-isogeny-walk-budget.md) | investigating | complete release-library validation | diagnose the unchanged case and complete focused/full checks without weakening assertions |
 | [Symmetric PKM complete cost and cold DLP qualification](symmetric-pkm-complete-cost.md) | open | G1–G6 complete-cost improvement decision | checkpoint/artifact access, qualified native panels/counters, external reference and ideal/curve/cost proof bridges |
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
 | [Hashed ECDL tensor audit](hashed-ecdl-tensor-backend.md) | independent audit open; code implemented | conditional tensor algorithm | general correctness, precision/packing invariants and complexity accounting; bounded controls do not establish the source theorem |

@@ -118,15 +118,23 @@ same-host/external superiority. No external solver was run here.
 
 ## Lean scope
 
-`ThreeLeads/PKMChainCoverage.lean::finite_chain_order` assumes an additive
-commutative group, a+b!=0 and c!=d. It proves that either the order a,b,c,d has
-nonzero intermediate sums, or swapping the last two gives nonzero
-intermediate sums and the same final sum. For actual distinct-abscissa curve
-points, the first pair is not inverse and the last two points differ. That
-ECC/coordinate-to-group bridge remains unformalized. The lemma supplies no
-polynomial completeness or complexity bound. It uses only the standard Lean
-foundations; exact fresh build, axiom and module-replay receipts are retained.
-The entire scoped project now audits11 declarations, zero trusted exceptions.
+The scoped project now audits13 declarations, zero trusted exceptions. The
+versioned affine proof receipts build and kernel-replay the final module.
+
+| Declaration in ThreeLeads/PKMChainCoverage.lean | Exact checked scope |
+|---|---|
+| finite_chain_order | Additive commutative group; a+b!=0 and c!=d imply one of the two last-point orders has finite intermediate sums and the same final sum. |
+| affine_pair_nonzero | Mathlib nonsingular affine Weierstrass points over a field with decidable equality; unequal x-coordinates imply their sum is not O. |
+| affine_finite_chain_order | Instantiates the chain-order statement on four actual Mathlib affine points, under nonsingularity and x0!=x1,x2!=x3. Pairwise distinct abscissae imply these conditions. |
+
+The coordinate-to-group implication is checked for Mathlib's point type.
+The bridge from Rust's representation and the precise polynomial system to
+those objects, and all solving/extraction-cost bounds, remain unformalized.
+These are standard structural facts, with no global novelty or complexity
+claim. The earlier11-declaration software receipt remains as its original
+version; the fresh13-declaration receipt validates the stronger module. An
+initial scratch attempt lacked the explicit decidable-equality instance; its
+failed source/log are retained as plaintext and are not reported as a proof.
 
 ## Reproduction and execution gate
 
@@ -170,3 +178,23 @@ The IC scoreboard, progress timeline, leaderboard and canonical curve graphs
 are unchanged: no admitted performance value, curve or isogeny edge was added.
 The diagram and inspected PDF explain the implementation and open bridges.
 Validation status and exact source/log hashes are in `validation/receipt.json`.
+
+## Final development validation and remaining software limit
+
+The final12-test native suite passes, including full m=4 witness-set agreement
+on all35finite points of the two F17 development fixtures. The strengthened
+three-presentation two-sum control extracts a nonempty witness set in each arm.
+All8legacy regression tests, strict lint, rustfmt, ordinary binary build and
+fresh native backlog validation pass. The compiled CLI fails closed at the
+unchanged checkpoint gate before reading a controlled nonexistent request.
+Fresh final Lean audit passes13declarations/zero trusted exceptions, and the
+stronger affine module builds and kernel-replays. Both final PDF pages were
+visually inspected.
+
+The broader serial5553-case library run was capped at40minutes:2173passed,
+0failed,47ignored,one unchanged JV case active at the cap and3332cases not
+reached. The timeout wrapper exits124. No full-library pass is claimed. See
+[the named validation problem](../../../problems/release-suite-jv-isogeny-walk-budget.md).
+Its raw output exceeds the artifact policy threshold and is NOT_UPLOADED; exact
+size/hash/path and a bounded excerpt are retained. This is separate from the
+scientific access/accounting/proof gaps and supplies no PKM performance result.

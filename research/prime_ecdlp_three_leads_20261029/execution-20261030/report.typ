@@ -14,7 +14,7 @@
   [G3], [Chain/plain-full/symmetric adapters; canonical JSON and msolve input export.], [Equal-domain m=4 panel, qualified pinned external solver/extractor, A/A and null controls.],
   [G4], [No optimization promoted.], [Freeze an equal-output baseline; test the proposed 20% cost or 2x-memory objective with held-outs.],
   [G5], [No scaling panel launched.], [Predeclared depth/field-size cells, censored boundaries and held-out checks within existing caps.],
-  [G6], [Tiny cold relation/LA/recovery control; abstract chain-order Lean dependency.], [Growing-family cold IC/rho/BSGS comparison, independent rank/cost admission, ideal/curve/cost proof bridges.],
+  [G6], [Tiny cold relation/LA/recovery control; Mathlib affine chain-order dependencies.], [Growing-family cold IC/rho/BSGS comparison, independent rank/cost admission, ideal/curve/cost proof bridges.],
 )
 
 == Supported computation
@@ -33,7 +33,7 @@ Comparison admission is always false. Constructor helper arithmetic, emitted vis
 Oracle phase intervals are exclusive and reconcile to the diagnostic total. Cold toy setup, full query intervals, scalar verification and unattributed overhead reconcile separately. Elimination time is a subset of query time. Process startup, input loading, binding and serialization are outside those process-core clocks. Reported RSS is a whole-process lifetime high-water mark. External process/memory caps and supported journaling/resume remain necessary.
 
 == Proof and validation scope
-The new Lean theorem assumes an additive commutative group, a+b != 0 and c != d. It proves that a,b,c,d or a,b,d,c has finite intermediate sums and the same final sum. The ECC coordinate bridge is not formalized. Fresh scoped audit: 11 declarations, zero trusted exceptions. The module builds and kernel-replays on Lean4.34.1 / pinned Mathlib. Native validation outcomes, source/binary hashes and every retained failure are recorded in validation/receipt.json. Historical receipt directories remain unchanged.
+The abstract theorem assumes an additive commutative group, a+b != 0 and c != d. Two new lemmas check the distinct-x pair-sum implication and finite-chain order on actual nonsingular Mathlib affine Weierstrass points, over a field with decidable equality. Rust/polynomial-to-point and complete-cost bridges remain open. Fresh scoped audit: 13 declarations, zero trusted exceptions. The final module builds and kernel-replays on Lean4.34.1 / pinned Mathlib. Native validation outcomes, source/binary hashes and every retained failure are recorded in validation/receipt.json. Historical receipt directories remain unchanged. The broader 5553-test serial library run was capped at40minutes: 2173passed,0failed,47ignored,one unchanged JV case active and3332not reached. No full-suite pass is claimed; its large raw log is NOT_UPLOADED.
 
 == Execution blockers and sources
 The unchanged checkpoint gate fails because no upload token/AWS profile is configured. The managed runtime reports no configured identities/secrets/runtime variables. The available GitHub Isolab path is ecbench-spec-specific; this native example has no qualified source-bound runtime image/route yet. No scientific run, lease, funding, quota or IAM change occurred.
