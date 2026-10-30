@@ -23,7 +23,12 @@
 //!   per `n` the polynomial-subspace `D_reg` set against Kousidis–Wiemers.
 //!
 //! A verdict is only computed from rows that exist; a missing stage reads
-//! `"not_run"`.  C0 failing marks every new-row verdict `invalid_measurement`.
+//! `"not_run"`.  Unless C0 passes, the A/A reruns agree and no planted
+//! control refutes, every new-row verdict reads `invalid_measurement`; the
+//! F4 comparison needs C0 and C1.  P1 holds only on the full planned panel
+//! (one exact `d_F <= 4` refutes it) and P2 fails only when all 8 panel
+//! instances are exactly 5; otherwise they read `undecided`.  Replaced
+//! (satisfiable) draws are diagnostics and enter no verdict.
 
 use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
@@ -56,6 +61,7 @@ fn rows(dir: &Path) -> Vec<Value> {
     let mut paths: Vec<_> = entries
         .filter_map(|e| e.ok().map(|e| e.path()))
         .filter(|p| p.extension().is_some_and(|x| x == "jsonl"))
+        .filter(|p| p.file_stem().is_some_and(|x| x != "executions"))
         .collect();
     paths.sort();
     for p in paths {
@@ -69,6 +75,19 @@ fn rows(dir: &Path) -> Vec<Value> {
     }
     out
 }
+
+/// A drawn or recorded instance with a closure measurement: not a planted
+/// control and not a replaced (satisfiable) draw's diagnostic line.
+fn measured(v: &Value) -> bool {
+    v["planted"] != true && v["replaced"] != true && v.get("closure").is_some()
+}
+
+/// The 8 instances of claim C2 (d_F >= 5 certified at n = 33..37).
+const D5_PANEL: [&str; 8] = [
+    "T33a", "T33b", "R35a", "R35b", "U35a", "U35b", "R37a", "R37b",
+];
+/// Planned random-subspace instances of P1: 3 per n = 41, 43, ..., 51.
+const P1_PLANNED: usize = 18;
 
 /// (exact degree, lower bound) of a row's closure.
 fn lfd(v: &Value) -> (Option<u64>, Option<u64>) {
@@ -163,18 +182,24 @@ fn main() {
         "aa".into(),
         json!({"status": if aa_rows.is_empty() { "not_run" } else if aa_ok { "pass" } else { "fail" }, "rows": aa_rows}),
     );
+    // Closure stages and the negative control.
+    let d4 = rows(&root.join("runs/closure-d4"));
+    let neg: Vec<&Value> = d4.iter().filter(|v| v["planted"] == true).collect();
+    let neg_fail = neg.iter().any(|v| lfd(v).0.is_some());
+    // Every substantive verdict needs the whole instrument check: C0, the
+    // A/A reruns (run in the calibrate stage) and no refuted planted control.
+    let instrument_ok = c0_pass && !aa_rows.is_empty() && aa_ok && !neg_fail;
     let gate = |s: &str| {
-        if c0_pass {
+        if instrument_ok {
             s.to_string()
         } else {
             "invalid_measurement".to_string()
         }
     };
-
-    // Closure stages and the negative control.
-    let d4 = rows(&root.join("runs/closure-d4"));
-    let neg: Vec<&Value> = d4.iter().filter(|v| v["planted"] == true).collect();
-    let neg_fail = neg.iter().any(|v| lfd(v).0.is_some());
+    out.insert(
+        "instrument".into(),
+        json!({"c0_pass": c0_pass, "aa_pass": !aa_rows.is_empty() && aa_ok, "negative_refuted": neg_fail, "admitted": instrument_ok}),
+    );
     out.insert(
         "negative".into(),
         json!({"status": if neg.is_empty() { "not_run".into() } else if neg_fail { "fail".to_string() } else { gate("pass") },
@@ -182,7 +207,7 @@ fn main() {
     );
     let instance_rows = |vs: &[Value]| -> Vec<Value> {
         vs.iter()
-            .filter(|v| v["planted"] != true && v.get("closure").is_some())
+            .filter(|v| measured(v))
             .map(|v| json!({"name": v["name"], "n": v["n"], "k": v["k"], "family": v["family"],
                              "lfd": v["closure"]["last_fall_degree"], "verdict": gate(verdict(v)),
                              "columns": v["closure"]["scan"].as_array().and_then(|s| s.last()).map(|s| s["columns"].clone()),
@@ -192,15 +217,20 @@ fn main() {
     out.insert("closure_d4".into(), json!(instance_rows(&d4)));
     let p1_rows: Vec<&Value> = d4
         .iter()
-        .filter(|v| v["planted"] != true && v["family"] == "R")
+        .filter(|v| measured(v) && v["family"] == "R")
         .filter(|v| (41..=51).contains(&v["n"].as_u64().unwrap_or(0)))
         .collect();
+    // One exact d_F <= 4 refutes P1; holding needs the whole planned panel.
     let p1 = if p1_rows.is_empty() {
         "not_run".to_string()
-    } else if p1_rows.iter().all(|v| lfd(v).1.is_some_and(|a| a >= 5)) {
+    } else if p1_rows.iter().any(|v| lfd(v).0.is_some_and(|e| e <= 4)) {
+        gate("fails")
+    } else if p1_rows.len() == P1_PLANNED
+        && p1_rows.iter().all(|v| lfd(v).1.is_some_and(|a| a >= 5))
+    {
         gate("holds")
     } else {
-        gate("fails")
+        gate("undecided")
     };
     out.insert(
         "p1".into(),
@@ -208,16 +238,27 @@ fn main() {
     );
     let d5 = rows(&root.join("runs/closure-d5"));
     out.insert("closure_d5".into(), json!(instance_rows(&d5)));
+    // One d_F >= 6 establishes P2; failing needs every panel instance at exactly 5.
+    let d5_of = |name: &str| d5.iter().find(|v| measured(v) && v["name"] == name);
     let p2 = if d5.is_empty() {
         "not_run".to_string()
-    } else if d5.iter().any(|v| lfd(v).1.is_some_and(|a| a >= 6)) {
+    } else if d5
+        .iter()
+        .any(|v| measured(v) && lfd(v).1.is_some_and(|a| a >= 6))
+    {
         gate("holds")
-    } else if d5.iter().all(|v| lfd(v).0 == Some(5)) {
+    } else if D5_PANEL
+        .iter()
+        .all(|n| d5_of(n).is_some_and(|v| lfd(v).0 == Some(5)))
+    {
         gate("fails")
     } else {
         gate("undecided")
     };
-    out.insert("p2".into(), json!({"status": p2, "instances": d5.len()}));
+    out.insert(
+        "p2".into(),
+        json!({"status": p2, "instances": d5.iter().filter(|v| measured(v)).count(), "panel": D5_PANEL}),
+    );
 
     // F4.
     let f4 = rows(&root.join("runs/f4"));
@@ -243,6 +284,9 @@ fn main() {
         f4_rows.push(json!({"name": name, "n": v["n"], "family": v["family"], "d_reg": dreg,
                             "censored": censored, "d_f": df, "overshoot": dreg.zip(df).map(|(a, b)| a as i64 - b as i64)}));
     }
+    // The F4 comparison shares the build C0 checks, and C1 (D_reg >= d_F)
+    // checks the engine against the closure; either failing voids it.
+    let f4_ok = c0_pass && c1_ok;
     let kw: Vec<Value> = KW_DREG
         .iter()
         .map(|&(n, k)| {
@@ -251,6 +295,8 @@ fn main() {
                 "not_run".to_string()
             } else if ours.iter().any(|&(_, c)| c) {
                 "censored".to_string()
+            } else if !f4_ok {
+                "invalid_measurement".to_string()
             } else if ours.iter().all(|&(d, _)| d == k as u64) {
                 "reproduced".to_string()
             } else {

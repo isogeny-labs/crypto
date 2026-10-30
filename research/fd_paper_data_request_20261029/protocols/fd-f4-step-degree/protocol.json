@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "FD-F4-STEP-DEGREE-20261029",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-29",
   "repository": "crypto",
   "study_dir": "research/fd_paper_data_request_20261029/protocols/fd-f4-step-degree",
@@ -13,7 +13,9 @@
     "instances": "inputs/instances_m2_recorded.json (crypto-autoresearcher instances.json @ 4d3b9a29) and P draws n=34-48",
     "instrument": "crypto:examples/fd_m2_degrees.rs --f4 (builds the descent natively and reports F4Stats.degree_reached = D_reg, solving_degree, refuted, counted word XORs)",
     "runner": "crypto:.github/workflows/fd-paper-degrees.yml stage f4",
-    "pilot": "2026-10-30: on R11a, R13a, R15a, R19a, P17a, P21a, P21c the F4 basis is {1} with degree_reached equal to the recorded d_F"
+    "pilot": "2026-10-30: on R11a, R13a, R15a, R19a, P17a, P21a, P21c the F4 basis is {1} with degree_reached equal to the recorded d_F",
+    "v1_freeze": "protocol_sha256 3ede7e827fc457c340f761f5d8e87b1303484be3c3793e68c34f132ce9db9418 at commit 5e8c0fbe (superseded by amendment A1 before any data)",
+    "export": "runs/<stage>/executions.jsonl -> experiment_protocol.py from-rows -> runs/<stage>/export.json; check-export --verify-files. Named cells (recorded instance names, R41, sat33, f4-P34, ...) sit outside the tool's numeric seed table and each arm covers its own instance set by design; those check-export findings are expected and reported, not suppressed."
   },
   "question": "On the same binary S_3 descent systems whose last fall degree d_F is known, what maximal step degree D_reg does an F4 run reach, and does it reproduce Kousidis and Wiemers' published D_reg (4 at n=34-36, 5 at n=37-48) on Semaev's polynomial subspace?",
   "claims": [
@@ -435,10 +437,11 @@
   "analysis_plan": {
     "script": {
       "path": "crypto:examples/fd_m2_analyze.rs",
-      "sha256": "7de7d79b3ac23dd1b58f0c4e3be060c79c234fbe50a8d2f86d29882cefc28260"
+      "sha256": "36503114f56b273db8af83866cae2edbe3e983bc8d9745df798994f20d9a0d38"
     },
     "inputs": [
-      "export.json"
+      "export.json",
+      "runs/<stage>/executions.jsonl (one row per execution attempt)"
     ],
     "outputs": [
       "fd_m2_analyze <study dir> > analysis.json (c0, aa, negative, closure_d4, closure_d5, p1, p2, f4)",
@@ -474,12 +477,30 @@
       "verified_by": null
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Code review of the frozen analysis (PR #2902, Codex findings) before any run: the admission gate checked only C0, replaced satisfiable draws could enter P1, P1/P2 could be decided on a partial panel, and no execution rows existed for the unified export.",
+      "changes": [
+        "analysis_plan.script.sha256: fd_m2_analyze.rs revised; every substantive verdict now requires C0 pass, the A/A reruns present and agreeing, and no refuted planted control (instrument.admitted); the F4 comparison requires C0 and C1",
+        "replaced (satisfiable) draws are diagnostics only and enter no verdict",
+        "P1 holds only on all 18 planned R instances (one exact d_F <= 4 refutes it); P2 fails only when all 8 panel instances are exactly 5; otherwise undecided",
+        "run.sh writes runs/<stage>/executions.jsonl (status succeeded/failed/interrupted, wall seconds, exit code) and continues past a failed instance; the export is built from it with from-rows"
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256",
+        "version",
+        "freeze"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "3ede7e827fc457c340f761f5d8e87b1303484be3c3793e68c34f132ce9db9418",
-    "commit": "5e8c0fbeb5bb5ecf0ef51f2914905997897ff705",
-    "frozen_at": "2026-10-30T00:46:57Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }

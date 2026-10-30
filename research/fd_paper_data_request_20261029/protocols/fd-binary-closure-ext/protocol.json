@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "FD-BINARY-CLOSURE-EXT-20261029",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-29",
   "repository": "crypto",
   "study_dir": "research/fd_paper_data_request_20261029/protocols/fd-binary-closure-ext",
@@ -14,7 +14,9 @@
     "instrument": "crypto:examples/fd_m2_degrees.rs (native Rust; replaces the draft's lfdclose2 because crypto forbids Python research tooling and the 120 GiB runner is a crypto runner)",
     "runner": "crypto:.github/workflows/fd-paper-degrees.yml on crypto-eks-highmem; crypto:research/fd_paper_data_request_20261029/run.sh",
     "pilot": "2026-10-30 local 4-vCPU container: native closure reproduced the recorded d_F on R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a (exact) and T33a (>=5, W_4 rank 48068 = recorded); D=4 at n=33 in 34-44 s; D=5 at n=21 (35443 columns) 117-137 s; planted controls never refuted to D=5",
-    "data_request": "research/fd_paper_data_request_20261029/DATA_REQUEST.md"
+    "data_request": "research/fd_paper_data_request_20261029/DATA_REQUEST.md",
+    "v1_freeze": "protocol_sha256 d827594a6d5aff3404c49f6b252b361b9c23de260781619c10d738a52cbb8a31 at commit 5e8c0fbe (superseded by amendment A1 before any data)",
+    "export": "runs/<stage>/executions.jsonl -> experiment_protocol.py from-rows -> runs/<stage>/export.json; check-export --verify-files. Named cells (recorded instance names, R41, sat33, f4-P34, ...) sit outside the tool's numeric seed table and each arm covers its own instance set by design; those check-export findings are expected and reported, not suppressed."
   },
   "question": "For the binary Weil descent of Semaev's S_3 (m=2, k=ceil(n/2)), measured by a second, independent closure implementation: (a) does d_F >= 5 hold on random-subspace instances at n=41-51 and on Semaev's polynomial subspace at n=47-51; and (b) does the last fall degree reach 6 on any of the 8 instances certified d_F >= 5 at n=33-37?",
   "claims": [
@@ -621,12 +623,13 @@
   "analysis_plan": {
     "script": {
       "path": "crypto:examples/fd_m2_analyze.rs",
-      "sha256": "7de7d79b3ac23dd1b58f0c4e3be060c79c234fbe50a8d2f86d29882cefc28260"
+      "sha256": "36503114f56b273db8af83866cae2edbe3e983bc8d9745df798994f20d9a0d38"
     },
     "inputs": [
       "runs/calibrate/*.jsonl",
       "runs/closure-d4/*.jsonl",
-      "runs/closure-d5/*.jsonl"
+      "runs/closure-d5/*.jsonl",
+      "runs/<stage>/executions.jsonl (one row per execution attempt)"
     ],
     "outputs": [
       "fd_m2_analyze <study dir> > analysis.json (c0, aa, negative, closure_d4, closure_d5, p1, p2, f4)",
@@ -670,12 +673,30 @@
       "verified_by": "treatise Ch. 6 re-verification of T33a, 2026-10-29"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Code review of the frozen analysis (PR #2902, Codex findings) before any run: the admission gate checked only C0, replaced satisfiable draws could enter P1, P1/P2 could be decided on a partial panel, and no execution rows existed for the unified export.",
+      "changes": [
+        "analysis_plan.script.sha256: fd_m2_analyze.rs revised; every substantive verdict now requires C0 pass, the A/A reruns present and agreeing, and no refuted planted control (instrument.admitted); the F4 comparison requires C0 and C1",
+        "replaced (satisfiable) draws are diagnostics only and enter no verdict",
+        "P1 holds only on all 18 planned R instances (one exact d_F <= 4 refutes it); P2 fails only when all 8 panel instances are exactly 5; otherwise undecided",
+        "run.sh writes runs/<stage>/executions.jsonl (status succeeded/failed/interrupted, wall seconds, exit code) and continues past a failed instance; the export is built from it with from-rows"
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256",
+        "version",
+        "freeze"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "d827594a6d5aff3404c49f6b252b361b9c23de260781619c10d738a52cbb8a31",
-    "commit": "5e8c0fbeb5bb5ecf0ef51f2914905997897ff705",
-    "frozen_at": "2026-10-30T00:46:57Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }
