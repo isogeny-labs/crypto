@@ -1,7 +1,15 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: higher-m prime terminal certificates
+## Latest: higher-m prime quadratic exclusion
+
+All 42 retained prime m3–9 cases now have the conditional interval **7 ≤ FFD ≤ 17**. Seven shared degree-six coefficient maps are full rank; all seven producers, fresh replays and S3-restored replays passed, as did assembly of all 42 exact source identities. The written pair-covering argument gives lower7, joined to the historical upper17 only after source and factor-base hashes match. Independent scientific review and formalization remain pending. Exact FFD, new LFD, solving degree and elite-base improvement remain unresolved.
+
+Read the [native summary](evidence/prime-quadratic/summary.json), [source-matched intervals](evidence/prime-quadratic/combined-bounds.json), [replay instructions](evidence/prime-quadratic/README.md), [format](PRIME_QUADRATIC_FORMAT.json), [bounded execution contract](PRIME_QUADRATIC_BOUNDED.md), [S3 custody](evidence/prime-quadratic-storage.json), [validated export](experiment-prime-quadratic.export.json), and [inspected report](reports/run-20261030T1541Z-prime-quadratic/report.pdf). All 198 raw payloads were verified before and after restored replay; full coefficient and elimination journals are retained.
+
+The exporter produces 126 new quadratic metric rows from committed history in the isolated source check. The full exporter still exceeded a 60-second check; no full-export runtime pass is asserted.
+
+## Earlier: higher-m prime terminal certificates
 
 All42 retained prime m3–9 original/baseline/spike40 planted/natural systems have source-bound highest-form **FFD <= 17** certificates. All42 producer,fresh-process and S3-restored replays pass. This is an upper bound,not exactFFD;no new strict LFD bound is certified.
 

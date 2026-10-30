@@ -26,3 +26,7 @@ Finish export validation, data commit/push, report/PDF inspection and durable su
 
 ### Errors
 Archive helper wrote new custody/download receipts into old development scratch; copied byte-identical receipts into bounded support. Sealed historical archives unchanged. Publication helper stopped on missing validation parent; corrected directory creation and reran metadata publication only. All drafts retained.
+
+
+### Publication follow-through
+Data commit42ea5dfd9ff1 pushed. Unified export zero findings;82 indexed file hashes verified. One-page PDF rendered and visually inspected. New metrics source emits126 committed-history rows in3.60s. Date-only since cutoff excluded the new commit; explicit midnight fixes that selection. Full exporter with explicit midnight exceeded60s (exit124), so no full-export performance pass. This broader exporter limitation remains open; no scientific data are affected. Raw/support/report persistence and PR update retained separately.
