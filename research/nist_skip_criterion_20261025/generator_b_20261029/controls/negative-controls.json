@@ -1,0 +1,60 @@
+{
+  "kind": "synthetic-integrity-controls/v1",
+  "production_census_executed": false,
+  "cases": [
+    {
+      "id": "wrong-point",
+      "status": 1,
+      "expected_refusal": "point/group check failed",
+      "passed": true
+    },
+    {
+      "id": "wrong-trait",
+      "status": 1,
+      "expected_refusal": "trait value mismatch",
+      "passed": true
+    },
+    {
+      "id": "unknown-as-zero",
+      "status": 1,
+      "expected_refusal": "unknown historical point changed",
+      "passed": true
+    },
+    {
+      "id": "false-recipe",
+      "status": 1,
+      "expected_refusal": "recipe equality mismatch",
+      "passed": true
+    },
+    {
+      "id": "duplicate-cutoff",
+      "status": 1,
+      "expected_refusal": "duplicate cutoff row",
+      "passed": true
+    },
+    {
+      "id": "wrong-difference",
+      "status": 1,
+      "expected_refusal": "difference mismatch",
+      "passed": true
+    },
+    {
+      "id": "missing-point",
+      "status": 1,
+      "expected_refusal": "missing point record/catalog",
+      "passed": true
+    },
+    {
+      "id": "changed-inherited",
+      "status": 1,
+      "expected_refusal": "inherited value changed",
+      "passed": true
+    },
+    {
+      "id": "false-summary",
+      "status": 1,
+      "expected_refusal": "headline summary mismatch",
+      "passed": true
+    }
+  ]
+}

@@ -134,10 +134,14 @@ pub fn decomposition_network(
     let mut sum_square: Option<Word> = None;
     for base in bases {
         let (point, point_square) = if curve.cofactor().is_one() {
-            encoder.input_point_with_square(curve, meter)?
+            let (point, square) = encoder.input_point_with_square(curve, meter)?;
+            (point, Some(square))
         } else {
             let source = encoder.input_point(curve, true, meter)?;
-            (encoder.clear_cofactor(curve, &source, meter)?, Encoder::constant(1, &BigUint::zero())?)
+            (
+                encoder.clear_cofactor(curve, &source, meter)?,
+                None,
+            )
         };
         encoder.hash_member(
             curve,
@@ -152,7 +156,7 @@ pub fn decomposition_network(
         // input_point already validated the point; do not validate again.
         if first {
             sum = point;
-            sum_square = Some(point_square);
+            sum_square = point_square;
             first = false;
         } else {
             sum = encoder.point_add_raw_with(curve, &sum, &point, sum_square.as_ref(), meter)?;
@@ -798,7 +802,7 @@ mod tests {
                 .len(),
             2
         );
-        let bases = vec![base.clone(), base];
+        let bases = vec![base.clone(), base.clone()];
         let points = decompose(
             &curve,
             &bases,
@@ -815,6 +819,31 @@ mod tests {
             curve.add(&points[0], &points[1], &mut meter).unwrap(),
             *curve.generator()
         );
+
+        let enumerated = base.enumerate(&curve, &mut Seeded(3), &mut meter).unwrap();
+        let mut brute = BigUint::zero();
+        for a in &enumerated {
+            for b in &enumerated {
+                if curve.add(a, b, &mut meter).unwrap() == *curve.generator() {
+                    brute += BigUint::one();
+                }
+            }
+        }
+        for program in [false, true] {
+            let net = decomposition_network_derived(
+                &curve,
+                &[base.clone(), base.clone()],
+                curve.generator(),
+                program,
+                &mut meter,
+            )
+            .unwrap();
+            let mut counter = Counter::default();
+            let count = counter
+                .count(&net, &vec![None; net.edge_count()], &mut meter)
+                .unwrap();
+            assert_eq!(count, brute.clone() * curve.cofactor().clone());
+        }
     }
 
     #[test]
@@ -865,7 +894,7 @@ pub fn decomposition_network_program(
     let mut first = true;
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
     for base in bases {
-        let (point, point_square) = if curve.cofactor().is_one() {
+        let (point, _point_square) = if curve.cofactor().is_one() {
             encoder.input_point_with_square(curve, meter)?
         } else {
             let source = encoder.input_point(curve, true, meter)?;
@@ -882,5 +911,84 @@ pub fn decomposition_network_program(
         }
     }
     encoder.assert_point_equal(&sum, &Encoder::constant_point(curve, target)?, meter)?;
+    encoder.finish(meter)
+}
+
+/// Derived-parameter decomposition: A1 is selected and A2 = T - A1.
+/// For a nontrivial cofactor, the free curve point is projected into the
+/// certified subgroup before membership is checked. Projection can have
+/// multiple preimages, so witness assignments need not be parsimonious.
+/// The satisfying projections are exactly the subgroup decompositions.
+pub fn decomposition_network_derived(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    program: bool,
+    meter: &mut Meter,
+) -> Result<Network> {
+    if bases.len() != 2 || !curve.in_subgroup(target, meter)? {
+        return Err(invalid("derived decomposition arity or target"));
+    }
+    let mut encoder = Encoder::new();
+    let a1 = if curve.cofactor().is_one() {
+        encoder.input_point_with_square(curve, meter)?.0
+    } else {
+        let source = encoder.input_point(curve, true, meter)?;
+        encoder.clear_cofactor(curve, &source, meter)?
+    };
+    encoder.hash_member(
+        curve,
+        &a1,
+        &bases[0].prime,
+        &bases[0].seed.alpha,
+        &bases[0].seed.beta,
+        &bases[0].threshold,
+        meter,
+    )?;
+    encoder.mark_point_interface(&a1, meter)?;
+    let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
+    let target_words = Encoder::constant_point(curve, target)?;
+    let a2 = if program {
+        encoder.point_add_program_raw(curve, &target_words, &neg_a1, meter)?
+    } else {
+        encoder.point_add_raw_with(curve, &target_words, &neg_a1, None, meter)?
+    };
+    encoder.hash_member(
+        curve,
+        &a2,
+        &bases[1].prime,
+        &bases[1].seed.alpha,
+        &bases[1].seed.beta,
+        &bases[1].threshold,
+        meter,
+    )?;
+    encoder.finish(meter)
+}
+
+/// Scalar-parameter decomposition: k free, A1 = k*G (on-curve by construction),
+/// A2 = T - A1. k -> k*G is a bijection on the prime-order subgroup, so the
+/// exact count is unchanged, and no curve-validity check is needed at all.
+pub fn decomposition_network_scalar(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<Network> {
+    if bases.len() != 2 || !curve.in_subgroup(target, meter)? {
+        return Err(invalid("scalar decomposition arity or target"));
+    }
+    let order_bits = curve.order().bits() as usize;
+    let mut encoder = Encoder::new();
+    let k = encoder.input_word(order_bits, meter)?;
+    encoder.mark_interface(&k, meter)?;
+    let order = Encoder::constant(order_bits, curve.order())?;
+    let below = encoder.less_than(&k, &order, meter)?;
+    encoder.assert_equal(&below, &Encoder::constant(1, &BigUint::one())?, meter)?;
+    let a1 = encoder.scalar_mul_program(curve, &k, curve.generator(), meter)?;
+    encoder.hash_member(curve, &a1, &bases[0].prime, &bases[0].seed.alpha, &bases[0].seed.beta, &bases[0].threshold, meter)?;
+    let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
+    let target_words = Encoder::constant_point(curve, target)?;
+    let a2 = encoder.point_add_program_raw(curve, &target_words, &neg_a1, meter)?;
+    encoder.hash_member(curve, &a2, &bases[1].prime, &bases[1].seed.alpha, &bases[1].seed.beta, &bases[1].threshold, meter)?;
     encoder.finish(meter)
 }

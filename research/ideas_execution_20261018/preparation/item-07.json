@@ -1,0 +1,47 @@
+{
+  "item": 7,
+  "title": "Out-of-core / distributed Boolean F4",
+  "original_requirement": "Complete next m4 cells beyond n<=15 ell<=5 memory wall with distributed/out-of-core Boolean F4 or GPU-HBM Macaulay reduction.",
+  "acceptance_criteria": [
+    "Profile construction, symbolic preprocessing, elimination and fill-in separately.",
+    "Complete m4 ell6,7 and guess-count ell8,9 frontier cells; preserve older degree7 closures as separate requested trials.",
+    "Small controls agree exactly; checkpoint/restart, peak memory, disk/network traffic and full resource accounting."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/sparse_macaulay.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/pq_f4_f2.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/inherited_f4.rs"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_f5b_m4ri.cpp"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "cloud/fleet.py"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Host has16GiB and no GPU; cited18-50GB cells exceed available RAM without an implementation change.",
+    "Implement serializable elimination checkpoint, row/block streaming, bounded resident storage and distributed/GPU kernel; ordinary sparse in-memory elimination is not out-of-core.",
+    "Local RUNPOD_API_KEY missing; remote credential availability is not known from local environment."
+  ],
+  "dependencies": [
+    5,
+    6
+  ],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Distributed or out-of-core Boolean F4. The entire binary verdict rests on extrapolating D from n ≤ 15 and ℓ ≤ 5, and the next cells died at 18 to 50 GB. The blocker is memory engineering, not mathematics. A multi-node block reduction or a GPU-HBM Macaulay pass is the single highest-leverage measurement in the program."
+}
