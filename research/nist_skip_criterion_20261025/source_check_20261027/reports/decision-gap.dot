@@ -1,0 +1,11 @@
+digraph decision_gap {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.35", ranksep="0.4"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+        color="#17384B", fillcolor="#EDF2F5", margin="0.12,0.10"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#A36B32", style=dashed];
+  parameters [label="Reconstructed seed positions\nand published parameters\nAvailable", color="#2F6F8F"];
+  visits [label="Original program visits\nand point-count inputs\nUnknown"];
+  decision [label="Actual keep/reject mechanism\nand historical explanation\nUnknown"];
+  parameters -> visits [label="missing record"];
+  visits -> decision [label="missing record"];
+}
