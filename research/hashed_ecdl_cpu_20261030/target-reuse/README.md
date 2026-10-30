@@ -29,7 +29,7 @@ This is a separate one-factor candidate from `../optional-profile/`, not a
 combined patch. Current executable timings exclude both proposals.
 
 [Source identities](source.json), [patch](target-reuse.patch),
-[validation helper](validate.py), [validation receipt](validation.json),
+[validation helper](validate.sh), [validation receipt](validation.json),
 and [unchanged-verifier digest](verifier-check.json) are preserved.
 
 All 32 release tests pass in an isolated standalone CPU snapshot, alongside
@@ -43,13 +43,19 @@ all-target oracle tests and malformed-oracle cases pass unchanged.
 Reproduce in a fresh disposable destination:
 
 ```sh
-python3 research/hashed_ecdl_cpu_20261030/target-reuse/validate.py   /tmp/hashed-ecdl-target-reuse-unique   /tmp/hashed-ecdl-target-reuse-build
+bash research/hashed_ecdl_cpu_20261030/target-reuse/validate.sh /tmp/hashed-ecdl-target-reuse-unique /tmp/hashed-ecdl-target-reuse-build
 ```
 
 The helper refuses existing destinations, checks exact source and patch hashes,
 applies only in the snapshot, tests the standalone crate and rechecks that the
 original source did not change. Root crypto/CUDA is not built. Test logs are
 development validation, not performance data.
+
+The active helper uses Bash, GNU coreutils, jq, Git and Cargo. The original
+`validate.sh` and its receipts remain unchanged as historical development
+evidence; the Python helper is retired from the reproduction path. The shell
+runner retains the exact source/patch/candidate hashes, atomic fresh-directory
+refusal, isolated patch application, all three checks and source readback.
 
 ## Handoff
 
@@ -66,3 +72,24 @@ development validation, not performance data.
   unmet; strict isolation, external comparisons and larger-scale CPU recovery
   remain unresolved.
 - Errors: no compilation, test, Clippy or formatting failures in this snapshot.
+
+Shell replacement validation: all32 standalone release tests, locked strict
+Clippy, formatting and Bash syntax pass. Negative checks refuse an existing
+snapshot and reject wrong source/patch hashes before creating a destination.
+The new [software receipt](shell-validation/receipt.json) and exact command logs
+are additive; historical Python-era artifacts and the reserved source retain
+their original bytes. These are development checks, not timing measurements.
+
+The active reproduction path uses thin shell tooling and the shared
+`../validate-snapshot.sh` runner. It reconstructs source, crates and certificate
+fixtures from the exact `base_commit` in the immutable descriptor, then checks
+the base, patch and candidate digests. This remains reproducible after later
+source integration. The current shared source is hash-checked before and after
+and is never edited. Original Python helpers and historical receipts remain
+unchanged as evidence, outside the active reproduction path. Requires Bash,
+GNU coreutils, jq, Git and Cargo. No timing or scientific run is performed.
+
+The [pinned shell reproduction receipt](pinned-shell-validation/receipt.json)
+records successful release tests, strict Clippy and formatting after the later
+source integration. The current shared source is retained byte-for-byte. The
+source descriptors and Python-era receipts keep their original recorded state.
