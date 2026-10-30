@@ -110,3 +110,11 @@ identical. Complete HEAD/default exporters exit0within60s; R44four counters
 Scientific runs unchanged; update sourcepins for metadata-code fix and require
 raw archive hash75ce4225486332e328af1a187f20165c127edb984ada31fc1773a80bc806223f
 unchanged. Publish R44as a new regular stacked PR against parent2873.
+
+## Final delivery reconciliation
+All mathematical processes terminal; no producers repeated. Raw archive fresh
+GetObject/member hashes/deterministic repack verified, unchanged75ce4225hash.
+New branch codex/koblitz-r44-orientation; parent2873head110476230 retained.
+The earlier live-process paragraphs are historical, superseded by terminal
+results.json and this update. Next research: actual orientation screening of
+500/580 supports; trace0 alone is only eligibility. Goal remains active.
