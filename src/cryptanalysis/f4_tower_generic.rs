@@ -49,6 +49,9 @@
 //! Limits as in `f4_fp_tower`: at most 64 tower variables and 4 free
 //! variables with exponents below 256.
 
+#[path = "f4_prime_dynamic.rs"]
+pub mod dynamic;
+
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
