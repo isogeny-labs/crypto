@@ -14,3 +14,6 @@ Initial read requested nonexistent FILTER_PROTOCOL.md/REPLAY_TRACE.sh and stale 
 
 ## Terminal outcomes
 All4native runs accepted, plus Lean compile/audit0. New9/11/13cases:60/260/580closedpoints,6/26/58deckorbits. All3source sizes remain fixed n5. Lean4audited declarations=3named+1generated,0failing/trusted. No native failures/caps. Donor hashes and complete7point-set equality verified by ASSEMBLE_RECORDS. R46root-method controls are separate.
+
+## Rendering correction
+Initial literal runs/* path was parsed as a Typst comment and hid remaining paragraphs. Inspection caught it; path quoted, full page rerendered and inspected, extracted text includes final sources. No native/proof outputs changed.

@@ -17,7 +17,7 @@ The accepted cases are 420/540/2860/7540 rational points, respectively,
 Four native attempts and one Lean workflow pass. Three named theorems and
 one generated equation pass the audit, with zero failing or trusted declarations.
 The exact complete point records are in results.json and
-runs/*/points/closed-points.txt. All attempts, caps and exits are retained.
+`runs/*/points/closed-points.txt`. All attempts, caps and exits are retained.
 
 Degrees 9 and 11 were frozen before data. Degree 13 was added by a prospective
 amendment after their outcomes, with unchanged 4 GiB / 1200 s build/run caps.
