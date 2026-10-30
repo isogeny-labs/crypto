@@ -18,6 +18,9 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// Checked native PMU lifecycle; legacy counters below retain their API.
+pub mod checked;
+
 /// One logical CPU's place in the machine.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CpuPlace {
