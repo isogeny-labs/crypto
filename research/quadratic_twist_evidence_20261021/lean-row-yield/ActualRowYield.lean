@@ -167,7 +167,7 @@ theorem actual_signed_known_log_recovery {b : ℕ} (A : Fin b → T.Point)
         apply Finset.sum_congr rfl
         intro i hi
         rw [hlogs i,map_zsmul,hI,mul_zsmul]
-      _ = _ := by rw [Finset.sum_zsmul]
+      _ = _ := by rw [Finset.sum_smul]
   rw [hs,hI] at hh
   rw [sub_zsmul,hh]
   abel
