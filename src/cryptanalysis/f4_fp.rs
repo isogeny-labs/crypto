@@ -120,6 +120,35 @@ fn notify_progress(progress: F4Progress) {
 /// loops.
 static FIELD_OPS: AtomicU64 = AtomicU64::new(0);
 
+/// Process-wide count of native (non-multiplication) operations the F4 driver
+/// does outside row reduction and that no field-multiplication counter prices:
+/// leading-monomial divisibility tests (symbolic preprocessing and the staircase
+/// checks of the stopping rules) and monomial-table probes of symbolic
+/// preprocessing.  A diagnostic for AGENTS.md section 5a; incomplete by design (pair
+/// selection, matrix assembly and sorting are not counted), so it is a lower bound.
+static NATIVE_OPS: AtomicU64 = AtomicU64::new(0);
+/// The share of [`native_ops_total`] spent on staircase / Hilbert-function checks.
+static NATIVE_STAIR: AtomicU64 = AtomicU64::new(0);
+
+pub fn native_ops_total() -> u64 {
+    NATIVE_OPS.load(AtomicOrdering::Relaxed) + NATIVE_STAIR.load(AtomicOrdering::Relaxed)
+}
+
+/// Staircase and Hilbert-function checks only (inside [`native_ops_total`]).
+pub fn native_stair_ops_total() -> u64 {
+    NATIVE_STAIR.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn count_native(n: u64) {
+    NATIVE_OPS.fetch_add(n, AtomicOrdering::Relaxed);
+}
+
+#[inline]
+fn count_stair(n: u64) {
+    NATIVE_STAIR.fetch_add(n, AtomicOrdering::Relaxed);
+}
+
 thread_local! {
     /// The same count, on the thread that did the work.
     static FIELD_OPS_THREAD: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
@@ -161,23 +190,142 @@ pub fn take_run_log() -> RunLog {
 }
 /// Degree-`d` monomials in `n` variables divisible by no leading monomial.
 fn uncovered_in_degree(lms: &[&[u32]], n: usize, d: u32) -> usize {
-    fn rec(k: usize, left: u32, mono: &mut Vec<u32>, lms: &[&[u32]], cnt: &mut usize) {
+    fn rec(
+        k: usize,
+        left: u32,
+        mono: &mut Vec<u32>,
+        lms: &[&[u32]],
+        cnt: &mut usize,
+        tests: &mut u64,
+    ) {
         if k + 1 == mono.len() {
             mono[k] = left;
-            if !lms.iter().any(|l| divides(l, mono)) {
-                *cnt += 1;
+            match lms.iter().position(|l| divides(l, mono)) {
+                Some(i) => *tests += i as u64 + 1,
+                None => {
+                    *tests += lms.len() as u64;
+                    *cnt += 1;
+                }
             }
             return;
         }
         for e in 0..=left {
             mono[k] = e;
-            rec(k + 1, left - e, mono, lms, cnt);
+            rec(k + 1, left - e, mono, lms, cnt, tests);
         }
     }
     let mut cnt = 0;
+    let mut tests = 0u64;
     let mut mono = vec![0u32; n];
-    rec(0, d, &mut mono, lms, &mut cnt);
+    rec(0, d, &mut mono, lms, &mut cnt, &mut tests);
+    count_stair(tests);
     cnt
+}
+
+/// The uncovered monomials of each degree (those divisible by no leading monomial
+/// of the basis so far), kept up to date as basis elements are appended, for the
+/// Hilbert stopping rule.  Coverage only grows: an element is killed (`alive`
+/// false) only when a newer leading monomial divides its own, so the union over
+/// all basis elements is the union over the alive ones.  The counts equal
+/// [`uncovered_in_degree`] on the alive leading monomials (asserted in tests).
+/// Work is charged to the native staircase counter: one unit per divisibility
+/// test and per monomial generated.
+struct StairTracker {
+    n: usize,
+    done: usize,
+    /// Leading monomials by total degree: only those of degree `<= k` can divide a
+    /// monomial of degree `k`.
+    lms_by_deg: Vec<Vec<Vec<u32>>>,
+    /// `u[k]`: uncovered monomials of degree `k`, for `k <= u.len() - 1`.
+    u: Vec<Vec<Vec<u32>>>,
+}
+
+impl StairTracker {
+    fn new(n: usize) -> Self {
+        Self {
+            n,
+            done: 0,
+            lms_by_deg: Vec::new(),
+            u: vec![vec![vec![0u32; n]]],
+        }
+    }
+
+    /// Take in the basis elements appended since the last call.
+    fn absorb(&mut self, basis: &[Poly]) {
+        let mut work = 0u64;
+        while self.done < basis.len() {
+            let l = basis[self.done][0].0.clone();
+            let dl = total_degree(&l) as usize;
+            for level in self.u.iter_mut().skip(dl) {
+                work += level.len() as u64;
+                level.retain(|m| !divides(&l, m));
+            }
+            if self.lms_by_deg.len() <= dl {
+                self.lms_by_deg.resize(dl + 1, Vec::new());
+            }
+            self.lms_by_deg[dl].push(l);
+            self.done += 1;
+        }
+        count_stair(work);
+    }
+
+    /// Build the levels up to degree `k`.
+    fn ensure(&mut self, k: u32) {
+        let mut work = 0u64;
+        while self.u.len() <= k as usize {
+            let prev = self.u.last().unwrap();
+            let mut next: Vec<Vec<u32>> = Vec::new();
+            for m in prev {
+                let mx = m.iter().rposition(|&e| e > 0).unwrap_or(0);
+                for i in mx..self.n {
+                    let mut c = m.clone();
+                    c[i] += 1;
+                    work += 1;
+                    let mut covered = false;
+                    for bucket in self.lms_by_deg.iter().take(self.u.len() + 1) {
+                        for l in bucket {
+                            work += 1;
+                            if divides(l, &c) {
+                                covered = true;
+                                break;
+                            }
+                        }
+                        if covered {
+                            break;
+                        }
+                    }
+                    if !covered {
+                        next.push(c);
+                    }
+                }
+            }
+            self.u.push(next);
+        }
+        count_stair(work);
+    }
+
+    #[allow(unused_variables)]
+    fn count(&mut self, basis: &[Poly], alive: &[bool], k: u32) -> usize {
+        self.absorb(basis);
+        self.ensure(k);
+        let c = self.u[k as usize].len();
+        #[cfg(test)]
+        {
+            let lms: Vec<&[u32]> = basis
+                .iter()
+                .zip(alive)
+                .filter(|(_, &a)| a)
+                .map(|(f, _)| f[0].0.as_slice())
+                .collect();
+            assert_eq!(c, uncovered_in_degree(&lms, self.n, k), "tracker vs scan");
+        }
+        c
+    }
+}
+
+fn stair_scan() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_STAIR").as_deref() == Ok("scan"))
 }
 
 fn field_ops_now() -> u64 {
@@ -1081,7 +1229,7 @@ mod ckpt {
 /// One step of a recorded run: the pair rows that did not reduce to zero
 /// by the reducers alone (as `(basis index, multiplier)`), and the leading
 /// monomials of the polynomials the step added.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
@@ -1093,7 +1241,7 @@ pub struct TraceStep {
 /// the pair selection and every row that reduced to zero).  A replay
 /// checks at every step that the leading monomials it finds are the
 /// recorded ones and gives up otherwise (`F4Report::trace_mismatch`).
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct F4Trace {
     /// Leading monomials of the normalised input, in order.
     pub input_lms: Vec<Vec<u32>>,
@@ -1251,12 +1399,21 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         k: usize,
         mono: &mut Vec<u32>,
         cap: &[u32],
-        lms: &[&[u32]],
+        lms: &[(u32, &[u32])],
         count: &mut usize,
         bound: usize,
+        tests: &mut u64,
     ) -> bool {
-        if lms.iter().any(|l| divides(l, mono)) {
-            return true;
+        // only a leading monomial of degree <= deg(mono) can divide it
+        let dm: u32 = mono.iter().sum();
+        for (dl, l) in lms {
+            if *dl > dm {
+                break;
+            }
+            *tests += 1;
+            if divides(l, mono) {
+                return true;
+            }
         }
         if k == cap.len() {
             *count += 1;
@@ -1264,7 +1421,7 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         }
         for e in 0..cap[k] {
             mono[k] = e;
-            if !walk(k + 1, mono, cap, lms, count, bound) {
+            if !walk(k + 1, mono, cap, lms, count, bound, tests) {
                 mono[k] = 0;
                 return false;
             }
@@ -1272,12 +1429,17 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         mono[k] = 0;
         true
     }
+    let mut sorted: Vec<(u32, &[u32])> = lms.iter().map(|l| (total_degree(l), *l)).collect();
+    sorted.sort_by_key(|x| x.0);
     let mut count = 0usize;
+    let mut tests = 0u64;
     let mut mono = vec![0u32; n_vars];
-    walk(0, &mut mono, &cap, lms, &mut count, bound).then_some(count)
+    let ok = walk(0, &mut mono, &cap, &sorted, &mut count, bound, &mut tests);
+    count_stair(tests);
+    ok.then_some(count)
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize)]
 pub struct F4Report {
     /// The (interreduced) degree-bounded basis, `[1]` when inconsistent.
     pub basis: Vec<Poly>,
@@ -1328,7 +1490,7 @@ pub struct F4Report {
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
 pub enum HilbertStop {
     /// Not requested.
     Off,
@@ -1547,6 +1709,12 @@ impl Packed {
         let mut frontier: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         while !frontier.is_empty() {
             // the frontier rows' terms against the monomials known so far
+            count_native(
+                frontier
+                    .iter()
+                    .map(|&(i, _)| self.terms[i].len() as u64)
+                    .sum(),
+            );
             let known = &ids;
             let mut frows: Vec<Vec<u32>> = frontier
                 .par_iter()
@@ -1611,10 +1779,11 @@ impl Packed {
                 .filter(|&id| !lead[id])
                 .filter_map(|id| {
                     let mono = monos[id];
-                    alive_idx
+                    let k = alive_idx
                         .iter()
-                        .find(|&&i| self.divides(self.lms[i], mono))
-                        .map(|&i| (i, mono - self.lms[i]))
+                        .position(|&i| self.divides(self.lms[i], mono));
+                    count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
+                    k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
                 })
                 .collect();
             extra.extend(next.iter().copied());
@@ -1687,6 +1856,7 @@ impl Packed {
         for &(idx, m) in &seeds {
             let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
             t.done[row[0] as usize] = true;
+            count_native(row.len() as u64);
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
@@ -1697,10 +1867,15 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            if let Some(&idx) = alive_idx.iter().find(|&&i| self.divides(self.lms[i], mono)) {
+            let found = alive_idx
+                .iter()
+                .position(|&i| self.divides(self.lms[i], mono));
+            count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
+            if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
                 if seen.insert((idx, m)) {
                     let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
+                    count_native(row.len() as u64);
                     rows.push(row);
                     extra.push((idx, m));
                 }
@@ -2982,6 +3157,7 @@ fn f4_with_arithmetic(
     let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
     let mut hilbert_violated = false;
+    let mut stair = StairTracker::new(n_vars);
     RUN_LOG.with(|l| *l.borrow_mut() = RunLog::default());
 
     let ck_fp = opts
@@ -3053,16 +3229,24 @@ fn f4_with_arithmetic(
     loop {
         if let (Some(h), false) = (&opts.hilbert_expect, hilbert_violated) {
             while let Some(d) = pairs.iter().map(|pr| pr.degree).min() {
-                let lms: Vec<&[u32]> = basis
-                    .iter()
-                    .zip(&alive)
-                    .filter(|(_, &a)| a)
-                    .map(|(f, _)| f[0].0.as_slice())
-                    .collect();
+                let lms: Vec<&[u32]> = if stair_scan() {
+                    basis
+                        .iter()
+                        .zip(&alive)
+                        .filter(|(_, &a)| a)
+                        .map(|(f, _)| f[0].0.as_slice())
+                        .collect()
+                } else {
+                    Vec::new()
+                };
                 let want = |k: u32| h.get(k as usize).copied().unwrap_or(0);
                 let mut met = true;
                 for k in 0..=d {
-                    let unc = uncovered_in_degree(&lms, n_vars, k);
+                    let unc = if stair_scan() {
+                        uncovered_in_degree(&lms, n_vars, k)
+                    } else {
+                        stair.count(&basis, &alive, k)
+                    };
                     if unc < want(k) {
                         // fewer standard monomials than the complete
                         // intersection allows: the certificate was wrong
@@ -4515,6 +4699,10 @@ pub struct VisitReport {
     /// The visitor requested termination after an equation-checked witness.
     pub stopped_early: bool,
     pub timed_out: bool,
+    /// The fallible trace sink rejected an event; no later callback ran.
+    pub trace_stopped: bool,
+    /// At most 512 UTF-8 bytes of the first sink error.
+    pub trace_error: Option<String>,
     pub solutions_visited: usize,
     pub candidates_rejected: usize,
     pub solving_degree: u32,
@@ -4534,38 +4722,141 @@ enum VisitEnd {
     Complete,
     Stopped,
     TimedOut,
+    TraceStopped,
 }
 
-struct VisitState<'a, F> {
+/// Borrowed events for one depth-first traversal. `assignments` contains only
+/// fixed original variables; `active_variables` maps local exponent positions
+/// to original variables. Node IDs are monotonically assigned within the call.
+/// Native traces retain useful rows, not zero rows or private pivots. They are
+/// materialized per F4 call, so sink limits do not bound native matrix memory.
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum VisitEvent<'a> {
+    System {
+        node_id: usize,
+        parent_id: Option<usize>,
+        active_variables: &'a [usize],
+        assignments: &'a [(usize, u64)],
+        polynomials: &'a [Poly],
+    },
+    NativeResult {
+        node_id: usize,
+        report: &'a F4Report,
+        trace: &'a F4Trace,
+    },
+    Branch {
+        node_id: usize,
+        original_variable: usize,
+        value: u64,
+        source: &'static str,
+    },
+    Candidate {
+        node_id: usize,
+        assignment: &'a [u64],
+        residual_satisfied: bool,
+        original_satisfied: Option<bool>,
+    },
+}
+
+struct VisitState<'a, F, S> {
     original: &'a [Poly],
     domains: &'a [Option<Vec<u64>>],
     p: u64,
     opts: &'a F4Options,
     assignment: Vec<u64>,
     visitor: F,
+    sink: Option<S>,
+    next_node: usize,
     report: VisitReport,
 }
 
-impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
+impl<F, S> VisitState<'_, F, S>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    fn emit(&mut self, event: VisitEvent<'_>) -> bool {
+        if self.report.trace_stopped {
+            return false;
+        }
+        if let Some(sink) = &mut self.sink {
+            if let Err(mut error) = sink(event) {
+                let mut end = error.len().min(512);
+                while !error.is_char_boundary(end) {
+                    end -= 1;
+                }
+                error.truncate(end);
+                self.report.trace_stopped = true;
+                self.report.trace_error = Some(error);
+                return false;
+            }
+        }
+        true
+    }
     fn expired(&self) -> bool {
         self.opts.deadline.is_some_and(|d| Instant::now() >= d)
     }
 
-    fn walk(&mut self, input: &[Poly], active: &[usize]) -> VisitEnd {
+    fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
+        if self.report.trace_stopped {
+            return VisitEnd::TraceStopped;
+        }
         if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        let node_id = self.next_node;
+        self.next_node += 1;
+        if self.sink.is_some() {
+            let assignments: Vec<_> = self
+                .assignment
+                .iter()
+                .copied()
+                .enumerate()
+                .filter(|(i, _)| !active.contains(i))
+                .collect();
+            if !self.emit(VisitEvent::System {
+                node_id,
+                parent_id,
+                active_variables: active,
+                assignments: &assignments,
+                polynomials: input,
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+        }
+        // Sink persistence may itself consume the remaining deadline. It is
+        // cooperative (not interruptible), but must not admit later work.
+        if self.sink.is_some() && self.expired() {
             return VisitEnd::TimedOut;
         }
         if active.is_empty() {
             // A degree-truncated basis can describe a strict superset of
             // the original variety. Never expose those spurious roots.
-            if input.iter().any(|g| eval(g, &[], self.p) != 0) {
+            let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
+            let original_satisfied = residual_satisfied.then(|| {
+                self.original
+                    .iter()
+                    .all(|g| eval(g, &self.assignment, self.p) == 0)
+            });
+            if self.sink.is_some() {
+                let assignment = self.assignment.clone();
+                if !self.emit(VisitEvent::Candidate {
+                    node_id,
+                    assignment: &assignment,
+                    residual_satisfied,
+                    original_satisfied,
+                }) {
+                    return VisitEnd::TraceStopped;
+                }
+            }
+            if self.sink.is_some() && self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            if !residual_satisfied {
                 return VisitEnd::Complete;
             }
-            if !self
-                .original
-                .iter()
-                .all(|g| eval(g, &self.assignment, self.p) == 0)
-            {
+            if original_satisfied == Some(false) {
                 self.report.candidates_rejected += 1;
                 return VisitEnd::Complete;
             }
@@ -4582,7 +4873,12 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
         {
             return VisitEnd::Complete;
         }
-        let r = f4(input, active.len(), self.p, self.opts);
+        let (r, trace) = if self.sink.is_some() {
+            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+            (r, Some(trace))
+        } else {
+            (f4(input, active.len(), self.p, self.opts), None)
+        };
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
@@ -4590,6 +4886,15 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        if let Some(trace) = &trace {
+            if !self.emit(VisitEvent::NativeResult {
+                node_id,
+                report: &r,
+                trace,
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+        }
         if r.timed_out || self.expired() {
             return VisitEnd::TimedOut;
         }
@@ -4676,6 +4981,23 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
             if full_field {
                 self.report.full_field_branches += 1;
             }
+            if !self.emit(VisitEvent::Branch {
+                node_id,
+                original_variable: original,
+                value,
+                source: if has_univariate {
+                    "univariate_roots"
+                } else if full_field {
+                    "full_field"
+                } else {
+                    "finite_domain"
+                },
+            }) {
+                return VisitEnd::TraceStopped;
+            }
+            if self.sink.is_some() && self.expired() {
+                return VisitEnd::TimedOut;
+            }
             self.assignment[original] = value;
             let sub: Vec<_> = r
                 .basis
@@ -4685,7 +5007,7 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
                 })
                 .filter(|g| !g.is_empty())
                 .collect();
-            let end = self.walk(&sub, &remaining);
+            let end = self.walk(&sub, &remaining, Some(node_id));
             if end != VisitEnd::Complete {
                 return end;
             }
@@ -4702,6 +5024,13 @@ impl<F: FnMut(&[u64]) -> bool> VisitState<'_, F> {
 ///
 /// Unlike [`solve`], this opt-in path uses rational-factor extraction for
 /// unrestricted univariates. The legacy exhaustive scan remains a control.
+///
+/// Returns `Err` before traversal, callbacks or native checkpoint I/O if any
+/// of `checkpoint`, `checkpoint_stop_after`, `checkpoint_in_step` or
+/// `checkpoint_stop_in_rref` is set, including hooks without a checkpoint
+/// path. A native checkpoint describes one polynomial system, not this
+/// recursive traversal: specialized systems cannot reuse its path. Direct
+/// native F4 checkpoint support is unaffected.
 pub fn solve_visit(
     input: &[Poly],
     n_vars: usize,
@@ -4710,6 +5039,61 @@ pub fn solve_visit(
     domains: &[Option<Vec<u64>>],
     visitor: impl FnMut(&[u64]) -> bool,
 ) -> Result<VisitReport, String> {
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+    )
+}
+
+/// Traced variant of [`solve_visit`]. Sink failure is sticky and returns an
+/// incomplete report with `trace_stopped`, distinct from positive visitor stop
+/// or timeout. Input errors remain `Err`. Events borrow native data only during
+/// the callback. Native row traces are materialized once per recursive F4 call;
+/// external time/memory limits remain necessary. Hilbert stopping is rejected
+/// because the native recording path does not support that strategy.
+/// All four checkpoint options are also rejected with `Err` before traversal,
+/// either callback or native checkpoint I/O, as in [`solve_visit`]. There is
+/// no recursive traversal or trace-sink resume support.
+pub fn solve_visit_traced(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    visitor: impl FnMut(&[u64]) -> bool,
+    sink: impl FnMut(VisitEvent<'_>) -> Result<(), String>,
+) -> Result<VisitReport, String> {
+    if opts.stop_hilbert.is_some() {
+        return Err("traced visitor does not support Hilbert stopping".into());
+    }
+    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink))
+}
+
+fn solve_visit_impl<F, S>(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    visitor: F,
+    sink: Option<S>,
+) -> Result<VisitReport, String>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    if opts.checkpoint.is_some()
+        || opts.checkpoint_stop_after.is_some()
+        || opts.checkpoint_in_step.is_some()
+        || opts.checkpoint_stop_in_rref.is_some()
+    {
+        return Err("recursive visitor does not support checkpoint options".into());
+    }
     if p >= 1u64 << 32
         || !super::residual_walk::is_prime_u64(p)
         || domains.len() != n_vars
@@ -4731,9 +5115,11 @@ pub fn solve_visit(
         opts,
         assignment: vec![0; n_vars],
         visitor,
+        sink,
+        next_node: 0,
         report: VisitReport::default(),
     };
-    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>());
+    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
@@ -5005,6 +5391,280 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    #[test]
+    fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
+        let root = std::env::temp_dir().join(format!(
+            "f4-visitor-checkpoint-rejection-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let existing = root.join("existing.checkpoint");
+        let absent_parent = root.join("absent");
+        let absent = absent_parent.join("new.checkpoint");
+        let sentinel = b"not a native checkpoint; must remain untouched";
+        std::fs::write(&existing, sentinel).unwrap();
+        // The empty system would immediately visit a solution; the quadratic
+        // would invoke native F4. Reject before either traversal can begin.
+        for (input, n_vars, domains) in [
+            (vec![], 0, vec![]),
+            (vec![vec![(vec![2], 1), (vec![0], 6)]], 1, vec![None]),
+        ] {
+            for path in [&existing, &absent] {
+                // Each option alone, each hook with a checkpoint path, and all
+                // options together. Orphan hooks must not silently be ignored.
+                for case in 0..8 {
+                    let mut opts = F4Options::new(Ordering::Grevlex, 4);
+                    if case == 0 || case >= 4 {
+                        opts.checkpoint = Some((path.clone(), Duration::ZERO));
+                    }
+                    if matches!(case, 1 | 4 | 7) {
+                        opts.checkpoint_stop_after = Some(0);
+                    }
+                    if matches!(case, 2 | 5 | 7) {
+                        opts.checkpoint_in_step = Some(Duration::ZERO);
+                    }
+                    if matches!(case, 3 | 6 | 7) {
+                        opts.checkpoint_stop_in_rref = Some(0);
+                    }
+                    let plain = solve_visit(&input, n_vars, 7, &opts, &domains, |_| {
+                        panic!("checkpoint options reached the solution visitor")
+                    });
+                    let traced = solve_visit_traced(
+                        &input,
+                        n_vars,
+                        7,
+                        &opts,
+                        &domains,
+                        |_| panic!("checkpoint options reached the traced solution visitor"),
+                        |_| panic!("checkpoint options reached the trace sink"),
+                    );
+                    for result in [plain, traced] {
+                        assert_eq!(
+                            result.unwrap_err(),
+                            "recursive visitor does not support checkpoint options",
+                            "case {case}, path {path:?}, n_vars {n_vars}"
+                        );
+                    }
+                    assert_eq!(std::fs::read(&existing).unwrap(), sentinel);
+                    assert!(!absent_parent.exists());
+                    assert_eq!(std::fs::read_dir(&root).unwrap().count(), 1);
+                }
+            }
+        }
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn traced_visit_matches_plain_with_unrestricted_auxiliary_and_serializable_events() {
+        // x in {4}, y unrestricted, y^2=x over F7. In particular the
+        // valid auxiliary y=2 must not inherit the singleton leaf domain {4}.
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        for order in [Ordering::Lex, Ordering::Grevlex] {
+            let opts = F4Options::new(order, 4);
+            let mut plain = Vec::new();
+            let a = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                plain.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            let mut traced = Vec::new();
+            let mut systems = 0;
+            let mut native = 0;
+            let mut candidates = 0;
+            let b = solve_visit_traced(
+                &input,
+                2,
+                7,
+                &opts,
+                &domains,
+                |s| {
+                    traced.push(s.to_vec());
+                    false
+                },
+                |event| {
+                    // The callback can durably encode without owning the native data.
+                    assert!(serde_json::to_vec(&event).is_ok());
+                    match event {
+                        VisitEvent::System {
+                            node_id,
+                            active_variables,
+                            assignments,
+                            ..
+                        } => {
+                            assert_eq!(node_id, systems);
+                            systems += 1;
+                            assert_eq!(active_variables.len() + assignments.len(), 2);
+                            for (original, _) in assignments {
+                                assert!(!active_variables.contains(original));
+                            }
+                        }
+                        VisitEvent::NativeResult { report, trace, .. } => {
+                            native += 1;
+                            assert!(!report.timed_out);
+                            assert!(!trace.input_lms.is_empty());
+                        }
+                        VisitEvent::Candidate {
+                            residual_satisfied,
+                            original_satisfied,
+                            ..
+                        } => {
+                            candidates += 1;
+                            assert!(residual_satisfied);
+                            assert_eq!(original_satisfied, Some(true));
+                        }
+                        _ => {}
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            plain.sort();
+            traced.sort();
+            assert_eq!(plain, vec![vec![4, 2], vec![4, 5]]);
+            assert_eq!(traced, plain);
+            assert!(a.complete && b.complete && !b.trace_stopped);
+            assert_eq!(native, b.f4_runs);
+            assert_eq!(candidates, b.solutions_visited);
+            assert!(b.factored_univariates > 0);
+            assert_eq!(b.full_field_branches, 0);
+        }
+    }
+
+    #[test]
+    fn traced_visit_sink_failure_is_sticky_and_distinct_from_other_stops() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut calls = 0;
+        let before = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &opts,
+            &[None],
+            |_| panic!("sink rejected before any witness"),
+            |_| {
+                calls += 1;
+                Err("é".repeat(400))
+            },
+        )
+        .unwrap();
+        assert_eq!(calls, 1);
+        assert_eq!(before.f4_runs, 0);
+        assert!(
+            before.trace_stopped && !before.complete && !before.stopped_early && !before.timed_out
+        );
+        assert_eq!(before.trace_error.unwrap().len(), 512);
+
+        let mut sequence = Vec::new();
+        let during = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &opts,
+            &[None],
+            |_| panic!("sink rejects before visiting candidate"),
+            |event| {
+                match event {
+                    VisitEvent::System { .. } => sequence.push("system"),
+                    VisitEvent::NativeResult { .. } => sequence.push("native"),
+                    VisitEvent::Branch { .. } => {
+                        sequence.push("branch");
+                        return Err("event limit".into());
+                    }
+                    VisitEvent::Candidate { .. } => panic!("after sink failure"),
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(sequence, ["system", "native", "branch"]);
+        assert_eq!(during.f4_runs, 1);
+        assert_eq!(during.solutions_visited, 0);
+        assert!(
+            during.trace_stopped && !during.complete && !during.stopped_early && !during.timed_out
+        );
+        assert_eq!(during.trace_error.as_deref(), Some("event limit"));
+
+        let positive =
+            solve_visit_traced(&input, 1, 7, &opts, &[None], |_| true, |_| Ok(())).unwrap();
+        assert!(positive.stopped_early && !positive.complete && !positive.trace_stopped);
+        let expired = F4Options::new(Ordering::Grevlex, 4).with_budget(Duration::ZERO);
+        let timeout = solve_visit_traced(
+            &input,
+            1,
+            7,
+            &expired,
+            &[None],
+            |_| panic!("expired visitor"),
+            |_| panic!("expired sink"),
+        )
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete && !timeout.trace_stopped);
+    }
+
+    #[test]
+    fn traced_visit_checks_truncated_candidates_and_stops_lazy_full_field_branching() {
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 1], 6)],
+            vec![(vec![0, 2], 1), (vec![1, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 1);
+        let mut roots = Vec::new();
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |s| {
+                assert!(input.iter().all(|g| eval(g, s, 7) == 0));
+                roots.push(s.to_vec());
+                false
+            },
+            |_| Ok(()),
+        )
+        .unwrap();
+        let expected: Vec<_> = (0..7)
+            .flat_map(|x| (0..7).map(move |y| vec![x, y]))
+            .filter(|s| input.iter().all(|g| eval(g, s, 7) == 0))
+            .collect();
+        roots.sort();
+        assert_eq!(roots, expected);
+        assert!(report.complete);
+
+        // An unconstrained variable would have billions of values. Reject the
+        // first branch: no range collection, child F4 or candidate is allowed.
+        let p = 4_294_967_291;
+        let mut branches = 0;
+        let lazy = solve_visit_traced(
+            &[],
+            1,
+            p,
+            &opts,
+            &[None],
+            |_| panic!("branch rejected"),
+            |event| {
+                if let VisitEvent::Branch { value, source, .. } = event {
+                    branches += 1;
+                    assert_eq!(value, 0);
+                    assert_eq!(source, "full_field");
+                    return Err("branch cap".into());
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(branches, 1);
+        assert!(lazy.trace_stopped && !lazy.complete);
+        assert_eq!(lazy.f4_runs, 1);
+        assert_eq!(lazy.solutions_visited, 0);
+    }
 
     #[test]
     fn streaming_domains_follow_original_variables_and_match_the_legacy_solver() {

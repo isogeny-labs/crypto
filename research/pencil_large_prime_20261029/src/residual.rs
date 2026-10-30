@@ -1,8 +1,8 @@
 //! Retained row space for the graph's emitted small-variable constraints.
 //! Caps count coefficients, not bytes or total memory. No row is silently lost.
 
-use crate::{accumulate, is_prime, mul, neg, pow, Error, Sparse};
-use std::collections::BTreeMap;
+use crate::sparse::TrackedMap;
+use crate::{accumulate, inverse, is_prime, mul, neg, reduce, Error, Sparse};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Limits {
@@ -36,7 +36,7 @@ pub struct Basis {
     p: u64,
     columns: usize,
     limits: Limits,
-    rows: BTreeMap<usize, Sparse>,
+    rows: TrackedMap<Sparse>,
     retained: usize,
     counts: Counts,
 }
@@ -50,7 +50,7 @@ impl Basis {
             p,
             columns,
             limits,
-            rows: BTreeMap::new(),
+            rows: TrackedMap::new(),
             retained: 0,
             counts: Counts::default(),
         })
@@ -69,20 +69,30 @@ impl Basis {
     pub fn rows(&self) -> impl Iterator<Item = &Sparse> {
         self.rows.values()
     }
+    /// Lookup by normalized leading column without scanning all stored rows.
+    pub fn pivot(&self, column: usize) -> Option<&Sparse> {
+        self.rows.get(&column)
+    }
 
     /// Incorporate a homogeneous equation. On a cap outcome the basis is
     /// unchanged, but counters retain work already performed. A working cap
     /// applies at each intermediate map update, even if later terms cancel.
     pub fn insert(&mut self, terms: &[(usize, u64)]) -> Result<Insert, Error> {
-        if terms.iter().any(|&(i, _)| i >= self.columns) {
+        if terms.iter().any(|&(i, _)| {
+            crate::meter::collection(1, 0, 0, 1);
+            i >= self.columns
+        }) {
             return Err(Error::ColumnOutOfRange);
         }
         let mut row = Sparse::new();
         for &(i, value) in terms {
+            crate::meter::collection(1, 0, 0, 0);
             self.counts.input_terms += 1;
-            let value = value % self.p;
-            if value != 0 && !row.contains_key(&i) && row.len() == self.limits.working_coefficients
-            {
+            let value = reduce(value, self.p);
+            if value != 0 && !row.contains_key(&i) && {
+                crate::meter::collection(0, 0, 0, 1);
+                row.len() == self.limits.working_coefficients
+            } {
                 return Ok(Insert::WorkingCap);
             }
             accumulate(&mut row, i, value, self.p);
@@ -90,8 +100,10 @@ impl Basis {
                 self.counts.peak_working_coefficients.max(row.len());
         }
         while let Some((&column, &value)) = row.first_key_value() {
+            crate::meter::collection(0, 1, 0, 0);
             self.counts.pivot_lookups += 1;
             let Some(pivot) = self.rows.get(&column) else {
+                crate::meter::collection(0, 0, 0, 1);
                 if row.len()
                     > self
                         .limits
@@ -101,7 +113,7 @@ impl Basis {
                     return Ok(Insert::RetainedCap);
                 }
                 self.counts.inversions += 1;
-                let inverse = pow(value, self.p - 2, self.p);
+                let inverse = inverse(value, self.p);
                 for coefficient in row.values_mut() {
                     *coefficient = mul(*coefficient, inverse, self.p);
                     self.counts.normalization_multiplications += 1;
@@ -112,7 +124,10 @@ impl Basis {
             };
             let factor = neg(value, self.p);
             for (&i, &coefficient) in pivot {
-                if !row.contains_key(&i) && row.len() == self.limits.working_coefficients {
+                if !row.contains_key(&i) && {
+                    crate::meter::collection(0, 0, 0, 1);
+                    row.len() == self.limits.working_coefficients
+                } {
                     return Ok(Insert::WorkingCap);
                 }
                 accumulate(&mut row, i, mul(factor, coefficient, self.p), self.p);
@@ -128,6 +143,58 @@ impl Basis {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn cap_predicates_charge_only_evaluated_length_checks() {
+        let mut working = Basis::new(
+            7,
+            1,
+            Limits {
+                working_coefficients: 0,
+                retained_coefficients: 10,
+            },
+        )
+        .unwrap();
+        crate::meter::reset();
+        assert_eq!(working.insert(&[(0, 1)]), Ok(Insert::WorkingCap));
+        assert_eq!(crate::meter::snapshot().collection_comparisons, 2); // bound + working length
+        assert_eq!(crate::meter::snapshot().collection_elements_initialized, 0);
+        assert_eq!(crate::meter::snapshot().collection_elements_copied, 0);
+        let mut retained = Basis::new(
+            7,
+            1,
+            Limits {
+                working_coefficients: 10,
+                retained_coefficients: 0,
+            },
+        )
+        .unwrap();
+        crate::meter::reset();
+        assert_eq!(retained.insert(&[(0, 1)]), Ok(Insert::RetainedCap));
+        assert_eq!(crate::meter::snapshot().collection_comparisons, 3); // bound + working + retained
+        assert_eq!(crate::meter::snapshot().collection_elements_initialized, 1);
+        assert_eq!(crate::meter::snapshot().collection_elements_copied, 1);
+    }
+
+    #[test]
+    fn slice_validation_and_consumption_charge_attempts() {
+        let mut b = Basis::new(
+            7,
+            2,
+            Limits {
+                retained_coefficients: 10,
+                working_coefficients: 10,
+            },
+        )
+        .unwrap();
+        crate::meter::reset();
+        assert_eq!(b.insert(&[(0, 0), (1, 0)]), Ok(Insert::Dependent));
+        assert_eq!(crate::meter::snapshot().collection_entry_visits, 4);
+        assert_eq!(crate::meter::snapshot().collection_comparisons, 2);
+        crate::meter::reset();
+        assert_eq!(b.insert(&[(2, 1), (0, 1)]), Err(Error::ColumnOutOfRange));
+        assert_eq!(crate::meter::snapshot().collection_entry_visits, 1);
+        assert_eq!(crate::meter::snapshot().collection_comparisons, 1);
+    }
 
     #[test]
     fn caps_preserve_basis_and_charge_attempts() {
