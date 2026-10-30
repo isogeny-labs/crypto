@@ -111,9 +111,9 @@ has an exit-zero receipt with matching runtime-source readback. These checks
 validate bounded software behavior and add no scientific samples or cloud cells.
 The initial build failed on Rust reader ownership; that failure is retained.
 
-`crypto dataset export` now stages `prefix-features.jsonl` alongside static
-`features.jsonl`, with policy `strict-structural-allowlist-v5`. Only those two files
-are eligible model inputs. `restricted/prefix-records.jsonl` holds observed action
+The validated v5 format stages `prefix-features.jsonl` alongside static
+`features.jsonl`, with policy `strict-structural-allowlist-v5`. Those two files
+are its eligible model inputs. `restricted/prefix-records.jsonl` holds observed action
 labels, source cuts/joins, explicit ideal-equality certificates and replay summaries.
 Static feature identities remain unchanged. Prefix identities hash the task,
 public initial input, active-variable map, fixed bindings, fresh polynomial graphs
@@ -121,6 +121,21 @@ and independently derived remaining iterator. Field elements are decimal strings
 The iterator selects its variable from pre-cut algebra using the current native
 rule; this is observed value-order imitation, not evidence of optimal variable
 selection. Monomial/exponent and equation incidence are explicit in each graph.
+
+The subsequent v6 source adds `algebraic-features.jsonl` as a third eligible
+input file and `restricted/algebraic-records.jsonl` for independently checked
+polynomial-consequence labels. It preserves the static/branch input identity
+rules and routes consequence records separately from branch record numbering.
+Only already equality-certified prime native nodes supply these consequences;
+the feature graph uses the source system before that native call, while returned
+basis rows and separately searched multiplier witnesses remain restricted.
+Zero and unknown rows create no new public feature occurrence. The consequence
+channel has its own cumulative limits and does not consume the branch verifier
+budget. Its witnessed cancellation label establishes no exact fall degree or
+closure result. See the [frozen contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md)
+and [implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
+New-source runtime tests have not yet executed after an initial manifest-macro compilation failure; the v5 receipts above remain
+evidence only for their recorded revisions.
 
 The reader admits at most4096 events,8MiB per event and64MiB per source stream.
 One containment/equality search admits degree8,8192 generated rows,262144 sparse

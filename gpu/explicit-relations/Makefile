@@ -4,13 +4,14 @@ ARCH ?= sm_80
 CARGO ?= cargo
 CXXFLAGS ?= -O3 -std=c++17 -Wall -Wextra
 OUT := build
-.PHONY: all cuda cuda-cached cuda-compact cuda-wide-index cuda-dense host test test-cuda syntax clean
+.PHONY: all cuda cuda-cached cuda-compact cuda-wide-index cuda-dense cuda-dense-cub host test test-cuda syntax clean
 all: cuda $(OUT)/paper-driver
 cuda: $(OUT)/explicit-relations-cuda
 cuda-cached: $(OUT)/explicit-relations-cached
 cuda-compact: $(OUT)/explicit-relations-compact
 cuda-wide-index: $(OUT)/explicit-relations-wide-index
 cuda-dense: $(OUT)/explicit-relations-dense
+cuda-dense-cub: $(OUT)/explicit-relations-dense-cub
 host: $(OUT)/explicit-relations-host $(OUT)/paper-driver
 $(OUT):
 	mkdir -p $@
@@ -26,6 +27,10 @@ $(OUT)/explicit-relations-wide-index: service.cpp device.cuh host.hpp curve.cuh 
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -x cu service.cpp -o $@
 $(OUT)/explicit-relations-dense: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -x cu service.cpp -o $@
+$(OUT)/explicit-relations-dense-cub: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -x cu service.cpp -o $@
+$(OUT)/query-cub-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT query-check.cu -o $@
 $(OUT)/query-dense-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS query-check.cu -o $@
 $(OUT)/query-wide-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
@@ -57,3 +62,10 @@ test-cuda: all cuda-cached cuda-compact $(OUT)/query-check $(OUT)/query-cached-c
 	$(OUT)/query-compact-check
 clean:
 	rm -rf $(OUT)
+
+.PHONY: cuda-persistent
+cuda-persistent: $(OUT)/explicit-relations-persistent
+$(OUT)/explicit-relations-persistent: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -x cu service.cpp -o $@
+$(OUT)/query-persistent-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_PERSISTENT_BLOCK_LIMIT=2 query-check.cu -o $@
