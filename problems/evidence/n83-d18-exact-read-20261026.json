@@ -1,0 +1,21 @@
+{
+  "schema": "n83.d18-exact-read-grant-receipt/v1",
+  "observed_at_utc": "2026-10-26T21:26:28Z",
+  "proposal_sha256": "8e002232fcae81c81558ea5cbe842f45419a48a14bd5513a64753e70d9dc0600",
+  "user_name": "rho-gh-snapshot-readonly-20261024",
+  "policy_name": "N83D18ExactInputRead20261025",
+  "policy_document": {
+    "Statement": [
+      {
+        "Action": "s3:GetObject",
+        "Effect": "Allow",
+        "Resource": [
+          "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/manifest.json",
+          "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/d18-full-direct-subgroup-v1/a0/objects/c295da8898cfad29a053621c768ca059eea4263f89f5ca78b4f98af43c383f3f.jsonl.gz"
+        ],
+        "Sid": "ReadExactN83D18Inputs"
+      }
+    ],
+    "Version": "2012-10-17"
+  }
+}
