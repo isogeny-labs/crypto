@@ -33,3 +33,5 @@
 
 This is a prospective worklist, not an assertion that an unexecuted stage
 passed or that the global geometry is complete.
+
+If presentation identity evaluation reaches a wall cap, the next distinct implementation should log each stage and evaluate source maps inside the exact target quotient ring, avoiding a large ambient substitution followed by a single reduction. This is suggested by normal.lib norTest, which constructs source/target qrings before its map checks. It is a prospective implementation lead, not a measured speedup or a claim about which unlogged step consumed an existing run. Preserve existing capped attempts and do not retroactively change their interpretation.
