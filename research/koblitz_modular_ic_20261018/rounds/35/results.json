@@ -1,0 +1,127 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 35,
+  "runs": [
+    {
+      "attempt": "algebra35-01",
+      "status": "accepted",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "native_errors": false,
+      "observations": [
+        "ALG35_RESULT dimension=770 precision=154 basis_rank=770 inverse_recombination=all ring_identities=all actual_coefficient_embedding=checked"
+      ]
+    },
+    {
+      "attempt": "inflate35-01",
+      "status": "accepted",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "native_errors": false,
+      "observations": [
+        "INFLATE35_DIVISOR label=coupled-r1-f2 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r1-f3 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r2-f2 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r2-f3 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r3-f2 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r3-f3 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r4-f2 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r4-f3 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r5-f2 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_DIVISOR label=coupled-r5-f3 input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",
+        "INFLATE35_RESULT divisors=10 source_kernel_rank=68 large_model_rank=196 ambient_rank=324 products=46240 independent_products=46240 corrupt_controls=10"
+      ]
+    },
+    {
+      "attempt": "jets35-01",
+      "status": "accepted",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "native_errors": false,
+      "observations": [
+        "JET35_STAGE precision=2 all_source=pass",
+        "JET35_STAGE precision=4 all_source=pass",
+        "JET35_STAGE precision=8 all_source=pass",
+        "JET35_STAGE precision=16 all_source=pass",
+        "JET35_STAGE precision=32 all_source=pass",
+        "JET35_STAGE precision=64 all_source=pass",
+        "JET35_STAGE precision=128 all_source=pass",
+        "JET35_STAGE precision=154 all_source=pass",
+        "JET35_SOURCE precision=154 units=8 discriminant=unit conjugates=5 corrupt_control=pass",
+        "JET35_REGRESSION coordinates=6 units=8 inverses=8 sections=68 quadratics=196 precision=9 pass",
+        "JET35_RESULT precision=154 residue_degree=5 source_equations=5 units=8 conjugates=5 descent_functions=68 ranks=68,196,324 old_precision9=pass pivot_recombination=all"
+      ]
+    },
+    {
+      "attempt": "lean35-01",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 4
+    },
+    {
+      "attempt": "multiply35-01",
+      "status": "accepted",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "native_errors": false,
+      "observations": [
+        "MULT35_INPUT space=1 rank=68",
+        "MULT35_INPUT space=2 rank=196",
+        "MULT35_INPUT space=3 rank=324",
+        "MULT35_STAGE rows=32 products=9872 rank=452",
+        "MULT35_STAGE rows=64 products=18720 rank=452",
+        "MULT35_STAGE rows=96 products=26544 rank=484",
+        "MULT35_STAGE rows=128 products=33344 rank=580",
+        "MULT35_STAGE rows=160 products=39120 rank=580",
+        "MULT35_STAGE rows=192 products=43872 rank=580",
+        "MULT35_STAGE rows=224 products=47600 rank=612",
+        "MULT35_STAGE rows=256 products=50304 rank=708",
+        "MULT35_STAGE rows=288 products=51984 rank=708",
+        "MULT35_STAGE rows=320 products=52640 rank=708",
+        "MULT35_RESULT input_rank=324 output_rank=708 products=52650 independent_products=52650 all_recombinations=52650 field_table_checks=1024 corrupt_controls=2"
+      ]
+    }
+  ],
+  "construction_counts": {
+    "closed_point_algebra_dimension": 770,
+    "source_jet_precision": 154,
+    "complete_base_sections": 68,
+    "complete_quadratic_sections": 196,
+    "large_model_sections": 324,
+    "multiplication_space_dimension": 708,
+    "complete_multiplication_products": 52650,
+    "independently_checked_multiplication_products": 52650,
+    "large_model_vanishing_spaces": 10,
+    "large_model_vanishing_dimension": 196,
+    "inflation_products": 46240,
+    "independently_checked_inflation_products": 46240
+  },
+  "controls": {
+    "native_field_products": 1024,
+    "basis_inverse_recombinations": 770,
+    "all_source_equations": 5,
+    "registered_units": 8,
+    "coefficient_conjugates": 5,
+    "all_old_precision9_values_reproduced": true,
+    "native_corrupt_controls_rejected": true
+  },
+  "formal": {
+    "accepted_runs": 1,
+    "audited_declarations": 4,
+    "native_arrays_imported": false,
+    "proper_geometry_formalized": false
+  },
+  "geometry": {
+    "complete_RR_interpretation": "conditional on retained proper/local/pole bridge in R33/R34",
+    "signed_Picard_class_evaluated": false,
+    "desired_modular_factor_image": null,
+    "full_quotient_saturation_proved": false,
+    "proper_polarized_factor_embedding": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "root_library_suite_passed": false
+}
