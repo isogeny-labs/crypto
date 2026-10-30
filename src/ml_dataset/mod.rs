@@ -2517,6 +2517,12 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
         return Err("cell provenance differs from frozen plan".into());
     }
     // Bind the original cell before admitting any specialized replay claim.
+    let dynamic_replay = solvers::verify_dynamic_cell(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     let wide_prime_replay = solvers::verify_prime_f4_wide(
         dir,
         &manifest.config,
@@ -2659,17 +2665,28 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("PDP label lacks its group replay certificate".into());
     }
-    if replay && complete_known_answer {
+    if replay
+        && complete_known_answer
+        && (dynamic_replay != solvers::DynamicReplayDisposition::RawPrefix
+            || manifest.outcome["known_answer_verified"] == true)
+    {
         curves::verify(
             &read_json(&dir.join("public.json"))?,
             &read_json(&dir.join("witness.json"))?,
         )?;
     }
-    if replay && complete_factor_base {
+    if replay
+        && complete_factor_base
+        && (dynamic_replay != solvers::DynamicReplayDisposition::RawPrefix
+            || manifest.outcome["factor_base_verified"] == true)
+    {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
         curves::verify_factor_base(&public, &base)?;
-        if has("prime-f4-input.json") && !censored_m3_prefix {
+        if has("prime-f4-input.json")
+            && !censored_m3_prefix
+            && dynamic_replay == solvers::DynamicReplayDisposition::Ordinary
+        {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
             // A declared chain may not evade reconstruction by changing schema.

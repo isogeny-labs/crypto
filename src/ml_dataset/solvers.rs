@@ -3249,7 +3249,17 @@ fn verify_dynamic_claims(
             return Err(format!("dynamic replay does not certify outer {key}"));
         }
     }
+    let supervisor_censored = matches!(
+        outcome["status"].as_str(),
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed")
+    );
     for key in ["solver_completed", "pdp_witness_verified"] {
+        // terminal_outcome intentionally drops worker witness claims on a
+        // supervisor stop. Absence is not a positive assertion. Explicit null
+        // or a missing completion flag still fails the typed outcome contract.
+        if key == "pdp_witness_verified" && supervisor_censored && outcome.get(key).is_none() {
+            continue;
+        }
         if !outcome[key].is_boolean() {
             return Err(format!("dynamic outcome lacks boolean {key}"));
         }
@@ -3500,6 +3510,349 @@ fn dynamic_partial_result(stage: &str, reason: &str, custody_failed: bool) -> So
     result
 }
 
+// Draft addition to solvers.rs; parent must authenticate frozen plan/config first.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum DynamicReplayDisposition {
+    Ordinary,
+    Mathematical,
+    RawPrefix,
+}
+
+fn dynamic_reserved(a: &super::types::Artifact) -> bool {
+    let path = a.path.strip_prefix("live/payloads/").unwrap_or(&a.path);
+    path.starts_with("prime-f4-wide-dynamic-")
+        || a.role.starts_with("restricted-wide-prime-dynamic-")
+}
+
+const DYNAMIC_SLOTS: [(&str, &str, &str); 6] = [
+    (
+        "prime-f4-wide-dynamic-setup.json",
+        "restricted-wide-prime-dynamic-setup/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-native.json",
+        "restricted-wide-prime-dynamic-native/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-events.jsonl",
+        "restricted-wide-prime-dynamic-events/v1",
+        "jsonl",
+    ),
+    (
+        "prime-f4-wide-dynamic-linear.json",
+        "restricted-wide-prime-dynamic-linear/v1",
+        "json",
+    ),
+    (
+        "prime-f4-wide-dynamic-group.json",
+        "restricted-wide-prime-dynamic-group/v1",
+        "jsonl",
+    ),
+    (
+        "prime-f4-wide-dynamic-result.json",
+        "restricted-wide-prime-dynamic-result/v1",
+        "json",
+    ),
+];
+
+fn dynamic_slot_identities(artifacts: &[super::types::Artifact]) -> Result<(), String> {
+    for a in artifacts.iter().filter(|a| dynamic_reserved(a)) {
+        if artifacts
+            .iter()
+            .filter(|other| other.path == a.path)
+            .count()
+            != 1
+        {
+            return Err("duplicate dynamic artifact path".into());
+        }
+        let live = a.path.strip_prefix("live/payloads/");
+        let path = live.unwrap_or(&a.path);
+        let Some((_, role, encoding)) = DYNAMIC_SLOTS.iter().find(|slot| slot.0 == path) else {
+            return Err("unknown or displaced reserved dynamic artifact".into());
+        };
+        let raw = a.role == "unregistered-partial-artifact" && a.encoding == "native";
+        if live.is_some() {
+            // Collector assigns raw custody identity to the captured copy.
+            // Its mathematical identity is in the checked committed chain.
+            if !raw {
+                return Err("dynamic live copy has canonical manifest identity".into());
+            }
+        } else if !raw && (a.role != *role || a.encoding != *encoding) {
+            return Err("dynamic canonical artifact identity mismatch".into());
+        }
+    }
+    Ok(())
+}
+
+fn dynamic_no_promoted_claims(outcome: &Value) -> Result<(), String> {
+    prime_f4_wide::verify_unproved_claims(outcome)?;
+    prime_f4_wide::verify_censored_outcome(outcome)?;
+    for key in [
+        "certificate_durably_persisted",
+        "group_domain_complete",
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("raw dynamic prefix promotes {key}"));
+        }
+    }
+    Ok(())
+}
+
+pub(super) fn verify_dynamic_cell(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<DynamicReplayDisposition, String> {
+    use super::execution;
+    use prime_f4_wide::artifact;
+    let selected = config.solver == DYNAMIC_PROFILE;
+    if !selected
+        && outcome["strategy"] != DYNAMIC_STRATEGY
+        && !artifacts.iter().any(dynamic_reserved)
+    {
+        return Ok(DynamicReplayDisposition::Ordinary);
+    }
+    if !selected
+        || config.family != "prime"
+        || !(33..=61).contains(&config.n)
+        || !(4..=15).contains(&config.m)
+        || config.degree_bound != 12
+        || config.work_limit == 0
+    {
+        return Err("dynamic evidence differs from original profile".into());
+    }
+    let context = execution::load(dir)?.ok_or("dynamic replay lacks original execution context")?;
+    artifact(artifacts, execution::PATH, execution::ROLE, "json", true)?;
+    let (binding, limits) = super::admit_capture_context(dir)?
+        .ok_or("dynamic replay lacks original capture context")?;
+    verify_dynamic_bound_files(dir, config, outcome, artifacts, &context, &binding, &limits)
+}
+
+/// Checks files against caller-authenticated context; original-run admission is
+/// performed by verify_dynamic_cell. Direct controls test this narrower layer.
+fn verify_dynamic_bound_files(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+    context: &super::execution::LaunchContext,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+) -> Result<DynamicReplayDisposition, String> {
+    use super::{capture, storage};
+    use prime_f4_wide::artifact;
+    dynamic_slot_identities(artifacts)?;
+    if &context.binding != binding {
+        return Err("dynamic execution and capture attempts differ".into());
+    }
+    // Bind the committed capture root in the manifest; its payload hashes are
+    // checked transitively by the capture reader and independent child.
+    for path in ["live/committed.json", "live/events.jsonl"] {
+        if fs::symlink_metadata(dir.join(path)).is_ok()
+            && artifacts.iter().filter(|a| a.path == path).count() != 1
+        {
+            return Err(format!(
+                "dynamic capture root lacks manifest binding: {path}"
+            ));
+        }
+    }
+    let load_value = |path: &str| -> Result<Value, String> {
+        storage::contained_path(dir, path, false)?;
+        serde_json::from_slice(&prime_f4_wide::read_bounded(dir, path, 1024 * 1024)?)
+            .map_err(|e| e.to_string())
+    };
+    let censored = matches!(
+        outcome["status"].as_str(),
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed")
+    );
+    let ready = [
+        "prime-f4-input.json",
+        "prime-f4-wide-dynamic-setup.json",
+        "prime-f4-wide-dynamic-native.json",
+        "prime-f4-wide-dynamic-events.jsonl",
+    ]
+    .iter()
+    .all(|path| {
+        artifacts
+            .iter()
+            .any(|a| a.path == *path && a.role != "unregistered-partial-artifact")
+    });
+    let registered_terminal = artifacts.iter().any(|a| {
+        (a.path == "prime-f4-wide-dynamic-result.json"
+            || a.role == "restricted-wide-prime-dynamic-result/v1")
+            && a.role != "unregistered-partial-artifact"
+    });
+    let registered_witness = artifacts.iter().any(|a| {
+        (a.path == "pdp-witness.json" || a.role == "independently-verified-pdp")
+            && a.role != "unregistered-partial-artifact"
+    });
+    if !ready && !registered_terminal && !registered_witness {
+        if !censored && !matches!(outcome["status"].as_str(), Some("partial" | "error")) {
+            return Err("incomplete dynamic evidence has nonpartial status".into());
+        }
+        dynamic_no_promoted_claims(outcome)?;
+        if artifacts
+            .iter()
+            .any(|a| a.path == "result.json" && a.role == "solver-outcome")
+        {
+            artifact(artifacts, "result.json", "solver-outcome", "json", true)?;
+            let retained = load_value("result.json")?;
+            dynamic_no_promoted_claims(&retained)?;
+            if !censored {
+                let mut outer = outcome.clone();
+                outer
+                    .as_object_mut()
+                    .ok_or("dynamic raw outcome object")?
+                    .remove("supervisor");
+                if retained != outer {
+                    return Err("raw dynamic worker and outer outcome differ".into());
+                }
+            }
+        } else if !censored {
+            return Err("noncensored dynamic prefix lacks retained worker outcome".into());
+        }
+        // Retain oversize raw output for trace-budget failures. It is hash-bound
+        // custody, never admitted to the mathematical parser as a valid bundle.
+        capture::verify_live_committed_prefix(dir, binding, limits)?;
+        return Ok(DynamicReplayDisposition::RawPrefix);
+    }
+    // A registered terminal/witness cannot escape strict replay by removing a
+    // prerequisite or relabelling its status as partial/censored.
+    for (path, role) in [
+        ("public.json", "public-instance"),
+        ("factor-base.json", "factor-base"),
+    ] {
+        artifact(artifacts, path, role, "json", true)?;
+    }
+    let case = CaseData {
+        public_instance: load_value("public.json")?,
+        factor_base: load_value("factor-base.json")?,
+        private_witness: Value::Null,
+    };
+    let original = dynamic_original(config, &case, context.memory_bytes, context.trace_bytes)?;
+    if artifact(
+        artifacts,
+        "solver-domain.json",
+        "exact-signed-factor-base",
+        "json",
+        false,
+    )?
+    .is_some()
+    {
+        let group = Group::read(&case)?;
+        let expected = json!({"points":domain(&group, &case)?.iter().map(Element::json).collect::<Vec<_>>(),
+            "negation_closed":true,"repetitions_allowed":true});
+        if load_value("solver-domain.json")? != expected {
+            return Err("dynamic solver domain differs from original factor base".into());
+        }
+    } else if fs::symlink_metadata(dir.join("solver-domain.json")).is_ok() {
+        return Err("dynamic solver domain lacks manifest identity".into());
+    }
+    let verified = prime_f4_wide_dynamic_replay::verify_files(
+        dir,
+        &original.expected(),
+        artifacts,
+        binding,
+        limits,
+        prime_f4_wide_dynamic_replay::ReplayLimits {
+            work: 10_000_000_000,
+            allocation_bytes: 128 << 20,
+            deadline: Instant::now() + Duration::from_secs(30),
+        },
+    )?;
+    verify_dynamic_claims(outcome, &verified)?;
+    let worker = artifact(
+        artifacts,
+        "result.json",
+        "solver-outcome",
+        "json",
+        !censored,
+    )?;
+    if worker.is_some() {
+        let retained = load_value("result.json")?;
+        verify_dynamic_claims(&retained, &verified)?;
+        if !censored {
+            let mut outer = outcome.clone();
+            outer
+                .as_object_mut()
+                .ok_or("dynamic outcome object")?
+                .remove("supervisor");
+            if retained != outer {
+                return Err("dynamic worker and outer outcome differ".into());
+            }
+        }
+    } else if fs::symlink_metadata(dir.join("result.json")).is_ok() {
+        return Err("dynamic retained outcome lacks manifest binding".into());
+    }
+    Ok(DynamicReplayDisposition::Mathematical)
+}
+
+#[cfg(test)]
+mod dynamic_admission_tests {
+    use super::*;
+    fn record(path: &str, role: &str, encoding: &str) -> super::super::types::Artifact {
+        super::super::types::Artifact {
+            path: path.into(),
+            role: role.into(),
+            encoding: encoding.into(),
+            sha256: "0".repeat(64),
+            bytes: 0,
+        }
+    }
+    #[test]
+    fn dynamic_slot_identity_keeps_raw_live_copies_distinct_from_canonical_slots() {
+        for (path, role, encoding) in DYNAMIC_SLOTS {
+            let canonical = record(path, role, encoding);
+            assert!(dynamic_reserved(&canonical));
+            let raw = record(path, "unregistered-partial-artifact", "native");
+            let live = record(
+                &format!("live/payloads/{path}"),
+                "unregistered-partial-artifact",
+                "native",
+            );
+            dynamic_slot_identities(&[canonical.clone(), live.clone()]).unwrap();
+            dynamic_slot_identities(&[raw]).unwrap();
+            for bad in [
+                record(path, "other", encoding),
+                record(path, role, "utf8"),
+                record("other.json", role, encoding),
+                record(&live.path, role, encoding),
+                record(path, "restricted-wide-prime-dynamic-result/v999", encoding),
+            ] {
+                assert!(dynamic_slot_identities(&[bad]).is_err());
+            }
+            assert!(dynamic_slot_identities(&[canonical.clone(), canonical]).is_err());
+        }
+        let unknown = record(
+            "prime-f4-wide-dynamic-unknown.json",
+            "unregistered-partial-artifact",
+            "native",
+        );
+        assert!(dynamic_reserved(&unknown));
+        assert!(dynamic_slot_identities(&[unknown]).is_err());
+        for shared in [
+            record(
+                "prime-f4-input.json",
+                "complete-prime-field-polynomial-system",
+                "json",
+            ),
+            record("pdp-witness.json", "independently-verified-pdp", "json"),
+        ] {
+            assert!(!dynamic_reserved(&shared));
+        }
+    }
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
@@ -3637,7 +3990,7 @@ mod tests {
             expired.deadline = Instant::now();
             assert!(solve_dynamic_bound(&config, &case, &expired).is_err());
             let result = solve_dynamic_bound(&config, &case, &context).unwrap();
-            let artifacts: Vec<_> = result
+            let mut artifacts: Vec<_> = result
                 .artifacts
                 .iter()
                 .map(|a| {
@@ -3666,6 +4019,135 @@ mod tests {
                 _ => panic!("bound sink lost"),
             });
             drop(guard);
+            for (path, role, value) in [
+                ("public.json", "public-instance", &case.public_instance),
+                ("factor-base.json", "factor-base", &case.factor_base),
+                ("result.json", "solver-outcome", &result.outcome),
+            ] {
+                artifacts
+                    .push(super::super::storage::write_json(&cell, path, role, value).unwrap());
+            }
+            for path in ["live/committed.json", "live/events.jsonl"] {
+                let (sha256, bytes) = crate::store::hash_file(&cell.join(path)).unwrap();
+                artifacts.push(super::super::types::Artifact {
+                    path: path.into(),
+                    role: "unregistered-partial-artifact".into(),
+                    encoding: "native".into(),
+                    sha256,
+                    bytes,
+                });
+            }
+            assert_eq!(
+                verify_dynamic_bound_files(
+                    &cell,
+                    &config,
+                    &result.outcome,
+                    &artifacts,
+                    &context.launch,
+                    &binding,
+                    &limits
+                )
+                .unwrap(),
+                DynamicReplayDisposition::Mathematical
+            );
+            for stop in [Some("timeout"), Some("trace_budget_exhausted"), None] {
+                let censored = super::super::execution::terminal_outcome(
+                    result.outcome.clone(),
+                    stop,
+                    false,
+                    Some(137),
+                );
+                assert_eq!(
+                    verify_dynamic_bound_files(
+                        &cell,
+                        &config,
+                        &censored,
+                        &artifacts,
+                        &context.launch,
+                        &binding,
+                        &limits
+                    )
+                    .unwrap(),
+                    DynamicReplayDisposition::Mathematical
+                );
+            }
+            for missing in ["live/committed.json", "public.json", "pdp-witness.json"] {
+                let changed: Vec<_> = artifacts
+                    .iter()
+                    .filter(|a| a.path != missing)
+                    .cloned()
+                    .collect();
+                assert!(
+                    verify_dynamic_bound_files(
+                        &cell,
+                        &config,
+                        &result.outcome,
+                        &changed,
+                        &context.launch,
+                        &binding,
+                        &limits
+                    )
+                    .is_err(),
+                    "{missing}"
+                );
+            }
+            let raw = root.join("raw");
+            fs::create_dir(&raw).unwrap();
+            let partial = json!({"status":"error","reason":"interrupted setup",
+                "solver_completed":false,"pdp_witness_verified":false});
+            let raw_artifacts = vec![super::super::storage::write_json(
+                &raw,
+                "result.json",
+                "solver-outcome",
+                &partial,
+            )
+            .unwrap()];
+            assert_eq!(
+                verify_dynamic_bound_files(
+                    &raw,
+                    &config,
+                    &partial,
+                    &raw_artifacts,
+                    &context.launch,
+                    &binding,
+                    &limits
+                )
+                .unwrap(),
+                DynamicReplayDisposition::RawPrefix
+            );
+            let mut promoted = partial.clone();
+            promoted["pdp_witness_verified"] = json!(true);
+            assert!(verify_dynamic_bound_files(
+                &raw,
+                &config,
+                &promoted,
+                &raw_artifacts,
+                &context.launch,
+                &binding,
+                &limits
+            )
+            .is_err());
+            let mut falsely_complete = raw_artifacts;
+            falsely_complete.push(
+                super::super::storage::write_bytes(
+                    &raw,
+                    "prime-f4-wide-dynamic-result.json",
+                    "restricted-wide-prime-dynamic-result/v1",
+                    "json",
+                    b"{broken",
+                )
+                .unwrap(),
+            );
+            assert!(verify_dynamic_bound_files(
+                &raw,
+                &config,
+                &partial,
+                &falsely_complete,
+                &context.launch,
+                &binding,
+                &limits
+            )
+            .is_err());
             let original = dynamic_original(
                 &config,
                 &case,
@@ -3687,6 +4169,39 @@ mod tests {
             )
             .unwrap();
             verify_dynamic_claims(&result.outcome, &verified).unwrap();
+            for stop in [Some("timeout"), Some("trace_budget_exhausted"), None] {
+                let censored = super::super::execution::terminal_outcome(
+                    result.outcome.clone(),
+                    stop,
+                    false,
+                    Some(137),
+                );
+                assert!(censored.get("pdp_witness_verified").is_none());
+                verify_dynamic_claims(&censored, &verified).unwrap();
+                for claim in [
+                    "solver_completed",
+                    "pdp_witness_verified",
+                    "certificate_durably_persisted",
+                    "group_domain_complete",
+                    "exhaustive_no_decomposition",
+                ] {
+                    let mut promoted = censored.clone();
+                    promoted[claim] = json!(true);
+                    assert!(
+                        verify_dynamic_claims(&promoted, &verified).is_err(),
+                        "{claim}"
+                    );
+                }
+                let mut malformed = censored.clone();
+                malformed["pdp_witness_verified"] = Value::Null;
+                assert!(verify_dynamic_claims(&malformed, &verified).is_err());
+                malformed = censored;
+                malformed
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("solver_completed");
+                assert!(verify_dynamic_claims(&malformed, &verified).is_err());
+            }
             assert!(verified.first_witness_verified && verified.witness_capture_committed);
             assert!(!verified.independent_derivation_verified);
             let initial = super::super::capture::CaptureCursor::initial(&binding).unwrap();
