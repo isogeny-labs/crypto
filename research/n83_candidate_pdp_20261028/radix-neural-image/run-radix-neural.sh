@@ -10,7 +10,7 @@ PROTOCOL_SHA=${1:-}
 if [ "${1:-}" != "--validate-only" ]; then
   : "${PROTOCOL_SHA:?pass the frozen protocol sha256 as argv[1]}"
 fi
-python3 - "$ROOT" "$EXPECTED_MANIFEST" <<'PY'
+python3 - "$ROOT" "$EXPECTED_MANIFEST" "$OUT" <<'PY'
 import hashlib,json,pathlib,sys
 root=pathlib.Path(sys.argv[1]); expected=sys.argv[2]
 manifest_bytes=(root/'manifest.json').read_bytes()
@@ -26,11 +26,11 @@ for x in cases:
  assert len(b)==x['bytes'],(p,len(b),x['bytes'])
  assert hashlib.sha256(b).hexdigest()==x['sha256'],p
 assert len(list((root/'cases').glob('*.json')))==3010
-(root.parent/'input-validation.json').write_text(json.dumps({'manifest_sha256':actual,'case_count':len(cases),'hashes_verified':len(cases)},indent=2)+'\n')
+(pathlib.Path(sys.argv[3])/'input-validation.json').write_text(json.dumps({'manifest_sha256':actual,'case_count':len(cases),'hashes_verified':len(cases)},indent=2)+'\n')
 PY
 printf '%s  %s\n' "$EXPECTED_BINARY" /usr/local/bin/radix_neural_probe | sha256sum -c -
 if [ "${1:-}" = "--validate-only" ]; then
-  cat "$ROOT/../input-validation.json"
+  cat "$OUT/input-validation.json"
   exit 0
 fi
 : "${ISOLAB_RESULTS_URI:?missing ISOLAB_RESULTS_URI}"
