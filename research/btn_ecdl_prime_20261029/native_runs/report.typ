@@ -67,6 +67,28 @@ assignments equal $2^(4d)$ in every count:
 
 #figure(image("native_scaling.svg", width: 100%), caption: [Recorded sizes, per-count assignments and steps, and the derived ECCp-131 comparison. Source: `native_runs/report.json`.])
 
+== The recursion crossover (headline)
+
+#let X = R.at("recursion_crossover")
+The only part of the algorithm that could beat exponential cost is the
+recursive backend (OpenAI Appendix D.4). In the crate's `Counter::count`, it is
+selected only when $"root_u" = lambda \/ #X.at("epsilon_denominator")$ is at least 1,
+with $lambda = ceil(log_2 (2 dot "edges"))$. That needs
+$lambda >= #X.at("min_lambda_for_recursion")$, i.e. at least
+$2^#calc.round(X.at("lower_bound_log2_edges"))$ edges (further gates only raise it).
+
+The largest network built here is
+$2^#calc.round(X.at("log2_max_edges_built_here"), digits: 1)$ edges. The gap to the
+crossover is about $2^#calc.round(X.at("lower_bound_log2_edges") - X.at("log2_max_edges_built_here"))$. Across all
+#R.at("counts").at("n") counts and #R.at("solves").at("n") solves the recursive backend was selected
+*#R.at("recursive_backend_used")* times: every exact count used the fallback
+(`Functional`/`Direct`), whose cost is $2^"free input bits"$ per contraction.
+
+This threshold is faithful to the manuscript, which states a saving only above
+networks of size #X.at("paper_threshold_log2_edges_approx"). No prime-field curve
+produces a network near it, so this implementation gives no sub-exponential
+behaviour at any reachable size, including ECCp-131.
+
 == Derived: ECCp-131
 
 The backend actually used at every measured size is `Functional`, which visits

@@ -1,10 +1,18 @@
 # BTN index calculus over prime fields: encoding, solves and 131-bit extrapolation
 
-> **Status: historical Python evidence, on hold (PR #2888).** `AGENTS.md`
-> forbids Python for cryptographic research here; the native path is the
-> `hashed-ecdl-tensor` crate (#2878). All timings below are Python, unisolated,
-> and taken while other solves shared the same 4 cores, so they are not valid
-> measurements. Counts, widths and recovered secrets are exact and unaffected.
+> **Native rework lives in `native/` and `native_runs/` (PR #2888).** The
+> result the study is about — the method's distance from ECCp-131 — is measured
+> there in Rust against the `hashed-ecdl-tensor` crate (#2878), with a
+> report PDF in `native_runs/report.pdf`. Headline: the one backend that could
+> beat exponential cost (OpenAI Appendix D recursion) is gated off below about
+> 2^131070 edges, faithful to the manuscript's 2^(2^17) threshold; the largest
+> network built here is 2^17.8 edges, so every exact count used the fallback and
+> no sub-exponential behaviour appears at any reachable size.
+>
+> The Python below (`*.py`) is **historical evidence only**: `AGENTS.md` forbids
+> Python for cryptographic research here. Its counts, widths and recovered
+> secrets are exact and reproduced natively; its wall-clock timings were
+> unisolated and are not valid measurements. See [`native/README.md`](native/README.md).
 
 Prime-field version of the binary prototype in `research/btn_ecdl_20261029/`.
 The paper (Akshima et al., "A Subexponential Time Algorithm for Elliptic Curve

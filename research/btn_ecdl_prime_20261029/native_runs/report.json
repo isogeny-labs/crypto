@@ -231,6 +231,15 @@
     "steps are hashed-ecdl-tensor Meter charges: deterministic diagnostics, not calibrated time units",
     "no wall-clock time is reported"
   ],
+  "recursion_crossover": {
+    "epsilon_denominator": 131072,
+    "log2_max_edges_built_here": 17.77143788480261,
+    "lower_bound_log2_edges": 131070.0,
+    "max_edges_built_here": 223736,
+    "min_lambda_for_recursion": 131072,
+    "note": "transcribed from recursive.rs Setup::parameters; recursion engages only above ~2^131070 edges, so no feasible curve reaches it and every count here used the exact fallback",
+    "paper_threshold_log2_edges_approx": "2^17 = 131072 (manuscript's 2^(2^17))"
+  },
   "recursive_backend_used": false,
   "schema": "btn-prime-native-report/v1",
   "sizes": {
@@ -415,7 +424,7 @@
   },
   "solves": {
     "all_ok": true,
-    "n": 2,
+    "n": 3,
     "rows": [
       {
         "backend": "Some(Functional)",
@@ -449,6 +458,23 @@
         "secret": 1,
         "seed": 2,
         "steps": 211864590,
+        "verified": true
+      },
+      {
+        "backend": "Some(Functional)",
+        "contractions": 375,
+        "d": 3,
+        "edge_assignments": 0,
+        "functional_assignments": 308775,
+        "ok": true,
+        "p": 7,
+        "r": 13,
+        "recovered": "3",
+        "recursive_calls": 0,
+        "relations": 25,
+        "secret": 3,
+        "seed": 1,
+        "steps": 738643764,
         "verified": true
       }
     ]

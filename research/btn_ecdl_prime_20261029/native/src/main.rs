@@ -341,6 +341,26 @@ fn report(dir: &str) -> Res<Value> {
     let d131 = 131u64;
     let eccp_input_bits = 4 * d131;
     let rho_log2 = 0.5 * (std::f64::consts::PI * 2f64.powi(131) / 4.0).log2();
+
+    // Recursion crossover, transcribed from crates/hashed-ecdl-tensor
+    // src/contraction/recursive.rs Setup::parameters: at depth 0 the recursive
+    // backend is selected only if root_u = lambda / (128*1024) >= 1, where
+    // lambda = ceil(log2(size)) and size = 2*edges.  So lambda >= 131072 =
+    // 2^17, i.e. size >= 2^131071, edges >= 2^131070.  Further gates
+    // (m >= 2*array^2*delta with array = 64^(4*root_u)) only raise it.  This is
+    // a lower bound on the smallest network for which the recursion engages at
+    // all; below it every count uses the exact fallback (Functional/Direct).
+    const EPSILON_DENOM: u64 = 128 * 1024; // crate constant, = 2^17
+    let min_lambda = EPSILON_DENOM; // smallest lambda with root_u >= 1
+    let crossover_log2_edges = (min_lambda - 1 - 1) as f64; // size >= 2^(lambda-1); edges = size/2
+    // Largest network we actually built (ECCp-131 or the size sweep).
+    let max_edges = eccp
+        .as_ref()
+        .and_then(|e| e.get("networks"))
+        .and_then(|n| n.as_array())
+        .and_then(|a| a.iter().filter_map(|r| r.get("edges").and_then(Value::as_u64)).max())
+        .or_else(|| sizes.iter().map(|s| u(s, "edges")).max())
+        .unwrap_or(0);
     Ok(json!({
         "schema": "btn-prime-native-report/v1",
         "inputs": { "sizes": format!("{dir}/sizes.jsonl"), "counts": format!("{dir}/counts.jsonl"),
@@ -350,6 +370,15 @@ fn report(dir: &str) -> Res<Value> {
                     "functional_assignments_equal_2_pow_4d": assignments_rule, "rows": per_count },
         "solves": { "n": solves.len(), "all_ok": !solves.is_empty() && solves.iter().all(|s| s["ok"] == json!(true)), "rows": solves },
         "recursive_backend_used": any_recursion,
+        "recursion_crossover": {
+            "epsilon_denominator": EPSILON_DENOM,
+            "min_lambda_for_recursion": min_lambda,
+            "lower_bound_log2_edges": crossover_log2_edges,
+            "paper_threshold_log2_edges_approx": "2^17 = 131072 (manuscript's 2^(2^17))",
+            "max_edges_built_here": max_edges,
+            "log2_max_edges_built_here": if max_edges > 0 { (max_edges as f64).log2() } else { f64::NAN },
+            "note": "transcribed from recursive.rs Setup::parameters; recursion engages only above ~2^131070 edges, so no feasible curve reaches it and every count here used the exact fallback",
+        },
         "sizes": { "rows": sizes, "growth": size_growth },
         "eccp131": {
             "network": eccp,
