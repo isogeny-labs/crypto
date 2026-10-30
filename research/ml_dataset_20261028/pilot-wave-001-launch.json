@@ -1,0 +1,18 @@
+{
+  "schema": "crypto.ml-dataset.launch/v1",
+  "job_name": "ml-dataset-4c94f1d-pilot-001-20261028",
+  "status": "prepared_not_submitted",
+  "source_commit": "4c94f1dfc9bf2df2290a0645a2de6dada7b3c024",
+  "binary_sha256": "333da60b62312d33efb43ba6c4fb7826d8627c5c2fbf5bfcb7c645eed227222b",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c1c439c2a19f6d93b162ed0d3fb6a4f71a9783337796ccf8f0c4d150a62ff4b1",
+  "plan_sha256": "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a",
+  "protocol_file_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "command": ["/usr/local/bin/crypto", "dataset", "generate", "--plan", "/opt/ml-dataset/pilot-plan.json", "--protocol", "/opt/ml-dataset/protocol.json", "--out", "/work/results/dataset", "--max-cases", "36", "--shard-index", "0", "--shard-count", "19", "--seconds-per-case", "30", "--memory-mib", "2048", "--trace-mib", "64", "--publish", "--remote", "s3://setec-astronomy-artifacts/store"],
+  "cpu": 2,
+  "memory": "4Gi",
+  "seconds": 3600,
+  "retries": 0,
+  "validation": {"focused_passed": 49, "focused_failed": 0, "library_passed": 5016, "library_failed": 0, "library_ignored": 122, "source_readback": "matched", "container_uid1000_capabilities": "matched_host_binary"},
+  "scope": "First bounded partial correctness wave; no completed-corpus, performance or exact fall-degree claim. Full pilot has720 method cells corresponding to144 arm-instance bundles; a36-cell partial export cannot satisfy complete-panel cardinality.",
+  "publication": "Each sealed cell is uploaded and every object read back before advancing. Portable receipts are additionally stored under the Job's ISOLAB_RESULTS_URI/dataset-receipts prefix. Inspect this exact Job and its S3 receipts before any retry."
+}

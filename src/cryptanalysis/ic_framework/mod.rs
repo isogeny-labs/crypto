@@ -62,7 +62,9 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod archive;
 pub mod cm_orbit;
+pub mod explicit_base;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
@@ -76,6 +78,7 @@ pub mod shared_rank;
 pub mod solvers;
 pub mod stages;
 pub mod subspace_select;
+pub mod useful_rank;
 
 use std::time::Instant;
 
@@ -97,6 +100,7 @@ pub struct PipelineSpec {
     pub factor_base: String,
     pub factor_base_params: Params,
     pub oracle: String,
+    /// `audit_rank` is a runner flag, removed before oracle callbacks.
     pub oracle_params: Params,
     /// The polynomial solver, for oracles that use one.
     pub solver: Option<String>,
@@ -239,6 +243,11 @@ pub struct RunReport {
     pub factor_base: FactorBaseReport,
     pub decomposition: DecompositionReport,
     pub linear_algebra: LinearAlgebraReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub useful_rank: Option<useful_rank::RankAudit>,
+    /// Missing prices prevent total-cost or speedup admission.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cost_qualification: Option<String>,
     pub verify: PhaseCost,
     /// The recovered logarithm, and whether it is the planted one.
     pub recovered: Option<u64>,
@@ -277,7 +286,23 @@ pub struct RunReport {
 /// compare an F4 `S` from before that merge with one after it, or a priced
 /// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
+    if LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.get()) {
+        return op_unit == "word XORs";
+    }
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
+}
+
+// Pre-#1774 pricing for committed evidence, set by the replay audit only
+// (`ecbench::legacy`): only the bare `word XORs` unit is priced by count, so
+// a qualified inherited-F4 unit is priced at wall time and taken back out.
+thread_local! {
+    static LEGACY_EXACT_WORD_XOR_UNIT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Match the bare `word XORs` unit alone, as before #1774; `false` restores
+/// the normal prefix match.
+pub fn set_legacy_exact_word_xor_unit(on: bool) {
+    LEGACY_EXACT_WORD_XOR_UNIT.with(|c| c.set(on));
 }
 
 /// Certify the solved logarithm of one nonzero-coefficient point in each
@@ -365,6 +390,36 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let mut fb_ops = GroupOps::default();
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    let archive_import = base_builder.name() == "archive";
+    if archive_import
+        && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
+        && spec.factor_base_params.get("symmetry") != Some("frobenius")
+    {
+        return Err(
+            "archive Frobenius oracle requires symmetry=frobenius and verified orbit closure"
+                .into(),
+        );
+    }
+    let audit_enabled = archive_import || spec.oracle_params.flag("audit_rank");
+    if audit_enabled && (fb.columns == 0 || fb.columns > 4096) {
+        return Err("rank audit requires 1..4096 columns".into());
+    }
+    let linalg_name = if spec.linalg.is_empty() {
+        "incremental-gauss"
+    } else {
+        spec.linalg.as_str()
+    };
+    if audit_enabled
+        && !matches!(
+            linalg_name,
+            "incremental-gauss"
+                | "incremental-gauss-full-rank"
+                | "incremental-gauss-full-rank-checked"
+                | "structured-gauss"
+        )
+    {
+        return Err("rank audit requires an incremental Gaussian solver".into());
+    }
     let mut fb_cost = fb.cost.clone();
     fb_cost.group_ops.merge(fb_ops);
     fb_cost.wall_ns = fb_cost.wall_ns.max(fb_started.elapsed().as_nanos() as u64);
@@ -377,8 +432,12 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // one in the first frozen solver sweep.
     measurement::mark(measurement::Phase::Precompute);
     let mut prep_ops = GroupOps::default();
+    let mut oracle_params = std::borrow::Cow::Borrowed(&spec.oracle_params);
+    if oracle_params.get("audit_rank").is_some() {
+        oracle_params.to_mut().0.remove("audit_rank");
+    }
     let prep_started = Instant::now();
-    oracle.prepare(ctx, &fb, &spec.oracle_params, &mut prep_ops)?;
+    oracle.prepare(ctx, &fb, oracle_params.as_ref(), &mut prep_ops)?;
     let mut prep_cost = PhaseCost::default();
     prep_cost.group_ops.merge(prep_ops);
     prep_cost.native = oracle.setup_native();
@@ -391,35 +450,48 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // the collision guards and the verification are the audited ones,
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
-    // A base whose column logarithms are known has nothing to eliminate:
-    // the relation's own row names the target, so the matrix is the
-    // direct reader and the run completes on the first verified relation.
     let known = fb.known_logs.is_some();
-    let linalg_name = if known {
-        "known-logs"
-    } else if spec.linalg.is_empty() {
-        "incremental-gauss"
-    } else {
-        spec.linalg.as_str()
+    let linalg_name = {
+        let prior = linalg_name;
+        if known {
+            "known-logs"
+        } else {
+            prior
+        }
     };
     // The loop's unknowns are the logs of `[h]P_v` (its rows read
     // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
     // log `s` enters as `h·s`; at `h = 1` this is the identity.
-    let mut matrix: Box<dyn RelationSolver> = match &fb.known_logs {
+    let mut plain = Some(match &fb.known_logs {
         Some(logs) => {
             let h = ctx.cofactor % ctx.r;
             let scaled = logs
                 .iter()
                 .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
                 .collect();
-            Box::new(KnownLogSolver::new(scaled, ctx.r))
+            Box::new(KnownLogSolver::new(scaled, ctx.r)) as Box<dyn RelationSolver>
         }
         None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
+    });
+    let mut audited = if audit_enabled && !known {
+        Some(useful_rank::AuditedMatrix::new(
+            ctx,
+            &fb,
+            plain.take().unwrap(),
+        )?)
+    } else {
+        None
+    };
+    let matrix: &mut dyn RelationSolver = if let Some(m) = &mut audited {
+        m
+    } else {
+        plain.as_mut().unwrap().as_mut()
     };
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
         Targets::Walk | Targets::Residual => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
@@ -483,7 +555,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             &fb,
             spec.seed,
             spec.max_trials,
-            matrix.as_mut(),
+            matrix,
         )
     } else {
         // `decompose_relations` is `decompose` for every oracle without
@@ -501,7 +573,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             spec.max_trials,
             source,
             RestartPool::Lazy,
-            matrix.as_mut(),
+            matrix,
             completion,
             |ops, counters, point, a, b| {
                 oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
@@ -517,8 +589,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     // verified full-rank solution solely from the target-point check.
     if checked_full_rank && outcome.verified {
         measurement::mark(measurement::Phase::RecoveryCheck);
-        outcome.verified =
-            check_full_rank_base_columns(ctx, &fb, matrix.as_ref(), &mut outcome.verify);
+        outcome.verified = check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
         // The check's `pinned` scans: the matrix's totals replace the
         // ones the relation loop recorded.
         outcome
@@ -527,6 +598,23 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             .extend(matrix.work_counters());
     }
     measurement::end_online();
+    let (work, work_unit) = matrix.work();
+    let useful_rank = audited.map(|audit| {
+        outcome.linear_algebra.group_ops.merge(audit.cost.group_ops);
+        for (name, value) in audit.cost.native {
+            outcome.linear_algebra.count(&name, value);
+        }
+        outcome.linear_algebra.wall_ns += audit.setup_ns;
+        outcome.verified &= audit.audit.invalid_rows == 0;
+        audit.audit
+    });
+    let cost_qualification = audit_enabled.then(|| {
+        if archive_import {
+            "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
+        } else {
+            "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
+        }
+    });
 
     // ── The report ─────────────────────────────────────────────────
     let mut fb_phase = fb_cost;
@@ -624,8 +712,6 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     let sqrt_r = (ctx.r as f64).sqrt();
     let s = total_gae / sqrt_r;
 
-    let (work, work_unit) = matrix.work();
-
     Ok((
         RunReport {
             instance: ctx.name.clone(),
@@ -665,13 +751,17 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
                 work_unit: work_unit.into(),
                 cost: la,
             },
+            useful_rank,
+            cost_qualification: cost_qualification.clone(),
             verify: ver,
             recovered: outcome.recovered,
             verified: outcome.verified && outcome.recovered == Some(planted),
             total_gae,
             s,
             rho_s,
-            s_over_rho: rho_s.map(|rho| s / rho),
+            s_over_rho: rho_s
+                .filter(|_| cost_qualification.is_none())
+                .map(|rho| s / rho),
             wall_seconds: started.elapsed().as_secs_f64(),
             exhausted: outcome.recovered.is_none(),
         },
@@ -682,6 +772,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
+    if rows.iter().any(|r| r.cost_qualification.is_some()) {
+        out.push_str("Archive/rank-audit rows report partial counted cost only. Original generation/transfer and unpriced work prevent total-cost or speedup claims.\n\n");
+    }
     out.push_str(
         "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n",
     );
@@ -824,6 +917,45 @@ mod tests {
         assert_eq!(la.cost.gae, 0.0);
         assert_eq!(la.rank, 1);
         assert_eq!(report.decomposition.relations_found, 1);
+    }
+
+    /// **The `k`-sum table oracle recovers the planted logarithm** on a
+    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
+    /// has `k` summands, and the table holds one entry per negation orbit
+    /// of the signed `k`-sums of the base.
+    #[test]
+    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+        use super::plugins::{KSumOracle, PrimeAbscissaBase};
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "ksum".into(),
+                targets: Targets::Walk,
+                linalg: "incremental-gauss".into(),
+                max_trials: 50_000_000,
+                seed: 11,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", size.to_string());
+            spec.oracle_params.set("m", k.to_string());
+            let mut oracle = KSumOracle::new(k);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "k = {k}: did not recover the log");
+            assert_eq!(report.recovered, Some(planted));
+            assert!(report.decomposition.relations_found > 0);
+        }
     }
 
     /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar
@@ -1112,6 +1244,36 @@ mod tests {
         let rn = &renew.decomposition.cost;
         assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
         assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        // The deferred guard presents the same targets, keeps the same rows
+        // and recovers the same logarithm.  It probes only the targets that
+        // decompose; each repeat the eager guard skipped costs it one table
+        // lookup instead, and at most one confirming addition.
+        let deferred = run(Targets::StrideRenewDeferredGuard);
+        assert!(deferred.verified);
+        assert_eq!(deferred.recovered, Some(planted));
+        assert_eq!(
+            deferred.decomposition.targets_tried,
+            renew.decomposition.targets_tried
+        );
+        let dn = &deferred.decomposition.cost;
+        let count = |c: &PhaseCost, key: &str| c.native.get(key).copied().unwrap_or(0);
+        for key in [
+            "relations",
+            "stride_steps",
+            "stride_restarts",
+            "stride_renewals",
+        ] {
+            assert_eq!(count(dn, key), count(rn, key), "{key}");
+        }
+        let eager_skips = count(rn, "repeated_targets_skipped");
+        assert_eq!(count(dn, "lookups"), count(rn, "lookups") + eager_skips);
+        assert_eq!(dn.group_ops.scalar_mults, rn.group_ops.scalar_mults);
+        assert_eq!(dn.group_ops.doubles, rn.group_ops.doubles);
+        assert!(dn.group_ops.adds >= rn.group_ops.adds);
+        assert!(dn.group_ops.adds <= rn.group_ops.adds + eager_skips);
+        let probes = count(dn, "target_guard_probes");
+        assert!(probes <= count(dn, "relations") + count(dn, "repeated_targets_skipped"));
+        assert!(probes < count(rn, "target_guard_probes"));
         assert_eq!(stride.recovered, Some(planted));
         let rel = &stride.decomposition.cost;
         assert_eq!(rel.native.get("stride_restarts"), Some(&1));

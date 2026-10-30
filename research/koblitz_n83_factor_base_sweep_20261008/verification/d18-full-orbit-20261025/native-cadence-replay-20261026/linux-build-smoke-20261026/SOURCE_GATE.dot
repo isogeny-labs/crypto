@@ -1,0 +1,15 @@
+digraph source_gate {
+  graph [rankdir=LR, fontname="Helvetica", label="N83 D18 Linux route: private fetch failed; no-source Rust command passed", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#e8f2ff"];
+  spot [label="c7i.2xlarge Spot\nallocated; Rust available\nEC2 terminated", fillcolor="#e4f4e8"];
+  fetch [label="Private GitHub fetch\nnoninteractive auth absent\njob error", fillcolor="#ffe8de"];
+  build [label="Hosted Cargo tests/binaries\nnot reached", fillcolor="#eeeeee"];
+  source [label="Exact 45ce91d5 package\nlocal build passed\nS3 upload pending", fillcolor="#fff2d6"];
+  nosource [label="No-source Rust Spot\ncommand exit 0\nEC2 terminated", fillcolor="#e4f4e8"];
+  input [label="Original D18 S3 GET\nrunner role 403; grant pending", fillcolor="#fff2d6"];
+  arm [label="Positive then natural\nnot launched", fillcolor="#eeeeee"];
+  spot -> fetch -> build -> arm;
+  spot -> nosource -> source;
+  source -> build;
+  input -> arm;
+}
