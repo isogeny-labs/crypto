@@ -235,7 +235,7 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 ## Curve records and factor bases
 
-Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (27 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
+Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC curve records: schema [`docs/curves/ic/curves.schema.json`](../../docs/curves/ic/curves.schema.json), records [`docs/curves/ic/curves.yaml`](../../docs/curves/ic/curves.yaml) (31 records). 24 of the 24 board curves have a record there; 0 have a reconciled factor base.
 
 The registry overview below uses current links. Frozen measurement rows retain their original link metadata; refreshing registry links does not change their validation status.
 
@@ -470,6 +470,7 @@ Component speed-up, class engineering: `f4_fp` before and after #1717 in example
 | 53 | 2 | 33 | 2121 | 425.2 | 4.99 | 1843 | 370 |
 | 101 | 1 | 53 | 1455 | 287.5 | 5.06 | 981 | 194 |
 | 101 | 2 | 50 | 2370 | 466.4 | 5.08 | 1897 | 373 |
+
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
 Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
@@ -784,8 +785,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
-- `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/f4_fp_ic_effect_20261018/summary.json` — sha256 `7eff13424e0e9b1a…`
+- `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
@@ -836,7 +837,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `docs/curves/registry.json` — sha256 `88390d7b472098e3…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
-- `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`
