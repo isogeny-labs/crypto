@@ -727,3 +727,28 @@ Collect and delete active v11 before v13 CUDA validation and execution.
 Static syntax alone missed a valid shell command in the wrong working
 directory. Launch review caught it before deployment. T957 is cancelled and
 cannot reopen; scoped correction is owned by T961.
+
+## 2026-10-30T17:28UTC — separate 63-bit arithmetic preparation
+
+### What was done
+Prepared p<2^63 and full-u64 hash support under T966; retainedr<2^63.
+Overflow-safe hash operations, widened Hasse radicand, modular affine formulas
+and a direct terminal prefix offset remove identified width hazards. Host
+fixtures pass; new native Rust/device boundary tests await GPU execution.
+
+### Decisions made
+HAC14.32/14.33 reviewed before changes; see FIELD63.md. Shared Montgomery
+operations are unchanged; their documented bound widens with explicit argument
+and differential fixtures. V11/v13 source pins and frozen designs are untouched.
+No new frontier protocol is frozen until the current cache panel is collected.
+
+### Open threads
+V11 final62-bit target remains running; collect/delete, then execute pinnedv13.
+Only afterward validate this width extension and freeze any larger probe.
+
+### Errors
+A guarded source-edit script stopped on a changed text match after earlier
+replacements; inspected the partial edit and corrected the interval comparison.
+A candidate hash-fixture integer was composite; the host fixture selected and
+checked6917529027641081737 before it was recorded in the pending Rust test.
+No GPU result is claimed for this extension.

@@ -4,7 +4,7 @@
 //! with a separate complete tensor implementation exported as [`tensor`].
 //! This bounded reference's default oracle enumerates group decompositions (generic
 //! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
-//! performance claim is made. Cofactor-one prime-field curves below 2^60 are
+//! performance claim is made. Cofactor-one prime-field curves below 2^63 are
 //! supported using an exact prime-order witness; the original constructor
 //! retains its small-field exhaustive check. Answers carry replayable certificates.
 //!
@@ -162,6 +162,9 @@ pub(crate) fn inverse(a: u64, p: u64) -> u64 {
 }
 
 fn addmod(a: u64, b: u64, p: u64) -> u64 {
+    if p >= (1u64 << 63) {
+        return if a >= p - b { a - (p - b) } else { a + b };
+    }
     let sum = a + b;
     if sum >= p {
         sum - p
@@ -170,11 +173,13 @@ fn addmod(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 
-fn floor_sqrt(n: u64) -> u64 {
-    let (mut lo, mut hi) = (0u64, 1u64 << 32);
+fn floor_sqrt(n: u128) -> u64 {
+    // Only Hasse radicands <=4*(2^63-1), plus u64 test inputs.
+    assert!(n < (1u128 << 65));
+    let (mut lo, mut hi) = (0u64, 1u64 << 33);
     while lo + 1 < hi {
         let mid = (lo + hi) / 2;
-        if u128::from(mid) * u128::from(mid) <= u128::from(n) {
+        if u128::from(mid) * u128::from(mid) <= n {
             lo = mid;
         } else {
             hi = mid;
@@ -319,7 +324,7 @@ impl Curve {
         r: u64,
         generator: Point,
     ) -> Result<Self, Error> {
-        if !(5..(1u64 << 62)).contains(&p)
+        if !(5..(1u64 << 63)).contains(&p)
             || !(3..(1u64 << 63)).contains(&r)
             || !prime(p)
             || !prime(r)
@@ -344,7 +349,7 @@ impl Curve {
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         let (lower, upper) = (p + 1 - radius, p + 1 + radius);
         if lower.div_ceil(r) != 1 || upper / r != 1 {
             // Preserve exact validation for ambiguous tiny Hasse intervals.
@@ -363,7 +368,7 @@ impl Curve {
         if a >= p || b >= p || (4 * a * a % p * a + 27 * b * b) % p == 0 {
             return Err(Error::Invalid("noncanonical or singular curve"));
         }
-        let radius = floor_sqrt(4 * p);
+        let radius = floor_sqrt(4 * u128::from(p));
         if p >= 1024 && (p + 1 - radius).div_ceil(r) == 1 && (p + 1 + radius) / r == 1 {
             // The same exact certificate as with_order_witness, discovering
             // a public point rather than enumerating every x in the field.
@@ -442,7 +447,15 @@ impl Curve {
         self.r
     }
     fn rhs(&self, x: u64) -> u64 {
-        (mulmod(mulmod(x, x, self.p), x, self.p) + mulmod(self.a, x, self.p) + self.b) % self.p
+        addmod(
+            addmod(
+                mulmod(mulmod(x, x, self.p), x, self.p),
+                mulmod(self.a, x, self.p),
+                self.p,
+            ),
+            self.b,
+            self.p,
+        )
     }
 
     /// Test canonical coordinates and the curve equation; accepts the identity.
@@ -497,7 +510,13 @@ impl Curve {
             return None;
         }
         let (num, den) = if x == xx {
-            ((3 * mulmod(x, x, p) + self.a) % p, 2 * y % p)
+            (
+                {
+                    let xx = mulmod(x, x, p);
+                    addmod(addmod(addmod(xx, xx, p), xx, p), self.a, p)
+                },
+                2 * y % p,
+            )
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
@@ -534,7 +553,7 @@ impl Curve {
 /// One affine hash and its threshold, defining a slot-specific factor base.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HashBase {
-    /// Prime hash modulus, in `[2p,4p]` and strictly below `2^63`.
+    /// Prime hash modulus, in `[2p,4p]` and representable as u64.
     pub s: u64,
     /// Nonzero multiplier modulo `s`.
     pub alpha: u64,
@@ -546,9 +565,8 @@ pub struct HashBase {
 
 impl HashBase {
     fn validate(&self, curve: &Curve) -> Result<(), Error> {
-        if self.s >= (1u64 << 63)
-            || self.s < 2 * curve.p
-            || self.s > 4 * curve.p
+        if self.s < 2 * curve.p
+            || u128::from(self.s) > 4 * u128::from(curve.p)
             || !prime(self.s)
             || self.alpha == 0
             || self.alpha >= self.s
@@ -567,7 +585,12 @@ impl HashBase {
         if self.tau > MAX_HASH_CANDIDATES {
             return Err(Error::Limit("inverse-hash candidate bound"));
         }
-        let inv = inverse(self.alpha, self.s);
+        // Keep the established signed EEA bound; use Fermat for full-u64 hashes.
+        let inv = if self.s < (1u64 << 63) {
+            inverse(self.alpha, self.s)
+        } else {
+            pow(self.alpha, self.s - 2, self.s)
+        };
         let mut points = Vec::new();
         for t in 0..self.tau {
             let z = mulmod(inv, sub(t, self.beta, self.s), self.s);
@@ -951,9 +974,10 @@ pub fn solve_with_oracle_profile(
             attempts: 0,
         });
     }
-    let s = (2 * curve.p..=(4 * curve.p).min((1u64 << 63) - 1))
+    let upper = (4 * u128::from(curve.p)).min(u128::from(u64::MAX)) as u64;
+    let s = (2 * curve.p..=upper)
         .find(|&s| prime(s))
-        .ok_or(Error::Limit("no supported hash prime below 2^63"))?;
+        .ok_or(Error::Limit("no supported u64 hash prime in [2p,4p]"))?;
     // Binary search and saturating products avoid both a sqrt(r) setup loop
     // and overflow for large exponents; only comparison against r matters.
     let (mut lower, mut root) = (0, curve.r);
@@ -995,7 +1019,7 @@ pub fn solve_with_oracle_profile(
             || bases.iter().zip(&hashes).any(|(base, h)| {
                 base.windows(2).any(|w| w[0] >= w[1])
                     || base.iter().any(|&point| match curve.encode(point) {
-                        Ok(z) => (mulmod(h.alpha, z, h.s) + h.beta) % h.s >= h.tau,
+                        Ok(z) => addmod(mulmod(h.alpha, z, h.s), h.beta, h.s) >= h.tau,
                         Err(_) => true,
                     })
             })
@@ -1535,8 +1559,76 @@ mod tests {
             assert!(prime(n));
         }
         for n in [0, 1, 2, 3, 4, 15, 16, 17, u64::MAX] {
-            let x = u128::from(floor_sqrt(n));
+            let x = u128::from(floor_sqrt(u128::from(n)));
             assert!(x * x <= u128::from(n) && (x + 1) * (x + 1) > u128::from(n));
+        }
+    }
+
+    #[test]
+    fn field63_full_hash_and_hasse_boundaries() {
+        let p = 9_223_372_036_854_775_783u64;
+        let s = 18_446_744_073_709_551_557u64;
+        assert!(prime(p) && prime(s));
+        for modulus in [p, s, u64::MAX] {
+            for a in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                for b in [0, 1, modulus / 2, modulus - 2, modulus - 1] {
+                    assert_eq!(
+                        addmod(a, b, modulus),
+                        ((u128::from(a) + u128::from(b)) % u128::from(modulus)) as u64
+                    );
+                }
+            }
+        }
+        for n in [u128::from(u64::MAX), 4 * u128::from(p), (1u128 << 65) - 1] {
+            let x = u128::from(floor_sqrt(n));
+            assert!(x * x <= n && (x + 1) * (x + 1) > n);
+        }
+        // Arithmetic fixture only: no group order is asserted by this struct.
+        let c = Curve {
+            p,
+            a: p - 3,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(p)),
+        };
+        for x in [0, 1, p / 2, p - 2, p - 1] {
+            let expected = ((u128::from(mulmod(mulmod(x, x, p), x, p))
+                + u128::from(mulmod(c.a, x, p))
+                + u128::from(c.b))
+                % u128::from(p)) as u64;
+            assert_eq!(c.rhs(x), expected);
+            if let Some(q) = c.decode(2 * x) {
+                assert_eq!(c.decode(c.encode(Some(q)).unwrap()), Some(q));
+                assert!(c.contains(c.add(Some(q), Some(q)).unwrap()));
+            }
+        }
+        // Use a smaller 63-bit field so [2p,4p] contains u64 primes.
+        let hp = 6_917_529_027_641_081_737u64;
+        assert!(prime(hp));
+        let hc = Curve {
+            p: hp,
+            a: 0,
+            b: 7,
+            r: 3,
+            roots: vec![],
+            sqrt: Some(SqrtContext::new(hp)),
+        };
+        for alpha in [1, 17, s - 1] {
+            for beta in [0, s / 2, s - 1] {
+                let h = HashBase {
+                    s,
+                    alpha,
+                    beta,
+                    tau: 257,
+                };
+                for point in h.enumerate(&hc).unwrap() {
+                    let z = hc.encode(point).unwrap();
+                    let expected = ((u128::from(mulmod(alpha, z, s)) + u128::from(beta))
+                        % u128::from(s)) as u64;
+                    assert!(expected < h.tau && hc.contains(point));
+                }
+            }
         }
     }
 
