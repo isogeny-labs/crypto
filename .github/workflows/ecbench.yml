@@ -345,21 +345,159 @@ jobs:
           # Every session directory by schema, plus any session.json or
           # records.jsonl removed or renamed anywhere (a deleted session
           # is no longer listed at HEAD).
-          changed=$( {
-            git diff --name-only --no-renames --diff-filter=MDRT "$BASE" HEAD -- \
-              'research/ecbench_*/sessions' \
-              'research/ghs_curve_comparison_20261009/sessions' \
-              'research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions' \
-              'research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions' \
-              "${sessions[@]}"
-            git diff --name-only --no-renames --diff-filter=DR "$BASE" HEAD -- \
-              '*/session.json' '*/records.jsonl'
-          } | sort -u)
-          if [ -n "$changed" ]; then
-            echo "these committed session files were modified, renamed or deleted; add a new session instead:" >&2
-            echo "$changed" >&2
-            exit 1
-          fi
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          base = os.environ["BASE"]
+          begin = "# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)"
+          end = "# <<< artifacts"
+
+          def git_bytes(*args):
+              return subprocess.run(["git", *args], check=True, stdout=subprocess.PIPE).stdout
+
+          def optional_git_bytes(ref, path):
+              result = subprocess.run(["git", "show", f"{ref}:{path}"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+              return result.stdout if result.returncode == 0 else None
+
+          def git_file_digest(ref, path):
+              proc = subprocess.Popen(["git", "show", f"{ref}:{path}"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+              h = hashlib.sha256()
+              size = 0
+              for chunk in iter(lambda: proc.stdout.read(1024 * 1024), b""):
+                  size += len(chunk)
+                  h.update(chunk)
+              if proc.wait() != 0:
+                  return None
+              return h.hexdigest(), size
+
+          def file_digest(path):
+              h = hashlib.sha256()
+              size = 0
+              with open(path, "rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      size += len(chunk)
+                      h.update(chunk)
+              return h.hexdigest(), size
+
+          def unmanage(text):
+              if text.count(begin) != text.count(end) or text.count(begin) > 1:
+                  raise ValueError("invalid managed-artifact markers")
+              if begin not in text:
+                  return text
+              left, rest = text.split(begin, 1)
+              _, right = rest.split(end, 1)
+              return left.rstrip("\n") + ("\n" if left.strip() else "") + right.lstrip("\n")
+
+          def escaped(name):
+              out = "".join("\\" + c if c in "*?[]!#\\" else c for c in name)
+              if out.endswith(" "):
+                  out = out[:-1] + "\\ "
+              return "/" + out
+
+          def manifest_for(root):
+              raw = optional_git_bytes("HEAD", f"{root}/.artifacts.json")
+              if raw is None:
+                  raise ValueError(f"{root}: artifact manifest missing at HEAD")
+              manifest = json.loads(raw)
+              if manifest.get("schema") != "artifacts.manifest/v1" or not isinstance(manifest.get("files"), dict):
+                  raise ValueError(f"{root}: invalid artifact manifest")
+              return manifest
+
+          session_dirs = [line.strip().strip("/") for line in open(os.path.join(os.environ["RUNNER_TEMP"], "ecbench-sessions.txt")) if line.strip()]
+          changed = git_bytes("diff", "--name-only", "--no-renames", "--diff-filter=AMDRT", base, "HEAD", "--",
+              "research/ecbench_*/sessions",
+              "research/ghs_curve_comparison_20261009/sessions",
+              "research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions",
+              "research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions",
+              *session_dirs)
+          paths = sorted(set(changed.decode().splitlines()))
+          root_exists = {}
+          checked_entries = set()
+
+          def base_has_session(root):
+              if root not in root_exists:
+                  root_exists[root] = optional_git_bytes(base, f"{root}/session.json") is not None
+              return root_exists[root]
+
+          def validate_entry(root, name, entry):
+              path = f"{root}/{name}"
+              key = (root, name)
+              if not isinstance(entry, dict) or set(("sha256", "bytes")) - set(entry):
+                  raise ValueError(f"{path}: malformed artifact entry")
+              expected = (entry["sha256"], entry["bytes"])
+              if key not in checked_entries:
+                  original = git_file_digest(base, path)
+                  if original is None:
+                      raise ValueError(f"{path}: artifact has no corresponding frozen base blob")
+                  if original != expected:
+                      raise ValueError(f"{path}: base blob does not match immutable artifact manifest")
+                  restored = Path(path)
+                  if not restored.is_file() or file_digest(restored) != expected:
+                      raise ValueError(f"{path}: pulled artifact does not match immutable manifest")
+                  checked_entries.add(key)
+
+          try:
+              for path in paths:
+                  parts = Path(path).parts
+                  if "sessions" not in parts:
+                      continue
+                  i = parts.index("sessions")
+                  if i + 1 >= len(parts):
+                      raise ValueError(f"{path}: invalid session path")
+                  root = Path(*parts[:i + 2]).as_posix()
+                  if not base_has_session(root):
+                      continue  # New sessions are valid; existing sessions are immutable.
+
+                  if path == f"{root}/session.json":
+                      raise ValueError(f"{path}: session metadata changed; add a new session instead")
+
+                  manifest = manifest_for(root)
+                  files = manifest["files"]
+
+                  if path == f"{root}/.artifacts.json":
+                      old_raw = optional_git_bytes(base, path)
+                      old_files = json.loads(old_raw).get("files", {}) if old_raw else {}
+                      for name, entry in old_files.items():
+                          if files.get(name) != entry:
+                              raise ValueError(f"{path}: existing artifact entry changed or disappeared: {name}")
+                      for name, entry in files.items():
+                          if name not in old_files:
+                              validate_entry(root, name, entry)
+                      continue
+
+                  if path == f"{root}/.gitignore":
+                      old_raw = optional_git_bytes(base, path)
+                      old_text = old_raw.decode() if old_raw else ""
+                      new_raw = optional_git_bytes("HEAD", path)
+                      if new_raw is None:
+                          raise ValueError(f"{path}: ignore file disappeared")
+                      new_text = new_raw.decode()
+                      if unmanage(old_text) != unmanage(new_text):
+                          raise ValueError(f"{path}: content outside the managed artifact block changed")
+                      start = new_text.find(begin)
+                      finish = new_text.find(end, start + len(begin))
+                      expected = "\n".join([begin, "!.artifacts.json", *[escaped(name) for name in sorted(files)], end])
+                      if start < 0 or finish < 0 or new_text[start:finish + len(end)] != expected:
+                          raise ValueError(f"{path}: managed artifact ignore block does not match its manifest")
+                      continue
+
+                  name = Path(path).relative_to(root).as_posix()
+                  entry = files.get(name)
+                  if entry is None:
+                      raise ValueError(f"{path}: changed session evidence is not preserved by the artifact manifest")
+                  validate_entry(root, name, entry)
+
+          except Exception as exc:
+              print(f"::error::{exc}", file=sys.stderr)
+              sys.exit(1)
+
+          print(f"verified {len(paths)} changed paths: frozen base blobs, pulled artifacts, manifests, and managed ignore blocks")
+          PY
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
