@@ -242,7 +242,7 @@ impl<O: FnMut(Event) -> Result<(), ()>> Gate<'_, O> {
     }
     fn push<T>(&mut self, out: &mut Vec<T>, item: T) -> Result<(), Stop> {
         if out.len() == out.capacity() {
-            let cap = out.capacity().checked_mul(2).unwrap_or(usize::MAX).max(4);
+            let cap = out.capacity().saturating_mul(2).max(4);
             std::alloc::Layout::array::<T>(cap).map_err(|_| Stop::StorageLimit)?;
             let bytes = (cap as u64)
                 .checked_mul(size_of::<T>() as u64)
