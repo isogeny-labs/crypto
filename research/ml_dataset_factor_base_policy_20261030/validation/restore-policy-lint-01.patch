@@ -1,0 +1,25 @@
+--- a/src/ml_dataset/restore.rs
++++ b/src/ml_dataset/restore.rs
+@@ -111,16 +111,14 @@
+     {
+         return Err(format!("unsafe receipt artifact path {:?}", artifact.path));
+     }
+-    if artifact.path == super::types::case_binding::POLICY_PATH
+-        || artifact.role == super::types::case_binding::POLICY_ROLE
+-    {
+-        if artifact.path != super::types::case_binding::POLICY_PATH
++    if (artifact.path == super::types::case_binding::POLICY_PATH
++        || artifact.role == super::types::case_binding::POLICY_ROLE)
++        && (artifact.path != super::types::case_binding::POLICY_PATH
+             || artifact.role != super::types::case_binding::POLICY_ROLE
+             || artifact.encoding != "json"
+-            || artifact.bytes > super::types::case_binding::POLICY_MAX_BYTES as u64
+-        {
+-            return Err("invalid or oversized restricted case policy artifact".into());
+-        }
++            || artifact.bytes > super::types::case_binding::POLICY_MAX_BYTES as u64)
++    {
++        return Err("invalid or oversized restricted case policy artifact".into());
+     }
+     if artifact.role.trim().is_empty()
+         || artifact.encoding.trim().is_empty()
