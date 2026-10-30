@@ -1625,7 +1625,13 @@ pub fn twist24_base(inst: &Twist24Instance, seed: u64, combined: bool) -> Folded
 /// A matched rho walk on all 24 classes.  It uses E18's jump table,
 /// look-ahead, fruitless-cycle escape and charging convention.
 pub fn rho_twist24(inst: &Twist24Instance, seed: u64) -> RhoRun4F {
-    let curve = inst.core.curve();
+    rho_twist24_with(inst, seed, super::gaudry_quartic::karatsuba_default())
+}
+
+/// [`rho_twist24`] with the `F_{p⁴}` product chosen (E29, §9.27); the
+/// `[d]G` check's share is recorded apart.
+pub fn rho_twist24_with(inst: &Twist24Instance, seed: u64, karatsuba: bool) -> RhoRun4F {
+    let curve = Curve4::with_params_arith(inst.core.p, inst.core.a, inst.core.b, karatsuba);
     let f = &curve.f;
     let n = inst.core.n;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x8D04_F01D);
@@ -1707,6 +1713,7 @@ pub fn rho_twist24(inst: &Twist24Instance, seed: u64) -> RhoRun4F {
         b = mulm((b + mults[j].1) % n, m, n);
         pt = next;
     }
+    let (walk_muls, walk_ops) = (f.muls(), curve.ops());
     let correct = found == Some(inst.core.d)
         && found.is_some_and(|d| curve.mul(&inst.core.g, d) == inst.core.q);
     RhoRun4F {
@@ -1719,8 +1726,8 @@ pub fn rho_twist24(inst: &Twist24Instance, seed: u64) -> RhoRun4F {
         correct,
         recovered: found,
         visit_digest: 0,
-        verify_fp_muls: 0,
-        verify_group_ops: 0,
+        verify_fp_muls: f.muls() - walk_muls,
+        verify_group_ops: curve.ops() - walk_ops,
     }
 }
 
@@ -2143,6 +2150,10 @@ pub struct K4PipelineReport {
     /// to the linear algebra (the walks excluded), each charged `16`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ic_fp_inversions: Option<u64>,
+    /// E30 (§9.28): `F_p` multiplications the trivial-product audit re-prices
+    /// away over the same span as `ic_fp_inversions` (absent when off).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ic_trivial_product_savings: Option<u64>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -2378,6 +2389,7 @@ fn collect_and_solve(
     } = setup;
     let mut fallbacks = 0u64;
     super::gaudry_quartic::reset_fp_inversions_total();
+    super::gaudry_quartic::reset_trivial_product_savings();
     let mut folded = Arm::new(arm, fb.columns);
     let mut unsolved_outcomes = std::collections::BTreeMap::new();
     let mut per_target = [0u64; 10];
@@ -2483,6 +2495,7 @@ fn collect_and_solve(
         ));
     }
     let ic_fp_inversions = super::gaudry_quartic::fp_inversions_total();
+    let ic_trivial = super::gaudry_quartic::trivial_product_savings();
     let mut folds = vec![RhoFold::None, RhoFold::Negation];
     if !folds.contains(&matched) {
         folds.push(matched);
@@ -2561,6 +2574,8 @@ fn collect_and_solve(
         solver_fallbacks: solver.map(|_| fallbacks),
         fp4_product: super::gaudry_quartic::karatsuba_default().then(|| "karatsuba".to_string()),
         ic_fp_inversions: super::gaudry_quartic::karatsuba_default().then_some(ic_fp_inversions),
+        ic_trivial_product_savings: super::gaudry_quartic::trivial_product_audit()
+            .then_some(ic_trivial),
     })
 }
 
@@ -4551,4 +4566,252 @@ pub fn run_gls_tau_stage_a(
         rho_e27,
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
     })
+}
+
+// ── E29 (§9.27): the order-24 twist action on E18's `j = 0` line ────────
+
+/// The order of `x` in `(Z/n)^*` given that it divides `m` (`m | n − 1`).
+fn order_dividing(x: u64, m: u64, n: u64) -> u64 {
+    let mut best = m;
+    for &(q, _) in factor_u64(m).iter() {
+        while best % q == 0 && pow_mod(x, best / q, n) == 1 {
+            best /= q;
+        }
+    }
+    best
+}
+
+/// The order of `y² = x³ + b₀t³` over `F_{p⁴}` (the lane's formula in
+/// [`construct_twist24`]), without building the curve.
+pub fn twist24_order(p: u64, b0: u64) -> Option<u64> {
+    let mut count = 1u64;
+    for x in 0..p {
+        let v = (pow_mod(x, 3, p) + b0) % p;
+        count += if v == 0 {
+            1
+        } else if pow_mod(v, (p - 1) / 2, p) == 1 {
+            2
+        } else {
+            0
+        };
+    }
+    let tr = (p + 1) as i128 - count as i128;
+    let tr2 = tr * tr - 2 * p as i128;
+    let tr4 = tr2 * tr2 - 2 * (p as i128).pow(2);
+    let order = (p as i128).pow(4) + 1 + tr4;
+    (order > 0 && order <= u64::MAX as i128).then_some(order as u64)
+}
+
+/// One E29 kill-test row (§9.27, G2.104).
+#[derive(Clone, Debug, Serialize)]
+pub struct E29Kill {
+    pub p: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub bits: f64,
+    /// `ψ_p(x, y) = (u²x^p, u³y^p)`, `u = b^{−(p−1)/6}`, maps random points
+    /// of `E` to points of `E`.
+    pub psi_p_on_curve: bool,
+    /// `ψ_p(G) = [λ_p]G` with `λ_p` a 24th root of unity mod `n`.
+    pub lambda_p_found: bool,
+    pub order_lambda_p: u64,
+    /// `χ₆(b) = b^{(p⁴−1)/6}` and its order (derived: `ord ψ_p = 4·ord χ₆`).
+    pub order_chi6_b: u64,
+    pub order_lambda_omega: u64,
+    /// `|⟨λ_p, λ_ω, −1⟩|` in `(Z/n)^*`.
+    pub group_order: u64,
+    /// Whether `u² ∈ F_p` (then `ψ_p` keeps E18's base `x ∈ F_p`).
+    pub u2_in_fp: bool,
+    /// `b₀` with `#(y² = x³ + b₀t³) = n` (the least), if any.
+    pub canonical_b0: Option<u64>,
+    pub n_mod_24: u64,
+    pub n_mod_96: u64,
+}
+
+pub fn run_e29_kill(p: u64, seed: u64) -> Result<E29Kill, String> {
+    let inst = generate_psi_instance(p, seed)?;
+    let curve = inst.curve();
+    let f = &curve.f;
+    let n = inst.n;
+    let q4 = (p as u128).pow(4) - 1;
+    // u = b^{−(p−1)/6}.
+    let u = f.pow(&inst.b, q4 - (p as u128 - 1) / 6);
+    let (u2, u3) = {
+        let u2 = f.sq(&u);
+        (u2, f.mul(&u2, &u))
+    };
+    let z = f.pow(&E4([0, 1, 0, 0]), (p - 1) as u128);
+    if !z.in_fp() {
+        return Err("t^{p−1} is not in F_p".into());
+    }
+    let psi_p = |pt: &Pt4| -> Pt4 {
+        if pt.inf {
+            return *pt;
+        }
+        Pt4 {
+            x: f.mul(&u2, &f.frob_p(&pt.x, z.0[0])),
+            y: f.mul(&u3, &f.frob_p(&pt.y, z.0[0])),
+            inf: false,
+        }
+    };
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE29C_4111);
+    let on_curve = (0..8).all(|_| {
+        let pt = random_point(&curve, &mut rng);
+        curve.on_curve(&psi_p(&pt))
+    });
+    let chi = f.pow(&inst.b, q4 / 6);
+    let order_chi6 = (1..=6u128)
+        .find(|&k| f.pow(&chi, k) == E4::ONE)
+        .unwrap_or(0) as u64;
+    // A generator of the 24th roots of unity mod n.
+    let zeta = (2..n)
+        .map(|g| pow_mod(g, (n - 1) / 24, n))
+        .find(|&w| order_dividing(w, 24, n) == 24)
+        .ok_or("no element of order 24 mod n")?;
+    let pg = psi_p(&inst.g);
+    let k_p = (0..24u64).find(|&k| curve.mul(&inst.g, pow_mod(zeta, k, n)) == pg);
+    let k_w = (0..24u64)
+        .find(|&k| pow_mod(zeta, k, n) == inst.lambda)
+        .ok_or("λ_ω is not a 24th root of unity")?;
+    let (order_lambda_p, group_order) = match k_p {
+        Some(k) => {
+            let g = [k, k_w, 12, 24].iter().fold(0u64, |a, &b| gcd(a, b));
+            (24 / gcd(k, 24), 24 / g)
+        }
+        None => (0, 0),
+    };
+    let canonical_b0 = (1..p).find(|&b0| twist24_order(p, b0) == Some(n));
+    Ok(E29Kill {
+        p,
+        seed,
+        n,
+        bits: (n as f64).log2(),
+        psi_p_on_curve: on_curve,
+        lambda_p_found: k_p.is_some(),
+        order_lambda_p,
+        order_chi6_b: order_chi6,
+        order_lambda_omega: 24 / gcd(k_w, 24),
+        group_order,
+        u2_in_fp: u2.in_fp(),
+        canonical_b0,
+        n_mod_24: n % 24,
+        n_mod_96: n % 96,
+    })
+}
+
+fn gcd(a: u64, b: u64) -> u64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+/// E29 Stage R: order-6 and order-24 walks on one canonical model.
+#[derive(Clone, Debug, Serialize)]
+pub struct E29StageR {
+    pub p: u64,
+    pub b0: u64,
+    pub n: u64,
+    pub bits: f64,
+    pub karatsuba: bool,
+    pub order6: Vec<RhoRun4F>,
+    pub order24: Vec<RhoRun4F>,
+}
+
+pub fn run_e29_stage_r(
+    p: u64,
+    b0: u64,
+    seed: u64,
+    walks: usize,
+    karatsuba: bool,
+) -> Result<E29StageR, String> {
+    let inst = construct_twist24(p, b0, seed)?;
+    let seeds: Vec<u64> = (0..walks as u64).map(|k| seed * 1000 + k).collect();
+    let order6: Vec<RhoRun4F> = seeds
+        .par_iter()
+        .map(|&s| rho4_folded_with(&inst.core, RhoFold::Psi, s, karatsuba))
+        .collect();
+    let order24: Vec<RhoRun4F> = seeds
+        .par_iter()
+        .map(|&s| rho_twist24_with(&inst, s, karatsuba))
+        .collect();
+    Ok(E29StageR {
+        p,
+        b0,
+        n: inst.core.n,
+        bits: (inst.core.n as f64).log2(),
+        karatsuba,
+        order6,
+        order24,
+    })
+}
+
+/// E28 supplementary control (§9.30, a recorded deviation): the weighted
+/// `D₄` solve on targets the exact oracle does decompose, so that the
+/// agreement check is not vacuous.  Draws uniform targets until `k` have a
+/// verified decomposition and reports how many were drawn.
+pub fn run_gls_tau_control_decomposed(
+    p: u64,
+    seed: u64,
+    k: usize,
+) -> Result<(Vec<D4ControlCall>, u64), String> {
+    let inst = generate_gls_tau_instance(p, seed, 16)?;
+    let curve = inst.curve();
+    let n = inst.n;
+    let fb = gls_tau_base(&inst, &mut StdRng::seed_from_u64(seed), false)?;
+    let base = &fb.points;
+    let table = pair_table(&curve, base);
+    let d4 = D4Instance {
+        curve: inst.curve(),
+        x0: inst.x0,
+        c: inst.c,
+    };
+    let mut crng = StdRng::seed_from_u64(seed ^ 0xE28D_EC05);
+    let pre = SymmetrisedD4::precompute(&d4, &mut crng, 8)?;
+    let mut by_y: HashMap<u64, usize> = HashMap::new();
+    for (i, pt) in base.iter().enumerate() {
+        by_y.insert(d4.y_of_x(&pt.x).0[0], i);
+    }
+    let verified = |r: &Pt4| -> std::collections::BTreeSet<Vec<(usize, i64)>> {
+        mitm_signed(&curve, base, &table, r)
+            .iter()
+            .filter(|terms| {
+                let mut acc = *r;
+                for &(i, s) in terms.iter() {
+                    acc = if s == 1 {
+                        curve.sub(&acc, &base[i])
+                    } else {
+                        curve.add(&acc, &base[i])
+                    };
+                }
+                acc.inf
+            })
+            .map(|t| dec_key(t))
+            .collect()
+    };
+    let (mut calls, mut drawn) = (Vec::new(), 0u64);
+    while calls.len() < k && drawn < 1_000_000 {
+        drawn += 1;
+        let (a, b) = (crng.gen_range(0..n), crng.gen_range(1..n));
+        let r = curve.add(&curve.mul(&inst.g, a), &curve.mul(&inst.q, b));
+        let oracle = verified(&r);
+        if oracle.is_empty() {
+            continue;
+        }
+        let out = d4_decompose(&inst, &pre, base, &by_y, &r, seed * 104_729 + drawn);
+        let solve: std::collections::BTreeSet<Vec<(usize, i64)>> =
+            out.decs.iter().map(|t| dec_key(t)).collect();
+        calls.push(D4ControlCall {
+            solved: out.solved,
+            outcome: out.outcome.clone(),
+            degree: out.degree,
+            call_muls: out.call_muls,
+            decompositions: solve.len(),
+            mitm_decompositions: oracle.len(),
+            agrees: out.solved && solve == oracle,
+            ms: out.ms,
+        });
+    }
+    Ok((calls, drawn))
 }

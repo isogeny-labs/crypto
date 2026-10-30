@@ -11,7 +11,9 @@
 use std::env;
 use std::fs;
 
-use crypto_lib::cryptanalysis::quartic_folds::{run_gls_tau_stage0, run_gls_tau_stage_a};
+use crypto_lib::cryptanalysis::quartic_folds::{
+    run_gls_tau_control_decomposed, run_gls_tau_stage0, run_gls_tau_stage_a,
+};
 use serde_json::Value;
 
 fn main() {
@@ -62,7 +64,21 @@ fn main() {
     let mut rows: Vec<Value> = Vec::new();
     for &p in &sizes {
         for seed in s0..=s1 {
-            let v = if stage == "0" {
+            let v = if stage == "c" {
+                // Supplementary control (§9.30): D4 solves on decomposed targets.
+                match run_gls_tau_control_decomposed(p, seed, control) {
+                    Ok((calls, drawn)) => {
+                        for c in &calls {
+                            println!(
+                                "e28 control-decomposed p={p} seed={seed} C={:.3e} {} solve {} oracle {} agrees {}",
+                                c.call_muls as f64, c.outcome, c.decompositions, c.mitm_decompositions, c.agrees
+                            );
+                        }
+                        serde_json::json!({"p": p, "seed": seed, "drawn": drawn, "calls": calls})
+                    }
+                    Err(e) => serde_json::json!({"p": p, "seed": seed, "error": e}),
+                }
+            } else if stage == "0" {
                 match run_gls_tau_stage0(p, seed) {
                     Ok(r) => {
                         println!(

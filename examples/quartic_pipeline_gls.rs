@@ -66,6 +66,10 @@ fn main() {
                 i += 1;
                 solver = V4Solver::parse(&args[i]).expect("--solver macaulay|chain|chain-sparsest");
             }
+            "--audit" => {
+                // E30 (§9.28): the trivial-product audit counter.
+                crypto_lib::cryptanalysis::gaudry_quartic::set_trivial_product_audit(true);
+            }
             "--karatsuba" => {
                 crypto_lib::cryptanalysis::gaudry_quartic::set_karatsuba_default(true);
             }

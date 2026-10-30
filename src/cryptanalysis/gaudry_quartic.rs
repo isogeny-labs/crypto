@@ -87,6 +87,41 @@ pub fn reset_fp_inversions_total() {
     FP_INVERSIONS_TOTAL.store(0, std::sync::atomic::Ordering::SeqCst);
 }
 
+/// E30 (§9.28): the audit of structurally trivial `F_{p⁴}` products.  When
+/// on, every product whose operand is `0` or `1` (re-priced `0`) or lies in
+/// `F_p` (re-priced `4`, a scaling) adds the difference from its charged cost
+/// to a process-wide counter.  Recorded counts never change.
+static AUDIT_ON: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static AUDIT_SAVINGS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+pub fn set_trivial_product_audit(on: bool) {
+    AUDIT_ON.store(on, std::sync::atomic::Ordering::SeqCst);
+}
+
+pub fn trivial_product_audit() -> bool {
+    AUDIT_ON.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn trivial_product_savings() -> u64 {
+    AUDIT_SAVINGS.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+pub fn reset_trivial_product_savings() {
+    AUDIT_SAVINGS.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
+/// What the audit re-prices one product at, given its charged cost.
+pub fn audited_product_cost(a: &E4, b: &E4, charged: u64) -> u64 {
+    let unit = |x: &E4| x.is_zero() || *x == E4::ONE;
+    if unit(a) || unit(b) {
+        0
+    } else if a.in_fp() || b.in_fp() {
+        4.min(charged)
+    } else {
+        charged
+    }
+}
+
 pub fn karatsuba_default() -> bool {
     KARATSUBA_DEFAULT.load(std::sync::atomic::Ordering::SeqCst)
 }
@@ -204,6 +239,13 @@ impl Fp4 {
     /// Schoolbook with `t⁴ = c`: 16 products and 3 reductions; or, in
     /// Karatsuba mode, [`Fp4::mul_karatsuba`] (`13`).
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
+        if AUDIT_ON.load(std::sync::atomic::Ordering::Relaxed) {
+            let charged = if self.karatsuba { 13 } else { 19 };
+            let saved = charged - audited_product_cost(a, b, charged);
+            if saved > 0 {
+                AUDIT_SAVINGS.fetch_add(saved, std::sync::atomic::Ordering::Relaxed);
+            }
+        }
         if self.karatsuba {
             return self.mul_karatsuba(a, b);
         }
