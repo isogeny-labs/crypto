@@ -1,0 +1,19 @@
+digraph continuation {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.25, ranksep=0.30, pad=0.10];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, margin="0.14,0.10", color="#527080"];
+  edge [color="#657985", arrowsize=0.65];
+  source [label="Frozen source\nF343, r=373, kernel153\n4 source tests pass", fillcolor="#e4f3e9"];
+  controls [label="Target Kummer evaluator\n3 historical vectors reproduced\ntrace identity certificate checked", fillcolor="#e4f3e9"];
+  arithmetic [label="Native divisor arithmetic + fitter\nimplemented and compiled\nanchor execution unverified", fillcolor="#fff2d5"];
+  frame [label="9 target frame images + frozen M\nnot executed", fillcolor="#f4f5f7", style="rounded,dashed,filled"];
+  holdout [label="32 fixed inputs + 32 successors\nnew target comparisons: 0 attempted", fillcolor="#f4f5f7", style="rounded,dashed,filled"];
+  inverse [label="Inverse fibers, signs, group/Frobenius\nand Profile B: not executed", fillcolor="#f4f5f7", style="rounded,dashed,filled"];
+  checkpoint [label="Required S3 checkpoint\nupload approval/access pending", fillcolor="#ffe5dd", color="#a6553c"];
+  {rank=same; source; controls;}
+  source -> arithmetic;
+  controls -> arithmetic;
+  arithmetic -> frame [style=dashed];
+  checkpoint -> frame [style=dashed,label="launch gate",fontname="DejaVu Sans",fontsize=9];
+  frame -> holdout [style=dashed];
+  holdout -> inverse [style=dashed,label="only after 32/32",fontname="DejaVu Sans",fontsize=9];
+}

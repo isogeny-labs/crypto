@@ -1,0 +1,12 @@
+digraph review {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.18, ranksep=0.28, pad=0.12];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#476276", fillcolor="#e7f3ed", margin="0.16,0.10"];
+  edge [color="#476276", arrowsize=0.7];
+  inputs [label="32 frozen source-coordinate cases\nPrimary + P+G + permutation vectors"];
+  validation [label="Validate all rows before target arithmetic\n8 coordinates; nonzero vectors; exact input binding"];
+  tests [label="Development checks pass\n17 target/proof + 4 source tests; unchanged public proof"];
+  gate [label="Target experiment has not run\nCheckpoint connection + matching EKS image/route required", fillcolor="#fff2d9", color="#9a712c"];
+  target [label="Nine frame pairs → immutable matrix\nThen all 32 primary + successor comparisons", style="rounded,dashed", fillcolor="white"];
+  inputs -> validation -> tests -> gate;
+  gate -> target [style=dashed];
+}
