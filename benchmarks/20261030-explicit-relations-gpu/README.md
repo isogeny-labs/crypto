@@ -38,3 +38,11 @@ executions: one61-bit recovery and one61-bit memory refusal; both62-bit cells
 were unattempted by the stopping rule. The [two-page v9 report](e2e-v9-report.pdf),
 [SVG](e2e-scaling-v9.svg) and [PNG](e2e-scaling-v9.png) preserve this incomplete
 rung. Both PDF pages were inspected. Earlier report copies remain unchanged.
+
+V11 completed all 12 prescribed executions, including both fixed 61-bit and
+62-bit targets. The [two-page v11 report](e2e-v11-report.pdf),
+[SVG](e2e-scaling-v11.svg) and [150-dpi PNG](e2e-scaling-v11.png) retain every
+row. Both report pages were visually inspected after raw commit `099dff2edd81`.
+These are unadmitted L0 observations with no matched rho or independent
+scientific validation; 62 bits is the complete prescribed rung, not a global
+hardware maximum. Earlier panels and their failures remain unchanged.
