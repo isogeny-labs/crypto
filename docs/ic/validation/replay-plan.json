@@ -581,8 +581,146 @@
    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
    "replay": "all",
    "expect": "drift",
-   "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
-   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   "reason": "Preserved native source6f reproduces48/72 eligible records. Exactly24 ic.pipeline records show the complete pinned non-scalar accounting/pricing/metadata discrepancy; recovered and exhaustion match. Every failing identity and complete detail are pinned. This remains drift; no frozen record is rewritten. New-source native verification remains pending.",
+   "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv",
+   "previous_expectation": {
+    "dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n23",
+    "replay": "all",
+    "expect": "drift",
+    "reason": "4 of 12 replays reproduce on current main; same counters as the ladder and cross-family drift (bisect window 7ab28103d to 16e74770d)",
+    "evidence": "research/leaderboard_rigor_20261021/plan_runs/results.tsv"
+   },
+   "expected_drift": [
+    {
+     "seq": 24,
+     "record_id": "ECR1h594c966d0648",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 27,
+     "record_id": "ECR1hfdf588292463",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 30,
+     "record_id": "ECR1hab1882b9d0ee",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 33,
+     "record_id": "ECR1he4d8a589d9eb",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 36,
+     "record_id": "ECR1hcfe1a760e9ef",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 39,
+     "record_id": "ECR1hd050d0cfa743",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 42,
+     "record_id": "ECR1h5a4941e1448f",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 45,
+     "record_id": "ECR1hf4b5d0ab5e6c",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 50,
+     "record_id": "ECR1h294598786fbc",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 53,
+     "record_id": "ECR1h3e333c7d5b61",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 56,
+     "record_id": "ECR1hc76ed82e608a",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 59,
+     "record_id": "ECR1h893b6b10ee28",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 62,
+     "record_id": "ECR1h1807ced60f4d",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 65,
+     "record_id": "ECR1h0b0db4093a3f",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 68,
+     "record_id": "ECR1h5ec0dc22d1c4",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 71,
+     "record_id": "ECR1h314c23bc1fed",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 72,
+     "record_id": "ECR1h0dfbf9230292",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 75,
+     "record_id": "ECR1hef85a5b1f448",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 78,
+     "record_id": "ECR1h055bea5c542b",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 81,
+     "record_id": "ECR1h8476b3a8f81a",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 84,
+     "record_id": "ECR1h1d02672c32db",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 87,
+     "record_id": "ECR1h46ad178d7464",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 90,
+     "record_id": "ECR1hbfe23bd512f9",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    },
+    {
+     "seq": 93,
+     "record_id": "ECR1hff4df551ad40",
+     "detail": "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms"
+    }
+   ],
+   "current_replay_evidence": {
+    "source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "replayed": 72,
+    "reproduced": 48,
+    "derived_summary": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0017.derived-union.json.gz",
+    "native_member_index": "reports/ci-repair-integration-20261029/replay-expectation-evidence/0017.native-member-index.json",
+    "status": "Actual72 single-record native receipts; derived union explicitly is not a native full-session receipt."
+   }
   },
   {
    "dir": "research/f4_f5_f6_cross_family_20261011/sessions/R13",
@@ -1251,12 +1389,10 @@
    "expect": "identical"
   }
  ],
- "require_pinned_drift": false,
+ "require_pinned_drift": true,
  "pinned_drift_completion": {
-  "status": "partial; final all115 native verification pending",
-  "unpinned_historical_drift": [
-   "research/f6_ic_ecbench_ladder_20261005/sessions/n23"
-  ],
-  "requirement": "Set require_pinned_drift true only after actual native receipts determine every remaining historical expectation."
+  "status": "All historical drift identities and details pinned from actual native source6f; new-source validation remains pending.",
+  "unpinned_historical_drift": [],
+  "requirement": "New, changed or healed drift fails. Existing source6f receipts never qualify a changed native binary."
  }
 }
