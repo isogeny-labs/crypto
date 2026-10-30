@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
-  "protocol_id": "QT-degree-qualified-F13-20261030",
-  "version": 2,
+  "protocol_id": "QT-degree-qualified-F13-20261030-rerun3",
+  "version": 3,
   "created": "2026-10-30",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_evidence_20261021",
@@ -10,7 +10,8 @@
   ],
   "links": {
     "spec": "DEGREE_QUALIFIED_20261030_PROTOCOL.md",
-    "prior": "reports/row-transport-20261030/README.md"
+    "prior": "reports/row-transport-20261030/README.md",
+    "prior_failed_run": "run02fullCPP and rejected audit retained;canonical A2 after-data flag rejected for original dataset. This is full fresh corrected-instrument replication,not a retroactive confirmatory claim."
   },
   "question": "Can an actually bounded algebraic S3 solver obtain higher certified useful rank at a lower expanded-witness budget,with public-log setup and verified original-main recovery,over all16 F13 arms?",
   "claims": [
@@ -290,7 +291,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "Complete all288configurations and1728separate targets or600sec command cap;iteration08:25–09:25UTC.",
+      "rule": "Complete all288configurations and1728separate targets or600sec command cap;iteration08:25\u201309:25UTC.",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -324,7 +325,7 @@
   "analysis_plan": {
     "script": {
       "path": "research/quadratic_twist_evidence_20261021/native/degree-qualified-audit/main.rs",
-      "sha256": "a1ec55f427c8b61821b0fa9f0d8ab2d1e4b6507d59833b1dd29059ae05903fa1"
+      "sha256": "4c4829b0d35f1405eec44fa8e18ca943885a8a28c1f80288a1e6732b01be72ae"
     },
     "inputs": [
       "native/uniform-20261029/cases/p13-*",
@@ -376,13 +377,23 @@
         "remove duplicate Clone derive",
         "fix exact full case coverage and emit declared policy frontiers and deduplicated strongest-source comparisons"
       ]
+    },
+    {
+      "id": "A2-audit-dispatch",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Filed BEFORE affected NEW full rerun03 data. Earlier v2CPP results and rejected audit are already seen and retained;unchanged scientific contract/criteria/inputs. Correct two-root-only auditor dispatch to the already specified b3 no-reduction rule. No comparative rule chosen from outcomes;exact deterministic full census,not blinded confirmatory inference.",
+      "changes": [
+        "guard TWO-root-only reduction helper by base.len()==2",
+        "same equality predicate,shorter diagnostic to avoid dumping full records"
+      ]
     }
   ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "c2c8411deb95bfc90634b3bc98dbba0e09903b30cf5fc4377a673cb595783838",
-    "commit": "331a01c04d249b287ed4e5f309d1280e00c81ff9",
-    "frozen_at": "2026-10-30T08:43:35Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }
