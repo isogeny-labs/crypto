@@ -161,6 +161,34 @@ baseline. Every such improvement is a success and is reported as one.**
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
+## Tracks of index calculus
+
+Owner's rule, 2026-10-29 (`research/prime_ic_program_20261029/DECISIONS.md`
+R1, Option C as amended for D2). It refines the 2026-10-24 criterion
+(`docs/ic/SWEEPER.md`, "Tracks").
+
+Index-calculus pipelines are reported in two tracks. Each track has its own
+baseline and its own ratchet under the success criterion above.
+
+- **Algebraic.** Relations come from a solver applied to a system that
+  contains both the summation polynomial and the factor-base constraint, for
+  example ⟨S_{m+1}, F_V⟩ handed to msolve or F4, Weil descent over a subspace
+  base, or a PKM tower system. This is the headline track.
+- **Generic decomposition.** Relations come from enumerating the base,
+  computing group sums or differences, and testing them against the base or a
+  table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
+  and large primes on a pair table. Such an oracle runs identically on a
+  random base, so it is a generic algorithm bounded by √r. Improvements in
+  this track are successes under the 2026-10-15 criterion. They are labelled
+  "generic decomposition (bounded by √r; cannot beat rho)" and are never
+  described as algebraic progress.
+
+Arms of the two tracks may be ranked against each other on the same
+instances, in the same unit and across the §5a band. A gain in one track
+never ratchets the other track's baseline. Each row reports its distance to
+matched rho. Per-oracle classification:
+`research/prime_ic_program_20261029/ruling/classification.json`, column C.
+
 ## Pointers
 
 - **Shared conventions with `crypto-autoresearcher`, `cryptanalysis` and

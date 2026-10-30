@@ -313,17 +313,29 @@ enum Cmd {
         #[arg(long)]
         prefix: PathBuf,
     },
-    /// Audit a session from its own files.
+    /// Audit a session from its own files.  Exits 1 when the audit finds a
+    /// problem (and 2 when it cannot be run at all), so a failed audit
+    /// fails whatever calls it; a receipt is printed either way.
     Verify {
         /// The session directory (`session.json`, `records.jsonl`, …).
         #[arg(long)]
         dir: String,
-        /// Re-execute this many measured runs and require identical counts.
+        /// Re-execute this many measured runs, drawn at random from the
+        /// deterministic ones, and require identical counts.
         #[arg(long, default_value_t = 0)]
         replay: usize,
         /// Re-execute every measured deterministic run.
         #[arg(long)]
         replay_all: bool,
+        /// The auditor's randomness for the `--replay N` draw (default: a
+        /// seed from the operating system's entropy).  Recorded in the
+        /// receipt; the same seed on the same session draws the same runs.
+        #[arg(long)]
+        replay_seed: Option<u64>,
+        /// Also re-execute the run with this sequence number (repeatable),
+        /// beside any sample.
+        #[arg(long = "replay-seq")]
+        replay_seq: Vec<u64>,
         /// Accept a session marked `interrupted`: every integrity check
         /// still applies, but not "every planned execution recorded".
         #[arg(long)]
@@ -331,8 +343,9 @@ enum Cmd {
         /// Write the receipt here (it is also printed).
         #[arg(long)]
         out: Option<PathBuf>,
-        /// Exit 1 when the audit finds a problem (isolab's verify contract).
-        #[arg(long)]
+        /// Accepted for compatibility and ignored: a failed audit always
+        /// exits 1.
+        #[arg(long, hide = true)]
         exit_code: bool,
     },
     /// Compare arm B against arm A.
@@ -1350,19 +1363,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             dir,
             replay,
             replay_all,
+            replay_seed,
+            replay_seq,
             allow_interrupted,
             out,
-            exit_code,
+            exit_code: _,
         } => {
             let dir = PathBuf::from(isolab::expand_env(&dir)?);
-            let rep = audit::audit_with(
+            let rep = audit::audit_opts(
                 &dir,
-                if replay_all {
-                    audit::REPLAY_ALL
-                } else {
-                    replay
+                &audit::AuditOptions {
+                    replay: if replay_all {
+                        audit::REPLAY_ALL
+                    } else {
+                        replay
+                    },
+                    replay_seed,
+                    replay_seqs: replay_seq,
+                    allow_interrupted,
                 },
-                allow_interrupted,
             )?;
             let text = serde_json::to_string_pretty(&rep).map_err(|e| e.to_string())? + "\n";
             if let Some(o) = out {
@@ -1370,6 +1389,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("receipt sha256 {}", canonical::sha256_hex(text.as_bytes()));
             }
             print!("{text}");
+            for w in &rep.warnings {
+                eprintln!("warning: {w}");
+            }
+            if let Some(seed) = rep.replay_seed {
+                eprintln!(
+                    "replay seed {seed} ({} eligible runs)",
+                    rep.replay_candidates.unwrap_or(0)
+                );
+            }
             eprintln!(
                 "audit {}: {} records, {} verified, {} replays reproduced, {} problems",
                 if rep.ok { "OK" } else { "FAILED" },
@@ -1378,6 +1406,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            for problem in rep.problems.iter().take(20) {
+                eprintln!("problem: {problem}");
+            }
             if rep.records_bound == Some(false) && rep.interruption.is_some() {
                 eprintln!(
                     "warning: interruption {}: records_bound false (no records hash binds \
@@ -1385,8 +1416,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rep.interruption.as_deref().unwrap_or("")
                 );
             }
-            if exit_code && !rep.ok {
-                return Ok(ExitCode::from(1));
+            if rep.exit_status() != 0 {
+                return Ok(ExitCode::from(rep.exit_status()));
             }
         }
         Cmd::GpuStage {
@@ -1747,7 +1778,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     .map(|p| crypto_lib::store::resolve_path(p))
                     .collect::<Result<_, _>>()?;
                 let refs: Vec<&Path> = resolved.iter().map(|p| p.as_path()).collect();
-                print!("{}", db::sql(&refs)?);
+                let batch = db::sql_batch(&refs);
+                print!("{}", batch.sql);
+                // A refused path (tampered, unreadable, not ecbench) loads
+                // nothing and does not stop the rest; the exit status says
+                // the load was not complete.
+                for (path, why) in &batch.refused {
+                    eprintln!("db sql: skipped {}: {why}", path.display());
+                }
+                if !batch.refused.is_empty() {
+                    eprintln!(
+                        "db sql: {} of {} paths were skipped; the SQL above omits them",
+                        batch.refused.len(),
+                        refs.len()
+                    );
+                    return Ok(ExitCode::from(1));
+                }
             }
         },
         Cmd::IsolabJob {
@@ -2327,8 +2373,8 @@ fn band_cmd(
 }
 
 fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
-    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |");
-    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|");
+    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |");
+    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|");
     for d in dirs {
         let s = runner::read_session(d)?;
         let recs = runner::read_records(d)?;
@@ -2447,8 +2493,26 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         _ => "",
                     }
                 );
+                // Fixed set-up above a tenth of S, or r below the calibrated
+                // range (README §7, "The strong reference"), over the
+                // verified runs the mean S is taken from.
+                let flags = any
+                    .map(|r| {
+                        let runs: Vec<(&[methods::PhaseRecord], f64)> = mine
+                            .iter()
+                            .filter(|r| r.counts())
+                            .filter_map(|r| Some((r.phases.as_slice(), r.cost.total_gae?)))
+                            .collect();
+                        methods::pooled_row_flags(
+                            &r.workload.curve.family,
+                            (r.workload.curve.r as f64).log2(),
+                            &arm.method.family,
+                            &runs,
+                        )
+                    })
+                    .unwrap_or_default();
                 println!(
-                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
                     arm.name,
                     arm.method.id,
@@ -2483,6 +2547,11 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         .map(|(k, v)| format!("{k}×{v}"))
                         .collect::<Vec<_>>()
                         .join(" "),
+                    if flags.is_empty() {
+                        "–".to_string()
+                    } else {
+                        flags.join("; ")
+                    },
                 );
             }
         }

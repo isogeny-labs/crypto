@@ -27,6 +27,15 @@ registry=${ISOLAB_IMAGE_REPOSITORY%%/*}
 repository=${ISOLAB_IMAGE_REPOSITORY#*/}
 tag="gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${revision}"
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$registry"
+# The task image is FROM a public.ecr.aws base. Anonymous pulls of that base hit
+# "429 Too Many Requests: Data limit exceeded" and the build never starts; an
+# authenticated public-ECR pull has its own quota. Keep this best-effort so a
+# deployment whose role lacks ecr-public:GetAuthorizationToken still publishes,
+# and the build reports the 429 itself if the anonymous quota is spent.
+if ! aws ecr-public get-login-password --region us-east-1 \
+     | docker login --username AWS --password-stdin public.ecr.aws >/dev/null 2>&1; then
+  echo 'warning: public.ecr.aws login failed; the base image pull uses the anonymous quota' >&2
+fi
 docker build --platform linux/amd64 --file "$here/Dockerfile.ecbench" \
   --build-arg "SOURCE_REVISION=$revision" --tag "$ISOLAB_IMAGE_REPOSITORY:$tag" "$context"
 docker push "$ISOLAB_IMAGE_REPOSITORY:$tag"
