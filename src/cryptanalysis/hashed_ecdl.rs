@@ -835,24 +835,57 @@ impl Rng {
     }
 }
 
-fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>, Error> {
-    let n: usize = bases.iter().map(Vec::len).sum();
+// Validate every relation before elimination, including rows after the first
+// dependency. Keep one column per slot instead of an N-by-N staging matrix.
+fn incidence_columns(
+    bases: &[Vec<Point>],
+    relations: &[Relation],
+) -> Result<Vec<Vec<usize>>, Error> {
     relations
         .iter()
         .map(|rel| {
             if rel.points.len() != bases.len() {
                 return Err(Error::Verification);
             }
-            let mut row = vec![0; n];
+            let mut row = Vec::with_capacity(bases.len());
             let mut offset = 0;
             for (base, point) in bases.iter().zip(&rel.points) {
                 let index = base.binary_search(point).map_err(|_| Error::Verification)?;
-                row[offset + index] = 1;
+                row.push(offset + index);
                 offset += base.len();
             }
             Ok(row)
         })
         .collect()
+}
+
+#[cfg(test)]
+fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>, Error> {
+    let n = bases.iter().map(Vec::len).sum();
+    Ok(incidence_columns(bases, relations)?
+        .iter()
+        .map(|columns| {
+            let mut row = vec![0; n];
+            for &column in columns {
+                row[column] = 1;
+            }
+            row
+        })
+        .collect())
+}
+
+fn relation_dependency(
+    bases: &[Vec<Point>],
+    relations: &[Relation],
+    r: u64,
+) -> Result<Option<Vec<u64>>, Error> {
+    let columns = incidence_columns(bases, relations)?;
+    let n = bases.iter().map(Vec::len).sum();
+    Ok(dependency_rows(relations.len(), n, r, |i, row| {
+        for &column in &columns[i] {
+            row[column] = 1;
+        }
+    }))
 }
 
 // Store sparse pivot tails only when their payload is no larger than dense.
@@ -905,7 +938,19 @@ impl PivotTail {
 // First row dependency, independent of u/v. Keep elimination factors instead
 // of updating a full provenance vector at every pivot; reconstruct once by
 // triangular back-substitution when the first dependent row is reached.
+#[cfg(test)]
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
+    dependency_rows(rows.len(), rows.first().map_or(0, Vec::len), r, |i, row| {
+        row.copy_from_slice(&rows[i]);
+    })
+}
+
+fn dependency_rows(
+    row_count: usize,
+    width: usize,
+    r: u64,
+    fill_row: impl Fn(usize, &mut [u64]),
+) -> Option<Vec<u64>> {
     let modulus = Modulus::new(r);
     struct Pivot {
         tail: PivotTail,
@@ -915,8 +960,10 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
     }
     let mut columns = BTreeMap::<usize, usize>::new();
     let mut pivots: Vec<Pivot> = Vec::new();
-    for (i, source) in rows.iter().enumerate() {
-        let mut row = source.clone();
+    let mut row = vec![0; width];
+    for i in 0..row_count {
+        row.fill(0);
+        fill_row(i, &mut row);
         let mut factors = Vec::new();
         for (&col, &index) in &columns {
             let k = row[col];
@@ -931,7 +978,7 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
         }
         match row.iter().position(|&a| a != 0) {
             None => {
-                let mut combination = vec![0; rows.len()];
+                let mut combination = vec![0; row_count];
                 combination[i] = 1;
                 let mut weights = vec![0; pivots.len()];
                 for (j, k) in factors {
@@ -1151,7 +1198,7 @@ fn solve_reduction<const PROFILE: bool>(
             continue;
         }
         let stage = PROFILE.then(Instant::now);
-        let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
+        let coeff = relation_dependency(&bases, &relations, curve.r)?.ok_or(Error::Verification)?;
         let scalar = extract(&relations, &coeff, curve.r);
         if let Some(stage) = stage {
             stats.linear += stage.elapsed();
@@ -2363,6 +2410,63 @@ mod tests {
             Enumerate.find(&c, &bases, None, 1),
             Err(Error::Limit(_))
         ));
+    }
+
+    #[test]
+    fn streamed_incidence_matches_dense_dependencies() {
+        let mut rng = Rng(71823);
+        for slots in 2..=8 {
+            for size in 1..=7 {
+                // Repeated points across slots must retain separate columns.
+                let base: Vec<_> = (0..size).map(|i| Some((i as u64, 1))).collect();
+                let bases = vec![base.clone(); slots];
+                let mut relations = Vec::new();
+                let mut dense = Vec::new();
+                for _ in 0..slots * size + 3 {
+                    let mut points = Vec::new();
+                    let mut row = vec![0; slots * size];
+                    for slot in 0..slots {
+                        let index = rng.below(size as u64) as usize;
+                        points.push(base[index]);
+                        row[slot * size + index] = 1;
+                    }
+                    relations.push(Relation { u: 0, v: 0, points });
+                    dense.push(row);
+                }
+                for r in [3, 199, 1_099_512_551_701] {
+                    assert_eq!(
+                        relation_dependency(&bases, &relations, r).unwrap(),
+                        dependency(&dense, r)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn streamed_incidence_validates_rows_after_first_dependency() {
+        let point = Some((3, 33));
+        let bases = vec![vec![point], vec![point]];
+        let valid = Relation {
+            u: 0,
+            v: 0,
+            points: vec![point, point],
+        };
+        let mut relations = vec![valid; 3];
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199).unwrap(),
+            Some(vec![198, 1, 0])
+        );
+        relations[2].points[1] = Some((0, 0));
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199),
+            Err(Error::Verification)
+        );
+        relations[2].points.pop();
+        assert_eq!(
+            relation_dependency(&bases, &relations, 199),
+            Err(Error::Verification)
+        );
     }
 
     #[test]
