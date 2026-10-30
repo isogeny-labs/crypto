@@ -24,6 +24,8 @@ mod prefix_algebra;
 mod prime_chain_graph;
 #[path = "prime_chain_prefix.rs"]
 mod prime_chain_prefix;
+#[path = "sat_prefix.rs"]
+mod sat_prefix;
 
 const CHUNK_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RECORD_BYTES: usize = 64 * 1024 * 1024;
@@ -33,8 +35,90 @@ const STANDARD_PDP_DOMAIN: &str = "cyclic-subgroup-factor-base";
 const KUMMER_PDP_DOMAIN: &str = "prime-kummer-full-curve";
 const FROBENIUS_LARGE_PRIME_DOMAIN: &str = "cyclic-subgroup-signed-frobenius-large-prime";
 const GENERIC_LARGE_PRIME_DOMAIN: &str = "cyclic-subgroup-identity-signed-large-prime";
+const SAT_GATE_MAP_ROLE: &str = "native-binary-s3-gate-map";
+const SAT_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
+const SAT_MAP_BYTES: u64 = 16 * 1024 * 1024;
 const LARGE_PRIME_DOMAIN_ROLE: &str = "exact-large-prime-discovery-domains";
 const LARGE_PRIME_TRANSCRIPT_ROLE: &str = "large-prime-elimination-transcript";
+
+/// Source manifests were checked by the caller. Bound allocations before parsing
+/// retained maps; missing historical maps exclude this channel, not static inputs.
+fn sat_pattern_sources(
+    directory: &Path,
+    artifacts: &[Artifact],
+) -> Result<
+    (
+        Option<std::collections::BTreeMap<u32, sat_prefix::PatternSource>>,
+        &'static str,
+    ),
+    String,
+> {
+    let mut maps = std::collections::BTreeMap::new();
+    let mut formulas = std::collections::BTreeMap::new();
+    let mut bytes = 0u64;
+    for artifact in artifacts {
+        let (suffix, collection) = match artifact.role.as_str() {
+            SAT_GATE_MAP_ROLE => {
+                if artifact.encoding != "json" {
+                    return Err("invalid SAT gate-map encoding".into());
+                }
+                if artifact.bytes > SAT_MAP_BYTES {
+                    return Ok((None, "sat_source_artifact_budget_exhausted"));
+                }
+                (".gate-map.json", &mut maps)
+            }
+            "complete-original-cnf-xor" => {
+                if artifact.encoding != "dimacs-xor" {
+                    return Err("invalid SAT formula encoding".into());
+                }
+                (".xor.cnf", &mut formulas)
+            }
+            _ => continue,
+        };
+        let pattern = artifact
+            .path
+            .strip_prefix("sat-pattern-")
+            .and_then(|s| s.strip_suffix(suffix))
+            .and_then(|s| s.parse::<u32>().ok())
+            .ok_or("invalid SAT pattern artifact path")?;
+        if pattern >= (1 << 13)
+            || artifact.path != format!("sat-pattern-{pattern}{suffix}")
+            || collection.insert(pattern, artifact).is_some()
+        {
+            return Err("duplicate or noncanonical SAT pattern artifact".into());
+        }
+        bytes = bytes.saturating_add(artifact.bytes);
+        if bytes > SAT_SOURCE_BYTES {
+            return Ok((None, "sat_source_artifact_budget_exhausted"));
+        }
+    }
+    if maps.is_empty() {
+        return Ok((None, "no_retained_sat_gate_maps"));
+    }
+    if maps.keys().ne(formulas.keys()) {
+        return Err("SAT pattern map/formula inventory differs".into());
+    }
+    let read = |artifact: &Artifact| -> Result<Vec<u8>, String> {
+        use std::io::Read;
+        let mut contents = Vec::new();
+        File::open(directory.join(&artifact.path))
+            .map_err(|e| e.to_string())?
+            .take(artifact.bytes + 1)
+            .read_to_end(&mut contents)
+            .map_err(|e| e.to_string())?;
+        if contents.len() as u64 != artifact.bytes || super::digest(&contents) != artifact.sha256 {
+            return Err("SAT source changed after manifest verification".into());
+        }
+        Ok(contents)
+    };
+    let mut sources = std::collections::BTreeMap::new();
+    for (pattern, map) in maps {
+        let gate_map = serde_json::from_slice(&read(map)?).map_err(|e| e.to_string())?;
+        let formula = String::from_utf8(read(formulas[&pattern])?).map_err(|e| e.to_string())?;
+        sources.insert(pattern, sat_prefix::PatternSource { gate_map, formula });
+    }
+    Ok((Some(sources), "available"))
+}
 
 fn text(value: &Value, name: &str) -> Result<String, String> {
     value
@@ -788,6 +872,12 @@ fn export_with_graph_projector(
     let mut prefix_records = Sorter::new(&scratch.0, "prefix-record");
     let mut algebraic_features = Sorter::new(&scratch.0, "algebraic-feature");
     let mut algebraic_records = Sorter::new(&scratch.0, "algebraic-record");
+    let mut sat_features = Sorter::new(&scratch.0, "sat-feature");
+    let mut sat_records = Sorter::new(&scratch.0, "sat-record");
+    let mut sat_occurrences = 0u64;
+    let mut sat_unknown_suffixes = 0u64;
+    let mut sat_summary_rows = 0u64;
+    let mut sat_unavailable_cells = 0u64;
     let mut algebraic_occurrences = 0u64;
     let mut algebraic_verified_nonzero = 0u64;
     let mut algebraic_verified_zero = 0u64;
@@ -858,6 +948,14 @@ fn export_with_graph_projector(
             if has("public.json") && has("factor-base.json") && has("witness.json") {
                 let public: Value = super::read_json(&dir.join("public.json"))?;
                 let base: Value = super::read_json(&dir.join("factor-base.json"))?;
+                if manifest.config.solver != "sat"
+                    && manifest
+                        .artifacts
+                        .iter()
+                        .any(|a| a.role == SAT_GATE_MAP_ROLE)
+                {
+                    return Err("SAT gate map on a different solver source cell".into());
+                }
                 let alternative = manifest
                     .artifacts
                     .iter()
@@ -942,6 +1040,86 @@ fn export_with_graph_projector(
                     let domain = text(&inputs["pdp_domain"], "PDP domain")?;
                     let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
                     let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
+                    if manifest.config.solver == "sat" {
+                        let (patterns, source_status) =
+                            sat_pattern_sources(&dir, &manifest.artifacts)?;
+                        let event_artifact = manifest
+                            .artifacts
+                            .iter()
+                            .find(|a| a.path == "sat-native-events.jsonl");
+                        if let Some(artifact) = event_artifact {
+                            if artifact.role != "native-sat-search-events"
+                                || artifact.encoding != "jsonl"
+                            {
+                                return Err("invalid SAT event artifact role or encoding".into());
+                            }
+                        }
+                        let summary = if let (Some(patterns), Some(artifact)) =
+                            (patterns, event_artifact)
+                        {
+                            let reader = BufReader::new(
+                                File::open(dir.join(&artifact.path)).map_err(|e| e.to_string())?,
+                            );
+                            let mut occurrence = 0u64;
+                            let replay = sat_prefix::replay(
+                                &inputs,
+                                &public,
+                                &base,
+                                &patterns,
+                                reader,
+                                sat_prefix::ReplayLimits::default(),
+                                &mut |feature, record| {
+                                    occurrence += 1;
+                                    let record_id = super::digest(
+                                        format!("{target_id}\nsat-record\n{occurrence}").as_bytes(),
+                                    );
+                                    let feature_id = match (
+                                        record["admission_status"].as_str(),
+                                        feature,
+                                    ) {
+                                        (Some("verified_decision"), Some(feature)) => {
+                                            let id = super::digest(
+                                                bounded_json(&feature, MAX_RECORD_BYTES)?
+                                                    .as_bytes(),
+                                            );
+                                            sat_features.push(&id, &json!({"schema":"ml-dataset.sat-features/v1",
+                                                "feature_id":id,"split_component":group,"split":partition,"inputs":feature}))?;
+                                            sat_occurrences += 1;
+                                            Some(id)
+                                        }
+                                        (Some("bounded_unknown_suffix"), None) => {
+                                            sat_unknown_suffixes += 1;
+                                            None
+                                        }
+                                        _ => {
+                                            return Err(
+                                                "invalid SAT feature/record admission pair".into()
+                                            )
+                                        }
+                                    };
+                                    sat_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-sat-record/v1",
+                                        "record_id":record_id,"source_target_id":target_id,"source_event_artifact":artifact,
+                                        "feature_id":feature_id,"split_component":group,"split":partition,"record":record}))
+                                },
+                            )?;
+                            serde_json::to_value(replay).map_err(|e| e.to_string())?
+                        } else {
+                            sat_unavailable_cells += 1;
+                            json!({"schema":"ml-dataset.sat-prefix-replay/v1","admission_status":"unavailable",
+                                "reason":if source_status == "available" {"no_retained_sat_events"} else {source_status},
+                                "verified_decisions":0,"native_execution_trace_verified":false,
+                                "native_instruction_count_verified":false,"unsat_proof_checked":false})
+                        };
+                        let record_id =
+                            super::digest(format!("{target_id}\nsat-replay-summary").as_bytes());
+                        sat_records.push(
+                            &record_id,
+                            &json!({"schema":"ml-dataset.restricted-sat-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"feature_id":null,
+                            "split_component":group,"split":partition,"record":summary}),
+                        )?;
+                        sat_summary_rows += 1;
+                    }
                     if inputs.get("prime_chain_graph").is_some() {
                         let event_artifact = manifest
                             .artifacts
@@ -1112,6 +1290,13 @@ fn export_with_graph_projector(
     let algebraic_records_staged = scratch.0.join("algebraic-records.jsonl");
     let unique_algebraic_features = algebraic_features.finish(&algebraic_features_staged)?;
     let algebraic_record_rows = algebraic_records.finish(&algebraic_records_staged)?;
+    let sat_features_staged = scratch.0.join("sat-features.jsonl");
+    let sat_records_staged = scratch.0.join("sat-records.jsonl");
+    let unique_sat_features = sat_features.finish(&sat_features_staged)?;
+    let sat_record_rows = sat_records.finish(&sat_records_staged)?;
+    if sat_record_rows != sat_occurrences + sat_unknown_suffixes + sat_summary_rows {
+        return Err("export lost SAT feature or record joins".into());
+    }
     if algebraic_occurrences != algebraic_verified_nonzero
         || algebraic_record_rows
             != algebraic_verified_nonzero + algebraic_verified_zero + algebraic_unknown_suffixes
@@ -1164,6 +1349,18 @@ fn export_with_graph_projector(
             "restricted/algebraic-records.jsonl",
             "restricted-checked-polynomial-consequences-certificates-and-provenance",
         )?,
+        install(
+            &out,
+            &sat_features_staged,
+            "sat-features.jsonl",
+            "allowlisted-causal-sat-inputs",
+        )?,
+        install(
+            &out,
+            &sat_records_staged,
+            "restricted/sat-records.jsonl",
+            "restricted-checked-sat-decisions-and-provenance",
+        )?,
     ];
     // Keep each object expansion bounded without changing manifest keys or order.
     let mut manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
@@ -1187,8 +1384,8 @@ fn export_with_graph_projector(
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v6","only_features_jsonl_is_model_input":false,
-            "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl"],
+        "feature_policy":{"version":"strict-structural-allowlist-v7","only_features_jsonl_is_model_input":false,
+            "model_input_files":["features.jsonl","prefix-features.jsonl","algebraic-features.jsonl","sat-features.jsonl"],
             "algebraic_task":"prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
             "algebraic_claim_limits":["recursive prime m3..15 and p<2^32 only","admission requires a previously certified equality node","separate cumulative consequence-channel caps preserve existing branch budget","witness-dependent cancellation is not exact first/last fall degree","no native-operation or native-instruction witness"],
             "prefix_task":"prime-chain-next-branch-attempt/v1; replayed recursive state and independently derived iterator; observed imitation labels only, no optimality or counterfactual cost",
@@ -1209,6 +1406,21 @@ fn export_with_graph_projector(
         .as_object_mut()
         .expect("manifest is an object literal")
         .extend(tail_fields);
+    manifest["sat_feature_occurrences"] = json!(sat_occurrences);
+    manifest["feature_policy"]["sat_task"] = json!("binary-sat-decision/v1; checked pre-decision formula, gate graph and trail; native choice is restricted imitation supervision");
+    manifest["feature_policy"]["sat_claim_limits"] = json!([
+        "fresh finite-coordinate binary/Koblitz snapshot profile only",
+        "bounded independent learned-clause entailment checks",
+        "unknown suffix preserves earlier admitted decisions",
+        "no complete native trace, CPU instruction total or global UNSAT proof",
+        "no optimal-action or counterfactual-cost claim"
+    ]);
+    manifest["unique_sat_feature_rows"] = json!(unique_sat_features);
+    manifest["restricted_sat_record_rows"] = json!(sat_record_rows);
+    manifest["sat_outcomes"] = json!({"verified_decision_occurrences":sat_occurrences,
+        "unknown_suffix_records":sat_unknown_suffixes,"summary_rows":sat_summary_rows,
+        "cells_without_sat_channel":sat_unavailable_cells,
+        "count_scope":"replayed decision occurrences and restricted summaries; not solved instances or complete native proofs"});
     let manifest_artifact =
         storage::write_json(&out, "manifest.json", "training-export-manifest", &manifest)?;
     storage::verify_manifest(&out, &artifacts)?;
@@ -1219,6 +1431,72 @@ fn export_with_graph_projector(
 mod tests {
     use super::*;
     use crate::ml_dataset::{curves, CellManifest, DatasetPlan};
+
+    #[test]
+    fn sat_source_inventory_distinguishes_missing_maps_from_mismatched_pairs() {
+        let formula = Artifact {
+            role: "complete-original-cnf-xor".into(),
+            path: "sat-pattern-0.xor.cnf".into(),
+            sha256: "0".repeat(64),
+            bytes: 1,
+            encoding: "dimacs-xor".into(),
+        };
+        let map = Artifact {
+            role: SAT_GATE_MAP_ROLE.into(),
+            path: "sat-pattern-1.gate-map.json".into(),
+            sha256: "0".repeat(64),
+            bytes: 1,
+            encoding: "json".into(),
+        };
+        let absent = Path::new("/no-source-read-permitted-for-inventory-only-check");
+        let historical = sat_pattern_sources(absent, std::slice::from_ref(&formula)).unwrap();
+        assert!(historical.0.is_none());
+        assert_eq!(historical.1, "no_retained_sat_gate_maps");
+        assert!(sat_pattern_sources(absent, &[formula, map]).is_err());
+    }
+
+    #[test]
+    fn sat_source_inventory_rejects_duplicate_noncanonical_or_misencoded_maps() {
+        let map = Artifact {
+            role: SAT_GATE_MAP_ROLE.into(),
+            path: "sat-pattern-0.gate-map.json".into(),
+            sha256: "0".repeat(64),
+            bytes: 1,
+            encoding: "json".into(),
+        };
+        let absent = Path::new("/no-source-read-permitted-for-inventory-only-check");
+        assert!(sat_pattern_sources(absent, &[map.clone(), map.clone()]).is_err());
+        for path in [
+            "sat-pattern-00.gate-map.json",
+            "sat-pattern-8192.gate-map.json",
+            "../sat-pattern-0.gate-map.json",
+        ] {
+            let mut changed = map.clone();
+            changed.path = path.into();
+            assert!(sat_pattern_sources(absent, &[changed]).is_err());
+        }
+        let mut changed = map;
+        changed.encoding = "jsonl".into();
+        assert!(sat_pattern_sources(absent, &[changed]).is_err());
+    }
+
+    #[test]
+    fn sat_source_inventory_caps_before_opening_payloads() {
+        let oversized = Artifact {
+            role: SAT_GATE_MAP_ROLE.into(),
+            path: "sat-pattern-0.gate-map.json".into(),
+            sha256: "0".repeat(64),
+            bytes: SAT_MAP_BYTES + 1,
+            encoding: "json".into(),
+        };
+        let result = sat_pattern_sources(
+            Path::new("/no-source-read-permitted-for-inventory-only-check"),
+            &[oversized],
+        )
+        .unwrap();
+        assert!(result.0.is_none());
+        assert_eq!(result.1, "sat_source_artifact_budget_exhausted");
+    }
 
     struct Fixture(PathBuf);
     impl Fixture {
@@ -1560,7 +1838,7 @@ mod tests {
             assert_eq!(result["export"]["restricted_target_rows"], 4);
             assert_eq!(
                 result["export"]["feature_policy"]["version"],
-                "strict-structural-allowlist-v6"
+                "strict-structural-allowlist-v7"
             );
             let bytes = fs::read_to_string(out.join("features.jsonl")).unwrap();
             let rows: Vec<Value> = bytes

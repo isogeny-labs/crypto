@@ -86,8 +86,10 @@ examples. A separate cumulative operation/row/payload budget preserves admitted
 rows and allows the original branch channel to continue. See
 [operations](OPERATIONS.md) for the exact accounting scope and limits.
 
-This v6 implementation and its tests are authored; new-source runtime tests
-have not yet executed after an initial manifest-macro compilation failure. The [status record](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md)
+The v6 runtime db9bd045e38f passed254 dataset tests, strict Clippy and the release
+build. Its corrected actual CLI fixture at e935f7d9e4af passed curve/twist export,
+retry, joins and corruption checks; full-library continuation03 remains pending.
+The initial compile failure and later fixture assertion failure are preserved. The [status record](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md)
 tracks that gate separately from historical v4/v5 passes. The static and branch
 identity rules are preserved, but their byte stability must be checked by the
 new actual-CLI fixture. No corpus growth, learned advantage or new theorem is
@@ -325,3 +327,34 @@ its degree-filtered algebra engines; neither name alone implies a canonical
 general-purpose Gröbner algorithm. Likewise a PKM audit score is not a complete
 PKM descent/solve. Those distinctions are part of the capability registry and
 must survive into training labels and user-facing reports.
+
+## Causal binary SAT decisions (v7 development)
+
+The [frozen SAT contract](../../research/ml_dataset_sat_prefix_20261030/CONTRACT.md)
+adds `sat-features.jsonl` with task `binary-sat-decision/v1`. Inputs contain the
+strict public problem, retained algebraic gate map and independently checked
+CNF/XOR/trail state immediately before a decision. The matching native literal
+is restricted supervision, admitted only after its assignment is checked.
+A graph model can learn wire/field structure and a policy can imitate branch
+selection. Neither training target supplies an optimal choice or the cost of
+untried branches. A future learned policy must be measured with verification,
+rejections and fallback included under a separately frozen evaluation protocol.
+
+The gate map records wire blocks, polynomial-basis reduction/squaring maps,
+AND gates, parity constraints, units, identity pattern and exact finite domain.
+Native regeneration binds it to the verified public curve/target/domain; a
+separate Boolean normalizer and replayer check the stored formula and trace.
+Learned clauses require independent entailment checks from the admitted formula,
+without assuming the current decisions. Recorded analysis omits minimization
+steps and cannot itself certify the final learned clause.
+
+Keep selected-variable activity/priority, event identifiers, proofs, verification
+work, future conflicts, models and group lifts out of public inputs. Earlier
+features cannot depend on a future suffix. A cap or inconclusive proof check
+retains previously admitted rows and produces an explicit restricted unknown
+suffix. The initial profile covers fresh finite-coordinate binary/Koblitz SAT
+attachment; unsupported incremental/orbit/order profiles remain visible gaps.
+
+This v7 increment is under implementation and has not been compiled or executed.
+The native encoder is source-reviewed; replay, integration and nonzero curve/
+twist CLI learning coverage remain open. See [SAT status](../../research/ml_dataset_sat_prefix_20261030/STATUS.md).

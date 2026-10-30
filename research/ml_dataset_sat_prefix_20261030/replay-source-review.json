@@ -1,0 +1,27 @@
+{
+  "schema": "software-source-review/v1",
+  "contract_commit": "f71728b66558",
+  "source": "src/ml_dataset/sat_prefix.rs",
+  "source_sha256": "ed235acc792f6eb7511c56f56859551bf8ecc521cb616b792ca4994e6bbebdcf",
+  "reviewer": "consequence_contract",
+  "review_scope": "source admission, normalization, literal ranges, shared work and logical payload budgets",
+  "blocking_findings": 0,
+  "resolved_findings": [
+    "typed regeneration caps",
+    "shared source and state budget",
+    "pending state budget",
+    "streaming DIMACS comparison",
+    "feature reservation before expansion",
+    "expanded support work charges",
+    "malformed ranges before censoring"
+  ],
+  "tests_authored": 11,
+  "tests_executed": false,
+  "compilation_executed": false,
+  "limitations": [
+    "logical accounting is not RSS",
+    "native encoder temporary allocations excluded",
+    "native PDP learned/backjump CLI gate missing"
+  ],
+  "verified_cloud_dataset_cells": 0
+}

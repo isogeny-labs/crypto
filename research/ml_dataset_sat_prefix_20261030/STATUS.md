@@ -7,8 +7,9 @@ or test execution has occurred. See encoder-source-review.json for exact hash.
 
 Exporter integration for sat-features.jsonl and restricted/sat-records.jsonl,
 strict allowlistv7, checked source inventories, joins and immutable artifacts is
-implemented but uncompiled. The independent normalizer/replayer module remains
-under implementation and review. Existing static/prime/algebraic input identity
+implemented but uncompiled. The independent normalizer/replayer module is implemented and source-reviewed;
+11 tests are authored, not executed. See replay-source-review.json for the
+exact final hash and narrow review scope. Existing static/prime/algebraic input identity
 must remain unchanged; runtime tests will verify that obligation.
 
 Shared solvers.rs is still owned by T887. The reviewable proposal in
@@ -22,7 +23,10 @@ prove nonzero decision rows, certified learning followed by another decision,
 or nonzero twist coverage. A future explicitly bounded deterministic fixture
 selection must satisfy these requirements; empty output is not a substitute.
 
-Parent consequence validation remains active in the other worktree (handle24426,
-full03). No competing builds have started. Sourcecheckpoint01 was freshly
+Parent consequence full03 terminated with exit101: 5458 passed, 1 failed,
+123 ignored. The one failure is a missing sparse-checkout archive manifest
+directory, before its width rejection test can run. Both source checks passed.
+Fixture-only correction is being prepared separately. No competing builds
+have started. Sourcecheckpoint01 was freshly
 restored and its Git bundle verified; it contains a committed design/handoff and
 in-progress source, not a validated runtime. Verified cloud dataset cells0.

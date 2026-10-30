@@ -400,12 +400,12 @@ attempts appear in the restricted index without fabricated feature or target row
 Use a separate destination outside the source tree. Export refuses the source
 root, its ancestors and paths inside `cells/`, and rejects symlink ancestors.
 Exports are immutable snapshots: identical retries verify existing bytes; a
-changed source or export policy requires a fresh destination. The current
-implemented policy is `strict-structural-allowlist-v6`. It adds the consequence
+changed source or export policy requires a fresh destination. The validated CLI increment uses `strict-structural-allowlist-v6`. It adds the consequence
 input file while retaining the static and branch input identity rules. Keep
 historical v5 exports immutable; use a new destination for v6 and verify the
-manifest policy before selecting model inputs. New-source runtime validation is
-pending as recorded in the [consequence implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
+manifest policy before selecting model inputs. Full-library continuation03 remains pending; scoped dataset tests, strict
+Clippy, release build and the corrected actual v6 CLI fixture have passed on
+their recorded sources.
 
 Prime-chain recursive events and termination records stay in restricted
 artifacts/provenance. The v4 exporter adds a `prime-chain-graph/v1` static equation
@@ -465,10 +465,11 @@ node equality work includes both search and prior identity checking and is
 shared across target rows; do not sum it once per target. Neither counter is a
 counterfactual policy cost. See the [frozen consequence contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md).
 
-The v6 source and tests are authored; runtime tests have not yet executed after an initial manifest-macro compilation failure. Its
-frozen CLI fixture will check both retained curve/twist cells, all three input
-files, restricted joins/counts, immutable retry and unchanged static/branch
-feature bytes. Earlier v4/v5 evidence validates only its recorded source.
+The v6 runtime db9bd045e38f passed254 dataset tests, strict Clippy and release
+build. The corrected fixture at e935f7d9e4af passed both retained curve/twist
+cells, all three input files, restricted joins/counts, immutable retry, unchanged
+static/branch feature bytes and rejection of rehashed altered consequence output.
+The full-library continuation remains pending; earlier failed attempts are retained. Earlier v4/v5 evidence validates only its recorded source.
 Native re-export checks direct identities again; it is not an independent
 implementation or a standalone validator for externally supplied consequence
 records. No new scientific samples or cloud cells are established here.
@@ -525,3 +526,28 @@ not establish worker access or replace a real producer-to-S3-to-consumer replay.
 The first durable producer cell must be restored into an isolated directory and
 checked by both the native producer and that independent consumer before any
 broader scientific claim or training acceptance.
+
+### v7 SAT channel under development
+
+The new exporter policy is `strict-structural-allowlist-v7`; use a fresh destination
+when it is validated. Its fourth model-input file is `sat-features.jsonl`, and
+`restricted/sat-records.jsonl` holds decisions, source joins, replay work and
+unknown-suffix records. All existing input-file identities must remain stable.
+Do not use restricted records as model inputs or interpret native imitation as
+optimal-action supervision.
+
+New SAT adapter integration requires a compact per-pattern gate-map artifact
+before search. Maps have a16MiB serialized bound; formula plus map artifacts
+share64MiB, with native events separately capped16MiB/100000events. These are
+artifact bounds, not a total output or RSS guarantee. Missing historical maps
+make the SAT channel unavailable while preserving eligible static inputs.
+Mismatched map/formula pairs, malformed bindings and invalid semantic transitions
+are rejected. Valid but unproved or capped suffixes remain explicitly unknown.
+
+The replayer has separate decision-count, derived-payload, work and logical-state
+limits specified in the [SAT contract](../../research/ml_dataset_sat_prefix_20261030/CONTRACT.md).
+It must verify construction normalization and initial snapshot before a decision,
+then check entailment of learned clauses and exact parity/trail transitions.
+The source is not yet compiled or validated. The required actual PDP CLI fixture
+with decisions before and after certified learning, plus nonzero twist decisions,
+is still missing; an empty feature file cannot satisfy this gate.
