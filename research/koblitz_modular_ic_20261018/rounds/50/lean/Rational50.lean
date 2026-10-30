@@ -1,5 +1,6 @@
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 namespace Rational50
 /-- The quadratic norm relation exactly clears the rational denominator. -/
 theorem quadratic_norm_zero_iff {K : Type*} [Field K]
@@ -31,4 +32,15 @@ theorem bezout_norm_inverse {K : Type*} [CommRing K]
     _ = (x*a + y*b)^2 + (2 : K) *
         (x^2*a*b + e*x^2*b^2 - x*y*a*b) := by ring
     _ = 1 := by rw [h2, zero_mul, add_zero, h]; simp
+/-- A map from a finite field extension to a nontrivial algebra of equal
+finite dimension is bijective. The target need not be assumed a field. -/
+theorem field_map_bijective_of_equal_finrank
+    (K L T : Type*) [Field K] [Field L] [CommRing T] [Nontrivial T]
+    [Algebra K L] [Algebra K T]
+    [FiniteDimensional K L] [FiniteDimensional K T]
+    (f : L →ₐ[K] T) (h : Module.finrank K L = Module.finrank K T) :
+    Function.Bijective f := by
+  refine ⟨f.toRingHom.injective, ?_⟩
+  exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+    (f := f.toLinearMap) h).mp f.toRingHom.injective
 end Rational50
