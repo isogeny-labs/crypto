@@ -802,3 +802,25 @@ Fresh RunPod catalog2.49/hour; noold/newtaskpodpresent in readinesslist.
 ### Errors
 No v11 execution failed. Canonicalchecker assumes rectangulararms×sizes and
 retains5findingsagainstthefrozenstagedplan; no full canonicalpassclaimed.
+
+## 2026-10-30T17:59UTC — v11 report and v13 launch
+
+### What was done
+Rendered the separate two-page v11 report after raw commit 099dff2edd81 and
+visually inspected both pages. Added versioned PDF/SVG/PNG catalog copies and
+hashes. Preserved artifact-bot migration of the raw validation log.
+Launched frozen v13 on pod 7tugqyoxyvnikm at 17:57:20 UTC; controller 25269
+owns collection and deletion. One RTX PRO 6000, EUR-IS-2, USD 2.49/hour.
+
+### Decisions made
+V13 remains pinned to e9e87ffb8380, separate from the newer 63-bit source.
+Its correctness and sanitizer preflight must finish before measurements.
+Reports preserve L0 timing limits and five canonical coverage findings.
+
+### Open threads
+Collect, audit, publish and delete v13; then validate the separate width
+extension and freeze any larger probe. Recheck PR2985 at its final head.
+
+### Errors
+Poppler reported a tagged-PDF metadata warning; both pages rendered and were
+visually inspected successfully. No v13 result is claimed during preflight.
