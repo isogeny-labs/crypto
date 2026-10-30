@@ -3,7 +3,8 @@ set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 out=${EPHEMERAL_OUT:?output directory required}
 study="$root/research/explicit_relations_e2e_20261030"
-mkdir -p "$out"+nvidia-smi -q > "$out/gpu-before.txt"
+mkdir -p "$out"
+nvidia-smi -q > "$out/gpu-before.txt"
 cat /proc/cpuinfo > "$out/cpuinfo.txt"
 cat /proc/self/status > "$out/process-status.txt"
 git rev-parse HEAD > "$out/source-commit.txt"
