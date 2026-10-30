@@ -119,6 +119,9 @@ struct Set {
     canon: f64,         // canonical rho step in units
     batch_total_units: f64,
     batch_gae: f64,
+    canon_uncharged: f64, // rho canonicalisations not in `gae` (one per step)
+    ic_collect_adds: f64, // summands scanned (each one batched addition)
+    ic_pairs: f64,        // stored pairs (each built by one addition)
 }
 
 struct Size {
@@ -151,6 +154,9 @@ fn read_size(dir: &Path) -> Size {
             canon: jf(&v, &["step_prices", "canonical_step_units"]),
             batch_total_units: jf(&v, &["rho_batch", "s_priced_per_target"]) * sr * 32.0,
             batch_gae: jf(&v, &["rho_batch", "gae"]),
+            canon_uncharged: jf(&v, &["rho_batch", "counters", "canonicalisations_uncharged"]),
+            ic_collect_adds: jf(&v, &["counts", "collect", "summands_scanned"]),
+            ic_pairs: jf(&v, &["counts", "build", "stored_pairs"]),
         });
     }
     let (name, n, log2_r, r) = meta.unwrap();
@@ -231,6 +237,40 @@ fn main() {
             "window_lo": c.k_lo, "window_hi": c.k_hi, "r": sz.r,
         }));
         lng_draws.push(lgs);
+    }
+
+    // AGENTS.md section 5a: price the unpriced work on every arm at 0, 0.1 and 1 GAE per native operation, from counts.
+    // IC counts used: one batched addition per summand scanned, per stored pair and per descent trial (lower bounds: linear
+    // algebra, selection, projections and constructions emit no GAE count).  Rho counts: `rho_batch.gae` (additions) plus one
+    // canonicalisation per step at weight w.  Variant A prices w on rho only (IC at its additions alone, the IC-favourable
+    // reading); variant B also prices one lookup per IC addition at w (symmetric).
+    println!("\n## Count-based section 5a band: G = min_k IC(k)/batch rho(k) from native operation counts (IC counts are lower bounds)\n");
+    println!("| curve | log2 r | S0c/rho1c (w=0) | d_c/rho1c (w=0) | G A w=0 [min,max over 4 sets] | G A w=0.1 | G A w=1 | G B w=0 | G B w=0.1 | G B w=1 | k_opt A w=0 |");
+    println!("|:--|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|");
+    let mut band_json = vec![];
+    for sz in &sizes {
+        let kk32 = kk(32.0);
+        let ga = |s: &Set, w: f64, sym: bool| -> Cross {
+            let f = if sym { 1.0 + w } else { 1.0 };
+            let s0 = (s.ic_collect_adds + s.ic_pairs) * f;
+            let d = s.trials.iter().sum::<f64>() / 32.0 * f;
+            let rho1 = (s.batch_gae + w * s.canon_uncharged) / kk32;
+            cross(s0, d, rho1)
+        };
+        let mean_g = |w: f64, sym: bool| mean(&sz.sets.iter().map(|s| ga(s, w, sym).g_min).collect::<Vec<_>>());
+        let gs0: Vec<f64> = sz.sets.iter().map(|s| ga(s, 0.0, false).g_min).collect();
+        let (lo, hi) = (gs0.iter().cloned().fold(f64::INFINITY, f64::min), gs0.iter().cloned().fold(0.0, f64::max));
+        let s0c = mean(&sz.sets.iter().map(|s| s.ic_collect_adds + s.ic_pairs).collect::<Vec<_>>());
+        let dc = mean(&sz.sets.iter().map(|s| s.trials.iter().sum::<f64>() / 32.0).collect::<Vec<_>>());
+        let r1c = mean(&sz.sets.iter().map(|s| s.batch_gae / kk32).collect::<Vec<_>>());
+        let kopt = mean(&sz.sets.iter().map(|s| ga(s, 0.0, false).k_opt).collect::<Vec<_>>());
+        println!(
+            "| {} | {:.1} | {:.1} | {:.3} | {:.2} [{:.2}, {:.2}] | {:.2} | {:.2} | {:.2} | {:.2} | {:.2} | {:.0} |",
+            sz.name, sz.log2_r, s0c / r1c, dc / r1c, mean_g(0.0, false), lo, hi, mean_g(0.1, false), mean_g(1.0, false),
+            mean_g(0.0, true), mean_g(0.1, true), mean_g(1.0, true), kopt
+        );
+        band_json.push(serde_json::json!({"curve": sz.name, "log2_r": sz.log2_r, "sigma_c": s0c / r1c, "delta_c": dc / r1c,
+            "G_A": [mean_g(0.0, false), mean_g(0.1, false), mean_g(1.0, false)], "G_B": [mean_g(0.0, true), mean_g(0.1, true), mean_g(1.0, true)]}));
     }
 
     // recipe sweep: same S0/d accounting on every (columns, descent arity) point of the sweep, rho1 from the size's measure sets
@@ -429,7 +469,7 @@ fn main() {
         s += &format!("<text x='{ml}' y='16'>Gap G = min over k of IC(k)/batch-rho(k), against log2 r. Blue: k=32 recipe, 95% bootstrap. Orange: best swept recipe. Green: n=83 wall (K3300).</text><text x='{}' y='{}' text-anchor='middle'>log2 r (n = 19..61 counted units; n = 83 recorded seconds)</text></svg>", (ml + w) / 2.0, h - 8.0);
         fs::write("g_vs_log2r.svg", s).unwrap();
     }
-    let out = serde_json::json!({"sizes": rows_json, "n83_anchors": anchors, "rho73_s": rho73, "best_sweep": best_sweep.iter().map(|b| serde_json::json!({"log2_r": b.0, "G": b.1, "recipe": b.2, "k_opt": b.3})).collect::<Vec<_>>()});
+    let out = serde_json::json!({"sizes": rows_json, "n83_anchors": anchors, "rho73_s": rho73, "count_band": band_json, "best_sweep": best_sweep.iter().map(|b| serde_json::json!({"log2_r": b.0, "G": b.1, "recipe": b.2, "k_opt": b.3})).collect::<Vec<_>>()});
     fs::write("crossover_results.json", serde_json::to_string_pretty(&out).unwrap()).unwrap();
 }
 

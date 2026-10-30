@@ -1,12 +1,19 @@
 # Many-target crossover: amortised compact-orbit IC against batch rho (2026-10-30)
 
-**Verdict: dead at every measured size; the lead does not undecide at n = 73/83.** Amortising the relation
-collection over k targets never makes IC cheaper than batch rho at any k. The best amortised ratio is
-G = min over k of IC(k)/batch-rho(k) = **3.0 to 4.1 at n = 41..61** (best swept recipe, counted units),
-**4.8 to 5.1 at n = 83** (same-runner wall seconds, K3300), and no size has G < 1. G has stopped falling
-above 2^36 and is flat to rising from there, so the data give no support for a crossover at larger n.
-At n = 83 even a precomputation-rho table with the *same setup time* has a smaller per-target cost than IC
-(Table 4), so IC is dominated at every k by an arm that is already in the repo.
+**Verdict: dead where it can be ranked (n = 41..61); undecidable at n = 73/83 only for want of counts, and the
+n = 83 wall-clock evidence points the same way.** Amortising relation collection over k targets never makes IC
+cheaper than batch rho at any k. G = min over k of IC(k)/batch-rho(k), the distance remaining:
+
+- **Clock-priced `ic price` units (same process, both arms):** G = 3.0 to 4.1 at n = 41..61 (best swept recipe),
+  3.7 to 6.8 for the recipe tuned for k = 32. No size has G < 1; above 2^36 G is flat to rising.
+- **Section 5a count band (Table 1b):** with IC priced at its *emitted* additions only (a lower bound) and rho
+  at 0, 0.1 and 1 GAE per canonicalisation, G stays above 1 at n = 41, 43, 53, 61 (3.1 to 4.8 at w = 0, still
+  1.6 to 2.4 at w = 1), so the order holds across the band at those sizes. At n <= 45 and at n = 47 the IC
+  lower bound is below rho because descent and construction work is not emitted as counts: **those sizes are
+  unresolved by counts** (clock-priced G there is 5.3 to 24, which is a calibration, not a band result).
+- **n = 83 (wall/CPU seconds, practicality evidence only, not a metric):** G = 4.8 to 5.1 for K3300, and a
+  precomputation-rho table with the same setup time has a smaller per-target cost than IC at every k (Table 4).
+  The producer emits no counted S0 at n = 73/83 (implementation gap), so §5a cannot rank them.
 
 Class: accounting / audit. Not an improvement to the IC baseline (AGENTS.md section 6). Nothing was run;
 every number is extracted from recorded runs with the native `crossover/` program in this directory.
@@ -42,34 +49,54 @@ Per target set of k targets on one curve, total cost in one unit:
   generic lower bound matching O(sqrt(np)) for n logs in a group of order p; I could not read the parameter
   condition. Consequence: sqrt(k N) is the right comparator and the exponent cannot be beaten by a generic
   table, but a non-generic method (IC) is not bound by it, which is why the measured S0 and d decide.
-  **Validity range (unverified).** I recall the Kuhn-Struik sqrt(kN) law being stated for k up to about
-  N'^(1/4), but could not confirm that bound from the abstracts I could read (the Fouque-Joux-Mavromati
-  abstract states none). N'^(1/4) is about 290 (n = 41), 800 (n = 53), 1,100 (n = 61), 2,700 (n = 83). The
-  Table 1 optima (k_opt 148, 626, 444 at n = 41, 53, 61) are inside it; the Table 2 best-recipe optima (759,
-  1,830, 2,730) and the n = 83 optimum (16,800) are up to 6x outside it. If the law underestimated batch rho's
-  true cost out there by a factor f, G would fall by f; f of 3 or more would be needed to bring the best rows
-  to 1, and nothing recorded suggests it. Table 1 does not depend on this caveat.
+  **Literature gap.** The PDFs of Fouque-Joux-Mavromati and Yun returned HTTP 403 here and the
+  Kuhn-Struik text was not reachable, so any range restriction on k (for example k up to N'^(1/4), about 290,
+  800, 1,100 and 2,700 at n = 41, 53, 61, 83) is **not confirmed by a source I could read**. Galbraith,
+  *Mathematics of Public Key Cryptography*, ch. 14 attributes a sqrt(kN)-type collision estimate to Kuhn-Struik
+  Theorem 1, which supports the form only. The Table 1 optima (k_opt 148, 626, 444) are below those
+  values; the Table 2 best-recipe optima (759, 1,830, 2,730) and the n = 83 optimum (16,800) are up to 6x above
+  them. If the law underestimated batch rho's true cost there by a factor f, those G would fall by f; f of 3 or
+  more would be needed to bring a best-recipe row to 1, and nothing recorded suggests it. Table 1 and Table 1b
+  do not depend on this caveat. The KS-check column (0.80 to 1.19) is the empirical support at k = 32.
 
 ## 2. What is measured and what is extrapolated
 
 | component | n = 19..61 | n = 73 | n = 83 |
 |:--|:--|:--|:--|
-| S0 (setup + relation collection + LA) | **measured**, `ic price` units, 4 sets x 9 sizes + recipe sweep | ledger (R1: 5.1 h single thread, 18,398 s, K600); **not re-measured** | **measured**, `/usr/bin/time` user CPU of the IC process, 4 records (2 runs x K600/K3300) |
+| S0 (setup + relation collection + LA) | **measured**, clock-priced `ic price` units plus emitted counts, 4 sets x 9 sizes + recipe sweep | ledger (R1: 5.1 h single thread, 18,398 s, K600); **not re-measured** | **measured**, `/usr/bin/time` user CPU of the IC process, 4 records (2 runs x K600/K3300) |
 | d (per-target descent) | **measured**, mean over 32 targets per set | one target only (249 to 544 ms, 457,561 probes); heavy-tailed, so a single sample is weak | **measured**, mean of 16 targets (heavy tail: 0.6 to 165 ms), bootstrap |
 | rho1 | **measured** batch of 32 plus 32 cold singles, same process | **scaled** from n = 83 by sqrt(N'73/N'83) = 3.38 (the recorded rho intervals on the shared host vary 46 to 683 s and are not usable) | **measured**, 16 plain-rho runs on the same runner |
 | trend fit and extrapolation to n = 73/83 | **extrapolated** (section 5) | | |
 | counted S0 at n = 73/83 | | not emitted | **not emitted**: the IC producer reports wall and states, not GAE, for the rank stage (implementation gap) |
 
-Units: `ic price` units are a clock-priced batched-addition equivalent measured in the same process for both
-arms (rho step 2.3 units, 1.0 of which is the addition). So the IC arm has no unpriced counter. AGENTS.md
-section 5a is applied to the rho arm only: its canonicalisation is priced at 0, 0.1 and 1 GAE per native
-operation (rho step 1.0, 1.1, 2.0 units; measured 2.28). G > 1 at every weight (columns "rho step = 1.0 / 2.0"
-in Table 1), so the ranking (rho ahead) holds across the band. Rho at the cheapest weight is the case least
-favourable to IC and is the one in the main columns' neighbourhood; none flips the order.
+Units. Tables 1 to 2 are in **clock-priced `ic price` units**: every phase of both arms is timed on an
+exclusive clock in the same process and divided by the measured time of one batched affine addition
+(LEADERBOARD Tables A and C: "a clock reading, not a count"). That is a calibration, and AGENTS.md section 5a
+says a calibration may be added as a further point but never replaces the 0 / 0.1 / 1 GAE band. So the
+band is applied separately, from native operation counts, in **Table 1b**:
+
+- IC counts: one batched addition per summand scanned in collection (`counts.collect.summands_scanned`), per
+  stored pair (`counts.build.stored_pairs`) and per descent trial (`counts.descent.trials_per_target`).
+  Collection scans via `add_many_lazy*`, so a summand is one batched addition (price.rs implied 2.6 units per
+  summand, 9.2 per stored pair, so each is at least one addition and a lookup). These are **lower bounds**: linear
+  algebra, selection, projections, constructions and, for m = 3 descents, the summands scanned per trial are not
+  emitted as counts.
+- Rho counts: `rho_batch.gae` (additions) plus one canonicalisation per step (`canonicalisations_uncharged`) at
+  weight w = 0, 0.1, 1 GAE.
+- Variant A prices w on rho only (the IC-favourable reading). Variant B also prices one lookup per IC addition at
+  w.
+- Ranking rule: an order is claimed only where it holds at every weight with IC at its lower bound.
+
+The columns "G, rho step = 1.0 / 2.0" in Table 1 reprice only the rho step inside the clock-priced units
+(1 + w units, w = 0 and 1) and are a sensitivity, not the band.
 
 ## 3. Results
 
-### Table 1: k = 32 recipe, counted units, four target sets per size (uncertainty: 2,000-draw bootstrap over sets and targets)
+### Table 1: k = 32 recipe, clock-priced `ic price` units, four target sets per size
+
+Uncertainty: 2,000 bootstrap draws; each draw picks one of the four sets (which fixes S0, the per-target trial
+counts and that set's batch-rho price, so rho1 varies only across the four sets), then resamples that set's 32
+targets with replacement for d. S0 is deterministic per recipe (counts identical across repetitions).
 
 | curve | log2 r | S0/rho1 | d/rho1 | G = min IC/batch [95%] | k_opt | G, S0 without constructions | G, rho step 1.0 | G, rho step 2.0 |
 |:--|--:|--:|--:|:--|--:|--:|--:|--:|
@@ -84,6 +111,28 @@ favourable to IC and is the one in the main columns' neighbourhood; none flips t
 | K_0/GF(2^61) | 47.2 | 80.8 | 0.182 | 6.80 [5.36, 9.49] | 444 | 6.54 | 15.65 | 7.82 |
 
 Full output, raw S0, d, rho1 in units: [results.md](results.md), [crossover_results.json](crossover_results.json).
+
+### Table 1b: section 5a count band, G from native operation counts (IC counts are lower bounds)
+
+| curve | log2 r | S0c/rho1c | dc/rho1c | G, A, w=0 [range over 4 sets] | A, w=0.1 | A, w=1 | B, w=0 | B, w=0.1 | B, w=1 | reading |
+|:--|--:|--:|--:|:--|--:|--:|--:|--:|--:|:--|
+| K_1/GF(2^19) | 18.0 | 3.3 | 0.015 | 0.39 [0.33, 0.44] | 0.37 | 0.28 | 0.39 | 0.41 | 0.57 | unresolved (counts incomplete) |
+| K_1/GF(2^23) | 22.0 | 2.1 | 0.065 | 0.69 [0.38, 0.97] | 0.65 | 0.43 | 0.69 | 0.72 | 0.87 | unresolved |
+| K_1/GF(2^45) | 24.8 | 2.7 | 0.079 | 0.82 [0.74, 0.90] | 0.76 | 0.48 | 0.82 | 0.84 | 0.96 | unresolved |
+| K_0/GF(2^37) | 27.8 | 3.3 | 0.354 | 1.94 [1.40, 2.41] | 1.79 | 1.05 | 1.94 | 1.97 | 2.11 | rho ahead in the band (w = 1 marginal) |
+| K_1/GF(2^43) | 32.1 | 8.7 | 0.482 | 3.62 [3.12, 4.03] | 3.31 | 1.86 | 3.62 | 3.64 | 3.73 | rho ahead in the band |
+| K_1/GF(2^47) | 36.6 | 12.1 | 0.000 | 0.07 [0.06, 0.07] | 0.06 | 0.03 | 0.07 | 0.07 | 0.07 | unresolved: m = 3 descent emits no scan count (164 trials), lower bound is empty |
+| K_0/GF(2^41) | 39.0 | 21.5 | 0.212 | 3.78 [3.50, 4.15] | 3.44 | 1.90 | 3.78 | 3.79 | 3.80 | rho ahead in the band |
+| K_0/GF(2^53) | 44.3 | 34.2 | 0.086 | 3.12 [2.00, 4.21] | 2.84 | 1.56 | 3.12 | 3.13 | 3.13 | rho ahead in the band |
+| K_0/GF(2^61) | 47.2 | 54.3 | 0.132 | 4.77 [4.31, 5.89] | 4.34 | 2.39 | 4.77 | 4.77 | 4.77 | rho ahead in the band |
+
+"Unresolved" rows are exactly those where IC's emitted counts are so incomplete that its lower bound sits below
+rho (n <= 45: constructions and projections dominate the clock price, 7 to 70% of S; n = 47: the descent is
+m = 3 and its per-trial scanning is not emitted). By section 5a those cannot be ranked from counts; I do not
+call them rho wins, and the clock-priced G there (Table 1: 5.3 to 24) is a calibration. At n = 41, 43, 53, 61
+the IC lower bound alone is already above rho at every weight, so the ranking is band-stable there. The
+S0c/rho1c column also shows that the setup, in additions alone, is 21 to 54 single-target rho walks at
+n = 41, 53, 61 and grows with n there (21.5, 34.2, 54.3).
 
 ### Table 2: best recipe in the recorded (columns, descent arity) sweep (re-ranked for large k, not for k = 32)
 
@@ -174,7 +223,7 @@ sigma x delta < 0.318; measured minimum 2.8 (n = 41, c152-m2), 4.0 (n = 47), 3.9
    needs 24 to 48 GiB and 40 to 100 core-hours of table walks, the host is loaded, and its output is single-target
    online wall. The n = 83 control above is the recorded substitute and is wall-clock on hosted runners.
 3. **Models, not measurements, at the top.** S0 at n = 73 and 83 has no counted-unit emission; n = 73 has one
-   target; rho1(73) is a scaling. Only n <= 61 is in counted units, and G there is already 3 to 7.
+   target; rho1(73) is a scaling. Only n <= 61 has emitted counts and clock-priced units, and G there is already 3 to 7.
 4. **Selection.** Table 2 minimises over about 20 recipes per size; Table 1 uses the recipe tuned for k = 32.
    The truth for a recipe tuned for each k is between them; both exceed 2.9.
 5. **Heavy tails.** d at n = 83 ranges 0.6 to 165 ms across 16 targets; the bootstrap interval for G is

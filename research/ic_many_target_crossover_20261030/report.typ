@@ -4,11 +4,13 @@
 
 = Many-target crossover: amortised compact-orbit IC against batch rho (2026-10-30)
 
-*Verdict: dead at every measured size.* Amortising relation collection over $k$ targets never makes IC cheaper than
-batch rho. With $G = min_k "IC"(k) / "batch rho"(k)$: $G = 3.0$ to $4.1$ at $n = 41 .. 61$ (best swept recipe, counted units),
-$4.8$ to $5.1$ at $n = 83$ (same-runner wall seconds, K3300); no size has $G < 1$. $G$ is flat to rising above $2^36$.
-At $n = 83$ a precomputation-rho table with the same setup time has a smaller per-target cost than IC at every $k$.
-Class: accounting. Not an improvement to the IC baseline.
+*Verdict: dead where it can be ranked ($n = 41..61$); undecidable at $n = 73, 83$ only for want of counts, and the $n = 83$ wall-clock
+evidence points the same way.* Amortising relation collection over $k$ targets never makes IC cheaper than batch rho. With
+$G = min_k "IC"(k) / "batch rho"(k)$: clock-priced `ic price` units give $G = 3.0$ to $4.1$ at $n = 41..61$ (best swept recipe); no size has $G < 1$;
+$G$ is flat to rising above $2^36$. The §5a count band (IC at its emitted additions, a lower bound; rho at 0, 0.1, 1 GAE per canonicalisation) keeps
+$G > 1$ at $n = 41, 43, 53, 61$ ($3.1$ to $4.8$ at $w = 0$, $1.6$ to $2.4$ at $w = 1$); at $n <= 45$ and $n = 47$ IC's descent and construction counts are not
+emitted, so those sizes are unresolved by counts. $n = 83$ (wall seconds, practicality only): $G = 4.8$ to $5.1$, and a precomputation-rho
+table with the same setup time has a smaller per-target cost than IC at every $k$. Class: accounting. Not an improvement to the IC baseline.
 
 *Model.* $"IC"(k) = S_0 + k d$; $"batch rho"(k) = rho_1 K(k)$ with $K(k) = sum_(i<k) binom(2i,i) 4^(-i) approx 2 sqrt(k/pi)$
 (Kuhn--Struik law as implemented in `src/bin/ic/rho.rs`, $K(32)/32 = 0.19869$). A window exists iff
@@ -30,7 +32,7 @@ $sigma delta < 0.318$ with $sigma = S_0 / rho_1$, $delta = d / rho_1$; $G approx
   [K0/2^61], [47.2], [80.8], [0.182], [6.80 [5.36, 9.49]], [444], [4.10],
 )
 
-*Measured vs extrapolated.* Measured: $S_0$, $d$, $rho_1$ for $n=19..61$ (counted `ic price` units, same process, 4 target sets x 9 sizes
+*Measured vs extrapolated.* Measured: $S_0$, $d$, $rho_1$ for $n=19..61$ (clock-priced `ic price` units and emitted counts, same process, 4 target sets x 9 sizes
 plus the recipe sweep); $n=83$ $S_0$, $d$ (16 targets), $rho_1$ (16 plain-rho runs) in CPU seconds on one runner per row.
 Ledger only: $n=73$ (one target, $rho_1$ scaled from $n=83$): $G = 15$ to $22$ for the untuned K600 recipe. Extrapolated: the trend fit
 (slope $-0.054$ per bit, $G(73) = 2.3 [1.6, 3.0]$, $G(83) = 2.7 [2.0, 3.5]$), which is not relied on: the top four sizes are flat to rising.
