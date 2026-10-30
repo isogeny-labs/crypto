@@ -64,3 +64,10 @@ CI/review remain pending; neither task PR is merged. The earlier statement
 that byte parity must wait for unrelated PR2906 is superseded: current local
 parity was restored by carrying existing landed peer source, without merging
 or changing that unrelated PR. Root validation still gates pushing updates.
+
+Publication file-count correction, 2026-10-30 04:41 UTC:
+The historical prose said28 native files. Both actual sources-union.sha256 and
+sources-merged-peer.sha256 contain26 entries, and git's tracked-tree count is26.
+Every manifest entry and actual merged-peer byte comparison passes; the error
+was the prose count, not the hashes or tested source. Earlier receipts remain
+as historical records with this explicit correction. Publication parity is26files.

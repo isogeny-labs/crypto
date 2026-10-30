@@ -156,3 +156,10 @@ See combined-main-integration.txt for exact scope, setup failure and live receip
 123existingignored,0filtered. See root-union-complete.txt. Actual merged peer
 head018fd41b matches all28 publication files after a blank-line-only adjustment;
 new sources-merged-peer.sha256 preserves publication hashes separately.
+
+Publication file-count correction, 2026-10-30 04:41 UTC:
+The historical prose said28 native files. Both actual sources-union.sha256 and
+sources-merged-peer.sha256 contain26 entries, and git's tracked-tree count is26.
+Every manifest entry and actual merged-peer byte comparison passes; the error
+was the prose count, not the hashes or tested source. Earlier receipts remain
+as historical records with this explicit correction. Publication parity is26files.
