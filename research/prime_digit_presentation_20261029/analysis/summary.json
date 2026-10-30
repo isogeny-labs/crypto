@@ -445,23 +445,6 @@
   {
    "m": 3,
    "arm": "U",
-   "s": 4,
-   "closure": false,
-   "draws": 4,
-   "distinct": 4,
-   "primes": 4,
-   "nsol": "0",
-   "law": 13,
-   "ffd": "13",
-   "d_last": "n/a",
-   "censored": 0,
-   "D_null": 13,
-   "cols": "n/a",
-   "secs_max": 0
-  },
-  {
-   "m": 3,
-   "arm": "U",
    "s": 5,
    "closure": false,
    "draws": 4,
@@ -485,8 +468,8 @@
    "failing_draws": []
   },
   {
-   "name": "P1 ffd = 13, m = 3, s = 4, 5 (U)",
-   "holding": 12,
+   "name": "P1 ffd = 13, m = 3, s = 4, 5 (U), independent instances",
+   "holding": 8,
    "failing": 0,
    "failing_draws": []
   },
@@ -511,6 +494,12 @@
   {
    "name": "P4 Ublock: ffd = law and d_last = ffd",
    "holding": 44,
+   "failing": 0,
+   "failing_draws": []
+  },
+  {
+   "name": "replay check: the first-fall-only rerun of the m = 3, s = 4 instances gives the closure run ffd",
+   "holding": 4,
    "failing": 0,
    "failing_draws": []
   }

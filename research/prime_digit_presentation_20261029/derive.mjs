@@ -7,7 +7,13 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
 mkdirSync("analysis", { recursive: true });
 const load = (f) => readFileSync(`results/${f}.jsonl`, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
-const rows = [...load("A"), ...load("B"), ...load("C"), ...load("D")].filter((r) => !r.error);
+const all = [...load("A"), ...load("B"), ...load("C"), ...load("D")].filter((r) => !r.error);
+// A first-fall-only record with the same seed, prime, curve and target as a closure record is a replay of that
+// instance, not a new one (panel D, m = 3, s = 4).
+const inst = (r) => `${r.m}|${r.s}|${r.seed}|${r.p}|${r.a}|${r.b}|${r.kind}`;
+const closureInst = new Map(all.filter((r) => r.closure).map((r) => [inst(r), r]));
+const replays = all.filter((r) => !r.closure && closureInst.has(inst(r)));
+const rows = all.filter((r) => !replays.includes(r));
 const errors = [...load("A"), ...load("B"), ...load("C"), ...load("D")].filter((r) => r.error);
 const plain = load("E");
 
@@ -46,18 +52,19 @@ for (const k of keys) {
   md += `| ${row.m} | ${row.arm}${row.closure ? "" : " (first fall)"} | ${row.s} | ${row.draws} | ${row.distinct} | ${row.primes} | ${row.nsol} | ${row.law} | ${row.ffd} | ${row.d_last} | ${row.censored} | ${row.D_null} | ${row.cols} | ${row.cols === "n/a" ? "n/a" : (+row.cols / 2 ** (r0.m * r0.s)).toFixed(2)} |\n`;
 }
 
-// the registered predictions, checked on every draw
+// the registered predictions, checked on every independent instance
 const chk = (name, ok, bad) => ({ name, ok, bad });
 const real = rows.filter((r) => (r.arm === "U" || r.arm === "P") && r.m === 2 && r.closure);
 const pred = [
   chk("P1 ffd = 4 + floor(s/2), m = 2, real draws", real.filter((r) => r.ffd === 4 + Math.floor(r.s / 2)).length, real.filter((r) => r.ffd !== 4 + Math.floor(r.s / 2))),
-  chk("P1 ffd = 13, m = 3, s = 4, 5 (U)", rows.filter((r) => r.m === 3 && r.ffd === 13).length, rows.filter((r) => r.m === 3 && r.ffd !== 13)),
+  chk("P1 ffd = 13, m = 3, s = 4, 5 (U), independent instances", rows.filter((r) => r.m === 3 && r.ffd === 13).length, rows.filter((r) => r.m === 3 && r.ffd !== 13)),
   chk("P2 d_last = ffd, real unsatisfiable draws", real.filter((r) => r.arm === "U" && !r.censored && r.d_last === r.ffd).length, real.filter((r) => r.arm === "U" && (r.censored || r.d_last !== r.ffd))),
   chk("P5 d_last = ffd, planted draws", real.filter((r) => r.arm === "P" && !r.censored && r.d_last === r.ffd).length, real.filter((r) => r.arm === "P" && (r.censored || r.d_last !== r.ffd))),
   chk("P3 Usupp: ffd = d_last = D_null = s + 3", rows.filter((r) => r.arm === "Usupp" && r.ffd === r.s + 3 && r.d_last === r.s + 3).length, rows.filter((r) => r.arm === "Usupp" && !(r.ffd === r.s + 3 && r.d_last === r.s + 3))),
   chk("P4 Ublock: ffd = law and d_last = ffd", rows.filter((r) => r.arm === "Ublock" && r.ffd === r.law_ffd && r.d_last === r.ffd).length, rows.filter((r) => r.arm === "Ublock" && !(r.ffd === r.law_ffd && r.d_last === r.ffd))),
 ];
-const total = (n) => (n === 0 ? 0 : rows.length);
+const replayOk = replays.filter((r) => closureInst.get(inst(r)).ffd === r.ffd);
+pred.push(chk("replay check: the first-fall-only rerun of the m = 3, s = 4 instances gives the closure run ffd", replayOk.length, replays.filter((r) => !replayOk.includes(r))));
 md += "\n| registered prediction | draws holding | draws failing |\n|:--|--:|--:|\n";
 for (const p of pred) {
   const tot = p.ok + p.bad.length;

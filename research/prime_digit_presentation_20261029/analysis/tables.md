@@ -26,17 +26,17 @@
 | 2 | Ublock | 6 | 8 | 8 | 8 | 0 | 7 | 7 | 7 | 0 | 9 | 3302 | 0.81 |
 | 2 | Ublock | 7 | 4 | 4 | 4 | 0 | 7 | 7 | 7 | 0 | 10 | 9908 | 0.60 |
 | 3 | U | 4 | 4 | 4 | 4 | 0 | 13 | 13 | 13 | 0 | 13 | 4096 | 1.00 |
-| 3 | U (first fall) | 4 | 4 | 4 | 4 | 0 | 13 | 13 | n/a | 0 | 13 | n/a | n/a |
 | 3 | U (first fall) | 5 | 4 | 4 | 4 | 0 | 13 | 13 | n/a | 0 | 14 | n/a | n/a |
 
 | registered prediction | draws holding | draws failing |
 |:--|--:|--:|
 | P1 ffd = 4 + floor(s/2), m = 2, real draws | 106 / 106 | 0 |
-| P1 ffd = 13, m = 3, s = 4, 5 (U) | 12 / 12 | 0 |
+| P1 ffd = 13, m = 3, s = 4, 5 (U), independent instances | 8 / 8 | 0 |
 | P2 d_last = ffd, real unsatisfiable draws | 60 / 60 | 0 |
 | P5 d_last = ffd, planted draws | 46 / 46 | 0 |
 | P3 Usupp: ffd = d_last = D_null = s + 3 | 44 / 44 | 0 |
 | P4 Ublock: ffd = law and d_last = ffd | 44 / 44 | 0 |
+| replay check: the first-fall-only rerun of the m = 3, s = 4 instances gives the closure run ffd | 4 / 4 | 0 |
 
 | p | draws | nsol | ffd | d_last | d_last - p | censored | grid points p^2 |
 |--:|--:|:--|:--|:--|:--|--:|--:|
