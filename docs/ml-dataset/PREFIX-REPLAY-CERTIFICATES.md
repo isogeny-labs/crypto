@@ -77,3 +77,40 @@ publishing prefix features through `crypto dataset export`.
 Status at contract creation: certificate search, prefix replay and CLI prefix
 publication are not yet implemented. Static graph export is merged in PR2865;
 verified cloud dataset cells remain zero.
+
+## Implemented format and current validation state
+
+Source `5d4336b45d2` implemented the initial modules and CLI integration; the next
+commit corrects the bounded reader and adds cumulative verifier accounting.
+Validation is in progress. The initial build failed on Rust reader ownership;
+that failure is retained. No passing implementation claim follows yet.
+
+`crypto dataset export` now stages `prefix-features.jsonl` alongside static
+`features.jsonl`, with policy `strict-structural-allowlist-v5`. Only those two files
+are eligible model inputs. `restricted/prefix-records.jsonl` holds observed action
+labels, source cuts/joins, explicit ideal-equality certificates and replay summaries.
+Static feature identities remain unchanged. Prefix identities hash the task,
+public initial input, active-variable map, fixed bindings, fresh polynomial graphs
+and independently derived remaining iterator. Field elements are decimal strings.
+The iterator selects its variable from pre-cut algebra using the current native
+rule; this is observed value-order imitation, not evidence of optimal variable
+selection. Monomial/exponent and equation incidence are explicit in each graph.
+
+The reader admits at most4096 events,8MiB per event and64MiB per source stream.
+One containment/equality search admits degree8,8192 generated rows,262144 sparse
+entries and10million coefficient operations. A shared100million coefficient
+operation budget covers certificate and root routines across a cell. The root
+splitter tries at most256 deterministic shifts per factor, verifies the exact
+quotient and each distinct root, and checks its cardinality against
+`gcd(f,X^p-X)`. Exceeding a cap preserves earlier certified prefixes and marks the
+remaining suffix unknown. Full-field fallback domains are intervals, never arrays
+of all field elements. Inputs and current native replay require p<2^32; wide-prime
+static graphs remain supported through the existing separate path.
+
+Verifier counters count their specified coefficient arithmetic and finite-domain
+evaluations. They exclude parsing, primality checks, specialization, feature graph
+construction and I/O, and cannot become whole-export instruction totals. Sparse
+entry accounting bounds the search representation; no total-process RSS bound is
+claimed. Verification does not import native F4 pivots or trust reported native
+costs. Original trace completeness, missing native internals, comprehensive
+measurements and the full campaign remain open.
