@@ -1,0 +1,293 @@
+--- a/src/cryptanalysis/hashed_ecdl.rs
++++ b/src/cryptanalysis/hashed_ecdl.rs
+@@ -899,7 +899,7 @@
+     config: &Config,
+     oracle: &mut impl DecompositionOracle,
+ ) -> Result<Certificate, Error> {
+-    solve_with_oracle_profile(curve, p, q, config, oracle, &mut ReductionStats::default())
++    solve_reduction::<false>(curve, p, q, config, oracle, &mut ReductionStats::default())
+ }
+ 
+ /// Descriptive stage clocks, accumulated across all attempted trials.
+@@ -927,6 +927,19 @@
+     oracle: &mut impl DecompositionOracle,
+     stats: &mut ReductionStats,
+ ) -> Result<Certificate, Error> {
++    solve_reduction::<true>(curve, p, q, config, oracle, stats)
++}
++
++// One reduction body preserves identical random draws, bounds and verification.
++// The ordinary API does not read clocks for statistics the caller discarded.
++fn solve_reduction<const PROFILE: bool>(
++    curve: &Curve,
++    p: Point,
++    q: Point,
++    config: &Config,
++    oracle: &mut impl DecompositionOracle,
++    stats: &mut ReductionStats,
++) -> Result<Certificate, Error> {
+     use std::time::Instant;
+     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
+         return Err(Error::Invalid("generator or target"));
+@@ -974,11 +987,13 @@
+     }
+     let mut rng = Rng(config.seed);
+     let mut attempts = 0;
+-    let stage = Instant::now();
++    let stage = PROFILE.then(Instant::now);
+     let fixed = FixedPair::new(curve, p, q);
+-    stats.targets += stage.elapsed();
++    if let Some(stage) = stage {
++        stats.targets += stage.elapsed();
++    }
+     for trial in 1..=config.max_trials {
+-        let stage = Instant::now();
++        let stage = PROFILE.then(Instant::now);
+         let hashes: Vec<_> = (0..config.m)
+             .map(|_| HashBase {
+                 s,
+@@ -1000,7 +1015,9 @@
+             return Err(Error::Verification);
+         }
+         let n: usize = bases.iter().map(Vec::len).sum();
+-        stats.bases += stage.elapsed();
++        if let Some(stage) = stage {
++            stats.bases += stage.elapsed();
++        }
+         if n > config.max_columns {
+             return Err(Error::Limit("dense relation matrix columns"));
+         }
+@@ -1010,19 +1027,25 @@
+         let mut relations = Vec::new();
+         for _ in 0..20 * (n + 1) {
+             attempts += 1;
+-            let stage = Instant::now();
++            let stage = PROFILE.then(Instant::now);
+             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
+             let target = fixed.evaluate(curve, u, v);
+-            stats.targets += stage.elapsed();
+-            let stage = Instant::now();
++            if let Some(stage) = stage {
++                stats.targets += stage.elapsed();
++            }
++            let stage = PROFILE.then(Instant::now);
+             let found = oracle.find(curve, &bases, target, config.max_work);
+-            stats.oracle += stage.elapsed();
++            if let Some(stage) = stage {
++                stats.oracle += stage.elapsed();
++            }
+             if let Some(points) = found? {
+-                let stage = Instant::now();
++                let stage = PROFILE.then(Instant::now);
+                 let rel = Relation { u, v, points };
+-                check_relation(curve, &fixed, &bases, &rel)?;
++                check_collected_relation(curve, &bases, &rel, target)?;
+                 relations.push(rel);
+-                stats.targets += stage.elapsed();
++                if let Some(stage) = stage {
++                    stats.targets += stage.elapsed();
++                }
+                 if relations.len() == n + 1 {
+                     break;
+                 }
+@@ -1031,10 +1054,12 @@
+         if relations.len() != n + 1 {
+             continue;
+         }
+-        let stage = Instant::now();
++        let stage = PROFILE.then(Instant::now);
+         let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
+         let scalar = extract(&relations, &coeff, curve.r);
+-        stats.linear += stage.elapsed();
++        if let Some(stage) = stage {
++            stats.linear += stage.elapsed();
++        }
+         if let Some(scalar) = scalar {
+             let cert = Certificate {
+                 scalar,
+@@ -1044,9 +1069,11 @@
+                 trials: trial,
+                 attempts,
+             };
+-            let stage = Instant::now();
++            let stage = PROFILE.then(Instant::now);
+             verify(curve, p, q, &cert)?;
+-            stats.replay += stage.elapsed();
++            if let Some(stage) = stage {
++                stats.replay += stage.elapsed();
++            }
+             return Ok(cert);
+         }
+     }
+@@ -1207,6 +1234,32 @@
+     }
+ }
+ 
++// Collection already computed target=[u]P+[v]Q immediately before the query.
++// Check every returned point and the affine tuple sum against that exact target.
++// Only the collector uses this helper; independent certificate replay below
++// always recomputes the target from the recorded u/v with check_relation.
++fn check_collected_relation(
++    curve: &Curve,
++    bases: &[Vec<Point>],
++    rel: &Relation,
++    target: Point,
++) -> Result<(), Error> {
++    if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
++        return Err(Error::Verification);
++    }
++    let mut sum = None;
++    for (base, &point) in bases.iter().zip(&rel.points) {
++        if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
++            return Err(Error::Verification);
++        }
++        sum = curve.add_valid(sum, point);
++    }
++    if sum != target {
++        return Err(Error::Verification);
++    }
++    Ok(())
++}
++
+ fn check_relation(
+     curve: &Curve,
+     fixed: &FixedPair,
+@@ -1298,6 +1351,138 @@
+     use super::*;
+     fn fixture() -> (Curve, Point) {
+         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
++    }
++
++    #[test]
++    fn collected_relation_reuses_target_but_full_replay_recomputes_it() {
++        let (curve, p) = fixture();
++        let q = curve.mul(p, 42).unwrap();
++        let config = Config {
++            m: 3,
++            tau: Some(40),
++            seed: 111,
++            max_trials: 16,
++            ..Config::default()
++        };
++        let cert = solve(&curve, p, q, &config).unwrap();
++        let bases: Vec<_> = cert
++            .hashes
++            .iter()
++            .map(|h| h.enumerate(&curve).unwrap())
++            .collect();
++        let fixed = FixedPair::new(&curve, p, q);
++        for rel in &cert.relations {
++            let target = fixed.evaluate(&curve, rel.u, rel.v);
++            assert_eq!(
++                check_collected_relation(&curve, &bases, rel, target),
++                check_relation(&curve, &fixed, &bases, rel)
++            );
++            let wrong = curve.add(target, p).unwrap();
++            assert_eq!(
++                check_collected_relation(&curve, &bases, rel, wrong),
++                Err(Error::Verification)
++            );
++            for point in [None, Some((0, 0)), Some((211, 33))] {
++                let mut bad = rel.clone();
++                bad.points[0] = point;
++                assert_eq!(
++                    check_collected_relation(&curve, &bases, &bad, target),
++                    Err(Error::Verification)
++                );
++            }
++            let mut bad = rel.clone();
++            bad.u = curve.r;
++            assert_eq!(
++                check_collected_relation(&curve, &bases, &bad, target),
++                Err(Error::Verification)
++            );
++            bad = rel.clone();
++            bad.points.pop();
++            assert_eq!(
++                check_collected_relation(&curve, &bases, &bad, target),
++                Err(Error::Verification)
++            );
++        }
++        let mut bad = cert.clone();
++        bad.relations[0].u = (bad.relations[0].u + 1) % curve.r;
++        assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
++        verify(&curve, p, q, &cert).unwrap();
++    }
++
++    #[test]
++    fn optional_profile_preserves_queries_certificates_and_stats() {
++        struct Trace(Vec<Point>);
++        impl DecompositionOracle for Trace {
++            fn find(
++                &mut self,
++                c: &Curve,
++                b: &[Vec<Point>],
++                t: Point,
++                w: u64,
++            ) -> Result<Option<Vec<Point>>, Error> {
++                self.0.push(t);
++                Enumerate.find(c, b, t, w)
++            }
++        }
++        let (curve, p) = fixture();
++        for scalar in [0, 1, 42, 198] {
++            for seed in [111, 222, 333] {
++                let q = curve.mul(p, scalar).unwrap();
++                let config = Config {
++                    m: 3,
++                    tau: Some(40),
++                    seed,
++                    max_trials: 16,
++                    ..Config::default()
++                };
++                let mut plain = Trace(vec![]);
++                let mut profiled = Trace(vec![]);
++                let expected = solve_with_oracle(&curve, p, q, &config, &mut plain).unwrap();
++                let marker = std::time::Duration::from_secs(1);
++                let mut stats = ReductionStats {
++                    bases: marker,
++                    targets: marker,
++                    oracle: marker,
++                    linear: marker,
++                    replay: marker,
++                };
++                let actual =
++                    solve_with_oracle_profile(&curve, p, q, &config, &mut profiled, &mut stats)
++                        .unwrap();
++                assert_eq!(actual, expected);
++                assert_eq!(plain.0, profiled.0);
++                verify(&curve, p, q, &actual).unwrap();
++                for clock in [
++                    stats.bases,
++                    stats.targets,
++                    stats.oracle,
++                    stats.linear,
++                    stats.replay,
++                ] {
++                    assert!(clock >= marker);
++                }
++                let mut untouched = ReductionStats {
++                    bases: marker,
++                    targets: marker,
++                    oracle: marker,
++                    linear: marker,
++                    replay: marker,
++                };
++                let no_clocks =
++                    solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
++                        .unwrap();
++                assert_eq!(no_clocks, expected);
++                for clock in [
++                    untouched.bases,
++                    untouched.targets,
++                    untouched.oracle,
++                    untouched.linear,
++                    untouched.replay,
++                ] {
++                    assert_eq!(clock, marker);
++                }
++            }
++        }
+     }
+ 
+     #[test]
