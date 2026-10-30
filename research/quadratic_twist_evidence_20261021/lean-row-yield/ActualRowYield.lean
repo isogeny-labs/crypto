@@ -167,7 +167,15 @@ theorem actual_signed_known_log_recovery {b : ℕ} (A : Fin b → T.Point)
         apply Finset.sum_congr rfl
         intro i hi
         rw [hlogs i,map_zsmul,hI,mul_zsmul]
-      _ = _ := by rw [Finset.sum_smul]
+      _ = _ := by
+        have hsum : ∀ S : Finset (Fin b),
+            S.sum (fun i => (v i*logs i) • P)=(S.sum (fun i => v i*logs i)) • P := by
+          intro S
+          induction S using Finset.induction_on with
+          | empty => simp only [Finset.sum_empty,zero_zsmul]
+          | @insert i S hi ih =>
+            simp only [Finset.sum_insert hi,add_zsmul,ih]
+        exact hsum Finset.univ
   rw [hs,hI] at hh
   rw [sub_zsmul,hh]
   abel
