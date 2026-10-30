@@ -1,0 +1,115 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 40,
+  "runs": [
+    {
+      "attempt": "encode40-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "a786de9959936abe7448e633413472b7b8d77006",
+      "observations": [
+        "ENC40_RESULT original_functions=68 descended_functions=68 exact_reconstructions=136 denominators=checked corrupt_control=rejected"
+      ]
+    },
+    {
+      "attempt": "jets40-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "05f2824468b9c32d72f862900c00fa49128eeafa",
+      "observations": [
+        "JET40_CONTROL F32_reference_sections=588 precision=17 coordinates_from_independent_solver=true corrupt_top_nu=rejected",
+        "JET40_RESULT closed_points=60 precision=17 residue_degree=7 evaluation_divisor_degree=7140 all_source_equations=5 unit_inverses_per_point=8 coefficient_conjugates=7 section_ranks=68,196,324 all_pivot_recombinations=checked F32_precision17_reference_rows=588 complete_degree460_divisor_evaluated=false new_Picard_classes_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "couple40-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "476252d334427fd979f5a8cdd2f5202ab6d4d2cd",
+      "observations": [
+        "COUPLE40_RESULT complete_effective_divisors=59 divisor_degree=128 padding_Q_multiplicity=20 padding_R0_multiplicity=3 padding_R0_degree=7 small_spaces=59 large_spaces=59 ranks=68,196 evaluation_rank_each=128 all_kernel_recombinations=checked vanishing_nonmember_control=rejected proper_RR_bridge=retained Picard_group_operations_performed=false factor_images_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "pair40-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "e02af5f22706170efaa83064e23ff0e3ed109ae4",
+      "observations": [
+        "PAIR40_RESULT independent_orbits=1,2 support_difference_degree=7 pair_equal=false difference_principal=false self_control=pass inverse_cancellation=pass complete_quotients=all_generators independent_products=all forward_image_construction=false modular_factor_images_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "lean40-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 5
+    }
+  ],
+  "source_jets": {
+    "closed_points": 60,
+    "precision": 17,
+    "residue_degree": 7,
+    "evaluation_divisor_degree": 7140,
+    "source_equations": 5,
+    "units_per_point": 8,
+    "coefficient_conjugates": 7,
+    "corrupt_top_nu_rejected": true,
+    "F32_regression_rows": 588,
+    "F32_regression_precision": 17,
+    "section_ranks": [
+      68,
+      196,
+      324
+    ],
+    "original_column_pivot_recombinations": true
+  },
+  "coupled_divisors": {
+    "complete_divisors": 59,
+    "degree": 128,
+    "padding": "20Q+3R0",
+    "Q_degree": 5,
+    "R0_degree": 7,
+    "vanishing_condition_rank": 128,
+    "small_rank": 68,
+    "large_rank": 196,
+    "all_kernel_recombinations": true,
+    "proper_RR_interpretation": "retained written bridge"
+  },
+  "actual_collector_difference": {
+    "support_pair": [
+      "o1-d1",
+      "o2-d0"
+    ],
+    "forward_image_construction": false,
+    "pair_equal": false,
+    "difference_principal": false,
+    "self_control": true,
+    "inverse_cancellation": true,
+    "modular_factor_images_evaluated": false
+  },
+  "formal": {
+    "audited_declarations": 5,
+    "native_arrays_formalized": false,
+    "proper_geometry_formalized": false,
+    "Newton_convergence_formalized": false
+  },
+  "larger_geometry": {
+    "precision615_source_jets_constructed": false,
+    "larger_RR_spaces_constructed": false,
+    "complete_degree460_divisor_evaluated": false,
+    "full_quotient_saturation": false,
+    "proper_polarized_embedding": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "pending exclusive T-865"
+}

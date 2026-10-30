@@ -353,6 +353,66 @@ def koblitz_modular_geometry(ref, since):
                  source=f"{path}@{commit}")
 
 
+    path = f"{base}33/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("twist_projective_quadrics", "koblitz_modular.twist_projective_quadrics", "homogeneous equations",
+             "Exact twist I2 equations; proper curve interpretation uses written bridge, no polarized factor embedding"),
+            ("descended_sections", "koblitz_modular.twist_rr_sections", "sections",
+             "Explicit descended complete RR sections; inherited written pole bridge"),
+            ("evaluated_degree83_points", "koblitz_modular.twist_rr_evaluated_degree83_points", "closed points",
+             "Complete section evaluation at actual degree83 twist points; not IC relation rank"),
+            ("padding_closed_points", "koblitz_modular.twist_rational_padding_closed_points", "closed points",
+             "Native closed degree5 twist points; proper local binding remains separate")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
+    path = f"{base}34/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("local_source_presentations", "koblitz_modular.ordinary_source_local_presentations", "closed supports",
+             "Exact source-bound standard-etale witnesses; global quotient saturation remains separate"),
+            ("complete_coupled_divisors", "koblitz_modular.complete_coupled_degree128_divisors", "divisor representations",
+             "Complete ordinary P+9Q vanishing spaces; no projected factor image or IC-rank claim")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
+    path = f"{base}35/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("closed_point_algebra_dimension", "koblitz_modular.closed_point_algebra_dimension", "F2 dimensions",
+             "Exact closed-point algebra and complete inverse basis; not IC relation rank"),
+            ("source_jet_precision", "koblitz_modular.source_jet_precision", "local coefficients",
+             "Complete source/descent jets at fixed degree5 point; no target factor action"),
+            ("multiplication_space_dimension", "koblitz_modular.large_model_product_dimension", "F2 dimensions",
+             "Exact full product space; RR interpretation uses retained proper and pole bridge"),
+            ("large_model_vanishing_spaces", "koblitz_modular.large_model_vanishing_spaces", "divisor representations",
+             "Actual L3D vanishing spaces; signed Picard and order11 images remain separate")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
+    path = f"{base}36/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for key, metric, unit, label in (
+            ("exact_subspace_divisions", "koblitz_modular.exact_subspace_divisions", "certified computations",
+             "Exact all-generator quotient controls; no IC performance claim"),
+            ("actual_source_classes_tested", "koblitz_modular.actual_source_classes_with_group_controls", "source classes",
+             "Native class equality, negation and cancellation; target factor action remains separate")):
+            value = record.get("construction_counts", {}).get(key)
+            emit(metric, value, date=date, problem=P_IC, unit=unit, better="neutral",
+                 label=label, source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"

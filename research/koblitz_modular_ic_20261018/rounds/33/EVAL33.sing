@@ -1,0 +1,77 @@
+proc tr33(number value){number ans=0;int k;for(k=0;k<83;k++){ans=ans+value;value=value^2;}if(ans!=0 && ans!=1){ERROR("EVAL33_TRACE_NOT_F2");}return(ans);}
+list betaPowers33;list powerTraces33;number bp33=1;int e33;
+for(e33=0;e33<=164;e33++){powerTraces33[e33+1]=tr33(bp33);if(e33<83){betaPowers33[e33+1]=bp33;}bp33=bp33*beta;}
+proc bits33(number value){poly ans=0;int k;for(k=0;k<83;k++){if(tr33(value*betaPowers33[k+1])==1){ans=ans+w^k;}}return(ans);}
+list detPiv33;int detRank33;int i33;int j33;int p33;poly db33;
+for(i33=1;i33<=83;i33++){detPiv33[i33]=poly(0);}
+for(i33=0;i33<83;i33++){
+ db33=0;for(j33=0;j33<83;j33++){if(powerTraces33[i33+j33+1]==1){db33=db33+w^j33;}}
+ while(db33!=0){p33=deg(db33)+1;if(detPiv33[p33]==0){detPiv33[p33]=db33;detRank33++;break;}db33=db33+detPiv33[p33];}
+}
+if(detRank33!=83){ERROR("EVAL33_TRACE_COORDINATES_DEGENERATE");}
+print("EVAL33_TRACE_DETECTOR rank=83");
+proc rankEval33(list values,string label,int expected){
+ int count=size(values);list original;list piv;list coords;list kernels;int rankE=0;
+ int i;int j;int k;int p;poly value;poly co;poly rebuilt;number fieldRebuilt;
+ for(i=1;i<=83;i++){piv[i]=poly(0);coords[i]=poly(0);}
+ for(i=1;i<=count;i++){
+  value=bits33(number(values[i]));original[i]=value;co=w^(i-1);
+  while(value!=0){p=deg(value)+1;if(piv[p]==0){piv[p]=value;coords[p]=co;rankE++;break;}value=value+piv[p];co=co+coords[p];}
+  if(value==0){
+   if(deg(co)!=i-1){ERROR("EVAL33_KERNEL_LEADING_LABEL");}
+   kernels[size(kernels)+1]=co;
+  }
+ }
+ if(expected>=0 && rankE!=expected){ERROR("EVAL33_EVALUATION_RANK_"+label);}
+ if(rankE+size(kernels)!=count){ERROR("EVAL33_RANK_NULLITY");}
+ for(i=1;i<=size(kernels);i++){
+  co=kernels[i];rebuilt=0;fieldRebuilt=0;
+  for(j=1;j<=size(co);j++){
+   if(leadcoef(co[j])!=1){ERROR("EVAL33_NONBINARY_KERNEL");}
+   k=deg(co[j])+1;rebuilt=rebuilt+original[k];fieldRebuilt=fieldRebuilt+number(values[k]);
+  }
+  if(rebuilt!=0 || fieldRebuilt!=0){ERROR("EVAL33_KERNEL_RECOMBINATION");}
+ }
+ for(p=1;p<=83;p++){
+  if(piv[p]!=0){co=coords[p];rebuilt=0;for(j=1;j<=size(co);j++){rebuilt=rebuilt+original[deg(co[j])+1];}if(rebuilt!=piv[p]){ERROR("EVAL33_PIVOT_RECOMBINATION");}}
+ }
+ link out="ASCII:w "+label+".sing";open(out);write(out,"ideal evaluationValues;ideal evaluationBits;ideal evaluationKernel;");
+ for(i=1;i<=count;i++){write(out,"evaluationValues["+string(i)+"]="+string(values[i])+";");}
+ for(i=1;i<=count;i++){write(out,"evaluationBits["+string(i)+"]="+string(original[i])+";");}
+ for(i=1;i<=size(kernels);i++){write(out,"evaluationKernel["+string(i)+"]="+string(kernels[i])+";");}
+ close(out);print("EVAL33_RESULT "+label+" columns="+string(count)+" rank="+string(rankE)+" kernel="+string(size(kernels))+" recombination=all");
+ return(rankE);
+}
+ideal asEval33=std(ideal(T^2+T+1));int evalCases33;
+proc evalOne33(int root,int factor,number b,number c,number l,number n){
+ number A=1+c;if(c==0){ERROR("EVAL33_C_ZERO");}
+ number u0=(b+c)/c^2;if(u0==0 || u0==1){ERROR("EVAL33_BASE_CUSP_DENOMINATOR");}
+ number v0=((b/c)*u0^3+1)/(u0+1);
+ if(v0^2+v0!=u0^3+u0){ERROR("EVAL33_BASE_EQUATION");}
+ number rn=(u0+1)*v0+1;number cn=rn+u0^3;
+ if(b!=rn*cn/u0^7 || c!=cn/u0^4){ERROR("EVAL33_BIRATIONAL_INVERSE");}
+ number oldD=u0^16*(u0+1)^16;number newD=u0^49*(u0+1)^16;
+ map oldAt=rrBasis27,n+b*T,l+A*T,v0,u0;
+ map oldSigmaAt=rrBasis27,n+b*(T+1),l+A*(T+1),v0,u0;
+ map newAt=twistBasis33,n,l,v0,u0;
+ ideal f=reduce(oldAt(basisNumerators),asEval33);ideal sf=reduce(oldSigmaAt(basisNumerators),asEval33);
+ ideal g=newAt(twistNumerators33);list gValues;list productValues;
+ int i;int j;int k;poly coeff;poly rebuilt;poly descended;
+ for(i=1;i<=68;i++){
+  rebuilt=0;coeff=sigmaColumns[i];
+  for(j=1;j<=size(coeff);j++){rebuilt=rebuilt+f[deg(coeff[j])+1];}
+  if(reduce(rebuilt+sf[i],asEval33)!=0){ERROR("EVAL33_SAVED_SIGMA_MISMATCH");}
+  descended=reduce((f[i]+T*(f[i]+rebuilt))/oldD,asEval33);
+  if(descended!=subst(descended,T,0)){ERROR("EVAL33_VALUE_NOT_DESCENDED");}
+  if(descended!=g[i]/newD){ERROR("EVAL33_EXPLICIT_FUNCTION_MISMATCH");}
+  gValues[i]=number(descended);
+ }
+ for(i=1;i<=196;i++){
+  j=sectionPairs2[i,1];k=sectionPairs2[i,2];
+  if(j<1 || j>68 || k<1 || k>68){ERROR("EVAL33_PRODUCT_INDEX");}
+  productValues[i]=number(gValues[j])*number(gValues[k]);
+ }
+ string tag="point-r"+string(root)+"-f"+string(factor);
+ int rank1=rankEval33(gValues,tag+"-D",-1);int rank2=rankEval33(productValues,tag+"-2D",83);
+ evalCases33++;
+}
