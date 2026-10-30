@@ -129,7 +129,7 @@ def _prefetch_histories(ref, since):
     ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
         "data/index.json", "evidence/pdp/paired-summary.json",
         "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
-        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json", "evidence/degree4-propagation/summary.json", "evidence/degree4-quartic/summary.json", "evidence/prime-first-fall/summary.json", "evidence/prime-terminal/summary.json")]
+        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json", "evidence/degree4-propagation/summary.json", "evidence/degree4-quartic/summary.json", "evidence/prime-first-fall/summary.json", "evidence/prime-terminal/summary.json", "evidence/prime-linear/summary.json")]
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda path: _history_log(ref, path, since), paths))
 
@@ -659,6 +659,17 @@ def n83_candidate_datasets(ref, since):
                 emit(f"n83.prime_terminal.{row['key']}.{field}", row.get(field),
                      date=date, problem="n83-prime-higher-m-fall-degree", unit="degree",
                      label=f"Retained prime terminal {row['key']}: {field}; upper FFD only; affine strictness not checked; no new LFD bound; review pending",
+                     source=f"{path}@{commit}")
+
+
+
+    path = f"{study}/evidence/prime-linear/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("rows", []):
+            for field, unit in (("first_fall_lower_bound", "degree"), ("projected_rank", "rows"), ("projected_columns", "columns")):
+                emit(f"n83.prime_linear.{row['key']}.{field}", row.get(field),
+                     date=date, problem="n83-prime-higher-m-fall-degree", unit=unit,
+                     label=f"Retained prime {row['key']}: {field}; seven shared projection maps, covering argument; no exactFFD or LFD claim; review pending",
                      source=f"{path}@{commit}")
 
 
