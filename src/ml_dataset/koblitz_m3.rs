@@ -1830,3 +1830,317 @@ mod input_verification_tests {
         }
     }
 }
+/// A single actual addition in the lexicographic four-point signed domain.
+/// `prefix == None` denotes infinity, including an inverse-pair prefix.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct SignedPrefix {
+    sequence: u16,
+    tuple: u8,
+    indices: [u8; 3],
+    summand: u8,
+    prefix: Option<(u64, u64)>,
+    matches_target: bool,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub(super) struct PrefixAssessment {
+    performed_additions: usize,
+    acknowledged_additions: usize,
+    completed_tuples: usize,
+    candidate_tuples: Vec<u8>,
+    all_tuples_acknowledged: bool,
+}
+
+/// Replay a bounded historical prefix using only original-domain arithmetic.
+/// The final optional event was performed but not acknowledged by the sink.
+/// This function establishes neither durable witness custody nor an uncensored
+/// solver outcome. Outer binding/role validation and budget accounting remain
+/// mandatory before using its assessment in a dataset label.
+pub(super) fn verify_signed_prefix(
+    original: &MathInput,
+    acknowledged: &[SignedPrefix],
+    unacknowledged: Option<&SignedPrefix>,
+) -> Result<PrefixAssessment, String> {
+    use crate::binary_ecc::{curve::point_add, BinaryPoint, F2mElement};
+    use num_traits::ToPrimitive;
+    let performed = acknowledged
+        .len()
+        .checked_add(usize::from(unacknowledged.is_some()))
+        .ok_or("signed prefix length overflow")?;
+    if performed > 192 {
+        return Err("signed prefix exceeds 64 ordered triples".into());
+    }
+    let domain = original.signed.map(|(x, y)| BinaryPoint::Affine {
+        x: F2mElement::from_words(&[x], original.curve.m),
+        y: F2mElement::from_words(&[y], original.curve.m),
+    });
+    let mut prefix = BinaryPoint::Infinity;
+    let mut candidates = Vec::new();
+    candidates
+        .try_reserve_exact(64)
+        .map_err(|_| "signed prefix allocation")?;
+    for (sequence, saved) in acknowledged.iter().chain(unacknowledged).enumerate() {
+        let tuple = sequence / 3;
+        let summand = sequence % 3;
+        let indices = [tuple / 16, (tuple / 4) % 4, tuple % 4];
+        if summand == 0 {
+            prefix = BinaryPoint::Infinity;
+        }
+        prefix = point_add(&original.curve, &prefix, &domain[indices[summand]]);
+        let expected = match &prefix {
+            BinaryPoint::Infinity => None,
+            BinaryPoint::Affine { x, y } => Some((
+                x.to_biguint().to_u64().ok_or("reference x exceeds word")?,
+                y.to_biguint().to_u64().ok_or("reference y exceeds word")?,
+            )),
+        };
+        let matched = summand == 2 && expected == Some(original.target);
+        if saved.sequence as usize != sequence
+            || saved.tuple as usize != tuple
+            || saved.indices != indices.map(|i| i as u8)
+            || saved.summand as usize != summand
+            || saved.prefix != expected
+            || saved.matches_target != matched
+        {
+            return Err(format!("signed prefix mismatch at addition {sequence}"));
+        }
+        if matched {
+            candidates.push(tuple as u8);
+        }
+    }
+    Ok(PrefixAssessment {
+        performed_additions: performed,
+        acknowledged_additions: acknowledged.len(),
+        completed_tuples: performed / 3,
+        candidate_tuples: candidates,
+        all_tuples_acknowledged: acknowledged.len() == 192 && unacknowledged.is_none(),
+    })
+}
+
+#[cfg(test)]
+mod signed_prefix_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
+    use num_traits::ToPrimitive;
+
+    fn fast_events(original: &MathInput) -> Vec<SignedPrefix> {
+        let curve = FastBinaryCurve::new(
+            &original.curve.irreducible,
+            original.curve.a.to_biguint().to_u64().unwrap(),
+        )
+        .unwrap();
+        let mut events = Vec::new();
+        for tuple in 0..64usize {
+            let indices = [tuple / 16, (tuple / 4) % 4, tuple % 4];
+            let mut prefix = None;
+            for summand in 0..3 {
+                prefix = curve.add(prefix, Some(original.signed[indices[summand]]));
+                events.push(SignedPrefix {
+                    sequence: events.len() as u16,
+                    tuple: tuple as u8,
+                    indices: indices.map(|i| i as u8),
+                    summand: summand as u8,
+                    prefix,
+                    matches_target: summand == 2 && prefix == Some(original.target),
+                });
+            }
+        }
+        events
+    }
+
+    #[test]
+    fn independent_signed_replay_keeps_every_partial_boundary_and_infinity() {
+        let mut original = construction_tests::fixture();
+        // A fixed positive control: P + (-P) + Q = Q, without resampling.
+        original.target = original.signed[0];
+        let events = fast_events(&original);
+        assert!(events.iter().any(|e| e.prefix.is_none()));
+        let full = verify_signed_prefix(&original, &events, None).unwrap();
+        assert!(full.all_tuples_acknowledged);
+        assert!(!full.candidate_tuples.is_empty());
+        assert_eq!(full.completed_tuples, 64);
+        for n in 0..192 {
+            let partial = verify_signed_prefix(&original, &events[..n], None).unwrap();
+            assert_eq!(partial.performed_additions, n);
+            assert!(!partial.all_tuples_acknowledged);
+            let refused = verify_signed_prefix(&original, &events[..n], Some(&events[n])).unwrap();
+            assert_eq!(refused.performed_additions, n + 1);
+            assert_eq!(refused.acknowledged_additions, n);
+            assert!(!refused.all_tuples_acknowledged);
+        }
+    }
+
+    #[test]
+    fn independent_signed_replay_rejects_semantic_and_order_mutations() {
+        let original = construction_tests::fixture();
+        let events = fast_events(&original);
+        for mutation in 0..8 {
+            let mut changed = events.clone();
+            match mutation {
+                0 => changed[1].sequence += 1,
+                1 => changed[1].tuple += 1,
+                2 => changed[1].indices[0] ^= 1,
+                3 => changed[1].summand = 0,
+                4 => changed[0].prefix = None,
+                5 => changed[2].matches_target = !changed[2].matches_target,
+                6 => {
+                    changed.remove(1);
+                }
+                7 => changed.push(events[0].clone()),
+                _ => unreachable!(),
+            }
+            assert!(
+                verify_signed_prefix(&original, &changed, None).is_err(),
+                "mutation {mutation}"
+            );
+        }
+        let mut value = serde_json::to_value(&events[0]).unwrap();
+        value["unchecked"] = serde_json::json!(true);
+        assert!(serde_json::from_value::<SignedPrefix>(value).is_err());
+    }
+
+    #[test]
+    fn independent_signed_replay_covers_both_twists_at_field_boundaries() {
+        use crate::ml_dataset::{curves, types::CaseConfig};
+        for n in [23, 31, 47, 53, 61] {
+            for twist in [false, true] {
+                let cfg = CaseConfig {
+                    family: "koblitz".into(),
+                    n,
+                    m: 3,
+                    twist,
+                    curve_seed: 7,
+                    generator_index: 1,
+                    key_index: 1,
+                    seed: 42,
+                    factor_base_size: 4,
+                    degree_bound: 3,
+                    work_limit: 16384,
+                    solver: "weil".into(),
+                };
+                let original = original_math(&cfg, &curves::generate(&cfg).unwrap()).unwrap();
+                let events = fast_events(&original);
+                let result = verify_signed_prefix(&original, &events, None).unwrap();
+                assert!(result.all_tuples_acknowledged);
+                assert_eq!(result.performed_additions, 192);
+            }
+        }
+    }
+}
+
+const SIGNED_REPLAY_BYTE_CAP: usize = 128 * 1024;
+
+/// A separately bound arithmetic-prefix artifact, not a native execution log.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedSignedReplay {
+    schema: String,
+    binding: super::super::capture::AttemptBinding,
+    public_sha256: String,
+    factor_base_sha256: String,
+    input_sha256: String,
+    addition_limit: u64,
+    performed_additions: usize,
+    acknowledged_additions: usize,
+    acknowledged: Vec<SignedPrefix>,
+    unacknowledged: Option<SignedPrefix>,
+}
+
+/// Expected digests and limits come from authenticated original artifacts and
+/// the admitted launch, never from the saved transcript. A historical check has
+/// no live attempt deadline. Decode size and arithmetic replay are bounded.
+pub(super) fn verify_signed_replay(
+    bytes: &[u8],
+    original: &MathInput,
+    binding: &super::super::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    input_sha256: &str,
+    addition_limit: u64,
+) -> Result<PrefixAssessment, String> {
+    if bytes.len() > SIGNED_REPLAY_BYTE_CAP {
+        return Err("signed replay exceeds byte cap".into());
+    }
+    let saved: SavedSignedReplay =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict signed replay: {e}"))?;
+    saved.binding.validate()?;
+    let hash_valid = |s: &str| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit());
+    if saved.schema != "crypto.ml-dataset.koblitz-m3-signed-prefix/v1"
+        || saved.binding != *binding
+        || !hash_valid(public_sha256)
+        || !hash_valid(factor_base_sha256)
+        || !hash_valid(input_sha256)
+        || saved.public_sha256 != public_sha256
+        || saved.factor_base_sha256 != factor_base_sha256
+        || saved.input_sha256 != input_sha256
+        || saved.addition_limit != addition_limit
+        || saved.performed_additions as u64 > addition_limit
+        || saved.performed_additions > 192
+        || saved.acknowledged_additions != saved.acknowledged.len()
+        || saved.performed_additions
+            != saved
+                .acknowledged
+                .len()
+                .checked_add(usize::from(saved.unacknowledged.is_some()))
+                .ok_or("signed replay counter overflow")?
+    {
+        return Err("signed replay binding, limit or counter mismatch".into());
+    }
+    verify_signed_prefix(original, &saved.acknowledged, saved.unacknowledged.as_ref())
+}
+
+#[cfg(test)]
+mod signed_binding_tests {
+    use super::*;
+    #[test]
+    fn signed_replay_rejects_binding_counter_limit_and_schema_mutations() {
+        let original = construction_tests::fixture();
+        let binding = matrix_tests::binding();
+        let original_value = serde_json::json!({
+            "schema": "crypto.ml-dataset.koblitz-m3-signed-prefix/v1",
+            "binding": binding,
+            "public_sha256": "8".repeat(64),
+            "factor_base_sha256": "9".repeat(64),
+            "input_sha256": "a".repeat(64),
+            "addition_limit": 192,
+            "performed_additions": 0,
+            "acknowledged_additions": 0,
+            "acknowledged": [],
+            "unacknowledged": null
+        });
+        let check = |bytes: &[u8]| {
+            verify_signed_replay(
+                bytes,
+                &original,
+                &binding,
+                &"8".repeat(64),
+                &"9".repeat(64),
+                &"a".repeat(64),
+                192,
+            )
+        };
+        let empty = check(&serde_json::to_vec(&original_value).unwrap()).unwrap();
+        assert!(!empty.all_tuples_acknowledged);
+        for mutation in 0..9 {
+            let mut v = original_value.clone();
+            match mutation {
+                0 => v["schema"] = serde_json::json!("wrong"),
+                1 => v["binding"]["cell_index"] = serde_json::json!(1),
+                2 => v["public_sha256"] = serde_json::json!("b".repeat(64)),
+                3 => v["factor_base_sha256"] = serde_json::json!("b".repeat(64)),
+                4 => v["input_sha256"] = serde_json::json!("b".repeat(64)),
+                5 => v["addition_limit"] = serde_json::json!(193),
+                6 => v["performed_additions"] = serde_json::json!(1),
+                7 => v["acknowledged_additions"] = serde_json::json!(1),
+                8 => v["negative"] = serde_json::json!(true),
+                _ => unreachable!(),
+            }
+            assert!(
+                check(&serde_json::to_vec(&v).unwrap()).is_err(),
+                "mutation {mutation}"
+            );
+        }
+        assert!(check(&vec![b' '; SIGNED_REPLAY_BYTE_CAP + 1]).is_err());
+    }
+}
