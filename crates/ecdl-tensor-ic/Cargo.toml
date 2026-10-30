@@ -1,0 +1,35 @@
+[package]
+name = "ecdl-tensor-ic"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "Toy index calculus for ECDLP with Boolean tensor contraction relation finding (Rust port of the Go ecdltensor prototype)"
+
+[lib]
+name = "ecdl_tensor_ic"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ecdldemo"
+path = "src/bin/ecdldemo.rs"
+
+[[bin]]
+name = "ecdlscale"
+path = "src/bin/ecdlscale.rs"
+
+[dependencies]
+num-bigint = "0.4"
+num-integer = "0.1"
+num-traits = "0.2"
+rand = "0.8"
+sha2 = "0.10"
+
+# The gadget tests sweep thousands of tiny DFS contractions; optimise them.
+[profile.test]
+opt-level = 3
+
+[lints.clippy]
+# The Go code is written with index loops over parallel slices (blocks, NTT
+# indices); rewriting them as iterator chains would obscure the port.
+needless_range_loop = "allow"

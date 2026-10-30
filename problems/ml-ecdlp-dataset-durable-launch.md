@@ -158,3 +158,48 @@ The separate consumer companion audited 72 sealed software fixtures and checked
 it has not validated an actual restored worker dataset. Preserve failed attempts
 and their original source/image identities. No new job, E12 retry, administrative
 grant, budget increase or deadline extension was made.
+
+## 2026-10-28 budget implementation and launch-adapter review
+
+Source `23b3c0e527d621aebf6532db61744fab77867f48` implements native
+cumulative admission and S3/STS attempt accounting, protected finalization,
+actual-owner-bound grants and retained worker journals. Focused software tests,
+strict lint, CLI and container preflight passed; final full-library validation
+is pending. This closes the earlier absence of an accounting implementation,
+but no real campaign ledger/grant or new worker wave has been issued.
+
+The [launch-adapter contract](../docs/ml-dataset/LAUNCH-ADAPTER.md) records the
+remaining integration: reserve startup before provisioning, gate work until
+actual Job/Pod identities are reconciled, deliver the designated grant and retain
+authority state, and bind actual hardware to an independently established finite
+resource lifetime. Job deadline and tracked empty-node consolidation do not
+establish an EC2 billing bound. Generic MCP run lacks the lower-level launcher's
+instance-type option and has no grant startup handoff. These are concrete
+implementation gaps, not a mathematical obstruction or a reason to relabel
+planned cells as generated data.
+
+Preflight also needs an additive canonical plan digest output for preparing
+grants; its existing file digest is different. That correction is temporarily
+waiting on the active T-755 file reservation. The operator guide explicitly
+prohibits substituting the file hash. The pending human answer for the scoped
+shared-role policy remains unresolved, and no IAM mutation has occurred.
+
+Next: land the metadata correction when its scope is available; finish and
+archive exact-source software checks; implement/review the finite launch
+handshake; reconcile prior obligations and resource evidence; then perform
+worker-role conditional PUT/GET verification and the frozen wave only after
+its existing admission and permission gates are satisfied. Preserve the
+earlier failed attempts and zero verified cloud cells.
+
+### Completed software validation and coordination
+
+The final unchanged-source23b3 release library suite completed with5,105 passed,
+zero failed and123 ignored, exit0 observed. Source hashes still matched after
+the run. The existing initial validation record remains unchanged; the final
+result is retained separately in the source23b3 archive.
+
+The human authorized coordination with T-755. Its owner could not be addressed
+through the app's available task routing, so the exact minimal metadata request
+was posted on the owning delivery PR: [coordination comment](https://github.com/isogeny-labs/crypto/pull/2790#issuecomment-6475281809).
+No reserved source was changed. The worker IAM decision remains separate and
+unanswered; no new cloud wave or real budget grant was issued.

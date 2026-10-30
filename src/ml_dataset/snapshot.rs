@@ -11,12 +11,13 @@ use std::sync::Arc;
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use super::budget::BudgetSession;
+use super::budget::{BudgetScope, RunBinding};
 use super::capture::{self, AttemptBinding, CaptureCursor, CaptureStop, CapturedDelta};
+use super::s3_budget::S3BudgetContext;
 use super::storage;
 use super::types::Artifact;
 use crate::hash::sha256::Sha256;
-use crate::store::backend::{object_key, Backend, Phase, RemoteSpec, SINGLE_PUT_MAX};
+use crate::store::backend::{object_key, Backend, RemoteSpec, SINGLE_PUT_MAX};
 use crate::store::index::validate_sha256;
 use crate::store::{Config, Store};
 
@@ -500,7 +501,12 @@ fn install_copy(
     Ok(destination)
 }
 
-fn download(backend: &dyn Backend, object: &ObjectRef, scratch: &Path) -> Result<TempFile, String> {
+fn download(
+    backend: &SnapshotIo<'_>,
+    object: &ObjectRef,
+    scratch: &Path,
+) -> Result<TempFile, String> {
+    backend.expect(object)?;
     let meta = backend.head(&object.key)?.ok_or("partial object missing")?;
     // Directory HEAD reports the final key component as its hash hint, which
     // is not a digest for fixed ordinal catalogs. Verify bytes on every GET.
@@ -514,7 +520,7 @@ fn download(backend: &dyn Backend, object: &ObjectRef, scratch: &Path) -> Result
 }
 
 fn read_remote<T: DeserializeOwned>(
-    backend: &dyn Backend,
+    backend: &SnapshotIo<'_>,
     object: &ObjectRef,
     scratch: &Path,
     limits: &SnapshotLimits,
@@ -533,7 +539,7 @@ fn read_remote<T: DeserializeOwned>(
 }
 
 fn publish_object(
-    backend: &dyn Backend,
+    backend: &SnapshotIo<'_>,
     remote: &RemoteSpec,
     root: &Path,
     artifact: &Artifact,
@@ -541,17 +547,24 @@ fn publish_object(
 ) -> Result<(), String> {
     let source = storage::contained_path(root, &artifact.path, false)?;
     check_regular(&source, object)?;
+    backend.reserve(object, artifact)?;
     match remote {
         RemoteSpec::Dir(directory) => {
             let directory = storage::root_dir(directory, true)?;
             install_copy(&directory, &object.key, &source, object)?;
         }
-        RemoteSpec::S3 { .. } => {
-            storage::prepare_s3_publication(backend, remote, &object.key, &source, artifact, root)?
-        }
+        RemoteSpec::S3 { .. } => storage::prepare_s3_publication(
+            backend.backend,
+            remote,
+            &object.key,
+            &source,
+            artifact,
+            root,
+        )?,
     }
     // Deliberately do this on retries too. A successful PUT/HEAD is insufficient.
     let _readback = download(backend, object, root)?;
+    backend.verify(object)?;
     Ok(())
 }
 
@@ -826,7 +839,7 @@ fn validate_checked_local_context(root: &Path, state: &ChainState) -> Result<(),
 }
 
 fn load_chain(
-    backend: &dyn Backend,
+    backend: &SnapshotIo<'_>,
     remote: &str,
     anchor: &SnapshotAnchor,
     scratch: &Path,
@@ -920,44 +933,145 @@ fn load_chain(
 
 fn open_store(
     cfg: Config,
-    budget: Option<Arc<BudgetSession>>,
-    phase: Phase,
+    budget: Option<&Arc<S3BudgetContext>>,
+    scope: BudgetScope,
 ) -> Result<Store, String> {
     match cfg.remote.as_ref() {
-        Some(RemoteSpec::S3 { bucket, .. }) => {
-            if bucket != "setec-astronomy-artifacts" {
-                return Err("partial S3 snapshots require the approved artifact bucket".into());
-            }
-            let budget =
-                budget.ok_or("partial S3 operations require cumulative budget admission")?;
-            Store::open_guarded(cfg, budget.guard(phase))
+        Some(RemoteSpec::S3 { bucket, .. }) if bucket != "setec-astronomy-artifacts" => {
+            Err("partial S3 snapshots require the approved artifact bucket".into())
         }
-        Some(RemoteSpec::Dir(_)) => Store::open(cfg),
         None => Err("partial snapshots require an explicit remote".into()),
+        _ => storage::dataset_store(cfg, budget, scope),
+    }
+}
+
+fn publication_scope(
+    request: &SnapshotRequest,
+    grant: Option<&RunBinding>,
+) -> Result<BudgetScope, String> {
+    let plan = if let Some(grant) = grant {
+        if grant.source_commit != request.binding.source_commit
+            || grant.binary_sha256 != request.binding.binary_sha256
+            || grant.protocol_sha256 != request.binding.protocol_sha256
+            || grant.shard_count == 0
+            || request.binding.cell_index % grant.shard_count != grant.shard_index
+        {
+            return Err(
+                "partial snapshot differs from the original owner's source/binary/protocol/shard"
+                    .into(),
+            );
+        }
+        // Capture custody binds saved plan bytes, whereas cell reservations use
+        // the canonical typed plan. They deliberately have different hashes.
+        &grant.plan_sha256
+    } else {
+        &request.binding.plan_sha256
+    };
+    if request.observation.status == AttemptStatus::Running {
+        Ok(BudgetScope::Cell(format!(
+            "cell-{}-{}",
+            plan, request.binding.cell_index
+        )))
+    } else {
+        Ok(BudgetScope::Finalization)
+    }
+}
+
+/// Bind every read before native HEAD/GET and reserve every output against the
+/// original owner. Successful publication requires an independently hashed GET.
+struct SnapshotIo<'a> {
+    backend: &'a dyn Backend,
+    remote: &'a RemoteSpec,
+    budget: Option<&'a Arc<S3BudgetContext>>,
+    scope: BudgetScope,
+}
+impl<'a> std::ops::Deref for SnapshotIo<'a> {
+    type Target = dyn Backend + 'a;
+    fn deref(&self) -> &Self::Target {
+        self.backend
+    }
+}
+impl<'a> SnapshotIo<'a> {
+    fn new(
+        backend: &'a dyn Backend,
+        remote: &'a RemoteSpec,
+        budget: Option<&'a Arc<S3BudgetContext>>,
+        scope: BudgetScope,
+    ) -> Result<Self, String> {
+        if matches!(remote, RemoteSpec::S3 { .. }) && budget.is_none() {
+            return Err("partial S3 operations require the original owner's active budget".into());
+        }
+        Ok(Self {
+            backend,
+            remote,
+            budget,
+            scope,
+        })
+    }
+    fn expect(&self, object: &ObjectRef) -> Result<(), String> {
+        storage::expect_remote_object(
+            self.budget,
+            self.remote,
+            &object.key,
+            &Artifact {
+                path: object.key.clone(),
+                role: "partial-object".into(),
+                sha256: object.sha256.clone(),
+                bytes: object.bytes,
+                encoding: "binary".into(),
+            },
+            self.scope.clone(),
+        )
+    }
+    fn reserve(&self, object: &ObjectRef, artifact: &Artifact) -> Result<(), String> {
+        storage::reserve_remote_output(
+            self.budget,
+            self.remote,
+            &object.key,
+            artifact,
+            self.scope.clone(),
+        )
+    }
+    fn verify(&self, object: &ObjectRef) -> Result<(), String> {
+        storage::verify_remote_output(self.budget, self.remote, &object.key, self.scope.clone())
     }
 }
 
 pub fn publish_partial(
     snapshot_dir: &Path,
     cfg: Config,
-    budget: Option<Arc<BudgetSession>>,
+    budget: Option<Arc<S3BudgetContext>>,
     request: &SnapshotRequest,
     limits: &SnapshotLimits,
 ) -> Result<SnapshotAck, String> {
     limits.validate()?;
-    let phase = if request.observation.status == AttemptStatus::Running {
-        Phase::Snapshot
-    } else {
-        Phase::Finalize
-    };
-    let store = open_store(cfg, budget, phase)?;
-    publish_with_backend(
-        snapshot_dir,
-        store.remote()?,
-        store.cfg.remote.as_ref().ok_or("no remote")?,
-        request,
-        limits,
-    )
+    let store = open_store(
+        cfg,
+        budget.as_ref(),
+        publication_scope(
+            request,
+            budget
+                .as_ref()
+                .map(|b| &b.session().grant().request.binding),
+        )?,
+    )?;
+    match budget.as_ref() {
+        Some(budget) => publish_with_backend_budget(
+            snapshot_dir,
+            store.remote()?,
+            store.cfg.remote.as_ref().ok_or("no remote")?,
+            Some(budget),
+            request,
+            limits,
+        ),
+        None => publish_with_backend(
+            snapshot_dir,
+            store.remote()?,
+            store.cfg.remote.as_ref().ok_or("no remote")?,
+            request,
+            limits,
+        ),
+    }
 }
 
 fn publish_with_backend(
@@ -967,6 +1081,27 @@ fn publish_with_backend(
     request: &SnapshotRequest,
     limits: &SnapshotLimits,
 ) -> Result<SnapshotAck, String> {
+    publish_with_backend_budget(snapshot_dir, backend, remote, None, request, limits)
+}
+
+fn publish_with_backend_budget(
+    snapshot_dir: &Path,
+    backend: &dyn Backend,
+    remote: &RemoteSpec,
+    budget: Option<&Arc<S3BudgetContext>>,
+    request: &SnapshotRequest,
+    limits: &SnapshotLimits,
+) -> Result<SnapshotAck, String> {
+    let io = SnapshotIo::new(
+        backend,
+        remote,
+        budget,
+        publication_scope(
+            request,
+            budget.map(|b| &b.session().grant().request.binding),
+        )?,
+    )?;
+    let backend = &io;
     limits.validate()?;
     request.binding.validate()?;
     request.observation.validate()?;
@@ -1152,20 +1287,30 @@ fn publish_with_backend(
 
 pub fn restore_partial(
     cfg: Config,
-    budget: Option<Arc<BudgetSession>>,
+    budget: Option<Arc<S3BudgetContext>>,
     anchor: &SnapshotAnchor,
     destination: &Path,
     limits: &SnapshotLimits,
 ) -> Result<RestoreReport, String> {
     limits.validate()?;
-    let store = open_store(cfg, budget, Phase::Restore)?;
-    restore_with_backend(
-        store.remote()?,
-        store.cfg.remote.as_ref().ok_or("no remote")?,
-        anchor,
-        destination,
-        limits,
-    )
+    let store = open_store(cfg, budget.as_ref(), BudgetScope::Work)?;
+    match budget.as_ref() {
+        Some(budget) => restore_with_backend_budget(
+            store.remote()?,
+            store.cfg.remote.as_ref().ok_or("no remote")?,
+            Some(budget),
+            anchor,
+            destination,
+            limits,
+        ),
+        None => restore_with_backend(
+            store.remote()?,
+            store.cfg.remote.as_ref().ok_or("no remote")?,
+            anchor,
+            destination,
+            limits,
+        ),
+    }
 }
 
 fn restore_with_backend(
@@ -1175,6 +1320,19 @@ fn restore_with_backend(
     destination: &Path,
     limits: &SnapshotLimits,
 ) -> Result<RestoreReport, String> {
+    restore_with_backend_budget(backend, remote, None, anchor, destination, limits)
+}
+
+fn restore_with_backend_budget(
+    backend: &dyn Backend,
+    remote: &RemoteSpec,
+    budget: Option<&Arc<S3BudgetContext>>,
+    anchor: &SnapshotAnchor,
+    destination: &Path,
+    limits: &SnapshotLimits,
+) -> Result<RestoreReport, String> {
+    let io = SnapshotIo::new(backend, remote, budget, BudgetScope::Work)?;
+    let backend = &io;
     limits.validate()?;
     anchor_valid(anchor, &remote.display(), limits)?;
     let destination = storage::root_dir(destination, true)?;
@@ -1274,6 +1432,38 @@ fn restore_with_backend(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn partial_cell_scope_uses_typed_grant_plan_not_saved_plan_file_digest() {
+        let fixture = Fixture::new();
+        let mut request = fixture.initial();
+        let mut binding = RunBinding {
+            source_commit: request.binding.source_commit.clone(),
+            binary_sha256: request.binding.binary_sha256.clone(),
+            plan_sha256: "c".repeat(64),
+            protocol_sha256: request.binding.protocol_sha256.clone(),
+            shard_index: request.binding.cell_index % 3,
+            shard_count: 3,
+        };
+        assert_ne!(binding.plan_sha256, request.binding.plan_sha256);
+        assert_eq!(
+            publication_scope(&request, Some(&binding)).unwrap(),
+            BudgetScope::Cell(format!(
+                "cell-{}-{}",
+                binding.plan_sha256, request.binding.cell_index
+            ))
+        );
+        request.observation.status = AttemptStatus::Interrupted;
+        assert_eq!(
+            publication_scope(&request, Some(&binding)).unwrap(),
+            BudgetScope::Finalization
+        );
+        binding.shard_index = (binding.shard_index + 1) % 3;
+        assert!(publication_scope(&request, Some(&binding)).is_err());
+        binding.shard_index = request.binding.cell_index % 3;
+        binding.binary_sha256 = "d".repeat(64);
+        assert!(publication_scope(&request, Some(&binding)).is_err());
+    }
     use crate::store::backend::{DirBackend, Meta};
     use std::sync::Mutex;
 

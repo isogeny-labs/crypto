@@ -1,5 +1,11 @@
 # Results: fall-degree experiments E1, E1b, E2 (`m = 2`)
 
+**Latest E12c preservation update (2026-10-28):** the additional `4:28:7`,
+`N=84` Spot attempt retained **one of four requested completed draw records**
+before reclaim (exit 143). Its window is uncertified, with null degree-result
+fields: this is **inconclusive**, not a `d_F >= 5` measurement. See the appended
+interrupted-continuation section and [report](e12/interrupted-c-20261028/README.md).
+
 **Latest continuation (2026-10-28):** E12b cell `3:24:7` completed four draws,
 `≥5, 4, ≥5, 4`. Amendment 15's frozen lower-median rule gives **4**, hence
 the registered reading **“mixed.”** See the appended completed-continuation
@@ -492,5 +498,57 @@ are unknown. The prior 282-row Lean table excludes these four new rows. No new
 Lean proof or independent implementation validation is claimed.
 
 The [PDF](e12/completed-20261028/report.pdf) and censoring-aware
-[graph](e12/completed-20261028/draws.svg) describe this completed attempt. E12a
-and E12c remain separate ongoing attempts; this section adds no results for them.
+[graph](e12/completed-20261028/draws.svg) describe this completed attempt. At the
+time of that report, E12a and E12c were separate ongoing attempts. Both have now
+ended after Spot reclaim; their terminal records follow below. This E12b section
+adds no results for them.
+
+## E12c interrupted additional attempt, 2026-10-28
+
+The Amendment-13 attempt at `(m,n,ell)=(4,28,7)`, `N=84`, retained **one of four
+requested completed draw records** before Spot reclaim. Draw 0 records zero
+solutions, `window.w1x.certified=false`, `d_f_window=null` and `d_f_le3=null`.
+These are producer-reported labels. A failed restricted window is inconclusive
+and cannot establish `d_F >= 5`; there is no exact degree or lower-bound claim.
+The frozen E12c positive reading requires at least two completed degree-4
+certifications; this attempt has none and supplies **no reading**.
+
+Job `20261028-021036-fd-e12c-20261028-r3-914d46` records a Spot notice at
+07:21:44 UTC, exit **143**, final output upload, then shutdown. The terminal
+receipt reports `interrupted`; output status remains `gate_passed`, without the
+wrapper's final `done`. Three requested completed records are missing. This is
+not an overall completion or a resumable solver-memory checkpoint.
+
+The original and canonical S3 archives passed download/hash verification. The
+archive contains 24 regular `out/` files plus `host.txt` and `rusage.txt`; all
+24 separately downloaded final outputs match the archive. Archive SHA-256:
+`fa4edf72399ec45b293b783d8582d9a26406c1670a3612a75b6110dd1e824f09`.
+The raw 775-byte row, original terminal/snapshot receipts, canonical PUT/GET
+readback, full identities, [report](e12/interrupted-c-20261028/README.md),
+[completion diagram](e12/interrupted-c-20261028/flow.svg) and
+[PDF](e12/interrupted-c-20261028/report.pdf) are preserved together.
+
+Gate logs were inspected; no solution recount, closure replay, formal independent
+experiment review or Lean proof was performed. Earlier reports remain historical
+records. Existing degree plots and unrestricted `fall_degree.*` metrics exclude
+this null window result because it is not a censored unrestricted degree. E12a
+and the general first-/last-fall-degree questions remain separate unfinished work.
+
+## E12a interrupted additional attempt, 2026-10-28
+
+The Amendment-13/14 attempt at `(m,n,ell)=(3,21,7)`, `N=42`, degree cap 5,
+ended after Spot reclaim with **zero of two requested completed target records**.
+Job `20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f` records a Spot notice at
+12:03:18 UTC, command exit **143**, and terminal status `interrupted` at
+12:04:22 UTC. The saved target JSONL and error file are empty; output status
+remains `gate_passed`. The attempt supplies **no registered degree-5 reading**
+and establishes neither an exact degree nor a lower bound.
+
+The [terminal preservation packet](e12/terminal-a-20261028/README.md) retains
+the receipts, final output snapshot, producer gate records, hashes and canonical
+S3 PUT/GET evidence. Its 14,706-byte canonical bundle has SHA-256
+`3030d78c8e0a21bbd9c774294b338586cb58a136565e4fd35c5da4678bd09ba9`.
+These are verified output files, not a solver-memory checkpoint. No closure
+replay, independent algorithm validation, retry or deadline extension accompanies
+this preservation. Earlier still-running records are historical; the requested
+E12a degree determination and the general first-/last-fall questions remain open.

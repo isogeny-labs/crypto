@@ -1683,6 +1683,35 @@ mod tests {
             &value
         )
         .is_err());
+        // Bridge the exact arithmetic context into the bounded native root
+        // adapter on this same frozen public fixture; no target resampling.
+        cfg.solver = "root".into();
+        assert!(case.private_witness.is_null());
+        let rooted = super::super::solvers::solve(&cfg, &case).unwrap();
+        let certificates: Vec<_> = rooted
+            .artifacts
+            .iter()
+            .filter(|a| a.role == "prime-root-certificates/v1")
+            .collect();
+        assert_eq!(certificates.len(), 1);
+        let certificate: Value = serde_json::from_slice(&certificates[0].bytes).unwrap();
+        assert!(!certificate["queries"].as_array().unwrap().is_empty());
+        super::super::solvers::verify_prime_root_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &cfg,
+            &certificate,
+        )
+        .unwrap();
+        super::super::verify_prime_root_outcome(&rooted.outcome, &certificate).unwrap();
+        assert_eq!(rooted.outcome["scalar_recovered_without_witness"], false);
+        assert_eq!(certificate["execution_trace_complete_verified"], false);
+        assert_eq!(certificate["total_operation_count_verified"], false);
+        if certificate["censored"] == true {
+            assert_eq!(rooted.outcome["status"], "budget_exhausted");
+            assert_eq!(rooted.outcome["solver_completed"], false);
+            assert_eq!(certificate["root_queries_completed"], false);
+        }
         for solver in ["f4", "pkm"] {
             cfg.solver = solver.into();
             let result = super::super::solvers::solve(&cfg, &case).unwrap();

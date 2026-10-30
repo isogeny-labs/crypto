@@ -1,0 +1,54 @@
+## A. m=3, nT>0, fb!=twistmult: count-weighted mean of f*q/nT (configs with M_nd>0), by bits,nT,fb
+12	nT=1	farey	configs=4	M_nd=1527	E_nd=1907500	weighted_f_q_over_nT=2.2021
+12	nT=1	interval	configs=4	M_nd=1217	E_nd=2039440	weighted_f_q_over_nT=1.6394
+12	nT=1	random	configs=3	M_nd=1313	E_nd=2325239	weighted_f_q_over_nT=1.5602
+12	nT=3	farey	configs=5	M_nd=3911	E_nd=2320484	weighted_f_q_over_nT=1.5578
+12	nT=3	interval	configs=6	M_nd=3819	E_nd=2066943	weighted_f_q_over_nT=1.7010
+12	nT=3	random	configs=5	M_nd=4601	E_nd=2221913	weighted_f_q_over_nT=1.9171
+16	nT=1	farey	configs=4	M_nd=94	E_nd=3263805	weighted_f_q_over_nT=1.5738
+16	nT=1	interval	configs=4	M_nd=115	E_nd=3217631	weighted_f_q_over_nT=1.6913
+16	nT=1	random	configs=4	M_nd=93	E_nd=2910080	weighted_f_q_over_nT=1.5409
+16	nT=3	farey	configs=4	M_nd=251	E_nd=3173618	weighted_f_q_over_nT=1.2803
+16	nT=3	interval	configs=4	M_nd=279	E_nd=3083692	weighted_f_q_over_nT=1.6045
+16	nT=3	random	configs=4	M_nd=230	E_nd=3208175	weighted_f_q_over_nT=1.2054
+20	nT=1	interval	configs=1	M_nd=1	E_nd=96867	weighted_f_q_over_nT=7.0621
+20	nT=3	farey	configs=1	M_nd=2	E_nd=91717	weighted_f_q_over_nT=3.9034
+20	nT=3	random	configs=1	M_nd=2	E_nd=82661	weighted_f_q_over_nT=5.5171
+## B. H3 random FB: configs, ratio_naive in [0.7,1.4], ratio_ref in [0.7,1.4]
+H3_naive_FAIL 12_0_0_m3_random_0.5 0.6980441 0.6379254 0.7592760 ratio_ref 0.8929443
+H3_naive_FAIL 12_0_0_m3_random_0.65 0.6939911 0.6850171 0.7025618 ratio_ref 0.9635733
+H3_naive_FAIL 12_0_2_m3_random_0.5 1.622090 1.548611 1.696681 ratio_ref 0.9206816
+H3_naive_FAIL 12_1_2_m3_random_0.5 0.6206569 0.5733187 0.6658913 ratio_ref 0.9212348
+H3_naive_FAIL 16_0_2_m2_random_0.5 0.6977565 0.5482372 0.8472757 ratio_ref 0.8284397
+H3_naive_FAIL 16_1_0_m3_random_0.5 0.6437168 0.6185005 0.6705675 ratio_ref 0.9836407
+random_configs 148 naive_pass 142 ref_pass 148
+## C. ratio_ref range (random FB): min,max
+0.8284397 1.139323
+## D. H2 point estimate > 5/q (resolvable configs), by nT,m,bits
+m=2	nT=0	bits=12	resolvable=10	point_gt_5/q=0	F4=0
+m=2	nT=1	bits=12	resolvable=4	point_gt_5/q=0	F4=0
+m=2	nT=3	bits=12	resolvable=7	point_gt_5/q=0	F4=0
+m=3	nT=0	bits=12	resolvable=30	point_gt_5/q=0	F4=0
+m=3	nT=0	bits=16	resolvable=28	point_gt_5/q=0	F4=0
+m=3	nT=1	bits=12	resolvable=16	point_gt_5/q=1	F4=0
+m=3	nT=1	bits=16	resolvable=16	point_gt_5/q=0	F4=0
+m=3	nT=3	bits=12	resolvable=16	point_gt_5/q=9	F4=6
+m=3	nT=3	bits=16	resolvable=16	point_gt_5/q=3	F4=0
+## E. gcd_odd>1 strata: configs and nondegenerate mixed counts
+gcdodd>1=0	m=2	nT=0	configs=92	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=0	m=2	nT=1	configs=48	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=0	m=2	nT=3	configs=44	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=0	m=3	nT=0	configs=80	M_nd=0	M_deg=82253	S_nd=0
+gcdodd>1=0	m=3	nT=1	configs=44	M_nd=2233	M_deg=51869	S_nd=2233
+gcdodd>1=0	m=3	nT=3	configs=36	M_nd=6956	M_deg=48103	S_nd=6956
+gcdodd>1=1	m=2	nT=0	configs=68	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=1	m=2	nT=1	configs=32	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=1	m=2	nT=3	configs=36	M_nd=0	M_deg=0	S_nd=0
+gcdodd>1=1	m=3	nT=0	configs=56	M_nd=0	M_deg=57140	S_nd=0
+gcdodd>1=1	m=3	nT=1	configs=24	M_nd=2127	M_deg=30705	S_nd=2127
+gcdodd>1=1	m=3	nT=3	configs=32	M_nd=6139	M_deg=45323	S_nd=6139
+## F. curveflag counts
+FALLBACK_no_gcdodd_in_5000 68
+ok 524
+## G. targets_xR_in_V total, truncated configs
+targets_xR_in_V_total 4112 truncated_configs 0

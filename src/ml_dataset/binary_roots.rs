@@ -142,6 +142,81 @@ fn event_size(index: usize, x: u64, event: &RootEvent) -> Result<usize, String> 
         .map_err(|e| e.to_string())?
         .len())
 }
+
+// Only byte admission failure can be sealed by this adapter. Real live/state
+// I/O failures return Err before saving a call or completion certificate.
+fn verify_event_budget(
+    row: &Query,
+    index: usize,
+    x: u64,
+    byte_cap: usize,
+    totals: &mut (u64, usize),
+) -> Result<(), String> {
+    for event in &row.report.events {
+        totals.0 = totals
+            .0
+            .checked_add(1)
+            .ok_or("binary event count overflow")?;
+        totals.1 = totals
+            .1
+            .checked_add(event_size(index, x, event)?)
+            .ok_or("binary event bytes overflow")?;
+        if totals.0 > TRACE_EVENT_CAP || totals.1 > byte_cap {
+            return Err("binary native event count or bytes exceed cap".into());
+        }
+    }
+    let report = &row.report;
+    if report.stop == RootStop::SinkFailure {
+        let attempted = report
+            .unacknowledged
+            .as_ref()
+            .ok_or("missing byte-capped event")?;
+        if !row.trace_byte_cap_reached
+            || report.sink_error.as_deref() != Some(BYTE_CAP_REASON)
+            || totals.0 >= TRACE_EVENT_CAP
+            || totals
+                .1
+                .checked_add(event_size(index, x, attempted)?)
+                .ok_or("binary event bytes overflow")?
+                <= byte_cap
+        {
+            return Err("unjustified binary byte-cap stop".into());
+        }
+    } else if row.trace_byte_cap_reached
+        || report.unacknowledged.is_some()
+        || report.sink_error.is_some()
+    {
+        return Err("binary byte-cap label or failed-sink state differs".into());
+    }
+    Ok(())
+}
+
+/// Check aggregate admission and the supplied canonical event envelopes. This
+/// does not establish a complete native trajectory or full execution cost.
+pub(super) fn trace_totals(artifact: &Value) -> Result<(u64, u64), String> {
+    let cert: Certificate = serde_json::from_value(artifact.clone()).map_err(|e| e.to_string())?;
+    if cert.event_cap != TRACE_EVENT_CAP || cert.event_byte_cap != EVENT_BYTE_CAP {
+        return Err("binary root event admission caps differ".into());
+    }
+    let mut totals = (0, 0);
+    for (index, row) in cert.queries.iter().enumerate() {
+        let x = row.fixed_x.parse::<u64>().map_err(|e| e.to_string())?;
+        if row.call_index != index || row.fixed_x != x.to_string() {
+            return Err("binary root event query identity differs".into());
+        }
+        verify_event_budget(row, index, x, EVENT_BYTE_CAP, &mut totals)?;
+        if row.trace_byte_cap_reached && index + 1 != cert.queries.len() {
+            return Err("binary root queries continue after byte-cap refusal".into());
+        }
+    }
+    if cert.acknowledged_native_events != totals.0
+        || cert.acknowledged_native_event_bytes != totals.1
+    {
+        return Err("binary root acknowledged event aggregates differ".into());
+    }
+    Ok((totals.0, totals.1 as u64))
+}
+
 fn validate_config(public: &Value, base: &Value, config: &CaseConfig) -> Result<(), String> {
     if config.solver != "root"
         || !["binary", "koblitz"].contains(&config.family.as_str())
@@ -448,28 +523,9 @@ pub(super) fn verify(
             return Err("failed binary linear system is not a dataset certificate".into());
         }
         used += report.counters.work();
-        events += report.events.len() as u64;
-        for event in &report.events {
-            bytes += event_size(index, x, event)?;
-            if bytes > EVENT_BYTE_CAP {
-                return Err("binary native event bytes exceed cap".into());
-            }
-        }
-        let byte_cap = report.stop == RootStop::SinkFailure;
-        if row.trace_byte_cap_reached != byte_cap {
-            return Err("binary byte-cap label differs".into());
-        }
-        if byte_cap {
-            let attempted = report
-                .unacknowledged
-                .as_ref()
-                .ok_or("missing byte-capped event")?;
-            if report.sink_error.as_deref() != Some(BYTE_CAP_REASON)
-                || bytes.saturating_add(event_size(index, x, attempted)?) <= EVENT_BYTE_CAP
-            {
-                return Err("unjustified binary byte-cap stop".into());
-            }
-        }
+        let mut totals = (events, bytes);
+        verify_event_budget(row, index, x, EVENT_BYTE_CAP, &mut totals)?;
+        (events, bytes) = totals;
         let roots = if report.stop == RootStop::AllFieldElements {
             xs.clone()
         } else {
@@ -652,6 +708,86 @@ mod tests {
                 assert_eq!(cert["censored"], cap != exact);
             }
         }
+    }
+
+    #[test]
+    fn canonical_envelope_caps_bind_failed_finish_and_accumulate_across_calls() {
+        let limits = RootLimits {
+            work: 10_000,
+            events: 10_000,
+        };
+        let field = FieldSpec {
+            degree: 3,
+            modulus: 0b1011,
+        };
+        let report = native::solve(&[0, 1, 1], field, limits, &mut |_| Ok(())).unwrap();
+        native::verify(&report).unwrap();
+        assert!(report.complete());
+        assert_eq!(report.roots, vec![0, 1]);
+        let mut query = Query {
+            call_index: 0,
+            fixed_x: "7".into(),
+            coefficients_constant_first: vec![0, 1, 1],
+            work_before: 0,
+            coefficient_setup_work: SETUP_WORK,
+            work_after: report.counters.work() + SETUP_WORK,
+            trace_byte_cap_reached: false,
+            report,
+            checks: vec![],
+        };
+        let exact = query
+            .report
+            .events
+            .iter()
+            .map(|e| event_size(0, 7, e).unwrap())
+            .sum::<usize>();
+        let mut totals = (0, 0);
+        verify_event_budget(&query, 0, 7, exact, &mut totals).unwrap();
+        assert_eq!(totals, (query.report.events.len() as u64, exact));
+        assert!(verify_event_budget(&query, 0, 7, exact - 1, &mut (0, 0)).is_err());
+        // Both individual calls fit; the second call crosses the shared cap.
+        let mut second = (0, 0);
+        verify_event_budget(&query, 1, 7, usize::MAX, &mut second).unwrap();
+        let mut cumulative = (0, 0);
+        verify_event_budget(&query, 0, 7, exact + second.1, &mut cumulative).unwrap();
+        verify_event_budget(&query, 1, 7, exact + second.1, &mut cumulative).unwrap();
+        assert_eq!(
+            cumulative,
+            (2 * query.report.events.len() as u64, exact + second.1)
+        );
+        let mut cumulative = (0, 0);
+        verify_event_budget(&query, 0, 7, exact + second.1 - 1, &mut cumulative).unwrap();
+        assert!(verify_event_budget(&query, 1, 7, exact + second.1 - 1, &mut cumulative).is_err());
+        query.trace_byte_cap_reached = true;
+        assert!(verify_event_budget(&query, 0, 7, exact, &mut (0, 0)).is_err());
+
+        let mut acknowledged = 0;
+        query.report = native::solve(&[0, 1, 1], field, limits, &mut |event| {
+            let size = event_size(0, 7, event)?;
+            if acknowledged + size > exact - 1 {
+                return Err(BYTE_CAP_REASON.into());
+            }
+            acknowledged += size;
+            Ok(())
+        })
+        .unwrap();
+        native::verify(&query.report).unwrap();
+        assert_eq!(query.report.stop, RootStop::SinkFailure);
+        assert!(matches!(
+            query.report.unacknowledged.as_ref(),
+            Some(RootEvent::Finish { .. })
+        ));
+        assert!(query.report.roots.is_empty());
+        let mut totals = (0, 0);
+        verify_event_budget(&query, 0, 7, exact - 1, &mut totals).unwrap();
+        assert_eq!(totals, (query.report.events.len() as u64, acknowledged));
+        assert!(verify_event_budget(&query, 0, 7, exact, &mut (0, 0)).is_err());
+        query.trace_byte_cap_reached = false;
+        assert!(verify_event_budget(&query, 0, 7, exact - 1, &mut (0, 0)).is_err());
+        query.trace_byte_cap_reached = true;
+        query.report.sink_error = Some("selected-state I/O failure".into());
+        native::verify(&query.report).unwrap();
+        assert!(verify_event_budget(&query, 0, 7, exact - 1, &mut (0, 0)).is_err());
     }
 
     #[test]

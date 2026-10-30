@@ -12,8 +12,12 @@ use std::process::{Command, Stdio};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use super::budget::{self, BudgetSession};
+use super::budget::{
+    take_inherited_owner_lease, BudgetSession, CampaignPolicy, OwnerIdentity, WorkerGrant,
+    OWNER_LEASE_ENV,
+};
 use super::capture::{self, AttemptBinding, CaptureCursor, CaptureLimits};
+use super::s3_budget::S3BudgetContext;
 use super::snapshot::{
     self, AttemptObservation, AttemptStatus, SnapshotAnchor, SnapshotLimits, SnapshotProfile,
     SnapshotRequest,
@@ -21,6 +25,70 @@ use super::snapshot::{
 use super::{storage, Artifact, SupervisedChild};
 use crate::store::backend::{Phase, RemoteSpec, S3Guard};
 use crate::store::Config;
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct OwnerBudgetDescriptor {
+    schema: String,
+    policy: CampaignPolicy,
+    grant: WorkerGrant,
+    owner: OwnerIdentity,
+}
+
+fn helper_budget<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<OwnerBudgetDescriptor>, D::Error> {
+    let value = Option::<serde_json::Value>::deserialize(deserializer)?;
+    match value {
+        None => Ok(None),
+        // Original local-only helper requests explicitly serialized three null
+        // paths. They confer no authority; S3 still requires an active owner.
+        Some(serde_json::Value::Object(ref fields))
+            if fields.len() == 3
+                && ["policy", "allocation", "journal"]
+                    .iter()
+                    .all(|key| fields.get(*key).is_some_and(serde_json::Value::is_null)) =>
+        {
+            Ok(None)
+        }
+        Some(value) => serde_json::from_value(value)
+            .map(Some)
+            .map_err(serde::de::Error::custom),
+    }
+}
+
+impl OwnerBudgetDescriptor {
+    fn from_session(session: &BudgetSession) -> Self {
+        Self {
+            schema: "crypto.ml-dataset.supervised-owner-lease/v1".into(),
+            policy: session.policy().clone(),
+            grant: session.grant().clone(),
+            owner: session.grant().request.owner.clone(),
+        }
+    }
+
+    fn open_inherited(&self) -> Result<Arc<BudgetSession>, String> {
+        if self.schema != "crypto.ml-dataset.supervised-owner-lease/v1" {
+            return Err("unknown supervised budget owner protocol".into());
+        }
+        #[cfg(unix)]
+        {
+            let held = take_inherited_owner_lease()?;
+            let session = Arc::new(BudgetSession::open_with_owner_lease(
+                Path::new(&self.grant.request.worker_journal_path),
+                &self.policy,
+                &self.grant,
+                &self.owner,
+                held,
+            )?);
+            session.require_active()?;
+            super::validate_budget_actor(&session)?;
+            Ok(session)
+        }
+        #[cfg(not(unix))]
+        Err("supervised budget owner leases require Unix".into())
+    }
+}
 
 #[derive(Args, Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -34,11 +102,11 @@ pub struct BudgetArgs {
 }
 
 impl BudgetArgs {
-    pub fn open(&self) -> Result<Option<Arc<BudgetSession>>, String> {
+    pub fn open(&self) -> Result<Option<Arc<super::legacy_budget::BudgetSession>>, String> {
         match (&self.policy, &self.allocation, &self.journal) {
             (None, None, None) => Ok(None),
             (Some(policy), Some(allocation), Some(journal)) => {
-                BudgetSession::open(policy, allocation, journal).map(Some)
+                super::legacy_budget::BudgetSession::open(policy, allocation, journal).map(Some)
             }
             _ => Err(
                 "provide all of --budget-policy, --budget-allocation and --budget-journal".into(),
@@ -66,7 +134,10 @@ pub fn require_budget(cfg: &Config, budget: &Option<Arc<BudgetSession>>) -> Resu
     Ok(())
 }
 
-pub fn guard(budget: &Option<Arc<BudgetSession>>, phase: Phase) -> Option<S3Guard> {
+pub fn guard(
+    budget: &Option<Arc<super::legacy_budget::BudgetSession>>,
+    phase: Phase,
+) -> Option<S3Guard> {
     budget.as_ref().map(|b| b.guard(phase))
 }
 
@@ -85,7 +156,7 @@ pub struct AllocateArgs {
 }
 
 pub fn allocate(args: &AllocateArgs) -> Result<serde_json::Value, String> {
-    budget::allocate(
+    super::legacy_budget::allocate(
         &args.policy,
         &args.allocation_id,
         super::read_json(&args.limits)?,
@@ -104,16 +175,17 @@ pub struct RestorePartialArgs {
     #[arg(long)]
     pub remote: Option<String>,
     #[command(flatten)]
-    pub budget: BudgetArgs,
+    pub budget: super::BudgetArgs,
 }
 
 pub fn restore_partial(args: &RestorePartialArgs) -> Result<serde_json::Value, String> {
     let cfg = store_config(&args.out, args.remote.as_deref())?;
-    let budget = args.budget.open()?;
+    let budget = super::open_budget(&args.budget)?;
     require_budget(&cfg, &budget)?;
     let anchor: SnapshotAnchor = super::read_json(&args.anchor)?;
+    let context = super::budget_transport(budget)?;
     let report =
-        snapshot::restore_partial(cfg, budget, &anchor, &args.out, &SnapshotLimits::default())?;
+        snapshot::restore_partial(cfg, context, &anchor, &args.out, &SnapshotLimits::default())?;
     serde_json::to_value(report).map_err(|e| e.to_string())
 }
 
@@ -235,7 +307,8 @@ struct HelperRequest {
     copied_context: BTreeSet<String>,
     observation: AttemptObservation,
     remote: String,
-    budget: BudgetArgs,
+    #[serde(default, deserialize_with = "helper_budget")]
+    budget: Option<OwnerBudgetDescriptor>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -329,8 +402,18 @@ pub fn snapshot_worker(request_path: &Path) -> Result<(), String> {
         return Err("cell binding changed before snapshot".into());
     }
     let cfg = store_config(&request.snapshot, Some(&request.remote))?;
-    let budget = request.budget.open()?;
-    require_budget(&cfg, &budget)?;
+    let session = match &request.budget {
+        Some(descriptor) => Some(descriptor.open_inherited()?),
+        None if std::env::var_os(OWNER_LEASE_ENV).is_some() => {
+            return Err("inherited owner lease has no bound budget descriptor".into());
+        }
+        None => None,
+    };
+    require_budget(&cfg, &session)?;
+    if let Some(session) = &session {
+        super::validate_budget_run(session, &request.cell)?;
+    }
+    let budget = super::budget_transport(session)?;
     super::checked_directory(&request.snapshot, true)?;
     let prepared_dir = request_path.parent().ok_or("request has no parent")?;
     let prepared_path = prepared_dir.join("prepared.json");
@@ -660,7 +743,8 @@ pub struct LiveSupervisor {
     ordinal: u64,
     helper_ordinal: u64,
     remote: String,
-    budget: BudgetArgs,
+    budget: Option<OwnerBudgetDescriptor>,
+    budget_session: Option<Arc<BudgetSession>>,
     interval: Duration,
     timeout: Duration,
     last_attempt: Instant,
@@ -669,6 +753,15 @@ pub struct LiveSupervisor {
 
 impl LiveSupervisor {
     pub fn new(root: &Path, cell: &Path, args: &super::GenerateArgs) -> Result<Self, String> {
+        Self::new_with_budget(root, cell, args, None)
+    }
+
+    pub fn new_with_budget(
+        root: &Path,
+        cell: &Path,
+        args: &super::GenerateArgs,
+        context: Option<&Arc<S3BudgetContext>>,
+    ) -> Result<Self, String> {
         if args.snapshot_seconds == 0 || args.snapshot_timeout_seconds == 0 {
             return Err("snapshot interval and timeout must be positive".into());
         }
@@ -694,8 +787,10 @@ impl LiveSupervisor {
         )?;
         let remote = store_config(root, args.remote.as_deref())?
             .remote
-            .ok_or("partial publication requires a remote")?
-            .display();
+            .ok_or("partial publication requires a remote")?;
+        let budget_session = context.map(|context| context.session().clone());
+        super::require_remote_budget(&remote, budget_session.as_ref())?;
+        let remote = remote.display();
         let base = super::checked_directory(
             &root
                 .join("partial-snapshots")
@@ -716,7 +811,10 @@ impl LiveSupervisor {
             ordinal: 0,
             helper_ordinal: 0,
             remote,
-            budget: args.budget.clone(),
+            budget: budget_session
+                .as_deref()
+                .map(OwnerBudgetDescriptor::from_session),
+            budget_session,
             interval: Duration::from_secs(args.snapshot_seconds),
             timeout: Duration::from_secs(args.snapshot_timeout_seconds),
             last_attempt: Instant::now(),
@@ -782,6 +880,10 @@ impl LiveSupervisor {
             .arg(directory.join("request.json"))
             .stdout(Stdio::from(stdout))
             .stderr(Stdio::from(stderr));
+        command.env_remove(OWNER_LEASE_ENV);
+        if let Some(session) = &self.budget_session {
+            session.configure_helper_lease(&mut command)?;
+        }
         #[cfg(unix)]
         {
             use std::os::unix::process::CommandExt;
@@ -1038,7 +1140,7 @@ mod tests {
                 copied_context: copied,
                 observation: observation(AttemptStatus::Running, None, None),
                 remote: format!("file://{}", self.0.join("remote").display()),
-                budget: BudgetArgs::default(),
+                budget: None,
             }
         }
         fn run(&self, request: &HelperRequest) -> HelperResult {
@@ -1372,6 +1474,32 @@ mod tests {
         assert!(!fixture.0.join("remote").exists());
         assert!(!dir.join("result.json").exists());
     }
+    #[test]
+    fn legacy_empty_helper_budget_is_local_only_and_never_spendable_authority() {
+        let fixture = Fixture::new();
+        let request = fixture.request(fixture.prepare(), None);
+        let mut wire = serde_json::to_value(&request).unwrap();
+        for empty in [
+            serde_json::Value::Null,
+            serde_json::json!({"policy":null,"allocation":null,"journal":null}),
+        ] {
+            wire["budget"] = empty;
+            let parsed: HelperRequest = serde_json::from_value(wire.clone()).unwrap();
+            assert!(parsed.budget.is_none());
+            let cfg =
+                store_config(&fixture.0, Some("s3://setec-astronomy-artifacts/test")).unwrap();
+            assert!(require_budget(&cfg, &None).is_err());
+        }
+        for invalid in [
+            serde_json::json!({}),
+            serde_json::json!({"policy":"old-policy.json","allocation":"old.json","journal":"old-journal"}),
+            serde_json::json!({"policy":null,"allocation":null,"journal":null,"extra":null}),
+        ] {
+            wire["budget"] = invalid;
+            assert!(serde_json::from_value::<HelperRequest>(wire.clone()).is_err());
+        }
+    }
+
     #[test]
     fn partial_budget_arguments_fail_before_opening_any_session() {
         let args = BudgetArgs {

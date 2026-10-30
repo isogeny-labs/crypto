@@ -67,7 +67,9 @@ impl AttemptBinding {
         let cell_index = attempt["cell_index"]
             .as_u64()
             .ok_or("attempt has no cell index")?;
-        let plan_sha256 = super::digest(&serde_json::to_vec(&plan).map_err(|e| e.to_string())?);
+        // Run/attempt identity uses the typed plan; retained context below
+        // separately binds the exact saved bytes, including their formatting.
+        let plan_sha256 = plan.binding_sha256()?;
         if run["plan_sha256"] != plan_sha256 || attempt["plan_sha256"] != plan_sha256 {
             return Err("capture attempt/run/plan mismatch".into());
         }
@@ -181,6 +183,27 @@ impl CaptureLimits {
         }
         Ok(())
     }
+}
+
+pub fn capture_limits(trace_mib: u64) -> Result<CaptureLimits, String> {
+    let total = trace_mib
+        .checked_mul(1024 * 1024)
+        .ok_or("capture limit overflow")?;
+    if total < 1024 * 1024 {
+        return Err("capture requires at least one MiB of worker output allowance".into());
+    }
+    let limits = CaptureLimits {
+        max_event_bytes: (total / 16).min(1024 * 1024),
+        max_stream_bytes: total / 8,
+        max_payload_bytes: total / 8,
+        max_payload_count: 4096,
+        max_capture_bytes: total,
+        chunk_bytes: (total / 16).min(1024 * 1024),
+        max_chunks: 4096,
+        metadata_reserve_bytes: (total / 8).min(1024 * 1024),
+    };
+    limits.validate()?;
+    Ok(limits)
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -1103,6 +1126,112 @@ mod tests {
             max_chunks: 128,
             metadata_reserve_bytes: 4096,
         }
+    }
+
+    #[test]
+    fn capture_limits_preserve_worker_allowance_and_reject_invalid_sizes() {
+        assert!(capture_limits(0).is_err());
+        assert!(capture_limits(u64::MAX).is_err());
+        for mib in [1, 8, 64, 128] {
+            let cap = capture_limits(mib).unwrap();
+            assert_eq!(cap.max_capture_bytes, mib * 1024 * 1024);
+            assert_eq!(cap.max_stream_bytes, cap.max_capture_bytes / 8);
+            assert_eq!(cap.max_payload_bytes, cap.max_capture_bytes / 8);
+            assert_eq!(cap.max_event_bytes, cap.chunk_bytes);
+            // The helper admits simultaneous maximum stream and payload
+            // content, including the snapshot copy and reserved metadata.
+            cap.local_peak(cap.max_stream_bytes, cap.max_payload_bytes)
+                .unwrap();
+        }
+        assert!(capture_limits(32769).is_err());
+    }
+
+    #[test]
+    fn cell_binding_distinguishes_typed_plan_identity_from_saved_file_hash() {
+        let f = Fixture::new();
+        let mut protocol = json!({"schema":"experiment.protocol/v1",
+            "purpose":"capture binding software fixture"});
+        let protocol_body = super::super::protocol_canonical_bytes(&protocol).unwrap();
+        protocol["freeze"] = json!({"status":"frozen",
+            "protocol_sha256":super::super::digest(&protocol_body),
+            "filed_before_affected_data":true,"frozen_at":"2026-10-29T00:00:00Z"});
+        let protocol_bytes = serde_json::to_vec(&protocol).unwrap();
+        let plan = super::super::DatasetPlan {
+            schema: "crypto.ml-dataset.plan/v1".into(),
+            field_sizes: vec![23],
+            arities: vec![2],
+            families: vec!["prime".into()],
+            solvers: vec!["root".into()],
+            curve_seeds: 1,
+            generators: 1,
+            keys: 1,
+            seed: 19,
+            factor_base_size: 4,
+            degree_bound: 3,
+            work_limit: 100,
+            twists: true,
+            protocol_sha256: Some(super::super::digest(&protocol_bytes)),
+            split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
+        };
+        let typed_hash = plan.binding_sha256().unwrap();
+        let config = plan.cell(0).unwrap();
+        let run = json!({"schema":"crypto.ml-dataset.run/v1",
+            "plan_sha256":typed_hash,"source_commit":"a".repeat(40),
+            "binary_sha256":"b".repeat(64)});
+        let attempt = json!({"schema":"crypto.ml-dataset.attempt/v1",
+            "plan_sha256":typed_hash,"cell_index":0});
+        storage::write_json(&f.cell(), "run.json", "run", &run).unwrap();
+        storage::write_json(&f.cell(), "attempt.json", "attempt", &attempt).unwrap();
+        storage::write_json(&f.cell(), "config.json", "config", &config).unwrap();
+        storage::write_json(&f.cell(), "plan.json", "plan", &plan).unwrap();
+        storage::write_bytes(
+            &f.cell(),
+            "protocol.json",
+            "protocol",
+            "json",
+            &protocol_bytes,
+        )
+        .unwrap();
+
+        let saved_bytes = fs::read(f.cell().join("plan.json")).unwrap();
+        let saved_hash = super::super::digest(&saved_bytes);
+        assert_ne!(saved_hash, typed_hash);
+        let first = AttemptBinding::from_cell_files(&f.cell()).unwrap();
+        assert_eq!(first.plan_sha256, saved_hash);
+
+        // Equivalent formatting preserves the frozen typed identity but must
+        // change the byte-bound capture context.
+        fs::write(
+            f.cell().join("plan.json"),
+            serde_json::to_vec(&plan).unwrap(),
+        )
+        .unwrap();
+        let reformatted = AttemptBinding::from_cell_files(&f.cell()).unwrap();
+        assert_eq!(reformatted.plan_sha256, typed_hash);
+        assert_ne!(first.digest().unwrap(), reformatted.digest().unwrap());
+
+        let mut wrong_run = run.clone();
+        wrong_run["plan_sha256"] = json!(saved_hash);
+        fs::write(
+            f.cell().join("run.json"),
+            serde_json::to_vec(&wrong_run).unwrap(),
+        )
+        .unwrap();
+        assert!(AttemptBinding::from_cell_files(&f.cell())
+            .unwrap_err()
+            .contains("attempt/run/plan mismatch"));
+        fs::write(f.cell().join("run.json"), serde_json::to_vec(&run).unwrap()).unwrap();
+        let mut wrong_config = config;
+        wrong_config.seed += 1;
+        fs::write(
+            f.cell().join("config.json"),
+            serde_json::to_vec(&wrong_config).unwrap(),
+        )
+        .unwrap();
+        assert!(AttemptBinding::from_cell_files(&f.cell())
+            .unwrap_err()
+            .contains("config does not match frozen plan cell"));
     }
 
     #[test]

@@ -1,0 +1,27 @@
+digraph proof {
+  graph [rankdir=TB, bgcolor="white", label="Guarded fall-degree proof dependencies (derived results)", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", fontname="Helvetica", fontsize=11];
+  edge [color="#39546b", fontname="Helvetica", fontsize=10];
+  sources [label="Primary sources\nclosure definition; S3 formulas"];
+  local [label="Three-abscissa ordinary-ring proof\nstaged quadratic normalization + resultant"];
+  odd [label="Characteristic > 3\nexact pair (4,5)", fillcolor="#e4f3e7"];
+  binary [label="Ordinary binary curve\nlast fall 4 on cube orbits; 5 otherwise", fillcolor="#e4f3e7"];
+  growing [label="Growing explicit membership cardinality B\nlinear degree bounds, not bit-complexity bounds", fillcolor="#e4f3e7"];
+  native [label="Native sparse replay\nu64 and arbitrary-precision backends", fillcolor="#e9eef8"];
+  large [label="Four public standard prime-curve fixtures\n256 / 256 / 384 / 521 bits; cap 5", fillcolor="#e4f3e7"];
+  lean [label="Lean: COMPLETE prime-field guarded B=3 pair (4,5)\nV5 construction + V4 obstruction + graded Koszul", fillcolor="#c7e8d1"];
+  boolupper [label="Fully Boolean binary one-auxiliary chain\nd_F <= 3 ell + 1 via affine specialization", fillcolor="#e4f3e7"];
+  primebits [label="Bit-restricted Fp lookup inputs\nd_F <= 3 ell + 2; extra hypotheses", fillcolor="#e4f3e7"];
+  boolean [label="Growing Boolean lower bounds / exact degrees\ncardinality lower-bound transfer UNPROVED", fillcolor="#fce5e5"];
+  sources -> local;
+  sources -> boolupper [label="binary formula + Boolean indicators"];
+  sources -> primebits [label="rational roots + localized quadratics"];
+  local -> odd;
+  local -> binary;
+  odd -> growing;
+  binary -> growing;
+  local -> native [label="finite instances"];
+  native -> large [label="separate producer, replay, curve checks"];
+  local -> lean [label="complete central theorem checked"];
+  growing -> boolean [style=dashed, label="missing lower-bound transfer"];
+}

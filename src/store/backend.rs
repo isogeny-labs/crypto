@@ -402,6 +402,39 @@ impl S3Backend {
         a
     }
 
+    /// A single page for the exact object-key prefix. This is deliberately
+    /// separate from normal listing: no pagination or broader prefix may turn
+    /// a failed HEAD into an absence decision.
+    fn absence_probe_args(&self, key: &str) -> Vec<String> {
+        let mut a: Vec<String> = vec![
+            "s3api".into(),
+            "list-objects-v2".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--prefix".into(),
+            self.full_key(key),
+            "--max-keys".into(),
+            "1".into(),
+            "--no-paginate".into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        a.extend(self.endpoint_args());
+        a
+    }
+
+    fn proves_absent(&self, key: &str) -> bool {
+        // Directory buckets require slash-ended prefixes. Never alter the
+        // requested key or broaden its prefix to accommodate that restriction.
+        if key.is_empty() || self.bucket.ends_with("--x-s3") {
+            return false;
+        }
+        let Ok(out) = self.run(&self.absence_probe_args(key)) else {
+            return false;
+        };
+        out.status.success() && empty_prefix_listing(&out.stdout, &self.bucket, &self.full_key(key))
+    }
+
     fn run(&self, args: &[String]) -> Result<Output, String> {
         self.run_with_download(args, 0)
     }
@@ -739,42 +772,6 @@ fn bounded_command(aws: &str, args: &[String], timeout_secs: u64) -> Result<Outp
     }
 }
 
-fn empty_scoped_listing(stdout: &[u8], bucket: &str, prefix: &str) -> bool {
-    #[derive(serde::Deserialize)]
-    #[serde(rename_all = "PascalCase")]
-    struct Listing {
-        name: String,
-        prefix: String,
-        max_keys: u64,
-        key_count: u64,
-        is_truncated: bool,
-        #[serde(default)]
-        contents: Vec<serde_json::Value>,
-        #[serde(default)]
-        common_prefixes: Vec<serde_json::Value>,
-        #[serde(flatten)]
-        extra: serde_json::Map<String, serde_json::Value>,
-    }
-    let Ok(v) = serde_json::from_slice::<Listing>(stdout) else {
-        return false;
-    };
-    v.name == bucket
-        && v.prefix == prefix
-        && v.max_keys == 1
-        && v.key_count == 0
-        && !v.is_truncated
-        && v.contents.is_empty()
-        && v.common_prefixes.is_empty()
-        && ![
-            "ContinuationToken",
-            "NextContinuationToken",
-            "StartAfter",
-            "Delimiter",
-        ]
-        .iter()
-        .any(|k| v.extra.contains_key(*k))
-}
-
 /// True when `aws s3api head-object` said the key is absent.
 pub fn is_not_found(stderr: &str) -> bool {
     stderr.contains("(404)") || stderr.contains("Not Found") || stderr.contains("NoSuchKey")
@@ -824,6 +821,45 @@ pub fn parse_list(stdout: &[u8], strip: &str) -> Result<Vec<(String, u64)>, Stri
     Ok(out)
 }
 
+/// Unlike the normal listing parser, this rejects missing, mistyped, or
+/// duplicate required fields. Explicit null arrays are invalid too. A listing
+/// can establish current absence only; conditional PUT still handles races.
+fn empty_prefix_listing(stdout: &[u8], bucket: &str, prefix: &str) -> bool {
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "PascalCase")]
+    struct Listing {
+        name: String,
+        prefix: String,
+        max_keys: u64,
+        key_count: u64,
+        is_truncated: bool,
+        #[serde(default)]
+        contents: Vec<serde_json::Value>,
+        #[serde(default)]
+        common_prefixes: Vec<serde_json::Value>,
+        #[serde(flatten)]
+        extra: serde_json::Map<String, serde_json::Value>,
+    }
+    let Ok(listing) = serde_json::from_slice::<Listing>(stdout) else {
+        return false;
+    };
+    listing.name == bucket
+        && listing.prefix == prefix
+        && listing.max_keys == 1
+        && listing.key_count == 0
+        && !listing.is_truncated
+        && listing.contents.is_empty()
+        && listing.common_prefixes.is_empty()
+        && ![
+            "ContinuationToken",
+            "NextContinuationToken",
+            "StartAfter",
+            "Delimiter",
+        ]
+        .iter()
+        .any(|field| listing.extra.contains_key(*field))
+}
+
 impl Backend for S3Backend {
     fn describe(&self) -> String {
         let base = if self.prefix.is_empty() {
@@ -847,16 +883,10 @@ impl Backend for S3Backend {
             return Ok(None);
         }
         let mut msg = self.failure("head-object", &out);
-        if self.guard.is_some() && stderr.contains("(403)") {
-            let mut args = self.list_args(key);
-            args.extend(["--max-keys".into(), "1".into(), "--no-paginate".into()]);
-            if let Ok(probe) = self.run(&args) {
-                if probe.status.success()
-                    && empty_scoped_listing(&probe.stdout, &self.bucket, &self.full_key(key))
-                {
-                    return Ok(None);
-                }
-            }
+        // Require the explicit AWS CLI status marker. The word "Forbidden"
+        // alone could occur in an unrelated gateway or execution error.
+        if stderr.contains("(403)") && self.proves_absent(key) {
+            return Ok(None);
         }
         if stderr.contains("(403)") || stderr.contains("Forbidden") {
             msg.push_str(
