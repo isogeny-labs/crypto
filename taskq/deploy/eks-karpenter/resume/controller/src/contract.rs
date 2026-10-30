@@ -17,6 +17,27 @@ pub struct Build {
     pub ecbench_sha256: String,
 }
 
+/// Explicit bounded memory envelope shared by computation and fresh L2 pods.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Memory {
+    #[default]
+    #[serde(rename = "4Gi")]
+    Gi4,
+    #[serde(rename = "8Gi")]
+    Gi8,
+}
+impl Memory {
+    fn is_default(&self) -> bool {
+        *self == Self::Gi4
+    }
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Gi4 => "4Gi",
+            Self::Gi8 => "8Gi",
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
@@ -29,6 +50,8 @@ pub struct Request {
     pub instance_type: String,
     pub checkpoint_interval_seconds: u64,
     pub max_restores: u32,
+    #[serde(default, skip_serializing_if = "Memory::is_default")]
+    pub memory: Memory,
 }
 
 pub fn hex(s: &str, n: usize) -> bool {
@@ -152,12 +175,86 @@ pub fn fixture() -> Request {
         instance_type: "c8a.2xlarge".into(),
         checkpoint_interval_seconds: 60,
         max_restores: 2,
+        memory: Memory::default(),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn memory_preserves_legacy_request_bytes_and_binds_explicit_eight_gib() {
+        // Exact pre-memory serialization layout, independent of Request's fields.
+        #[derive(Serialize)]
+        struct Legacy<'a> {
+            schema: &'a str,
+            run_name: &'a str,
+            deadline_unix_seconds: u64,
+            build: &'a Build,
+            runtime_image_uri: &'a str,
+            spec: &'a Value,
+            instance_type: &'a str,
+            checkpoint_interval_seconds: u64,
+            max_restores: u32,
+        }
+        let req = fixture();
+        let legacy = serde_json::to_vec(&Legacy {
+            schema: &req.schema,
+            run_name: &req.run_name,
+            deadline_unix_seconds: req.deadline_unix_seconds,
+            build: &req.build,
+            runtime_image_uri: &req.runtime_image_uri,
+            spec: &req.spec,
+            instance_type: &req.instance_type,
+            checkpoint_interval_seconds: req.checkpoint_interval_seconds,
+            max_restores: req.max_restores,
+        })
+        .unwrap();
+        assert_eq!(serde_json::to_vec(&req).unwrap(), legacy);
+        assert_eq!(req.hash(), digest(&legacy));
+        let old = Request::parse(&legacy).unwrap();
+        assert_eq!(old.memory, Memory::Gi4);
+        let mut explicit = serde_json::to_value(&old).unwrap();
+        explicit["memory"] = Value::String("4Gi".into());
+        let four = Request::parse(&serde_json::to_vec(&explicit).unwrap()).unwrap();
+        assert_eq!(four.hash(), old.hash());
+        explicit["memory"] = Value::String("8Gi".into());
+        let eight = Request::parse(&serde_json::to_vec(&explicit).unwrap()).unwrap();
+        assert_eq!(eight.memory, Memory::Gi8);
+        assert_ne!(eight.hash(), old.hash());
+        assert_eq!(serde_json::to_value(&eight).unwrap()["memory"], "8Gi");
+        assert_eq!(eight.deadline_unix_seconds, old.deadline_unix_seconds);
+        for invalid in [
+            serde_json::json!("16Gi"),
+            serde_json::json!("8192Mi"),
+            serde_json::json!(8),
+            Value::Null,
+        ] {
+            explicit["memory"] = invalid;
+            assert!(Request::parse(&serde_json::to_vec(&explicit).unwrap()).is_err());
+        }
+    }
+
+    #[test]
+    fn schema_memory_enum_matches_native_contract_and_is_optional() {
+        let schema: Value =
+            serde_json::from_str(include_str!("../../request.schema.json")).unwrap();
+        assert_eq!(
+            schema["properties"]["memory"]["enum"],
+            serde_json::json!(["4Gi", "8Gi"])
+        );
+        assert_eq!(schema["properties"]["memory"]["default"], "4Gi");
+        assert!(!schema["required"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("memory")));
+        for value in schema["properties"]["memory"]["enum"].as_array().unwrap() {
+            let mut req = serde_json::to_value(fixture()).unwrap();
+            req["memory"] = value.clone();
+            assert!(Request::parse(&serde_json::to_vec(&req).unwrap()).is_ok());
+        }
+    }
+
     #[test]
     fn strict_contract_rejects_unknown_fields_and_unpinned_sources() {
         let good = fixture();
