@@ -715,12 +715,58 @@ fn matrix(bases: &[Vec<Point>], relations: &[Relation]) -> Result<Vec<Vec<u64>>,
         .collect()
 }
 
+// Store sparse pivot tails only when their payload is no larger than dense.
+// Pivot traversal and normalization stay unchanged, preserving the first
+// dependent row and its exact recovered coefficients.
+enum PivotTail {
+    Sparse(Vec<(usize, u64)>),
+    Dense(Vec<u64>),
+}
+impl PivotTail {
+    fn new(row: &[u64]) -> Self {
+        let nonzero = row.iter().filter(|&&x| x != 0).count();
+        if nonzero * std::mem::size_of::<(usize, u64)>() <= std::mem::size_of_val(row) {
+            let mut entries = Vec::with_capacity(nonzero);
+            entries.extend(row.iter().copied().enumerate().filter(|&(_, x)| x != 0));
+            Self::Sparse(entries)
+        } else {
+            Self::Dense(row.to_vec())
+        }
+    }
+    fn subtract_from(&self, row: &mut [u64], k: u64, r: u64) {
+        let update = |a: &mut u64, b| {
+            if b != 0 {
+                let product = if k == 1 {
+                    b
+                } else if b == 1 {
+                    k
+                } else {
+                    mulmod(k, b, r)
+                };
+                *a = sub(*a, product, r);
+            }
+        };
+        match self {
+            Self::Sparse(entries) => {
+                for &(i, b) in entries {
+                    update(&mut row[i], b);
+                }
+            }
+            Self::Dense(entries) => {
+                for (a, &b) in row.iter_mut().zip(entries) {
+                    update(a, b);
+                }
+            }
+        }
+    }
+}
+
 // First row dependency, independent of u/v. Keep elimination factors instead
 // of updating a full provenance vector at every pivot; reconstruct once by
 // triangular back-substitution when the first dependent row is reached.
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
     struct Pivot {
-        row: Vec<u64>,
+        tail: PivotTail,
         source: usize,
         inverse: u64,
         factors: Vec<(usize, u64)>,
@@ -736,9 +782,8 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 continue;
             }
             factors.push((index, k));
-            for (a, &b) in row[col..].iter_mut().zip(&pivots[index].row[col..]) {
-                *a = sub(*a, mulmod(k, b, r), r);
-            }
+            row[col] = 0; // the normalized pivot entry is exactly one
+            pivots[index].tail.subtract_from(&mut row[col + 1..], k, r);
         }
         match row.iter().position(|&a| a != 0) {
             None => {
@@ -762,12 +807,14 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
             }
             Some(col) => {
                 let inv = inverse(row[col], r);
-                for a in &mut row[col..] {
-                    *a = mulmod(*a, inv, r);
+                for a in &mut row[col + 1..] {
+                    if *a != 0 && inv != 1 {
+                        *a = mulmod(*a, inv, r);
+                    }
                 }
                 columns.insert(col, pivots.len());
                 pivots.push(Pivot {
-                    row,
+                    tail: PivotTail::new(&row[col + 1..]),
                     source: i,
                     inverse: inv,
                     factors,
@@ -1281,10 +1328,22 @@ mod tests {
         let mut rng = Rng(321);
         for r in [3, 199, 1_099_512_551_701] {
             for n in 1..25 {
-                let rows: Vec<Vec<u64>> = (0..n + 1)
-                    .map(|_| (0..n).map(|_| rng.below(r)).collect())
-                    .collect();
-                assert_eq!(dependency(&rows, r), eager(&rows, r));
+                for density in [1, 2, 8, 32] {
+                    let rows: Vec<Vec<u64>> = (0..n + 1)
+                        .map(|_| {
+                            (0..n)
+                                .map(|_| {
+                                    if rng.below(density) == 0 {
+                                        rng.below(r)
+                                    } else {
+                                        0
+                                    }
+                                })
+                                .collect()
+                        })
+                        .collect();
+                    assert_eq!(dependency(&rows, r), eager(&rows, r));
+                }
             }
         }
     }
