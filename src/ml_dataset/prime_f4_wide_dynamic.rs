@@ -25,6 +25,8 @@ pub(super) enum Stop {
     Allocation,
     ArithmeticOverflow,
     TicketExhausted,
+    OutputLimit,
+    Serialization,
 }
 
 /// One pool of the parent attempt. Callers retain it across all invocations.
@@ -391,6 +393,420 @@ pub(super) fn build_original_chain(
     Ok(out)
 }
 
+#[derive(Clone, Copy, Debug)]
+pub(super) struct AffinePoint {
+    pub x: u64,
+    pub y: u64,
+}
+/// Producer-owned original input view. Structural validation is mandatory in
+/// encode_input; an untrusted verifier must additionally reconstruct equations
+/// and validate the curve/domain instead of trusting this representation.
+pub(super) struct ChainInputView<'a> {
+    pub field: &'a Fp64Arithmetic,
+    pub parameters: Parameters<'a>,
+    pub target: AffinePoint,
+    pub signed_domain: &'a [AffinePoint],
+    pub polynomials: &'a [InputPolynomial],
+}
+
+struct Decimal(u64);
+impl serde::Serialize for Decimal {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut digits = [0u8; 20];
+        let mut start = digits.len();
+        let mut value = self.0;
+        loop {
+            start -= 1;
+            digits[start] = b'0' + (value % 10) as u8;
+            value /= 10;
+            if value == 0 {
+                break;
+            }
+        }
+        serializer.serialize_str(std::str::from_utf8(&digits[start..]).expect("decimal digits"))
+    }
+}
+struct VariableName {
+    index: usize,
+    m: usize,
+}
+impl serde::Serialize for VariableName {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut name = [0u8; 3];
+        let (prefix, index) = if self.index < self.m {
+            (b'x', self.index)
+        } else {
+            (b'u', self.index - self.m)
+        };
+        name[0] = prefix;
+        let len = if index < 10 {
+            name[1] = b'0' + index as u8;
+            2
+        } else {
+            name[1] = b'0' + (index / 10) as u8;
+            name[2] = b'0' + (index % 10) as u8;
+            3
+        };
+        serializer.serialize_str(std::str::from_utf8(&name[..len]).expect("bounded variable name"))
+    }
+}
+struct Sequence<F> {
+    len: usize,
+    item: F,
+}
+impl<F, T> serde::Serialize for Sequence<F>
+where
+    F: Fn(usize) -> T,
+    T: serde::Serialize,
+{
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = serializer.serialize_seq(Some(self.len))?;
+        for i in 0..self.len {
+            seq.serialize_element(&(self.item)(i))?;
+        }
+        seq.end()
+    }
+}
+#[derive(serde::Serialize)]
+struct PointView {
+    x: Decimal,
+    y: Decimal,
+}
+impl From<AffinePoint> for PointView {
+    fn from(point: AffinePoint) -> Self {
+        Self {
+            x: Decimal(point.x),
+            y: Decimal(point.y),
+        }
+    }
+}
+#[derive(serde::Serialize)]
+struct CurveView {
+    a: Decimal,
+    b: Decimal,
+}
+#[derive(serde::Serialize)]
+struct RoleView {
+    index: usize,
+    name: VariableName,
+    role: &'static str,
+    domain: &'static str,
+}
+#[derive(serde::Serialize)]
+struct TermView<'a> {
+    exponents: &'a [u16],
+    coefficient: Decimal,
+}
+impl serde::Serialize for ChainInputView<'_> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        let Parameters {
+            m,
+            a,
+            b,
+            target_x,
+            codes,
+        } = self.parameters;
+        let v = 2 * m - 2;
+        let mut state = serializer.serialize_struct("OriginalPrimeChain", 24)?;
+        state.serialize_field("schema", "ml-dataset.prime-f4-chain-input/v1")?;
+        state.serialize_field("strategy", super::PRIME_CHAIN_STRATEGY)?;
+        state.serialize_field("m", &m)?;
+        state.serialize_field("n_vars", &v)?;
+        state.serialize_field("modulus", &Decimal(self.field.p()))?;
+        state.serialize_field(
+            "curve",
+            &CurveView {
+                a: Decimal(a),
+                b: Decimal(b),
+            },
+        )?;
+        state.serialize_field("target", &PointView::from(self.target))?;
+        state.serialize_field("target_x", &Decimal(target_x))?;
+        state.serialize_field("ring", "Fp[x0,...,x(m-1),u0,...,u(m-3)]")?;
+        state.serialize_field(
+            "variables",
+            &Sequence {
+                len: v,
+                item: |index: usize| VariableName { index, m },
+            },
+        )?;
+        state.serialize_field(
+            "variable_roles",
+            &Sequence {
+                len: v,
+                item: |index: usize| RoleView {
+                    index,
+                    name: VariableName { index, m },
+                    role: if index < m {
+                        "factor_base_leaf"
+                    } else {
+                        "unrestricted_affine_auxiliary"
+                    },
+                    domain: if index < m { "factor_base_x" } else { "all_Fp" },
+                },
+            },
+        )?;
+        state.serialize_field("monomial_order", "degrevlex")?;
+        state.serialize_field(
+            "domains",
+            &Sequence {
+                len: v,
+                item: |i: usize| (i < m).then_some(codes),
+            },
+        )?;
+        state.serialize_field(
+            "factor_base_x",
+            &Sequence {
+                len: codes.len(),
+                item: |i: usize| Decimal(codes[i]),
+            },
+        )?;
+        state.serialize_field(
+            "signed_factor_base",
+            &Sequence {
+                len: self.signed_domain.len(),
+                item: |i: usize| PointView::from(self.signed_domain[i]),
+            },
+        )?;
+        state.serialize_field(
+            "polynomials",
+            &Sequence {
+                len: self.polynomials.len(),
+                item: |i: usize| {
+                    let poly = &self.polynomials[i];
+                    Sequence {
+                        len: poly.terms.len(),
+                        item: move |j: usize| TermView {
+                            exponents: poly.terms[j]
+                                .mono
+                                .exponents(v)
+                                .expect("validated variable count"),
+                            coefficient: Decimal(poly.terms[j].coefficient),
+                        },
+                    }
+                },
+            },
+        )?;
+        state.serialize_field("chain_equation_count", &(m - 1))?;
+        state.serialize_field("membership_equation_count", &m)?;
+        state.serialize_field(
+            "membership_variables",
+            &Sequence {
+                len: m,
+                item: |i: usize| i,
+            },
+        )?;
+        state.serialize_field("native_normalization_applied", &false)?;
+        state.serialize_field(
+            "coefficient_arithmetic",
+            "u128 modular intermediates; merged nonzero terms, leading-first, no monic rescaling",
+        )?;
+        state.serialize_field("native_modulus_limit_exclusive", "4294967296")?;
+        state.serialize_field("affine_chain_exceptional_infinity_branches_covered", &false)?;
+        state.serialize_field(
+            "negative_scope",
+            "encoding-relative only; no exhaustive PDP nonexistence claim",
+        )?;
+        state.end()
+    }
+}
+fn validate_view(view: &ChainInputView<'_>, ledger: &mut Ledger) -> Result<(), Stop> {
+    ledger.check()?;
+    let Parameters {
+        m,
+        a,
+        b,
+        target_x,
+        codes,
+    } = view.parameters;
+    let p = view.field.p();
+    if !(4..=15).contains(&m)
+        || p < 5
+        || codes.is_empty()
+        || codes.len() > 32
+        || view.signed_domain.is_empty()
+        || view.signed_domain.len() > 64
+        || view.polynomials.len() != 2 * m - 1
+        || [a, b, target_x, view.target.x, view.target.y]
+            .iter()
+            .any(|&x| x >= p)
+        || target_x != view.target.x
+    {
+        return Err(Stop::InvalidInput);
+    }
+    {
+        let mut ticket = ledger.reserve(128 + codes.len() as u64 * 32, 0)?;
+        ticket.spend(128)?;
+        for (i, &x) in codes.iter().enumerate() {
+            ticket.spend(32)?;
+            if x >= p || (i > 0 && codes[i - 1] >= x) {
+                return Err(Stop::InvalidInput);
+            }
+        }
+    }
+    for point in view.signed_domain {
+        let mut ticket = ledger.reserve(64 + codes.len() as u64 * 16, 0)?;
+        ticket.spend(64 + codes.len() as u64 * 16)?;
+        if point.x >= p || point.y >= p || !codes.contains(&point.x) {
+            return Err(Stop::InvalidInput);
+        }
+    }
+    for x in codes {
+        let mut ticket = ledger.reserve(view.signed_domain.len() as u64 * 16, 0)?;
+        ticket.spend(view.signed_domain.len() as u64 * 16)?;
+        if !view.signed_domain.iter().any(|point| point.x == *x) {
+            return Err(Stop::InvalidInput);
+        }
+    }
+    let v = 2 * m - 2;
+    for (i, poly) in view.polynomials.iter().enumerate() {
+        let limit = if i < m - 1 { 13 } else { codes.len() + 1 };
+        if poly.terms.len() > limit {
+            return Err(Stop::InvalidInput);
+        }
+        for (j, term) in poly.terms.iter().enumerate() {
+            let work = 32 * v as u64 + 128;
+            let mut ticket = ledger.reserve(work, 0)?;
+            ticket.spend(work)?;
+            if term.coefficient == 0
+                || term.coefficient >= p
+                || term
+                    .mono
+                    .exponents(v)
+                    .ok_or(Stop::InvalidInput)?
+                    .iter()
+                    .any(|&e| e > 32)
+                || term.mono.exponents(MAX_V).ok_or(Stop::InvalidInput)?[v..]
+                    .iter()
+                    .any(|&e| e != 0)
+                || (j > 0 && cmp(&poly.terms[j - 1], term, v) != Ordering::Greater)
+            {
+                return Err(Stop::InvalidInput);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// One caller-admitted slot; physical spare capacity is never usable budget.
+pub(super) struct InputBuffer {
+    bytes: Vec<u8>,
+    logical_cap: usize,
+}
+impl InputBuffer {
+    pub fn new(cap: usize, ledger: &mut Ledger) -> Result<Self, Stop> {
+        if cap > 4 * 1024 * 1024 {
+            return Err(Stop::StorageLimit);
+        }
+        Ok(Self {
+            bytes: requested_vec::<u8>(cap, ledger)?,
+            logical_cap: cap,
+        })
+    }
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+}
+struct MeteredWriter<'a> {
+    ledger: &'a mut Ledger,
+    output: Option<&'a mut Vec<u8>>,
+    count: usize,
+    cap: usize,
+    stop: Option<Stop>,
+}
+impl std::io::Write for MeteredWriter<'_> {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if self.stop.is_some() {
+            return Err(std::io::ErrorKind::Other.into());
+        }
+        let result = (|| {
+            let next = self
+                .count
+                .checked_add(bytes.len())
+                .ok_or(Stop::ArithmeticOverflow)?;
+            if next > self.cap {
+                return Err(Stop::OutputLimit);
+            }
+            // At most 256 output bytes between original deadline checks.
+            // Both count and write consume this schedule independently.
+            for chunk in bytes.chunks(256) {
+                let work = 8 * chunk.len() as u64 + 32;
+                let mut ticket = self.ledger.reserve(work, 0)?;
+                ticket.spend(work)?;
+                if let Some(output) = self.output.as_mut() {
+                    output.extend_from_slice(chunk);
+                }
+                self.count += chunk.len();
+            }
+            Ok(bytes.len())
+        })();
+        match result {
+            Ok(n) => Ok(n),
+            Err(stop) => {
+                self.stop = Some(stop);
+                Err(std::io::ErrorKind::Other.into())
+            }
+        }
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+/// Two independent metered passes. The buffer is logically empty on every
+/// failure, so a censored prefix cannot be mistaken for a complete artifact.
+pub(super) fn encode_input(
+    view: &ChainInputView<'_>,
+    output: &mut InputBuffer,
+    ledger: &mut Ledger,
+) -> Result<(), Stop> {
+    output.bytes.clear();
+    let result = (|| {
+        validate_view(view, ledger)?;
+        // Account fixed formatting/serializer/sink mathematical scratch. serde
+        // machinery and errors remain within the existing outer process gate.
+        let scratch = size_of::<[u8; 20]>()
+            + size_of::<[u8; 3]>()
+            + size_of::<MeteredWriter<'static>>()
+            + size_of::<[usize; 32]>();
+        {
+            let mut ticket = ledger.reserve(scratch as u64 * 8, scratch as u64)?;
+            ticket.spend(scratch as u64 * 8)?;
+        }
+        let mut counter = MeteredWriter {
+            ledger,
+            output: None,
+            count: 0,
+            cap: output.logical_cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut counter, view).is_err() {
+            return Err(counter.stop.unwrap_or(Stop::Serialization));
+        }
+        let count = counter.count;
+        let mut writer = MeteredWriter {
+            ledger,
+            output: Some(&mut output.bytes),
+            count: 0,
+            cap: output.logical_cap,
+            stop: None,
+        };
+        if serde_json::to_writer(&mut writer, view).is_err() {
+            return Err(writer.stop.unwrap_or(Stop::Serialization));
+        }
+        if writer.count != count {
+            return Err(Stop::Serialization);
+        }
+        ledger.check()?;
+        Ok(())
+    })();
+    if result.is_err() {
+        output.bytes.clear();
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -630,5 +1046,220 @@ mod tests {
         let mut ticket = budget.reserve(10, 10).unwrap();
         assert_eq!(ticket.spend(11), Err(Stop::TicketExhausted));
         assert_eq!(*ticket.performed, 0);
+    }
+    fn typed_view<'a>(
+        field: &'a Fp64Arithmetic,
+        polynomials: &'a [InputPolynomial],
+        m: usize,
+    ) -> ChainInputView<'a> {
+        ChainInputView {
+            field,
+            parameters: Parameters {
+                m,
+                a: 1,
+                b: 2,
+                target_x: 1,
+                codes: &[1],
+            },
+            target: AffinePoint { x: 1, y: 2 },
+            signed_domain: &[AffinePoint { x: 1, y: 2 }, AffinePoint { x: 1, y: 99 }],
+            polynomials,
+        }
+    }
+    #[test]
+    fn typed_input_schema_matches_legacy_for_every_arity() {
+        use num_bigint::BigUint;
+        let setup = field(101);
+        let curve = super::super::curves::ExactPrimeCurve {
+            p: 101u32.into(),
+            a: 1u32.into(),
+            b: 2u32.into(),
+            gx: 1u32.into(),
+            gy: 2u32.into(),
+            n: 1u32.into(),
+            cofactor: 1,
+        };
+        let point = |y: u64| {
+            super::super::Element::Prime(crate::ecc::Point::Affine {
+                x: curve.fe(BigUint::from(1u64)),
+                y: curve.fe(BigUint::from(y)),
+            })
+        };
+        let target = point(2);
+        let domain = [point(2), point(99)];
+        let group = super::super::Group::Prime(curve.clone());
+        for m in 4..=15 {
+            let params = Parameters {
+                m,
+                a: 1,
+                b: 2,
+                target_x: 1,
+                codes: &[1],
+            };
+            let polys = build_original_chain(&setup.field, params, &mut ledger()).unwrap();
+            let view = typed_view(&setup.field, &polys, m);
+            let mut budget = ledger();
+            let mut output = InputBuffer::new(131072, &mut budget).unwrap();
+            encode_input(&view, &mut output, &mut budget).unwrap();
+            let actual: serde_json::Value = serde_json::from_slice(output.bytes()).unwrap();
+            let expected = super::super::prime_chain_input(m, &group, &domain, &target)
+                .unwrap()
+                .artifact;
+            assert_eq!(actual, expected);
+            assert_eq!(
+                serde_json::to_vec(&actual).unwrap(),
+                serde_json::to_vec(&expected).unwrap()
+            );
+        }
+    }
+    #[test]
+    fn typed_input_exact_one_less_bytes_work_and_empty_failure() {
+        let setup = field(101);
+        let params = Parameters {
+            m: 4,
+            a: 1,
+            b: 2,
+            target_x: 1,
+            codes: &[1],
+        };
+        let polys = build_original_chain(&setup.field, params, &mut ledger()).unwrap();
+        let view = typed_view(&setup.field, &polys, 4);
+        let mut initial = ledger();
+        let mut generous = InputBuffer::new(131072, &mut initial).unwrap();
+        encode_input(&view, &mut generous, &mut initial).unwrap();
+        let size = generous.bytes().len();
+        let mut measured = ledger();
+        let mut exact = InputBuffer::new(size, &mut measured).unwrap();
+        encode_input(&view, &mut exact, &mut measured).unwrap();
+        assert_eq!(exact.bytes(), generous.bytes());
+        let work = measured.reserved_work;
+        let bytes = measured.reserved_bytes;
+        let mut exact_budget = Ledger::new(work, bytes, Instant::now() + Duration::from_secs(30));
+        let mut exact_again = InputBuffer::new(size, &mut exact_budget).unwrap();
+        encode_input(&view, &mut exact_again, &mut exact_budget).unwrap();
+        assert_eq!(exact_again.bytes(), exact.bytes());
+        let mut low_work = Ledger::new(work - 1, bytes, Instant::now() + Duration::from_secs(30));
+        let mut failed = InputBuffer::new(size, &mut low_work).unwrap();
+        assert_eq!(
+            encode_input(&view, &mut failed, &mut low_work),
+            Err(Stop::WorkLimit)
+        );
+        assert!(failed.bytes().is_empty());
+        assert!(low_work.reserved_work > 0);
+        // Physical storage is large enough; the logical cap still wins.
+        generous.logical_cap = size - 1;
+        assert_eq!(
+            encode_input(&view, &mut generous, &mut ledger()),
+            Err(Stop::OutputLimit)
+        );
+        assert!(generous.bytes().is_empty());
+        let mut low_bytes = Ledger::new(work, bytes - 1, Instant::now() + Duration::from_secs(30));
+        let mut output = InputBuffer::new(size, &mut low_bytes).unwrap();
+        assert_eq!(
+            encode_input(&view, &mut output, &mut low_bytes),
+            Err(Stop::StorageLimit)
+        );
+        assert!(output.bytes().is_empty());
+    }
+    #[test]
+    fn typed_input_rejects_dimensions_coordinates_coverage_and_coefficients() {
+        let setup = field(101);
+        let params = Parameters {
+            m: 4,
+            a: 1,
+            b: 2,
+            target_x: 1,
+            codes: &[1],
+        };
+        let mut polys = build_original_chain(&setup.field, params, &mut ledger()).unwrap();
+        let mut output = InputBuffer::new(131072, &mut ledger()).unwrap();
+        let mut view = typed_view(&setup.field, &polys, 4);
+        view.target.x = 2;
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        view.target.x = 1;
+        view.signed_domain = &[AffinePoint { x: 2, y: 2 }];
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        view.signed_domain = &[AffinePoint { x: 1, y: 101 }];
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        view.signed_domain = &[AffinePoint { x: 1, y: 2 }; 65];
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        view.signed_domain = &[AffinePoint { x: 1, y: 2 }];
+        view.parameters.codes = &[1, 2];
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        view.parameters.m = usize::MAX;
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        polys[0].terms[0].coefficient = 101;
+        let view = typed_view(&setup.field, &polys, 4);
+        assert_eq!(
+            encode_input(&view, &mut output, &mut ledger()),
+            Err(Stop::InvalidInput)
+        );
+        assert!(output.bytes().is_empty());
+    }
+    #[test]
+    fn typed_input_maximum_shape_fits_original_algebra_allowance() {
+        let p = (1u64 << 61) - 1;
+        let setup = field(p);
+        let codes: [u64; 32] = std::array::from_fn(|i| p - 32 + i as u64);
+        // Structural canonical schema fixture only; arbitrary y values are not
+        // claimed to be on-curve. The all-arity test above uses actual points.
+        let signed: [AffinePoint; 64] = std::array::from_fn(|i| AffinePoint {
+            x: codes[i / 2],
+            y: if i % 2 == 0 { 1 } else { p - 1 },
+        });
+        let params = Parameters {
+            m: 15,
+            a: p - 1,
+            b: p - 2,
+            target_x: p - 3,
+            codes: &codes,
+        };
+        let mut budget = Ledger::new(
+            3 * 16_777_216 / 4,
+            64 * 1024 * 1024,
+            Instant::now() + Duration::from_secs(30),
+        );
+        let polys = build_original_chain(&setup.field, params, &mut budget).unwrap();
+        let view = ChainInputView {
+            field: &setup.field,
+            parameters: params,
+            target: AffinePoint { x: p - 3, y: 1 },
+            signed_domain: &signed,
+            polynomials: &polys,
+        };
+        // Approved maximum E input slot, including its fixed R/S reservations.
+        let cap = (4 * 1024 * 1024 - 65536 - 4096) / 3;
+        let mut output = InputBuffer::new(cap, &mut budget).unwrap();
+        encode_input(&view, &mut output, &mut budget).unwrap();
+        assert!(output.bytes().len() <= cap);
+        eprintln!(
+            "dynamic_input_max_shape bytes={} reserved_work={} reserved_bytes={}",
+            output.bytes().len(),
+            budget.reserved_work,
+            budget.reserved_bytes
+        );
+        assert!(budget.reserved_work <= 3 * 16_777_216 / 4);
+        assert!(budget.reserved_bytes <= 64 * 1024 * 1024);
+        let value: serde_json::Value = serde_json::from_slice(output.bytes()).unwrap();
+        assert_eq!(value["polynomials"].as_array().unwrap().len(), 29);
+        assert_eq!(value["signed_factor_base"].as_array().unwrap().len(), 64);
     }
 }
