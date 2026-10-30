@@ -91,3 +91,27 @@ A fresh FULL cargo test --locked --release --lib is executing using the cached
 build, output /tmp/crypto-root-tests-restored.log. Its wrapper records the actual
 exit status in /tmp/crypto-root-tests-restored.exit. No final pass is claimed.
 The earlier item 12's compiling status is superseded by this executing rerun.
+
+2026-10-30 recovery (00:29 UTC):
+The restored run did not leave its promised parent exit marker. Tool session
+20447 is no longer available; its cargo/test processes are zombies. Its trace
+ends without a full-suite summary. The isolated one-test summary embedded in
+that trace is not a full-suite result. Completion and parent exit are UNKNOWN.
+Trace: /tmp/crypto-root-tests-restored.log, 300952 bytes,
+SHA-256 1f6feada84a48d54dea3ec6caac5e0ba398ae39c14526193ec4797a33e96960c,
+NOT_UPLOADED. No source, fixture or assertion was changed during recovery.
+Restarted the unchanged mandatory command cargo test --locked --release --lib
+with output /tmp/crypto-root-tests-20261030.log and actual exit marker
+/tmp/crypto-root-tests-20261030.exit. Its result is pending. Earlier statements
+that the 23:43 run is executing are superseded by this recovery observation.
+
+Mirror publication:
+cryptanalysis PR1302 head b27ae2e5f525dc5a5a28d5fa935f67c9eeab965f has all
+applicable hosted checks successful, no unresolved review threads, and the
+completed automatic code review reports no findings. The opcounts job is
+legitimately skipped because its condition excludes pull_request events.
+A guarded merge attempt was rejected because current main cannot merge cleanly.
+Auto-merge remains enabled. Per AGENTS.md, asked Copilot once to merge main into
+the PR without rebasing/force-pushing or changing scope; resolution pending:
+https://github.com/isogeny-labs/cryptanalysis/pull/1302#issuecomment-6511852645
+No conflicting file was edited while that request is pending.
