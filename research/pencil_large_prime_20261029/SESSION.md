@@ -1247,3 +1247,20 @@ resource envelope, remaining empirical cohort and timing requirements.
 
 ### Errors
 No failed CI observed at delivery; old PR2869 evidence shards remain pending.
+
+## 2026-10-30 — Continuation consumer validation and resource admission
+
+### What was done
+The disjoint native analyzer and canonical exporter passed their final source-held validation. Native price:34 library tests,2CLI tests and an explicit retained1080-record integration preserving21600missing future slots. Exporter:54library,1CLI,1historical hash,3production tests and separately hydrated exact7-plan1260-workload replay passed; formatting and strict Clippy passed. Raw development failures and final receipts are retained. The prior CI run40984336538 finished successfully including16evidence-audit shards.
+
+### Decisions made
+Recorded the user's3hrs as10800cumulative active worker seconds and conservative outer expiry2026-10-30T05:05:50Z from recording at02:05:50Z. No reset of first-gate authorization. The revised conditional operational guard uses internal03:28:20Z and900secondsreserve, reviewed against four bounded kube calls and normal scheduling/Kubernetes enforcement. This is resource admission only; source/protocol/coverage admission remains distinct.
+
+### Open threads
+Commit reviewed consumers, bind postcommit source receipts, finish prospective protocol/source coverage, freeze and commit before any affected observations, then reconcile live jobs before submission. All1260 targets and qualified timing remain the original completion scope. No new experiment was launched by these software checks.
+
+### Errors
+The exporter's first hydrated integration overlapped a source edit and correctly failed its source-integrity check. Sources were then held unchanged through the successful final replay; both logs remain. The initial180-second guard missed cumulative bounded API delays; its review and the corrected900-second version remain separate records.
+
+### Prospective upper gate freeze
+Frozen the reviewed p186379target0 finite-count protocol before data: canonical body009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091, file709cb1b8dca094588db8e85429e186db2580d45f996f20c1388a365bdf38b133. Native frozen validation passes. Exact source848f495fa7031f0d0b5ac0d811ec07aa29fed9e7 and additive postcommit build attestation are bound. No launch follows from validator success; independent exact-body coverage, committed publication and live owner/resource admission remain required. Software PR2912 created after branch push and auto-merge enabled. Initial PR creation ran before push completed and failed without creating a PR; the successful retry is the only PR.
