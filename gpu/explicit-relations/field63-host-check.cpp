@@ -4,7 +4,8 @@
 using namespace explicit_relations;
 using W=unsigned __int128;
 Point refadd(Point a,Point b,U p,U ca) {
- if(a.inf)return b;if(b.inf)return a;
+ if (a.inf) return b;
+ if (b.inf) return a;
  if(a.x==b.x&&(a.y+b.y)%p==0)return {};
  U den=a.x==b.x?2*a.y%p:(b.x+p-a.x)%p;
  U num=a.x==b.x?U((3*W(modmul(a.x,a.x,p))+ca)%p):(b.y+p-a.y)%p;
