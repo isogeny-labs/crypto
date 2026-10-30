@@ -3620,17 +3620,6 @@ mod tests {
             expired.deadline = Instant::now();
             assert!(solve_dynamic_bound(&config, &case, &expired).is_err());
             let result = solve_dynamic_bound(&config, &case, &context).unwrap();
-            assert_eq!(
-                result.outcome["pdp_witness_verified"], true,
-                "{:?}",
-                result.outcome
-            );
-            assert!(result.outcome.get("live_persistence_errors").is_none());
-            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
-                Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
-                _ => panic!("bound sink lost"),
-            });
-            drop(guard);
             let artifacts: Vec<_> = result
                 .artifacts
                 .iter()
@@ -3645,6 +3634,21 @@ mod tests {
                     .unwrap()
                 })
                 .collect();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{:?}",
+                result.outcome
+            );
+            assert!(
+                result.outcome.get("live_persistence_errors").is_none(),
+                "{:?}",
+                result.outcome
+            );
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
+                _ => panic!("bound sink lost"),
+            });
+            drop(guard);
             let original = dynamic_original(
                 &config,
                 &case,

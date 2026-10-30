@@ -645,8 +645,7 @@ fn witness_hash_work(n: usize) -> Result<u64, WitnessError> {
 /// hold this within its original allowance while continuing other work.
 pub(super) fn witness_confirmation_work(n: usize) -> Result<u64, WitnessError> {
     witness_hash_work(n)?
-        .checked_mul(2)
-        .and_then(|x| x.checked_add((n as u64).checked_mul(16)?))
+        .checked_add((n as u64).checked_mul(32).ok_or(WitnessError::Work)?)
         .and_then(|x| x.checked_add(8192))
         .ok_or(WitnessError::Work)
 }
@@ -808,6 +807,38 @@ fn witness_file_check(
     if &digest != expected {
         return Err(WitnessError::Integrity);
     }
+    Ok(())
+}
+/// The supplied bytes were already hashed against the committed identity.
+/// Exact comparison binds the file to those bytes without hashing it again.
+/// Reuses the admitted I/O buffer; read and comparison each retain their
+/// existing conservative 16-per-byte tariff.
+fn witness_file_matches(
+    path: &Path,
+    expected: &[u8],
+    scratch: &mut Vec<u8>,
+    ticket: &mut WitnessTicket<'_>,
+) -> Result<(), WitnessError> {
+    ticket.check()?;
+    witness_regular(path)?;
+    let mut file = File::open(path)?;
+    if file.metadata()?.len() != expected.len() as u64 {
+        return Err(WitnessError::Integrity);
+    }
+    scratch.resize(4096, 0);
+    for chunk in expected.chunks(4096) {
+        ticket.check()?;
+        ticket.spend(32 * chunk.len() as u64)?;
+        file.read_exact(&mut scratch[..chunk.len()])?;
+        if &scratch[..chunk.len()] != chunk {
+            return Err(WitnessError::Integrity);
+        }
+    }
+    let mut extra = [0u8; 1];
+    if file.read(&mut extra)? != 0 {
+        return Err(WitnessError::Integrity);
+    }
+    ticket.check()?;
     Ok(())
 }
 fn witness_write(
@@ -1004,13 +1035,13 @@ impl CaptureEmitter {
                     return Err(WitnessError::Identity);
                 }
             }
-            let cost = witness_hash_work(bytes.len())?
-                .checked_add(16 * bytes.len() as u64)
+            let cost = (bytes.len() as u64)
+                .checked_mul(32)
                 .and_then(|n| n.checked_add(4096))
                 .ok_or(WitnessError::Work)?;
             let mut t = budget.reserve(cost, 0)?;
             t.spend(4096)?;
-            witness_file_check(&w.paths[1], &digest, bytes.len() as u64, &mut w.io, &mut t)?;
+            witness_file_matches(&w.paths[1], bytes, &mut w.io, &mut t)?;
             self.witness = WitnessIdentity {
                 committed: true,
                 digest,
@@ -3193,6 +3224,52 @@ mod tests {
                 assert_eq!(receipt.payload_sha256, first.payload_sha256);
                 assert_eq!(receipt.sequence, first.sequence);
                 assert_eq!(b.reserved_work - before, quoted);
+            }
+        }
+    }
+    #[test]
+    fn witness_confirmation_compares_full_bytes_across_io_boundaries() {
+        for length in [624usize, 4102] {
+            for mutation in [
+                None,
+                Some(0usize),
+                Some(length - 1),
+                Some(4096.min(length - 1)),
+                Some(length),
+                Some(length + 1),
+            ] {
+                let f = Fixture::new();
+                let mut e = f.emitter();
+                let mut b = witness_budget();
+                let mut w = e.prepare_witness(&mut b).unwrap();
+                let mut global = 0;
+                // Valid JSON bytes exercise custody only, not witness mathematics.
+                let bytes = format!("\"{}\"", "x".repeat(length - 2)).into_bytes();
+                e.publish_first_witness(&bytes, &mut w, &mut b, &mut global)
+                    .unwrap();
+                let head = fs::read(f.live().join("committed.json")).unwrap();
+                if let Some(index) = mutation {
+                    let mut changed = bytes.clone();
+                    if index < length {
+                        changed[index] ^= 1;
+                    } else if index == length {
+                        changed.pop();
+                    } else {
+                        changed.push(b' ');
+                    }
+                    fs::write(f.live().join(WITNESS_PATH), changed).unwrap();
+                }
+                let quoted = witness_confirmation_work(bytes.len()).unwrap();
+                b.set_exclusive_supply(quoted, 0).unwrap();
+                let result = e.publish_first_witness(&bytes, &mut w, &mut b, &mut global);
+                if mutation.is_some() {
+                    assert_eq!(result.unwrap_err(), WitnessError::Integrity);
+                    assert!(e.failed);
+                } else {
+                    assert_eq!(result.unwrap().commit, WitnessCommit::AlreadyCommitted);
+                }
+                assert_eq!(global, 1);
+                assert_eq!(fs::read(f.live().join("committed.json")).unwrap(), head);
             }
         }
     }
