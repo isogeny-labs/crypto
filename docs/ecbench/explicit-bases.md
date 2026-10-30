@@ -882,3 +882,29 @@ No automatic default change or claim of fastest external implementation.
 ### Errors
 None in the standalone filter fixture or host syntax check. GPU checks have
 not run; pending validation is not a pass.
+
+## 2026-10-30T19:30UTC — first-rung stopping audit
+
+### What was done
+Fixed the post-run checker's regression controls to accept a complete first
+rung containing a recorded limit. Previously its own truncation test assumed
+that first rung was successful, causing the audit to panic on a valid stop.
+Added a check rejecting any later execution after that stopping boundary and
+made the verification-label corruption invalid for successful and failed rows.
+
+### Decisions made
+This is an audit correction; no frozen protocol, measurement, solver or active
+GPU source changes. Native checker compiles with warnings denied and passes
+retained v11 and v9 records plus an explicitly synthetic, temporary first-rung
+limit fixture. Do not publish the synthetic fixture as experiment data.
+
+### Open threads
+V13 has11verified rows; final62-bit target runs on pod7tugqyoxyvnikm. V15 pins
+23dc8a61ca92 and remains unexecuted. PR2991 merged after13success/5skip checks.
+After collection, publish raw evidence before the fresh report and inspect all
+pages. The updated audit includes one positive stop and nine negative controls
+when the first rung succeeds; a valid first-rung stop is itself accepted.
+
+### Errors
+The old regression-control assumption was the error; exact plan validation
+already recognized first-rung stops. No recorded data was changed.
