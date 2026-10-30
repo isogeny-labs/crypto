@@ -1,0 +1,27 @@
+ideal separatedCoordinates50=t,v,u;
+ring boundaryField50=(2,a),(w),dp;minpoly=a^2+a+1;short=0;
+if(a^2+a+1!=0 || a==0 || a==1){ERROR("BOUNDARY50_RESIDUE_FIELD");quit;}
+int conjugate50;poly root50;ideal point050;ideal point150;ideal residual050;ideal residual150;
+link boundaryOut50="ASCII:w boundary-certificate50.sing";open(boundaryOut50);
+write(boundaryOut50,"ring boundaryCertificate50=(2,a),(w),dp;minpoly=a^2+a+1;ideal point0;ideal point1;");
+for(conjugate50=0;conjugate50<2;conjugate50++){
+ root50=a+conjugate50;
+ if(root50^2+root50+1!=0){ERROR("BOUNDARY50_CONJUGATE");quit;}
+ map evaluate050=relativeFinite50,root50,0,1;
+ map evaluate150=relativeFinite50,root50,1,1;
+ residual050=evaluate050(relativeIdeal50);residual150=evaluate150(relativeIdeal50);
+ point050=evaluate050(separatedCoordinates50);point150=evaluate150(separatedCoordinates50);
+ map planeEvaluate50=integralCandidate50,root50,1;
+ ideal planeResidual50=planeEvaluate50(candidateIdeal50);
+ if(size(residual050)!=0 || size(residual150)!=0 || size(planeResidual50)!=0){ERROR("BOUNDARY50_ACTUAL_SOURCE_POINTS");quit;}
+ if(point050[1]!=point150[1] || point050[3]!=point150[3] || point050[2]==point150[2]){ERROR("BOUNDARY50_FIBER_SEPARATION");quit;}
+ map corruptedPoint50=relativeFinite50,root50,a,1;
+ ideal corruptedResidual50=corruptedPoint50(relativeIdeal50);
+ if(size(corruptedResidual50)==0){ERROR("BOUNDARY50_CORRUPTED_POINT_ACCEPTED");quit;}
+ write(boundaryOut50,"point0["+string(3*conjugate50+1)+"]="+string(point050[1])+";point0["+string(3*conjugate50+2)+"]="+string(point050[2])+";point0["+string(3*conjugate50+3)+"]="+string(point050[3])+";");
+ write(boundaryOut50,"point1["+string(3*conjugate50+1)+"]="+string(point150[1])+";point1["+string(3*conjugate50+2)+"]="+string(point150[2])+";point1["+string(3*conjugate50+3)+"]="+string(point150[3])+";");
+ print("BOUNDARY50_PAIR conjugate="+string(conjugate50)+" t="+string(root50)+" u=1 v0="+string(point050[2])+" v1="+string(point150[2])+" actual_source_residuals=0 corrupted_point_rejected=true");
+}
+close(boundaryOut50);
+print("BOUNDARY50_RESULT conjugate_pairs=2 refined_geometric_points=4 plane_closed_points=1 refined_closed_points=2 source_bound_fiber_separation=true");
+print("BOUNDARY50_ALL_CHECKS_PASS");quit;
