@@ -37,6 +37,8 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|bielliptic-quartic.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|bielliptic-quartic.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - name: Free hosted runner disk before Rust installation
         if: runner.environment == 'github-hosted'
@@ -45,6 +47,9 @@ jobs:
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
           df -h /
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.87.0'
