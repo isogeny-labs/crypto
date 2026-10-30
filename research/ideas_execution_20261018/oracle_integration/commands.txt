@@ -1,0 +1,65 @@
+Working directory: /workspace/crypto
+Build environment: CARGO_HOME=/workspace/toolchains/cargo RUSTUP_HOME=/workspace/toolchains/rustup
+Cargo/rustc: /workspace/toolchains/cargo/bin/{cargo,rustc}; rustc1.99.1
+
+Original unedited panels:
+target/release/examples/ic_improve_02_equivariant_oracle --mode step --n 7,11,13 --targets 8 --check --posctl
+target/release/examples/ic_improve_02_equivariant_oracle --mode oracle --n 5,7,11,13 --targets 12
+stdout/stderr/exit files: runs/equivariant-{step,oracle}.*
+
+Initial native component runtime (source snapshots and hashes in runs/):
+runs/components cyclotomic-n83 runs/cyclotomic-n83.json
+runs/components presentation-cert runs/presentation-cert.json
+runs/components summarize runs/panels-progress.json runs
+runs/components summarize runs/panels-summary.json runs
+Above short runs/ paths are expanded in actual argv to research/ideas_execution_20261018/oracle_integration/runs/.
+Initial direct build exact flags:
+rustc --edition 2021 -C opt-level=2 -L dependency=target/release/deps --extern crypto_lib=target/release/deps/libcrypto_lib-3e0b38c24aa5646f.rlib --extern num_bigint=target/release/deps/libnum_bigint-55328cacea398f24.rlib --extern num_traits=target/release/deps/libnum_traits-b3c4044e620ded21.rlib --extern serde_json=target/release/deps/libserde_json-458049281485fb75.rlib --extern blake3=target/release/deps/libblake3-a58323f89bb40c63.rlib examples/ideas_oracle_components.rs -o research/ideas_execution_20261018/oracle_integration/runs/components
+The initial test build adds --test and outputs runs/components-test; --nocapture was passed when running it. Failed build/import attempts remain in runs/*build*.log.
+
+Final Cargo and component commands:
+cargo test --release --example ideas_oracle_components --jobs 1
+cargo build --release --example ideas_oracle_components --jobs 1
+target/release/examples/ideas_oracle_components verify-n83 runs/n83-replay.json runs/cyclotomic-n83.json
+target/release/examples/ideas_oracle_components unprojected-anf runs/unprojected-anf.json
+target/release/examples/ideas_oracle_components cyclotomic-n83-anf runs/cyclotomic-n83-anf.json runs/cyclotomic-n83.json
+target/release/examples/ideas_oracle_components tamper-n83 runs/n83-tampered.json runs/cyclotomic-n83.json
+target/release/examples/ideas_oracle_components verify-n83 runs/n83-tamper-replay.json runs/n83-tampered.json
+The last command is the expected rejection(exit101). Other component commands exit0.
+
+Current checkout build attempt:
+cargo build --release --bin ecbench --example ideas_oracle_components --jobs 1
+Result: CLI compilation error, unresolved fbm at src/bin/ecbench.rs:1205/1206; native example built.
+
+Release fallback (prospective protocol and publisher hashes retained):
+Runtime=/tmp/oracle-release-v0.1.2538/crypto-v0.1.2538-x86_64-unknown-linux-gnu/ecbench
+Release tag v0.1.2538; source commit b1bf5b8935f68257dfdd3fc542cb2fef41db741c.
+$Runtime plan --spec research/ideas_execution_20261018/oracle_integration/factorial-spec.json
+$Runtime run --wait --allow-busy --cpus none --spec research/ideas_execution_20261018/oracle_integration/factorial-spec.json --out research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session
+$Runtime verify --dir research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session --replay-all --out research/ideas_execution_20261018/oracle_integration/runs/factorial-release-audit.json
+$Runtime verify --dir research/ic_improve_20261014/01-d4-2lp/ecbench/session-20261014-d4-2lp --replay 12 --out research/ideas_execution_20261018/oracle_integration/runs/prior-d4-session-replay.json
+$Runtime table --dir research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session
+$Runtime resources --dir research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session --out research/ideas_execution_20261018/oracle_integration/runs/factorial-release-resources.json
+$Runtime compare --dir research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session --a rho-negation --b ARM
+ARM exhaustively takes neither,2lp-only,d4-only,d4-2lp,d4-eager-incumbent,d4-aa. Additional comparisons use --a neither --b 2lp-only and --a d4-only --b d4-2lp. Outputs retained as runs/compare-*.txt plus stderr/exit files.
+
+Native descriptive analysis:
+cargo test --release --example ideas_oracle_factorial_summary --jobs 1
+cargo build --release --example ideas_oracle_factorial_summary --jobs 1
+target/release/examples/ideas_oracle_factorial_summary research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session research/ideas_execution_20261018/oracle_integration/runs/factorial-release-summary-v2.json
+V1 summary output retained with documented flag-label correction. V2 changes no measured values.
+
+Rendering only:
+MPLCONFIGDIR=/tmp/oracle-integration-mpl python3 research/ideas_execution_20261018/oracle_integration/reports/plot_recorded.py
+cd research/ideas_execution_20261018/oracle_integration/reports
+pdflatex -interaction=nonstopmode -halt-on-error report.tex
+
+Root-authorized current CLI import and exact repeat:
+cargo test --release --bin ecbench --jobs 1
+cargo build --release --bin ecbench --jobs 1
+target/release/ecbench run --wait --allow-busy --cpus none --spec research/ideas_execution_20261018/oracle_integration/factorial-spec.json --out research/ideas_execution_20261018/oracle_integration/runs/factorial-current-session
+target/release/ecbench verify --dir research/ideas_execution_20261018/oracle_integration/runs/factorial-current-session --replay-all --out research/ideas_execution_20261018/oracle_integration/runs/factorial-current-audit.json
+target/release/examples/ideas_oracle_factorial_summary research/ideas_execution_20261018/oracle_integration/runs/factorial-current-session research/ideas_execution_20261018/oracle_integration/runs/factorial-current-summary.json
+rustc --edition 2021 -C opt-level=2 -L dependency=target/release/deps --extern serde_json=target/release/deps/libserde_json-458049281485fb75.rlib research/ideas_execution_20261018/oracle_integration/compare_sessions.rs -o /tmp/oracle-compare-sessions
+/tmp/oracle-compare-sessions research/ideas_execution_20261018/oracle_integration/runs/factorial-release-session research/ideas_execution_20261018/oracle_integration/runs/factorial-current-session research/ideas_execution_20261018/oracle_integration/runs/release-current-comparison.json
+All224 deterministic comparison payloads match(including72 exhausted); timings/source labels excluded.

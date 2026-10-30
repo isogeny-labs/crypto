@@ -5,6 +5,7 @@ use std::{
     sync::atomic::{AtomicUsize, Ordering},
 };
 static NEXT: AtomicUsize = AtomicUsize::new(0);
+
 fn ic_binary() -> PathBuf {
     option_env!("CARGO_BIN_EXE_ic")
         .or(option_env!("IC_TEST_BINARY"))

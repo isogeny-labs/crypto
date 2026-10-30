@@ -1,0 +1,49 @@
+{
+  "schema": "crypto.isogeny-walk-atomic-fetch-s3-acceptance/v1",
+  "date_utc": "2026-10-23",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-atomic-fetch/20261023T031235Z-82b8b9e2",
+  "run_id": "custom-e193cd27a390fe52",
+  "checks": {
+    "successful_fetch": {
+      "exit_code": 0,
+      "files": [
+        "curves.yaml",
+        "isogeny_routes.json",
+        "walk.json"
+      ],
+      "sha256": {
+        "curves.yaml": "301e545e6a4e247018a448eae44e03eb4403f5bbc228843e4275db93be53003f",
+        "isogeny_routes.json": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "walk.json": "3e24978e7cec5f105bab6716c986e1d30ea20441af56a3bbc5301a870558ea5b"
+      }
+    },
+    "existing_output": {
+      "exit_code": 1,
+      "error": "isogeny_walk: refusing to overwrite /Volumes/T7/codex/isogeny-atomic-fetch-acceptance-20261023/complete-fetch",
+      "files_unchanged": true
+    },
+    "missing_second_object": {
+      "exit_code": 1,
+      "error": "isogeny_walk: ic/v1/acceptance/isogeny-atomic-fetch/20261023T031235Z-82b8b9e2/runs/custom-e193cd27a390fe52/attempts/local-1792725156937200000/isogeny_routes.json.gz: missing",
+      "output_absent": true,
+      "temporary_paths_absent": true
+    },
+    "objects_deleted_after_fault": 3,
+    "prefix_empty": true
+  },
+  "binary_sha256": "61b5c89bc43d70131a0bcc0b6501e35a417c5a1bd2fae621e347e049904a8955",
+  "limit": "One public three-curve walk and one missing second object in one S3 account and region; does not validate concurrent fetches or power-loss durability.",
+  "baseline_failure": {
+    "revision": "2a4d009f2d5401d372de9af8e2668514a0e31880",
+    "binary_sha256": "63087e0f28241f10b8bb875a9a086cd18b2fcec75bc81f5717baacf534d1b5c3",
+    "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-fetch-partial-baseline/20261023T030516Z-11ee9a96",
+    "fault": "deleted the second object, isogeny_routes.json.gz, after publishing",
+    "fetch_exit_code": 1,
+    "output_directory_existed": true,
+    "output_files": [
+      "curves.yaml"
+    ],
+    "prefix_empty_after_cleanup": true
+  },
+  "base_revision": "2a4d009f2d5401d372de9af8e2668514a0e31880"
+}

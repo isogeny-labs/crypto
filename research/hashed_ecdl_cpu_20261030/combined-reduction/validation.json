@@ -1,0 +1,73 @@
+{
+  "source": {
+    "base_commit": "137992726326deb91e94633fb6ce9285783cbcd9",
+    "path": "src/cryptanalysis/hashed_ecdl.rs",
+    "base_sha256": "9c27f57a09433ae1b2ae7668e4f897e0aea9b3079451c8fa199541fc1a83f225",
+    "candidate_sha256": "050a35a500f1685e16870f3375d67f2c61fbd979be5ded5e4ee374c77554b026",
+    "patch_sha256": "16aa67c94f1382d6e1c6e26c1e65e79be6e3604e9af25824de9a809f4873ea34",
+    "composition": [
+      {
+        "folder": "optional-profile",
+        "patch_sha256": "12b08d04ada9b9bcf6834212a204eb2e7ebe4fb4913156c270f224befd21bb3e",
+        "candidate_sha256": "f686bec1052c408c02d443263035cec833771e38743227bd8e049fe37ab77222"
+      },
+      {
+        "folder": "target-reuse",
+        "patch_sha256": "0efe612d42f2e44586fd5e418eb3715e86eda38e6e93b572d160dc57eba46491",
+        "candidate_sha256": "613ad64310739d62d13d5a3c9895cf0f7a67743eec553198e3d4272eddfd4f7c"
+      }
+    ],
+    "independent_verifier_sha256": "d21e3bcadf19006698a71c0b97b5a2add0fceb1d05e6b0baf381defcbfb4da31",
+    "status": "unapplied; shared path reserved by T-906"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/home/ec2-user/hashed-ecdl-cpu-combined-20261030/snapshot/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/home/ec2-user/hashed-ecdl-cpu-build-20261030"
+      ],
+      "exit_code": 0,
+      "log": "validation-0.log",
+      "sha256": "ed15f188f20e2be2c30448a5db7b58ffd483ac8c3a745fae43bef44d0dcea9fe"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--all-targets",
+        "--manifest-path",
+        "/home/ec2-user/hashed-ecdl-cpu-combined-20261030/snapshot/crates/hashed-ecdl-cpu/Cargo.toml",
+        "--target-dir",
+        "/home/ec2-user/hashed-ecdl-cpu-build-20261030",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "validation-1.log",
+      "sha256": "7b04f9c48a501d6b92059490bb6e4c12749745fd88373d87144966062ec5de8c"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--check",
+        "--manifest-path",
+        "/home/ec2-user/hashed-ecdl-cpu-combined-20261030/snapshot/crates/hashed-ecdl-cpu/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "log": "validation-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "shared_source_unchanged": true,
+  "scope": "development correctness checks only; no timing or EKS execution"
+}

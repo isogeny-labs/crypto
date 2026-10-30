@@ -1,0 +1,101 @@
+{
+  "kind": "display-of-native-verified-records/v1",
+  "source": "runs/attempt-002/results/points.tsv",
+  "source_sha256": "c4a76fc43183c595efb78113aae2efb560fce1e026598ef98b1c89af9efbaa65",
+  "p224": [
+    {
+      "view": "historical",
+      "label": "p224-777",
+      "role": "skipped",
+      "canonical_x": "0"
+    },
+    {
+      "view": "smaller_b_p224",
+      "label": "p224-777",
+      "role": "skipped",
+      "canonical_x": "0"
+    },
+    {
+      "view": "historical",
+      "label": "p224-1485",
+      "role": "skipped",
+      "canonical_x": "1"
+    },
+    {
+      "view": "smaller_b_p224",
+      "label": "p224-1485",
+      "role": "skipped",
+      "canonical_x": "1"
+    },
+    {
+      "view": "historical",
+      "label": "p224-5736",
+      "role": "skipped",
+      "canonical_x": "1"
+    },
+    {
+      "view": "smaller_b_p224",
+      "label": "p224-5736",
+      "role": "skipped",
+      "canonical_x": "1"
+    },
+    {
+      "view": "historical",
+      "label": "p224-7026",
+      "role": "published",
+      "canonical_x": "3"
+    },
+    {
+      "view": "smaller_b_p224",
+      "label": "p224-7026",
+      "role": "published",
+      "canonical_x": "3"
+    }
+  ],
+  "declared_x_bitlength_envelope": [
+    {
+      "view": "historical",
+      "published_kept": "10",
+      "skipped_kept": "8",
+      "retained_skips": "p192-2198,p192-5405,p239-36,p239-1562,p239-2491,p239-2682,p239-2863,p256-876"
+    },
+    {
+      "view": "smaller_b_p224",
+      "published_kept": "10",
+      "skipped_kept": "8",
+      "retained_skips": "p192-2198,p192-5405,p239-36,p239-1562,p239-2491,p239-2682,p239-2863,p256-876"
+    }
+  ],
+  "headline": {
+    "kind": "native-generator-b-comparison/v1",
+    "input_class": "production-parameter-analysis",
+    "curve_choices": 21,
+    "published": 10,
+    "skipped": 11,
+    "coefficient_views": 2,
+    "point_rows": 588,
+    "traits_per_point": 171,
+    "trait_cells": 100548,
+    "cutoff_comparisons": 19152,
+    "exact_single_separators": 0,
+    "scalar_recipe_tests": 880,
+    "scalar_recipe_matches": 0,
+    "historical_skip_generators": "unknown for all11",
+    "historical_use_established": false
+  },
+  "verification": {
+    "kind": "independent-gmp-generator-verification/v1",
+    "input_class": "production-parameter-analysis",
+    "curve_choices": 21,
+    "point_rows": 588,
+    "trait_cells_checked": 100548,
+    "cutoffs_checked": 19152,
+    "point_differences_checked": 119700,
+    "inherited_differences_checked": 28175,
+    "recipe_tests_checked": 880,
+    "unknown_historical_skip_generators_retained": true,
+    "sha_implementation": "shared OpenSSL; group/trait arithmetic separately GMP",
+    "historical_use_established": false
+  },
+  "plotting_recomputes_curve_arithmetic": false
+}
