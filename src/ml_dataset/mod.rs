@@ -350,6 +350,7 @@ impl DatasetPlan {
                     "root",
                     "pkm",
                     "double-large-prime",
+                    "f4-wide-dynamic-v1",
                 ][..],
             ),
         ] {
@@ -4337,6 +4338,221 @@ mod tests {
     fn wide_prime_f4_cell_fixture(fixture: &TempRun, twist: bool) -> PathBuf {
         wide_prime_f4_cell_fixture_kind(fixture, twist, false)
     }
+    fn dynamic_frozen_cell_fixture(fixture: &TempRun, twist: bool, m: usize) -> PathBuf {
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![47];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4-wide-dynamic-v1".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 12;
+        plan.work_limit = 16384;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(256);
+        binding["trace_mib"] = json!(128);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        for _ in 0..m {
+            sum = arithmetic.reference_add(sum, point);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture
+            .0
+            .join(format!("cell-dynamic-frozen-twist{twist}-m{m}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        artifacts.push(telemetry::checked::install_policy(&dir).unwrap());
+        let capture_binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
+        let capture_limits = capture::capture_limits(128).unwrap();
+        artifacts.push(
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &capture_binding,
+            )
+            .unwrap(),
+        );
+        artifacts.push(
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &capture_limits,
+            )
+            .unwrap(),
+        );
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_bound_event_sink_context(
+            &config,
+            &case,
+            &dir.join("live"),
+            capture_binding,
+            capture_limits,
+            Some(&context),
+        )
+        .unwrap();
+        if m == 4 {
+            assert_eq!(
+                solved.outcome["pdp_witness_verified"], true,
+                "{}",
+                solved.outcome
+            );
+            assert_eq!(
+                solved.outcome["native_backend_invoked"], true,
+                "{}",
+                solved.outcome
+            );
+        } else {
+            assert_eq!(
+                solved.outcome["status"], "unsupported",
+                "{}",
+                solved.outcome
+            );
+            assert_eq!(solved.outcome["pdp_witness_verified"], false);
+        }
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        artifacts.push(
+            storage::write_json(&dir, "result.json", "solver-outcome", &solved.outcome).unwrap(),
+        );
+        artifacts.extend(
+            collect_cell_artifacts(&dir)
+                .unwrap()
+                .into_iter()
+                .filter(|a| a.path.starts_with("live/")),
+        );
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    #[test]
+    fn dynamic_frozen_run_replay_both_twists_and_censored_outcomes() {
+        let fixture = TempRun::new();
+        for twist in [false, true] {
+            let dir = dynamic_frozen_cell_fixture(&fixture, twist, 4);
+            let unsupported = dynamic_frozen_cell_fixture(&fixture, twist, 2);
+            assert_eq!(
+                verify_cell(&unsupported, true).unwrap().outcome["status"],
+                "unsupported"
+            );
+            for status in ["timeout", "trace_budget_exhausted", "worker_failed"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("dynamic-{twist}-{status}")),
+                    |_, manifest| {
+                        manifest.outcome = json!({"status":status,"solver_completed":false});
+                    },
+                );
+                verify_cell(&changed, true).unwrap();
+            }
+            let changed = altered_cell(
+                &dir,
+                &fixture.0.join(format!("dynamic-{twist}-bad-input")),
+                |path, manifest| {
+                    manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                    alter_json(&path.join("prime-f4-input.json"), |value| {
+                        value["schema"] = json!("invalid");
+                    });
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+            let changed = altered_cell(
+                &dir,
+                &fixture.0.join(format!("dynamic-{twist}-wrong-attempt")),
+                |path, _| {
+                    alter_json(&path.join("capture-binding.json"), |value| {
+                        value["attempt_sha256"] = json!("8".repeat(64));
+                    });
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+        }
+    }
+
     fn wide_prime_f4_cell_fixture_kind(fixture: &TempRun, twist: bool, negative: bool) -> PathBuf {
         let m = 2;
         let (mut plan, mut binding, protocol) = fixture.bound();

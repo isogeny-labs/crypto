@@ -167,7 +167,6 @@ pub(super) fn live_event(event: &Value) -> Result<(), String> {
 /// New bounded profiles require an attempt-bound sink. The caller debits the
 /// buffer's requested storage once and reuses it; this bridge does not reset
 /// budgets or silently downgrade to the legacy allocating event path.
-#[allow(dead_code)] // Dynamic dispatcher remains gated on complete adapter validation.
 pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
     kind: super::capture::TypedEventKind,
     payload: &T,
@@ -186,7 +185,6 @@ pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
 /// Dedicated witness preparation/publication never downgrades to Legacy.
 /// The caller supplies and reconciles remaining original checking/byte budgets;
 /// `global_acknowledged` is the SAME adapter-wide4096 counter, not a new pool.
-#[allow(dead_code)]
 pub(super) fn prepare_bound_witness(
     budget: &mut super::capture::WitnessBudget,
 ) -> Result<super::capture::WitnessCaptureWorkspace, super::capture::WitnessError> {
@@ -195,7 +193,6 @@ pub(super) fn prepare_bound_witness(
         _ => Err(super::capture::WitnessError::Unbound),
     })
 }
-#[allow(dead_code)]
 pub(super) fn publish_bound_witness(
     bytes: &[u8],
     workspace: &mut super::capture::WitnessCaptureWorkspace,
@@ -212,7 +209,6 @@ pub(super) fn publish_bound_witness(
 
 /// Borrowed complete artifacts from early dynamic failures use the same bound
 /// outer custody path. Dedicated witness publication is never downgraded here.
-#[allow(dead_code)] // Dormant dynamic parent integration.
 pub(super) fn live_borrowed_payload(
     path: &str,
     role: &str,
@@ -397,6 +393,7 @@ pub fn capabilities() -> Value {
     json!({
         "schema":"ml-dataset.capabilities/v1",
         "solvers":[
+            {"id":"f4-wide-dynamic-v1","families":["prime"],"n":[33,61],"m":[4,15],"degree_bound":12,"requires_original_execution_context":true,"requires_bound_capture":true,"maximum_signed_domain_points":64,"maximum_x_codes":32,"kind":"bounded native dynamic prime F4 and independently replayed finite-domain PDP evidence","trace":"original equations, native boundary reports, linear transitions, group prefixes and durable witnesses","unsupported_cells":"retained with explicit status","gaps":["independent native basis derivation","full instruction trajectory"]},
             {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
@@ -609,6 +606,17 @@ pub(super) fn solve_with_context(
     if !(2..=15).contains(&config.m) {
         return Err("decomposition arity must be 2..15".into());
     }
+    if config.solver == DYNAMIC_PROFILE && !dynamic_supported(config) {
+        let mut unsupported = outcome(
+            "unsupported",
+            "dynamic profile requires prime n33..61, m4..15, degree12 and positive work",
+        );
+        unsupported["strategy"] = json!(DYNAMIC_STRATEGY);
+        return Ok(SolverData {
+            outcome: unsupported,
+            artifacts: Vec::new(),
+        });
+    }
     let group = Group::read(case)?;
     let target = group.point(&case.public_instance["target"])?;
     if !group.on_curve(&target) {
@@ -617,6 +625,11 @@ pub(super) fn solve_with_context(
     let points = domain(&group, case)?;
     let field_tally = crate::binary_ecc::operation_tally::OperationTally::begin();
     let mut result = match config.solver.as_str() {
+        DYNAMIC_PROFILE => solve_dynamic_bound(
+            config,
+            case,
+            context.ok_or("dynamic profile requires original execution context")?,
+        )?,
         "enumerate" | "pdp" => enumerate(config, &group, &points, &target)?,
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
@@ -3115,11 +3128,9 @@ pub(super) enum WidePrimeReplay {
     CensoredM3Prefix,
 }
 /// Semantic wide-prime replay, independent of native basis derivation.
-// Original-input construction is separate from profile dispatch. The versioned
-// solver identifier is deliberately NOT yet accepted by production plan/CLI.
-#[allow(dead_code)]
+// Versioned supervised profile; original-input validation is shared by runtime
+// dispatch and independent central replay.
 const DYNAMIC_PROFILE: &str = "f4-wide-dynamic-v1";
-#[allow(dead_code)]
 struct DynamicOriginal {
     p: u64,
     a: u64,
@@ -3132,7 +3143,6 @@ struct DynamicOriginal {
     memory_bytes: u64,
     trace_bytes: u64,
 }
-#[allow(dead_code)]
 impl DynamicOriginal {
     fn expected(&self) -> prime_f4_wide_dynamic_replay::Expected<'_> {
         prime_f4_wide_dynamic_replay::Expected {
@@ -3152,7 +3162,6 @@ impl DynamicOriginal {
 /// The parent must first authenticate config and execution limits against the
 /// original run. This independently validates/reconstructs public mathematical
 /// inputs; it never consults private_witness or any solver-produced input file.
-#[allow(dead_code)]
 fn dynamic_original(
     config: &CaseConfig,
     case: &CaseData,
@@ -3227,7 +3236,6 @@ fn dynamic_original(
 
 /// Reconcile outer labels with independently checked mathematics and separately
 /// reported native boundary facts. Does not select/admit a profile or run it.
-#[allow(dead_code)]
 fn verify_dynamic_claims(
     outcome: &Value,
     verified: &prime_f4_wide_dynamic_replay::Verified,
@@ -3332,10 +3340,8 @@ fn verify_dynamic_claims(
     Ok(())
 }
 
-/// Execute the private dynamic profile under the original worker context.
-/// Caller authenticates config/context and owns the attempt-bound sink. This
-/// function is not registered in DatasetPlan or the runtime dispatcher yet.
-#[allow(dead_code)]
+/// Execute the versioned dynamic profile under the original worker context.
+/// Caller authenticates config/context and owns the attempt-bound sink.
 fn solve_dynamic_bound(
     config: &CaseConfig,
     case: &CaseData,
@@ -3495,7 +3501,14 @@ fn solve_dynamic_bound(
     flush_prime_chain_payloads(&mut result);
     Ok(result)
 }
-#[allow(dead_code)]
+fn dynamic_supported(config: &CaseConfig) -> bool {
+    config.family == "prime"
+        && (33..=61).contains(&config.n)
+        && (4..=15).contains(&config.m)
+        && config.degree_bound == 12
+        && config.work_limit > 0
+}
+
 fn dynamic_partial_result(stage: &str, reason: &str, custody_failed: bool) -> SolverData {
     let mut result = SolverData {
         outcome: json!({"strategy":DYNAMIC_STRATEGY,"status":"partial",
@@ -3622,13 +3635,7 @@ pub(super) fn verify_dynamic_cell(
     {
         return Ok(DynamicReplayDisposition::Ordinary);
     }
-    if !selected
-        || config.family != "prime"
-        || !(33..=61).contains(&config.n)
-        || !(4..=15).contains(&config.m)
-        || config.degree_bound != 12
-        || config.work_limit == 0
-    {
+    if !selected {
         return Err("dynamic evidence differs from original profile".into());
     }
     let context = execution::load(dir)?.ok_or("dynamic replay lacks original execution context")?;
@@ -3697,7 +3704,12 @@ fn verify_dynamic_bound_files(
             && a.role != "unregistered-partial-artifact"
     });
     if !ready && !registered_terminal && !registered_witness {
-        if !censored && !matches!(outcome["status"].as_str(), Some("partial" | "error")) {
+        if !censored
+            && !matches!(
+                outcome["status"].as_str(),
+                Some("partial" | "error" | "unsupported")
+            )
+        {
             return Err("incomplete dynamic evidence has nonpartial status".into());
         }
         dynamic_no_promoted_claims(outcome)?;
@@ -3872,6 +3884,9 @@ fn wide_begin_failure(
     context: Option<&super::execution::SolverExecutionContext>,
     error: String,
 ) -> Result<SolverData, String> {
+    if config.solver == DYNAMIC_PROFILE {
+        return Ok(dynamic_partial_result("solver_begin", &error, true));
+    }
     let Some(context) = context else {
         return Err(error);
     };
@@ -3909,6 +3924,54 @@ fn wide_begin_failure(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn dynamic_unsupported_axes_preserve_outcomes_without_reading_curve_bytes() {
+        let base = CaseConfig {
+            family: "prime".into(),
+            n: 47,
+            m: 4,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 2,
+            degree_bound: 12,
+            work_limit: 16384,
+            solver: DYNAMIC_PROFILE.into(),
+        };
+        let case = CaseData {
+            public_instance: Value::Null,
+            private_witness: Value::Null,
+            factor_base: Value::Null,
+        };
+        for mutation in 0..5 {
+            let mut config = base.clone();
+            match mutation {
+                0 => config.family = "binary".into(),
+                1 => config.family = "koblitz".into(),
+                2 => config.n = 23,
+                3 => config.m = 2,
+                _ => config.degree_bound = 8,
+            }
+            let result = solve_with_context(&config, &case, None).unwrap();
+            assert_eq!(result.outcome["status"], "unsupported");
+            assert_eq!(result.outcome["solver_completed"], false);
+            assert_eq!(result.outcome["pdp_witness_verified"], false);
+            assert!(result.artifacts.is_empty());
+        }
+        let refused = wide_begin_failure(
+            &base,
+            &case,
+            None,
+            "fixture begin persistence refusal".into(),
+        )
+        .unwrap();
+        assert_eq!(refused.outcome["solver_completed"], false);
+        assert_eq!(refused.outcome["stage"], "solver_begin");
+        assert!(refused.outcome.get("live_persistence_errors").is_some());
+    }
+
     #[test]
     fn dynamic_runtime_composes_actual_bound_capture_and_independent_replay() {
         for twist in [false, true] {
