@@ -115,7 +115,10 @@ function_up() { # function_up <name> <memory MB> <timeout s> <env>
 function_up "$name-admin" 3008 900 "$admin_env"
 function_up "$name-api" 1024 30 "$api_env"
 # At most 10 concurrent API instances x 2 connections x 2 pools stays far below max_connections.
-$aws lambda put-function-concurrency --function-name "$name-api" --reserved-concurrent-executions 10 >/dev/null
+# Accounts whose total Lambda concurrency is small cannot reserve any (AWS keeps 10 unreserved);
+# their account limit already bounds the connections.
+$aws lambda put-function-concurrency --function-name "$name-api" --reserved-concurrent-executions 10 >/dev/null 2>&1 \
+  || log "reserved concurrency not set (account concurrency limit too small); the account limit bounds connections"
 
 if ! $aws lambda get-function-url-config --function-name "$name-api" >/dev/null 2>&1; then
   $aws lambda create-function-url-config --function-name "$name-api" --auth-type NONE >/dev/null
