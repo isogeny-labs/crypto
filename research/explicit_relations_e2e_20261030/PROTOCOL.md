@@ -137,3 +137,42 @@ frozen analyzer includes every attempted execution and draws incomplete
 rows in red. Two fixed targets do not establish a general success rate.
 The reported frontier means all prescribed cells at that rung completed
 under these exact limits; a timeout is not a mathematical impossibility.
+
+## Exact compact-row panel (v6)
+
+Frozen `protocol-v6.json` has hash
+`2ab44ea0799d563bac3c6a8c1f647b9e637cba1b625e4d68da7ab2c2feb9c450`.
+It was designed while v5's larger cases were still running, after both 56-bit
+recoveries and the matched 52-bit cache loss. The cache remains opt-in.
+
+On one validated odd-prime curve, a canonical x coordinate and y parity
+identify a point exactly, as specified by [SEC 1 v2, section 2.3.3](https://www.secg.org/sec1-v2.pdf).
+The internal key is `2*(x+1)+(y&1)`, with zero reserved for infinity.
+Under the service's `p < 2^62` bound, finite keys and index endpoints fit u64.
+A key plus the original tuple ID occupies 16 bytes instead of the full row's
+32 bytes. This representation is valid only for points on the same curve;
+it is neither a fingerprint nor a comparator for arbitrary coordinate pairs.
+Duplicate keys sort by original ID, preserving the existing witness rule.
+
+`ER_COMPACT_ROWS` enables this representation; `make cuda-compact` exposes it
+without changing the ordinary build. Both arms disable the partial-sum cache.
+The existing full-coordinate index is the matched baseline at 52 bits, with
+identical candidate A/A repeats and both seeds. Candidate-only probes cover
+56/58/60 bits, for at most 12 rows. All curve/target rules remain fixed.
+Every success requires fresh complete replay and corrupt-scalar rejection.
+
+Every arm uses max_rows=2^31, max_work=2^32 and chunk_rows=2^20. Admission
+reserves three buffers of the actual row type plus other allocations and
+leaves 25% of free GPU memory unused. Solve limits are 180/300/900/1200 seconds
+for 52/56/58/60 bits; worker 6900 seconds and controller 7200 seconds. These
+are new explicit bounds, not a cross-host speed comparison. Finish the first
+incomplete rung and leave higher rungs unattempted. No task GPU runs in
+parallel: v5 must be archived and deleted before this panel starts.
+
+New differential checks exhaust every valid point on a small curve against
+full-coordinate lookup, with duplicate IDs, both signs, infinity, missing
+keys and empty index buckets. Endpoint arithmetic is checked separately.
+All existing query/reprepare/recovery tests run for full, cached and compact
+variants; full and compact queries each receive memcheck/racecheck/synccheck.
+Host syntax and native instrument metadata checks passed locally. CUDA
+compilation and this panel's device results remain pending until executed.

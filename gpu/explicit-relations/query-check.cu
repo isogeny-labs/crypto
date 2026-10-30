@@ -7,7 +7,8 @@ static void require(bool ok) {
   if (!ok)
     throw std::runtime_error("query boundary check failed");
 }
-__global__ void check_index(const Row *rows, U size, const U *prefixes,
+template <class TableRow>
+__global__ void check_index(const TableRow *rows, U size, const U *prefixes,
                             const Point *queries, U count, U *answers) {
   U i = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (i < count)
@@ -42,9 +43,58 @@ static void prefix_boundaries() {
   for (size_t i = 0; i < queries.size(); ++i)
     require(got[i] == lookup(rows.data(), rows.size(), queries[i]));
 }
+static void compact_boundaries() {
+  Curve c = curve(65521, 0, 7);
+  std::vector<Row> full{{Point{}, 7}, {Point{}, 3}};
+  std::vector<Point> queries{Point{}};
+  // Exhaust every valid point on this curve, including opposite signs and
+  // any y=0 point. Keep sparse table coverage so misses/empty buckets occur.
+  for (U x = 0; x < c.f.p; ++x) {
+    Point q;
+    if (!c.lift(x, 0, q))
+      continue;
+    for (Point point : {q, c.neg(q)}) {
+      queries.push_back(point);
+      if (x % 13 == 0 || x < 2 || x > c.f.p - 8)
+        for (U id : {U(9), U(2)})
+          full.push_back({point, id});
+    }
+  }
+  std::sort(full.begin(), full.end(), RowLess{});
+  std::vector<CompactRow> rows;
+  for (const auto &row : full)
+    rows.push_back({point_key(row.point), row.id});
+  std::sort(rows.begin(), rows.end(), CompactRowLess{});
+  thrust::device_vector<CompactRow> device_rows(rows.begin(), rows.end());
+  thrust::device_vector<Point> device_queries(queries.begin(), queries.end());
+  thrust::device_vector<U> prefixes(1025), answers(queries.size());
+  build_prefix<<<5, BLOCK>>>(data(device_rows), rows.size(), 1024, 6,
+                             data(prefixes));
+  cuda_check(cudaGetLastError());
+  check_index<<<(queries.size() + BLOCK - 1) / BLOCK, BLOCK>>>(
+      data(device_rows), rows.size(), data(prefixes), data(device_queries),
+      queries.size(), data(answers));
+  cuda_check(cudaGetLastError());
+  std::vector<U> got(queries.size());
+  cuda_check(cudaMemcpy(got.data(), data(answers), got.size() * sizeof(U),
+                        cudaMemcpyDeviceToHost));
+  for (size_t i = 0; i < queries.size(); ++i) {
+    U expected = lookup(full.data(), full.size(), queries[i]);
+    require(got[i] == expected);
+    require(lookup(rows.data(), rows.size(), queries[i]) == expected);
+  }
+  require(point_key(Point{}) == 0);
+  require(point_key(Point{0, 0, false}) == 2);
+  require(point_key(Point{0, 1, false}) == 3);
+  require(point_key(Point{(U(1) << 62) - 1, 1, false}) ==
+          (U(1) << 63) + 1);
+  // The largest prefix endpoint is representable too (not a curve point).
+  require(point_key(Point{U(1) << 62, 0, false}) == (U(1) << 63) + 2);
+}
 int main() {
   try {
     prefix_boundaries();
+    compact_boundaries();
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
     require(packed_winner_fits(UINT64_MAX, 1));
@@ -149,7 +199,7 @@ int main() {
         << "PASS packed overflow bounds, deterministic witnesses, repeated "
            "queries/prepares, chunk tails, empty plans, visited counts and "
            "prefix bucket/duplicate/infinity boundaries, bounded partial-sum "
-           "reuse and uncached fallback\n";
+           "reuse, uncached fallback and exact compact point keys\n";
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
     return 1;

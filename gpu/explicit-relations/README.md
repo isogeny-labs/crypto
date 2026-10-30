@@ -205,3 +205,16 @@ path and the same cache implementation became the explicit `cuda-cached`
 option. Do not run historical scripts against a different source revision
 and label the result a replay. The active v5 larger-field probes remain
 unchanged on their pinned source; their final outcomes are recorded separately.
+
+### Exact compact table (opt-in)
+
+`make cuda-compact ARCH=sm_120` builds `build/explicit-relations-compact`
+with `ER_COMPACT_ROWS`. It retains an exact x/parity key plus the original
+64-bit tuple ID in a 16-byte row, preserving signed points, infinity and the
+minimum matching tuple ID. This is exact point compression on a fixed,
+validated prime-field curve, not a probabilistic hash. Partial-sum caching
+remains disabled in this variant. Admission charges three buffers of the
+actual row size; cold execution includes conversion, sorting and indexing.
+The matched panel and larger-field limits are frozen in
+[`protocol-v6.json`](../../research/explicit_relations_e2e_20261030/protocol-v6.json).
+This opt-in variant still awaits its recorded GPU validation.

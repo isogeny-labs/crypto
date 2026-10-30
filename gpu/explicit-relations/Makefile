@@ -4,10 +4,11 @@ ARCH ?= sm_80
 CARGO ?= cargo
 CXXFLAGS ?= -O3 -std=c++17 -Wall -Wextra
 OUT := build
-.PHONY: all cuda cuda-cached host test test-cuda syntax clean
+.PHONY: all cuda cuda-cached cuda-compact host test test-cuda syntax clean
 all: cuda $(OUT)/paper-driver
 cuda: $(OUT)/explicit-relations-cuda
 cuda-cached: $(OUT)/explicit-relations-cached
+cuda-compact: $(OUT)/explicit-relations-compact
 host: $(OUT)/explicit-relations-host $(OUT)/paper-driver
 $(OUT):
 	mkdir -p $@
@@ -17,6 +18,10 @@ $(OUT)/explicit-relations-cuda: service.cpp device.cuh host.hpp curve.cuh ../roo
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -x cu service.cpp -o $@
 $(OUT)/explicit-relations-cached: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_QUERY_CACHED -x cu service.cpp -o $@
+$(OUT)/explicit-relations-compact: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -x cu service.cpp -o $@
+$(OUT)/query-compact-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS query-check.cu -o $@
 $(OUT)/query-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) query-check.cu -o $@
 $(OUT)/query-cached-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
@@ -30,12 +35,15 @@ test: host
 	$(CARGO) test --locked --release --manifest-path Cargo.toml --target-dir $(OUT)/cargo
 	$(OUT)/explicit-relations-host --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-host --self-test
-test-cuda: all cuda-cached $(OUT)/query-check $(OUT)/query-cached-check
+test-cuda: all cuda-cached cuda-compact $(OUT)/query-check $(OUT)/query-cached-check $(OUT)/query-compact-check
 	$(OUT)/explicit-relations-cuda --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-cuda --self-test
 	$(OUT)/query-check
 	$(OUT)/explicit-relations-cached --self-test
 	$(OUT)/paper-driver $(OUT)/explicit-relations-cached --self-test
 	$(OUT)/query-cached-check
+	$(OUT)/explicit-relations-compact --self-test
+	$(OUT)/paper-driver $(OUT)/explicit-relations-compact --self-test
+	$(OUT)/query-compact-check
 clean:
 	rm -rf $(OUT)

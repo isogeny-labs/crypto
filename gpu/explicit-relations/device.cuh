@@ -97,13 +97,28 @@ __device__ Point normalize_block(Curve c, Jac p) {
   return c.affine(p, tree[BLOCK + t]);
 #endif
 }
+#ifdef ER_COMPACT_ROWS
+using DeviceRow = CompactRow;
+using DeviceRowLess = CompactRowLess;
+RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
+#else
+using DeviceRow = Row;
+using DeviceRowLess = RowLess;
+RF_HD DeviceRow device_row(Point point, U id) { return {point, id}; }
+#endif
+RF_HD bool row_less_key(const Row &row, Point key) {
+  return compare(row.point, key) < 0;
+}
+RF_HD bool row_less_key(const CompactRow &row, Point key) {
+  return row.key < point_key(key);
+}
 __global__ void build_left(Curve c, Bases b, unsigned split, U count,
-                           Row *rows) {
+                           DeviceRow *rows) {
   U id = U(blockIdx.x) * BLOCK + threadIdx.x;
   Jac sum = id < count ? tuple_sum(c, b, 0, split, id) : Jac{};
   Point point = normalize_block(c, sum);
   if (id < count)
-    rows[id] = {point, id};
+    rows[id] = device_row(point, id);
 }
 __global__ void build_partial(Curve c, Bases b, unsigned first, unsigned end,
                               U count, Point *points) {
@@ -126,7 +141,8 @@ inline bool packed_winner_fits(U left, U count) {
 // Index the high x bits of the sorted full-point table. Each bucket retains
 // the original row order (including duplicate-point ids). Infinity sorts
 // before finite points and deliberately uses the unindexed lookup.
-__global__ void build_prefix(const Row *rows, U size, U bins, unsigned shift,
+template <class TableRow>
+__global__ void build_prefix(const TableRow *rows, U size, U bins, unsigned shift,
                              U *offsets) {
   U bucket = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (bucket > bins)
@@ -135,14 +151,15 @@ __global__ void build_prefix(const Row *rows, U size, U bins, unsigned shift,
   U lo = 0, hi = size;
   while (lo < hi) {
     U mid = lo + (hi - lo) / 2;
-    if (compare(rows[mid].point, key) < 0)
+    if (row_less_key(rows[mid], key))
       lo = mid + 1;
     else
       hi = mid;
   }
   offsets[bucket] = lo;
 }
-RF_HD U indexed_lookup(const Row *rows, U size, Point key, const U *offsets,
+template <class TableRow>
+RF_HD U indexed_lookup(const TableRow *rows, U size, Point key, const U *offsets,
                        unsigned shift) {
   if (!offsets || key.inf)
     return lookup(rows, size, key);
@@ -152,7 +169,7 @@ RF_HD U indexed_lookup(const Row *rows, U size, Point key, const U *offsets,
 }
 template <bool Packed>
 __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
-                             U start, U count, const Row *left, U left_size,
+                             U start, U count, const DeviceRow *left, U left_size,
                              U *matches, unsigned long long *winner,
                              const U *offsets, unsigned shift,
                              RightPartials partials) {
@@ -220,7 +237,7 @@ class DeviceBackend {
   U cap, chunk;
   bool packed = false;
   thrust::device_vector<Point> points;
-  thrust::device_vector<Row> rows;
+  thrust::device_vector<DeviceRow> rows;
   thrust::device_vector<U> matches;
   thrust::device_vector<U> prefixes;
   thrust::device_vector<Point> right_first, right_second;
@@ -318,7 +335,7 @@ public:
     }
 #endif
     // 3 row buffers cover the retained table and conservative sort scratch.
-    U bytes = product(p.left, 3 * sizeof(Row)) +
+    U bytes = product(p.left, 3 * sizeof(DeviceRow)) +
               product(p.points.size(), sizeof(Point)) +
               (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U) +
               (bins ? product(bins + 1, sizeof(U)) : 0) +
@@ -354,7 +371,7 @@ public:
       build_left<<<blocks(p.left), BLOCK>>>(c, p.view(data(points)), p.split,
                                             p.left, data(rows));
       cuda_check(cudaGetLastError());
-      thrust::sort(rows.begin(), rows.end(), RowLess{});
+      thrust::sort(rows.begin(), rows.end(), DeviceRowLess{});
       if (bins) {
         prefixes.resize(bins + 1);
         build_prefix<<<blocks(bins + 1), BLOCK>>>(data(rows), p.left, bins,
