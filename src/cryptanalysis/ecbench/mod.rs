@@ -11,6 +11,7 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
@@ -21,6 +22,7 @@
 //! | [`spec`] | the experiment spec and its deterministic expansion |
 //! | [`host`] | the host capsule and its environment class |
 //! | [`isolation`] | CPU reservation, eviction, pinning, NUMA binding, kernel counters |
+//! | [`legacy`] | the accounting of the past under which committed records still replay |
 //! | [`record`] | the record, the child protocol, isolation grading |
 //! | [`runner`] | sessions: interleaved measured children, sealed append-only records |
 //! | [`signals`] | interruption: the host is restored and no child outlives the runner |
@@ -39,9 +41,10 @@
 //!
 //! [`CountedGroup`]: crate::cryptanalysis::ic_boundary::CountedGroup
 
+pub mod aps;
 pub mod audit;
-pub mod best2_model;
 pub mod band;
+pub mod best2_model;
 pub mod bounds;
 pub mod calibration;
 pub mod callgrind;
@@ -63,14 +66,15 @@ pub mod generic;
 pub mod ghs_cover;
 pub mod gpu;
 pub mod host;
-pub mod isogeny;
 pub mod hyper;
 pub mod hyper_ic;
+pub mod isogeny;
 pub mod isolab;
 pub mod isolation;
-pub mod known_log;
 pub mod jacobian;
+pub mod known_log;
 pub mod koblitz_descent;
+pub mod legacy;
 pub mod methods;
 pub mod plane_quartic;
 pub mod record;
@@ -79,7 +83,8 @@ pub mod runner;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod three_leads;
 pub mod trend;
-pub mod work;
 pub mod wordram_price;
+pub mod work;
 pub mod workload;

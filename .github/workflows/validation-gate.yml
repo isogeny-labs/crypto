@@ -29,7 +29,7 @@ jobs:
     # Keep the merge gate available while the optional EKS pools are offline.
     # This is ordinary CPU validation; experiment runner selection is separate.
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       # The full-history checkout no longer fits a hosted runner: from
       # 2026-10-23 04:20 UTC every run died with "No space left on device".
@@ -47,6 +47,26 @@ jobs:
         with:
           fetch-depth: 1
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst research/four_followups_20261021/results/matched research/four_followups_20261021/results/pencil-pilot research/ic_aimed_gather_20261023/aa2_20261029/runs research/kummer_coordinates_20261022/results research/kummer_differential_collector_20261022/results research/pencil_sparse_20261022/results research/postgb_linear_stage_20261026 research/projective_law_followup_20261022/results
       - name: Fetch the base tip
         if: github.event_name == 'pull_request'
         env:
@@ -60,6 +80,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Restore tracked benchmark inputs for committed-tree tests
+        run: |
+          git restore --source=HEAD --worktree -- \
+            research/postgb_linear_stage_20261026 \
+            research/ic_m2_linear_ladder_20261024 \
+            research/s5_plain_c4_options_20261019
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings

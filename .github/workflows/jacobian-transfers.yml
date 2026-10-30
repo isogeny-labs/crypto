@@ -34,6 +34,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /tools/factor-base/
             /.github/scripts/
             /Cargo.toml
             /tools/volcano-cli/
@@ -67,9 +68,9 @@ jobs:
       - name: The summary table in JACOBIAN_TRANSFERS.md is current
         run: |
           ./target/release/jacobian_transfers table > /tmp/table.md
-          sed -n '/<!-- jacobian_transfers table -->/,$p' docs/curves/JACOBIAN_TRANSFERS.md | tail -n +2 > /tmp/committed.md
+          sed -n "/<!-- jacobian_transfers table -->/,\$p" docs/curves/JACOBIAN_TRANSFERS.md | tail -n +2 > /tmp/committed.md
           if ! diff /tmp/committed.md /tmp/table.md; then
-            echo 'docs/curves/JACOBIAN_TRANSFERS.md table is stale: run `jacobian_transfers table --write-doc docs/curves/JACOBIAN_TRANSFERS.md`'
+            echo 'docs/curves/JACOBIAN_TRANSFERS.md table is stale: run jacobian_transfers table --write-doc docs/curves/JACOBIAN_TRANSFERS.md'
             exit 1
           fi
       - name: Queries run on the committed file
