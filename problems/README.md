@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Release suite JV isogeny-walk budget](release-suite-jv-isogeny-walk-budget.md) | investigating | complete release-library validation | diagnose the unchanged case and complete focused/full checks without weakening assertions |
+| [Symmetric PKM complete cost and cold DLP qualification](symmetric-pkm-complete-cost.md) | open | G1–G6 complete-cost improvement decision | checkpoint/artifact access, qualified native panels/counters, external reference and ideal/curve/cost proof bridges |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
