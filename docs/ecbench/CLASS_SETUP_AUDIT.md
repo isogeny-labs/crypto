@@ -37,6 +37,7 @@ storage form. Each binary was built from a commit without
 | `d24c224771974018…f56ade6acf` | `7fa17f92e` | `research/drastic_prime_conductor_gap_round3_20261012/sessions/{d4-*-auto,d3-*-cubic}` |
 | `ac4bc5b26f858a4d…360735fb35` | `d13f5259c` | `research/volcano_ecdlp_census_20261017/sessions/V3-*.tar.xz`, `research/volcano_ecdlp_census_followup_20261023/sessions/V5-*.tar.xz` |
 | `7da27ec3f0dadbae…b4b1fa7a9f` | `3d191d806` | `research/isogeny-volcano-cost_20261017/sessions/{j0,j1728}/spec-crater-aut` |
+| `e265bbc00a91e874…52954d50b1` | `7ed39a752` | `research/ecbench_accounting_v2_20261023/sessions/{j0-frozen-branch,j0-v2}` (the accounting study's branch binary, built before that branch merged the fix: its 48 frozen `rho.cubic` records carry the set-up in the phases and not in the total) |
 
 The full digests are in `audit::PRE_CLASS_SETUP_BINARIES`. The list is
 closed. A pre-fix record found later, from another binary, fails its
@@ -59,6 +60,41 @@ In short:
 - The census's IC / `rho-cubic` gap on the V3 crater is about 81×, not
   85×.
 - The 40-bit conductor-gap rows move by under 0.03%.
+
+## `rho.gls` and `rho.frobenius_orbit` (2026-10-28)
+
+These two methods walk on the classes of an endomorphism: ψ on a GLS curve
+over `F_{p²}`, and π on a subfield curve over `F_{p³}`. Each verifies the
+endomorphism's eigenvalue on `G` before the walk. Until 2026-10-28,
+`methods::solve_endo_orbit` merged that check into the ledger the phases
+are read from, but not into `total_gae`. This is the same undercharge the
+quartic and cubic walks had. Since the fix:
+- the total carries the check (`charge_class_setup`);
+- the record writes `detail.class_setup`;
+- the audit's phases-sum-to-total check covers these methods.
+
+`verify` admits the reconstruction for the two binaries that wrote the
+committed records, under the three conditions above. Condition 1 now also
+names `rho.gls` and `rho.frobenius_orbit`. The producers were found by
+reading every `spec.json` added to this repository since the methods were
+registered (570 files). Only `research/ext_endo_rho_20261023` uses them.
+
+| binary (sha256) | built from | sessions |
+|:--|:--|:--|
+| `87bac3448d63e3c1…d9931d148f` | `6bf8d5c2f` | `research/ext_endo_rho_20261023/sessions/{gls-fp2,subfield-fp3}` |
+| `1153d340d7b81a58…7d0799a6bc` | `a2eefe194` | `research/ext_endo_rho_20261023/sessions-a1/{gls-fp2,subfield-fp3}` |
+
+The undercharge on each record is the eigenvalue check: 36 GAE on the GLS
+curves and 28 GAE on the subfield curves. Measured over the verified,
+non-warm-up records of each session:
+
+| session | candidate / `rho.negation`, ratio of totals as recorded | corrected (phase sum) |
+|:--|--:|--:|
+| `gls-fp2` (`rho.gls`) | 0.5109 | 0.5118 |
+| `subfield-fp3` (`rho.frobenius_orbit`) | 0.4935 | 0.4947 |
+
+The `sessions-a1` replication gives the same figures. Every ratio moves by
+under 0.25%, so no conclusion of the study changes.
 
 ## Kangaroo re-placements
 
