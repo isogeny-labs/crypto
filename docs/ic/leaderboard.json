@@ -98,6 +98,14 @@
    "path": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
    "sha256": "143247c6b81d3539bcecbb461d8df2db17baccd47f97c799f39334d83f6fba1b"
   },
+  "f4_pricing_jump_k13_rerun": {
+   "path": "research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13/records.jsonl",
+   "sha256": "3dcbe7519a797ae019d3e467b4cfe4aad894654f82f89faa54637e0f756a436a"
+  },
+  "f4_pricing_jump_note": {
+   "path": "research/f4_pricing_jump_20261018/README.md",
+   "sha256": "162cec157a6e0f63247184ffa72a6c741a34645a14af3e9d4773fbcb5b0855d4"
+  },
   "n41_n53_counted": {
    "path": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
    "sha256": "fe55908f837840eeee173cfeae463368bb272e3c65ef03fa2b66efeead769331"
@@ -13732,6 +13740,59 @@
     "matrix_f4_over_inherited_w": null,
     "log2_inherited_over_f6_w": 0.371949795784,
     "f6_verdict": "F6-IC saves solver work"
+   }
+  ],
+  "corrections": [
+   {
+    "date": "2026-10-30",
+    "session": "K13",
+    "curve": "icv1-f2m13-t181-515ee569",
+    "source": "research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13/records.jsonl",
+    "note": "research/f4_pricing_jump_20261018/README.md",
+    "arms": {
+     "f6-ic": {
+      "runs": 8,
+      "median_s": 1571.20078412,
+      "min_s": 1187.26040583,
+      "max_s": 2063.75885965,
+      "lower_bound": false
+     },
+     "inherited-f4": {
+      "runs": 8,
+      "median_s": 630.858673219,
+      "min_s": 492.448666622,
+      "max_s": 806.365555245,
+      "lower_bound": false
+     },
+     "matrix-f4": {
+      "runs": 8,
+      "median_s": 115576.178804,
+      "min_s": 83062.6841881,
+      "max_s": 149978.427763,
+      "lower_bound": false
+     },
+     "matrix-f5": {
+      "runs": 8,
+      "median_s": 74870.4901958,
+      "min_s": 53415.3897382,
+      "max_s": 96624.0518533,
+      "lower_bound": false
+     },
+     "rho-negation": {
+      "runs": 8,
+      "median_s": 2.29025263111,
+      "min_s": 1.78751424868,
+      "max_s": 3.41862100059,
+      "lower_bound": true
+     },
+     "rho-strong": {
+      "runs": 8,
+      "median_s": 14.3183734934,
+      "min_s": 13.6033677939,
+      "max_s": 14.3407174215,
+      "lower_bound": true
+     }
+    }
    }
   ],
   "online_speedup": null,

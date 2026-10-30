@@ -75,6 +75,8 @@ SOURCES = {
     "f6_small_cold_replay": "research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json",
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
+    "f4_pricing_jump_k13_rerun": "research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13/records.jsonl",
+    "f4_pricing_jump_note": "research/f4_pricing_jump_20261018/README.md",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
@@ -1623,10 +1625,42 @@ def build(allow_unvalidated: bool = False) -> dict:
                 "log2_inherited_over_f6_w": q["q3_log2_inherited_over_f6_word_xors"]["log2_ratio"]["median"],
                 "f6_verdict": q["q3_log2_inherited_over_f6_word_xors"]["verdict"],
             })
+    # Correction 2026-10-30: the K13 S above were recorded before PR #1774
+    # (2026-10-14) charged qualified word-XOR units at the pinned
+    # ns_per_word_xor.  The same spec re-run on main (2026-10-18) is read
+    # here; the archived figures stay as recorded.
+    rerun_s: dict[str, list[float]] = {}
+    rerun_lb: dict[str, set] = {}
+    for line in (REPO / SOURCES["f4_pricing_jump_k13_rerun"]).read_text().splitlines():
+        r = json.loads(line)
+        if r["warmup"] or r["outcome"]["status"] != "verified":
+            continue
+        rerun_s.setdefault(r["arm"], []).append(r["cost"]["s"])
+        rerun_lb.setdefault(r["arm"], set()).add(r["cost"]["lower_bound"])
+    if rerun_lb.get("inherited-f4") != {False} or len(rerun_s.get("inherited-f4", [])) != 8:
+        raise SystemExit("review the K13 re-run before updating the leaderboard correction")
+    k13_correction = {
+        "date": "2026-10-30",
+        "session": "K13",
+        "curve": names("icv1-f2m13-t181-515ee569")["slug"],
+        "source": SOURCES["f4_pricing_jump_k13_rerun"],
+        "note": SOURCES["f4_pricing_jump_note"],
+        "arms": {
+            arm: {
+                "runs": len(v),
+                "median_s": statistics.median(v),
+                "min_s": min(v),
+                "max_s": max(v),
+                "lower_bound": sorted(rerun_lb[arm]) != [False],
+            }
+            for arm, v in sorted(rerun_s.items())
+        },
+    }
     cross_diagnostic = {
         "source": SOURCES["f4_f5_f6_cross_family"],
         "class": "relabelling; stage diagnostic with solver word XORs unpriced (S is a lower bound)",
         "rows": cross_rows,
+        "corrections": [k13_correction],
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
@@ -2481,6 +2515,24 @@ def markdown(doc: dict) -> str:
                  f"{f3(z['f6_s'])} | {f3(z['f5_over_f4_w'])} | {f3(z['matrix_f4_over_inherited_w'])} | "
                  f"{f3(z['log2_inherited_over_f6_w'])} |")
     L.append("")
+    for c in y.get("corrections", []):
+        a = c["arms"]
+        L += [f"**Correction {c['date']} ({c['session']}, `{c['curve']}`).** The {c['session']} row above was "
+              "recorded on 2026-10-11, before PR #1774 (2026-10-14) charged inherited-F4 / pdp3 word XORs at the "
+              "pinned `ns_per_word_xor` (0.002304 GAE per word XOR on this curve). Its IC `S` are lower bounds and "
+              "are kept as recorded. The same spec re-run on main (2026-10-18, "
+              f"[records](../../{c['source']}), [note](../../{c['note']})) charges that work; medians over "
+              "8 verified targets with ranges. This is accounting, not a change in the work done. "
+              "It is complete only under the pinned word-XOR ratio.", "",
+              "| arm | median S on main [range] | lower bound | archived S |",
+              "|:--|--:|:--|--:|"]
+        row = next(z for z in y["rows"] if z["session"] == c["session"])
+        archived = {"inherited-f4": row["inherited_s"], "f6-ic": row["f6_s"],
+                    "rho-negation": row["rho_negation_s"], "rho-strong": row["rho_strong_s"]}
+        for arm, s in a.items():
+            L.append(f"| {arm} | {s['median_s']:.3f} [{s['min_s']:.3f}, {s['max_s']:.3f}] | "
+                     f"{'yes' if s['lower_bound'] else 'no'} | {f3(archived.get(arm))} |")
+        L.append("")
     v = doc["n41_n53_counted_diagnostic"]
 
     def qmd(q: dict) -> str:
@@ -3326,7 +3378,27 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["base_points"]}</td><td>{h3(z["rho_negation_s"])}</td><td>{h3(z["rho_strong_s"])}</td>'
                  f'<td>{h3(z["inherited_s"])}</td><td>{h3(z["f6_s"])}</td><td>{h3(z["f5_over_f4_w"])}</td>'
                  f'<td>{h3(z["matrix_f4_over_inherited_w"])}</td><td>{h3(z["log2_inherited_over_f6_w"])}</td></tr>')
-    P.append('</tbody></table></section>')
+    P.append('</tbody></table>')
+    for c in y.get("corrections", []):
+        row = next(z for z in y["rows"] if z["session"] == c["session"])
+        archived = {"inherited-f4": row["inherited_s"], "f6-ic": row["f6_s"],
+                    "rho-negation": row["rho_negation_s"], "rho-strong": row["rho_strong_s"]}
+        P.append(f'<p><strong>Correction {esc(c["date"])} ({esc(c["session"])}, <code>{esc(c["curve"])}</code>).</strong> '
+                 f'The {esc(c["session"])} row above was recorded on 2026-10-11, before PR #1774 (2026-10-14) charged '
+                 'inherited-F4 / pdp3 word XORs at the pinned <code>ns_per_word_xor</code> (0.002304 GAE per word XOR on '
+                 'this curve). Its IC S are lower bounds and are kept as recorded. The same spec re-run on main '
+                 f'(2026-10-18, <a href="https://github.com/aburan28/crypto/blob/main/{esc(c["source"])}">records</a>, '
+                 f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c["note"])}">note</a>) charges that work; '
+                 'medians over 8 verified targets with ranges. This is accounting, not a change in the work done. '
+                 'It is complete only under the pinned word-XOR ratio.</p>')
+        P.append('<table><thead><tr><th>Arm</th><th>Median S on main [range]</th><th>Lower bound</th>'
+                 '<th>Archived S</th></tr></thead><tbody>')
+        for arm, s in c["arms"].items():
+            P.append(f'<tr><td>{esc(arm)}</td><td>{s["median_s"]:.3f} '
+                     f'<span class="muted">[{s["min_s"]:.3f}, {s["max_s"]:.3f}]</span></td>'
+                     f'<td>{"yes" if s["lower_bound"] else "no"}</td><td>{h3(archived.get(arm))}</td></tr>')
+        P.append('</tbody></table>')
+    P.append('</section>')
     v = doc["n41_n53_counted_diagnostic"]
 
     def qhtml(q: dict) -> str:

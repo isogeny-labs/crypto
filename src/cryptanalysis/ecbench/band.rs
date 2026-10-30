@@ -32,11 +32,58 @@ use crate::cryptanalysis::ic_boundary::pinned_calibration_ratios;
 /// The band every comparison uses unless it states a wider one.
 pub const DEFAULT_WEIGHTS: [f64; 3] = [0.0, 0.1, 1.0];
 
+/// The `unpriced` entry a record carries when its solver reported work in a
+/// unit [`solver_unit_recognised`] does not know.
+pub const UNRECOGNISED_SOLVER_UNIT: &str = "unrecognised_solver_unit";
+
+/// Solver units whose `ops` are counts of native solver operations, the
+/// thing the band charges at `w` GAE each.  A unit matches a family when it
+/// equals it or qualifies it as `family (…)`.  Seeded from every `op_unit` in
+/// `src/` and in the committed records (2026-10-30).
+pub const RECOGNISED_SOLVER_UNIT_FAMILIES: &[&str] = &[
+    "word XORs",
+    "word operations",
+    "vector XORs",
+    "row-by-row-equivalent 64-bit XORs",
+    "mac_op",
+    "F_p multiplications",
+    "F_p multiply-adds",
+    "F_q multiplications",
+    "monomial operations",
+    "monomial tests",
+    "conflicts",
+];
+
+/// Whether the band may charge `op_unit` per operation.  Anything else
+/// (CPU instructions, nanoseconds, a new engine's private unit) is not a
+/// native operation count, and charging it at `w` GAE per unit would put
+/// two arms on different scales without saying so (pilot 2026-10-30, D3:
+/// msolve's 10¹² retired instructions).
+pub fn solver_unit_recognised(op_unit: &str) -> bool {
+    RECOGNISED_SOLVER_UNIT_FAMILIES.iter().any(|f| {
+        op_unit == *f
+            || op_unit
+                .strip_prefix(f)
+                .is_some_and(|rest| rest.starts_with(" ("))
+    })
+}
+
+/// Whether `r`'s solver did work in an unrecognised unit.  A solver block
+/// with no calls and no operations did no work and is never flagged.
+pub fn has_unrecognised_solver_unit(r: &Record) -> bool {
+    r.solver
+        .as_ref()
+        .is_some_and(|s| (s.ops > 0 || s.calls > 0) && !solver_unit_recognised(&s.op_unit))
+}
+
 /// The count behind each unpriced counter of `r`, `None` where the record
 /// names the counter but carries no count for it.  A counter `X_uncharged`
 /// is looked up in the top-level counters, then in each phase's native map
 /// as `X_uncharged` or `X`, and a `solver_*` counter in the solver block.
+/// A solver counter in an unrecognised unit has no count: the record is a
+/// lower bound that cannot be ranked above `w = 0`.
 pub fn unpriced_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
+    let unrecognised = has_unrecognised_solver_unit(r);
     let mut out = BTreeMap::new();
     for name in &r.cost.unpriced {
         let base = name.strip_suffix("_uncharged").unwrap_or(name);
@@ -53,6 +100,10 @@ pub fn unpriced_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
             }
         }
         if !found && base.starts_with("solver_") {
+            if unrecognised {
+                out.insert(name.clone(), None);
+                continue;
+            }
             if let Some(s) = &r.solver {
                 out.insert(name.clone(), Some(s.ops));
                 continue;
@@ -330,6 +381,82 @@ pub fn markdown(rep: &BandReport) -> String {
 #[cfg(all(test, not(ecbench_reader)))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_solver_unit_in_use_is_recognised_and_others_are_not() {
+        // Every `op_unit` in `src/` and in the committed records, 2026-10-30.
+        for unit in [
+            "word XORs",
+            "word XORs (elimination only)",
+            "word XORs (elimination, specialisation and linear elimination only)",
+            "word XORs (elimination, including M4RI tables)",
+            "word XORs (elimination and specialisation only)",
+            "word XORs (Gray-code steps)",
+            "word XORs (elimination, plus extraction monomial tests and affine elimination counted one each)",
+            "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)",
+            "vector XORs (Gray-code steps, 16 lanes of 32 bits)",
+            "row-by-row-equivalent 64-bit XORs (elimination only; actual table-assisted XORs are cost.extra.word_xors_performed)",
+            "mac_op (Macaulay word operations)",
+            "F_p multiplications",
+            "F_p multiplications (grid)",
+            "F_p multiply-adds (elimination only)",
+            "F_p multiply-adds (tower F4 elimination)",
+            "F_q multiplications",
+            "monomial operations",
+            "monomial operations (modelled)",
+            "monomial tests",
+            "conflicts",
+        ] {
+            assert!(solver_unit_recognised(unit), "{unit}");
+        }
+        for unit in [
+            "msolve instructions retired",
+            "ns",
+            "wall nanoseconds",
+            "word XORsish",
+            "conflicts per second",
+            "",
+        ] {
+            assert!(!solver_unit_recognised(unit), "{unit}");
+        }
+    }
+
+    /// Pilot 2026-10-30, D3: a solver block in an unknown unit must not be
+    /// charged at `w` per unit.  The committed R13 inherited-F4 records leave
+    /// their word XORs uncharged; with the unit renamed to msolve's the band
+    /// has no count above `w = 0`, and the renamed record says why.
+    #[test]
+    fn an_unrecognised_solver_unit_is_uncounted_not_priced() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(
+            "research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-R13",
+        );
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let r = records
+            .iter()
+            .find(|r| {
+                r.arm == "inherited-f4"
+                    && r.cost.unpriced.iter().any(|u| u.starts_with("solver_"))
+            })
+            .expect("an inherited-F4 record with uncharged solver work")
+            .clone();
+        let ops = r.solver.as_ref().unwrap().ops;
+        assert!(ops > 0);
+        assert!(!has_unrecognised_solver_unit(&r));
+        let tag = r.cost.unpriced.iter().find(|u| u.starts_with("solver_")).unwrap();
+        assert_eq!(unpriced_counts(&r)[tag], Some(ops));
+        assert!(priced_gae(&r, 0.1).unwrap().is_some());
+
+        let mut x = r.clone();
+        x.solver.as_mut().unwrap().op_unit = "msolve instructions retired".into();
+        x.cost.unpriced.push(UNRECOGNISED_SOLVER_UNIT.into());
+        assert!(has_unrecognised_solver_unit(&x));
+        let counts = unpriced_counts(&x);
+        assert_eq!(counts[tag], None);
+        assert_eq!(counts[UNRECOGNISED_SOLVER_UNIT], None);
+        assert_eq!(priced_gae(&x, 0.0).unwrap(), Some(x.cost.total_gae.unwrap()));
+        assert_eq!(priced_gae(&x, 0.1).unwrap(), None);
+        assert_eq!(priced_gae(&x, 1.0).unwrap(), None);
+    }
 
     #[test]
     fn exact_sums_reproduce_the_band_means() {

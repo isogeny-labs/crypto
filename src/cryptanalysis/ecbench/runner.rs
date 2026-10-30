@@ -271,6 +271,44 @@ fn classify_stop(
     }
 }
 
+/// Block until child `pid` has exited without reaping it, then read its
+/// lifetime instruction and cycle counts.  `None` when either call fails
+/// (the counts are then unknown, never zero).
+#[cfg(target_os = "macos")]
+fn macos_process_hw(pid: i32) -> Option<crate::cryptanalysis::ecbench::record::ProcessHw> {
+    // SAFETY: waiting for our own child without reaping it; `info` and
+    // `ri` are plain structs the calls fill.
+    unsafe {
+        loop {
+            let mut info: libc::siginfo_t = std::mem::zeroed();
+            let rc = libc::waitid(
+                libc::P_PID,
+                pid as libc::id_t,
+                &mut info,
+                libc::WEXITED | libc::WNOWAIT,
+            );
+            if rc == 0 {
+                break;
+            }
+            if std::io::Error::last_os_error().kind() != std::io::ErrorKind::Interrupted {
+                return None;
+            }
+        }
+        let mut ri: libc::rusage_info_v4 = std::mem::zeroed();
+        let rc = libc::proc_pid_rusage(
+            pid,
+            libc::RUSAGE_INFO_V4,
+            &mut ri as *mut libc::rusage_info_v4 as *mut libc::rusage_info_t,
+        );
+        (rc == 0).then(|| crate::cryptanalysis::ecbench::record::ProcessHw {
+            instructions: ri.ri_instructions,
+            cycles: ri.ri_cycles,
+            source: "macos.proc_pid_rusage.v4".into(),
+            descendants_uncounted: ri.ri_child_user_time + ri.ri_child_system_time > 0,
+        })
+    }
+}
+
 /// Spawn, pin, feed, wait, reap.
 fn run_child(
     opts: &RunOptions,
@@ -387,6 +425,12 @@ fn run_child(
                 }
                 break;
             }
+        }
+        // macOS: wait the same way, then read the exited child's lifetime
+        // counts, which are gone once it is reaped.
+        #[cfg(target_os = "macos")]
+        {
+            timing.process_hw = macos_process_hw(pid);
         }
         #[cfg(target_os = "linux")]
         {
@@ -1194,6 +1238,36 @@ mod exact_record_reader_tests {
         assert!(from_str_exact_floats::<Record>(record_line).is_ok());
         let duplicate = record_line.replacen("{", r#"{"schema":"ecbench.record/v1","#, 1);
         assert!(from_str_exact_floats::<Record>(&duplicate).is_err());
+    }
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod process_hw_tests {
+    use super::macos_process_hw;
+
+    fn counts(script: &str) -> crate::cryptanalysis::ecbench::record::ProcessHw {
+        let mut child = std::process::Command::new("/bin/sh")
+            .arg("-c")
+            .arg(script)
+            .spawn()
+            .unwrap();
+        let hw = macos_process_hw(child.id() as i32);
+        // `waitid(WNOWAIT)` left the child unreaped; reap it now.
+        assert!(child.wait().unwrap().success());
+        hw.expect("proc_pid_rusage on the exited child")
+    }
+
+    /// Pilot 2026-10-30, D5: per-run counts come from the run's own child,
+    /// read before the reap, and say when a descendant's work is missing.
+    #[test]
+    fn the_exited_child_is_counted_and_a_descendant_is_flagged() {
+        let direct = counts("i=0; while [ $i -lt 2000 ]; do i=$((i+1)); done");
+        assert!(direct.instructions > 0 && direct.cycles > 0);
+        assert_eq!(direct.source, "macos.proc_pid_rusage.v4");
+        assert!(!direct.descendants_uncounted);
+        let nested =
+            counts("/bin/sh -c 'i=0; while [ $i -lt 200000 ]; do i=$((i+1)); done'; true");
+        assert!(nested.descendants_uncounted);
     }
 }
 

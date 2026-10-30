@@ -4812,6 +4812,19 @@ fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
     }
 }
 
+/// The `unpriced` entry for solver work in a unit the band cannot charge
+/// per operation (`band::solver_unit_recognised`).  `run_pipeline` prices
+/// such a unit at wall time, which under `pinned_only_calibration`
+/// (`ns_per_add = 1`) is wall nanoseconds read as GAE; the record must say
+/// the unit was not understood instead of carrying it as an ordinary
+/// uncharged count.
+fn unrecognised_solver_unit_tag(
+    s: &crate::cryptanalysis::ic_framework::SolverReport,
+) -> Option<String> {
+    ((s.ops > 0 || s.calls > 0) && !super::band::solver_unit_recognised(&s.op_unit))
+        .then(|| super::band::UNRECOGNISED_SOLVER_UNIT.to_string())
+}
+
 fn ic_report(
     m: &ResolvedMethod,
     rep: RunReport,
@@ -4846,6 +4859,9 @@ fn ic_report(
             phases[2].gae = rep.decomposition.gae_before_solver;
             total = phases.iter().fold(0.0, |acc, p| acc + p.gae);
             unpriced.push(format!("solver_{}_uncharged", s.op_unit.replace(' ', "_")));
+        }
+        if let Some(tag) = unrecognised_solver_unit_tag(s) {
+            unpriced.push(tag);
         }
         if param_u64(m, "solver_budget_seconds").unwrap_or(0) > 0 {
             nondeterminism.push("solver ran under a wall-clock budget".into());
@@ -6904,6 +6920,32 @@ mod tests {
         .unwrap();
         assert!(applicable(&m, &inst, &w.curve).is_ok());
         assert!(solve(&m, &inst, &w.curve, &w.target, 1).is_ok());
+    }
+
+    #[test]
+    fn an_unrecognised_solver_unit_is_tagged_and_known_units_are_not() {
+        use crate::cryptanalysis::ic_framework::SolverReport;
+        let report = |unit: &str, calls, ops| SolverReport {
+            name: "x".into(),
+            calls,
+            ops,
+            op_unit: unit.into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            unrecognised_solver_unit_tag(&report("msolve instructions retired", 40, 10)),
+            Some(super::super::band::UNRECOGNISED_SOLVER_UNIT.to_string())
+        );
+        assert_eq!(
+            unrecognised_solver_unit_tag(&report(
+                "word XORs (elimination, specialisation and linear elimination only)",
+                40,
+                10
+            )),
+            None
+        );
+        // No work, nothing to flag.
+        assert_eq!(unrecognised_solver_unit_tag(&report("", 0, 0)), None);
     }
 
     #[test]

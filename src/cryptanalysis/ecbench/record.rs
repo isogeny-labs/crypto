@@ -629,6 +629,27 @@ pub struct Timing {
     /// The child's own view of the solve window (grading version 3).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub solve: Option<SolveObs>,
+    /// Hardware counts over the run's whole child process, exec to exit,
+    /// which the runner reads from the exited child before reaping it
+    /// (macOS `proc_pid_rusage`; absent elsewhere).  The parent's own
+    /// `time -l` never includes these (pilot 2026-10-30, D5).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_hw: Option<ProcessHw>,
+}
+
+/// One run's child process, counted by the kernel over its lifetime.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProcessHw {
+    /// Instructions retired by the child itself.
+    pub instructions: u64,
+    pub cycles: u64,
+    /// Where the counts come from, e.g. `macos.proc_pid_rusage.v4`.
+    pub source: String,
+    /// Processes the child spawned and waited for used CPU.  Their
+    /// instructions are not in `instructions` (the kernel does not roll
+    /// them up; measured 2026-10-30: 3.9e9 direct against 2.9e7 through
+    /// `sh -c`); their CPU time is in `user_ns` / `sys_ns`.
+    pub descendants_uncounted: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

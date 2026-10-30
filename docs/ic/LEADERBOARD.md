@@ -311,6 +311,17 @@ Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight publ
 | koblitz | 19 | `icv1-f2m19-t797-b6cf2467` | 139 | 1.310 | 3.090 | 5.106 | 6483.443 | — | — | 0.359 |
 | binary | 19 | `icv1-f2m19-tm649-a9133fe6` | 129 | 1.387 | — | 3.405 | 4714.506 | — | — | 0.372 |
 
+**Correction 2026-10-30 (K13, `icv1-f2m13-t181-515ee569`).** The K13 row above was recorded on 2026-10-11, before PR #1774 (2026-10-14) charged inherited-F4 / pdp3 word XORs at the pinned `ns_per_word_xor` (0.002304 GAE per word XOR on this curve). Its IC `S` are lower bounds and are kept as recorded. The same spec re-run on main (2026-10-18, [records](../../research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13/records.jsonl), [note](../../research/f4_pricing_jump_20261018/README.md)) charges that work; medians over 8 verified targets with ranges. This is accounting, not a change in the work done. It is complete only under the pinned word-XOR ratio.
+
+| arm | median S on main [range] | lower bound | archived S |
+|:--|--:|:--|--:|
+| f6-ic | 1571.201 [1187.260, 2063.759] | no | 1161.733 |
+| inherited-f4 | 630.859 [492.449, 806.366] | no | 16.285 |
+| matrix-f4 | 115576.179 [83062.684, 149978.428] | no | — |
+| matrix-f5 | 74870.490 [53415.390, 96624.052] | no | — |
+| rho-negation | 2.290 [1.788, 3.419] | yes | 2.290 |
+| rho-strong | 14.318 [13.603, 14.341] | yes | 14.318 |
+
 ## n41/n53 shared-rank counted panel, outside tables A–C
 
 The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 control, method parameters unchanged) ran on 16 new public one-target workloads on each of the next two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under the frozen parameters is unknown, not a cost. 206 of 640 measured runs verified; decision `frozen_parameters_do_not_transfer`; the L2 host run is pending. Read the [frozen decision](../../research/ecbench_n41_n53_shared_rank_20261005/DECISION.json).
@@ -782,6 +793,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json` — sha256 `307f02ce84e5cb46…`
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
+- `research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13/records.jsonl` — sha256 `3dcbe7519a797ae0…`
+- `research/f4_pricing_jump_20261018/README.md` — sha256 `162cec157a6e0f63…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
