@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "isogeny-walk-cli-acceptance",
+  "checked_at_utc": "2026-10-23T19:08:09.008391+00:00",
+  "source_parent_commit": "bcd27ba7d4f446d34069e0d2f44f73ebf6acaa1f",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8",
+  "checks": {
+    "crax_json_walk": {
+      "wrapped_report_equals_walk_file": true,
+      "counts": {
+        "curves": 3,
+        "curves_expanded": 1,
+        "max_depth_reached": 1,
+        "edges_verified": 2,
+        "edges_beyond_cap": 0,
+        "failures": 0,
+        "order_proved_prime": 3,
+        "order_consistent_unproved": 0,
+        "order_refuted": 0,
+        "a_minus_3_models": 2,
+        "qr_prefix_64_min": 27,
+        "qr_prefix_64_max": 43
+      },
+      "run_id": "custom-94da2d79ce8acf2a"
+    },
+    "remote_exists": {
+      "bytes": 1974,
+      "exists": true,
+      "marker": "s3://setec-astronomy-artifacts/ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8/runs/custom-94da2d79ce8acf2a/complete.json",
+      "object_check": {
+        "checked": 3,
+        "mismatched": [],
+        "missing": [],
+        "status": "pass"
+      },
+      "schema": "isogeny-walk-exists/v1",
+      "sha256": "2054701197ca39b901ef213778b6a5bc23025185d386984487f966ab4b51969e"
+    },
+    "fresh_fetch_and_verify": {
+      "byte_identical": {
+        "curves.yaml": true,
+        "isogeny_routes.json": true,
+        "walk.json": true
+      },
+      "verification": {
+        "schema": "isogeny-walk-verify/v1",
+        "isogeny_routes_sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+        "curves_verified": 3,
+        "edges_verified": 2,
+        "audit_points": 2,
+        "result": "pass"
+      }
+    },
+    "tampered_route_rejected": true,
+    "paired_ic_smoke": {
+      "prime": {
+        "scalar": "190",
+        "direct_and_crax_verified": true,
+        "input_sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6"
+      },
+      "cubic": {
+        "scalar": "5",
+        "direct_and_crax_verified": true,
+        "input_sha256": "0c25e85a200879a26e26692eebc866f5a88d72ece24c88033a34f54c72950a57"
+      }
+    }
+  },
+  "objects": [
+    {
+      "key": "ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8/runs/custom-94da2d79ce8acf2a/attempts/local-1792782489805879000/curves.yaml.gz",
+      "bytes": 1947
+    },
+    {
+      "key": "ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8/runs/custom-94da2d79ce8acf2a/attempts/local-1792782489805879000/isogeny_routes.json.gz",
+      "bytes": 973
+    },
+    {
+      "key": "ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8/runs/custom-94da2d79ce8acf2a/attempts/local-1792782489805879000/walk.json.gz",
+      "bytes": 1435
+    },
+    {
+      "key": "ic/v1/acceptance/isogeny-walk-cli-20261023T190809Z-765c20b8/runs/custom-94da2d79ce8acf2a/complete.json",
+      "bytes": 1974
+    }
+  ],
+  "cleanup": {
+    "objects_deleted": 4,
+    "prefix_empty_after_delete": true
+  },
+  "source_sha256": {
+    "src/bin/isogeny_walk.rs": "9908bcec4d0b35b8454a783b5304e54e36271e3d39d7281e2e17d8b4b09f0517"
+  },
+  "binary_sha256": {
+    "isogeny_walk_release": "aa7147d624fe39a630dfb695ade48366d353aad384b48ad3ca979a201c5db279",
+    "crax_release": "bd6dcd35ce54327e0a94f14f96e1269a1a8847b0e2d05194d6f92cc9cd44c916"
+  },
+  "validation": {
+    "release_isogeny_walk_build": "passed",
+    "release_isogeny_walk_binary_tests": "0 tests, target built",
+    "rustfmt_touched_file": "passed",
+    "git_diff_check": "passed",
+    "json_parse_check": "passed",
+    "release_library_tests": "4489 passed, 0 failed, 119 ignored",
+    "note": "The first release suite process was interrupted before a result; the resumed full suite completed successfully."
+  }
+}

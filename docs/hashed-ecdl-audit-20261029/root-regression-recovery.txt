@@ -1,0 +1,36 @@
+Root regression recovery, 2026-10-30 01:17 UTC
+
+Required command: cargo test --locked --release --lib
+Repository: isogeny-labs/crypto
+Source/test snapshot: 6c11977e1546dd9cc0556aa1fe2e227cafe979da
+
+The run started at 00:28 UTC (tool session 25769) is INCOMPLETE/UNKNOWN,
+not a pass. At 01:15 UTC the session was unavailable, cargo PID 32047 and
+test PID 32054 were zombies, and the promised parent exit marker was absent.
+The trace has no full-suite result. Its embedded filtered child-test summaries
+do not establish the result of the parent suite.
+
+Raw trace: /tmp/crypto-root-tests-20261030.log
+Bytes: 482016
+SHA-256: 019547df1e055cc32182b0247885f4b5e488ea4bea4da7d71f5df5d9c2bc56b2
+Remote durability: NOT_UPLOADED; local trace only.
+The original sparse-fixture failures and earlier unknown run remain recorded
+in validation.txt. No failed/incomplete receipt is replaced by this receipt.
+
+The termination cause is unknown. Cgroup memory.events at recovery reported
+oom=0 and oom_kill=0; that observation does not establish a termination cause.
+No source, test, fixture, assertion, ignored-test annotation or check changed.
+
+At 01:16:30 UTC the same full command was restarted using nohup + setsid,
+with stdin /dev/null, so it does not depend on an interactive tool-session
+handle. Wrapper PID/SID 41032, parent PID 1, verified alive after launch.
+Wrapper: /tmp/crypto-root-tests-detached-20261030.sh
+Metadata: /tmp/crypto-root-tests-detached-20261030.meta
+Output: /tmp/crypto-root-tests-detached-20261030.log
+Actual wrapper exit: /tmp/crypto-root-tests-detached-20261030.exit
+The wrapper records start time and tested HEAD, catches HUP/TERM, and writes
+its actual exit status on EXIT. SIGKILL could still prevent a receipt.
+
+Status: PENDING. Require an actual zero exit receipt AND the complete parent
+summary before reporting a full pass or publishing the crypto branch. A live
+process, partial successes, or a filtered child summary is insufficient.

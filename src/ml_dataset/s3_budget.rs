@@ -531,7 +531,7 @@ impl S3BudgetContext {
         expected: &ExpectedObject,
         scope: &BudgetScope,
         source: PutSource,
-    ) -> Result<(), String> {
+    ) -> Result<bool, String> {
         let (client, expiration) = self.client()?;
         let operation = self.operation(HttpMethod::Put, bucket, key, expected, scope);
         let checksum = crate::store::backend::hex_to_b64(&expected.sha256)?;
@@ -561,7 +561,7 @@ impl S3BudgetContext {
             );
             if result.is_ok() {
                 gate.finish(0, None)?;
-                return Ok(());
+                return Ok(true);
             }
             let status = gate.status()?;
             let retry = gate.retryable()?;
@@ -569,7 +569,7 @@ impl S3BudgetContext {
             // A 412 never establishes equality. The caller must perform a new
             // full GET against the registered digest before returning success.
             if status == Some(412) {
-                return Ok(());
+                return Ok(false);
             }
             if !retry || attempt + 1 == ATTEMPTS {
                 return Err(gate.failure("conditional PUT")?);
@@ -729,7 +729,7 @@ impl Backend for BudgetedS3Backend {
         self.context
             .head_object(&self.bucket, &key, &expected, &self.scope)
     }
-    fn put(&self, key: &str, src: &Path, digest: &str) -> Result<(), String> {
+    fn put(&self, key: &str, src: &Path, digest: &str) -> Result<bool, String> {
         let key = self.key(key)?;
         let (actual, bytes) = crate::store::hash_file(src)?;
         if actual != digest {
@@ -742,7 +742,7 @@ impl Backend for BudgetedS3Backend {
             self.context
                 .session
                 .reserve_object(&self.bucket, &key, digest, bytes, &self.scope)?;
-        self.context.put_body(
+        let created = self.context.put_body(
             &self.bucket,
             &key,
             &expected,
@@ -758,7 +758,8 @@ impl Backend for BudgetedS3Backend {
         )?;
         self.context
             .session
-            .verify_object(&reservation, &ticket, digest, bytes)
+            .verify_object(&reservation, &ticket, digest, bytes)?;
+        Ok(created)
     }
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
         let key = self.key(key)?;
@@ -1440,7 +1441,7 @@ mod tests {
             .push_back(Reply::Ambiguous { method: "PUT" });
         fixture.wire.push("PUT", 412, b"");
         fixture.wire.push("GET", 200, b"abc");
-        fixture
+        let created = fixture
             .context
             .put_body(
                 "setec-astronomy-artifacts",
@@ -1450,6 +1451,10 @@ mod tests {
                 PutSource::Bytes(b"abc".to_vec()),
             )
             .unwrap();
+        assert!(
+            !created,
+            "a conditional collision never reports a newly created object"
+        );
         let ticket = fixture
             .context
             .get_body(

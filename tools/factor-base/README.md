@@ -204,6 +204,23 @@ the native replay verifies the mathematical contents.
 
 ## Limits and tests
 
+### Opt-in derived-final-slot relation oracle
+
+`decompose STORE MANIFEST_SHA256 REQUEST RECEIPT` consumes an archived base and
+an explicit JSON request with `targets` (finite point specs), `arity` (2..8)
+and `search_cap` (1..10000000). `replay-decomposition STORE MANIFEST_SHA256
+RECEIPT` regenerates and checks that receipt. For example requests and the IC
+lead map see [the application report](../../research/ecdlp_ic_leads_20261030/README.md).
+
+This generic oracle enumerates m−1 prefix points and derives the final point.
+It preserves repetitions, inverse-pair exclusion and sorted point indices.
+`complete: false` leaves missing witnesses unknown. Counters cover prefix visits
+plus target lookups; index construction, validation, group/bit work and full IC
+cost are additional. The existing exhaustive `evaluate` and its receipts retain
+their semantics. No source-specific counting exponent or speedup is asserted.
+
+### Construction bounds
+
 Generation is bounded by one million x candidates, two million stored points,
 and 65,536 points per shard. It keeps the point set in memory. Download is capped
 at 2 GB. A batch is resumable by deterministic recipe identity and object reuse;

@@ -1583,7 +1583,7 @@ mod tests {
         fn head(&self, key: &str) -> Result<Option<Meta>, String> {
             self.inner.head(key)
         }
-        fn put(&self, _key: &str, _src: &Path, _sha256: &str) -> Result<(), String> {
+        fn put(&self, _key: &str, _src: &Path, _sha256: &str) -> Result<bool, String> {
             panic!("partial file publisher must never use overwriting directory PUT")
         }
         fn get(&self, key: &str, destination: &Path) -> Result<(), String> {

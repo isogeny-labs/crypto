@@ -1,0 +1,102 @@
+{
+  "kind": "exact-local-analysis-execution/v1",
+  "source_revision": "93501d9143bf56cfa3f5cd1abb528b1f48daef14",
+  "classification": "local development reanalysis of existing certified results",
+  "raw_run": "/workspace/nist-expanded-cutoff-reanalysis-run-001",
+  "phases": [
+    {
+      "id": "producer-control",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "verifier-control",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "producer",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "verifier",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "prepare-character",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "refuse-character",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "expected_refusal"
+    },
+    {
+      "id": "prepare-calibration",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "refuse-calibration",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "expected_refusal"
+    },
+    {
+      "id": "prepare-summary",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed"
+    },
+    {
+      "id": "refuse-summary",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "expected_refusal"
+    }
+  ],
+  "flow": {
+    "planned": 10,
+    "attempted": 10,
+    "completed_as_expected": 10,
+    "unexplained_failures": 0
+  },
+  "summary_source": {
+    "bytes": 14798,
+    "sha256": "3a0159a03f43b8195f315bf9382ae8fb5d988f9e870b7f1380ca5c817857dddc"
+  },
+  "summary_binary": {
+    "bytes": 77200,
+    "sha256": "52e765d550cee4a78882a1a44eda76b36875a9e25d203578f328bbd05a024cfe"
+  },
+  "raw_summary": {
+    "bytes": 460,
+    "sha256": "7f8413a7842e71030e20c6f7def8301e243b4b72c969d9102ecf395a23295435"
+  },
+  "verification": {
+    "bytes": 233,
+    "sha256": "bc374ed556b63b597050d60f5e56bef533f940b825dbc8de7908f7999ee7636e"
+  },
+  "native_tables": {
+    "character_rows_including_exceptional2": 14049,
+    "profile_rows": 102921,
+    "cutoff_rows": 4901,
+    "label_rows": 4480
+  },
+  "new_point_counts": 0,
+  "new_curves": 0,
+  "DLP_attempted": false,
+  "timing_admitted": false,
+  "S3_checkpoint_claimed": false,
+  "full_random_baseline_completed": false
+}
