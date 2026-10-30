@@ -605,3 +605,34 @@ No v11 GPU execution yet. Local host syntax, shell syntax and both native
 metadata compiles passed; local root/plugin builds remain prohibited by the
 user's disk constraint. The standard dated log is absent in this sparse
 branch; this existing scoped project handoff preserves the required headings.
+
+## 2026-10-30T15:54Z — v9 report and v11 execution
+
+### What was done
+
+Published a separate two-page v9 observation report, preserving the earlier
+seven-page v1-v8 report. Both new pages were visually inspected; SVG/PNG/PDF
+catalog copies are hash-bound and explicitly unadmitted. The post-run strict
+checker now recognizes v11's four-arm52-bit and v-only61/62-bit contract;
+existing v9 positive and eight mutation controls still pass.
+
+### Decisions made
+
+V11 source d44b59149f468357e86186f956ecb7e323f38915 was pushed and checkpointed
+before pod jees49ew9dkfd7 launched15:50:53UTC at2.49USD/hour inUS-NE-1. It is
+one RTX PRO6000 with97887MiB reported by nvidia-smi, CUDA13.2.51, Rust1.88.0.
+Controller exec90595 collects and deletes with its18300s bound. New PR2971
+is open with auto-merge enabled; PR2896 is merged. GPU preflight is in progress.
+
+### Open threads
+
+Collect/audit/export every v11 outcome, verify deletion, remove private request
+and credential, publish raw data before its report, and recheck exact-head CI.
+The protocol is unchanged after launch. No v11 recovery claim yet.
+
+### Errors
+
+The first report render interpreted an unescaped less-than sign as a Typst
+label; corrected to code markup and both final pages rendered and inspected.
+CUDA emits ignored defaulted-constructor annotation warnings; no failure has
+been observed so far. PR attachment tool calls remain pending in the app.
