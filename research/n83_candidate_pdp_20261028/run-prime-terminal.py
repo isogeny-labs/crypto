@@ -1,9 +1,9 @@
 """EKS worker: restore frozen source, run native arithmetic, preserve every outcome."""
 from pathlib import Path
 import hashlib,json,os,resource,shutil,subprocess,sys,tarfile,threading,time
-source_uri,source_hash,binary_hash=sys.argv[1:]
+source_uri,source_hash,binary_hash,dest=sys.argv[1:]
 work=Path('/work');root=work/'prime-terminal-source';raw=work/'results'/'dataset'
-dest=os.environ['ISOLAB_RESULTS_URI'].rstrip('/')
+launcher_results_uri=os.environ.get('ISOLAB_RESULTS_URI');dest=dest.rstrip('/')
 assert dest.startswith('s3://setec-astronomy-artifacts/')
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 def aws(*args):subprocess.run(['aws','s3',*args,'--region','us-east-2','--only-show-errors'],check=True)
