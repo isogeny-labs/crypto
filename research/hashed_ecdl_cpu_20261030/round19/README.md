@@ -73,3 +73,15 @@ No new group formula is introduced. T-1014 owns this preparation directory;
 it does not reserve the shared implementation or the future report directory.
 The initial draft validator rejected a missing freeze block; that schema issue
 was corrected before freezing. The committed protocol passes validation.
+
+## Native validation/export migration
+
+PR2980 review identified that the original synthetic tests were implemented in
+Python. The active path is now the Rust crate documented in
+../native-panel-tools/README.md. Its eleven synthetic checks pass for this panel;
+the six original analyzer cases and three original export cases are retained,
+with stale-PASS and analyzer-source-mismatch checks added. Original Python files
+are preserved under ../native-panel-tools/legacy/round19/ as historical source.
+The frozen analyzer, protocol, build/source manifests and binary bytes are
+unchanged. Local bundle executable permissions were corrected after the first
+native test attempt exposed that copying had stripped them.
