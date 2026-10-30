@@ -93,6 +93,11 @@ Read before choosing the implementation change:
 The unmodified native release panel passed 27 tests. New focused sampling
 controls (2 tests) and the two-level taper control (1 test, nine graph cases)
 pass. Final commands and outcomes are recorded in [validation.txt](validation.txt).
+The complete crypto root regression subsequently passed 5,389 tests with zero
+failures and 123 existing ignored cases; its actual parent exit was zero.
+The [complete receipt](root-tests-complete.txt) retains the raw trace's hash
+and identifies the tested revision. Earlier failed/incomplete runs remain
+recorded separately and are not treated as passes.
 This round uses Rust 1.99.1 on a Linux x86-64 cloud development container,
 without performance isolation. Test-run durations are not performance evidence.
 
