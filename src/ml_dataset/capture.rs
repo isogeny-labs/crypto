@@ -1739,6 +1739,110 @@ fn check_record(
     Ok((super::digest(line), artifact))
 }
 
+/// Read-only custody evidence for a sealed cell. The caller must bind `binding`
+/// and `limits` to the original run before using these publication sequences.
+#[allow(dead_code)] // Central dynamic admission is not yet activated.
+pub(super) struct VerifiedLivePrefix {
+    pub payloads: Vec<(u64, Artifact)>,
+}
+
+/// Validate exactly the committed prefix, ignoring an uncommitted trailing tail.
+/// No snapshots, new receipts, or scientific claims are produced. Allocation and
+/// hashing here belong to outer artifact custody, not the inner solver ledger.
+#[allow(dead_code)]
+pub(super) fn verify_live_committed_prefix(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    binding.validate()?;
+    limits.validate()?;
+    let cell = storage::root_dir(cell_dir, false)?;
+    let live = cell.join("live");
+    match fs::symlink_metadata(&live) {
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(e.to_string()),
+        Ok(_) => {}
+    }
+    let live = storage::root_dir(&live, false)?;
+    let head_path = storage::contained_path(&live, "committed.json", false)?;
+    if !head_path.exists() {
+        return Ok(None);
+    }
+    let head: CommittedHead = read_json(&live, "committed.json", limits.metadata_reserve_bytes)?;
+    let mut cursor = CaptureCursor::initial(binding)?;
+    validate_head(&head, binding, &cursor)?;
+    if head.byte_end > limits.max_stream_bytes
+        || head.payload_bytes > limits.max_payload_bytes
+        || head.payload_count > limits.max_payload_count
+    {
+        return Err("capture watermark exceeds frozen limits".into());
+    }
+    limits.local_peak(head.byte_end, head.payload_bytes)?;
+    let file = File::open(storage::contained_path(&live, "events.jsonl", false)?)
+        .map_err(|e| e.to_string())?;
+    if file.metadata().map_err(|e| e.to_string())?.len() < head.byte_end {
+        return Err("event stream shorter than committed watermark".into());
+    }
+    let mut reader = BufReader::new(file.take(head.byte_end));
+    let binding_sha = binding.digest()?;
+    let mut payloads = BTreeMap::<String, (u64, Artifact)>::new();
+    loop {
+        let mut line = Vec::new();
+        let count = Read::by_ref(&mut reader)
+            .take(limits.max_event_bytes + 1)
+            .read_until(b'\n', &mut line)
+            .map_err(|e| e.to_string())?;
+        if count == 0 {
+            break;
+        }
+        if cursor.event_count >= head.event_count || line.len() as u64 > limits.max_event_bytes {
+            return Err("committed event exceeds configured record bounds".into());
+        }
+        let (hash, payload) = check_record(
+            &line,
+            &binding_sha,
+            cursor.event_count + 1,
+            &cursor.last_event_sha256,
+        )?;
+        cursor.event_count += 1;
+        cursor.byte_end += line.len() as u64;
+        cursor.last_event_sha256 = hash;
+        if let Some(payload) = payload {
+            cursor.payload_count += 1;
+            cursor.payload_bytes = cursor
+                .payload_bytes
+                .checked_add(payload.bytes)
+                .ok_or("payload accounting overflow")?;
+            if cursor.payload_count > head.payload_count
+                || cursor.payload_bytes > head.payload_bytes
+            {
+                return Err("payload records exceed committed watermark".into());
+            }
+            if payloads
+                .insert(payload.path.clone(), (cursor.event_count, payload))
+                .is_some()
+            {
+                return Err("duplicate payload commit in event prefix".into());
+            }
+        }
+    }
+    if cursor.byte_end != head.byte_end
+        || cursor.event_count != head.event_count
+        || cursor.last_event_sha256 != head.last_event_sha256
+        || cursor.payload_count != head.payload_count
+        || cursor.payload_bytes != head.payload_bytes
+    {
+        return Err("verified prefix does not match committed watermark".into());
+    }
+    for (_, payload) in payloads.values() {
+        storage::verify_manifest(&live, std::slice::from_ref(payload))?;
+    }
+    Ok(Some(VerifiedLivePrefix {
+        payloads: payloads.into_values().collect(),
+    }))
+}
+
 /// Copy only a committed event prefix. Missing live/head is normal before the
 /// solver starts. Context files are captured separately by the supervisor.
 pub fn capture_committed_delta(
@@ -2996,6 +3100,68 @@ mod tests {
                 .is_err());
             assert!(!f.live().join(WITNESS_PATH).exists());
             assert_eq!(e.head.event_count, 0);
+        }
+    }
+    #[test]
+    fn readonly_live_prefix_binds_witness_sequence_and_rejects_corruption() {
+        for mutation in 0..4 {
+            let f = Fixture::new();
+            let mut emitter = f.emitter();
+            let mut budget = witness_budget();
+            let mut workspace = emitter.prepare_witness(&mut budget).unwrap();
+            let mut global = 0;
+            let payload = witness_payload();
+            let receipt = emitter
+                .publish_first_witness(&payload.bytes, &mut workspace, &mut budget, &mut global)
+                .unwrap();
+            emitter.finish().unwrap();
+            let before = fs::read(f.live().join("committed.json")).unwrap();
+            let verified = verify_live_committed_prefix(&f.cell(), &binding(), &limits())
+                .unwrap()
+                .unwrap();
+            assert_eq!(verified.payloads.len(), 1);
+            assert_eq!(Some(verified.payloads[0].0), receipt.sequence);
+            assert_eq!(verified.payloads[0].1.path, WITNESS_PATH);
+            assert_eq!(
+                verified.payloads[0].1.sha256,
+                super::super::digest(&payload.bytes)
+            );
+            assert_eq!(fs::read(f.live().join("committed.json")).unwrap(), before);
+            assert!(!f.snapshot(0).exists());
+            let mut wrong_binding = binding();
+            wrong_binding.cell_index += 1;
+            assert!(verify_live_committed_prefix(&f.cell(), &wrong_binding, &limits()).is_err());
+            match mutation {
+                0 => {
+                    let mut file = OpenOptions::new()
+                        .append(true)
+                        .open(f.live().join("events.jsonl"))
+                        .unwrap();
+                    file.write_all(b"uncommitted incomplete tail").unwrap();
+                    assert!(verify_live_committed_prefix(&f.cell(), &binding(), &limits()).is_ok());
+                    let mut bytes = payload.bytes.clone();
+                    bytes[0] ^= 1;
+                    fs::write(f.live().join(WITNESS_PATH), bytes).unwrap();
+                }
+                1 => {
+                    fs::remove_file(f.live().join(WITNESS_PATH)).unwrap();
+                }
+                2 => {
+                    let mut bytes = fs::read(f.live().join("events.jsonl")).unwrap();
+                    bytes[0] ^= 1;
+                    fs::write(f.live().join("events.jsonl"), bytes).unwrap();
+                }
+                _ => {
+                    let mut head: CommittedHead = serde_json::from_slice(&before).unwrap();
+                    head.payload_count += 1;
+                    fs::write(
+                        f.live().join("committed.json"),
+                        serde_json::to_vec(&head).unwrap(),
+                    )
+                    .unwrap();
+                }
+            }
+            assert!(verify_live_committed_prefix(&f.cell(), &binding(), &limits()).is_err());
         }
     }
     #[test]

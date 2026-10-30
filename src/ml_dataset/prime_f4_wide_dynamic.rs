@@ -7591,6 +7591,15 @@ mod tests {
                 _ => panic!("bound sink lost"),
             });
             drop(guard);
+            let verified_live = capture::verify_live_committed_prefix(&cell, &binding, &limits)
+                .unwrap()
+                .unwrap();
+            let live_witness: Vec<_> = verified_live
+                .payloads
+                .iter()
+                .filter(|(_, a)| a.path == "payloads/pdp-witness.json")
+                .collect();
+            assert_eq!(live_witness.len(), 1);
             let initial = capture::CaptureCursor::initial(&binding).unwrap();
             let snapshot = root.join("restored");
             let delta =
@@ -7615,6 +7624,7 @@ mod tests {
                 1,
                 "confirmation must not republish the witness"
             );
+            assert_eq!(sequences[0], live_witness[0].0);
             let descriptors: [Option<&crate::ml_dataset::types::Artifact>; 8] =
                 std::array::from_fn(|i| {
                     let path = format!("payloads/{}", SLOT_REGISTRY[i].0);
