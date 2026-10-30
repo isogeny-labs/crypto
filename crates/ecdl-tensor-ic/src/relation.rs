@@ -91,18 +91,25 @@ pub struct FactorBases {
 pub fn new_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases {
     let target = (2.0 * c.order as f64).powf(1.0 / m as f64).ceil();
     let modulus = (c.order as f64 / target).round().max(1.0) as u64;
-    let mut fb = FactorBases {
-        sets: vec![Vec::new(); m],
-        ..Default::default()
-    };
-    for _ in 0..m {
-        let mut key = [0u8; 16];
-        rng.fill_bytes(&mut key);
-        fb.keys.push(key);
-        fb.mods.push(modulus);
+    // Unlike Go, redraw the keys while any F_i is empty, as
+    // new_affine_factor_bases does: an empty F_i admits no relation, and the
+    // solver's collection loop would never finish.
+    loop {
+        let mut fb = FactorBases {
+            sets: vec![Vec::new(); m],
+            ..Default::default()
+        };
+        for _ in 0..m {
+            let mut key = [0u8; 16];
+            rng.fill_bytes(&mut key);
+            fb.keys.push(key);
+            fb.mods.push(modulus);
+        }
+        fb.list(c);
+        if fb.sets.iter().all(|set| !set.is_empty()) {
+            return fb;
+        }
     }
-    fb.list(c);
-    fb
 }
 
 /// NewAffineFactorBases draws F_i = {A : (alpha x + beta y + gamma) mod p <

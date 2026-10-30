@@ -82,11 +82,15 @@ pub struct SupportVertex {
 
 impl SupportVertex {
     /// Go: NewSupportVertex. Returns the struct by value (wrap in `Vertex::Support`).
+    /// Unlike Go, duplicate rows are dropped (first occurrence kept): a
+    /// support vertex is a 0/1 predicate, and a repeated row would make
+    /// SparseContractor and DFSCounter count it twice but BruteForceCounter once.
     pub fn new(edges: Vec<usize>, rows: Vec<Vec<bool>>) -> SupportVertex {
         let mut set = HashSet::with_capacity(rows.len());
-        for r in &rows {
-            set.insert(bits_key(r));
-        }
+        let rows: Vec<Vec<bool>> = rows
+            .into_iter()
+            .filter(|r| set.insert(bits_key(r)))
+            .collect();
         SupportVertex {
             e: edges,
             rows,
