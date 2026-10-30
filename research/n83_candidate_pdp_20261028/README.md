@@ -419,3 +419,5 @@ and metrics helpers and diagnostic output archive. All312 new metric fields
 match committed native records; unknown values remain absent.
 
 Native Lefschetz continuation (2026-10-30): the separate Rust certificate path and signal-safe journal pass development controls and S3-restored native tests. See [native development evidence](validation-prime-lefschetz-native-development/README.md) and [file format](NATIVE_LEFSCHETZ_FORMAT.json). Zero native production cases; no new degree result. The prior interrupted run and all Python-era evidence remain preserved.
+
+Native EKS launch (2026-10-30): [source/image/protocol and launch receipt](evidence/prime-lefschetz-native-launch/README.md), [raw file format](PRIME_LEFSCHETZ_NATIVE_RUN_FORMAT.json). Job n83-native-lefschetz-20261030-r2 is active/Pending in its recorded launch snapshot. This records no completed production certificate; prior degree results remain unchanged until terminal execution and replay evidence is published.
