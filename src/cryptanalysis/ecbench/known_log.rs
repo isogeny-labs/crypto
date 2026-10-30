@@ -16,7 +16,7 @@ use std::time::Instant;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use crate::cryptanalysis::ic_boundary::{
-    addmod, mulmod, CountedGroup, FactorBase, GroupOps, PairTable,
+    addmod, mulmod, CountedGroup, FactorBase, GroupOps, KSumTable, PairTable,
 };
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 
@@ -44,7 +44,24 @@ pub struct Prepared<E> {
     logs: Vec<u64>,
     r: u64,
     multiplier: u64,
-    table: PairTable,
+    table: Table,
+}
+
+/// The target-blind table a known-log base is searched with: the
+/// two-summand pair table, or a `k`-sum table (`ic.known_log_ksum_v1`).
+enum Table {
+    Pair(PairTable),
+    KSum(KSumTable),
+}
+
+impl Table {
+    #[cfg(test)]
+    fn entries(&self) -> u64 {
+        match self {
+            Self::Pair(t) => t.entries,
+            Self::KSum(t) => t.entries,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default)]
@@ -62,12 +79,22 @@ fn count(counters: &mut BTreeMap<String, u64>, name: &str, n: u64) {
     *counters.entry(name.into()).or_default() += n;
 }
 
-pub fn prepare<G: CountedGroup>(
+/// The seeded signed base with every logarithm known, before any table.
+struct Base<E> {
+    base: FactorBase<E>,
+    ops: GroupOps,
+    wall_ns: u64,
+    counters: BTreeMap<String, u64>,
+    anchor: E,
+    logs: Vec<u64>,
+}
+
+fn check_base_parameters<G: CountedGroup>(
     g: &G,
     generator: G::Elt,
     r: u64,
-    params: Parameters,
-) -> Result<Prepared<G::Elt>, String> {
+    params: &Parameters,
+) -> Result<u64, String> {
     let size = u64::try_from(params.size).map_err(|_| "base size does not fit u64")?;
     if r < 3 || size == 0 || size > (r - 1) / 2 {
         return Err("known-log size must lie in 1..=(r-1)/2 for an odd prime r".into());
@@ -78,6 +105,16 @@ pub fn prepare<G: CountedGroup>(
     if g.is_identity(&generator) {
         return Err("known-log generator must be nonidentity".into());
     }
+    Ok(size)
+}
+
+pub fn prepare<G: CountedGroup>(
+    g: &G,
+    generator: G::Elt,
+    r: u64,
+    params: Parameters,
+) -> Result<Prepared<G::Elt>, String> {
+    let size = check_base_parameters(g, generator, r, &params)?;
     let pair_work = size
         .checked_add(1)
         .and_then(|next| size.checked_mul(next))
@@ -92,7 +129,104 @@ pub fn prepare<G: CountedGroup>(
     if size > u64::from(u32::MAX) / 2 {
         return Err("known-log signed base exceeds the pair-table index width".into());
     }
+    let Base {
+        base,
+        ops,
+        wall_ns: base_wall_ns,
+        mut counters,
+        anchor,
+        logs,
+    } = build_base(g, generator, r, &params)?;
 
+    measurement::mark(Phase::Precompute);
+    let table = PairTable::build_negation_folded(g, &base);
+    // Exactly one inverse pair per signed pair maps to O and is skipped.
+    // The remaining size^2 attempts cover ± sums; entries are distinct classes.
+    count(&mut counters, "pair_attempts", pair_work);
+    count(&mut counters, "pair_identity_sums", size);
+    count(&mut counters, "pair_distinct_signed_classes", table.entries);
+    count(
+        &mut counters,
+        "pair_colliding_attempts",
+        size * size - table.entries,
+    );
+    count(&mut counters, "table_inserts_uncharged", size * size);
+    count(&mut counters, "unknown_base_logs", 0);
+    Ok(Prepared {
+        base,
+        base_ops: ops,
+        table_ops: table.build_ops,
+        base_wall_ns,
+        table_wall_ns: table.build_wall_ns,
+        counters,
+        anchor,
+        generator,
+        logs,
+        r,
+        multiplier: params.base_multiplier,
+        table: Table::Pair(table),
+    })
+}
+
+/// [`prepare`] with a table of every signed `k`-sum of the base
+/// (`k = 3, 4, 5`, [`KSumTable`]) in place of the pair table: the same
+/// seeded target-blind base, so a hit's logarithm is the sum of `k` known
+/// logarithms.
+pub fn prepare_ksum<G: CountedGroup>(
+    g: &G,
+    generator: G::Elt,
+    r: u64,
+    params: Parameters,
+    k: u32,
+) -> Result<Prepared<G::Elt>, String> {
+    let size = check_base_parameters(g, generator, r, &params)?;
+    let combinations =
+        (0..u64::from(k.min(size as u32))).fold(1u64, |c, i| c.saturating_mul(size - i) / (i + 1));
+    let sums = combinations.saturating_mul(1u64 << k.saturating_sub(1).min(63));
+    if sums > params.max_pair_work {
+        return Err(format!(
+            "known-log {k}-sum table needs about {sums} sums, above max_pair_work={}",
+            params.max_pair_work
+        ));
+    }
+    let Base {
+        base,
+        ops,
+        wall_ns: base_wall_ns,
+        mut counters,
+        anchor,
+        logs,
+    } = build_base(g, generator, r, &params)?;
+    measurement::mark(Phase::Precompute);
+    let table = KSumTable::build_negation_folded(g, &base, k)?;
+    for (name, v) in table.work_counters() {
+        count(&mut counters, &format!("{name}_uncharged"), v);
+    }
+    count(&mut counters, "ksum_distinct_signed_classes", table.entries);
+    count(&mut counters, "unknown_base_logs", 0);
+    Ok(Prepared {
+        base,
+        base_ops: ops,
+        table_ops: table.build_ops,
+        base_wall_ns,
+        table_wall_ns: table.build_wall_ns,
+        counters,
+        anchor,
+        generator,
+        logs,
+        r,
+        multiplier: params.base_multiplier,
+        table: Table::KSum(table),
+    })
+}
+
+fn build_base<G: CountedGroup>(
+    g: &G,
+    generator: G::Elt,
+    r: u64,
+    params: &Parameters,
+) -> Result<Base<G::Elt>, String> {
+    let size = params.size as u64;
     measurement::mark(Phase::FactorBase);
     let started = Instant::now();
     let mut ops = GroupOps::default();
@@ -136,35 +270,13 @@ pub fn prepare<G: CountedGroup>(
     )?;
     count(&mut counters, "base_index_entries_uncharged", size * 2);
     count(&mut counters, "base_negations_uncharged", size * 3);
-    let base_wall_ns = started.elapsed().as_nanos() as u64;
-
-    measurement::mark(Phase::Precompute);
-    let table = PairTable::build_negation_folded(g, &base);
-    // Exactly one inverse pair per signed pair maps to O and is skipped.
-    // The remaining size^2 attempts cover ± sums; entries are distinct classes.
-    count(&mut counters, "pair_attempts", pair_work);
-    count(&mut counters, "pair_identity_sums", size);
-    count(&mut counters, "pair_distinct_signed_classes", table.entries);
-    count(
-        &mut counters,
-        "pair_colliding_attempts",
-        size * size - table.entries,
-    );
-    count(&mut counters, "table_inserts_uncharged", size * size);
-    count(&mut counters, "unknown_base_logs", 0);
-    Ok(Prepared {
+    Ok(Base {
         base,
-        base_ops: ops,
-        table_ops: table.build_ops,
-        base_wall_ns,
-        table_wall_ns: table.build_wall_ns,
+        ops,
+        wall_ns: started.elapsed().as_nanos() as u64,
         counters,
         anchor,
-        generator,
         logs,
-        r,
-        multiplier: params.base_multiplier,
-        table,
     })
 }
 
@@ -198,29 +310,46 @@ pub fn recover<G: CountedGroup>(
                 Some((None, 0))
             } else {
                 let mut probes = 0;
-                let found = prepared.table.probe(
-                    g,
-                    &prepared.base,
-                    &mut out.decomposition_ops,
-                    &mut probes,
-                    query,
-                );
+                let found = match &prepared.table {
+                    Table::Pair(t) => t
+                        .probe(
+                            g,
+                            &prepared.base,
+                            &mut out.decomposition_ops,
+                            &mut probes,
+                            query,
+                        )
+                        .map(|(i, j)| vec![i, j]),
+                    Table::KSum(t) => t.probe(
+                        g,
+                        &prepared.base,
+                        &mut out.decomposition_ops,
+                        &mut probes,
+                        query,
+                    ),
+                };
                 count(&mut out.counters, "lookups_uncharged", probes);
-                found.map(|(i, j)| (Some((i, j)), addmod(prepared.logs[i], prepared.logs[j], r)))
+                found.map(|idx| {
+                    let log = idx.iter().fold(0, |s, &i| addmod(s, prepared.logs[i], r));
+                    (Some(idx), log)
+                })
             };
             if let Some((indices, sum_log)) = witness {
                 measurement::mark(Phase::TargetRelationCheck);
-                if let Some((i, j)) = indices {
-                    let sum = g.add(
-                        &mut out.relation_ops,
-                        prepared.base.points[i],
-                        prepared.base.points[j],
-                    );
+                if let Some(idx) = indices {
+                    let mut sum = prepared.base.points[idx[0]];
+                    for &i in &idx[1..] {
+                        sum = g.add(&mut out.relation_ops, sum, prepared.base.points[i]);
+                    }
                     if sum != query {
-                        return Err("known-log pair witness failed its point check".into());
+                        return Err("known-log witness failed its point check".into());
                     }
                     count(&mut out.counters, "relation_point_checks", 1);
-                    count(&mut out.counters, "scalar_additions_uncharged", 1);
+                    count(
+                        &mut out.counters,
+                        "scalar_additions_uncharged",
+                        idx.len() as u64 - 1,
+                    );
                 }
                 measurement::mark(Phase::TargetDescent);
                 let log_anchor = addmod(sum_log, r - a, r);
@@ -290,6 +419,33 @@ mod tests {
     }
 
     #[test]
+    fn ksum_tables_recover_every_nonzero_prime_log() {
+        let i = roster_prime_instance(10).unwrap();
+        let g = &i.curve;
+        for k in [3u32, 4, 5] {
+            let params = Parameters {
+                size: 7,
+                max_pair_work: 1 << 20,
+                ..parameters()
+            };
+            let prepared = prepare_ksum(g, i.generator_point(), i.r, params, k).unwrap();
+            assert!(prepared.table.entries() > 0);
+            assert_eq!(prepared.base_ops.scalar_mults, 7);
+            for d in 1..i.r {
+                let target = g.mul(&mut GroupOps::default(), i.generator_point(), d);
+                let out = recover(g, &prepared, target, 7, i.r).unwrap();
+                assert_eq!(out.recovered, Some(d), "k = {k}, d = {d}");
+            }
+        }
+        let tight = Parameters {
+            size: 7,
+            max_pair_work: 10,
+            ..parameters()
+        };
+        assert!(prepare_ksum(g, i.generator_point(), i.r, tight, 3).is_err());
+    }
+
+    #[test]
     fn generator_transport_keeps_the_base_and_query_trajectory_fixed() {
         let i = roster_prime_instance(10).unwrap();
         let g = &i.curve;
@@ -309,7 +465,7 @@ mod tests {
         .unwrap();
         assert_eq!(a.base.points, b.base.points);
         assert_eq!(a.logs, b.logs);
-        assert_eq!(a.table.entries, b.table.entries);
+        assert_eq!(a.table.entries(), b.table.entries());
         for k in [1, 17, i.r - 1] {
             let q = g.mul(&mut GroupOps::default(), original, k);
             let ar = recover(g, &a, q, 31, i.r).unwrap();
