@@ -18,18 +18,21 @@ sha256sum service.cpp host.hpp curve.cuh device.cuh paper_driver.rs Cargo.toml C
 nvidia-smi --query-gpu=name,uuid,driver_version,memory.total,compute_cap --format=csv | tee "$out/gpu.csv"
 expected_gpu=${ER_EXPECT_GPU:-RTX PRO 6000}
 case "$expected_gpu" in
-    'RTX PRO 6000'|'RTX 5090') ;;
-    *) echo "unsupported sm_120 validation GPU: $expected_gpu" >&2; exit 2 ;;
+    'RTX PRO 6000'|'RTX 5090') required_arch=sm_120; expected_cc=12.0 ;;
+    'RTX 4090') required_arch=sm_89; expected_cc=8.9 ;;
+    *) echo "unsupported validation GPU: $expected_gpu" >&2; exit 2 ;;
 esac
 test "$(wc -l < "$out/gpu.csv")" = 2
 grep -Fq -- "$expected_gpu" "$out/gpu.csv"
-grep -Eq ', *12[.]0 *$' "$out/gpu.csv"
+arch=${ER_CUDA_ARCH:-$required_arch}
+test "$arch" = "$required_arch"
+awk -F, -v expected="$expected_cc" 'NR == 2 {gsub(/[[:space:]]/, "", $5); if ($5 != expected) exit 1}' "$out/gpu.csv"
 nvcc --version
 c++ --version
 rustc --version
 rustup component add clippy
 make test
-make ARCH=sm_120 test-cuda
+make ARCH="$arch" test-cuda
 cargo clippy --locked --release --manifest-path Cargo.toml --target-dir build/cargo -- -D warnings
 timeout 600 compute-sanitizer --tool memcheck --error-exitcode 86 build/explicit-relations-cuda --self-test
-echo "$expected_gpu sm_120 build, host reference, CUDA differential, reduction replay and memcheck passed"
+echo "$expected_gpu $arch build, host reference, CUDA differential, reduction replay and memcheck passed"
