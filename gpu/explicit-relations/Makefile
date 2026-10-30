@@ -62,3 +62,10 @@ test-cuda: all cuda-cached cuda-compact $(OUT)/query-check $(OUT)/query-cached-c
 	$(OUT)/query-compact-check
 clean:
 	rm -rf $(OUT)
+
+.PHONY: cuda-persistent
+cuda-persistent: $(OUT)/explicit-relations-persistent
+$(OUT)/explicit-relations-persistent: service.cpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -x cu service.cpp -o $@
+$(OUT)/query-persistent-check: query-check.cu device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_PERSISTENT_BLOCK_LIMIT=2 query-check.cu -o $@
