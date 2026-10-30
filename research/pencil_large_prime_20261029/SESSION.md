@@ -1294,3 +1294,7 @@ Publish native partial analysis, canonical shortfall findings, PDF and graph aft
 ### Errors
 
 Native controller recorded deadline expiration and a last-contact error that the supervisor container could not be found. Supervisor receipt still says running with an earlier timestamp and null exit code. The controller's terminal state and stale supervisor status are both preserved unchanged. No IAM or RBAC expansion attempted.
+
+### 2026-10-30T03:37Z — Additive shutdown reconciliation
+
+AWS DescribeInstances now reports the exact bound worker instance i-027be1b63d0a94827 as terminated, with launch 02:47:55 UTC and transition reason timestamp 03:30:41 UTC. Saved response and readback timestamp unchanged. This resolves the live-worker existence question; it does not establish exact active payload time or repair the stale supervisor receipt. The report will bind this additive resource observation without converting infrastructure lifetime into algorithm costs. Two artifact-check invocations initially used the wrong path/missing base argument; the corrected tools/artifacts/artifacts.py check HEAD~1 HEAD passed.
