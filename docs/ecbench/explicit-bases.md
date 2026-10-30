@@ -946,3 +946,30 @@ Refresh this overview again with the actual new validation outcomes.
 ### Errors
 The original introductory source-only status and row-cap/domain descriptions
 had become stale as later PRs landed. Historical entries remain preserved.
+
+## 2026-10-30 20:12 UTC — v13 complete, v15 launched
+
+### What was done
+Collected v13 with all 12 prescribed recoveries, including both 62-bit targets.
+Raw results and source/instrument hashes are in `results-v13`; every certificate
+passed fresh CPU replay and scalar+1 rejection. Archive SHA256 is
+`f00ea3e1ef9d32ebbf2063cb43b99939a42a19f31085c0f1ccb1d32d8e083338`.
+Pod `7tugqyoxyvnikm` was deleted, with a fresh complete provider list confirming
+absence. Schema/file hashes/native strict coverage pass; five canonical
+nonrectangular-coverage findings are retained in CHECKER-NOTE.md.
+
+### Decisions made
+Preserve diagnostic L0 timing scope and every raw row. Both 62-bit cells actually
+cached all right rows; admission estimates are not peak VRAM. V15 launched only
+after v13 collection/deletion, pinned to `23dc8a61ca928e47237f8fb5a3a8d87228649628`
+and frozen protocol `8e079c9e143ddfcb00dcf66a5d5002d22e9ce7722291e14b4f28292c8eee65ad`.
+
+### Open threads
+Publish v13 inspected report after raw commit/push. V15 pod `ndiwvrvehbf4hy`
+started 20:10:04 UTC on one RTX PRO6000 at 2.49/hour; full preflight precedes
+matched 52-bit filter controls and two 63-bit targets. No v15 result yet.
+The full paper GPU tensor backend and matched-rho/external comparisons remain open.
+
+### Errors
+No v13 process failure. Canonical checker assumes rectangular arms by sizes,
+so its five findings remain explicit; no full checker-pass claim is made.
