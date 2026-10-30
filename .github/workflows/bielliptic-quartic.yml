@@ -34,7 +34,7 @@ concurrency:
 jobs:
   replay:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Free hosted runner disk before Rust installation
         if: runner.environment == 'github-hosted'
@@ -43,6 +43,9 @@ jobs:
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
           df -h /
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.87.0'
