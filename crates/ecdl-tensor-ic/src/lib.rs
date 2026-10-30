@@ -14,6 +14,7 @@ pub mod curve;
 pub mod field;
 pub mod gadgets;
 pub mod linalg;
+pub mod opcount;
 pub mod pointgadget;
 pub mod relation;
 pub mod scale;

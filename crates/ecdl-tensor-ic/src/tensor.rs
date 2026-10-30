@@ -363,6 +363,7 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
             }
         }
     }
+    crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
     out
 }
 
@@ -425,6 +426,7 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
             *slot = slot.wrapping_add(c);
         }
     }
+    crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
     Ok(out)
 }
 
@@ -452,6 +454,7 @@ fn apply_pred(t: &Table, v: &PredVertex) -> Result<Table> {
             *slot = slot.wrapping_add(c);
         }
     }
+    crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
     Ok(out)
 }
 

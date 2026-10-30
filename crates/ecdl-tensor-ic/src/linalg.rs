@@ -38,17 +38,21 @@ pub fn left_kernel_vector(rows: &[HashMap<usize, u64>], ncols: usize, r: u64) ->
         for t in 0..mat[piv].len() {
             mat[piv][t] = mul_mod(mat[piv][t], inv, r);
         }
+        crate::opcount::bump("linalg_mulmod_uncharged", mat[piv].len() as u64);
         let prow = mat[piv].clone();
         for j in 0..k {
             if used[j] || mat[j][col] == 0 {
                 continue;
             }
             let f = mat[j][col];
+            let mut muls = 0u64;
             for t in 0..mat[j].len() {
                 if prow[t] != 0 {
                     mat[j][t] = sub_mod(mat[j][t], mul_mod(f, prow[t], r), r);
+                    muls += 1;
                 }
             }
+            crate::opcount::bump("linalg_mulmod_uncharged", muls);
         }
     }
     // An unused row now has zeros in every column; its identity block is a

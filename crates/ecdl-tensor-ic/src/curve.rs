@@ -76,6 +76,7 @@ impl Curve {
         if t.inf {
             return s;
         }
+        crate::opcount::bump(if s == t { "doubles" } else { "adds" }, 1);
         let p = self.p;
         let lambda = if s.x == t.x {
             if add_mod(s.y, t.y, p) == 0 {
