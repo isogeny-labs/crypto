@@ -242,11 +242,12 @@ fn provision(s: &State) -> Result<Value, String> {
         .checked_sub(now())
         .filter(|n| *n > 0)
         .ok_or("original deadline expired")?;
-    ensure(
-        NAMESPACE,
-        &json!({"apiVersion":"v1","kind":"Pod","metadata":metadata(&name,req),"spec":{"restartPolicy":"Never","activeDeadlineSeconds":remaining,"automountServiceAccountToken":false,"enableServiceLinks":false,"nodeSelector":{"isolab.dev/pool":"cpu-spot","node.kubernetes.io/instance-type":req.instance_type},"tolerations":[{"key":"isolab.dev/workload","operator":"Equal","value":"cpu","effect":"NoSchedule"}],"containers":[{"name":"supervisor","image":req.runtime_image_uri,"command":[SUPERVISOR,"supervise","/request/request.json",s.attempt.to_string()],"securityContext":{"privileged":true,"runAsUser":0,"runAsGroup":0},"resources":{"requests":{"cpu":"4","memory":"4Gi"},"limits":{"cpu":"4","memory":"4Gi"}},"volumeMounts":[{"name":"work","mountPath":"/work"},{"name":"request","mountPath":"/request","readOnly":true}]}],"volumes":[{"name":"work","persistentVolumeClaim":{"claimName":name}},{"name":"request","configMap":{"name":format!("{}-request",req.run_name)}}]}}),
-        req,
-    )
+    ensure(NAMESPACE, &computation_pod(s, remaining), req)
+}
+fn computation_pod(s: &State, remaining: u64) -> Value {
+    let req = &s.request;
+    let name = basename(s);
+    json!({"apiVersion":"v1","kind":"Pod","metadata":metadata(&name,req),"spec":{"restartPolicy":"Never","activeDeadlineSeconds":remaining,"automountServiceAccountToken":false,"enableServiceLinks":false,"nodeSelector":{"isolab.dev/pool":"cpu-spot","node.kubernetes.io/instance-type":req.instance_type},"tolerations":[{"key":"isolab.dev/workload","operator":"Equal","value":"cpu","effect":"NoSchedule"}],"containers":[{"name":"supervisor","image":req.runtime_image_uri,"command":[SUPERVISOR,"supervise","/request/request.json",s.attempt.to_string()],"securityContext":{"privileged":true,"runAsUser":0,"runAsGroup":0},"resources":{"requests":{"cpu":"4","memory":req.memory.as_str()},"limits":{"cpu":"4","memory":req.memory.as_str()}},"volumeMounts":[{"name":"work","mountPath":"/work"},{"name":"request","mountPath":"/request","readOnly":true}]}],"volumes":[{"name":"work","persistentVolumeClaim":{"claimName":name}},{"name":"request","configMap":{"name":format!("{}-request",req.run_name)}}]}})
 }
 fn bind_placement(stored: &mut Stored, pod: &Value) -> Result<bool, String> {
     let Some(node_name) = pod["spec"]["nodeName"].as_str() else {
@@ -550,7 +551,7 @@ fn manifest_job(s: &State, remaining: u64) -> Result<Value, String> {
         "--cpu",
         "4",
         "--memory",
-        "4Gi",
+        s.request.memory.as_str(),
         "--seconds",
         &remaining.to_string(),
         "--retries",
@@ -1137,6 +1138,61 @@ pub fn wait(req: Request, dir: &Path) -> Result<Value, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn memory_envelope_reaches_computation_and_fresh_l2_manifests() {
+        // Isolate environment changes; submit-job is run ONLY in --dry-run mode.
+        const CHILD: &str = "ISOLAB_MEMORY_MANIFEST_TEST_CHILD";
+        if std::env::var_os(CHILD).is_none() {
+            let status = Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "cloud::tests::memory_envelope_reaches_computation_and_fresh_l2_manifests",
+                ])
+                .env(CHILD, "1")
+                .status()
+                .unwrap();
+            assert!(status.success());
+            return;
+        }
+        use std::os::unix::fs::PermissionsExt;
+        let dir =
+            std::env::temp_dir().join(format!("isolab-memory-manifest-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let script = dir.join("submit-job");
+        fs::write(&script, include_str!("../../../submit-job")).unwrap();
+        fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+        std::env::set_var("ISOLAB_DEPLOY_DIR", &dir);
+        for memory in [crate::contract::Memory::Gi4, crate::contract::Memory::Gi8] {
+            let mut req = crate::contract::fixture();
+            req.memory = memory;
+            let mut state = State::new(req, "test".into(), 1000).unwrap();
+            state.benchmark_job = Some("memory-envelope-test".into());
+            let pod = computation_pod(&state, 3600);
+            let job = manifest_job(&state, 3600).unwrap();
+            for resources in [
+                &pod["spec"]["containers"][0]["resources"],
+                &job["spec"]["template"]["spec"]["containers"][0]["resources"],
+            ] {
+                assert_eq!(resources["requests"]["memory"], memory.as_str());
+                assert_eq!(resources["limits"]["memory"], memory.as_str());
+                assert_eq!(resources["requests"]["cpu"], "4");
+                assert_eq!(resources["limits"]["cpu"], "4");
+            }
+            assert_eq!(pod["spec"]["activeDeadlineSeconds"], 3600);
+            assert_eq!(job["spec"]["activeDeadlineSeconds"], 3600);
+            assert_eq!(job["spec"]["backoffLimit"], 0);
+            assert_eq!(
+                job["metadata"]["annotations"]["isolab.dev/recovery-request"],
+                state.request_sha256
+            );
+            assert_eq!(
+                job["spec"]["template"]["spec"]["nodeSelector"]["isolab.dev/pool"],
+                "cpu-l2-spot"
+            );
+        }
+        fs::remove_dir_all(dir).unwrap();
+    }
+
     #[test]
     fn checkpoint_readback_rejects_corruption_version_and_manifest_changes() {
         // Isolate PATH changes in a child test process; the parent test suite may
