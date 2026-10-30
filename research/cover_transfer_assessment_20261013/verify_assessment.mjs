@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { catalogSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
 
 const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 
@@ -1166,11 +1166,17 @@ for (const artifact of sourceArtifacts) {
   check(absolute !== null, "unsafe source-artifact path " + String(artifact.path));
   check(absolute !== null && fs.existsSync(absolute), "missing source artifact " + String(artifact.path));
   if (absolute !== null && fs.existsSync(absolute)) {
-    check(
-      /^[0-9a-f]{64}$/u.test(artifact.sha256) &&
-        sha256(catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit)) === artifact.sha256,
-      "source-artifact digest mismatch for " + artifact.path,
-    );
+    try {
+      const bytes = Object.hasOwn(artifact, "source_commit")
+        ? legacyFormulaSnapshotBytes(root, artifact.path, artifact.source_commit)
+        : catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit);
+      check(
+        /^[0-9a-f]{64}$/u.test(artifact.sha256) && sha256(bytes) === artifact.sha256,
+        "source-artifact digest mismatch for " + artifact.path,
+      );
+    } catch (error) {
+      check(false, `unreadable pinned source artifact ${artifact.path}: ${error.message}`);
+    }
   }
 }
 for (const requiredPath of requiredSourceArtifactPaths) {

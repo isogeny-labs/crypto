@@ -1,0 +1,205 @@
+{
+  "schema": "fall-degree-formalization-progress/v1",
+  "requested": "Exact ordinary first/last pair (4,5), uniformly under original guarded prime-field hypotheses",
+  "request_complete": false,
+  "verified": [
+    {
+      "declaration": "FilteredClosure.least",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary variable type σ, input set F and degree d; V is a coefficient submodule containing eligible inputs and closed under all products of actual total degree <=d; p is Derivable F d",
+      "claim": "Every derivable p belongs to V.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.lastFallBound_iff_refutation",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary F,d; 1 belongs to Ideal.span F",
+      "claim": "LastFallBound F d iff 1 is Derivable F d, with the ordinary max(d,totalDegree p) convention.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.closed_at_four_of_low_part",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; ideal I, coefficient submodule W; every member of W of degree <=3 lies in I; every member of I of degree <=4 lies in W; p in W and degree(q*p)<=4",
+      "claim": "q*p belongs to W, for arbitrary polynomial q, including zero and constants.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quadratic_leading_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K; three distinct a,b,c; A*t^2+B*t+C vanishes at each",
+      "claim": "A=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quartic_weights_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; all guarded-grid scalar equalities displayed in the source hold for arbitrary r,c1,c2,l0,lx,ly,lz,lv",
+      "claim": "Both quartic weights c1,c2 vanish.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.affine_expansion",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; finite variable type σ; totalDegree p<=1",
+      "claim": "p equals its explicitly given constant-plus-linear coefficient expansion.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.square_coefficient_degree",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; p in MvPolynomial (Fin 5) K with totalDegree p<=3",
+      "claim": "The coefficient of u^2 under finSuccEquiv has total degree <=1 in the remaining four variables.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.coefficient_affine",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K; five-variable p with totalDegree p<=3; u left formal and x,y,z,v specialized to x,y,z,1/(x-y)",
+      "claim": "One fixed affine expression in x,y,z,1/(x-y) gives the specialized u^2 coefficient for every x,y,z.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.low_part",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; i vanishes on guarded grid; p=i+c1*f1+c2*f2 with degree p<=3; f1,f2 have specialized u^2 coefficients (x-y)^2,(z-r)^2",
+      "claim": "p vanishes on the guarded grid with u left formal.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.not_refutable_four",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; f1,f2 have the displayed u^2 coefficients; each input is f1, f2, or vanishes on the guarded grid",
+      "claim": "1 is not derivable at degree four.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_degree_four_refutation",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Every field K with 6!=0; pairwise distinct a,b,c; arbitrary alpha,beta,r; exactly GuardedModel.inputs (the six original polynomials), variable order u,x,y,z,v",
+      "claim": "1 is not in ordinary V(F,4); no curve or satisfiability assumption is used.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_refutation_below_five",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; natural d<5",
+      "claim": "1 is not in ordinary V(F,d).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.lastFall_lower",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; additionally 1 in Ideal.span F; natural d<5",
+      "claim": "LastFallBound F d is false. The rational-unsatisfiability-to-unit-ideal bridge is not assumed proved.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.pairDifference_derivable",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the six original inputs",
+      "claim": "The explicit quadratic divided difference belongs to V(F,4), by degree-checked derivation rules.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.guardTop_ne_zero",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; five-variable polynomial ring",
+      "claim": "v*(x-y) is a nonzero polynomial.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.cubic_guard_top_injective",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; scalar a,b,c, polynomial L; a*x^3+b*y^3+c*z^3+L*v*(x-y)=0",
+      "claim": "a=b=c=0 and L=0; no weighted syzygy/Koszul definition is claimed.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.degree_four_top_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; the explicit x,y,v top forms",
+      "claim": "v*x^3-v*y^3-(x^2+x*y+y^2)*v*(x-y)=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.lifted_guard_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; any monic cubic coefficients; g and Q exactly as defined in the statement",
+      "claim": "v*(g(x)-g(y))-Q*(v*(x-y)-1)=Q.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ]
+}

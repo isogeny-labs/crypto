@@ -2545,7 +2545,19 @@ fn rho_native<G: NativeGroup>(
     cap: u64,
     fold: bool,
     counts: impl Fn() -> Counts,
+    before_target: impl FnOnce(),
 ) -> (Option<u64>, Vec<NativePhase>, BTreeMap<String, u64>) {
+    let mut before_target = Some(before_target);
+    let mut target_mul = |scalar| {
+        // A zero multiple never reads target coordinates. Defer the boundary
+        // until the first nonzero use, including initial start and restarts.
+        if scalar != 0 {
+            if let Some(begin) = before_target.take() {
+                begin();
+            }
+        }
+        g.mul(q, scalar)
+    };
     let ring = Ring::new(r);
     let mut rng = Rng(seed);
     let mut draws = 0;
@@ -2554,7 +2566,8 @@ fn rho_native<G: NativeGroup>(
     while jumps.len() < 16 {
         let a = uniform(&mut rng, r.min(4096), &mut draws);
         let b = uniform(&mut rng, r.min(4096), &mut draws);
-        let x = g.add(g.mul(p, a), g.mul(q, b));
+        let generator_part = g.mul(p, a);
+        let x = g.add(generator_part, target_mul(b));
         if x != g.identity() {
             jumps.push((x, a, b));
         }
@@ -2563,7 +2576,7 @@ fn rho_native<G: NativeGroup>(
         uniform(&mut rng, r, &mut draws),
         uniform(&mut rng, r, &mut draws),
     );
-    let start = g.add(g.mul(p, a), g.mul(q, b));
+    let start = g.add(g.mul(p, a), target_mul(b));
     let (mut x, aa, bb, _) = canonical(g, start, a, b, &ring, fold);
     a = aa;
     b = bb;
@@ -2603,7 +2616,7 @@ fn rho_native<G: NativeGroup>(
                 consecutive = 0;
                 a = uniform(&mut rng, r, &mut draws);
                 b = uniform(&mut rng, r, &mut draws);
-                x = g.add(g.mul(p, a), g.mul(q, b));
+                x = g.add(g.mul(p, a), target_mul(b));
             } else {
                 x = g.add(x, x);
                 a = ring.add(a, a);
@@ -2687,6 +2700,20 @@ pub fn solve_rho(
     fold: bool,
     transferred: bool,
 ) -> Outcome {
+    solve_rho_with_target_hook(inst, target, seed, cap, fold, transferred, || {})
+}
+
+/// Same arithmetic and counters as solve_rho; hook runs immediately before
+/// first target-dependent arithmetic (target transfer or first target multiple).
+pub fn solve_rho_with_target_hook(
+    inst: &StudyInstance,
+    target: Point,
+    seed: u64,
+    cap: u64,
+    fold: bool,
+    transferred: bool,
+    before_target: impl FnOnce(),
+) -> Outcome {
     let fresh = inst.fresh();
     let inst = &fresh;
     if transferred {
@@ -2701,12 +2728,14 @@ pub fn solve_rho(
         }];
         let before = counts();
         let p = s.tau(s.from_short(inst.generator));
+        before_target();
         let q = s.tau(s.from_short(target));
         phases.push(NativePhase {
             name: "transfer".into(),
             counts: counts() - before,
         });
-        let (recovered, mut walk, native) = rho_native(&s.j, p, q, inst.r, seed, cap, fold, counts);
+        let (recovered, mut walk, native) =
+            rho_native(&s.j, p, q, inst.r, seed, cap, fold, counts, || {});
         phases.append(&mut walk);
         Outcome {
             recovered,
@@ -2719,10 +2748,17 @@ pub fn solve_rho(
     } else {
         let e = &inst.curve;
         e.f.reset();
-        let (recovered, phases, native) =
-            rho_native(e, inst.generator, target, inst.r, seed, cap, fold, || {
-                e.f.counts()
-            });
+        let (recovered, phases, native) = rho_native(
+            e,
+            inst.generator,
+            target,
+            inst.r,
+            seed,
+            cap,
+            fold,
+            || e.f.counts(),
+            before_target,
+        );
         Outcome {
             recovered,
             exhausted: recovered.is_none(),
@@ -2737,6 +2773,56 @@ pub fn solve_rho(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn rho_target_hook_defers_zero_multiples() {
+        use std::cell::Cell;
+        struct TracedGroup<'a> {
+            started: &'a Cell<bool>,
+            zero_before: &'a Cell<usize>,
+        }
+        impl NativeGroup for TracedGroup<'_> {
+            type Element = u64;
+            fn identity(&self) -> u64 {
+                0
+            }
+            fn add(&self, a: u64, b: u64) -> u64 {
+                (a + b) % 3
+            }
+            fn neg(&self, a: u64) -> u64 {
+                (3 - a) % 3
+            }
+            fn hash(&self, a: u64) -> u64 {
+                a
+            }
+            fn mul(&self, a: u64, k: u64) -> u64 {
+                if a == 2 {
+                    if k != 0 {
+                        assert!(self.started.get(), "target used before hook");
+                    } else if !self.started.get() {
+                        self.zero_before.set(self.zero_before.get() + 1);
+                    }
+                }
+                (a * k) % 3
+            }
+        }
+        let zero_before = Cell::new(0);
+        for seed in 0..64 {
+            let started = Cell::new(false);
+            let group = TracedGroup {
+                started: &started,
+                zero_before: &zero_before,
+            };
+            rho_native(&group, 1, 2, 3, seed, 0, false, Counts::default, || {
+                assert!(!started.replace(true), "duplicate target hook");
+            });
+            assert!(started.get());
+        }
+        assert!(
+            zero_before.get() > 0,
+            "fixture must exercise leading zero multiples"
+        );
+    }
+
     fn small(e: Elliptic, family: &str, parameter: u64) -> Option<StudyInstance> {
         let order = exhaustive_order(&e);
         let &(r, exp) = factor(order).last()?;
