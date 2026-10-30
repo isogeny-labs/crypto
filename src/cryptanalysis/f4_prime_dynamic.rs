@@ -376,6 +376,8 @@ enum FrontierCheckpoint {
 }
 #[cfg(test)]
 thread_local! {
+    static INVERSE_TEST_LEGACY: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static INVERSE_TEST_OPS: std::cell::Cell<(u64,u64)> = const { std::cell::Cell::new((0,0)) };
     static FRONTIER_TEST_HASH: std::cell::Cell<Option<u64>> = const { std::cell::Cell::new(None) };
     static FRONTIER_TEST_EXPIRY: std::cell::Cell<Option<(FrontierCheckpoint,u64)>> = const { std::cell::Cell::new(None) };
     static FRONTIER_TEST_LEGACY: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
@@ -501,6 +503,20 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
         if a == 0 {
             return Err(Stop::InvalidInput);
         }
+        #[cfg(test)]
+        let dispatch = !INVERSE_TEST_LEGACY.with(|flag| flag.get());
+        #[cfg(not(test))]
+        let dispatch = true;
+        if dispatch {
+            // Load, compare, branch/control and return: four scalar actions.
+            // Montgomery identity is field.one(), not canonical integer 1.
+            self.gate.permit(32, 0)?;
+            let one = self.field.one();
+            if a == one {
+                return Ok(one);
+            }
+        }
+        // General inversion retains its full original tariff and algorithm.
         self.gate.permit(4096, 0)?;
         let mut e = self.field.p() - 2;
         let mut x = a;
@@ -509,8 +525,18 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
             self.gate.check()?;
             if e & 1 != 0 {
                 r = self.field.mul(r, x);
+                #[cfg(test)]
+                INVERSE_TEST_OPS.with(|ops| {
+                    let (m, s) = ops.get();
+                    ops.set((m + 1, s));
+                });
             }
             x = self.field.sqr(x);
+            #[cfg(test)]
+            INVERSE_TEST_OPS.with(|ops| {
+                let (m, s) = ops.get();
+                ops.set((m, s + 1));
+            });
             e >>= 1;
         }
         Ok(r)
@@ -2042,5 +2068,165 @@ mod tests {
         assert_eq!(high.maximum_input_degree, 32);
         assert_eq!(high.maximum_processed_row_degree, 32);
         assert_eq!(high.basis[0].terms[0].coefficient, 1);
+    }
+    struct InverseTestReset;
+    impl Drop for InverseTestReset {
+        fn drop(&mut self) {
+            INVERSE_TEST_LEGACY.with(|f| f.set(false));
+            INVERSE_TEST_OPS.with(|o| o.set((0, 0)));
+        }
+    }
+    fn inverse_control(
+        field: &Fp64Arithmetic,
+        a: u64,
+        work: u64,
+        until: Instant,
+    ) -> (Result<u64, Stop>, Reserved, (u64, u64)) {
+        let mut observer = |_: Event| Ok(());
+        let mut e = Engine {
+            field,
+            v: 1,
+            gate: Gate {
+                limits: Limits {
+                    work,
+                    ..Limits::default()
+                },
+                reserved: Reserved::default(),
+                deadline: until,
+                events: 0,
+                observer: &mut observer,
+            },
+            basis: Vec::new(),
+            pairs: Vec::new(),
+            selected: 0,
+            invoked: false,
+            matrix_rows: 0,
+            updates: 0,
+            max_row_degree: 0,
+            peak_rows: 0,
+            peak_columns: 0,
+            peak_pairs: 0,
+            steps: 0,
+        };
+        INVERSE_TEST_OPS.with(|o| o.set((0, 0)));
+        let result = e.inverse(a);
+        (result, e.gate.reserved, INVERSE_TEST_OPS.with(|o| o.get()))
+    }
+    #[test]
+    fn dynamic_f4_unit_inverse_exact_limits_deadline_and_montgomery_identity() {
+        let _reset = InverseTestReset;
+        for p in [101, (1u64 << 61) - 1] {
+            let f = field(p);
+            assert_ne!(f.one(), 1);
+            assert_eq!(f.to_u64(f.one()), 1);
+            for (work, expected, charged) in [(31, Err(Stop::WorkLimit), 0), (32, Ok(f.one()), 32)]
+            {
+                let (result, reserved, ops) = inverse_control(&f, f.one(), work, deadline());
+                assert_eq!(result, expected);
+                assert_eq!(reserved.work, charged);
+                assert_eq!(reserved.bytes, 0);
+                assert_eq!(ops, (0, 0));
+            }
+            let a = f.from_u64(2);
+            let (result, reserved, ops) = inverse_control(&f, a, 4127, deadline());
+            assert_eq!(result, Err(Stop::WorkLimit));
+            assert_eq!(reserved.work, 32);
+            assert_eq!(ops, (0, 0));
+            let (result, reserved, ops) = inverse_control(&f, a, 4128, deadline());
+            assert_eq!(f.mul(a, result.unwrap()), f.one());
+            assert_eq!(reserved.work, 4128);
+            assert_eq!(reserved.bytes, 0);
+            assert!(ops.0 > 0 && ops.1 > 0);
+            let (result, reserved, ops) = inverse_control(&f, 1, 4128, deadline());
+            assert_eq!(f.mul(1, result.unwrap()), f.one());
+            assert_eq!(reserved.work, 4128);
+            assert!(ops.1 > 0);
+            let (result, reserved, ops) = inverse_control(&f, f.one(), MAX_WORK, Instant::now());
+            assert_eq!(result, Err(Stop::Deadline));
+            assert_eq!(reserved.work, 0);
+            assert_eq!(ops, (0, 0));
+            let (result, reserved, ops) = inverse_control(&f, 0, 0, Instant::now());
+            assert_eq!(result, Err(Stop::InvalidInput));
+            assert_eq!(reserved.work, 0);
+            assert_eq!(ops, (0, 0));
+        }
+    }
+    #[test]
+    fn dynamic_f4_inverse_general_path_matches_legacy_operations() {
+        let _reset = InverseTestReset;
+        for p in [101, (1u64 << 61) - 1] {
+            let f = field(p);
+            for a in [1, f.from_u64(2), f.from_u64(7), f.from_u64(p - 1), f.one()] {
+                INVERSE_TEST_LEGACY.with(|v| v.set(true));
+                let old = inverse_control(&f, a, MAX_WORK, deadline());
+                INVERSE_TEST_LEGACY.with(|v| v.set(false));
+                let new = inverse_control(&f, a, MAX_WORK, deadline());
+                assert_eq!(old.0, new.0);
+                assert_eq!(f.mul(a, new.0.unwrap()), f.one());
+                assert_eq!(old.1.work, 4096);
+                assert_eq!(new.1.bytes, 0);
+                if a == f.one() {
+                    assert_eq!(new.1.work, 32);
+                    assert_eq!(new.2, (0, 0));
+                    assert!(old.2 .1 > 0);
+                } else {
+                    assert_eq!(new.1.work, 4128);
+                    assert_eq!(new.2, old.2);
+                }
+            }
+        }
+    }
+    #[test]
+    fn dynamic_f4_unit_inverse_preserves_basis_batches_and_pivot_semantics() {
+        let _reset = InverseTestReset;
+        let _frontier_reset = FrontierTestReset;
+        for v in [2, 4] {
+            let f = field(17);
+            let input = fixed(v, 17);
+            let mut results = Vec::new();
+            for legacy in [true, false] {
+                INVERSE_TEST_LEGACY.with(|b| b.set(legacy));
+                FRONTIER_TEST_BATCHES.with(|b| *b.borrow_mut() = Some(Vec::new()));
+                let mut stages = Vec::new();
+                let report = run(
+                    &f,
+                    v as u8,
+                    &input,
+                    &Limits::default(),
+                    deadline(),
+                    &mut |event| {
+                        stages.push((event.stage, event.sequence));
+                        Ok(())
+                    },
+                );
+                let batches = FRONTIER_TEST_BATCHES.with(|b| b.borrow_mut().take().unwrap());
+                assert!(matches!(report.stop, Stop::Complete | Stop::UnitDerived));
+                check_linear_ideal(&report, v, 17);
+                results.push((report, stages, batches));
+            }
+            let (a, sa, ba) = &results[0];
+            let (b, sb, bb) = &results[1];
+            assert_eq!(a.basis, b.basis);
+            assert_eq!(a.stop, b.stop);
+            assert_eq!(sa, sb);
+            assert_eq!(ba, bb);
+            assert_eq!(
+                (
+                    a.matrix_rows_reduced,
+                    a.pivot_updates,
+                    a.pairs_pending,
+                    a.pairs_selected_unfinished,
+                    a.completed_steps
+                ),
+                (
+                    b.matrix_rows_reduced,
+                    b.pivot_updates,
+                    b.pairs_pending,
+                    b.pairs_selected_unfinished,
+                    b.completed_steps
+                )
+            );
+            assert_eq!(a.reserved.bytes, b.reserved.bytes);
+        }
     }
 }
