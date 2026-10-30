@@ -1392,3 +1392,21 @@ Complete exact-body finite-coverage review, commit/publish freeze and source, re
 ### Errors
 
 Initial frozen validation rejected the honest null estimate. A scoped, fail-closed native admission exception resolves that software blocker without manufacturing an estimate. Conductor scope add replaces the reservation list; restored all three T891 scopes after detecting the native-only list. Reading the migration receipt as the ordinary user was denied; approved read-only sudo access succeeded. No duplicate migration recovery or scientific generator was started.
+
+## 2026-10-30T05:42Z — Exact c1 replacement submitted once
+
+### What was done
+
+Published frozen protocol/source/reviews at64fbfaf8a7389b71a8ca8ec7500d21a5ca6b5719 and opened regular PR2943 with auto-merge enabled. Independent final admission review checked exact committed files, approved client/controller/images, zero active controller builds/jobs and absent c1 state. Issued external execution-admission SHA5b6c92fe9e1e1329cc14351fc81a7e7bfb40b5502d2aa16ece5cd3513dfd1bfd. Submitted exact request once with the reviewed ac7 client; CodeBuild returned isolab-recovery-controller:9a658f4d-b903-4083-9a77-b04c217cb6a0 and request identity92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907. Receipt retained. Initial remote status is awaiting_controller_receipt, not a completed execution.
+
+### Decisions made
+
+No second submission on pending state. Preserve request cutoff08:10:24Z, outer expiry11:17:54Z and cumulative21600 active-worker seconds from05:17:54Z. Exact frozen design and external execution permission are separate; no remaining-cohort admission or timing qualification. Raw Cargo-log terminal blank lines retained rather than changing reviewed hashes; source whitespace check passed.
+
+### Open threads
+
+Monitor this controller/build/request identity, retain actual worker/epoch receipts and full costs, then package and independently review complete or incomplete output. All1260-target completion remains unresolved. PR2943 checks are in progress; native canonical-export and preparation jobs have passed.
+
+### Errors
+
+No submission error. GitHub push warned about existing historical large blobs; scoped artifact check reports no new data files committed. No history rewrite or unrelated cleanup performed.
