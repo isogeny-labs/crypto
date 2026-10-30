@@ -331,6 +331,7 @@ pub struct Curve {
     roots: Vec<Option<u64>>,
     sqrt: Option<SqrtContext>,
     inverses: Vec<u64>,
+    field: Modulus,
 }
 
 impl Curve {
@@ -370,6 +371,7 @@ impl Curve {
             roots: Vec::new(),
             sqrt: Some(SqrtContext::new(p)),
             inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
@@ -407,6 +409,7 @@ impl Curve {
                 roots: Vec::new(),
                 sqrt: Some(SqrtContext::new(p)),
                 inverses: small_inverses(p),
+                field: Modulus::new(p),
             };
             let witness = (0..p).find_map(|x| curve.decode(2 * x));
             if witness.is_some() && curve.mul(witness, r)?.is_none() {
@@ -438,6 +441,7 @@ impl Curve {
             roots,
             sqrt: None,
             inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         // Finite differences of x^3+a*x+b: first difference at zero
         // is 1+a, second is 6, and the third difference is constant 6.
@@ -474,14 +478,22 @@ impl Curve {
         self.r
     }
     fn rhs(&self, x: u64) -> u64 {
-        (mulmod(mulmod(x, x, self.p), x, self.p) + mulmod(self.a, x, self.p) + self.b) % self.p
+        addmod(
+            addmod(
+                self.field.mul(self.field.mul(x, x), x),
+                self.field.mul(self.a, x),
+                self.p,
+            ),
+            self.b,
+            self.p,
+        )
     }
 
     /// Test canonical coordinates and the curve equation; accepts the identity.
     pub fn contains(&self, point: Point) -> bool {
         match point {
             None => true,
-            Some((x, y)) => x < self.p && y < self.p && mulmod(y, y, self.p) == self.rhs(x),
+            Some((x, y)) => x < self.p && y < self.p && self.field.mul(y, y) == self.rhs(x),
         }
     }
 
@@ -525,17 +537,21 @@ impl Curve {
             Some(p) => p,
         };
         let p = self.p;
-        if x == xx && (y + yy) % p == 0 {
+        if x == xx && addmod(y, yy, p) == 0 {
             return None;
         }
         let (num, den) = if x == xx {
-            ((3 * mulmod(x, x, p) + self.a) % p, 2 * y % p)
+            let square = self.field.mul(x, x);
+            (
+                addmod(addmod(addmod(square, square, p), square, p), self.a, p),
+                addmod(y, y, p),
+            )
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
-        let slope = mulmod(num, self.field_inverse(den), p);
-        let nx = sub(sub(mulmod(slope, slope, p), x, p), xx, p);
-        Some((nx, sub(mulmod(slope, sub(x, nx, p), p), y, p)))
+        let slope = self.field.mul(num, self.field_inverse(den));
+        let nx = sub(sub(self.field.mul(slope, slope), x, p), xx, p);
+        Some((nx, sub(self.field.mul(slope, sub(x, nx, p)), y, p)))
     }
 
     /// Checked affine addition, including identity, inverses, and doubling.
@@ -1230,7 +1246,7 @@ struct FixedPair {
 impl FixedPair {
     fn new(curve: &Curve, p: Point, q: Point) -> Self {
         let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
             for window in 0..windows {
@@ -1251,7 +1267,7 @@ impl FixedPair {
             out
         };
         Self {
-            modulus: Modulus::new(curve.p),
+            modulus: curve.field,
             p: table(p),
             q: table(q),
         }
@@ -1523,7 +1539,7 @@ mod tests {
     #[test]
     fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
         let (curve, generator) = fixture();
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let points: Vec<_> = (0..curve.r)
             .map(|k| curve.mul(generator, k).unwrap())
             .collect();
@@ -1601,6 +1617,82 @@ mod tests {
             for _ in 0..10000 {
                 let (a, b) = (rng.below(p), rng.below(p));
                 assert_eq!(m.mul(a, b), reference(a, b, p));
+            }
+        }
+    }
+
+    #[test]
+    fn cached_curve_arithmetic_matches_independent_remainders() {
+        // Test oracle uses wide integer remainder and Fermat inversion, neither
+        // the reciprocal reducer nor the inverse cache used by production.
+        fn product(a: u64, b: u64, p: u64) -> u64 {
+            (u128::from(a) * u128::from(b) % u128::from(p)) as u64
+        }
+        fn power(mut a: u64, mut n: u64, p: u64) -> u64 {
+            let mut r = 1;
+            while n != 0 {
+                if n & 1 != 0 {
+                    r = product(r, a, p);
+                }
+                a = product(a, a, p);
+                n >>= 1;
+            }
+            r
+        }
+        fn add(a: Point, b: Point, c: &Curve) -> Point {
+            let (Some((x, y)), Some((xx, yy))) = (a, b) else {
+                return a.or(b);
+            };
+            let p = c.p;
+            if x == xx && (y + yy) % p == 0 {
+                return None;
+            }
+            let (n, d) = if x == xx {
+                ((3 * product(x, x, p) + c.a) % p, 2 * y % p)
+            } else {
+                ((yy + p - y) % p, (xx + p - x) % p)
+            };
+            let slope = product(n, power(d, p - 2, p), p);
+            let nx = (product(slope, slope, p) + 2 * p - x - xx) % p;
+            Some((nx, (product(slope, (x + p - nx) % p, p) + p - y) % p))
+        }
+        for (p, a, b, r, g) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+            (65521, 65518, 3, 65563, Some((0, 64894))),
+            (
+                1_099_511_627_563,
+                1_099_511_627_560,
+                56,
+                1_099_512_551_701,
+                Some((1, 15_267_301_451)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, g).unwrap();
+            let mut points = vec![None];
+            for _ in 1..r.min(200) {
+                points.push(add(*points.last().unwrap(), g, &c));
+            }
+            for &x in &points {
+                assert!(c.contains(x));
+                for &y in &points {
+                    assert_eq!(c.add(x, y).unwrap(), add(x, y, &c));
+                }
+            }
+            let mut rng = Rng(0x9c43);
+            for x in [0, 1, p / 2, p - 1]
+                .into_iter()
+                .chain((0..256).map(|_| rng.below(p)))
+            {
+                let rhs = (product(product(x, x, p), x, p) + product(a, x, p) + b) % p;
+                assert_eq!(c.rhs(x), rhs);
+                for y in [0, 1, p / 2, p - 1] {
+                    assert_eq!(c.contains(Some((x, y))), product(y, y, p) == rhs);
+                }
+            }
+            for invalid in [Some((p, 0)), Some((0, p)), Some((u64::MAX, u64::MAX))] {
+                assert!(!c.contains(invalid));
+                assert!(c.add(invalid, g).is_err());
             }
         }
     }
