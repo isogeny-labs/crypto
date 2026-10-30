@@ -289,9 +289,9 @@ proc common30(number jj,number kk){return(linearRoots30(gcd(phi30(jj),phi30(kk))
 proc parameters30(number jj,number kk){return(linearRoots30(gcd(X^8+X^4+1+jj*X^7,X^8+X^4+1+kk*X)));}
 proc inverse30(poly aa30,poly pp30){
  ideal generators30=pp30,aa30;
- if(std(generators30)[1]!=1){ERROR("nonunit kernel denominator");return(poly(0));}
+ if(std(generators30)[1]!=1){ERROR("nonunit kernelLocal44 denominator");return(poly(0));}
  matrix witness30=lift(generators30,ideal(1));poly answer30=reduce(witness30[2,1],std(ideal(pp30)));
- if(reduce(aa30*answer30+1,std(ideal(pp30)))!=0){ERROR("kernel inverse witness failed");}
+ if(reduce(aa30*answer30+1,std(ideal(pp30)))!=0){ERROR("kernelLocal44 inverse witness failed");}
  return(answer30);
 }
 proc division30(number bb30,int ell30){
@@ -339,7 +339,7 @@ proc kernels30(number bb30,int ell30){
 proc choose30(number bb30,list kernels30,number targetJ30){
  poly found30;int count30;int ii30;
  for(ii30=1;ii30<=size(kernels30);ii30++){if(quotientB30(bb30,kernels30[ii30])==1/targetJ30){found30=kernels30[ii30];count30++;}}
- if(count30!=1){ERROR("requested cyclic kernel not uniquely identified");}return(found30);
+ if(count30!=1){ERROR("requested cyclic kernelLocal44 not uniquely identified");}return(found30);
 }
 proc velux30(poly kernel30,poly modulus30){
  ideal ig30=std(ideal(modulus30));poly z30=reduce(diff(kernel30,X)*inverse30(kernel30,modulus30),ig30);
@@ -347,7 +347,7 @@ proc velux30(poly kernel30,poly modulus30){
 }
 proc normpoly30(poly image30,poly modulus30){
  poly nn30=resultant(modulus30,Z+image30,X);nn30=subst(nn30,Z,X);
- if(deg(nn30)!=deg(modulus30) || leadcoef(nn30)!=1){ERROR("transported kernel norm degree/monic failed");}
+ if(deg(nn30)!=deg(modulus30) || leadcoef(nn30)!=1){ERROR("transported kernelLocal44 norm degree/monic failed");}
  return(nn30);
 }
 proc transport30(number bb30,number b730,poly k730,poly k4930,poly k1130){
@@ -386,20 +386,20 @@ proc add44(list p,list q,poly b,poly a,ideal rel){if(size(p)==0){return(q);}if(s
  poly rx=reduce(slope^2+a*slope+b+x+z,rel);poly ry=reduce((slope+a)*rx+y+slope*x+b,rel);
  if(reduce(ry^2+a*rx*ry+b*ry+rx^3+b*rx^2,rel)!=0){ERROR("POINT44_GROUP_CURVE");}return(list(rx,ry));
 }
-proc passage44(int caseid,number mx,number my,poly kernel,int d){
- if(deg(kernel)!=5 || leadcoef(kernel)!=1 || gcd(kernel,diff(kernel,X))!=1){ERROR("POINT44_KERNEL_SHAPE");}
- ideal base=std(ideal(kernel,Z,T));if(vdim(base)!=5){ERROR("POINT44_BASE_DIM");}
- poly xf=X;poly fd;int k;for(k=1;k<=5*d;k++){xf=reduce(xf^2,base);if(k==d){fd=xf;}}if(xf!=X || gcd(fd-X,kernel)!=1){ERROR("POINT44_KERNEL_RABIN");}
+proc passage44(int caseid,number mx,number my,poly kernelLocal44,int d){
+ if(deg(kernelLocal44)!=5 || leadcoef(kernelLocal44)!=1 || gcd(kernelLocal44,diff(kernelLocal44,X))!=1){ERROR("POINT44_KERNEL_SHAPE");}
+ ideal base=std(ideal(kernelLocal44,Z,T));if(vdim(base)!=5){ERROR("POINT44_BASE_DIM");}
+ poly xf=X;poly fd;int k;for(k=1;k<=5*d;k++){xf=reduce(xf^2,base);if(k==d){fd=xf;}}if(xf!=X || gcd(fd-X,kernelLocal44)!=1){ERROR("POINT44_KERNEL_RABIN");}
  list triple=triple30(mx,my);number B=1/triple[1];list k7s=kernels30(B,7);poly k7=choose30(B,k7s,triple[2]);
  number c2=number((jet(k7,2)+jet(k7,1))/X^2);number c1=number((jet(k7,1)+jet(k7,0))/X);number c0=number(subst(k7,X,0));
  poly rr=X;poly x2=reduce(rr^2+B*inv44(rr^2,base),base);poly v=reduce(rr+x2,base);poly u=reduce(rr*inv44(v,base),base);poly iu=inv44(u,base);
  poly bb=reduce(v^3*inv44(rr^2,base),base);poly cc=reduce(x2*inv44(rr,base),base);poly aa=reduce(1+cc,base);
  if(reduce(u*aa+1,base)!=0 || reduce(bb*u^3+rr,base)!=0){ERROR("POINT44_NORMALIZATION");}
  poly g2=reduce((rr+c2)*iu^2,base);poly g1=reduce((rr^2+c1)*iu^4,base);poly g0=reduce((rr^3+c2*rr^2+c1*rr+c0)*iu^6,base);
- list sum;list P=list(poly(0),poly(0));for(k=1;k<=11;k++){sum=add44(sum,P,bb,aa,base);if(k<11 && size(sum)==0){ERROR("POINT44_EARLY_ORDER");}}if(size(sum)!=0){ERROR("POINT44_ORDER11");}
- int twist;int unused;int step;int j;int matches;int matched;int period;poly L;poly trace;poly term;poly nv;ideal q;ideal physical;list p;list ph;list deck;list cur;list fp;list sign;list bad;
+ list sumLocal44;list P=list(poly(0),poly(0));for(k=1;k<=11;k++){sumLocal44=add44(sumLocal44,P,bb,aa,base);if(k<11 && size(sumLocal44)==0){ERROR("POINT44_EARLY_ORDER");}}if(size(sumLocal44)!=0){ERROR("POINT44_ORDER11");}
+ int twist;int unused;int step;int j;int matches;int matched;int period;poly L;poly traceLocal44;poly term;poly nv;ideal q;ideal physical;list p;list ph;list deck;list cur;list fp;list sign;list bad;
  for(twist=0;twist<=1;twist++){
-  L=Z^2+aa*Z+bb+g2+twist*aa^2;q=std(ideal(kernel,L,T));physical=std(ideal(kernel,L,T^2+T+1));
+  L=Z^2+aa*Z+bb+g2+twist*aa^2;q=std(ideal(kernelLocal44,L,T));physical=std(ideal(kernelLocal44,L,T^2+T+1));
   if(vdim(q)!=10 || vdim(physical)!=20){ERROR("POINT44_SOURCE_DIM");}
   nv=reduce((g1+bb*Z)*inv44(aa,base),q);p=list(bb,cc,poly(Z),nv);ph=list(bb,cc,Z+twist*aa*T,nv+twist*bb*T);
   if(reduce(ph[4]^2+bb*ph[4]+g0,physical)!=0){ERROR("POINT44_QR_CONSTANT");}
@@ -412,13 +412,13 @@ proc passage44(int caseid,number mx,number my,poly kernel,int d){
    cur=deck44(cur,physical);
   }if(same44(cur,ph,physical)==0){ERROR("POINT44_DECK_PERIOD");}
   bad=list(ph[1],ph[2],ph[3],ph[4]+1);map corrupt=r,bad[4],bad[3],bad[1],bad[2];ideal cr=corrupt(original);int rejected=0;for(j=1;j<=5;j++){if(reduce(cr[j],physical)!=0){rejected=1;}}if(rejected==0){ERROR("POINT44_CORRUPT_ACCEPTED");}
-  term=reduce((bb+g2+twist*aa^2)*inv44(aa^2,base),base);trace=0;for(k=0;k<5*d;k++){trace=reduce(trace+term,base);term=reduce(term^2,base);}if(trace!=0 && trace!=1){ERROR("POINT44_AS_TRACE");}
+  term=reduce((bb+g2+twist*aa^2)*inv44(aa^2,base),base);traceLocal44=0;for(k=0;k<5*d;k++){traceLocal44=reduce(traceLocal44+term,base);term=reduce(term^2,base);}if(traceLocal44!=0 && traceLocal44!=1){ERROR("POINT44_AS_TRACE");}
   fp=p;for(k=1;k<=d;k++){fp=square44(fp,q);}matches=0;matched=-1;for(step=0;step<10;step++){if(same44(fp,deck[step+1],q)==1){matches++;matched=step;}}
   if(matches!=1){ERROR("POINT44_FROB_DECK_MATCH");}
-  fp=p;for(k=1;k<=5*d;k++){fp=square44(fp,q);}sign=list(bb,cc,Z+aa*trace,nv+bb*trace);if(same44(fp,sign,q)==0){ERROR("POINT44_FROB_TRACE_SIGN");}
+  fp=p;for(k=1;k<=5*d;k++){fp=square44(fp,q);}sign=list(bb,cc,Z+aa*traceLocal44,nv+bb*traceLocal44);if(same44(fp,sign,q)==0){ERROR("POINT44_FROB_TRACE_SIGN");}
   fp=p;period=0;for(k=1;k<=10*d;k++){fp=square44(fp,q);if(same44(fp,p,q)==1){period=k;break;}}if(period==0){ERROR("POINT44_ABSOLUTE_PERIOD");}
-  print("POINT44_RESULT case="+string(caseid)+" base_degree="+string(d)+" twist="+string(twist)+" kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace="+string(trace)+" Frobenius_d_deck_step="+string(matched)+" source_tuple_period="+string(period)+" all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11");
-  print("POINT44_KERNEL");kernel;print("POINT44_ORIENTATION");L;print("POINT44_b");bb;print("POINT44_c");cc;print("POINT44_lambda");Z;print("POINT44_nu");nv;
+  print("POINT44_RESULT case="+string(caseid)+" base_degree="+string(d)+" twist="+string(twist)+" kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace="+string(traceLocal44)+" Frobenius_d_deck_step="+string(matched)+" source_tuple_period="+string(period)+" all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11");
+  print("POINT44_KERNEL");kernelLocal44;print("POINT44_ORIENTATION");L;print("POINT44_b");bb;print("POINT44_c");cc;print("POINT44_lambda");Z;print("POINT44_nu");nv;
  }
  return(1);
 }
