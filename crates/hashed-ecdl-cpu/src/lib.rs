@@ -4,6 +4,7 @@
 pub mod paper;
 use paper::{Curve, DecompositionOracle, Error, Point};
 mod certificate;
+mod checked_sum;
 pub use certificate::Archive;
 
 /// Cumulative structural counters, including discarded trials and preparation.
@@ -274,8 +275,9 @@ impl DecompositionOracle for CachedMitm {
                     let mut tuple = vec![None; bases.len()];
                     decode(&bases[..p.split], start + offset, &mut tuple[..p.split]);
                     decode(&bases[p.split..], id, &mut tuple[p.split..]);
-                    // Keep a checked group replay at the public oracle boundary.
-                    let sum = tuple.iter().try_fold(None, |s, &q| curve.add(s, q))?;
+                    // Validate all points and independently sum at the oracle boundary.
+                    // Full certificate replay still uses the shared verifier.
+                    let sum = checked_sum::sum(curve, &tuple)?;
                     if sum != target {
                         return Err(Error::Verification);
                     }
