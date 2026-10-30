@@ -1,0 +1,135 @@
+--- a/src/ml_dataset/mod.rs
++++ b/src/ml_dataset/mod.rs
+@@ -4054,6 +4054,13 @@
+         fixture: &TempRun,
+         solver: &str,
+     ) -> types::plan_v2::DatasetPlanV2 {
++        bound_v2_fixture_for_solver_and_trace(fixture, solver, 1)
++    }
++    fn bound_v2_fixture_for_solver_and_trace(
++        fixture: &TempRun,
++        solver: &str,
++        trace_mib: u64,
++    ) -> types::plan_v2::DatasetPlanV2 {
+         let mut plan = v2_fixture_plan();
+         plan.axes.field_sizes = vec![7];
+         plan.axes.arities = vec![2];
+@@ -4077,7 +4084,7 @@
+             "schema":"crypto.ml-dataset.run/v2","plan_sha256":plan.binding_sha256().unwrap(),
+             "source_commit":"a".repeat(40),"binary_sha256":"b".repeat(64),
+             "shard_index":0,"shard_count":1,"execution_context_required":true,
+-            "seconds_per_case":30,"memory_mib":128,"trace_mib":1}),
++            "seconds_per_case":30,"memory_mib":128,"trace_mib":trace_mib}),
+         )
+         .unwrap();
+         plan
+@@ -4282,7 +4289,15 @@
+         index: u64,
+         solver: &str,
+     ) -> (PathBuf, CaseConfig) {
+-        let plan = bound_v2_fixture_for_solver(fixture, solver);
++        v2_attempt_fixture_for_solver_and_trace(fixture, index, solver, 1)
++    }
++    fn v2_attempt_fixture_for_solver_and_trace(
++        fixture: &TempRun,
++        index: u64,
++        solver: &str,
++        trace_mib: u64,
++    ) -> (PathBuf, CaseConfig) {
++        let plan = bound_v2_fixture_for_solver_and_trace(fixture, solver, trace_mib);
+         let dir = fixture.0.join(format!("cells/{index:012}"));
+         fs::create_dir_all(&dir).unwrap();
+         for name in ["plan.json", "run.json", "protocol.json"] {
+@@ -4479,7 +4494,9 @@
+     fn v2_native_sat_producer_and_exporter_bind_both_policies_and_twists() {
+         for index in 0..4 {
+             let fixture = TempRun::new();
+-            let (dir, config) = v2_attempt_fixture_for_solver(&fixture, index, "sat");
++            let trace_mib = 64;
++            let (dir, config) =
++                v2_attempt_fixture_for_solver_and_trace(&fixture, index, "sat", trace_mib);
+             telemetry::checked::install_policy(&dir).unwrap();
+             let binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
+             storage::write_json(
+@@ -4493,7 +4510,7 @@
+                 &dir,
+                 "capture-limits.json",
+                 "partial-capture-limits",
+-                &capture::capture_limits(1).unwrap(),
++                &capture::capture_limits(trace_mib).unwrap(),
+             )
+             .unwrap();
+             execution::create(&dir).unwrap();
+@@ -4563,6 +4580,72 @@
+     }
+ 
+     #[test]
++    #[cfg(target_os = "linux")]
++    fn v2_native_sat_one_mib_capture_stops_without_promoting_solver_success() {
++        let fixture = TempRun::new();
++        let (dir, config) = v2_attempt_fixture_for_solver(&fixture, 0, "sat");
++        telemetry::checked::install_policy(&dir).unwrap();
++        let binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
++        let limits = capture::capture_limits(1).unwrap();
++        storage::write_json(
++            &dir,
++            "capture-binding.json",
++            "partial-capture-binding",
++            &binding,
++        )
++        .unwrap();
++        storage::write_json(
++            &dir,
++            "capture-limits.json",
++            "partial-capture-limits",
++            &limits,
++        )
++        .unwrap();
++        execution::create(&dir).unwrap();
++        storage::write_json(
++            &dir,
++            "worker-process.json",
++            "process-provenance",
++            &json!({}),
++        )
++        .unwrap();
++        for name in ["stdout.log", "stderr.log"] {
++            storage::write_bytes(&dir, name, "process-log", "utf8", b"").unwrap();
++        }
++        worker(&config, &dir).unwrap();
++        let outcome: Value = read_json(&dir.join("result.json")).unwrap();
++        assert_eq!(outcome["status"], "error");
++        assert!(outcome["reason"]
++            .as_str()
++            .unwrap()
++            .contains("StreamByteLimit"));
++        assert_eq!(outcome["solver_completed"], false);
++        assert_eq!(outcome["scalar_recovered_without_witness"], false);
++        let artifacts = collect_cell_artifacts(&dir).unwrap();
++        storage::verify_manifest(&dir, &artifacts).unwrap();
++        assert!(!artifacts
++            .iter()
++            .any(|a| a.role == "native-binary-s3-gate-map"));
++        assert!(artifacts
++            .iter()
++            .any(|a| a.path.starts_with("live/") && a.role == "unregistered-partial-artifact"));
++        let initial = capture::CaptureCursor::initial(&binding).unwrap();
++        let retained = TempRun::new();
++        let delta = capture::capture_committed_delta(
++            &dir,
++            &retained.0.join("prefix"),
++            &binding,
++            &initial,
++            &limits,
++        )
++        .unwrap()
++        .unwrap();
++        capture::verify_captured_delta(&retained.0.join("prefix"), &delta, &initial).unwrap();
++        assert!(delta.cursor.event_count > 0);
++        assert!(delta.cursor.byte_end <= limits.max_stream_bytes);
++    }
++
++    #[test]
+     fn policy_file_original_duplicate_keys_and_unknown_fields_are_rejected() {
+         let fixture = TempRun::new();
+         let path = fixture.0.join("policies.json");
