@@ -31,6 +31,7 @@ use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
     verify_candidate, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::koblitz_descent::{
@@ -250,6 +251,46 @@ const STRONG_PARAMS: &[ParamDecl] = &[
         default: Some("2000"),
         help: "give up after this multiple of the ideal step count",
     },
+];
+
+/// The arm's solver seed: the harness's algorithm seed unless pinned.
+const HEC_FIXED_SEED: ParamDecl = ParamDecl {
+    name: "fixed_seed",
+    default: Some("none"),
+    help: "a decimal seed the solver uses instead of the harness's algorithm seed, to reproduce a study's seed list one arm per seed; `none` uses the algorithm seed",
+};
+
+const HEC_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "branches",
+        default: None,
+        help: "factor-base walk steps (the thread's fb-walk: 64)",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: None,
+        help: "one step in d_step_in is by D₁ or D₂ rather than a place (the thread's fb-walk: 4)",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: None,
+        help: "rows collected beyond the m + 1 unknowns (the thread: 8)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("5000000"),
+        help: "candidate divisors before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
+];
+
+const HEC_RHO_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "max_steps",
+        default: Some("200000000"),
+        help: "walk steps before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
 ];
 
 const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
@@ -890,6 +931,20 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
+            id: "hec.ic_fb_walk",
+            family: "ic",
+            summary: "index calculus on a hyperelliptic Jacobian (hec_thread curves): the full degree-1 factor base, the factor-base walk, the gcd smoothness test, sparse elimination mod r and the solver's own [k]D₁ = D₂ checks, every F_p, mod-r, word and hash-probe operation counted in bitop/v1 primitives by phase (ecbench::hec); group operations in gae are a lower bound",
+            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+            applies: Applies::Any,
+            params: HEC_IC_PARAMS,
+        },
+        MethodDecl {
+            id: "hec.rho_full_width",
+            family: "rho",
+            summary: "Pollard rho on a hyperelliptic Jacobian (hec_thread curves): 16 full-width branches a_jD₁ + b_jD₂, distinguished points, about 1.25·√r steps, counted in bitop/v1 primitives by phase like hec.ic_fb_walk",
+            entry: "hyperelliptic_ic_bench::pollard_rho_jacobian_with(DistinguishedPointsFullWidth)",
+            applies: Applies::Any,
+            params: HEC_RHO_PARAMS,
             id: "ic.cm_folded_native_v2",
             family: "ic",
             summary: "CM scalar-orbit signed MITM2, native backend with independent Rust point/relation replay; unpriced native work retained; _v2 of the frozen `_v1` id: the replay's counted operations are charged (total_gae, S) and the unpriced native counters are named",
@@ -2632,6 +2687,15 @@ fn solve_inner(
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
+    if let Instance::Hec(i) = inst {
+        return hec::solve(m, i, tx, ty, seed);
+    }
+    if m.id.starts_with("hec.") {
+        return Err(format!(
+            "`{}` runs on hec_thread curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
+    }
     if let Instance::Ext(i) = inst {
         return solve_ext(m, i, tx, ty, seed);
     }
@@ -2936,6 +3000,7 @@ fn solve_inner(
         }
         (Instance::Wide(_), _)
         | (Instance::Fp4(_), _)
+        | (Instance::Hec(_), _)
         | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
@@ -6353,7 +6418,7 @@ pub fn dump_factor_base(
     if let Instance::Hyper(_) = &inst {
         return Err("no factor-base plug-in runs on a hyperelliptic Jacobian".into());
     }
-    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) | Instance::Hec(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
@@ -6462,6 +6527,7 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
+        | Instance::Hec(_)
         | Instance::ThreeLeads(_)
         | Instance::Ext(_)
         | Instance::Genus2(_)

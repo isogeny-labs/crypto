@@ -14,6 +14,7 @@
 //! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
+//! | [`hec`] | hyperelliptic Jacobians: the thread's instances, `hec.ic_fb_walk` and its rho reference, counted in `bitop/v1` primitives |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
 //! | [`koblitz_descent`] | `ic.koblitz_descent`: the ledger §23 one-target Koblitz index calculus, charged by counted group operations |
@@ -65,6 +66,7 @@ pub mod full_price;
 pub mod generic;
 pub mod ghs_cover;
 pub mod gpu;
+pub mod hec;
 pub mod host;
 pub mod hyper;
 pub mod hyper_ic;
