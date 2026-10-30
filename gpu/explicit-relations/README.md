@@ -5,7 +5,15 @@ Server Edition, compiled for `sm_120` with CUDA 13.2.51. Host and CUDA
 arithmetic/base/relation tests, bounded reduction/replay, standalone Rust
 tests, Clippy, and Compute Sanitizer memcheck passed (zero memory errors).
 See [the validation record](VALIDATION.md) for revisions, outcomes and limits;
-no measured performance improvement is claimed.
+no end-to-end speedup is established.
+
+Block normalization now uses a product tree with 765 source-level field
+multiplications per 256-lane block, replacing 4608 in the previous dual scan
+(both still pay one inversion and the same affine conversions). A matched
+RTX PRO 6000 panel retained the old implementation, NVIDIA CUB BlockScan and
+an A/A control. See [the complete diagnostic report](../../research/explicit_relations_perf_20261030/RESULTS.md)
+for raw timings, exact equality checks and limits: the normalization kernel
+had lower observed medians, but no end-to-end speedup is established.
 
 `service.cpp` builds as either a CUDA service or a host reference. The service
 stays alive across queries. `paper_driver.rs` plugs it into the repository's

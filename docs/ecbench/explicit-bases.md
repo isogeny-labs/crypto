@@ -229,3 +229,38 @@ a managed exec session launched the one recorded pod after reconciliation.
 The shared daily log remains reserved by T-827, so this scoped handoff carries
 the entry under Conductor T-861. AWS quota blocks are historical and no longer
 block this completed device validation.
+
+## Normalization optimization — 2026-10-29 Pacific
+
+### What was done
+
+Implemented a CUDA product-tree block inverse, retaining old-scan and CUB
+reference builds. Ran the frozen four-arm panel on RunPod pod 1lq0cd2l0en5ju:
+120 complete rows, identical cross-arm outputs, independent CPU witness
+checks, and zero memcheck/racecheck/synccheck errors. The pod was deleted.
+Committed the frozen protocol, native instrument/analyzer and raw records;
+[the report](../../research/explicit_relations_perf_20261030/RESULTS.md)
+records exact sources, hashes, diagnostics and limitations.
+
+### Decisions made
+
+Use the product tree by default: it preserves outputs while reducing the
+normalization inversion-preparation count from 4608 to 765 multiplies/block.
+Keep timings as L0 diagnostics. The observed kernel change did not establish
+an end-to-end speedup; query/cold costs and A/A ranges remain in the report.
+No leaderboard or scientific claim is promoted from this software panel.
+
+### Open threads
+
+Chunk synchronization and repeated right sums are next optimization targets;
+respect explicit memory caps and deterministic witness order. Root/ecbench
+integration and the separate GPU tensor backend remain outside this run.
+
+### Errors
+
+The initial export adapter needed its native passed label mapped to the
+schema's verified label. A metadata-only corrected export withdraws an
+unobserved unmasking timestamp; raw rows are unchanged. A concurrent Git
+staging attempt hit the index lock and was retried after the first commit
+finished; the frozen protocol was verified committed before the GPU launch.
+Conductor T-863 replaced the expired/cancelled T-862 reservation.
