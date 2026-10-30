@@ -98,7 +98,10 @@ verified cloud dataset cells remain zero.
 Source `5d4336b45d2` implemented the initial modules and CLI integration; the next
 commit corrects the bounded reader and adds cumulative verifier accounting.
 Sourceadde10cad21 passed29 focused tests and strict maintained Clippy.
-Full-library, actual CLI and combined-current-main validation remain pending.
+Source `06773dcf28f` subsequently passed a release build and four actual CLI
+export/retry checks on retained curve/twist cells, producing four branch prefixes
+for the curve and zero for the twist's certified inconsistent root. Full-library
+and combined-current-main validation remain pending at source `113526b5770`.
 The initial build failed on Rust reader ownership; that failure is retained.
 
 `crypto dataset export` now stages `prefix-features.jsonl` alongside static

@@ -147,6 +147,36 @@ enormous corpus.
 
 ## Next discriminating validation
 
+### October 30 integration checkpoint
+
+Source `113526b577044a6283be81acb1a847c89c96aa4e` imports newer native libraries
+from main `bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. The table above records
+the prior validated scope; these additional source capabilities remain subject
+to combined-revision validation:
+
+- Prime F4 has a supervised wide-field **m = 2** adapter through
+  `p = 2^61 - 1`, requiring the original execution context. Recursive
+  **m = 3..15** elimination still requires `p < 2^32`. The wide adapter's
+  distinct event format is outside the new recursive-prefix verifier.
+- Prime root adapters retain bounded field, power, GCD and split states;
+  binary adapters retain quadratic, trace, half-trace and matrix states.
+  Distinct-root certificates do not establish complete native execution or
+  total solver cost.
+- Native phase telemetry distinguishes unavailable PMU counters, raw counts,
+  and counts exact within the declared scope. The imported measurement and
+  capture mechanisms require validation on the actual worker before making
+  campaign-wide instruction or artifact-completeness claims.
+- Prefix source `06773dcf28f` passed four actual CLI export/retry checks on
+  retained curve/twist fixtures, producing four curve branch examples and
+  zero twist branch examples. These checks added no scientific samples.
+  Combined tests and full-library validation are still pending; three failed
+  combined attempts document sparse-checkout omissions and a corrected
+  restoration-helper bug.
+
+See [prefix software evidence](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md)
+for exact revisions, retained failures and S3 readback. None of these imported
+capabilities establishes a completed cloud dataset or model efficacy.
+
 1. Complete centralized checks for the final immutable source, preserving native
    tests for n = 23, 24, 31, 47, 61 for each family and twist, the n = 11/12
    repeated-prime controls, prime n = 7 cardinality, and genuine large-prime

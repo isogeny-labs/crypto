@@ -3,9 +3,23 @@
 Current source `adde10cad21b8179ec358af81827eb76073abdaa` passed29 focused release
 library tests (0failed,0ignored), including the existing exporter checks and new
 certificate/root/replay tests. Strict maintained Clippy also passed on that source.
-This is partial software validation; full-library, actual CLI and current-main
-combined validation remain pending. Source06773dcf28f adds two further regression
-tests, not yet executed, and its release CLI build is running. Initial source5d4336b45d2 failed compilation because of
+Source `06773dcf28f` passed the release CLI build and four actual export/retry
+commands on the frozen retained curve/twist fixture. It exported four verified
+branch prefixes for the curve and no branch prefixes for the inconsistent twist
+root. Artifact readback, feature identities, restricted label joins, immutable
+retries and unchanged input inventories passed. Its two added regression tests
+still require execution. This remains partial software validation.
+
+Combined source `113526b577044a6283be81acb1a847c89c96aa4e` imports main
+`bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. Its first validation failed because a
+sparse local Cargo dependency was absent. Attempts two and three failed on 42
+missing compile-time fixtures. The first scratch restoration helper omitted the
+input redirection to its read loop and restored zero files; version two corrects
+that bookkeeping error and restores hash-checked blobs from the exact combined
+revision. These failures and both helper versions are retained. Combined tests,
+lint, release CLI and full-library validation remain pending.
+
+Initial source5d4336b45d2 failed compilation because of
 a bounded-reader ownership error; its log and exit101 receipt are retained.
 
 [store-index.json](store-index.json) names immutable native artifact-store objects
