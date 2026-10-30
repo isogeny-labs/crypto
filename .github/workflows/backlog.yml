@@ -76,13 +76,25 @@ jobs:
         run: node .github/scripts/ci-scope.mjs --materialize
       - name: Draft runner resume and selection controls (mocked ecbench)
         run: python3 backlog/XP-20261016-prime-base-oracle-tuning/test_runner.py -v
+      - name: Install the native zlib link dependency
+        run: |
+          if ! pkg-config --exists zlib; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends zlib1g-dev
+          fi
+          pkg-config --modversion zlib
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --bin backlog --bin backlog_check_aux2t
       - name: Fetch main's history (no blobs) for the merged-commit check
-        run: git fetch --no-tags --filter=blob:none origin +refs/heads/main:refs/remotes/origin/main
+        run: |
+          history_args=()
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            history_args+=(--unshallow)
+          fi
+          git fetch "${history_args[@]}" --no-tags --filter=blob:none --recurse-submodules=no origin +refs/heads/main:refs/remotes/origin/main
       - name: Every card validates; ready cards pin a commit on main
         run: ./target/release/backlog validate --all --merged-into origin/main
       - name: Unit and integration tests (cairn lab tests skip here, loudly; the lab job runs them)
@@ -117,6 +129,13 @@ jobs:
             /problems/
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
+      - name: Install the native zlib link dependency
+        run: |
+          if ! pkg-config --exists zlib; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends zlib1g-dev
+          fi
+          pkg-config --modversion zlib
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'

@@ -127,6 +127,9 @@
 //! - G. Bard, *Algebraic Cryptanalysis*, Springer 2009, ch. 13 — the
 //!   Boolean-ring representation.
 
+#[path = "koblitz_s4_bounded.rs"]
+pub mod bounded_s4;
+
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::inherited_f4::{ChildSystem, InheritCost, ReducedBasis};
@@ -177,6 +180,14 @@ impl FieldStructure {
             reduced,
             squares,
         }
+    }
+
+    /// Whether the one-word structure constants hold the whole field.
+    /// Past `n = 64` the table keeps only the low word of each product,
+    /// so a system built from it is a different system: it must not be
+    /// built at all, or its UNSAT would be reported as a refutation.
+    pub fn is_exact(&self) -> bool {
+        self.n <= 64
     }
 }
 
@@ -977,7 +988,7 @@ pub fn build_decomposition_system(
     m: usize,
     st: &FieldStructure,
 ) -> Option<DecompositionSystem> {
-    if m < 2 {
+    if m < 2 || !st.is_exact() {
         return None;
     }
     let ell = basis.len();
@@ -1324,6 +1335,834 @@ fn poly_from_column_order(terms: Vec<F2BoolMono>, n_vars: usize) -> F2BoolPoly {
         .windows(2)
         .all(|pair| cmp_mono(pair[0], pair[1]).is_gt()));
     F2BoolPoly { terms, n_vars }
+}
+
+/// Bounded, serial three-variable Macaulay steps. These are fixed-degree
+/// matrix operations, not recursive solvers or complete Gröbner computations.
+pub mod bounded_matrix {
+    use super::{echelon_f2_suffix_counted, mono_key, F2BoolMono, F2BoolPoly, Mask};
+    use std::alloc::Layout;
+    use std::mem::size_of;
+    use std::time::Instant;
+
+    pub const MAX_EQUATIONS: usize = 61;
+    pub const MAX_ROWS: usize = 488;
+    pub const MAX_WORK: u64 = 16_777_216;
+    pub const MAX_BYTES: u64 = 64 * 1024 * 1024;
+    pub const MAX_EVENTS: u64 = 4096;
+    /// Fixed native metadata allowance; not a compiler stack/RSS measurement.
+    pub const METADATA_BYTES: u64 = 8192;
+    pub(crate) const MULTIPLIERS: [u8; 8] = [0, 1, 2, 4, 3, 5, 6, 7];
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Engine {
+        F4Macaulay,
+        F5KoszulFrobenius,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Limits {
+        pub work: u64,
+        pub bytes: u64,
+        /// Eligible main multiplier attempts, including zero/pruned products.
+        pub main_rows: u64,
+        pub events: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Stop {
+        Complete,
+        InvalidInput,
+        InvalidLimits,
+        WorkLimit,
+        ByteLimit,
+        RowLimit,
+        EventLimit,
+        Deadline,
+        Observer,
+        Allocation,
+        Overflow,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum CriterionStatus {
+        NotRequested,
+        EmptyInput,
+        SkippedConstantInput,
+        Active,
+    }
+
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Reservation {
+        pub work: u64,
+        pub bytes: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Counters {
+        pub main_attempts: u64,
+        pub nonempty_rows: u64,
+        pub selected_rows: u64,
+        pub pruned_nonempty_rows: u64,
+        pub criterion_attempts: u64,
+        pub criterion_rows: u64,
+        pub criterion_zero_reductions: u64,
+        pub koszul_pruned: u64,
+        pub frobenius_pruned: u64,
+        pub criterion_word_xors: u64,
+        pub reduction_word_xors: u64,
+        pub attempted_events: u64,
+        pub acknowledged_events: u64,
+        /// Sum of requested dynamic element layouts, not allocator capacities.
+        pub dynamic_layout_bytes: u64,
+        pub allocation_requests: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    pub enum Stage {
+        Begin,
+        CriterionLevel {
+            level: u32,
+        },
+        CriterionCandidate {
+            generator: usize,
+            multiplier: u8,
+            frobenius: bool,
+        },
+        MainCandidate {
+            generator: usize,
+            multiplier: u8,
+        },
+        Pack,
+        Reduce,
+        Readback,
+        Finish,
+    }
+
+    /// A boundary snapshot, not a primitive-operation or derivation trace.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Event {
+        pub stage: Stage,
+        pub reserved: Reservation,
+        pub counters: Counters,
+    }
+
+    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    pub struct Report {
+        pub engine: Engine,
+        pub degree: u32,
+        pub stop: Stop,
+        /// A named native phase passed its resource permit. This does not
+        /// imply nonempty candidates, an active F5 criterion, or completion.
+        pub backend_invoked: bool,
+        pub native_step_complete: bool,
+        pub criterion_status: CriterionStatus,
+        pub reserved: Reservation,
+        pub counters: Counters,
+        pub columns: usize,
+        pub rank: Option<usize>,
+        pub rows: Vec<F2BoolPoly>,
+    }
+
+    fn checked_add(a: u64, b: u64) -> Result<u64, Stop> {
+        a.checked_add(b).ok_or(Stop::Overflow)
+    }
+
+    fn checked_mul(a: u64, b: u64) -> Result<u64, Stop> {
+        a.checked_mul(b).ok_or(Stop::Overflow)
+    }
+
+    fn entry_reservation(equations: usize) -> Result<Reservation, Stop> {
+        Ok(Reservation {
+            work: checked_add(4096, checked_mul(128, equations as u64)?)?,
+            bytes: METADATA_BYTES,
+        })
+    }
+
+    pub(crate) fn main_reservation(equations: usize) -> Result<Reservation, Stop> {
+        let r = checked_mul(8, equations as u64)?;
+        let kernel = checked_mul(64 * 9, checked_add(r, 1)?)?;
+        let row_bytes = checked_mul(r, (size_of::<Vec<u64>>() + size_of::<u64>()) as u64)?;
+        let output_bytes = checked_add(
+            checked_mul(8, size_of::<F2BoolPoly>() as u64)?,
+            checked_mul(64, size_of::<F2BoolMono>() as u64)?,
+        )?;
+        Ok(Reservation {
+            work: checked_add(checked_add(4096, checked_mul(1024, r)?)?, kernel)?,
+            bytes: checked_add(row_bytes, output_bytes)?,
+        })
+    }
+
+    pub(crate) fn criterion_reservation(equations: usize) -> Result<Reservation, Stop> {
+        let e = equations as u64;
+        Ok(Reservation {
+            work: checked_add(
+                checked_add(4096, checked_mul(128, e)?)?,
+                checked_mul(1024, checked_add(checked_mul(32, e)?, 1)?)?,
+            )?,
+            bytes: 0,
+        })
+    }
+
+    /// Structural worst-case reservation, not measured work. The F5 permit is
+    /// retained even when constants cause the criterion to be skipped.
+    pub fn required_reservation(equations: usize, engine: Engine) -> Result<Reservation, Stop> {
+        if equations > MAX_EQUATIONS {
+            return Err(Stop::InvalidInput);
+        }
+        let mut total = entry_reservation(equations)?;
+        let main = main_reservation(equations)?;
+        total.work = checked_add(total.work, main.work)?;
+        total.bytes = checked_add(total.bytes, main.bytes)?;
+        if engine == Engine::F5KoszulFrobenius {
+            total.work = checked_add(total.work, criterion_reservation(equations)?.work)?;
+        }
+        Ok(total)
+    }
+
+    pub(crate) struct Gate<'a, F> {
+        pub report: Report,
+        limits: Limits,
+        deadline: Instant,
+        observer: &'a mut F,
+    }
+
+    impl<'a, F: FnMut(&Event) -> Result<(), ()>> Gate<'a, F> {
+        pub(crate) fn new(
+            engine: Engine,
+            degree: u32,
+            limits: Limits,
+            deadline: Instant,
+            observer: &'a mut F,
+        ) -> Self {
+            Self {
+                report: Report {
+                    engine,
+                    degree,
+                    stop: Stop::InvalidInput,
+                    backend_invoked: false,
+                    native_step_complete: false,
+                    criterion_status: CriterionStatus::NotRequested,
+                    reserved: Reservation::default(),
+                    counters: Counters::default(),
+                    columns: 0,
+                    rank: None,
+                    rows: Vec::new(),
+                },
+                limits,
+                deadline,
+                observer,
+            }
+        }
+
+        pub(crate) fn clock(&self) -> Result<(), Stop> {
+            if Instant::now() >= self.deadline {
+                Err(Stop::Deadline)
+            } else {
+                Ok(())
+            }
+        }
+
+        pub(crate) fn reserve(&mut self, next: Reservation) -> Result<(), Stop> {
+            self.clock()?;
+            let work = checked_add(self.report.reserved.work, next.work)?;
+            let bytes = checked_add(self.report.reserved.bytes, next.bytes)?;
+            if work > self.limits.work {
+                return Err(Stop::WorkLimit);
+            }
+            if bytes > self.limits.bytes {
+                return Err(Stop::ByteLimit);
+            }
+            self.report.reserved = Reservation { work, bytes };
+            Ok(())
+        }
+
+        pub(crate) fn emit(&mut self, stage: Stage) -> Result<(), Stop> {
+            self.clock()?;
+            if self.report.counters.attempted_events >= self.limits.events {
+                return Err(Stop::EventLimit);
+            }
+            self.report.counters.attempted_events += 1;
+            let event = Event {
+                stage,
+                reserved: self.report.reserved,
+                counters: self.report.counters,
+            };
+            (self.observer)(&event).map_err(|()| Stop::Observer)?;
+            self.report.counters.acknowledged_events += 1;
+            self.clock()
+        }
+
+        pub(crate) fn prepare(
+            &mut self,
+            polys: &[F2BoolPoly],
+            n_vars: usize,
+        ) -> Result<[u32; MAX_EQUATIONS], Stop> {
+            if self.limits.work > MAX_WORK
+                || self.limits.bytes > MAX_BYTES
+                || self.limits.main_rows > MAX_ROWS as u64
+                || self.limits.events > MAX_EVENTS
+            {
+                return Err(Stop::InvalidLimits);
+            }
+            if n_vars != 3 || polys.len() > MAX_EQUATIONS || !(1..=6).contains(&self.report.degree)
+            {
+                return Err(Stop::InvalidInput);
+            }
+            self.reserve(entry_reservation(polys.len())?)?;
+            let mut degrees = [0; MAX_EQUATIONS];
+            for (i, p) in polys.iter().enumerate() {
+                if p.n_vars != 3
+                    || p.terms.len() > 8
+                    || !p.is_canonical()
+                    || p.terms.iter().any(|m| m.mask & !7 != 0)
+                {
+                    return Err(Stop::InvalidInput);
+                }
+                degrees[i] = p.terms.iter().map(|m| m.degree()).max().unwrap_or(0);
+            }
+            self.emit(Stage::Begin)?;
+            Ok(degrees)
+        }
+
+        fn vec<T>(&mut self, capacity: usize) -> Result<Vec<T>, Stop> {
+            self.clock()?;
+            let bytes = Layout::array::<T>(capacity)
+                .map_err(|_| Stop::Overflow)?
+                .size() as u64;
+            let total = checked_add(self.report.counters.dynamic_layout_bytes, bytes)?;
+            // The fixed metadata envelope is not spendable on dynamic storage.
+            if total > self.report.reserved.bytes.saturating_sub(METADATA_BYTES) {
+                return Err(Stop::ByteLimit);
+            }
+            let mut out = Vec::new();
+            if capacity != 0 {
+                self.report.counters.dynamic_layout_bytes = total;
+                self.report.counters.allocation_requests += 1;
+                out.try_reserve_exact(capacity)
+                    .map_err(|_| Stop::Allocation)?;
+            }
+            Ok(out)
+        }
+
+        pub(crate) fn main(
+            &mut self,
+            polys: &[F2BoolPoly],
+            degrees: &[u32; MAX_EQUATIONS],
+            pruned: &[u8; MAX_EQUATIONS],
+        ) -> Result<(), Stop> {
+            self.reserve(main_reservation(polys.len())?)?;
+            self.report.backend_invoked = true;
+            let mut supports = [0u8; MAX_ROWS];
+            let mut selected = 0usize;
+            let mut union = 0u8;
+            for (i, p) in polys.iter().enumerate() {
+                if degrees[i] > self.report.degree {
+                    continue;
+                }
+                for multiplier in MULTIPLIERS {
+                    if multiplier.count_ones() > self.report.degree - degrees[i] {
+                        continue;
+                    }
+                    if self.report.counters.main_attempts >= self.limits.main_rows {
+                        return Err(Stop::RowLimit);
+                    }
+                    self.emit(Stage::MainCandidate {
+                        generator: i,
+                        multiplier,
+                    })?;
+                    self.report.counters.main_attempts += 1;
+                    let support = product(p, multiplier, false);
+                    if support == 0 {
+                        continue;
+                    }
+                    self.report.counters.nonempty_rows += 1;
+                    if pruned[i] & (1 << multiplier) != 0 {
+                        self.report.counters.pruned_nonempty_rows += 1;
+                        continue;
+                    }
+                    supports[selected] = support;
+                    selected += 1;
+                    self.report.counters.selected_rows += 1;
+                    union |= support;
+                }
+            }
+            self.emit(Stage::Pack)?;
+            let (columns, count) = columns(union);
+            self.report.columns = count;
+            let mut matrix = self.vec::<Vec<u64>>(selected)?;
+            for &support in &supports[..selected] {
+                let mut row = self.vec::<u64>(1)?;
+                row.push(pack(support, &columns, count) as u64);
+                matrix.push(row);
+            }
+            self.emit(Stage::Reduce)?;
+            let rank = echelon_f2_suffix_counted(
+                &mut matrix,
+                count,
+                &mut self.report.counters.reduction_word_xors,
+                true,
+            );
+            self.clock()?;
+            self.emit(Stage::Readback)?;
+            let mut output = self.vec::<F2BoolPoly>(rank)?;
+            for row in &matrix[..rank] {
+                let mut terms = self.vec::<F2BoolMono>(row[0].count_ones() as usize)?;
+                for (c, &mask) in columns[..count].iter().enumerate() {
+                    if row[0] & (1 << c) != 0 {
+                        terms.push(F2BoolMono::from_mask(mask as Mask));
+                    }
+                }
+                output.push(F2BoolPoly { terms, n_vars: 3 });
+            }
+            self.emit(Stage::Finish)?;
+            self.report.rank = Some(rank);
+            self.report.rows = output;
+            self.report.native_step_complete = true;
+            Ok(())
+        }
+
+        pub(crate) fn finish(mut self, result: Result<(), Stop>) -> Report {
+            self.report.stop = match result {
+                Ok(()) => Stop::Complete,
+                Err(stop) => stop,
+            };
+            self.report
+        }
+    }
+
+    pub(crate) fn product(p: &F2BoolPoly, multiplier: u8, plus_one: bool) -> u8 {
+        let mut support = if plus_one { 1u8 << multiplier } else { 0 };
+        for term in &p.terms {
+            support ^= 1u8 << (term.mask as u8 | multiplier);
+        }
+        support
+    }
+
+    pub(crate) fn columns(support: u8) -> ([u8; 8], usize) {
+        let mut columns = [0u8; 8];
+        let mut count = 0;
+        for mask in 0..8u8 {
+            if support & (1 << mask) == 0 {
+                continue;
+            }
+            let mut j = count;
+            while j != 0
+                && mono_key(F2BoolMono::from_mask(columns[j - 1] as Mask))
+                    < mono_key(F2BoolMono::from_mask(mask as Mask))
+            {
+                columns[j] = columns[j - 1];
+                j -= 1;
+            }
+            columns[j] = mask;
+            count += 1;
+        }
+        (columns, count)
+    }
+
+    pub(crate) fn pack(support: u8, columns: &[u8; 8], count: usize) -> u8 {
+        let mut row = 0;
+        for (c, &mask) in columns[..count].iter().enumerate() {
+            if support & (1 << mask) != 0 {
+                row |= 1 << c;
+            }
+        }
+        row
+    }
+
+    /// One serial reduced Macaulay step with explicit K2 resource admission.
+    /// `deadline` is absolute. Callback-owned storage/work is outside the native
+    /// reservation model; callback failure is sticky and returns no final rows.
+    pub fn matrix_f4_f2_bounded<F: FnMut(&Event) -> Result<(), ()>>(
+        polys: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        limits: Limits,
+        deadline: Instant,
+        mut observer: F,
+    ) -> Report {
+        let mut gate = Gate::new(Engine::F4Macaulay, degree, limits, deadline, &mut observer);
+        let result = (|| {
+            let degrees = gate.prepare(polys, n_vars)?;
+            gate.main(polys, &degrees, &[0; MAX_EQUATIONS])
+        })();
+        gate.finish(result)
+    }
+
+    #[cfg(test)]
+    pub(crate) mod tests {
+        use super::*;
+        use std::time::Duration;
+
+        pub(crate) fn limits() -> Limits {
+            Limits {
+                work: MAX_WORK,
+                bytes: MAX_BYTES,
+                main_rows: MAX_ROWS as u64,
+                events: MAX_EVENTS,
+            }
+        }
+
+        pub(crate) fn deadline() -> Instant {
+            Instant::now() + Duration::from_secs(60)
+        }
+
+        pub(crate) fn polynomial(anf: u8) -> F2BoolPoly {
+            F2BoolPoly::from_monos(
+                (0..8)
+                    .filter(|&m| anf & (1 << m) != 0)
+                    .map(|m| F2BoolMono::from_mask(m as Mask))
+                    .collect(),
+                3,
+            )
+        }
+
+        // Independent dense Boolean elimination in raw numeric-mask order;
+        // it does not call the production product/column/packed-row helpers.
+        pub(crate) fn row_space(polys: &[F2BoolPoly]) -> [u8; 8] {
+            let mut rows: Vec<u8> = polys
+                .iter()
+                .map(|p| p.terms.iter().fold(0, |row, m| row ^ (1 << m.mask as u8)))
+                .collect();
+            let mut pivot = 0;
+            let mut result = [0; 8];
+            for c in 0..8 {
+                let Some(found) = (pivot..rows.len()).find(|&r| rows[r] & (1 << c) != 0) else {
+                    continue;
+                };
+                rows.swap(pivot, found);
+                let value = rows[pivot];
+                for (r, row) in rows.iter_mut().enumerate() {
+                    if r != pivot && *row & (1 << c) != 0 {
+                        *row ^= value;
+                    }
+                }
+                pivot += 1;
+            }
+            for &row in &rows[..pivot] {
+                result[row.trailing_zeros() as usize] = row;
+            }
+            result
+        }
+
+        pub(crate) fn oracle(polys: &[F2BoolPoly], degree: u32) -> [u8; 8] {
+            let mut rows = Vec::new();
+            for p in polys {
+                let d = p
+                    .terms
+                    .iter()
+                    .map(|m| m.mask.count_ones())
+                    .max()
+                    .unwrap_or(0);
+                if d > degree {
+                    continue;
+                }
+                for multiplier in 0..8u8 {
+                    if multiplier.count_ones() > degree - d {
+                        continue;
+                    }
+                    let mut coefficients = [false; 8];
+                    for term in &p.terms {
+                        let index = (term.mask as u8 | multiplier) as usize;
+                        coefficients[index] = !coefficients[index];
+                    }
+                    let bits = coefficients
+                        .iter()
+                        .enumerate()
+                        .fold(0, |bits, (m, &value)| bits | (u8::from(value) << m));
+                    rows.push(polynomial(bits));
+                }
+            }
+            row_space(&rows)
+        }
+
+        fn run(polys: &[F2BoolPoly], degree: u32, caps: Limits) -> Report {
+            matrix_f4_f2_bounded(polys, 3, degree, caps, deadline(), |_| Ok(()))
+        }
+
+        pub(crate) fn censored(report: &Report, stop: Stop) {
+            assert_eq!(report.stop, stop);
+            assert!(!report.native_step_complete);
+            assert_eq!(report.rank, None);
+            assert!(report.rows.is_empty());
+        }
+
+        #[test]
+        fn bounded_f4_exhaustive_single_anf_matches_legacy_and_independent_span() {
+            for anf in 0..=255u8 {
+                let input = [polynomial(anf)];
+                for degree in 1..=6 {
+                    let report = run(&input, degree, limits());
+                    assert_eq!(report.stop, Stop::Complete, "anf={anf}, degree={degree}");
+                    assert!(report.native_step_complete);
+                    assert!(report.rows.iter().all(F2BoolPoly::is_canonical));
+                    assert_eq!(row_space(&report.rows), oracle(&input, degree));
+                    let legacy = super::super::matrix_f4_f2(&input, 3, degree).unwrap();
+                    assert_eq!(report.rows, legacy);
+                    assert_eq!(row_space(&report.rows), row_space(&legacy));
+                    assert_eq!(report.rank, Some(report.rows.len()));
+                    assert!(
+                        report.counters.dynamic_layout_bytes + METADATA_BYTES
+                            <= report.reserved.bytes
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn bounded_f4_multi_generator_and_zero_unit_semantics() {
+            for masks in [
+                vec![],
+                vec![0],
+                vec![1],
+                vec![0, 3, 5],
+                vec![14, 14, 23],
+                vec![255, 41, 129, 1],
+            ] {
+                let input: Vec<_> = masks.into_iter().map(polynomial).collect();
+                let report = run(&input, 4, limits());
+                assert_eq!(report.stop, Stop::Complete);
+                assert_eq!(row_space(&report.rows), oracle(&input, 4));
+                let legacy = super::super::matrix_f4_f2(&input, 3, 4).unwrap();
+                assert_eq!(report.rows, legacy);
+                assert_eq!(row_space(&report.rows), row_space(&legacy));
+            }
+        }
+
+        #[test]
+        fn bounded_f4_maximum_rows_admits_before_candidate_callback() {
+            let input = vec![polynomial(1); MAX_EQUATIONS];
+            let full = run(&input, 6, limits());
+            assert_eq!(full.stop, Stop::Complete);
+            assert_eq!(full.counters.main_attempts, MAX_ROWS as u64);
+            assert_eq!(full.counters.selected_rows, MAX_ROWS as u64);
+            assert!(full.counters.reduction_word_xors > 0);
+            let mut caps = limits();
+            caps.main_rows = MAX_ROWS as u64 - 1;
+            let mut callbacks = 0;
+            let partial = matrix_f4_f2_bounded(&input, 3, 6, caps, deadline(), |event| {
+                if matches!(event.stage, Stage::MainCandidate { .. }) {
+                    callbacks += 1;
+                }
+                Ok(())
+            });
+            censored(&partial, Stop::RowLimit);
+            assert_eq!(callbacks, MAX_ROWS - 1);
+            assert_eq!(partial.counters.main_attempts, callbacks as u64);
+            assert_eq!(partial.counters.selected_rows, callbacks as u64);
+            assert_eq!(partial.counters.dynamic_layout_bytes, 0);
+        }
+
+        #[test]
+        fn bounded_f4_exact_and_one_less_reservations_and_events() {
+            let input = [polynomial(14), polynomial(11)];
+            let required = required_reservation(input.len(), Engine::F4Macaulay).unwrap();
+            let mut caps = limits();
+            caps.work = required.work;
+            caps.bytes = required.bytes;
+            let full = run(&input, 5, caps);
+            assert_eq!(full.stop, Stop::Complete);
+            assert_eq!(full.reserved, required);
+            caps.events = full.counters.attempted_events;
+            assert_eq!(run(&input, 5, caps).stop, Stop::Complete);
+            let mut less = caps;
+            less.events -= 1;
+            censored(&run(&input, 5, less), Stop::EventLimit);
+            less = caps;
+            less.work -= 1;
+            censored(&run(&input, 5, less), Stop::WorkLimit);
+            less = caps;
+            less.bytes -= 1;
+            censored(&run(&input, 5, less), Stop::ByteLimit);
+        }
+
+        #[test]
+        fn bounded_f4_invocation_requires_main_phase_admission() {
+            let input = [polynomial(14)];
+            let entry = entry_reservation(input.len()).unwrap();
+            let required = required_reservation(input.len(), Engine::F4Macaulay).unwrap();
+            for work in [entry.work, required.work - 1] {
+                let mut caps = limits();
+                caps.work = work;
+                let mut seen = Vec::new();
+                let report = matrix_f4_f2_bounded(&input, 3, 5, caps, deadline(), |event| {
+                    seen.push(event.stage);
+                    Ok(())
+                });
+                censored(&report, Stop::WorkLimit);
+                assert_eq!(seen, [Stage::Begin]);
+                assert_eq!(report.reserved, entry);
+                assert!(!report.backend_invoked);
+                assert_eq!(report.counters.main_attempts, 0);
+                assert_eq!(report.counters.allocation_requests, 0);
+            }
+            let mut caps = limits();
+            caps.work = required.work;
+            caps.bytes = required.bytes - 1;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::ByteLimit);
+            assert!(!report.backend_invoked);
+            caps.bytes += 1;
+            let report = run(&input, 5, caps);
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert!(report.counters.main_attempts > 0);
+
+            // Admission is distinct from useful work: the phase may then
+            // encounter its first row cap, or complete an empty rank-zero step.
+            caps.main_rows = 0;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::RowLimit);
+            assert!(report.backend_invoked);
+            assert_eq!(report.counters.main_attempts, 0);
+            let report = run(&[], 5, limits());
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert_eq!(report.rank, Some(0));
+            assert_eq!(report.counters.main_attempts, 0);
+        }
+
+        #[test]
+        fn bounded_f4_strict_input_rejected_before_callbacks() {
+            let good = polynomial(14);
+            let mut wrong_vars = good.clone();
+            wrong_vars.n_vars = 4;
+            let mut high = good.clone();
+            high.terms[0].mask |= 8;
+            let mut duplicate = good.clone();
+            duplicate.terms.push(duplicate.terms[0]);
+            let mut reversed = good.clone();
+            reversed.terms.reverse();
+            let many_terms = F2BoolPoly {
+                terms: vec![F2BoolMono::one(); 9],
+                n_vars: 3,
+            };
+            for input in [
+                vec![wrong_vars],
+                vec![high],
+                vec![duplicate],
+                vec![reversed],
+                vec![many_terms],
+                vec![good.clone(); 62],
+            ] {
+                let report = matrix_f4_f2_bounded(&input, 3, 4, limits(), deadline(), |_| {
+                    panic!("invalid input callback")
+                });
+                censored(&report, Stop::InvalidInput);
+                assert_eq!(report.counters.allocation_requests, 0);
+                assert!(!report.backend_invoked);
+            }
+            for (n_vars, degree) in [(2, 4), (4, 4), (3, 0), (3, 7), (3, u32::MAX)] {
+                let report = matrix_f4_f2_bounded(
+                    std::slice::from_ref(&good),
+                    n_vars,
+                    degree,
+                    limits(),
+                    deadline(),
+                    |_| panic!("invalid shape callback"),
+                );
+                censored(&report, Stop::InvalidInput);
+            }
+            let mut caps = limits();
+            caps.work = u64::MAX;
+            censored(&run(&[good], 4, caps), Stop::InvalidLimits);
+        }
+
+        #[test]
+        fn bounded_f4_observer_failure_and_deadline_never_return_final_rank() {
+            let input = [polynomial(14), polynomial(11)];
+            for stage in [
+                Stage::Begin,
+                Stage::Pack,
+                Stage::Reduce,
+                Stage::Readback,
+                Stage::Finish,
+            ] {
+                let mut refused = false;
+                let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), deadline(), |event| {
+                    assert!(!refused, "callback after refusal");
+                    if event.stage == stage {
+                        refused = true;
+                        Err(())
+                    } else {
+                        Ok(())
+                    }
+                });
+                assert!(refused);
+                censored(&report, Stop::Observer);
+                assert_eq!(
+                    report.counters.attempted_events,
+                    report.counters.acknowledged_events + 1
+                );
+            }
+            let expired = Instant::now();
+            let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), expired, |_| {
+                panic!("expired callback")
+            });
+            censored(&report, Stop::Deadline);
+            let soon = Instant::now() + Duration::from_millis(20);
+            let report = matrix_f4_f2_bounded(&input, 3, 5, limits(), soon, |_| {
+                std::thread::sleep(Duration::from_millis(25));
+                Ok(())
+            });
+            censored(&report, Stop::Deadline);
+            assert!(report.counters.attempted_events <= 1);
+            assert_eq!(
+                report.counters.attempted_events,
+                report.counters.acknowledged_events
+            );
+        }
+
+        #[test]
+        fn bounded_matrix_acknowledged_finish_after_deadline_is_censored() {
+            let input = [polynomial(14), polynomial(11)];
+            for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+                let expires = Instant::now() + Duration::from_secs(1);
+                let mut last = None;
+                let mut observer = |event: &Event| {
+                    last = Some(event.stage);
+                    if event.stage == Stage::Finish {
+                        std::thread::sleep(
+                            expires.saturating_duration_since(Instant::now())
+                                + Duration::from_millis(1),
+                        );
+                    }
+                    Ok(())
+                };
+                let report = match engine {
+                    Engine::F4Macaulay => {
+                        matrix_f4_f2_bounded(&input, 3, 5, limits(), expires, &mut observer)
+                    }
+                    Engine::F5KoszulFrobenius => {
+                        crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2_bounded(
+                            &input,
+                            3,
+                            5,
+                            limits(),
+                            expires,
+                            &mut observer,
+                        )
+                    }
+                };
+                // This must reach the actual terminal callback, not pass by
+                // expiring at entry or an earlier phase on a stalled runner.
+                assert_eq!(last, Some(Stage::Finish));
+                censored(&report, Stop::Deadline);
+                assert!(report.backend_invoked);
+                assert!(report.counters.main_attempts > 0);
+                assert!(report.counters.dynamic_layout_bytes > 0);
+                assert_eq!(
+                    report.counters.attempted_events,
+                    report.counters.acknowledged_events
+                );
+            }
+        }
+    }
 }
 
 // ── Matrix-F4 over the Boolean ring ────────────────────────────────
@@ -4365,6 +5204,24 @@ fn legacy_rref_kernel() -> bool {
     *LEGACY.get_or_init(|| std::env::var("KIC_F4_KERNEL").as_deref() == Ok("legacy"))
 }
 
+// Two defaults of #1646 (`e49afb98f`, 2026-10-11) changed what the inherited
+// engine counts: the row echelon form of a root went through the Four
+// Russians kernel of `gf2_elim` (before, the column-at-a-time kernel's word
+// XORs), and a child asked the node oracle before specialising its bases
+// (before, after).  Committed records made before then charge the old
+// accounting; the replay audit turns this on for them (`ecbench::legacy`).
+// Per thread.
+thread_local! {
+    static LEGACY_PRE_1646: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count as the inherited engine did before #1646: echelon forms on the
+/// column-at-a-time kernels, the node oracle asked after the specialisation.
+/// `false` restores the normal choice.
+pub fn set_legacy_pre_1646(on: bool) {
+    LEGACY_PRE_1646.with(|c| c.set(on));
+}
+
 /// Reduced row echelon form, which is unique: whichever kernel runs, the
 /// matrix comes back the same, and only the time and the word XORs
 /// charged differ.  Matrices of at least 128 rows and 256 columns go to
@@ -4416,7 +5273,12 @@ pub(crate) fn echelon_f2_counted(
     // themselves (`gf2_elim_bench`), and the legacy kernels below it.  The
     // inherited engine's root, the only echelon on the solving path,
     // previously never reached it.  `KIC_F4_KERNEL=legacy` is the control.
-    if !legacy_rref_kernel() && !suffix_kernel_forced() && matrix.len() >= 128 && n_cols >= 256 {
+    if !legacy_rref_kernel()
+        && !LEGACY_PRE_1646.with(|c| c.get())
+        && !suffix_kernel_forced()
+        && matrix.len() >= 128
+        && n_cols >= 256
+    {
         return crate::cryptanalysis::gf2_elim::echelon_counted(matrix, n_cols, word_ops);
     }
     if suffix_kernel_forced()
@@ -5934,11 +6796,10 @@ pub fn gate_first_skips_thread() -> (u64, u64) {
 /// (`research/ic_improve_20261015/05-linear-harvest/`), with the gate
 /// widened in round 3 item 02
 /// (`research/ic_improve3_20261015/02-harvest-gate/`): the default is
-/// [`LINEAR_HARVEST_DEFAULT`] — root only, in solves with fewer than
-/// 0.961 non-zero generators per occurring variable (item 05's gate) **or**
-/// whose root basis has rank ≥ 331 (item 02's frozen size gate, which adds
-/// the large cells where the rebuild is amortised and leaves out the small
-/// over-determined (13,4) m3 system, where it is not).
+/// [`LINEAR_HARVEST_DEFAULT`] — root only, in solves whose root basis has
+/// rank ≥ 331 (item 02's size gate; repair R8 dropped the gpv half, which
+/// regressed against off at the small m = 2 cells; `KIC_LINEAR_HARVEST=r3`
+/// restores item 02's `gpv OR rank` default, [`LINEAR_HARVEST_R3`]).
 /// **Opt out with `KIC_LINEAR_HARVEST=0`**, which restores the
 /// pre-harvest engine exactly (identical counters); `KIC_LINEAR_HARVEST=gpv`
 /// restores item 05's gpv-only gate ([`LINEAR_HARVEST_GPV`]); `every`
@@ -5967,22 +6828,41 @@ pub struct LinearHarvest {
 }
 
 /// The default harvest (also `KIC_LINEAR_HARVEST=1`): root only, gated on
-/// generators per occurring variable `< 0.961` (item 05's frozen θ =
-/// 0.9607) **or** root basis rank `≥ 331` (round 3 item 02's frozen θ), as
-/// `parse_linear_harvest("root,gpv=0.9607,rank=331")` stores it.
+/// root basis rank `>= 331` alone (round 3 item 02's size gate), as
+/// `parse_linear_harvest("root,gpv=0,rank=331")` stores it.
+///
+/// **Repair R8 (2026-10-26).** Round 3 item 02 shipped
+/// `gpv < 0.9607 OR rank >= 331` ([`LINEAR_HARVEST_R3`]). Against harvest
+/// off, the gpv half regresses at (17,9) m2 and (19,10) m2 (rank < 331), in two paired data
+/// sets: `research/ic_improve3_20261015/02-harvest-gate/runs/fit_test.jsonl`
+/// line 78 (production CPU off/default 0.873 [0.783, 0.974]) and
+/// `research/ic_r8_harvest_default_20261026/` (production word operations
+/// 0.843 and 0.852, CIs excluding 1). Every cell where the default wins has
+/// rank >= 331, so dropping the gpv half keeps the measured wins and makes
+/// the default counter-identical to off where it lost.
 pub const LINEAR_HARVEST_DEFAULT: LinearHarvest = LinearHarvest {
     max_vars: u32::MAX,
     root_only: true,
     min_free: 0,
-    gpv_below_milli: 961,
+    gpv_below_milli: 0,
     or_occ_at_least: u32::MAX,
     or_rank_at_least: 331,
+};
+
+/// The default shipped by round 3 item 02 (`KIC_LINEAR_HARVEST=r3`):
+/// `gpv < 0.9607 OR rank >= 331`, as
+/// `parse_linear_harvest("root,gpv=0.9607,rank=331")` stores it.  Kept as the
+/// same-binary control for repair R8.
+pub const LINEAR_HARVEST_R3: LinearHarvest = LinearHarvest {
+    gpv_below_milli: 961,
+    ..LINEAR_HARVEST_DEFAULT
 };
 
 /// Item 05's default before round 3 item 02 (`KIC_LINEAR_HARVEST=gpv`):
 /// root only, gated on generators per occurring variable `< 0.961` alone,
 /// as `parse_linear_harvest("root,gpv=0.9607")` stores it.
 pub const LINEAR_HARVEST_GPV: LinearHarvest = LinearHarvest {
+    gpv_below_milli: 961,
     or_rank_at_least: u32::MAX,
     ..LINEAR_HARVEST_DEFAULT
 };
@@ -6023,6 +6903,9 @@ pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
     if spec == "gpv" {
         return Some(LINEAR_HARVEST_GPV);
     }
+    if spec == "r3" {
+        return Some(LINEAR_HARVEST_R3);
+    }
     let mut h = LINEAR_HARVEST_EVERY_NODE;
     if spec == "every" {
         return Some(h);
@@ -6056,6 +6939,9 @@ pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
 /// ([`LINEAR_HARVEST_GPV`]), anything else is [`parse_linear_harvest`]d.
 pub fn linear_harvest() -> Option<LinearHarvest> {
     static ENV: std::sync::OnceLock<Option<LinearHarvest>> = std::sync::OnceLock::new();
+    if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
+        return None;
+    }
     if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
         return v;
     }
@@ -6063,6 +6949,20 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
         Err(_) => Some(LINEAR_HARVEST_DEFAULT),
         Ok(s) => parse_linear_harvest(&s),
     })
+}
+
+// The replay audit's view of a record made before the harvest was on by
+// default (`ecbench::legacy`): no harvest at all, whatever a caller's
+// override says, since the oracle sets and clears that override around each
+// solve.  Per thread.
+thread_local! {
+    static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count as the engine did before the harvest was the default; `false`
+/// restores the normal choice.
+pub fn set_legacy_no_linear_harvest(on: bool) {
+    LEGACY_NO_LINEAR_HARVEST.with(|c| c.set(on));
 }
 
 /// Override `KIC_LINEAR_HARVEST` on this thread (`None` restores it;
@@ -6612,7 +7512,8 @@ fn solve_with_policy_and_oracle(
 /// the node oracle, as it did before; a same-binary control, read once.
 fn early_oracle_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ENABLED.get_or_init(|| std::env::var("KIC_F4_EARLY_ORACLE").as_deref() != Ok("0"))
+    !LEGACY_PRE_1646.with(|c| c.get())
+        && *ENABLED.get_or_init(|| std::env::var("KIC_F4_EARLY_ORACLE").as_deref() != Ok("0"))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -8597,6 +9498,7 @@ mod tests {
                 None,
                 Some(LINEAR_HARVEST_DEFAULT),
                 Some(LINEAR_HARVEST_GPV),
+                Some(LINEAR_HARVEST_R3),
                 Some(LINEAR_HARVEST_EVERY_NODE),
                 parse_linear_harvest("root"),
                 parse_linear_harvest("k=2"),
@@ -8626,8 +9528,13 @@ mod tests {
         assert_eq!(parse_linear_harvest("0"), None);
         assert_eq!(parse_linear_harvest("1"), Some(LINEAR_HARVEST_DEFAULT));
         assert_eq!(
-            parse_linear_harvest("root,gpv=0.9607,rank=331"),
+            parse_linear_harvest("root,gpv=0,rank=331"),
             Some(LINEAR_HARVEST_DEFAULT)
+        );
+        assert_eq!(parse_linear_harvest("r3"), Some(LINEAR_HARVEST_R3));
+        assert_eq!(
+            parse_linear_harvest("root,gpv=0.9607,rank=331"),
+            Some(LINEAR_HARVEST_R3)
         );
         assert_eq!(parse_linear_harvest("gpv"), Some(LINEAR_HARVEST_GPV));
         assert_eq!(
