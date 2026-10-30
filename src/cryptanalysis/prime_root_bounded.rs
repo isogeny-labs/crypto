@@ -820,6 +820,7 @@ impl Replay {
                     return Err(Stop::InvalidCertificate);
                 }
                 self.splits += 1;
+                self.gate.metrics.splits += 1;
             }
             EventKind::LinearRoot { polynomial, root } => {
                 if !self.linear_seen
@@ -1125,7 +1126,14 @@ mod tests {
                 assert_eq!(&report.roots[..usize::from(report.root_count)], expected);
                 assert!(report.metrics.arithmetic_invoked);
                 assert!(report.metrics.splits > 0);
-                assert!(check(&f, &report, &events).unwrap().finite_complete);
+                let checked = check(&f, &report, &events).unwrap();
+                assert!(checked.finite_complete);
+                let split_events = events
+                    .iter()
+                    .filter(|event| matches!(event.kind, EventKind::Split { .. }))
+                    .count() as u64;
+                assert_eq!(checked.replay_metrics.splits, split_events);
+                assert!(checked.replay_metrics.splits > 0);
                 assert!(
                     !check(&f, &report, &events)
                         .unwrap()

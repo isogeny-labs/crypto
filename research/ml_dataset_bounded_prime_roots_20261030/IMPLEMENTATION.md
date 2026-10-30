@@ -27,3 +27,14 @@ Producer metrics/stop-cause metadata are range/shape checked, not independently 
 Six authored test functions cover exhaustive F7 quadratics; repeated derivative-zero F3; constants/zero/irreducible/mixed nonlinear factors; fixed nonmonic/repeated/degree8 roots at47/53/61bits; actual split events; exact/one-less work,field,bytes,event and split controls; invalid inputs before callback; sticky Begin/middle/Finish observer refusal; Begin and actualFinish callback expiry; original deadline already expired; independent replay input/gcd/delta/order/omission/duplication/root/canonical-tail tampering; replay tiny-budget refusal and sticky invalid-prefix state. Tests collect streams in test-owned Vecs, outside native memory claims. All tests are authored, unrun. Fixed wide degree8 completion gates must pass without resampling or increased ceilings; if not, report the failed gate and improve bounded implementation under review.
 
 Remaining: parent source review/build/focused/full validation; bounded adapter serialization and replay envelopes; nonlinear multivariate residual visitor; group/domain/original-equation checks; exact-role persistence and rehashed dataset controls; source-bound CLI and S3 restore evidence. None is implied by this native commit.
+
+## Independent review correction: replay split accounting
+
+The independent review of d630bc682d9e found that Replay checked and incremented
+its internal split-event counter without updating the returned replay metrics.
+The correction increments replay_metrics.splits after each successfully checked
+Split event. The existing fixed wide nonmonic/degree-eight controls now compare
+that metric with the recorded Split event count and require a nonzero count.
+This reports checked replay splits; it does not certify the producer's complete
+operation trajectory. Source formatting and diff checks are separate from
+runtime validation, which remains queued behind the combined regression suite.
