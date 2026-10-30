@@ -118,3 +118,12 @@ Retained validation/combined-full-01.summary.json records exact scope and failur
 ExistingT977 was offered to liveT956session under assignment2edd61a8 at21:07:34Z,
 expires21:12:34Z; task remainsproposed at21:14Z and no acknowledgment was observed.
 Current source checkpoint18 is verified atfc3ff8d1d3b1; readback receipt retained.
+
+Update2026-10-30T21:44Z: exacttested snapshot09 now also has a self-contained
+standalone validation-source Git commit1d858fb9e4b8035b38f93db4423880627b09211f.
+All3963 files match original hashes/modes/file-set, original snapshot unchanged,
+root Git bundle verified. Source package archive SHA39cf38c008b681cafd4a3c2a38d84c64455c6d3bb05f55e0ae749093fd060d8f
+(36590013B) passed fresh S3 GET comparison; see validation/clean-source-package-01-readback.json.
+This is validation-source provenance, not upstream delivery or owner integration.
+Build01 of actualcryptoCLI/nativecontroller has been admitted with realcommit and
+clean-source guards; binary result pending. No shared source reservation changed.
