@@ -27,6 +27,8 @@ def fixture():
         })
     return {
         'schema': 'n83.crossfamily-current-validated/v1',
+        'curve_id': subject.CURVE_ID,
+        'subgroup_order': subject.SUBGROUP_ORDER,
         'source_sha256': subject.SOURCE_SHA256,
         'targets_sha256': subject.TARGETS_SHA256,
         'evidence_status': 'PASS_INDEPENDENT_REPLAY',
@@ -67,6 +69,13 @@ def main():
     wrong = copy.deepcopy(data)
     wrong['different_cloud_instances'] = False
     assert subject.select(wrong)['online']['selected_candidate_id'] is None
+    wrong_curve = copy.deepcopy(data)
+    wrong_curve['curve_id'] = 'EC1N83Ckb1a0hother'
+    assert subject.select(wrong_curve)['admission_status'] == (
+        'SOURCE_TARGET_OR_REPLAY_GATE')
+    wrong_order = copy.deepcopy(data)
+    wrong_order['subgroup_order'] = 2417851639230796216685689
+    assert subject.select(wrong_order)['online']['selected_candidate_id'] is None
     tied = copy.deepcopy(data)
     for point in tied['points']:
         for arm in point['arms']:
@@ -88,7 +97,7 @@ def main():
     finally:
         subject.sign_flip_p = original
     print(json.dumps({'status': 'PASS_CROSSFAMILY_CURRENT_SELECTOR',
-                      'cases': 9, 'exact_minimum_p': minimum}, sort_keys=True))
+                      'cases': 11, 'exact_minimum_p': minimum}, sort_keys=True))
 
 
 if __name__ == '__main__':
