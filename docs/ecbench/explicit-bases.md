@@ -645,8 +645,9 @@ T940 holds the GPU source and this handoff. Added an optional persistent
 right-search grid, exact two-stage minimum witness resolution, a24-byte result
 readback and actual search-visit accounting. The ordinary chunked path stays
 available. Tests force a two-block grid, multi-stride late matches, complete
-misses, partial tiles, resets and empty reprepare. Host fixture construction
-and syntax checks passed; CUDA validation remains pending. Updated README
+misses, partial tiles, resets and empty reprepare. Host syntax passed; the first late-hit fixture constructor failed because
+its row cap also bounded input-base size. A corrected explicit unbalanced
+split is checked in the following repair; CUDA validation remains pending. Updated README
 arithmetic guards to match the already validated v9 source.
 
 ### Decisions made

@@ -211,10 +211,12 @@ int main() {
       bases[0] = {base.front()};
       bases[1].assign(base.begin(), base.begin() + 33);
       bases[2].assign(base.begin() + 32, base.end());
-      Plan p = plan(wide, bases, 1);
+      Plan p = plan(wide, bases, 65);
+      // A valid deliberately unbalanced split exercises long right traversals.
+      p.split = 1; p.left = 1; p.right = 33 * 33;
       require(p.left == 1 && p.right == 1089 && p.split == 1);
-      DeviceBackend device(wide, 1, 1);
-      HostBackend host(wide, 1, 1);
+      DeviceBackend device(wide, 65, 1);
+      HostBackend host(wide, 65, 1);
       device.prepare(p);
       host.prepare(p);
       Point late, absent;
