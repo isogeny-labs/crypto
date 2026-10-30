@@ -273,3 +273,71 @@ run end to end here.
   algebra for the denser 6-point rows, no scoreboard or leaderboard
   change (stage diagnostic only).
 - Research-visuals (graph + PDF) not produced in this session.
+
+## Update 2026-10-18: direct quartic root solve (resolvent cubic)
+
+**Status: stage diagnostic (kernel B/B2 quartic root finder), not an
+end-to-end result.**  The 2026-10-12 verdict above priced one `S₄` root
+solve at 20–60 `S₃` solves (the Berlekamp trace-splitting finder:
+`n` squarings modulo the quartic plus gcds) and named break-even at
+~12.  `S4Tables::roots` replaces it by a direct solve: normalise to
+`Y⁴+Y³+eY+g`, find a root `u` of the resolvent cubic `u³+eu+(e²+g)` by a
+Lucas (Dickson `D₃`) ladder, split into two quadratics, and solve each
+by a byte-table half-trace.  Needs odd `n ≤ 62` with `9 ∤ 2ⁿ+1` (all of
+n = 17, 23, 31, 41, 53, 83 qualify); anything outside the generic
+`a ≠ 0`, squarefree, resolvent-root-in-field case goes to the previous
+routine and is counted (`s4_fallbacks`, 0 on every complete quartic
+measured).  Select with `KIC_S4_ROOTS=split|resolvent` (default
+`resolvent`); `split` is the control and is unchanged.
+
+Correctness: 10⁴ random quartics and 10⁴ complete `S₄` quartics at each of
+n = 17, 23, 41 against the gcd-route reference and the group-law roots
+`x(R ± s₁ ± s₂)`; 600 degenerate/repeated-root/zero-`X³` cases at n = 17
+against brute force over all of F₂¹⁷; every relation still re-added in
+the group (0 rejects, 0 lift failures).  Tests 10/10.
+
+Cost per solve (`koblitz_sixsum_extract_probe --solver-bench`, 3000
+complete quartics, best of 7, interleaved; JSON `solver_costs`):
+
+| n | S₃ (loop half-trace) | S₃ (table) | roots, split | roots, resolvent | resolvent in S₃ (wall) | split in S₃ (wall) | field ops resolvent vs split |
+|--:|--:|--:|--:|--:|--:|--:|:--|
+| 23 | 395 ns | 234 ns | 8.79 µs | 0.72 µs | 1.83 | 22.3 | 52 mul, 31 sqr, 2 inv, 8 maps vs 970 mul, 220 sqr, 7 inv |
+| 31 | 517 ns | 291 ns | 11.3 µs | 0.93 µs | 1.79 | 21.9 | 61 mul, 40 sqr, 2 inv, 8 maps vs 1292 mul, 299 sqr, 7 inv |
+| 41 | 354 ns | 179 ns | 9.54 µs | 0.61 µs | 1.73 (3.4 vs table S₃) | 27.0 | 70 mul, 49 sqr, 2 inv, 8 table maps vs 1710 mul, 395 sqr, 7 inv |
+
+An `S₄` pair (coefficients + roots) is ~1.8 `S₃` by wall, 2.5 by priced
+field operations, against the break-even ~12.  The two solvers agree on
+every benchmarked quartic.
+
+Kernel B2, n = 41 (r ≈ 2³⁹), 32 verified relations per cell, same seed,
+same table, same `S₄`-solve counts (371k and 132k per relation), only the
+root finder changes (wall per relation, shared host at load ~2, so
+secondary):
+
+| K | 4-sum (S₃ loop) | B2 split (control) | B2 resolvent | B2 resolvent vs split | vs 4-sum |
+|--:|--:|--:|--:|--:|--:|
+| 10 | 2.37 s | 3.89 s | 0.350 s | 11.1x faster | 6.8x faster |
+| 20 | 0.475 s | 1.34 s | 0.128 s | 10.5x faster | 3.7x faster |
+
+In S₃-solve-equivalents (`s3_equivalents_per_relation_wall` in the JSON)
+B2 is 7.7x (K=10) and 4.2x (K=20) below the 4-sum.  Against a 4-sum that
+uses the table half-trace (S₃ at 179 ns, 2x faster than the crate's loop,
+not measured end to end) the wall margin would be about 3.4x and 1.9x.
+
+Classification: **engineering, stage improvement** of relation extraction
+(kernel B2, n = 41, K = 10 and 20).  It reverses the 2026-10-12 verdict
+for B2 (1–8x more work -> 3.7–6.8x less wall per relation) on this
+ladder.  It does not move end-to-end `S`: no factor-base size, linear
+algebra, or sieve-phase cost is included, the gain at n = 41 depends on
+the pair-table abundance there, and no rho comparison, key-recovery or
+deployed-curve claim follows.  Not yet done: an end-to-end cold `S` for a
+B2 pipeline against the frozen baseline, and n = 53 (a pair table of
+that size).  Evidence: `raw_resolvent_20261018/` (n = 41, K = 10 and 20,
+split and resolvent; n = 23/31 saturated, solver costs only).
+
+Report and graph: `REPORT_resolvent.pdf` (source `REPORT_resolvent.typ`),
+`sixsum_s4_resolvent_n41.svg` / `.png` (source `plot_resolvent.py`, plots
+recorded values only), frozen summary `resolvent_summary.json` (feeds the
+leaderboard's `sixsum_resolvent_component`); copies in
+`benchmarks/20261018-sixsum-s4-resolvent/`.  The 3.4x / 1.9x margin against
+a table-half-trace 4-sum above is an estimate, not measured.

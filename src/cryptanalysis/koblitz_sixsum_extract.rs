@@ -148,6 +148,9 @@ pub struct ProbeCounters {
     pub s3_solves: u64,
     /// Quartic `S₄(x_R, x₁, x₂, X)` root solves ([`s4_roots`]).
     pub s4_solves: u64,
+    /// `S₄` solves the direct solver handed to the general routine
+    /// ([`S4Fallback`]); zero for a complete quartic from rational points.
+    pub s4_fallbacks: u64,
     /// **Probes in the feasibility note's unit**: first-summand states
     /// tried.  For the 4-sum every abscissa state (one `S₃` solve each);
     /// for kernel A every signed shifted state `s₁` (each followed by a
@@ -193,6 +196,7 @@ impl ProbeCounters {
         self.targets += o.targets;
         self.s3_solves += o.s3_solves;
         self.s4_solves += o.s4_solves;
+        self.s4_fallbacks += o.s4_fallbacks;
         self.outer_probes += o.outer_probes;
         self.point_adds += o.point_adds;
         self.canonicalisations += o.canonicalisations;
@@ -322,6 +326,10 @@ pub struct SixSumTable {
     n: u32,
     b: u64,
     pub build: BuildStats,
+    /// Tables of the direct quartic solve.
+    s4: S4Tables,
+    /// Which quartic root finder kernel B runs.
+    pub s4_mode: S4Mode,
 }
 
 impl SixSumTable {
@@ -447,7 +455,21 @@ impl SixSumTable {
             n: inst.n,
             b: inst.b,
             build: stats,
+            s4: S4Tables::new(&inst.gf),
+            s4_mode: S4Mode::from_env(),
         })
+    }
+
+    /// The same table with kernel B's quartic root finder chosen
+    /// explicitly (the default is `KIC_S4_ROOTS`, see [`S4Mode`]).
+    pub fn with_s4_mode(mut self, mode: S4Mode) -> Self {
+        self.s4_mode = mode;
+        self
+    }
+
+    /// The tables of the direct quartic solve (for cost probes).
+    pub fn s4_tables(&self) -> &S4Tables {
+        &self.s4
     }
 
     /// Entries in the table (`≈ K²n`).
@@ -842,7 +864,14 @@ impl SixSumTable {
             ctr.outer_probes += 1;
             let quartic = s4_in_x4(gf, self.b, target.x, x1, x2);
             roots.clear();
-            s4_roots_split(gf, &quartic, roots);
+            match self.s4_mode {
+                S4Mode::Split => s4_roots_split(gf, &quartic, roots),
+                S4Mode::Resolvent => {
+                    if let S4Path::Fallback(_) = self.s4.roots(gf, &quartic, roots) {
+                        ctr.s4_fallbacks += 1;
+                    }
+                }
+            }
             roots.sort_unstable();
             roots.dedup();
             for &root in roots.iter() {
@@ -1021,6 +1050,202 @@ pub fn verify_relation(
     })
 }
 
+// ── Field operations the quartic solvers use ───────────────────────
+
+/// The `F_{2^n}` operations the quartic root finders are written over.
+/// [`Gf2`] implements it by delegation (no overhead, so the timed path is
+/// the plain field); [`CountedField`] wraps a `Gf2` and counts every
+/// operation, so the cost of a solve is reported in field operations as
+/// well as in wall.
+pub trait Fld {
+    fn nbits(&self) -> u32;
+    fn mask(&self) -> u64;
+    fn mul(&self, a: u64, b: u64) -> u64;
+    fn sqr(&self, a: u64) -> u64;
+    fn sqr_k(&self, a: u64, k: u32) -> u64;
+    fn inv(&self, a: u64) -> u64;
+    /// Bookkeeping for the byte-table linear maps of [`S4Tables`]; a no-op
+    /// except in [`CountedField`].
+    #[inline(always)]
+    fn tick(&self, _kind: LinKind) {}
+}
+
+/// Which byte-table `F₂`-linear map was applied.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LinKind {
+    HalfTrace,
+    Trace,
+    Sqrt,
+}
+
+impl Fld for Gf2 {
+    #[inline(always)]
+    fn nbits(&self) -> u32 {
+        self.n
+    }
+    #[inline(always)]
+    fn mask(&self) -> u64 {
+        self.mask
+    }
+    #[inline(always)]
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        Gf2::mul(self, a, b)
+    }
+    #[inline(always)]
+    fn sqr(&self, a: u64) -> u64 {
+        Gf2::sqr(self, a)
+    }
+    #[inline(always)]
+    fn sqr_k(&self, a: u64, k: u32) -> u64 {
+        Gf2::sqr_k(self, a, k)
+    }
+    #[inline(always)]
+    fn inv(&self, a: u64) -> u64 {
+        Gf2::inv(self, a)
+    }
+}
+
+/// Field operations performed by a solve.  `sqr_k(a, k)` counts `k`
+/// squarings; an inversion counts once (it is `n − 1` squarings and a few
+/// products inside, which [`OpWeights`] prices).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct FieldOps {
+    pub mul: u64,
+    pub sqr: u64,
+    pub inv: u64,
+    pub half_trace: u64,
+    pub trace: u64,
+    pub sqrt: u64,
+}
+
+impl FieldOps {
+    pub fn add(&mut self, o: &FieldOps) {
+        self.mul += o.mul;
+        self.sqr += o.sqr;
+        self.inv += o.inv;
+        self.half_trace += o.half_trace;
+        self.trace += o.trace;
+        self.sqrt += o.sqrt;
+    }
+
+    /// Cost in nanoseconds under measured per-operation prices.
+    pub fn cost_ns(&self, w: &OpWeights) -> f64 {
+        self.mul as f64 * w.mul
+            + self.sqr as f64 * w.sqr
+            + self.inv as f64 * w.inv
+            + (self.half_trace + self.trace + self.sqrt) as f64 * w.lin
+    }
+}
+
+/// Measured nanoseconds per field operation on one host and field.
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct OpWeights {
+    pub mul: f64,
+    pub sqr: f64,
+    pub inv: f64,
+    /// One byte-table linear map (half-trace, trace, square root).
+    pub lin: f64,
+}
+
+/// A [`Gf2`] that counts what it is asked to do.
+pub struct CountedField<'a> {
+    pub gf: &'a Gf2,
+    ops: std::cell::Cell<FieldOps>,
+}
+
+impl<'a> CountedField<'a> {
+    pub fn new(gf: &'a Gf2) -> Self {
+        Self {
+            gf,
+            ops: std::cell::Cell::new(FieldOps::default()),
+        }
+    }
+
+    pub fn ops(&self) -> FieldOps {
+        self.ops.get()
+    }
+
+    pub fn reset(&self) {
+        self.ops.set(FieldOps::default());
+    }
+
+    #[inline(always)]
+    fn bump(&self, f: impl FnOnce(&mut FieldOps)) {
+        let mut o = self.ops.get();
+        f(&mut o);
+        self.ops.set(o);
+    }
+}
+
+impl Fld for CountedField<'_> {
+    #[inline(always)]
+    fn nbits(&self) -> u32 {
+        self.gf.n
+    }
+    #[inline(always)]
+    fn mask(&self) -> u64 {
+        self.gf.mask
+    }
+    #[inline(always)]
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.bump(|o| o.mul += 1);
+        self.gf.mul(a, b)
+    }
+    #[inline(always)]
+    fn sqr(&self, a: u64) -> u64 {
+        self.bump(|o| o.sqr += 1);
+        self.gf.sqr(a)
+    }
+    #[inline(always)]
+    fn sqr_k(&self, a: u64, k: u32) -> u64 {
+        self.bump(|o| o.sqr += k as u64);
+        self.gf.sqr_k(a, k)
+    }
+    #[inline(always)]
+    fn inv(&self, a: u64) -> u64 {
+        self.bump(|o| o.inv += 1);
+        self.gf.inv(a)
+    }
+    #[inline(always)]
+    fn tick(&self, kind: LinKind) {
+        self.bump(|o| match kind {
+            LinKind::HalfTrace => o.half_trace += 1,
+            LinKind::Trace => o.trace += 1,
+            LinKind::Sqrt => o.sqrt += 1,
+        });
+    }
+}
+
+/// An `F₂`-linear map on `n ≤ 64` bits applied by byte tables.
+#[derive(Clone, Debug)]
+struct ByteLinear {
+    tables: Vec<[u64; 256]>,
+}
+
+impl ByteLinear {
+    fn from_images(images: &[u64]) -> Self {
+        let chunks = images.len().div_ceil(8);
+        let mut tables = vec![[0u64; 256]; chunks];
+        for (chunk, table) in tables.iter_mut().enumerate() {
+            for byte in 1usize..256 {
+                let low = byte & (byte - 1);
+                let bit = chunk * 8 + byte.trailing_zeros() as usize;
+                table[byte] = table[low] ^ images.get(bit).copied().unwrap_or(0);
+            }
+        }
+        Self { tables }
+    }
+
+    #[inline(always)]
+    fn apply(&self, v: u64) -> u64 {
+        let mut acc = 0u64;
+        for (chunk, table) in self.tables.iter().enumerate() {
+            acc ^= table[((v >> (8 * chunk)) & 0xff) as usize];
+        }
+        acc
+    }
+}
+
 // ── The quartic S₄ and its roots ───────────────────────────────────
 
 /// Coefficients `c[0..=4]` of `S₄(x₁, x₂, x₃, X)` as a polynomial in `X`
@@ -1035,8 +1260,8 @@ pub fn verify_relation(
 /// `A₂ = x₃² + X², B₂ = x₃X, C₂ = x₃²X² + b` polynomials in `X`
 /// (`binary_semaev::binary_semaev_s4`'s formula, expanded in its last
 /// argument).  Degree 4 in general, lower on degenerate inputs.
-pub fn s4_in_x4(gf: &Gf2, b: u64, x1: u64, x2: u64, x3: u64) -> [u64; 5] {
-    let b = b & gf.mask;
+pub fn s4_in_x4<F: Fld>(gf: &F, b: u64, x1: u64, x2: u64, x3: u64) -> [u64; 5] {
+    let b = b & gf.mask();
     let a1 = gf.sqr(x1 ^ x2);
     let b1 = gf.mul(x1, x2);
     let c1 = gf.sqr(b1) ^ b;
@@ -1065,7 +1290,7 @@ pub fn s4_in_x4(gf: &Gf2, b: u64, x1: u64, x2: u64, x3: u64) -> [u64; 5] {
 }
 
 /// Evaluate a polynomial (low coefficient first) at `x`.
-pub fn poly_eval(gf: &Gf2, coeffs: &[u64], x: u64) -> u64 {
+pub fn poly_eval<F: Fld>(gf: &F, coeffs: &[u64], x: u64) -> u64 {
     let mut acc = 0u64;
     for &c in coeffs.iter().rev() {
         acc = gf.mul(acc, x) ^ c;
@@ -1084,7 +1309,7 @@ fn degree(p: &[u64]) -> Option<usize> {
 }
 
 /// Make monic; `p` non-zero.
-fn monic(gf: &Gf2, p: &mut [u64]) {
+fn monic<F: Fld>(gf: &F, p: &mut [u64]) {
     let lead = *p.last().expect("non-zero polynomial");
     if lead != 1 {
         let inv = gf.inv(lead);
@@ -1095,7 +1320,7 @@ fn monic(gf: &Gf2, p: &mut [u64]) {
 }
 
 /// `a mod f`, `f` monic and non-constant.
-fn rem(gf: &Gf2, a: &[u64], f: &[u64]) -> Vec<u64> {
+fn rem<F: Fld>(gf: &F, a: &[u64], f: &[u64]) -> Vec<u64> {
     let df = degree(f).expect("non-zero modulus");
     let mut r = a.to_vec();
     trim(&mut r);
@@ -1114,7 +1339,7 @@ fn rem(gf: &Gf2, a: &[u64], f: &[u64]) -> Vec<u64> {
 }
 
 /// `(a div f, a mod f)`, `f` monic and non-constant.
-fn divmod(gf: &Gf2, a: &[u64], f: &[u64]) -> (Vec<u64>, Vec<u64>) {
+fn divmod<F: Fld>(gf: &F, a: &[u64], f: &[u64]) -> (Vec<u64>, Vec<u64>) {
     let df = degree(f).expect("non-zero modulus");
     let mut r = a.to_vec();
     trim(&mut r);
@@ -1136,7 +1361,7 @@ fn divmod(gf: &Gf2, a: &[u64], f: &[u64]) -> (Vec<u64>, Vec<u64>) {
 }
 
 /// `p² mod f` in characteristic 2.
-fn square_mod(gf: &Gf2, p: &[u64], f: &[u64]) -> Vec<u64> {
+fn square_mod<F: Fld>(gf: &F, p: &[u64], f: &[u64]) -> Vec<u64> {
     if p.is_empty() {
         return Vec::new();
     }
@@ -1148,7 +1373,7 @@ fn square_mod(gf: &Gf2, p: &[u64], f: &[u64]) -> Vec<u64> {
 }
 
 /// Monic `gcd(a, b)`; the zero polynomial is empty.
-fn gcd(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
+fn gcd<F: Fld>(gf: &F, a: &[u64], b: &[u64]) -> Vec<u64> {
     let mut a = a.to_vec();
     let mut b = b.to_vec();
     trim(&mut a);
@@ -1173,7 +1398,7 @@ fn gcd(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
 /// factors over `F_{2^n}` into its roots, by the trace: `Tr(βX) mod g`
 /// for the basis elements `β = 2^i` in turn until a proper factor
 /// appears, then recurse (deterministic Berlekamp trace splitting).
-fn split_linear(gf: &Gf2, g: &[u64], roots: &mut Vec<u64>) {
+fn split_linear<F: Fld>(gf: &F, g: &[u64], roots: &mut Vec<u64>) {
     let Some(d) = degree(g) else {
         return;
     };
@@ -1181,7 +1406,7 @@ fn split_linear(gf: &Gf2, g: &[u64], roots: &mut Vec<u64>) {
         0 => {}
         1 => roots.push(g[0]),
         _ => {
-            let n = gf.n;
+            let n = gf.nbits();
             for i in 0..n {
                 let beta = 1u64 << i;
                 // acc = Σ_{j<n} (βX)^{2^j} mod g
@@ -1217,7 +1442,7 @@ fn split_linear(gf: &Gf2, g: &[u64], roots: &mut Vec<u64>) {
 /// coefficient first): `gcd(f, X^{2^n} − X)` by `n` squarings modulo `f`,
 /// then trace splitting.  The zero polynomial and constants have no
 /// roots reported.
-pub fn s4_roots(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
+pub fn s4_roots<F: Fld>(gf: &F, coeffs: &[u64], roots: &mut Vec<u64>) {
     let mut f = coeffs.to_vec();
     trim(&mut f);
     let Some(d) = degree(&f) else {
@@ -1233,7 +1458,7 @@ pub fn s4_roots(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
     }
     // h = X^{2^n} mod f
     let mut h = rem(gf, &[0, 1], &f);
-    for _ in 0..gf.n {
+    for _ in 0..gf.nbits() {
         h = square_mod(gf, &h, &f);
     }
     // h + X
@@ -1259,7 +1484,7 @@ pub fn s4_roots(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
 /// `X^{2^j} mod f` (reused by every trace), then per basis element `β`
 /// one trace `Σ β^{2^j} X^{2^j}` and one small gcd, then two half-trace
 /// quadratics — a dozen or so `S₃`-solve equivalents.
-pub fn s4_roots_split(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
+pub fn s4_roots_split<F: Fld>(gf: &F, coeffs: &[u64], roots: &mut Vec<u64>) {
     let mut f = coeffs.to_vec();
     trim(&mut f);
     let Some(d) = degree(&f) else {
@@ -1288,7 +1513,7 @@ pub fn s4_roots_split(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
             // f = h²: the roots of h.
             let mut h = vec![0u64; f.len().div_ceil(2)];
             for (i, slot) in h.iter_mut().enumerate() {
-                *slot = gf.sqr_k(f[2 * i], gf.n - 1);
+                *slot = gf.sqr_k(f[2 * i], gf.nbits() - 1);
             }
             trim(&mut h);
             h
@@ -1305,7 +1530,7 @@ pub fn s4_roots_split(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
             Some(2) => quadratic_roots(gf, &g, roots),
             Some(dg) if dg >= 3 => {
                 // Residues X^{2^j} mod g, j = 0..n.
-                let n = gf.n as usize;
+                let n = gf.nbits() as usize;
                 let mut powers: Vec<Vec<u64>> = Vec::with_capacity(n);
                 let mut p = rem(gf, &[0, 1], &g);
                 for _ in 0..n {
@@ -1331,16 +1556,16 @@ pub fn s4_roots_split(gf: &Gf2, coeffs: &[u64], roots: &mut Vec<u64>) {
 /// Roots in `F_{2^n}` of a monic quadratic `X² + aX + b`: `X = a·z` with
 /// `z² + z = b/a²` (Artin–Schreier, one half-trace for odd `n`); `a = 0`
 /// gives the double root `√b`.  Roots are checked by evaluation.
-fn quadratic_roots(gf: &Gf2, g: &[u64], roots: &mut Vec<u64>) {
+fn quadratic_roots<F: Fld>(gf: &F, g: &[u64], roots: &mut Vec<u64>) {
     debug_assert_eq!(g.len(), 3);
     let (b, a) = (g[0], g[1]);
     if a == 0 {
-        roots.push(gf.sqr_k(b, gf.n - 1));
+        roots.push(gf.sqr_k(b, gf.nbits() - 1));
         return;
     }
     let inv_a = gf.inv(a);
     let c = gf.mul(b, gf.sqr(inv_a));
-    let Some(z) = crate::cryptanalysis::koblitz_fast_arith::artin_schreier_root(gf, gf.n, c) else {
+    let Some(z) = artin_schreier_root_g(gf, c) else {
         return;
     };
     let r1 = gf.mul(a, z);
@@ -1357,7 +1582,13 @@ fn quadratic_roots(gf: &Gf2, g: &[u64], roots: &mut Vec<u64>) {
 /// elements `β = 2^i`, `i ≥ from`, form `Tr(βX) mod g = Σ β^{2^j}·powers[j]`
 /// and split by `gcd(g, Tr(βX))`; the factors inherit the residues by
 /// reduction and recurse, degree-2 factors going to the half-trace.
-fn split_with_powers(gf: &Gf2, g: &[u64], powers: &[Vec<u64>], from: u32, roots: &mut Vec<u64>) {
+fn split_with_powers<F: Fld>(
+    gf: &F,
+    g: &[u64],
+    powers: &[Vec<u64>],
+    from: u32,
+    roots: &mut Vec<u64>,
+) {
     let Some(d) = degree(g) else {
         return;
     };
@@ -1373,7 +1604,7 @@ fn split_with_powers(gf: &Gf2, g: &[u64], powers: &[Vec<u64>], from: u32, roots:
         }
         _ => {}
     }
-    let n = gf.n;
+    let n = gf.nbits();
     for i in from..n {
         let mut beta = 1u64 << i;
         let mut trace = vec![0u64; d];
@@ -1398,6 +1629,388 @@ fn split_with_powers(gf: &Gf2, g: &[u64], powers: &[Vec<u64>], from: u32, roots:
             }
         }
     }
+}
+
+// ── The direct quartic solver: resolvent cubic and Artin–Schreier ──
+
+/// Which root finder kernel B runs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum S4Mode {
+    /// The control: `n` squarings modulo the quartic for the residues
+    /// `X^{2^j}`, Berlekamp trace splitting ([`s4_roots_split`]).
+    Split,
+    /// The direct solve: resolvent cubic by a Lucas ladder, two
+    /// Artin–Schreier quadratics by byte-table half-traces
+    /// ([`S4Tables::roots`]).
+    Resolvent,
+}
+
+impl S4Mode {
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "split" | "berlekamp" | "control" => Ok(Self::Split),
+            "resolvent" | "direct" | "ferrari" => Ok(Self::Resolvent),
+            other => Err(format!(
+                "unknown KIC_S4_ROOTS `{other}` (split | resolvent)"
+            )),
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Split => "split",
+            Self::Resolvent => "resolvent",
+        }
+    }
+
+    /// `KIC_S4_ROOTS=split|resolvent`, read once per process; unset gives
+    /// [`S4Mode::DEFAULT`].  An unparsable value panics rather than
+    /// silently measuring the wrong solver.
+    pub fn from_env() -> Self {
+        static MODE: std::sync::OnceLock<S4Mode> = std::sync::OnceLock::new();
+        *MODE.get_or_init(|| match std::env::var("KIC_S4_ROOTS") {
+            Ok(v) if !v.trim().is_empty() => Self::parse(&v).unwrap_or_else(|e| panic!("{e}")),
+            _ => Self::DEFAULT,
+        })
+    }
+
+    pub const DEFAULT: S4Mode = S4Mode::Resolvent;
+}
+
+/// Why [`S4Tables::roots`] handed a quartic to the control instead.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum S4Fallback {
+    /// The solver needs odd `n ≤ 62` with `9 ∤ 2ⁿ + 1`.
+    Field,
+    /// Degree below 4 (a degenerate `S₄`).
+    Degree,
+    /// `X³` coefficient zero: the quartic is not in the `a ≠ 0` form.
+    NoCubicTerm,
+    /// A repeated root.
+    Repeated,
+    /// The resolvent cubic has no root in the field: the quartic is a
+    /// linear factor times an irreducible cubic, and its one root is
+    /// found by the general gcd route.
+    NoResolventRoot,
+}
+
+/// How a root solve ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum S4Path {
+    Resolvent,
+    Fallback(S4Fallback),
+}
+
+/// Tables for the direct quartic solve over one field: the byte-table
+/// maps `half_trace`, `trace` and `sqrt` (all `F₂`-linear), and the two
+/// Lucas-ladder exponents.  Built once per field.
+#[derive(Clone, Debug)]
+pub struct S4Tables {
+    n: u32,
+    sqrt: ByteLinear,
+    half_trace: ByteLinear,
+    trace_mask: u64,
+    /// `(2^{n+1} − 1)/3`: the cube-root exponent in `F_q*` (`3 ∤ q − 1`).
+    e_field: u64,
+    /// `3⁻¹ mod (2ⁿ + 1)/3`: the cube-root exponent on the norm-one
+    /// subgroup of `F_{q²}`; zero when the solver does not apply.
+    e_norm: u64,
+}
+
+impl S4Tables {
+    pub fn new(gf: &Gf2) -> Self {
+        let n = gf.n;
+        let unit: Vec<u64> = (0..n).map(|b| 1u64 << b).collect();
+        let usable = n % 2 == 1 && n <= 62;
+        let (mut half, mut trace_mask, mut e_field, mut e_norm) = (Vec::new(), 0u64, 0u64, 0u64);
+        if usable {
+            for &e in &unit {
+                let (mut acc, mut power) = (e, e);
+                for _ in 0..(n - 1) / 2 {
+                    power = gf.sqr(gf.sqr(power));
+                    acc ^= power;
+                }
+                half.push(acc);
+            }
+            for (bit, &e) in unit.iter().enumerate() {
+                let (mut acc, mut power) = (e, e);
+                for _ in 1..n {
+                    power = gf.sqr(power);
+                    acc ^= power;
+                }
+                if acc & 1 == 1 {
+                    trace_mask |= 1u64 << bit;
+                }
+            }
+            e_field = ((1u128 << (n + 1)) - 1) as u64 / 3;
+            let m = ((1u64 << n) + 1) / 3;
+            e_norm = match m % 3 {
+                1 => (2 * m + 1) / 3,
+                2 => (m + 1) / 3,
+                _ => 0,
+            };
+        }
+        let sqrt_images: Vec<u64> = unit.iter().map(|&e| gf.sqr_k(e, n - 1)).collect();
+        Self {
+            n,
+            sqrt: ByteLinear::from_images(&sqrt_images),
+            half_trace: ByteLinear::from_images(&half),
+            trace_mask,
+            e_field,
+            e_norm,
+        }
+    }
+
+    /// Whether the direct solve applies to this field.
+    pub fn usable(&self) -> bool {
+        self.e_norm != 0
+    }
+
+    #[inline(always)]
+    fn tr<F: Fld>(&self, gf: &F, c: u64) -> u64 {
+        gf.tick(LinKind::Trace);
+        ((c & self.trace_mask).count_ones() & 1) as u64
+    }
+
+    #[inline(always)]
+    fn ht<F: Fld>(&self, gf: &F, c: u64) -> u64 {
+        gf.tick(LinKind::HalfTrace);
+        self.half_trace.apply(c)
+    }
+
+    #[inline(always)]
+    fn sqrt<F: Fld>(&self, gf: &F, c: u64) -> u64 {
+        gf.tick(LinKind::Sqrt);
+        self.sqrt.apply(c)
+    }
+
+    /// `V_e(κ)` for the Lucas sequence `V_k = w^k + w^{-k}` with
+    /// `V_1 = κ` (so `V_{2k} = V_k²`, `V_{2k+1} = V_kV_{k+1} + κ` in
+    /// characteristic 2): one product and one squaring per bit of `e`.
+    fn lucas<F: Fld>(&self, gf: &F, kappa: u64, e: u64) -> u64 {
+        let mut vk = kappa;
+        let mut vk1 = gf.sqr(kappa);
+        for bit in (0..63 - e.leading_zeros()).rev() {
+            let mixed = gf.mul(vk, vk1) ^ kappa;
+            if (e >> bit) & 1 == 0 {
+                vk = gf.sqr(vk);
+                vk1 = mixed;
+            } else {
+                vk = mixed;
+                vk1 = gf.sqr(vk1);
+            }
+        }
+        vk
+    }
+
+    /// **Every distinct root in `F_{2^n}`** of the polynomial `coeffs`
+    /// (low coefficient first), exact on every input.  The generic case —
+    /// degree 4, `X³` coefficient non-zero, squarefree — is solved
+    /// directly:
+    ///
+    /// 1. scale `X = (c₃/c₄)·T` and shift `T = Y + β`, so the quartic is
+    ///    `Y⁴ + Y³ + eY + g` (one inversion, batched for `c₃` and `c₄`);
+    /// 2. `Y⁴ + Y³ + eY + g = (Y² + pY + q)(Y² + (p+1)Y + q + u)` with
+    ///    `u = p² + p` a root of the **resolvent cubic**
+    ///    `u³ + eu + (e² + g) = 0` and `q = e + pu`;
+    /// 3. the cubic, `u = √e·v`, `v³ + v = κ`, is `D₃(v) = κ` for the
+    ///    Dickson polynomial `D₃`, so `v = V_E(κ)` by a Lucas ladder with
+    ///    `E` the cube-root exponent of the field (when `Tr(1/κ) = 0`) or of
+    ///    the norm-one group of `F_{q²}` (when `Tr(1/κ) = 1`), checked by
+    ///    substitution (a second inversion);
+    /// 4. a root `u` with `Tr(u) = 0` gives `p = H(u)` (half-trace);
+    ///    `Tr(u) = 1` means no root of the quartic lies in the field;
+    /// 5. each quadratic `Y² + cY + d` is `z² + z = d/c²` with `Y = cz`,
+    ///    solved by the half-trace, `1/p` and `1/(p+1)` from `1/u =
+    ///    (u² + e)/(e² + g)` without a further inversion.
+    ///
+    /// `n` odd with `9 ∤ 2ⁿ + 1` is required (the Lucas exponents exist);
+    /// degenerate inputs, repeated roots and the linear-times-irreducible
+    /// cubic case go to the general routines (reported in the returned
+    /// [`S4Path`]).  `roots` is appended to, in no particular order.
+    pub fn roots<F: Fld>(&self, gf: &F, coeffs: &[u64], roots: &mut Vec<u64>) -> S4Path {
+        let before = roots.len();
+        let fallback = |why: S4Fallback, roots: &mut Vec<u64>| {
+            roots.truncate(before);
+            s4_roots(gf, coeffs, roots);
+            S4Path::Fallback(why)
+        };
+        if !self.usable() {
+            return fallback(S4Fallback::Field, roots);
+        }
+        let mut deg = coeffs.len();
+        while deg > 0 && coeffs[deg - 1] == 0 {
+            deg -= 1;
+        }
+        if deg != 5 {
+            return fallback(S4Fallback::Degree, roots);
+        }
+        let (c0, c1, c2, c3, c4) = (coeffs[0], coeffs[1], coeffs[2], coeffs[3], coeffs[4]);
+        if c3 == 0 {
+            return fallback(S4Fallback::NoCubicTerm, roots);
+        }
+        // 1. X = λT, T⁴ + T³ + βT² + γT + δ.
+        let inv_both = gf.inv(gf.mul(c3, c4));
+        let ic3 = gf.mul(c4, inv_both);
+        let ic4 = gf.mul(c3, inv_both);
+        let lambda = gf.mul(c3, ic4);
+        let ic3_2 = gf.sqr(ic3);
+        let c4_2 = gf.sqr(c4);
+        let beta = gf.mul(gf.mul(c2, c4), ic3_2);
+        let gamma = gf.mul(gf.mul(c1, c4_2), gf.mul(ic3_2, ic3));
+        let delta = gf.mul(gf.mul(c0, gf.mul(c4_2, c4)), gf.sqr(ic3_2));
+        let bg = gf.mul(beta, gamma);
+        // The derivative T² + γ vanishes at √γ only: repeated root iff
+        // f(√γ) = γ² + βγ + δ = 0.
+        if gf.sqr(gamma) ^ bg ^ delta == 0 {
+            return fallback(S4Fallback::Repeated, roots);
+        }
+        // Y = T + β: Y⁴ + Y³ + eY + g.
+        let beta_2 = gf.sqr(beta);
+        let e = beta_2 ^ gamma;
+        let g = gf.sqr(beta_2) ^ bg ^ delta;
+        let q_res = gf.sqr(e) ^ g; // ≠ 0 for a squarefree quartic
+        if q_res == 0 {
+            return fallback(S4Fallback::Repeated, roots);
+        }
+        // 3. a root u of u³ + eu + Q, and 1/Q.
+        let (u, inv_q) = if e == 0 {
+            // u³ = Q: the cube map is a bijection for odd n.
+            let (mut acc, mut t) = (q_res, q_res);
+            for _ in 0..(self.n - 1) / 2 {
+                t = gf.sqr(gf.sqr(t));
+                acc = gf.mul(acc, t);
+            }
+            (acc, gf.inv(q_res))
+        } else {
+            let s = self.sqrt(gf, e);
+            let es = gf.mul(e, s);
+            let inv_all = gf.inv(gf.mul(es, q_res));
+            let inv_es = gf.mul(q_res, inv_all);
+            let inv_q = gf.mul(es, inv_all);
+            let kappa = gf.mul(q_res, inv_es);
+            let inv_kappa = gf.mul(es, inv_q);
+            let exp = if self.tr(gf, inv_kappa) == 0 {
+                self.e_field
+            } else {
+                self.e_norm
+            };
+            let v = self.lucas(gf, kappa, exp);
+            if gf.mul(gf.sqr(v), v) ^ v != kappa {
+                return fallback(S4Fallback::NoResolventRoot, roots);
+            }
+            (gf.mul(s, v), inv_q)
+        };
+        // 4. Tr(u) = 1: no root of the quartic in the field.
+        if self.tr(gf, u) == 1 {
+            return S4Path::Resolvent;
+        }
+        let p = self.ht(gf, u);
+        let r = p ^ 1;
+        let q = e ^ gf.mul(p, u);
+        let t = q ^ u;
+        // 5. 1/u = (u² + e)/Q; 1/p = r/u, 1/r = p/u.
+        let w = gf.mul(gf.sqr(u) ^ e, inv_q);
+        let inv_p = gf.mul(r, w);
+        let inv_r = gf.mul(p, w);
+        for (coef, rhs) in [(p, gf.mul(q, gf.sqr(inv_p))), (r, gf.mul(t, gf.sqr(inv_r)))] {
+            if self.tr(gf, rhs) != 0 {
+                continue;
+            }
+            let y1 = gf.mul(coef, self.ht(gf, rhs));
+            for y in [y1, y1 ^ coef] {
+                roots.push(gf.mul(lambda, y ^ beta));
+            }
+        }
+        S4Path::Resolvent
+    }
+}
+
+/// One root of `u² + u = c` over `F_{2^n}`, if any: the generic form of
+/// [`crate::cryptanalysis::koblitz_fast_arith::artin_schreier_root`]
+/// (trace by `n − 1` squarings, half-trace for odd `n`), kept for the
+/// control's quadratics.
+fn artin_schreier_root_g<F: Fld>(gf: &F, c: u64) -> Option<u64> {
+    let n = gf.nbits();
+    let c = c & gf.mask();
+    let mut acc = c;
+    let mut tr = c;
+    for _ in 1..n {
+        acc = gf.sqr(acc);
+        tr ^= acc;
+    }
+    if tr == 1 {
+        return None;
+    }
+    if n % 2 == 1 {
+        let mut t = c;
+        let mut a = c;
+        for _ in 0..(n - 1) / 2 {
+            a = gf.sqr(gf.sqr(a));
+            t ^= a;
+        }
+        return Some(t);
+    }
+    if n > 20 {
+        return None;
+    }
+    (0..(1u64 << n)).find(|&v| (gf.sqr(v) ^ v) == c)
+}
+
+/// `S₃(left, right, x₃) = 0` solved for `x₃`, generic over the field so
+/// that its operations can be counted: the arithmetic of
+/// [`s3_x_roots`] step for step, with the half-trace either by squarings
+/// (`tables = None`, the crate's solver) or by the byte tables of
+/// [`S4Tables`] (the table-driven solver of the orbit examples, a
+/// stronger baseline).  Needs odd `n`.
+pub fn s3_roots_generic<F: Fld>(
+    gf: &F,
+    b: u64,
+    left: u64,
+    right: u64,
+    tables: Option<&S4Tables>,
+) -> Option<[u64; 2]> {
+    let b = b & gf.mask();
+    let a = gf.sqr(left ^ right);
+    let p = gf.mul(left, right);
+    let ps = gf.sqr(p);
+    if a == 0 {
+        if left == 0 {
+            return None;
+        }
+        let root = gf.mul(ps ^ b, gf.inv(p));
+        return Some([root, root]);
+    }
+    if ps == 0 {
+        let root = gf.sqr_k(gf.mul(b, gf.inv(a)), gf.nbits() - 1);
+        return Some([root, root]);
+    }
+    let inv_combined = gf.inv(gf.mul(a, ps));
+    let q = gf.mul(p, gf.mul(ps, inv_combined));
+    let c = ps ^ b;
+    let d = gf.mul(gf.mul(c, a), gf.mul(a, inv_combined));
+    let half_trace = match tables {
+        Some(t) => {
+            if t.tr(gf, d) == 1 {
+                return None;
+            }
+            t.ht(gf, d)
+        }
+        None => {
+            let mut half_trace = d;
+            let mut power = d;
+            for _ in 0..(gf.nbits() - 1) / 2 {
+                power = gf.sqr(gf.sqr(power));
+                half_trace ^= power;
+            }
+            if (gf.sqr(half_trace) ^ half_trace) != d {
+                return None;
+            }
+            half_trace
+        }
+    };
+    let first = gf.mul(q, half_trace);
+    Some([first, first ^ q])
 }
 
 // ── Framework oracle ───────────────────────────────────────────────
@@ -1618,6 +2231,13 @@ mod tests {
             if brute.len() == 4 {
                 assert_eq!(split, brute, "round {round}: split path on a split quartic");
             }
+            let mut direct = Vec::new();
+            S4Tables::new(gf).roots(gf, &q, &mut direct);
+            direct.sort_unstable();
+            assert_eq!(
+                direct, brute,
+                "round {round}: resolvent solver vs brute force"
+            );
         }
         // Polynomials built from rational points split completely and
         // the roots are exactly x(R ± s1 ± s2).
@@ -1644,6 +2264,17 @@ mod tests {
             s4_roots_split(gf, &q, &mut split);
             split.sort_unstable();
             assert_eq!(split, want, "k = {k}: roots are x(R ± s1 ± s2)");
+            let mut direct = Vec::new();
+            let path = S4Tables::new(gf).roots(gf, &q, &mut direct);
+            direct.sort_unstable();
+            assert_eq!(direct, want, "k = {k}: resolvent solver");
+            if want.len() == 4 {
+                assert_eq!(
+                    path,
+                    S4Path::Resolvent,
+                    "k = {k}: a complete quartic is solved directly"
+                );
+            }
             let mut general = Vec::new();
             s4_roots(gf, &q, &mut general);
             general.sort_unstable();
@@ -1990,5 +2621,236 @@ mod tests {
         assert!(found[0] > 0, "4-sum found nothing at a saturated rung");
         assert!(found[1] > 0, "kernel A found nothing at a saturated rung");
         assert_eq!(ctr.verification_rejects, 0);
+    }
+
+    fn sorted_roots_resolvent(gf: &Gf2, tabs: &S4Tables, q: &[u64]) -> (Vec<u64>, S4Path) {
+        let mut v = Vec::new();
+        let path = tabs.roots(gf, q, &mut v);
+        v.sort_unstable();
+        (v, path)
+    }
+
+    fn sorted_general(gf: &Gf2, q: &[u64]) -> Vec<u64> {
+        let mut v = Vec::new();
+        s4_roots(gf, q, &mut v);
+        v.sort_unstable();
+        v.dedup();
+        v
+    }
+
+    /// **Randomised differential test, 10⁴ quartics per field**: the
+    /// resolvent solver returns exactly the roots of the general gcd
+    /// route (the reference, itself checked against brute force at
+    /// `n = 17` above) on uniformly random quartics, whatever their root
+    /// structure, and the control `s4_roots_split` agrees with both on
+    /// every quartic that splits completely (it promises nothing more).
+    /// Also tallies the root-count classes so that the test is seen to
+    /// reach all of them.
+    #[test]
+    fn s4_resolvent_matches_reference_on_random_quartics() {
+        for (a, n) in [(1u8, 17u32), (0, 23), (0, 41)] {
+            let inst = koblitz_instance(a, n).expect("Koblitz instance");
+            let gf = &inst.gf;
+            let tabs = S4Tables::new(gf);
+            assert!(tabs.usable(), "n = {n}");
+            let mut rng = StdRng::seed_from_u64(0x54_0000 + n as u64);
+            let mut by_count = [0u32; 5];
+            let mut fallbacks = 0u32;
+            let mut control_missed = 0u32;
+            for round in 0..10_000 {
+                let q: Vec<u64> = (0..5).map(|_| rng.gen::<u64>() & gf.mask).collect();
+                let want = sorted_general(gf, &q);
+                let (got, path) = sorted_roots_resolvent(gf, &tabs, &q);
+                assert_eq!(got, want, "n = {n}, round {round}: quartic {q:?}");
+                by_count[want.len()] += 1;
+                if matches!(path, S4Path::Fallback(_)) {
+                    fallbacks += 1;
+                }
+                let mut split = Vec::new();
+                s4_roots_split(gf, &q, &mut split);
+                split.sort_unstable();
+                split.dedup();
+                assert!(
+                    split.iter().all(|r| want.contains(r)),
+                    "control reported a non-root"
+                );
+                if want.len() == 4 {
+                    assert_eq!(
+                        split, want,
+                        "n = {n}, round {round}: control on a split quartic"
+                    );
+                }
+                if split != want {
+                    control_missed += 1;
+                }
+            }
+            eprintln!(
+                "n = {n}: root-count classes {by_count:?}, resolvent fallbacks {fallbacks}, \
+                 quartics where the control found fewer roots than exist {control_missed}"
+            );
+            // 0, 1, 2 and 4 roots all occur; (1)(3) is the only fallback.
+            assert!(by_count[0] > 0 && by_count[1] > 0 && by_count[2] > 0 && by_count[4] > 0);
+            assert!(fallbacks as usize <= by_count[1] as usize + 5);
+        }
+    }
+
+    /// 10⁴ complete `S₄` quartics per field (`x_R, x(s₁), x(s₂)` from
+    /// random rational points): the resolvent solver, the control and the
+    /// group-law roots `x(R ± s₁ ± s₂)` coincide and no solve falls back.
+    #[test]
+    fn s4_resolvent_matches_control_on_complete_quartics() {
+        for (a, n) in [(1u8, 17u32), (0, 23), (0, 41)] {
+            let inst = koblitz_instance(a, n).expect("Koblitz instance");
+            let gf = &inst.gf;
+            let tabs = S4Tables::new(gf);
+            let mut rng = StdRng::seed_from_u64(0x55_0000 + n as u64);
+            let g = inst.generator;
+            let mut fallbacks = 0u32;
+            let mut four = 0u32;
+            for round in 0..10_000 {
+                let mut pt = || inst.fast.mul_u64(g, rng.gen_range(2..inst.r));
+                let (r, s1, s2) = (pt(), pt(), pt());
+                let q = s4_in_x4(gf, inst.b, r.x, s1.x, s2.x);
+                let (got, path) = sorted_roots_resolvent(gf, &tabs, &q);
+                if matches!(path, S4Path::Fallback(_)) {
+                    fallbacks += 1;
+                }
+                let mut split = Vec::new();
+                s4_roots_split(gf, &q, &mut split);
+                split.sort_unstable();
+                split.dedup();
+                let mut want: Vec<u64> =
+                    [(false, false), (false, true), (true, false), (true, true)]
+                        .iter()
+                        .map(|&(n1, n2)| {
+                            let a1 = if n1 { inst.fast.neg(s1) } else { s1 };
+                            let a2 = if n2 { inst.fast.neg(s2) } else { s2 };
+                            inst.fast.add(inst.fast.add(r, a1), a2)
+                        })
+                        .filter(|p| !p.infinity)
+                        .map(|p| p.x)
+                        .collect();
+                want.sort_unstable();
+                want.dedup();
+                assert_eq!(got, want, "n = {n}, round {round}: resolvent");
+                assert_eq!(split, want, "n = {n}, round {round}: control");
+                four += (want.len() == 4) as u32;
+            }
+            eprintln!(
+                "n = {n}: {four}/10000 quartics with four distinct roots, {fallbacks} fallbacks"
+            );
+            assert!(four > 9_000, "complete quartics have four distinct roots");
+            assert!(fallbacks < 20, "n = {n}: {fallbacks} fallbacks");
+        }
+    }
+
+    /// Quartics built from chosen roots, including repeated roots, a zero
+    /// `X³` coefficient (roots summing to 0), zero `X` coefficient,
+    /// non-monic scalings and degrees 0 to 3: the resolvent solver equals
+    /// brute force over all of `F_{2^17}`.
+    #[test]
+    fn s4_resolvent_handles_degenerate_quartics() {
+        let inst = koblitz_instance(1, 17).expect("n=17");
+        let gf = &inst.gf;
+        let tabs = S4Tables::new(gf);
+        let mut rng = StdRng::seed_from_u64(0xdead_17);
+        let mul_lin = |p: &[u64], root: u64| -> Vec<u64> {
+            // p · (X + root)
+            let mut out = vec![0u64; p.len() + 1];
+            for (i, &c) in p.iter().enumerate() {
+                out[i + 1] ^= c;
+                out[i] ^= gf.mul(c, root);
+            }
+            out
+        };
+        let mut checked = 0;
+        for round in 0..600 {
+            let mut roots: Vec<u64> = (0..4).map(|_| rng.gen::<u64>() & gf.mask).collect();
+            match round % 6 {
+                0 => roots[1] = roots[0],                       // double root
+                1 => roots[3] = roots[2],                       // double root again
+                2 => roots[3] = roots[0] ^ roots[1] ^ roots[2], // sum zero: c3 = 0
+                3 => {
+                    roots[1] = roots[0];
+                    roots[3] = roots[2];
+                }
+                4 => roots = vec![roots[0]; 4],
+                _ => {}
+            }
+            let mut q = vec![1u64];
+            for &r in &roots {
+                q = mul_lin(&q, r);
+            }
+            let scale = (rng.gen::<u64>() & gf.mask).max(1);
+            for c in q.iter_mut() {
+                *c = gf.mul(*c, scale);
+            }
+            let brute = brute_roots(gf, &q);
+            let (got, _) = sorted_roots_resolvent(gf, &tabs, &q);
+            assert_eq!(got, brute, "round {round}: roots {roots:?}");
+            // Truncations to degree 3, 2, 1 and the zero polynomial.
+            for cut in 0..4 {
+                let mut lower = q.clone();
+                lower.truncate(4 - cut);
+                let brute = brute_roots(gf, &lower);
+                let (got, _) = sorted_roots_resolvent(gf, &tabs, &lower);
+                if lower.iter().all(|&c| c == 0) || lower.len() <= 1 {
+                    continue;
+                }
+                assert_eq!(got, brute, "round {round}, cut {cut}");
+            }
+            checked += 1;
+        }
+        assert_eq!(checked, 600);
+        // Explicit special coefficient patterns.
+        for q in [
+            vec![5u64, 0, 0, 0, 1],
+            vec![0, 0, 0, 0, 1],
+            vec![7, 3, 0, 0, 1],
+            vec![7, 0, 9, 0, 1],
+            vec![7, 0, 0, 1, 1],
+            vec![0, 1, 0, 1, 1],
+            vec![1, 1, 1, 1, 1],
+        ] {
+            let (got, _) = sorted_roots_resolvent(gf, &tabs, &q);
+            assert_eq!(got, brute_roots(gf, &q), "{q:?}");
+        }
+    }
+
+    /// The counted field returns the same roots, the generic `S₃` solver
+    /// equals [`s3_x_roots`] (loop half-trace) and its table form gives
+    /// the same roots, and the operation counts are what the algorithm
+    /// says: a complete quartic costs two inversions and no gcd work.
+    #[test]
+    fn s4_counted_field_and_generic_s3_agree() {
+        let inst = koblitz_instance(0, 41).expect("n=41");
+        let gf = &inst.gf;
+        let tabs = S4Tables::new(gf);
+        let counted = CountedField::new(gf);
+        let mut rng = StdRng::seed_from_u64(41);
+        for _ in 0..300 {
+            let (l, r) = (rng.gen::<u64>() & gf.mask, rng.gen::<u64>() & gf.mask);
+            let want = s3_x_roots(gf, inst.b, l, r);
+            assert_eq!(s3_roots_generic(gf, inst.b, l, r, None), want);
+            let table = s3_roots_generic(gf, inst.b, l, r, Some(&tabs));
+            assert_eq!(table.is_some(), want.is_some());
+            if let (Some(t), Some(w)) = (table, want) {
+                assert_eq!(t, w);
+            }
+            assert_eq!(s3_roots_generic(&counted, inst.b, l, r, None), want);
+        }
+        let g = inst.generator;
+        let pt = |k| inst.fast.mul_u64(g, k);
+        let q = s4_in_x4(gf, inst.b, pt(5).x, pt(77).x, pt(1234).x);
+        counted.reset();
+        let mut a = Vec::new();
+        let path = tabs.roots(&counted, &q, &mut a);
+        let ops = counted.ops();
+        assert_eq!(path, S4Path::Resolvent);
+        let mut b = Vec::new();
+        tabs.roots(gf, &q, &mut b);
+        assert_eq!(a, b);
+        assert_eq!(ops.inv, 2, "{ops:?}");
+        assert!(ops.mul < 120 && ops.sqr < 120, "{ops:?}");
     }
 }
