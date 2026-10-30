@@ -1,7 +1,6 @@
 //! Reusable CPU decomposition for the independently verified paper reduction.
 //! Generic meet-in-the-middle enumeration, not Boolean tensor contraction.
 #[path = "../../../src/cryptanalysis/hashed_ecdl.rs"]
-#[clippy::msrv = "1.78"] // The shared reduction retains the root crate's MSRV.
 pub mod paper;
 use paper::{Curve, DecompositionOracle, Error, Point};
 mod certificate;

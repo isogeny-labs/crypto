@@ -20,7 +20,7 @@ hashed-ecdl-cpu --verify certificate.json
 complete certificate independently before emitting JSON. A limit is an error,
 never evidence that no relation exists. The included shared reduction validates
 the full prime order with the generator witness and Hasse interval, supporting
-fields below 2^60. Optional `max_columns` defaults to512, at most16384. These
+fields below 2^60. Optional `max_columns` defaults to 512, at most 16384. These
 are admission limits, not evidence that all admitted instances are feasible.
 
 ## Work and memory
@@ -40,8 +40,8 @@ is replayed using the independent checked group operations.
 `max_rows` and `max_work` cap the combined *retained tuple count*, checked before
 preparation and again on warm queries. They do not cap total RSS, arithmetic or
 wall time. The original exhaustive oracle uses a different work unit.
-Preparation also stores the original bases and curve and uses temporary sum
-vectors; queries use O(batch) scratch. `peak_table_bytes` counts only retained
+Preparation also stores the original bases and four curve parameters and uses
+temporary sum vectors; queries use O(batch) scratch. `peak_table_bytes` counts only retained
 sum-table capacities, excluding these other allocations. All counters include
 discarded trials. `clear()` drops tables without resetting cumulative counters.
 
