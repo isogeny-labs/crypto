@@ -35,9 +35,9 @@ use crate::cryptanalysis::ic_boundary::{
     BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
     PrimePoint, QuarticClasses,
 };
+use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
-use crate::cryptanalysis::residual_walk::is_prime_u64;
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -85,9 +85,9 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
-    /// An externally supplied public point, with no logarithm in the fixture.
-    /// Restricted to cofactor-one prime-order regression cohorts. Primality
-    /// and point-count certificates accompany the input catalog.
+    /// An externally supplied public point with no logarithm in the fixture,
+    /// retained verbatim in measured child inputs. Restricted to certified
+    /// cofactor-one prime-order regression cohorts.
     PrimePublicFixture {
         p: u64,
         a: u64,
@@ -1343,8 +1343,16 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) = self {
-            // Planted targets only on E(F_{p⁴}): no public-target law yet.
+        if let Instance::Fp4(_)
+            | Instance::Fp4Torsion(_)
+            | Instance::F2m4(_)
+            | Instance::ThreeLeads(_)
+            | Instance::Hyper(_) = self
+        {
+            // Planted targets only on E(F_{p^4}), the tower, the three-leads
+            // study and the hyperelliptic Jacobians: no public-target law yet.
+            return None;
+        }
             // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
             // Jacobians: no public-target law yet.
             return None;

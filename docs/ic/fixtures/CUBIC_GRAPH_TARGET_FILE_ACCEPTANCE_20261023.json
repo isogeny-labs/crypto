@@ -1,0 +1,100 @@
+{
+  "schema": "crypto.cubic-graph-target-file-s3-acceptance/v1",
+  "date_utc": "2026-10-23",
+  "base_revision": "836263b33ed8ab2b40de50c55baa342b987dc28f",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-graph-target-file/20261023T035744Z-baa6150e",
+  "name": "acceptance/cubic-graph-target-file/20261023T035744Z-baa6150e/target.json",
+  "input_sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+  "input_bytes": 146,
+  "checks": {
+    "push": {
+      "bytes": 146,
+      "cached": true,
+      "name": "acceptance/cubic-graph-target-file/20261023T035744Z-baa6150e/target.json",
+      "replaced": false,
+      "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+      "uploaded": true
+    },
+    "ic_store_name": {
+      "nodes": 6,
+      "edges": 18,
+      "input_artifact": {
+        "bytes": 146,
+        "reference": "store:acceptance/cubic-graph-target-file/20261023T035744Z-baa6150e/target.json",
+        "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+      }
+    },
+    "icx_digest": {
+      "nodes": 6,
+      "edges": 18,
+      "input_artifact": {
+        "bytes": 146,
+        "reference": "sha256:8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+        "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+      }
+    },
+    "remote_verify": {
+      "exit_code": 0,
+      "stdout": "acceptance/cubic-graph-target-file/20261023T035744Z-baa6150e/target.json: not cached, remote bytes ok",
+      "stderr": "1 entries verified"
+    },
+    "objects_deleted": 1,
+    "prefix_empty": true,
+    "local_equivalence": {
+      "ic": {
+        "same_graph": true,
+        "nodes": 6,
+        "edges": 18,
+        "canonical_graph_sha256": "fc525b93e856756e4a43f150f2d1ba9afca64b6bf3f76c46324957b2d8973f3d",
+        "input_artifact": {
+          "bytes": 146,
+          "reference": "/Volumes/SSD990/llm/tmp/crypto-cli-audit-20261017/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+          "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+        }
+      },
+      "icx": {
+        "same_graph": true,
+        "nodes": 6,
+        "edges": 18,
+        "canonical_graph_sha256": "fc525b93e856756e4a43f150f2d1ba9afca64b6bf3f76c46324957b2d8973f3d",
+        "input_artifact": {
+          "bytes": 146,
+          "reference": "/Volumes/SSD990/llm/tmp/crypto-cli-audit-20261017/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+          "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+        }
+      }
+    },
+    "negative_inputs": {
+      "missing_source": {
+        "exit_code": 1,
+        "message": "cubic graph needs --input or --p --c --a --b"
+      },
+      "mixed_source": {
+        "exit_code": 1,
+        "message": "--input cannot be combined with --p, --c, --a, or --b"
+      },
+      "unknown_field": {
+        "exit_code": 1,
+        "message": "unknown field `unexpected`, expected one of `p`, `c`, `a`, `b`, `n`, `gx`, `gy`, `qx`, `qy` at line 1 column 138"
+      },
+      "oversized": {
+        "exit_code": 1,
+        "message": "cubic graph input exceeds 64 KiB"
+      },
+      "noncanonical": {
+        "exit_code": 1,
+        "message": "cubic graph field coefficients must be canonical triples"
+      }
+    }
+  },
+  "prior_attempt": {
+    "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-graph-target-file/20261023T035701Z-08e0ea7a",
+    "result": "Graph runs passed, but receipt script parsed crypto store verify text as JSON and exited before writing receipt; exact prefix was empty after finally cleanup."
+  },
+  "binary_sha256": {
+    "crypto": "0c1d2a5b5f4339a4261e461b5bd263bc7fb19f8d4da492bb3304f5e9caab889a",
+    "ic": "4bd99d49e10891cd94edef4474dc373b52dcabe94c77413fbaebec770fb846b3",
+    "icx": "5e976723f7e0467410f7f16a54745c5ea8f6e6071169ea9a567dbf9c12d95fae"
+  },
+  "limit": "One public F_7^3 target and its degree-3/5 j graph in one S3 account/region. The graph reads field and curve coefficients; solve-cubic checks points and subgroup."
+}
