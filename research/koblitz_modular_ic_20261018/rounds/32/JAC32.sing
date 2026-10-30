@@ -1,0 +1,32 @@
+proc checkJac32(int root,int twist,poly L,number b,number c,poly l,poly n){
+ ideal q=std(ideal(L,T^2+T+1));
+ if(q[1]==1){ERROR("JAC32_ZERO_FAMILY_NEGATIVE_CONTROL");}
+ map ev32=r,n,l,b,c;matrix jm=ev32(jacobian32);
+ int i;int j;int a;int z;int e;int u;int v;int w;int count3=0;int count4=0;
+ ideal m3;
+ for(a=1;a<=3;a++){for(z=a+1;z<=4;z++){for(e=z+1;e<=5;e++){
+  for(u=1;u<=2;u++){for(v=u+1;v<=3;v++){for(w=v+1;w<=4;w++){
+   intvec rows=a,z,e;intvec cols=u,v,w;matrix mm[3][3];
+   for(i=1;i<=3;i++){for(j=1;j<=3;j++){mm[i,j]=jm[rows[i],cols[j]];}}
+   count3++;m3[count3]=reduce(det(mm),q);
+  }}}
+ }}}
+ for(a=1;a<=5;a++){
+  matrix mm4[4][4];int row4=0;
+  for(i=1;i<=5;i++){if(i!=a){row4++;for(j=1;j<=4;j++){mm4[row4,j]=jm[i,j];}}}
+  if(reduce(det(mm4),q)!=0){ERROR("JAC32_RANK4");}count4++;
+ }
+ if(count3!=40 || count4!=5){ERROR("JAC32_MINOR_ENUMERATION");}
+ ideal generators=q,m3;
+ if(std(generators)[1]!=1){ERROR("JAC32_RANK_BELOW3_ON_SOME_BRANCH");}
+ matrix witness=lift(generators,ideal(1));
+ // Matrix multiplication preserves zero generator slots. size(ideal) counts
+ // only nonzero entries and must not truncate the coordinate reconstruction.
+ matrix reconstructed=matrix(generators)*witness;
+ if(reconstructed[1,1]!=1){ERROR("JAC32_UNIT_IDENTITY");}
+ print("JAC32_GENERATOR_DIMENSIONS nonzero="+string(size(generators))+" slots="+string(ncols(matrix(generators))));
+ print("JAC32_RESULT root="+string(root)+" twist="+string(twist)+" rank=3 minors3=40 minors4=5 zero_control=proper");
+ print("JAC32_EVALUATED_MATRIX");jm;
+ print("JAC32_GENERATORS");generators;
+ print("JAC32_UNIT_WITNESS");witness;
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "software-cli-fixture/v1",
+  "purpose": "Actual native CLI causal export of already retained prime F4 curve/twist cells; no generation or benchmark",
+  "input_root": "/home/ec2-user/ml-dataset-work-20261028/startup-main-cli-fixture-run",
+  "source_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "shards": [62, 63],
+  "n": 7,
+  "m": 3,
+  "commands": ["export curve", "export curve immutable retry", "export twist", "export twist immutable retry"],
+  "checks": ["CLI exit", "source receipt identity", "all output artifact hashes and sizes", "v5 model-input allowlist", "prefix feature identity", "restricted label joins", "at least one real retained branch example", "stable immutable retry", "source inventory unchanged"],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "native_execution_trace_complete_verified": false,
+  "total_instruction_count_verified": false
+}

@@ -5,23 +5,27 @@ on:
     branches: [main]
     paths:
       - 'src/cryptanalysis/aps_single_relation.rs'
+      - 'src/cryptanalysis/aps_single_relation/**'
       - 'src/cryptanalysis/f4_fp.rs'
       - 'src/cryptanalysis/glv_invariant_base.rs'
       - 'src/cryptanalysis/prime_fast.rs'
       - 'examples/aps_single_relation_check.rs'
       - 'research/aps_extensions_20261026/**'
       - 'research/aps_followup_20261028/**'
+      - 'research/aps_replay_20261029/**'
       - '.github/workflows/aps-single-relation.yml'
   push:
     branches: [main]
     paths:
       - 'src/cryptanalysis/aps_single_relation.rs'
+      - 'src/cryptanalysis/aps_single_relation/**'
       - 'src/cryptanalysis/f4_fp.rs'
       - 'src/cryptanalysis/glv_invariant_base.rs'
       - 'src/cryptanalysis/prime_fast.rs'
       - 'examples/aps_single_relation_check.rs'
       - 'research/aps_extensions_20261026/**'
       - 'research/aps_followup_20261028/**'
+      - 'research/aps_replay_20261029/**'
       - '.github/workflows/aps-single-relation.yml'
   workflow_dispatch:
 

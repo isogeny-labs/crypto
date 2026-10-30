@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "check": "Canonical repository tools/experiment_protocol.py schema and semantic validation with current jsonschema",
+  "command": [
+    "uv",
+    "run",
+    "--no-project",
+    "--with",
+    "jsonschema>=4",
+    "python",
+    "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+    "validate",
+    "research/pencil_large_prime_20261029/protocol_draft/protocol.json"
+  ],
+  "exit_code": 0,
+  "stdout": "OK: experiment.protocol/v1 research/pencil_large_prime_20261029/protocol_draft/protocol.json (0 finding(s))\n",
+  "stderr": "",
+  "checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+  "protocol_file_sha256": "260aa20ee9648cb0c050ccc4d3016350a6fe53244b7df23bf855b4dd168265a3",
+  "freeze_status": "draft"
+}

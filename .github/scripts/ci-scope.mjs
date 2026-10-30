@@ -114,11 +114,10 @@ function sourceText(cwd, file) {
 
 // Cargo paths are literal TOML strings. Read the manifest from HEAD when a
 // scope-only sparse checkout hasn't materialized it, without loading archives.
-export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
-  if (!tracked.includes('Cargo.toml')) return new Set();
-  const manifest = existsSync(path.join(cwd, 'Cargo.toml'))
-    ? readFileSync(path.join(cwd, 'Cargo.toml'), 'utf8')
-    : git(['show', 'HEAD:Cargo.toml'], cwd);
+export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd), manifestPath = 'Cargo.toml') {
+  if (!tracked.includes(manifestPath)) return new Set();
+  const manifest = sourceText(cwd, manifestPath);
+  const crateDir = path.posix.dirname(manifestPath);
   const targets = new Set();
   for (const block of manifest.split(/^\s*(?:\[\[(?:example|bin|bench|test)\]\]|\[lib\])\s*$/m).slice(1)) {
     const table = block.split(/^\s*\[/m)[0];
@@ -127,7 +126,8 @@ export function cargoSourceFiles(cwd, tracked = trackedFiles(cwd)) {
     const literal = line.match(/^("(?:[^"\\]|\\.)*"|'[^']*')\s*(?:#.*)?$/);
     if (!literal) throw new Error('unsupported Cargo target path syntax');
     const value = literal[1][0] === '"' ? JSON.parse(literal[1]) : literal[1].slice(1, -1);
-    const target = path.posix.normalize(value);
+    if (path.posix.isAbsolute(value)) throw new Error('Cargo target escapes the checkout');
+    const target = path.posix.normalize(path.posix.join(crateDir, value));
     if (target.startsWith('../') || path.posix.isAbsolute(target)) throw new Error('Cargo target escapes the checkout');
     targets.add(target);
   }
@@ -152,18 +152,11 @@ export function sourceFiles(cwd) {
   const tracked = trackedFiles(cwd);
   const trackedSet = new Set(tracked);
   const sources = new Set(tracked.filter(file => /\.rs$/.test(file)
-    && (maintained.test(file) || frozenExamples.test(file) || rootPathCrateRust.test(file)
-      || isogenyAlgosInputs.test(file) || file === 'build.rs')));
-  // Seed the recursive source walk with the Rust files of every transitively
-  // discovered path crate. Their include!/#[path] dependencies are then
-  // followed by the same fail-closed traversal as maintained sources.
-  const dependencies = [...pathDependencyDirs(cwd)];
-  for (const file of tracked) {
-    if (!/\.rs$/.test(file)) continue;
-    if (dependencies.some(dir => file === `${dir}/build.rs`
-      || file.startsWith(`${dir}/src/`))) sources.add(file);
-  }
+    && (maintained.test(file) || frozenExamples.test(file) || file === 'build.rs')));
   for (const source of cargoSourceFiles(cwd, tracked)) sources.add(source);
+  for (const source of pathDependencyFiles(cwd, tracked)) {
+    if (!source.endsWith('/Cargo.toml')) sources.add(source);
+  }
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
@@ -245,17 +238,26 @@ export function pathDependencyDirs(cwd) {
   return dirs;
 }
 
+function pathDependencyFiles(cwd, tracked = trackedFiles(cwd)) {
+  const files = new Set();
+  for (const dir of pathDependencyDirs(cwd)) {
+    const manifest = `${dir}/Cargo.toml`;
+    if (!tracked.includes(manifest)) throw new Error(`missing tracked path-dependency manifest: ${manifest}`);
+    files.add(manifest);
+    for (const file of tracked) {
+      if (!file.startsWith(`${dir}/`)) continue;
+      const relative = file.slice(dir.length + 1);
+      if (relative === 'build.rs' || /^(src|tests|examples|benches)\/.*\.rs$/.test(relative)) files.add(file);
+    }
+    for (const target of cargoSourceFiles(cwd, tracked, manifest)) files.add(target);
+  }
+  return files;
+}
+
 export function materializeInputs(cwd = process.cwd()) {
-  // Every path crate's manifest, build script and sources, followed through
-  // their manifests; never the crate's other files (archives, fixtures that
-  // no source embeds).
-  const crates = [...pathDependencyDirs(cwd)];
-  const crateFiles = trackedFiles(cwd).filter(file => crates.some(dir => file === `${dir}/Cargo.toml`
-    || file === `${dir}/build.rs` || (file.startsWith(`${dir}/src/`) && file.endsWith('.rs'))));
-  const sources = new Set([...sourceFiles(cwd), ...crateFiles.filter(file => file.endsWith('.rs'))]);
-  const manifests = trackedFiles(cwd).filter(file => file.endsWith('/Cargo.toml')
-    && (rootPathCrateRust.test(file) || isogenyAlgosInputs.test(file)));
-  materializeSources(cwd, new Set([...sources, ...manifests, ...crateFiles]));
+  const sources = sourceFiles(cwd);
+  const manifests = [...pathDependencyFiles(cwd)].filter(file => file.endsWith('/Cargo.toml'));
+  materializeSources(cwd, new Set([...sources, ...manifests]));
   const inputs = [...embeddedInputs(cwd, sources)];
   if (inputs.some(input => input.startsWith('../') || path.posix.isAbsolute(input))) {
     throw new Error('compile-time input escapes the checkout');

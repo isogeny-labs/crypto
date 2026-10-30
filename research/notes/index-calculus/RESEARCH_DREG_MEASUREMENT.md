@@ -1028,3 +1028,47 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   **Superseded:** structured sparse elimination landed ("Sparse
   elimination" above). The frontier is now wall time. A degree-6 matrix at
   28 unknowns takes more than 4.5 hours on a four-core container (Result 4).
+
+## Pair-invariant arms (2026-10-28)
+
+- `examples/dreg_invariant.rs` builds two variants of the m = 3 chain, each
+  checked against the plain system by exact polynomial identity (`--check`):
+  - Q adds the summand-swap invariant `p = x₁x₂` as unknowns;
+  - R adds the non-invariant `r = x₁e₁`.
+- Both are quadratic. Neither refutes at degree 3 on the committed (22, 6)
+  and (21, 7) draws, and their degree-4 matrices are 5.1–5.5 times the plain
+  system's (`research/dreg_pair_invariant_20261028/RESULTS.md`).
+- At (22, 6), making the system quadratic with auxiliary unknowns does not
+  lower the MutantXL closure degree.
+- At (21, 7), degree 4 of the quadratic arms is unmeasured: a sparse run
+  capped at 10⁹ entries. A lower degree there is not excluded.
+
+## Linear guesses (2026-10-29)
+
+- `examples/dreg_linear_guess.rs` specialises the chained system with fixed
+  variables and linear substitutions `x_j := x_i + c`. `--check` evaluates
+  every specialised equation against the original at 4,096 random points of
+  the guessed subspace.
+- `examples/dreg_chain_solutions.rs` lists every solution of an m = 3 draw
+  and checks it against the system. That is what makes a refutation of a
+  satisfiable branch checkable.
+- At (22, 8), a guess on `a₇ + b₇` refutes at degree 4 on more draws than a
+  guess on `a₇` (2 against 1 of 4;
+  `research/dreg_invariant_guess_20261029/RESULTS.md`).
+- Branches that hold a solution cannot refute, and at this size they ran
+  past 16 GB.
+
+## Invariant guesses on fresh draws (2026-10-29)
+
+- On 8 fresh (22, 8) draws, a guess on `a₇ + b₇` lets degree 4 refute on every
+  branch of 5 draws, and a guess on `a₇` on none (p = 0.031, pre-registered;
+  `research/dreg_invariant_guess_more_20261029/RESULTS.md`).
+- `examples/dreg_linear_guess_more_score.rs` re-checks the draw generator's
+  replay of the committed draws before scoring.
+
+## A second invariant guess on the pair (2026-10-29)
+
+- Replacing the raw guess `c₇` by `a₆ + b₆` at (22, 8) lets degree 4 refute on
+  every branch of 2 of 12 draws, against 7 of 12 for S3. That is no detected
+  difference at the registered two-sided threshold (p = 0.0625), and the new
+  arm is never better (`research/dreg_invariant_pair_guess_20261029/RESULTS.md`).
