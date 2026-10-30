@@ -3205,6 +3205,103 @@ fn dynamic_original(
     })
 }
 
+/// Reconcile outer labels with independently checked mathematics and separately
+/// reported native boundary facts. Does not select/admit a profile or run it.
+#[allow(dead_code)]
+fn verify_dynamic_claims(
+    outcome: &Value,
+    verified: &prime_f4_wide_dynamic_replay::Verified,
+) -> Result<(), String> {
+    if !outcome.is_object() {
+        return Err("dynamic outcome must be an object".into());
+    }
+    prime_f4_wide::verify_unproved_claims(outcome)?;
+    for key in [
+        "independent_derivation_verified",
+        "operation_trajectory_verified",
+        "exact_instruction_count_verified",
+        "full_execution_trace_verified",
+        "fall_degree_verified",
+        "linear_extraction_complete",
+        "extraction_complete",
+    ] {
+        if !outcome[key].is_null() && outcome[key] != false {
+            return Err(format!("dynamic replay does not certify outer {key}"));
+        }
+    }
+    for key in ["solver_completed", "pdp_witness_verified"] {
+        if !outcome[key].is_boolean() {
+            return Err(format!("dynamic outcome lacks boolean {key}"));
+        }
+    }
+    for (key, supported) in [
+        ("solver_completed", verified.solver_completed_verified),
+        (
+            "pdp_witness_verified",
+            verified.first_witness_verified && verified.witness_capture_committed,
+        ),
+        (
+            "certificate_durably_persisted",
+            verified.witness_capture_committed,
+        ),
+        (
+            "group_domain_complete",
+            verified.independent_group_domain_complete,
+        ),
+        ("exhaustive_no_decomposition", verified.negative_verified),
+    ] {
+        if outcome[key].is_null() {
+            continue;
+        }
+        let claimed = outcome[key]
+            .as_bool()
+            .ok_or_else(|| format!("nonboolean dynamic claim {key}"))?;
+        if claimed && !supported {
+            return Err(format!("unsupported dynamic outcome claim {key}"));
+        }
+    }
+    for (key, reported) in [
+        (
+            "native_backend_invoked",
+            verified.native_backend_invoked_reported,
+        ),
+        (
+            "native_statistics_complete",
+            verified.native_statistics_complete_reported,
+        ),
+        (
+            "algebra_completed",
+            verified.native_statistics_complete_reported,
+        ),
+    ] {
+        if !outcome[key].is_null() && outcome[key] != json!(reported) {
+            return Err(format!("dynamic native metadata mismatch: {key}"));
+        }
+    }
+    if outcome.get("live_persistence_errors").is_some() && outcome["solver_completed"] == true {
+        return Err("dynamic completion cannot survive outer persistence failure".into());
+    }
+    match outcome["status"].as_str() {
+        Some("partial") => {}
+        Some("verified")
+            if outcome["solver_completed"] == true && outcome["pdp_witness_verified"] == true => {}
+        Some("timeout" | "trace_budget_exhausted" | "worker_failed") => {
+            prime_f4_wide::verify_censored_outcome(outcome)?;
+            for key in [
+                "certificate_durably_persisted",
+                "group_domain_complete",
+                "exhaustive_no_decomposition",
+            ] {
+                if outcome[key] == true {
+                    return Err("censored outer dynamic outcome promotes a claim".into());
+                }
+            }
+        }
+        _ => return Err("dynamic outcome status contradicts verified scope".into()),
+    }
+    Ok(())
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,

@@ -7716,6 +7716,54 @@ mod tests {
             assert!(
                 file_verified.first_witness_verified && file_verified.witness_capture_committed
             );
+            let outer = serde_json::json!({
+                "status": if file_verified.solver_completed_verified { "verified" } else { "partial" },
+                "solver_completed": file_verified.solver_completed_verified,
+                "pdp_witness_verified": true,
+                "certificate_durably_persisted": true,
+                "group_domain_complete": file_verified.independent_group_domain_complete,
+                "exhaustive_no_decomposition": file_verified.negative_verified,
+                "native_backend_invoked": file_verified.native_backend_invoked_reported,
+                "native_statistics_complete": file_verified.native_statistics_complete_reported
+            });
+            super::super::verify_dynamic_claims(&outer, &file_verified).unwrap();
+            for key in [
+                "scalar_recovered_without_witness",
+                "native_basis_derivation_verified",
+                "execution_trace_complete_verified",
+                "total_operation_count_verified",
+                "independent_derivation_verified",
+                "operation_trajectory_verified",
+                "exact_instruction_count_verified",
+                "full_execution_trace_verified",
+                "fall_degree_verified",
+                "extraction_complete",
+                "exhaustive_no_decomposition",
+            ] {
+                let mut forged = outer.clone();
+                forged[key] = serde_json::json!(true);
+                assert!(
+                    super::super::verify_dynamic_claims(&forged, &file_verified).is_err(),
+                    "{key}"
+                );
+            }
+            let mut forged = outer.clone();
+            forged["pdp_witness_verified"] = serde_json::json!(1);
+            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
+            forged = outer.clone();
+            forged["native_backend_invoked"] =
+                serde_json::json!(!file_verified.native_backend_invoked_reported);
+            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
+            forged = outer.clone();
+            forged["solver_completed"] = serde_json::json!(true);
+            forged["live_persistence_errors"] = serde_json::json!(["retention failed"]);
+            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
+            super::super::verify_dynamic_claims(
+                &serde_json::json!({"status":"timeout",
+                "solver_completed":false,"pdp_witness_verified":false}),
+                &file_verified,
+            )
+            .unwrap();
             if !exceptional {
                 assert!(!file_verified.independent_group_domain_complete);
                 assert!(!file_verified.solver_completed_verified);

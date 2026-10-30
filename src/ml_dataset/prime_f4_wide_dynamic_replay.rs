@@ -465,6 +465,8 @@ pub(super) struct Verified {
     pub witness_capture_committed: bool,
     pub independent_group_domain_complete: bool,
     pub solver_completed_verified: bool,
+    pub native_backend_invoked_reported: bool,
+    pub native_statistics_complete_reported: bool,
     pub negative_verified: bool,
     pub independent_derivation_verified: bool,
     pub operation_trajectory_verified: bool,
@@ -823,6 +825,8 @@ fn input(j: &J<'_>, e: &Expected<'_>, original: &[Poly], b: &mut Budget) -> R<()
     Ok(())
 }
 struct Native {
+    invoked: bool,
+    statistics_complete: bool,
     basis: Vec<Poly>,
     retained: bool,
     unit: bool,
@@ -987,7 +991,7 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
         }
     }
     let retained = x.get("basis_retained")?.yes()?;
-    x.get("native_backend_invoked")?.yes()?;
+    let invoked = x.get("native_backend_invoked")?.yes()?;
     let statistics_complete = x.get("native_statistics_complete")?.yes()?;
     for key in [
         "matrix_rows_reduced",
@@ -999,7 +1003,7 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
     ] {
         x.get(key)?.n()?;
     }
-    if statistics_complete && !["complete", "unit_derived"].contains(&stop) {
+    if statistics_complete && (!invoked || !["complete", "unit_derived"].contains(&stop)) {
         return Err(Error::Claim);
     }
     if !x.get("basis_retention_stop")?.is_null()
@@ -1030,6 +1034,8 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
         return Err(Error::Shape);
     }
     Ok(Native {
+        invoked,
+        statistics_complete,
         basis,
         retained,
         unit: stop == "unit_derived",
@@ -2905,6 +2911,8 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
         witness_capture_committed: durable,
         independent_group_domain_complete: complete,
         solver_completed_verified: solver_completed,
+        native_backend_invoked_reported: n.invoked,
+        native_statistics_complete_reported: n.statistics_complete,
         negative_verified,
         independent_derivation_verified: false,
         operation_trajectory_verified: false,
@@ -2947,6 +2955,8 @@ mod tests {
     }
     fn small_native() -> Native {
         Native {
+            invoked: false,
+            statistics_complete: false,
             basis: Vec::new(),
             retained: true,
             unit: false,
@@ -2970,6 +2980,19 @@ mod tests {
  "schema":"ml-dataset.prime-f4-chain-input/v1","strategy":"prime-affine-s3-chain-f4-visitor/v1","m":e.m,"n_vars":v,"modulus":e.p.to_string(),"curve":{"a":e.a.to_string(),"b":e.b.to_string()},"target":{"x":e.target.x.to_string(),"y":e.target.y.to_string()},"target_x":e.target.x.to_string(),"ring":"Fp[x0,...,x(m-1),u0,...,u(m-3)]",
  "variables":(0..v).map(|i|if i<e.m{format!("x{i}")}else{format!("u{}",i-e.m)}).collect::<Vec<_>>(),
  "variable_roles":(0..v).map(|i|json!({"index":i,"name":if i<e.m{format!("x{i}")}else{format!("u{}",i-e.m)},"role":if i<e.m{"factor_base_leaf"}else{"unrestricted_affine_auxiliary"},"domain":if i<e.m{"factor_base_x"}else{"all_Fp"}})).collect::<Vec<_>>(),"monomial_order":"degrevlex","domains":(0..v).map(|i|if i<e.m{json!(e.codes)}else{Value::Null}).collect::<Vec<_>>(),"factor_base_x":e.codes.iter().map(|x|x.to_string()).collect::<Vec<_>>(),"signed_factor_base":e.domain.iter().map(|q|json!({"x":q.x.to_string(),"y":q.y.to_string()})).collect::<Vec<_>>(),"polynomials":polys.iter().map(|p|p.iter().map(|t|json!({"exponents":t.e[..v],"coefficient":t.c.to_string()})).collect::<Vec<_>>()).collect::<Vec<_>>(),"chain_equation_count":e.m-1,"membership_equation_count":e.m,"membership_variables":(0..e.m).collect::<Vec<_>>(),"native_normalization_applied":false,"coefficient_arithmetic":"u128 modular intermediates; merged nonzero terms, leading-first, no monic rescaling","native_modulus_limit_exclusive":"4294967296","affine_chain_exceptional_infinity_branches_covered":false,"negative_scope":"encoding-relative only; no exhaustive PDP nonexistence claim"})
+    }
+    #[test]
+    fn complete_native_metadata_requires_reported_invocation() {
+        let e = expected();
+        let mut value = native_fixture();
+        value["metadata"]["stop"] = json!("complete");
+        value["metadata"]["native_statistics_complete"] = json!(true);
+        let raw = bytes(&value);
+        assert!(native(&parsed(&raw, &mut budget()), &e, &mut budget()).is_err());
+        value["metadata"]["native_backend_invoked"] = json!(true);
+        let raw = bytes(&value);
+        let result = native(&parsed(&raw, &mut budget()), &e, &mut budget()).unwrap();
+        assert!(result.invoked && result.statistics_complete);
     }
     fn native_fixture() -> Value {
         json!({"metadata":{"schema":"crypto.ml-dataset.wide-prime-dynamic-native/v1","m":4,"variables":6,"stop":"work_limit","supplied":{"work":10000,"bytes":10000},"consumed":{"work":0,"bytes":0},"limits":{"work":10000,"bytes":10000,"rows":8192,"columns":8192,"basis":256,"pairs":32768,"steps":64,"events":4096,"max_pair_degree":12},"acknowledged_events":0,"native_backend_invoked":false,"native_statistics_complete":false,"matrix_rows_reduced":0,"pivot_updates":0,"pairs_pending":0,"pairs_selected_unfinished":0,"maximum_rows_admitted":0,"maximum_columns_admitted":0,"maximum_pending_pairs":0,"completed_steps":0,"maximum_input_degree":4,"maximum_processed_row_degree":0,"basis_retained":true,"basis_retention_stop":null,"native_basis_derivation_verified":false,"independent_derivation_verified":false,"linear_extraction_complete":false,"group_domain_complete":false,"pdp_witness_verified":false,"exhaustive_no_decomposition":false,"solver_completed":false,"exact_instruction_count_verified":false,"full_execution_trace_verified":false,"fall_degree_verified":false},"basis":[]})
