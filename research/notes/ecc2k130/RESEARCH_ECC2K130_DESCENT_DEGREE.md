@@ -91,10 +91,13 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - **Rows.** The m = 3 degree-4 row is withdrawn. The m = 4 degree-4 row
      (`2^68.43`) keeps measured support to ℓ = 4 only. Held at 5, m = 4
      prices `2^71.13`, `2^+10.32` over rho.
+   - *(2026-10-30)* That is the w = 1 floor, a lower bound. At the fitted w
+     it is `+61.45` bits over rho in rho-step units (§7, correction).
 8. **N does not set the closure degree; ℓ = 7 or m·ℓ ≥ 21 does (§8).**
    - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
      degree-4 row (`2^68.43`) is contradicted.
    - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+   - *(2026-10-30)* That price is at w = 1, a floor; see the §7 correction.
 
 ## 1. What is measured
 
@@ -436,6 +439,43 @@ ran to completion.
 - **No row beats rho.** The free-oracle floor (§2) still binds, and the
   units are unconverted.
 
+### Correction 2026-10-30: the `+10.32` row is a floor; the row at a fitted w
+
+The m = 4, degree-5, w = 1 row above (`2^71.13`, `2^+10.32`, column-touch units) is a **lower bound**:
+§2 calls w = 1 "one touch per column, which no elimination beats". It is not the optimistic case that
+point 7 and §8 call it. `research/m4_matrix_profile_20261030/README.md` fits w on the recorded closures (1561 `scan` rows; OLS with intercept per
+degree block; 95% intervals from a bootstrap that resamples whole cells) and reprices the row with the
+model of `research/m4_reprice_20261024/` (ℓ = 34, except the w = 1 floor in rho-step units, which is at
+ℓ = 32; conversion `-8.44` bits from word operations to the n = 83 rho step; K not stacked on `cols^w`):
+
+| oracle price | w (95% CI) | intercept a | column-touch units, vs rho | rho-step units, vs rho (95%) |
+|---|--:|--:|--:|--:|
+| w = 1 floor (the row above) | 1 | 0 | +10.32 | +6.95 |
+| w = 2 (the row above) | 2 | 0 | +45.71 | +37.27 |
+| degree-4 fit, proxy at D = 5 | 2.54 (2.42 to 2.60) | -4.5 | +60.65 | +52.21 (49.5 to 53.7) |
+| **degree-5 fit** | **2.83 (2.59 to 2.92)** | -5.9 | +69.89 | **+61.45 (55.8 to 64.0)** |
+
+- The fitted degree-3 block is `2.00` (1.83 to 2.07). w rises with size and degree; the local slope at
+  the top of the degree-4 and degree-5 ranges is 2.7 to 3.2. The row crosses `+30` in rho-step units
+  only at w about 1.80 (intercept 0), which no fitted block supports.
+- **The matrix as an object** (34 profile runs, m = 4, degrees 3 and 4): the saturated degree-4 closure
+  has rank 0.68 to 1.00 of the columns (high rank, not low), the closure is over 99.7% of the work (340
+  to 2500 times the plain Macaulay reduction), and subspace columns fall from 22% at degree 2 to 1.6% to
+  4.3% at degree 4.
+- **A structured elimination does not reach the floor.** Block Wiedemann on the plain-XL matrix prices
+  the row at about `+43` in rho-step units (`+42.8` to `+43.5`; `+51.2` to `+51.9` with no conversion),
+  because plain XL refutes at least one degree after the closure (0 of 136 unsatisfiable draws at
+  degree 4). At the measured sizes it equals the dense reduction (ratio 0.8 to 1.0).
+- **Caveats.** The intervals cover the bootstrap of `(a, w)` only: they exclude the extrapolation from
+  about 2^16 to about 2^36 columns (20 bits of log-columns, the dominant uncertainty) and the conversion
+  range (about +/-1.5 bits). w is the exponent of this dense Four-Russians kernel, not a bound on every
+  elimination. Degree 5 held to N = 398 is still an assumption, and none of these is a measured row at
+  n = 131.
+- **Consequence.** Under the 2026-10-24 review's F1 rule (above about `+30` in rho-step units), the
+  (4,6) cell is downgraded to a degree curiosity and memory is not rented for it alone.
+
+The rows and text above are left unchanged.
+
 ## 8. What sets the closure degree (2026-10-16)
 
 `research/dreg_closure_driver_20261016/` was pre-registered, with 16 draws.
@@ -460,6 +500,9 @@ ran to completion.
 |--:|--:|--:|--:|--:|
 | 4 | 1 | 34 | `2^71.13` | `2^+10.32` |
 | 3 | 1 | 41 | `2^85.18` | `2^+24.37` |
+
+*(2026-10-30)* Both rows are priced at w = 1, a floor. At the fitted w the m = 4 row is `+61.45`
+bits over rho in rho-step units (bootstrap 55.8 to 64.0); see the §7 correction.
 
 - **Degree 5 is unmeasured past ℓ = 7.** Whether it holds there decides
   even these rows, and testing that needs a sparse closure.

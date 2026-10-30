@@ -77,6 +77,7 @@ D=2 `+8.83 / +5.44` at w=2.
   2.19), so w at 2^36 columns is more likely above 2.33 than below it, and each unit of w adds about 36 bits. Sparse or structured elimination could also go the other way, below 2; none is measured.
 - The degree cell (does the closure stay at 5 up to N near 394) is still unmeasured and still the
   larger lever: D = 4 to 7 spans `+25` to `+61` bits in B at w = 2.
+- *Update 2026-10-30.* The w = 2.25 "optimistic case" above is superseded: `research/m4_matrix_profile_20261030/README.md` fits w with an intercept (degree 5: 2.83, 95% CI 2.59 to 2.92; degree 4: 2.54, 2.42 to 2.60) and prices this row at `+61.45` in B (bootstrap 55.8 to 64.0; `+69.89` in A), degree-4 proxy `+52.21` (49.5 to 53.7). The ratios 2.18 to 2.33 understated the slope because the intercept is negative. A structured / block-Wiedemann route gives about `+43` in B.
 
 ## What this does not establish
 

@@ -60,6 +60,7 @@ saturated.
   measured at m = 4, ℓ ≥ 6.
   - The degree-5 rows become the optimistic case: m = 4 at `2^71.13`
     (`2^+10.32` over rho), and m = 3 at `2^85.18`.
+  - Correction 2026-10-30: `+10.32` is the w = 1 floor (a lower bound), not an optimistic estimate. At the fitted w (degree 5: 2.83, 95% CI 2.59 to 2.92) the m = 4 degree-5 row is **+61.45 bits over rho in rho-step units** (bootstrap 55.8 to 64.0; degree-4 proxy +52.21), and a structured / block-Wiedemann elimination prices it at about +43. Source: `research/m4_matrix_profile_20261030/README.md` §2, §3a, §5; `research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md` §7 correction.
   - Degree 5 itself is unmeasured above N = 25. No row beats rho, and the
     free-oracle floor still binds.
 - **Against the success criterion.** This narrows which extrapolation the
