@@ -217,7 +217,7 @@ fn mask_check(mask: &[u64], n: u32) -> Check<()> {
         mask.len() == (n as usize).div_ceil(64),
         "invalid XOR mask width",
     )?;
-    if n % 64 != 0 {
+    if !n.is_multiple_of(64) {
         ensure(
             mask.last().copied().unwrap_or(0) >> (n % 64) == 0,
             "XOR padding bit set",

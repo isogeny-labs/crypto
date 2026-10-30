@@ -1,3 +1,6 @@
+#[path = "case_binding.rs"]
+pub mod case_binding;
+
 #[path = "plan_v2.rs"]
 pub mod plan_v2;
 
