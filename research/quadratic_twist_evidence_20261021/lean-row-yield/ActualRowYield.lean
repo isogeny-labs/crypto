@@ -143,6 +143,44 @@ theorem qualified_span_inclusion {b : ℕ} (V : Finset (Coeff b))
   simp only [admitted,Finset.mem_filter] at hv ⊢
   exact ⟨hv.1,hcompress v hv.1 hv.2⟩
 
+/-- One actual relation-collection step under a supplied seven-torsion query
+rule. Different degree-admitted oracles are deliberately not identified here. -/
+noncomputable def mainStep {b : ℕ} (V : Finset (Coeff b))
+    (B : Fin b → E.Point) (query : Submodule (ZMod 7) (Vec7 b) → E.Point)
+    (L : Submodule (ZMod 7) (Vec7 b)) : Submodule (ZMod 7) (Vec7 b) :=
+  L ⊔ rowSpan (mainRows V B (query L))
+noncomputable def twistStep {b : ℕ} (V : Finset (Coeff b))
+    (B : Fin b → E.Point) (query : Submodule (ZMod 7) (Vec7 b) → E.Point)
+    (L : Submodule (ZMod 7) (Vec7 b)) : Submodule (ZMod 7) (Vec7 b) :=
+  L ⊔ rowSpan (twistRows V B (query L))
+
+theorem actual_adaptive_steps_equal {b : ℕ} (V : Finset (Coeff b))
+    (B : Fin b → E.Point) (query : Submodule (ZMod 7) (Vec7 b) → E.Point)
+    (hB : ∀ i, (7:ℕ) • B i=0) (hquery : ∀ L, (7:ℕ) • query L=0) :
+    twistStep V B query=mainStep V B query := by
+  funext L
+  unfold twistStep mainStep
+  rw [actual_coefficient_spans_equal V B (query L) hB (hquery L)]
+
+theorem actual_adaptive_states_equal {b : ℕ} (V : Finset (Coeff b))
+    (B : Fin b → E.Point) (query : Submodule (ZMod 7) (Vec7 b) → E.Point)
+    (hB : ∀ i, (7:ℕ) • B i=0) (hquery : ∀ L, (7:ℕ) • query L=0)
+    (L : Submodule (ZMod 7) (Vec7 b)) (n : ℕ) :
+    (twistStep V B query)^[n] L=(mainStep V B query)^[n] L := by
+  rw [actual_adaptive_steps_equal V B query hB hquery]
+
+theorem actual_adaptive_rank_progress_equal {b : ℕ} (V : Finset (Coeff b))
+    (B : Fin b → E.Point) (query : Submodule (ZMod 7) (Vec7 b) → E.Point)
+    (hB : ∀ i, (7:ℕ) • B i=0) (hquery : ∀ L, (7:ℕ) • query L=0)
+    (L : Submodule (ZMod 7) (Vec7 b)) (n : ℕ) :
+    Module.finrank (ZMod 7) ↥((twistStep V B query)^[n] L)=
+      Module.finrank (ZMod 7) ↥((mainStep V B query)^[n] L) := by
+  rw [actual_adaptive_states_equal V B query hB hquery L n]
+
+#print axioms actual_adaptive_steps_equal
+#print axioms actual_adaptive_states_equal
+#print axioms actual_adaptive_rank_progress_equal
+
 /-- Actual domain control: the forward map has nonzero rational 2-kernel. -/
 theorem source_kernel_nonzero : K ≠ (0:E.Point) := by decide +kernel
 

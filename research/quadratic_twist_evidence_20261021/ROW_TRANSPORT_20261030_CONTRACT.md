@@ -56,3 +56,10 @@ First build failed on zero-action simplification,forward-hom coercion and
 finrank submodule-to-type coercion. Exact source/log retained;no theorem or
 hypothesis weakened. Add actual sourceK=(10,0) nonzero/kernel/not7ann controls
 so the false full-group injectivity claim is explicitly rejected by Lean.
+
+## Checked stage and adaptive coupling extension
+Corrected stage2passes15named/19audited with0extra trusted. Preserve its exact
+source/receipt. Extend the same complete matched-row statement to equal
+collection-step functions and their finite iterates under any supplied
+state-dependent7torsion query rule. This is deterministic coupled-oracle state
+equality,not iid stopping-time/absorption/integrability or capped-solver semantics.
