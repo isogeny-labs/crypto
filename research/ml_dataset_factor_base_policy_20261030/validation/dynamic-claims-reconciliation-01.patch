@@ -1,0 +1,254 @@
+diff --git a/src/ml_dataset/prime_f4_wide_dynamic.rs b/src/ml_dataset/prime_f4_wide_dynamic.rs
+index ed7d58c7ce98..e9034e335631 100644
+--- a/src/ml_dataset/prime_f4_wide_dynamic.rs
++++ b/src/ml_dataset/prime_f4_wide_dynamic.rs
+@@ -7716,6 +7716,54 @@ mod tests {
+             assert!(
+                 file_verified.first_witness_verified && file_verified.witness_capture_committed
+             );
++            let outer = serde_json::json!({
++                "status": if file_verified.solver_completed_verified { "verified" } else { "partial" },
++                "solver_completed": file_verified.solver_completed_verified,
++                "pdp_witness_verified": true,
++                "certificate_durably_persisted": true,
++                "group_domain_complete": file_verified.independent_group_domain_complete,
++                "exhaustive_no_decomposition": file_verified.negative_verified,
++                "native_backend_invoked": file_verified.native_backend_invoked_reported,
++                "native_statistics_complete": file_verified.native_statistics_complete_reported
++            });
++            super::super::verify_dynamic_claims(&outer, &file_verified).unwrap();
++            for key in [
++                "scalar_recovered_without_witness",
++                "native_basis_derivation_verified",
++                "execution_trace_complete_verified",
++                "total_operation_count_verified",
++                "independent_derivation_verified",
++                "operation_trajectory_verified",
++                "exact_instruction_count_verified",
++                "full_execution_trace_verified",
++                "fall_degree_verified",
++                "extraction_complete",
++                "exhaustive_no_decomposition",
++            ] {
++                let mut forged = outer.clone();
++                forged[key] = serde_json::json!(true);
++                assert!(
++                    super::super::verify_dynamic_claims(&forged, &file_verified).is_err(),
++                    "{key}"
++                );
++            }
++            let mut forged = outer.clone();
++            forged["pdp_witness_verified"] = serde_json::json!(1);
++            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
++            forged = outer.clone();
++            forged["native_backend_invoked"] =
++                serde_json::json!(!file_verified.native_backend_invoked_reported);
++            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
++            forged = outer.clone();
++            forged["solver_completed"] = serde_json::json!(true);
++            forged["live_persistence_errors"] = serde_json::json!(["retention failed"]);
++            assert!(super::super::verify_dynamic_claims(&forged, &file_verified).is_err());
++            super::super::verify_dynamic_claims(
++                &serde_json::json!({"status":"timeout",
++                "solver_completed":false,"pdp_witness_verified":false}),
++                &file_verified,
++            )
++            .unwrap();
+             if !exceptional {
+                 assert!(!file_verified.independent_group_domain_complete);
+                 assert!(!file_verified.solver_completed_verified);
+diff --git a/src/ml_dataset/prime_f4_wide_dynamic_replay.rs b/src/ml_dataset/prime_f4_wide_dynamic_replay.rs
+index 09a2f02aca43..3369b329dfde 100644
+--- a/src/ml_dataset/prime_f4_wide_dynamic_replay.rs
++++ b/src/ml_dataset/prime_f4_wide_dynamic_replay.rs
+@@ -465,6 +465,8 @@ pub(super) struct Verified {
+     pub witness_capture_committed: bool,
+     pub independent_group_domain_complete: bool,
+     pub solver_completed_verified: bool,
++    pub native_backend_invoked_reported: bool,
++    pub native_statistics_complete_reported: bool,
+     pub negative_verified: bool,
+     pub independent_derivation_verified: bool,
+     pub operation_trajectory_verified: bool,
+@@ -823,6 +825,8 @@ fn input(j: &J<'_>, e: &Expected<'_>, original: &[Poly], b: &mut Budget) -> R<()
+     Ok(())
+ }
+ struct Native {
++    invoked: bool,
++    statistics_complete: bool,
+     basis: Vec<Poly>,
+     retained: bool,
+     unit: bool,
+@@ -987,7 +991,7 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
+         }
+     }
+     let retained = x.get("basis_retained")?.yes()?;
+-    x.get("native_backend_invoked")?.yes()?;
++    let invoked = x.get("native_backend_invoked")?.yes()?;
+     let statistics_complete = x.get("native_statistics_complete")?.yes()?;
+     for key in [
+         "matrix_rows_reduced",
+@@ -999,7 +1003,7 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
+     ] {
+         x.get(key)?.n()?;
+     }
+-    if statistics_complete && !["complete", "unit_derived"].contains(&stop) {
++    if statistics_complete && (!invoked || !["complete", "unit_derived"].contains(&stop)) {
+         return Err(Error::Claim);
+     }
+     if !x.get("basis_retention_stop")?.is_null()
+@@ -1030,6 +1034,8 @@ fn native(j: &J<'_>, e: &Expected<'_>, b: &mut Budget) -> R<Native> {
+         return Err(Error::Shape);
+     }
+     Ok(Native {
++        invoked,
++        statistics_complete,
+         basis,
+         retained,
+         unit: stop == "unit_derived",
+@@ -2905,6 +2911,8 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
+         witness_capture_committed: durable,
+         independent_group_domain_complete: complete,
+         solver_completed_verified: solver_completed,
++        native_backend_invoked_reported: n.invoked,
++        native_statistics_complete_reported: n.statistics_complete,
+         negative_verified,
+         independent_derivation_verified: false,
+         operation_trajectory_verified: false,
+@@ -2947,6 +2955,8 @@ mod tests {
+     }
+     fn small_native() -> Native {
+         Native {
++            invoked: false,
++            statistics_complete: false,
+             basis: Vec::new(),
+             retained: true,
+             unit: false,
+@@ -2971,6 +2981,19 @@ mod tests {
+  "variables":(0..v).map(|i|if i<e.m{format!("x{i}")}else{format!("u{}",i-e.m)}).collect::<Vec<_>>(),
+  "variable_roles":(0..v).map(|i|json!({"index":i,"name":if i<e.m{format!("x{i}")}else{format!("u{}",i-e.m)},"role":if i<e.m{"factor_base_leaf"}else{"unrestricted_affine_auxiliary"},"domain":if i<e.m{"factor_base_x"}else{"all_Fp"}})).collect::<Vec<_>>(),"monomial_order":"degrevlex","domains":(0..v).map(|i|if i<e.m{json!(e.codes)}else{Value::Null}).collect::<Vec<_>>(),"factor_base_x":e.codes.iter().map(|x|x.to_string()).collect::<Vec<_>>(),"signed_factor_base":e.domain.iter().map(|q|json!({"x":q.x.to_string(),"y":q.y.to_string()})).collect::<Vec<_>>(),"polynomials":polys.iter().map(|p|p.iter().map(|t|json!({"exponents":t.e[..v],"coefficient":t.c.to_string()})).collect::<Vec<_>>()).collect::<Vec<_>>(),"chain_equation_count":e.m-1,"membership_equation_count":e.m,"membership_variables":(0..e.m).collect::<Vec<_>>(),"native_normalization_applied":false,"coefficient_arithmetic":"u128 modular intermediates; merged nonzero terms, leading-first, no monic rescaling","native_modulus_limit_exclusive":"4294967296","affine_chain_exceptional_infinity_branches_covered":false,"negative_scope":"encoding-relative only; no exhaustive PDP nonexistence claim"})
+     }
++    #[test]
++    fn complete_native_metadata_requires_reported_invocation() {
++        let e = expected();
++        let mut value = native_fixture();
++        value["metadata"]["stop"] = json!("complete");
++        value["metadata"]["native_statistics_complete"] = json!(true);
++        let raw = bytes(&value);
++        assert!(native(&parsed(&raw, &mut budget()), &e, &mut budget()).is_err());
++        value["metadata"]["native_backend_invoked"] = json!(true);
++        let raw = bytes(&value);
++        let result = native(&parsed(&raw, &mut budget()), &e, &mut budget()).unwrap();
++        assert!(result.invoked && result.statistics_complete);
++    }
+     fn native_fixture() -> Value {
+         json!({"metadata":{"schema":"crypto.ml-dataset.wide-prime-dynamic-native/v1","m":4,"variables":6,"stop":"work_limit","supplied":{"work":10000,"bytes":10000},"consumed":{"work":0,"bytes":0},"limits":{"work":10000,"bytes":10000,"rows":8192,"columns":8192,"basis":256,"pairs":32768,"steps":64,"events":4096,"max_pair_degree":12},"acknowledged_events":0,"native_backend_invoked":false,"native_statistics_complete":false,"matrix_rows_reduced":0,"pivot_updates":0,"pairs_pending":0,"pairs_selected_unfinished":0,"maximum_rows_admitted":0,"maximum_columns_admitted":0,"maximum_pending_pairs":0,"completed_steps":0,"maximum_input_degree":4,"maximum_processed_row_degree":0,"basis_retained":true,"basis_retention_stop":null,"native_basis_derivation_verified":false,"independent_derivation_verified":false,"linear_extraction_complete":false,"group_domain_complete":false,"pdp_witness_verified":false,"exhaustive_no_decomposition":false,"solver_completed":false,"exact_instruction_count_verified":false,"full_execution_trace_verified":false,"fall_degree_verified":false},"basis":[]})
+     }
+diff --git a/src/ml_dataset/solvers.rs b/src/ml_dataset/solvers.rs
+index 349bb0969095..3c4c0a3b5cb2 100644
+--- a/src/ml_dataset/solvers.rs
++++ b/src/ml_dataset/solvers.rs
+@@ -3205,6 +3205,103 @@ fn dynamic_original(
+     })
+ }
+ 
++/// Reconcile outer labels with independently checked mathematics and separately
++/// reported native boundary facts. Does not select/admit a profile or run it.
++#[allow(dead_code)]
++fn verify_dynamic_claims(
++    outcome: &Value,
++    verified: &prime_f4_wide_dynamic_replay::Verified,
++) -> Result<(), String> {
++    if !outcome.is_object() {
++        return Err("dynamic outcome must be an object".into());
++    }
++    prime_f4_wide::verify_unproved_claims(outcome)?;
++    for key in [
++        "independent_derivation_verified",
++        "operation_trajectory_verified",
++        "exact_instruction_count_verified",
++        "full_execution_trace_verified",
++        "fall_degree_verified",
++        "linear_extraction_complete",
++        "extraction_complete",
++    ] {
++        if !outcome[key].is_null() && outcome[key] != false {
++            return Err(format!("dynamic replay does not certify outer {key}"));
++        }
++    }
++    for key in ["solver_completed", "pdp_witness_verified"] {
++        if !outcome[key].is_boolean() {
++            return Err(format!("dynamic outcome lacks boolean {key}"));
++        }
++    }
++    for (key, supported) in [
++        ("solver_completed", verified.solver_completed_verified),
++        (
++            "pdp_witness_verified",
++            verified.first_witness_verified && verified.witness_capture_committed,
++        ),
++        (
++            "certificate_durably_persisted",
++            verified.witness_capture_committed,
++        ),
++        (
++            "group_domain_complete",
++            verified.independent_group_domain_complete,
++        ),
++        ("exhaustive_no_decomposition", verified.negative_verified),
++    ] {
++        if outcome[key].is_null() {
++            continue;
++        }
++        let claimed = outcome[key]
++            .as_bool()
++            .ok_or_else(|| format!("nonboolean dynamic claim {key}"))?;
++        if claimed && !supported {
++            return Err(format!("unsupported dynamic outcome claim {key}"));
++        }
++    }
++    for (key, reported) in [
++        (
++            "native_backend_invoked",
++            verified.native_backend_invoked_reported,
++        ),
++        (
++            "native_statistics_complete",
++            verified.native_statistics_complete_reported,
++        ),
++        (
++            "algebra_completed",
++            verified.native_statistics_complete_reported,
++        ),
++    ] {
++        if !outcome[key].is_null() && outcome[key] != json!(reported) {
++            return Err(format!("dynamic native metadata mismatch: {key}"));
++        }
++    }
++    if outcome.get("live_persistence_errors").is_some() && outcome["solver_completed"] == true {
++        return Err("dynamic completion cannot survive outer persistence failure".into());
++    }
++    match outcome["status"].as_str() {
++        Some("partial") => {}
++        Some("verified")
++            if outcome["solver_completed"] == true && outcome["pdp_witness_verified"] == true => {}
++        Some("timeout" | "trace_budget_exhausted" | "worker_failed") => {
++            prime_f4_wide::verify_censored_outcome(outcome)?;
++            for key in [
++                "certificate_durably_persisted",
++                "group_domain_complete",
++                "exhaustive_no_decomposition",
++            ] {
++                if outcome[key] == true {
++                    return Err("censored outer dynamic outcome promotes a claim".into());
++                }
++            }
++        }
++        _ => return Err("dynamic outcome status contradicts verified scope".into()),
++    }
++    Ok(())
++}
++
+ pub(super) fn verify_prime_f4_wide(
+     dir: &Path,
+     config: &CaseConfig,
