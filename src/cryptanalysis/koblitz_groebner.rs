@@ -2330,7 +2330,7 @@ pub fn matrix_f4_f2_counted_with(
 /// `KIC_F4_SOLVER_LINEAR_TAIL=0|1` overrides that selection and
 /// `KIC_F4_FLAT_MATRIX=0|1` controls the contiguous solver matrix,
 /// `KIC_F4_SOLVER_FULL_READBACK=1` restores the complete legacy readback.
-fn matrix_f4_f2_solver_consequences(
+pub(crate) fn matrix_f4_f2_solver_consequences(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
@@ -5296,6 +5296,14 @@ pub(crate) fn echelon_f2_counted(
 #[path = "f4_rref_tests.rs"]
 mod rref_tests;
 
+#[path = "f4_trace.rs"]
+mod f4_trace;
+pub use f4_trace::{
+    matrix_f4_f2_record, matrix_f4_f2_record_counted, matrix_f4_f2_replay,
+    matrix_f4_f2_replay_checked, matrix_f4_f2_replay_counted, F4Trace, F4TraceStep, ReplayReject,
+    DEFAULT_AUDIT,
+};
+
 // ── Macaulay profile / first fall degree ───────────────────────────
 
 /// Rank measurement of one Macaulay matrix.
@@ -5906,6 +5914,35 @@ pub enum SolverEngine {
         /// Highest Macaulay degree to build before splitting.
         max_degree: u32,
     },
+    /// MutantXL closure ([`ReducedBasis::from_system_closed_full`]) at every
+    /// node: the degree-`D` Macaulay row space saturated under multiplying
+    /// every element of lower degree (a "degree fall") by every variable,
+    /// for `D` from the node system's degree (at least 2) up to
+    /// `max_degree`.  A node is refuted when `1` enters the saturated row
+    /// space, and a forced variable is read off it as for the other engines.
+    ///
+    /// The saturated space contains the plain Macaulay space of the same
+    /// degree and lies in the ideal, so the engine is sound (it never
+    /// refutes a satisfiable node) and its verdicts and roots are those of
+    /// `MatrixF4`; only the tree differs, because the closure refutes and
+    /// forces earlier (degree 3-4 where plain XL needs 5-7 on unsatisfiable
+    /// descended Semaev systems:
+    /// `research/dreg_closure_mutantxl_20261016/RESULTS.md`).
+    ///
+    /// Structure: the closure runs at **every** node, from scratch, with no
+    /// basis inherited from the parent (the per-node closure is a fresh
+    /// `from_system_closed_full`, so the cost model is `MatrixF4`'s, not
+    /// `InheritedF4`'s), and the ladder is always ascending (cheapest
+    /// degree first, stopping at the first decisive one), whatever the
+    /// variable count.  Running it at the root only and splitting the
+    /// remainder with another engine would need the closure's rows to be
+    /// handed to a second engine; per node keeps one code path and lets the
+    /// closure prune deep nodes too.  [`SplitRule::Auto`] resolves to
+    /// `LowestFree`, the rule the from-scratch engines use.
+    Closure {
+        /// Highest Macaulay degree whose closure is built before splitting.
+        max_degree: u32,
+    },
     /// Full Buchberger Gröbner basis
     /// ([`crate::cryptanalysis::pq_groebner_f2::groebner_basis_f2`]) at
     /// every node.  The reference engine: same answers, far slower on
@@ -5974,11 +6011,17 @@ impl SolverEngine {
         let max_degree = match self {
             SolverEngine::MatrixF4 { max_degree }
             | SolverEngine::MatrixF5 { max_degree }
-            | SolverEngine::InheritedF4 { max_degree } => max_degree,
+            | SolverEngine::InheritedF4 { max_degree }
+            | SolverEngine::Closure { max_degree } => max_degree,
             SolverEngine::Buchberger => return None,
         };
         let base = system_degree.max(2);
         let top = max_degree.max(base);
+        if matches!(self, SolverEngine::Closure { .. }) {
+            // Ascending always: a closure at degree `d` is far cheaper than
+            // at `d + 1`, and the first decisive degree ends the ladder.
+            return Some(base..=top);
+        }
         // A higher-degree Macaulay matrix includes the lower-degree rows,
         // so this changes work scheduling rather than the ideal or roots.
         static HIGHEST_ONLY: std::sync::OnceLock<Option<bool>> = std::sync::OnceLock::new();
@@ -6372,6 +6415,11 @@ fn dump_node_system(system: &[F2BoolPoly], n_vars: usize, engine: SolverEngine) 
     let _ = writeln!(file, "{line}");
 }
 
+/// Closure rounds per node of [`SolverEngine::Closure`]: effectively
+/// unbounded, so each node's closure runs to saturation (the scan in
+/// `koblitz_bench::closure_refutation_scan` uses the same cap).
+const CLOSURE_ROUNDS: u32 = 1_000_000;
+
 fn reduce_system_uncached(
     system: &[F2BoolPoly],
     n_vars: usize,
@@ -6389,6 +6437,46 @@ fn reduce_system_uncached(
     match engine {
         SolverEngine::Buchberger => Some(groebner_basis_f2(system.to_vec(), n_vars)),
         SolverEngine::InheritedF4 { .. } => unreachable!("mapped to MatrixF4 above"),
+        SolverEngine::Closure { .. } => {
+            let ladder = engine
+                .degree_ladder(system_degree(system), n_vars)
+                .expect("closure has a ladder");
+            let mut best: Option<Vec<F2BoolPoly>> = None;
+            for d in ladder {
+                let started = std::time::Instant::now();
+                let Some((mut basis, mut cost)) =
+                    ReducedBasis::from_system_closed_full(system, n_vars, d, CLOSURE_ROUNDS)
+                else {
+                    // Matrix over the size caps: use what we have.
+                    stats.oversize += 1;
+                    f4_profile_add(|p| p.oversize += 1);
+                    break;
+                };
+                stats.max_degree_built = stats.max_degree_built.max(d);
+                let rows = if basis.is_refuted() {
+                    vec![F2BoolPoly::from_monos(vec![F2BoolMono::one()], n_vars)]
+                } else {
+                    basis.decisive_rows(&mut cost)
+                };
+                let word_ops = cost.word_ops();
+                charge_word_ops(word_ops);
+                let (rank, columns) = (basis.rank() as u64, basis.columns() as u64);
+                f4_profile_add(|p| {
+                    p.calls += 1;
+                    p.build_ns += started.elapsed().as_nanos();
+                    p.rows += rank;
+                    p.cols += columns;
+                    p.word_ops += word_ops;
+                });
+                let decisive = rows.iter().any(is_constant_one)
+                    || rows.iter().any(|p| forced_assignment(p).is_some());
+                best = Some(rows);
+                if decisive {
+                    break;
+                }
+            }
+            best
+        }
         SolverEngine::MatrixF4 { .. } | SolverEngine::MatrixF5 { .. } => {
             let criterion = RowCriterion::from_env_or(match engine {
                 SolverEngine::MatrixF5 { .. } => RowCriterion::F5,
@@ -9178,8 +9266,144 @@ mod tests {
                     assert_eq!(stats.max_degree_built, want_stats.max_degree_built);
                     assert_eq!(stats.oversize, want_stats.oversize);
                 }
+                // The closure engine prunes harder, so its tree is not the
+                // same, but it finds the same roots, never with more
+                // splits than the plain Macaulay tree, and never refutes a
+                // node the reference keeps.
+                for max_degree in [3u32, 4] {
+                    let opts = SolveOptions {
+                        engine: SolverEngine::Closure { max_degree },
+                        ..reference
+                    };
+                    let (mut got, stats) = solve_boolean_system(&sys.equations, sys.n_vars, &opts);
+                    got.sort_unstable();
+                    assert_eq!(
+                        got, want,
+                        "Closure({max_degree}) m={m} x_R={raw}: roots differ"
+                    );
+                    assert!(!stats.exhausted && stats.oversize == 0, "{stats:?}");
+                    assert!(
+                        stats.splits <= want_stats.splits,
+                        "Closure({max_degree}) m={m} x_R={raw}: {} splits against {}",
+                        stats.splits,
+                        want_stats.splits
+                    );
+                }
             }
         }
+    }
+
+    /// The constructed positive control of
+    /// `research/dreg_closure_mutantxl_20261016/PREREGISTRATION.md`:
+    /// `f1 = x1x2x3 + x4x5x6`, `f2 = f1 + x7 + 1`,
+    /// `f3 = x7x8x9 + x8x9 + 1`.  The degree fall `f1 + f2 = x7 + 1` times
+    /// `x8x9` meets `f3` in `1`, so the closure refutes the root at degree
+    /// 3, where plain XL needs degree 4.  The engine therefore closes the
+    /// root with no split; the plain solving degree is 4.
+    #[test]
+    fn closure_engine_refutes_the_constructed_control_at_the_root() {
+        let n = 9;
+        let m = |vars: &[u32]| F2BoolMono::from_mask(vars.iter().fold(0, |a, &v| a | 1 << v));
+        let f1 = F2BoolPoly::from_monos(vec![m(&[0, 1, 2]), m(&[3, 4, 5])], n);
+        let f2 = F2BoolPoly::from_monos(
+            vec![m(&[0, 1, 2]), m(&[3, 4, 5]), m(&[6]), F2BoolMono::one()],
+            n,
+        );
+        let f3 = F2BoolPoly::from_monos(vec![m(&[6, 7, 8]), m(&[7, 8]), F2BoolMono::one()], n);
+        let system = vec![f1, f2, f3];
+        assert_eq!(solving_degree(&system, n, 6).0, Some(4));
+        let run = |engine| {
+            solve_boolean_system(
+                &system,
+                n,
+                &SolveOptions {
+                    engine,
+                    max_solutions: 1 << 10,
+                    node_budget: 100_000,
+                    split_rule: SplitRule::LowestFree,
+                },
+            )
+        };
+        let (roots, stats) = run(SolverEngine::Closure { max_degree: 3 });
+        assert!(roots.is_empty());
+        assert_eq!(
+            (stats.reductions, stats.splits, stats.infeasible_branches),
+            (1, 0, 1),
+            "{stats:?}"
+        );
+        assert_eq!(stats.max_degree_built, 3);
+        let (roots, plain) = run(SolverEngine::MatrixF4 { max_degree: 3 });
+        assert!(roots.is_empty());
+        // The F4 engine's own propagation also closes this control at the
+        // root, so the guaranteed contract is only "no more splits".
+        assert!(plain.splits >= stats.splits, "{plain:?}");
+        // The closure and XL agree on the verdict at every degree they
+        // share; XL's own refutation degree is 4.
+        let (roots, deep) = run(SolverEngine::MatrixF4 { max_degree: 4 });
+        assert!(roots.is_empty());
+        assert_eq!(deep.splits, 0, "{deep:?}");
+    }
+
+    /// Soundness: the closure never refutes a satisfiable node.  Satisfiable
+    /// fixtures with a planted root are solved by the closure engine, which
+    /// must return exactly the brute-force variety (a spurious refutation
+    /// would lose a root).
+    #[test]
+    fn closure_engine_never_refutes_a_satisfiable_system() {
+        let mut seed = 0x0c10_5ed5_0bad_cafeu64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut satisfiable = 0usize;
+        for trial in 0..80 {
+            let n_vars = 6 + (trial % 5);
+            let planted = next() & ((1u64 << n_vars) - 1);
+            let m = 4 + (trial % 4);
+            // Random generators of degree up to 3, each shifted by its
+            // value at the planted point so the system is satisfiable.
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|_| {
+                    let terms = 3 + (next() % 6) as usize;
+                    let mut monos: Vec<F2BoolMono> = (0..terms)
+                        .map(|_| {
+                            let d = (next() % 4) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    let p = F2BoolPoly::from_monos(monos.clone(), n_vars);
+                    if p.eval(planted) != 0 {
+                        monos.push(F2BoolMono::one());
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            let brute: Vec<u64> = (0..(1u64 << n_vars))
+                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .collect();
+            assert!(brute.contains(&planted), "trial {trial}: fixture unsound");
+            satisfiable += 1;
+            for max_degree in [3u32, 4] {
+                let opts = SolveOptions {
+                    engine: SolverEngine::Closure { max_degree },
+                    max_solutions: 1 << 12,
+                    node_budget: 100_000,
+                    split_rule: SplitRule::LowestFree,
+                };
+                let (mut got, stats) = solve_boolean_system(&system, n_vars, &opts);
+                got.sort_unstable();
+                assert!(!stats.exhausted, "trial {trial}");
+                assert_eq!(got, brute, "trial {trial} Closure({max_degree})");
+            }
+        }
+        assert_eq!(satisfiable, 80);
     }
 
     /// `Auto` resolves to the rule each engine runs best with, and an
@@ -9306,6 +9530,19 @@ mod tests {
                         masks_low64(&got),
                         brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
+                    );
+                }
+                // The closure engine: same variety, on a different tree.
+                for max_degree in [3u32, 4] {
+                    let opts = SolveOptions {
+                        engine: SolverEngine::Closure { max_degree },
+                        ..reference
+                    };
+                    let (mut got, _) = solve_boolean_system(&system, n_vars, &opts);
+                    got.sort_unstable();
+                    assert_eq!(
+                        got, brute,
+                        "trial {trial} {split_rule:?} Closure({max_degree}): roots differ"
                     );
                 }
             }
@@ -9581,6 +9818,7 @@ mod tests {
             for engine in [
                 SolverEngine::MatrixF4 { max_degree: 3 },
                 SolverEngine::InheritedF4 { max_degree: 3 },
+                SolverEngine::Closure { max_degree: 3 },
             ] {
                 for split_rule in [SplitRule::LowestFree, SplitRule::HighestFree] {
                     for (rebuild_on_drop, support_local) in
@@ -9917,6 +10155,14 @@ mod tests {
                 (
                     SplitRule::HighestFree,
                     SolverEngine::InheritedF4 { max_degree: 3 },
+                ),
+                (
+                    SplitRule::LowestFree,
+                    SolverEngine::Closure { max_degree: 3 },
+                ),
+                (
+                    SplitRule::HighestFree,
+                    SolverEngine::Closure { max_degree: 4 },
                 ),
             ] {
                 let opts = SolveOptions {
