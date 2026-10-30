@@ -4728,6 +4728,112 @@ mod tests {
                 manifest.outcome = json!({"status":"timeout","solver_completed":false});
             });
             verify_cell(&retained, true).unwrap();
+            for stop in ["missing_execution_context", "profile_admission"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("false-admission-{stop}")),
+                    |path, manifest| {
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            value["stop"] = json!(stop);
+                            value["native_statistics_complete"] = json!(false);
+                        });
+                        manifest.outcome["termination"] = json!(stop);
+                        manifest.outcome["native_statistics_complete"] = json!(false);
+                        manifest.outcome["algebra_completed"] = json!(false);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for (field, counter, limit_key) in [
+                ("work_reserved", "native_work_reserved", "work"),
+                (
+                    "bytes_reserved",
+                    "native_cumulative_bytes_reserved",
+                    "bytes",
+                ),
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("terminal-{field}")),
+                    |path, manifest| {
+                        let events =
+                            fs::read_to_string(path.join("prime-f4-wide-m3-events.jsonl")).unwrap();
+                        let terminal: Value =
+                            serde_json::from_str(events.lines().last().unwrap()).unwrap();
+                        assert_eq!(terminal["boundary"], "terminal");
+                        let mut new_count = 0;
+                        alter_json(&path.join("prime-f4-wide-m3-result.json"), |value| {
+                            let old = value[field].as_u64().unwrap();
+                            new_count = old + 1;
+                            assert!(new_count <= value["limits"][limit_key].as_u64().unwrap());
+                            value[field] = json!(new_count);
+                        });
+                        manifest.outcome["counters"][counter] = json!(new_count);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for kind in [
+                "points",
+                "negation_closed",
+                "repetitions_allowed",
+                "role",
+                "missing",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("solver-domain-{kind}")),
+                    |path, manifest| {
+                        if kind == "missing" {
+                            manifest
+                                .artifacts
+                                .retain(|a| a.path != "solver-domain.json");
+                        } else if kind == "role" {
+                            manifest
+                                .artifacts
+                                .iter_mut()
+                                .find(|a| a.path == "solver-domain.json")
+                                .unwrap()
+                                .role = "incorrect-role".into();
+                        } else {
+                            alter_json(&path.join("solver-domain.json"), |value| {
+                                if kind == "points" {
+                                    value["points"].as_array_mut().unwrap().swap(0, 1);
+                                } else {
+                                    value[kind] = json!(false);
+                                }
+                            });
+                        }
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
+            for key in [
+                "native_work_reserved",
+                "native_cumulative_bytes_reserved",
+                "acknowledged_native_boundaries",
+            ] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("counter-{key}")),
+                    |_, manifest| {
+                        let old = manifest.outcome["counters"][key].as_u64().unwrap();
+                        manifest.outcome["counters"][key] = json!(old + 1);
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+                let changed = altered_cell(
+                    &retained,
+                    &fixture.0.join(format!("retained-counter-{key}")),
+                    |path, _| {
+                        alter_json(&path.join("result.json"), |value| {
+                            let old = value["counters"][key].as_u64().unwrap();
+                            value["counters"][key] = json!(old + 1);
+                        });
+                    },
+                );
+                assert!(verify_cell(&changed, true).is_err());
+            }
             for key in [
                 "trace_complete",
                 "scalar_replay_verified",

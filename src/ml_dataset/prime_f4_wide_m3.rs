@@ -860,6 +860,27 @@ pub(super) fn verify(
         return Err("m3 canonical equations mismatch".into());
     }
     let result: ResultRecord = read(dir, RESULT, limits.as_ref())?;
+    let domain_descriptor = artifact(
+        artifacts,
+        "solver-domain.json",
+        "exact-signed-factor-base",
+        "json",
+        result.native_backend_invoked
+            || result.extraction_retained
+            || result.work_reserved != 0
+            || result.acknowledged_events != 0,
+    )?;
+    if domain_descriptor.is_some() {
+        let saved_domain: Value =
+            serde_json::from_slice(&read_bounded(dir, "solver-domain.json", RESERVE)?)
+                .map_err(|e| e.to_string())?;
+        let expected_domain = json!({"points":domain.iter().map(Element::json).collect::<Vec<_>>(),"negation_closed":true,"repetitions_allowed":true});
+        if saved_domain != expected_domain {
+            return Err("m3 signed solver domain differs from canonical domain".into());
+        }
+    } else if fs::symlink_metadata(dir.join("solver-domain.json")).is_ok() {
+        return Err("m3 solver domain lacks manifest binding".into());
+    }
     if result.schema != "crypto.ml-dataset.wide-prime-f4-m3-result/v1"
         || result.strategy != STRATEGY
         || result.launch != context
@@ -879,6 +900,14 @@ pub(super) fn verify(
             }
     {
         return Err("m3 admission refusal mismatch".into());
+    }
+    if limits.is_some()
+        && matches!(
+            result.stop.as_str(),
+            "missing_execution_context" | "profile_admission"
+        )
+    {
+        return Err("m3 admitted context cannot claim admission refusal".into());
     }
     let complete = matches!(result.stop.as_str(), "complete" | "unit_derived");
     if result.native_statistics_complete != complete || complete && !result.native_backend_invoked {
@@ -909,6 +938,8 @@ pub(super) fn verify(
             return Err("wide F4 counters exceed admission".into());
         }
     } else if result.native_backend_invoked
+        || result.native_statistics.is_some()
+        || result.basis_retained
         || result.work_reserved != 0
         || result.bytes_reserved != 0
         || result.acknowledged_events != 0
@@ -1009,6 +1040,13 @@ pub(super) fn verify(
         work = event.work_reserved;
         bytes = event.bytes_reserved;
     }
+    if events.last().is_some_and(|e| {
+        e.boundary == "terminal"
+            && (e.work_reserved != result.work_reserved
+                || e.bytes_reserved != result.bytes_reserved)
+    }) {
+        return Err("m3 acknowledged terminal totals differ from result".into());
+    }
     if complete && events.last().is_none_or(|e| e.boundary != "terminal") {
         return Err("complete wide F4 lacks terminal acknowledgement".into());
     }
@@ -1092,6 +1130,11 @@ pub(super) fn verify(
         outcome
     };
     verify_m3_claims(effective)?;
+    if effective["counters"]
+        != json!({"native_work_reserved":result.work_reserved,"native_cumulative_bytes_reserved":result.bytes_reserved,"acknowledged_native_boundaries":result.acknowledged_events})
+    {
+        return Err("m3 worker counters differ from retained native result".into());
+    }
     let persistence_failed = effective.get("live_persistence_errors").is_some();
     if result.extraction_retained {
         let extraction: Extraction = read(dir, EXTRACT, limits.as_ref())?;
@@ -1262,6 +1305,13 @@ fn verify_extraction(
                 return Err("m3 missing completed certificate".into());
             }
             if let Some(cursor) = first_match {
+                // The producer reserves all three calls before checking any
+                // certificate-replay deadline, even if zero calls finish.
+                if saved.stop == "witness_replay_deadline"
+                    && limits.group_adds.saturating_sub(2 * (cursor as u64 + 1)) < 3
+                {
+                    return Err("m3 partial certificate lacks three-add permit".into());
+                }
                 if cursor + 1 != saved.rows.len()
                     || !matches!(
                         saved.stop.as_str(),
@@ -1293,7 +1343,20 @@ fn verify_extraction(
                 && saved.first_verified_cursor.is_none()
                 && saved.witness_replay_adds < 3 => {}
         "deadline_between_adds" if saved.rows.last().is_some_and(|r| r.total.is_none()) => {}
-        "deadline" | "extraction_bytes" if !full => {}
+        "deadline" if !full => {}
+        "extraction_bytes" if !full => {
+            let cap = limits.encoded_bytes / 8;
+            let mut pre_next = saved.clone();
+            pre_next.stop = "complete".into();
+            pre_next.persistence_error = None;
+            pre_next.domain_complete = false;
+            if saved.rows.len() as u64 >= limits.domain_tests
+                || limits.group_adds.saturating_sub(saved.group_adds) < 2
+                || cap.saturating_sub(encoded(&pre_next, cap)?.len()) >= 4096
+            {
+                return Err("m3 extraction byte stop lacks pre-next-row shortage".into());
+            }
+        }
         "observer_failure" if saved.persistence_error.is_some() => {}
         _ => return Err("m3 extraction stop inconsistent".into()),
     }
@@ -1595,5 +1658,59 @@ mod tests {
             );
         }
         fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn m3_false_byte_stop_on_valid_deadline_prefix_is_rejected() {
+        let (cfg, case, context) = fixture_at(false, 61);
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let target = group.mul(&points[0], 4);
+        let input = prime_chain_input(3, &group, &points, &target).unwrap();
+        let limits = Limits::derive(&cfg, &context.launch).unwrap();
+        let mut checks = 0;
+        let baseline = extract_with_clock(&input, &group, &points, &target, &limits, &mut || {
+            checks += 1;
+            checks >= 3
+        })
+        .unwrap();
+        assert_eq!(baseline.stop, "deadline");
+        assert_eq!(baseline.rows.len(), 1);
+        verify_extraction(&input, &baseline, &group, &points, &target, &limits).unwrap();
+        let mut forged = baseline.clone();
+        forged.stop = "extraction_bytes".into();
+        assert!(verify_extraction(&input, &forged, &group, &points, &target, &limits).is_err());
+        let mut empty = baseline;
+        empty.rows.clear();
+        empty.group_adds = 0;
+        empty.original_equation_evaluations = 0;
+        empty.stop = "complete".into();
+        let mut tight = limits.clone();
+        tight.encoded_bytes = (encoded(&empty, limits.encoded_bytes).unwrap().len() + 4096) * 8;
+        let actual = extract(&input, &group, &points, &target, &tight, None).unwrap();
+        assert_eq!(actual.stop, "extraction_bytes");
+        assert_eq!(actual.rows.len(), 1);
+        verify_extraction(&input, &actual, &group, &points, &target, &tight).unwrap();
+    }
+    #[test]
+    fn m3_partial_certificate_deadline_requires_full_three_add_reservation() {
+        let (cfg, case, context) = fixture_at(false, 61);
+        let group = Group::read(&case).unwrap();
+        let points = domain(&group, &case).unwrap();
+        let target = group.mul(&points[0], 3);
+        let input = prime_chain_input(3, &group, &points, &target).unwrap();
+        let mut limits = Limits::derive(&cfg, &context.launch).unwrap();
+        limits.group_adds = 4;
+        let baseline = extract(&input, &group, &points, &target, &limits, None).unwrap();
+        assert_eq!(baseline.stop, "witness_replay_budget");
+        assert_eq!(baseline.group_adds, 2);
+        assert_eq!(baseline.rows[0].matches_target, Some(true));
+        verify_extraction(&input, &baseline, &group, &points, &target, &limits).unwrap();
+        for replay_adds in [0, 1, 2] {
+            let mut forged = baseline.clone();
+            forged.stop = "witness_replay_deadline".into();
+            forged.witness_replay_adds = replay_adds;
+            forged.group_adds = 2 + replay_adds;
+            assert!(verify_extraction(&input, &forged, &group, &points, &target, &limits).is_err());
+        }
     }
 }

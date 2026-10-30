@@ -133,3 +133,18 @@ shared input/events, omit dependencies, mutate retained outcomes, preserve a rea
 truncated raw-censored prefix, and reject promoted outer fields. Parent performs
 builds/tests, independent source review and CLI/publication gates before claiming
 this implementation is validated or producing a scientific corpus.
+
+## Independent source review correction A–F
+
+The parent executed immutable e3fbd87b36f focused validation:282 passed,0 failed,
+1 ignored (19 native,5 Fp64,232 dataset,26 checked); this is focused evidence,
+not a full-suite claim. All seven initially authored tests executed there.
+Independent review subsequently identified six replay-envelope gaps. This separate
+correction requires the full three-add permit for partial/deadline certificate
+replay, binds effective outcome counters exactly, reconstructs the actual
+pre-next-row byte shortage, binds exact solver-domain descriptor/value after work,
+rejects admission-refusal labels under an admitted context, and binds acknowledged
+terminal counters exactly. Nonterminal boundary/result differences remain allowed.
+Additional tests are authored, not yet executed at this correction's publication.
+The first-match dedicated live-certificate persistence issue remains a separate
+follow-up and is not silently treated as solved by these semantic replay changes.
