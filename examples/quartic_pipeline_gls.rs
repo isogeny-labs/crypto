@@ -16,6 +16,9 @@
 //!
 //! E31 (§9.22): `--solver chain` or `--solver chain-sparsest` decomposes with
 //! the chain solve instead; the default (`macaulay`) is E25's solver.
+//!
+//! E27 (§9.25): `--karatsuba` prices every `F_{p⁴}` product by the Karatsuba
+//! tower (`13` instead of `19`); the computation is unchanged.
 
 use std::env;
 use std::fs;
@@ -62,6 +65,9 @@ fn main() {
             "--solver" => {
                 i += 1;
                 solver = V4Solver::parse(&args[i]).expect("--solver macaulay|chain|chain-sparsest");
+            }
+            "--karatsuba" => {
+                crypto_lib::cryptanalysis::gaudry_quartic::set_karatsuba_default(true);
             }
             "--json" => {
                 i += 1;

@@ -39,7 +39,9 @@ use serde::Serialize;
 
 use super::d4_weighted_s5::{lift_back, solve_weighted, weighted_system, MACAULAY_BOUND};
 use super::gaudry_cubic::{square_core, wiedemann_u64, SparseRel};
-use super::gaudry_quartic::{mitm_signed, pair_table, Curve4, Pt4, QuarticSolve, E4};
+use super::gaudry_quartic::{
+    batch_inv_fp, mitm_signed, pair_table, AddJob, Curve4, Pt4, QuarticSolve, E4,
+};
 use super::gaudry_quartic_d4::{D4Instance, SymmetrisedD4};
 use super::glv_invariant_base::factor_u64;
 use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod, sqrt_mod};
@@ -610,7 +612,94 @@ pub struct RhoRun4F {
     pub correct: bool,
     /// Collision-recovered scalar, including failed or unverified candidates.
     pub recovered: Option<u64>,
+    /// A digest of every class representative the walk visited, in order
+    /// (E27; `0` where a walk does not compute it).
+    pub visit_digest: u64,
+    /// The part of `fp_muls` and `group_ops` spent verifying `[d]G = Q` after
+    /// the collision (charged since 2026-10-24; E25's records did not charge
+    /// it).  `0` where a walk does not separate it.
+    pub verify_fp_muls: u64,
+    pub verify_group_ops: u64,
 }
+
+/// The class representative of `pt` under `fold` and the scalar `m` with
+/// `rep = [m]·pt` on `⟨G⟩` (the walk's canonical form).
+fn rho_canon(inst: &FoldInstance4, curve: &Curve4, fold: RhoFold, pt: Pt4) -> (Pt4, u64) {
+    let f = &curve.f;
+    let n = inst.n;
+    match fold {
+        RhoFold::None => (pt, 1),
+        RhoFold::Negation => {
+            let ny = f.neg(&pt.y);
+            if ny < pt.y {
+                (Pt4 { y: ny, ..pt }, n - 1)
+            } else {
+                (pt, 1)
+            }
+        }
+        RhoFold::Gls => {
+            let img = inst.psi_gls(curve, &pt);
+            let best = if img.x < pt.x {
+                (img, inst.lambda % n)
+            } else {
+                (pt, 1)
+            };
+            let ny = f.neg(&best.0.y);
+            if ny < best.0.y {
+                (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
+            } else {
+                best
+            }
+        }
+        RhoFold::Psi => {
+            let lam = [1, inst.lambda % n, mulm(inst.lambda, inst.lambda, n)];
+            let mut best = (pt, 1u64);
+            for (k, &l) in lam.iter().enumerate().skip(1) {
+                let img = inst.psi(curve, &pt, k as u32);
+                if img.x < best.0.x {
+                    best = (img, l);
+                }
+            }
+            let ny = f.neg(&best.0.y);
+            if ny < best.0.y {
+                (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
+            } else {
+                best
+            }
+        }
+        RhoFold::Twist24 => unreachable!("use rho_twist24 for this action"),
+    }
+}
+
+/// The walk's partition of a representative into `r` classes.
+fn rho_part(pt: &Pt4, r: usize) -> usize {
+    let h = pt.x.0[0] ^ pt.x.0[1].wrapping_mul(0x9E37_79B9) ^ pt.x.0[2].rotate_left(17);
+    (mix64(h ^ pt.x.0[3].rotate_left(29)) % r as u64) as usize
+}
+
+/// One step of a running digest of the representatives a walk visits (E27's
+/// bit-identity check).
+fn visit_digest(acc: u64, pt: &Pt4) -> u64 {
+    let mut h = acc;
+    for v in pt.x.0.iter().chain(pt.y.0.iter()) {
+        h = mix64(h ^ v.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+    }
+    h
+}
+
+/// The walk's set-up draws, in the order the serial walk draws them: the
+/// `r` multipliers `(α, β)` and the start `(a, b)`.
+fn rho_setup_draws(n: u64, seed: u64, r: usize) -> (Vec<(u64, u64)>, (u64, u64)) {
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D04_F01D);
+    let mults = (0..r)
+        .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+        .collect();
+    let a = rng.gen_range(0..n);
+    let b = rng.gen_range(1..n);
+    (mults, (a, b))
+}
+
+const RHO_PARTITIONS: usize = 32;
 
 /// An r-adding walk with exhaustive storage on class representatives.
 /// A step whose successor would land in its own partition takes the next
@@ -619,65 +708,28 @@ pub struct RhoRun4F {
 /// escaped by doubling the current point.  Every group operation and field
 /// multiplication is charged, set-up included.
 pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
+    rho4_folded_with(inst, fold, seed, super::gaudry_quartic::karatsuba_default())
+}
+
+/// [`rho4_folded`] with the `F_{p⁴}` product chosen (E27): the same walk,
+/// priced by the schoolbook (`false`) or the Karatsuba tower (`true`).
+pub fn rho4_folded_with(
+    inst: &FoldInstance4,
+    fold: RhoFold,
+    seed: u64,
+    karatsuba: bool,
+) -> RhoRun4F {
     assert!(fold != RhoFold::Psi || inst.family == Family4::Psi);
     assert!(fold != RhoFold::Gls || inst.gls.is_some());
-    let curve = inst.curve();
-    let f = &curve.f;
+    let curve = Curve4::with_params_arith(inst.p, inst.a, inst.b, karatsuba);
     let n = inst.n;
-    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D04_F01D);
-    let r = 32usize;
-    let lam = [1, inst.lambda % n, mulm(inst.lambda, inst.lambda, n)];
-    let canon = |pt: Pt4| -> (Pt4, u64) {
-        match fold {
-            RhoFold::None => (pt, 1),
-            RhoFold::Negation => {
-                let ny = f.neg(&pt.y);
-                if ny < pt.y {
-                    (Pt4 { y: ny, ..pt }, n - 1)
-                } else {
-                    (pt, 1)
-                }
-            }
-            RhoFold::Gls => {
-                let img = inst.psi_gls(&curve, &pt);
-                let best = if img.x < pt.x {
-                    (img, inst.lambda % n)
-                } else {
-                    (pt, 1)
-                };
-                let ny = f.neg(&best.0.y);
-                if ny < best.0.y {
-                    (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
-                } else {
-                    best
-                }
-            }
-            RhoFold::Psi => {
-                let mut best = (pt, 1u64);
-                for (k, &l) in lam.iter().enumerate().skip(1) {
-                    let img = inst.psi(&curve, &pt, k as u32);
-                    if img.x < best.0.x {
-                        best = (img, l);
-                    }
-                }
-                let ny = f.neg(&best.0.y);
-                if ny < best.0.y {
-                    (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
-                } else {
-                    best
-                }
-            }
-            RhoFold::Twist24 => unreachable!("use rho_twist24 for this action"),
-        }
-    };
-    let part = |pt: &Pt4| -> usize {
-        let h = pt.x.0[0] ^ pt.x.0[1].wrapping_mul(0x9E37_79B9) ^ pt.x.0[2].rotate_left(17);
-        (mix64(h ^ pt.x.0[3].rotate_left(29)) % r as u64) as usize
-    };
-    let mults: Vec<(u64, u64, Pt4)> = (0..r)
-        .map(|_| {
-            let al = rng.gen_range(0..n);
-            let be = rng.gen_range(1..n);
+    let r = RHO_PARTITIONS;
+    let canon = |pt: Pt4| rho_canon(inst, &curve, fold, pt);
+    let part = |pt: &Pt4| rho_part(pt, r);
+    let (draws, (mut a, mut b)) = rho_setup_draws(n, seed, r);
+    let mults: Vec<(u64, u64, Pt4)> = draws
+        .iter()
+        .map(|&(al, be)| {
             (
                 al,
                 be,
@@ -687,16 +739,16 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
         .collect();
     let mut table: HashMap<Pt4, (u64, u64)> = HashMap::new();
     let (mut steps, mut cycle_escapes) = (0u64, 0u64);
+    let mut digest = 0u64;
     let mut found = None;
     let cap = 64 * (n as f64).sqrt() as u64 + 1_000_000;
-    let mut a = rng.gen_range(0..n);
-    let mut b = rng.gen_range(1..n);
     let start = curve.add(&curve.mul(&inst.g, a), &curve.mul(&inst.q, b));
     let (mut l, m) = canon(start);
     a = mulm(a, m, n);
     b = mulm(b, m, n);
     while steps <= cap {
         steps += 1;
+        digest = visit_digest(digest, &l);
         if let Some(&(a2, b2)) = table.get(&l) {
             let db = (b + n - b2) % n;
             if db != 0 {
@@ -724,17 +776,414 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
         b = mulm((b + mults[j].1) % n, m, n);
         l = next;
     }
+    let (walk_muls, walk_ops) = (curve.f.muls(), curve.ops());
     let correct = found == Some(inst.d) && found.is_some_and(|d| curve.mul(&inst.g, d) == inst.q);
     RhoRun4F {
         fold,
         seed,
         steps,
         group_ops: curve.ops(),
-        fp_muls: f.muls(),
+        fp_muls: curve.f.muls(),
         cycle_escapes,
         correct,
         recovered: found,
+        visit_digest: digest,
+        verify_fp_muls: curve.f.muls() - walk_muls,
+        verify_group_ops: curve.ops() - walk_ops,
     }
+}
+
+/// A double-and-add in flight, one bit per round ([`Curve4::mul`]'s order).
+#[derive(Clone, Copy)]
+struct ScalarJob {
+    acc: Pt4,
+    base: Pt4,
+    k: u64,
+}
+
+impl ScalarJob {
+    fn new(pt: Pt4, k: u64) -> ScalarJob {
+        ScalarJob {
+            acc: Pt4::INF,
+            base: pt,
+            k,
+        }
+    }
+    fn requests(&self, out: &mut Vec<(Pt4, Pt4)>) {
+        if self.k > 0 {
+            if self.k & 1 == 1 {
+                out.push((self.acc, self.base));
+            }
+            out.push((self.base, self.base));
+        }
+    }
+    fn deliver(&mut self, res: &mut std::slice::Iter<Pt4>) {
+        if self.k > 0 {
+            if self.k & 1 == 1 {
+                self.acc = *res.next().unwrap();
+            }
+            self.base = *res.next().unwrap();
+            self.k >>= 1;
+        }
+    }
+}
+
+enum WalkPhase {
+    /// The `2r + 2` scalar multiplications of the set-up.
+    Setup(Vec<ScalarJob>),
+    /// The `r + 1` sums `[α]G + [β]Q` and the start.
+    Combine(Vec<ScalarJob>),
+    /// One addition in flight: a step (`Some(j)`, `second`) or an escape.
+    Step {
+        j: Option<usize>,
+        second: bool,
+    },
+    /// The verification `[d]G` of a recovered logarithm.
+    Verify(ScalarJob),
+    Done,
+}
+
+/// One walk of [`rho4_folded`] as a state machine whose additions are
+/// handed out one round at a time, so that the inversions of a pool of
+/// walks can be batched.  Its sequence of group operations, and every
+/// point it computes, are the serial walk's.
+struct WalkMachine<'a> {
+    inst: &'a FoldInstance4,
+    fold: RhoFold,
+    seed: u64,
+    curve: Curve4,
+    draws: Vec<(u64, u64)>,
+    start_ab: (u64, u64),
+    mults: Vec<(u64, u64, Pt4)>,
+    table: HashMap<Pt4, (u64, u64)>,
+    l: Pt4,
+    a: u64,
+    b: u64,
+    steps: u64,
+    cycle_escapes: u64,
+    digest: u64,
+    cap: u64,
+    found: Option<u64>,
+    correct: bool,
+    /// Counters when the collision was found (the verification follows).
+    walk_cost: Option<(u64, u64)>,
+    phase: WalkPhase,
+}
+
+impl<'a> WalkMachine<'a> {
+    fn new(inst: &'a FoldInstance4, fold: RhoFold, seed: u64, karatsuba: bool) -> WalkMachine<'a> {
+        let n = inst.n;
+        let (draws, start_ab) = rho_setup_draws(n, seed, RHO_PARTITIONS);
+        let mut jobs = Vec::with_capacity(2 * RHO_PARTITIONS + 2);
+        for &(al, be) in draws.iter().chain(std::iter::once(&start_ab)) {
+            jobs.push(ScalarJob::new(inst.g, al));
+            jobs.push(ScalarJob::new(inst.q, be));
+        }
+        WalkMachine {
+            inst,
+            fold,
+            seed,
+            curve: Curve4::with_params_arith(inst.p, inst.a, inst.b, karatsuba),
+            draws,
+            start_ab,
+            mults: Vec::new(),
+            table: HashMap::new(),
+            l: Pt4::INF,
+            a: 0,
+            b: 0,
+            steps: 0,
+            cycle_escapes: 0,
+            digest: 0,
+            cap: 64 * (n as f64).sqrt() as u64 + 1_000_000,
+            found: None,
+            correct: false,
+            walk_cost: None,
+            phase: WalkPhase::Setup(jobs),
+        }
+    }
+
+    fn done(&self) -> bool {
+        matches!(self.phase, WalkPhase::Done)
+    }
+
+    fn canon(&self, pt: Pt4) -> (Pt4, u64) {
+        rho_canon(self.inst, &self.curve, self.fold, pt)
+    }
+
+    /// The additions this walk needs next.
+    fn requests(&self) -> Vec<(Pt4, Pt4)> {
+        let mut out = Vec::new();
+        match &self.phase {
+            WalkPhase::Setup(jobs) => jobs.iter().for_each(|j| j.requests(&mut out)),
+            WalkPhase::Combine(jobs) => {
+                for pair in jobs.chunks(2) {
+                    out.push((pair[0].acc, pair[1].acc));
+                }
+            }
+            WalkPhase::Step { j: Some(j), .. } => out.push((self.l, self.mults[*j].2)),
+            WalkPhase::Step { j: None, .. } => out.push((self.l, self.l)),
+            WalkPhase::Verify(job) => job.requests(&mut out),
+            WalkPhase::Done => {}
+        }
+        out
+    }
+
+    /// Hand the sums back and advance to the next additions needed.
+    fn deliver(&mut self, results: &[Pt4]) {
+        let n = self.inst.n;
+        let r = RHO_PARTITIONS;
+        let mut it = results.iter();
+        let phase = std::mem::replace(&mut self.phase, WalkPhase::Done);
+        match phase {
+            WalkPhase::Setup(mut jobs) => {
+                jobs.iter_mut().for_each(|j| j.deliver(&mut it));
+                self.phase = if jobs.iter().all(|j| j.k == 0) {
+                    WalkPhase::Combine(jobs)
+                } else {
+                    WalkPhase::Setup(jobs)
+                };
+            }
+            WalkPhase::Combine(_) => {
+                let sums: Vec<Pt4> = it.copied().collect();
+                self.mults = self
+                    .draws
+                    .iter()
+                    .zip(&sums)
+                    .map(|(&(al, be), &pt)| (al, be, pt))
+                    .collect();
+                let (l, m) = self.canon(sums[r]);
+                self.l = l;
+                self.a = mulm(self.start_ab.0, m, n);
+                self.b = mulm(self.start_ab.1, m, n);
+                self.advance();
+            }
+            WalkPhase::Step { j: None, .. } => {
+                let (dbl, m) = self.canon(*it.next().unwrap());
+                self.l = dbl;
+                self.a = mulm(mulm(2, self.a, n), m, n);
+                self.b = mulm(mulm(2, self.b, n), m, n);
+                self.advance();
+            }
+            WalkPhase::Step { j: Some(j), second } => {
+                let (next, m) = self.canon(*it.next().unwrap());
+                if !second && self.fold != RhoFold::None && rho_part(&next, r) == j {
+                    self.phase = WalkPhase::Step {
+                        j: Some((j + 1) % r),
+                        second: true,
+                    };
+                    return;
+                }
+                self.a = mulm((self.a + self.mults[j].0) % n, m, n);
+                self.b = mulm((self.b + self.mults[j].1) % n, m, n);
+                self.l = next;
+                self.advance();
+            }
+            WalkPhase::Verify(mut job) => {
+                job.deliver(&mut it);
+                if job.k == 0 {
+                    self.correct = job.acc == self.inst.q;
+                    self.phase = WalkPhase::Done;
+                } else {
+                    self.phase = WalkPhase::Verify(job);
+                }
+            }
+            WalkPhase::Done => {}
+        }
+    }
+
+    /// The serial walk's loop head: run until the next addition.
+    fn advance(&mut self) {
+        let n = self.inst.n;
+        if self.steps > self.cap {
+            self.finish();
+            return;
+        }
+        self.steps += 1;
+        self.digest = visit_digest(self.digest, &self.l);
+        if let Some(&(a2, b2)) = self.table.get(&self.l) {
+            let db = (self.b + n - b2) % n;
+            if db != 0 {
+                let da = (a2 + n - self.a) % n;
+                self.found = Some(mulm(da, inv_mod(db, n), n));
+                self.finish();
+                return;
+            }
+            self.cycle_escapes += 1;
+            self.phase = WalkPhase::Step {
+                j: None,
+                second: false,
+            };
+            return;
+        }
+        self.table.insert(self.l, (self.a, self.b));
+        self.phase = WalkPhase::Step {
+            j: Some(rho_part(&self.l, RHO_PARTITIONS)),
+            second: false,
+        };
+    }
+
+    fn finish(&mut self) {
+        self.walk_cost = Some((self.curve.f.muls(), self.curve.ops()));
+        self.phase = match self.found {
+            Some(d) if d == self.inst.d => WalkPhase::Verify(ScalarJob::new(self.inst.g, d)),
+            _ => WalkPhase::Done,
+        };
+        if let WalkPhase::Verify(job) = &self.phase {
+            if job.k == 0 {
+                self.correct = self.inst.q.inf;
+                self.phase = WalkPhase::Done;
+            }
+        }
+    }
+
+    fn report(&self) -> RhoRun4F {
+        RhoRun4F {
+            fold: self.fold,
+            seed: self.seed,
+            steps: self.steps,
+            group_ops: self.curve.ops(),
+            fp_muls: self.curve.f.muls(),
+            cycle_escapes: self.cycle_escapes,
+            correct: self.correct,
+            recovered: self.found,
+            visit_digest: self.digest,
+            verify_fp_muls: self.walk_cost.map_or(0, |(m, _)| self.curve.f.muls() - m),
+            verify_group_ops: self.walk_cost.map_or(0, |(_, o)| self.curve.ops() - o),
+        }
+    }
+}
+
+/// What a pool of batched walks spent on its shared inversions (E27).
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct BatchStats {
+    pub pool: usize,
+    pub rounds: u64,
+    /// `F_p` norms inverted, and the `F_p` multiplications the batches cost
+    /// (`3(m − 1) + 16` each), shared among their members.
+    pub inversions: u64,
+    pub batch_muls: u64,
+    pub filler_walks: u64,
+    /// Inversions of the recorded walks only, and their share.
+    pub recorded_inversions: u64,
+    pub recorded_batch_muls: u64,
+}
+
+/// E27 (§9.25): the walks of [`rho4_folded`] for `seeds`, run in lockstep
+/// in a pool of `pool` walks whose `F_p` norm inversions are inverted
+/// together by Montgomery's trick each round.  A finished walk's slot is
+/// taken by a filler walk (seeds from `filler_seed_base`) until every
+/// recorded walk is done, so the batch stays full; fillers pay their share
+/// and are not reported.  A batch's cost is split among its members in
+/// integers, the remainder rotating, so the walk totals are exact.  Every
+/// recorded walk performs the serial walk's group operations on the same
+/// points; only the price of its inversions differs.
+pub fn rho4_folded_batched(
+    inst: &FoldInstance4,
+    fold: RhoFold,
+    seeds: &[u64],
+    pool: usize,
+    filler_seed_base: u64,
+    karatsuba: bool,
+) -> (Vec<RhoRun4F>, BatchStats) {
+    assert!(fold != RhoFold::Psi || inst.family == Family4::Psi);
+    assert!(fold != RhoFold::Gls || inst.gls.is_some());
+    assert!(pool >= 1);
+    let p = inst.p;
+    let mut stats = BatchStats {
+        pool,
+        ..BatchStats::default()
+    };
+    let mut out: Vec<Option<RhoRun4F>> = vec![None; seeds.len()];
+    // (machine, index into `seeds` or None for a filler).
+    let mut slots: Vec<(WalkMachine, Option<usize>)> = Vec::new();
+    let mut next_seed = 0usize;
+    let mut fillers = 0u64;
+    let mut round = 0u64;
+    loop {
+        if out.iter().all(|o| o.is_some()) {
+            break;
+        }
+        while slots.len() < pool {
+            if next_seed < seeds.len() {
+                slots.push((
+                    WalkMachine::new(inst, fold, seeds[next_seed], karatsuba),
+                    Some(next_seed),
+                ));
+                next_seed += 1;
+            } else {
+                slots.push((
+                    WalkMachine::new(inst, fold, filler_seed_base + fillers, karatsuba),
+                    None,
+                ));
+                fillers += 1;
+            }
+        }
+        // Begin every addition the pool needs.
+        let mut jobs: Vec<Vec<AddJob>> = Vec::with_capacity(slots.len());
+        for (wm, _) in &slots {
+            let reqs = wm.requests();
+            jobs.push(
+                reqs.iter()
+                    .map(|(p1, p2)| wm.curve.add_begin(p1, p2))
+                    .collect(),
+            );
+        }
+        // One simultaneous inversion of every pending norm.
+        let mut owners: Vec<usize> = Vec::new();
+        let mut ds: Vec<u64> = Vec::new();
+        for (w, js) in jobs.iter().enumerate() {
+            for job in js {
+                if let Some(d) = job.norm() {
+                    owners.push(w);
+                    ds.push(d);
+                }
+            }
+        }
+        let (invs, cost) = batch_inv_fp(&ds, p);
+        let m = ds.len() as u64;
+        if m > 0 {
+            let (share, rem) = (cost / m, cost % m);
+            for (k, &w) in owners.iter().enumerate() {
+                let rot = (k as u64 + round) % m;
+                let c = share + u64::from(rot < rem);
+                slots[w].0.curve.f.charge(c);
+                if slots[w].1.is_some() {
+                    stats.recorded_batch_muls += c;
+                    stats.recorded_inversions += 1;
+                }
+            }
+            stats.inversions += m;
+            stats.batch_muls += cost;
+        }
+        // Finish the additions and advance every walk.
+        let mut inv_it = invs.into_iter();
+        for (w, js) in jobs.iter().enumerate() {
+            let sums: Vec<Pt4> = js
+                .iter()
+                .map(|job| {
+                    let dinv = job.norm().map(|_| inv_it.next().unwrap());
+                    slots[w].0.curve.add_end(job, dinv)
+                })
+                .collect();
+            slots[w].0.deliver(&sums);
+        }
+        // Retire the finished walks.
+        let mut k = 0;
+        while k < slots.len() {
+            if slots[k].0.done() {
+                let (wm, idx) = slots.swap_remove(k);
+                if let Some(i) = idx {
+                    out[i] = Some(wm.report());
+                }
+            } else {
+                k += 1;
+            }
+        }
+        round += 1;
+    }
+    stats.rounds = round;
+    stats.filler_walks = fillers;
+    (out.into_iter().map(|o| o.unwrap()).collect(), stats)
 }
 
 /// One E18 run: the instance, both arms on one relation stream, and the
@@ -1054,6 +1503,7 @@ pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, 
             lambda: 0,
             x0: E4::ZERO,
             c: 0,
+            gls: None,
         },
         b0,
         z: z.0[0],
@@ -1162,6 +1612,8 @@ fn twist24_columns(
         coef,
         columns,
         points_per_column: index.len() as f64 / columns as f64,
+        // Not measured by this producer.
+        build_muls: 0,
     }
 }
 
@@ -1266,6 +1718,9 @@ pub fn rho_twist24(inst: &Twist24Instance, seed: u64) -> RhoRun4F {
         cycle_escapes,
         correct,
         recovered: found,
+        visit_digest: 0,
+        verify_fp_muls: 0,
+        verify_group_ops: 0,
     }
 }
 
@@ -1584,7 +2039,6 @@ fn run_k4_twist24_inner(
     })
 }
 
-
 impl CallStats {
     fn of(mut v: Vec<u64>) -> Self {
         if v.is_empty() {
@@ -1681,6 +2135,14 @@ pub struct K4PipelineReport {
     /// E31: calls the chain solve handed to the existing solver (charged).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub solver_fallbacks: Option<u64>,
+    /// E27 (§9.25): `"karatsuba"` when every `F_{p⁴}` product was priced by
+    /// the Karatsuba tower; absent for the schoolbook.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fp4_product: Option<String>,
+    /// E27: `F_p` inversions performed by `Fp4::inv` from target generation
+    /// to the linear algebra (the walks excluded), each charged `16`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ic_fp_inversions: Option<u64>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -1915,6 +2377,7 @@ fn collect_and_solve(
         solver,
     } = setup;
     let mut fallbacks = 0u64;
+    super::gaudry_quartic::reset_fp_inversions_total();
     let mut folded = Arm::new(arm, fb.columns);
     let mut unsolved_outcomes = std::collections::BTreeMap::new();
     let mut per_target = [0u64; 10];
@@ -2019,6 +2482,7 @@ fn collect_and_solve(
             "p = {p} seed {seed}: no solve within {max_residuals} residuals"
         ));
     }
+    let ic_fp_inversions = super::gaudry_quartic::fp_inversions_total();
     let mut folds = vec![RhoFold::None, RhoFold::Negation];
     if !folds.contains(&matched) {
         folds.push(matched);
@@ -2095,6 +2559,8 @@ fn collect_and_solve(
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
         solver: solver.map(String::from),
         solver_fallbacks: solver.map(|_| fallbacks),
+        fp4_product: super::gaudry_quartic::karatsuba_default().then(|| "karatsuba".to_string()),
+        ic_fp_inversions: super::gaudry_quartic::karatsuba_default().then_some(ic_fp_inversions),
     })
 }
 
@@ -3461,5 +3927,131 @@ mod e23_tests {
             empty > 0 && confined > 0,
             "empty {empty}, confined {confined}"
         );
+    }
+}
+
+/// E27 (§9.25): the cheaper walk arithmetic gives the same walks.
+#[cfg(test)]
+mod e27_tests {
+    use super::*;
+    use crate::cryptanalysis::gaudry_quartic::Fp4;
+
+    #[test]
+    fn e27_karatsuba_product_equals_the_schoolbook() {
+        for p in [13u64, 101, 397, 1033] {
+            let f = Fp4::with_arith(p, true);
+            let mut rng = StdRng::seed_from_u64(p);
+            let mut differs = 0;
+            for _ in 0..20_000 {
+                let (a, b) = (f.random(&mut rng), f.random(&mut rng));
+                let before = f.muls();
+                let k = f.mul_karatsuba(&a, &b);
+                assert_eq!(f.muls() - before, 13);
+                let before = f.muls();
+                assert_eq!(k, f.mul_schoolbook(&a, &b));
+                assert_eq!(f.muls() - before, 19);
+                // Negative control: one coordinate of one factor moved.
+                let mut b2 = b;
+                b2.0[2] = (b2.0[2] + 1) % p;
+                if f.mul_schoolbook(&a, &b2) != k {
+                    differs += 1;
+                }
+            }
+            // a·(b + t²) ≠ a·b unless a = 0.
+            assert!(
+                differs >= 19_990,
+                "negative control not detected at p = {p}"
+            );
+        }
+    }
+
+    #[test]
+    fn e27_batched_additions_equal_serial_additions() {
+        let ki = generate_gls_klein_instance(101, 1, 16).unwrap();
+        let inst = ki.inst;
+        for karatsuba in [false, true] {
+            let serial = Curve4::with_params_arith(inst.p, inst.a, inst.b, karatsuba);
+            let batched = Curve4::with_params_arith(inst.p, inst.a, inst.b, karatsuba);
+            let mut pts = vec![inst.g];
+            for k in 1..40u64 {
+                pts.push(serial.mul(&inst.g, 7919 * k + 3));
+            }
+            serial.reset_ops();
+            serial.f.reset_muls();
+            // Distinct points, a doubling, P + (−P) and O + P.
+            let mut pairs: Vec<(Pt4, Pt4)> = pts.windows(2).map(|w| (w[0], w[1])).collect();
+            pairs.push((pts[3], pts[3]));
+            pairs.push((pts[4], serial.neg(&pts[4])));
+            pairs.push((Pt4::INF, pts[5]));
+            let want: Vec<Pt4> = pairs.iter().map(|(a, b)| serial.add(a, b)).collect();
+            let jobs: Vec<AddJob> = pairs.iter().map(|(a, b)| batched.add_begin(a, b)).collect();
+            let ds: Vec<u64> = jobs.iter().filter_map(|j| j.norm()).collect();
+            let (invs, cost) = batch_inv_fp(&ds, inst.p);
+            assert_eq!(cost, 3 * (ds.len() as u64 - 1) + 16);
+            let mut it = invs.iter();
+            let got: Vec<Pt4> = jobs
+                .iter()
+                .map(|j| batched.add_end(j, j.norm().map(|_| *it.next().unwrap())))
+                .collect();
+            assert_eq!(got, want);
+            assert_eq!(batched.ops(), serial.ops());
+            // Serial pays 16 per F_p inversion; the batch pays nothing yet.
+            assert_eq!(batched.f.muls() + 16 * ds.len() as u64, serial.f.muls());
+            // Negative control: one perturbed norm inverse is detected.
+            let mut bad = batch_inv_fp(&ds, inst.p).0;
+            bad[7] = (bad[7] + 1) % inst.p;
+            let mut it = bad.iter();
+            let wrong: Vec<Pt4> = jobs
+                .iter()
+                .map(|j| batched.add_end(j, j.norm().map(|_| *it.next().unwrap())))
+                .collect();
+            let diffs = (0..want.len()).filter(|&i| wrong[i] != want[i]).count();
+            assert_eq!(diffs, 1);
+            assert!(!serial.on_curve(&wrong[7]));
+        }
+    }
+
+    #[test]
+    fn e27_batched_walks_are_the_serial_walks() {
+        let ki = generate_gls_klein_instance(101, 2, 16).unwrap();
+        let inst = ki.inst;
+        for fold in [RhoFold::Gls, RhoFold::Negation] {
+            let seeds: Vec<u64> = (0..6u64).map(|k| 2000 + k).collect();
+            let school: Vec<RhoRun4F> = seeds
+                .iter()
+                .map(|&s| rho4_folded_with(&inst, fold, s, false))
+                .collect();
+            let kara: Vec<RhoRun4F> = seeds
+                .iter()
+                .map(|&s| rho4_folded_with(&inst, fold, s, true))
+                .collect();
+            let (batched, stats) = rho4_folded_batched(&inst, fold, &seeds, 4, 1 << 40, true);
+            assert!(stats.filler_walks > 0 && stats.inversions > 0);
+            for ((a, b), c) in school.iter().zip(&kara).zip(&batched) {
+                for w in [b, c] {
+                    assert_eq!(
+                        (
+                            a.steps,
+                            a.group_ops,
+                            a.cycle_escapes,
+                            a.recovered,
+                            a.correct
+                        ),
+                        (
+                            w.steps,
+                            w.group_ops,
+                            w.cycle_escapes,
+                            w.recovered,
+                            w.correct
+                        )
+                    );
+                    assert_eq!(a.visit_digest, w.visit_digest);
+                }
+                assert!(a.correct);
+                assert!(b.fp_muls < a.fp_muls && c.fp_muls < b.fp_muls);
+            }
+            // The digest tells walks apart (its own negative control).
+            assert_ne!(school[0].visit_digest, school[1].visit_digest);
+        }
     }
 }
