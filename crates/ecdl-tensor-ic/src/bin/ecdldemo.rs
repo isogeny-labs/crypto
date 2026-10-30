@@ -11,6 +11,7 @@
 //!   -gadgets    use low-degree arithmetic gadgets (slow; keep -bits small)
 //!   -window K   with -gadgets: constrain x < p>>K in every factor base (0 = off)
 //!   -mitm       find relations by meeting in the middle (~sqrt(2r) additions per attempt)
+//!   -threads N  relation-search workers with -mitm (0 = one per core, 1 = sequential)
 
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -30,6 +31,7 @@ struct Flags {
     gadgets: bool,
     window: i64,
     mitm: bool,
+    threads: i64,
 }
 
 /// Marker error text for -h / -help (Go: flag.ErrHelp).
@@ -43,6 +45,8 @@ fn usage() {
     eprintln!("    \tuse low-degree arithmetic gadgets (slow; keep -bits small)");
     eprintln!("  -mitm");
     eprintln!("    \tfind relations by meeting in the middle (~sqrt(2r) additions per attempt)");
+    eprintln!("  -threads int");
+    eprintln!("    \trelation-search workers with -mitm (0 = one per core, 1 = sequential)");
     eprintln!("  -m int");
     eprintln!("    \tnumber of factor bases (default 2)");
     eprintln!("  -q\tsuppress progress output");
@@ -108,6 +112,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
         gadgets: false,
         window: 0,
         mitm: false,
+        threads: 0,
     };
     let mut i = 0;
     while i < args.len() {
@@ -146,7 +151,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
                     _ => f.mitm = v,
                 }
             }
-            "bits" | "m" | "seed" | "window" => {
+            "bits" | "m" | "seed" | "window" | "threads" => {
                 let v = match inline {
                     Some(v) => v,
                     None => {
@@ -165,6 +170,7 @@ fn parse_flags(args: &[String]) -> Result<Flags, String> {
                     "bits" => f.bits = n,
                     "m" => f.m = n,
                     "window" => f.window = n,
+                    "threads" => f.threads = n,
                     _ => f.seed = n,
                 }
             }
@@ -246,6 +252,7 @@ fn main() {
         s.window_bits = usize::try_from(flags.window).unwrap_or(0);
     }
     s.mitm = flags.mitm;
+    s.threads = usize::try_from(flags.threads).unwrap_or(0);
     if !flags.quiet {
         s.logf = Some(Box::new(|msg: &str| eprintln!("{}", msg)));
     }
