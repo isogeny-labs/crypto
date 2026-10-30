@@ -6,3 +6,5 @@ Separate module Separation50, frozen before its data, proves the evaluation-sepa
 Before separation50-02: separation50-01 compile exits1 because Ring.Hom.Basic is absent from this pinned Mathlib source/cache. Use the actual cached Ring.Hom.Defs module. The theorem is unchanged; failed compile retained and no audit was run for it.
 
 Before separation50-03: separation50-02 compile exits1 because the minimal ring-hom import does not include Set.range. Its definition is in Mathlib.Data.Set.Operations, whose source and cached olean were checked. Add that exact import; theorem unchanged. Retain both rejected compile workflows.
+
+Separate Local50 module, before compile data: monic scaled-coordinate identity, explicit Bezout-CRT intersection reconstruction, and exact eighth-power nilpotency implication. These support the actual native LOCAL50 module/block certificates. Same pins, resource limits and transitive audit, with its own fresh build and runner.
