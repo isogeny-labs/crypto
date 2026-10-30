@@ -1088,3 +1088,17 @@ and fresh preflight remain. New twelve-slot tests still need Rust/device executi
 
 ### Errors
 No new failure. The current shared-host GPU is active; no duplicate task pod.
+
+## 2026-10-30T20:56Z — V16 interruption and V17 collection repair
+
+### What was done
+V16 console recorded six52-bit completions and63-101-u at1148.950seconds. Provider GET then returned404; DELETE also404, and a fresh complete list had no task pods. S3 had only source-checkout.tgz, no results archive. Preserved console bytes/hash, receipts and controller exit22 under interrupted-v16. PR2996 merged at83720a2463b2; current CI checked separately.
+
+### Decisions made
+Do not promote console-only cells into audited recovery rows: certificates were not collected. V17 source/targets/caps remain frozen. A dated collection addendum adds60-second partial artifact copies and tolerates failed status reads without deleting a potentially healthy worker. No process restore. All clocks remain L0. Reviewed RunPod APIv2 overview and repository artifact/checkpoint rules.
+
+### Open threads
+Run V17 on one GPU after fresh absence/capacity/checkpoint gate; collect final or partial artifacts, independently verify actual certificates, then publish outcomes.
+
+### Errors
+Cause of provider disappearance unknown; no result archive exists. V16 is closed as interrupted, not silently retried.
