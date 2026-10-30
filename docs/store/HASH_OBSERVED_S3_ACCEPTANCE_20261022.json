@@ -1,0 +1,75 @@
+{
+  "checks": {
+    "aws_identity": true,
+    "cleanup_count": 1,
+    "final_head_404": true,
+    "fresh_cache_sha256": true,
+    "fresh_store_replay": true,
+    "head_exists": true,
+    "one_content_addressed_object": true,
+    "pull": true,
+    "remote_verify_download": true,
+    "two_names": true
+  },
+  "date_utc": "2026-10-22T06:47:26.474368+00:00",
+  "names": [
+    {
+      "algorithm": "sha256",
+      "bytes": 164,
+      "file": "docs/ic/fixtures/hash_differential_sha256_public.json",
+      "name": "hash-observed/public-sha256.json",
+      "object_key": "ic/v1/acceptance/hash-observed-20261022T064726Z-9046189a/sha256/63/632daf64e25480880a1c9018f559d368d43e7c93df5cefcb348d76457c11070d",
+      "result": {
+        "algorithm": "sha256",
+        "distinct_messages": 4,
+        "equal_digest_pairs": 0,
+        "input_difference_hex": "01",
+        "maximum_output_bit_distance": 139,
+        "mean_output_bit_distance": 127.5,
+        "method": "observed-hash-xor-differential",
+        "minimum_output_bit_distance": 116,
+        "output_bit_distance_histogram": {
+          "116": 1,
+          "139": 1
+        },
+        "output_bytes": 32,
+        "pairs_used": 2,
+        "schema_version": 1,
+        "status": "measured"
+      },
+      "sha256": "632daf64e25480880a1c9018f559d368d43e7c93df5cefcb348d76457c11070d",
+      "uploaded": true
+    },
+    {
+      "algorithm": "sha3-256",
+      "bytes": 164,
+      "file": "docs/ic/fixtures/hash_differential_sha3_256_public.json",
+      "name": "hash-observed/public-sha3-256.json",
+      "object_key": "ic/v1/acceptance/hash-observed-20261022T064726Z-9046189a/sha256/63/632daf64e25480880a1c9018f559d368d43e7c93df5cefcb348d76457c11070d",
+      "result": {
+        "algorithm": "sha3-256",
+        "distinct_messages": 4,
+        "equal_digest_pairs": 0,
+        "input_difference_hex": "01",
+        "maximum_output_bit_distance": 132,
+        "mean_output_bit_distance": 128.5,
+        "method": "observed-hash-xor-differential",
+        "minimum_output_bit_distance": 125,
+        "output_bit_distance_histogram": {
+          "125": 1,
+          "132": 1
+        },
+        "output_bytes": 32,
+        "pairs_used": 2,
+        "schema_version": 1,
+        "status": "measured"
+      },
+      "sha256": "632daf64e25480880a1c9018f559d368d43e7c93df5cefcb348d76457c11070d",
+      "uploaded": false
+    }
+  ],
+  "region": "us-east-2",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/hash-observed-20261022T064726Z-9046189a",
+  "schema": "crypto.hash-observed-s3-acceptance/v1",
+  "source_parent_commit": "7fe8b1e775b779eb33920d69f7f36bba227e37c3"
+}

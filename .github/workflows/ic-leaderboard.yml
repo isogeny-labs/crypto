@@ -22,6 +22,7 @@ on:
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
       - 'scripts/test_build_ic_leaderboard.py'
+      - 'scripts/test_leaderboard_sparse_component_inputs.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic-leaderboard/**'
@@ -43,6 +44,7 @@ on:
       - 'docs/curves/ic/curves.schema.json'
       - 'research/ic_descent_20260930/runs-isolated/main/**'
       - 'research/ic_single_target_20260930/runs/**'
+      - 'research/ic_tool_program/rule/v3/runs/**'
       - 'research/ic_tool_program/rule/v7/analysis.json'
       - 'research/ic_tool_program/rule/v7/replay-certificate.json'
       - 'research/ic_tool_program/rule/v7/validator-report.json'
@@ -248,6 +250,8 @@ jobs:
           python-version: '3.11'
       - name: The path check's own tests
         run: python3 scripts/test_check_ic_leaderboard_paths.py
+      - name: Sparse engineering component evidence inputs
+        run: python3 scripts/test_leaderboard_sparse_component_inputs.py
       - name: Curve-record parser tests
         run: python3 scripts/test_build_ic_leaderboard.py
       - name: This workflow's path filter covers every file the builder reads
