@@ -60,3 +60,13 @@ the inclusion is strict. LOCAL50 computes the exact128-dimensional cyclic
 defect block and its saturation exponent8; see LOCAL-GEOMETRY.md for the
 module presentation and CRT argument. These steps remove and measure actual
 nonnormality before the remaining normalization calculation.
+
+## Complete RR algebra on the inverse-base chart
+The complete-RR vectors now give a32-generator polynomial module with index
+length376 and full original-column/source lifts. All528 products pass in
+the actual source quotient and define a complete finite free algebra. Its
+fresh serialized table and source embedding pass independently of the
+producer process. RR-ALGEBRA.md states the native identities and retained
+geometric hypotheses identifying it with the affine normalization. The next
+explicit normal-chart gluing uses diamond transport and full regularity
+lifts,as detailed in NEXT_SOURCE_NORMALIZATION.md.

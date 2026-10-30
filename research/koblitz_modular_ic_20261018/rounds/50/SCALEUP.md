@@ -41,3 +41,10 @@ model must be compared after that degree3 extension, since the current
 source is the diamond23 quotient, not the full X1(77) field. The remaining
 check is explicit rational-function evaluation of the published elliptic
 parameters, CRT and Tate normalization on that extension.
+
+## Actual marked23 result
+marked23-50-02 passes the degree7 prime,all coordinate inverses,nonzero
+Tate discriminant,2P/3P and exact order23 via prefixes1,2,5,11,23.
+marked23-50-01 fails a reserved local identifier and remains rejected.
+The repaired source and all actual field/inverse/point arrays are retained.
+Next apply only universal QR7 equations S3-S5 to this accepted base.

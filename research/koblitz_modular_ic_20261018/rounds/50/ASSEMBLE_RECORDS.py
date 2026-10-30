@@ -43,12 +43,15 @@ for folder in sorted((here / "runs").iterdir()):
         row["exports"] = {p.name: {"sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
                                   "bytes": p.stat().st_size}
                           for p in sorted(folder.glob("*.sing")) if p.name != "input.sing"}
+        if folder.name == "rr-pid50-01":
+            row["export_header_requires_validated_recovery"] = True
+            row["export_recovery_note"] = "RR-SERIALIZATION-RECOVERY.md"
     else:
         row.update(kind="admission", status="running")
     rows.append(row)
 accepted = {row["attempt"] for row in rows if row["status"] == "accepted"}
 result = {
-    "schema": "koblitz.results/v1", "round": 50, "sealed": False, "runs": rows,
+    "schema": "koblitz.results/v1", "round": 50, "runs": rows,
     "status_counts": dict(collections.Counter(row["status"] for row in rows)),
     "audited_unique_theorems": sorted(theorems),
     "construction_counts": {
@@ -61,6 +64,15 @@ result = {
         "infinity_coordinate_defect_F2_dimension": 94 if "defect50-01" in accepted else None,
         "global_coordinate_defect_F2_dimension": 992 if "defect50-01" in accepted else None,
         "verified_affine_normalizations": sum(name.startswith("verify-relative-") for name in accepted),
+        "normalization_presentations_computed": sum(name.startswith("normal-relative-") for name in accepted),
+        "proper_sign_quotient_charts": 2 if "quotient50-01" in accepted else 0,
+        "RR_product_columns": 196 if "rr-field50-01" in accepted else 0,
+        "RR_PID_basis_rank": 32 if "rr-pid50-01" in accepted else 0,
+        "RR_PID_normalization_index": 376 if "rr-pid50-01" in accepted else None,
+        "RR_algebra_product_pairs": 528 if "rr-mult50-02" in accepted else 0,
+        "RR_algebra_serialized_reload_checked": int("rr-table-reload50-01" in accepted),
+        "marked23_base_generic_degree": 7 if "marked23-50-02" in accepted else None,
+        "marked23_point_exact_order": 23 if "marked23-50-02" in accepted else None,
         "audited_unique_theorems": len(theorems),
     },
     "native_arrays_formalized": False,

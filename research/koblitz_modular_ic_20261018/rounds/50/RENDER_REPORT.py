@@ -2,6 +2,7 @@
 from pathlib import Path
 import html
 import json
+import re
 
 h = Path(__file__).resolve().parent
 r = json.loads((h / "results.json").read_text())
@@ -25,7 +26,7 @@ svg += ['<text x="24" y="245" font-size="16">Total: 992 dimensions. Arithmetic-g
 (h / "round50.svg").write_text("\n".join(svg) + "\n")
 
 def txt(s):
-    return '#text(' + json.dumps(s) + ')'
+    return 'text(' + json.dumps(s) + ')'
 
 rows = []
 for row in r["runs"]:
@@ -61,12 +62,48 @@ give arithmetic genera1953 and961. These are native identities and written
 geometric deductions; the linked notes state their hypotheses.
 
 == Formal algebra
-Ten unique mathematical declarations compile and pass the axiom audit:
+Twelve unique mathematical declarations compile and pass the axiom audit:
 six Rational50 norm, coordinate, field-map and overlap lemmas; one Separation50
 evaluation-separation lemma; and three Local50 scaling, constructive CRT and
-nilpotency lemmas. Zero failing or trusted declarations. Actual CAS arrays,
+nilpotency lemmas;two Marked23_50 binary-prefix and prime-order lemmas.
+Zero failing or trusted declarations. Actual CAS arrays,
 scheme gluing and complete pole geometry are outside these Lean propositions.
 Lean4.34.1/mathlib d13f23b, one thread,4096MiB,1200s per compile/audit.
+
+#pagebreak()
+== Complete RR algebra and larger marked base
+All68 descended sections and196 complete-RR products have actual32-entry
+field vectors,complete denominator identities and full reconstruction.
+Coefficient inversion transports them to z=1/u. The PID module has rank32,
+common denominator degree37 and index length376 over F₂. Both original-column
+lifts and the entire source power-basis embedding pass.
+
+All528 unordered products of the32 basis functions are checked in the actual
+source quotient. The complete32-by528 table identity and corruption control
+pass. A fresh process reloads the actual serialized parents,products,table
+and source embeddings and rechecks all complete identities. This gives an
+explicit finite free source algebra. The written RR and Nakayama argument
+identifies it with the affine normalization under the retained genus61,
+proper source,pole support and complete-space hypotheses. Those hypotheses
+are stated in the notes and not formalized by the conditional Lean lemmas.
+
+The known sign quotient now has monic degree8 equations on both proper
+charts,full coupled-source identities,generic ranks16 and32,and five overlap
+products. Its arithmetic genus is449. It supplies source geometry for
+reconstructing the anti-invariant double cover.
+
+The larger marked23 base passes over the actual prime degree7 characteristic2
+field. The Tate-coordinate inverses,nonzero discriminant,2P/3P controls and
+every binary prefix1,2,5,11,23 pass. The final point is infinity and P is
+nonidentity,hence has exact order23. All actual arrays are retained. Next
+apply only universal QR7 equations S3-S5 to this base;degree112 remains a
+prospective extension value.
+
+The next proper-source gluing uses the RR algebra and its diamond transport.
+The overlap begins with h0=z+V,h1=z+V+z²;full module lifts must certify
+regularity of every transported generator,including exceptional branches.
+A complete132-section finite-u RR intersection from saved1476-dimensional
+spaces is a separate route. See NEXT_SOURCE_NORMALIZATION.md.
 
 #pagebreak()
 == Actual attempts and receipts
@@ -83,26 +120,37 @@ separation module. The weighted plane normalizer reaches normalP and caps at
 1200s without module output. The refined finite normalizer exports candidate
 arrays but fails a coefficient-display-string equality: Singular displays
 the prime field as ZZ/2. That producer remains rejected. A separately frozen
-verifier tests its hash-bound arrays independently, using characteristic2 and
-zero coefficient parameters and the original full acceptance conditions.
-Every later attempt and its exact outcome is indexed in results.json.
+finite verifier hits1200s in the22-variable standard-basis construction.
+The repaired infinity producer exports a14-variable presentation with delta376;
+its independent presentation verifier remains prepared,unexecuted.
 
-The RR normalization lead uses the already complete196-section L(2D0) basis.
-A written RR and Nakayama argument makes this a possible full affine
-normalization-module construction over F₂[1/u], with the retained proper/pole
-bridge made explicit. The frozen rational-vector producer evaluates those
-actual saved functions before any PID-module calculation. The marked23
-model and larger-n plan remain saved separately in SCALEUP.md.
+The first marked23 native attempt fails a reserved identifier;the repaired
+run passes. Its first Lean compile misses distributivity;the repaired build
+and audit pass. The PID writer's comment header swallows a declaration;
+the first table consumer rejects. The repaired consumer strips only that
+comment prefix,rechecks both full saved module products,and the accepted
+table subsequently passes a fresh reload. Every failure remains indexed.
 
 All native CAS invocations use4GiB virtual memory,1200s,seed50 and one thread,
-serially. Failed late PASS markers never count. R27–R49 stay sealed. No new
-research EKS job, Diem/freezer restart, Conductor claim or agent merge.
+serially. Failed late PASS markers never count. R27–R49 stay sealed.
+CPU time was not instrumented;actual native UTC wall timestamps are retained.
+No new research EKS job, Diem/freezer restart, Conductor claim or agent merge.
 This report describes component checks; independent scientific replay and
 semantic review have not been performed. See LOCAL-GEOMETRY.md,
 DEFECT-GEOMETRY.md, RR-NORMALIZATION-LEAD.md and the exact attempt logs.
 '''
+source = re.sub(r"\b(All|all|and|actual|rank|degree|length|genus|the|of|index|delta|with|by|at|is|prefix|exponent|complete)(?=\d)", r"\1 ", source)
+source = re.sub(r",(?=\S)", ", ", source)
+source = re.sub(r"(?<=\d)(?=GiB|MiB|s\b)", " ", source)
 (h / "report.typ").write_text(source)
-report = f'''# R50: explicit charts and exact coordinate saturation
+report = f'''# R50: explicit RR algebra,proper charts and larger marked base
+
+The complete RR space now gives an explicit rank32 algebra over F2[z],with
+index length376 and all528 multiplication products. A fresh process reloads
+and checks the complete table and source embedding. Its normalization
+interpretation uses the retained proper/genus/pole/RR hypotheses,stated in
+[RR-ALGEBRA.md](RR-ALGEBRA.md). The larger marked23 base also passes the
+actual degree7 prime,coordinate inverses,discriminant and exact order23 check.
 
 The checked plane-to-integral-v coordinate defect has total F2 dimension992:
 898 on the finite chart and94 at infinity. Its boundary contains the exact
@@ -110,7 +158,7 @@ The checked plane-to-integral-v coordinate defect has total F2 dimension992:
 Bézout coefficients and all parameter-power normal forms are retained.
 
 There are {len(r["runs"])} attempts: {r["status_counts"].get("accepted",0)} accepted,
-{r["status_counts"].get("rejected",0)} rejected. Ten unique conditional algebra
+{r["status_counts"].get("rejected",0)} rejected. Twelve unique conditional algebra
 theorems pass Lean compile and audit, with zero failing/trusted declarations.
 Every actual receipt, failed compile, cap, error and late marker is indexed
 in [results.json](results.json). The report source, recorded-value chart and
@@ -121,5 +169,11 @@ See [local algebra](LOCAL-GEOMETRY.md), [complete coordinate defect](DEFECT-GEOM
 and [RR module construction](RR-NORMALIZATION-LEAD.md). Sources and limits are
 recorded in the prospective protocols. These are component observations and
 written implications, with exact claim boundaries in the notes.
+
+Next constructions are the explicit localized diamond gluing and the larger
+QR7 extension in [NEXT_SOURCE_NORMALIZATION.md](NEXT_SOURCE_NORMALIZATION.md).
+The complete-RR132-section finite-u intersection is retained as another route.
+The existing factor-map and ordinary-divisor tasks retain their separate
+obligations.
 '''
 (h / "REPORT.md").write_text(report)

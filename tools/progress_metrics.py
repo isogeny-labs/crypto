@@ -603,6 +603,34 @@ def koblitz_affine_normalization(ref, since):
                  source=f"{path}@{commit}")
 
 
+def koblitz_checked_source_geometry(ref, since):
+    """Exact source geometry and RR algebra counters, with neutral direction."""
+    path = "research/koblitz_modular_ic_20261018/rounds/50/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("proper_monic_charts", "checked source charts", "Monic rank32 charts with exact overlap products"),
+            ("integral_v_charts", "checked source charts", "Integral quadratic-base refinement on both charts"),
+            ("proper_sign_quotient_charts", "checked quotient charts", "Known sign quotient with explicit monic rank16 equations"),
+            ("complete_forward_source_products", "complete polynomial products", "All four original source equations under the rational map"),
+            ("boundary_cyclic_F2_dimension", "F2 dimensions", "Exact source coordinate-defect block at the degree2 boundary"),
+            ("boundary_exact_saturation_exponent", "parameter powers", "Least power of u+1 annihilating the checked cyclic block"),
+            ("global_coordinate_defect_F2_dimension", "F2 dimensions", "Complete plane-to-integral-v coordinate defect on the proper model"),
+            ("RR_product_columns", "checked field columns", "All196 complete-RR products in the actual32-element field basis"),
+            ("RR_PID_basis_rank", "module generators", "Checked complete-RR polynomial module with original-column lifts"),
+            ("RR_PID_normalization_index", "F2 dimensions", "Exact source lattice index under the retained complete-RR bridge"),
+            ("RR_algebra_product_pairs", "complete product pairs", "All528 source-bound multiplication identities of the RR algebra"),
+            ("marked23_base_generic_degree", "field degrees", "Actual prime characteristic2 marked23 base field"),
+            ("marked23_point_exact_order", "point order", "Exact order23 point verified in the actual larger base field"),
+            ("normalization_presentations_computed", "normalizer outputs", "Accepted serialized presentations; independent ring checks separate"),
+            ("verified_affine_normalizations", "checked presentations", "Independent full affine-presentation verification receipts"),
+            ("audited_unique_theorems", "audited declarations", "Unique conditional algebra lemmas; concrete arrays remain native data"),
+        ):
+            emit("koblitz_modular.geometry50_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -715,6 +743,7 @@ def main():
     koblitz_degree13_divisors(a.ref, a.since)
     koblitz_degree13_characters(a.ref, a.since)
     koblitz_affine_normalization(a.ref, a.since)
+    koblitz_checked_source_geometry(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
