@@ -236,3 +236,12 @@ Lean4.34.1(commit5045d0056413266e57c625dcd7c365b10e377c52) verified; exact
 formalidentitymetadata recorded,notnewproof/nativevalidation. Sourceb022,
 recipemetadata c71e30719,reportmetadata30c6f9140 plus laterhandoff remain
 UNPUSHED. Localwhitespace/size/artifact checks passagainstmaincc5,notCI.
+
+### Update20:25UTC — repaired-source examples now PASS
+
+Existing49719 firstphase finished20:24:55UTC with23pass/0fail/0ignored
+(4Hecke+15oracle+4symmetric),3ACTUALnewbinarypaths/hashes and17clean source
+objects in validation/repaired-main-cc5addeba/examples-pass-20261030T2025Z/.
+No oldbinaries/receipts reused. Clippywasactive20:25; remainingphases/library
+stillpending. DoNOTrepeattheseexamplesonunchangedsource. Nextscheduled21:21
+collection can retain its time; newactualphaseprogress resetsunchanged0.

@@ -1,5 +1,8 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+**20:25UTC:** [23 repaired-source example tests PASS](validation/repaired-main-cc5addeba/examples-pass-20261030T2025Z/receipt.json); zero failures/ignored.
+Remaining native phases are pending in the existing run, not passed. No scientific result.
+
 2026-10-30. **All six scientific goals remain incomplete.** This is native
 checker and proof development, with no scientific panel or admitted performance
 result. The original acceptance criteria in [PKM_GOALS.md](../PKM_GOALS.md)

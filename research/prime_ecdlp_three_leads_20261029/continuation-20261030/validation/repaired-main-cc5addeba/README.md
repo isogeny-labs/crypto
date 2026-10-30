@@ -37,3 +37,12 @@ source. A new final native receipt/binary binding is required before normal
 publication. Raw logs>64KiB stay out of Git: exact final hash/bytes/path, bounded
 excerpt and NOT_UPLOADED if transport remains unavailable. No compression or
 splitting to evade policy. G1–G6 remains incomplete and comparison admissionfalse.
+
+## First completed phase,20:24:55UTC
+
+[Fresh example receipt](examples-pass-20261030T2025Z/receipt.json) records
+23passes(4Hecke+15oracle+4symmetric),0failures,0ignored on repairedsourceb022.
+All17sourceobjects stillclean/equal and3actualtestbinaryhashes are retained.
+The original compilation blocker is no longer present in this phase. The
+existing49719run is continuing through remainingchecks; no fullsuitepass or
+scientific result is claimed. Do not duplicate these unchanged exampletests.

@@ -1,5 +1,8 @@
 # Validation: faade scoped pass/cap; a030 native compilation blocked
 
+**20:25UTC:** [23 repaired-source example tests PASS](repaired-main-cc5addeba/examples-pass-20261030T2025Z/receipt.json); zero failures/ignored.
+Remaining native phases are pending in the existing run, not passed. No scientific result.
+
 **Latest repaired sourceb022:** [new native validation](repaired-main-cc5addeba/README.md)
 is compiling, not passed. The changed source incorporates main's delimiter
 repair; both older runs remain terminal and immutable. Exact unchanged formal

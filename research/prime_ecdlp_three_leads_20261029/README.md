@@ -1,5 +1,8 @@
 # Prime-field ECDLP: three leads and checked structural proofs
 
+**20:25UTC:** [23 repaired-source example tests PASS](continuation-20261030/validation/repaired-main-cc5addeba/examples-pass-20261030T2025Z/receipt.json); zero failures/ignored.
+Remaining native phases are pending in the existing run, not passed. No scientific result.
+
 2026-10-29. Development and formalization follow-up. This directory contains no
 new admitted performance result and makes no ECDLP speedup or security claim.
 
