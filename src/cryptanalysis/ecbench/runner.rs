@@ -58,6 +58,9 @@ pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 /// Where and how a session runs; recorded whole in `session.json`.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RunOptions {
+    /// Explicit instrument provenance; absent preserves historical behavior.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostic_launch: Option<super::diagnostic_launch::DiagnosticLaunch>,
     pub cpus: CpuRequest,
     pub lock_path: String,
     pub wait_for_lock: bool,
@@ -73,6 +76,63 @@ pub struct RunOptions {
 
 fn default_hz() -> u64 {
     100
+}
+
+/// Bind one scheduled child to the same explicit launch used by every arm.
+/// This constructs metadata only; it neither starts a child nor admits a run.
+pub(crate) fn prepare_lifecycle_child(
+    launch: &super::diagnostic_launch::DiagnosticLaunch,
+    session: &str,
+    execution: &Execution,
+    arm: &super::spec::Arm,
+    workload: &Workload,
+    output_root: &Path,
+) -> Result<super::record::DiagnosticChild, String> {
+    let doc = launch.document()?;
+    let binding = doc
+        .arms
+        .iter()
+        .find(|a| a.name == arm.name)
+        .ok_or("scheduled arm absent from diagnostic launch")?;
+    let method_hash = super::diagnostic_launch::resolved_method_binding(&arm.method)?;
+    if binding.role != arm.role
+        || binding.method != arm.method.id
+        || binding.method_config_sha256 != method_hash
+    {
+        return Err("scheduled diagnostic arm/configuration mismatch".into());
+    }
+    let workload_value = serde_json::to_value(workload).map_err(|e| e.to_string())?;
+    let workload_bytes = serde_json::to_vec(&workload_value).map_err(|e| e.to_string())?;
+    let prefix = super::diagnostics::Context {
+        schema: "ecbench.diagnostic_context/v1".into(),
+        relative_leaf: format!("diagnostic-{:06}-attempt-{}", execution.seq, doc.attempt),
+        identity: super::diagnostics::Identity {
+            session: session.into(),
+            execution: execution.seq,
+            workload_sha256: sha256_hex(&workload_bytes),
+            binary_sha256: doc.binary_sha256.clone(),
+            protocol_sha256: doc.protocol_sha256.clone(),
+            seed: execution.algorithm_seed,
+            attempt: doc.attempt,
+            source_sha256: doc.source_receipt.source_manifest_sha256.clone(),
+            method_config_sha256: method_hash,
+        },
+    };
+    let envelope = super::diagnostic_launch::ChildEnvelope {
+        schema: super::diagnostic_launch::CHILD_SCHEMA.into(),
+        launch_sha256: launch.raw_sha256().into(),
+        scientific_run_id: doc.scientific_run_id.clone(),
+        profile: doc.profile.clone(),
+        source_receipt: doc.source_receipt.clone(),
+        arm: binding.clone(),
+        prefix,
+    };
+    envelope.validate(launch)?;
+    Ok(super::record::DiagnosticChild {
+        launch: launch.clone(),
+        envelope,
+        output_root: output_root.into(),
+    })
 }
 fn grading_v1() -> u32 {
     1
@@ -512,6 +572,12 @@ pub fn run_session(
     }
     // A spec that does not parse is refused before waiting for anything.
     let spec = Spec::from_json(spec_text)?;
+    if let Some(launch) = &opts.diagnostic_launch {
+        let (_, spec_digest) = short_id("ECS1", &spec.identity_view())?;
+        // Validate before planning can construct even a known-answer workload.
+        launch.validate_spec(&spec, &spec_digest, None)?;
+        return Err("diagnostic lifecycle integration is not enabled or admitted".into());
+    }
     // The lock comes first.  Planning (a prime search can burn minutes of
     // CPU), the host capture and the choice of CPUs all disturb whatever
     // timed session holds the lock, and a CPU choice made while queued
@@ -624,6 +690,25 @@ fn execute_session(
     progress: &mut impl FnMut(&str),
 ) -> Result<Session, String> {
     std::fs::create_dir(out.join("exec")).map_err(|e| format!("{}: {e}", out.display()))?;
+    let diagnostic_root = if let Some(launch) = &opts.diagnostic_launch {
+        launch.validate_spec(
+            &p.spec,
+            &p.spec_sha256,
+            capsule.build.binary_sha256.as_deref(),
+        )?;
+        launch.validate_plan(p)?;
+        let root = out.join("diagnostic-output");
+        let mut builder = std::fs::DirBuilder::new();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            builder.mode(0o700);
+        }
+        builder.create(&root).map_err(|e| e.to_string())?;
+        Some(std::fs::canonicalize(root).map_err(|e| e.to_string())?)
+    } else {
+        None
+    };
     std::fs::write(out.join("spec.json"), spec_text).map_err(|e| e.to_string())?;
     let host_sha256 = write_json(&out.join("host.json"), capsule)?;
     let plan_doc = PlanDoc {
@@ -739,6 +824,20 @@ fn execute_session(
             let input = ChildInput {
                 schema: CHILD_INPUT_SCHEMA.into(),
                 diagnostics: None,
+                diagnostic_lifecycle: opts
+                    .diagnostic_launch
+                    .as_ref()
+                    .map(|launch| {
+                        prepare_lifecycle_child(
+                            launch,
+                            &session_id,
+                            ex,
+                            arm,
+                            w,
+                            diagnostic_root.as_deref().ok_or("diagnostic root absent")?,
+                        )
+                    })
+                    .transpose()?,
                 curve: w.curve_spec.for_child(inst),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
@@ -1216,6 +1315,7 @@ mod watchdog_record_tests {
         let input = ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
+            diagnostic_lifecycle: None,
             curve: w.curve_spec.clone(),
             target_seed: w.target_seed,
             target_index: w.target_index,
@@ -1339,6 +1439,7 @@ mod robustness_tests {
 
     fn options(lock: &Path, exe: &str, wait: bool) -> RunOptions {
         RunOptions {
+            diagnostic_launch: None,
             cpus: CpuRequest::None,
             lock_path: lock.display().to_string(),
             wait_for_lock: wait,
@@ -1375,6 +1476,7 @@ mod robustness_tests {
         ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
                 diagnostics: None,
+                diagnostic_lifecycle: None,
             curve: serde_json::from_str(
                 r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
             )

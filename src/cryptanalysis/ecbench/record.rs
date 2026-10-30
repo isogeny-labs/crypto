@@ -110,6 +110,9 @@ pub struct ChildInput {
     /// Reserved explicit diagnostic context; producer execution remains disabled.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub diagnostics: Option<super::diagnostics::Context>,
+    /// Separate v2 transport; remains disabled until the complete adapter lands.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostic_lifecycle: Option<DiagnosticChild>,
     pub schema: String,
     pub curve: CurveSpec,
     pub target_seed: u64,
@@ -121,6 +124,177 @@ pub struct ChildInput {
     pub method: MethodSpec,
     pub expected_method_id: String,
     pub algorithm_seed: u64,
+}
+
+/// Explicit provenance and output-root transport for lifecycle diagnostics.
+/// This is not scientific admission, and no ambient directory is consulted.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DiagnosticChild {
+    pub launch: super::diagnostic_launch::DiagnosticLaunch,
+    pub envelope: super::diagnostic_launch::ChildEnvelope,
+    pub output_root: std::path::PathBuf,
+}
+
+pub const MAX_DIAGNOSTIC_CHILD_BYTES: usize = 4 * super::diagnostic_launch::MAX_LAUNCH_BYTES;
+
+impl DiagnosticChild {
+    /// Validate metadata and output custody without constructing a workload.
+    pub fn validate(&self, job: &ChildInput) -> Result<(), String> {
+        if job.diagnostics.is_some() {
+            return Err("mixed v1/v2 diagnostic contexts".into());
+        }
+        if job.diagnostic_lifecycle.as_ref() != Some(self) {
+            return Err("diagnostic child transport differs from scheduled input".into());
+        }
+        if serde_json::to_vec(self).map_err(|e| e.to_string())?.len() > MAX_DIAGNOSTIC_CHILD_BYTES {
+            return Err("diagnostic child exceeds byte bound".into());
+        }
+        self.envelope.validate(&self.launch)?;
+        let method = resolve(&job.method)?;
+        if job.schema != CHILD_INPUT_SCHEMA
+            || method.id != self.envelope.arm.method
+            || method.method_id != job.expected_method_id
+            || super::diagnostic_launch::resolved_method_binding(&method)?
+                != self.envelope.prefix.identity.method_config_sha256
+            || job.algorithm_seed != self.envelope.prefix.identity.seed
+        {
+            return Err("diagnostic child scheduled method/seed mismatch".into());
+        }
+        validate_diagnostic_root(&self.output_root)
+    }
+
+    /// After the ordinary workload rebuild and expected-ID check, bind the full
+    /// serialized record value exactly as the parent diagnostic reader does.
+    /// This is distinct from Workload.workload_sha256's internal identity.
+    pub fn validate_workload(&self, workload: &Workload) -> Result<(), String> {
+        let value = serde_json::to_value(workload).map_err(|e| e.to_string())?;
+        let bytes = serde_json::to_vec(&value).map_err(|e| e.to_string())?;
+        if sha256_hex(&bytes) != self.envelope.prefix.identity.workload_sha256 {
+            return Err("diagnostic child rebuilt workload binding mismatch".into());
+        }
+        Ok(())
+    }
+
+    /// Exclusive lifecycle leaf; prefix records must use a different leaf.
+    pub fn lifecycle_directory(&self) -> std::path::PathBuf {
+        self.output_root
+            .join(format!("{}-lifecycle", self.envelope.prefix.relative_leaf))
+    }
+}
+
+/// Trusted runner creates this private root before spawning children. Refuse
+/// traversal, symlink components and shared writable non-sticky ancestors.
+/// Metadata checks are not protection against a hostile process with our UID;
+/// that owner is already trusted to replace the executable and input pipe.
+fn validate_diagnostic_root(root: &std::path::Path) -> Result<(), String> {
+    use std::path::Component;
+    if !root.is_absolute()
+        || root.as_os_str().len() > 4096
+        || root
+            .components()
+            .any(|c| !matches!(c, Component::RootDir | Component::Normal(_)))
+    {
+        return Err("diagnostic root must be bounded absolute path without traversal".into());
+    }
+    if std::fs::canonicalize(root).map_err(|e| e.to_string())? != root {
+        return Err("diagnostic root is not canonical".into());
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        // SAFETY: geteuid takes no arguments and has no failure mode.
+        let uid = unsafe { libc::geteuid() };
+        for ancestor in root.ancestors() {
+            let meta = std::fs::symlink_metadata(ancestor).map_err(|e| e.to_string())?;
+            if !meta.is_dir() || meta.file_type().is_symlink() {
+                return Err("diagnostic root has non-directory/symlink ancestor".into());
+            }
+            let mode = meta.mode();
+            if ancestor == root {
+                if meta.uid() != uid || mode & 0o7777 != 0o700 {
+                    return Err(
+                        "diagnostic root must be owner-only0700 and owned by child uid".into(),
+                    );
+                }
+            } else if mode & 0o022 != 0 && mode & 0o1000 == 0 {
+                return Err("diagnostic root has unprotected shared writable ancestor".into());
+            }
+        }
+        Ok(())
+    }
+    #[cfg(not(unix))]
+    {
+        Err("diagnostic private root requires Unix ownership checks".into())
+    }
+}
+
+/// Software integration seam: same lifecycle ownership on every arm. Caller
+/// owns the enclosing cost interval. Returning this summary is diagnostic only;
+/// it neither accepts a report nor covers parent publication or final-write tail.
+/// Errors/panics never use Drop to manufacture a finished lifecycle record.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DiagnosticCallbackSummary {
+    pub lifecycle: super::diagnostic_runtime::LifecycleSummary,
+    /// Writer observations only, never merged into algorithm counts or price.
+    pub prefix_io: Option<Value>,
+}
+
+pub fn with_diagnostic_lifecycle<T>(
+    diagnostic: &DiagnosticChild,
+    job: &ChildInput,
+    callback: impl FnOnce() -> Result<T, String>,
+) -> Result<(Result<T, String>, DiagnosticCallbackSummary), String> {
+    diagnostic.validate(job)?;
+    let scope = super::diagnostic_runtime::DiagnosticScope::install(
+        &diagnostic.lifecycle_directory(),
+        diagnostic.envelope.prefix.identity.clone(),
+    )?;
+    let prefix = if diagnostic.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        match super::three_leads::ScopedPencilProgress::install(
+            &diagnostic
+                .output_root
+                .join(&diagnostic.envelope.prefix.relative_leaf),
+            diagnostic.envelope.prefix.identity.clone(),
+        ) {
+            Ok(prefix) => Some(prefix),
+            Err(error) => {
+                let finished = scope.finish(super::diagnostic_runtime::FinishStatus::Error);
+                return Err(format!(
+                    "diagnostic prefix install: {error}; lifecycle finish: {finished:?}"
+                ));
+            }
+        }
+    } else {
+        None
+    };
+    let result = callback();
+    let prefix_io = prefix
+        .map(|guard| {
+            guard
+                .finish()
+                .and_then(|totals| serde_json::to_value(totals).map_err(|e| e.to_string()))
+        })
+        .transpose();
+    let status = if result.is_ok() && prefix_io.is_ok() {
+        super::diagnostic_runtime::FinishStatus::Returned
+    } else {
+        super::diagnostic_runtime::FinishStatus::Error
+    };
+    let lifecycle = scope.finish(status);
+    // Both explicit finish attempts happen even if prefix publication failed.
+    match (prefix_io, lifecycle) {
+        (Ok(prefix_io), Ok(lifecycle)) => Ok((
+            result,
+            DiagnosticCallbackSummary {
+                lifecycle,
+                prefix_io,
+            },
+        )),
+        (prefix, lifecycle) => Err(format!(
+            "diagnostic finish failure: prefix={prefix:?}; lifecycle={lifecycle:?}"
+        )),
+    }
 }
 
 /// `/proc/self/schedstat`: on-CPU time, run-queue wait, timeslices.
@@ -411,6 +585,27 @@ pub fn child_main(input: &str) -> ChildOutput {
             return out;
         }
     };
+    if job.diagnostics.is_some() || job.diagnostic_lifecycle.is_some() {
+        if input.len() > MAX_DIAGNOSTIC_CHILD_BYTES {
+            out.error = Some("diagnostic child input exceeds byte bound".into());
+            return out;
+        }
+        if let Err(error) = super::canonical::reject_duplicate_keys(input) {
+            out.error = Some(error);
+            return out;
+        }
+        if job.diagnostics.is_some() && job.diagnostic_lifecycle.is_some() {
+            out.error = Some("mixed v1/v2 diagnostic contexts".into());
+            return out;
+        }
+    }
+    if let Some(diagnostic) = &job.diagnostic_lifecycle {
+        out.error = Some(match diagnostic.validate(&job) {
+            Ok(()) => "diagnostic lifecycle adapter is not enabled or admitted".into(),
+            Err(error) => error,
+        });
+        return out;
+    }
     // Explicit rejection before workload construction: this slice cannot activate
     // an unreviewed producer or run an algorithm to test diagnostic plumbing.
     if let Some(context) = &job.diagnostics {
@@ -445,6 +640,9 @@ pub fn child_main(input: &str) -> ChildOutput {
                 "rebuilt workload {} is not the planned {}",
                 w.workload_id, job.expected_workload_id
             ));
+        }
+        if let Some(diagnostic) = &job.diagnostic_lifecycle {
+            diagnostic.validate_workload(&w)?;
         }
         let m = resolve(&job.method)?;
         if m.method_id != job.expected_method_id {
@@ -2142,6 +2340,7 @@ mod allocator_tests {
         ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
+            diagnostic_lifecycle: None,
             curve: w.curve_spec.for_child(&inst),
             target_seed: 7,
             target_index: 0,
@@ -2260,5 +2459,289 @@ mod diagnostic_context_tests {
         );
         assert!(result.report.is_none());
         assert!(result.workload_id.is_none());
+    }
+}
+
+#[cfg(all(test, unix))]
+mod diagnostic_child_v2_tests {
+    use super::super::diagnostic_launch::{
+        resolved_method_binding, ChildEnvelope, DiagnosticLaunch, CHILD_SCHEMA, LAUNCH_SCHEMA,
+        PROFILE_VERSION,
+    };
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+
+    struct Root(std::path::PathBuf);
+    impl Root {
+        fn new() -> Self {
+            let path = std::env::temp_dir().join(format!(
+                "ecbench-child-v2-{}-{}",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::Relaxed)
+            ));
+            std::fs::create_dir(&path).unwrap();
+            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+            Self(std::fs::canonicalize(path).unwrap())
+        }
+    }
+    impl Drop for Root {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    fn fixture(root: &Root, candidate: bool) -> ChildInput {
+        let method_name = if candidate {
+            "ic.three_leads_genus2_pencil_symbolic_v2"
+        } else {
+            "rho.three_leads_negation_v1"
+        };
+        let method = MethodSpec {
+            id: method_name.into(),
+            params: BTreeMap::new(),
+        };
+        let resolved = resolve(&method).unwrap();
+        let full_hash = resolved_method_binding(&resolved).unwrap();
+        let profile = serde_json::json!({"version":PROFILE_VERSION,"sha256":"a".repeat(64)});
+        let arms: Vec<_> = [
+            (
+                "pencil",
+                "candidate",
+                "ic.three_leads_genus2_pencil_symbolic_v2",
+            ),
+            ("rho", "reference", "rho.three_leads_negation_v1"),
+            ("rho_AA", "control", "rho.three_leads_negation_v1"),
+        ]
+        .iter()
+        .map(|(name, role, id)| {
+            serde_json::json!({"name":name,"role":role,"method":id,
+                    "method_config_sha256":full_hash,"profile":profile})
+        })
+        .collect();
+        let launch = DiagnosticLaunch::from_bytes(
+            &serde_json::to_vec(&serde_json::json!({
+                "schema":LAUNCH_SCHEMA,"expected_spec_sha256":"b".repeat(64),
+                "binary_sha256":"c".repeat(64),"protocol_sha256":"d".repeat(64),
+                "source_receipt":{"scope":"external_manifest_binding_only",
+                    "receipt_sha256":"e".repeat(64),"source_manifest_sha256":"f".repeat(64)},
+                "scientific_run_id":"software-fixture","attempt":0,"profile":profile,"arms":arms
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let doc = launch.document().unwrap();
+        let prefix = super::super::diagnostics::Context {
+            schema: "ecbench.diagnostic_context/v1".into(),
+            relative_leaf: "execution_0".into(),
+            identity: super::super::diagnostics::Identity {
+                session: "software-fixture".into(),
+                execution: 0,
+                workload_sha256: "1".repeat(64),
+                binary_sha256: doc.binary_sha256.clone(),
+                protocol_sha256: doc.protocol_sha256.clone(),
+                seed: 17,
+                attempt: 0,
+                source_sha256: doc.source_receipt.source_manifest_sha256.clone(),
+                method_config_sha256: full_hash,
+            },
+        };
+        let envelope = ChildEnvelope {
+            schema: CHILD_SCHEMA.into(),
+            launch_sha256: launch.raw_sha256().into(),
+            scientific_run_id: doc.scientific_run_id,
+            profile: doc.profile,
+            source_receipt: doc.source_receipt,
+            arm: doc.arms[if candidate { 0 } else { 1 }].clone(),
+            prefix,
+        };
+        // Deliberately invalid curve; no test is permitted to build it.
+        serde_json::from_value(serde_json::json!({"schema":CHILD_INPUT_SCHEMA,
+            "curve":{"kind":"prime_explicit","p":0,"a":0,"b":0,"group_order":0,"r":0,"gx":0,"gy":0},
+            "target_seed":0,"target_index":0,"expected_workload_id":"never-build",
+            "method":method,"expected_method_id":resolved.method_id,"algorithm_seed":17,
+            "diagnostic_lifecycle":DiagnosticChild{launch,envelope,output_root:root.0.clone()}
+        }))
+        .unwrap()
+    }
+    #[test]
+    fn child_v2_full_workload_serialization_binding_without_build() {
+        let root = Root::new();
+        let mut job = fixture(&root, false);
+        let mut workload = Workload {
+            workload_id: "serialization-fixture".into(),
+            workload_sha256: "2".repeat(64),
+            curve_spec: job.curve.clone(),
+            curve: CurveFacts {
+                slug: "fixture".into(),
+                icv1: "fixture".into(),
+                family: "prime".into(),
+                construction: "not-built".into(),
+                field_degree: None,
+                field_bits: None,
+                group_order: 0,
+                r: 0,
+                cofactor: 0,
+                generator: ["0".into(), "0".into()],
+                automorphisms_available: 0,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            },
+            target_law: "serialization-only".into(),
+            target_seed: 0,
+            target_index: 0,
+            target: ["0".into(), "0".into()],
+            planted: None,
+            target_counter: None,
+        };
+        let bytes = serde_json::to_vec(&serde_json::to_value(&workload).unwrap()).unwrap();
+        let diagnostic = job.diagnostic_lifecycle.as_mut().unwrap();
+        diagnostic.envelope.prefix.identity.workload_sha256 = sha256_hex(&bytes);
+        assert!(diagnostic.validate_workload(&workload).is_ok());
+        assert_ne!(
+            diagnostic.envelope.prefix.identity.workload_sha256,
+            workload.workload_sha256
+        );
+        workload.target_seed += 1;
+        assert!(diagnostic.validate_workload(&workload).is_err());
+    }
+
+    #[test]
+    fn child_v2_roundtrip_and_disabled_boundary() {
+        let root = Root::new();
+        let job = fixture(&root, false);
+        job.diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&job)
+            .unwrap();
+        let text = serde_json::to_string(&job).unwrap();
+        let again: ChildInput = serde_json::from_str(&text).unwrap();
+        assert_eq!(again, job);
+        let out = child_main(&text);
+        assert_eq!(
+            out.error.as_deref(),
+            Some("diagnostic lifecycle adapter is not enabled or admitted")
+        );
+        assert!(out.report.is_none());
+        assert!(out.workload_id.is_none());
+        assert!(std::fs::read_dir(&root.0).unwrap().next().is_none());
+        let mut old = job;
+        old.diagnostic_lifecycle = None;
+        assert!(serde_json::to_value(old)
+            .unwrap()
+            .get("diagnostic_lifecycle")
+            .is_none());
+    }
+    #[test]
+    fn child_v2_rejects_mixed_seed_method_and_insecure_path() {
+        let root = Root::new();
+        let job = fixture(&root, false);
+        let mut bad = job.clone();
+        bad.algorithm_seed += 1;
+        assert!(bad
+            .diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&bad)
+            .is_err());
+        let mut bad = job.clone();
+        bad.expected_method_id = "wrong".into();
+        assert!(bad
+            .diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&bad)
+            .is_err());
+        let mut bad = job.clone();
+        bad.diagnostics = Some(
+            bad.diagnostic_lifecycle
+                .as_ref()
+                .unwrap()
+                .envelope
+                .prefix
+                .clone(),
+        );
+        let out = child_main(&serde_json::to_string(&bad).unwrap());
+        assert_eq!(
+            out.error.as_deref(),
+            Some("mixed v1/v2 diagnostic contexts")
+        );
+        assert!(out.report.is_none());
+        let mut bad = job.clone();
+        bad.diagnostic_lifecycle.as_mut().unwrap().output_root = "relative".into();
+        assert!(bad
+            .diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&bad)
+            .is_err());
+        std::fs::set_permissions(&root.0, std::fs::Permissions::from_mode(0o755)).unwrap();
+        assert!(job
+            .diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&job)
+            .is_err());
+    }
+    #[test]
+    fn child_v2_rejects_symlink_output_root() {
+        let root = Root::new();
+        let job = fixture(&root, false);
+        let link = root.0.join("link");
+        std::os::unix::fs::symlink(&root.0, &link).unwrap();
+        let mut bad = job;
+        bad.diagnostic_lifecycle.as_mut().unwrap().output_root = link;
+        assert!(bad
+            .diagnostic_lifecycle
+            .as_ref()
+            .unwrap()
+            .validate(&bad)
+            .is_err());
+    }
+    #[test]
+    fn child_v2_fake_callback_all_arms_and_candidate_only_prefix() {
+        for candidate in [false, true] {
+            let root = Root::new();
+            let job = fixture(&root, candidate);
+            let diagnostic = job.diagnostic_lifecycle.as_ref().unwrap();
+            let (value, summary) =
+                with_diagnostic_lifecycle(diagnostic, &job, || Ok(23u64)).unwrap();
+            assert_eq!(value.unwrap(), 23);
+            assert!(summary.lifecycle.diagnostic_only);
+            assert_eq!(summary.prefix_io.is_some(), candidate);
+            assert!(diagnostic
+                .lifecycle_directory()
+                .join("finished.json")
+                .exists());
+            // Exclusive writer must never overwrite a prior execution.
+            assert!(with_diagnostic_lifecycle(diagnostic, &job, || Ok(24u64)).is_err());
+        }
+    }
+    #[test]
+    fn child_v2_fake_callback_error_and_panic_do_not_run_algorithm() {
+        let root = Root::new();
+        let job = fixture(&root, false);
+        let d = job.diagnostic_lifecycle.as_ref().unwrap();
+        let (value, summary) =
+            with_diagnostic_lifecycle::<()>(d, &job, || Err("fixture-error".into())).unwrap();
+        assert_eq!(value.unwrap_err(), "fixture-error");
+        assert_eq!(
+            summary.lifecycle.requested_finish,
+            super::super::diagnostic_runtime::FinishStatus::Error
+        );
+        let root = Root::new();
+        let job = fixture(&root, true);
+        let d = job.diagnostic_lifecycle.as_ref().unwrap();
+        let panic = std::panic::catch_unwind(|| {
+            let _ = with_diagnostic_lifecycle::<()>(d, &job, || panic!("fixture-panic"));
+        });
+        assert!(panic.is_err());
+        assert!(!d.lifecycle_directory().join("finished.json").exists());
+        let root = Root::new();
+        let job = fixture(&root, true);
+        let d = job.diagnostic_lifecycle.as_ref().unwrap();
+        assert!(with_diagnostic_lifecycle(d, &job, || Ok(())).is_ok());
     }
 }

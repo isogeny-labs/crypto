@@ -16,6 +16,7 @@ use std::time::Instant;
 
 #[path = "pencil.rs"]
 mod pencil;
+pub(crate) use pencil::ScopedPencilProgress;
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -117,6 +118,11 @@ pub fn solve(
     seed: u64,
 ) -> Result<SolveReport, String> {
     if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+        if let Some(result) = pencil::with_active_progress(|sink| {
+            pencil::solve_with_progress(m, inst, target, seed, Some(sink))
+        })? {
+            return result;
+        }
         return pencil::solve(m, inst, target, seed);
     }
     let adapter_start = Instant::now();
