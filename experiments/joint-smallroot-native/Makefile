@@ -21,7 +21,7 @@ $(BUILD)/cdd-helper: src/cdd_helper.cpp | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) -lcddgmp -lgmpxx -lgmp -o $@
 
 .PHONY: cpu-accounting
-cpu-accounting: $(BUILD)/cpu-accounting $(BUILD)/fake-child
+cpu-accounting: $(BUILD)/cpu-accounting $(BUILD)/fake-child panel-status
 $(BUILD)/cpu-accounting: tests/cpu_accounting.cpp $(HEADERS) | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 $(BUILD)/fake-child: tests/fake_child.cpp | $(BUILD)
@@ -32,4 +32,10 @@ guard-qualification: $(BUILD)/guard-qualification $(BUILD)/guard-worker
 $(BUILD)/guard-qualification: tests/guard_qualification.cpp $(HEADERS) | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
 $(BUILD)/guard-worker: tests/guard_worker.cpp $(HEADERS) | $(BUILD)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@
+
+.PHONY: panel-status
+panel-status: $(BUILD)/panel-status
+	$(BUILD)/panel-status
+$(BUILD)/panel-status: tests/panel_status.cpp $(HEADERS) | $(BUILD)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(LDFLAGS) $(LDLIBS) -o $@

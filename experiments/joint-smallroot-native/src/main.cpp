@@ -2,6 +2,7 @@
 #include "admission.hpp"
 #include "control.hpp"
 #include "pipeline.hpp"
+#include "panel_status.hpp"
 #include "supervisor.hpp"
 #include <iostream>
 #include <sys/prctl.h>
@@ -82,23 +83,19 @@ int main(int argc, char **argv) {
       }
       auto receipt = output / (c.id + "-supervisor");
       fs::create_directory(receipt);
-      try {
-        auto st = supervised(
-            delegated, receipt, admission.get("worker_binary"),
-            {"--approved-worker", argv[2], c.id, (output / c.id).string()});
-        std::string status =
-            st.censored
-                ? "censored"
-                : (WIFEXITED(st.wait_status) && WEXITSTATUS(st.wait_status) == 0
-                       ? "complete"
-                       : "failed");
-        statuses[c.id] = status + "\tretained supervisor receipt";
-        healthy = fs::exists(delegated / "cgroup.controllers") &&
-                  available_memory() >= 12ULL * 1024 * 1024 * 1024;
-      } catch (const std::exception &e) {
-        statuses[c.id] = "not_started\t" + std::string(e.what());
-        healthy = false;
-      }
+      auto result = run_panel_cell(
+          [&](bool &started) {
+            return supervised(
+                delegated, receipt, admission.get("worker_binary"),
+                {"--approved-worker", argv[2], c.id, (output / c.id).string()},
+                &started);
+          },
+          [&]() {
+            return fs::exists(delegated / "cgroup.controllers") &&
+                   available_memory() >= 12ULL * 1024 * 1024 * 1024;
+          });
+      statuses[c.id] = result.status;
+      healthy = result.healthy;
       save_statuses();
     }
     return healthy ? 0 : 1;

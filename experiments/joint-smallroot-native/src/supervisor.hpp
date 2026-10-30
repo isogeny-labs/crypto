@@ -30,7 +30,10 @@ inline unsigned long long available_memory() {
 inline SupervisedExit supervised(const fs::path &delegated,
                                  const fs::path &archive,
                                  const fs::path &binary,
-                                 const std::vector<std::string> &args) {
+                                 const std::vector<std::string> &args,
+                                 bool *started = nullptr) {
+  if (started)
+    *started = false;
   require(available_memory() >= 12ULL * 1024 * 1024 * 1024,
           "infrastructure-not-started: less than12GiB available");
   for (auto name : {"meminfo", "cpuinfo", "loadavg"})
@@ -76,6 +79,8 @@ inline SupervisedExit supervised(const fs::path &delegated,
     auto start = std::chrono::steady_clock::now();
     child = fork();
     require(child >= 0, "worker fork failed");
+    if (child > 0 && started)
+      *started = true;
     if (child == 0) {
       if (setpgid(0, 0) != 0)
         _exit(126);
