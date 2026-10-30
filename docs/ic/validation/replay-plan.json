@@ -34,8 +34,14 @@
    "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13",
    "replay": "all",
    "expect": "drift",
-   "reason": "the four IC arms (inherited F4 and root-finder, m2 and m3) differ; the rho rows reproduce",
+   "reason": "pre-#2043 recording (2245b75, lazy inherited-F4 specialisation charge, no accounting version): the inherited-F4 arms differ under the eager version-2 charge that is the method identity (owner, 2026-10-28), and the root-finder arms lack the two oracle_setup outcome counters added by c8bd952c4; the rho rows reproduce. Replayable only by its recording binary; re-recorded under version 2 as claim-n13-v2",
    "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"
+  },
+  {
+   "dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2",
+   "replay": "all",
+   "expect": "identical",
+   "evidence": "research/ecbench_rootfind_engine_20261012/audits/audit-claim-n13-v2-run1.json"
   },
   {
    "dir": "research/ecbench_n37_rank_columns_20261004/sessions/mac_arm64_l0_01",

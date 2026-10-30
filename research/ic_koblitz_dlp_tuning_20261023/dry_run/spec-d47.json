@@ -1,0 +1,166 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "dry",
+  "description": "Koblitz double-large-prime tuning, research/ic_koblitz_dlp_tuning_20261023/PROTOCOL.md. Counts only; public synthetic; no security claim.",
+  "workloads": {
+    "targets_per_curve": 2,
+    "target_seed": 777007,
+    "target_kind": "public",
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 47
+      }
+    ]
+  },
+  "arms": [
+    {
+      "name": "rho-frob",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "base-k64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=64,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "base-k128",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=128,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius-counted:m=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k4-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k8-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=2",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=10",
+          "max_trials": "50000000"
+        }
+      }
+    },
+    {
+      "name": "dlp-k16-c40",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=1000000",
+          "oracle": "mitm-frobenius:m=3,large_primes=2,lp_domain_factor=40",
+          "max_trials": "50000000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 777008,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}
