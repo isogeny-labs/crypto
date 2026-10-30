@@ -1,0 +1,21 @@
+digraph APS {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.3", fontname="Helvetica", fontsize=11, label="APS instrument: one cold timeline; no performance experiment has run", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3fb", color="#46627b", fontname="Helvetica", fontsize=10, margin="0.11,0.08"];
+  edge [fontname="Helvetica", fontsize=9, color="#46627b"];
+  setup [label="SETUP\nexplicit parameters\ncurve/orbit checks"];
+  query [label="TARGET QUERY\nlive validation\nseeded labeled base"];
+  pdp [label="TARGET PDP\nequations + export hash\nF4 + exact/legacy roots"];
+  relation [label="RELATION CHECK\nall signs; require B != 0\nindependent label/sum check"];
+  descent [label="DESCENT\nA/B modular recovery"];
+  check [label="RECOVERY CHECK\nproducer + independent\nscalar equality check"];
+  record [label="OUTCOME\nchecked answer in budget\nor retained failure/partial", fillcolor="#e9f4ed"];
+  gap [label="OPEN: complete native pricing\nfull-set/metric audit, native experiment export\nfrozen protocol + checkpoint + EKS", style="rounded,dashed,filled", fillcolor="#fff4df", color="#a87827"];
+  { rank=same; setup; query; pdp; }
+  { rank=same; relation; descent; check; }
+  { rank=same; record; gap; }
+  setup -> query -> pdp -> relation -> descent -> check -> record;
+  relation -> pdp [label="uninformative / exhaustive", constraint=false];
+  query -> record [label="abort", style=dashed, constraint=false];
+  pdp -> record [label="error / deadline", style=dashed, constraint=false];
+  gap -> record [style=dashed, arrowhead=none, constraint=false];
+}

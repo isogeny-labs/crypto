@@ -1,0 +1,174 @@
+import Mathlib.Algebra.Group.Basic
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.NormNum
+
+/-!
+Ternary packet labels. This is pure additive label algebra, independent of
+the coefficient ring used in contraction. The structural locality theorem
+explicitly assumes the selected coordinate's digit difference. It does not
+assert an integer-valuation-to-base-three-digit bridge, packet padding,
+target-split mode factorization, precision recovery, or a complexity theorem.
+-/
+
+namespace TernaryPacket
+
+variable {A : Type*} [AddCommGroup A]
+
+abbrev Pair (A : Type*) := A × A
+abbrev Tag (A : Type*) := Pair A × Pair A
+abbrev Digit := ZMod 3
+
+private theorem d10 : (1 : Digit) ≠ 0 := by decide
+private theorem d20 : (2 : Digit) ≠ 0 := by decide
+private theorem d21 : (2 : Digit) ≠ 1 := by decide
+private theorem d11 : (1 : Digit) + 1 = 2 := by decide
+private theorem d12 : (1 : Digit) + 2 = 0 := by decide
+private theorem d22 : (2 : Digit) + 2 = 1 := by decide
+private theorem dn1 : -(1 : Digit) = 2 := by decide
+private theorem dn2 : -(2 : Digit) = 1 := by decide
+
+def rot (p : Pair A) : Pair A := (-p.1 - p.2, p.1)
+def invRot (p : Pair A) : Pair A := (p.2, -p.1 - p.2)
+
+theorem rot_thrice (p : Pair A) : rot (rot (rot p)) = p := by
+  ext <;> simp [rot] <;> abel
+
+theorem rot_invRot (p : Pair A) : rot (invRot p) = p := by
+  ext <;> simp [rot, invRot] <;> abel
+
+theorem invRot_rot (p : Pair A) : invRot (rot p) = p := by
+  ext <;> simp [rot, invRot] <;> abel
+
+def pairAction (d : Digit) (p : Pair A) : Pair A :=
+  if d = 0 then p else if d = 1 then rot p else invRot p
+
+/-- Component one rotates forward; component two rotates backward. -/
+def tagAction (d : Digit) (t : Tag A) : Tag A :=
+  (pairAction d t.1, pairAction (-d) t.2)
+
+theorem pairAction_zero (p : Pair A) : pairAction 0 p = p := by
+  simp [pairAction]
+
+theorem tagAction_zero (t : Tag A) : tagAction 0 t = t := by
+  simp [tagAction, pairAction]
+
+theorem pairAction_add (x y : Digit) (p : Pair A) :
+    pairAction (x + y) p = pairAction y (pairAction x p) := by
+  fin_cases x <;> fin_cases y <;>
+    ext <;> simp [pairAction, d10, d20, d21, d11, d12, d22,
+      show (2 : Digit) + 1 = 0 from by decide, rot, invRot] <;> abel
+
+theorem tagAction_add (x y : Digit) (t : Tag A) :
+    tagAction (x + y) t = tagAction y (tagAction x t) := by
+  apply Prod.ext
+  · exact pairAction_add x y t.1
+  · simpa only [tagAction, neg_add] using pairAction_add (-x) (-y) t.2
+
+def row (c : Digit) (t : Tag A) : A := if c = 1 then t.1.1 else t.2.1
+def col (c : Digit) (t : Tag A) : A := if c = 1 then t.1.2 else t.2.2
+
+/-- For either nonzero digit c, the selected column at x+c equals the row at x. -/
+theorem digit_locality (t : Tag A) (x c : Digit) (hc : c ≠ 0) :
+    row c (tagAction x t) = col c (tagAction (x + c) t) := by
+  fin_cases x <;> fin_cases c <;>
+    simp_all [row, col, tagAction, pairAction, d10, d20, d21, d11, d12, d22,
+      show (2 : Digit) + 1 = 0 from by decide, dn1, dn2, rot, invRot] <;> abel
+
+def slotAction {a : Nat} (x : Fin a → Digit) (g : Fin a → Tag A) :
+    Fin a → Tag A := fun i => tagAction (x i) (g i)
+
+theorem slotAction_add {a : Nat} (x y : Fin a → Digit) (g : Fin a → Tag A) :
+    slotAction (x + y) g = slotAction y (slotAction x g) := by
+  funext i
+  exact tagAction_add (x i) (y i) (g i)
+
+theorem slotAction_translate {a : Nat} (g : Fin a → Tag A)
+    (x y d : Fin a → Digit) (h : slotAction x g = slotAction y g) :
+    slotAction (x + d) g = slotAction (y + d) g := by
+  rw [slotAction_add, slotAction_add, h]
+
+/-- Fibers of the slot-to-orbit map over any two reached classes are in
+bijection, by translation. This is the uniform multiplicity mechanism. -/
+def orbitFiberEquiv {a : Nat} (g : Fin a → Tag A) (x y : Fin a → Digit) :
+    {z : Fin a → Digit // slotAction z g = slotAction x g} ≃
+      {z : Fin a → Digit // slotAction z g = slotAction y g} where
+  toFun z := ⟨z.1 + (y - x), by
+    have h := slotAction_translate g z.1 x (y - x) z.2
+    have he : x + (y - x) = y := by abel
+    simpa only [he] using h⟩
+  invFun z := ⟨z.1 + (x - y), by
+    have h := slotAction_translate g z.1 y (x - y) z.2
+    have he : y + (x - y) = x := by abel
+    simpa only [he] using h⟩
+  left_inv z := by
+    apply Subtype.ext
+    change z.1 + (y - x) + (x - y) = z.1
+    abel
+  right_inv z := by
+    apply Subtype.ext
+    change z.1 + (x - y) + (y - x) = z.1
+    abel
+
+theorem orbit_fiber_uniform {a : Nat} (g : Fin a → Tag A)
+    (x y : Fin a → Digit) :
+    Nat.card {z : Fin a → Digit // slotAction z g = slotAction x g} =
+      Nat.card {z : Fin a → Digit // slotAction z g = slotAction y g} := by
+  exact Nat.card_congr (orbitFiberEquiv g x y)
+
+/-- Actual pointwise label implication, conditional only on the digit relation. -/
+theorem slot_locality {a : Nat} (g : Fin a → Tag A)
+    (x y : Fin a → Digit) (i : Fin a) (c : Digit)
+    (hc : c ≠ 0) (h : y i = x i + c) :
+    row c (slotAction x g i) = col c (slotAction y g i) := by
+  change row c (tagAction (x i) (g i)) = col c (tagAction (y i) (g i))
+  rw [h]
+  exact digit_locality (g i) (x i) c hc
+
+/-- The exact condition needed for fixed points to be zero. It is not automatic
+in characteristic three, even though locality and order three remain valid. -/
+def NoThreeTorsion (A : Type*) [AddCommGroup A] : Prop :=
+  ∀ z : A, z + z + z = 0 → z = 0
+
+theorem rot_fixed_iff (ht : NoThreeTorsion A) (p : Pair A) :
+    rot p = p ↔ p = (0, 0) := by
+  constructor
+  · intro h
+    have h₁ := congrArg Prod.fst h
+    have h₂ := congrArg Prod.snd h
+    change -p.1 - p.2 = p.1 at h₁
+    change p.1 = p.2 at h₂
+    have hz : p.1 + p.1 + p.1 = 0 := by
+      rw [← h₂] at h₁
+      calc
+        p.1 + p.1 + p.1 = (-p.1 - p.1) + p.1 + p.1 := by rw [h₁]
+        _ = 0 := by abel
+    have hzero := ht p.1 hz
+    ext <;> simp_all
+  · rintro rfl
+    simp [rot]
+
+theorem noThreeTorsion67 : NoThreeTorsion (ZMod 67) := by
+  decide
+
+theorem rot_fixed_iff67 (p : Pair (ZMod 67)) :
+    rot p = p ↔ p = (0, 0) := rot_fixed_iff noThreeTorsion67 p
+
+end TernaryPacket
+
+#print axioms TernaryPacket.rot_thrice
+#print axioms TernaryPacket.rot_invRot
+#print axioms TernaryPacket.invRot_rot
+#print axioms TernaryPacket.pairAction_zero
+#print axioms TernaryPacket.tagAction_zero
+#print axioms TernaryPacket.pairAction_add
+#print axioms TernaryPacket.tagAction_add
+#print axioms TernaryPacket.digit_locality
+#print axioms TernaryPacket.slotAction_add
+#print axioms TernaryPacket.slotAction_translate
+#print axioms TernaryPacket.orbit_fiber_uniform
+#print axioms TernaryPacket.slot_locality
+#print axioms TernaryPacket.rot_fixed_iff
+#print axioms TernaryPacket.noThreeTorsion67
+#print axioms TernaryPacket.rot_fixed_iff67
