@@ -4815,3 +4815,85 @@ pub fn run_gls_tau_control_decomposed(
     }
     Ok((calls, drawn))
 }
+
+/// E28–E30 (§9.26–§9.28): the constructions and the audit, with negative
+/// controls.
+#[cfg(test)]
+mod e28_e30_tests {
+    use super::*;
+    use crate::cryptanalysis::gaudry_quartic::{audited_product_cost, Fp4};
+
+    #[test]
+    fn e28_psi_keeps_t_and_the_line_and_a_wrong_sign_does_not() {
+        let inst = generate_gls_tau_instance(53, 2, 16).unwrap();
+        let curve = inst.curve();
+        let base = gls_tau_base(&inst, &mut StdRng::seed_from_u64(2), true).unwrap();
+        assert!((base.points_per_column - 4.0).abs() < 1e-9);
+        let t = Pt4 {
+            x: inst.x0,
+            y: E4::ZERO,
+            inf: false,
+        };
+        assert_eq!(inst.psi_gls(&curve, &t), t);
+        assert_eq!(
+            inst.psi_gls(&curve, &inst.g),
+            curve.mul(&inst.g, inst.lambda)
+        );
+        // Negative control: x ↦ +σ(x) is not an endomorphism of E.
+        let (_, cy) = inst.gls.unwrap();
+        let mut bad = inst;
+        bad.gls = Some((curve.f.from_fp(1), cy));
+        let img = bad.psi_gls(&curve, &inst.g);
+        assert!(!curve.on_curve(&img) || img != curve.mul(&inst.g, inst.lambda));
+    }
+
+    #[test]
+    fn e29_psi_p_has_order_24_and_a_wrong_twist_factor_fails() {
+        let k = run_e29_kill(241, 1).unwrap();
+        assert!(k.psi_p_on_curve && k.lambda_p_found);
+        assert_eq!(
+            (k.order_lambda_p, k.order_chi6_b, k.group_order),
+            (24, 6, 24)
+        );
+        assert_eq!(twist24_order(241, k.canonical_b0.unwrap()), Some(k.n));
+        // Negative control: u = b^{−(p−1)/3} (a cube root, not a sixth root of
+        // b^{1−p}) does not give a map onto E.
+        let inst = generate_psi_instance(241, 1).unwrap();
+        let curve = inst.curve();
+        let f = &curve.f;
+        let q4 = 241u128.pow(4) - 1;
+        let u = f.pow(&inst.b, q4 - 240 / 3);
+        let z = f.pow(&E4([0, 1, 0, 0]), 240).0[0];
+        let pt = inst.g;
+        let img = Pt4 {
+            x: f.mul(&f.sq(&u), &f.frob_p(&pt.x, z)),
+            y: f.mul(&f.mul(&f.sq(&u), &u), &f.frob_p(&pt.y, z)),
+            inf: false,
+        };
+        assert!(!curve.on_curve(&img));
+    }
+
+    #[test]
+    fn e30_audit_reprices_only_trivial_products() {
+        let f = Fp4::with_arith(101, true);
+        let mut rng = StdRng::seed_from_u64(1);
+        let a = loop {
+            let a = f.random(&mut rng);
+            if !a.in_fp() {
+                break a;
+            }
+        };
+        assert_eq!(audited_product_cost(&a, &E4::ONE, 13), 0);
+        assert_eq!(audited_product_cost(&E4::ZERO, &a, 19), 0);
+        assert_eq!(audited_product_cost(&a, &f.from_fp(7), 13), 4);
+        // Negative control: two generic elements keep their full price.
+        let b = loop {
+            let b = f.random(&mut rng);
+            if !b.in_fp() {
+                break b;
+            }
+        };
+        assert_eq!(audited_product_cost(&a, &b, 13), 13);
+        assert_eq!(audited_product_cost(&a, &b, 19), 19);
+    }
+}

@@ -3384,3 +3384,34 @@ divides the columns by `4.00` and the linear algebra by `13`–`15` against E18'
 `S₅` handover by `≈ 9`–`10` bits on the same curves, to `2^{135}`–`2^{142}`.  **Class: engineering on the `j = 0`
 / `S₅` line, and a model (no `S₅` solve was run); not an improvement of the baseline**, whose modelled handover
 (E24, `2^{90.1}`; E25 `2^{88.0}`) is `≥ 2^{45}` earlier.
+
+### 9.32 E30 measured: trivial products are `0.31 %` of `S`; the distance to rho moves `−0.31 %` at most — an accounting correction
+
+*2026-10-30.*  Code and binary `0e4fccce1` (`experiments/35_invariants_lite/binary_commit.txt`).  Walk audit
+`examples/e30_audit.rs` (`walk_audit.{json,log}`); IC side `run_e2e.sh` (E27's Karatsuba solver-A runs plus
+`--audit`; `e2e_audit_p*s*.json`, log, finished `2026-10-30T22:23:38Z`); tables `examples/e30_tables.rs` →
+`tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.  As §9.28 states, this is a
+minimal accounting audit registered in place of the lost "invariants-lite" draft, not that draft.
+
+**Results.**  All twenty audited records reproduce E27's Karatsuba records in every field except wall times and
+the new counter (the walks are re-run and not compared here; E27 established them).  The audit re-prices
+`0.3087`–`0.3131 %` of `S` away on every row (`1.4·10⁷`–`7.1·10⁸` `F_p` multiplications per run): products by
+`0`, `1` or an element of `F_p` in the IC side's `F_{p⁴}` work, which here is `≈ 2 %` of `S`, so about one in seven
+of its counted products is trivial.  The `⟨±ψ⟩` walk's saving is `0`–`1.1` multiplications per walk
+(`≤ 0.0002 %`): its `ψ` multipliers are not in `F_p` on any of the ten curves.  The distance to the matched walk
+(E27's (iii)) moves by **`−0.309`–`−0.313 %`** at `0` GAE, `−0.084`–`−0.086 %` at `0.1` and `−0.011 %` at `1` GAE.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.110 | every non-count field of E27's records reproduced on all `20` | **holds** |
+| G2.111 | `S` falls `0.309`–`0.313 %` | **holds** |
+| G2.112 | walk `≤ 0.0002 %` | **holds** |
+| G2.113 | largest change `0.313 %` (red team's estimate for the lost draft: `≈ 0.6 %`) | **holds** |
+
+**What it says.**  Pricing a product by `0`, `1` or an `F_p` scalar as such moves `S` by `0.31 %` and the walk
+by nothing measurable.  **Class: accounting** — no algorithm changed, and it is not an improvement.  It is
+recorded so that a later counter change of this kind is not mistaken for progress.  Of comparable size, and
+also an accounting effect, is main's change of 2026-10-24 (§9.29): charging the walks' `[d]G` check moved
+every matched rho of these curves by `0.13`–`0.78 %` in the other direction.
+
+**Unit tests (E27–E30), run in one build at the end of the session:** recorded in the session log and the PR.
