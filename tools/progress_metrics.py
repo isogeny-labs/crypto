@@ -543,12 +543,36 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+
+def twist_cm8_b3(ref, since):
+    """Exact finite cohort counters only; no speed or distinct-challenge estimate."""
+    path = "research/quadratic_twist_evidence_20261021/native/cm8-37-b3-20261030/audit.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "quadratic-twist-cm8-37-b3-audit/v1":
+            continue
+        for field, unit in (
+            ("configurations", "complete policy/encoding/cap configurations"),
+            ("source_targets", "configuration-target attempts on 18 repeated source points"),
+            ("verified_recoveries", "verified original-source recovery runs, repeated points"),
+            ("blocked_setups", "public-log setups blocked within caps 0 through 8"),
+            ("strict_joint_recovery_admitted", "boundary-limited higher-rank/lower-cap pair records"),
+            ("strongest_source_joint_pair_records", "boundary-limited strongest-source joint records"),
+        ):
+            value = record.get(field)
+            if isinstance(value, int) and not isinstance(value, bool):
+                emit("twist.cm8_f37_b3." + field, value, date=date,
+                     problem=P_IC, unit=unit, better="neutral",
+                     label="F37 size-three cohort, caps 0-8; no cost or regularity result",
+                     source=f"{path}@{commit}")
+
 def main():
     a = args()
     twist_known_roots(a.ref)
     twist_signed_cache(a.ref)
     twist_direct_sign(a.ref)
     twist_cm8_transfer(a.ref)
+    twist_cm8_b3(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)

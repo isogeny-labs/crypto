@@ -1,5 +1,14 @@
 # Requirement-to-evidence map
 
+## 2026-10-30: complete size-three F37 study and boundary finding
+
+[New report](reports/cm8-37-b3-20261030/README.md):336arms/one encoding/caps0..8,3024configs/54432 separate attempts on18 repeated original-source points.1944recoveries verify,2916public-log setups blocked,52100capped diagnostic query records. Ten changed controls reject101/no receipt,22backend tests pass. New generic cubic/S3 input-equality proof6named/7audited passes; prior actual F37 source reduction19/22 reused within hypotheses.
+
+ZERO joint/strongest-source records is BOUNDARY-LIMITED: all roles have0recoveries throughcap7 and486perrole atcap8, so there is no eligible admitted lower-cap comparison in0..8. Do not treat this as universal no-advantage. Next preregister fresh caps9..12 across ALL336arms, retain0..8 as fixed historical evidence and distinguish old/new execution. No extension/newencoding run yet. Symmetric-coordinate distinct/diagonal membership is a secondary unproved/unimplemented hypothesis requiring faithful proofs/lifting before data.
+
+Owner merge af3587 leaves frozen study paths unchanged; literal registry20809 SHA53fe929b9b971fa2c74ee29fcd5cea7fca969d411ae28e8cbf413c9550f3032e adds22,loses0,changes0shared,still1921studyrowsabsent. NativeCI primary failure on syntheticmerge26fb0d38 again emits1921rows/3842aliases, not installed/combined verified. Exact checkout/hash distinction retained. Auto-merge disabled again via dedicated non-merge mutation. Root/currentglobal suite not newly tested, naming/Conductor127/no lease/requiredCI/review/integration holds remain. Keep samePRopen/nondraft/auto-mergeOFF, approved branch checkpoints/localresources only. Scientific window15:15–16:15UTC is finished; no science in flight.
+
+
 ## 2026-10-30: executed F37 transfer and full size-two frontier
 
 [New report](reports/cm8-37-20261030/README.md): actual E/F37(7,19) and nonsquare35 twist T(28,33), P=(1,8), U=(32,29), order19. Native independent paths check38+38 points,2888 addition pairs,19 scalar images/inverses. New actual-point Lean source passes19 named/22 audited declarations, no extra trusted axioms; explicit cyclic-domain source-DLP equivalence and kernel controls, not generic classification.
