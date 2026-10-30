@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
 - **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-10-30
 
 ## Problem
 
@@ -72,6 +72,23 @@ all phases, matched rho and independent replay under repository rules.
   and verification, or a concrete relevant algebraic certificate.
 
 ## Resolution and history
+
+2026-10-30: the [structured predicate reference](../research/prime_ic_zero_filter_20261030/implementation/README.md)
+implements a rational two-isogeny fibre membership circuit with actual subgroup
+constraints, complete signed point-summation charts, exact counts and prefix
+witness extraction. A reusable local membership decision diagram can be built
+from quadratic fibre roots and both rational lifts, without scanning all field
+encodings; a separate exhaustive compiler is the finite control. The native
+checks cover two small fields, including the intermediate identity chart,
+noncanonical/nonrational inputs, poles, subgroup rejection and zero/limit
+distinctions. This special rational-two-torsion family does not cover arbitrary
+PKM auxiliary isogenies or prime-order curves without rational two-torsion.
+The execution backend remains finite functional enumeration. No compact message
+for the complete summation zero predicate, growing-parameter advantage, useful
+relation-rank improvement or end-to-end IC cost is established. The next code
+obligation is a bounded representation for the constrained summation boundary,
+checked against this reference with setup and intermediate storage retained.
+The successful-work and regularity exit conditions above remain open.
 
 2026-10-26: the literature/atlas review selects the still-unexamined native
 transfer of the product-profile/linearization-excess prior. The

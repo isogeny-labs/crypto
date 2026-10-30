@@ -404,7 +404,10 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
         } else if let Some((_, target)) = BinaryCurve::certicom_challenge(&curve.name) {
             (nist::AnyPoint::Binary(target), None, None)
         } else {
-            return Err(format!("{} is not a supported Certicom challenge", curve.name));
+            return Err(format!(
+                "{} is not a supported Certicom challenge",
+                curve.name
+            ));
         }
     } else if let Some(path) = &args.point_file {
         let (point, receipt) = load_target_artifact(&curve, path)?;
@@ -625,6 +628,26 @@ fn cmd_bench(args: &BenchArgs, json: bool) -> Result<(), String> {
     Ok(())
 }
 
+fn main() -> ExitCode {
+    let cli = Cli::parse();
+    let r = match &cli.command {
+        Command::List => cmd_list(cli.json),
+        Command::Audit(a) => cmd_audit(&a.curve, cli.json),
+        Command::Solve(a) => cmd_solve(a, cli.json),
+        Command::Smart(a) => cmd_smart(a, cli.json),
+        Command::Bench(a) => cmd_bench(a, cli.json),
+    };
+    match r {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(e) => {
+            if !e.is_empty() {
+                eprintln!("error: {e}");
+            }
+            ExitCode::FAILURE
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -718,25 +741,5 @@ mod tests {
         std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
         assert_eq!(load_target_artifact(&curve, &path).unwrap().0, point);
         std::fs::remove_file(path).unwrap();
-    }
-}
-
-fn main() -> ExitCode {
-    let cli = Cli::parse();
-    let r = match &cli.command {
-        Command::List => cmd_list(cli.json),
-        Command::Audit(a) => cmd_audit(&a.curve, cli.json),
-        Command::Solve(a) => cmd_solve(a, cli.json),
-        Command::Smart(a) => cmd_smart(a, cli.json),
-        Command::Bench(a) => cmd_bench(a, cli.json),
-    };
-    match r {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(e) => {
-            if !e.is_empty() {
-                eprintln!("error: {e}");
-            }
-            ExitCode::FAILURE
-        }
     }
 }

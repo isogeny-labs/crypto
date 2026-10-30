@@ -1,0 +1,361 @@
+openapi: 3.1.0
+info:
+  title: ecdb
+  version: 0.1.0
+  summary: Elliptic curves, higher-genus curves, Jacobians, isogenies, covers and DLP transfers.
+  description: |
+    Read-mostly catalogue API over the Postgres schema in ecdb/migrations (schema `ec`).
+
+    Conventions:
+    * Integers are exact. An integer outside +/-(2^53 - 1) is returned as a decimal string;
+      smaller integers and non-integers are JSON numbers.
+    * Field elements are strings in the field's `element_encoding`: decimal residue for GF(p),
+      `0x` bitset (bit i = coefficient of t^i) for polynomial-basis GF(2^m), `e_0,...,e_{k-1}`
+      for GF(p^k). Polynomials are arrays of field elements, ascending degree.
+    * Every derived value carries a status (`proved`, `probable`, `bounded`, `heuristic`,
+      `conjectural`, `refuted`, `unknown`, `not_evaluated`, `not_applicable`). Unknown values are
+      null; null is never zero or false.
+    * A curve reference (`{reference}`) is a numeric id, an ICV1 slug or full ICV1 string, an EC1
+      alias, an EC1 `curve_uid`, a standard name or OID, or any recorded alias (case-insensitive).
+      An ambiguous reference returns 409 with the candidates.
+    * Identity is never inferred from j, order or degree; twists share j and isogenous curves share
+      the order.
+servers:
+  - url: http://localhost:8080
+security:
+  - {}
+  - bearer: []
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      description: Required on reads when ECDB_READ_TOKEN is set; always required on writes (ECDB_WRITE_TOKEN).
+  parameters:
+    reference:
+      name: reference
+      in: path
+      required: true
+      schema: { type: string }
+      example: secp256k1
+    limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+    offset:
+      name: offset
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        code: { type: string, description: SQLSTATE for database errors }
+        detail: { type: [string, "null"] }
+        hint: { type: [string, "null"] }
+        candidates:
+          type: array
+          description: Present on 409 (ambiguous reference).
+          items: { type: object }
+    Page:
+      type: object
+      properties:
+        total: { type: [integer, string] }
+        limit: { type: integer }
+        offset: { type: integer }
+        items: { type: array, items: { type: object } }
+    CurveSummary:
+      type: object
+      description: One row of ec.v_curve_summary.
+      properties:
+        id: { type: integer }
+        icv1_slug: { type: [string, "null"] }
+        icv1: { type: [string, "null"] }
+        family: { type: [string, "null"] }
+        genus: { type: integer }
+        model: { type: string }
+        field_kind: { type: string, enum: [rational, number_field, prime, binary, prime_power, p_adic, real, complex, function_field] }
+        characteristic: { type: [integer, string] }
+        field_degree: { type: [integer, "null"] }
+        q: { type: [integer, string, "null"] }
+        field_bits: { type: [integer, "null"], description: "ceil(log2 q)" }
+        standard_names: { type: [array, "null"], items: { type: string } }
+        j_invariant: { type: [string, "null"] }
+        isogeny_class_label: { type: [string, "null"] }
+        trace: { type: [integer, string, "null"] }
+        group_order: { type: [integer, string, "null"] }
+        frobenius_discriminant: { type: [integer, string, "null"] }
+        cm_discriminant: { type: [integer, string, "null"] }
+        conductor_v: { type: [integer, string, "null"], description: "[O_K : Z[pi]]" }
+        class_number: { type: [integer, string, "null"] }
+        end_discriminant: { type: [integer, string, "null"] }
+        end_conductor: { type: [integer, string, "null"] }
+        end_is_maximal: { type: [boolean, "null"] }
+        subgroup_order: { type: [integer, string, "null"] }
+        subgroup_bits: { type: [integer, "null"] }
+        cofactor: { type: [integer, string, "null"] }
+        embedding_degree: { type: [integer, string, "null"] }
+        twist_largest_prime_bits: { type: [integer, "null"] }
+        definition_degree: { type: [integer, "null"] }
+        isogeny_count: { type: integer }
+        cover_count: { type: integer }
+paths:
+  /healthz:
+    get:
+      summary: Liveness and schema version.
+      security: [{}]
+      responses: { "200": { description: OK } }
+  /openapi.yaml:
+    get:
+      summary: This document.
+      security: [{}]
+      responses: { "200": { description: OK } }
+  /v1/meta:
+    get:
+      summary: Row counts, schema version and the pinned input files (path, sha256, commit).
+      responses: { "200": { description: OK } }
+  /v1/schema:
+    get:
+      summary: Every table and view with column types, comments, foreign keys and CHECK constraints; enums; documented functions.
+      description: Start here to write POST /v1/sql queries.
+      responses: { "200": { description: OK } }
+  /v1/curves:
+    get:
+      summary: Filter and sort curves (ec.v_curve_summary).
+      parameters:
+        - { name: field_kind, in: query, schema: { type: string } }
+        - { name: characteristic, in: query, schema: { type: string } }
+        - { name: field_degree, in: query, schema: { type: integer } }
+        - { name: field_bits_min, in: query, schema: { type: integer } }
+        - { name: field_bits_max, in: query, schema: { type: integer } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: icv1_field, in: query, schema: { type: string } }
+        - { name: genus, in: query, schema: { type: integer } }
+        - { name: model, in: query, schema: { type: string }, description: "ec.curve_model, e.g. short_weierstrass, binary_weierstrass, montgomery, twisted_edwards, hyperelliptic" }
+        - { name: family, in: query, schema: { type: string }, description: "producer family: koblitz, binary, prime, extension, subfield, isogeny-walk, cover" }
+        - { name: trace, in: query, schema: { type: string } }
+        - { name: isogeny_class, in: query, schema: { type: string }, description: LMFDB-style label g.q.a_1_..._a_g }
+        - { name: j_invariant, in: query, schema: { type: string } }
+        - { name: cm_discriminant, in: query, schema: { type: string } }
+        - { name: class_number, in: query, schema: { type: string } }
+        - { name: class_number_max, in: query, schema: { type: string } }
+        - { name: conductor_bits_max, in: query, schema: { type: integer } }
+        - { name: end_discriminant, in: query, schema: { type: string } }
+        - { name: end_is_maximal, in: query, schema: { type: boolean } }
+        - { name: subgroup_bits_min, in: query, schema: { type: integer } }
+        - { name: subgroup_bits_max, in: query, schema: { type: integer } }
+        - { name: cofactor, in: query, schema: { type: string } }
+        - { name: embedding_degree_max, in: query, schema: { type: string } }
+        - { name: twist_prime_bits_min, in: query, schema: { type: integer } }
+        - { name: is_anomalous, in: query, schema: { type: boolean } }
+        - { name: is_supersingular, in: query, schema: { type: boolean } }
+        - { name: definition_degree, in: query, schema: { type: integer } }
+        - { name: standard, in: query, schema: { type: string }, description: substring of a standard name }
+        - { name: name, in: query, schema: { type: string }, description: substring of any alias or standard name }
+        - { name: has_isogenies, in: query, schema: { type: boolean } }
+        - { name: has_covers, in: query, schema: { type: boolean } }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [id, icv1_slug, field_bits, group_order_bits, subgroup_bits, trace, class_number, conductor_bits, embedding_degree, cm_discriminant, isogeny_count, cover_count]
+        - { name: order, in: query, schema: { type: string, enum: [asc, desc] } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: A page of curve summaries.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Page"
+                  - properties: { items: { type: array, items: { $ref: "#/components/schemas/CurveSummary" } } }
+  /v1/curves/{reference}:
+    get:
+      summary: Everything recorded about one curve (ec.curve_document).
+      description: |
+        Field and EC1 field records; model, coefficients, ICV1 model JSON; genus-1 invariants or the
+        hyperelliptic / equation model; geometric invariants; aliases and standards; EC1
+        representations; Jacobian and isogeny class (Weil polynomial); zeta / point counts;
+        Frobenius and per-prime data; endomorphism ring and volcano levels; automorphism group;
+        explicit endomorphisms and GLV/GLS decompositions; tau-adic data; subfield descent; twists;
+        group structure; subgroups with pairing data and attack-surface summaries; p-adic invariants;
+        global data; generation; relations, isogenies, covers, transfers; division polynomials;
+        certificates; external labels; evidence links.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses:
+        "200": { description: The curve document. }
+        "404": { description: Unknown reference., content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "409": { description: Ambiguous reference; candidates listed., content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+  /v1/curves/{reference}/isogenies:
+    get:
+      summary: Isogenies from or to the curve, with kernel polynomials, Vélu codomains and certificates.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: OK } }
+  /v1/curves/{reference}/graph:
+    get:
+      summary: Recorded isogeny graph around the curve (breadth-first over stored edges only).
+      parameters:
+        - $ref: "#/components/parameters/reference"
+        - { name: depth, in: query, schema: { type: integer, minimum: 0, maximum: 8, default: 2 } }
+        - { name: ell, in: query, schema: { type: string }, description: restrict to l-isogenies }
+      responses: { "200": { description: "{root, depth, ell, nodes[{id, icv1_slug, j_invariant, trace, end_discriminant, end_conductor, levels}], edges[]}" } }
+  /v1/curves/{reference}/transfers:
+    get:
+      summary: Priced DLP transfer routes for the curve (GHS / Weil descent, covers, base-change descent, extension-field index calculus).
+      description: Costs are formula estimates under the cost model in the provenance parameters, not measured speedups.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: OK } }
+  /v1/curves/{reference}/covers:
+    get:
+      summary: Morphisms from higher-genus curves onto this curve (and from this curve), with the cover's model and map.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: OK } }
+  /v1/curves/{reference}/traits:
+    get:
+      summary: Verbatim producer trait records (e.g. curve-traits/2 with DiSSECT families).
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: OK } }
+  /v1/isogenies/{id}:
+    get:
+      summary: One isogeny with its routes and provenance.
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /v1/isogeny-classes:
+    get:
+      summary: Isogeny classes of abelian varieties over finite fields (Weil polynomials), any dimension.
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: p, in: query, schema: { type: string } }
+        - { name: g, in: query, schema: { type: integer } }
+        - { name: trace, in: query, schema: { type: string } }
+        - { name: label_prefix, in: query, schema: { type: string } }
+        - { name: is_supersingular, in: query, schema: { type: boolean } }
+        - { name: is_simple, in: query, schema: { type: boolean } }
+        - { name: p_rank, in: query, schema: { type: integer } }
+        - { name: has_jacobian, in: query, schema: { type: boolean } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/isogeny-classes/{label}:
+    get:
+      summary: One isogeny class (label or id) with Frobenius data, per-prime data, member curves and volcanoes.
+      parameters: [{ name: label, in: path, required: true, schema: { type: string }, example: 1.8.af }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /v1/fields:
+    get:
+      summary: Field representations with curve counts.
+      parameters:
+        - { name: kind, in: query, schema: { type: string } }
+        - { name: characteristic, in: query, schema: { type: string } }
+        - { name: degree, in: query, schema: { type: integer } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/fields/{id}:
+    get:
+      summary: One field with its EC1 records and embeddings.
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /v1/transfers:
+    get:
+      summary: DLP transfer routes across all curves, highest formula ratio first.
+      parameters:
+        - { name: route_kind, in: query, schema: { type: string } }
+        - { name: verdict, in: query, schema: { type: string, examples: [formula_advantage, formula_marginal, boundary, not_carried] } }
+        - { name: target, in: query, schema: { type: string } }
+        - { name: min_ratio_log2, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: OK } }
+  /v1/polynomials/{sha256}:
+    get:
+      summary: A content-addressed polynomial (inline coefficients or an artifact pointer).
+      parameters: [{ name: sha256, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK }, "404": { description: Not found } }
+  /v1/modular-polynomials:
+    get:
+      summary: Modular polynomials by level and kind.
+      parameters:
+        - { name: level, in: query, schema: { type: integer } }
+        - { name: kind, in: query, schema: { type: string } }
+      responses: { "200": { description: OK } }
+  /v1/sql:
+    post:
+      summary: Run one read-only SQL query (search_path ec, public).
+      description: |
+        One statement, wrapped as a subquery, in a READ ONLY transaction with a statement timeout,
+        as ECDB_SQL_ROLE (ecdb_reader). Rows come back as arrays in column order.
+        Useful functions: ec.resolve_curve(text), ec.curve_document(bigint),
+        ec.isogeny_neighbourhood(bigint, integer, numeric).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sql]
+              properties:
+                sql: { type: string, example: "SELECT cm_discriminant, count(*) FROM v_curve_summary GROUP BY 1 ORDER BY 2 DESC LIMIT 10" }
+                limit: { type: integer }
+      responses:
+        "200":
+          description: "{columns, types, rows, row_count, truncated}"
+        "400": { description: SQL error (message, SQLSTATE, detail, hint)., content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+  /v1/evidence:
+    post:
+      summary: Link a curve to a research artifact (write token).
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [curve, kind, agent]
+              properties:
+                curve: { type: string }
+                kind: { type: string, examples: [ecbench_session, isogeny_walk, ic_run, rho_run, report, paper] }
+                repository: { type: string }
+                path: { type: string }
+                sha256: { type: string }
+                summary: { type: object }
+                validation_status: { type: string }
+                agent:
+                  type: object
+                  required: [name]
+                  properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
+      responses: { "201": { description: Created }, "200": { description: Duplicate }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }
+  /v1/isogenies:
+    post:
+      summary: Record an isogeny claim between two curves over the same field (write token).
+      description: |
+        Status `proved` needs a certificate and a kernel polynomial; a kernel polynomial of a cyclic
+        l-isogeny must be monic of degree (l - 1)/2 (1 for l = 2). The API does not verify the
+        kernel against the division polynomial: the row is a claim with agent provenance.
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source, target, degree, agent]
+              properties:
+                source: { type: string }
+                target: { type: string }
+                degree: { type: string }
+                kernel_polynomial: { type: array, items: { type: string } }
+                formula: { type: string, enum: [velu, kohel, elkies, sqrt_velu, radical, modular_polynomial, richelot, lubicz_robert, cosset_robert, kani, frobenius, verschiebung, dual, composition, cm_action, other, unknown] }
+                direction: { type: string, enum: [horizontal, ascending, descending, unknown] }
+                certificate: { type: string }
+                status: { type: string, enum: [proved, probable, heuristic, conjectural, unknown] }
+                external_id: { type: string }
+                agent:
+                  type: object
+                  required: [name]
+                  properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
+      responses: { "201": { description: Created }, "200": { description: Duplicate }, "400": { description: Rejected }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }

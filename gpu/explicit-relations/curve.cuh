@@ -1,5 +1,5 @@
 // Public-input arithmetic for explicit signed relation finding. Reuses the
-// repository's Montgomery Fp64 implementation; 5 <= p < 2^62, p prime.
+// repository's Montgomery Fp64 implementation; 5 <= p < 2^63, p prime.
 #pragma once
 #include "../rootfind/fp64.cuh"
 
@@ -7,7 +7,7 @@ namespace explicit_relations {
 using U = uint64_t;
 // Canonical residues, 0 < modulus < 2^63. Every addition is <2*modulus,
 // hence fits u64. Used only for wider hash moduli; curve Montgomery stays
-// on its established p<2^62 path.
+// on its checked p<2^63 path; this helper retains its narrower bound.
 RF_HD U hash_mul63(U a, U b, U modulus) {
   U result = 0;
   while (b) {
@@ -23,10 +23,40 @@ RF_HD U hash_mul63(U a, U b, U modulus) {
   }
   return result;
 }
+// Overflow-safe canonical multiplication for any nonzero u64 modulus.
+RF_HD U hash_mul64(U a, U b, U modulus) {
+  U result = 0;
+  while (b) {
+    if (b & 1)
+      result = result >= modulus - a ? result - (modulus - a) : result + a;
+    a = a >= modulus - a ? a - (modulus - a) : a + a;
+    b >>= 1;
+  }
+  return result;
+}
 struct Point {
   U x = 0, y = 0;
   bool inf = true;
 };
+// Exact affine cache: x=UINT64_MAX is disjoint from every supported field.
+struct alignas(16) CachedPoint {
+  U x = UINT64_MAX, y = 0;
+  RF_HD static CachedPoint from(Point p) {
+    return p.inf ? CachedPoint{} : CachedPoint{p.x, p.y};
+  }
+  RF_HD Point point() const {
+    return x == UINT64_MAX ? Point{} : Point{x, y, false};
+  }
+};
+static_assert(sizeof(CachedPoint) == 16 && alignof(CachedPoint) == 16,
+              "exact aligned affine cache layout");
+// Admission arithmetic avoids overflowing count*sizeof(CachedPoint).
+RF_HD bool right_cache_fits(U count, U retained, U free_bytes, U byte_limit) {
+  const U budget = free_bytes - free_bytes / 4;
+  return count && retained <= budget &&
+         count <= (budget - retained) / sizeof(CachedPoint) &&
+         count <= byte_limit / sizeof(CachedPoint);
+}
 struct Jac {
   U x = 0, y = 0, z = 0;
 };
@@ -179,8 +209,8 @@ struct RowLess {
 };
 // Exact point compression on one validated odd-prime curve (SEC 1 section
 // 2.3.3): the two roots y and p-y have opposite parity. Infinity is key zero;
-// finite keys are 2*(x+1)+(y&1). The service requires p<2^62, so keys and the
-// prefix endpoint at x=2^62 fit u64. This is not a fingerprint and must never
+// finite keys are 2*(x+1)+(y&1). The service requires p<2^63, so all finite keys fit u64.
+// The terminal prefix offset is written as table size, without encoding 2^63. This is not a fingerprint and must never
 // be used to compare arbitrary off-curve coordinates or different curves.
 RF_HD U point_key(Point p) {
   return p.inf ? 0 : ((p.x + 1) << 1) | (p.y & 1);

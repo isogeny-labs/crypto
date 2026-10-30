@@ -22,10 +22,7 @@ pub enum ChainBuildError {
 
 /// Worst-case SAT variable count for the field-product circuit, before a
 /// finite-coordinate domain. The bound is exact for the all-affine pattern.
-/// Defined through `m = 9`, the summand sweep's range; the five- and
-/// six-summand decomposers keep their own admission.
 pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
-    if !(2..=9).contains(&m) || !(2..=127).contains(&n) {
     // m=15 uses only 13 intermediate-identity bits. Keep this explicit
     // bound below the u32 mask width; build() checks its allocation cap
     // against the returned full circuit bound before constructing gates.

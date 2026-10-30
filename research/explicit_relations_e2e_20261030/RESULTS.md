@@ -169,3 +169,28 @@ certified. EKS was not used; any future EKS image must come from crypto main.
 
 [Inspected seven-page report](reports/run-20261030T0304Z/report.pdf) and
 [benchmark browsing copies](../../benchmarks/20261030-explicit-relations-gpu/README.md).
+
+## V11: complete prescribed recovery through 62 field bits
+
+All 12 executions succeeded: eight matched 52-bit controls and both fixed
+targets at 61 and 62 bits. Every certificate passed fresh CPU replay and
+scalar+1 rejection; the prescribed 52-bit cross-arm certificates match exactly.
+The measured source is `d44b59149f468357e86186f956ecb7e323f38915`.
+
+The two 62-bit cold solves took 2139.880951918 and 2187.942594727 seconds; totals
+including the separate audit were 2139.908483146 and 2187.971582474 seconds.
+For this panel, target-coordinate generation is outside `solver_seconds` and
+included in `wall_seconds`, along with fresh replay and corruption rejection.
+All clocks remain L0 diagnostics with `wall_valid=false`. Table admission
+estimates, including queried CUB scratch, were 48,798,250,775 and 49,539,778,479
+bytes; these are not measured peak VRAM. No hardware maximum is established.
+
+[Raw rows](results-v11/rows.csv), [export](results-v11/export.json),
+[strict audit](results-v11/frontier-audit.txt), [validation scope](results-v11/CHECKER-NOTE.md),
+and [inspected two-page report](reports/run-20261030T1550Z/report.pdf).
+All 19 Rust tests and recorded device/header/Clippy/sanitizer checks passed.
+Archive integrity and pod deletion were verified; raw evidence was pushed
+before rendering. Schema/flow/file hashes pass; five canonical rectangular
+coverage findings remain disclosed. The exact staged plan and eight mutation
+controls pass the native coverage audit. V13 separately tests persistent
+queries and full right-sum reuse; its results are not included here.

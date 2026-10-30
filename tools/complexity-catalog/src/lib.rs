@@ -154,6 +154,8 @@ impl Catalog {
 
 #[cfg(test)]
 mod controls;
+#[cfg(test)]
+mod prime_ic;
 
 #[cfg(test)]
 mod tests {

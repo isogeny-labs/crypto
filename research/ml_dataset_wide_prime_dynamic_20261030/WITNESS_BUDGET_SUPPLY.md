@@ -1,0 +1,9 @@
+# Persistent witness budget exclusive supply
+
+2026-10-30; outside patch against ae420869a0567d1ae737771456fce13b3acf0ce2. Root authorized narrow API; dynamic author confirmed exact names and semantics before code.
+
+set_exclusive_supply(remaining_work:u64,remaining_bytes:u64)->Result<(),WitnessError> first closes old unused supply, then checked-adds cumulative reserved_work/reserved_bytes to the supplied parent remainder. Both new limits install only after both additions succeed. Overflow returns Work/Storage and leaves supply closed. release_exclusive_supply()->() clamps both absolute limits to their cumulative reservations. Neither method changes cumulative receipts or original deadline; reconciliation is clock-independent even after expiry. Actual reserve/spend retains original deadline checks. No allocation or new storage fields.
+
+Caller must exclusively lend the CURRENT original parent remainder; this API cannot authenticate an arbitrary caller number. The same parent allowance cannot remain concurrently spendable. Persist one WitnessBudget for preparation, publication and retries. After each callback success/error, release supply and settle only the new cumulative reservation/performed deltas, unconditionally. Unused unreserved supply returns to parent access; already reserved work/bytes never refund, even if local performed was smaller. Do not reconstruct a budget, reset a watermark or extend deadline. Borrowing &mut ensures release cannot invalidate a still-live local WitnessTicket in safe Rust.
+
+Controls cover preserved reserved/performed history, exact supplied remainder and one-more refusal, release disallowing positive work/byte reservation, work and byte overflow fail-closed atomically, and resupply after expiry leaving original deadline unchanged and execution refused. This is an integration mechanism, not a new resource grant or runtime activation.

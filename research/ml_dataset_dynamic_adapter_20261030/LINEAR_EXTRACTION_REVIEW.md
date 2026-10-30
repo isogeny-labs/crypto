@@ -1,0 +1,9 @@
+# Independent linear-extraction v3 narrow review
+
+2026-10-30. Verified patch SHA256 `22b511981de3a06bbaa253ee0292ed15c0f0c05ac50ff083db3586480f891c3c` and reviewed its complete difference from v2 `36865d73630b3027c2a42fbd136fcf11f3e29e5acc0b170e3e7e73d1c0a844f3`. Base remains `342eef26d2f1c5af3a8f20033102a20bf063d379`. No patch application, repository edits, Cargo or cloud activity.
+
+The remaining preflight issue is resolved. The scan reserves 32+16*n once from the persistent algebra ledger, spends its fixed32 charge locally, and spends16 through the same local ticket before each visited polynomial length check. Ticket::spend checks the existing deadline; polling now occurs per entry. No nested parent debit, refunded reservation or fresh allowance is introduced. Early oversize or expiry preserves the full consumed reservation while performed charges cover only the admitted prefix of visited entries. The guarded maximum256 basis count keeps reservation arithmetic bounded.
+
+Preflight still precedes assignment reset and polynomial processing. Exact scan allowance therefore reaches the final oversized polynomial and yields TermLimit; one less allowance refuses reservation with WorkLimit. The previously reviewed tests are unchanged. No other algorithm, cap, input, test expectation or assurance flag changes appear in this revision.
+
+Verdict: no remaining blocking issue in the reviewed three-revision extraction patch. Proceed to root-owned application and focused validation. This is source acceptance, not a compile/test pass, real-native-positive extraction result, derivation proof or runtime activation. Prior requirements for integration, authentic native-positive controls and independent artifact replay remain open; the failed useful-work panel is not promoted by this review.
