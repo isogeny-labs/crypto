@@ -404,8 +404,8 @@ changed source or export policy requires a fresh destination. The current
 implemented policy is `strict-structural-allowlist-v6`. It adds the consequence
 input file while retaining the static and branch input identity rules. Keep
 historical v5 exports immutable; use a new destination for v6 and verify the
-manifest policy before selecting model inputs. New-source runtime validation is
-pending as recorded in the [consequence implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
+manifest policy before selecting model inputs. Completed source-bound software
+validation is recorded in the [consequence implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
 
 Prime-chain recursive events and termination records stay in restricted
 artifacts/provenance. The v4 exporter adds a `prime-chain-graph/v1` static equation
@@ -465,10 +465,13 @@ node equality work includes both search and prior identity checking and is
 shared across target rows; do not sum it once per target. Neither counter is a
 counterfactual policy cost. See the [frozen consequence contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md).
 
-The v6 source and tests are authored; runtime tests have not yet executed after an initial manifest-macro compilation failure. Its
-frozen CLI fixture will check both retained curve/twist cells, all three input
-files, restricted joins/counts, immutable retry and unchanged static/branch
-feature bytes. Earlier v4/v5 evidence validates only its recorded source.
+The v6 runtime passed254 scoped dataset tests, strict maintained Clippy, a release
+build and5459 full library tests (0 failed,123 ignored). Its actual CLI fixture
+passed curve/twist export and immutable retry, all three input files, restricted
+joins/counts, unchanged static/branch feature bytes and corruption rejection.
+Failed earlier attempts remain preserved. See the implementation status for exact
+runtime, fixture and validation revisions; later main changes are outside this
+validation. Earlier v4/v5 evidence validates only its recorded source.
 Native re-export checks direct identities again; it is not an independent
 implementation or a standalone validator for externally supplied consequence
 records. No new scientific samples or cloud cells are established here.
