@@ -97,7 +97,11 @@ __device__ Point normalize_block(Curve c, Jac p) {
   return c.affine(p, tree[BLOCK + t]);
 #endif
 }
-#ifdef ER_COMPACT_ROWS
+#if defined(ER_DENSE_ROWS)
+using DeviceRow = DenseRow;
+using DeviceRowLess = DenseRowLess;
+RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
+#elif defined(ER_COMPACT_ROWS)
 using DeviceRow = CompactRow;
 using DeviceRowLess = CompactRowLess;
 RF_HD DeviceRow device_row(Point point, U id) { return {point_key(point), id}; }
@@ -111,6 +115,9 @@ RF_HD bool row_less_key(const Row &row, Point key) {
 }
 RF_HD bool row_less_key(const CompactRow &row, Point key) {
   return row.key < point_key(key);
+}
+RF_HD bool row_less_key(const DenseRow &row, Point key) {
+  return row.key() < point_key(key);
 }
 __global__ void build_left(Curve c, Bases b, unsigned split, U count,
                            DeviceRow *rows) {
@@ -137,6 +144,37 @@ struct RightPartials {
 // full batch cannot be encoded without overflow (including non-service users).
 inline bool packed_winner_fits(U left, U count) {
   return left && count <= UINT64_MAX / left;
+}
+struct PrefixLayout {
+  U bins;
+  unsigned shift;
+};
+inline PrefixLayout prefix_layout(U prime, U row_count) {
+  U bins = 0;
+  unsigned shift = 0;
+#ifndef ER_QUERY_BINARY_REFERENCE
+  if (row_count >= 4096) {
+    unsigned bits = 0;
+    for (U v = prime - 1; v; v >>= 1)
+      ++bits;
+    bins = 1;
+    unsigned index_bits = 0;
+    // Larger tables otherwise leave thousands of keys in every bucket.
+    // Opt in to at most 2^24 buckets (128 MiB plus one offset); setup
+    // and the actual offsets remain included in cold work and admission.
+#ifdef ER_WIDE_INDEX
+    constexpr U max_bins = U(1) << 24;
+#else
+    constexpr U max_bins = U(1) << 16;
+#endif
+    while (bins < max_bins && bins * 2 <= row_count / 32 && index_bits < bits) {
+      bins *= 2;
+      ++index_bits;
+    }
+    shift = bits - index_bits;
+  }
+#endif
+  return {bins, shift};
 }
 // Index the high x bits of the sorted full-point table. Each bucket retains
 // the original row order (including duplicate-point ids). Infinity sorts
@@ -222,6 +260,18 @@ __global__ void hash_base(Curve c, Fp64Ctx h, U inv, U beta, U tau,
     c.lift(z / 2, z & 1, q);
   out[t] = q;
 }
+__global__ void hash_base_wide(Curve c, U modulus, U inv, U beta, U tau,
+                               Point *out) {
+  U t = U(blockIdx.x) * BLOCK + threadIdx.x;
+  if (t >= tau)
+    return;
+  U v = t >= beta ? t - beta : modulus - (beta - t);
+  U z = hash_mul63(inv, v, modulus);
+  Point q;
+  if (z < 2 * c.f.p)
+    c.lift(z / 2, z & 1, q);
+  out[t] = q;
+}
 struct IsInfinity {
   RF_HD bool operator()(Point p) const { return p.inf; }
 };
@@ -291,6 +341,10 @@ public:
     right_second.clear();
     right_second.shrink_to_fit();
     p = next;
+#ifdef ER_DENSE_ROWS
+    if (p.left > (U(1) << 32))
+      throw std::runtime_error("LIMIT dense tuple ID capacity");
+#endif
     packed = packed_winner_fits(p.left, std::min(chunk, p.right));
 #ifdef ER_QUERY_REFERENCE
     packed = false;
@@ -319,21 +373,9 @@ public:
       }
     }
 #endif
-    U bins = 0;
-#ifndef ER_QUERY_BINARY_REFERENCE
-    if (p.left >= 4096) {
-      unsigned bits = 0;
-      for (U v = c.f.p - 1; v; v >>= 1)
-        ++bits;
-      bins = 1;
-      unsigned index_bits = 0;
-      while (bins < 65536 && bins * 2 <= p.left / 32 && index_bits < bits) {
-        bins *= 2;
-        ++index_bits;
-      }
-      prefix_shift = bits - index_bits;
-    }
-#endif
+    const auto layout = prefix_layout(c.f.p, p.left);
+    U bins = layout.bins;
+    prefix_shift = layout.shift;
     // 3 row buffers cover the retained table and conservative sort scratch.
     U bytes = product(p.left, 3 * sizeof(DeviceRow)) +
               product(p.points.size(), sizeof(Point)) +
@@ -456,10 +498,15 @@ public:
   }
   std::vector<Point> hash(U s, U alpha, U beta, U tau) {
     admission(product(tau, 3 * sizeof(Point)));
-    Fp64Ctx h = fp64_ctx_new(s);
-    U inv = fp64_to_mont(h, modpow(alpha, s - 2, s));
+    U canonical_inv = modpow(alpha, s - 2, s);
     thrust::device_vector<Point> out(tau);
-    hash_base<<<blocks(tau), BLOCK>>>(c, h, inv, beta, tau, data(out));
+    if (s < (U(1) << 62)) {
+      Fp64Ctx h = fp64_ctx_new(s);
+      U inv = fp64_to_mont(h, canonical_inv);
+      hash_base<<<blocks(tau), BLOCK>>>(c, h, inv, beta, tau, data(out));
+    } else {
+      hash_base_wide<<<blocks(tau), BLOCK>>>(c, s, canonical_inv, beta, tau, data(out));
+    }
     cuda_check(cudaGetLastError());
     return compact(out);
   }

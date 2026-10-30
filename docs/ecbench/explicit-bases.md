@@ -359,3 +359,212 @@ without removing a lock or rewriting history. Artifact-bot migrations are
 preserved and checked against archived log hashes. T884owns this continuation;
 T882was released after its implementation phase. The shared daily log remains
 outside this task's scope, so this is the committed project handoff.
+
+## 2026-10-30 05:58 UTC — compact-row continuation
+
+### What was done
+
+V5 completed ten executions: nine independently replayed recoveries and one
+58-bit timeout. The largest two-target rung was 56 bits; seed 101 recovered
+at 58 bits in 595.862060 seconds cold, while seed 202 reached 600 seconds.
+Raw records, archive hash and verified deletion are committed under
+`research/explicit_relations_e2e_20261030/results-v5/`.
+
+Exact x/parity compression now provides an opt-in 16-byte table row instead
+of 32 bytes, retaining original tuple IDs and deterministic witnesses.
+`make cuda-compact ARCH=sm_120` selects it. Full/cached/compact service builds,
+13 Rust tests, reduction replay, exhaustive compact/full lookup checks and
+query sanitizers passed on RTX PRO 6000. The corrected maximum row-cap
+header also passed in the active retry before timing began.
+
+Separate post-run audits validate the earlier 120-row normalization/query
+panels and v3/v4/v5 frontier coverage. Their regression controls reject
+missing and duplicate executions, wrong inputs/flags and truncated successful
+prefixes. Frozen analyzers and measurements are unchanged. Unadmitted
+benchmark visual copies and a clearly labeled catalog link are committed;
+the admitted benchmark table remains byte-identical.
+
+### Decisions made
+
+The cache showed no matched 52-bit timing benefit, so it remains opt-in.
+Compact storage is exact on a fixed validated odd-prime curve (SEC 1 v2,
+section 2.3.3), not a probabilistic key. New protocol-v7 keeps the v6 fixtures,
+arms and explicit limits, while correcting the service-header cap. Only one
+task GPU runs at a time. All clocks remain L0 diagnostics; no external-tool,
+matched-rho or conditional tensor-contraction result is claimed.
+
+### Open threads
+
+V7 pod `ex8tm7votw4h4g` is active, controller session `16482`, local bundle
+`/home/ec2-user/ecbench-e2e-20261030-v7`, pinned source
+`4014622e18caef9a6b6c89d79653e7633f5aaaff`. Reconcile it before any launch.
+The six 52-bit cells and both 56-bit targets passed; 58/60-bit outcomes are
+pending. Collect the complete archive, verify deletion, run the strict
+frontier audit and publish raw records before the final inspected report.
+The draft report covers v1–v6; its final chapter and benchmark copies await
+v7. T894 owns this continuation; T895 owns the visual catalog. The shared
+progress exporter remains reserved by T890 and has not been edited.
+
+### Errors
+
+V6 passed preflight but failed its first solver header: the protocol requested
+2^31 rows while the service still enforced 2^30. No CSV data row was recorded.
+The failed archive and deletion receipt remain in `failed-launch-v6/`.
+Source 4014622 adds consistent cap admission, boundary tests and actual header
+preflight under a new frozen protocol. The initial push was rejected after
+an artifact-bot update; that update was merged without rewriting history,
+and moved log/PNG hashes were verified. Canonical rectangular-coverage
+findings remain disclosed; the separate audit verifies the actual frozen
+nonrectangular plans. The separate CPU tensor implementation and its open
+independent audit are documented in `problems/hashed-ecdl-tensor-backend.md`;
+this CUDA service does not port that backend.
+
+## 2026-10-30 06:24 UTC: larger prefix index prepared
+
+### What was done
+
+Reconciled the active v7 pod without launching another GPU. Both 58-bit
+public targets passed recovery and fresh replay; 60-bit outcomes remain
+pending. Merged remote CPU work already delivered through PR2933 without
+rewriting evidence. The v7 source stays4014622; the merged CPU changes are
+not retroactively GPU-validated by that run. Added optional ER_WIDE_INDEX,
+a 2^24-bucket ceiling with actual storage charged to admission, and exact
+CPU/device offset and lookup boundary tests. Host syntax and Rust instrument
+metadata checks passed; CUDA validation remains pending.
+
+### Decisions made
+
+Relation lookup dominates the observed large-field stage clocks. The next
+matched52-bit panel changes only the index ceiling on identical16-byte rows
+and the same driver, then probes56/58/60bits. Frozen v8 hash
+fd8bf698d02f02bea73c7ed46c4b55e039ee62927e4f18fa74165b691afc793c;
+worker9000/controller9300seconds,60-bit solve1800seconds. No new GPU before
+v7 collection and verified deletion. Field61/62 widening was assessed but
+not implemented; no task or run for that arithmetic change exists.
+
+### Open threads
+
+Collect v7; preserve every outcome and archive; validate optional wide index
+and the merged CPU driver on the next single RTX PRO6000. Publish raw data
+before the final inspected report and benchmark copies. The progress exporter
+is now reserved by T901, so its shared file remains untouched.
+
+### Errors
+
+The first draft v8 schema check rejected its absent freeze block. Added the
+required draft block, validated and froze it before any affected data. This
+was a metadata preparation error, not a GPU launch.
+
+## 2026-10-30 06:48 UTC: compact-table frontier collected
+
+### What was done
+
+V7 completed12 prescribed executions: ten verified recoveries through both
+58-bit targets and two60-bit timeouts at1200seconds. Exact58-bit cold times
+were489.753544246 and530.119796136seconds. Both60-bit tables admitted:
+1,202,274,400/1,025,758,188 left rows with conservative allocations
+57,709,730,784/49,236,951,816bytes. These were time limits, not memory refusal.
+Archive SHA25601cd78dbd5cb64410d0c02ba12473964683299f42702a7c5cb46a8f4b7c37891
+matched. Worker/controller exited0 and podex8tm7votw4h4g deletion was verified.
+Public receipts were uploaded; the key remains only in v8's restricted binding.
+
+### Decisions made
+
+Retain58bits as the largest complete rung in v7. All six52-bit matched
+certificates agree; full32-byte cold times37.660575827/40.318152374seconds
+and compact16-byte candidate29.427842022/31.972280910seconds are L0
+observations. Keep every timeout. Continue only with the separately frozen
+v8 larger-index comparison, pinnedbbf0f2f51e73, after raw publication.
+
+### Open threads
+
+V8 request is prepared, no pod created yet. T910owns the wider-index phase.
+Final inspected report and benchmark copies will include both panels.
+The shared driver source is reserved by T906; wider-field arithmetic remains
+unmodified. The progress exporter is reserved by T901.
+
+### Errors
+
+Canonical schema/flow/file hashes pass. The protocol-aware checker reports
+four rectangular-coverage findings; CHECKER-NOTE.md preserves them. Frozen
+native analysis and separate strict audit pass the actual12-cell contract
+and reject corrupt coverage. No failed execution is counted as a recovery.
+
+
+## 2026-10-30T14:56Z — completed 60-bit panel
+
+### What was done
+
+Collected v8 on source bbf0f2f51e73afd7e41174094feb2c56a72d3d9d: all 12
+prescribed executions recovered, including both 60-bit targets. Fresh CPU
+replay, wrong-scalar rejection and matched-arm byte equality passed. Archived
+results SHA-256 f8924a3418fd268f0f8492f260b8e7fda66616017e1b60fc84488342a98e7d10;
+controller/worker exited zero and royvvmmehidtwt deletion was verified.
+Public receipts were uploaded and task credential/request files removed.
+Raw results committed before final report generation. The seven-page v1-v8
+report was visually inspected; complete graphs and browsing copies accompany it.
+
+### Decisions made
+
+Retain all prior failures and timeouts. Wide indexing remains explicit opt-in.
+The 60-bit cold solves were 770.270416129 and 845.179937170 seconds; L0 clocks
+remain descriptive. Current source includes separately merged CPU work, so
+v7/v8 timing differences do not isolate one change. Extend the existing T-906
+field-width task only after this completed panel is safely published.
+
+### Open threads
+
+Fields 61/62 need reviewed hash/driver arithmetic and a separately frozen
+single-device admission/recovery probe. No hardware maximum, matched rho,
+fastest external solver, GPU tensor backend or independent scientific
+validation is established. Current-head CI remains a separate check.
+The new progress-metadata reader emits 20 exact metrics in 3.563 seconds;
+the entire pre-existing exporter reached a 55-second administrative timeout
+before the new function on this storage, so its full runtime requirement is
+not claimed passed.
+
+### Errors
+
+System Python lacked the schema validator API; the established tools venv
+passed schema/flow/hashes. Four canonical rectangular-coverage findings remain
+recorded, while the exact native analyzer and eight-mutation strict audit pass.
+An initial sparse git add excluded tools/progress_metrics.py; it is staged
+explicitly with --sparse in the subsequent metadata commit. A ready T-906
+reservation was initially mistaken for another live worker; inspection and
+successful claim resolved it without overriding ownership.
+
+## 2026-10-30T15:06Z — bounded wider probe and exporter runtime repair
+
+### What was done
+
+Committed/pushed e1a38ce4bc586050c3faa67a3ab79f312eb549b5 with p<2^62,
+r<2^63 and checked hash s<2^63. Frozen v9 hash
+bf1e4a2dddbfdadb2cb8de32a0c659bbcdd528cc2851c63864c66d009f4e5142
+was committed before launching pod nd5qev6envru7z at 15:02:46UTC. One full
+RTX PRO6000 in US-NC-1 at catalog2.49USD/hour, pinned CUDA image; worker18000s,
+controller18300s, single-object upload expires after21600s. Existing unrelated
+pods were inspected and left untouched. All19 Rust tests and initial CUDA,
+Clippy/memcheck controls passed; first52-bit execution succeeded. Larger
+outcomes remain pending. No second taskGPU is authorized concurrently.
+
+### Decisions made
+
+Preserve fast Montgomery hashing below2^62; use exact canonical add/double
+only for wider hash moduli. Retain25%free-memory reserve and conservative
+sort admission. The new row cap2^32 allocates no memory by itself. Frozen
+52-bit controls precede two fixed61/62-bit targets; stop after the first
+incomplete rung, recording every refusal/timeout.
+
+### Open threads
+
+Collect, hash, replay-audit, export and report v9; verify deletion before
+any further GPU launch. Its source is distinct from the completed v8 record.
+Current-head CI and independent scientific review remain separate.
+
+### Errors
+
+The full progress exporter previously exceeded55s due to repeated Git
+processes. Persistent cat-file reads now preserve exact git-show bytes,
+missing-source behavior and cleanup. Default command with --since2026-10-01
+passed in24.17s; HEAD export also passed within55s with675records. The prior
+runtime limitation is resolved for these observed checks, not hidden.

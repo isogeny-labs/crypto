@@ -60,14 +60,14 @@ static Point independent_add(Point a, Point b, U p, U ca) {
   return {x, (modmul(slope, (a.x + p - x) % p, p) + p - a.y) % p, false};
 }
 static void validate_caps(U cap, U chunk) {
-  if (!cap || cap > (U(1) << 31) || !chunk || chunk > cap)
-    throw std::runtime_error("row caps must be in 1..2^31, chunk <= cap");
+  if (!cap || cap > (U(1) << 32) || !chunk || chunk > cap)
+    throw std::runtime_error("row caps must be in 1..2^32, chunk <= cap");
 }
 static void selftest() {
   validate_caps(1, 1);
-  validate_caps(U(1) << 31, U(1) << 20);
-  validate_caps(U(1) << 31, U(1) << 31);
-  for (auto caps : {std::pair<U, U>{0, 1}, {U(1) << 31 | 1, 1},
+  validate_caps(U(1) << 32, U(1) << 20);
+  validate_caps(U(1) << 32, U(1) << 32);
+  for (auto caps : {std::pair<U, U>{0, 1}, {U(1) << 32 | 1, 1},
                     {1, 0}, {1, 2}}) {
     bool rejected = false;
     try {
@@ -76,6 +76,43 @@ static void selftest() {
       rejected = true;
     }
     require(rejected, "invalid row/chunk cap accepted");
+  }
+  for (U modulus : {U(1) << 62, (U(1) << 62) + 57,
+                    (U(1) << 63) - 25}) {
+    for (U a : {U(0), U(1), modulus / 2, modulus - 2, modulus - 1})
+      for (U b : {U(0), U(1), modulus / 2, modulus - 2, modulus - 1})
+        require(hash_mul63(a, b, modulus) == modmul(a, b, modulus),
+                "wide hash multiply disagrees with u128");
+  }
+  // Public arithmetic fixtures, not certified group-order fixtures.
+  for (U modulus : {(U(1) << 61) - 1, (U(1) << 62) - 57}) {
+    while (!prime(modulus))
+      modulus -= 2;
+    Curve c = curve(modulus, modulus - 3, 7);
+    Backend device(c, 100000, 257);
+    HostBackend host(c, 100000, 257);
+    for (U initial : {2 * modulus, (U(1) << 63) - 25}) {
+      U s = initial;
+      while (!prime(s))
+        ++s;
+      if (s > 4 * modulus)
+        continue;
+      for (U alpha : {U(1), U(17), s - 1})
+        for (U beta : {U(0), s / 2, s - 1}) {
+          hash_parameters(c, s, alpha, beta, 1024, 100000);
+          auto got = device.hash(s, alpha, beta, 1024);
+          auto expected = host.hash(s, alpha, beta, 1024);
+          require(got.size() == expected.size(), "wide hash size mismatch");
+          for (size_t j = 0; j < got.size(); ++j)
+            require(equal(got[j], expected[j]), "wide hash point mismatch");
+        }
+    }
+    for (U bad_s : {U(1) << 63, U(-1)}) {
+      bool rejected = false;
+      try { hash_parameters(c, bad_s, 17, 0, 1, 100000); }
+      catch (const std::runtime_error &) { rejected = true; }
+      require(rejected, "unsupported hash modulus accepted");
+    }
   }
   for (U modulus : {97, 211}) {
     U ca = modulus == 97 ? 2 : 0, cb = modulus == 97 ? 3 : 7;

@@ -9,10 +9,10 @@ static void require(bool ok) {
 }
 template <class TableRow>
 __global__ void check_index(const TableRow *rows, U size, const U *prefixes,
-                            const Point *queries, U count, U *answers) {
+                            const Point *queries, U count, U *answers, unsigned shift = 6) {
   U i = U(blockIdx.x) * BLOCK + threadIdx.x;
   if (i < count)
-    answers[i] = indexed_lookup(rows, size, queries[i], prefixes, 6);
+    answers[i] = indexed_lookup(rows, size, queries[i], prefixes, shift);
 }
 static void prefix_boundaries() {
   // Synthetic sorted full keys deliberately leave empty buckets, repeat
@@ -43,6 +43,7 @@ static void prefix_boundaries() {
   for (size_t i = 0; i < queries.size(); ++i)
     require(got[i] == lookup(rows.data(), rows.size(), queries[i]));
 }
+template <class TableRow, class Less>
 static void compact_boundaries() {
   Curve c = curve(65521, 0, 7);
   std::vector<Row> full{{Point{}, 7}, {Point{}, 3}};
@@ -56,16 +57,18 @@ static void compact_boundaries() {
     for (Point point : {q, c.neg(q)}) {
       queries.push_back(point);
       if (x % 13 == 0 || x < 2 || x > c.f.p - 8)
-        for (U id : {U(9), U(2)})
+        for (U id : {U(9), U(2), U(UINT32_MAX)})
           full.push_back({point, id});
+      else if (x % 17 == 0)
+        full.push_back({point, U(UINT32_MAX)});
     }
   }
   std::sort(full.begin(), full.end(), RowLess{});
-  std::vector<CompactRow> rows;
+  std::vector<TableRow> rows;
   for (const auto &row : full)
     rows.push_back({point_key(row.point), row.id});
-  std::sort(rows.begin(), rows.end(), CompactRowLess{});
-  thrust::device_vector<CompactRow> device_rows(rows.begin(), rows.end());
+  std::sort(rows.begin(), rows.end(), Less{});
+  thrust::device_vector<TableRow> device_rows(rows.begin(), rows.end());
   thrust::device_vector<Point> device_queries(queries.begin(), queries.end());
   thrust::device_vector<U> prefixes(1025), answers(queries.size());
   build_prefix<<<5, BLOCK>>>(data(device_rows), rows.size(), 1024, 6,
@@ -91,10 +94,74 @@ static void compact_boundaries() {
   // The largest prefix endpoint is representable too (not a curve point).
   require(point_key(Point{U(1) << 62, 0, false}) == (U(1) << 63) + 2);
 }
+// Exercise the largest new offset array with sparse exact keys, long empty
+// ranges, endpoint buckets and duplicates. Compare every offset on CPU;
+// query both row layouts independently against the original full lookup.
+static void wide_prefix_boundaries() {
+  const auto layout = prefix_layout((U(1) << 62) - 1, U(1) << 31);
+#ifdef ER_WIDE_INDEX
+  require(layout.bins == (U(1) << 24) && layout.shift == 38);
+#else
+  require(layout.bins == (U(1) << 16) && layout.shift == 46);
+#endif
+  require(prefix_layout(65521, 4095).bins == 0);
+  require(prefix_layout(65521, 4096).bins == 128);
+  const U bins = U(1) << 24;
+  const unsigned shift = 38; // domain endpoint 2^62, including compact key
+  std::vector<Row> full{{Point{}, 7}, {Point{}, 3}};
+  std::vector<Point> queries{Point{}};
+  for (U bucket : {U(0), U(1), U(65535), U(65536), bins / 2, bins - 1}) {
+    for (U delta : {U(0), U(1), (U(1) << shift) - 1}) {
+      U x = (bucket << shift) + delta;
+      for (U parity : {U(0), U(1)}) {
+        Point q{x, parity, false};
+        queries.push_back(q);
+        if (delta != 1)
+          for (U id : {U(9), U(2)})
+            full.push_back({q, id});
+      }
+    }
+  }
+  // Synthetic comparator fixtures only; compact/full parity keys agree by
+  // construction. Actual on-curve compact identities are exhausted above.
+  std::sort(full.begin(), full.end(), RowLess{});
+  std::vector<DeviceRow> rows;
+  for (const auto &row : full)
+    rows.push_back(device_row(row.point, row.id));
+  std::sort(rows.begin(), rows.end(), DeviceRowLess{});
+  thrust::device_vector<DeviceRow> device_rows(rows.begin(), rows.end());
+  thrust::device_vector<Point> device_queries(queries.begin(), queries.end());
+  thrust::device_vector<U> prefixes(bins + 1), answers(queries.size());
+  build_prefix<<<(bins + 1 + BLOCK - 1) / BLOCK, BLOCK>>>(
+      data(device_rows), rows.size(), bins, shift, data(prefixes));
+  cuda_check(cudaGetLastError());
+  std::vector<U> offsets(bins + 1);
+  cuda_check(cudaMemcpy(offsets.data(), data(prefixes), offsets.size() * sizeof(U),
+                        cudaMemcpyDeviceToHost));
+  U position = 0;
+  for (U bucket = 0; bucket <= bins; ++bucket) {
+    Point key{bucket << shift, 0, false};
+    while (position < full.size() && row_less_key(full[position], key))
+      ++position;
+    require(offsets[bucket] == position);
+  }
+  check_index<<<1, BLOCK>>>(data(device_rows), rows.size(), data(prefixes),
+      data(device_queries), queries.size(), data(answers), shift);
+  cuda_check(cudaGetLastError());
+  std::vector<U> got(queries.size());
+  cuda_check(cudaMemcpy(got.data(), data(answers), got.size() * sizeof(U),
+                        cudaMemcpyDeviceToHost));
+  for (size_t i = 0; i < queries.size(); ++i)
+    require(got[i] == lookup(full.data(), full.size(), queries[i]));
+}
 int main() {
   try {
     prefix_boundaries();
-    compact_boundaries();
+    compact_boundaries<CompactRow, CompactRowLess>();
+    compact_boundaries<DenseRow, DenseRowLess>();
+    require(DenseRow((U(1) << 63) + 1, UINT32_MAX).key() == (U(1) << 63) + 1);
+    require(U(DenseRow(0, UINT32_MAX).id) != UINT64_MAX);
+    wide_prefix_boundaries();
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
     require(packed_winner_fits(UINT64_MAX, 1));
@@ -102,6 +169,19 @@ int main() {
     require(packed_winner_fits(U(1) << 32, (U(1) << 32) - 1));
     require(!packed_winner_fits(U(1) << 32, U(1) << 32));
     Curve c = curve(97, 0, 7);
+#ifdef ER_DENSE_ROWS
+    DeviceBackend guarded(c, 1, 1);
+    Plan oversized;
+    oversized.left = (U(1) << 32) + 1;
+    bool rejected = false;
+    try { guarded.prepare(oversized); }
+    catch (const std::runtime_error &e) {
+      rejected = std::string(e.what()) == "LIMIT dense tuple ID capacity";
+    }
+    require(rejected);
+    guarded.prepare(Plan{});
+    require(!guarded.find(Point{}, 0).found);
+#endif
     std::vector<Point> ps;
     for (U x = 0; x < 97; ++x) {
       Point q;

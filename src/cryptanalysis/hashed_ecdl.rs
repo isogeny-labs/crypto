@@ -142,10 +142,10 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 }
 
 // Extended Euclid (HAC 2.107/2.142), for nonzero residues modulo a
-// validated prime below 2^62 (including hash moduli). Public research
+// validated prime below 2^63 (including hash moduli). Public research
 // inputs: variable time. Signed intermediates fit within i128.
 pub(crate) fn inverse(a: u64, p: u64) -> u64 {
-    debug_assert!(a > 0 && a < p && p < (1 << 62));
+    debug_assert!(a > 0 && a < p && p < (1 << 63));
     let (mut r, mut next) = (p, a);
     let (mut t, mut next_t) = (0i128, 1i128);
     while next != 0 {
@@ -319,8 +319,8 @@ impl Curve {
         r: u64,
         generator: Point,
     ) -> Result<Self, Error> {
-        if !(5..(1u64 << 60)).contains(&p)
-            || !(3..(1u64 << 61)).contains(&r)
+        if !(5..(1u64 << 62)).contains(&p)
+            || !(3..(1u64 << 63)).contains(&r)
             || !prime(p)
             || !prime(r)
             || a >= p
@@ -534,7 +534,7 @@ impl Curve {
 /// One affine hash and its threshold, defining a slot-specific factor base.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HashBase {
-    /// Prime hash modulus, in `[2p,4p]`.
+    /// Prime hash modulus, in `[2p,4p]` and strictly below `2^63`.
     pub s: u64,
     /// Nonzero multiplier modulo `s`.
     pub alpha: u64,
@@ -546,7 +546,8 @@ pub struct HashBase {
 
 impl HashBase {
     fn validate(&self, curve: &Curve) -> Result<(), Error> {
-        if self.s < 2 * curve.p
+        if self.s >= (1u64 << 63)
+            || self.s < 2 * curve.p
             || self.s > 4 * curve.p
             || !prime(self.s)
             || self.alpha == 0
@@ -899,7 +900,7 @@ pub fn solve_with_oracle(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
 ) -> Result<Certificate, Error> {
-    solve_with_oracle_profile(curve, p, q, config, oracle, &mut ReductionStats::default())
+    solve_reduction::<false>(curve, p, q, config, oracle, &mut ReductionStats::default())
 }
 
 /// Descriptive stage clocks, accumulated across all attempted trials.
@@ -920,6 +921,19 @@ pub struct ReductionStats {
 
 /// The same reduction with accumulated diagnostic stage clocks.
 pub fn solve_with_oracle_profile(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+) -> Result<Certificate, Error> {
+    solve_reduction::<true>(curve, p, q, config, oracle, stats)
+}
+
+// One reduction body preserves identical random draws, bounds and verification.
+// The ordinary API does not read clocks for statistics the caller discarded.
+fn solve_reduction<const PROFILE: bool>(
     curve: &Curve,
     p: Point,
     q: Point,
@@ -950,7 +964,9 @@ pub fn solve_with_oracle_profile(
             attempts: 0,
         });
     }
-    let s = (2 * curve.p..=4 * curve.p).find(|&s| prime(s)).unwrap();
+    let s = (2 * curve.p..=(4 * curve.p).min((1u64 << 63) - 1))
+        .find(|&s| prime(s))
+        .ok_or(Error::Limit("no supported hash prime below 2^63"))?;
     // Binary search and saturating products avoid both a sqrt(r) setup loop
     // and overflow for large exponents; only comparison against r matters.
     let (mut lower, mut root) = (0, curve.r);
@@ -974,11 +990,13 @@ pub fn solve_with_oracle_profile(
     }
     let mut rng = Rng(config.seed);
     let mut attempts = 0;
-    let stage = Instant::now();
+    let stage = PROFILE.then(Instant::now);
     let fixed = FixedPair::new(curve, p, q);
-    stats.targets += stage.elapsed();
+    if let Some(stage) = stage {
+        stats.targets += stage.elapsed();
+    }
     for trial in 1..=config.max_trials {
-        let stage = Instant::now();
+        let stage = PROFILE.then(Instant::now);
         let hashes: Vec<_> = (0..config.m)
             .map(|_| HashBase {
                 s,
@@ -1000,7 +1018,9 @@ pub fn solve_with_oracle_profile(
             return Err(Error::Verification);
         }
         let n: usize = bases.iter().map(Vec::len).sum();
-        stats.bases += stage.elapsed();
+        if let Some(stage) = stage {
+            stats.bases += stage.elapsed();
+        }
         if n > config.max_columns {
             return Err(Error::Limit("dense relation matrix columns"));
         }
@@ -1010,19 +1030,25 @@ pub fn solve_with_oracle_profile(
         let mut relations = Vec::new();
         for _ in 0..20 * (n + 1) {
             attempts += 1;
-            let stage = Instant::now();
+            let stage = PROFILE.then(Instant::now);
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
             let target = fixed.evaluate(curve, u, v);
-            stats.targets += stage.elapsed();
-            let stage = Instant::now();
-            let found = oracle.find(curve, &bases, target, config.max_work);
-            stats.oracle += stage.elapsed();
-            if let Some(points) = found? {
-                let stage = Instant::now();
-                let rel = Relation { u, v, points };
-                check_relation(curve, &fixed, &bases, &rel)?;
-                relations.push(rel);
+            if let Some(stage) = stage {
                 stats.targets += stage.elapsed();
+            }
+            let stage = PROFILE.then(Instant::now);
+            let found = oracle.find(curve, &bases, target, config.max_work);
+            if let Some(stage) = stage {
+                stats.oracle += stage.elapsed();
+            }
+            if let Some(points) = found? {
+                let stage = PROFILE.then(Instant::now);
+                let rel = Relation { u, v, points };
+                check_collected_relation(curve, &bases, &rel, target)?;
+                relations.push(rel);
+                if let Some(stage) = stage {
+                    stats.targets += stage.elapsed();
+                }
                 if relations.len() == n + 1 {
                     break;
                 }
@@ -1031,10 +1057,12 @@ pub fn solve_with_oracle_profile(
         if relations.len() != n + 1 {
             continue;
         }
-        let stage = Instant::now();
+        let stage = PROFILE.then(Instant::now);
         let coeff = dependency(&matrix(&bases, &relations)?, curve.r).ok_or(Error::Verification)?;
         let scalar = extract(&relations, &coeff, curve.r);
-        stats.linear += stage.elapsed();
+        if let Some(stage) = stage {
+            stats.linear += stage.elapsed();
+        }
         if let Some(scalar) = scalar {
             let cert = Certificate {
                 scalar,
@@ -1044,9 +1072,11 @@ pub fn solve_with_oracle_profile(
                 trials: trial,
                 attempts,
             };
-            let stage = Instant::now();
+            let stage = PROFILE.then(Instant::now);
             verify(curve, p, q, &cert)?;
-            stats.replay += stage.elapsed();
+            if let Some(stage) = stage {
+                stats.replay += stage.elapsed();
+            }
             return Ok(cert);
         }
     }
@@ -1207,6 +1237,32 @@ impl FixedPair {
     }
 }
 
+// Collection already computed target=[u]P+[v]Q immediately before the query.
+// Check every returned point and the affine tuple sum against that exact target.
+// Only the collector uses this helper; independent certificate replay below
+// always recomputes the target from the recorded u/v with check_relation.
+fn check_collected_relation(
+    curve: &Curve,
+    bases: &[Vec<Point>],
+    rel: &Relation,
+    target: Point,
+) -> Result<(), Error> {
+    if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
+        return Err(Error::Verification);
+    }
+    let mut sum = None;
+    for (base, &point) in bases.iter().zip(&rel.points) {
+        if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
+            return Err(Error::Verification);
+        }
+        sum = curve.add_valid(sum, point);
+    }
+    if sum != target {
+        return Err(Error::Verification);
+    }
+    Ok(())
+}
+
 fn check_relation(
     curve: &Curve,
     fixed: &FixedPair,
@@ -1301,6 +1357,138 @@ mod tests {
     }
 
     #[test]
+    fn collected_relation_reuses_target_but_full_replay_recomputes_it() {
+        let (curve, p) = fixture();
+        let q = curve.mul(p, 42).unwrap();
+        let config = Config {
+            m: 3,
+            tau: Some(40),
+            seed: 111,
+            max_trials: 16,
+            ..Config::default()
+        };
+        let cert = solve(&curve, p, q, &config).unwrap();
+        let bases: Vec<_> = cert
+            .hashes
+            .iter()
+            .map(|h| h.enumerate(&curve).unwrap())
+            .collect();
+        let fixed = FixedPair::new(&curve, p, q);
+        for rel in &cert.relations {
+            let target = fixed.evaluate(&curve, rel.u, rel.v);
+            assert_eq!(
+                check_collected_relation(&curve, &bases, rel, target),
+                check_relation(&curve, &fixed, &bases, rel)
+            );
+            let wrong = curve.add(target, p).unwrap();
+            assert_eq!(
+                check_collected_relation(&curve, &bases, rel, wrong),
+                Err(Error::Verification)
+            );
+            for point in [None, Some((0, 0)), Some((211, 33))] {
+                let mut bad = rel.clone();
+                bad.points[0] = point;
+                assert_eq!(
+                    check_collected_relation(&curve, &bases, &bad, target),
+                    Err(Error::Verification)
+                );
+            }
+            let mut bad = rel.clone();
+            bad.u = curve.r;
+            assert_eq!(
+                check_collected_relation(&curve, &bases, &bad, target),
+                Err(Error::Verification)
+            );
+            bad = rel.clone();
+            bad.points.pop();
+            assert_eq!(
+                check_collected_relation(&curve, &bases, &bad, target),
+                Err(Error::Verification)
+            );
+        }
+        let mut bad = cert.clone();
+        bad.relations[0].u = (bad.relations[0].u + 1) % curve.r;
+        assert_eq!(verify(&curve, p, q, &bad), Err(Error::Verification));
+        verify(&curve, p, q, &cert).unwrap();
+    }
+
+    #[test]
+    fn optional_profile_preserves_queries_certificates_and_stats() {
+        struct Trace(Vec<Point>);
+        impl DecompositionOracle for Trace {
+            fn find(
+                &mut self,
+                c: &Curve,
+                b: &[Vec<Point>],
+                t: Point,
+                w: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                self.0.push(t);
+                Enumerate.find(c, b, t, w)
+            }
+        }
+        let (curve, p) = fixture();
+        for scalar in [0, 1, 42, 198] {
+            for seed in [111, 222, 333] {
+                let q = curve.mul(p, scalar).unwrap();
+                let config = Config {
+                    m: 3,
+                    tau: Some(40),
+                    seed,
+                    max_trials: 16,
+                    ..Config::default()
+                };
+                let mut plain = Trace(vec![]);
+                let mut profiled = Trace(vec![]);
+                let expected = solve_with_oracle(&curve, p, q, &config, &mut plain).unwrap();
+                let marker = std::time::Duration::from_secs(1);
+                let mut stats = ReductionStats {
+                    bases: marker,
+                    targets: marker,
+                    oracle: marker,
+                    linear: marker,
+                    replay: marker,
+                };
+                let actual =
+                    solve_with_oracle_profile(&curve, p, q, &config, &mut profiled, &mut stats)
+                        .unwrap();
+                assert_eq!(actual, expected);
+                assert_eq!(plain.0, profiled.0);
+                verify(&curve, p, q, &actual).unwrap();
+                for clock in [
+                    stats.bases,
+                    stats.targets,
+                    stats.oracle,
+                    stats.linear,
+                    stats.replay,
+                ] {
+                    assert!(clock >= marker);
+                }
+                let mut untouched = ReductionStats {
+                    bases: marker,
+                    targets: marker,
+                    oracle: marker,
+                    linear: marker,
+                    replay: marker,
+                };
+                let no_clocks =
+                    solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
+                        .unwrap();
+                assert_eq!(no_clocks, expected);
+                for clock in [
+                    untouched.bases,
+                    untouched.targets,
+                    untouched.oracle,
+                    untouched.linear,
+                    untouched.replay,
+                ] {
+                    assert_eq!(clock, marker);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
         let (curve, generator) = fixture();
         let modulus = Modulus::new(curve.p);
@@ -1388,7 +1576,12 @@ mod tests {
                 assert_eq!(inverse(a, p), pow(a, p - 2, p));
             }
         }
-        for p in [1_099_511_627_563, 2_305_843_009_213_693_951] {
+        for p in [
+            1_099_511_627_563,
+            2_305_843_009_213_693_951,
+            9_223_372_036_854_775_783,
+        ] {
+            assert!(prime(p));
             let mut rng = Rng(0x12345678);
             for a in [1, 2, p / 2, p - 2, p - 1]
                 .into_iter()
