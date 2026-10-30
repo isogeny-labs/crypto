@@ -55,3 +55,9 @@ external comparisons and larger CPU scale remain open.
 T-929 reserved the shared source and this handoff directory before editing.
 No compilation or release-test failure occurred. Source-level elimination of
 remainder operations is not a measured end-to-end performance result.
+
+Validation-record correction: the first region-hash script selected an earlier
+`cfg(test)` marker and hashed an empty slice. Its endpoint now searches after
+`check_relation` and asserts that the nonempty region includes `pub fn verify`.
+The corrected full-region comparison passes; source code and tests were not
+changed by this metadata correction. The original record remains in history.
