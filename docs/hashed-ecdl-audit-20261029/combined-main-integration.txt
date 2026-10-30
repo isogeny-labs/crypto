@@ -1,0 +1,29 @@
+Combined native main integration, 2026-10-30 03:30 UTC
+
+Crypto base: f81b1c6c562d10251eae883c8084affddc060f8b
+Peer base: 7f07bce0d8da8ec9d31c13094a5b7d5060b679cf
+The sampler and both taper controls are retained. Current-main source and
+all session entries are preserved in both repositories. No frozen evidence
+was resolved by selecting one side.
+
+The crypto Copilot request at 02:23 UTC had no response after just over an
+hour; explained fallback on PR2909 in comment6514197577. Merged current main
+without rebasing or force-pushing. The peer also integrates its newer main.
+To restore byte identity, carried already-landed peer strict-input and
+functional-pruning corrections into the crypto task branch. This leaves
+unrelated crypto PR2906 untouched; it is not merged by this tracker. These
+upstream changes are integration work, not new algorithms attributed to this
+sampling audit. The existing panel executable was preserved, not run as a
+benchmark or challenge campaign.
+
+Both native trees are byte-identical over all 28 tracked files. A separate
+sources-union.sha256 records this combined source snapshot; previous 16- and
+18-file manifests remain historical and are not overwritten.
+
+Validation status at integration: PENDING. Both native release panels,
+peer bindings, lint/MSRV/docs are running on the combined source. A new full
+crypto root test is required because its dependency and base have changed.
+The earlier 5389-pass root receipt remains valid only for its tested snapshot.
+Do not publish these local merge updates until required combined checks pass.
+No current-head hosted CI or merge is yet claimed. General theorem/complexity
+obligations remain open; public64-bit admission still selects fallback.
