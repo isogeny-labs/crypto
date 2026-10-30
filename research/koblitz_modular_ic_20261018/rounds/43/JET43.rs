@@ -6,23 +6,7 @@ fn product(mut a:u16,mut b:u16,m:usize,modulus:u16)->u8{let mut c=0;for _ in 0..
 fn independent(a:u8,b:u8,m:usize,modulus:u16)->u8{let mut c=0u16;for i in 0..m{for j in 0..m{if (a>>i)&1!=0&&(b>>j)&1!=0{c^=1<<(i+j);}}}for k in (m..=2*m-2).rev(){if c&(1<<k)!=0{c^=modulus<<(k-m);}}c as u8}
 impl Field{
  fn new(m:usize,modulus:u16)->Self{let size=1<<m;let mut table=vec![vec![0;size];size];for a in 0..size{for b in 0..size{table[a][b]=product(a as u16,b as u16,m,modulus);assert_eq!(table[a][b],independent(a as u8,b as u8,m,modulus));if a!=0&&b!=0{assert_ne!(table[a][b],0);}}}let mut f=Self{m,size,table,inverse:vec![0;size]};for a in 1..size{f.inverse[a]=f.pow(a as u8,size-2);assert_eq!(f.mul(a as u8,f.inverse[a]),1);}for a in 0..size{for b in 0..size{for c in 0..size{assert_eq!(f.mul(f.mul(a as u8,b as u8),c as u8),f.mul(a as u8,f.mul(b as u8,c as u8)));assert_eq!(f.mul(a as u8,(b^c) as u8),f.mul(a as u8,b as u8)^f.mul(a as u8,c as u8));}}}for a in 0..size{assert_ne!(f.mul(a as u8,a as u8)^a as u8^1,0);}for a in 0..size{for b in 0..size{if a!=0||b!=0{let q=[a as u8,b as u8];assert_eq!(f.qmul(q,f.qinv(q)),[1,0]);}}}f}
- fn mul(&self,a:&Series,b:&Series)->Series{
-  let mut c=vec![[0,0];self.n];
-  let aa:Vec<_>=a.iter().enumerate().filter(|(_,x)|**x!=[0,0]).collect();
-  let bb:Vec<_>=b.iter().enumerate().filter(|(_,x)|**x!=[0,0]).collect();
-  for &(i,x) in &aa{for &(k,y) in &bb{if i+k>=self.n{break;}c[i+k]=qadd(c[i+k],self.f.qmul(*x,*y));}}c
- }
- fn dense(&self,a:&Series,b:&Series)->Series{let mut c=self.c([0,0]);for i in 0..self.n{for k in 0..self.n-i{c[i+k]=qadd(c[i+k],self.f.qmul(a[i],b[k]));}}c}
- fn square(&self,a:&Series)->Series{let mut c=self.c([0,0]);for i in 0..=(self.n-1)/2{c[2*i]=self.f.qmul(a[i],a[i]);}c}
- fn grouped(&self,polys:&[Poly],images:&[Series;4])->Vec<Series>{
-  let mut max=[0;4];let mut keys=BTreeSet::new();
-  for p in polys{for e in p{for k in 0..4{max[k]=max[k].max(e[k]);}keys.insert([e[0],e[1],e[2]]);}}
-  let mut pw=vec![];for k in 0..4{let mut row=vec![self.c([1,0])];for i in 0..max[k]{row.push(self.mul(&row[i],&images[k]));}pw.push(row);}
-  let mut prefix=BTreeMap::new();for e in keys{let mut t=self.c([1,0]);for k in 0..3{if e[k]>0{t=self.mul(&t,&pw[k][e[k]]);}}prefix.insert(e,t);}
-  let ans:Vec<_>=polys.iter().map(|p|{let mut groups:BTreeMap<[usize;3],Series>=BTreeMap::new();for e in p{let g=groups.entry([e[0],e[1],e[2]]).or_insert_with(||self.c([0,0]));*g=self.add(g,&pw[3][e[3]]);}let mut sum=self.c([0,0]);for(key,v)in groups{sum=self.add(&sum,&self.mul(&prefix[&key],&v));}sum}).collect();
-  let j=Jet{f:self.f,n:154};let small=images.clone().map(|a|j.truncate(&a));let check=j.eval(polys,&small);for(a,b)in ans.iter().zip(check){assert_eq!(j.truncate(a),b);}
-  ans
- }
+ fn mul(&self,a:u8,b:u8)->u8{self.table[a as usize][b as usize]}
  fn pow(&self,mut a:u8,mut n:usize)->u8{let mut v=1;while n>0{if n&1!=0{v=self.mul(v,a);}n>>=1;if n>0{a=self.mul(a,a);}}v}
  fn div(&self,a:u8,b:u8)->u8{assert_ne!(b,0);self.mul(a,self.inverse[b as usize])}
  fn qmul(&self,a:Quad,b:Quad)->Quad{let t=self.mul(a[1],b[1]);[self.mul(a[0],b[0])^t,self.mul(a[0],b[1])^self.mul(a[1],b[0])^t]}
@@ -48,7 +32,20 @@ impl<'a> Jet<'a>{
  fn add(&self,a:&Series,b:&Series)->Series{a.iter().zip(b).map(|(&x,&y)|qadd(x,y)).collect()}
  fn mul(&self,a:&Series,b:&Series)->Series{
   let mut c=vec![[0,0];self.n];
-  for i in 0..self.n{if a[i]==[0,0]{continue;}for j in 0..self.n-i{if b[j]!=[0,0]{c[i+j]=qadd(c[i+j],self.f.qmul(a[i],b[j]));}}}c
+  let aa:Vec<_>=a.iter().enumerate().filter(|(_,x)|**x!=[0,0]).collect();
+  let bb:Vec<_>=b.iter().enumerate().filter(|(_,x)|**x!=[0,0]).collect();
+  for &(i,x) in &aa{for &(k,y) in &bb{if i+k>=self.n{break;}c[i+k]=qadd(c[i+k],self.f.qmul(*x,*y));}}c
+ }
+ fn dense(&self,a:&Series,b:&Series)->Series{let mut c=self.c([0,0]);for i in 0..self.n{for k in 0..self.n-i{c[i+k]=qadd(c[i+k],self.f.qmul(a[i],b[k]));}}c}
+ fn square(&self,a:&Series)->Series{let mut c=self.c([0,0]);for i in 0..=(self.n-1)/2{c[2*i]=self.f.qmul(a[i],a[i]);}c}
+ fn grouped(&self,polys:&[Poly],images:&[Series;4])->Vec<Series>{
+  let mut max=[0;4];let mut keys=BTreeSet::new();
+  for p in polys{for e in p{for k in 0..4{max[k]=max[k].max(e[k]);}keys.insert([e[0],e[1],e[2]]);}}
+  let mut pw=vec![];for k in 0..4{let mut row=vec![self.c([1,0])];for i in 0..max[k]{row.push(self.mul(&row[i],&images[k]));}pw.push(row);}
+  let mut prefix=BTreeMap::new();for e in keys{let mut t=self.c([1,0]);for k in 0..3{if e[k]>0{t=self.mul(&t,&pw[k][e[k]]);}}prefix.insert(e,t);}
+  let ans:Vec<_>=polys.iter().map(|p|{let mut groups:BTreeMap<[usize;3],Series>=BTreeMap::new();for e in p{let g=groups.entry([e[0],e[1],e[2]]).or_insert_with(||self.c([0,0]));*g=self.add(g,&pw[3][e[3]]);}let mut sum=self.c([0,0]);for(key,v)in groups{sum=self.add(&sum,&self.mul(&prefix[&key],&v));}sum}).collect();
+  let j=Jet{f:self.f,n:154};let small=images.clone().map(|a|j.truncate(&a));let check=j.eval(polys,&small);for(a,b)in ans.iter().zip(check){assert_eq!(j.truncate(a),b);}
+  ans
  }
  fn pow(&self,a:&Series,mut e:usize)->Series{let mut b=a.clone();let mut c=self.c([1,0]);while e>0{if e&1!=0{c=self.mul(&c,&b);}e>>=1;if e>0{b=self.square(&b);}}c}
  fn inv(&self,a:&Series)->Series{
