@@ -1,0 +1,43 @@
+{
+  "kind": "t21_wide_producer_arithmetic_protocol",
+  "frozen_before_timing": true,
+  "task": "T21 of RESEARCH_IC_LEADS_ASSESSMENT_20261018.md; card research/t20_n73_k600_e2e_20261019/NEXT_T21.md",
+  "class": "engineering (same algorithm, same probes and relations; native arithmetic only)",
+  "branch": "t21-wide-producer-arithmetic, stacked on t20-n73-k600-rerun (PR #2318) on #2156",
+  "cuts": {
+    "sparse": "KIC_SPARSE_REDUCE=1: Gf2_128 reduction by constant shifts for tails {0,2,3,4} (n=73) and {0,2,4,7} (n=83) instead of the two carry-less folds (src/cryptanalysis/semaev_decomp.rs); equal to the fold and the byte table on 20,000 random and edge inputs per modulus (unit test)",
+    "algebra": "KIC_ROOT_ALGEBRA=1: batched inversion of (l+r)*l*r, quotients recovered by two field squarings: 10 multiplications plus 2 squarings per candidate instead of 11 multiplications; equal roots in the same order on random and exceptional inputs, scalar and batched, n=73 and 83 (unit test)",
+    "factorise": "early stop of the u128 trial division once the remainder is a word-size prime (koblitz_index_calculus.rs::factorise_u128); same factor list as the old trial division (unit test incl. the n=73 order)",
+    "dropped_before_freeze": "single to_normal per candidate through linearity: to_normal(first^q) needs to_normal(q), so the apply count is unchanged; basis-aware solve not attempted"
+  },
+  "pilot_excluded_from_data": "unfrozen single and double runs during development (scan ns per probe 216-294, noisy; one callgrind pass at K=40, 2000 states: collected Ir ctl 2634M, sparse 2608M, algebra 2721M, all 2693M; reduce_fold Ir ctl 427M, sparse 511M). They are disclosed, not data. Both switches default OFF in the shipped binary on the strength of the Ir pilot; arms below set them explicitly.",
+  "binaries": {
+    "new": "target/release/examples/koblitz_orbit_dlp_fast sha256 cb9502a2b2767cacdbea20587cab4f6d052e6eb20b2d9c08def482bd78889bbc (this branch, rustc 1.97.0)",
+    "old": "/home/user/wt/target-t20/release/examples/koblitz_orbit_dlp_fast sha256 bd9c3f0dc8c3113ed6ffba4a85bef4249fdfa39d1d3454dff82624ba4767edb4 (built from PR #2318 head 3b453df5a2, the T20 binary lineage)"
+  },
+  "instances": {
+    "base": "experiments/koblitz-single-target-n73-20261002/base_n73_K600.jsonl sha256 a65776025e4b9ebc4a1e074f9304d834ac12cd533afc7d89a1d3ee72a2a766cc",
+    "target": "experiments/koblitz-single-target-n73-20261003/frozen/target_points.jsonl sha256 f813c261330dfa7b0dfaeb010c7d14828f596b32b3b08b908dbbed1250beb83b",
+    "rank_seed": 7
+  },
+  "host": "same 4 vCPU Xeon 2.80 GHz KVM guest as T20; cores 1-3 (scan) and core 1 (process start, callgrind) through tools/isolated_bench.py",
+  "stage_A_scan": {
+    "what": "ns per probe of the 20,000-state scan at the real K=600 base (KIC_PROF_MAX_STATES=20000, KIC_INDEX_THREADS=3 KIC_INDEX_BATCH_INV=1), same new binary, switches set explicitly",
+    "arms": {"ctl": "KIC_ROOT_ALGEBRA=0 KIC_SPARSE_REDUCE=0", "sparse": "KIC_ROOT_ALGEBRA=0 KIC_SPARSE_REDUCE=1", "algebra": "KIC_ROOT_ALGEBRA=1 KIC_SPARSE_REDUCE=0", "all": "both on", "ctl2": "A/A copy of ctl"},
+    "design": "7 rounds, arm order rotated by one per round (5 arms), pairing by round",
+    "statistic": "ratio of medians arm/ctl over rounds; 95% percentile bootstrap over rounds (10,000)",
+    "kill": "a cut (and all) clears only if median ratio <= 1/1.2 = 0.8333 AND the bootstrap upper bound <= 0.90; otherwise it is recorded as not reaching 1.2x on the scan and not carried to end to end",
+    "validity": "probes and hits identical in every run; A/A ctl2 CI contains 1"
+  },
+  "stage_P_process_start": {
+    "what": "wall of one process start (construct:73:1:40, exit after one scanned state, single core), old binary vs new binary, 5 rounds alternating, paired by round; measures the factorise cut",
+    "no_kill": "reported only; it is outside the rank stage and about 0.2% of the n=73 K=600 row"
+  },
+  "stage_C_instruction_counts": "callgrind collected Ir at K=40, 2000 states, ctl/sparse/algebra/all, secondary deterministic evidence; no gate",
+  "stage_B_end_to_end": {
+    "runs_only_if": "stage A gate clears for 'all' or for a single cut; then the T20 harness (run_t20.sh pattern, 3 pinned cores, KIC_RANK_THREADS=3, same base/target/seed 7) with arms C (ctl) and T (the clearing configuration), order C1 T1 C2, A/A = C1/C2, reusing the T20 matched rho draws (same host, same rho binary; disclosed) and a fresh frozen protocol file before timing",
+    "otherwise": "not run; the negative scan result is the T21 result"
+  },
+  "inadmissible": ["changing arms, rounds, gate or switches after timing", "dropping a round for being slow", "pooling contended and uncontended runs", "reporting a scan ratio as an end-to-end speedup"],
+  "report": "observation; no S claim (counted S identical by construction); wall time secondary"
+}

@@ -30,9 +30,12 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::ic_framework::plugins::CompactOrbitScanBase;
 use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
+use crypto_lib::cryptanalysis::koblitz_fast_arith::s3_x_roots;
 use crypto_lib::cryptanalysis::koblitz_sixsum_extract::{
-    Budget, BuildStats, Kernel, ProbeCounters, ScanEnd, SixSumTable,
+    s3_roots_generic, s4_in_x4, s4_roots_split, Budget, BuildStats, CountedField, FieldOps, Kernel,
+    OpWeights, ProbeCounters, S4Mode, S4Path, S4Tables, ScanEnd, SixSumTable,
 };
+use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 
 struct Args {
     ns: Vec<u32>,
@@ -48,6 +51,8 @@ struct Args {
     early_abort: bool,
     raw_x_cap: u64,
     keep_relations: usize,
+    /// Quartics timed per field by the solver-cost section (0 skips it).
+    solver_bench: usize,
 }
 
 fn parse_list<T: std::str::FromStr>(raw: &str, what: &str) -> Vec<T> {
@@ -82,6 +87,7 @@ fn parse_args() -> Args {
         early_abort: true,
         raw_x_cap: 100_000_000,
         keep_relations: 4,
+        solver_bench: 3000,
     };
     for arg in std::env::args().skip(1) {
         let (key, value) = arg
@@ -110,9 +116,10 @@ fn parse_args() -> Args {
             "early-abort" => args.early_abort = matches!(value, "1" | "true" | "yes"),
             "raw-x-cap" => args.raw_x_cap = value.parse().expect("raw-x-cap"),
             "keep-relations" => args.keep_relations = value.parse().expect("keep-relations"),
+            "solver-bench" => args.solver_bench = value.parse().expect("solver-bench"),
             "help" | "h" => {
                 eprintln!(
-                    "--n=23,31,41 --a=0 --columns=5,10,20 --kernels=4sum,a,b,b2,c --relations=32 --seed=S --max-targets=N --max-s3=N --max-s4=N --cell-wall-s=S --early-abort=1 --raw-x-cap=N --keep-relations=N"
+                    "--n=23,31,41 --a=0 --columns=5,10,20 --kernels=4sum,a,b,b2,c --relations=32 --seed=S --max-targets=N --max-s3=N --max-s4=N --cell-wall-s=S --early-abort=1 --raw-x-cap=N --keep-relations=N --solver-bench=N (env KIC_S4_ROOTS=split|resolvent picks kernel B's quartic root finder)"
                 );
                 std::process::exit(0);
             }
@@ -222,7 +229,292 @@ struct Cell {
     outer_probes_over_model_45: Option<f64>,
     scan_ends: BTreeMap<String, u64>,
     stop_reason: String,
+    /// Kernel B's quartic root finder in this run (`KIC_S4_ROOTS`).
+    s4_mode: &'static str,
+    /// One `S₄` pair (coefficients `s4_in_x4` + root solve by `s4_mode`)
+    /// in `S₃` solves, by wall, from this rung's solver-cost section.
+    s4_pair_in_s3_wall: Option<f64>,
+    /// The same by field operations priced at the measured per-operation
+    /// nanoseconds.
+    s4_pair_in_s3_ops: Option<f64>,
+    /// `S₃` solves plus `S₄` pairs × `s4_pair_in_s3_wall`, per relation.
+    s3_equivalents_per_relation_wall: Option<f64>,
+    s3_equivalents_per_relation_ops: Option<f64>,
     sample_relations: Vec<crypto_lib::cryptanalysis::koblitz_sixsum_extract::Relation>,
+}
+
+/// Field operations and wall of one solve of each kind at one field.
+#[derive(Serialize, Default, Clone)]
+struct SolverCost {
+    n: u32,
+    quartics: usize,
+    s3_pairs: usize,
+    weights_ns: OpWeights,
+    /// Per solve: field operations.
+    ops_s3_crate: FieldOps,
+    ops_s3_table: FieldOps,
+    ops_s4_build: FieldOps,
+    ops_roots_split: FieldOps,
+    ops_roots_resolvent: FieldOps,
+    /// Per solve: wall ns (best of the repeats, interleaved).
+    ns_s3_crate: f64,
+    ns_s3_table: f64,
+    ns_s4_build: f64,
+    ns_roots_split: f64,
+    ns_roots_resolvent: f64,
+    /// Priced operation cost, ns.
+    priced_s3_crate: f64,
+    priced_s3_table: f64,
+    priced_s4_build: f64,
+    priced_roots_split: f64,
+    priced_roots_resolvent: f64,
+    /// Root solve alone, in `S₃` solves (crate's loop half-trace).
+    split_in_s3_wall: f64,
+    resolvent_in_s3_wall: f64,
+    split_in_s3_ops: f64,
+    resolvent_in_s3_ops: f64,
+    /// The same against the table-half-trace `S₃` (stronger unit).
+    split_in_s3table_wall: f64,
+    resolvent_in_s3table_wall: f64,
+    split_in_s3table_ops: f64,
+    resolvent_in_s3table_ops: f64,
+    /// Resolvent solves handed to the general routine.
+    resolvent_fallbacks: u64,
+    /// Roots of the two solvers differed on any benchmarked quartic.
+    solvers_disagree: u64,
+}
+
+fn avg_ops(total: FieldOps, k: usize) -> FieldOps {
+    let d = |v: u64| (v as f64 / k as f64).round() as u64;
+    FieldOps {
+        mul: d(total.mul),
+        sqr: d(total.sqr),
+        inv: d(total.inv),
+        half_trace: d(total.half_trace),
+        trace: d(total.trace),
+        sqrt: d(total.sqrt),
+    }
+}
+
+fn time_best<T>(reps: usize, per: usize, mut f: impl FnMut() -> T) -> f64 {
+    let mut best = f64::MAX;
+    for _ in 0..reps {
+        let t = Instant::now();
+        std::hint::black_box(f());
+        best = best.min(t.elapsed().as_nanos() as f64 / per as f64);
+    }
+    best
+}
+
+/// Per-operation prices (dependent chains, as the solvers run them).
+fn op_weights(gf: &Gf2) -> OpWeights {
+    let reps = 5;
+    let k = 200_000usize;
+    let seed = 0x9e37_79b9_7f4a_7c15u64 & ((1u64 << gf.n) - 1);
+    let mul = time_best(reps, k, || {
+        let (mut a, b) = (seed | 1, seed ^ 0x5555);
+        for _ in 0..k {
+            a = gf.mul(a, b) ^ 1;
+        }
+        a
+    });
+    let sqr = time_best(reps, k, || {
+        let mut a = seed | 1;
+        for _ in 0..k {
+            a = gf.sqr(a) ^ 1;
+        }
+        a
+    });
+    let ki = 20_000usize;
+    let inv = time_best(reps, ki, || {
+        let mut a = seed | 1;
+        for _ in 0..ki {
+            a = gf.inv(a) ^ 1;
+        }
+        a
+    });
+    // The table-map price `lin` is set by the caller (it needs the S3 timings).
+    OpWeights {
+        mul,
+        sqr,
+        inv,
+        lin: 0.0,
+    }
+}
+
+fn solver_cost(inst: &BinaryInstance, count: usize, seed: u64) -> SolverCost {
+    let gf = &inst.gf;
+    let tabs = S4Tables::new(gf);
+    let mut cost = SolverCost {
+        n: inst.n,
+        ..Default::default()
+    };
+    if !tabs.usable() {
+        return cost;
+    }
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x504c_5254 ^ inst.n as u64);
+    let g = inst.generator;
+    let mut pt = || inst.fast.mul_u64(g, rng.gen_range(2..inst.r));
+    // Complete quartics (the kernel's inputs) and S3 operand pairs.
+    let mut triples = Vec::with_capacity(count);
+    let mut quartics = Vec::with_capacity(count);
+    for _ in 0..count {
+        let (r, a, b) = (pt(), pt(), pt());
+        quartics.push(s4_in_x4(gf, inst.b, r.x, a.x, b.x));
+        triples.push((r.x, a.x, b.x));
+    }
+    let s3_n = count * 8;
+    let pairs: Vec<(u64, u64)> = (0..s3_n).map(|_| (pt().x, pt().x)).collect();
+    cost.quartics = count;
+    cost.s3_pairs = s3_n;
+    // Operation counts (averaged).
+    let cf = CountedField::new(gf);
+    let ops = |f: &mut dyn FnMut()| -> FieldOps {
+        cf.reset();
+        f();
+        cf.ops()
+    };
+    let mut roots = Vec::new();
+    cost.ops_s3_crate = avg_ops(
+        ops(&mut || {
+            for &(l, r) in &pairs[..count] {
+                std::hint::black_box(s3_roots_generic(&cf, inst.b, l, r, None));
+            }
+        }),
+        count,
+    );
+    cost.ops_s3_table = avg_ops(
+        ops(&mut || {
+            for &(l, r) in &pairs[..count] {
+                std::hint::black_box(s3_roots_generic(&cf, inst.b, l, r, Some(&tabs)));
+            }
+        }),
+        count,
+    );
+    cost.ops_s4_build = avg_ops(
+        ops(&mut || {
+            for &(r, a, b) in &triples {
+                std::hint::black_box(s4_in_x4(&cf, inst.b, r, a, b));
+            }
+        }),
+        count,
+    );
+    cost.ops_roots_split = avg_ops(
+        ops(&mut || {
+            for q in &quartics {
+                roots.clear();
+                s4_roots_split(&cf, q, &mut roots);
+            }
+        }),
+        count,
+    );
+    let mut fallbacks = 0u64;
+    cost.ops_roots_resolvent = avg_ops(
+        ops(&mut || {
+            for q in &quartics {
+                roots.clear();
+                if let S4Path::Fallback(_) = tabs.roots(&cf, q, &mut roots) {
+                    fallbacks += 1;
+                }
+            }
+        }),
+        count,
+    );
+    cost.resolvent_fallbacks = fallbacks;
+    // Agreement on the benchmarked inputs.
+    let mut disagree = 0u64;
+    for q in &quartics {
+        let (mut a, mut b) = (Vec::new(), Vec::new());
+        s4_roots_split(gf, q, &mut a);
+        tabs.roots(gf, q, &mut b);
+        a.sort_unstable();
+        b.sort_unstable();
+        a.dedup();
+        b.dedup();
+        disagree += (a != b) as u64;
+    }
+    cost.solvers_disagree = disagree;
+    // Wall, plain field (no counting), interleaved repeats.
+    let reps = 7;
+    let (mut b_s3, mut b_s3t, mut b_build, mut b_split, mut b_res) =
+        (f64::MAX, f64::MAX, f64::MAX, f64::MAX, f64::MAX);
+    for _ in 0..reps {
+        b_s3 = b_s3.min(time_best(1, s3_n, || {
+            let mut acc = 0u64;
+            for &(l, r) in &pairs {
+                if let Some(v) = s3_x_roots(gf, inst.b, l, r) {
+                    acc ^= v[0];
+                }
+            }
+            acc
+        }));
+        b_s3t = b_s3t.min(time_best(1, s3_n, || {
+            let mut acc = 0u64;
+            for &(l, r) in &pairs {
+                if let Some(v) = s3_roots_generic(gf, inst.b, l, r, Some(&tabs)) {
+                    acc ^= v[0];
+                }
+            }
+            acc
+        }));
+        b_build = b_build.min(time_best(1, count, || {
+            let mut acc = 0u64;
+            for &(r, a, b) in &triples {
+                acc ^= s4_in_x4(gf, inst.b, r, a, b)[1];
+            }
+            acc
+        }));
+        b_split = b_split.min(time_best(1, count, || {
+            let mut acc = 0u64;
+            for q in &quartics {
+                roots.clear();
+                s4_roots_split(gf, q, &mut roots);
+                acc ^= roots.first().copied().unwrap_or(0);
+            }
+            acc
+        }));
+        b_res = b_res.min(time_best(1, count, || {
+            let mut acc = 0u64;
+            for q in &quartics {
+                roots.clear();
+                tabs.roots(gf, q, &mut roots);
+                acc ^= roots.first().copied().unwrap_or(0);
+            }
+            acc
+        }));
+    }
+    cost.ns_s3_crate = b_s3;
+    cost.ns_s3_table = b_s3t;
+    cost.ns_s4_build = b_build;
+    cost.ns_roots_split = b_split;
+    cost.ns_roots_resolvent = b_res;
+    // Prices: mul, sqr, inv measured; one table map priced from the
+    // table-S3 against the loop-S3 (their op counts differ by the loop's
+    // squarings against one trace and one half-trace map).
+    let mut w = op_weights(gf);
+    let loop_ops = cost.ops_s3_crate;
+    let tab_ops = cost.ops_s3_table;
+    let lin_ops = (tab_ops.half_trace + tab_ops.trace + tab_ops.sqrt).max(1) as f64;
+    let ns_diff = b_s3 - b_s3t;
+    let sqr_saved = loop_ops.sqr.saturating_sub(tab_ops.sqr) as f64;
+    w.lin = ((sqr_saved * w.sqr - ns_diff) / lin_ops)
+        .max(0.0)
+        .min(w.mul);
+    cost.weights_ns = w;
+    cost.priced_s3_crate = cost.ops_s3_crate.cost_ns(&w);
+    cost.priced_s3_table = cost.ops_s3_table.cost_ns(&w);
+    cost.priced_s4_build = cost.ops_s4_build.cost_ns(&w);
+    cost.priced_roots_split = cost.ops_roots_split.cost_ns(&w);
+    cost.priced_roots_resolvent = cost.ops_roots_resolvent.cost_ns(&w);
+    cost.split_in_s3_wall = b_split / b_s3;
+    cost.resolvent_in_s3_wall = b_res / b_s3;
+    cost.split_in_s3_ops = cost.priced_roots_split / cost.priced_s3_crate;
+    cost.resolvent_in_s3_ops = cost.priced_roots_resolvent / cost.priced_s3_crate;
+    cost.split_in_s3table_wall = b_split / b_s3t;
+    cost.resolvent_in_s3table_wall = b_res / b_s3t;
+    cost.split_in_s3table_ops = cost.priced_roots_split / cost.priced_s3_table;
+    cost.resolvent_in_s3table_ops = cost.priced_roots_resolvent / cost.priced_s3_table;
+    cost
 }
 
 #[derive(Serialize)]
@@ -253,6 +545,8 @@ struct Report {
     note: &'static str,
     rungs: Vec<RungRecord>,
     cells: Vec<Cell>,
+    s4_mode: &'static str,
+    solver_costs: Vec<SolverCost>,
     total_wall_s: f64,
 }
 
@@ -288,6 +582,9 @@ fn main() {
     let started = Instant::now();
     let mut cells = Vec::new();
     let mut rungs = Vec::new();
+    let mut solver_costs: Vec<SolverCost> = Vec::new();
+    let s4_mode = S4Mode::from_env();
+    eprintln!("# kernel B quartic root finder: {}", s4_mode.name());
     for &n in &args.ns {
         let Some(inst) = koblitz_instance(args.a, n) else {
             eprintln!("# no registered K_{} rung at n = {n}; skipped", args.a);
@@ -300,6 +597,18 @@ fn main() {
             (inst.r as f64).log2(),
             inst.cofactor
         );
+        let sc = if args.solver_bench > 0 {
+            let sc = solver_cost(&inst, args.solver_bench, args.seed);
+            eprintln!(
+                "# n={n} solver cost: S3 {:.0} ns (table {:.0}), s4_in_x4 {:.0} ns, roots split {:.0} ns ({:.1} S3), resolvent {:.0} ns ({:.2} S3); ops/solve split {:?} resolvent {:?}; disagree {}",
+                sc.ns_s3_crate, sc.ns_s3_table, sc.ns_s4_build, sc.ns_roots_split, sc.split_in_s3_wall,
+                sc.ns_roots_resolvent, sc.resolvent_in_s3_wall, sc.ops_roots_split, sc.ops_roots_resolvent, sc.solvers_disagree
+            );
+            solver_costs.push(sc.clone());
+            Some(sc)
+        } else {
+            None
+        };
         let mut rung = RungRecord {
             n,
             a: args.a,
@@ -484,6 +793,24 @@ fn main() {
                 let interp = scan_solves
                     * ((-unit_lambda).exp() / (1.0 - (-unit_lambda).exp())
                         + 1.0 / (mu * unit_lambda + 1.0));
+                let (pair_wall, pair_ops) = match &sc {
+                    Some(sc) if sc.ns_s3_crate > 0.0 => {
+                        let (rw, ro) = match s4_mode {
+                            S4Mode::Split => (sc.ns_roots_split, sc.priced_roots_split),
+                            S4Mode::Resolvent => (sc.ns_roots_resolvent, sc.priced_roots_resolvent),
+                        };
+                        (
+                            Some((sc.ns_s4_build + rw) / sc.ns_s3_crate),
+                            Some((sc.priced_s4_build + ro) / sc.priced_s3_crate),
+                        )
+                    }
+                    _ => (None, None),
+                };
+                let equiv = |pair: Option<f64>| {
+                    pair.and_then(|p| {
+                        ratio(ctr.s3_solves as f64 + ctr.s4_solves as f64 * p, relations)
+                    })
+                };
                 let cell = Cell {
                     n,
                     a: args.a,
@@ -525,6 +852,11 @@ fn main() {
                     models,
                     scan_ends,
                     stop_reason,
+                    s4_mode: s4_mode.name(),
+                    s4_pair_in_s3_wall: pair_wall,
+                    s4_pair_in_s3_ops: pair_ops,
+                    s3_equivalents_per_relation_wall: equiv(pair_wall),
+                    s3_equivalents_per_relation_ops: equiv(pair_ops),
                     sample_relations: samples,
                 };
                 eprintln!(
@@ -572,12 +904,14 @@ fn main() {
     argmap.insert("raw_x_cap".into(), args.raw_x_cap.to_string());
     let report = Report {
         tool: "koblitz_sixsum_extract_probe",
-        version: 3,
+        version: 4,
         date_utc: chrono_free_utc_now(),
         args: argmap,
         note: "Public synthetic [a]G targets on registered Koblitz rungs; every relation re-added as a group equation (fast and general arithmetic) before it counts. Units: S3/S4 root solves, targets, wall. No key-recovery, sub-rho or deployed-curve claim.",
         rungs,
         cells,
+        s4_mode: s4_mode.name(),
+        solver_costs,
         total_wall_s: started.elapsed().as_secs_f64(),
     };
     println!("{}", serde_json::to_string_pretty(&report).expect("json"));

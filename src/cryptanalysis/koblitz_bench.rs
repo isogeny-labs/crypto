@@ -2567,6 +2567,55 @@ mod tests {
         assert_eq!(checked, 6);
     }
 
+    /// The production closure engine ([`SolverEngine::Closure`]) agrees
+    /// with `MatrixF4` on the chained draws of the closure scan: the same
+    /// roots on satisfiable and unsatisfiable draws alike, and on the
+    /// unsatisfiable ones it closes the tree in no more splits.
+    #[test]
+    fn closure_engine_agrees_with_matrix_f4_on_chained_draws() {
+        use crate::cryptanalysis::koblitz_groebner::{
+            solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
+        };
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        let mut seen = (0usize, 0usize);
+        for (m, n, ell, seed) in [(3usize, 5u32, 2usize, 11u64), (3, 7, 2, 12), (4, 4, 1, 13)] {
+            let irr = find_irreducible_sparse(n).unwrap();
+            let st = FieldStructure::new(n, &irr);
+            let b = F2mElement::one(n);
+            let mut rng = StdRng::seed_from_u64(seed);
+            for _ in 0..6 {
+                let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+                let sys = build_decomposition_system(&basis, &x_r, &b, m, &st).unwrap();
+                let run = |engine| {
+                    let opts = SolveOptions {
+                        engine,
+                        max_solutions: 1 << 12,
+                        node_budget: 1_000_000,
+                        split_rule: SplitRule::LowestFree,
+                    };
+                    let (mut roots, stats) =
+                        solve_boolean_system(&sys.equations, sys.n_vars, &opts);
+                    roots.sort_unstable();
+                    assert!(!stats.exhausted);
+                    (roots, stats)
+                };
+                let (want, plain) = run(SolverEngine::MatrixF4 { max_degree: 3 });
+                for max_degree in [3u32, 4] {
+                    let (got, stats) = run(SolverEngine::Closure { max_degree });
+                    assert_eq!(got, want, "m={m} n={n} seed={seed} Closure({max_degree})");
+                    assert!(stats.splits <= plain.splits, "{stats:?} against {plain:?}");
+                }
+                if want.is_empty() {
+                    seen.0 += 1;
+                } else {
+                    seen.1 += 1;
+                }
+            }
+        }
+        // Both outcomes occur, so the agreement is not vacuous.
+        assert!(seen.0 > 0 && seen.1 > 0, "{seen:?}");
+    }
+
     #[test]
     fn random_subspace_basis_is_independent_and_of_the_asked_dimension() {
         let mut rng = StdRng::seed_from_u64(7);
