@@ -32,3 +32,9 @@ are accompanied by matching 150-dpi PNGs and hashes in copies.json. All seven
 PDF pages were visually inspected. Raw records were committed and pushed
 before rendering. These remain unadmitted L0 diagnostics, with no matched
 rho or independent scientific validation.
+
+The separate v9 extension retains seven verified recoveries from eight recorded
+executions: one61-bit recovery and one61-bit memory refusal; both62-bit cells
+were unattempted by the stopping rule. The [two-page v9 report](e2e-v9-report.pdf),
+[SVG](e2e-scaling-v9.svg) and [PNG](e2e-scaling-v9.png) preserve this incomplete
+rung. Both PDF pages were inspected. Earlier report copies remain unchanged.
