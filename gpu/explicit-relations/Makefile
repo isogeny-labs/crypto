@@ -91,3 +91,13 @@ $(OUT)/explicit-relations-filter: service.cpp device.cuh negative-filter.hpp hos
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_NEGATIVE_FILTER -x cu service.cpp -o $@
 $(OUT)/query-filter-check: query-check.cu device.cuh negative-filter.hpp host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
 	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_NEGATIVE_FILTER -DER_PERSISTENT_BLOCK_LIMIT=2 query-check.cu -o $@
+
+$(OUT)/affine-host-check: affine-host-check.cpp affine-fixtures.hpp host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(CXX) $(CXXFLAGS) -Wno-unknown-pragmas $< -o $@
+$(OUT)/affine-device-check: affine-device-check.cu affine-fixtures.hpp device.cuh host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) $< -o $@
+
+.PHONY: cuda-affine
+cuda-affine: $(OUT)/explicit-relations-affine
+$(OUT)/explicit-relations-affine: service.cpp device.cuh negative-filter.hpp host.hpp curve.cuh ../rootfind/fp64.cuh | $(OUT)
+	$(NVCC) -O3 -std=c++17 -arch=$(ARCH) -DER_CUDA -DER_COMPACT_ROWS -DER_WIDE_INDEX -DER_DENSE_ROWS -DER_CUB_SORT -DER_QUERY_PERSISTENT -DER_RIGHT_FULL_CACHE -DER_NEGATIVE_FILTER -DER_QUERY_CACHED -DER_AFFINE_QUERY -x cu service.cpp -o $@
