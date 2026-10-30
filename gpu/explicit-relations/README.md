@@ -222,7 +222,7 @@ panel completed both 58-bit targets and retained two 60-bit timeouts; all
 preflight and query sanitizers passed. See the [raw export](../../research/explicit_relations_e2e_20261030/results-v7/export.json).
 Both attempts are retained, and shared-host timings remain L0 diagnostics.
 
-### Wider prefix index (opt-in, validation pending)
+### Wider prefix index (opt-in, device validated)
 
 `make cuda-wide-index ARCH=sm_120` builds `build/explicit-relations-wide-index`
 with exact compact rows and `ER_WIDE_INDEX`. It permits up to 2^24 buckets
@@ -232,4 +232,9 @@ plus one u64. Setup and actual storage remain charged to cold execution
 and memory admission. Infinity, full keys and lowest duplicate IDs retain
 the same semantics. The separately frozen [v8 panel](../../research/explicit_relations_e2e_20261030/protocol-v8.json)
 compares both ceilings at 52 bits before probing larger complete recoveries.
-The default remains the existing index until recorded validation.
+The completed panel records 12/12 verified recoveries through both 60-bit
+targets, including fresh CPU replay and negative controls. Cold solve times
+at 60 bits are 770.270416 and 845.179937 seconds, with all three query
+sanitizers passing. See the [complete report](../../research/explicit_relations_e2e_20261030/RESULTS.md)
+and [v8 export](../../research/explicit_relations_e2e_20261030/results-v8/export.json).
+The default remains the existing index; wider indexing is explicitly selected.

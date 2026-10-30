@@ -15,6 +15,8 @@ Sources (all committed, read at --ref unless noted):
                                 proved complete integer records in the all-21 selection census
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/explicit_relations_e2e_20261030/results-v*/
+                                exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -450,6 +452,69 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def explicit_gpu_frontier(ref, since):
+    """Exact completed-panel counts; no timing or global-maximum claims."""
+    study = "research/explicit_relations_e2e_20261030"
+    revision = _git("rev-parse", ref).strip()[:12]
+    paths = [p for p in ls(ref, study) if p.endswith("/coverage.json")]
+    requested = [f"{p.rsplit('/', 1)[0]}/{name}" for p in paths
+                 for name in ("coverage.json", "export.json", "frontier.txt")]
+    # One Git process avoids per-file process and remote-filesystem overhead.
+    batch = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                           input="".join(f"{ref}:{p}\n" for p in requested).encode(),
+                           capture_output=True, check=True).stdout
+    blobs, offset = {}, 0
+    for path in requested:
+        end = batch.index(b"\n", offset)
+        header = batch[offset:end].split()
+        offset = end + 1
+        if header[-1] == b"missing":
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"invalid committed GPU source: {path}")
+        size = int(header[2])
+        blobs[path] = batch[offset:offset + size].decode()
+        if batch[offset + size:offset + size + 1] != b"\n":
+            raise ValueError(f"truncated committed GPU source: {path}")
+        offset += size + 1
+    for path in paths:
+        directory = path.rsplit("/", 1)[0]
+        name = directory.rsplit("/", 1)[-1]
+        if not name.startswith("results-v") or not name[9:].isdigit():
+            continue
+        coverage_text = blobs.get(path)
+        export_text = blobs.get(f"{directory}/export.json")
+        if not coverage_text or not export_text:
+            continue
+        coverage, export = json.loads(coverage_text), json.loads(export_text)
+        date = export.get("created", "")[:10]
+        if len(date) != 10 or date < since:
+            continue
+        runs = export.get("runs", [])
+        verified = sum(r.get("status") == "succeeded" and
+                       r.get("verification", {}).get("status") == "verified" for r in runs)
+        if len(runs) != coverage.get("attempted") or verified != coverage.get("verified_recoveries"):
+            raise ValueError(f"inconsistent completed GPU panel: {path}")
+        prefix = f"gpu.explicit_relations.{name[8:]}"
+        source = f"{path}@{revision}"
+        for suffix, value, label in (
+            ("attempted", coverage["attempted"], "recorded executions"),
+            ("verified_recoveries", verified, "fresh CPU-replayed recoveries"),
+            ("timeouts", sum(r.get("status") == "timeout" for r in runs), "retained solve timeouts"),
+        ):
+            emit(f"{prefix}.{suffix}", value, date=date, problem="gpu-generic-decomposition",
+                 unit="count", better="neutral", label=f"GPU {name}: {label}; fixed bounded panel, L0",
+                 source=source)
+        frontier = blobs.get(f"{directory}/frontier.txt")
+        if frontier:
+            key, _, value = frontier.strip().partition("=")
+            if key == "largest_complete_bits" and value.isdigit():
+                emit(f"{prefix}.complete_field_bits", int(value), date=date,
+                     problem="gpu-generic-decomposition", unit="field bits", better="neutral",
+                     label=f"GPU {name}: complete two-target rung under fixed limits; not a global maximum",
+                     source=f"{directory}/frontier.txt@{revision}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -469,6 +534,7 @@ def main():
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    explicit_gpu_frontier(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

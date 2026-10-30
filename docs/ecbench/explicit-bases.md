@@ -489,3 +489,46 @@ Canonical schema/flow/file hashes pass. The protocol-aware checker reports
 four rectangular-coverage findings; CHECKER-NOTE.md preserves them. Frozen
 native analysis and separate strict audit pass the actual12-cell contract
 and reject corrupt coverage. No failed execution is counted as a recovery.
+
+
+## 2026-10-30T14:56Z — completed 60-bit panel
+
+### What was done
+
+Collected v8 on source bbf0f2f51e73afd7e41174094feb2c56a72d3d9d: all 12
+prescribed executions recovered, including both 60-bit targets. Fresh CPU
+replay, wrong-scalar rejection and matched-arm byte equality passed. Archived
+results SHA-256 f8924a3418fd268f0f8492f260b8e7fda66616017e1b60fc84488342a98e7d10;
+controller/worker exited zero and royvvmmehidtwt deletion was verified.
+Public receipts were uploaded and task credential/request files removed.
+Raw results committed before final report generation. The seven-page v1-v8
+report was visually inspected; complete graphs and browsing copies accompany it.
+
+### Decisions made
+
+Retain all prior failures and timeouts. Wide indexing remains explicit opt-in.
+The 60-bit cold solves were 770.270416129 and 845.179937170 seconds; L0 clocks
+remain descriptive. Current source includes separately merged CPU work, so
+v7/v8 timing differences do not isolate one change. Extend the existing T-906
+field-width task only after this completed panel is safely published.
+
+### Open threads
+
+Fields 61/62 need reviewed hash/driver arithmetic and a separately frozen
+single-device admission/recovery probe. No hardware maximum, matched rho,
+fastest external solver, GPU tensor backend or independent scientific
+validation is established. Current-head CI remains a separate check.
+The new progress-metadata reader emits 20 exact metrics in 3.563 seconds;
+the entire pre-existing exporter reached a 55-second administrative timeout
+before the new function on this storage, so its full runtime requirement is
+not claimed passed.
+
+### Errors
+
+System Python lacked the schema validator API; the established tools venv
+passed schema/flow/hashes. Four canonical rectangular-coverage findings remain
+recorded, while the exact native analyzer and eight-mutation strict audit pass.
+An initial sparse git add excluded tools/progress_metrics.py; it is staged
+explicitly with --sparse in the subsequent metadata commit. A ready T-906
+reservation was initially mistaken for another live worker; inspection and
+successful claim resolved it without overriding ownership.

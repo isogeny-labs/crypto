@@ -246,6 +246,29 @@ contract. This is not an independent scientific validation-gate approval.
 All wall clocks remain shared-host L0 observations. The GPU relation oracle
 is generic meet-in-the-middle decomposition; the separate CPU tensor backend
 is not ported here. Root crypto/ecbench was not compiled locally. Later
-merged CPU arithmetic and the optional wider prefix index are being tested
+merged CPU arithmetic and the optional wider prefix index were tested
 under separately frozen v8 on source `bbf0f2f51e73afd7e41174094feb2c56a72d3d9d`;
 v7 does not validate that later revision.
+
+
+## Complete wider-index panel
+
+V8 completed all 12 executions, including both 60-bit targets, on pod
+`royvvmmehidtwt`. Cold solve times at 60 bits are 770.270416129 and
+845.179937170 seconds; full audit totals are 770.303987251 and
+845.214672718 seconds. All successful outputs passed fresh replay and
+scalar-plus-one rejection. Matched arms produced byte-identical certificates.
+
+All 17 Rust tests, full/cached/compact CUDA checks, Clippy, maximum-cap
+headers and full/compact/wide query memcheck, racecheck and synccheck passed.
+The wide-index boundary check validates 2^24 exact offsets. Worker/controller
+exit zero, archive collection and pod deletion were verified. Archive SHA-256:
+`f8924a3418fd268f0f8492f260b8e7fda66616017e1b60fc84488342a98e7d10`.
+
+[Full report](../../research/explicit_relations_e2e_20261030/RESULTS.md),
+[v8 export](../../research/explicit_relations_e2e_20261030/results-v8/export.json),
+[strict coverage audit](../../research/explicit_relations_e2e_20261030/frontier-audit-v8.txt).
+Schema/flow/hashes pass; four canonical rectangular-coverage findings remain.
+This validates the recorded source and fixed public fixtures. Later merged
+revisions, fields above the driver's p < 2^60 guard, a GPU tensor backend,
+and matched rho/fastest external comparisons are not covered by this run.
