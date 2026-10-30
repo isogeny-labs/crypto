@@ -82,6 +82,41 @@ The other three leads have verified reviewer access recorded in
 ../../validation/completed_leads_access_20261030/receipt.json. That access audit
 does not freshly recompute their science. For pencil, completion still requires
 the full prescribed outcome matrix, matched counted costs, verification/replay,
-explicit clock qualification or unresolved status, all resource boundaries, and
+separate reporting of clock qualification, all resource boundaries, and
 PDF/SVG/standardized raw and derived artifacts. The 60-target gate is not the
 full-cohort result.
+
+
+## Independent design review: admission still required
+
+The read-only review on 2026-10-30 checked this proposal, the original and
+accounting-amended stopping rules, frozen v5, and native_price/src/aggregate.rs.
+It found the design suitable for discussion but not ready to freeze. These are
+requirements for the next contract, not approvals or altered historical outcomes.
+
+- Define the prospective finite-cost stopping-rule amendment explicitly. Any
+  permission to advance on mathematical verification, complete counted costs and
+  independent non-wall replay must leave the failed timing gate unchanged.
+- Before reusing p739, bind all60 original workloads and1080 original executions
+  to their full-cohort positions, including arms, method parameters, prescribed
+  seeds, streams and warmups. Preserve original session/record/sequence identities.
+  Prove that reused and remaining enrollment are disjoint and total1260 workloads,
+  22680 base executions and6300 measured pairs. Appending the gate to the existing
+  seven complete plans would duplicate workloads and is not an admissible shortcut.
+  Native plan validation, aggregation and export must support the reviewed mapping.
+- Bind independent replay to the reused observations. The computation epoch's900
+  reproduced measured executions do not by themselves certify fresh-session rows;
+  prove their exact non-wall equivalence or supply a distinct fresh-record replay.
+- At p186379 target0, a capped, invalid, wrong-answer or incomplete outcome stops
+  automatic extension. Require independent replay and review before remaining
+  cohort admission. Define finite-cost and clock acceptance separately.
+- Any timing repair requires a prospectively reviewed instrument, fixed observation
+  boundary, fresh per-call state, matched controls, complete phase costs and observer
+  overhead. Repeated-call blocks do not substitute for individual-call latency.
+
+Completion has separate statuses: the finite-cost cohort is incomplete until the
+full prescribed matrix and its validation exist; timing remains incomplete until
+its own accepted requirements are met. Merely reporting unresolved timing does not
+complete that requirement. The overall objective remains incomplete while either
+required track is unfinished. The resource ceiling and deadline are additional,
+independent prerequisites; none is supplied by this review.

@@ -1077,3 +1077,23 @@ gate, size and artifacts. Later-stage resource question remains pending.
 ### Errors
 Initial merge preview used stale origin/main. Dedicated fetched ref revealed the
 actual progress-export conflict; both contributors are retained and checked.
+
+## 2026-10-30 — Independent continuation design review
+
+### What was done
+Read-only review checked the prospective plan against prior stopping rules and
+native aggregate identity checks. Recorded concrete enrollment, replay binding,
+upper-gate stopping and timing-completion requirements in the draft.
+
+### Decisions made
+Explicitly reject interpreting reported unresolved clocks as completed timing.
+No existing gate identity or frozen contract changed. Reuse of60 targets remains
+unadmitted until a native disjoint enrollment and replay binding are verified.
+
+### Open threads
+Later-stage budget and deadline, prospective scientific admission, full pencil
+cohort and timing requirement remain open. Exact-head CI is running on867e04616.
+
+### Errors
+The prior completion wording was ambiguous about unresolved clock status; the
+prospective draft now distinguishes reporting from satisfying that requirement.
