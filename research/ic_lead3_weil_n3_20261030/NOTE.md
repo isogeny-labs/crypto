@@ -52,3 +52,11 @@ Price band (AGENTS.md 5a; unpriced hash probes: IC 3 per residual, rho 1 per ste
 ## 4. Not done
 p = 8209 rows (run `armP_p8209`, in flight at stop; `data/armP_p8209.log`), final fit with them, SVG/PNG/PDF (`plot_n3.py` written, not run), `benchmarks/` row, Conductor check, cleanup of the scratch crate/target (`/private/tmp/claude-501/.../scratchpad/{n3crate,target}`).
 Reproduce: scratch crate `#[path]`-includes unmodified `gaudry_cubic.rs`/`residual_walk.rs` with no-op `jv_bitops` hook stubs and the FxHasher part of `fx_hash.rs`; commands in `PROTOCOL.md`; `fit_n3 out.json P=... M=... J=...`.
+
+## 5. Addendum: p = 8209 finished; refit over p = 271..8209 (arm P), full output in `fit_output.md`, rows in `results.json`
+Pooled S_rho = 1.336 +- 0.104 (30 instances). 2lp at p=8209 (log2 n = 39.0): 107,863 residuals, 1.49e4 ops/residual, 9.1e4 ops/decomposition, 257 independent relations,
+total 1.61e9 counted ops = 1,618x pooled rho (down from 3,535x at p=271); dense full-base 397x, Wiedemann full-base 398x. All 15 rows at p=8209 verified.
+Refit exponents (6 sizes): 2lp total 0.425 [0.416,0.434]; 2lp relation phase 0.425, LA phase 0.505 [0.482,0.525] (consistent with rho's 0.5 and now close to theory's 4/9 only at the lower CI end);
+dense relation 0.333 / LA 0.894. Two-phase projection for 2lp: minimum 1.5x rho at log2 n ~ 226, first below 1: none; theory-exponent crossover log2 n ~ 230.
+So with the LA exponent at 0.505 the 2lp method approaches parity with rho near 2^226 but a +-0.02 uncertainty on the LA exponent decides whether it ever crosses: **verdict unchanged: no reachable sub-rho point; asymptotically marginal.**
+Still not done: graph/PDF, benchmarks row, Conductor check, scratch cleanup.
