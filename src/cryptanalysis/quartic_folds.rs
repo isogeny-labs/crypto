@@ -1141,8 +1141,8 @@ pub fn rho4_folded_batched(
         }
         let (invs, cost) = batch_inv_fp(&ds, p);
         let m = ds.len() as u64;
-        if m > 0 {
-            let (share, rem) = (cost / m, cost % m);
+        if let Some(share) = cost.checked_div(m) {
+            let rem = cost % m;
             for (k, &w) in owners.iter().enumerate() {
                 let rot = (k as u64 + round) % m;
                 let c = share + u64::from(rot < rem);
@@ -4574,7 +4574,7 @@ pub fn run_gls_tau_stage_a(
 fn order_dividing(x: u64, m: u64, n: u64) -> u64 {
     let mut best = m;
     for &(q, _) in factor_u64(m).iter() {
-        while best % q == 0 && pow_mod(x, best / q, n) == 1 {
+        while best.is_multiple_of(q) && pow_mod(x, best / q, n) == 1 {
             best /= q;
         }
     }
