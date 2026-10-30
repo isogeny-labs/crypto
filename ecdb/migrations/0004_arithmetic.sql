@@ -107,18 +107,34 @@ CREATE TABLE ec.frobenius_ell (
   ell                ec.pos NOT NULL,
   volcano_depth      integer,              -- v_ell(v): depth of the ell-isogeny volcano
   splitting          text CHECK (splitting IN ('split','inert','ramified')),  -- of ell in Q(pi)
-  frobenius_action   text,                 -- on E[ell]: 'scalar','split','inert','ramified','jordan'
-  rational_isogenies integer,              -- number of F_q-rational ell-isogenies (when determined by the class)
-  torsion_point_degree integer,            -- least k with a point of order ell over F_{q^k}
-  full_torsion_degree integer,             -- least k with E[ell] subset E(F_{q^k})
-  isogeny_field_degree integer,            -- least k over which an ell-isogeny is defined
-  all_isogenies_degree integer,
-  division_poly_factor_degrees text,       -- factorization pattern of psi_ell
+  rational_isogenies integer,              -- F_q-rational ell-isogenies, only where the class fixes it (depth 0)
   status             ec.fact_status NOT NULL DEFAULT 'unknown',
   provenance_id      bigint REFERENCES ec.provenance(id),
   PRIMARY KEY (isogeny_class_id, ell)
 );
-COMMENT ON TABLE ec.frobenius_ell IS 'Per-prime ell data fixed by the Weil polynomial: volcano depth, splitting, torsion and isogeny fields of definition.';
+COMMENT ON TABLE ec.frobenius_ell IS
+  'Per-prime data the Weil polynomial fixes: volcano depth v_ell(v), splitting of ell in Q(pi), and the rational ell-isogeny count when ell does not divide v. Curve-dependent torsion data is in ec.curve_ell_torsion.';
+
+-- When ell | v, Frobenius on E[ell] is the scalar t/2 or a Jordan block
+-- depending on the curve's level in the ell-volcano (docs/curves/TRAITS.md),
+-- so the action, the torsion and isogeny fields of definition and the
+-- factorization of psi_ell belong to the curve, not the isogeny class.
+CREATE TABLE ec.curve_ell_torsion (
+  curve_id           bigint NOT NULL REFERENCES ec.curve(id) ON DELETE CASCADE,
+  ell                ec.pos NOT NULL,
+  frobenius_action   text,                 -- on E[ell]: 'scalar','split','inert','ramified','jordan'
+  rational_isogenies integer,              -- F_q-rational ell-isogenies of this curve
+  torsion_point_degree integer,            -- least k with a point of order ell over F_{q^k}
+  full_torsion_degree integer,             -- least k with E[ell] subset E(F_{q^k})
+  isogeny_field_degree integer,            -- least k over which an ell-isogeny is defined
+  all_isogenies_degree integer,            -- least k over which every ell-isogeny is defined
+  division_poly_factor_degrees text,       -- factorization pattern of psi_ell
+  status             ec.fact_status NOT NULL DEFAULT 'unknown',
+  provenance_id      bigint REFERENCES ec.provenance(id),
+  PRIMARY KEY (curve_id, ell)
+);
+COMMENT ON TABLE ec.curve_ell_torsion IS
+  'Per-curve ell-torsion: Frobenius action on E[ell], torsion and isogeny fields of definition, rational ell-isogenies, psi_ell factor degrees.';
 
 -- ------------------------------------------------- endomorphisms
 

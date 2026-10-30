@@ -100,6 +100,20 @@ async fn migrate_import_and_query() {
     assert!(out["rows"][0][0].as_i64().unwrap() > 20000);
     let (s, _) = post(&app, "/v1/sql", r#"{"sql": "select 1; drop schema ec cascade"}"#).await;
     assert_eq!(s, StatusCode::BAD_REQUEST);
+    // Duplicate column names keep their own values.
+    let (_, out) = post(&app, "/v1/sql", r#"{"sql": "select 1 as x, 2 as x"}"#).await;
+    assert_eq!(out["rows"][0], serde_json::json!([1, 2]));
+
+    // l-torsion is per curve: two curves of one GF(2^17) class sit at different
+    // levels of the 17-volcano (traits.json: Jordan block vs scalar).
+    let torsion_sql =
+        "select c.icv1_slug, t.frobenius_action from curve_ell_torsion t join curve c on c.id = t.curve_id \
+        where t.ell = 17 and c.icv1_slug in ('icv1-f2m17-t209-0eba1a1e', 'icv1-f2m17-t209-e5c8e740') order by 1";
+    let (_, out) = post(&app, "/v1/sql", &serde_json::json!({ "sql": torsion_sql }).to_string()).await;
+    assert_eq!(
+        out["rows"],
+        serde_json::json!([["icv1-f2m17-t209-0eba1a1e", "jordan"], ["icv1-f2m17-t209-e5c8e740", "scalar"]])
+    );
     let (s, _) = post(&app, "/v1/evidence", r#"{}"#).await;
     assert_eq!(s, StatusCode::FORBIDDEN);
 }

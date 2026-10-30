@@ -109,6 +109,28 @@ fn convert(k: &Fq, v: &Value) -> Result<Vec<String>> {
         .collect()
 }
 
+/// The cover map as recorded. For a Montgomery or Edwards target the
+/// polynomial map lands on an intermediate short Weierstrass model and the
+/// certificate's `target_model_map` (docs/curves/COVERS.md, "Montgomery and
+/// Edwards targets") carries it on to the target; both parts are kept, with
+/// the composition stated. That map stays verbatim, packed-hex encoding included.
+fn cover_map(k: &Fq, cert: &Value) -> Result<Value> {
+    let mut map = json!({
+        "x": convert(k, &cert["x"])?, "y_v": convert(k, &cert["y_v"])?, "y_0": convert(k, &cert["y_0"])?,
+    });
+    if cert["target_model_map"].is_null() {
+        map["convention"] = json!("x = x(u), y = y_v(u)*v + y_0(u) on H: v^2 + h(u) v = f(u), onto the target model");
+    } else {
+        map["convention"] = json!(
+            "x = x(u), y = y_v(u)*v + y_0(u) on H: v^2 + h(u) v = f(u) lands on target_model_map.source_model \
+             (short Weierstrass); compose with target_model_map.forward to reach the target model. \
+             target_model_map is verbatim from docs/curves/covers.json (packed-hex coefficient encoding)"
+        );
+        map["target_model_map"] = cert["target_model_map"].clone();
+    }
+    Ok(map)
+}
+
 fn poly_text(c: &[String], var: &str) -> String {
     let terms: Vec<String> = c
         .iter()
@@ -168,8 +190,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                 "infinity_type": if ramified { Some("ramified") } else { None },
                 "points_at_infinity": if ramified { Some(1) } else { None },
                 "construction": cert["construction"], "degree": cert["degree"],
-                "map": { "x": convert(k, &cert["x"])?, "y_v": convert(k, &cert["y_v"])?, "y_0": convert(k, &cert["y_0"])?,
-                         "convention": "x = x(u), y = y_v(u)*v + y_0(u) on H: v^2 + h(u) v = f(u)" },
+                "map": cover_map(k, cert)?,
                 "map_direction": c["map_direction"], "field_relation": c["field_relation"], "exists": true,
                 "minimal_degree": c["minimal_degree"], "minimal_genus": c["minimal_genus"],
                 "subfield_descent": c["subfield_descent"], "subgroup_transfer": c["subgroup_transfer"],

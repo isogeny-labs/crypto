@@ -4,9 +4,10 @@
 //! the statement is wrapped as a subquery (so it must be a SELECT / VALUES /
 //! WITH ... SELECT); the transaction is READ ONLY with a statement timeout;
 //! with ECDB_SQL_ROLE set it runs as that role (ecdb_reader: SELECT only);
-//! DISCARD ALL afterwards drops session state a rollback would keep. The
-//! login role must itself hold no more than ecdb_reader: a query can reset
-//! `role` to the session user inside its own transaction.
+//! DISCARD ALL afterwards, on every exit path, drops session state a rollback
+//! would keep, and a connection it cannot clean leaves the pool. The login
+//! role must itself hold no more than ecdb_reader: a query can reset `role` to
+//! the session user inside its own transaction.
 
 use super::{ApiError, ApiResult, Shared};
 use crate::json::safe_numbers;
@@ -26,13 +27,27 @@ fn quote_ident(s: &str) -> String {
 }
 
 pub async fn run(State(state): State<Shared>, Json(req): Json<SqlRequest>) -> ApiResult<Json<Value>> {
-    let cfg = &state.config;
     let sql = req.sql.trim().trim_end_matches(';').trim();
     if sql.is_empty() {
         return Err(ApiError::bad_request("sql is empty"));
     }
-    let limit = req.limit.unwrap_or(cfg.sql_max_rows.min(1000)).min(cfg.sql_max_rows);
     let mut client = state.read.get().await?;
+    let result = query(&mut client, &state.config, sql, req.limit).await;
+    // The transaction inside `query` is dropped (rolled back) on every path by
+    // now; session advisory locks survive a rollback, so reset the session too.
+    if client.batch_execute("DISCARD ALL").await.is_err() {
+        drop(deadpool_postgres::Object::take(client));
+    }
+    result.map(Json)
+}
+
+async fn query(
+    client: &mut deadpool_postgres::Object,
+    cfg: &super::Config,
+    sql: &str,
+    limit: Option<usize>,
+) -> ApiResult<Value> {
+    let limit = limit.unwrap_or(cfg.sql_max_rows.min(1000)).min(cfg.sql_max_rows);
     let tx = client.build_transaction().read_only(true).start().await?;
     tx.batch_execute(&format!(
         "SET LOCAL statement_timeout = {}; SET LOCAL search_path = ec, public",
@@ -48,7 +63,10 @@ pub async fn run(State(state): State<Shared>, Json(req): Json<SqlRequest>) -> Ap
     if columns.is_empty() {
         return Err(ApiError::bad_request("the statement returns no columns; only queries are accepted"));
     }
-    let wrapped = format!("SELECT row_to_json(t)::text FROM (\n{sql}\n) AS t LIMIT {}", limit + 1);
+    // Rename the columns positionally so duplicate names (SELECT 1 AS x, 2 AS x) survive row_to_json.
+    let aliases: Vec<String> = (0..columns.len()).map(|i| format!("c{i}")).collect();
+    let wrapped =
+        format!("SELECT row_to_json(t)::text FROM (\n{sql}\n) AS t({}) LIMIT {}", aliases.join(", "), limit + 1);
     let rows = tx.query(&wrapped, &[]).await?;
     let truncated = rows.len() > limit;
     let mut out = Vec::with_capacity(rows.len().min(limit));
@@ -56,12 +74,8 @@ pub async fn run(State(state): State<Shared>, Json(req): Json<SqlRequest>) -> Ap
         let text: String = r.get(0);
         let obj: Map<String, Value> = serde_json::from_str(&text)?;
         out.push(Value::Array(
-            columns.iter().map(|c| safe_numbers(obj.get(c).cloned().unwrap_or(Value::Null))).collect(),
+            aliases.iter().map(|a| safe_numbers(obj.get(a).cloned().unwrap_or(Value::Null))).collect(),
         ));
     }
-    // Dropping the transaction rolls it back, so nothing a query does outlives the request, except
-    // session state a rollback keeps (session advisory locks) on the pooled connection.
-    drop(tx);
-    client.batch_execute("DISCARD ALL").await?;
-    Ok(Json(json!({ "columns": columns, "types": types, "rows": out, "row_count": out.len(), "truncated": truncated })))
+    Ok(json!({ "columns": columns, "types": types, "rows": out, "row_count": out.len(), "truncated": truncated }))
 }

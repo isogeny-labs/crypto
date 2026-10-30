@@ -8,7 +8,7 @@ use crate::math::imaginary_quadratic_field;
 use anyhow::{anyhow, Result};
 use num_bigint::BigInt;
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 const ORDER_CHECK_SQL: &str = "
 UPDATE ec.curve_zeta z SET order_check = r.status::ec.fact_status, order_method = r.method
@@ -51,21 +51,31 @@ LEFT JOIN ec.number_field nf ON nf.fundamental_discriminant = r.cm_disc AND nf.d
 ORDER BY av.isogeny_class_id
 ON CONFLICT (isogeny_class_id) DO NOTHING";
 
+// Only class invariants here (small_primes: depth, splitting, and the isogeny
+// count it gives only at depth 0), so any member's record represents the class.
 const FROBENIUS_ELL_SQL: &str = "
-INSERT INTO ec.frobenius_ell (isogeny_class_id, ell, volcano_depth, splitting, frobenius_action, rational_isogenies,
-       torsion_point_degree, full_torsion_degree, isogeny_field_degree, all_isogenies_degree,
-       division_poly_factor_degrees, status, provenance_id)
-SELECT DISTINCT ON (av.isogeny_class_id, r.ell) av.isogeny_class_id, r.ell, r.depth, r.splitting, r.action,
-       r.rational_isogenies, r.point_degree, r.full_degree, r.isogeny_degree, r.all_isogenies_degree, r.psi_degrees,
-       r.status::ec.fact_status, $2::bigint
-FROM jsonb_to_recordset($1::jsonb) AS r(key text, ell numeric, depth int, splitting text, action text,
-     rational_isogenies int, point_degree int, full_degree int, isogeny_degree int, all_isogenies_degree int,
-     psi_degrees text, status text)
+INSERT INTO ec.frobenius_ell (isogeny_class_id, ell, volcano_depth, splitting, rational_isogenies, status, provenance_id)
+SELECT DISTINCT ON (av.isogeny_class_id, r.ell) av.isogeny_class_id, r.ell, r.depth, r.splitting,
+       r.rational_isogenies, r.status::ec.fact_status, $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, ell numeric, depth int, splitting text, rational_isogenies int,
+     status text)
 JOIN ec.curve c ON c.icv1_slug = r.key
 JOIN ec.abelian_variety av ON av.curve_id = c.id
 WHERE av.isogeny_class_id IS NOT NULL
 ORDER BY av.isogeny_class_id, r.ell
 ON CONFLICT (isogeny_class_id, ell) DO NOTHING";
+
+// DiSSECT torsion records depend on the curve (its volcano level), not only the class.
+const TORSION_SQL: &str = "
+INSERT INTO ec.curve_ell_torsion (curve_id, ell, frobenius_action, rational_isogenies, torsion_point_degree,
+       full_torsion_degree, isogeny_field_degree, all_isogenies_degree, division_poly_factor_degrees, status,
+       provenance_id)
+SELECT c.id, r.ell, r.action, r.rational_isogenies, r.point_degree, r.full_degree, r.isogeny_degree,
+       r.all_isogenies_degree, r.psi_degrees, r.status::ec.fact_status, $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, ell numeric, action text, rational_isogenies int, point_degree int,
+     full_degree int, isogeny_degree int, all_isogenies_degree int, psi_degrees text, status text)
+JOIN ec.curve c ON c.icv1_slug = r.key
+ON CONFLICT (curve_id, ell) DO NOTHING";
 
 const ENDO_SQL: &str = "
 INSERT INTO ec.endomorphism_ring (curve_id, kind, discriminant, conductor_f, conductor_divides, is_maximal, contains,
@@ -167,7 +177,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         (vec![], vec![], vec![], vec![], vec![]);
     let (mut level_rows, mut descent_rows, mut sub_rows, mut pair_rows, mut twist_rows) =
         (vec![], vec![], vec![], vec![], vec![]);
-    let mut record_rows = vec![];
+    let (mut record_rows, mut torsion_rows) = (vec![], vec![]);
     let mut cm_fields: BTreeMap<String, Value> = BTreeMap::new();
 
     for c in curves {
@@ -204,27 +214,18 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             "ordinary": ordinary, "status": status(&fr["status"]),
         }));
 
-        let torsion: BTreeMap<String, &Value> = c["dissect"]["torsion"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|t| s(&t["ell"]).map(|e| (e, t)))
-            .collect();
-        let mut ells: BTreeSet<String> = torsion.keys().cloned().collect();
-        let small: BTreeMap<String, &Value> =
-            c["small_primes"].as_array().into_iter().flatten().filter_map(|t| s(&t["ell"]).map(|e| (e, t))).collect();
-        ells.extend(small.keys().cloned());
-        for ell in ells {
-            let sp = small.get(&ell).copied().unwrap_or(&Value::Null);
-            let to = torsion.get(&ell).copied().unwrap_or(&Value::Null);
-            let rational =
-                if sp["rational_isogenies"].is_null() { &to["rational_isogenies"] } else { &sp["rational_isogenies"] };
+        for sp in c["small_primes"].as_array().into_iter().flatten() {
             ell_rows.push(json!({
-                "key": key, "ell": ell, "depth": sp["depth"], "splitting": sp["splitting"], "action": to["frobenius"],
-                "rational_isogenies": rational, "point_degree": to["point_degree"], "full_degree": to["full_degree"],
+                "key": key, "ell": s(&sp["ell"]), "depth": sp["depth"], "splitting": sp["splitting"],
+                "rational_isogenies": sp["rational_isogenies"], "status": status(&fr["status"]),
+            }));
+        }
+        for to in c["dissect"]["torsion"].as_array().into_iter().flatten() {
+            torsion_rows.push(json!({
+                "key": key, "ell": s(&to["ell"]), "action": to["frobenius"], "rational_isogenies": to["rational_isogenies"],
+                "point_degree": to["point_degree"], "full_degree": to["full_degree"],
                 "isogeny_degree": to["isogeny_degree"], "all_isogenies_degree": to["all_isogenies_degree"],
-                "psi_degrees": s(&to["psi_degrees"]),
-                "status": if to.is_null() { status(&fr["status"]) } else { status(&c["dissect"]["status"]) },
+                "psi_degrees": s(&to["psi_degrees"]), "status": status(&c["dissect"]["status"]),
             }));
         }
 
@@ -289,6 +290,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("class_status", bulk1(client, CLASS_STATUS_SQL, &class_rows).await?);
     report.count("frobenius", bulk(client, FROBENIUS_SQL, &frob_rows, prov).await?);
     report.count("frobenius_ell", bulk(client, FROBENIUS_ELL_SQL, &ell_rows, prov).await?);
+    report.count("curve_ell_torsion", bulk(client, TORSION_SQL, &torsion_rows, prov).await?);
     report.count("endomorphism_rings", bulk(client, ENDO_SQL, &endo_rows, prov).await?);
     report.count("volcano_levels", bulk(client, LEVEL_SQL, &level_rows, prov).await?);
     report.count("descent", bulk(client, DESCENT_SQL, &descent_rows, prov).await?);

@@ -169,6 +169,7 @@ SELECT jsonb_build_object(
                   JOIN ec.abelian_variety av ON av.isogeny_class_id = fr.isogeny_class_id WHERE av.curve_id = c.id),
   'frobenius_ell', (SELECT jsonb_agg(to_jsonb(fe) - 'isogeny_class_id' ORDER BY fe.ell) FROM ec.frobenius_ell fe
                       JOIN ec.abelian_variety av ON av.isogeny_class_id = fe.isogeny_class_id WHERE av.curve_id = c.id),
+  'ell_torsion', (SELECT jsonb_agg(to_jsonb(t) - 'curve_id' ORDER BY t.ell) FROM ec.curve_ell_torsion t WHERE t.curve_id = c.id),
   'endomorphism_ring', (SELECT to_jsonb(er) - 'curve_id' FROM ec.endomorphism_ring er WHERE er.curve_id = c.id),
   'volcano_levels', (SELECT jsonb_agg(to_jsonb(el) - 'curve_id' ORDER BY el.ell) FROM ec.endomorphism_level el WHERE el.curve_id = c.id),
   'automorphism_group', (SELECT to_jsonb(ag) - 'curve_id' FROM ec.automorphism_group ag WHERE ag.curve_id = c.id),
