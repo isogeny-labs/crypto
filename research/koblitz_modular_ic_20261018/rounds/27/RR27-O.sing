@@ -1,0 +1,95 @@
+// charts contains all20 (coords,u,v,e,cusp_index) Laurent records.
+// Constraint bits and candidate-coefficient bits are polynomials over F2,
+// used ONLY as finite vectors with XOR, never as polynomial modules.
+write("chart-series.dump",charts);
+list widths=8,16,24,32;
+int widthIndex;int width;int il;int jn;int ev;int iu;int ch;int tid;
+int total;int cand;int bound;int rrExponent;int pos;int pivot;int rankJ;
+int dependent;int valid;int reductions;int gi;int z;
+list oneChart;list chartCoords;list value;list baseValue;
+poly bits;poly jj;poly comb;poly currentBits;poly currentJet;poly currentComb;
+poly term;poly cc;poly verifyBits;poly verifyJet;
+list allBits;list allJets;list constraintBasis;list constraintComb;list constraintJet;
+list jetBasis;list jetComb;list accepted;
+for(widthIndex=1;widthIndex<=size(widths);widthIndex++){
+ width=widths[widthIndex];
+ print("RR27_WIDTH "+string(width));
+ allBits=list();allJets=list();constraintBasis=list();constraintComb=list();constraintJet=list();
+ jetBasis=list();jetComb=list();accepted=list();
+ for(z=1;z<=10240;z++){
+  constraintBasis=insert(constraintBasis,poly(0),size(constraintBasis));
+  constraintComb=insert(constraintComb,poly(0),size(constraintComb));
+  constraintJet=insert(constraintJet,poly(0),size(constraintJet));
+ }
+ for(z=1;z<=129;z++){jetBasis=insert(jetBasis,poly(0),size(jetBasis));jetComb=insert(jetComb,poly(0),size(jetComb));}
+ rankJ=0;dependent=0;valid=0;reductions=0;cand=0;
+ for(il=0;il<=3;il++){
+ for(jn=0;jn<=3;jn++){
+ for(ev=0;ev<=1;ev++){
+ for(iu=-width;iu<=2*width;iu++){
+  bits=0;jj=0;
+  for(ch=1;ch<=size(charts);ch++){
+   oneChart=charts[ch];chartCoords=oneChart[1];
+   baseValue=lm(lpw(la(oneChart[2],lc(1)),width),lc(1));
+   baseValue=li(baseValue);
+   if(iu<0){baseValue=lm(baseValue,lpw(li(oneChart[2]),-iu));}
+   else{baseValue=lm(baseValue,lpw(oneChart[2],iu));}
+   value=lm(lm(lm(baseValue,lpw(oneChart[3],ev)),lpw(chartCoords[2],il)),lpw(chartCoords[1],jn));
+   bound=0;
+   if(oneChart[5]==1){bound=7*oneChart[4];}
+   if(oneChart[5]==4){bound=oneChart[4];}
+   if(value[3]<=0 || value[2]<-512){ERROR("RR27 candidate precision/row bound insufficient");}
+   if(ch==1 && value[3]<129){ERROR("RR27 evaluation jet precision insufficient");}
+   for(tid=1;tid<=size(value[1]);tid++){
+    term=value[1][tid];rrExponent=deg(term)+value[2];
+    if(rrExponent < -bound){bits=bits+w^((ch-1)*512+rrExponent+512);}
+    if(ch==1 && rrExponent>=0 && rrExponent<129){jj=jj+w^rrExponent;}
+   }
+  }
+  allBits=insert(allBits,bits,size(allBits));allJets=insert(allJets,jj,size(allJets));
+  print("RR27_CANDIDATE "+string(cand)+" "+string(il)+" "+string(jn)+" "+string(ev)+" "+string(iu));
+  currentBits=bits;currentJet=jj;currentComb=w^cand;
+  while(currentBits!=0){
+   pivot=deg(currentBits)+1;
+   if(constraintBasis[pivot]==0){
+    constraintBasis[pivot]=currentBits;constraintComb[pivot]=currentComb;constraintJet[pivot]=currentJet;break;
+   }
+   currentBits=currentBits+constraintBasis[pivot];
+   currentComb=currentComb+constraintComb[pivot];currentJet=currentJet+constraintJet[pivot];
+   reductions=reductions+1;
+  }
+  if(currentBits==0){
+   valid=valid+1;
+   while(currentJet!=0){
+    pivot=deg(currentJet)+1;
+    if(jetBasis[pivot]==0){
+     jetBasis[pivot]=currentJet;jetComb[pivot]=currentComb;
+     accepted=insert(accepted,currentComb,size(accepted));rankJ=rankJ+1;break;
+    }
+    currentJet=currentJet+jetBasis[pivot];currentComb=currentComb+jetComb[pivot];
+   }
+   if(currentJet==0){dependent=dependent+1;}
+  }
+  cand=cand+1;
+ }
+ }
+ }
+ }
+ print("RR27_COUNTS width,candidates,valid_vectors,jet_rank,dependent,reductions");
+ width;cand;valid;rankJ;dependent;reductions;
+ // Independent recombination from original columns for every accepted vector.
+ for(gi=1;gi<=size(accepted);gi++){
+  verifyBits=0;verifyJet=0;cc=accepted[gi];
+  for(tid=1;tid<=size(cc);tid++){
+   pos=deg(cc[tid])+1;verifyBits=verifyBits+allBits[pos];verifyJet=verifyJet+allJets[pos];
+  }
+  if(verifyBits!=0 || verifyJet==0){ERROR("RR27 independent certificate recombination failed");}
+ }
+ write("rr27-width"+string(width)+"-certificate.dump",accepted);
+ write("rr27-width"+string(width)+"-constraints.dump",allBits);
+ write("rr27-width"+string(width)+"-jets.dump",allJets);
+ if(rankJ>68){ERROR("RR27 rank exceeds geometric dimension; stop and audit bridges");}
+ if(rankJ==68){print("RR27_COMPLETE_BASIS_DIMENSION_68");break;}
+}
+print("RR27_FINAL_RANK "+string(rankJ));
+print("RR27_ALL_CHECKS_PASS");quit;

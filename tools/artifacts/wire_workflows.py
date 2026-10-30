@@ -96,6 +96,8 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
     i2 = indent + "  "
     return [
         f"{indent}- name: {STEP_NAME}",
+        f"{i2}shell: bash",
+        f"{i2}working-directory: ${{{{ github.workspace }}}}",
         f"{i2}env:",
         f"{i2}  AWS_ACCESS_KEY_ID: ${{{{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}}}",
         f"{i2}  AWS_SECRET_ACCESS_KEY: ${{{{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}}}",
@@ -109,6 +111,17 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
         f'{i2}    chmod -R u+x "$RUNNER_TEMP/awscli"',  # zipfile drops the mode bits
         f'{i2}    "$RUNNER_TEMP/awscli/aws/install" --update -i "$RUNNER_TEMP/aws-cli" -b "$RUNNER_TEMP/aws-bin"',
         f'{i2}    export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"',
+        # A pinned, isolated CLI works on Linux, macOS and Windows without sudo.
+        f"{i2}  if ! command -v aws >/dev/null; then",
+        f'{i2}    python3 -m venv "$RUNNER_TEMP/artifacts-awscli"',
+        f'{i2}    artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"',
+        f'{i2}    artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"',
+        f'{i2}    if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then',
+        f'{i2}      artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"',
+        f'{i2}      artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"',
+        f'{i2}    fi',
+        f'{i2}    "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2',
+        f'{i2}    export ARTIFACTS_AWS="$artifacts_cli_aws"',
         f"{i2}  fi",
         f"{i2}  python3 tools/artifacts/artifacts.py pull --jobs 16 {' '.join(paths)}",
     ]
@@ -156,6 +169,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > len(indent)):
                 j += 1
             while not lines[j - 1].strip():
+            while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
         step = step_lines(indent, paths)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
@@ -176,6 +190,11 @@ def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
     for k, b in enumerate(block):
         scalar = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
         if scalar:  # one pattern on the key line: rewrite as a block list
+        if scalar and "${{" in scalar.group(2):
+            # A conditional empty value means a full checkout. Appending literal
+            # patterns would silently narrow it to the artifact bootstrap only.
+            return block
+        if scalar:  # one literal pattern on the key line: rewrite as a block list
             pad = indent + "      "
             block = block[:k] + [f"{scalar.group(1)}|", pad + scalar.group(2)] + block[k + 1:]
             b = block[k]
