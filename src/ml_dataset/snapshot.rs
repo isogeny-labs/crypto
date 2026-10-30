@@ -21,10 +21,38 @@ use crate::store::index::validate_sha256;
 use crate::store::{Config, Store};
 
 const MANIFEST_SCHEMA: &str = "ml-dataset.partial-snapshot/v1";
+const CHECKED_MANIFEST_SCHEMA: &str = "ml-dataset.partial-snapshot/v2";
 const RECEIPT_SCHEMA: &str = "ml-dataset.partial-receipt/v1";
 const CATALOG_SCHEMA: &str = "ml-dataset.partial-catalog/v1";
 const ANCHOR_SCHEMA: &str = "ml-dataset.partial-anchor/v1";
 static TEMP_ID: AtomicU64 = AtomicU64::new(0);
+
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum SnapshotProfile {
+    #[default]
+    LegacyV1,
+    CheckedPhaseV2,
+}
+impl SnapshotProfile {
+    pub fn is_legacy(&self) -> bool {
+        *self == Self::LegacyV1
+    }
+    fn schema(self) -> &'static str {
+        if self.is_legacy() {
+            MANIFEST_SCHEMA
+        } else {
+            CHECKED_MANIFEST_SCHEMA
+        }
+    }
+    fn from_schema(schema: &str) -> Result<Self, String> {
+        match schema {
+            MANIFEST_SCHEMA => Ok(Self::LegacyV1),
+            CHECKED_MANIFEST_SCHEMA => Ok(Self::CheckedPhaseV2),
+            _ => Err("unknown partial snapshot schema".into()),
+        }
+    }
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -120,6 +148,8 @@ pub struct SnapshotAnchor {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SnapshotRequest {
+    #[serde(default, skip_serializing_if = "SnapshotProfile::is_legacy")]
+    pub profile: SnapshotProfile,
     pub binding: AttemptBinding,
     pub ordinal: u64,
     pub previous: Option<SnapshotAnchor>,
@@ -554,6 +584,7 @@ fn expected_context<'a>(binding: &'a AttemptBinding, path: &str) -> Option<&'a s
 
 #[derive(Default)]
 struct ChainState {
+    profile: Option<SnapshotProfile>,
     context: BTreeSet<String>,
     paths: BTreeMap<String, Artifact>,
     cursor: Option<CaptureCursor>,
@@ -600,6 +631,7 @@ fn advance(
     limits: &SnapshotLimits,
     accounting: &mut Accounting,
 ) -> Result<(), String> {
+    let profile = SnapshotProfile::from_schema(&manifest.schema)?;
     manifest.binding.validate()?;
     manifest.observation.validate()?;
     claims_false(
@@ -607,7 +639,7 @@ fn advance(
         manifest.solver_state_restorable,
         manifest.scientific_result_verified,
     )?;
-    if manifest.schema != MANIFEST_SCHEMA
+    if state.profile.is_some_and(|previous| previous != profile)
         || manifest.ordinal >= limits.max_chain_length
         || manifest.objects.len() as u64 > limits.max_snapshot_artifacts
         || state
@@ -626,6 +658,7 @@ fn advance(
         }
     }
     let request = SnapshotRequest {
+        profile,
         binding: manifest.binding.clone(),
         ordinal: manifest.ordinal,
         previous: manifest.previous.clone(),
@@ -655,19 +688,63 @@ fn advance(
         if context.encoding != "json" || !state.context.insert(context.path.clone()) {
             return Err("invalid or redefined partial context".into());
         }
+        if profile == SnapshotProfile::CheckedPhaseV2 {
+            let local = context
+                .path
+                .strip_prefix("context/")
+                .ok_or("invalid checked context prefix")?;
+            let expected =
+                super::live::context_role(local).ok_or("unknown checked context path")?;
+            if context.role != expected
+                || context.bytes > super::telemetry::checked::byte_limit(local)
+            {
+                return Err("invalid checked context role or bound".into());
+            }
+        }
         if let Some(expected) = expected_context(&manifest.binding, &context.path) {
             if manifest.ordinal != 0 || context.sha256 != expected {
                 return Err("partial immutable context digest mismatch".into());
             }
-        } else if !matches!(
+        } else if !(matches!(
             context.path.as_str(),
             "context/public.json"
                 | "context/witness.json"
                 | "context/factor-base.json"
                 | "context/host.json"
                 | "context/worker-process.json"
-        ) {
+        ) || (profile == SnapshotProfile::CheckedPhaseV2
+            && context
+                .path
+                .strip_prefix("context/")
+                .and_then(super::telemetry::checked::role)
+                .is_some()))
+        {
             return Err("unrecognized partial context file".into());
+        }
+    }
+    if profile == SnapshotProfile::CheckedPhaseV2 {
+        if !state.context.contains("context/measurement-policy.json") {
+            return Err("checked snapshot lacks policy".into());
+        }
+        let mut previous_complete = true;
+        for phase in super::telemetry::checked::types::Phase::ALL {
+            let start = state
+                .context
+                .contains(&format!("context/{}", phase.path(true)));
+            let end = state
+                .context
+                .contains(&format!("context/{}", phase.path(false)));
+            if (end && !start) || (start && !previous_complete) {
+                return Err("checked snapshot is not dependency-closed".into());
+            }
+            previous_complete = end;
+        }
+        let context_bytes = state.context.iter().try_fold(0u64, |sum, path| {
+            sum.checked_add(state.paths[path].bytes)
+                .ok_or("checked context bytes overflow")
+        })?;
+        if state.context.len() > 19 || context_bytes > super::telemetry::checked::MAX_CONTEXT {
+            return Err("checked context envelope exceeded".into());
         }
     }
     if manifest.ordinal == 0 {
@@ -709,6 +786,7 @@ fn advance(
         state.stop = delta.head.stop.clone();
     }
     state.binding = Some(manifest.binding.clone());
+    state.profile = Some(profile);
     state.last_observation = Some(manifest.observation.clone());
     if manifest.coverage != coverage(state) {
         return Err("partial coverage disagrees with committed capture".into());
@@ -720,6 +798,31 @@ struct LoadedSnapshot {
     anchor: SnapshotAnchor,
     receipt: PartialReceipt,
     manifest: SnapshotManifest,
+}
+
+fn validate_checked_local_context(root: &Path, state: &ChainState) -> Result<(), String> {
+    let mut files = BTreeMap::new();
+    for path in &state.context {
+        let artifact = &state.paths[path];
+        let local = path
+            .strip_prefix("context/")
+            .ok_or("checked context prefix")?;
+        let bytes = super::telemetry::checked::read(
+            root,
+            path,
+            super::telemetry::checked::byte_limit(local),
+        )?;
+        if bytes.len() as u64 != artifact.bytes || super::digest(&bytes) != artifact.sha256 {
+            return Err("checked restored or prepared context identity mismatch".into());
+        }
+        files.insert(local.to_owned(), bytes);
+    }
+    let binding = AttemptBinding::from_cell_files(&root.join("context"))?;
+    if state.binding.as_ref() != Some(&binding) {
+        return Err("checked restored authoritative binding mismatch".into());
+    }
+    super::telemetry::checked::validate_context(&binding, &files)?;
+    Ok(())
 }
 
 fn load_chain(
@@ -904,7 +1007,7 @@ fn publish_with_backend(
         next_coverage.capture_stopped = delta.head.stop.is_some();
     }
     let manifest = SnapshotManifest {
-        schema: MANIFEST_SCHEMA.into(),
+        schema: request.profile.schema().into(),
         binding: request.binding.clone(),
         ordinal: request.ordinal,
         previous: request.previous.clone(),
@@ -918,6 +1021,9 @@ fn publish_with_backend(
         scientific_result_verified: false,
     };
     advance(&manifest, &mut state, limits, &mut accounting)?;
+    if request.profile == SnapshotProfile::CheckedPhaseV2 {
+        validate_checked_local_context(&root, &state)?;
+    }
     for object in &manifest.objects {
         let source = storage::contained_path(&root, &object.artifact.path, false)?;
         check_regular(&source, &object.object)?;
@@ -1134,6 +1240,9 @@ fn restore_with_backend(
             )?;
         }
     }
+    if state.profile == Some(SnapshotProfile::CheckedPhaseV2) {
+        validate_checked_local_context(artifacts, &state)?;
+    }
     let report = RestoreReport {
         schema: "ml-dataset.artifact-only-restore/v1".into(),
         anchor: anchor.clone(),
@@ -1239,6 +1348,7 @@ mod tests {
                 cell_index: 12,
             };
             SnapshotRequest {
+                profile: SnapshotProfile::LegacyV1,
                 binding,
                 ordinal: 0,
                 previous: None,
@@ -1306,6 +1416,7 @@ mod tests {
 
     fn terminal(initial: &SnapshotRequest, ack: &SnapshotAck) -> SnapshotRequest {
         SnapshotRequest {
+            profile: initial.profile,
             binding: initial.binding.clone(),
             ordinal: ack.anchor.ordinal + 1,
             previous: Some(ack.anchor.clone()),
