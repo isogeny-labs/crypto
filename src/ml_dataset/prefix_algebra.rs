@@ -652,6 +652,48 @@ mod tests {
         }
     }
     #[test]
+    fn bounded_span_miss_can_be_followed_by_an_exact_higher_degree_certificate() {
+        // y = (1-x)(xy+y) + y*x^2. Degree2 generator multiples cannot
+        // certify y here, while degree3 can; a low-bound miss is not a lower
+        // bound on first/last fall degree or proof of ideal nonmembership.
+        let left = vec![poly(&[(&[2, 0], 1)]), poly(&[(&[1, 1], 1), (&[0, 1], 1)])];
+        let mut right = left.clone();
+        right.push(poly(&[(&[0, 1], 1)]));
+        let low = equivalent(
+            &left,
+            &right,
+            2,
+            127,
+            Limits {
+                degree: 2,
+                ..Limits::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(low.status, "unknown");
+        let high = equivalent(
+            &left,
+            &right,
+            2,
+            127,
+            Limits {
+                degree: 3,
+                ..Limits::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(high.status, "ideal_equality_certified");
+        assert!(high.certificate.unwrap().right_from_left[2]
+            .iter()
+            .any(|m| m.exponents.iter().any(|e| *e > 0)));
+    }
+    #[test]
+    fn root_operation_caps_preserve_partial_verification_work() {
+        let mut work = Work::default();
+        assert!(super::roots(&[1, 125, 1], 127, &mut work, 5).is_err());
+        assert_eq!(work.coefficient_operations, 5);
+    }
+    #[test]
     fn wide_field_certificate_has_independent_bigint_identity() {
         use num_bigint::BigUint;
         let p = (1u64 << 61) - 1;
