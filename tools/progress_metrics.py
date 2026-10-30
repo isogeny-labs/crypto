@@ -20,6 +20,8 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 import datetime as dt
 import json
 import os
@@ -47,7 +49,7 @@ def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
 
-def file_history(ref, path, since):
+def _uncached_file_history(ref, path, since):
     """Yield (date, commit, text) for the newest commit per day touching `path`, newest first."""
     out = _git("log", "--first-parent", ref, f"--since={since}", "--format=%H %cs", "--", path, check=False)
     seen = set()
@@ -59,6 +61,45 @@ def file_history(ref, path, since):
         txt = show(h, path)
         if txt is not None:
             yield d, h[:12], txt
+
+
+@lru_cache(maxsize=None)
+def _history_rows(ref, path, since):
+    return tuple(_uncached_file_history(ref, path, since))
+
+
+def file_history(ref, path, since):
+    return iter(_history_rows(ref, path, since))
+
+
+def show_many(ref, paths):
+    """Read committed text blobs in one size-framed Git batch."""
+    if not paths:
+        return []
+    requests = "".join(f"{ref}:{path}\n" for path in paths).encode()
+    proc = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                          input=requests, capture_output=True, check=True)
+    data = proc.stdout
+    pos = 0
+    values = []
+    for path in paths:
+        end = data.index(b"\n", pos)
+        header = data[pos:end].split()
+        pos = end + 1
+        if header[-1] == b"missing":
+            values.append(None)
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"unexpected Git object for {path}")
+        size = int(header[2])
+        values.append(data[pos:pos + size].decode())
+        pos += size
+        if data[pos:pos + 1] != b"\n":
+            raise ValueError("invalid Git batch framing")
+        pos += 1
+    if pos != len(data):
+        raise ValueError("extra Git batch output")
+    return values
 
 
 def emit(metric, value, *, date=None, problem="misc", unit="", better="neutral", kind="gauge", label="", source=""):
@@ -452,6 +493,115 @@ def koblitz_larger_constructions(ref, since):
                  label="Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
                  source=f"{path}@{commit}")
 
+
+def koblitz_ordinary_orientation(ref, since):
+    """Fixed n5 source-algebra counters; not larger-n Koblitz or IC performance."""
+    path = "research/koblitz_modular_ic_20261018/rounds/44/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts")
+        if not isinstance(counts, dict):
+            continue
+        for key, metric, unit, label in (
+            ("actual_source_blocks", "koblitz_modular.ordinary_source_algebra_blocks", "fixed source blocks",
+             "Actual nonsplit-kernel source checks; proper/moduli interpretation retained, not IC rank"),
+            ("exact_orientation_trace_cases", "koblitz_modular.orientation_trace_cases", "fixed middle cases",
+             "Independent seven-kernel/Tate-twist trace decomposition; not a success distribution"),
+            ("orientation_filter_control_blocks", "koblitz_modular.orientation_filter_control_blocks", "retained controls",
+             "Trace screen against recorded83/284source algebras; not independent collector images"),
+            ("max_actual_source_tuple_degree", "koblitz_modular.max_ordinary_source_tuple_degree", "absolute residue degree",
+             "Largest certified source tuple on fixed n5carrier; not a larger-n Koblitz transfer"),
+        ):
+            emit(metric, counts.get(key), date=date, problem=P_IC, unit=unit,
+                 better="neutral", label=label, source=f"{path}@{commit}")
+
+def koblitz_source_collector(ref, since):
+    """Actual fixed-n5 chart enumeration; neither Picard rank nor target recovery."""
+    path = "research/koblitz_modular_ic_20261018/rounds/45/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("collector_cases", []):
+            if row.get("status") != "accepted" or row.get("role") == "control":
+                continue
+            degree = row["extension_degree"]
+            for key, unit in (("rational_source_points", "rational source points"),
+                              ("closed_points", "closed source points"),
+                              ("deck_orbits", "deck orbits")):
+                emit(f"koblitz_modular.collector_degree{degree}_{key}", row.get(key),
+                     date=date, problem=P_IC, unit=unit, better="neutral",
+                     label=f"Complete fixed chart over F2^{degree}; fixed n5 carrier, Picard images unevaluated",
+                     source=f"{path}@{commit}")
+
+
+def koblitz_root_collector(ref, since):
+    """Exact candidate counts and equality controls, not measured execution cost."""
+    path = "research/koblitz_modular_ic_20261018/rounds/46/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for row in record.get("collector_cases", []):
+            if row.get("status") == "accepted":
+                degree = row["extension_degree"]
+                emit(f"koblitz_modular.root_collector_degree{degree}_candidates",
+                     row.get("lambda_candidates"), date=date, problem=P_IC,
+                     unit="algebraic root candidates", better="neutral",
+                     label="Exact root collector; total cost and Picard images unevaluated",
+                     source=f"{path}@{commit}")
+        comparisons = record.get("point_set_comparisons", [])
+        emit("koblitz_modular.root_collector_complete_set_controls",
+             sum(x.get("byte_identical") is True for x in comparisons),
+             date=date, problem=P_IC, unit="complete point-set comparisons",
+             better="neutral", label="Compared with exhaustive fixed-chart detector; not IC rank",
+             source=f"{path}@{commit}")
+
+
+def koblitz_degree13_divisors(ref, since):
+    """Actual fixed-input divisor computations; retained geometric bridge, no IC rank."""
+    path = "research/koblitz_modular_ic_20261018/rounds/47/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("full_jet_cases", "closed source points", "Degree13 source jets; fixed n5 carrier, not a larger-n transfer"),
+            ("complete_divisor_representations", "effective divisors", "Complete 23Q+P kernels under retained proper/RR bridge"),
+            ("signed_class_cases", "actual source classes", "Degree13 collected signed sums; chosen target images not evaluated"),
+        ):
+            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
+def koblitz_degree13_characters(ref, since):
+    """Fixed source character tests and finite old-line matches; no target rank."""
+    path = "research/koblitz_modular_ic_20261018/rounds/48/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("character_components_tested", "source components", "Degree13 actual diamond characters under retained proper/Picard bridge"),
+            ("old_line_scalar_comparisons", "complete scalar tests", "All eleven multiples in each tested old source line"),
+            ("matched_old_coordinates", "matched source components", "Exact cyclic-line coordinates; independent target rank unevaluated"),
+            ("crossed_source_operator_images", "source operator images", "Full retained crossed operators on a collected class; chosen-model map open"),
+        ):
+            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
+def koblitz_affine_normalization(ref, since):
+    """Neutral exact-work counters; output computation and verification stay separate."""
+    path = "research/koblitz_modular_ic_20261018/rounds/49/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("normalization_control_cases", "control cases", "Smooth and cusp normalization API controls over F2"),
+            ("source_preparation_cases", "prepared source ideals", "Exact twisted F2 source input; not a normalization"),
+            ("generic_source_prime", "certified generic fields", "Exact generic primeness; affine contraction and normalization separate"),
+            ("primitive_presentations", "two-way field presentations", "Fixed primitive-element test; integral model and normalization separate"),
+            ("normalization_outputs_computed", "normalizer outputs", "Computed affine presentations; independent exported-data checks counted separately"),
+            ("verified_affine_normalizations", "checked affine presentations", "Affine normalization only; proper projective and modular-factor geometry remain open"),
+            ("audited_conditional_declarations", "audited declarations", "Conditional field-degree lemmas; concrete native ideals not formalized"),
+        ):
+            emit("koblitz_modular.affine_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -479,8 +629,8 @@ def fall_degree(ref):
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
-    for f in files:
-        for line in (show(ref, f) or "").splitlines():
+    for text in show_many(ref, files):
+        for line in (text or "").splitlines():
             if not line.startswith("{"):
                 continue
             r = json.loads(line)
@@ -531,6 +681,13 @@ def curve_traits(ref):
 
 def main():
     a = args()
+    # Independent histories are prefetched without emitting output; metric
+    # ordering and the original first-parent/per-day semantics stay unchanged.
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47, 48)]
+    pool = ThreadPoolExecutor(max_workers=4)
+    histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
@@ -545,9 +702,18 @@ def main():
     fall_degree(a.ref)
     curve_traits(a.ref)
 
+    for history in histories:
+        history.result()
+    pool.shutdown()
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
     koblitz_larger_constructions(a.ref, a.since)
+    koblitz_ordinary_orientation(a.ref, a.since)
+    koblitz_source_collector(a.ref, a.since)
+    koblitz_root_collector(a.ref, a.since)
+    koblitz_degree13_divisors(a.ref, a.since)
+    koblitz_degree13_characters(a.ref, a.since)
+    koblitz_affine_normalization(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

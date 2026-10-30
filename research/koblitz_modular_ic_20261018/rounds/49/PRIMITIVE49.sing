@@ -1,0 +1,33 @@
+ring primDp49=(2,u),(l,v,t),dp;
+option(redSB);short=0;
+map shifted49=affine49,t+u*l+u^2*v,l,v,u;
+ideal primStd49=std(shifted49(sourceIdeal49));
+if(vdim(primStd49)!=32){ERROR("PRIMITIVE49_INPUT_DIMENSION");quit;}
+ring primLex49=(2,u),(l,v,t),lp;
+print("PRIMITIVE49_STAGE FGLM_begin=true fixed_element=n+u*l+u^2*v");
+ideal lexStd49=fglm(primDp49,primStd49);
+if(!defined(lexStd49)){ERROR("PRIMITIVE49_FGLM_OUTPUT_MISSING");quit;}
+if(vdim(lexStd49)!=32){ERROR("PRIMITIVE49_FGLM_DIMENSION");quit;}
+poly minimal49;int entry49;int found49=0;
+for(entry49=1;entry49<=size(lexStd49);entry49++){
+ if(subst(lexStd49[entry49],l,0)==lexStd49[entry49] && subst(lexStd49[entry49],v,0)==lexStd49[entry49]){minimal49=lexStd49[entry49];found49++;}
+}
+poly lValue49=reduce(l,lexStd49);poly vValue49=reduce(v,lexStd49);
+int shape49=(found49==1 && deg(minimal49)==32 && subst(lValue49,l,0)==lValue49 && subst(lValue49,v,0)==lValue49 && subst(vValue49,l,0)==vValue49 && subst(vValue49,v,0)==vValue49);
+print("PRIMITIVE49_SHAPE fixed_element_primitive="+string(shape49)+" univariate_generators="+string(found49)+" minimal_degree="+string(deg(minimal49)));
+if(shape49==0){print("PRIMITIVE49_RESULT fixed_element_primitive=false normalization_performed=false");print("PRIMITIVE49_ALL_CHECKS_PASS");quit;}
+minimal49=minimal49/leadcoef(minimal49);ideal minimalStd49=std(ideal(minimal49));
+poly nValue49=t+u*lValue49+u^2*vValue49;
+map sourceToPrimitive49=affine49,nValue49,lValue49,vValue49,u;
+if(size(reduce(sourceToPrimitive49(sourceIdeal49),minimalStd49))!=0){ERROR("PRIMITIVE49_SOURCE_IDENTITIES");quit;}
+ring sourceField49=(2,u),(n,l,v),dp;
+map fromAffine49=affine49,n,l,v,u;
+ideal sourceStd49=std(fromAffine49(sourceIdeal49));
+map back49=primLex49,l,v,n+u*l+u^2*v;
+if(reduce(back49(minimal49),sourceStd49)!=0 || reduce(back49(nValue49)+n,sourceStd49)!=0 || reduce(back49(lValue49)+l,sourceStd49)!=0 || reduce(back49(vValue49)+v,sourceStd49)!=0){ERROR("PRIMITIVE49_REVERSE_IDENTITIES");quit;}
+if(reduce(back49(nValue49+1)+n,sourceStd49)==0){ERROR("PRIMITIVE49_CORRUPTION_ACCEPTED");quit;}
+setring primLex49;
+link primitiveOut49="ASCII:w primitive-field49.sing";open(primitiveOut49);
+write(primitiveOut49,"ring primitiveField49=(2,u),(t),dp;poly minimal49="+string(minimal49)+";poly nValue49="+string(nValue49)+";poly lValue49="+string(lValue49)+";poly vValue49="+string(vValue49)+";");close(primitiveOut49);
+print("PRIMITIVE49_RESULT fixed_element_primitive=true minimal_degree=32 two_way_identities=true corrupted_inverse_rejected=true normalization_performed=false");
+print("PRIMITIVE49_ALL_CHECKS_PASS");quit;

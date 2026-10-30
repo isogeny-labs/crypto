@@ -1,0 +1,7 @@
+proc filter44(int root,int twist,int expected,int d,poly L,number b,number c){
+ number a=1+c;if(a==0 || diff(L,Z)!=a){ERROR("FILTER44_QUADRATIC");}number x=number(subst(L,Z,0))/a^2;number tr=0;int k;
+ for(k=0;k<d;k++){tr=tr+x;x=x^2;}if(tr!=0 && tr!=1){ERROR("FILTER44_TRACE");}
+ if((tr==0)!=(expected==1)){ERROR("FILTER44_REFERENCE_MISMATCH");}
+ ideal q=std(ideal(L,X,T));poly zf=Z;for(k=1;k<=d;k++){zf=reduce(zf^2,q);}if(reduce(zf+Z+a*tr,q)!=0){ERROR("FILTER44_FROBENIUS_SIGN");}
+ print("FILTER44_RESULT base_degree="+string(d)+" root="+string(root)+" twist="+string(twist)+" orientation_trace="+string(tr)+" retained_split="+string(expected)+" actual_Frobenius_sign=checked source_class_nonzero_asserted=false");return(1);
+}
