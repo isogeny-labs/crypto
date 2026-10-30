@@ -72,7 +72,9 @@ arithmetic. All five files reconstruct byte for byte, and all ten phases match
 expectations: seven exit0, three deliberately altered field/frequency/summary
 copies correctly refused with native exit1. Shared compiler and TSV I/O are
 disclosed; no statistic/null arithmetic is shared. Sources, native binaries,
-arguments, outputs and wrong copies are retained in the local raw archive.
+arguments, outputs and wrong copies are retained in the raw archive. Its exact
+original bytes now have durable authenticated S3 custody and verified complete
+readback; see DELIVERY.json. This post-audit upload is not a pre-run checkpoint.
 
 The two-page anonymous report and standalone build pass make check. All pages
 are inspected, fonts embedded, references resolved and no overfull boxes remain;
@@ -81,7 +83,7 @@ the presentation values. [REPRODUCE.md](REPRODUCE.md), [EXECUTION.json](EXECUTIO
 and [DELIVERY.json](DELIVERY.json) bind the full record.
 
 This is exact local analysis of existing verified results under AGENTS9a's
-development exception, explicitly CHECKPOINT_SKIP. No S3 checkpoint/upload or
+development exception, explicitly CHECKPOINT_SKIP. No S3 pre-run checkpoint or
 gate on the real-curve experiment is claimed passed. The previously denied
 older paper payload remains local and excluded. No new curve, character,
 point count, factorization, random draw, DLP, timing or paid job was introduced.
@@ -103,3 +105,13 @@ inputs already specify42and102; no cohort, code, output or verdict changes.
 This documentary addition was retrieved after the native audit and is bound
 separately in RESULTS-SHA256SUMS, outside the already closed raw snapshot.
 The original source/protocol and its procedural history remain unchanged.
+
+## Review corrections
+
+REVIEW-FIXES.md records the native preparation replacement and later durable
+custody. The active reproduction no longer invokes Python. The native converter
+matches all 68 frozen rows byte for byte; malformed-input and overwrite controls
+pass. No trait, score, cohort, distribution, claim or paper changes. All 21 source
+bindings remain unchanged. Original documentary receipts and the original result
+manifest are versioned under historical/pre-review/; current result hashes are
+explicitly amended for these documentation/custody corrections only.
