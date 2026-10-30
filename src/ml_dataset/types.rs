@@ -1,3 +1,6 @@
+#[path = "plan_v2.rs"]
+pub mod plan_v2;
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
