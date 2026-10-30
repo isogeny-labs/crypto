@@ -1,0 +1,103 @@
+name: Native twist and factor-base experiments
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/twist-relations/**'
+      - '.github/workflows/twist-relations.yml'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Diagnostic scope (performance admission is separate)
+        type: choice
+        options: [smoke, benchmark, exhaustive, all]
+        default: all
+      seeds:
+        description: Benchmark trials per curve
+        type: string
+        default: '30'
+      seed_start:
+        description: First seed, for disjoint trial shards
+        type: string
+        default: '0'
+      runner:
+        description: Explicit runner backend
+        type: choice
+        options: [crypto-eks-linux, ubuntu-latest]
+        default: crypto-eks-linux
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    env:
+      TWIST_SOURCE_REVISION: ${{ github.sha }}
+      TWIST_SUITE: ${{ inputs.suite || 'smoke' }}
+      TWIST_SEEDS: ${{ inputs.seeds || '2' }}
+      TWIST_SEED_START: ${{ inputs.seed_start || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/twist-relations
+            backlog/XP-20261029-twist-factor-base
+            scripts
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - name: Native correctness, formatting, and accounting checks
+        shell: bash
+        run: |
+          cargo fmt --manifest-path tools/twist-relations/Cargo.toml --check
+          cargo clippy --release --locked --manifest-path tools/twist-relations/Cargo.toml --all-targets -- -D warnings
+          cargo test --release --locked --manifest-path tools/twist-relations/Cargo.toml
+      - name: Checkpoint the manual diagnostic before execution
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+        run: |
+          mkdir -p .resume
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Execute the native twist/factor-base diagnostic suite selected by this workflow.
+          ## Lead / hypothesis
+          Test whether public twist-coordinate selection reduces charged original-curve relation work.
+          ## Spec
+          backlog/XP-20261029-twist-factor-base/PROTOCOL.md at source $GITHUB_SHA.
+          Suite $TWIST_SUITE, seed count $TWIST_SEEDS, first seed $TWIST_SEED_START.
+          ## State
+          Native correctness checks passed; no diagnostic records produced yet.
+          ## Next steps
+          Run tools/twist-relations/target/release/twist-relations with these parameters and a fresh output directory.
+          ## Runs in flight
+          GitHub run $GITHUB_RUN_ID, attempt $GITHUB_RUN_ATTEMPT; no other submissions by this workflow.
+          ## Stop and success conditions
+          Thirty-minute job deadline; stop on budget or invariant failure. Success means verified diagnostic artifacts, not an admitted speedup.
+          EOF
+          scripts/checkpoint.sh gate
+      - name: Execute selected native diagnostics
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          tools/twist-relations/target/release/twist-relations \
+            --suite "$TWIST_SUITE" --seeds "$TWIST_SEEDS" \
+            --seed-start "$TWIST_SEED_START" --output-dir artifacts/twist-relations
+          if test -f artifacts/twist-relations/benchmark.json; then
+            tools/twist-relations/target/release/twist-relations verify artifacts/twist-relations/benchmark.json
+          fi
+          if test -f artifacts/twist-relations/exhaustive.json; then
+            tools/twist-relations/target/release/twist-relations verify artifacts/twist-relations/exhaustive.json
+          fi
+      - name: Upload diagnostic records and provenance
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: twist-relations-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/twist-relations
+          if-no-files-found: warn
