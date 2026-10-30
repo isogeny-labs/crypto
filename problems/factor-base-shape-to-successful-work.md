@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
 - **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-10-29
 
 ## Problem
 
@@ -96,3 +96,16 @@ cofactor/rank diagnostics. Successful solver work and regularity remain
 unresolved. This record and its PR do not discharge those obligations.
 
 2026-10-26 storage follow-up: explicit owner S3 approval, verified full archive readback and a verified resume checkpoint remove the earlier authorization/custody blocker for the prepared software validation. See [publication receipt](../research/factor_base_excess_20261026/publication-20261026/README.md). Successful native decomposition/rank/complete-cost transfer remains unresolved; no research panel or old-card dispatch occurred.
+
+2026-10-29 lead investigation: the
+[target-conditioned symmetric-kernel review](../research/factor_base_kernel_lead_20261029/README.md)
+identifies a specific unfinished native transfer. The sibling symmetric m=2
+formulation already exists; this is not a new algebraic discovery. The current
+unified sweeper still uses direct descended F4, while the other native
+linearized path is subfield-specific. The proposed general-subspace adapter
+must charge the actual affine kernel search, splitting, original-inventory
+point checks and independent relation rank. Its
+[comparison design](../research/factor_base_kernel_lead_20261029/NEXT_TEST.md)
+is not a frozen executable protocol, implemented adapter or experiment result.
+No old card was promoted or dispatched. The native successful-work and
+regularity obligations remain open; custody completion does not discharge them.
