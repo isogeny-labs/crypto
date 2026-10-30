@@ -258,3 +258,95 @@ falsifiable conjecture:
 
 If C-step holds, `d_F` grows linearly in `t`, at one degree per four tower
 levels, against `2t + 2` for the no-fall certificate (D4).
+
+## Amendment 7 (2026-10-29, owner-adopted; before any Kummer `m = 2` row at `t >= 12` on the pushed branch; the `t <= 10` rows are being recomputed)
+
+Changes to resources and instruments for stage A at `t >= 11`, a rule for decomposable
+targets, and the scorer that implements Amendments 3, 5 and 7. No hypothesis changes, no
+§6 rule changes, and the Amendment 6 prediction is unchanged.
+
+**A. Resources.**
+- The relaunch runs on Iso Lab EKS (`isolab_k8s_run`), not on the shared 32 GB host of
+  Amendment 2. Each job pins `RAYON_NUM_THREADS` and records the instance type.
+- For `t >= 12`, each F4 system runs as its own job, with `--targets k`. It takes
+  `--budget 86400`, and `--max-dense` in place of `--max-nnz` (§16.2 of the PKM note: `--max-dense`
+  bounds the block held in memory). The memory request is 56Gi at `t = 12` and 112Gi at
+  `t = 13, 14`. `--max-dense` is the largest multiple of 10⁸ with `4·C <= request − 8 GiB`.
+- Closure limits (`max_cols 2·10⁶`, `max_entries 3·10⁸`, `--budget 1800` per closure) are unchanged.
+
+**B. A two-cap bracket for `t >= 12`.** Uncapped F4 at `t = 12, 13, 14` is expected to need
+1.7 h, 17 h and 7 days if the recorded 10x-per-level growth holds. That growth is derived in
+`research/prime_ic_program_20261029/fall_degree_relaunch/README.md` §2.6. For `t >= 12`, `d_F`
+therefore comes from capped F4 at the two degrees that bracket the Amendment 6 prediction
+`c* = 4 + ⌊(t − 2)/4⌋`, which is 6, 6, 7 at `t = 12, 13, 14`. This is the procedure §3 and §5 D
+allow once G3 has passed.
+- Run cap `c* − 1` first. If it refutes, `d_F <= c* − 1`; step the cap down until it does not refute.
+  The last non-refuting cap `c` gives `d_F = c + 1`.
+- If cap `c* − 1` does not refute, run cap `c*`. If that refutes, `d_F = c*`. If it does not, step the cap
+  up until a cap refutes, or until a cap is stopped by a limit (`d_F >= that cap`, censored).
+- A capped run stopped by its budget or `--max-dense` is censored: it bounds `d_F` from neither side.
+- Uncapped F4 still runs at `t = 11`, and at `t = 12` where it fits the budget, for H-FFD and H-gap.
+  Rows without `D` do not enter H-FFD (§6 as written). G2 is checked wherever `D` exists.
+
+**C. Decomposable targets.** For Kummer `m = 2` (every cell of stage A), a draw is certified
+inconsistent when the reduced `S₃` has no zero on the grid (D1). The certificate is
+`prime_fall_degree_tools ns-degree DIR --t-max 14`, field `grid_zeros`, computed on the
+closure row of the same system. A draw with `grid_zeros > 0` is **decomposable**. It is
+reported with its relation and excluded from every median and rule. It is not counted as
+censored, and it is not redrawn. A cell whose two draws are both decomposable has no median.
+For other kinds and `m`, a closure row that never contains `1` while `λ >= 0.01` is reported
+as "possibly decomposable", not as `d_F > cmax`.
+
+**D. The scorer.** Before scoring, `prime_fall_degree_tools score` is patched, committed and
+reviewed. The patch implements only the following.
+1. It reads `CAP-*.jsonl` and the bracket rows `X-*.jsonl` and keys them as the closure rows are keyed.
+2. For a system with a closure row censored at `c_last` with no `1`, so `d_F > c_last`:
+   - `d_F = D (F4)` if an uncapped `D*` row refuted at `D` and a capped row at `D − 1` did not refute
+     (Amendment 3);
+   - otherwise the bracket of B;
+   - otherwise the closure's one-sided value.
+   The source is printed per row (`closure`, `=D (F4)`, `bracket`).
+3. The C exclusion.
+4. The Amendment 2 repeat check, extended to rows imported from the first run if they are recovered.
+5. A line per `t >= 11` giving the C-step reading: **holds at t** (median equals `c*`), **refuted at t**
+   (median exact and different, or a bound that excludes `c*`) or **undecided at t** (a bound that
+   includes `c*`, or no median).
+
+**E. Disclosures made at registration.**
+- *Mac worktree not inspected.* The owner adopted this amendment on 2026-10-29 from a cloud session with no access to the Mac worktree (`RESTART.md`). Any `t >= 11` row later recovered from it predates this amendment. Such rows are listed in RESULTS as pre-amendment rows and are scored under the rules in force before Amendment 7. Any recovered `t >= 12` row is reported separately and never enters an Amendment-7 median.
+- *`t = 11` is not a blind test of C-step.* Committed round-2 rows (`research/pkm_tower_round2_20260925/`) already gave `D = 6` at `t = 11`, with cap 5 not refuting, before Amendment 6 was registered (`research/prime_ic_program_20261029/fall_degree_relaunch/README.md`). Only `t = 12, 13, 14` test C-step, and `t = 14` (predicting 7) is the decisive cell.
+
+Source: `research/prime_ic_program_20261029/fall_degree_relaunch/AMENDMENT_7_DRAFT.md` (the rationale notes stay there). Adopted per `research/prime_ic_program_20261029/DECISIONS.md` (D-FD7).
+
+## Amendment 8 (2026-10-29, owner-adopted; before any Kummer `m = 4` row at `t >= 4` in the relaunch)
+
+The `m = 4` extension. The full text, with derivations and estimates, is
+`research/prime_ic_program_20261029/fall_degree_relaunch/AMENDMENT_8_DRAFT_m4.md` (§§1-6), adopted
+as written, including its optional prediction. The binding parts are restated here.
+
+- **Cells.** Kummer, `m = 4`, chain presentation (2 free unknowns), `P1`, seed `0x504B4D54`,
+  `--planted 0 --random 2`, at `t = 4, 5, 6, 7` (`N = 16 ... 28`). The shape-matched null runs at `t = 4, 5`.
+- **Instruments.** Closure (`--engine hky`) to `--hky-cmax 8`, run per system (`--targets k`), with
+  `max_cols 4·10⁶`, `max_entries = floor((request − 8 GiB) / 8 B)` and `--budget 172800` per closure. Capped F4
+  runs only as Amendments 3 and 7 allow, after G3. Order: `t = 4` to `c = 7`, then `t = 5` to `c = 6`, then `t = 5`
+  to `c = 7`, then `t = 6` to `c = 6`, then `t = 6` to `c = 7` if the earlier entry counts suggest it fits.
+- **Readings** (lower medians over the 2 draws, as in §6):
+  - **rise**: `d_F(20) >= 8` with `d_F(16) = 7`;
+  - **flat**: `d_F(16) = d_F(20) = 7`;
+  - **fall**: `d_F(20) <= 6`;
+  - **undecided**: anything else, including a censored `t = 5`, `c = 7` closure.
+- **What the readings do.**
+  - *Close the lane* (the PKM tower factor base, judged by the HKY last fall degree) if C-step holds at `t = 12-14` and `m = 4` reads *rise*.
+  - *Keep it open as a mechanism question only* if `m = 4` reads *flat* or *fall* and C-step is refuted at `t = 12` or `t = 14` with a lower value. Next comes ladder C's growth in `m` at fixed `t`, toward `m = 6 ... 8`.
+  - *No change* otherwise.
+- **Prediction** (kept): `d_F(16) = 7`, and `t = 5` undecided because the `c = 7` closure will not fit.
+- **§6 option, adopted:** widen the closure's arithmetic to 64-bit primes (`u128` products or Montgomery). The
+  `m = 4` ladder can then go past `t = 7` at a prime near 2^40. This is engineering. Its cells need their own amendment
+  before any row at such a prime exists. Conditioning targets on inconsistency (a decomposability certificate
+  for `m = 4`) stays available and is not adopted.
+- **Resources.** The decisive `t = 5`, `c = 7` closure is projected at 80-510 GB (derived, low confidence). It runs only
+  on a host that fits it: a 256-512 GB host that stays up for days, or a disk-backed echelon. It is not forced into
+  the lab's 128 GiB pool. A censored result reads *undecided*, never *flat*.
+- No outcome is an `S`, a price or a leaderboard row (§8).
+
+Adopted per `research/prime_ic_program_20261029/DECISIONS.md` (D-FD8).

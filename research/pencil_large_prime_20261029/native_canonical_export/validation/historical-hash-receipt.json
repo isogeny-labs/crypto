@@ -1,0 +1,16 @@
+{
+  "schema": "pencil-canonical-hash-crosscheck/v1",
+  "scope": "Preserved actual pre-first-gate protocol; no Python execution or protocol mutation",
+  "historical_receipt_field": "protocol_sha256_integrity_only",
+  "historical_field_semantics": "raw file SHA-256; not canonical freeze hash",
+  "raw_file_sha256": "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594",
+  "canonical_without_freeze_sha256": "e00941ff8f17bb41091fcc11fcef11ff5137325da3127e7c85b1a461b56bd036",
+  "independent_canonical_producer": "jq -cS del(.freeze), final newline removed",
+  "independent_bytes_match_rust": true,
+  "previous_failed_check": "validation/historical-canonical-hash-category-mismatch.log",
+  "previous_failure_cause": "Compared canonical hash with historical raw-file hash",
+  "runtime_source_changed": false,
+  "adapter_pin_unchanged": true,
+  "additional_software_tests_passed": 1,
+  "cohort_executions": 0
+}
