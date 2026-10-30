@@ -76,7 +76,8 @@ func (b *Builder) EqualsConst(ar *Arith, v *Var, k *big.Int) {
 }
 
 // MembershipCheck constrains the affine point pt to lie in F_i of an affine
-// factor base: h = alpha x + beta y + gamma (mod p) and h < Bound_i.
+// factor base: h = alpha x + beta y + gamma (mod p) and h < Bound_i, plus
+// x < XBound_i when the factor bases carry a coordinate window.
 func (b *Builder) MembershipCheck(ar *Arith, fb *FactorBases, i int, pt FieldPoint) {
 	if !fb.Affine {
 		panic("ecdl: MembershipCheck needs affine factor bases")
@@ -88,6 +89,11 @@ func (b *Builder) MembershipCheck(ar *Arith, fb *FactorBases, i int, pt FieldPoi
 	h := b.FieldVar(ar, "hash")
 	b.LinCheck(ar, h, true, []Term{{-1, u1}, {-1, u2}}, new(big.Int).Neg(bi64(fb.Gamma[i])))
 	b.RangeCheck(ar, h, bi64(fb.Bound[i]), false)
+	if fb.XBound != nil {
+		// Compact coordinate constraint: x < XBound_i, a block-level compare
+		// chain of degree O(t) that reads only x.
+		b.RangeCheck(ar, pt.X, bi64(fb.XBound[i]), false)
+	}
 }
 
 func bi64(x uint64) *big.Int { return new(big.Int).SetUint64(x) }
@@ -203,7 +209,8 @@ func (b *Builder) CompleteAdd(ar *Arith, c *Curve, p1, p2 FieldPoint) FieldPoint
 
 // GadgetRelationNetwork is RelationNetwork built entirely from low-degree
 // gadgets, for affine factor bases. Each A_i is proposed by a hint (which
-// lists F_i, a toy shortcut) and constrained only by ValidityCheck and
+// lists F_i; with a coordinate window that listing is generated from the
+// window by square root, not from the whole group) and constrained only by ValidityCheck and
 // MembershipCheck; partial sums use CompleteAdd. It has no support vertex,
 // and it counts exactly what RelationNetwork counts for the same factor bases.
 func GadgetRelationNetwork(c *Curve, ar *Arith, fb *FactorBases, R Point) (*Network, []FieldPoint) {
@@ -212,6 +219,9 @@ func GadgetRelationNetwork(c *Curve, ar *Arith, fb *FactorBases, R Point) (*Netw
 	for i, set := range fb.Sets {
 		A[i] = FieldPoint{X: b.FieldVar(ar, "x"), Y: b.FieldVar(ar, "y")}
 		set := set
+		if fb.XBound != nil {
+			set = fb.WindowCandidates(c, i)
+		}
 		b.Hint(nil, []*Var{A[i].X, A[i].Y}, func([]*big.Int) [][]*big.Int {
 			rows := make([][]*big.Int, len(set))
 			for j, pt := range set {

@@ -65,6 +65,14 @@ type FactorBases struct {
 	Affine                    bool
 	Alpha, Beta, Gamma, Bound []uint64
 	p                         uint64
+
+	// XBound, if non-nil, adds a compact coordinate constraint: A is in F_i
+	// only if x(A) < XBound[i], on top of the hash test. WindowBits is the k
+	// with XBound = p >> k. The window is deterministic, so unlike the hash
+	// it is not random: it trades some independence between the F_i for
+	// membership tests that fix the high bits of x.
+	XBound     []uint64
+	WindowBits int
 }
 
 // NewFactorBases draws m hash keys and sizes each F_i near (2r)^(1/m), so the
@@ -90,13 +98,36 @@ func NewFactorBases(c *Curve, m int, rng *rand.Rand) *FactorBases {
 // SHA-256 its membership test is cheap to encode with the low-degree gadgets
 // (Builder.MembershipCheck).
 func NewAffineFactorBases(c *Curve, m int, rng *rand.Rand) *FactorBases {
+	return NewWindowedFactorBases(c, m, rng, 0)
+}
+
+// NewWindowedFactorBases is NewAffineFactorBases with the extra constraint
+// x < p >> k, so F_i = {A : x(A) < p>>k and hash_i(A) < U_i}. U_i is scaled
+// by 2^k to keep |F_i| near (2r)^(1/m). If the window alone would be smaller
+// than that, k is lowered until it fits. k = 0 means no window.
+func NewWindowedFactorBases(c *Curve, m int, rng *rand.Rand, k int) *FactorBases {
 	target := math.Ceil(math.Pow(2*float64(c.Order), 1/float64(m)))
-	bound := uint64(math.Max(1, math.Round(float64(c.P)*target/float64(c.Order-1))))
+	// The window holds about (r-1) * 2^-k points; it must hold at least target.
+	for k > 0 && float64(c.Order-1)/math.Pow(2, float64(k)) < target {
+		k--
+	}
+	xb := c.P >> uint(k)
+	if xb == 0 {
+		xb = 1
+	}
+	frac := float64(xb) / float64(c.P)
+	bound := uint64(math.Max(1, math.Round(float64(c.P)*target/(float64(c.Order-1)*frac))))
 	if bound > c.P {
 		bound = c.P
 	}
 	for {
 		fb := &FactorBases{Sets: make([][]Point, m), Index: map[Point]int{}, Affine: true, p: c.P}
+		if k > 0 {
+			fb.WindowBits = k
+			for i := 0; i < m; i++ {
+				fb.XBound = append(fb.XBound, xb)
+			}
+		}
 		for i := 0; i < m; i++ {
 			a, b := uint64(rng.Int63n(int64(c.P))), uint64(rng.Int63n(int64(c.P)))
 			for a == 0 && b == 0 {
@@ -118,12 +149,63 @@ func NewAffineFactorBases(c *Curve, m int, rng *rand.Rand) *FactorBases {
 	}
 }
 
-// list fills Sets, Points and Index. Toy shortcut: it enumerates the group.
-// At scale F_i is only ever accessed through its membership predicate.
+// list fills Sets, Points and Index. With a coordinate window it only visits
+// the window; otherwise it enumerates the whole group (toy shortcut; at scale
+// F_i is only ever accessed through its membership predicate).
 func (fb *FactorBases) list(c *Curve) {
+	if fb.XBound != nil {
+		fb.listWindow(c)
+		return
+	}
+	fb.listAll(c)
+}
+
+func (fb *FactorBases) listAll(c *Curve) {
 	m := len(fb.Sets)
 	for _, pt := range c.Points() {
 		for i := 0; i < m; i++ {
+			if fb.Member(i, pt) {
+				fb.Sets[i] = append(fb.Sets[i], pt)
+				if _, seen := fb.Index[pt]; !seen {
+					fb.Index[pt] = len(fb.Points)
+					fb.Points = append(fb.Points, pt)
+				}
+			}
+		}
+	}
+}
+
+// WindowCandidates returns F_i without listing the whole group when the
+// factor bases carry a coordinate window: it enumerates the window's points
+// by square root (Curve.WindowPoints) and keeps those that pass the hash. Its
+// cost is O(XBound_i) per factor base rather than O(|group|), and it never
+// touches a point outside the window. Without a window it returns a copy of
+// Sets[i], since there is no compact range to enumerate.
+func (fb *FactorBases) WindowCandidates(c *Curve, i int) []Point {
+	if fb.XBound == nil {
+		return append([]Point(nil), fb.Sets[i]...)
+	}
+	out := make([]Point, 0, len(fb.Sets[i]))
+	for _, pt := range c.WindowPoints(fb.XBound[i]) {
+		if fb.Member(i, pt) {
+			out = append(out, pt)
+		}
+	}
+	return out
+}
+
+// listWindow is listAll restricted to the union of the coordinate windows:
+// it takes square roots of x^3 + a x + b for x below the largest XBound,
+// then applies each F_i's membership predicate. Cost is O(max XBound).
+func (fb *FactorBases) listWindow(c *Curve) {
+	xmax := uint64(0)
+	for _, xb := range fb.XBound {
+		if xb > xmax {
+			xmax = xb
+		}
+	}
+	for _, pt := range c.WindowPoints(xmax) {
+		for i := range fb.Sets {
 			if fb.Member(i, pt) {
 				fb.Sets[i] = append(fb.Sets[i], pt)
 				if _, seen := fb.Index[pt]; !seen {
@@ -145,6 +227,9 @@ func (fb *FactorBases) AffineHash(i int, pt Point) uint64 {
 // Member is the membership predicate of F_i. O is never a member.
 func (fb *FactorBases) Member(i int, pt Point) bool {
 	if pt.Inf {
+		return false
+	}
+	if fb.XBound != nil && pt.X >= fb.XBound[i] {
 		return false
 	}
 	if fb.Affine {

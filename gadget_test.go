@@ -1,6 +1,7 @@
 package ecdl
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -415,5 +416,174 @@ func TestGadgetScaling(t *testing.T) {
 				t.Fatalf("b=%d %s: shape out of bounds", bitsz, name)
 			}
 		}
+	}
+}
+
+// The coordinate window composes with the hash: the gadget must accept
+// exactly the points with x < XBound that pass the hash test, and the window
+// must shrink F_i without changing its target size.
+func TestWindowedMembershipExhaustive(t *testing.T) {
+	rng := rand.New(rand.NewSource(19))
+	var c *Curve
+	var fb *FactorBases
+	for tries := 0; fb == nil || fb.XBound == nil; tries++ {
+		if tries == 50 {
+			t.Fatal("window was always dropped")
+		}
+		var err error
+		if c, err = RandomPrimeOrderCurve(rng, 4); err != nil {
+			t.Fatal(err)
+		}
+		fb = NewWindowedFactorBases(c, 2, rng, 1)
+	}
+	ar := NewArith(bi(c.P))
+	for i := range fb.Sets {
+		for _, pt := range fb.Sets[i] {
+			if pt.X >= fb.XBound[i] {
+				t.Fatalf("F_%d contains %v outside the window", i, pt)
+			}
+		}
+		b := &Builder{Exhaustive: true}
+		pt := FieldPoint{X: b.FieldVar(ar, "x"), Y: b.FieldVar(ar, "y")}
+		b.Hint(nil, []*Var{pt.X, pt.Y}, nil)
+		b.ValidityCheck(ar, c, pt)
+		b.MembershipCheck(ar, fb, i, pt)
+		if k := countWith(t, b.Finalize(), nil, nil); k != uint64(len(fb.Sets[i])) {
+			t.Fatalf("F_%d: gadget accepts %d encodings, |F_i| = %d", i, k, len(fb.Sets[i]))
+		}
+	}
+}
+
+// sqrtMod must agree with a brute-force square table on every residue.
+func TestSqrtMod(t *testing.T) {
+	for _, p := range []uint64{11, 13, 17, 29, 97, 101, 241} {
+		sq := map[uint64]bool{}
+		for y := uint64(0); y < p; y++ {
+			sq[mulMod(y, y, p)] = true
+		}
+		for a := uint64(0); a < p; a++ {
+			y, ok := sqrtMod(a, p)
+			if ok != sq[a] {
+				t.Fatalf("p=%d a=%d: ok=%v want %v", p, a, ok, sq[a])
+			}
+			if ok && mulMod(y, y, p) != a {
+				t.Fatalf("p=%d a=%d: %d^2 != a", p, a, y)
+			}
+		}
+	}
+}
+
+// Generating F_i from the coordinate window must yield exactly the points the
+// membership predicate accepts.
+func TestWindowCandidates(t *testing.T) {
+	rng := rand.New(rand.NewSource(29))
+	c, err := RandomPrimeOrderCurve(rng, 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fb := NewWindowedFactorBases(c, 3, rng, 1)
+	if fb.XBound == nil {
+		t.Fatal("window was dropped")
+	}
+	for i := range fb.Sets {
+		got := fb.WindowCandidates(c, i)
+		want := map[Point]bool{}
+		for _, pt := range fb.Sets[i] {
+			want[pt] = true
+		}
+		if len(got) != len(want) {
+			t.Fatalf("F_%d: window gives %d points, predicate has %d", i, len(got), len(want))
+		}
+		seen := map[Point]bool{}
+		for _, pt := range got {
+			if !want[pt] || seen[pt] {
+				t.Fatalf("F_%d: window point %v not in F_i or duplicated", i, pt)
+			}
+			seen[pt] = true
+		}
+	}
+}
+
+// Building the sets from the window must give the same sets, points and
+// column index as enumerating the whole group.
+func TestWindowedListMatchesFull(t *testing.T) {
+	rng := rand.New(rand.NewSource(31))
+	c, err := RandomPrimeOrderCurve(rng, 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fb := NewWindowedFactorBases(c, 3, rng, 1)
+	if fb.XBound == nil {
+		t.Fatal("window was dropped")
+	}
+	full := *fb
+	full.Sets = make([][]Point, len(fb.Sets))
+	full.Points = nil
+	full.Index = map[Point]int{}
+	full.listAll(c)
+	for i := range fb.Sets {
+		if len(fb.Sets[i]) != len(full.Sets[i]) {
+			t.Fatalf("F_%d: windowed list has %d points, full list %d", i, len(fb.Sets[i]), len(full.Sets[i]))
+		}
+		for j := range fb.Sets[i] {
+			if fb.Sets[i][j] != full.Sets[i][j] {
+				t.Fatalf("F_%d: point %d differs", i, j)
+			}
+		}
+	}
+	if len(fb.Points) != len(full.Points) || len(fb.Index) != len(full.Index) {
+		t.Fatalf("column counts differ: windowed %d/%d, full %d/%d", len(fb.Points), len(fb.Index), len(full.Points), len(full.Index))
+	}
+	for pt, col := range full.Index {
+		if fb.Index[pt] != col {
+			t.Fatalf("column of %v differs: %d vs %d", pt, fb.Index[pt], col)
+		}
+	}
+}
+
+// Windowed gadget networks count what the whole-point network counts.
+func TestWindowedRelationCounts(t *testing.T) {
+	rng := rand.New(rand.NewSource(23))
+	c, err := RandomPrimeOrderCurve(rng, 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ar := NewArith(bi(c.P))
+	fb := NewWindowedFactorBases(c, 2, rng, 1)
+	if fb.XBound == nil {
+		t.Fatal("window was dropped")
+	}
+	for ti := 0; ti < 4; ti++ {
+		R := c.Mul(uint64(1+rng.Int63n(int64(c.Order-1))), c.G)
+		want, err := (&SparseContractor{}).Count(func() *Network { n, _ := RelationNetwork(c, fb, R); return n }(), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		n, _ := GadgetRelationNetwork(c, ar, fb, R)
+		got, err := (DFSCounter{}).Count(n, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != want {
+			t.Fatalf("target %d: gadget count %d, whole-point count %d", ti, got, want)
+		}
+	}
+}
+
+// Building m = 2 factor bases for b = 16: whole-group enumeration vs the
+// coordinate window at k = 1, 2, 4.
+func BenchmarkFactorBaseBuild(b *testing.B) {
+	rng := rand.New(rand.NewSource(37))
+	c, err := RandomPrimeOrderCurve(rng, 16)
+	if err != nil {
+		b.Fatal(err)
+	}
+	for _, k := range []int{0, 1, 2, 4} {
+		k := k
+		b.Run(fmt.Sprintf("k=%d", k), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				NewWindowedFactorBases(c, 2, rng, k)
+			}
+		})
 	}
 }

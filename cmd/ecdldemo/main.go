@@ -20,6 +20,7 @@ func main() {
 	seed := flag.Int64("seed", time.Now().UnixNano(), "random seed")
 	quiet := flag.Bool("q", false, "suppress progress output")
 	gadgets := flag.Bool("gadgets", false, "use low-degree arithmetic gadgets (slow; keep -bits small)")
+	window := flag.Int("window", 0, "with -gadgets: constrain x < p>>k in every factor base (0 = off)")
 	flag.Parse()
 
 	rng := rand.New(rand.NewSource(*seed))
@@ -35,6 +36,7 @@ func main() {
 	s := &ecdl.Solver{Curve: c, M: *m, Counter: &ecdl.SparseContractor{}, Rng: rng}
 	if *gadgets {
 		s.Gadgets, s.Counter = true, ecdl.DFSCounter{}
+		s.WindowBits = *window
 	}
 	if !*quiet {
 		s.Logf = func(f string, a ...interface{}) { fmt.Fprintf(os.Stderr, f+"\n", a...) }

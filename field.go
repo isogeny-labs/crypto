@@ -46,6 +46,51 @@ func invMod(a, m uint64) uint64 {
 	return powMod(a, m-2, m)
 }
 
+// sqrtMod returns y with y^2 = a mod p, where p is an odd prime, via
+// Tonelli-Shanks. ok is false when a is a non-residue.
+func sqrtMod(a, p uint64) (uint64, bool) {
+	a %= p
+	if a == 0 {
+		return 0, true
+	}
+	if powMod(a, (p-1)/2, p) != 1 {
+		return 0, false
+	}
+	if p%4 == 3 {
+		return powMod(a, (p+1)/4, p), true
+	}
+	q, s := p-1, 0
+	for q%2 == 0 {
+		q /= 2
+		s++
+	}
+	z := uint64(2)
+	for powMod(z, (p-1)/2, p) != p-1 {
+		z++
+	}
+	m := s
+	c := powMod(z, q, p)
+	t := powMod(a, q, p)
+	r := powMod(a, (q+1)/2, p)
+	for t != 1 {
+		i := 0
+		t2 := t
+		for t2 != 1 {
+			t2 = mulMod(t2, t2, p)
+			i++
+		}
+		b := c
+		for j := 0; j+1 < m-i; j++ {
+			b = mulMod(b, b, p)
+		}
+		m = i
+		c = mulMod(b, b, p)
+		t = mulMod(t, c, p)
+		r = mulMod(r, b, p)
+	}
+	return r, true
+}
+
 // IsPrime is a deterministic Miller-Rabin test for 64-bit integers.
 func IsPrime(n uint64) bool {
 	if n < 2 {

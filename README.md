@@ -79,6 +79,31 @@ The degree ratio wobbles because L is rounded to a power of two.
 
 `go run ./cmd/ecdldemo -bits 8 -gadgets` solves a discrete logarithm with relations found on the gadget network. For example, m = 2 took 7.8 s and m = 3 took 15 s on 8-bit curves. It is slow, because the DFS counter evaluates every gadget for every candidate tuple.
 
+## Hash plus coordinate-window factor bases
+
+`NewWindowedFactorBases(c, m, rng, k)` (demo: `-gadgets -window k`) defines
+
+    F_i = { A : x(A) < p >> k  and  (alpha_i x + beta_i y + gamma_i) mod p < U_i }
+
+so the keyed hash is combined with a compact, deterministic coordinate constraint.
+
+- U_i is scaled by 2^k so |F_i| stays near (2r)^(1/m). If the window alone would hold fewer than that many points, k is lowered, down to 0 (no window).
+- In the gadget network the window is one extra `RangeCheck` on x, a block compare chain of degree O(t) that reads only x. At b = 8 it adds 24 edges to a 7591-edge network (m = 2) and leaves the max degree unchanged.
+- Membership and relation hints are generated from the window, not from the whole group. `Curve.WindowPoints` walks x < XBound and takes a modular square root (Tonelli-Shanks) of x^3 + a x + b; `FactorBases.WindowCandidates` keeps the points that pass the hash. Building the factor bases costs O(max XBound) field square roots instead of O(|group|). At b = 16, m = 2 (3 runs, one core):
+
+  | k | build time |
+  |--:|-----------:|
+  | 0 (whole group) | 16.1 ms |
+  | 1 | 5.0 ms |
+  | 2 | 3.3 ms |
+  | 4 | 0.94 ms |
+
+- `TestSqrtMod` checks the square root against a brute-force table; `TestWindowCandidates` and `TestWindowedListMatchesFull` check that the window path yields exactly the same sets, points and column indices as enumerating the group.
+- `TestWindowedMembershipExhaustive` checks that the gadget accepts exactly the windowed F_i over every 4-bit encoding. `TestWindowedRelationCounts` checks that gadget and whole-point counts agree.
+- 8-bit end-to-end runs (m = 2, one seed each) recovered the secret with k = 0, 1 and 2. Timings (14 s, 31 s, 15 s) are too noisy at this size to say anything about the window's effect.
+
+Caveat: the window is not random, so the F_i no longer have the independence that the hashed-factor-base theorem assumes. The window is only meant to make membership cheaper to test and to propose candidates from. Whether a window keeps the paper's bound is not tested here.
+
 ## Run
 
 ```bash

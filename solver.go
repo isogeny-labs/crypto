@@ -38,6 +38,9 @@ type Solver struct {
 	// whole-point vertices. The Counter must then support hinted schedules,
 	// e.g. DFSCounter.
 	Gadgets bool
+	// WindowBits > 0 (with Gadgets) adds the coordinate window x < p>>k to
+	// every factor base; see NewWindowedFactorBases.
+	WindowBits int
 	// Logf, if set, receives progress messages.
 	Logf func(format string, args ...interface{})
 
@@ -70,7 +73,7 @@ func (s *Solver) Solve(Q Point) (uint64, Stats, error) {
 		// Step 1: factor-base selection.
 		var fb *FactorBases
 		if s.Gadgets {
-			fb = NewAffineFactorBases(c, s.M, s.Rng)
+			fb = NewWindowedFactorBases(c, s.M, s.Rng, s.WindowBits)
 		} else {
 			fb = NewFactorBases(c, s.M, s.Rng)
 		}

@@ -107,6 +107,31 @@ func (c *Curve) Points() []Point {
 	return pts
 }
 
+// WindowPoints enumerates the affine points with x < xBound by taking the
+// square root of x^3 + a x + b for each x. Its cost is about xBound field
+// square-root tests, not the size of the group, so it is the cheap way to
+// touch a compact coordinate window.
+func (c *Curve) WindowPoints(xBound uint64) []Point {
+	if xBound > c.P {
+		xBound = c.P
+	}
+	pts := make([]Point, 0, 2*xBound)
+	for x := uint64(0); x < xBound; x++ {
+		y, ok := sqrtMod(c.rhs(x), c.P)
+		if !ok {
+			continue
+		}
+		if y != 0 && y > c.P-y {
+			y = c.P - y
+		}
+		pts = append(pts, Point{X: x, Y: y})
+		if y != 0 {
+			pts = append(pts, Point{X: x, Y: c.P - y})
+		}
+	}
+	return pts
+}
+
 // RandomPrimeOrderCurve searches for a curve over a random b-bit prime field
 // whose group order is prime, by naive point counting. Toy sizes only.
 func RandomPrimeOrderCurve(rng *rand.Rand, b int) (*Curve, error) {
