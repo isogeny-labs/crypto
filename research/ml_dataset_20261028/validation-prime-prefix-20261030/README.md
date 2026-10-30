@@ -7,17 +7,24 @@ Source `06773dcf28f` passed the release CLI build and four actual export/retry
 commands on the frozen retained curve/twist fixture. It exported four verified
 branch prefixes for the curve and no branch prefixes for the inconsistent twist
 root. Artifact readback, feature identities, restricted label joins, immutable
-retries and unchanged input inventories passed. Its two added regression tests
-still require execution. This remains partial software validation.
+retries and unchanged input inventories passed. This remains partial software
+validation.
 
 Combined source `113526b577044a6283be81acb1a847c89c96aa4e` imports main
 `bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. Its first validation failed because a
 sparse local Cargo dependency was absent. Attempts two and three failed on 42
 missing compile-time fixtures. The first scratch restoration helper omitted the
 input redirection to its read loop and restored zero files; version two corrects
-that bookkeeping error and restores hash-checked blobs from the exact combined
-revision. These failures and both helper versions are retained. Combined tests,
-lint, release CLI and full-library validation remain pending.
+that bookkeeping error and restored 126 hash-checked blobs (34,801,774 bytes)
+from the exact combined revision. These failures and both helper versions are
+retained. Attempt four passed **236 dataset tests, 0 failed, 1 ignored**, including
+both added regression tests, with exit code 0 and matching runtime-source
+readback. Full-library validation, maintained Clippy and combined release CLI
+replay are the next phases in [combined-validation-plan.json](combined-validation-plan.json).
+The ignored test is the separately runnable 360-cell endpoint integration sweep;
+its earlier-source results do not establish execution on this combined revision.
+The full serialized suite is running under the finite plan, followed by lint,
+build and CLI only if preceding phases pass.
 
 Initial source5d4336b45d2 failed compilation because of
 a bounded-reader ownership error; its log and exit101 receipt are retained.
@@ -27,7 +34,13 @@ under `s3://setec-astronomy-artifacts/store`. [initial-readback.json](initial-re
 records fresh download and byte comparison of the first five completed artifacts.
 [pre-cli-readback.json](pre-cli-readback.json) extends this to nine artifacts and
 10,455bytes, including lint evidence, the native-store archiver and the current
-worker-role policy readback. The worker role's attached policy still names only
+worker-role policy readback. [restoration-readback.json](restoration-readback.json)
+extends this to 26 freshly downloaded artifacts and 43,204,772 bytes, including
+the premerge CLI binary/output and the failed combined attempts. Later phases
+add separate immutable receipts to the same index.
+[dataset-pass-readback.json](dataset-pass-readback.json) records all
+29 objects, including the combined dataset pass and finite validation driver.
+The worker role's attached policy still names only
 the legacy bucket; no worker S3 roundtrip or IAM modification is implied.
 Use `CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store` and
 `CRYPTO_STORE_INDEX=<absolute path to store-index.json>` with `crypto store pull`
@@ -37,7 +50,10 @@ new CLI checks; `validate_prefix.sh` is thin shell process/log bookkeeping.
 The source checkpoint readback is retained separately in
 [../prefix-initial-checkpoint-readback.json](../prefix-initial-checkpoint-readback.json).
 Its Git bundle contains source5d4336b45d2 and requires parent764410c3af5. Later
-commits need a later checkpoint. A checkpoint is not corpus-generation evidence.
+commits are included in [the combined-source checkpoint](../prefix-combined-checkpoint-readback.json):
+head `37d6e8db1032`, fresh archive download and successful Git bundle verification,
+requiring parent commits `764410c3af5` and `bd4c2fe5e6fc`. A checkpoint is not
+corpus-generation evidence.
 
 Scientific samples added:0. Verified cloud dataset cells:0. No trained model,
 exact fall degree, native full-trace replay, whole-solver instruction total or

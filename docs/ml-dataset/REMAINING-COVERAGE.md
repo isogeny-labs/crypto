@@ -151,8 +151,9 @@ enormous corpus.
 
 Source `113526b577044a6283be81acb1a847c89c96aa4e` imports newer native libraries
 from main `bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. The table above records
-the prior validated scope; these additional source capabilities remain subject
-to combined-revision validation:
+the prior validated scope. The combined revision subsequently passed 236 dataset
+tests (0 failures, 1 ignored); full-library, lint and actual CLI checks remain
+pending. Additional imported capabilities and their limits are:
 
 - Prime F4 has a supervised wide-field **m = 2** adapter through
   `p = 2^61 - 1`, requiring the original execution context. Recursive
@@ -169,9 +170,11 @@ to combined-revision validation:
 - Prefix source `06773dcf28f` passed four actual CLI export/retry checks on
   retained curve/twist fixtures, producing four curve branch examples and
   zero twist branch examples. These checks added no scientific samples.
-  Combined tests and full-library validation are still pending; three failed
-  combined attempts document sparse-checkout omissions and a corrected
-  restoration-helper bug.
+  Combined dataset tests passed; full-library and combined CLI validation are
+  still pending. Three failed combined attempts document sparse-checkout
+  omissions and a corrected restoration-helper bug. The ignored test is the
+  360-cell endpoint integration sweep; this scoped pass does not claim that
+  sweep was re-executed on the combined revision.
 
 See [prefix software evidence](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md)
 for exact revisions, retained failures and S3 readback. None of these imported

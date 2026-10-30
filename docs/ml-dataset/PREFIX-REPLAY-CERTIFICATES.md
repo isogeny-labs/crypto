@@ -100,8 +100,10 @@ commit corrects the bounded reader and adds cumulative verifier accounting.
 Sourceadde10cad21 passed29 focused tests and strict maintained Clippy.
 Source `06773dcf28f` subsequently passed a release build and four actual CLI
 export/retry checks on retained curve/twist cells, producing four branch prefixes
-for the curve and zero for the twist's certified inconsistent root. Full-library
-and combined-current-main validation remain pending at source `113526b5770`.
+for the curve and zero for the twist's certified inconsistent root. Combined
+source `113526b5770` passed 236 dataset tests, with 0 failures and 1 ignored;
+this includes both subsequently added certificate/cap regression tests.
+Full-library, combined lint and release CLI validation remain pending.
 The initial build failed on Rust reader ownership; that failure is retained.
 
 `crypto dataset export` now stages `prefix-features.jsonl` alongside static
