@@ -1,0 +1,47 @@
+{
+  "initial_full_library": {
+    "source_head": "de22d9b482cde663217c69bd411482b0ec35f9f6",
+    "cargo_exit_code": 101,
+    "seconds": 3660,
+    "passed": 5388,
+    "failed": 1,
+    "ignored_existing": 123,
+    "test_seconds": 2625.66,
+    "raw_log_sha256": "4de1e7d5292014c8715f71a1e2d2a006f5bdc3c75f30af62122438947f908db9",
+    "log": "main-f7e8-initial-library.log.gz",
+    "gzip_sha256": "51eb1db9a0a06f13ddd6edd98175bab8cbfe2f0778b014914cf601571f8435df"
+  },
+  "root_cause": "Linux proc_pid_cmdline_read returns ESRCH when get_proc_task cannot find a task that exited after procfs directory enumeration/open; the scanner accepted only NotFound and failed valid restore verification.",
+  "observed_error": "cannot inspect process 685537: No such process (os error 3)",
+  "primary_source": "https://raw.githubusercontent.com/torvalds/linux/v6.18/fs/proc/base.c#proc_pid_cmdline_read",
+  "change": "Only vanished procfs entries (ENOENT/NotFound or ESRCH) are skipped. Same-user permission and other I/O errors still fail; live worker command and retained process-group checks remain.",
+  "focused_kernel_regression": {
+    "scope": "Exact unchanged function/test bodies extracted from edited production module; this focused kernel regression does not replace full-crate validation.",
+    "module_sha256": "0e9bd8bff945079723d920bc08bf5061f6e8daf2b9b28e8fdd6ed18ccea48f60",
+    "extracted_source_sha256": "979e20e428cc08921b2c1b91327bce181e7f7a7a3cd68dc99b15df4036983740",
+    "command": [
+      "rustc",
+      "+1.98.0",
+      "--edition",
+      "2021",
+      "--test",
+      "-C",
+      "opt-level=3",
+      "/workspace/procfs-vanished-process-actual-source-regression-20261029.rs",
+      "--extern",
+      "libc=/workspace/crypto/target/release/deps/liblibc-1ea52c1397d8163e.rlib",
+      "-L",
+      "dependency=/workspace/crypto/target/release/deps",
+      "-o",
+      "/workspace/procfs-vanished-process-actual-source-regression-20261029"
+    ],
+    "primary_source": "https://raw.githubusercontent.com/torvalds/linux/v6.18/fs/proc/base.c; proc_pid_cmdline_read returns -ESRCH after get_proc_task loses the exited task"
+  },
+  "focused_kernel_tests": {
+    "passed": 4,
+    "failed": 0,
+    "real_kernel_race": "Open own child cmdline, terminate/reap it, then read its still-open procfs file: ESRCH is accepted; reading its removed path yields ENOENT.",
+    "negative_controls": "EPERM/EACCES/EIO/ENOTDIR still reject; existing command bytes remain unchanged."
+  },
+  "full_fixed_suite": "Pending actual integrated release validation; no fixed full-suite success claimed."
+}

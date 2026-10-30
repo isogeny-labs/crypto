@@ -1,5 +1,13 @@
 # Hashed-factor-base ECDL: native tensor implementation
 
+2026-10-30 engineering follow-up: exact u64 primality, optional checked
+Pocklington parameter proofs and ordered functional witness search are described
+in the [optimization receipt](../research/hashed_ecdl_speed_20261029/README.md).
+It records 34 passing native tests, old/new complete certificate parity and the
+open profiling/A-B access requirements. The original implementation receipt and
+source manifest below remain historical; the new study has its own manifest.
+No runtime, end-to-end or challenge-solve claim follows from these changes.
+
 2026-10-29. The compact encoder, exact contraction algorithm and relation
 pipeline are implemented in Rust in both repositories. Small-case correctness
 checks do not establish the manuscript's asymptotic bound or a practical speedup.
@@ -107,6 +115,10 @@ and isolated scalar vertices. `Counter::count` returns an exact integer.
 `Counter::witness` fixes interface bits through exact prefix counts, using at
 most one initial count and one count per unfixed interface bit. `None` means
 an exact zero contraction. `Error::Limit` means unknown, never unsatisfiable.
+`Counter::sample` uses the same counts for random prefix choices. It is uniform
+over words for parsimonious encodings; other encodings weight words by their
+auxiliary completions. See the [sampling and recursive audit](hashed-ecdl-audit-20261029/README.md)
+for exact distribution controls and the additional two-level taper checks.
 
 ## Run and replay from files
 
@@ -187,8 +199,13 @@ experiment, IC/rho comparison, new mathematical result or Lean proof is claimed.
 
 ## Validation and provenance
 
+The [strict-input validation receipt](hashed-ecdl-tensor-input-validation.md)
+records the later duplicate-field and bounded-reader correction, its regression
+controls, and the current source manifest. Earlier receipts retain their
+historical source hashes and results.
+
 Use the [tensor validation receipt](hashed-ecdl-tensor-validation.md) for
-current commands, source hashes, failures and outcomes. The
+the original tensor implementation's commands, source hashes, failures and outcomes. The
 [first reference receipt](hashed-ecdl-validation.md) records the earlier
 bounded implementation and capped broad regression; its historical hashes
 and outcomes remain unchanged. The completion table is in
