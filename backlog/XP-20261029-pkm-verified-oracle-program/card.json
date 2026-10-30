@@ -1,0 +1,66 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261029-pkm-verified-oracle-program",
+  "title": "Symmetric PKM: verified complete oracle cost and one measured improvement",
+  "created": "2026-10-29",
+  "authors": ["prime-field ECDLP research lane"],
+  "status": "blocked",
+  "status_note": "Proposed G1-G6 program, not a frozen or executable panel. Producer, full accounting, replay verifier and protocol are not implemented or qualified. No task, lease, objective, funding or experiment is posted.",
+  "blocked_on": [
+    "pr:2868 native extraction and initial proof deliverable must be integrated and reviewed",
+    "note: implement the full-cost native panel, independent output/replay checker, matched representation adapters and qualified external solver",
+    "note: freeze experiment.protocol/v1, exact public curve/target roster, sample sizes and caps before data",
+    "note: checkpoint upload and artifact credentials absent; unchanged checkpoint gate must pass before measured launch",
+    "note: qualify an authenticated supported native execution and resumability route; no pool or quota expansion"
+  ],
+  "links": {
+    "lead": "research/prime_ecdlp_three_leads_20261029/PKM_GOALS.md",
+    "notes": [
+      "research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md sections3.3-3.7 and rounds1-8",
+      "research/ic_next10_20261014/03-pkm-degree/README.md",
+      "backlog/XP-20261015-pkm-m3-n21-m4-n20/card.json (older degree question; not replaced)",
+      "research/prime_ecdlp_three_leads_20261029/PROBLEM.md"
+    ],
+    "prs": [2632, 2650, 2868]
+  },
+  "question": "Does symmetric PKM reduce complete verified decomposition cost on actual curve targets, and can a measured component improvement lower the cold IC cost?",
+  "decision_value": "G1-G3 decide whether the old solver-stage advantage survives construction, extraction and failed queries. G4 chooses one improvement from measured phase costs; G5 checks held-out depth/resource growth; G6 decides whether useful relation/rank yield and complete LA/target recovery move cold IC cost. A null, external loss, correctness failure or cap is retained and does not promote a winner. This is distinct from the older raw degree-only N20 question.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": "8baeee2d446968936882adc503570fb957bb1429",
+    "branch": "codex/prime-ecdlp-three-leads-lean-20261029",
+    "build": [["cargo", "build", "--release", "--locked", "--example", "pkm_oracle_program"]]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 16,
+    "disk_gb": 16,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Provisional small-pilot ceilings, not a runtime estimate or a claim that every cell fits. The named future runner is unimplemented at the source pin. Freeze per-stage sizing before ready; large historical plain-arm projections do not authorize larger capacity."
+  },
+  "run": {
+    "argv": ["target/release/examples/pkm_oracle_program", "--protocol", "backlog/XP-20261029-pkm-verified-oracle-program/protocol.json", "--out", "{out}"],
+    "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "experiment.export/v1 plus verified native oracle/IC records; producer and replay adapter not implemented",
+    "verify": [],
+    "land": "research/prime_ecdlp_three_leads_20261029/pkm-execution"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": ["XP-20261029-pkm-verified-oracle-program"],
+    "ttl_s": 86400,
+    "env": {"name": "crypto-pkm-verified-oracle-pending", "recipe": "Pin merged producer, compiler, verifier, external solver and execution image after qualification; no runnable environment is claimed."},
+    "exec": {"cpus": 1, "memory_mb": 16384, "timeout_s": 3600, "sandbox": "auto", "publish": "runs/XP-20261029-pkm-verified-oracle-program"},
+    "funding": {"units": 0, "rationale": "Unfunded blocked design, like the APS complete-cost panel. Proposed scientific priority is G1-G3 before additional degree-only reach runs; no queue reward or spending is authorized."}
+  },
+  "owner_hint": "Native prime-field oracle and measurement lane"
+}
