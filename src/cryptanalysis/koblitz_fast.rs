@@ -18,10 +18,93 @@
 //! in the general arithmetic where the code already did so.
 
 use num_bigint::BigUint;
+use std::cell::Cell;
+use std::sync::{Arc, OnceLock};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, F2mElement};
 use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::semaev_decomp::Gf2;
+
+thread_local! {
+    static CACHED_POINT_LIFTS: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Select cached odd-degree point lifts for one synchronous builder call.
+///
+/// The default stays false for replay of existing recipes. Nested calls and
+/// unwinding restore the previous selection; concurrent threads are independent.
+pub fn with_cached_point_lifts<T>(enabled: bool, build: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            CACHED_POINT_LIFTS.with(|flag| flag.set(self.0));
+        }
+    }
+    let _restore = Restore(CACHED_POINT_LIFTS.with(|flag| flag.replace(enabled)));
+    build()
+}
+
+pub(crate) fn cached_point_lifts_enabled() -> bool {
+    CACHED_POINT_LIFTS.with(Cell::get)
+}
+
+/// The binary-linear halftrace, with a trace admission mask for an odd field.
+/// This is scoped to one field instance, never keyed by degree alone.
+#[derive(Debug)]
+struct OddHalfTrace {
+    degree: u32,
+    modulus: u64,
+    trace_mask: u64,
+    tables: Vec<[u64; 256]>,
+}
+
+impl OddHalfTrace {
+    fn new(field: &Gf2) -> Self {
+        let n = field.n;
+        debug_assert_eq!(n % 2, 1);
+        let mut trace_mask = 0;
+        let basis: Vec<u64> = (0..n)
+            .map(|i| {
+                let value = 1u64 << i;
+                let mut power = value;
+                let mut half_trace = value;
+                for _ in 0..(n - 1) / 2 {
+                    power = field.sqr(field.sqr(power));
+                    half_trace ^= power;
+                }
+                let trace = field.sqr(half_trace) ^ half_trace ^ value;
+                debug_assert!(trace <= 1);
+                trace_mask |= trace << i;
+                half_trace
+            })
+            .collect();
+        let tables = (0..n.div_ceil(8) as usize)
+            .map(|byte_index| {
+                let mut table = [0; 256];
+                for byte in 1usize..256 {
+                    let bit = byte_index * 8 + byte.trailing_zeros() as usize;
+                    table[byte] = table[byte & (byte - 1)] ^ basis.get(bit).copied().unwrap_or(0);
+                }
+                table
+            })
+            .collect();
+        Self {
+            degree: n,
+            modulus: field.irr,
+            trace_mask,
+            tables,
+        }
+    }
+
+    fn solve(&self, rhs: u64) -> Option<u64> {
+        if (rhs & self.trace_mask).count_ones() & 1 != 0 {
+            return None;
+        }
+        Some(self.tables.iter().enumerate().fold(0, |root, (i, table)| {
+            root ^ table[((rhs >> (8 * i)) & 255) as usize]
+        }))
+    }
+}
 
 /// A point with single-word coordinates, or `O`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -85,6 +168,9 @@ pub struct FastCurve {
     pub n: u32,
     pub a: u64,
     pub b: u64,
+    /// Lazy and opt-in: ordinary arithmetic and the legacy lifting path do
+    /// not allocate it. Clones share an initialized immutable cache.
+    half_trace: OnceLock<Arc<OddHalfTrace>>,
     /// The eight-lane AVX-512 kernel for [`Self::add_many_lazy`], when
     /// the CPU has it and the field's reduction polynomial suits it.
     #[cfg(target_arch = "x86_64")]
@@ -111,7 +197,32 @@ impl FastCurve {
             n: curve.m,
             a,
             b,
+            half_trace: OnceLock::new(),
         })
+    }
+
+    /// The same first Artin-Schreier root as the halftrace squaring loop.
+    /// Returns `None` for trace-one inputs or unsupported even degrees.
+    /// Intended for repeated public-input point lifting, not secret arithmetic.
+    pub fn half_trace_root_cached(&self, rhs: u64) -> Option<u64> {
+        if self.n & 1 == 0 || self.n != self.field.n {
+            return None;
+        }
+        let rhs = rhs & self.field.mask;
+        let cache = self
+            .half_trace
+            .get_or_init(|| Arc::new(OddHalfTrace::new(&self.field)));
+        // FastCurve's field is public. A caller may replace the field of an
+        // initialized clone; never reuse another modulus's linear map.
+        if cache.degree != self.field.n || cache.modulus != self.field.irr {
+            let (mut root, mut power) = (rhs, rhs);
+            for _ in 0..(self.n - 1) / 2 {
+                power = self.field.sqr(self.field.sqr(power));
+                root ^= power;
+            }
+            return (self.field.sqr(root) ^ root == rhs).then_some(root);
+        }
+        cache.solve(rhs)
     }
 
     /// Project a general point down.
@@ -2260,6 +2371,94 @@ mod simd512 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cached_halftrace_matches_definition_and_is_field_local() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        for n in [5, 7, 9, 11, 19, 31, 53, 61] {
+            let irr = find_irreducible_sparse(n).expect("test field");
+            let curve = BinaryCurve {
+                m: n,
+                irreducible: irr.clone(),
+                a: F2mElement::zero(n),
+                b: F2mElement::one(n),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            assert!(fast.half_trace.get().is_none());
+            let mut state = 0x9e37_79b9_7f4a_7c15u64;
+            for i in 0..if n <= 11 { 1u64 << n } else { 256 } {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let rhs = if n <= 11 { i } else { state & fast.field.mask };
+                let element = F2mElement::from_biguint(&BigUint::from(rhs), n);
+                let expected = (element.trace(&irr) == 0)
+                    .then(|| fast.field.from_element(&element.half_trace(&irr).unwrap()));
+                assert_eq!(
+                    fast.half_trace_root_cached(rhs),
+                    expected,
+                    "n={n}, rhs={rhs}"
+                );
+            }
+            let cloned = fast.clone();
+            assert!(Arc::ptr_eq(
+                fast.half_trace.get().unwrap(),
+                cloned.half_trace.get().unwrap()
+            ));
+        }
+        // Reciprocal irreducibles of the same degree must not share a cache.
+        let mut roots = Vec::new();
+        let mut curves = Vec::new();
+        for low_terms in [vec![0, 2], vec![0, 3]] {
+            let curve = BinaryCurve {
+                m: 5,
+                irreducible: crate::binary_ecc::IrreduciblePoly {
+                    degree: 5,
+                    low_terms,
+                },
+                a: F2mElement::zero(5),
+                b: F2mElement::one(5),
+                generator: BinaryPoint::Infinity,
+                order: BigUint::from(1u8),
+                cofactor: BigUint::from(1u8),
+            };
+            let fast = FastCurve::new(&curve).unwrap();
+            roots.push(
+                (0..32)
+                    .map(|v| fast.half_trace_root_cached(v))
+                    .collect::<Vec<_>>(),
+            );
+            curves.push(fast);
+        }
+        assert_ne!(roots[0], roots[1]);
+        let mut changed = curves[0].clone();
+        changed.field = curves[1].field.clone();
+        for rhs in 0..32 {
+            assert_eq!(changed.half_trace_root_cached(rhs), roots[1][rhs as usize]);
+        }
+    }
+
+    #[test]
+    fn cached_lift_scope_restores_on_nesting_unwind_and_new_threads() {
+        assert!(!cached_point_lifts_enabled());
+        with_cached_point_lifts(true, || {
+            assert!(cached_point_lifts_enabled());
+            with_cached_point_lifts(false, || assert!(!cached_point_lifts_enabled()));
+            assert!(cached_point_lifts_enabled());
+            std::thread::spawn(|| assert!(!cached_point_lifts_enabled()))
+                .join()
+                .unwrap();
+            let caught = std::panic::catch_unwind(|| {
+                with_cached_point_lifts(false, || panic!("restore the outer selection"));
+            });
+            assert!(caught.is_err());
+            assert!(cached_point_lifts_enabled());
+        });
+        assert!(!cached_point_lifts_enabled());
+    }
 
     /// The run-based least rotation, scalar and laned, against the
     /// exhaustive scan, on random words and on the patterns where it could
