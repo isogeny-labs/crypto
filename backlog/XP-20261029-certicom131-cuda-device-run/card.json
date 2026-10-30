@@ -24,7 +24,10 @@
   "code": {
     "repo": "crypto",
     "commit": "37d76b61ad4399c376dc5ac97321ee9e49e66747",
-    "build": [["make", "-C", "research/certicom131_cuda_port_20261023", "host-test"]]
+    "build": [
+      ["mkdir", "-p", "research/certicom131_cuda_port_20261023/build"],
+      ["make", "-C", "research/certicom131_cuda_port_20261023", "host-test"]
+    ]
   },
   "resources": {
     "cpus": 4,

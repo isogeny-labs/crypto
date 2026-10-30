@@ -41,8 +41,13 @@ and the device rate. The port's README says so in its first line.
 
 ```sh
 git checkout 37d76b61ad4399c376dc5ac97321ee9e49e66747
+mkdir -p research/certicom131_cuda_port_20261023/build
 make -C research/certicom131_cuda_port_20261023 cuda-run SMARCH=sm_120
 ```
+
+The explicit directory setup is required on a clean checkout: `cuda-run`
+writes `build/walk_cuda` but does not depend on the Makefile target that creates
+`build/`.
 
 `cuda-run` builds with `nvcc -O3 -arch=sm_120` and then runs
 `build/walk_cuda --threads 65536 --steps 8`. Inside that process, in this
@@ -97,10 +102,15 @@ The result lands as a PR that updates
 `research/certicom131_cuda_port_20261023/` — `results.json` gains the four
 JSON lines and the exit status, the report gains a device-parity section and a
 rate panel, and the README's "Not run on a GPU" paragraph is replaced with the
-device, driver and date. A `benchmarks/` row is added only if a campaign rate
-is later measured; a single timed launch is explicitly not one. Verification
-is `make host-test`, which re-derives the CPU reference the device matched and
-must still fold to `a4a414fc843c9989`.
+device, driver and date. The same result PR also adds the benchmark record:
+`benchmarks/<YYYYMMDD>-certicom131-cuda-device-run/` contains the run and
+results PDFs plus SVG and 150-dpi PNG copies of every graph, and
+`benchmarks/README.md` gets a row for the measured device rate. Label the rate
+as a single-launch diagnostic, not a campaign rate. Include the replay
+certificate, validator report and matched rho reference required by the
+benchmark validation gate, and generate the study and browsing copies from the
+same source. Verification is `make host-test`, which re-derives the CPU
+reference the device matched and must still fold to `a4a414fc843c9989`.
 
 ## Why this is blocked here
 
