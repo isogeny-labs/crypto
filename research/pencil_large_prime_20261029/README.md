@@ -456,3 +456,27 @@ prove this additional Rust module.
 The report, graph and `checks.csv` expose these boundaries for review. No
 claim of lower memory, lower runtime, sub-rho cost, or full-cohort completion
 is made.
+
+## Retained-data admission audits (2026-10-30)
+
+The [enrollment audit](validation/p739_enrollment_audit_20261030/README.md)
+verifies the60 gate workloads, three resolved arms and1080 exact execution slots
+against the cohort16 subset. Its correctedv2 preserves900 differing sequence
+positions, rejects unexpected execution fields and retains the original packet.
+See its [PDF](validation/p739_enrollment_audit_20261030/v2/output/report.pdf),
+[graph](validation/p739_enrollment_audit_20261030/v2/output/mapping.svg) and
+[exact mapping](validation/p739_enrollment_audit_20261030/v2/output/audit.json).
+
+The [cross-session audit](validation/p739_cross_session_audit_20261030/README.md)
+checks deterministic solver outcomes and operation accounting between the retained
+computation and fresh sessions. It joins records to their original plans and
+checks distinct measured replay coverage. Its [PDF](validation/p739_cross_session_audit_20261030/output/report.pdf),
+[graph](validation/p739_cross_session_audit_20261030/output/equivalence.svg) and
+[JSON](validation/p739_cross_session_audit_20261030/output/audit.json) preserve
+timing, observed resource and environment exclusions. This is same-instrument
+consistency, not independent-implementation agreement or clock qualification.
+
+These audits execute no solver and generate no new plan or measurement. They do
+not by themselves admit gate reuse, change native aggregation/export enrollment,
+or authorize remaining cohort execution. The prospective continuation contract,
+resource ceiling/deadline and full1260-target pencil completion remain open.
