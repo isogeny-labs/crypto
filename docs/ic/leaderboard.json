@@ -142,6 +142,18 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+  "aimed_gather": {
+   "path": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+   "sha256": "4be9dd4755ad6bb2024e85505b89b5000851707ef69746deaec4631729c740ee"
+  },
+  "aimed_gather_first": {
+   "path": "research/ic_aimed_gather_20261023/summary.json",
+   "sha256": "a3e06802bada65df50d0e5fc8d05fa76c37b756c5a07ba94c9fd082947c8b338"
+  },
+  "aimed_gather_corrected": {
+   "path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "sha256": "6df1dfcc98784b7b0d74b4e09aaaebcf0d8f68ff62dcce364355dd8f4b81fe8c"
+  },
   "quartic_tagged_p13": {
    "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
    "sha256": "02427944511bd86f99e291309e889c76276bc14becc38c695c3c775796de2c46"
@@ -309411,6 +309423,167 @@
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "aimed_gather_component": {
+  "rows": [
+   {
+    "metric": "collect phase",
+    "session": {
+     "ab": {
+      "median": 1.09308780762,
+      "ci95": [
+       1.06772029655,
+       1.13647065083
+      ],
+      "n": 42,
+      "above_one": 38,
+      "ci95_as_run": [
+       1.08982882862,
+       1.15972934411
+      ]
+     },
+     "aa": {
+      "median": 0.999423708512,
+      "ci95": [
+       0.97687976741,
+       1.02576715487
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
+       0.977119451945,
+       1.02965317261
+      ]
+     },
+     "margin": 0.0419531416824,
+     "established": true,
+     "established_as_run": true
+    },
+    "before": {
+     "ab": {
+      "median": 1.11132879368,
+      "ci95": [
+       1.08205913963,
+       1.14924506362
+      ],
+      "n": 30,
+      "above_one": 28,
+      "ci95_as_run": [
+       1.06478310166,
+       1.1603953138
+      ]
+     },
+     "aa": {
+      "median": 0.997665980456,
+      "ci95": [
+       0.944458829852,
+       1.08735820385
+      ],
+      "n": 5,
+      "above_one": 2,
+      "ci95_as_run": [
+       0.944458829852,
+       1.08735820385
+      ]
+     },
+     "margin": -0.00529906422176,
+     "established": false,
+     "established_as_run": false
+    }
+   },
+   {
+    "metric": "whole set-up",
+    "session": {
+     "ab": {
+      "median": 1.0416402202,
+      "ci95": [
+       1.02035468256,
+       1.0824004507
+      ],
+      "n": 42,
+      "above_one": 29,
+      "ci95_as_run": [
+       1.02052260114,
+       1.11589169838
+      ]
+     },
+     "aa": {
+      "median": 0.984586396814,
+      "ci95": [
+       0.945934974309,
+       1.01494893988
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
+       0.940907875559,
+       1.03541549806
+      ]
+     },
+     "margin": 0.00540574267808,
+     "established": true,
+     "established_as_run": false
+    },
+    "before": {
+     "ab": {
+      "median": 1.03722009497,
+      "ci95": [
+       1.01790624879,
+       1.07976658536
+      ],
+      "n": 30,
+      "above_one": 26,
+      "ci95_as_run": [
+       1.01790624879,
+       1.06849417711
+      ]
+     },
+     "aa": {
+      "median": 0.992713691781,
+      "ci95": [
+       0.952561674495,
+       1.12096272326
+      ],
+      "n": 5,
+      "above_one": 1,
+      "ci95_as_run": [
+       0.952561674495,
+       1.12096272326
+      ]
+     },
+     "margin": -0.103056474466,
+     "established": false,
+     "established_as_run": false
+    }
+   }
+  ],
+  "curve": "icv1-f2m53-tm56619371-dac20a85",
+  "callgrind_ratio": {
+   "k0n53": 1.0231123543,
+   "k0n61": 1.02948205463
+  },
+  "median_ms": {
+   "a": {
+    "collect": 230.3337535,
+    "total": 419.5670235
+   },
+   "c": {
+    "collect": 212.4524455,
+    "total": 398.809739
+   },
+   "q": {
+    "collect": 235.2093155,
+    "total": 428.2749685
+   }
+  },
+  "processes": 126,
+  "refused": 71,
+  "class": "engineering",
+  "study": "research/ic_aimed_gather_20261023/",
+  "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+  "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "quartic_twist_pair_component": {
   "rows": [

@@ -200,7 +200,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), binary-subspace:dimension=D, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
         },
         ParamDecl {
             name: "oracle",
@@ -5111,6 +5111,9 @@ fn prime_base_for<'a>(
 ) -> Result<Box<dyn FactorBaseBuilder<crate::cryptanalysis::ic_boundary::PrimeCurve> + 'a>, String>
 {
     Ok(match fb_name {
+        "explicit-x" => {
+            Box::new(crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase)
+        }
         "prime-abscissa" => Box::new(PrimeAbscissaBase { instance: inst }),
         "prime-projected-abscissa" => Box::new(PrimeProjectedAbscissaBase { instance: inst }),
         "glv-orbit" => Box::new(GlvOrbitBase { instance: inst }),
@@ -5480,6 +5483,11 @@ fn binary_base_for<'a>(
     inst: &'a BinaryInstance,
 ) -> Result<Box<dyn FactorBaseBuilder<BinaryGroup<'a>> + 'a>, String> {
     Ok(match fb_name {
+        "explicit-x" => Box::new(
+            crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
+                instance: inst,
+            },
+        ),
         "binary-subspace" => Box::new(BinarySubspaceBase { instance: inst }),
         "koblitz-orbit" => Box::new(KoblitzOrbitBase { instance: inst }),
         "compact-orbit-scan" => Box::new(CompactOrbitScanBase { instance: inst }),
@@ -6181,11 +6189,13 @@ pub fn dump_factor_base(
     match &inst {
         Instance::Prime(i) => {
             let abscissa = PrimeAbscissaBase { instance: i };
+            let explicit = crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
             let projected = PrimeProjectedAbscissaBase { instance: i };
             let orbit = GlvOrbitBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
+                "explicit-x" => &explicit,
                 "prime-abscissa" => &abscissa,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
@@ -6227,12 +6237,16 @@ pub fn dump_factor_base(
         Instance::Binary(i) => {
             let g = BinaryGroup(&i.fast);
             let subspace = BinarySubspaceBase { instance: i };
+            let explicit = crate::cryptanalysis::ic_framework::explicit_base::BinaryExplicitXBase {
+                instance: i,
+            };
             let orbit = KoblitzOrbitBase { instance: i };
             let compact = CompactOrbitScanBase { instance: i };
             let cyclotomic = CyclotomicBase { instance: i };
             let onb_weight = OnbWeightBase { instance: i };
             let plugin_base = binary_plugins().and_then(|p| (p.base)(name.as_str(), i));
             let base: &dyn FactorBaseBuilder<BinaryGroup> = match name.as_str() {
+                "explicit-x" => &explicit,
                 "binary-subspace" => &subspace,
                 "koblitz-orbit" => &orbit,
                 "compact-orbit-scan" => &compact,
