@@ -103,7 +103,9 @@ fn main() {
     let left = expand(&statement.lhs);
     let right = expand(&statement.rhs);
     assert_eq!(left, right);
-    let certificate = identity_certificate::issue(
+    // This is a public polynomial-identity proof record, not a credential or
+    // TLS certificate. Its full contents are intentionally published and replayed.
+    let public_identity_proof = identity_certificate::issue(
         statement,
         20261026,
         32,
@@ -112,16 +114,17 @@ fn main() {
     )
     .unwrap();
     assert!(matches!(
-        identity_certificate::check_with_extra(&certificate, Some((0x747261636533, 16))).unwrap(),
+        identity_certificate::check_with_extra(&public_identity_proof, Some((0x747261636533, 16)))
+            .unwrap(),
         identity_certificate::Verdict::Accept { .. }
     ));
-    fresh(Path::new(&path), &certificate);
+    fresh(Path::new(&path), &public_identity_proof);
     fresh(
         &Path::new(&path).with_extension("expansion.json"),
-        &json!({"certificate_id":certificate.id,"exact_integer_coefficient_comparison":true,"nonzero_monomials":left.len(),"coefficients":left.into_iter().map(|(m,c)|json!({"monomial":m,"coefficient":c})).collect::<Vec<_>>(),"formal_prover_used":false}),
+        &json!({"certificate_id":public_identity_proof.id,"exact_integer_coefficient_comparison":true,"nonzero_monomials":left.len(),"coefficients":left.into_iter().map(|(m,c)|json!({"monomial":m,"coefficient":c})).collect::<Vec<_>>(),"formal_prover_used":false}),
     );
     println!(
         "{}: exact integer expansion and canonical field certificate checked",
-        certificate.id
+        public_identity_proof.id
     );
 }

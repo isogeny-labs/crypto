@@ -83,6 +83,86 @@ fn f(value: &Value) -> F {
 fn row(value: &Value) -> Row {
     value.as_array().unwrap().iter().map(f).collect()
 }
+fn prediction_row(value: &Value) -> Row {
+    let coordinates = row(value);
+    assert_eq!(
+        coordinates.len(),
+        8,
+        "prediction must contain exactly eight coordinates"
+    );
+    assert!(
+        coordinates.iter().any(|c| *c != F::ZERO),
+        "prediction must be a nonzero projective vector"
+    );
+    coordinates
+}
+struct Prediction {
+    primary: Row,
+    auxiliary: Row,
+    swapped: Row,
+}
+/// Validate the entire prediction file before constructing any target divisor.
+fn checked_predictions(
+    predictions: &Value,
+    certificate: &Value,
+    inputs: &Value,
+) -> Vec<Prediction> {
+    object_keys(
+        predictions,
+        &[
+            "schema",
+            "matrix_sha256",
+            "input_sha256",
+            "points",
+            "target_divisor_arithmetic_called",
+            "discrete_log_or_source_enumeration_called",
+            "declared_file_reads",
+        ],
+    );
+    assert_eq!(predictions["schema"], "quotient-coordinate-predictions/v1");
+    assert_eq!(predictions["matrix_sha256"], certificate["matrix_sha256"]);
+    assert_eq!(predictions["input_sha256"], digest(INPUTS));
+    assert_eq!(predictions["target_divisor_arithmetic_called"], false);
+    assert_eq!(
+        predictions["discrete_log_or_source_enumeration_called"],
+        false
+    );
+    let reads = predictions["declared_file_reads"].as_array().unwrap();
+    assert_eq!(reads.len(), 2);
+    assert!(reads.iter().all(Value::is_string));
+    let frozen = inputs["points"].as_array().unwrap();
+    assert_eq!(frozen.len(), 32);
+    let predicted = predictions["points"].as_array().unwrap();
+    assert_eq!(predicted.len(), 32, "prediction case count must be 32");
+    predicted
+        .iter()
+        .zip(frozen)
+        .map(|(prediction, input)| {
+            object_keys(
+                prediction,
+                &[
+                    "case_id",
+                    "point",
+                    "point_plus_G",
+                    "mapped_coordinates",
+                    "mapped_auxiliary_coordinates",
+                    "swapped_coordinate_control",
+                ],
+            );
+            for key in ["case_id", "point", "point_plus_G"] {
+                assert_eq!(
+                    prediction[key], input[key],
+                    "prediction input mismatch: {key}"
+                );
+            }
+            Prediction {
+                primary: prediction_row(&prediction["mapped_coordinates"]),
+                auxiliary: prediction_row(&prediction["mapped_auxiliary_coordinates"]),
+                swapped: prediction_row(&prediction["swapped_coordinate_control"]),
+            }
+        })
+        .collect()
+}
 fn row_json(row: &[F]) -> Value {
     json!(row.iter().map(|v| v.0).collect::<Vec<_>>())
 }
@@ -449,8 +529,7 @@ fn validation_reference(
     let (certificate, _) = read_matrix(matrix_path);
     let inputs = pinned(inputs_path, INPUTS);
     let predictions = load(predictions_path);
-    assert_eq!(predictions["matrix_sha256"], certificate["matrix_sha256"]);
-    assert_eq!(predictions["input_sha256"], digest(INPUTS));
+    let predictions = checked_predictions(&predictions, &certificate, &inputs);
     let (ring, lines, zeta) = parse_target(&pinned(public_path, PUBLIC));
     let mut jac = Jacobian::new(ring, &lines);
     // This O(r) enumeration is deliberately validation-only, after matrix
@@ -476,9 +555,7 @@ fn validation_reference(
     let mut auxiliary_matches = 0;
     let mut swapped_passes = 0;
     for (index, input) in inputs["points"].as_array().unwrap().iter().enumerate() {
-        let predicted = &predictions["points"][index];
-        assert_eq!(predicted["case_id"], input["case_id"]);
-        assert_eq!(predicted["point"], input["point"]);
+        let predicted = &predictions[index];
         let n = labels[&point(&input["point"])];
         let na = labels[&point(&input["point_plus_G"])];
         let d = jac.add(&giants[n / 16], &babies[n % 16]);
@@ -487,13 +564,9 @@ fn validation_reference(
             .unwrap_or_else(|e| panic!("holdout case {index}: {e}"));
         let target_aux = kummer::evaluate(&jac.ring, &da, &zeta)
             .unwrap_or_else(|e| panic!("holdout successor {index}: {e}"));
-        let agrees = linear::projective_equal(&target, &row(&predicted["mapped_coordinates"]));
-        let auxiliary_agrees = linear::projective_equal(
-            &target_aux,
-            &row(&predicted["mapped_auxiliary_coordinates"]),
-        );
-        let swapped_agrees =
-            linear::projective_equal(&target, &row(&predicted["swapped_coordinate_control"]));
+        let agrees = linear::projective_equal(&target, &predicted.primary);
+        let auxiliary_agrees = linear::projective_equal(&target_aux, &predicted.auxiliary);
+        let swapped_agrees = linear::projective_equal(&target, &predicted.swapped);
         matches += usize::from(agrees);
         auxiliary_matches += usize::from(auxiliary_agrees);
         swapped_passes += usize::from(swapped_agrees);
@@ -570,6 +643,104 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn synthetic_predictions() -> (Value, Value, Value) {
+        let inputs: Value = serde_json::from_slice(INPUTS).unwrap();
+        let certificate = json!({"matrix_sha256":"synthetic-matrix"});
+        let coordinates = row_json(&[F::c(1); 8]);
+        let points = inputs["points"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| {
+                json!({"case_id":input["case_id"],"point":input["point"],"point_plus_G":input["point_plus_G"],"mapped_coordinates":coordinates,"mapped_auxiliary_coordinates":coordinates,"swapped_coordinate_control":coordinates})
+            })
+            .collect::<Vec<_>>();
+        let predictions = json!({"schema":"quotient-coordinate-predictions/v1","matrix_sha256":certificate["matrix_sha256"],"input_sha256":digest(INPUTS),"points":points,"target_divisor_arithmetic_called":false,"discrete_log_or_source_enumeration_called":false,"declared_file_reads":["synthetic-matrix.json","coordinate-inputs.json"]});
+        (predictions, certificate, inputs)
+    }
+
+    #[test]
+    fn projective_comparison_rejects_prefixes_and_extra_coordinates() {
+        let target = vec![F::c(1); 8];
+        for length in [0, 1, 7, 9] {
+            let incomplete = vec![F::c(1); length];
+            assert!(!linear::projective_equal(&target, &incomplete));
+            assert!(!linear::projective_equal(&incomplete, &target));
+        }
+        assert!(linear::projective_equal(&target, &[F::c(3); 8]));
+        assert!(!linear::projective_equal(&target, &[F::ZERO; 8]));
+        let mut different = target.clone();
+        different[7] = F::c(2);
+        assert!(!linear::projective_equal(&target, &different));
+    }
+
+    #[test]
+    fn prediction_parser_rejects_malformed_vectors_in_every_output_column() {
+        let (predictions, certificate, inputs) = synthetic_predictions();
+        assert_eq!(
+            checked_predictions(&predictions, &certificate, &inputs).len(),
+            32
+        );
+        for key in [
+            "mapped_coordinates",
+            "mapped_auxiliary_coordinates",
+            "swapped_coordinate_control",
+        ] {
+            for length in [0, 1, 7, 9] {
+                let mut malformed = predictions.clone();
+                malformed["points"][31][key] = row_json(&vec![F::c(1); length]);
+                assert!(std::panic::catch_unwind(|| {
+                    checked_predictions(&malformed, &certificate, &inputs)
+                })
+                .is_err());
+            }
+            let mut malformed = predictions.clone();
+            malformed["points"][31][key] = row_json(&[F::ZERO; 8]);
+            assert!(std::panic::catch_unwind(|| {
+                checked_predictions(&malformed, &certificate, &inputs)
+            })
+            .is_err());
+            let mut malformed = predictions.clone();
+            malformed["points"][31][key][0][17] = json!(7);
+            assert!(std::panic::catch_unwind(|| {
+                checked_predictions(&malformed, &certificate, &inputs)
+            })
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn prediction_parser_requires_the_complete_frozen_case_list() {
+        let (predictions, certificate, inputs) = synthetic_predictions();
+        for count in [31, 33] {
+            let mut malformed = predictions.clone();
+            let points = malformed["points"].as_array_mut().unwrap();
+            if count == 31 {
+                points.pop();
+            } else {
+                points.push(points[0].clone());
+            }
+            assert!(std::panic::catch_unwind(|| {
+                checked_predictions(&malformed, &certificate, &inputs)
+            })
+            .is_err());
+        }
+        for key in ["case_id", "point", "point_plus_G"] {
+            let mut malformed = predictions.clone();
+            malformed["points"][31][key] = Value::Null;
+            assert!(std::panic::catch_unwind(|| {
+                checked_predictions(&malformed, &certificate, &inputs)
+            })
+            .is_err());
+        }
+        let mut duplicate = predictions.clone();
+        duplicate["points"][31] = duplicate["points"][0].clone();
+        assert!(std::panic::catch_unwind(|| {
+            checked_predictions(&duplicate, &certificate, &inputs)
+        })
+        .is_err());
+    }
 
     #[test]
     fn planted_projective_map_recovers_the_same_matrix() {

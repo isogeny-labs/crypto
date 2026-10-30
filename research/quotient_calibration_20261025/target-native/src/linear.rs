@@ -205,7 +205,7 @@ pub fn normalized(mut a: Row) -> Row {
     a
 }
 pub fn projective_equal(a: &[F], b: &[F]) -> bool {
-    if !a.iter().any(|x| *x != F::ZERO) || !b.iter().any(|x| *x != F::ZERO) {
+    if a.len() != b.len() || !a.iter().any(|x| *x != F::ZERO) || !b.iter().any(|x| *x != F::ZERO) {
         return false;
     }
     let p = a.iter().position(|x| *x != F::ZERO).unwrap();
