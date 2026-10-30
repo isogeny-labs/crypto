@@ -1055,46 +1055,155 @@ pub fn solve_with_oracle_profile(
     ))
 }
 
+// Jacobian coordinates x=X/Z^2, y=Y/Z^3; Z=0 is the identity.
+// EFD madd-2004-hmv and standard Jacobian doubling, with explicit equal,
+// inverse and identity cases. Variable time on public research inputs.
+#[derive(Clone, Copy)]
+struct Jacobian {
+    x: u64,
+    y: u64,
+    z: u64,
+}
+impl Jacobian {
+    fn from_affine(point: Point) -> Self {
+        point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
+    }
+    fn affine(self, modulus: Modulus) -> Point {
+        if self.z == 0 {
+            return None;
+        }
+        let iz = inverse(self.z, modulus.p);
+        let iz2 = modulus.mul(iz, iz);
+        Some((
+            modulus.mul(self.x, iz2),
+            modulus.mul(self.y, modulus.mul(iz, iz2)),
+        ))
+    }
+    fn batch_affine(points: &[Self], modulus: Modulus) -> Vec<Point> {
+        let mut prefix = Vec::with_capacity(points.len());
+        let mut product = 1;
+        for point in points {
+            prefix.push(product);
+            if point.z != 0 {
+                product = modulus.mul(product, point.z);
+            }
+        }
+        let mut inv = inverse(product, modulus.p);
+        let mut out = vec![None; points.len()];
+        for (i, point) in points.iter().enumerate().rev() {
+            if point.z == 0 {
+                continue;
+            }
+            let iz = modulus.mul(inv, prefix[i]);
+            inv = modulus.mul(inv, point.z);
+            let iz2 = modulus.mul(iz, iz);
+            out[i] = Some((
+                modulus.mul(point.x, iz2),
+                modulus.mul(point.y, modulus.mul(iz, iz2)),
+            ));
+        }
+        out
+    }
+    fn double(self, a: u64, modulus: Modulus) -> Self {
+        if self.z == 0 || self.y == 0 {
+            return Self::from_affine(None);
+        }
+        let p = modulus.p;
+        let mul = |x, y| modulus.mul(x, y);
+        let twice = |x| addmod(x, x, p);
+        let xx = mul(self.x, self.x);
+        let yy = mul(self.y, self.y);
+        let yyyy = mul(yy, yy);
+        let zz = mul(self.z, self.z);
+        let s = twice(twice(mul(self.x, yy)));
+        let m = addmod(addmod(twice(xx), xx, p), mul(a, mul(zz, zz)), p);
+        let x = sub(mul(m, m), twice(s), p);
+        let y = sub(mul(m, sub(s, x, p)), twice(twice(twice(yyyy))), p);
+        Self {
+            x,
+            y,
+            z: twice(mul(self.y, self.z)),
+        }
+    }
+    fn add_affine(self, point: Point, a: u64, modulus: Modulus) -> Self {
+        let Some((x, y)) = point else {
+            return self;
+        };
+        if self.z == 0 {
+            return Self::from_affine(point);
+        }
+        let p = modulus.p;
+        let mul = |x, y| modulus.mul(x, y);
+        let z2 = mul(self.z, self.z);
+        let h = sub(mul(x, z2), self.x, p);
+        let r = sub(mul(y, mul(z2, self.z)), self.y, p);
+        if h == 0 {
+            return if r == 0 {
+                self.double(a, modulus)
+            } else {
+                Self::from_affine(None)
+            };
+        }
+        let hh = mul(h, h);
+        let hhh = mul(hh, h);
+        let v = mul(self.x, hh);
+        let nx = sub(sub(mul(r, r), addmod(v, v, p), p), hhh, p);
+        let ny = sub(mul(r, sub(v, nx, p)), mul(self.y, hhh), p);
+        Self {
+            x: nx,
+            y: ny,
+            z: mul(self.z, h),
+        }
+    }
+}
+
 // Fixed-base radix-16 multiplication. Constructed inside each solve/replay,
 // never shared between targets or excluded from the complete timing interval.
 // A replay constructs its own tables and still checks every relation.
 struct FixedPair {
+    modulus: Modulus,
     p: Vec<[Point; 16]>,
     q: Vec<[Point; 16]>,
 }
 impl FixedPair {
     fn new(curve: &Curve, p: Point, q: Point) -> Self {
         let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
+        let modulus = Modulus::new(curve.p);
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
             for window in 0..windows {
-                let mut row = [None; 16];
-                row[1] = base;
-                for digit in 2..16 {
-                    row[digit] = curve.add_valid(row[digit - 1], base);
+                let mut row = [Jacobian::from_affine(None); 17];
+                row[1] = Jacobian::from_affine(base);
+                for digit in 2..17 {
+                    row[digit] = row[digit - 1].add_affine(base, curve.a, modulus);
                 }
+                // Include 16*base in the same inversion for the next window.
+                let affine = Jacobian::batch_affine(&row, modulus);
+                let mut table_row = [None; 16];
+                table_row.copy_from_slice(&affine[..16]);
                 if window + 1 < windows {
-                    base = curve.add_valid(row[15], base);
+                    base = affine[16];
                 }
-                out.push(row);
+                out.push(table_row);
             }
             out
         };
         Self {
+            modulus: Modulus::new(curve.p),
             p: table(p),
             q: table(q),
         }
     }
     fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
         debug_assert!(u < curve.r && v < curve.r);
-        let mut out = None;
+        let mut out = Jacobian::from_affine(None);
         for (p, q) in self.p.iter().zip(&self.q) {
-            out = curve.add_valid(out, p[(u & 15) as usize]);
-            out = curve.add_valid(out, q[(v & 15) as usize]);
+            out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
+            out = out.add_affine(q[(v & 15) as usize], curve.a, self.modulus);
             u >>= 4;
             v >>= 4;
         }
-        out
+        out.affine(self.modulus)
     }
 }
 
@@ -1189,6 +1298,49 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
+        let (curve, generator) = fixture();
+        let modulus = Modulus::new(curve.p);
+        let points: Vec<_> = (0..curve.r)
+            .map(|k| curve.mul(generator, k).unwrap())
+            .collect();
+        for (i, &point) in points.iter().enumerate() {
+            let z = (i as u64 % (curve.p - 1)) + 1;
+            let projective = point.map_or(Jacobian::from_affine(None), |(x, y)| {
+                let z2 = modulus.mul(z, z);
+                Jacobian {
+                    x: modulus.mul(x, z2),
+                    y: modulus.mul(y, modulus.mul(z, z2)),
+                    z,
+                }
+            });
+            assert_eq!(projective.affine(modulus), point);
+            assert_eq!(
+                Jacobian::batch_affine(
+                    &[
+                        Jacobian::from_affine(None),
+                        projective,
+                        projective.double(curve.a, modulus)
+                    ],
+                    modulus
+                ),
+                vec![None, point, curve.add(point, point).unwrap()]
+            );
+            for &other in &points {
+                assert_eq!(
+                    projective
+                        .add_affine(other, curve.a, modulus)
+                        .affine(modulus),
+                    curve.add(point, other).unwrap()
+                );
+            }
+        }
+        // A point with y=0 doubles to identity, including a nonunit scale.
+        let m = Modulus::new(7);
+        assert_eq!(Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m), None);
     }
 
     #[test]
