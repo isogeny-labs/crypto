@@ -932,3 +932,17 @@ Latest remote controller state is provisioning, attempt0, no failure and no benc
 
 ### Errors
 No submission error occurred. Initial remote status awaited the controller receipt; it later resolved to provisioning without resubmission.
+
+## 2026-10-30 — First controller attempt failed before payload start
+
+### What was done
+Downloaded terminal failure, supervisor and state receipts plus controller logs. Build ef20ac28 failed at00:06:33Z. Worker instance i-0c8459b31372de7a9 and Pod16c4de04-44ec-49b7-b04b-d9e5eae0c94d were created; supervisor start failed with EACCES before assigning a payload PID. The copied specification and compute directory are setup artifacts, not observed mathematical runs. Retained receipts are under runs/p739-gate-20261030/.
+
+### Decisions made
+Independent review identified runtime image metadata: isolab-criu-progress is0700 root-owned, but spawn correctly drops toUID1000. Its bytes match the approved archive. Correct only the required execution/traversal modes during image composition, verify exact bytes and UID1000 no-payload invocation, and preserve the failed image. No IAM, RBAC, controller ZIP or mathematical source change is needed. Any corrected runtime requires a separate immutable infrastructure-replacement request because the old run is terminal; preserve its parent identity, consume the same remaining budget, retain both fixed deadlines and keep all missing slots.
+
+### Open threads
+Corrected runtime publication/independent verification and pre-data retry amendment are in progress. No second gate has been submitted. Existingfailedrun must never be treated as a scientific measurement or resumed from a nonexistent checkpoint.
+
+### Errors
+The original publication verified archive and executable bytes but did not catch restrictive executable modes in the image. Archive extraction under a restrictive umask removed UID1000 execute access. The failed cloud attempt is retained and will not be relabeled as a successful launch.
