@@ -14,5 +14,8 @@
   "normalizer_flint_threads": 1,
   "control_and_preparation_seed": "not explicitly fixed; prior generic runner retained",
   "timing_comparisons": false,
-  "dependency_binary_rechecker": false
+  "dependency_binary_rechecker": false,
+  "isolation": "shared host; independent exact CAS stages overlapped; no measured speed comparison",
+  "co_run_cpu_observation": "2026-10-30 two active CAS processes each about 46-48 percent CPU; wall-cap outcomes censored under co-tenancy",
+  "subsequent_normalizer_admission": "after existing CAS processes terminal; no cap increase"
 }
