@@ -1,10 +1,12 @@
 ring primDp49=(2,u),(l,v,t),dp;
+option(redSB);short=0;
 map shifted49=affine49,t+u*l+u^2*v,l,v,u;
 ideal primStd49=std(shifted49(sourceIdeal49));
 if(vdim(primStd49)!=32){ERROR("PRIMITIVE49_INPUT_DIMENSION");quit;}
 ring primLex49=(2,u),(l,v,t),lp;
 print("PRIMITIVE49_STAGE FGLM_begin=true fixed_element=n+u*l+u^2*v");
 ideal lexStd49=fglm(primDp49,primStd49);
+if(!defined(lexStd49)){ERROR("PRIMITIVE49_FGLM_OUTPUT_MISSING");quit;}
 if(vdim(lexStd49)!=32){ERROR("PRIMITIVE49_FGLM_DIMENSION");quit;}
 poly minimal49;int entry49;int found49=0;
 for(entry49=1;entry49<=size(lexStd49);entry49++){
