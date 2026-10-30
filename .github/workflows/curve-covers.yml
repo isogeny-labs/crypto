@@ -33,6 +33,7 @@ on:
       - 'scripts/update_curve_standards.py'
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
+      - 'scripts/test_cover_transfer_assessment.mjs'
       - 'scripts/catalog_snapshot.mjs'
       - 'scripts/test_catalog_snapshot.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
@@ -194,6 +195,9 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: python3 tools/artifacts/artifacts.py pull research/cover_transfer_assessment_20261013
       - name: Check deterministic catalog-wide assessment generation
+        run: node scripts/build_cover_transfer_assessments.mjs --check
+      - name: Reject incomplete and incorrect catalog memberships
+        run: node --test scripts/test_cover_transfer_assessment.mjs
         run: |
           node --test scripts/test_catalog_snapshot.mjs
           node scripts/build_cover_transfer_assessments.mjs --check

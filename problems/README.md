@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Cover-assessment catalog population](catalog-cover-assessment-population-stale.md) | open | current catalog-wide assessment freshness check | review current model membership, update older population guards and regenerate typed evidence bindings |
+| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
 | [Exact compact scalar-predicate splitting](prime-scalar-exact-splitting.md) | open | an essentially new compact scalar-verification route to sub-exponential prime-field ECDLP | constructible exact splitting/weighted extension with complete network, recursive, cost and formal proof bounds |
