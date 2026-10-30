@@ -66,7 +66,7 @@ solve, cloud resource, benchmark or artifact-store upload was launched.
 | Same runner, 16 MiB + 1 byte file | exit 1; `input file exceeds 16 MiB runner policy` |
 | Mirror tree comparison | identical, excluding build directories |
 | Existing artifact policy against the complete staged tree | exit 0; no data files committed, no waiver |
-| Crypto root release library | initial run interrupted by SIGKILL after the environment restart; uncapped retry is running, not yet a full pass; [compact receipt](hashed-ecdl-tensor-input-root-tests.txt) |
+| Crypto root release library, `cargo test --release --lib` | uncapped retry exit 0: 5389 passed, 0 failed, 123 pre-existing ignored; all 5512 accounted for; [compact receipt](hashed-ecdl-tensor-input-root-tests.txt) |
 
 An intermediate selected-package run passed the 27 core, 20 binding and 19
 FFI tests, but one new runner assertion failed because its expected JSON
@@ -82,12 +82,22 @@ trace is preserved locally with SHA-256
 the receipt records the SIGKILL observations and NOT_UPLOADED status. Its
 passing nested one-test result is not a full-library pass. The retry uses
 the same compiled source, no time cap, and a distinct raw log/status marker.
+It completed with 5389 passes, zero failures and 123 existing ignored tests;
+the persisted terminal marker is 0. The 482248-byte completed trace has SHA-256
+`4ff5132bc52999d37aeea60e54ae56b83fffd5b7ddd45b08c122f6449372d18f`
+and remains NOT_UPLOADED. This result covers implementation snapshot
+`6eb7175e38a3488f305da3faee30703e3c325961`; subsequent local changes are
+receipts and logs, with the same native source manifest.
 
 The new [source manifest](hashed-ecdl-tensor-input-sources.sha256) covers the
 17 Cargo/source/test files and has SHA-256
 `f3ab5c7f5e2aa83b47c40b5cb43d150d9c9fd5b9ed24fef66939965167df24b4`.
-Run it from the crate directory, with the owning
-repository's relative path to `docs/`. Earlier source manifests and validation
+It pins the input-fix snapshot named above and the mirrored cryptanalysis
+change. Approved later main additions are preserved and covered separately
+by the [integration receipt](hashed-ecdl-tensor-input-integration-validation.md)
+and its versioned manifest; the original digest is not rewritten to describe
+different code. Run each manifest from its corresponding crate snapshot,
+with the owning repository's relative path to `docs/`. Earlier source manifests and validation
 receipts remain historical snapshots and were not overwritten. The original
 large root trace's not-uploaded status remains unchanged.
 

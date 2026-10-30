@@ -22,8 +22,18 @@ Its one passing child-test summary does not establish a full-root pass.
 Storage: NOT_UPLOADED; no configured artifact-store identity. Local paths
 are not durable remote artifacts; the oversized raw trace is not committed.
 
-Attempt 2: RUNNING, no full result yet.
+Attempt 2: PASS, complete parent result and terminal exit code0.
 Uncapped retry log: /tmp/hashed-ecdl-input-root-retry-20261030T0101.txt
 Terminal status marker: /tmp/hashed-ecdl-input-root-retry-20261030T0101.exitcode
 The retry reused the completed build in0.12s and started5512 tests.
 No source, test input, assertion, limit or validation gate changed.
+Parent result: 5389 passed;0 failed;123 pre-existing ignored;0 filtered out.
+Raw bytes: 482248
+Raw SHA256:
+4ff5132bc52999d37aeea60e54ae56b83fffd5b7ddd45b08c122f6449372d18f
+Verbatim parent summary:
+test result: ok. 5389 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 1661.02s
+The persisted terminal marker contains0. This is a full-root pass for the
+source snapshot above, not a passing nested child summary.
+Storage: NOT_UPLOADED; oversized raw output remains local, not a durable
+remote artifact. The compact receipt retains its digest and terminal result.
