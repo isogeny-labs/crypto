@@ -1,0 +1,7 @@
+# Dated metadata errata, disclosed after data
+
+The frozen upper protocol6c11655aee552ac50346cac7dbeafc3fe0eee68dfc3bb802748348d71d77f340 retains two copied ledger descriptions. `variable_ledger.independent[0].levels[1]` says `original/reduced`; the intended and actually preregistered population is ONE original encoding, with cubic remainder equality. The question, primary metric definition336×1×4, arm parameters, factor how, Markdown contract, pre-data source loops and1344 coverage assertion all specify this. The lower0..8 protocol has the same stale level label; its frozen primary metric/source/Markdown also specify one encoding. No phantom duplicate run or missing distinct encoding is claimed.
+
+The source-binding factor says old bindings are checked by both native paths. More precisely, C++ emits bindings for its newly executed source; the independent Rust analysis checks these and imports the exact pinned, previously independently audited lower data. That distribution is already explicit in the frozen Markdown/source. The lower arithmetic is not newly re-executed, and old receipts do not supply current-head CI validation.
+
+These are ledger-label/check-distribution errors, not new populations, relaxed checks, changed criteria or retrospective freezes. Frozen JSONs, hashes, sources and scientific records remain untouched. Canonical schema/hash validation does not certify every copied prose field. Report this caveat alongside the accepted exact finite computation, with no blinded statistical claim.

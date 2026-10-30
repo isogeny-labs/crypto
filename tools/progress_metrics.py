@@ -566,6 +566,30 @@ def twist_cm8_b3(ref, since):
                      label="F37 size-three cohort, caps 0-8; no cost or regularity result",
                      source=f"{path}@{commit}")
 
+def twist_cm8_b3_upper(ref, since):
+    """Fresh upper counters and typed old/new frontier; no cost estimate."""
+    path = "research/quadratic_twist_evidence_20261021/native/cm8-37-b3-high-20261030/audit.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "quadratic-twist-cm8-37-b3-high-audit/v1":
+            continue
+        for field, unit in (
+            ("new_configurations", "fresh policy/encoding/cap configurations, caps 9-12"),
+            ("new_source_targets", "fresh configuration-target attempts on 18 repeated source points"),
+            ("new_verified_recoveries", "fresh verified original-source recovery runs, repeated points"),
+            ("new_blocked_setups", "fresh public-log setups blocked, caps 9-12"),
+            ("new_capped_response_queries", "fresh capped diagnostic query records, not all solver calls"),
+            ("combined_strict_joint_recovery_admitted", "combined 0-12 unmatched policy/target/cap pair records, not unique wins"),
+            ("combined_strongest_source_joint_pair_records", "combined 0-12 strongest-source joint pair records"),
+            ("combined_policy_target_cap_comparisons", "combined 0-12 policy/target/cap comparisons with pinned historical lower data"),
+        ):
+            value = record.get(field)
+            if isinstance(value, int) and not isinstance(value, bool):
+                emit("twist.cm8_f37_b3_upper." + field, value, date=date,
+                     problem=P_IC, unit=unit, better="neutral",
+                     label="F37 upper caps fresh; combined frontier imports pinned old data; no speed/regularity result",
+                     source=f"{path}@{commit}")
+
 def main():
     a = args()
     twist_known_roots(a.ref)
@@ -573,6 +597,7 @@ def main():
     twist_direct_sign(a.ref)
     twist_cm8_transfer(a.ref)
     twist_cm8_b3(a.ref, a.since)
+    twist_cm8_b3_upper(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
