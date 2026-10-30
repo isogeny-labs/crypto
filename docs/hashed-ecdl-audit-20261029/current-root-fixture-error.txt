@@ -1,0 +1,19 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+   Compiling ecdl-tensor-ic v0.1.0 (/workspace/crypto/crates/ecdl-tensor-ic)
+   Compiling crypto v0.1.0 (/workspace/crypto)
+error: couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-controls.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/aps/tests.rs:407:9
+    |
+407 |         include_str!("../../../../research/aps_measurement_20261029/spec-controls.json"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/cryptanalysis/ecbench/aps/../../../../research/aps_measurement_20261029/spec-orbit-controls.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/aps/tests.rs:408:9
+    |
+408 |         include_str!("../../../../research/aps_measurement_20261029/spec-orbit-controls.json"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (lib test) due to 2 previous errors

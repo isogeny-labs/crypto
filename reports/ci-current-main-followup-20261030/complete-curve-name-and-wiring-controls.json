@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-30T12:50:37.676623+00:00",
+  "results": [
+    {
+      "name": "materialize-complete-curve-name-inputs",
+      "command": [
+        "python3",
+        "/workspace/root-materialize-complete-curve-name-inputs-20261030.py"
+      ],
+      "exit_code": 0,
+      "log": "/workspace/root-final-materialize-complete-curve-name-inputs-20261030.log"
+    },
+    {
+      "name": "archived-label-controls",
+      "command": [
+        "python3",
+        "scripts/test_curve_names_archived_labels.py"
+      ],
+      "exit_code": 0,
+      "log": "/workspace/root-final-archived-label-controls-20261030.log"
+    },
+    {
+      "name": "curve-id-selftest",
+      "command": [
+        "python3",
+        "scripts/curve_id.py",
+        "selftest"
+      ],
+      "exit_code": 0,
+      "log": "/workspace/root-final-curve-id-selftest-20261030.log"
+    },
+    {
+      "name": "complete-curve-name-lint",
+      "command": [
+        "python3",
+        "scripts/check_curve_names.py"
+      ],
+      "exit_code": 0,
+      "log": "/workspace/root-final-complete-curve-name-lint-20261030.log"
+    },
+    {
+      "name": "workflow-wiring",
+      "command": [
+        "python3",
+        "tools/artifacts/wire_workflows.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/workspace/root-final-workflow-wiring-20261030.log"
+    }
+  ]
+}
