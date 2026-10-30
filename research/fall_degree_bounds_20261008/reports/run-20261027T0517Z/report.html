@@ -1,0 +1,47 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Fall degree E9/E10 run report</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.4;color:#111;margin:0}
+h1{font-size:17px}h2{font-size:13px;margin-top:16px}table{border-collapse:collapse;margin:6px 0}
+td,th{border:1px solid #bbb;padding:2px 6px;text-align:left}th{background:#f2f2f2}code{font-size:10px}
+.c{color:#c53030;font-weight:bold}img{width:100%}</style></head><body>
+<h1>Fall-degree bounds: E9 (N = 58–60) and E10 (balanced diagonal mℓ = n). Run report</h1>
+<p><b>What ran.</b> Amendment 10 of <code>research/fall_degree_bounds_20261008/PREREGISTRATION.md</code>, registered before any draw.
+Engine <code>examples/hky_par.rs</code> at source commit <code>5296ce8a7438</code>. Each instance built it from an S3 <code>git archive</code>
+(<code>fd-src-5296ce8.tgz</code>, sha256 <code>dade82a3…</code>), and the binary sha256 was <code>533f182b…</code> on all three instances.
+Draw rule: <code>ladder_sample</code> with <code>cell_seed(20261012, n, ℓ, m)</code>, the first 4 draws with no solutions, <code>cmax = 4</code>.
+A draw that is not refuted by degree 4 is recorded as <code>d_F ≥ 5</code>. Launch card <code>e10/launch3.card.yaml</code> (receipt <code>e10/launch_receipt3/</code>).
+Hosts: ephemeral Spot, lab account, us-east-1, AMD EPYC 9R14. Job A on m7a.8xlarge (32 vCPU); jobs B and C on m7a.4xlarge (16 vCPU). No isolation level was earned,
+so wall times below are indications only and are not scored. No Spot interruption.</p>
+<p><b>Gates, on each instance's exact binary, all passed.</b>
+<ul><li>0: <code>fast_chained_count_matches_the_reference</code> and <code>chained_count</code> tests, 3 passed.</li>
+<li>1: <code>e7/validate.sh</code>, AGREE 24 DISAGREE 0.</li>
+<li>2–3: <code>newcells</code> reproduces <code>e6/B_5-10-2.rerun</code>, <code>e6/B_3-18-6</code>, <code>e8/E8_4-8-2</code> and <code>e8/E8_5-8-2</code> exactly (empty diffs).</li></ul></p>
+<h2>Graph</h2>
+<img src="e9_e10_fall_degree.png">
+<p>Recorded <code>d_F</code> of all 36 E9/E10 draws (filled), and the committed diagonal points E6 (3, 18, 6), E6 (5, 10, 2) and E8 (4, 8, 2) (dashed), plotted against ℓ (left) and N (right).
+A hollow marker labelled “≥5” is a draw whose degree-4 closure stopped without 1. Marker area grows with the number of draws. Source: <code>plot_e9_e10.py</code>.</p>
+<h2>Measured values (per draw)</h2>
+<table><tr><th>exp.</th><th>cell m:n:ℓ</th><th>N</th><th>on mℓ = n</th><th>draws kept</th><th>d_F per draw</th><th>degree-4 closure dim / columns</th><th>s per draw (threads)</th><th>peak RSS</th></tr>
+<tr><td>E9</td><td>6:10:3</td><td>58</td><td>no</td><td>1, 2, 3, 4</td><td>4, 3, 4, 4</td><td>456,838 / 456,838 (d_F = 4 draws)</td><td>179–370 (32); 3.4 for d_F = 3</td><td>21.7 GB</td></tr>
+<tr><td>E9</td><td>5:15:3</td><td>60</td><td>yes</td><td>0–3</td><td>4, 4, 4, 4</td><td>523,686 / 523,686</td><td>902–1,348 (32)</td><td>30.1 GB</td></tr>
+<tr><td>E10</td><td>4:12:3</td><td>36</td><td>yes</td><td>0–3</td><td>4, 4, 4, 4</td><td>66,712 / 66,712</td><td>20–22 (16)</td><td>1.0 GB</td></tr>
+<tr><td>E10</td><td>4:16:4</td><td>48</td><td>yes</td><td>0, 1, 3, 4</td><td>4, 4, 4, 4</td><td>213,053 / 213,053</td><td>477–559 (16)</td><td>5.6 GB</td></tr>
+<tr><td>E10</td><td>4:20:5</td><td>60</td><td>yes</td><td>0, 1, 2, 4</td><td>4, 4, 4, 4</td><td>523,686 / 523,686</td><td>5,191–7,099 (16)</td><td>31.2 GB</td></tr>
+<tr><td>E10</td><td>6:12:2</td><td>60</td><td>yes</td><td>0–3</td><td>3, 3, 4, 4</td><td>523,686 / 523,686 (d_F = 4 draws)</td><td>261–267 (16); 2.1–2.2 for d_F = 3</td><td>26.7 GB</td></tr>
+<tr><td>E10</td><td>3:21:7</td><td>42</td><td>yes</td><td>0, 1, 3, 4</td><td class="c">≥5, ≥5, ≥5, ≥5</td><td>117,335; 116,485; 118,185; 117,505 / 124,314</td><td>134–141 (16)</td><td>1.9 GB</td></tr>
+<tr><td>E10</td><td>3:24:8</td><td>48</td><td>yes</td><td>0–3</td><td class="c">≥5 ×4</td><td>186,549; 187,453; 186,323; 185,193 / 213,053</td><td>773–793 (16)</td><td>4.8 GB</td></tr>
+<tr><td>E10</td><td>3:27:9</td><td>54</td><td>yes</td><td>1–4</td><td class="c">≥5 ×4</td><td>160,259 (all four) / 342,541</td><td>492–533 (16)</td><td>6.7 GB</td></tr></table>
+<p>Degree-2 and degree-3 closure dimensions: <code>per_degree</code> in each record. At m = 3 they are identical across draws within a cell (62/2,338; 71/3,056; 80/3,870).
+Raw records: <code>e9/run-r3/out/E_*.jsonl</code>, <code>e10/run-r3-B/out/E_*.jsonl</code>, <code>e10/run-r3-C/out/E_*.jsonl</code>, with gate logs, build logs and host files beside them.</p>
+<h2>Registered readings (Amendment 10), checked by Lean <code>decide</code></h2>
+<ul><li><b>E9:</b> “bounded” (every draw ≤ 4); “grows” is false.</li>
+<li><b>E10 m = 3 diagonal:</b> “grows”. Every draw of (21, 7), (24, 8) and (27, 9) is censored above 4.</li>
+<li><b>E10 m = 4, 5, 6 diagonals:</b> “flat”; every cell median is ≤ 4.</li>
+<li><b>Cross-m at fixed N:</b> “not rising” at N = 48 (m = 3: ≥5, m = 4: 4) and at N = 60 (4, 4, 3).</li></ul>
+<p>The theorem <code>registered_scoring</code> in <code>lean/FallDegree/Verdict.lean</code> is built in job E12b (log <code>e12/…/lean/lake.log</code>). Its status is recorded in RESULTS.md.</p>
+<h2>Observations (no interpretation beyond the registered readings)</h2>
+<ul><li>The censored draws are exactly the draws with ℓ ≥ 7. Every one of them has m = 3.</li>
+<li>Every draw with ℓ ≤ 6 has d_F ≤ 4, up to N = 60.</li>
+<li>Where d_F = 4, the degree-4 closure is the whole degree-≤4 space. Where d_F ≥ 5, it stops at 47–95% of the space without 1.</li>
+<li>Independent check of 3:21:7: an E11 subagent run of the same draws, on a separate host and build, also read d_F ≥ 5 on 4/4 draws, and two solution counters agreed on 0 solutions (<code>e11/scaling/</code>).
+That run uses the same closure code. A separate engine, <code>hky_crosscheck</code>, was running on draw 0 when this report was written; its result is recorded in RESULTS.md when it finishes.</li></ul>
+</body></html>
