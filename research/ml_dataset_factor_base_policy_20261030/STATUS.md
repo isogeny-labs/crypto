@@ -1,41 +1,30 @@
-# Policy occurrence binding ready for validation
+# Dataset helper validation and V2 integration
 
-Dataset03 at c277aa93e93b passed293 tests,0 failed,1 ignored with source preflight
-and readback matching. The strict Clippy01 attempt found one inherited SAT-prefix
-manual-is-multiple-of lint; both source checks passed. All receipts are retained.
+Dataset04 passed 297 tests, 0 failed, 1 ignored at source
+9f028b92b81dac42fa0b240dd9f532ae8ede49fb. Both source checks passed.
+This includes four installed case-binding helper tests.
 
-Reviewed case_binding.rs is now implemented under contract6364cbd94bb7. It binds
-original plan bytes, full typed plan, explicit origin/policy/global index and
-restricted sidecar custody; four helper tests remain unexecuted. V2 worker
-activation stays disabled in this helper until all CLI readers are integrated.
-The SAT lint is corrected without changing the bitmask condition's semantics.
-No new native pass is attributed to these changes before the next attempt.
+Clippy02 at that source stopped with exit101 because the tracked startup example
+includes research/ml_dataset_20261028/startup-integration-cli-fixture-native/run.rs,
+which was absent from this sparse checkout. Both source checks passed. The failure
+log and receipt are retained with fresh S3 readback. A dependency audit precedes
+exact materialization and a separately named Clippy attempt; no lint was relaxed.
 
-Parallel source proposals cover capture/execution, startup/budget/restore and
-strict mathematical V2 export/report. Shared dispatcher/capture/report files
-have active reservations; no conflicting edits were made. Full V2 CLI and cloud
-pilot remain incomplete. Verified cloud dataset cells remain0.
+The completed V2 CLI, capture, startup, restore and export integration proposals
+remain unapplied. Reserved shared files await coordination; no V2 CLI activation
+is claimed. Export proposal02 and the separate subgroup ECDLP view design have
+been archived and freshly downloaded. The subgroup view contract is accepted
+for a separate opt-in channel preserving checked ECDLP examples with an empty
+unused factor base, while keeping recovered scalars restricted and distinguishing
+synthetic membership from independent recovery. No new runtime tests apply to it.
 
-# Factor-base corrective source ready for attempt03
+Full integrated CLI, whole-worker instruction measurement, algebraic relation-to-
+scalar pipeline, full-library validation and cloud pilot remain open.
+Verified cloud dataset cells remain 0.
 
-Attempt01 stopped at source preflight: three correctly hashed restored files
-lacked their Git executable bit. Cargo did not start. Those modes were restored;
-failed logs/receipts were retained and freshly downloaded from S3.
-
-Attempt02 at e1ffaf5b81b6 compiled and ran the dataset suite: 283 passed, 8 failed,
-1 ignored. Both source preflight and readback passed. Seven native tests stopped
-at a Frobenius-power JSON representation mismatch; one strict-policy test exposed
-unknown-field acceptance on the legacy enum unit. These are observed source
-failures, not negative mathematical results. Failure evidence is immutable.
-
-Corrective source reads the existing integer Frobenius power and adds a strict
-input-only wire enum for policy parsing without changing public serialization.
-Targeted regression tests are added, not yet executed. The plan fix passed exact
-independent source review. Native behavior beyond the formerly failing parser
-remains unverified until attempt03 completes.
-
-Inventory03 explicitly binds Git modes plus bytes for2731 files/253915749bytes.
-The installed Python auditor and actual Bash mode-loop checks passed10 tests.
-Full v2 CLI/export integration remains pending; scratch worker-binding changes
-are not applied. Current CLI continues to admit v1 plans only. Full original
-corpus goal remains active, and verified cloud dataset cells remain0.
+The exact missing fixture is restored from source9f028: Git blobbf30004b9781,
+SHA256554e5bf1f70e051f0c59364305faa069b01ea35fbae0ab8e4f443d5d29ddb2c8.
+Inventory04 binds2732 inputs/253944747bytes, including Git modes; all explicit
+bytes and modes rechecked. Inventory SHA256
+068fa314f1ec00a81572def5332e17ed86dc876c13156f376aeae135a87cefac.
+No library implementation changed after dataset04. Clippy03 is next after freeze.
