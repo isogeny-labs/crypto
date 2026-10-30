@@ -1353,10 +1353,6 @@ impl Instance {
             // study and the hyperelliptic Jacobians: no public-target law yet.
             return None;
         }
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
-            return None;
-        }
         if let Instance::Wide(i) = self {
             // PUBLIC_TARGET_LAW_WIDE: the same inputs as decimal strings, a
             // 128-bit draw, its top bit choosing the ordinate.
