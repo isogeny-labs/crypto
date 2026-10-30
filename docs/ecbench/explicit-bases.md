@@ -855,3 +855,30 @@ complete-rung stopping. Update exact-current-head CI on the follow-up PR.
 Initial protocol validation caught the required draft freeze block omitted by
 metadata copying; restored before freeze/data. A stray nonexistent helper path
 returned127 after successful native-instrument compilation; no run occurred.
+
+## 2026-10-30T19:12UTC — optional negative GPU prefilter
+
+### What was done
+Added opt-in blocked Bloom prefilter before exact relation lookup. Every left
+point key is inserted using atomic OR after sort completion; only definite
+misses bypass the existing exact comparison. Added bounded word sizing,
+phase-aware storage accounting, TABLE filter_bytes, host fixtures and CUDA
+fixtures including a deliberately saturated filter. Existing deterministic
+witness, infinity, empty-plan, late-hit and reprepare tests remain enabled.
+
+### Decisions made
+Read the primary GPU Bloom paper, NVIDIA cuCollections interface/policies and
+Vigna SplitMix source before implementation; links and argument are in
+NEGATIVE-FILTER.md. Keep frozenv13/v14 source pins unchanged. This candidate
+requires a separately frozen panel and GPU checks; no measured gain claimed.
+Filter storage is charged before right-cache admission; any fallback must be
+reported. Preserve exact certificate replay and corrupt-scalar rejection.
+
+### Open threads
+CUDA build and sanitizer validation, full-pipeline matched controls, and any
+larger probe. V13 first62-bit target still runs; v14 prepared but not launched.
+No automatic default change or claim of fastest external implementation.
+
+### Errors
+None in the standalone filter fixture or host syntax check. GPU checks have
+not run; pending validation is not a pass.
