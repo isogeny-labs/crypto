@@ -66,7 +66,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/ic_candidate_tournament_20260915 research/sat_factor_base_review_20260908/autolab
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -161,7 +161,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/ic_candidate_tournament_20260915 research/sat_factor_base_review_20260908/autolab
       - uses: dtolnay/rust-toolchain@1.94.1
       - name: Refuse a repeated dispatch of this registered seed
         env:
@@ -256,7 +256,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/ic_candidate_tournament_20260915 research/sat_factor_base_review_20260908/autolab
       - uses: dtolnay/rust-toolchain@1.94.1
       - uses: Swatinem/rust-cache@v2
         with:
@@ -316,7 +316,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench docs/ic research/ic_candidate_tournament_20260915 research/sat_factor_base_review_20260908/autolab
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

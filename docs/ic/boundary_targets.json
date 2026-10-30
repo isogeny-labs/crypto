@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-10-12",
+  "updated": "2026-10-20",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
   "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gröbner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
@@ -1189,7 +1189,9 @@
         "vs_rho": {
           "status": "record",
           "current": {
-            "summary": "Sixth primary single-target online rung and first with a qualifying CPU-isolation receipt: a=0 n=61 compact-orbit IC (61,000 base points, 500 signed-Frobenius orbit columns, K=500) beats strong rho rung 3 on the identical public point per workload; 64 one-target workloads per host, claim-check PASS 64/64 on both an unpinned arm64 macOS host (median 12.9x) and a taskset-pinned x86_64 gvisor host (median 13.9x, 95% CI 9.8-19.1); identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho online interval recorded; IC reusable setup (about 28 s modal) outside the online interval, cold ratio median 83.4; both certificates replayed out of process; constant-factor win only, no asymptotic sub-rho claim",
+            "summary": "Sixth primary single-target online rung and first with a qualifying CPU-isolation receipt: a=0 n=61 compact-orbit IC (61,000 base points, 500 signed-Frobenius orbit columns, K=500) beats strong rho rung 3 on the identical public point per workload; 64 one-target workloads per host, claim-check PASS 64/64 on both an unpinned arm64 macOS host (median 12.9x) and a taskset-pinned x86_64 gvisor host (median 13.9x, 95% CI 9.8-19.1); identical candidate manifest on both hosts; five exclusive IC online phases and the exact rho online interval recorded; IC reusable setup (about 28 s modal) outside the online interval, cold ratio median 83.4; both certificates replayed out of process; constant-factor win only, no asymptotic sub-rho claim. SUPERSEDED 2026-10-20 (sweep B 108.1): the online 12.9x and 13.9x medians compare against empty-table rho; Bernstein-Lange rho at equal advice is 53-317x faster online; cold conclusion unchanged",
+            "superseded_on": "2026-10-20",
+            "superseded_by": "benchmarks/20261014-ic-next10-09-equal-advice",
             "metrics": {
               "n": 61,
               "a": 0,
@@ -1303,7 +1305,7 @@
                 "rayon_threads": 1
               },
               "asymptotic_sub_rho": false,
-              "single_target_crossover": "n=61 one-target online: IC faster than rho on the median workload on both hosts (12.9x and 13.9x medians)",
+              "single_target_crossover": "n=61 one-target online vs empty-table rho: 12.9x and 13.9x medians, superseded 2026-10-20, no IC advantage at equal advice (was: IC faster than rho on the median workload on both hosts)",
               "operation_accounting": {
                 "comparison_status": "native_counters_only",
                 "ic_online_operations": 78988,

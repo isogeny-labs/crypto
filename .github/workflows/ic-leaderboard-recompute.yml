@@ -58,7 +58,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_accounting_v2_20261023
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic research/ecbench_accounting_v2_20261023
       - name: The check catches a tampered row and a missing row
         run: bash scripts/ic_audit/test_check_board_recompute.sh
       - name: Every board row recomputes from raw records
