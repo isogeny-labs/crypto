@@ -103,5 +103,12 @@ exit0 and matching runtime-source readback. See
 [cap-fix-cli.receipt.json](cap-fix-cli.receipt.json).
 [cap-fix-cli-readback.json](cap-fix-cli-readback.json) retains fresh S3 byte
 comparisons for these logs/receipts, the frozen binary and CLI output archive.
-The full release library suite remains running; no terminal pass is claimed.
-No additional scientific samples or cloud cells were produced.
+The full release library suite then passed **5,445 tests, 0 failed, 123 ignored**
+with exit0 and matching runtime-source readback. The finite pipeline completed
+successfully at2026-10-30T05:33:11Z; see
+[cap-fix-full-library.receipt.json](cap-fix-full-library.receipt.json) and
+[cap-fix-pipeline.receipt.json](cap-fix-pipeline.receipt.json).
+[cap-fix-final-readback.json](cap-fix-final-readback.json) consolidates the
+per-artifact fresh S3 download receipts and rehashes their retained downloaded
+bytes against the exact artifact-index snapshot. No additional scientific
+samples or cloud cells were produced.
