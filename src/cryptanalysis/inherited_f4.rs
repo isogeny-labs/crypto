@@ -83,6 +83,11 @@ use crate::cryptanalysis::koblitz_groebner::{
 use crate::cryptanalysis::pq_groebner_f2::{
     cmp_mono, sort_masks_descending, F2BoolMono, F2BoolPoly,
 };
+mod profile;
+pub use profile::{
+    macaulay_input_profile, take_closure_trace, trace_closure, BlockProfile, ClosureRound,
+    MatrixProfile,
+};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -2863,7 +2868,14 @@ impl ReducedBasis {
                     })
                     .collect()
             };
+            let ops_before = cost.reduce_word_ops;
             self.absorb(packed, cost);
+            profile::note_round(profile::ClosureRound {
+                products: products.len() as u64,
+                reduce_word_ops: cost.reduce_word_ops - ops_before,
+                rows_after: self.rows.len() as u64,
+                columns: self.columns.len() as u64,
+            });
             if self.refuted {
                 break;
             }
