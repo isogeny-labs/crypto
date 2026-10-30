@@ -14,8 +14,9 @@
 //! squaring is linear in characteristic 2 and the 1/lanes inversion share is
 //! dropped).  A root call (one S3 solve) is priced from its multiplication
 //! count in the producer's code:
-//!   u64 path (n <= 63), unbatched: 8.5 M + one Itoh-Tsujii inversion,
-//!   wide path (n >= 71), inversions batched over 2n inputs: 10.5 M + I / 2n.
+//!   u64 path (n <= 63), unbatched: 8 M + one Itoh-Tsujii inversion,
+//!   wide path (n >= 71), inversions batched over 2n inputs: 11 M + I / 2n
+//!   (both roots always exist here, so the post-trace multiplication always runs).
 //! Probes (canonical rotation + hash lookup) and table inserts are unpriced
 //! native work at w in {0, 0.1, 1} GAE, like rho's canonicalisations.
 //! Variant B prices w on both arms (the section 5a rule); variant A on rho
@@ -53,14 +54,14 @@ fn it_mults(n: u32) -> f64 {
 
 fn root_call_gae(n: u32) -> f64 {
     if n <= 63 {
-        (8.5 + it_mults(n)) / GAE_M
+        (8.0 + it_mults(n)) / GAE_M
     } else {
         batched_root_call_gae(n)
     }
 }
 
 fn batched_root_call_gae(n: u32) -> f64 {
-    (10.5 + it_mults(n) / (2.0 * n as f64)) / GAE_M
+    (11.0 + it_mults(n) / (2.0 * n as f64)) / GAE_M
 }
 
 fn lift_gae(n: u32) -> f64 {
