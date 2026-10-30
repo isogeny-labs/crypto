@@ -43,12 +43,12 @@ jobs:
             fi
           fi
       - name: Build ic
-        run: cargo build --release --bin ic
+        run: cargo build --release --features ic-cli-contracts --bin ic
       - name: Parameter and synthetic pipeline checks
         env:
           IC_TEST_BINARY: ${{ github.workspace }}/target/release/ic
         # Run all three existing suites against the freshly built production CLI.
-        run: cargo test --release --bin ic
+        run: cargo test --release --features ic-cli-contracts --bin ic
       - name: Inspect supplied example documents
         run: |
           target/release/ic inspect --file docs/ic/prime-example.json --json
