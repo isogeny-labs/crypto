@@ -11,7 +11,7 @@ def asSum (x : R) : ℕ → R
 
 theorem as_sum_identity (x : R) (k : ℕ) :
     (asSum x k)^2 + asSum x k = x + x^(2^k) := by
-  have htwo : (2 : R)=0 := by norm_num
+  have htwo : (2 : R)=0 := CharP.cast_eq_zero R 2
   have hcancel (a : R) : a+a=0 := by rw [← two_mul, htwo, zero_mul]
   induction k with
   | zero => simp [asSum, hcancel]
