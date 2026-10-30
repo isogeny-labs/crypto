@@ -1,0 +1,70 @@
+{
+  "kind": "prepared-native-freelip-replay/v1",
+  "historical_orders_executed": 0,
+  "distinct_orders": 21,
+  "planned_calls": 84,
+  "cohort": "inputs/cohort.tsv",
+  "source_functions": "/workspace/nist-freelip-inspection/source-audit.json",
+  "compiler": {
+    "version": "0.15.2",
+    "target": "x86-linux-musl",
+    "archive_sha256": "02aa270f183da276e5b5920b1dac44a63f1a49e55050ebde3aecc9eb82f93239"
+  },
+  "flags": [
+    "GNU89",
+    "O0",
+    "fcommon",
+    "fwrapv",
+    "SINGLE_MUL",
+    "DOUBLES_LOW_HIGH",
+    "UBSan halt_on_error"
+  ],
+  "sources": {
+    "replay.c": "cab9a6c2132ff180af13202f898bcfaeb1dacf035217f64b53189acf2596efb1",
+    "bridge.c": "5357f45fbb08b8aff2bcc9458a470b4c4bbe266cd890d44dfd911c2062dc7fcc",
+    "bridge.h": "0d9808ea0b2dfb80fa648f09635cea1d11ab991c47710f0ab963b4e122f1f841",
+    "development.sh": "493c163e8bbc36e930a64a00f533fcb4fce00dbff1e22660daa5cec4f3f5f006",
+    "summarize.cpp": "9f7852051dfd6422dc4ab26dc50b0b0a76208733cabc69d7d4cbe64b1670eebf",
+    "run-cohort.sh": "2539762d794b1e6f165fc6d90d96bf73914629041d96634a2ff9d652a46c1132",
+    "PROTOCOL.md": "84f6324b77f74d80d9de428c1c3c12fa762cd540ffbb378a5a045e3bcebde59a"
+  },
+  "binaries": {
+    "v1.0-replay": {
+      "bytes": 2782988,
+      "sha256": "50431395853cc75ae48f05410bec34fb71fd3e6926536b8f44232df66f9511a2"
+    },
+    "v1.1-replay": {
+      "bytes": 2785708,
+      "sha256": "92c855dc7c98303906dbe4ce45a478b39db3ba71405d03b320b70ff2011759c1"
+    },
+    "summarize": {
+      "bytes": 59920,
+      "sha256": "015a65ada5b216499f7b79d0ee5db17d2b4385c2dfb0a19e0ca90530a8b61710"
+    },
+    "qemu-i386-static": {
+      "bytes": 8702448,
+      "sha256": "34f4268e06b87af48f434282caf9a03b162d98f10a1bd7125f92729cd82b41ca"
+    }
+  },
+  "controls": {
+    "1.0": {
+      "directory": "v1.0-008",
+      "fixtures": 13,
+      "methods": 2,
+      "passed": true
+    },
+    "1.1": {
+      "directory": "v1.1-004",
+      "fixtures": 13,
+      "methods": 2,
+      "passed": true
+    }
+  },
+  "backend": "local-fallback-existing-authorization",
+  "job_limit_seconds": 600,
+  "call_limit_seconds": 60,
+  "address_space_KiB": 786432,
+  "guest_reservation_bytes": 268435456,
+  "no_automatic_retry": true,
+  "measured_DLP": false
+}
