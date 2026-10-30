@@ -636,3 +636,39 @@ The first report render interpreted an unescaped less-than sign as a Typst
 label; corrected to code markup and both final pages rendered and inspected.
 CUDA emits ignored defaulted-constructor annotation warnings; no failure has
 been observed so far. PR attachment tool calls remain pending in the app.
+
+## 2026-10-30T16:06Z — optional GPU-resident query prototype
+
+### What was done
+
+T940 holds the GPU source and this handoff. Added an optional persistent
+right-search grid, exact two-stage minimum witness resolution, a24-byte result
+readback and actual search-visit accounting. The ordinary chunked path stays
+available. Tests force a two-block grid, multi-stride late matches, complete
+misses, partial tiles, resets and empty reprepare. Host syntax passed; the first late-hit fixture constructor failed because
+its row cap also bounded input-base size. A corrected explicit unbalanced
+split is checked in the following repair; CUDA validation remains pending. Updated README
+arithmetic guards to match the already validated v9 source.
+
+### Decisions made
+
+NVIDIA grid-stride guidance and CUDA device-scope atomic memory semantics
+were read before implementation; links and correctness argument are in
+PERSISTENT-QUERY.md. No cross-block wait or occupancy requirement is introduced.
+The active v11 remains pinned to d44b59149f46 and is unaffected by these edits.
+A separate frozen matched panel must precede any timing or backend promotion.
+
+### Open threads
+
+V11's eight52-bit control solves verified. Both61-bit outcomes remain pending.
+Prepare a separately bounded persistent-query validation after collection and
+deletion; never launch a concurrent taskGPU. Preserve every failed attempt.
+
+### Errors
+
+Full HEAD progress export twice hit55s on the shared workspace; a scoped
+committed GPU export completed in7.76s with all24metrics including v9 counts.
+A default-ref diagnostic invocation completed successfully within55s. Moving
+the script outside sparse checkout first lacked its repository selector;
+PM_REPO_PATH fixed that administrative invocation. No metrics source change
+was made, and no failed invocation is treated as a pass.
