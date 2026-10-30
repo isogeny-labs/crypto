@@ -6,7 +6,9 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct Expected {
-    pub session: String,
+    /// Prospective, unexecuted plans deliberately have no session identity.
+    /// A record can only be imported after a concrete session is supplied.
+    pub session: Option<String>,
     pub binary_sha256: String,
     pub seq: u64,
     pub round: u64,
@@ -76,9 +78,13 @@ pub fn import(record: &Value, expected: &Expected) -> Result<Imported, String> {
     {
         return Err("expected seed not canonical decimal u64".into());
     }
+    let session = expected
+        .session
+        .as_deref()
+        .ok_or("record present for a plan without a session identity")?;
     for (p, want) in [
-        ("/session_id", expected.session.as_str()),
-        ("/binary_sha256", &expected.binary_sha256),
+        ("/session_id", session),
+        ("/binary_sha256", expected.binary_sha256.as_str()),
         ("/arm", &expected.arm),
         ("/role", &expected.role),
         ("/algorithm_seed", &expected.seed),
@@ -455,7 +461,7 @@ mod tests {
     use serde_json::json;
     fn fixture() -> (Value, Expected) {
         let e = Expected {
-            session: "s".into(),
+            session: Some("s".into()),
             binary_sha256: "a".repeat(64),
             seq: 1,
             round: 1,

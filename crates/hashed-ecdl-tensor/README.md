@@ -24,6 +24,12 @@ output path. Omit the fixture seed for OS randomness. Certificates serialize
 large integers as little-endian 32-bit-limb arrays. Replay checks mathematics,
 not execution counters. All bundled examples are public inputs; the challenge example below is not a tiny fixture.
 
+Problem, receipt, certificate and point records reject duplicate and unknown
+fields at every typed level. An optional field set to null still counts as
+present for duplicate detection. File inputs are limited to 16 MiB of actual
+content; the reader uses one extra byte to reject oversized inputs, including
+growing files and streams.
+
 Sources and implementation boundaries:
 [implementation report](https://github.com/isogeny-labs/crypto/blob/main/docs/hashed-ecdl.md),
 [Bochum v0.2](https://github.com/bochum-crypto/subexponential-ecdl/tree/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f),
@@ -81,3 +87,12 @@ budget is an error with unknown result, not a solution or proof that no solution
 exists. These bounds do not make the challenge feasible. No ECCp-131 scalar
 has been recovered by the development checks. A successful receipt would need
 independent replay with the existing verify command.
+
+## Opt-in finite-size extensions
+
+See [FINITE_SIZE.md](FINITE_SIZE.md) for selector-domain witnesses and graphs,
+optional schoolbook multiplication, bounded exact width planning/conditioning,
+partial-relation elimination and odd-degree binary/Frobenius support. The file
+runner adds `solve-selectors` and `solve-width`; the original `solve` remains
+available. Exact limits return unknown-result errors. Small-parameter source
+packet recursion and scientific performance validation remain open.
