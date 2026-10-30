@@ -51,7 +51,7 @@ It is a distinct full point key, not a special x value. The service finds
 relations in the full curve group and does not assert prime order or cofactor
 one. Binary fields and 256-bit fields are outside this service's scope.
 
-The hash-construction mode requires `p < 2^60`, prime `2p <= s <= 4p`,
+The hash-construction mode requires `p < 2^62`, prime `2p <= s <= 4p` with `s < 2^63`,
 `0 < alpha < s`, `beta < s`, and `0 < tau <= s`. It enumerates
 `z = alpha^-1 (t-beta) mod s` for `0 <= t < tau`, discards `z >= 2p`,
 and lifts `x=z/2` with y parity `z mod 2`. It never closes signed hash bases
@@ -59,7 +59,7 @@ under negation. Every `(slot, point)` remains a distinct matrix column.
 
 The Rust reduction retains its original exhaustive tiny-curve constructor
 and 512-column default. The standalone driver now uses an exact order witness:
-prime `5 <= p < 2^60`, prime `r < 2^61`, a nonzero on-curve P with `[r]P=O`,
+prime `5 <= p < 2^62`, prime `r < 2^63`, a nonzero on-curve P with `[r]P=O`,
 and a unique multiple of r in the integer Hasse interval. Ambiguous large
 orders are rejected. Tonelli–Shanks avoids an O(p) root table. There are 2–8
 slots; explicit limits allow up to 16384 columns and 2^24 hash candidates.
@@ -238,3 +238,5 @@ at 60 bits are 770.270416 and 845.179937 seconds, with all three query
 sanitizers passing. See the [complete report](../../research/explicit_relations_e2e_20261030/RESULTS.md)
 and [v8 export](../../research/explicit_relations_e2e_20261030/results-v8/export.json).
 The default remains the existing index; wider indexing is explicitly selected.
+
+See [checked wider hashing](WIDE-HASH.md), [exact dense rows and queried sort scratch](DENSE-ROWS.md), and the [experimental GPU-resident query](PERSISTENT-QUERY.md) for their distinct validation status.

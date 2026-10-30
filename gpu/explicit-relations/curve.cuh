@@ -27,6 +27,25 @@ struct Point {
   U x = 0, y = 0;
   bool inf = true;
 };
+// Exact affine cache: x=UINT64_MAX is disjoint from every supported field.
+struct alignas(16) CachedPoint {
+  U x = UINT64_MAX, y = 0;
+  RF_HD static CachedPoint from(Point p) {
+    return p.inf ? CachedPoint{} : CachedPoint{p.x, p.y};
+  }
+  RF_HD Point point() const {
+    return x == UINT64_MAX ? Point{} : Point{x, y, false};
+  }
+};
+static_assert(sizeof(CachedPoint) == 16 && alignof(CachedPoint) == 16,
+              "exact aligned affine cache layout");
+// Admission arithmetic avoids overflowing count*sizeof(CachedPoint).
+RF_HD bool right_cache_fits(U count, U retained, U free_bytes, U byte_limit) {
+  const U budget = free_bytes - free_bytes / 4;
+  return count && retained <= budget &&
+         count <= (budget - retained) / sizeof(CachedPoint) &&
+         count <= byte_limit / sizeof(CachedPoint);
+}
 struct Jac {
   U x = 0, y = 0, z = 0;
 };
