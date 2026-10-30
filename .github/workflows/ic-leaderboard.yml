@@ -23,6 +23,7 @@ on:
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
       - 'scripts/test_build_ic_leaderboard.py'
+      - 'scripts/test_leaderboard_sparse_component_inputs.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic/LEADERBOARD.md'
@@ -43,6 +44,7 @@ on:
       - 'docs/curves/ic/curves.schema.json'
       - 'research/ic_descent_20260930/runs-isolated/main/**'
       - 'research/ic_single_target_20260930/runs/**'
+      - 'research/ic_tool_program/rule/v3/runs/**'
       - 'research/ic_tool_program/rule/v7/analysis.json'
       - 'research/ic_tool_program/rule/v7/replay-certificate.json'
       - 'research/ic_tool_program/rule/v7/validator-report.json'
@@ -64,6 +66,8 @@ on:
       - 'research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json'
       - 'research/f4_f5_f6_cross_family_20261011/ANALYSIS.json'
       - 'research/ecbench_n41_n53_shared_rank_20261005/DECISION.json'
+      - 'research/postgb_linear_stage_20261026/**'
+      - 'research/twist_index_calculus_20261020/**'
       - 'research/ecbench_conductor_gap_20261012/analysis.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/ecbench_frontier_20261013/frontier-data.json'
@@ -154,6 +158,8 @@ jobs:
           python-version: '3.11'
       - name: The path check's own tests
         run: python3 scripts/test_check_ic_leaderboard_paths.py
+      - name: Sparse engineering component evidence inputs
+        run: python3 scripts/test_leaderboard_sparse_component_inputs.py
       - name: Curve-record parser tests
         run: python3 scripts/test_build_ic_leaderboard.py
       - name: This workflow's path filter covers every file the builder reads
