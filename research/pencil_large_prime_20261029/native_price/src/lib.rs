@@ -3,6 +3,7 @@
 use std::collections::BTreeMap;
 
 pub const MODEL: &str = "atomic-scalar-disjoint-logical/v1-draft";
+pub mod disjoint;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     Overflow,
