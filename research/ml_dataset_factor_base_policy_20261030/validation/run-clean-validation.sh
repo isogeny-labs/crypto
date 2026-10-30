@@ -78,7 +78,17 @@ if [[ "$command_exit" != 0 ]]; then stage=command_failed; exit "$command_exit"; 
 [[ "$readback" == true ]]
 stage=coverage_check
 if [[ -n "$summary" ]]; then
-  [[ $(rg -c '^test result:' "$output/validation.log") == 1 ]]
-  rg -F "$summary" "$output/validation.log" > "$output/test-summary.txt"
+  mapfile -t results < <(rg '^test result:' "$output/validation.log")
+  if [[ "$phase" == dataset ]]; then
+    # The FIFO reader test intentionally invokes a one-test child harness.
+    [[ ${#results[@]} == 2 ]]
+    [[ ${results[0]} == 'test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5852 filtered out;'* ]]
+    rg -q '^running 481 tests$' "$output/validation.log"
+    rg -q '^test ml_dataset::telemetry::checked::tests::fifo_replacement_is_rejected_without_waiting_for_writer \.\.\. ok$' "$output/validation.log"
+  else
+    [[ ${#results[@]} == 1 ]]
+  fi
+  [[ ${results[-1]} == "$summary"* ]]
+  printf '%s\n' "${results[@]}" > "$output/test-summary.txt"
 fi
 stage=completed
