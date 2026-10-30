@@ -1116,3 +1116,17 @@ After account funding, reconcile live inventory and prepare a fresh bounded atte
 
 ### Errors
 HTTP402 is an external funding dependency; no GPU allocated.
+
+## 2026-10-30T21:10Z — Requested RTX5090 panel
+
+### What was done
+Owner reported account replenished and requested5090or4090. Selected32GB RTX5090 secure catalog1.19/hour; cap1.20. NVIDIA compute-capability table confirms5090 andPRO6000Blackwell both12.0, so kernels/build remain sm_120. Added explicitGPU selector, one-device and capability guards; five guardfixtures pass. Both controllerfault-injectionpaths pass. Protocolv18 frozen26446177ac80fae9ef001edef438e3a104c6bd73ae40bb0cf2a283463841038e; sourcee2cdde6d6f1fd5c316d2e8c5b5dfc24723e80eff. OriginalGit sourcearchive b597dd5d362d2fcd8327496e64ed5408d859a8f9c4bb9763a2ed902d1b5cef41 uploaded and freshGETbyteequal.
+
+### Decisions made
+Same52/63-bit targets,m8/m10/m12 and limits as unexecutedV17; lowerVRAM admission is part of this distinct hardwarepanel. No cross-run timing comparison. Prefer5090;4090wouldrequireseparatesm_89build/contract. Partial artifact copies are not restorecheckpoints.
+
+### Open threads
+Launch oneV18aftercheckpointgate; fullnewarityRust/device/sanitizerchecks precede data. PR2996 now has an evidence-audit shard8failure and other auditshards pending; inspect actual failure logs whenavailable, do not call its CIgreen. PR2997 carries current work.
+
+### Errors
+FirstV18draftliteratureentry failedschema; corrected before freeze,zero findings. Sourceindex-pack on sharedfilesystem failedbadfiledescriptor; local scratch rehearsal passed. Firstadministrativefaultfixture omittedrgfromPATH; corrected fixture passed; no provider call occurred in these tests.
