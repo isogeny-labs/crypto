@@ -2,8 +2,9 @@ FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.source="https://github.com/aburan28/crypto" \
       org.opencontainers.image.revision="${SOURCE_REVISION}"
-# Build context contains only these three files, never a repository or keys.
+# Build context contains only explicit binaries/metadata, never a repository or keys.
 COPY ecbench /usr/local/bin/ecbench
+COPY isolab-fresh-owner /usr/local/bin/isolab-fresh-owner
 COPY smoke-prime.json /opt/isolab/specs/smoke-prime.json
 COPY build-info.json /opt/isolab/build-info.json
 ENV HOME=/work

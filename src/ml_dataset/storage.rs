@@ -1549,7 +1549,7 @@ mod tests {
                 .join(object_key(&artifacts[0].sha256).unwrap());
         fs::write(&remote_path, b"ghijkl").unwrap();
         let err = publish(&f.0, &artifacts, &manifest, f.cfg(), "datasets/test").unwrap_err();
-        assert!(err.contains("round-trip"), "{err}");
+        assert!(err.contains("mismatched size or digest"), "{err}");
         assert_eq!(fs::read(remote_path).unwrap(), b"ghijkl");
     }
 

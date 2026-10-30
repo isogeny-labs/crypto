@@ -110,7 +110,7 @@ pub struct ChildInput {
     /// Reserved explicit diagnostic context; producer execution remains disabled.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub diagnostics: Option<super::diagnostics::Context>,
-    /// Separate v2 transport; remains disabled until the complete adapter lands.
+    /// Explicit v2 transport, admitted only after identity and custody checks.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub diagnostic_lifecycle: Option<DiagnosticChild>,
     pub schema: String,
@@ -137,6 +137,18 @@ pub struct DiagnosticChild {
 }
 
 pub const MAX_DIAGNOSTIC_CHILD_BYTES: usize = 4 * super::diagnostic_launch::MAX_LAUNCH_BYTES;
+
+/// Hash the running executable rather than trusting an envelope's declaration.
+/// Linux /proc/self/exe pins the exec'd inode even if its pathname is replaced.
+fn diagnostic_running_binary_sha256() -> Result<String, String> {
+    #[cfg(target_os = "linux")]
+    let path = std::path::PathBuf::from("/proc/self/exe");
+    #[cfg(not(target_os = "linux"))]
+    let path = std::env::current_exe().map_err(|error| error.to_string())?;
+    crate::store::hash_file(&path)
+        .map(|(digest, _)| digest)
+        .map_err(|error| format!("diagnostic child executable identity: {error}"))
+}
 
 impl DiagnosticChild {
     /// Validate metadata and output custody without constructing a workload.
@@ -538,6 +550,13 @@ pub struct ChildOutput {
     /// child serialization and the runner's independent audit verification.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub method_call_wall_ns: Option<u64>,
+    /// Explicit optional lifecycle observations, never mathematical acceptance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostic_lifecycle: Option<Value>,
+    /// From before diagnostic validation/scope allocation through explicit finish.
+    /// Excludes child-output serialization and parent resource/publication tails.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostic_call_wall_ns: Option<u64>,
     pub error: Option<String>,
     pub placement: SelfPlacement,
     /// Scheduler statistics across the solve alone.
@@ -571,6 +590,8 @@ pub fn child_main(input: &str) -> ChildOutput {
         method_id: None,
         report: None,
         method_call_wall_ns: None,
+        diagnostic_lifecycle: None,
+        diagnostic_call_wall_ns: None,
         error: None,
         placement: placement.clone(),
         schedstat_solve: None,
@@ -600,14 +621,21 @@ pub fn child_main(input: &str) -> ChildOutput {
         }
     }
     if let Some(diagnostic) = &job.diagnostic_lifecycle {
-        out.error = Some(match diagnostic.validate(&job) {
-            Ok(()) => "diagnostic lifecycle adapter is not enabled or admitted".into(),
-            Err(error) => error,
+        // All checks happen before workload construction or producer installation.
+        // This is software admission, not prospective research/budget approval.
+        let admission = diagnostic.validate(&job).and_then(|()| {
+            let actual = diagnostic_running_binary_sha256()?;
+            if actual != diagnostic.envelope.prefix.identity.binary_sha256 {
+                return Err("diagnostic child running binary binding mismatch".into());
+            }
+            Ok(())
         });
-        return out;
+        if let Err(error) = admission {
+            out.error = Some(error);
+            return out;
+        }
     }
-    // Explicit rejection before workload construction: this slice cannot activate
-    // an unreviewed producer or run an algorithm to test diagnostic plumbing.
+    // The legacy v1 transport remains reserved and cannot activate a producer.
     if let Some(context) = &job.diagnostics {
         out.error = Some(match context.validate() {
             Ok(()) => "diagnostic producer is not enabled or admitted".into(),
@@ -658,69 +686,91 @@ pub fn child_main(input: &str) -> ChildOutput {
         // the first sizeable allocation inside the solve does not pay for
         // it (see `AllocatorFacts`).  Not part of any clock.
         let allocator = prepare_allocator();
-        let counters = HwCounters::open();
-        let probe_before = SolveProbe::read();
-        let before = schedstat();
-        // Profiling is opt-in and the environment lookup is outside both
-        // boundaries. Callgrind's first part is workload/setup prework;
-        // sum every part after that marker through the solve marker, since
-        // ic_measurement may dump additional internal phase parts.
-        let profile_solve = std::env::var("ECBENCH_CALLGRIND_SOLVE").as_deref() == Ok("1");
-        counters.start();
-        if profile_solve {
-            ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
-        }
-        let method_call_start = std::time::Instant::now();
-        let report = crate::cryptanalysis::ecbench::methods::solve_measured(
-            &m,
-            &inst,
-            &w.curve,
-            &w.target,
-            job.algorithm_seed,
-        );
-        if profile_solve {
-            ic_measurement::callgrind_dump(b"ecbench_solve\0");
-        }
-        let mut report = report?;
-        let hw = counters.stop();
-        let after = schedstat();
-        let probe_after = SolveProbe::read();
-        // The factor-base inventory names the base in the record and changes
-        // no count; it is rebuilt here, after every window has closed.
-        crate::cryptanalysis::ecbench::methods::complete(
-            &m,
-            &inst,
-            &w.curve,
-            &w.target,
-            &mut report,
-        )?;
-        // This common cold-method clock remains the outer boundary that the
-        // pre-split `methods::solve` call supplied.  In particular it covers
-        // post-measurement report completion, while the profiling, PMU and
-        // scheduler windows above still exclude that inventory rebuild.  It
-        // consequently also includes the small cost of closing those nested
-        // instrumentation windows before `complete` runs.
-        out.method_call_wall_ns = Some(
-            u64::try_from(method_call_start.elapsed().as_nanos())
-                .map_err(|_| "method-call interval overflow")?,
-        );
-        let delta = match (before, after) {
-            (Some(a), Some(b)) => Some(SchedStat {
-                cpu_ns: b.cpu_ns.saturating_sub(a.cpu_ns),
-                run_delay_ns: b.run_delay_ns.saturating_sub(a.run_delay_ns),
-                timeslices: b.timeslices.saturating_sub(a.timeslices),
-            }),
-            _ => None,
+        // The old method/PMU/phase windows remain inside this callback. The
+        // optional lifecycle envelope surrounds it, including common sink setup
+        // and explicit finish. Without context, invoke the same callback directly.
+        let solve_call = || {
+            let counters = HwCounters::open();
+            let probe_before = SolveProbe::read();
+            let before = schedstat();
+            // Profiling is opt-in and the environment lookup is outside both
+            // boundaries. Callgrind's first part is workload/setup prework;
+            // sum every part after that marker through the solve marker, since
+            // ic_measurement may dump additional internal phase parts.
+            let profile_solve = std::env::var("ECBENCH_CALLGRIND_SOLVE").as_deref() == Ok("1");
+            counters.start();
+            if profile_solve {
+                ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
+            }
+            let method_call_start = std::time::Instant::now();
+            let report = crate::cryptanalysis::ecbench::methods::solve_measured(
+                &m,
+                &inst,
+                &w.curve,
+                &w.target,
+                job.algorithm_seed,
+            );
+            if profile_solve {
+                ic_measurement::callgrind_dump(b"ecbench_solve\0");
+            }
+            let mut report = report?;
+            let hw = counters.stop();
+            let after = schedstat();
+            let probe_after = SolveProbe::read();
+            // The factor-base inventory names the base in the record and changes
+            // no count; it is rebuilt here, after every window has closed.
+            crate::cryptanalysis::ecbench::methods::complete(
+                &m,
+                &inst,
+                &w.curve,
+                &w.target,
+                &mut report,
+            )?;
+            // This common cold-method clock remains the outer boundary that the
+            // pre-split `methods::solve` call supplied.  In particular it covers
+            // post-measurement report completion, while the profiling, PMU and
+            // scheduler windows above still exclude that inventory rebuild.  It
+            // consequently also includes the small cost of closing those nested
+            // instrumentation windows before `complete` runs.
+            out.method_call_wall_ns = Some(
+                u64::try_from(method_call_start.elapsed().as_nanos())
+                    .map_err(|_| "method-call interval overflow")?,
+            );
+            let delta = match (before, after) {
+                (Some(a), Some(b)) => Some(SchedStat {
+                    cpu_ns: b.cpu_ns.saturating_sub(a.cpu_ns),
+                    run_delay_ns: b.run_delay_ns.saturating_sub(a.run_delay_ns),
+                    timeslices: b.timeslices.saturating_sub(a.timeslices),
+                }),
+                _ => None,
+            };
+            out.workload_id = Some(w.workload_id);
+            out.method_id = Some(m.method_id);
+            Ok((
+                report,
+                delta,
+                hw,
+                probe_after.since(&probe_before),
+                allocator,
+            ))
         };
-        out.workload_id = Some(w.workload_id);
-        out.method_id = Some(m.method_id);
-        Ok((
-            report,
-            delta,
-            hw,
-            probe_after.since(&probe_before),
-            allocator,
-        ))
+        if let Some(diagnostic) = &job.diagnostic_lifecycle {
+            let diagnostic_start = std::time::Instant::now();
+            let completed = with_diagnostic_lifecycle(diagnostic, &job, solve_call);
+            out.diagnostic_call_wall_ns = Some(
+                u64::try_from(diagnostic_start.elapsed().as_nanos())
+                    .map_err(|_| "diagnostic-call interval overflow")?,
+            );
+            let (result, summary) = completed?;
+            // Preserve diagnostic writer observations even on a callback error.
+            // This field cannot supply a SolveReport or accepted cost.
+            out.diagnostic_lifecycle = Some(
+                serde_json::to_value(summary).map_err(|error| error.to_string())?,
+            );
+            result
+        } else {
+            solve_call()
+        }
     })();
     placement.cpu_at_end = current_cpu();
     // Where the solve's memory landed, read after it ran.
@@ -2491,7 +2541,7 @@ mod diagnostic_child_v2_tests {
             let _ = std::fs::remove_dir_all(&self.0);
         }
     }
-    fn fixture(root: &Root, candidate: bool) -> ChildInput {
+    fn fixture_method(candidate: bool) -> MethodSpec {
         let method_name = if candidate {
             "ic.three_leads_genus2_pencil_symbolic_v2"
         } else {
@@ -2505,10 +2555,17 @@ mod diagnostic_child_v2_tests {
         } else {
             BTreeMap::from([("trial_cap".into(), "1".into())])
         };
-        let method = MethodSpec {
+        MethodSpec {
             id: method_name.into(),
             params,
-        };
+        }
+    }
+    fn fixture(root: &Root, candidate: bool) -> ChildInput {
+        fixture_arm(root, if candidate { "pencil" } else { "rho" })
+    }
+    fn fixture_arm(root: &Root, arm_name: &str) -> ChildInput {
+        assert!(matches!(arm_name, "pencil" | "rho" | "rho_AA"));
+        let method = fixture_method(arm_name == "pencil");
         let resolved = resolve(&method).unwrap();
         let full_hash = resolved_method_binding(&resolved).unwrap();
         let profile = serde_json::json!({"version":PROFILE_VERSION,"sha256":"a".repeat(64)});
@@ -2523,8 +2580,12 @@ mod diagnostic_child_v2_tests {
         ]
         .iter()
         .map(|(name, role, id)| {
+            let arm_method = fixture_method(*name == "pencil");
+            let arm_resolved = resolve(&arm_method).unwrap();
+            assert_eq!(arm_resolved.id, *id);
+            let arm_hash = resolved_method_binding(&arm_resolved).unwrap();
             serde_json::json!({"name":name,"role":role,"method":id,
-                    "method_config_sha256":full_hash,"profile":profile})
+                    "method_config_sha256":arm_hash,"profile":profile})
         })
         .collect();
         let launch = DiagnosticLaunch::from_bytes(
@@ -2560,7 +2621,12 @@ mod diagnostic_child_v2_tests {
             scientific_run_id: doc.scientific_run_id,
             profile: doc.profile,
             source_receipt: doc.source_receipt,
-            arm: doc.arms[if candidate { 0 } else { 1 }].clone(),
+            arm: doc
+                .arms
+                .iter()
+                .find(|arm| arm.name == arm_name)
+                .unwrap()
+                .clone(),
             prefix,
         };
         // Deliberately invalid curve; no test is permitted to build it.
@@ -2616,7 +2682,7 @@ mod diagnostic_child_v2_tests {
     }
 
     #[test]
-    fn child_v2_roundtrip_and_disabled_boundary() {
+    fn child_v2_roundtrip_and_running_binary_boundary() {
         let root = Root::new();
         let job = fixture(&root, false);
         job.diagnostic_lifecycle
@@ -2630,7 +2696,7 @@ mod diagnostic_child_v2_tests {
         let out = child_main(&text);
         assert_eq!(
             out.error.as_deref(),
-            Some("diagnostic lifecycle adapter is not enabled or admitted")
+            Some("diagnostic child running binary binding mismatch")
         );
         assert!(out.report.is_none());
         assert!(out.workload_id.is_none());
@@ -2642,6 +2708,48 @@ mod diagnostic_child_v2_tests {
             .get("diagnostic_lifecycle")
             .is_none());
     }
+    fn bind_fixture_running_binary(job: &mut ChildInput) {
+        let binary = diagnostic_running_binary_sha256().unwrap();
+        let diagnostic = job.diagnostic_lifecycle.as_mut().unwrap();
+        let mut doc = serde_json::to_value(diagnostic.launch.document().unwrap()).unwrap();
+        doc["binary_sha256"] = serde_json::json!(binary);
+        diagnostic.launch =
+            DiagnosticLaunch::from_bytes(&serde_json::to_vec(&doc).unwrap()).unwrap();
+        diagnostic.envelope.launch_sha256 = diagnostic.launch.raw_sha256().into();
+        diagnostic.envelope.prefix.identity.binary_sha256 = binary;
+    }
+
+    #[test]
+    fn child_v2_all_arms_validate_binary_then_reject_wrong_workload_before_callback() {
+        // Known tiny public curve; this fixture builds a workload but never calls
+        // solve_measured, complete, rho, or the pencil collector.
+        let curve: CurveSpec = serde_json::from_str(
+            r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
+        ).unwrap();
+        let (workload, instance) = Workload::build(&curve, 7, 0, TargetKind::default()).unwrap();
+        for arm in ["pencil", "rho", "rho_AA"] {
+            let root = Root::new();
+            let mut job = fixture_arm(&root, arm);
+            bind_fixture_running_binary(&mut job);
+            job.curve = workload.curve_spec.for_child(&instance);
+            job.target_seed = 7;
+            job.expected_workload_id = workload.workload_id.clone();
+            // Correct normal workload ID; deliberately wrong full serialized
+            // workload digest forces the diagnostic-specific boundary.
+            let text = serde_json::to_string(&job).unwrap();
+            let out = child_main(&text);
+            assert_eq!(
+                out.error.as_deref(),
+                Some("diagnostic child rebuilt workload binding mismatch")
+            );
+            assert!(out.report.is_none());
+            assert!(out.diagnostic_lifecycle.is_none());
+            assert!(out.method_call_wall_ns.is_none());
+            assert!(out.diagnostic_call_wall_ns.is_none());
+            assert!(std::fs::read_dir(&root.0).unwrap().next().is_none());
+        }
+    }
+
     #[test]
     fn child_v2_rejects_mixed_seed_method_and_insecure_path() {
         let root = Root::new();
@@ -2710,15 +2818,23 @@ mod diagnostic_child_v2_tests {
     }
     #[test]
     fn child_v2_fake_callback_all_arms_and_candidate_only_prefix() {
-        for candidate in [false, true] {
+        for arm_name in ["pencil", "rho", "rho_AA"] {
             let root = Root::new();
-            let job = fixture(&root, candidate);
+            let job = fixture_arm(&root, arm_name);
             let diagnostic = job.diagnostic_lifecycle.as_ref().unwrap();
+            assert_eq!(diagnostic.envelope.arm.name, arm_name);
+            for arm in diagnostic.launch.document().unwrap().arms {
+                let method = resolve(&fixture_method(arm.name == "pencil")).unwrap();
+                assert_eq!(
+                    arm.method_config_sha256,
+                    resolved_method_binding(&method).unwrap()
+                );
+            }
             let (value, summary) =
                 with_diagnostic_lifecycle(diagnostic, &job, || Ok(23u64)).unwrap();
             assert_eq!(value.unwrap(), 23);
             assert!(summary.lifecycle.diagnostic_only);
-            assert_eq!(summary.prefix_io.is_some(), candidate);
+            assert_eq!(summary.prefix_io.is_some(), arm_name == "pencil");
             assert!(diagnostic
                 .lifecycle_directory()
                 .join("finished.json")

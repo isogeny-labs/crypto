@@ -1,0 +1,35 @@
+--- a/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
++++ b/taskq/deploy/eks-karpenter/resume/controller/src/cloud.rs
+@@ -1036,7 +1036,8 @@
+                 .and_then(Value::as_array_mut)
+             {
+                 for item in items {
+-                    if let Some(selector) = item["fieldRef"].as_object_mut() {
++                    if let Some(selector) = item.get_mut("fieldRef").and_then(Value::as_object_mut)
++                    {
+                         selector.entry("apiVersion").or_insert_with(|| json!("v1"));
+                     }
+                 }
+@@ -2323,4 +2324,21 @@
+         pin_fresh_selector_defaults(&mut extra);
+         assert_ne!(extra, intended);
+     }
+-}
++    #[test]
++    fn fresh_selector_defaults_preserve_resource_field_items() {
++        let mut manifest = json!({"spec":{"template":{"spec":{
++            "containers":[{"env":[{"name":"CPU_LIMIT","valueFrom":{"resourceFieldRef":{"resource":"limits.cpu","divisor":"1"}}}]}],
++            "volumes":[{"name":"resources","downwardAPI":{"items":[
++                {"path":"cpu","resourceFieldRef":{"containerName":"task","resource":"limits.cpu","divisor":"1"}}
++            ]}}]
++        }}}});
++        let original = manifest.clone();
++        pin_fresh_selector_defaults(&mut manifest);
++        assert_eq!(manifest, original);
++        assert!(
++            manifest["spec"]["template"]["spec"]["volumes"][0]["downwardAPI"]["items"][0]
++                .get("fieldRef")
++                .is_none()
++        );
++    }
++}

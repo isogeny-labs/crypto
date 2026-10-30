@@ -1,0 +1,24 @@
+   Compiling isolab-eks-recovery v0.1.0 (/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/fresh-api-defaults-proposal-v1/fixture/taskq/deploy/eks-karpenter/resume/controller)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.66s
+     Running unittests src/lib.rs (pencil-controller-review-20261029/c1-takeover-20261030/fresh-api-defaults-proposal-v1/target/debug/deps/isolab_eks_recovery-e4c03cc6ad79a3f9)
+
+running 1 test
+test cloud::campaign_cas_tests::fresh_api_roundtrip_preserves_exact_identity_comparison ... FAILED
+
+failures:
+
+---- cloud::campaign_cas_tests::fresh_api_roundtrip_preserves_exact_identity_comparison stdout ----
+
+thread 'cloud::campaign_cas_tests::fresh_api_roundtrip_preserves_exact_identity_comparison' (976727) panicked at src/cloud.rs:2084:9:
+assertion `left == right` failed
+  left: Object {"spec": Object {"template": Object {"spec": Object {"containers": Array [Object {"env": Array [Object {"name": String("POD_UID"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.uid")}}}, Object {"name": String("NODE_NAME"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("spec.nodeName")}}}, Object {"name": String("ISOLAB_OWNER_JOB_UID"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.labels['batch.kubernetes.io/controller-uid']")}}}, Object {"name": String("ISOLAB_OWNER_REQUEST_SHA256"), "value": String("pinned-request"), "valueFrom": Object {"fieldRef": Null}}]}], "volumes": Array [Object {"downwardAPI": Object {"items": Null}, "emptyDir": Object {"sizeLimit": String("8Gi")}, "name": String("work")}, Object {"downwardAPI": Object {"defaultMode": Number(292), "items": Array [Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.annotations['isolab.dev/diagnostic-fresh-launch']")}, "path": String("fresh-launch.json")}]}, "name": String("diagnostic-input")}]}}}}
+ right: Object {"spec": Object {"template": Object {"spec": Object {"containers": Array [Object {"env": Array [Object {"name": String("POD_UID"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.uid")}}}, Object {"name": String("NODE_NAME"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("spec.nodeName")}}}, Object {"name": String("ISOLAB_OWNER_JOB_UID"), "valueFrom": Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.labels['batch.kubernetes.io/controller-uid']")}}}, Object {"name": String("ISOLAB_OWNER_REQUEST_SHA256"), "value": String("pinned-request")}]}], "volumes": Array [Object {"emptyDir": Object {"sizeLimit": String("8Gi")}, "name": String("work")}, Object {"downwardAPI": Object {"defaultMode": Number(292), "items": Array [Object {"fieldRef": Object {"apiVersion": String("v1"), "fieldPath": String("metadata.annotations['isolab.dev/diagnostic-fresh-launch']")}, "path": String("fresh-launch.json")}]}, "name": String("diagnostic-input")}]}}}}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cloud::campaign_cas_tests::fresh_api_roundtrip_preserves_exact_identity_comparison
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,28 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--release",
+    "--bin",
+    "ecbench_owner_closure",
+    "--example",
+    "ecbench_child_overhead",
+    "-j",
+    "2",
+    "--",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "started_utc": "2026-10-30T20:40:02Z",
+  "ended_utc": "2026-10-30T20:48:13Z",
+  "source_manifest": "validation-source-hashes-v10.json",
+  "source_manifest_sha256": "fb7283b6e5b4d17db63e0647528335d8aaf23d56f3ff2bf0d474bb51745f0d68",
+  "scientific_cohort_execution": false,
+  "purpose": "software regression; known-answer fixtures only",
+  "logs": {
+    "stdout": "aeb47d923097d9e643d21f51e469edcdb226409947d5f4881fffff31c1171487",
+    "stderr": "ccd96cfbdd07a2faac3404dd90237455a80aac7467476744981aef38e3f83fd5"
+  }
+}

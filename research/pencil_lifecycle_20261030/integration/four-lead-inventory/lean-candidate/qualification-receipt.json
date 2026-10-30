@@ -1,0 +1,83 @@
+{
+  "schema": "lean-exploratory-candidate-receipt/v1",
+  "observed_utc": "2026-10-30T20:17:47.134329+00:00",
+  "machine_status": "infrastructure_error",
+  "candidate_status": "not_verified",
+  "fidelity": "not_reviewed",
+  "review_outcome": "inconclusive",
+  "attempt": "attempt1",
+  "exec_session_id": 19025,
+  "command": "bash check.sh > attempt1.log 2>&1",
+  "per_module_timeout_seconds": 120,
+  "observed_helper_pid": 1023458,
+  "observed_helper_main_thread": "zombie after timeout",
+  "observed_helper_remaining_thread": {
+    "tid": 1023463,
+    "state": "D",
+    "wchan": "rpc_wait_bit_killable"
+  },
+  "additional_cleanup": "SIGKILL sent to owned helper after timeout; subsequent process check found no remaining PIDs; exec session19025 returned124.",
+  "terminal_exit_status": 124,
+  "candidate_module_reached": false,
+  "helper_module": "ProjectiveLawBoundary.lean",
+  "toolchain_present": true,
+  "nine_manifest_revisions_match": true,
+  "new_theorem_axiom_output": null,
+  "new_olean_created": false,
+  "builds_of_entire_project": 0,
+  "network_installs": 0,
+  "scope": "No theorem claim. Existing pinned helper could not finish in bounded attempt; remaining thread blocked in RPC wait. Do not launch duplicate while pending reaping.",
+  "files": [
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/attempt1.log",
+      "sha256": "355a9a028f81641782d75d6e6b58dec70f29d2f61238a9e271690259d9bf5680",
+      "bytes": 106
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/inputs-attempt1.json",
+      "sha256": "98b501d32dcbf630d16f9c9f6229bd1c16d1d7069c2e5eb533d47ec6cd558792",
+      "bytes": 3804
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/lean-toolchain",
+      "sha256": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+      "bytes": 25
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/SameSupport.lean",
+      "sha256": "c0cd495c938a7370d0e8b3b199fe41b67301ae0377d462237bf533435e26977a",
+      "bytes": 1455
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/ProjectiveLawBoundary.lean",
+      "sha256": "0cbdbb636e11f34ad94493353f2fc748a353c89f248f868accbdaaf02fc88e2b",
+      "bytes": 7118
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/lake-manifest.json",
+      "sha256": "ebc6643e694eaa4a60ab2b727c96253f3d88694e7ecb404f2176a548eedbe98d",
+      "bytes": 3174
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/RuntimeSemantics.lean",
+      "sha256": "9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318",
+      "bytes": 9837
+    },
+    {
+      "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/four-lead-inventory-resume/lean-candidate/check.sh",
+      "sha256": "91332f2f0efa970e4cb8473781d3d4e2a93e6d45fecb5948a879e3da848494ed",
+      "bytes": 524
+    }
+  ],
+  "latest_process_observation_utc": "2026-10-30T20:18:23.229154+00:00",
+  "latest_process_observation": "    PID     TID S WCHAN\n",
+  "owner_processes": {
+    "exec_session": 19025,
+    "driver_pid": 1023365,
+    "timeout_pid": 1023457,
+    "lean_pid": 1023458,
+    "blocked_tid": 1023463
+  },
+  "reaped": true,
+  "terminal_observed_utc": "2026-10-30T20:18:33.722387+00:00"
+}

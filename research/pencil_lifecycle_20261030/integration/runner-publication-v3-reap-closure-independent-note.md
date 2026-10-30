@@ -1,0 +1,3 @@
+# V3 reap observation closure
+
+Read-only delta review, 2026-10-30. V3 adds Reaped.reap_observed, initialized false, set true only after wait4 returns the expected pid or successful non-Unix child.wait. Spawn failure stays false. Both contiguous ChildReaped recording and the sidecar read gate now use this explicit observation. This closes the v2 successful-return-versus-reap finding at source level. Direct Reaped fixture literals are updated; no compiler or fixture execution performed. Capacity, cumulative snapshot cost, clock scope and remaining failure-fixture limitations in runner-publication-independent-review.md remain unchanged. This note does not supersede or overwrite that v2 review.

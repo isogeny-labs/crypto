@@ -1,0 +1,825 @@
+--- a/deploy/eks-karpenter/resume/controller/src/contract.rs
++++ b/deploy/eks-karpenter/resume/controller/src/contract.rs
+@@ -55,6 +55,8 @@
+     /// Optional opaque launches, independently frozen for computation-L0/fresh-L2.
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub diagnostic_transport: Option<DiagnosticTransport>,
++    #[serde(default, skip_serializing_if = "Option::is_none")]
++    pub worker_campaign: Option<crate::campaign::Binding>,
+ }
+ 
+ pub const MAX_DIAGNOSTIC_LAUNCH_BYTES: usize = 65_536;
+@@ -191,6 +193,10 @@
+             })
+         {
+             return Err("the original benchmark spec must require L2, warmup, five rounds, reference and A/A control".into());
++        }
++        if let Some(binding) = &self.worker_campaign {
++            let spec_hash = digest(&serde_json::to_vec(&self.spec).map_err(|e| e.to_string())?);
++            binding.validate(&spec_hash, self.deadline_unix_seconds)?;
+         }
+         if let Some(transport) = &self.diagnostic_transport {
+             transport.validate(&self.spec)?;
+@@ -235,6 +241,7 @@
+         max_restores: 2,
+         memory: Memory::default(),
+         diagnostic_transport: None,
++        worker_campaign: None,
+     }
+ }
+ 
+--- a/deploy/eks-karpenter/resume/controller/src/cloud.rs
++++ b/deploy/eks-karpenter/resume/controller/src/cloud.rs
+@@ -380,7 +380,162 @@
+     retain_owner_bytes(&dir.join(name), &bytes)
+ }
+ 
++// Existing resourceVersion CAS is the admission boundary. No campaign is
++// auto-created: prior charged history must be reconciled before this path runs.
++fn campaign_admit(
++    s: &State,
++    epoch: crate::campaign::Epoch,
++) -> Result<Option<crate::campaign::Reservation>, String> {
++    let Some(binding) = &s.request.worker_campaign else {
++        return Ok(None);
++    };
++    let name = binding.policy.name();
++    let mut object = get(NAMESPACE, "configmap", &name)?
++        .ok_or("campaign admission ledger missing; refusing zero-balance initialization")?;
++    let policy_hash = binding.policy.hash()?;
++    if object["metadata"]["uid"] != binding.ledger_uid
++        || object["metadata"]["annotations"]["isolab.dev/worker-policy"] != policy_hash
++        || object["metadata"]["resourceVersion"]
++            .as_str()
++            .is_none_or(|s| s.is_empty())
++        || object["metadata"]["uid"]
++            .as_str()
++            .is_none_or(|s| s.is_empty())
++    {
++        return Err("campaign ConfigMap identity/resourceVersion missing or mismatched".into());
++    }
++    let raw = field(&object, "/data/ledger.json")?;
++    let mut ledger = crate::campaign::Ledger::from_bytes(raw.as_bytes())?;
++    let before = ledger.clone();
++    let spec_hash = digest(&serde_json::to_vec(&s.request.spec).map_err(error)?);
++    let reserved = ledger.reserve(
++        binding,
++        &spec_hash,
++        &s.request_sha256,
++        s.attempt,
++        epoch,
++        crate::campaign::AdmissionWindow {
++            request_deadline: s.request.deadline_unix_seconds,
++            now: now(),
++        },
++    )?;
++    if ledger != before {
++        object["data"]["ledger.json"] = json!(serde_json::to_string(&ledger).map_err(error)?);
++        // A conflict or ambiguous response aborts before worker creation. A
++        // later reconciliation reloads the permanent reservation; no refund.
++        let committed = stdin_json(
++            kube(NAMESPACE).args(["replace", "-f", "-", "-o", "json"]),
++            &object,
++        )?;
++        validate_campaign_cas_response(&object, &committed)?;
++    }
++    reserved.remaining_payload_seconds(now())?;
++    Ok(Some(reserved))
++}
++fn validate_campaign_cas_response(submitted: &Value, committed: &Value) -> Result<(), String> {
++    if committed["metadata"]["uid"] != submitted["metadata"]["uid"]
++        || committed["data"]["ledger.json"] != submitted["data"]["ledger.json"]
++        || committed["metadata"]["resourceVersion"]
++            .as_str()
++            .is_none_or(|s| s.is_empty())
++        || committed["metadata"]["resourceVersion"] == submitted["metadata"]["resourceVersion"]
++    {
++        return Err("campaign CAS response binding mismatch; charge retained".into());
++    }
++    Ok(())
++}
++// Collection is not an admission to continue payload work. Retain failure
++// evidence even when a grant expires, without converting the failure to success.
++fn retain_then_reject<T>(
++    reason: String,
++    collect: impl FnOnce() -> Result<(), String>,
++) -> Result<T, String> {
++    match collect() {
++        Ok(()) => Err(reason),
++        Err(error) => Err(format!(
++            "{reason}; terminal evidence retention failed: {error}"
++        )),
++    }
++}
++fn collection_call_fits(deadline: u64, observed_now: u64) -> Result<(), String> {
++    // Existing kube transport has180s timeout plus5s forced-kill grace.
++    if deadline
++        .checked_sub(observed_now)
++        .is_none_or(|left| left < 185)
++    {
++        return Err("insufficient absolute-deadline reserve for bounded evidence call".into());
++    }
++    Ok(())
++}
++fn retain_campaign_terminal_evidence(
++    s: &State,
++    dir: &Path,
++    epoch: crate::campaign::Epoch,
++) -> Result<(), String> {
++    let binding = s
++        .request
++        .worker_campaign
++        .as_ref()
++        .ok_or("campaign binding absent")?;
++    if now() >= binding.policy.absolute_deadline_unix_seconds {
++        return Err("absolute campaign collection deadline reached".into());
++    }
++    let deadline = binding.policy.absolute_deadline_unix_seconds;
++    collection_call_fits(deadline, now())?;
++    match epoch {
++        crate::campaign::Epoch::Computation => {
++            let Some(pod) = get(NAMESPACE, "pod", &basename(s))? else {
++                return Ok(());
++            };
++            identity(&pod, &s.request)?;
++            collection_call_fits(deadline, now())?;
++            let status = status(s)?;
++            save(&dir.join("supervisor-status.json"), &status)?;
++            if ["failed", "completed", "verified"].contains(&status.phase.as_str()) {
++                collection_call_fits(deadline, now())?;
++                collect_owner_exit(s, &pod, &status, dir)?;
++            }
++        }
++        crate::campaign::Epoch::Fresh => {
++            let Some(name) = &s.benchmark_job else {
++                return Ok(());
++            };
++            let Some(job) = get("isolab", "job", name)? else {
++                return Ok(());
++            };
++            identity(&job, &s.request)?;
++            if s.benchmark_uid
++                .as_ref()
++                .is_some_and(|uid| job["metadata"]["uid"] != *uid)
++            {
++                return Err("terminal fresh Job UID mismatch".into());
++            }
++            let bytes = serde_json::to_vec_pretty(&job).map_err(error)?;
++            let name = format!("benchmark-expired-job-{}.json", digest(&bytes));
++            retain_owner_bytes(&dir.join(name), &bytes)?;
++            // Evidence-only status retention. Fresh owner/artifact collector is
++            // a separate unfinished adapter; do not invoke verify/replay here.
++        }
++    }
++    Ok(())
++}
++
++fn campaign_bind_manifest(
++    v: &mut Value,
++    reservation: &crate::campaign::Reservation,
++    job: bool,
++) -> Result<(), String> {
++    let hash = digest(&serde_json::to_vec(reservation).map_err(error)?);
++    v["metadata"]["annotations"]["isolab.dev/worker-reservation"] = json!(hash);
++    if job {
++        v["spec"]["template"]["metadata"]["annotations"]["isolab.dev/worker-reservation"] =
++            json!(hash);
++    }
++    Ok(())
++}
++
+ fn provision(s: &State) -> Result<Value, String> {
++    let reservation = campaign_admit(s, crate::campaign::Epoch::Computation)?;
+     let req = &s.request;
+     let name = basename(s);
+     ensure(
+@@ -403,7 +558,22 @@
+         .checked_sub(now())
+         .filter(|n| *n > 0)
+         .ok_or("original deadline expired")?;
+-    ensure(NAMESPACE, &computation_pod(s, remaining), req)
++    let remaining = match &reservation {
++        Some(r) => remaining.min(r.remaining_payload_seconds(now())?),
++        None => remaining,
++    };
++    let mut manifest = computation_pod(s, remaining);
++    if let Some(r) = &reservation {
++        campaign_bind_manifest(&mut manifest, r, false)?;
++    }
++    let observed = ensure(NAMESPACE, &manifest, req)?;
++    if reservation.is_some()
++        && observed["metadata"]["annotations"]["isolab.dev/worker-reservation"]
++            != manifest["metadata"]["annotations"]["isolab.dev/worker-reservation"]
++    {
++        return Err("existing computation Pod lacks matching campaign reservation".into());
++    }
++    Ok(observed)
+ }
+ fn computation_pod(s: &State, remaining: u64) -> Value {
+     let req = &s.request;
+@@ -859,6 +1029,14 @@
+     )
+ }
+ fn benchmark(stored: &mut Stored, dir: &Path) -> Result<(), String> {
++    let reservation = match campaign_admit(&stored.state, crate::campaign::Epoch::Fresh) {
++        Ok(reservation) => reservation,
++        Err(error) => {
++            return retain_then_reject(error, || {
++                retain_campaign_terminal_evidence(&stored.state, dir, crate::campaign::Epoch::Fresh)
++            })
++        }
++    };
+     if stored.state.benchmark_manifest.is_none() {
+         let remaining = stored
+             .state
+@@ -867,7 +1045,15 @@
+             .checked_sub(now() + 120)
+             .filter(|x| *x >= 60)
+             .ok_or("insufficient original deadline for fresh epoch")?;
+-        stored.state.benchmark_manifest = Some(manifest_job(&stored.state, remaining)?);
++        let remaining = match &reservation {
++            Some(r) => remaining.min(r.remaining_payload_seconds(now())?),
++            None => remaining,
++        };
++        let mut manifest = manifest_job(&stored.state, remaining)?;
++        if let Some(r) = &reservation {
++            campaign_bind_manifest(&mut manifest, r, true)?;
++        }
++        stored.state.benchmark_manifest = Some(manifest);
+         stored.save()?;
+     }
+     let name = stored.state.benchmark_job.clone().ok_or("epoch missing")?;
+@@ -885,6 +1071,14 @@
+         .benchmark_manifest
+         .as_ref()
+         .ok_or("epoch manifest missing")?;
++    if let Some(r) = &reservation {
++        let hash = digest(&serde_json::to_vec(r).map_err(error)?);
++        if intended["metadata"]["annotations"]["isolab.dev/worker-reservation"] != hash {
++            return Err(
++                "retained fresh manifest differs from admitted campaign reservation".into(),
++            );
++        }
++    }
+     let current = match existing {
+         Some(v) => v,
+         None => {
+@@ -895,6 +1089,12 @@
+         }
+     };
+     identity(&current, &s.request)?;
++    if reservation.is_some()
++        && current["metadata"]["annotations"]["isolab.dev/worker-reservation"]
++            != intended["metadata"]["annotations"]["isolab.dev/worker-reservation"]
++    {
++        return Err("existing fresh Job lacks matching campaign reservation".into());
++    }
+     if current["spec"]["template"]["spec"]["containers"][0]["command"]
+         != intended["spec"]["template"]["spec"]["containers"][0]["command"]
+         || current["spec"]["template"]["spec"]["containers"][0]["image"]
+@@ -971,6 +1171,19 @@
+     Ok(Value::Object(result))
+ }
+ fn tick(stored: &mut Stored, dir: &Path) -> Result<(), String> {
++    if stored.state.request.worker_campaign.is_some()
++        && now() >= stored.state.request.deadline_unix_seconds
++    {
++        let epoch = if stored.state.phase == Phase::Benchmark {
++            crate::campaign::Epoch::Fresh
++        } else {
++            crate::campaign::Epoch::Computation
++        };
++        return retain_then_reject(
++            "original request deadline expired; no new work admitted".into(),
++            || retain_campaign_terminal_evidence(&stored.state, dir, epoch),
++        );
++    }
+     stored.state.enforce_deadline(now())?;
+     if stored.state.phase == Phase::Benchmark {
+         return benchmark(stored, dir);
+@@ -997,6 +1210,16 @@
+             return Ok(());
+         }
+         stored.state.confirm_terminated(&id, state.as_deref())?;
++        if stored.state.request.worker_campaign.is_some() {
++            // Reserve the next restoration before archive verification work.
++            // This remains charged if verification later fails or no restore runs.
++            let mut restoration = stored.state.clone();
++            restoration.attempt = restoration
++                .attempt
++                .checked_add(1)
++                .ok_or("attempt overflow")?;
++            campaign_admit(&restoration, crate::campaign::Epoch::Computation)?;
++        }
+         let mut selected = None;
+         for g in stored.state.generations.iter().rev() {
+             match verify_archive(g, dir) {
+@@ -1019,7 +1242,12 @@
+         return Ok(());
+     }
+     let pod = if matches!(stored.state.phase, Phase::Provisioning | Phase::Restoring) {
+-        provision(&stored.state)?
++        // Reconcile an already-created Pod before attempting fresh admission.
++        // An expired grant must not hide its terminal owner receipt.
++        match get(NAMESPACE, "pod", &basename(&stored.state))? {
++            Some(pod) => pod,
++            None => provision(&stored.state)?,
++        }
+     } else {
+         match get(NAMESPACE, "pod", &basename(&stored.state))? {
+             Some(p) => p,
+@@ -1075,6 +1303,14 @@
+         });
+     }
+     owner_collection.map_err(|error| format!("owner receipt retention failed: {error}"))?;
++    // All read-only terminal custody precedes this gate. Expiry still blocks
++    // start/restore/continue/checkpoint/verification or further work below.
++    if let Some(reservation) = campaign_admit(&stored.state, crate::campaign::Epoch::Computation)? {
++        let expected = digest(&serde_json::to_vec(&reservation).map_err(error)?);
++        if pod["metadata"]["annotations"]["isolab.dev/worker-reservation"] != expected {
++            return Err("existing computation Pod lacks matching campaign reservation".into());
++        }
++    }
+     match stored.state.phase {
+         Phase::Provisioning => {
+             if st.phase == "waiting" {
+@@ -1530,3 +1766,49 @@
+         fs::remove_dir_all(dir).unwrap();
+     }
+ }
++
++#[cfg(test)]
++mod campaign_cas_tests {
++    use super::*;
++    #[test]
++    fn expired_campaign_retains_terminal_evidence_without_admitting_work() {
++        let reservation = crate::campaign::Reservation {
++            request_sha256: "a".repeat(64),
++            attempt: 0,
++            epoch: crate::campaign::Epoch::Computation,
++            policy_sha256: "b".repeat(64),
++            admitted_unix_seconds: 100,
++            deadline_unix_seconds: 200,
++            ceiling_seconds: 160,
++            shutdown_reserve_seconds: 60,
++        };
++        let expiry = reservation.remaining_payload_seconds(200).unwrap_err();
++        assert!(collection_call_fits(200, 15).is_ok());
++        assert!(collection_call_fits(200, 16).is_err());
++        assert!(collection_call_fits(200, 200).is_err());
++        let retained = std::cell::Cell::new(false);
++        let result: Result<(), String> = retain_then_reject(expiry.clone(), || {
++            retained.set(true);
++            Ok(())
++        });
++        assert!(retained.get());
++        assert_eq!(result.unwrap_err(), expiry);
++        let result: Result<(), String> =
++            retain_then_reject("expired grant".into(), || Err("receipt failure".into()));
++        let message = result.unwrap_err();
++        assert!(message.contains("expired grant") && message.contains("receipt failure"));
++    }
++    #[test]
++    fn campaign_commit_requires_new_revision_same_uid_and_exact_ledger() {
++        let input = json!({"metadata":{"uid":"u","resourceVersion":"41"},"data":{"ledger.json":"exact bytes"}});
++        let mut committed = input.clone();
++        assert!(validate_campaign_cas_response(&input, &committed).is_err());
++        committed["metadata"]["resourceVersion"] = json!("42");
++        assert!(validate_campaign_cas_response(&input, &committed).is_ok());
++        committed["metadata"]["uid"] = json!("replacement");
++        assert!(validate_campaign_cas_response(&input, &committed).is_err());
++        committed["metadata"]["uid"] = json!("u");
++        committed["data"]["ledger.json"] = json!("changed bytes");
++        assert!(validate_campaign_cas_response(&input, &committed).is_err());
++    }
++}
+--- a/deploy/eks-karpenter/resume/controller/src/lib.rs
++++ b/deploy/eks-karpenter/resume/controller/src/lib.rs
+@@ -1,3 +1,4 @@
++pub mod campaign;
+ pub mod cloud;
+ pub mod contract;
+ pub mod io;
+--- /dev/null
++++ b/deploy/eks-karpenter/resume/controller/src/campaign.rs
+@@ -0,0 +1,420 @@
++//! Conservative campaign admission charges, never measured worker-time costs.
++//! Existing allocations are not refunded, including failed or ambiguous ones.
++use crate::contract::{digest, hex};
++use serde::{Deserialize, Serialize};
++use std::collections::BTreeSet;
++
++const CAP: usize = 256 * 1024;
++const MAX_RESERVATIONS: usize = 256;
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct Policy {
++    pub schema: String,
++    pub authorization_sha256: String,
++    pub cumulative_ceiling_seconds: u64,
++    pub absolute_deadline_unix_seconds: u64,
++    pub latest_scientific_stop_unix_seconds: u64,
++    pub allocation_unit: String,
++    pub route_spec_sha256: Vec<String>,
++    pub prior_charge_seconds: u64,
++    pub reconciliation_receipt_sha256: String,
++    pub owner_enforcement_review_sha256: String,
++}
++impl Policy {
++    pub fn validate(&self) -> Result<(), String> {
++        if self.schema != "isolab.worker-admission-policy/v1"
++            || self.cumulative_ceiling_seconds != 25_200
++            || self.absolute_deadline_unix_seconds != 1_793_398_120
++            || self.latest_scientific_stop_unix_seconds > 1_793_396_320
++            || self.latest_scientific_stop_unix_seconds == 0
++            || self.allocation_unit != "conservative_worker_allocation_seconds"
++            || self.authorization_sha256
++                != "201df07743540ac247e2ae0ec79c82c7b284aa16dd07d468924c87cf2a4b7a2b"
++            || !hex(&self.reconciliation_receipt_sha256, 64)
++            || !hex(&self.owner_enforcement_review_sha256, 64)
++            || self.prior_charge_seconds > self.cumulative_ceiling_seconds
++            || self.route_spec_sha256.len() != 8
++            || self.route_spec_sha256.iter().any(|s| !hex(s, 64))
++            || self.route_spec_sha256.iter().collect::<BTreeSet<_>>().len() != 8
++        {
++            return Err("invalid explicit campaign policy or original authorization".into());
++        }
++        Ok(())
++    }
++    pub fn hash(&self) -> Result<String, String> {
++        self.validate()?;
++        Ok(digest(
++            &serde_json::to_vec(self).map_err(|e| e.to_string())?,
++        ))
++    }
++    pub fn name(&self) -> String {
++        format!("worker-campaign-{}", self.authorization_sha256)
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct Binding {
++    pub policy: Policy,
++    /// Existing campaign ConfigMap UID; replacement must never reset balances.
++    pub ledger_uid: String,
++    pub computation_ceiling_seconds: u64,
++    pub fresh_ceiling_seconds: u64,
++    /// Explicit reviewed tail allowance; not a measured shutdown duration.
++    pub shutdown_reserve_seconds: u64,
++}
++impl Binding {
++    pub fn validate(&self, spec_sha256: &str, request_deadline: u64) -> Result<(), String> {
++        self.policy.validate()?;
++        if self.ledger_uid.is_empty()
++            || self.ledger_uid.len() > 128
++            || !self
++                .ledger_uid
++                .bytes()
++                .all(|c| c.is_ascii_alphanumeric() || c == b'-')
++        {
++            return Err("explicit existing campaign ledger UID required".into());
++        }
++        if !self
++            .policy
++            .route_spec_sha256
++            .iter()
++            .any(|h| h == spec_sha256)
++            || request_deadline > self.policy.latest_scientific_stop_unix_seconds
++            || self.shutdown_reserve_seconds < 60
++            || [self.computation_ceiling_seconds, self.fresh_ceiling_seconds]
++                .iter()
++                .any(|n| {
++                    *n <= self.shutdown_reserve_seconds
++                        || *n > self.policy.cumulative_ceiling_seconds
++                })
++        {
++            return Err("request outside campaign route/deadline/allocation envelope".into());
++        }
++        Ok(())
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "snake_case")]
++pub enum Epoch {
++    Computation,
++    Fresh,
++}
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct Reservation {
++    pub request_sha256: String,
++    pub attempt: u32,
++    pub epoch: Epoch,
++    pub policy_sha256: String,
++    pub admitted_unix_seconds: u64,
++    pub deadline_unix_seconds: u64,
++    pub ceiling_seconds: u64,
++    pub shutdown_reserve_seconds: u64,
++}
++impl Reservation {
++    pub fn remaining_payload_seconds(&self, now: u64) -> Result<u64, String> {
++        if now < self.admitted_unix_seconds {
++            return Err("campaign clock moved backwards".into());
++        }
++        self.deadline_unix_seconds
++            .checked_sub(now)
++            .filter(|n| *n > 0)
++            .ok_or_else(|| "campaign reservation payload cutoff reached; charge retained".into())
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct Ledger {
++    pub schema: String,
++    pub policy: Policy,
++    pub reservations: Vec<Reservation>,
++}
++pub struct AdmissionWindow {
++    pub request_deadline: u64,
++    pub now: u64,
++}
++impl Ledger {
++    pub fn from_bytes(bytes: &[u8]) -> Result<Self, String> {
++        if bytes.len() > CAP {
++            return Err("campaign ledger byte cap".into());
++        }
++        let ledger: Self = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
++        ledger.validate()?;
++        Ok(ledger)
++    }
++    pub fn validate(&self) -> Result<(), String> {
++        self.policy.validate()?;
++        if self.schema != "isolab.worker-admission-ledger/v1"
++            || self.reservations.len() > MAX_RESERVATIONS
++        {
++            return Err("invalid campaign ledger schema/count".into());
++        }
++        let mut keys = BTreeSet::new();
++        let hash = self.policy.hash()?;
++        for r in &self.reservations {
++            if !hex(&r.request_sha256, 64)
++                || r.policy_sha256 != hash
++                || !keys.insert((
++                    r.request_sha256.clone(),
++                    r.attempt,
++                    match r.epoch {
++                        Epoch::Computation => 0,
++                        Epoch::Fresh => 1,
++                    },
++                ))
++                || r.shutdown_reserve_seconds < 60
++                || r.ceiling_seconds <= r.shutdown_reserve_seconds
++                || r.deadline_unix_seconds <= r.admitted_unix_seconds
++                || r.deadline_unix_seconds > self.policy.latest_scientific_stop_unix_seconds
++                || r.deadline_unix_seconds
++                    .checked_sub(r.admitted_unix_seconds)
++                    .and_then(|n| n.checked_add(r.shutdown_reserve_seconds))
++                    .is_none_or(|n| n > r.ceiling_seconds)
++            {
++                return Err("invalid or duplicate campaign reservation".into());
++            }
++        }
++        self.charged_seconds()?;
++        Ok(())
++    }
++    pub fn charged_seconds(&self) -> Result<u64, String> {
++        let total =
++            self.reservations
++                .iter()
++                .try_fold(self.policy.prior_charge_seconds, |sum, r| {
++                    sum.checked_add(r.ceiling_seconds)
++                        .ok_or("campaign charge overflow")
++                })?;
++        if total > self.policy.cumulative_ceiling_seconds {
++            return Err("campaign cumulative ceiling exhausted".into());
++        }
++        Ok(total)
++    }
++    pub fn reserve(
++        &mut self,
++        binding: &Binding,
++        spec_sha: &str,
++        request_sha: &str,
++        attempt: u32,
++        epoch: Epoch,
++        window: AdmissionWindow,
++    ) -> Result<Reservation, String> {
++        let AdmissionWindow {
++            request_deadline,
++            now,
++        } = window;
++        self.validate()?;
++        binding.validate(spec_sha, request_deadline)?;
++        if self.policy != binding.policy || !hex(request_sha, 64) {
++            return Err("campaign policy/request mismatch".into());
++        }
++        if now >= self.policy.absolute_deadline_unix_seconds || now >= request_deadline {
++            return Err("campaign original/request deadline expired".into());
++        }
++        let ceiling = match epoch {
++            Epoch::Computation => binding.computation_ceiling_seconds,
++            Epoch::Fresh => binding.fresh_ceiling_seconds,
++        };
++        if let Some(old) = self
++            .reservations
++            .iter()
++            .find(|r| r.request_sha256 == request_sha && r.attempt == attempt && r.epoch == epoch)
++        {
++            if old.ceiling_seconds != ceiling
++                || old.shutdown_reserve_seconds != binding.shutdown_reserve_seconds
++            {
++                return Err("campaign reservation cannot be rebound".into());
++            }
++            old.remaining_payload_seconds(now)?;
++            return Ok(old.clone());
++        }
++        if self.reservations.len() >= MAX_RESERVATIONS {
++            return Err("campaign reservation count cap".into());
++        }
++        let deadline = now
++            .checked_add(ceiling - binding.shutdown_reserve_seconds)
++            .ok_or("campaign cutoff overflow")?
++            .min(request_deadline);
++        let next = Reservation {
++            request_sha256: request_sha.into(),
++            attempt,
++            epoch,
++            policy_sha256: self.policy.hash()?,
++            admitted_unix_seconds: now,
++            deadline_unix_seconds: deadline,
++            ceiling_seconds: ceiling,
++            shutdown_reserve_seconds: binding.shutdown_reserve_seconds,
++        };
++        // Validate a copy so a failed admission cannot mutate the caller's state.
++        let mut changed = self.clone();
++        changed.reservations.push(next.clone());
++        changed.validate()?;
++        *self = changed;
++        Ok(next)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn fixture() -> (Ledger, Binding) {
++        let policy = Policy {
++            schema: "isolab.worker-admission-policy/v1".into(),
++            authorization_sha256:
++                "201df07743540ac247e2ae0ec79c82c7b284aa16dd07d468924c87cf2a4b7a2b".into(),
++            cumulative_ceiling_seconds: 25200,
++            absolute_deadline_unix_seconds: 1793398120,
++            latest_scientific_stop_unix_seconds: 1793396320,
++            allocation_unit: "conservative_worker_allocation_seconds".into(),
++            route_spec_sha256: (0..8).map(|n| format!("{n:064x}")).collect(),
++            prior_charge_seconds: 100,
++            reconciliation_receipt_sha256: "a".repeat(64),
++            owner_enforcement_review_sha256: "b".repeat(64),
++        };
++        (
++            Ledger {
++                schema: "isolab.worker-admission-ledger/v1".into(),
++                policy: policy.clone(),
++                reservations: vec![],
++            },
++            Binding {
++                policy,
++                ledger_uid: "fixture-ledger-uid".into(),
++                computation_ceiling_seconds: 1000,
++                fresh_ceiling_seconds: 1000,
++                shutdown_reserve_seconds: 60,
++            },
++        )
++    }
++    #[test]
++    fn eight_routes_share_balance_and_restart_does_not_refund() {
++        let (mut l, b) = fixture();
++        let now = 1793390000;
++        for i in 0..8 {
++            let sha = format!("{i:064x}");
++            l.reserve(
++                &b,
++                &sha,
++                &sha,
++                0,
++                Epoch::Computation,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: now,
++                },
++            )
++            .unwrap();
++        }
++        assert_eq!(l.charged_seconds().unwrap(), 8100);
++        let raw = serde_json::to_vec(&l).unwrap();
++        let mut restored = Ledger::from_bytes(&raw).unwrap();
++        let old = restored
++            .reserve(
++                &b,
++                &format!("{:064x}", 0),
++                &format!("{:064x}", 0),
++                0,
++                Epoch::Computation,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: now + 1,
++                },
++            )
++            .unwrap();
++        assert_eq!(old.admitted_unix_seconds, now);
++        assert_eq!(restored, l);
++        assert!(restored
++            .reserve(
++                &b,
++                &format!("{:064x}", 0),
++                &format!("{:064x}", 0),
++                0,
++                Epoch::Computation,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: now + 1000
++                }
++            )
++            .is_err());
++        assert_eq!(restored, l);
++    }
++    #[test]
++    fn ambiguous_restore_and_fresh_are_separate_permanent_charges() {
++        let (mut l, b) = fixture();
++        let h = format!("{:064x}", 0);
++        for (attempt, epoch) in [
++            (0, Epoch::Computation),
++            (1, Epoch::Computation),
++            (1, Epoch::Fresh),
++        ] {
++            l.reserve(
++                &b,
++                &h,
++                &h,
++                attempt,
++                epoch,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: 1793390000,
++                },
++            )
++            .unwrap();
++        }
++        assert_eq!(l.charged_seconds().unwrap(), 3100);
++        let before = l.clone();
++        let mut too_large = b.clone();
++        too_large.computation_ceiling_seconds = 25000;
++        assert!(l
++            .reserve(
++                &too_large,
++                &h,
++                &h,
++                2,
++                Epoch::Computation,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: 1793390000
++                }
++            )
++            .is_err());
++        assert_eq!(l, before);
++    }
++    #[test]
++    fn policy_deadline_and_forged_history_reject() {
++        let (mut l, b) = fixture();
++        let h = format!("{:064x}", 0);
++        assert!(l
++            .reserve(
++                &b,
++                &h,
++                &h,
++                0,
++                Epoch::Fresh,
++                AdmissionWindow {
++                    request_deadline: 1793396000,
++                    now: 1793396000
++                }
++            )
++            .is_err());
++        let mut bad = b.clone();
++        bad.policy.cumulative_ceiling_seconds = 25201;
++        assert!(bad.policy.validate().is_err());
++        bad = b.clone();
++        bad.policy.absolute_deadline_unix_seconds += 1;
++        assert!(bad.policy.validate().is_err());
++        l.reserve(
++            &b,
++            &h,
++            &h,
++            0,
++            Epoch::Fresh,
++            AdmissionWindow {
++                request_deadline: 1793396000,
++                now: 1793390000,
++            },
++        )
++        .unwrap();
++        l.reservations.push(l.reservations[0].clone());
++        assert!(Ledger::from_bytes(&serde_json::to_vec(&l).unwrap()).is_err());
++    }
++}

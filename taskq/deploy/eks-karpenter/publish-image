@@ -7,7 +7,7 @@ bundle=$(realpath "$1") revision=$2 output=$3
 : "${ISOLAB_IMAGE_REPOSITORY:?}" "${AWS_REGION:?}" "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}"
 [[ "$revision" =~ ^[a-f0-9]{40}$ && "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
 [[ "$ISOLAB_IMAGE_REPOSITORY" =~ ^[0-9]{12}\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/isolab/tasks$ ]]
-for name in ecbench build-info.json; do
+for name in ecbench isolab-fresh-owner build-info.json; do
   [[ -f "$bundle/$name" && ! -L "$bundle/$name" ]]
 done
 jq -e --arg revision "$revision" '
@@ -15,11 +15,14 @@ jq -e --arg revision "$revision" '
  and .architecture=="linux/amd64" and .target=="x86_64-unknown-linux-musl"
  and .default_features==false and (.ecbench_sha256|test("^[a-f0-9]{64}$"))
 ' "$bundle/build-info.json" >/dev/null
+owner_binary=$(sha256sum "$bundle/isolab-fresh-owner" | cut -d' ' -f1)
+[[ "$owner_binary" == "$(jq -r .fresh_owner_sha256 "$bundle/build-info.json")" ]]
 binary=$(sha256sum "$bundle/ecbench" | cut -d' ' -f1)
 [[ "$binary" == "$(jq -r .ecbench_sha256 "$bundle/build-info.json")" ]]
 context=$(mktemp -d)
 trap 'rm -rf "$context"' EXIT
 install -m755 "$bundle/ecbench" "$context/ecbench"
+install -m755 "$bundle/isolab-fresh-owner" "$context/isolab-fresh-owner"
 install -m644 "$bundle/build-info.json" "$context/build-info.json"
 install -m644 "$here/l2-validation.json" "$context/smoke-prime.json"
 # The Dockerfile is trusted workflow code, never taken from the tested commit.
@@ -44,3 +47,6 @@ digest=$(aws ecr describe-images --repository-name "$repository" --image-ids "im
 [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
 jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg revision "$revision" --arg binary "$binary" \
   '{image_uri:$image,source_revision:$revision,ecbench_sha256:$binary}' > "$output"
+# Separate sidecar preserves legacy three-field Build deserialization.
+jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg owner_binary "$owner_binary" \
+  '{schema:"isolab.fresh-owner-image/v1",image_uri:$image,fresh_owner_sha256:$owner_binary}' > "$output.fresh-owner.json"
