@@ -1766,15 +1766,18 @@ fn pkm_solve(
 
 const PRIME_CHAIN_STRATEGY: &str = "prime-affine-s3-chain-f4-visitor/v1";
 const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached";
+const DYNAMIC_STRATEGY: &str = "prime_f4_wide_dynamic";
 
 fn retains_canonical_artifacts(data: &SolverData) -> bool {
     data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
         || data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY
 }
 fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
     if data.outcome["strategy"] == prime_f4_wide::STRATEGY
         || data.outcome["strategy"] == prime_f4_wide_m3::STRATEGY
+        || data.outcome["strategy"] == DYNAMIC_STRATEGY
     {
         data.outcome["solver_completed"] = json!(false);
         data.outcome["status"] = json!("partial");
@@ -1798,10 +1801,27 @@ fn flush_prime_chain_payloads(data: &mut SolverData) {
     if data.outcome.get("live_persistence_errors").is_some() {
         return;
     }
+    let dynamic = data.outcome["strategy"] == DYNAMIC_STRATEGY;
     let failure = data.artifacts.iter().find_map(|payload| {
-        live_payload(payload)
-            .err()
-            .map(|error| (payload.path.clone(), error))
+        let persisted = if dynamic {
+            // This exact artifact has already crossed dedicated publication and
+            // final confirmation. Ordinary capture must never republish it.
+            if payload.path == "pdp-witness.json"
+                && payload.role == "independently-verified-pdp"
+                && payload.encoding == "json"
+            {
+                return None;
+            }
+            live_borrowed_payload(
+                &payload.path,
+                &payload.role,
+                &payload.encoding,
+                &payload.bytes,
+            )
+        } else {
+            live_payload(payload)
+        };
+        persisted.err().map(|error| (payload.path.clone(), error))
     });
     if let Some((path, error)) = failure {
         record_prime_chain_persistence_error(data, &path, &error);

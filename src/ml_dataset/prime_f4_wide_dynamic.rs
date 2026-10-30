@@ -7579,18 +7579,57 @@ mod tests {
             let confirmation = confirm_step4_witness(&mut phase.prepared, &mut publisher);
             assert!(confirmation.is_ok(), "confirmation={confirmation:?}; remaining before={before_confirmation}; report={report:?}");
             retain_step4_terminal(&mut phase).unwrap();
-            visit_step4_retained_artifacts(&phase.prepared, |path, role, encoding, bytes| {
-                if path == "pdp-witness.json" {
-                    return Ok(());
-                }
-                super::super::live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
-            })
-            .unwrap();
+            let mut parent = crate::ml_dataset::types::SolverData {
+                outcome: serde_json::json!({
+                    "strategy": super::super::DYNAMIC_STRATEGY,
+                    "status": "partial", "solver_completed": false,
+                    "pdp_witness_verified": true, "certificate_durably_persisted": true
+                }),
+                artifacts: take_step4_artifacts(&mut phase.prepared).unwrap(),
+            };
+            assert!(super::super::retains_canonical_artifacts(&parent));
+            let allocations: Vec<_> = parent.artifacts.iter().map(|a| a.bytes.as_ptr()).collect();
+            super::super::flush_prime_chain_payloads(&mut parent);
+            assert!(parent.outcome.get("live_persistence_errors").is_none());
+            // The parent flush is idempotent and retains the original owners.
+            super::super::flush_prime_chain_payloads(&mut parent);
+            assert!(parent.outcome.get("live_persistence_errors").is_none());
+            assert_eq!(
+                allocations,
+                parent
+                    .artifacts
+                    .iter()
+                    .map(|a| a.bytes.as_ptr())
+                    .collect::<Vec<_>>()
+            );
             LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
                 Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
                 _ => panic!("bound sink lost"),
             });
             drop(guard);
+            // A later outer retention failure suppresses completion, while the
+            // dedicated acknowledgement and local mathematics remain intact.
+            parent.outcome["solver_completed"] = serde_json::json!(true);
+            super::super::flush_prime_chain_payloads(&mut parent);
+            assert_eq!(parent.outcome["solver_completed"], false);
+            assert_eq!(parent.outcome["status"], "partial");
+            assert_eq!(parent.outcome["pdp_witness_verified"], true);
+            assert_eq!(parent.outcome["certificate_durably_persisted"], true);
+            assert_eq!(
+                parent.outcome["live_persistence_errors"]
+                    .as_array()
+                    .unwrap()
+                    .len(),
+                1
+            );
+            super::super::flush_prime_chain_payloads(&mut parent);
+            assert_eq!(
+                parent.outcome["live_persistence_errors"]
+                    .as_array()
+                    .unwrap()
+                    .len(),
+                1
+            );
             let verified_live = capture::verify_live_committed_prefix(&cell, &binding, &limits)
                 .unwrap()
                 .unwrap();
