@@ -932,7 +932,7 @@ struct GroupWorkspace {
     first_certificate: [usize; 15],
     assignments: [Option<u64>; 28],
     sources: [usize; 28],
-    transitions: [usize; 29],
+    transitions: [Option<LinearTransition>; 29],
 }
 struct Workspace {
     linear_left: Vec<CanonicalTerm>,
@@ -959,7 +959,7 @@ impl Workspace {
             first_certificate: [0; 15],
             assignments: [None; 28],
             sources: [0; 28],
-            transitions: [0; 29],
+            transitions: [None; 29],
         };
         for (i, &point) in domain.iter().enumerate() {
             group.domain[i] = SmallPoint::Affine(point);
@@ -1322,6 +1322,8 @@ pub(super) struct PreparedOriginal {
     capture: TypedEventBuffer,
     ledger: Ledger,
     checking_work: u64,
+    checking_reserved_work: u64,
+    checking_performed_work: u64,
     terminal: Ledger,
     observer: ObserverState,
     phase_deadline: Instant,
@@ -1525,6 +1527,8 @@ pub(super) fn prepare_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> R
             capture,
             ledger,
             checking_work: w - algebra,
+            checking_reserved_work: 0,
+            checking_performed_work: 0,
             terminal,
             observer,
             phase_deadline,
@@ -1698,6 +1702,483 @@ pub(super) fn invoke_original<F: FnMut(&PhaseEvent, &mut TypedEventBuffer) -> Re
         diagnostic_stop,
         independent_derivation_verified: false,
     })
+}
+
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+struct LinearTransition {
+    variable: usize,
+    basis_id: usize,
+    a: u64,
+    b: u64,
+    value: u64,
+    algebra_reserved_work: u64,
+    checking_reserved_work: u64,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum LinearStop {
+    ReportedBasisCandidate,
+    NoRetainedBasis,
+    NativeUnit,
+    Contradiction,
+    OutsideDomain,
+    NonlinearOrUnderdetermined,
+    MissingPivot,
+    TermLimit,
+    InvalidBasis,
+    InvalidWorkspace,
+    WorkLimit,
+    Deadline,
+    OriginalEquationMismatch,
+    InvalidOriginal,
+}
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub(super) struct LinearReport {
+    pub stop: LinearStop,
+    pub assignments: usize,
+    pub completed_passes: usize,
+    pub original_equations_checked: usize,
+    pub candidate_verified_original: bool,
+    pub algebra_reserved_work: u64,
+    pub checking_reserved_work: u64,
+    pub independent_derivation_verified: bool,
+    pub pdp_witness_verified: bool,
+}
+fn linear_budget(stop: Stop) -> LinearStop {
+    match stop {
+        Stop::Deadline => LinearStop::Deadline,
+        Stop::WorkLimit | Stop::TicketExhausted => LinearStop::WorkLimit,
+        _ => LinearStop::InvalidWorkspace,
+    }
+}
+fn charge(ledger: &mut Ledger, units: u64) -> Result<(), LinearStop> {
+    let mut ticket = ledger.reserve(units, 0).map_err(linear_budget)?;
+    ticket.spend(units).map_err(linear_budget)
+}
+
+/// No allocations: both vectors retain their admitted logical8192 capacities.
+/// Each source exponent uses all16bits; assigned coordinates are zeroed only
+/// after their complete power has been applied through borrowed field arithmetic.
+fn linear_remainder(
+    source: &InputPolynomial,
+    v: usize,
+    field: &Fp64Arithmetic,
+    assigned: &[Option<u64>; 28],
+    left: &mut Vec<CanonicalTerm>,
+    right: &mut Vec<CanonicalTerm>,
+    ledger: &mut Ledger,
+) -> Result<(), LinearStop> {
+    if !(1..=28).contains(&v) || left.capacity() < 8192 || right.capacity() < 8192 {
+        return Err(LinearStop::InvalidWorkspace);
+    }
+    if source.terms.len() > 8192 {
+        return Err(LinearStop::TermLimit);
+    }
+    charge(ledger, 32)?;
+    left.clear();
+    right.clear();
+    for term in &source.terms {
+        charge(ledger, 8 * (MAX_V + v) as u64 + COPY_WORK + 64)?;
+        if term.coefficient == 0 || term.coefficient >= field.p() {
+            return Err(LinearStop::InvalidBasis);
+        }
+        let all = term.mono.exponents(MAX_V).ok_or(LinearStop::InvalidBasis)?;
+        if all[v..].iter().any(|&x| x != 0) {
+            return Err(LinearStop::InvalidBasis);
+        }
+        let mut powers = [0u16; 28];
+        powers[..v].copy_from_slice(&all[..v]);
+        let mut coefficient = field.from_u64(term.coefficient);
+        for axis in 0..v {
+            charge(ledger, 16)?;
+            let exponent = powers[axis];
+            if let Some(value) = assigned[axis] {
+                if value >= field.p() {
+                    return Err(LinearStop::InvalidBasis);
+                }
+                if exponent != 0 {
+                    let bits = u16::BITS - exponent.leading_zeros();
+                    charge(ledger, 64 + 48 * u64::from(bits))?;
+                    let mut base = field.from_u64(value);
+                    let mut power = exponent;
+                    let mut factor = field.one();
+                    while power != 0 {
+                        if power & 1 != 0 {
+                            factor = field.mul(factor, base);
+                        }
+                        power >>= 1;
+                        if power != 0 {
+                            base = field.sqr(base);
+                        }
+                    }
+                    coefficient = field.mul(coefficient, factor);
+                }
+                powers[axis] = 0;
+            }
+        }
+        charge(ledger, COPY_WORK + 8 * v as u64 + 32)?;
+        left.push(CanonicalTerm {
+            mono: Mono28::new(&powers[..v], v).ok_or(LinearStop::InvalidBasis)?,
+            coefficient: field.to_u64(coefficient),
+        });
+    }
+    let comparison = 16 * v as u64 + 8;
+    let mut width = 1usize;
+    while width < left.len() {
+        charge(ledger, 16)?;
+        right.clear();
+        for start in (0..left.len()).step_by(width * 2) {
+            let mid = (start + width).min(left.len());
+            let end = (start + 2 * width).min(left.len());
+            let mut i = start;
+            let mut j = mid;
+            while i < mid || j < end {
+                charge(ledger, comparison + COPY_WORK + 32)?;
+                if j == end || (i < mid && cmp(&left[i], &left[j], v) != Ordering::Less) {
+                    right.push(left[i]);
+                    i += 1;
+                } else {
+                    right.push(left[j]);
+                    j += 1;
+                }
+            }
+        }
+        std::mem::swap(left, right);
+        width *= 2;
+    }
+    let mut merged = 0;
+    for i in 0..left.len() {
+        charge(ledger, comparison + 2 * COPY_WORK + 32)?;
+        let term = left[i];
+        if merged > 0 && left[merged - 1].mono == term.mono {
+            left[merged - 1].coefficient =
+                add(left[merged - 1].coefficient, term.coefficient, field.p());
+        } else {
+            left[merged] = term;
+            merged += 1;
+        }
+    }
+    let mut kept = 0;
+    for i in 0..merged {
+        charge(ledger, COPY_WORK + 16)?;
+        if left[i].coefficient != 0 {
+            left[kept] = left[i];
+            kept += 1;
+        }
+    }
+    left.truncate(kept);
+    ledger.check().map_err(linear_budget)
+}
+#[derive(Clone, Copy)]
+struct LinearPivot {
+    variable: usize,
+    basis_id: usize,
+    a: u64,
+    b: u64,
+}
+/// None means zero or genuinely non-univariate-linear; nonzero constants are
+/// contradictions. The caller distinguishes zero from unresolved polynomial.
+fn pivot_from_remainder(
+    poly: &[CanonicalTerm],
+    v: usize,
+    basis_id: usize,
+    ledger: &mut Ledger,
+) -> Result<Option<LinearPivot>, LinearStop> {
+    let mut variable = None;
+    let mut a = 0;
+    let mut b = 0;
+    for term in poly {
+        charge(ledger, 16 * v as u64 + 32)?;
+        let powers = term.mono.exponents(v).ok_or(LinearStop::InvalidBasis)?;
+        let mut term_variable = None;
+        for (axis, &power) in powers.iter().enumerate() {
+            if power != 0 {
+                if power != 1 || term_variable.is_some() {
+                    return Ok(None);
+                }
+                term_variable = Some(axis);
+            }
+        }
+        if let Some(axis) = term_variable {
+            if variable.is_some_and(|old| old != axis) {
+                return Ok(None);
+            }
+            variable = Some(axis);
+            a = term.coefficient;
+        } else {
+            b = term.coefficient;
+        }
+    }
+    match variable {
+        Some(variable) => Ok(Some(LinearPivot {
+            variable,
+            basis_id,
+            a,
+            b,
+        })),
+        None if b != 0 => Err(LinearStop::Contradiction),
+        None => Ok(None),
+    }
+}
+fn invert_linear(
+    pivot: LinearPivot,
+    field: &Fp64Arithmetic,
+    ledger: &mut Ledger,
+) -> Result<u64, LinearStop> {
+    if pivot.a == 0 || pivot.a >= field.p() || pivot.b >= field.p() {
+        return Err(LinearStop::InvalidBasis);
+    }
+    // Single consumed ticket, per-bit deadline checks; no nested parent debit.
+    let mut ticket = ledger.reserve(4096, 0).map_err(linear_budget)?;
+    ticket.spend(128).map_err(linear_budget)?;
+    let a = field.from_u64(pivot.a);
+    let mut base = a;
+    let mut power = field.p() - 2;
+    let mut inverse = field.one();
+    while power != 0 {
+        ticket.spend(48).map_err(linear_budget)?;
+        if power & 1 != 0 {
+            inverse = field.mul(inverse, base);
+        }
+        power >>= 1;
+        if power != 0 {
+            base = field.sqr(base);
+        }
+    }
+    ticket.spend(128).map_err(linear_budget)?;
+    if field.mul(a, inverse) != field.one() {
+        return Err(LinearStop::InvalidBasis);
+    }
+    Ok(field.to_u64(field.mul(field.neg(field.from_u64(pivot.b)), inverse)))
+}
+/// Independent canonical u128 evaluator of the ORIGINAL input, not reported
+/// basis equations. No Montgomery multiplication, native root routine or group
+/// oracle is used here. Inputs have p<=2^61-1, hence products fit in u128.
+fn check_original_linear_candidate(
+    input: &[InputPolynomial],
+    v: usize,
+    p: u64,
+    workspace: &mut GroupWorkspace,
+    checking: &mut Ledger,
+    checked: &mut usize,
+) -> Result<(), LinearStop> {
+    if !(1..=28).contains(&v) || input.len() != v + 1 || !(5..=0x1fff_ffff_ffff_ffff).contains(&p) {
+        return Err(LinearStop::InvalidOriginal);
+    }
+    for axis in 0..v {
+        charge(checking, 16)?;
+        workspace.coordinates[axis] =
+            workspace.assignments[axis].ok_or(LinearStop::MissingPivot)?;
+    }
+    let mut terms_seen = 0usize;
+    let mut mismatch = false;
+    for (i, poly) in input.iter().enumerate() {
+        if poly.terms.len() > 33 {
+            return Err(LinearStop::InvalidOriginal);
+        }
+        terms_seen += poly.terms.len();
+        if terms_seen > 677 {
+            return Err(LinearStop::InvalidOriginal);
+        }
+        let mut residue = 0;
+        for term in &poly.terms {
+            charge(checking, 32)?;
+            if term.coefficient == 0 || term.coefficient >= p {
+                return Err(LinearStop::InvalidOriginal);
+            }
+            let mut product = term.coefficient;
+            let all = term
+                .mono
+                .exponents(MAX_V)
+                .ok_or(LinearStop::InvalidOriginal)?;
+            charge(checking, 8 * MAX_V as u64)?;
+            if all[v..].iter().any(|&e| e != 0) {
+                return Err(LinearStop::InvalidOriginal);
+            }
+            let powers = &all[..v];
+            for (axis, &exponent) in powers.iter().enumerate() {
+                charge(checking, 16)?;
+                if exponent > 32 {
+                    return Err(LinearStop::InvalidOriginal);
+                }
+                if exponent != 0 {
+                    let bits = u16::BITS - exponent.leading_zeros();
+                    charge(checking, 32 + 48 * u64::from(bits))?;
+                    let mut base = workspace.coordinates[axis];
+                    let mut power = exponent;
+                    let mut value = 1;
+                    while power != 0 {
+                        if power & 1 != 0 {
+                            value = ((u128::from(value) * u128::from(base)) % u128::from(p)) as u64;
+                        }
+                        power >>= 1;
+                        if power != 0 {
+                            base = ((u128::from(base) * u128::from(base)) % u128::from(p)) as u64;
+                        }
+                    }
+                    product = ((u128::from(product) * u128::from(value)) % u128::from(p)) as u64;
+                }
+            }
+            charge(checking, 24)?;
+            residue = ((u128::from(residue) + u128::from(product)) % u128::from(p)) as u64;
+        }
+        workspace.residues[i] = residue;
+        *checked += 1;
+        mismatch |= residue != 0;
+    }
+    if mismatch {
+        Err(LinearStop::OriginalEquationMismatch)
+    } else {
+        checking.check().map_err(linear_budget)?;
+        Ok(())
+    }
+}
+/// Deterministic V+1 complete passes: select lowest eligible original variable,
+/// then lowest basis ID. No assignment is committed until its whole pass has
+/// completed without contradiction or resource refusal. Partial native basis
+/// may supply a checked candidate, never an ideal-derivation/nonexistence proof.
+pub(super) fn extract_reported_linear(phase: &mut NativePhase) -> LinearReport {
+    let prepared = &mut phase.prepared;
+    let mut report = LinearReport {
+        stop: LinearStop::NoRetainedBasis,
+        assignments: 0,
+        completed_passes: 0,
+        original_equations_checked: 0,
+        candidate_verified_original: false,
+        algebra_reserved_work: prepared.ledger.reserved_work,
+        checking_reserved_work: prepared.checking_reserved_work,
+        independent_derivation_verified: false,
+        pdp_witness_verified: false,
+    };
+    if !phase.basis_retained {
+        return report;
+    }
+    if phase.report.stop == dynamic::Stop::UnitDerived {
+        report.stop = LinearStop::NativeUnit;
+        return report;
+    }
+    let v = 2 * prepared.m - 2;
+    let mut checking = Ledger::new(prepared.checking_work, 0, prepared.phase_deadline);
+    let result = (|| {
+        if !(1..=28).contains(&v) || phase.report.basis.len() > 256 {
+            return Err(LinearStop::InvalidBasis);
+        }
+        // One nonrefundable reservation, with per-entry deadline checks and
+        // performed charges only for visited entries. No borrowed basis clone.
+        {
+            let mut scan = prepared
+                .ledger
+                .reserve(32 + 16 * phase.report.basis.len() as u64, 0)
+                .map_err(linear_budget)?;
+            scan.spend(32).map_err(linear_budget)?;
+            for poly in &phase.report.basis {
+                scan.spend(16).map_err(linear_budget)?;
+                if poly.terms.len() > 8192 {
+                    return Err(LinearStop::TermLimit);
+                }
+            }
+        }
+        charge(
+            &mut prepared.ledger,
+            (size_of::<[Option<u64>; 28]>()
+                + size_of::<[usize; 28]>()
+                + size_of::<[Option<LinearTransition>; 29]>()) as u64
+                * 8,
+        )?;
+        prepared.workspace.group.assignments.fill(None);
+        prepared.workspace.group.sources.fill(0);
+        prepared.workspace.group.transitions.fill(None);
+        for _ in 0..=v {
+            let mut best: Option<LinearPivot> = None;
+            for (basis_id, poly) in phase.report.basis.iter().enumerate() {
+                linear_remainder(
+                    poly,
+                    v,
+                    &prepared.setup.field,
+                    &prepared.workspace.group.assignments,
+                    &mut prepared.workspace.linear_left,
+                    &mut prepared.workspace.linear_right,
+                    &mut prepared.ledger,
+                )?;
+                let pivot = pivot_from_remainder(
+                    &prepared.workspace.linear_left,
+                    v,
+                    basis_id,
+                    &mut prepared.ledger,
+                )?;
+                if let Some(pivot) = pivot {
+                    if prepared.workspace.group.assignments[pivot.variable].is_some() {
+                        return Err(LinearStop::InvalidBasis);
+                    }
+                    if best.is_none_or(|old| {
+                        (pivot.variable, pivot.basis_id) < (old.variable, old.basis_id)
+                    }) {
+                        best = Some(pivot);
+                    }
+                }
+            }
+            report.completed_passes += 1;
+            if report.assignments == v {
+                check_original_linear_candidate(
+                    &prepared.input,
+                    v,
+                    prepared.setup.field.p(),
+                    &mut prepared.workspace.group,
+                    &mut checking,
+                    &mut report.original_equations_checked,
+                )?;
+                return Ok(());
+            }
+            let Some(pivot) = best else {
+                return Err(LinearStop::NonlinearOrUnderdetermined);
+            };
+            let value = invert_linear(pivot, &prepared.setup.field, &mut prepared.ledger)?;
+            if pivot.variable < prepared.m {
+                charge(&mut checking, 64 * 16)?;
+                if !prepared
+                    .workspace
+                    .group
+                    .domain
+                    .iter()
+                    .any(|point| matches!(point,SmallPoint::Affine(point) if point.x==value))
+                {
+                    return Err(LinearStop::OutsideDomain);
+                }
+            }
+            charge(&mut prepared.ledger, 128)?;
+            let checking_reserved = prepared
+                .checking_reserved_work
+                .checked_add(checking.reserved_work)
+                .ok_or(LinearStop::WorkLimit)?;
+            prepared.workspace.group.assignments[pivot.variable] = Some(value);
+            prepared.workspace.group.sources[pivot.variable] = pivot.basis_id;
+            prepared.workspace.group.transitions[report.assignments] = Some(LinearTransition {
+                variable: pivot.variable,
+                basis_id: pivot.basis_id,
+                a: pivot.a,
+                b: pivot.b,
+                value,
+                algebra_reserved_work: prepared.ledger.reserved_work,
+                checking_reserved_work: checking_reserved,
+            });
+            report.assignments += 1;
+        }
+        Err(LinearStop::MissingPivot)
+    })();
+    // No clock check at settlement: all consumed checking work survives refusal.
+    prepared.checking_work -= checking.reserved_work;
+    prepared.checking_reserved_work += checking.reserved_work;
+    prepared.checking_performed_work += checking.performed_work;
+    report.algebra_reserved_work = prepared.ledger.reserved_work;
+    report.checking_reserved_work = prepared.checking_reserved_work;
+    match result {
+        Ok(()) => {
+            report.stop = LinearStop::ReportedBasisCandidate;
+            report.candidate_verified_original = true;
+        }
+        Err(stop) => report.stop = stop,
+    }
+    report
 }
 
 #[cfg(test)]
@@ -2705,5 +3186,271 @@ mod tests {
             "all432 fixed cases retained; {} failed gates",
             failures.len()
         );
+    }
+    fn linear_test_phase() -> NativePhase {
+        // P=(6,18) on y²=x³+7 over F101: 2P=(98,9), 3P=(99,91),
+        // 4P=(84,12). The original equations are genuine, not x_i-c_i inputs.
+        let prepared = prepare_original(
+            101,
+            Parameters {
+                m: 4,
+                a: 0,
+                b: 7,
+                target_x: 84,
+                codes: &[6],
+            },
+            AffinePoint { x: 84, y: 12 },
+            &[AffinePoint { x: 6, y: 18 }, AffinePoint { x: 6, y: 83 }],
+            phase_limits(),
+            EventPersistence::LocalOnly,
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let mut phase = invoke_original(prepared, &mut |_, _| Ok(())).unwrap();
+        // The following tests inject reported bases deliberately. They prove
+        // checked candidate semantics, never that native derived these bases.
+        phase.report.stop = dynamic::Stop::WorkLimit;
+        phase.report.native_statistics_complete = false;
+        phase.basis_retained = true;
+        phase.report.basis = linear_test_basis();
+        phase
+    }
+    fn linear_test_poly(terms: &[([u16; 6], u64)]) -> InputPolynomial {
+        let mut terms: Vec<_> = terms
+            .iter()
+            .map(|(e, c)| CanonicalTerm {
+                mono: Mono28::new(e, 6).unwrap(),
+                coefficient: *c,
+            })
+            .collect();
+        terms.sort_by(|a, b| cmp(b, a, 6));
+        InputPolynomial { terms }
+    }
+    fn linear_test_basis() -> Vec<InputPolynomial> {
+        [6u64, 6, 6, 6, 98, 99]
+            .into_iter()
+            .enumerate()
+            .map(|(i, value)| {
+                let mut powers = [0u16; 6];
+                powers[i] = 1;
+                linear_test_poly(&[(powers, 3), ([0; 6], neg(mul(3, value, 101), 101))])
+            })
+            .collect()
+    }
+    #[test]
+    fn linear_full_rank_nonmonic_partial_report_checks_original_chain_without_group_claim() {
+        let mut phase = linear_test_phase();
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::ReportedBasisCandidate);
+        assert_eq!(report.assignments, 6);
+        assert_eq!(report.completed_passes, 7);
+        assert_eq!(report.original_equations_checked, 7);
+        assert!(report.candidate_verified_original);
+        assert!(!report.independent_derivation_verified && !report.pdp_witness_verified);
+        assert!(!phase.report.native_statistics_complete);
+        assert_eq!(
+            &phase.prepared.workspace.group.coordinates[..6],
+            &[6, 6, 6, 6, 98, 99]
+        );
+        assert!(phase.prepared.workspace.group.residues[..7]
+            .iter()
+            .all(|&r| r == 0));
+        for (i, transition) in phase.prepared.workspace.group.transitions[..6]
+            .iter()
+            .enumerate()
+        {
+            let t = transition.unwrap();
+            assert_eq!(t.variable, i);
+            assert_eq!(t.basis_id, i);
+            assert_eq!(t.a, 3);
+        }
+    }
+    #[test]
+    fn linear_substitution_merges_cancellation_and_uses_lowest_basis_pivot() {
+        let mut phase = linear_test_phase();
+        // x0²-6*x0 cancels after x0=6, while x0*x1-3*x1-18 becomes 3*x1-18.
+        phase.report.basis.insert(
+            0,
+            linear_test_poly(&[([2, 0, 0, 0, 0, 0], 1), ([1, 0, 0, 0, 0, 0], 95)]),
+        );
+        phase.report.basis[2] = linear_test_poly(&[
+            ([1, 1, 0, 0, 0, 0], 1),
+            ([0, 1, 0, 0, 0, 0], 98),
+            ([0; 6], 83),
+        ]);
+        phase
+            .report
+            .basis
+            .push(linear_test_poly(&[([1, 0, 0, 0, 0, 0], 1), ([0; 6], 95)]));
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::ReportedBasisCandidate);
+        assert_eq!(phase.prepared.workspace.group.sources[0], 1);
+        assert_eq!(phase.prepared.workspace.group.sources[1], 2);
+    }
+    #[test]
+    fn linear_contradiction_domain_missing_auxiliary_and_nonlinear_are_distinct() {
+        let mut contradiction = linear_test_phase();
+        contradiction
+            .report
+            .basis
+            .push(linear_test_poly(&[([0; 6], 1)]));
+        let report = extract_reported_linear(&mut contradiction);
+        assert_eq!(report.stop, LinearStop::Contradiction);
+        assert_eq!(report.assignments, 0);
+        let mut outside = linear_test_phase();
+        outside.report.basis[0] = linear_test_poly(&[([1, 0, 0, 0, 0, 0], 1), ([0; 6], 94)]);
+        assert_eq!(
+            extract_reported_linear(&mut outside).stop,
+            LinearStop::OutsideDomain
+        );
+        let mut missing = linear_test_phase();
+        missing.report.basis.pop();
+        let report = extract_reported_linear(&mut missing);
+        assert_eq!(report.stop, LinearStop::NonlinearOrUnderdetermined);
+        assert_eq!(report.assignments, 5);
+        assert!(!report.candidate_verified_original);
+        let mut nonlinear = linear_test_phase();
+        nonlinear.report.basis[0] = linear_test_poly(&[([2, 0, 0, 0, 0, 0], 1), ([0; 6], 65)]);
+        let report = extract_reported_linear(&mut nonlinear);
+        assert_eq!(report.stop, LinearStop::NonlinearOrUnderdetermined);
+        assert!(!report.candidate_verified_original);
+    }
+    #[test]
+    fn linear_reported_assignment_must_satisfy_originals_and_retained_basis_gate() {
+        let mut phase = linear_test_phase();
+        phase.report.basis[5] = linear_test_poly(&[([0, 0, 0, 0, 0, 1], 1), ([0; 6], 1)]);
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::OriginalEquationMismatch);
+        assert_eq!(report.original_equations_checked, 7);
+        assert!(!report.candidate_verified_original);
+        let mut absent = linear_test_phase();
+        absent.basis_retained = false;
+        assert_eq!(
+            extract_reported_linear(&mut absent).stop,
+            LinearStop::NoRetainedBasis
+        );
+        let mut unit = linear_test_phase();
+        unit.report.stop = dynamic::Stop::UnitDerived;
+        assert_eq!(
+            extract_reported_linear(&mut unit).stop,
+            LinearStop::NativeUnit
+        );
+    }
+    #[test]
+    fn linear_uses_all28_u16_exponents_without_truncation_and_term_limit() {
+        let setup = field(101);
+        let mut budget = ledger();
+        budget.bytes_limit = 64 * 1024 * 1024;
+        let mut workspace = Workspace::new(&[], &mut budget).unwrap();
+        let assignments = std::array::from_fn(|i| Some(if i == 27 { 2 } else { 1 }));
+        let source = InputPolynomial {
+            terms: vec![CanonicalTerm {
+                mono: Mono28::new(&[u16::MAX; 28], 28).unwrap(),
+                coefficient: 7,
+            }],
+        };
+        linear_remainder(
+            &source,
+            28,
+            &setup.field,
+            &assignments,
+            &mut workspace.linear_left,
+            &mut workspace.linear_right,
+            &mut budget,
+        )
+        .unwrap();
+        let mut expected = 7u64;
+        for _ in 0..u16::MAX {
+            expected = mul(expected, 2, 101);
+        }
+        assert_eq!(workspace.linear_left.len(), 1);
+        assert_eq!(workspace.linear_left[0].coefficient, expected);
+        assert_eq!(workspace.linear_left[0].mono.degree(), 0);
+        let too_large = InputPolynomial {
+            terms: vec![source.terms[0]; 8193],
+        };
+        assert_eq!(
+            linear_remainder(
+                &too_large,
+                28,
+                &setup.field,
+                &assignments,
+                &mut workspace.linear_left,
+                &mut workspace.linear_right,
+                &mut budget
+            ),
+            Err(LinearStop::TermLimit)
+        );
+    }
+    #[test]
+    fn linear_length_preflight_finds_late_oversize_before_processing() {
+        let mut phase = linear_test_phase();
+        let term = phase.report.basis[0].terms[0];
+        phase.report.basis.push(InputPolynomial {
+            terms: vec![term; 8193],
+        });
+        let scan = 32 + 16 * phase.report.basis.len() as u64;
+        let before = phase.prepared.ledger.reserved_work;
+        phase.prepared.ledger.work_limit = before + scan;
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::TermLimit);
+        assert_eq!(report.assignments, 0);
+        assert_eq!(phase.prepared.ledger.reserved_work, before + scan);
+        let mut phase = linear_test_phase();
+        phase.report.basis.push(InputPolynomial {
+            terms: vec![term; 8193],
+        });
+        phase.prepared.ledger.work_limit = phase.prepared.ledger.reserved_work + scan - 1;
+        assert_eq!(
+            extract_reported_linear(&mut phase).stop,
+            LinearStop::WorkLimit
+        );
+    }
+    #[test]
+    fn linear_exact_and_one_less_algebra_and_checking_budget_admission() {
+        let mut measured = linear_test_phase();
+        let before = measured.prepared.ledger.reserved_work;
+        assert_eq!(
+            extract_reported_linear(&mut measured).stop,
+            LinearStop::ReportedBasisCandidate
+        );
+        let algebra = measured.prepared.ledger.reserved_work - before;
+        let checking = measured.prepared.checking_reserved_work;
+        for (extra, check, expected) in [
+            (algebra, checking, LinearStop::ReportedBasisCandidate),
+            (algebra - 1, checking, LinearStop::WorkLimit),
+            (algebra, checking - 1, LinearStop::WorkLimit),
+        ] {
+            let mut phase = linear_test_phase();
+            phase.prepared.ledger.work_limit = phase.prepared.ledger.reserved_work + extra;
+            phase.prepared.checking_work = check;
+            let report = extract_reported_linear(&mut phase);
+            assert_eq!(report.stop, expected);
+            assert!(phase.prepared.checking_reserved_work <= check);
+            assert!(phase.prepared.ledger.reserved_work <= phase.prepared.ledger.work_limit);
+            if expected != LinearStop::ReportedBasisCandidate {
+                assert!(!report.candidate_verified_original);
+            }
+        }
+    }
+    #[test]
+    fn linear_expired_phase_and_partial_pass_do_not_commit_unfinished_assignment() {
+        let mut phase = linear_test_phase();
+        phase.prepared.ledger.deadline = Instant::now();
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::Deadline);
+        assert_eq!(report.assignments, 0);
+        let mut phase = linear_test_phase();
+        phase.prepared.ledger.work_limit = phase.prepared.ledger.reserved_work + 4096;
+        let report = extract_reported_linear(&mut phase);
+        assert_eq!(report.stop, LinearStop::WorkLimit);
+        assert_eq!(report.assignments, 0);
+        assert!(phase
+            .prepared
+            .workspace
+            .group
+            .assignments
+            .iter()
+            .all(Option::is_none));
     }
 }
