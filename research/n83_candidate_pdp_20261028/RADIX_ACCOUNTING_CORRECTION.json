@@ -1,0 +1,13 @@
+{
+  "schema": "n83.radix-accounting-correction/v1",
+  "v1_protocol": "protocol-radix-census.json",
+  "intended_partition_records": 3010,
+  "schema_derived_execution_slots": 6020,
+  "issue": "sample_size.instances is per arm; v1 used total partition records across unequal arms",
+  "v2_protocol": "protocol-radix-census-local.json",
+  "v2_execution_slots": 2,
+  "v2_partitions_per_phase": 3010,
+  "input_and_native_instrument_changed": false,
+  "arithmetic_data_existed_at_correction": false,
+  "resolution": "One producer phase and one exact replay phase, each covering the same full census; do not invent6020 arithmetic trials."
+}
