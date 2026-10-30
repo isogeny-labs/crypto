@@ -417,3 +417,5 @@ regularity, larger-m/prime LFD and an elite-base improvement remain open.
 `top-publication/FORMAT.json` indexes the separately retained drafting, report
 and metrics helpers and diagnostic output archive. All312 new metric fields
 match committed native records; unknown values remain absent.
+
+Native Lefschetz continuation (2026-10-30): the separate Rust certificate path and signal-safe journal pass development controls and S3-restored native tests. See [native development evidence](validation-prime-lefschetz-native-development/README.md) and [file format](NATIVE_LEFSCHETZ_FORMAT.json). Zero native production cases; no new degree result. The prior interrupted run and all Python-era evidence remain preserved.

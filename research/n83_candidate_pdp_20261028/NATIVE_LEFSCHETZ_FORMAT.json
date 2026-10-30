@@ -1,0 +1,27 @@
+{
+  "schema": "n83.native-lefschetz-format/v1",
+  "stage": "native development; no production degree claim",
+  "encoding": "UTF-8 JSON; field residues are decimal strings; indices, exponents and dimensions are JSON integers",
+  "field_modulus": "4835703278761981908090881",
+  "files": {
+    "arithmetic-r3/identity.json": "Native source SHA256, development-only flag, zero production cases and null degree claim",
+    "arithmetic-r3/structure.json": "Primitive degree k, multiplicity C(27,k)-C(27,k-1), maximum L exponent27-2k, string length28-2k; Hilbert dimension in each degree0..27; minimum no-truncation slack for degrees4..16; first uncovered degree17",
+    "arithmetic-r3/upper-witness.json": "8192 [mask, coefficient] pairs for H=product_{i=0..12}(b_{2i}-b_{2i+1}); mask bit j denotes squarefree variable b_j, indices0..26. Residues normalized modulo field_modulus. Number of nonzero terms after one and two multiplications by L=sum b_j; source projection still required",
+    "arithmetic-r3/leading-m*.json": "Positive leading-term gates m3..9. Variables0..m-1 are L blocks; m..2m-3 are U auxiliaries. Each term is [sorted repeated variable indices, signed integer coefficient, weighted score]. Maximal terms and expected x^2*y^2 term retained",
+    "arithmetic-r3/tied-m*.json": "Negative leading-term controls with all weights1; valid must be false",
+    "journal-r1/": "Initial child-termination control, plus success/failure journals; retained but not sufficient as a direct controller signal test",
+    "journal-r2/": "Direct controller SIGTERM test, success and exit7 failure. Each terminal contains actual controller status and four phase statuses; unattempted is started=false,exit_code125",
+    "tests-r*.log": "Every test invocation log including inherited donor tests; r3 contains14 total, six new and eight inherited",
+    "source/": "Exact Rust checker, donor modules, Cargo files, shell launcher/journal/tests, written argument and development plan",
+    "instrument": "Release native certificate binary, not yet qualified on42production cases",
+    "test-instrument": "Exact compiled test executable for restored replay",
+    "manifest.sha256": "SHA256 of every archived payload except this manifest"
+  },
+  "production_schema": {
+    "status": "implemented, not yet run",
+    "case_records": "Exact input/source/base and native audit hashes; shared structure,witness,leading-record hashes; normalization inverses; conditional first-fall bounds and null new LFD fields",
+    "shared_certificate": "One structural certificate and seven leading gates are shared;42cases are not42independent arithmetic experiments",
+    "replay": "Fresh native producer logic recomputes each JSON value, verifies source/input/binary hashes and compares all saved records",
+    "claim_boundary": "Arithmetic checks plus written Lefschetz/Koszul argument and external SLP theorem; independent scientific review/formalization pending. No LFD, regularity or elite-base improvement follows from development controls"
+  }
+}
