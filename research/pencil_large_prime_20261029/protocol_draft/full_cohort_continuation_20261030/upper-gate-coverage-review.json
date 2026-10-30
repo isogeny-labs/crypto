@@ -1,0 +1,903 @@
+{
+  "schema": "pencil-algorithm-coverage-review/v1",
+  "status": "reviewed_complete",
+  "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+  "mapping_sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+  "protocol_sha256": "009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091",
+  "protocol_path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/full_cohort_continuation_20261030/upper-gate-protocol-body.json",
+  "original_frozen_protocol": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/first_gate_p739_infrastructure_retry_20261030/protocol.json",
+    "sha256": "7d9f3a299c8d2e39f0a7b69aaab34a922dcc192102ab8d0ee1971ab6e635efee",
+    "version": 5
+  },
+  "protocol_digest_semantics": "SHA256 canonical body excluding only top-level freeze; separately retain untouched frozen full-file SHA",
+  "rust_toolchain": "1.99.1",
+  "producer_identity": "/root",
+  "reviewer_identity": "/root/four_lead_state",
+  "prior_independent_source_audit": {
+    "path": "../accounting/finite-nine-category-source-audit.json",
+    "sha256": "28aa7c41bfc25552d9c63431671616d627fac61429b649ff4bffc1f8efba3724",
+    "reviewer_identity": "root/ci_audit"
+  },
+  "binary_sha256": [
+    "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+  ],
+  "source_files": [
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/full_cohort_continuation_20261030/coverage-current-source/analyzer.rs",
+      "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/full_cohort_continuation_20261030/coverage-current-source/importer.rs",
+      "sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/collector.rs",
+      "sha256": "ada360c21d2c9ccd135379f4cb841713f8e31b626dda526e70cfc776ad93f6d8"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/lib.rs",
+      "sha256": "615ba55e378fe2e1b5d086d679abdd63017b227a0d641173d1a541833b86164d"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/meter.rs",
+      "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/native_solver.rs",
+      "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/outer_primality.rs",
+      "sha256": "15dc97eca3aad733aaad43757a608af11e090f3b3c3806ad0aaab57e53df0937"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/residual.rs",
+      "sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+      "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/sparse.rs",
+      "sha256": "f6e5920670339fa73c3b070b09e83858887531255d6c5061841f3fca761f2821"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/research/pencil_large_prime_20261029/src/tracked_set.rs",
+      "sha256": "fc41c2295ee032a3018325928859ac13eee2f0a6261da5a4e4ebaa0743f52991"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/ecbench/pencil.rs",
+      "sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/ecbench/three_leads.rs",
+      "sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/three_leads.rs",
+      "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/three_leads_constructor_primality.rs",
+      "sha256": "b239f2041f4183c2694079a5d4c990c9e37fee251262fc48f94b56c8a34286fb"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/three_leads_geometry_events.rs",
+      "sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/finite_coverage_run_binding_20261030/source_snapshot/src/cryptanalysis/three_leads_rho_events.rs",
+      "sha256": "dd1a67d91cab300d7c19a113c76ce0d0cd44cbd6d6abd075459bbf08d3c43a24"
+    }
+  ],
+  "independent_report": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/full_cohort_continuation_20261030/finite-category-applicability-review.json",
+    "sha256": "49eea655a79aa9e055e3ea547d920a669010a5d2616d22a2e292e18e9cda6020"
+  },
+  "categories": [
+    {
+      "category": "field_arithmetic",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "Counts.m",
+        "Counts.s",
+        "Counts.i",
+        "Counts.field_adds",
+        "Counts.bit_ops",
+        "ArithmeticCounts.base_adds",
+        "ArithmeticCounts.base_muls",
+        "ArithmeticCounts.base_inversions",
+        "geometry.entry_visits",
+        "geometry.elements_copied",
+        "geometry.elements_initialized",
+        "geometry.key_comparisons"
+      ],
+      "source_sites": [
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 25,
+          "line_end": 520,
+          "primitive": "reference/candidate shared Field arithmetic increments exact M/S/I/add/bit counters",
+          "count_fields": [
+            "m",
+            "s",
+            "i",
+            "field_adds",
+            "bit_ops"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 539,
+          "line_end": 619,
+          "primitive": "candidate disjoint phase snapshots for field and native arithmetic",
+          "count_fields": [
+            "PhaseTotals.field",
+            "base_adds",
+            "base_muls",
+            "base_inversions"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 682,
+          "line_end": 835,
+          "primitive": "domain-checked candidate base arithmetic and polynomial predicate/collection events",
+          "count_fields": [
+            "base_adds",
+            "base_muls",
+            "base_inversions",
+            "collection_entry_visits",
+            "collection_elements_initialized",
+            "collection_comparisons"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 849,
+          "line_end": 892,
+          "primitive": "engine polynomial division/exactness predicates and arithmetic",
+          "count_fields": [
+            "m",
+            "s",
+            "i",
+            "entry_visits",
+            "elements_copied",
+            "elements_initialized",
+            "key_comparisons"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 182,
+          "line_end": 228,
+          "primitive": "checked field mapping, inverse expansion removal and logical base additions",
+          "count_fields": [
+            "m",
+            "s",
+            "i",
+            "field_adds",
+            "bit_ops",
+            "base_adds",
+            "base_muls",
+            "base_inversions"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "group/jacobian addition summaries are not extra field operations",
+        "report and host timing remain separate"
+      ],
+      "finding": "Prior pdiv/pexact predicate inconsistency is closed; no remaining selected field-arithmetic source omission found."
+    },
+    {
+      "category": "scalar_arithmetic",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "scalar_adds",
+        "scalar_muls",
+        "scalar_negations",
+        "scalar_inversions",
+        "modular_reductions",
+        "scalar_adds_uncharged",
+        "scalar_muls_uncharged",
+        "scalar_inversions_uncharged"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/meter.rs",
+          "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+          "line_start": 5,
+          "line_end": 136,
+          "primitive": "monotonic checked candidate scalar and reduction ledger",
+          "count_fields": [
+            "scalar_adds",
+            "scalar_muls",
+            "scalar_negations",
+            "scalar_inversions",
+            "modular_reductions"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 713,
+          "line_end": 760,
+          "primitive": "candidate base/scalar domain dispatch and expanded inversion loop",
+          "count_fields": [
+            "scalar_adds",
+            "scalar_muls",
+            "scalar_inversions"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/scalar_ledger.rs",
+          "sha256": "fa5c52c8137bd2da5aef8e560ef1e72111e508b81db4f329928e89ce110cf6ba",
+          "line_start": 14,
+          "line_end": 45,
+          "primitive": "checked candidate inverse expansion normalization and atomic rho mapping",
+          "count_fields": [
+            "additions_and_negations",
+            "multiplications_outside_inversions",
+            "inversions"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 1488,
+          "line_end": 1540,
+          "primitive": "reference Ring atomic scalar add/neg/mul/inv ledger",
+          "count_fields": [
+            "ScalarCounts.add",
+            "ScalarCounts.mul",
+            "ScalarCounts.inv"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/importer.rs",
+          "sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+          "line_start": 239,
+          "line_end": 324,
+          "primitive": "record scalar collection and checked normalization",
+          "count_fields": [
+            "normalized_scalar_events"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 219,
+          "line_end": 227,
+          "primitive": "single scalar atomic event sum in finite price",
+          "count_fields": [
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "expanded inversion multiplications are removed once before atomic inverse price",
+        "primality powers are not inverse expansion"
+      ],
+      "finding": "Wide-modulus and underflow tests match the actual loop; no remaining selected scalar source omission found."
+    },
+    {
+      "category": "outer_and_constructor_validation",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "outer_primality.*.modular_muls",
+        "outer_primality.*.modular_squares",
+        "outer_primality.*.standalone_modular_reductions",
+        "constructor_modular_muls",
+        "constructor_modular_squares",
+        "constructor_standalone_reductions",
+        "scalar_constructor_modular_muls",
+        "scalar_constructor_modular_squares",
+        "scalar_constructor_standalone_reductions"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/outer_primality.rs",
+          "sha256": "15dc97eca3aad733aaad43757a608af11e090f3b3c3806ad0aaab57e53df0937",
+          "line_start": 30,
+          "line_end": 117,
+          "primitive": "actual candidate p/r outer validation with noninvocation preserved",
+          "count_fields": [
+            "base_modulus",
+            "scalar_modulus",
+            "modular_muls",
+            "modular_squares",
+            "standalone_modular_reductions"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads_constructor_primality.rs",
+          "sha256": "b239f2041f4183c2694079a5d4c990c9e37fee251262fc48f94b56c8a34286fb",
+          "line_start": 1,
+          "line_end": 94,
+          "primitive": "equivalent deterministic constructor primality event expansion",
+          "count_fields": [
+            "modular_muls",
+            "modular_squares",
+            "standalone_modular_reductions"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads_geometry_events.rs",
+          "sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+          "line_start": 189,
+          "line_end": 212,
+          "primitive": "base constructor observation",
+          "count_fields": [
+            "constructor_prime_calls",
+            "constructor_modular_muls",
+            "constructor_modular_squares",
+            "constructor_standalone_reductions"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads_geometry_events.rs",
+          "sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+          "line_start": 381,
+          "line_end": 407,
+          "primitive": "scalar Ring constructor observation",
+          "count_fields": [
+            "scalar_constructor_prime_calls",
+            "scalar_constructor_modular_muls",
+            "scalar_constructor_modular_squares",
+            "scalar_constructor_standalone_reductions"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 1094,
+          "line_end": 1104,
+          "primitive": "actual Scholten base constructor call in original short-circuit order",
+          "count_fields": [
+            "constructor_*"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 1488,
+          "line_end": 1501,
+          "primitive": "actual Ring scalar constructor call once in original short-circuit order",
+          "count_fields": [
+            "scalar_constructor_*"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 254,
+          "line_end": 275,
+          "primitive": "base-domain M/S and scalar-domain native mapping with reductions once",
+          "count_fields": [
+            "m",
+            "s",
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "prime call counts, product reductions, loop and witness counters are diagnostic and not added again"
+      ],
+      "finding": "Prior missing rho Ring scalar constructor observation is closed; outer rejection prefixes and p/r domains remain distinct."
+    },
+    {
+      "category": "setup_transfer",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "cold_setup.field",
+        "cold_setup.arithmetic",
+        "cold_setup.semantic_counts",
+        "solver_including_cold_setup.*"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 1192,
+          "line_end": 1300,
+          "primitive": "validated cold setup, Scholten construction, transfer, rational inventory and projection checks",
+          "count_fields": [
+            "setup_field",
+            "setup_arithmetic",
+            "setup_semantic_counts"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 1381,
+          "line_end": 1415,
+          "primitive": "checked phase totals plus setup added exactly once to candidate totals",
+          "count_fields": [
+            "pencil_field",
+            "pencil_arithmetic",
+            "cold_setup"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 1084,
+          "line_end": 1287,
+          "primitive": "shared Scholten construction and transfer arithmetic through counted Field/Jacobian operations",
+          "count_fields": [
+            "Counts.*",
+            "geometry.*"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/pencil.rs",
+          "sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e",
+          "line_start": 66,
+          "line_end": 100,
+          "primitive": "adapter solver/start and geometry boundary around full cold setup",
+          "count_fields": [
+            "solver_including_cold_setup"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 200,
+          "line_end": 250,
+          "primitive": "candidate setup already in candidate arithmetic plus separate setup semantic ledger once",
+          "count_fields": [
+            "m",
+            "s",
+            "i",
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "setup elapsed/allocation remain separate resources",
+        "candidate detail totals already add setup arithmetic and field counts before export"
+      ],
+      "finding": "No selected setup or transfer primitive omission found; phase validation rejects unattributed arithmetic or symbolic work."
+    },
+    {
+      "category": "collection_graph_elimination",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "map_key_comparisons",
+        "map_entry_visits",
+        "map_cloned_entries",
+        "collection_entry_visits",
+        "collection_elements_copied",
+        "collection_elements_initialized",
+        "collection_comparisons",
+        "modular_reductions"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/meter.rs",
+          "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+          "line_start": 171,
+          "line_end": 184,
+          "primitive": "declared collection visit/copy/init/comparison unit",
+          "count_fields": [
+            "collection_entry_visits",
+            "collection_elements_copied",
+            "collection_elements_initialized",
+            "collection_comparisons"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/sparse.rs",
+          "sha256": "f6e5920670339fa73c3b070b09e83858887531255d6c5061841f3fca761f2821",
+          "line_start": 1,
+          "line_end": 130,
+          "primitive": "ordered map key comparisons, returned-entry visits, fresh entries and iteration",
+          "count_fields": [
+            "map_key_comparisons",
+            "map_entry_visits",
+            "map_cloned_entries",
+            "collection_elements_initialized"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/tracked_set.rs",
+          "sha256": "fc41c2295ee032a3018325928859ac13eee2f0a6261da5a4e4ebaa0743f52991",
+          "line_start": 1,
+          "line_end": 95,
+          "primitive": "set comparison, exact fresh size increase and yielded visits",
+          "count_fields": [
+            "map_key_comparisons",
+            "map_entry_visits",
+            "collection_elements_initialized"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/lib.rs",
+          "sha256": "615ba55e378fe2e1b5d086d679abdd63017b227a0d641173d1a541833b86164d",
+          "line_start": 109,
+          "line_end": 263,
+          "primitive": "sparse accumulation, graph traversal, borrowed lookup copies and graph predicates",
+          "count_fields": [
+            "map_entry_visits",
+            "collection_elements_copied",
+            "collection_elements_initialized",
+            "collection_comparisons",
+            "modular_reductions"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/collector.rs",
+          "sha256": "ada360c21d2c9ccd135379f4cb841713f8e31b626dda526e70cfc776ad93f6d8",
+          "line_start": 40,
+          "line_end": 160,
+          "primitive": "partition scans, retained vector elements and map-to-vector copy",
+          "count_fields": [
+            "collection_entry_visits",
+            "collection_elements_copied",
+            "collection_elements_initialized",
+            "collection_comparisons"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/residual.rs",
+          "sha256": "21fd29dc330fbbf8ce3c45876584418c55c366876adc85d24888d0693144966f",
+          "line_start": 78,
+          "line_end": 139,
+          "primitive": "input scans, successful first-key copy, map visits and short-circuit cap predicates",
+          "count_fields": [
+            "map_entry_visits",
+            "collection_elements_copied",
+            "collection_elements_initialized",
+            "collection_comparisons"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 443,
+          "line_end": 535,
+          "primitive": "graph adapter partition, relation vectors and recovered coefficient copy",
+          "count_fields": [
+            "collection_entry_visits",
+            "collection_elements_copied",
+            "collection_elements_initialized",
+            "collection_comparisons"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 228,
+          "line_end": 250,
+          "primitive": "whitelisted candidate collection fields added from query and setup once",
+          "count_fields": [
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "map_calls",
+        "sparse_accumulations",
+        "partition_terms",
+        "payload_terms",
+        "parent_hops and row summaries are excluded diagnostics",
+        "iterator visits are not copied again at fixed scalar locals",
+        "allocator nodes and rebalancing are outside the finite model"
+      ],
+      "finding": "Prior returned-entry, fresh-entry, first-key copy and cap-predicate gaps are closed. Exact source search found no remaining selected map/set/vector event family outside the wrappers and explicit call-site charges."
+    },
+    {
+      "category": "hash_rng",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "walk_label_calls",
+        "rho_semantic_key_comparisons_v1",
+        "rho_semantic_entry_visits_v1",
+        "rho_semantic_elements_copied_v1",
+        "rho_semantic_elements_initialized_v1",
+        "rho_observed_hash_calls_v1",
+        "partition_hashes_uncharged",
+        "rng_draws_uncharged"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/meter.rs",
+          "sha256": "9cce553585b0c75bed9552bda95a8b3d67d275f88191e9b73436628fddccf82a",
+          "line_start": 186,
+          "line_end": 190,
+          "primitive": "one atomic candidate walk-label call",
+          "count_fields": [
+            "walk_label_calls"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 1313,
+          "line_end": 1314,
+          "primitive": "two actual per-walk label invocations",
+          "count_fields": [
+            "walk_label_calls"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 1426,
+          "line_end": 1433,
+          "primitive": "actual label helper observes invocation before deterministic mix",
+          "count_fields": [
+            "walk_label_calls"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads_rho_events.rs",
+          "sha256": "dd1a67d91cab300d7c19a113c76ce0d0cd44cbd6d6abd075459bbf08d3c43a24",
+          "line_start": 1,
+          "line_end": 149,
+          "primitive": "pinned rho table key/hash observations and semantic collection events",
+          "count_fields": [
+            "hash_calls",
+            "hash_bytes",
+            "key_comparisons",
+            "entry_visits",
+            "elements_copied",
+            "elements_initialized"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 2607,
+          "line_end": 2765,
+          "primitive": "actual rho draws, hashes, table lookup/insert and collision path",
+          "count_fields": [
+            "rng_draws_uncharged",
+            "partition_hashes_uncharged",
+            "rho_semantic_*",
+            "rho_observed_hash_calls_v1"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 251,
+          "line_end": 296,
+          "primitive": "atomic RNG/hash and rho semantic mapping without overlap summary",
+          "count_fields": [
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "hash bytes and hash probes are diagnostic/excluded",
+        "internal mix/reduction and hash CPU expansion are not inferred",
+        "pinned hasher can affect runtime and remains bound to toolchain/binary"
+      ],
+      "finding": "Actual candidate label calls and reference table/hash operations have selected finite events; no remaining selected hash/RNG source omission found."
+    },
+    {
+      "category": "source_verification",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "candidate.counts",
+        "additional_source_verification.*",
+        "additional_source_verification geometry segment",
+        "reference field counters"
+      ],
+      "source_sites": [
+        {
+          "path": "research/pencil_large_prime_20261029/src/native_solver.rs",
+          "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+          "line_start": 1373,
+          "line_end": 1379,
+          "primitive": "solver-side recovered scalar check in counted recovery phase",
+          "count_fields": [
+            "candidate.counts",
+            "phases.recovery_check"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/pencil.rs",
+          "sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e",
+          "line_start": 82,
+          "line_end": 93,
+          "primitive": "additional fresh source verification added once after solver",
+          "count_fields": [
+            "additional_source_verification",
+            "geometry.additional_source_verification"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/three_leads.rs",
+          "sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716",
+          "line_start": 248,
+          "line_end": 273,
+          "primitive": "reference adapter fresh source verification included once in out counts",
+          "count_fields": [
+            "field_multiplications",
+            "field_squarings",
+            "field_inversions",
+            "geometry.additional_source_verification"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 200,
+          "line_end": 218,
+          "primitive": "candidate internal totals plus additional verification and reference exported totals",
+          "count_fields": [
+            "m",
+            "s",
+            "i",
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "parent record audit outside the method is a separate resource and is not folded into algorithm counters"
+      ],
+      "finding": "Solver and adapter verification scopes are disjoint and included once; no selected source-verification omission found."
+    },
+    {
+      "category": "metadata_clone",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "metadata_value_nodes_copied",
+        "metadata_string_bytes_copied",
+        "metadata_key_bytes_copied",
+        "metadata_family_bytes_copied"
+      ],
+      "source_sites": [
+        {
+          "path": "src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "line_start": 1290,
+          "line_end": 1307,
+          "primitive": "actual StudyInstance fresh clone call",
+          "count_fields": [
+            "metadata_*"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/three_leads_geometry_events.rs",
+          "sha256": "a60e3894f4178cf5894b3c277991627ab15c1279a78daf2000e897064f0f20ee",
+          "line_start": 214,
+          "line_end": 265,
+          "primitive": "serde Value node census and supplemental byte observations",
+          "count_fields": [
+            "metadata_value_nodes_copied",
+            "metadata_string_bytes_copied",
+            "metadata_key_bytes_copied",
+            "metadata_family_bytes_copied"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 328,
+          "line_end": 348,
+          "primitive": "one native unit per copied Value node only",
+          "count_fields": [
+            "logical"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "observer traversal creates no collection event",
+        "string/key/family bytes are retained supplemental observations",
+        "fixed whole-record Copy moves are excluded"
+      ],
+      "finding": "Actual metadata clone is observed once per fresh instance; no selected metadata-clone omission found."
+    },
+    {
+      "category": "calibration",
+      "disposition": "covered",
+      "uncovered_sites": [],
+      "count_fields": [
+        "source_unit_calibration_arithmetic.preparation.*",
+        "source_unit_calibration_arithmetic.addition.*",
+        "source_unit_calibration_arithmetic.total.*",
+        "geometry.source_unit_calibration.*"
+      ],
+      "source_sites": [
+        {
+          "path": "src/cryptanalysis/ecbench/pencil.rs",
+          "sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e",
+          "line_start": 94,
+          "line_end": 100,
+          "primitive": "candidate calibration preparation and source-addition counts",
+          "count_fields": [
+            "preparation",
+            "addition",
+            "total"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/pencil.rs",
+          "sha256": "48424cb11a2b308f385d4628dc92024ea7c09589da340247f85a5c2ac5f31b8e",
+          "line_start": 154,
+          "line_end": 177,
+          "primitive": "candidate exact geometry partition and explicit calibration block",
+          "count_fields": [
+            "geometry.source_unit_calibration",
+            "source_unit_calibration_arithmetic"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/three_leads.rs",
+          "sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716",
+          "line_start": 270,
+          "line_end": 284,
+          "primitive": "reference calibration preparation and source-addition counts",
+          "count_fields": [
+            "preparation",
+            "addition",
+            "total"
+          ]
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/three_leads.rs",
+          "sha256": "02dd6a5e6f665e302c1ccb208f5d9810955dab195aa993714a478df6cd567716",
+          "line_start": 341,
+          "line_end": 372,
+          "primitive": "reference exact geometry partition and explicit calibration block",
+          "count_fields": [
+            "geometry.source_unit_calibration",
+            "source_unit_calibration_arithmetic"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/importer.rs",
+          "sha256": "db05f1bda12bfbdeaff4806f3d3ac968e165c05d06b28e8dd73bb9868963633d",
+          "line_start": 325,
+          "line_end": 443,
+          "primitive": "partition recomputation and calibration/source-unit equality checks",
+          "count_fields": [
+            "geometry.total",
+            "geometry.segments",
+            "preparation",
+            "addition",
+            "total"
+          ]
+        },
+        {
+          "path": "research/pencil_large_prime_20261029/native_price/src/analyzer.rs",
+          "sha256": "450efc42a1d73d1cfcc6d99425da9c36a129f1c62c45763aaf6823add003587d",
+          "line_start": 298,
+          "line_end": 326,
+          "primitive": "method excludes calibration; separate and combined costs add it once",
+          "count_fields": [
+            "calibration"
+          ]
+        }
+      ],
+      "diagnostic_or_separate": [
+        "calibration is not silently free or included in method-only price",
+        "geometry total and segments are never added together"
+      ],
+      "finding": "Preparation plus addition and matched source unit are checked; no selected calibration omission found."
+    }
+  ],
+  "wall_qualified": false,
+  "empirical_ratios_in_review": null,
+  "review_timing": "post-data source/build identity closure; prior source coverage reviewed pre-data"
+}

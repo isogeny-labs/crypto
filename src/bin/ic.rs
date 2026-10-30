@@ -27,6 +27,8 @@ mod progress;
 mod rho;
 #[path = "ic/sweep/mod.rs"]
 mod sweep;
+#[path = "ic/tensor.rs"]
+mod tensor;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -120,6 +122,10 @@ enum Action {
     /// record: the unit `ic sweep` optimises over.  The score is a function
     /// of operation counts alone.
     SweepTrial(sweep::trial::TrialArgs),
+    /// Toy index calculus with relations found by Boolean tensor contraction
+    /// (crates/ecdl-tensor-ic): gadget-network shape table, or a solved toy
+    /// instance. Exponential counters; no speedup is claimed.
+    Tensor(tensor::TensorArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -177,6 +183,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
         Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
+        Some(Action::Tensor(args)) => tensor::run(args.clone(), cli.json),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
@@ -257,6 +264,7 @@ fn linear_algebra_summary(la: &Value) -> String {
 fn display(report: &Value) {
     match report["operation"].as_str() {
         Some("plan") => plan::display(report),
+        Some("tensor-scale" | "tensor-demo") => tensor::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",
@@ -654,3 +662,17 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+// Keep the CLI external contract suites available to a selected binary target.
+// Cargo integration-test mode also builds unrelated binaries.
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_framework.rs"]
+mod cli_framework_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_progress.rs"]
+mod cli_progress_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;
