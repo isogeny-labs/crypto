@@ -6,6 +6,12 @@ and fixed software correctness testing, not a scientific timing run.
 Before delivery, fast-forwarded the branch to `9ff0812160499f3974d3507b936f0b7cb28123f9`.
 That integration changes documentation/research records, not the root Rust
 sources, manifests, modified native crate or local dependency sources.
+For PR integration, merged `main` at
+`4b1834891e78ca3f83b64540717042e0569d2a60`. The only conflict was an
+append-only session log; both entries were retained. The only new source in
+the crate was the upstream `hashed-ecdl-panel` preparer. Its three release
+tests pass, and all-target strict Clippy, Rust 1.78 and formatting pass after
+integration. The three pruning source hashes below are unchanged.
 
 ## Requested scope and chosen increment
 

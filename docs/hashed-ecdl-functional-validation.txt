@@ -708,3 +708,26 @@ Uncompressed SHA-256: 978ab375720353a81580dec0b99f262c0e13f324fdd727698b510c55a5
 Artifact verification: repository verify --remote returned 1 hydrated entry,
 0 problems. A fresh aws s3 cp download matched the compressed artifact with
 cmp, and its decompressed output matched the complete original log with cmp.
+
+Main integration at 4b1834891e78ca3f83b64540717042e0569d2a60:
+Only session-log append conflict; both histories retained. Native pruning
+source hashes unchanged. New upstream panel preparer validation follows.
+Command: CARGO_BUILD_JOBS=2 cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl-panel
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `release` profile [optimized] target(s) in 2.96s
+     Running unittests src/bin/hashed-ecdl-panel.rs (crates/hashed-ecdl-tensor/target/release/deps/hashed_ecdl_panel-b9850214598f0c14)
+
+running 3 tests
+test tests::oracle_checks_full_cardinality_and_all_native_multiples ... ok
+test tests::panel_preserves_every_frozen_case_and_separates_answers ... ok
+test tests::preparation_is_complete_and_existing_evidence_is_never_replaced ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.57s
+warning: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+    Checking hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-hashed-tensor-functional-20261030/crates/hashed-ecdl-tensor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.92s
+Formatting check exited 0. All three modified native source hashes still
+match the validated cryptanalysis implementation.
