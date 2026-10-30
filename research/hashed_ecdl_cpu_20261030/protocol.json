@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "HASHED-ECDL-CPU-20261030",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-30",
   "repository": "crypto",
   "study_dir": "research/hashed_ecdl_cpu_20261030",
@@ -527,12 +527,22 @@
       "verified_by": "Pinned source9e55fa6f, read before implementation"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "reason": "First job failed HeadObject403 before downloading any instrument or running data. Permit one fresh measurement job using per-object presigned GET/PUT, retain failed staging receipt. Inputs, metrics, arms, counts and analysis unchanged.",
+      "filed_before_affected_data": true,
+      "id": "A1-staging",
+      "filed": "2026-10-30T03:10:00Z",
+      "changes": [
+        "Use per-object presigned artifact transport after zero-data staging failure; one fresh job."
+      ]
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "7942ce1822de29aa5e2e15fc2acac2a320fb3fd7daa861411131e8e91402495d",
-    "commit": "9e55fa6f9a26f37b9e671b6a6c9b64f911ad1a43",
-    "frozen_at": "2026-10-30T03:05:50Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
   }
 }
