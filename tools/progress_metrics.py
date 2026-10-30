@@ -13,6 +13,8 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
+                                IC collect-phase component: paired native ratio and its A/A floor
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -328,6 +330,29 @@ def koblitz_modular_geometry(ref, since):
                      better="neutral", label=label, source=f"{path}@{commit}")
 
 
+    path = f"{base}30/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("accepted_native") != 5 or record.get("native_failures") != 0:
+            continue
+        if not record.get("finite_middle_enumeration", {}).get("complete"):
+            continue
+        scale = record.get("scale", {}).get("records", [])
+        descent = record.get("constant_extension", {}).get("records", [])
+        if scale:
+            value = max((r["n"] for r in scale if r.get("d") == 1), default=None)
+            emit("koblitz_modular.formal_recovery_max_cyclic_length", value,
+                 date=date, problem=P_IC, unit="formal cyclic length", better="neutral",
+                 label="Certified generalized recovery family; larger-n geometric transfers not constructed",
+                 source=f"{path}@{commit}")
+        if descent:
+            value = max(r["absolute_algebra_degree"] for r in descent)
+            emit("koblitz_modular.ordinary_kernel_max_absolute_algebra_degree", value,
+                 date=date, problem=P_IC, unit="dimension over F2", better="neutral",
+                 label="Actual ordinary finite kernel algebra; no Jacobian image or IC-rank claim",
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -405,6 +430,46 @@ def curve_traits(ref):
          label="Proved primes in docs/curves/factor-hints.txt", source="docs/curves/factor-hints.txt")
 
 
+def pencil_gate_observations(ref, since):
+    """Copy committed native gate counts; do not derive costs or clock admission."""
+    path = "research/pencil_large_prime_20261029/validation/actual_gate_results_20261030/analysis-receipt.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "pencil-actual-gate-analysis-receipt/v1":
+            continue
+        for field, unit in (
+            ("observed_executions", "execution records including warmups"),
+            ("observed_warmup_executions", "warmup execution records"),
+        ):
+            emit("pencil.p739_gate." + field, record.get(field), date=date,
+                 problem=P_IC, unit=unit, better="neutral",
+                 label="Recorded synthetic p739 gate; no wall-time qualification",
+                 source=f"{path}@{commit}")
+        if record.get("all_expected_records_present") is True:
+            emit("pencil.p739_gate.observed_workloads", record.get("expected_workloads"),
+                 date=date, problem=P_IC, unit="distinct prescribed workloads",
+                 better="neutral", label="Complete 60-target gate inventory; not the 1260-target cohort",
+                 source=f"{path}@{commit}")
+def ic_aimed_gather(ref, since):
+    """The aimed-subset gather component (a stage measurement, not a whole-pipeline row):
+    the 42-round paired collect-phase ratio main / candidate and the lower end of its
+    corrected 95% interval, with the same-session A/A's upper end beside it."""
+    path = "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json"
+    for date, commit, text in file_history(ref, path, since):
+        s = json.loads(text).get("sessions", {}).get("2026-10-29", {})
+        ab, aa = s.get("ab_collect", {}), s.get("aa_collect", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.aimed_gather.collect_ratio", ab.get("median"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / aimed-gather candidate, median of 42 paired rounds (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.collect_ratio_ci95_lo", (ab.get("ci95") or {}).get("lo"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / candidate: lower end of the corrected 95% interval (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.aa_ci95_hi", (aa.get("ci95") or {}).get("hi"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC collect phase, same-session A/A upper end of the corrected 95% interval (stage)",
+             source=src)
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -423,6 +488,8 @@ def main():
 
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
+    pencil_gate_observations(a.ref, a.since)
+    ic_aimed_gather(a.ref, a.since)
 
 if __name__ == "__main__":
     main()

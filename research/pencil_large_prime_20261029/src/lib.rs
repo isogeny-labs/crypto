@@ -1,3 +1,4 @@
+#![recursion_limit = "256"]
 //! Exact elimination of at most two large variables per homogeneous row.
 //!
 //! Small columns are arbitrary symbolic variables, not known scalar values.
@@ -5,9 +6,16 @@
 //! Input modulus must be prime. All input coefficients are canonicalized,
 //! including duplicate columns, before changing graph state.
 
-use std::collections::BTreeMap;
+pub type Sparse = sparse::TrackedMap<u64>;
 
-pub type Sparse = BTreeMap<usize, u64>;
+pub mod allocation;
+pub mod collector;
+pub mod meter;
+pub mod outer_primality;
+pub mod residual;
+pub mod scalar_ledger;
+pub mod sparse;
+pub mod tracked_set;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
@@ -26,12 +34,15 @@ pub enum Outcome {
 }
 
 fn add(a: u64, b: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_adds += 1);
     ((a as u128 + b as u128) % p as u128) as u64
 }
 fn mul(a: u64, b: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_muls += 1);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 fn neg(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_negations += 1);
     if a == 0 {
         0
     } else {
@@ -50,23 +61,33 @@ fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
     v
 }
 
+fn reduce(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.modular_reductions += 1);
+    a % p
+}
+fn inverse(a: u64, p: u64) -> u64 {
+    meter::charge(|c| c.scalar_inversions += 1);
+    pow(a, p - 2, p)
+}
+
 // Deterministic Miller--Rabin base set for the complete u64 range.
 fn is_prime(p: u64) -> bool {
+    meter::charge(|c| c.primality_checks += 1);
     if p < 2 {
         return false;
     }
     for d in [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if p.is_multiple_of(d) {
+        if reduce(p, d) == 0 {
             return p == d;
         }
     }
     let s = (p - 1).trailing_zeros();
     let d = (p - 1) >> s;
     for a in [2, 325, 9375, 28178, 450775, 9780504, 1795265022] {
-        if a % p == 0 {
+        if reduce(a, p) == 0 {
             continue;
         }
-        let mut x = pow(a % p, d, p);
+        let mut x = pow(reduce(a, p), d, p);
         if x == 1 || x == p - 1 {
             continue;
         }
@@ -86,7 +107,17 @@ fn is_prime(p: u64) -> bool {
 }
 
 fn accumulate(out: &mut Sparse, column: usize, value: u64, p: u64) {
-    let v = add(out.get(&column).copied().unwrap_or(0), value, p);
+    meter::charge(|c| c.sparse_accumulations += 1);
+    let v = add(
+        out.get(&column)
+            .map(|&v| {
+                meter::collection(0, 1, 0, 0);
+                v
+            })
+            .unwrap_or(0),
+        value,
+        p,
+    );
     if v == 0 {
         out.remove(&column);
     } else {
@@ -95,6 +126,7 @@ fn accumulate(out: &mut Sparse, column: usize, value: u64, p: u64) {
 }
 fn axpy(out: &mut Sparse, a: u64, input: &Sparse, p: u64) {
     for (&column, &v) in input {
+        meter::charge(|c| c.payload_terms += 1);
         accumulate(out, column, mul(a, v, p), p);
     }
 }
@@ -124,6 +156,12 @@ impl SymbolicGraph {
         if !is_prime(p) {
             return Err(Error::NonPrimeModulus);
         }
+        meter::collection(
+            0,
+            0,
+            large_count.checked_mul(5).expect("vector size overflow"),
+            0,
+        );
         Ok(Self {
             p,
             small_count,
@@ -138,11 +176,17 @@ impl SymbolicGraph {
     fn expression(&self, mut node: usize) -> (usize, u64, Sparse) {
         let mut a = 1;
         let mut b = Sparse::new();
-        while self.parent[node] != node {
+        while {
+            meter::collection(1, 0, 0, 1);
+            self.parent[node] != node
+        } {
+            meter::collection(3, 0, 0, 0); // offset, scale, next parent reads
+            meter::charge(|c| c.parent_hops += 1);
             axpy(&mut b, a, &self.offset[node], self.p);
             a = mul(a, self.scale[node], self.p);
             node = self.parent[node];
         }
+        meter::collection(1, 0, 0, 0);
         if let Some(value) = &self.anchor[node] {
             axpy(&mut b, a, value, self.p);
             a = 0;
@@ -160,21 +204,28 @@ impl SymbolicGraph {
         large: &[(usize, u64)],
         small: &[(usize, u64)],
     ) -> Result<Outcome, Error> {
-        if large.iter().any(|&(i, _)| i >= self.parent.len())
-            || small.iter().any(|&(i, _)| i >= self.small_count)
-        {
+        if large.iter().any(|&(i, _)| {
+            meter::collection(1, 0, 0, 1);
+            i >= self.parent.len()
+        }) || small.iter().any(|&(i, _)| {
+            meter::collection(1, 0, 0, 1);
+            i >= self.small_count
+        }) {
             return Err(Error::ColumnOutOfRange);
         }
         let mut canonical = Sparse::new();
         for &(i, v) in large {
-            accumulate(&mut canonical, i, v % self.p, self.p);
+            meter::collection(1, 0, 0, 0);
+            accumulate(&mut canonical, i, reduce(v, self.p), self.p);
         }
+        meter::collection(0, 0, 0, 1);
         if canonical.len() > 2 {
             return Err(Error::MoreThanTwoLargeVariables);
         }
         let mut payload = Sparse::new();
         for &(i, v) in small {
-            accumulate(&mut payload, i, v % self.p, self.p);
+            meter::collection(1, 0, 0, 0);
+            accumulate(&mut payload, i, reduce(v, self.p), self.p);
         }
         let mut roots = Sparse::new();
         for (i, v) in canonical {
@@ -186,7 +237,8 @@ impl SymbolicGraph {
             0 => Ok(Outcome::Constraint(payload)),
             1 => {
                 let (&root, &a) = roots.first_key_value().unwrap();
-                let factor = neg(pow(a, self.p - 2, self.p), self.p);
+                meter::collection(0, 1, 0, 0);
+                let factor = neg(inverse(a, self.p), self.p);
                 self.anchor[root] = Some(scaled(&payload, factor, self.p));
                 Ok(Outcome::Anchored)
             }
@@ -194,14 +246,16 @@ impl SymbolicGraph {
                 let mut iter = roots.into_iter();
                 let (mut u, mut a) = iter.next().unwrap();
                 let (mut v, mut b) = iter.next().unwrap();
+                meter::collection(2, 0, 0, 1 + usize::from(self.size[u] == self.size[v]));
                 if (self.size[u], u) > (self.size[v], v) {
                     std::mem::swap(&mut u, &mut v);
                     std::mem::swap(&mut a, &mut b);
                 }
-                let factor = neg(pow(a, self.p - 2, self.p), self.p);
+                let factor = neg(inverse(a, self.p), self.p);
                 self.parent[u] = v;
                 self.scale[u] = mul(factor, b, self.p);
                 self.offset[u] = scaled(&payload, factor, self.p);
+                meter::collection(2, 0, 0, 0);
                 self.size[v] += self.size[u];
                 Ok(Outcome::Joined)
             }
@@ -213,6 +267,74 @@ impl SymbolicGraph {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn anchoring_copies_one_borrowed_lookup_entry() {
+        let mut graph = SymbolicGraph::new(7, 1, 0).unwrap();
+        meter::reset();
+        assert_eq!(graph.insert(&[(0, 1)], &[]), Ok(Outcome::Anchored));
+        assert_eq!(meter::snapshot().collection_elements_copied, 1);
+    }
+    #[test]
+    fn accumulation_copies_only_existing_coefficients() {
+        let mut out = Sparse::new();
+        meter::reset();
+        accumulate(&mut out, 0, 1, 7);
+        assert_eq!(meter::snapshot().collection_elements_copied, 0);
+        accumulate(&mut out, 0, 2, 7);
+        assert_eq!(meter::snapshot().collection_elements_copied, 1);
+        assert_eq!(meter::snapshot().collection_elements_initialized, 1);
+    }
+
+    #[test]
+    fn forest_initialization_and_slice_passes_are_disjoint() {
+        meter::reset();
+        let mut graph = SymbolicGraph::new(7, 2, 2).unwrap();
+        assert_eq!(meter::snapshot().collection_elements_initialized, 10);
+        meter::reset();
+        assert_eq!(
+            graph.insert(&[(0, 0)], &[(1, 0)]),
+            Ok(Outcome::Constraint(Sparse::new()))
+        );
+        let c = meter::snapshot();
+        assert_eq!(c.collection_entry_visits, 4); // two validation + two canonicalization entries
+        assert_eq!(c.collection_comparisons, 3); // bounds twice, canonical cardinality once
+        assert_eq!(c.collection_elements_initialized, 0);
+        meter::reset();
+        assert_eq!(
+            graph.insert(&[(2, 1)], &[(0, 1)]),
+            Err(Error::ColumnOutOfRange)
+        );
+        assert_eq!(meter::snapshot().collection_entry_visits, 1);
+        assert_eq!(meter::snapshot().collection_comparisons, 1);
+    }
+
+    #[test]
+    fn semantic_counters_separate_primality_and_inverse_work() {
+        meter::reset();
+        assert_eq!(inverse(3, 7), 5);
+        let c = meter::snapshot();
+        // Exponent 5 has three loop squares and two selected multiplies.
+        assert_eq!(c.scalar_muls, 5);
+        assert_eq!(c.scalar_inversions, 1);
+        meter::reset();
+        assert!(is_prime(101));
+        let c = meter::snapshot();
+        assert_eq!(c.primality_checks, 1);
+        assert_eq!(c.scalar_inversions, 0);
+        assert!(c.scalar_muls > 0);
+        assert!(c.modular_reductions > 0);
+        let mut g = SymbolicGraph::new(7, 3, 1).unwrap();
+        meter::reset();
+        assert_eq!(
+            g.insert(&[(0, 1), (1, 1), (2, 1)], &[]),
+            Err(Error::MoreThanTwoLargeVariables)
+        );
+        let c = meter::snapshot();
+        assert_eq!(c.modular_reductions, 3);
+        assert_eq!(c.sparse_accumulations, 3);
+        assert_eq!(c.scalar_adds, 3);
+        assert_eq!(c.scalar_inversions, 0);
+    }
 
     // Independent small-field reference: dense rows, exhaustive inverse
     // search, and ordinary RREF. No graph arithmetic helper is used.
@@ -272,6 +394,26 @@ mod tests {
                     state
                 };
                 let mut g = SymbolicGraph::new(p, nl, ns).unwrap();
+                let mut composed = collector::Collector::new(
+                    p,
+                    &[
+                        false, false, false, false, false, false, true, true, true, true,
+                    ],
+                    residual::Limits {
+                        retained_coefficients: ns * ns,
+                        working_coefficients: ns,
+                    },
+                )
+                .unwrap();
+                let mut basis = residual::Basis::new(
+                    p,
+                    ns,
+                    residual::Limits {
+                        retained_coefficients: ns * ns,
+                        working_coefficients: ns,
+                    },
+                )
+                .unwrap();
                 let mut original = Vec::new();
                 let mut emitted = Vec::new();
                 for _ in 0..40 {
@@ -289,7 +431,22 @@ mod tests {
                         dense[nl + i] = (dense[nl + i] + v) % p;
                     }
                     original.push(dense);
+                    let mut global = large.clone();
+                    global.extend(small.iter().map(|&(i, v)| (nl + i, v)));
+                    let admission = composed.insert(&global).unwrap();
+                    assert!(matches!(
+                        admission,
+                        collector::Admission::Joined
+                            | collector::Admission::Anchored
+                            | collector::Admission::Independent
+                            | collector::Admission::Dependent
+                    ));
                     if let Outcome::Constraint(row) = g.insert(&large, &small).unwrap() {
+                        let terms: Vec<_> = row.iter().map(|(&i, &v)| (i, v)).collect();
+                        assert!(matches!(
+                            basis.insert(&terms).unwrap(),
+                            residual::Insert::Independent | residual::Insert::Dependent
+                        ));
                         let mut dense = vec![0; ns];
                         for (i, v) in row {
                             dense[i] = v;
@@ -307,6 +464,29 @@ mod tests {
                         "p={p} seed={seed} prefix={}",
                         original.len()
                     );
+                    let retained: Vec<_> = basis
+                        .rows()
+                        .map(|row| {
+                            let mut dense = vec![0; ns];
+                            for (&i, &v) in row {
+                                dense[i] = v;
+                            }
+                            dense
+                        })
+                        .collect();
+                    assert_eq!(rref(retained, p, ns), expected);
+                    let retained: Vec<_> = composed
+                        .basis()
+                        .rows()
+                        .map(|row| {
+                            let mut dense = vec![0; ns];
+                            for (&i, &v) in row {
+                                dense[i] = v;
+                            }
+                            dense
+                        })
+                        .collect();
+                    assert_eq!(rref(retained, p, ns), expected);
                     prefixes += 1;
                 }
             }
@@ -384,3 +564,18 @@ mod tests {
         );
     }
 }
+
+#[cfg(feature = "producer")]
+pub use crate as kernel;
+#[cfg(feature = "producer")]
+pub use five_leads_study::three_leads as engine;
+#[cfg(feature = "producer")]
+#[path = "../../../src/cryptanalysis/ic_measurement.rs"]
+// The root-only external Callgrind dump entry is unused by this standalone crate.
+#[expect(
+    dead_code,
+    reason = "shared clock includes a root-only Callgrind entry"
+)]
+pub mod measurement;
+#[cfg(feature = "producer")]
+pub mod native_solver;

@@ -57,6 +57,7 @@ SOURCES = {
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
     "progress_timeline": "docs/ic/progress-timeline.json",
+    "native_tournament26": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
     "koblitz_s20": "research/ic_exponent_20260926/analysis.json",
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
@@ -1782,6 +1783,18 @@ def build(allow_unvalidated: bool = False) -> dict:
         "fully_priced_cold_speedup": None,
     }
     ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+    native_tournament = load(SOURCES["native_tournament26"])
+    if (native_tournament.get("schema") != "ic-native-tournament-measurements/1"
+            or native_tournament.get("round") != "round-0026"
+            or native_tournament.get("audit", {}).get("status") != "VERIFIED"
+            or native_tournament.get("audit", {}).get("trial_receipts") != 1632
+            or native_tournament.get("decision", {}).get("winner") != "batch16"
+            or native_tournament.get("decision", {}).get("status") != "promoted"
+            or len([r for r in native_tournament["rows"]
+                    if r["stage"] == "confirmation" and r["arm"] == "batch16"]) != 5):
+        raise ValueError("native tournament round 0026 is incomplete")
+    native_tournament["source"] = SOURCES["native_tournament26"]
+    native_tournament["report"] = "research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md"
     timeline = load(SOURCES["progress_timeline"])
     progress = next(series for series in timeline["series"] if series["id"] == "ec-cold")
     board = ladder + kob1 + kob
@@ -1833,6 +1846,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "progress": {"source": SOURCES["progress_timeline"], "updated": timeline["updated"],
                      "series_id": progress["id"], "label": progress["label"],
                      "points": progress["points"]},
+        "native_tournament_pilot": native_tournament,
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
         "jv_sieve_weak_class": jv_sieve_table(),
@@ -2140,6 +2154,37 @@ def markdown(doc: dict) -> str:
     for point in doc["progress"]["points"]:
         L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
                  f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
+    L.append("")
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    L += ["## Native candidate tournament, round 0026 (separate Ir unit)", "",
+          f"[Frozen per-cell data](../../{pilot['source']}) and [full result](../../{pilot['report']}) "
+          "retain all arms and the exact ICV1 curve identities. One target is charged cold per job. "
+          "The selected `batch16` configuration improves the incumbent, but its matched worker rho "
+          "is still cheaper on every curve; this rho is not qualified as globally strongest. "
+          "The factor base was fixed within each paired arm, so this panel does not choose a new base. "
+          "`2^x Ir` is guest instructions, with no measured curve-addition conversion. "
+          "The hosted wall times lack core-reservation and contention receipts, so the native "
+          "wall condition is unqualified and promotion awaits an isolated new round. "
+          "The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.", "",
+          "| ICV1 curve | Signed base B | Was: incumbent | batch16 | S (Ir/√r) | IC/incumbent | IC/rho (1.0× parity) |",
+          "|:--|--:|--:|--:|--:|--:|--:|"]
+    for r in confirmed:
+        L.append(f"| `{r['curve_slug']}` | {r['signed_base_sizes'][0]} | "
+                 f"2^{before[r['cell']]['log2_mean_ir']:.2f} Ir | 2^{r['log2_mean_ir']:.2f} Ir | "
+                 f"{r['mean_s_ir_per_sqrt_r']:,.0f} | {saved[r['cell']]:.3f}× | {paired[r['cell']]:.3f}× |")
+    L += ["", "All smoke recipes in the same Ir unit, each with 12 verified jobs; "
+          "the ratios below are descriptive ratios of per-cell mean Ir:", "",
+          "| ICV1 curve | Arm | 2^x Ir | IC/incumbent | IC/rho |",
+          "|:--|:--|--:|--:|--:|"]
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            L.append(f"| `{r['curve_slug']}` | `{r['arm']}` | 2^{r['log2_mean_ir']:.2f} Ir | "
+                     f"{r['ratio_to_incumbent_mean_ir']:.3f}× | {r['ratio_to_rho_mean_ir']:.3f}× |")
     L.append("")
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
@@ -3044,6 +3089,65 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{esc(point["reference"])}</td>'
                  f'<td>{esc(point.get("unit") or "source-specific; see result")}</td></tr>')
     P.append('</tbody></table></div></section>')
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    repo_link = "https://github.com/isogeny-labs/crypto/blob/main/"
+    P.append('<section class="panel" id="native-tournament-round-0026"><h2>Native tournament round 0026 · every recipe and curve</h2>'
+             '<p>The selected <code>batch16</code> configuration reduces complete cold instruction cost '
+             'against the same-fixture incumbent. Its matched worker rho remains cheaper on all five '
+             'curves. This panel has its own Valgrind Ir unit and is outside the GAE-ranked tables. '
+             '<strong>1.0× IC/rho is parity.</strong> Guest instruction counts have no measured '
+             'curve-addition conversion. The factor base was fixed between paired arms; this round '
+             'does not choose a different base. The rank floor is the weak Ir ≥ K, and no scaling '
+             'exponent was promoted. Hosted wall times lack isolation receipts; the native wall '
+             'condition is unqualified and promotion awaits an isolated new round.</p>'
+             f'<p><a href="{esc(repo_link + pilot["report"])}">Full result</a> · '
+             f'<a href="{esc(repo_link + pilot["source"])}">Frozen per-cell data</a> · '
+             f'{pilot["audit"]["trial_receipts"]:,} native-audited trial receipts.</p>'
+             '<div class="scroll"><table><caption>Confirmation, one public target per cold job. '
+             'Was = incumbent on the same targets; B = verified signed factor-base size. '
+             'Ratios are native paired decision values.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>B</th><th>Was: incumbent</th>'
+             '<th>batch16</th><th>S (Ir/√r)</th><th>IC/incumbent</th><th>IC/rho</th><th>Verified</th>'
+             '</tr></thead><tbody>')
+    for r in confirmed:
+        P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                 f'<td>{r["signed_base_sizes"][0]}</td>'
+                 f'<td>2<sup>{before[r["cell"]]["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>{r["mean_s_ir_per_sqrt_r"]:,.0f}</td>'
+                 f'<td>{saved[r["cell"]]:.3f}×</td><td>{paired[r["cell"]]:.3f}×</td>'
+                 f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    P.append('</tbody></table></div><div class="scroll"><table>'
+             '<caption>All smoke recipes, each with 12 verified jobs. Ratios are per-cell mean Ir '
+             'quotients, not pooled paired intervals.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>Arm</th><th>2^x Ir</th>'
+             '<th>Ir/incumbent</th><th>Ir/rho</th><th>Verified</th></tr></thead><tbody>')
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                     f'<td><code>{esc(r["arm"])}</code></td>'
+                     f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                     f'<td>{r["ratio_to_incumbent_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["ratio_to_rho_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    center = next(r for r in confirmed if r["cell"] == "n19a0")
+    prior = before["n19a0"]
+    P.append('</tbody></table></div>'
+             f'<p>On <code>{esc(center["curve_slug"])}</code>, factor-base/table setup is '
+             f'{center["phase_mean_ir"]["factor_base_and_tables"] / 1e6:.3f} million Ir in both '
+             'arms. Collection and decomposition fall from '
+             f'{prior["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} million Ir; '
+             'verification/filtering/linear algebra fall from '
+             f'{prior["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} million Ir. '
+             'PDP and linear algebra are grouped with neighboring work by the worker, so their '
+             'individual slopes remain unset. This constant change does not discharge m=83.</p></section>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
