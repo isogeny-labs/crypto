@@ -59,6 +59,15 @@ study by PR, including honest null or negative results.
 The current tiny public tests are a correctness prerequisite, not this panel's
 held-out data, a speed comparison or a reproduction of APS's full paper ladder.
 
+The [2026-10-29 replay continuation](../../research/aps_replay_20261029/README.md)
+adds independent BigUint EC/sampling/relation checks and complete-set oracles
+for emitted fixed-fixture transcripts. This supplies one replay component;
+it does not make this card ready. Full pricing, native ecbench/export records,
+pre-transcript abort outcomes, metric validation and the frozen protocol remain
+open. The future timed driver must freeze the common online verification
+interval and report post-run completeness auditing separately. No cost claim
+may be inferred from a replay receipt whose costs are explicitly unattested.
+
 ## Four additional comparisons (2026-10-28)
 
 The [follow-up implementation](../../research/aps_followup_20261028/README.md)

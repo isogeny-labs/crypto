@@ -31,6 +31,10 @@ name = "crypto"
 path = "src/main.rs"
 
 [[bin]]
+name = "n83-exclusion-audit"
+path = "research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs"
+
+[[bin]]
 name = "ecdlp-audit"
 path = "src/bin/ecdlp_audit.rs"
 
@@ -172,6 +176,8 @@ redis-native-tls = ["redis/tls-native-tls"]
 # (`pq_groebner_f2::Mask`).  Off by default: the 64-bit build, its counters
 # and its frozen benchmarks are unchanged.
 wide-vars = []
+# Explicit selected-bin CLI contracts; production builds keep their behavior.
+ic-cli-contracts = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []
@@ -214,9 +220,12 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
+ecdl-tensor-ic = { path = "crates/ecdl-tensor-ic" }
 pencil-symbolic-graph = { path = "research/pencil_large_prime_20261029", features = ["reporting"] }
 factor-base = { path = "tools/factor-base" }
 volcano-cli = { path = "tools/volcano-cli" }
+isogeny_algos = { path = "isogeny_algos" }
 # Durable per-vertex IC campaign checkpoints; matches volcano-cli's backend.
 rusqlite = { version = "0.32", features = ["bundled"] }
 # Dataset-only transport accounts each HTTP attempt before transmission.
@@ -256,7 +265,8 @@ rayon = "1.10"
 # BLAKE3 is kept as a crate: its Merkle-tree construction is too complex to
 # reimplement educationally without obscuring the learning goal.
 blake3 = "1.5"
-sha2 = "0.10"
+sha2 = { version = "0.10", features = ["compress"] }
+streebog = "0.10.2"
 # DEFLATE compression. Used only by the cryptopals Set-7 CRIME demo
 # (challenge 51): the attack treats compressed-output length as a
 # side channel, so we need a real LZ77-style compressor for the

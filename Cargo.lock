@@ -765,10 +765,13 @@ dependencies = [
  "base64 0.21.7",
  "blake3",
  "clap",
+ "ecdl-tensor-ic",
  "factor-base",
  "flate2",
  "getrandom 0.2.17",
+ "hashed-ecdl-tensor",
  "hex",
+ "isogeny_algos",
  "libc",
  "num-bigint 0.4.8",
  "num-integer",
@@ -781,6 +784,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.9",
+ "streebog",
  "subtle",
  "tokio",
  "volcano-cli",
@@ -852,6 +856,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
+]
+
+[[package]]
+name = "ecdl-tensor-ic"
+version = "0.1.0"
+dependencies = [
+ "num-bigint 0.4.8",
+ "num-integer",
+ "num-traits",
+ "rand",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -1066,6 +1081,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 dependencies = [
  "foldhash",
+]
+
+[[package]]
+name = "hashed-ecdl-tensor"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.2.17",
+ "num-bigint 0.5.1",
+ "num-integer",
+ "num-rational",
+ "num-traits",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1472,6 +1500,7 @@ checksum = "93e7820bc0a80a0238e650327316f929ba18d5be054b647490a3a6a339f3e7c0"
 dependencies = [
  "num-integer",
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1486,6 +1515,17 @@ version = "0.1.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ce2d95d4b3734dc35aa2f45e1aa22cd416814592a4f9d9205e11affd5b8e10b"
 dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
+dependencies = [
+ "num-bigint 0.4.8",
+ "num-integer",
  "num-traits",
 ]
 
@@ -1981,6 +2021,15 @@ name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
+
+[[package]]
+name = "streebog"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e7fe6ed8a42cec360e070309427bb7959e102849b0dbaa7de19d5b9860bd536"
+dependencies = [
+ "digest 0.10.7",
+]
 
 [[package]]
 name = "strsim"

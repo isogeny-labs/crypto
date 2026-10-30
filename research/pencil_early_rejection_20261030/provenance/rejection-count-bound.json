@@ -1,0 +1,18 @@
+{
+ "schema":"pencil-root-rejection-count-bound/v1",
+ "reviewer":"/root/four_lead_state",
+ "evidence_kind":"static_mathematical_source_argument",
+ "source":{"root":"/home/ec2-user/crypto-pencil-signed-graph-20261029","path":"research/pencil_large_prime_20261029/src/native_solver.rs","sha256":"e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df"},
+ "hypotheses":["odd-characteristic field","smooth quintic y^2=h(x), nonzero h_5","monic degree2 u","degree v<2","u divides v^2-h","faithful field arithmetic and exact source bucket/set construction"],
+ "identity":"q_lambda=q_0+2*lambda*v+lambda^2*u",
+ "leading_coefficient":"-h_5; equals -1 only when h is monic",
+ "claims":{"ordinary_bucket_entries_are_distinct_quotient_roots":true,"exceptional_support_disjoint_from_ordinary":true,"all_lambda_branch_impossible_by_smoothness":true,"exceptional_lambdas_at_most":2,"ordinary_collision_final_bucket_length":3,"rejected_calls_per_sieve_at_most":2,"walks_at_most":16,"rejected_calls_per_target_at_most":32},
+ "scope":"Bounds only the number of complement calls avoided by the proposed root-count reorder; not their fraction of work or a performance measurement.",
+ "rust_limit":"Retain prior normalized p<=2^63 nonoverflowing-input qualification for source behavioral equivalence; this algebra does not prove unrestricted full-u64 equivalence.",
+ "proof_path":"/tmp/pencil-root-rejection-count-bound.md",
+ "patch_applied":false,
+ "tests_run":0,
+ "solver_executions":0,
+ "cloud_calls":0,
+ "speed_claim":null
+}

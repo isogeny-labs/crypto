@@ -2081,6 +2081,22 @@ fn unix_nanos() -> Result<u128, String> {
 }
 
 #[cfg(target_os = "linux")]
+fn process_entry<T>(pid: u32, result: std::io::Result<T>) -> Result<Option<T>, String> {
+    match result {
+        Ok(value) => Ok(Some(value)),
+        // Linux proc_pid_cmdline_read returns ESRCH if the task exits after
+        // directory enumeration. It is as absent as an unlinked proc entry.
+        Err(error)
+            if error.kind() == std::io::ErrorKind::NotFound
+                || error.raw_os_error() == Some(libc::ESRCH) =>
+        {
+            Ok(None)
+        }
+        Err(error) => Err(format!("cannot inspect process {pid}: {error}")),
+    }
+}
+
+#[cfg(target_os = "linux")]
 fn assert_no_workers(root: &Path) -> Result<(), String> {
     let root = checked_directory(root, false)?;
     // A worker's external descendants may outlive a supervisor killed before
@@ -2103,7 +2119,9 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             ));
         }
     }
-    for entry in fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))? {
+    'processes: for entry in
+        fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))?
+    {
         let entry = entry.map_err(|e| e.to_string())?;
         let Some(pid) = entry
             .file_name()
@@ -2118,18 +2136,14 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
         // Workers execute under this account. Permission errors inspecting a
         // same-user process fail closed instead of assuming it has exited.
         use std::os::unix::fs::MetadataExt;
-        let metadata = match entry.metadata() {
-            Ok(m) => m,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(e) => return Err(e.to_string()),
+        let Some(metadata) = process_entry(pid, entry.metadata())? else {
+            continue;
         };
         if metadata.uid() != unsafe { libc::geteuid() } {
             continue;
         }
-        let command = match fs::read(entry.path().join("cmdline")) {
-            Ok(value) => value,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(e) => return Err(format!("cannot inspect process {pid}: {e}")),
+        let Some(command) = process_entry(pid, fs::read(entry.path().join("cmdline")))? else {
+            continue;
         };
         let args: Vec<_> = command
             .split(|b| *b == 0)
@@ -2150,9 +2164,10 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             let resolved = if path.is_absolute() {
                 path.to_path_buf()
             } else {
-                fs::read_link(entry.path().join("cwd"))
-                    .map_err(|e| format!("cannot resolve worker {pid} cwd: {e}"))?
-                    .join(path)
+                let Some(cwd) = process_entry(pid, fs::read_link(entry.path().join("cwd")))? else {
+                    continue 'processes;
+                };
+                cwd.join(path)
             };
             let resolved = resolved
                 .canonicalize()
@@ -3662,6 +3677,66 @@ mod tests {
             split_rule: "curve-twist-component-sha256-v1".into(),
         }
     }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn vanished_procfs_entries_do_not_block_worker_inspection() {
+        for errno in [libc::ENOENT, libc::ESRCH] {
+            let entry = process_entry::<Vec<u8>>(42, Err(std::io::Error::from_raw_os_error(errno)))
+                .unwrap();
+            assert!(entry.is_none(), "a vanished process is not a live owner");
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn procfs_permission_and_io_errors_still_block_worker_inspection() {
+        for errno in [libc::EPERM, libc::EACCES, libc::EIO, libc::ENOTDIR] {
+            assert!(
+                process_entry::<Vec<u8>>(42, Err(std::io::Error::from_raw_os_error(errno)))
+                    .is_err(),
+                "an uninspectable process cannot be assumed absent: errno {errno}"
+            );
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn successful_procfs_inspection_preserves_the_worker_command() {
+        let command = b"ic\0dataset\0worker\0--out\0/tmp/unit-output\0".to_vec();
+        assert_eq!(
+            process_entry(42, Ok(command.clone())).unwrap(),
+            Some(command)
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn process_exit_between_procfs_open_and_read_is_not_a_live_worker() {
+        use std::io::Read;
+        let mut child = std::process::Command::new("sleep")
+            .arg("30")
+            .spawn()
+            .unwrap();
+        let pid = child.id();
+        let path = format!("/proc/{pid}/cmdline");
+        let opened = std::fs::File::open(&path);
+        // Always terminate and reap the owned fixture before any assertion.
+        let killed = child.kill();
+        let waited = child.wait();
+        killed.unwrap();
+        waited.unwrap();
+        let missing = std::fs::read(&path);
+        assert_eq!(
+            missing.as_ref().unwrap_err().kind(),
+            std::io::ErrorKind::NotFound
+        );
+        assert!(process_entry(pid, missing).unwrap().is_none());
+        let mut opened = opened.unwrap();
+        let read = opened.read_to_end(&mut Vec::new());
+        assert_eq!(read.as_ref().unwrap_err().raw_os_error(), Some(libc::ESRCH));
+        assert!(process_entry(pid, read).unwrap().is_none());
+    }
+
     #[test]
     fn cross_product_has_no_duplicate_and_includes_twists_and_endpoints() {
         let p = plan();

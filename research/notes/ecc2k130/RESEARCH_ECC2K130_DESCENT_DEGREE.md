@@ -111,6 +111,13 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
       (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
       pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
       a result. No row moves.
+11. **The three-guess failure is the ℓ = 7 rise (§12).**
+    - The unspecialised (22, 7) system, same N = 43 and 136,698 columns as the
+      3-set, does not refute at degree 4 on 4 of 4 draws; 12 of 12 unspecialised
+      ℓ = 7 draws do not refute over surplus −2, 0, +1.
+    - The pattern fits `m·(ℓ−7)+1` guesses: 4 at ℓ = 8, 105 at the priced
+      m = 4, ℓ = 33 cell, against a break-even of 6. An extrapolation from ℓ = 7
+      and 8. No row moves.
 
 ## 1. What is measured
 
@@ -540,6 +547,26 @@ draws (N = 43, 136,698 columns), 8 branches per draw.
   k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
 - **No row moves** and none beats rho.
 
+## 12. The matched null at (22, 7) (2026-10-28)
+
+`research/dreg_closure_null22_7_20261028/` measured the unspecialised
+m = 3, (n, ℓ) = (22, 7) system: the same N = 43, 44 equations and 136,698
+columns as the three-guess set of §11, on four unsatisfiable draws (surplus +1).
+
+- **It does not refute at degree 4 on 4 of 4 draws** (registered verdict: the
+  pure ℓ = 7 reading). Identity, dimension-6 positive and satisfiable soundness
+  controls are valid.
+- **So the earlier ℓ = 7 failure is not a surplus artefact:** 12 of 12
+  unspecialised ℓ = 7 draws fail over surplus −2, 0, +1.
+- **What follows (derived).** Fixing the top coordinate of each summand takes
+  ℓ = 8 to ℓ = 7, and ℓ = 7 is where degree 4 stops refuting, so the guess count
+  is about `m·(ℓ−7)` plus the one that ℓ = 7 itself needs: 4 at ℓ = 8, which is
+  what §10 and §11 measured. Linear extrapolation gives 4·(33−7)+1 = 105 guesses
+  at the priced m = 4, ℓ = 33 cell, far above the break-even k ≤ 6, so the
+  hybrid does not beat degree 5 there. It rests on ℓ = 7 and ℓ = 8.
+- **Not measured:** a 3-set leaving one summand at dimension 8 (the reading
+  predicts failure); degree 5 at ℓ = 7. No row moves, and none beats rho.
+
 ## Scope and disclosures
 
 - **System.** `m = 3`, the chained `S₃`, with `b = 1`.
@@ -629,6 +656,40 @@ closure degree.
   ℓ = 33 stays far above the break-even of 6.
 - **Disclosure.** The soundness rule was replaced after the data, because the
   satisfiable branches holding solutions ran out of memory (Amendment 1).
+
+## Invariant guess, eight more draws (2026-10-29): the invariant guess is better (p = 0.031)
+
+`research/dreg_invariant_guess_more_20261029/` (pre-registered on fresh draws
+7–39 of the same seeded sequence; `RESULTS.md`, `results.pdf`).
+
+- **Result.** On the 8 registered unsatisfiable draws, guessing `a₇ + b₇`
+  suffices on 5 and guessing `a₇` on 0.
+  - All 5 discordant draws favour the invariant (one-sided exact sign test
+    p = 0.031).
+  - With the four earlier draws: 6 of 6, p = 0.016, and 7 of 12 draws
+    against 1 of 12.
+- **What it contradicts.** The summand-dimension reading of §12 does not hold
+  at this cell: what governs refutation is the coordinate of `s`, not the
+  dimension of the summands.
+- **What it is.** A measured stage-level improvement in the guess-then-degree-4
+  oracle's guess choice.
+- **What it is not.** No row moves: the guess count at ℓ = 33 is still
+  extrapolated far above the break-even of 6.
+- **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
+## A second invariant guess (2026-10-29): not a substitute for the raw guess on x₃
+
+`research/dreg_invariant_pair_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with a second invariant coordinate of the
+pair, `a₆ + b₆`, on the same 12 draws.
+
+- **Result.** The new arm suffices on 2 of 12 draws, against S3's 7 of 12.
+  - All 5 discordant draws favour S3. The registered two-sided sign test gives
+    p = 0.0625, so the verdict is no detected difference.
+  - It is never better on any draw.
+- **What it means.** One invariant guess per summand pair is the useful part,
+  and the raw guess on the third summand still carries weight.
+- **What it is not.** No row moves.
 
 ## Reproducing
 

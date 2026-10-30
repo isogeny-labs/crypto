@@ -1,0 +1,34 @@
+{
+  "schema": "software-validation-receipt/v1",
+  "task": "T-927",
+  "recorded_at": "2026-10-30T15:31:05.266334+00:00",
+  "scientific_executions": 0,
+  "solver_or_rho_calls": 0,
+  "tests": {
+    "profile": "release",
+    "filter": "progress::diagnostic_fixture_tests",
+    "passed": 9,
+    "failed": 0,
+    "filtered_out": 12
+  },
+  "clippy_lib_deny_warnings": "passed",
+  "production_integrated": false,
+  "execution_admitted": false,
+  "source_hashes": {
+    "Cargo.toml": "5861bc7e4723a930777e922069a0250124362633d05bccaaa7c4f2271874afef",
+    "Cargo.lock": "3b27710e1346d7375ce44feb7ba9ef6c035319c6a3385ac7a4f5ce97e5ef2c5b",
+    "src/lib.rs": "aaa34750a8a367c1371e108873b8885e50cfefe6c0e6afc6108672cb0213bab9",
+    "src/progress.rs": "5415467accaf0e8b6426a8834838ac6fc7e7a463520b02dfcbc8eb7d1338cd89",
+    "src/native_solver.rs": "4d88d814a04da81ec723aa9e91e9f742e329780cdffdd118d7a9906096d0de5c",
+    "evidence/native_solver.baseline.rs": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df",
+    "README.md": "f8ea1284be32a167b7cc619584b4070404186f2cfd2d32f198bffaf241b6a473"
+  },
+  "log_sha256": {
+    "evidence/clippy-review.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/tests-review-release.stdout": "44689edae5d5bd9425848ecde152869fc68cf48847fbb6da3c56974e5bd59341",
+    "evidence/fmt-review.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/fmt-review.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/clippy-review.stderr": "dfe420ba03efef56d1b56b99642e08679d24957385a00ac00937f4ce4774fc54",
+    "evidence/tests-review-release.stderr": "bdd18b456cc46f9c920002c9bbd333fe59ffcd1e5cc8075b732663565ace8d6c"
+  }
+}

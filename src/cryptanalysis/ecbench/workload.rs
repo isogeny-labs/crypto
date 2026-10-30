@@ -35,9 +35,9 @@ use crate::cryptanalysis::ic_boundary::{
     BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
     PrimePoint, QuarticClasses,
 };
+use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
-use crate::cryptanalysis::residual_walk::is_prime_u64;
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -85,9 +85,9 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
-    /// An externally supplied public point, with no logarithm in the fixture.
-    /// Restricted to cofactor-one prime-order regression cohorts. Primality
-    /// and point-count certificates accompany the input catalog.
+    /// An externally supplied public point with no logarithm in the fixture,
+    /// retained verbatim in measured child inputs. Restricted to certified
+    /// cofactor-one prime-order regression cohorts.
     PrimePublicFixture {
         p: u64,
         a: u64,
@@ -1343,10 +1343,14 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) = self {
-            // Planted targets only on E(F_{p⁴}): no public-target law yet.
-            // Planted targets only on E(F_{p⁴}) and on the hyperelliptic
-            // Jacobians: no public-target law yet.
+        if let Instance::Fp4(_)
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Hyper(_) = self
+        {
+            // Planted targets only on E(F_{p^4}), the tower, the three-leads
+            // study and the hyperelliptic Jacobians: no public-target law yet.
             return None;
         }
         if let Instance::Wide(i) = self {
@@ -1762,6 +1766,83 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
+        for spec in [
+            CurveSpec::Fp4Torsion {
+                p: 13,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::F2m4Torsion {
+                m: 4,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::Fp4Translation { p: 13, seed: 1 },
+        ] {
+            let encoded = serde_json::to_string(&spec).unwrap();
+            assert_eq!(serde_json::from_str::<CurveSpec>(&encoded).unwrap(), spec);
+            let inst = spec.build().unwrap();
+            let facts = inst.facts(&spec);
+            assert_eq!(inst.r(), facts.r);
+            assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
+            assert!(inst.mul_generator_hex(0).is_none());
+            assert!(inst.mul_generator_hex(inst.r()).is_none());
+            assert!(inst.mul_generator_hex(2).is_some());
+            assert!(
+                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
+                "quartic translation and torsion variants retain planted-only policy"
+            );
+            if !matches!(&inst, Instance::Fp4(_)) {
+                // Check subgroup arithmetic on the known fixture 2G, without
+                // enabling the deliberately unavailable public-target route.
+                let target = inst.mul_generator_hex(2).unwrap();
+                assert_eq!(inst.mul_generator_hex(2), Some(target.clone()));
+                let x = u64::from_str_radix(target[0].trim_start_matches("0x"), 16).unwrap();
+                let y = u64::from_str_radix(target[1].trim_start_matches("0x"), 16).unwrap();
+                let mut scratch = GroupOps::default();
+                match &inst {
+                    Instance::Fp4Torsion(i) => {
+                        let c = &i.inst.curve;
+                        let point = Pt4 {
+                            x: unpack_e4(i.p(), x),
+                            y: unpack_e4(i.p(), y),
+                            inf: false,
+                        };
+                        assert!(c.on_curve(&point));
+                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                    }
+                    Instance::F2m4(i) => {
+                        let c = &i.curve;
+                        let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
+                            x: c.f.unpack(x),
+                            y: c.f.unpack(y),
+                            inf: false,
+                        };
+                        assert!(c.on_curve(&point));
+                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                    }
+                    _ => unreachable!(),
+                }
+            }
+        }
+        assert!(CurveSpec::Fp4Torsion {
+            p: 9,
+            seed: 1,
+            max_cofactor: 16
+        }
+        .build()
+        .is_err());
+        assert!(CurveSpec::F2m4Torsion {
+            m: 3,
+            seed: 1,
+            max_cofactor: 16
+        }
+        .build()
+        .is_err());
+    }
 
     /// The slug-targeted extraction answers exactly as the full parse:
     /// the first entry carrying the slug, or none.

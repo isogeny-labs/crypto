@@ -166,8 +166,8 @@ jobs:
     timeout-minutes: ${{ github.event_name == 'push' && 45 || 50 }}
     steps:
       # The full-history checkout plus the release build no longer fits a
-      # hosted runner's disk (the job is lost before it writes a log); free
-      # the unused SDKs first, as the sibling Koblitz workflows do.
+      # hosted runner's disk (rustc exits 101 mid-build; the job is lost before
+      # it writes a log); free the unused SDKs first, as the sibling Koblitz workflows do.
       - name: Free runner disk
         if: runner.environment == 'github-hosted'
         run: |

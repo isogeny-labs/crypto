@@ -1,0 +1,35 @@
+{
+  "schema": "pencil-controller-external-admission-clarification/v1",
+  "created_utc": "2026-10-30T07:21:40.181388+00:00",
+  "review": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/fourth-controller-failed-row-clarification.json",
+    "sha256": "5031208233041986caef763e81fa596ce442f4c41e6bb324ce2cbed5c98316f5"
+  },
+  "original_admission": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/controller-takeover/continuation-admission.json",
+    "sha256": "187f21544280fdef4835b52e1ea860a1ed8472e0f3b50b2a6b6fdfd5da215ca2"
+  },
+  "interpretation": "For the optional fourth controller, no failedscience means: no terminal scientific-run restart, no retry of a capped/failed row, no new payload/run/session, and no seed/method/cap substitution. It does not mean that every row observed so far must be verified.",
+  "conditions": [
+    "controller invocation 3 is authoritatively terminal",
+    "the exact durable request remains nonterminal and is admitted before G",
+    "the original scientific process/payload remains the same one; no replacement process or scientific submission is launched",
+    "request, source, images, worker and Pod identity match, except a separately permitted and evidenced infrastructure restore within maximum one",
+    "seq 2 remains a timeout and is not scheduled again",
+    "the remaining scheduler work consists only of other sequence numbers already present in the frozen 18-row plan",
+    "all existing controller-count, queue, build-timeout, active-worker-second, G and D guards pass",
+    "automatic retry is disabled for controller invocation 4 and no fifth invocation is admitted"
+  ],
+  "preservation": "Original protocol, admission, review and failed row remain unchanged. Scientific timeout blocks later cohort. No new scientific execution authorized.",
+  "live_observation": {
+    "owner": "isolab-recovery-controller:2fe8ec79-1f54-4abe-8ec4-151b50b1178b",
+    "phase": "checkpointing",
+    "instance": "i-04d58c2b309fb6549",
+    "pod": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+    "attempt": 0,
+    "restores": 0,
+    "request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907"
+  },
+  "fourth_controller_invoked": false,
+  "decision": "Bind narrow clarification only; invocation requires separate live decision after third controller is terminal."
+}

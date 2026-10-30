@@ -463,9 +463,11 @@ default; the ids are:
 
 | id | family | what it is |
 |---|---|---|
+| `ic.aps_v1` | ic | bounded APS polynomial instrument, exclusive cold/online wall phases and retained failures; only independent-check group work is priced, so native operation totals remain incomplete |
 | `rho.frozen_reference` | rho | the frozen r-adding walk every ledger row was priced against through §17 (A = 1); the historical "before" mark |
 | `rho.plain` | rho | tuned r-adding walk on points (A = 1), distinguished points, stride starts |
 | `rho.negation` | rho | tuned walk on `{P, −P}` (A = 2), Wiener–Zuccherato look-ahead and cycle escape; the matched reference on a prime curve |
+| `rho.negation_strong` | rho | strong negation-map walk on `{P, −P}` (A = 2) over `F_{(2^m)^4}` (`f2m4_torsion` only): 32 jumps, escape of fruitless cycles by doubling, distinguished points, `lanes` walks per Montgomery-batched `F_{q⁴}` inversion; charged in counted `F_q` multiplications, the unit `ic.pipeline` + `gaudry-d4-bin` is charged in on those curves |
 | `rho.quartic`, `rho.cubic` | rho | the same walk on `{±ι^i P}` (A = 4, j = 1728) and `{±ζ₃^i P}` (A = 6, j = 0); refused at plan time on a curve without the structure |
 | `rho.negation_v2`, `rho.cubic_v2`, `rho.quartic_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | rho | the same walks under the `_v2` accounting: Brent cycle detection beside the 16-point window, lost-walk and distinguished-point table counters, the cubic/quartic class set-up in its own `automorphism_setup` phase, and for the strong reference the scaled `auto` shape with charged starts and a `verification` phase (Accounting v2 below) |
 | `rho.signed_frobenius` | rho | tuned walk on signed Frobenius orbits `{±φ^t P}` (A = 2n), Koblitz only; the matched reference there |
@@ -499,6 +501,7 @@ Curves of higher genus and the transfers are described in
 | `rho.quartic_v2`, `rho.cubic_v2` | as `rho.*` under the `_v2` walk (Brent cycle detection, charged lost-walk and distinguished-point table counters), plus the same class set-up scalar multiplication, charged in the total in its own `automorphism_setup` phase instead of the frozen ids' `setup` | as `rho.*`; the `_v2` ids also count the distinguished-point table queries and inserts |
 | `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
+| `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.multitarget_pooled` | the whole batch of `L = batch` targets: the shared jump table (full-size multiples of `G`), each target's `G + Q_i` and start stride, every walk start and step, look-ahead and escapes, and the internal `[d]G = Q_i` check of every recovered log; phases `setup`, `search`, `internal_verification` | canonicalisations; distinguished-point table inserts and probes |
 | `bsgs.*` | baby steps, the giant stride, giant steps (the `_v2` ids add the final check, phase `verification`) | table inserts and lookups |
@@ -507,6 +510,7 @@ Curves of higher genus and the transfers are described in
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
 | `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
+| `ic.tensor_contraction_v1` | every non-trivial point addition and doubling (neither input O) the toy tensor-contraction index calculus of `crates/ecdl-tensor-ic` performs, from the crate's per-phase tally: the relation targets `[u]P + [v]Q` (`relation_target`), every point addition evaluated inside the exact sparse contraction and the witness check (`relation_search`), the final `[ξ]P = Q` check (`recovery_check`); `factor_base` and `linear_algebra` charge 0. Prime-order curves only (cofactor 1) | contraction-table rows (`relation_search.contraction_rows_uncharged`), the factor-base listing, which enumerates the group (`factor_base.fb_points_listed_uncharged`) and evaluates every SHA-256 membership hash (`factor_base.fb_membership_evals_uncharged`), and elimination multiplications mod r (`linear_algebra.linalg_mulmod_uncharged`); priced across the §5a band. Exponential by construction: no [Ope26] solver |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`). Not the verification: `d1.scalar_mul(k)` runs twice on a success and increments no counter (frozen; the older text of this row said it was charged) | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band. The factor-base scan's `F_p` work (`f(x)` and a square root at every `x` it visits) is not tallied at all |
 | `ic.hyperelliptic_v2` | as `ic.hyperelliptic`, plus every Cantor doubling and addition of both verifications (`verification`, `⌊log₂ k⌋ + 1` doublings and one addition per set bit each, in the total); `ic.hyperelliptic_v2` minus `ic.hyperelliptic` is exactly that phase | as `ic.hyperelliptic`, plus the factor-base scan's `F_p` multiplications (`factor_base_fp_muls_uncharged`, phase `factor_base`, counted by `hyper_ic::factor_base_scan_muls` over the same `x`: Horner `f(x)`, Euler test, Tonelli–Shanks); the record is a lower bound at `w = 0` |
 | `ic.cm_folded_*_v1` | nothing: `total_gae` and every phase's `gae` are 0 (the replay's operations are in `independent_replay.adds/doubles/scalar_mults` only), so `S` is 0, below the floor, and the prose `unpriced` entry names no counter. Frozen | the native backend's work (`native_*_uncharged`) |
@@ -1571,6 +1575,16 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.
 
+Explicit x-coordinate lists use `explicit-x:xs=X0;X1;...` on prime and narrow
+binary curves. The plug-in lifts exactly those abscissae, rejects duplicates
+and missing roots, and preserves input order as column order. Binary linear
+bases separately use `binary-subspace:dimension=D,basis=B0;B1;...`.
+Both specs work in `ecbench fb` and an `ic.pipeline` arm. See
+[explicit bases](explicit-bases.md) for identity/accounting rules and the
+[standalone CUDA relation service](../../gpu/explicit-relations/README.md)
+for signed per-slot bases and the paper reduction. GPU work is not priced as
+CPU GAE or registered as a measured ecbench method.
+
 ## 12. Limits
 
 Stated so that nothing here is read as more than it is:
@@ -1766,3 +1780,30 @@ The [frozen comparison spec](../../research/nist_best2_small_batch_20261027/ecbe
 and [audit/status](../../research/nist_best2_small_batch_20261027/seeded-audit-v1/README.md)
 record the unexecuted integration/session/replay requirements. No model result
 may be multiplied by standalone GPU throughput to claim measured NIST savings.
+
+### Bounded APS instrument (`ic.aps_v1`)
+
+This native method exposes the existing APS zero-sum relation route with six
+encodings, exact/legacy root controls, exhaustive/first-informative recovery
+and certified cubic-orbit line pruning. Every search parameter is explicit;
+planning rejects unsupported combinations and p>65521. It takes the actual
+single target, never its known logarithm.
+
+The cold solver wall interval includes setup and all attempted bases, failed
+sampling/construction/solver work, equation export binding, roots, signed
+recovery and separate ordinary-residue witness/scalar checks. The five online
+phases start before target validation/sampling and sum exactly to their window.
+Final report aggregation/serialization is outside the solver clock. Observer and export
+construction overhead is included and must be assessed with controls.
+
+GAE prices only the independent check's counted group operations. F4/root
+multiplication diagnostics are retained; core group/field work, polynomial
+construction, allocations and hashing remain incompletely counted. Thus S and
+bitop totals are lower bounds, not admissible complete-cost rankings. The method
+is nondeterministic under a cooperative wall deadline; a returned witness is
+not a certificate of enumeration completeness, execution history or cost.
+
+[The instrument study](../../research/aps_measurement_20261029/README.md) has
+control specs and the remaining protocol/export/accounting/launch prerequisites.
+Those specs are development controls, not a frozen held-out scaling experiment.
+No benchmark or EKS job has run; the complete-cost research panel remains open.

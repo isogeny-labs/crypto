@@ -2191,6 +2191,7 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
     let w = &p.workloads[ex.workload];
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
         target_seed: w.target_seed,
