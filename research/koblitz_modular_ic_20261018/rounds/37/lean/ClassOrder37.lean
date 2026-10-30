@@ -52,4 +52,16 @@ theorem order_40931_of_nonannihilation (x : A) (h : 40931 • x = 0)
   · exact False.elim (h671 (by simpa only [horder] using addOrderOf_nsmul_eq_zero x))
   · exact horder
 
+theorem scalar_to_eleven_iff (x : A) (horder : addOrderOf x = 671) (k : ℕ) :
+    11 • (k • x) = 0 ↔ 61 ∣ k := by
+  rw [← mul_nsmul, ← addOrderOf_dvd_iff_nsmul_eq_zero, horder]
+  change 11 * 61 ∣ 11 * k ↔ 61 ∣ k
+  exact Nat.mul_dvd_mul_iff_left (by decide : 0 < 11)
+
+theorem finite_projector_idempotent (x : A) (h : 671 • x = 0) :
+    122 • (122 • x) = 122 • x := by
+  rw [← mul_nsmul]
+  have hnum : 122 * 122 = 122 + 22 * 671 := by decide
+  rw [hnum, add_nsmul, mul_nsmul, h, nsmul_zero, add_zero]
+
 end ClassOrder37
