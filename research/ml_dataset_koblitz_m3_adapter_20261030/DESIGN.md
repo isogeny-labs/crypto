@@ -286,3 +286,29 @@ nonempty native row/reduction work, cumulative reservations, exact/one-less inpu
 trace capacity, input I/O failure with byte retention, and matrix observer
 failure with no later extraction admission. They do not replace the independent
 signed-domain replay and frozen matrix-control panel required before activation.
+
+## Strict original-input verification
+
+`verify_original_input` first enforces the64KiB input cap and deserializes strict
+owned record/equation/monomial types, rejecting unknown and duplicate fields.
+It compares attempt binding, original digests, curve/field/domain/target,
+selector offsets, dimensions and resource ceilings to supplied validated
+originals. Historical limits can be reconstructed from saved config/launch
+metadata without reading a current deadline. The outer verifier still must
+load and authenticate those originals and enforce the reserved artifact
+path/role/encoding bijection; digest format alone is not custody proof.
+
+Equation verification uses the existing scalar `semaev_decomp::eval_f3` S4
+cross-check at all8 selector assignments, then a Boolean Mobius transform of
+those eight field words. For each coordinate it compares the resulting unique
+square-free coefficient mask with the saved polynomial, requiring three variables,
+at most8 terms, masks0..7 and strict native monomial order. It does not invoke
+the producer's symbolic builder to validate its equations. This establishes
+finite-domain original-ANF consistency, not a native matrix derivation or
+complete solver trace.
+
+The new controls cover both actual twists at all five requested boundary sizes,
+resource/attempt/target/code/selector/digest mutations, unknown nested fields,
+term removal/duplication and over-cap input. Each semantic mutation is serialized
+again before checking. Current-time-independent replay is separate from the
+runtime deadline checks already exercised by the admission controls.

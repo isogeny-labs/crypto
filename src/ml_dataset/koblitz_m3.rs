@@ -771,6 +771,171 @@ where
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) struct OriginalLimits {
+    native_work: u64,
+    memory: u64,
+    trace: u64,
+    additions: u64,
+}
+impl OriginalLimits {
+    /// Historical caller first validates the saved launch against the saved run
+    /// and attempt. No current clock is read when binding these resource values.
+    pub fn from_original(
+        config: &super::super::types::CaseConfig,
+        launch: &super::super::execution::LaunchContext,
+    ) -> Result<Self, String> {
+        if config.work_limit == 0 || launch.memory_bytes == 0 || launch.trace_bytes == 0 {
+            return Err("zero original Koblitz resource limit".into());
+        }
+        Ok(Self {
+            native_work: config
+                .work_limit
+                .checked_mul(1024)
+                .ok_or("original work overflow")?
+                .min(NATIVE_WORK_MAX),
+            memory: launch.memory_bytes,
+            trace: launch.trace_bytes,
+            additions: config.work_limit,
+        })
+    }
+}
+impl Budget {
+    pub fn original_limits(&self) -> OriginalLimits {
+        OriginalLimits {
+            native_work: self.native_work_limit,
+            memory: self.memory_limit,
+            trace: self.trace_limit,
+            additions: self.addition_limit,
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedMonomial {
+    mask: u8,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedEquation {
+    n_vars: usize,
+    terms: Vec<SavedMonomial>,
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SavedInput {
+    schema: String,
+    binding: super::super::capture::AttemptBinding,
+    public_sha256: String,
+    factor_base_sha256: String,
+    field_degree: u32,
+    irreducible_low_terms: Vec<u32>,
+    curve_a: u64,
+    curve_b: u64,
+    target: (u64, u64),
+    codes: [u64; 2],
+    signed_domain: [(u64, u64); 4],
+    selector_offsets: [u8; 3],
+    n_vars: usize,
+    equations: Vec<SavedEquation>,
+    native_work_limit: u64,
+    memory_limit: u64,
+    trace_limit: u64,
+    addition_limit: u64,
+}
+
+/// Verify finite-domain ANF independently of the producer's symbolic builder.
+/// Expected inputs/digests/limits must come from validated original files.
+/// This verifies equations, not native row derivations or a complete solver.
+pub(super) fn verify_original_input(
+    bytes: &[u8],
+    original: &MathInput,
+    binding: &super::super::capture::AttemptBinding,
+    public_sha256: &str,
+    factor_base_sha256: &str,
+    limits: OriginalLimits,
+) -> Result<(), String> {
+    use crate::cryptanalysis::pq_groebner_f2::{cmp_mono, mask_from64, F2BoolMono};
+    use crate::cryptanalysis::semaev_decomp::{eval_f3, Gf2};
+    use num_traits::ToPrimitive;
+    if bytes.len() > INPUT_BYTE_CAP {
+        return Err("saved Koblitz input exceeds byte cap".into());
+    }
+    let saved: SavedInput =
+        serde_json::from_slice(bytes).map_err(|e| format!("strict Koblitz input: {e}"))?;
+    saved.binding.validate()?;
+    if saved.schema != "crypto.ml-dataset.koblitz-m3-input/v1"
+        || saved.binding != *binding
+        || saved.public_sha256 != public_sha256
+        || saved.factor_base_sha256 != factor_base_sha256
+        || saved.field_degree != original.curve.m
+        || saved.irreducible_low_terms != original.curve.irreducible.low_terms
+        || Some(saved.curve_a) != original.curve.a.to_biguint().to_u64()
+        || saved.curve_b != 1
+        || saved.target != original.target
+        || saved.codes != original.codes
+        || saved.signed_domain != original.signed
+        || saved.selector_offsets != [0, 1, 2]
+        || saved.n_vars != 3
+        || saved.native_work_limit != limits.native_work
+        || saved.memory_limit != limits.memory
+        || saved.trace_limit != limits.trace
+        || saved.addition_limit != limits.additions
+        || saved.equations.len() != original.curve.m as usize
+    {
+        return Err("saved Koblitz input differs from originals".into());
+    }
+    let mut coefficients = [0u64; 8];
+    let gf = Gf2::new(&original.curve.irreducible);
+    for (assignment, value) in coefficients.iter_mut().enumerate() {
+        *value = eval_f3(
+            original.codes[assignment & 1],
+            original.codes[(assignment >> 1) & 1],
+            original.codes[(assignment >> 2) & 1],
+            original.target.0,
+            &gf,
+        );
+    }
+    // Boolean Mobius transform: unique square-free polynomial coefficients.
+    for bit in 0..3 {
+        for mask in 0..8 {
+            if mask & (1 << bit) != 0 {
+                coefficients[mask] ^= coefficients[mask ^ (1 << bit)];
+            }
+        }
+    }
+    for (coordinate, equation) in saved.equations.iter().enumerate() {
+        if equation.n_vars != 3
+            || equation.terms.len() > 8
+            || equation.terms.iter().any(|t| t.mask > 7)
+            || !equation.terms.windows(2).all(|pair| {
+                cmp_mono(
+                    F2BoolMono::from_mask(mask_from64(pair[0].mask as u64)),
+                    F2BoolMono::from_mask(mask_from64(pair[1].mask as u64)),
+                )
+                .is_gt()
+            })
+        {
+            return Err("noncanonical saved Koblitz equation".into());
+        }
+        let actual = equation
+            .terms
+            .iter()
+            .fold(0u8, |set, t| set | (1u8 << t.mask));
+        let expected = coefficients
+            .iter()
+            .enumerate()
+            .fold(0u8, |set, (mask, value)| {
+                set | ((((value >> coordinate) & 1) as u8) << mask)
+            });
+        if actual != expected {
+            return Err("saved Koblitz equation differs from independent scalar ANF".into());
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1067,6 +1232,10 @@ mod admission_tests {
         let mut f = Fixture::new();
         f.context.deadline = Instant::now() + Duration::from_secs(2);
         let b = f.admit().unwrap();
+        assert_eq!(
+            b.original_limits(),
+            OriginalLimits::from_original(&f.config, &f.context.launch).unwrap()
+        );
         assert_eq!(b.native_work_limit, 102400);
         assert_eq!(b.addition_limit, 100);
         assert_eq!(b.memory_limit, 64 << 20);
@@ -1348,7 +1517,7 @@ mod matrix_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_groebner::bounded_matrix as native;
     use crate::ml_dataset::capture::AttemptBinding;
-    fn binding() -> AttemptBinding {
+    pub(super) fn binding() -> AttemptBinding {
         AttemptBinding {
             schema: "crypto.ml-dataset.attempt-binding/v1".into(),
             run_sha256: "1".repeat(64),
@@ -1521,5 +1690,143 @@ mod matrix_tests {
             budget.begin_extraction(true, Instant::now()),
             Err(Stop::Observer)
         );
+    }
+}
+
+#[cfg(test)]
+mod input_verification_tests {
+    use super::*;
+    use serde_json::{json, Value};
+    fn fixture() -> (MathInput, OriginalLimits, Vec<u8>) {
+        let original = construction_tests::fixture();
+        let mut budget = construction_tests::budget();
+        let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+            .output
+            .unwrap();
+        let limits = budget.original_limits();
+        let input = persist_original(
+            &original,
+            &output,
+            &mut budget,
+            &matrix_tests::binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            &mut |_, _| Ok(()),
+        )
+        .unwrap();
+        let PersistedInput { bytes, .. } = input;
+        (original, limits, bytes)
+    }
+    fn verify(original: &MathInput, limits: OriginalLimits, bytes: &[u8]) -> Result<(), String> {
+        verify_original_input(
+            bytes,
+            original,
+            &matrix_tests::binding(),
+            &"8".repeat(64),
+            &"9".repeat(64),
+            limits,
+        )
+    }
+    #[test]
+    fn saved_input_matches_independent_scalar_coefficients_without_runtime_clock() {
+        let (original, limits, bytes) = fixture();
+        verify(&original, limits, &bytes).unwrap();
+        // The historical verifier accepts only original values, no live Budget
+        // or Instant. A different original allowance still fails binding.
+        let mut changed = limits;
+        changed.memory += 1;
+        assert!(verify(&original, changed, &bytes).is_err());
+    }
+    #[test]
+    fn reserialized_semantic_mutations_and_unknown_nested_fields_fail() {
+        let (original, limits, bytes) = fixture();
+        let baseline: Value = serde_json::from_slice(&bytes).unwrap();
+        for mutation in 0..12 {
+            let mut value = baseline.clone();
+            match mutation {
+                0 => value["codes"][0] = json!(0),
+                1 => value["target"][1] = json!(value["target"][1].as_u64().unwrap() ^ 1),
+                2 => value["curve_b"] = json!(2),
+                3 => value["public_sha256"] = json!("a".repeat(64)),
+                4 => value["selector_offsets"] = json!([2, 1, 0]),
+                5 => value["native_work_limit"] = json!(1),
+                6 => value["binding"]["attempt_sha256"] = json!("b".repeat(64)),
+                7 => value["unexpected"] = json!(true),
+                8 => value["equations"][0]["unexpected"] = json!(true),
+                9 => {
+                    let p = value["equations"]
+                        .as_array_mut()
+                        .unwrap()
+                        .iter_mut()
+                        .find(|p| !p["terms"].as_array().unwrap().is_empty())
+                        .unwrap();
+                    p["terms"][0]["unexpected"] = json!(true);
+                }
+                10 => {
+                    let p = value["equations"]
+                        .as_array_mut()
+                        .unwrap()
+                        .iter_mut()
+                        .find(|p| !p["terms"].as_array().unwrap().is_empty())
+                        .unwrap();
+                    p["terms"].as_array_mut().unwrap().remove(0);
+                }
+                11 => {
+                    let p = value["equations"]
+                        .as_array_mut()
+                        .unwrap()
+                        .iter_mut()
+                        .find(|p| !p["terms"].as_array().unwrap().is_empty())
+                        .unwrap();
+                    let term = p["terms"][0].clone();
+                    p["terms"].as_array_mut().unwrap().push(term);
+                }
+                _ => unreachable!(),
+            }
+            assert!(
+                verify(&original, limits, &serde_json::to_vec(&value).unwrap()).is_err(),
+                "accepted mutation {mutation}"
+            );
+        }
+        assert!(verify(&original, limits, &vec![b' '; INPUT_BYTE_CAP + 1]).is_err());
+    }
+    #[test]
+    fn independent_input_check_covers_all_requested_boundary_twists() {
+        use crate::ml_dataset::{curves, types::CaseConfig};
+        for n in [23, 31, 47, 53, 61] {
+            for twist in [false, true] {
+                let config = CaseConfig {
+                    family: "koblitz".into(),
+                    n,
+                    m: 3,
+                    twist,
+                    curve_seed: 7,
+                    generator_index: 1,
+                    key_index: 1,
+                    seed: 42,
+                    factor_base_size: 4,
+                    degree_bound: 3,
+                    work_limit: 16384,
+                    solver: "weil".into(),
+                };
+                let original = original_math(&config, &curves::generate(&config).unwrap()).unwrap();
+                let mut budget = construction_tests::budget();
+                let limits = budget.original_limits();
+                let output = construct_original(&original, &mut budget, &mut |_, _| Ok(()))
+                    .output
+                    .unwrap();
+                let input = persist_original(
+                    &original,
+                    &output,
+                    &mut budget,
+                    &matrix_tests::binding(),
+                    &"8".repeat(64),
+                    &"9".repeat(64),
+                    &mut |_, _| Ok(()),
+                )
+                .unwrap();
+                verify(&original, limits, &input.bytes).unwrap();
+            }
+        }
     }
 }
