@@ -2144,3 +2144,336 @@ mod signed_binding_tests {
         assert!(check(&vec![b' '; SIGNED_REPLAY_BYTE_CAP + 1]).is_err());
     }
 }
+/// Checked mathematical candidate. Durable custody is a separate publication.
+pub(super) struct CheckedSignedWitness {
+    pub indices: [u8; 3],
+    pub points: [(u64, u64); 3],
+    pub target: (u64, u64),
+}
+
+pub(super) struct SignedEnumeration {
+    pub acknowledged: Vec<SignedPrefix>,
+    pub unacknowledged: Option<SignedPrefix>,
+    pub enumeration_additions: u64,
+    pub witness_check_additions: u64,
+    pub first_receipt: Option<crate::ml_dataset::capture::WitnessReceipt>,
+    pub stop: Option<Stop>,
+    pub complete: bool,
+}
+
+/// Stage-only producer. The caller must admit field setup and generic-check
+/// scratch before entering, and supply trusted capture callbacks which charge
+/// serialization, retention and transport work to this same ledger. Runtime
+/// activation additionally requires a bound-capture bridge, not arbitrary
+/// caller receipts. Counts below are actual addition API calls, including O+P.
+pub(super) fn enumerate_signed(
+    original: &MathInput,
+    curve: &crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve,
+    budget: &mut Budget,
+    matrix_required: bool,
+    event_sink: &mut impl FnMut(&SignedPrefix, &mut Budget) -> Result<(), Stop>,
+    publish: &mut impl FnMut(
+        &CheckedSignedWitness,
+        &mut Budget,
+    ) -> Result<crate::ml_dataset::capture::WitnessReceipt, Stop>,
+) -> SignedEnumeration {
+    use crate::binary_ecc::{curve::point_add, BinaryPoint, F2mElement};
+    use num_traits::ToPrimitive;
+    let mut result = SignedEnumeration {
+        acknowledged: Vec::new(),
+        unacknowledged: None,
+        enumeration_additions: 0,
+        witness_check_additions: 0,
+        first_receipt: None,
+        stop: None,
+        complete: false,
+    };
+    let outcome = (|| -> Result<(), Stop> {
+        budget.begin_extraction(matrix_required, Instant::now())?;
+        // Check prepared-kernel metadata against the original curve. This is
+        // not authentication of its private reduction table: runtime entry must
+        // use an opaque original-bound setup token rather than a caller kernel.
+        let modulus = original
+            .curve
+            .irreducible
+            .low_terms
+            .iter()
+            .fold(1u64 << original.curve.m, |bits, &term| {
+                bits | (1u64 << term)
+            });
+        if curve.n != original.curve.m
+            || curve.gf.n != original.curve.m
+            || curve.gf.irr != modulus
+            || Some(curve.a) != original.curve.a.to_biguint().to_u64()
+        {
+            return budget.fail(Stop::InvalidLimits);
+        }
+        budget.reserve_bytes(
+            (192 * std::mem::size_of::<SignedPrefix>()) as u64,
+            Instant::now(),
+        )?;
+        result
+            .acknowledged
+            .try_reserve_exact(192)
+            .map_err(|_| Stop::Allocation)?;
+        for tuple in 0..64usize {
+            let indices = [tuple / 16, (tuple / 4) % 4, tuple % 4];
+            let mut prefix = None;
+            for summand in 0..3 {
+                budget.reserve_addition(Instant::now())?;
+                prefix = curve.add(prefix, Some(original.signed[indices[summand]]));
+                result.enumeration_additions += 1;
+                let event = SignedPrefix {
+                    sequence: (result.enumeration_additions - 1) as u16,
+                    tuple: tuple as u8,
+                    indices: indices.map(|i| i as u8),
+                    summand: summand as u8,
+                    prefix,
+                    matches_target: summand == 2 && prefix == Some(original.target),
+                };
+                result.unacknowledged = Some(event.clone());
+                budget.check(Instant::now())?;
+                if event.matches_target && result.first_receipt.is_none() {
+                    let points = indices.map(|i| original.signed[i]);
+                    let mut reference = BinaryPoint::Infinity;
+                    for (x, y) in points {
+                        let point = BinaryPoint::Affine {
+                            x: F2mElement::from_words(&[x], original.curve.m),
+                            y: F2mElement::from_words(&[y], original.curve.m),
+                        };
+                        budget.reserve_addition(Instant::now())?;
+                        reference = point_add(&original.curve, &reference, &point);
+                        result.witness_check_additions += 1;
+                        budget.check(Instant::now())?;
+                    }
+                    let expected = match reference {
+                        BinaryPoint::Infinity => None,
+                        BinaryPoint::Affine { x, y } => {
+                            x.to_biguint().to_u64().zip(y.to_biguint().to_u64())
+                        }
+                    };
+                    if expected != Some(original.target) {
+                        return budget.fail(Stop::NativeFailure);
+                    }
+                    let checked = CheckedSignedWitness {
+                        indices: indices.map(|i| i as u8),
+                        points,
+                        target: original.target,
+                    };
+                    // Retain a returned durable receipt BEFORE subsequent checks.
+                    result.first_receipt = Some(publish(&checked, budget)?);
+                    budget.check(Instant::now())?;
+                }
+                event_sink(&event, budget)?;
+                // Sink acknowledgement is a fact even if it consumed the final
+                // deadline or swallowed a failed reservation. Preserve it first.
+                result.acknowledged.push(event);
+                result.unacknowledged = None;
+                budget.check(Instant::now())?;
+            }
+        }
+        budget.finish_extraction(Instant::now())?;
+        result.complete = true;
+        Ok(())
+    })();
+    if let Err(stop) = outcome {
+        result.stop = Some(*budget.stopped.get_or_insert(stop));
+    }
+    result
+}
+
+#[cfg(test)]
+mod signed_producer_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
+    use crate::ml_dataset::capture::{WitnessCommit, WitnessProvenance, WitnessReceipt};
+    use num_traits::ToPrimitive;
+    fn prepared(original: &MathInput, additions: u64) -> (FastBinaryCurve, Budget) {
+        let curve = FastBinaryCurve::new(
+            &original.curve.irreducible,
+            original.curve.a.to_biguint().to_u64().unwrap(),
+        )
+        .unwrap();
+        let now = Instant::now();
+        let mut b = Budget::new(
+            additions,
+            1 << 20,
+            1 << 20,
+            now + Duration::from_secs(20),
+            now,
+        )
+        .unwrap();
+        b.begin_native(false, now).unwrap();
+        b.finish_native(now).unwrap();
+        (curve, b)
+    }
+    fn receipt() -> WitnessReceipt {
+        WitnessReceipt {
+            commit: WitnessCommit::NewCommit,
+            payload_sha256: [1; 32],
+            payload_bytes: 128,
+            sequence: Some(1),
+            provenance: WitnessProvenance::Dedicated,
+        }
+    }
+    #[test]
+    fn signed_producer_exact_positive_budget_publishes_only_once() {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        for allowance in [194, 195] {
+            let (curve, mut b) = prepared(&original, allowance);
+            let mut published = 0;
+            let r = enumerate_signed(
+                &original,
+                &curve,
+                &mut b,
+                false,
+                &mut |_, _| Ok(()),
+                &mut |_, _| {
+                    published += 1;
+                    Ok(receipt())
+                },
+            );
+            assert_eq!(published, 1);
+            assert_eq!(r.first_receipt, Some(receipt()));
+            assert_eq!(r.witness_check_additions, 3);
+            assert_eq!(r.enumeration_additions, allowance - 3);
+            assert_eq!(b.additions, allowance);
+            assert_eq!(r.complete, allowance == 195);
+            assert_eq!(
+                r.stop,
+                if allowance == 195 {
+                    None
+                } else {
+                    Some(Stop::Additions)
+                }
+            );
+        }
+    }
+    #[test]
+    fn signed_producer_retains_receipt_after_publisher_consumes_deadline() {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let (curve, mut b) = prepared(&original, 195);
+        let r = enumerate_signed(
+            &original,
+            &curve,
+            &mut b,
+            false,
+            &mut |_, _| Ok(()),
+            &mut |_, b| {
+                b.deadline = Instant::now();
+                Ok(receipt())
+            },
+        );
+        assert_eq!(r.first_receipt, Some(receipt()));
+        assert_eq!(r.stop, Some(Stop::Deadline));
+        assert!(r.unacknowledged.as_ref().unwrap().matches_target);
+        assert!(!r.complete);
+    }
+    #[test]
+    fn signed_producer_exact_and_one_less_negative_allowance() {
+        let original = construction_tests::fixture();
+        for allowance in [191, 192] {
+            let (curve, mut b) = prepared(&original, allowance);
+            let r = enumerate_signed(
+                &original,
+                &curve,
+                &mut b,
+                false,
+                &mut |_, _| Ok(()),
+                &mut |_, _| panic!("fixed negative control unexpectedly matched"),
+            );
+            assert_eq!(r.enumeration_additions, allowance);
+            assert_eq!(r.witness_check_additions, 0);
+            assert_eq!(b.additions, allowance);
+            assert_eq!(r.complete, allowance == 192);
+            assert_eq!(
+                r.stop,
+                if allowance == 192 {
+                    None
+                } else {
+                    Some(Stop::Additions)
+                }
+            );
+            let replay =
+                verify_signed_prefix(&original, &r.acknowledged, r.unacknowledged.as_ref())
+                    .unwrap();
+            assert_eq!(replay.all_tuples_acknowledged, allowance == 192);
+            assert!(replay.candidate_tuples.is_empty());
+        }
+    }
+    #[test]
+    fn signed_producer_retains_first_receipt_when_match_event_is_refused() {
+        let mut original = construction_tests::fixture();
+        original.target = original.signed[0];
+        let (curve, mut b) = prepared(&original, 195);
+        let mut published = 0;
+        let r = enumerate_signed(
+            &original,
+            &curve,
+            &mut b,
+            false,
+            &mut |e, _| {
+                if e.matches_target {
+                    Err(Stop::Observer)
+                } else {
+                    Ok(())
+                }
+            },
+            &mut |w, _| {
+                assert_eq!(w.target, original.target);
+                assert_eq!(w.points, w.indices.map(|i| original.signed[i as usize]));
+                published += 1;
+                Ok(receipt())
+            },
+        );
+        assert_eq!(published, 1);
+        assert_eq!(r.first_receipt, Some(receipt()));
+        assert_eq!(r.witness_check_additions, 3);
+        assert_eq!(r.stop, Some(Stop::Observer));
+        assert!(!r.complete);
+        assert!(r.unacknowledged.as_ref().unwrap().matches_target);
+        assert_eq!(
+            b.additions,
+            r.enumeration_additions + r.witness_check_additions
+        );
+        verify_signed_prefix(&original, &r.acknowledged, r.unacknowledged.as_ref()).unwrap();
+    }
+    #[test]
+    fn signed_producer_keeps_acknowledgement_after_swallowed_sink_budget_failure() {
+        let original = construction_tests::fixture();
+        let (curve, mut b) = prepared(&original, 192);
+        let r = enumerate_signed(
+            &original,
+            &curve,
+            &mut b,
+            false,
+            &mut |_, b| {
+                assert_eq!(b.reserve_trace(u64::MAX, Instant::now()), Err(Stop::Trace));
+                Ok(())
+            },
+            &mut |_, _| panic!("unexpected witness"),
+        );
+        assert_eq!(r.acknowledged.len(), 1);
+        assert!(r.unacknowledged.is_none());
+        assert_eq!(r.stop, Some(Stop::Trace));
+        assert!(!r.complete);
+    }
+    #[test]
+    fn signed_producer_rejects_wrong_prepared_kernel_before_any_addition() {
+        let original = construction_tests::fixture();
+        let (mut curve, mut b) = prepared(&original, 192);
+        curve.a ^= 1;
+        let r = enumerate_signed(
+            &original,
+            &curve,
+            &mut b,
+            false,
+            &mut |_, _| panic!("unexpected event"),
+            &mut |_, _| panic!("unexpected witness"),
+        );
+        assert_eq!(r.stop, Some(Stop::InvalidLimits));
+        assert_eq!(b.additions, 0);
+    }
+}
