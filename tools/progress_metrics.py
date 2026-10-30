@@ -7,10 +7,14 @@ Sources (all committed, read at --ref unless noted):
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
   benchmarks/README.md            append-only benchmark entries (one row per study)
   docs/ic/ci/runs/*.json          ic e2e history records
+  docs/curves/jacobian-transfers.json
+                                exact catalog coverage counts, not attack-performance claims
   research/nist_skipped_curve_dissection_20261021/factorization/progress.json
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
+                                IC collect-phase component: paired native ratio and its A/A floor
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -81,6 +85,21 @@ def args():
 
 P_IC = "ecdlp-index-calculus"
 P_PERF = "crypto-performance"
+
+
+def jacobian_catalog(ref, since):
+    path = "docs/curves/jacobian-transfers.json"
+    for date, commit, text in file_history(ref, path, since):
+        summary = json.loads(text).get("summary") or {}
+        source = f"{path}@{commit}"
+        for field, label in (("curves", "screened registry entries"),
+                             ("routes", "enumerated model routes")):
+            emit(f"jacobian.catalog.{field}", summary.get(field), date=date,
+                 problem="jacobian-transfer-catalog", unit="count", better="neutral",
+                 label=f"Jacobian catalog: {label}", source=source)
+        emit("jacobian.catalog.boundary_entries", (summary.get("by_class") or {}).get("boundary"),
+             date=date, problem="jacobian-transfer-catalog", unit="count", better="neutral",
+             label="Jacobian catalog: boundary classifications", source=source)
 
 
 def leaderboard(ref, since):
@@ -235,6 +254,121 @@ def nist_selection_exact_embedding(ref, since):
              source=f"{path}@{commit}")
 
 
+def koblitz_modular_augmentation(ref, since):
+    """Export the recorded scalar for the fixed n=5 augmentation presentation."""
+    path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        value = record.get("native", {}).get("recovery", {}).get("augmentation_target_least_scalar")
+        emit("koblitz_modular.n5_augmentation_recovery_scalar", value, date=date,
+             problem=P_IC, unit="integer scalar", better="lower",
+             label="Exact equivariant recovery scalar on the n=5 augmentation targets; no cost claim",
+             source=f"{path}@{commit}")
+
+
+def koblitz_modular_geometry(ref, since):
+    """Export exact recorded certificate counts, never cost or subgroup rank."""
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    for round_id in (24, 25, 26):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            if round_id == 24:
+                geometry = record.get("written_geometric_consequences", {})
+                if not geometry.get("proper_infinity_fiber_complete"):
+                    continue
+                value = len(record.get("points", []))
+                metric = "koblitz_modular.infinity_source_points"
+                label = "Original infinity fiber points under the written normalization bridge; no cost claim"
+                unit = "closed points"
+            elif round_id == 25:
+                quotient = record.get("registered_quotient", {})
+                if not (quotient.get("accepted") and quotient.get("all_pullback_residuals_zero")):
+                    continue
+                value = quotient.get("pullback_certificates")
+                metric = "koblitz_modular.registered_quotient_pullbacks"
+                label = "Exact original-source pullback identities on the registered b-unit quotient; no rank claim"
+                unit = "identities"
+            else:
+                transport = record.get("normalization_transport", {})
+                if not (transport.get("accepted") and transport.get("source_fifth_iterate_residuals_zero")):
+                    continue
+                value = len(transport.get("rational_base_cusps", []))
+                metric = "koblitz_modular.rational_cusp_fibers_with_charts"
+                label = "Rational base cusp fibers with transported charts under the written normalization bridge"
+                unit = "base cusps"
+            emit(metric, value, date=date, problem=P_IC, unit=unit,
+                 better="neutral", label=label, source=f"{path}@{commit}")
+
+
+    # Exact construction counters in the later Koblitz batches. These are
+    # recorded certificate sizes, not attack rank or comparative cost.
+    for round_id in (27, 28, 29):
+        path = f"{base}{round_id}/results.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            counters = []
+            if round_id == 27:
+                rr = record.get("complete_RR", {})
+                models = record.get("projective_models", {})
+                if rr.get("accepted") and rr.get("complete_serialized_exports"):
+                    counters.append(("koblitz_modular.complete_rr_sections", rr.get("sections"),
+                                     "sections", "Complete prescribed source RR basis; written geometry bridge"))
+                if models.get("accepted") and models.get("all_kernel_vectors_and_pivots_recombined"):
+                    counters.append(("koblitz_modular.proper_source_quadrics", models.get("source_quadrics"),
+                                     "homogeneous equations", "Complete source I2 basis; no IC relation-rank claim"))
+                    counters.append(("koblitz_modular.proper_quotient_quadrics", models.get("quotient_quadrics"),
+                                     "homogeneous equations", "Complete invariant quotient I2 basis; old coupled saturation remains separate"))
+            else:
+                images = record.get("ordinary_images", {})
+                if images.get("accepted"):
+                    count = images.get("selected_supports_cumulative", images.get("selected_supports"))
+                    counters.append(("koblitz_modular.ordinary_supports_with_selected_hecke_images", count,
+                                     "closed first-image supports", "Selected ordinary Hecke images under written norm bridge; C5 lifts and IC rank separate"))
+            for metric, value, unit, label in counters:
+                emit(metric, value, date=date, problem=P_IC, unit=unit,
+                     better="neutral", label=label, source=f"{path}@{commit}")
+
+
+    path = f"{base}30/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("accepted_native") != 5 or record.get("native_failures") != 0:
+            continue
+        if not record.get("finite_middle_enumeration", {}).get("complete"):
+            continue
+        scale = record.get("scale", {}).get("records", [])
+        descent = record.get("constant_extension", {}).get("records", [])
+        if scale:
+            value = max((r["n"] for r in scale if r.get("d") == 1), default=None)
+            emit("koblitz_modular.formal_recovery_max_cyclic_length", value,
+                 date=date, problem=P_IC, unit="formal cyclic length", better="neutral",
+                 label="Certified generalized recovery family; larger-n geometric transfers not constructed",
+                 source=f"{path}@{commit}")
+        if descent:
+            value = max(r["absolute_algebra_degree"] for r in descent)
+            emit("koblitz_modular.ordinary_kernel_max_absolute_algebra_degree", value,
+                 date=date, problem=P_IC, unit="dimension over F2", better="neutral",
+                 label="Actual ordinary finite kernel algebra; no Jacobian image or IC-rank claim",
+                 source=f"{path}@{commit}")
+
+
+def ghs_ipsec_archive(ref, since):
+    """Export recorded archive counters; no cryptographic computation or estimates."""
+    path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    data = json.loads(txt)
+    date = data.get("snapshot_date_utc")
+    if not date or date < since:
+        return
+    for key in ("discovered", "screened", "expanded"):
+        emit("ghs.ipsec155.archive." + key + "_frobenius_orbits",
+             data.get("counters", {}).get(key), date=date,
+             problem="ghs-ipsec155-isogeny-class", unit="Frobenius orbits",
+             better="higher", label="Historical IPsec GHS archive: " + key + " orbits",
+             source=path + "@" + ref)
 def fall_degree(ref):
     """HKY last fall degree d_F of Weil-descended chained Semaev systems (unsatisfiable draws,
     research/fall_degree_bounds_20261008, E7 onward). Counts of recorded draws only; a draw not
@@ -242,6 +376,7 @@ def fall_degree(ref):
     base = "research/fall_degree_bounds_20261008/"
     files = [f for f in ls(ref, base) if f.endswith(".jsonl") and (
         f.startswith(base + "e7/E7_") or f.startswith(base + "e8/E8_")
+        or f == base + "e12/completed-20261028/E_3-24-7.jsonl"
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
@@ -267,8 +402,77 @@ def fall_degree(ref):
     emit("fall_degree.min_n_vars_censored", min_censored_n, problem="fall-degree", unit="variables", label="Smallest N with a draw censored above its cap", source=src)
 
 
+def curve_traits(ref):
+    """End(E) and Frobenius-discriminant status counts in the committed curve-trait catalogue
+    (docs/curves/traits.json, built by curve_traits from the registry and the factor hints)."""
+    path = "docs/curves/traits.json"
+    txt = show(ref, path)
+    if not txt:
+        return
+    curves = json.loads(txt).get("curves", [])
+    end = {}
+    for r in curves:
+        st = (r.get("endomorphism") or {}).get("status")
+        end[st] = end.get(st, 0) + 1
+    unfactored = sum(1 for r in curves if (r.get("frobenius") or {}).get("status") == "bounded")
+    hints = sum(1 for l in (show(ref, "docs/curves/factor-hints.txt") or "").splitlines() if l.strip().isdigit())
+    emit("curve_traits.curves", len(curves), problem="curve-traits", unit="curves", label="Curves in the trait catalogue", source=path)
+    for st, better, label in (
+        ("proved", "neutral", "Curves with End(E) proved"),
+        ("probable", "neutral", "Curves with End(E) exact if every probable prime under it is prime"),
+        ("bounded", "lower", "Curves with End(E) only bounded (open volcano levels)"),
+        ("unknown", "lower", "Curves with End(E) unknown (Frobenius discriminant not factored)"),
+    ):
+        emit(f"curve_traits.end.{st}", end.get(st, 0), problem="curve-traits", unit="curves", better=better, label=label, source=path)
+    emit("curve_traits.disc_unfactored", unfactored, problem="curve-traits", unit="curves", better="lower",
+         label="Curves whose Frobenius discriminant has an unsplit composite", source=path)
+    emit("curve_traits.factor_hints", hints, problem="curve-traits", unit="primes", better="neutral",
+         label="Proved primes in docs/curves/factor-hints.txt", source="docs/curves/factor-hints.txt")
+
+
+def pencil_gate_observations(ref, since):
+    """Copy committed native gate counts; do not derive costs or clock admission."""
+    path = "research/pencil_large_prime_20261029/validation/actual_gate_results_20261030/analysis-receipt.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        if record.get("schema") != "pencil-actual-gate-analysis-receipt/v1":
+            continue
+        for field, unit in (
+            ("observed_executions", "execution records including warmups"),
+            ("observed_warmup_executions", "warmup execution records"),
+        ):
+            emit("pencil.p739_gate." + field, record.get(field), date=date,
+                 problem=P_IC, unit=unit, better="neutral",
+                 label="Recorded synthetic p739 gate; no wall-time qualification",
+                 source=f"{path}@{commit}")
+        if record.get("all_expected_records_present") is True:
+            emit("pencil.p739_gate.observed_workloads", record.get("expected_workloads"),
+                 date=date, problem=P_IC, unit="distinct prescribed workloads",
+                 better="neutral", label="Complete 60-target gate inventory; not the 1260-target cohort",
+                 source=f"{path}@{commit}")
+def ic_aimed_gather(ref, since):
+    """The aimed-subset gather component (a stage measurement, not a whole-pipeline row):
+    the 42-round paired collect-phase ratio main / candidate and the lower end of its
+    corrected 95% interval, with the same-session A/A's upper end beside it."""
+    path = "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json"
+    for date, commit, text in file_history(ref, path, since):
+        s = json.loads(text).get("sessions", {}).get("2026-10-29", {})
+        ab, aa = s.get("ab_collect", {}), s.get("aa_collect", {})
+        src = f"{path}@{commit}"
+        emit("ic_component.aimed_gather.collect_ratio", ab.get("median"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / aimed-gather candidate, median of 42 paired rounds (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.collect_ratio_ci95_lo", (ab.get("ci95") or {}).get("lo"), date=date, problem=P_IC,
+             unit="ratio", better="higher", label="IC collect phase, main / candidate: lower end of the corrected 95% interval (stage)",
+             source=src)
+        emit("ic_component.aimed_gather.aa_ci95_hi", (aa.get("ci95") or {}).get("hi"), date=date, problem=P_IC,
+             unit="ratio", better="lower", label="IC collect phase, same-session A/A upper end of the corrected 95% interval (stage)",
+             source=src)
+
+
 def main():
     a = args()
+    jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)
@@ -278,9 +482,14 @@ def main():
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
+    curve_traits(a.ref)
 
+    koblitz_modular_augmentation(a.ref, a.since)
+    koblitz_modular_geometry(a.ref, a.since)
+    pencil_gate_observations(a.ref, a.since)
+    ic_aimed_gather(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
-
