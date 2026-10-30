@@ -21,4 +21,14 @@ theorem zero_denominator_counterexample (K : Type*) [Field K] :
     ((1 / (0 : K))^2 + 1 / (0 : K) + 0 = 0) ∧
     ((1 : K)^2 + 1*0 + 0*0^2 ≠ 0) := by
   simp
+/-- A Bezout identity for a,b supplies an inverse of b modulo the
+quadratic norm in characteristic two. -/
+theorem bezout_norm_inverse {K : Type*} [CommRing K]
+    (a b e x y : K) (h2 : (2 : K) = 0) (h : x*a + y*b = 1) :
+    b * (x^2*a + (y^2 + e*x^2)*b) +
+      x^2 * (a^2 + a*b + e*b^2) = 1 := by
+  calc
+    _ = (x*a + y*b)^2 + (2 : K) *
+        (x^2*a*b + e*x^2*b^2 - x*y*a*b) := by ring
+    _ = 1 := by rw [h2, zero_mul, add_zero, h]; simp
 end Rational50
