@@ -1,0 +1,24 @@
+Current native-main integration, 2026-10-30 05:51 UTC
+
+Crypto base: 3b34d504b (full merge parent recorded in the commit)
+Peer native source: 55f659309e510fc861a1e54ff199b9f2bf63e17a
+Tracked native files: 36; all bytes match current peer main.
+Older26-file and earlier manifests remain frozen historical snapshots.
+The peer PR1302 is already merged; its private local branch/receipts remain
+intact. The peer checkout is detached at official main for validation only;
+no merged peer branch is replaced or pushed.
+
+Main advanced with native finite-size, width, binary-field, partial-relation,
+square-root reuse and ecdl-tensor-ic changes while the completed root ran.
+Those landed changes are retained, together with the exact sampler and both
+taper controls. The runner conflict retained both strict input reading and
+new solve dispatch. Current peer main additionally has checked hash-prime
+reuse/input helpers; carried those existing changes across to preserve native
+byte identity. They are upstream integration, not new algorithms attributed
+to this sampling audit. No benchmark/challenge solver is executed here.
+
+The root at9f0835c26 completed5430tests with actual exit0; its receipt is
+advanced-root-complete.txt. That success is NOT a pass for this newer source.
+New native/binding/lint/MSRV/docs and full root checks are required and pending.
+No assertion, source admission guard, check or ignored-test policy was weakened.
+General theorem/complexity obligations remain open. Only task PR2909 is active.

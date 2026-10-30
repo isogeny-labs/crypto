@@ -4,7 +4,7 @@
 - **Kind:** correctness/complexity validation, conditional external theorem
 - **Affected work:** [native implementation](../docs/hashed-ecdl.md)
 - **Next action owner:** unassigned independent reviewer
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-10-30
 
 ## Problem
 
@@ -77,6 +77,18 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-10-30 finite-size implementation follow-up: opt-in selector-domain
+witnesses and graphs, schoolbook encodings, checked exact cutsets/elimination,
+partial-relation provenance and binary XOR/Frobenius domains are implemented.
+See the [scoped receipt](../research/hashed_ecdl_finite_size_20261030/implementation/README.md).
+Local structural plan admission is not a smaller-parameter proof of the source
+packet transformation. Its packing, coefficient coverage, precision,
+reconstruction, shrink and cost obligations remain open; the original guards
+are unchanged. No new general theorem or Lean proof is claimed. Earlier S3
+upload/readback succeeded, superseding the historical upload blocker below;
+authenticated native image/execution and scientific measurement admission
+remain unverified. Neither challenge solve nor the independent audit is closed.
 
 2026-10-30 engineering follow-up: [native exact-primality and witness changes](../research/hashed_ecdl_speed_20261029/README.md)
 pass bounded correctness controls and preserve complete seeded certificates.

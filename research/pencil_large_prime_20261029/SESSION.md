@@ -1336,3 +1336,41 @@ Prospective implementation requires software equivalence fixtures with both mete
 ### Errors
 
 A combined read-only source lookup used the historical worktree for the newer pencil path and reported file not found; the pencil source was inspected in its actual current worktree. No data or scientific result changed.
+
+## 2026-10-30T04:49Z — Isolated early-rejection implementation and software validation
+
+### What was done
+
+Implemented a separate prospective crate in research/pencil_early_rejection_20261030, preserving the frozen native solver SHA e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df. Its helper extraction/reorder is independently source-reviewed; default ecbench integration and frozen source remain unchanged. Five selected tests passed in debug and release, with twelve inherited solver-path tests filtered. Strict Clippy and fmt passed. The bounded F19 fixtures explicitly distinguish 612 ordinary-origin and 470 exceptional-only invocations, with 826 accepted and 256 rejected cases. These are software coverage counts, not target/cohort results.
+
+### Decisions made
+
+Retained source-bound baseline helper, source-fork correspondence, both arithmetic/semantic meters, exact rejected counter deltas, selected graph-cap parity and singular-polynomial branch labeling. Preserved independent proof of at most two rejected complements per valid smooth-quintic sieve and 32 across sixteen walks; it is not a runtime estimate. No solver trial, rho trial, cohort, cloud launch or prospective scientific admission occurred. PR #2932 merged with its checks complete.
+
+### Open threads
+
+Publish neutral software-validation PDF/SVG/JSON and implementation PR. Full pencil cohort and timing requirements remain incomplete and subject to the failed upper-gate stop rule and future prospective admission. This instrument has not executed solve_one. T-885 is the separately claimed software-validation task; its heartbeat maintains coordination only, with no experiment budget/deadline change.
+
+### Errors
+
+Retained initial fixture failures, source-fidelity/Clippy development failures, and the origin-coverage review correction. The report's first render lacked a math-font package; failed logs retained before presentation correction. Prior T-826 lease was reconciled as failed and not revived; new software work was attached to T-885. A later check reports an exclusive reservation by this same claimed task; current fenced ownership is retained rather than creating a duplicate owner.
+
+## 2026-10-30T05:02Z — Prospective software CI and timing source review
+
+### What was done
+
+Added a scoped PR/main/merge-group workflow for the isolated early-rejection crate. It selects exactly five equivalence tests, runs debug and release, and checks formatting/Clippy; inherited solver and rho tests remain unexecuted. The workflow includes the producer and engine source dependencies in sparse checkout. Independent read-only timing review inspected record.rs, pencil.rs, three_leads.rs, native_solver.rs and the canonical exporter.
+
+### Decisions made
+
+Keep scientific execution separate from software CI. Preserve old timing fields: a future instrument needs an immediate-return cold interval, separate instrumentation closure and completion, explicit adapter verification/calibration/report durations, and arm-specific online phase validation. The existing target hooks already delimit online work. Inline meter overhead cannot be inferred by subtracting enclosing and enclosed clocks. No changed timing source, new estimand, qualified clock, trial or resource extension follows from this review.
+
+### Open threads
+
+PR2935 CI and merge remain pending. Full pencil cohort and timing are incomplete. All retained rho/control intervals are below the existing 1 ms floor; endpoint correction alone cannot qualify them. A future timing design must resolve individual-call measurement without presenting repeated-call blocks as equivalent latency. The original resource deadline and failed upper-gate stopping rule remain unchanged.
+
+### Errors
+
+The general Rust CI scope skips this standalone crate, motivating explicit software-only CI. No scientific run was retried. The implementation packet's ignored Cargo.lock was explicitly committed, and the oversized retained attempt3 log was published and remotely verified in the required artifact store before PR creation.
+
+CI review addendum: the broad initial artifact-wiring match suggested credentialed hydration of logs that tests do not read. Independent review identified the PR-head script/credential exposure. The final workflow instead checks out only source/provenance/manifests and runs from the root with an explicit manifest path; it uses no secrets, artifact tooling or result downloads. YAML/Bash syntax and the exact five-test/zero-benchmark listing passed; independent final source/dependency review found no concrete blocker. The repository wiring check is separately required before publication.
