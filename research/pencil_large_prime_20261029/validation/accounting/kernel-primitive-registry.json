@@ -1,0 +1,18 @@
+{
+  "schema": "pencil-kernel-primitive-registry/v1",
+  "status": "declared_event_mapping_not_full_pipeline_coverage",
+  "priced_native_event_fields": ["map_key_comparisons", "map_entry_visits", "map_cloned_entries", "collection_entry_visits", "collection_elements_copied", "collection_elements_initialized", "collection_comparisons", "modular_reductions"],
+  "scalar_fields_require_atomic_inverse_normalization": ["scalar_adds", "scalar_muls", "scalar_negations", "scalar_inversions"],
+  "diagnostics_not_added_to_primitive_price": {
+    "partition_terms": "Collector partition/insert source visits are represented by collection_entry_visits; do not add diagnostic again.",
+    "payload_terms": "axpy input traversal already appears in map_entry_visits.",
+    "sparse_accumulations": "Map and arithmetic primitives are recorded by underlying operations.",
+    "parent_hops": "Forest parent/offset/scale entry reads recorded as collection_entry_visits and arithmetic separately.",
+    "primality_checks": "Arithmetic/reductions recorded at implementation sites; check count is not operation price.",
+    "map_calls": "API call diagnostic; comparison and traversal primitives carry native price."
+  },
+  "distinct_passes": "Bounds prevalidation and subsequent input canonicalization each consume entries and are counted separately. Map-to-vector conversion charges wrapper visit once plus explicit output-element copy, with no extra collection visit.",
+  "element_unit": "Rust collection element; a tuple is one element, no byte-size expansion.",
+  "copy_initialization_disjoint": "Explicit copy events are not also counted as fresh initialization. Ordinary collection value moves are not clone events.",
+  "nonclaims": ["No allocator-internal instruction costs", "No CPU instruction census", "No full candidate/reference coverage certification", "No complete scientific price on rejection or cap"]
+}

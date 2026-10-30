@@ -64,6 +64,7 @@
 
 pub mod archive;
 pub mod cm_orbit;
+pub mod explicit_base;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
@@ -490,6 +491,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
         Targets::Walk | Targets::Residual => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
@@ -917,6 +919,45 @@ mod tests {
         assert_eq!(report.decomposition.relations_found, 1);
     }
 
+    /// **The `k`-sum table oracle recovers the planted logarithm** on a
+    /// 24-bit prime-order curve with `k = 3` and `k = 4`: every relation
+    /// has `k` summands, and the table holds one entry per negation orbit
+    /// of the signed `k`-sums of the base.
+    #[test]
+    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
+        use super::plugins::{KSumOracle, PrimeAbscissaBase};
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "ksum".into(),
+                targets: Targets::Walk,
+                linalg: "incremental-gauss".into(),
+                max_trials: 50_000_000,
+                seed: 11,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", size.to_string());
+            spec.oracle_params.set("m", k.to_string());
+            let mut oracle = KSumOracle::new(k);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "k = {k}: did not recover the log");
+            assert_eq!(report.recovered, Some(planted));
+            assert!(report.decomposition.relations_found > 0);
+        }
+    }
+
     /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar
     /// multiplications, every column's stored log is the scalar, the same
     /// seed gives the same base, and the pipeline recovers `k` with zero
@@ -1203,6 +1244,36 @@ mod tests {
         let rn = &renew.decomposition.cost;
         assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
         assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        // The deferred guard presents the same targets, keeps the same rows
+        // and recovers the same logarithm.  It probes only the targets that
+        // decompose; each repeat the eager guard skipped costs it one table
+        // lookup instead, and at most one confirming addition.
+        let deferred = run(Targets::StrideRenewDeferredGuard);
+        assert!(deferred.verified);
+        assert_eq!(deferred.recovered, Some(planted));
+        assert_eq!(
+            deferred.decomposition.targets_tried,
+            renew.decomposition.targets_tried
+        );
+        let dn = &deferred.decomposition.cost;
+        let count = |c: &PhaseCost, key: &str| c.native.get(key).copied().unwrap_or(0);
+        for key in [
+            "relations",
+            "stride_steps",
+            "stride_restarts",
+            "stride_renewals",
+        ] {
+            assert_eq!(count(dn, key), count(rn, key), "{key}");
+        }
+        let eager_skips = count(rn, "repeated_targets_skipped");
+        assert_eq!(count(dn, "lookups"), count(rn, "lookups") + eager_skips);
+        assert_eq!(dn.group_ops.scalar_mults, rn.group_ops.scalar_mults);
+        assert_eq!(dn.group_ops.doubles, rn.group_ops.doubles);
+        assert!(dn.group_ops.adds >= rn.group_ops.adds);
+        assert!(dn.group_ops.adds <= rn.group_ops.adds + eager_skips);
+        let probes = count(dn, "target_guard_probes");
+        assert!(probes <= count(dn, "relations") + count(dn, "repeated_targets_skipped"));
+        assert!(probes < count(rn, "target_guard_probes"));
         assert_eq!(stride.recovered, Some(planted));
         let rel = &stride.decomposition.cost;
         assert_eq!(rel.native.get("stride_restarts"), Some(&1));

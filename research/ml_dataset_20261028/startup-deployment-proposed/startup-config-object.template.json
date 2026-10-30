@@ -1,0 +1,15 @@
+{
+  "apiVersion": "v1",
+  "kind": "ConfigMap",
+  "metadata": {
+    "name": "__IMMUTABLE_CONFIG_OBJECT_NAME__",
+    "namespace": "__RESERVED_NAMESPACE__",
+    "annotations": {
+      "dataset.isolabs.dev/config-file-sha256": "__CONFIG_EXACT_BYTES_SHA256__"
+    }
+  },
+  "immutable": true,
+  "data": {
+    "startup-gate.json": "__JSON_STRING_CONTAINING_EXACT_RENDERED_GATE_CONFIG_BYTES__"
+  }
+}
