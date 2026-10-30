@@ -100,3 +100,21 @@ Local: /home/ec2-user/ml-dataset-work-20261028/native-control-workflow-01 and
 unified-v2-runtime-candidate-09. Validation plan: combined-plan-09.json.
 Snapshot09 preparation is in progress. Native acceptance API/export gates are
 recorded explicitly in the implementation; no source owner acknowledgment assumed.
+
+Update 2026-10-30T21:24Z - controller09 validation completed:
+
+combined-fixture-03 passed31tests,0failed,0ignored,terminal0 at21:21:39Z. Both
+sourceguards passed on09manifestf8ac4b4d42e18d971f89ace64afe78ecb9bd8f910b2de658d8ca54a4f867038f.
+This includes all16 stopped-slot ledger coverage, changed compiled-control source
+rejection after rehash, strict diagnostic tests and signal-exit regression. Log
+SHAe0a377741c7bcb9294aa8d11dce852988d4d59cecd471f77884c2c200506c270 andreceipt
+are archived freshGET. Actual native control commands have not been executed.
+
+Full-library08 combined-full-01 ended124 at21:08:14Z after1800s command allowance,
+both guards true. Partial terminal lines2208passed/0failed/47ignored of5853
+discovered; no complete suite result. Last active JV end-to-end test atp101.
+Retained validation/combined-full-01.summary.json records exact scope and failure.
+
+ExistingT977 was offered to liveT956session under assignment2edd61a8 at21:07:34Z,
+expires21:12:34Z; task remainsproposed at21:14Z and no acknowledgment was observed.
+Current source checkpoint18 is verified atfc3ff8d1d3b1; readback receipt retained.
