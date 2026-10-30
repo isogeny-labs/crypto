@@ -1514,3 +1514,21 @@ Current controller remains live. PR2957 artifacts and harness checks remain pend
 ### Errors
 
 Private checkpoint14 custody summary initially read outcome at the row root, producing null summaries; an additive correction uses nested producer outcomes and preserves the original receipt. Hash checks were unaffected. Python lacked hashlib.file_digest; streaming SHA256 completed the same archive check. Conductor check reported this task's own reservation; task show confirmed the same live T-913 owner and epoch before editing.
+
+## 2026-10-30T14:52Z — Terminal C1 accounting and report
+
+### What was done
+
+Preserved terminal controller failure and checkpoint18 raw observations at ed12fa3d1. Ran pinned native saved-record accounting and canonical export; rendered and visually inspected all5 pages of the terminal PDF packet, with SVG coverage graph, exact36-cell CSV, standardized JSON and LaTeX.
+
+### Decisions made
+
+Retain7/18 observed and4/15 measured rows, two pencil watchdog timeouts,11 missing rows and36 null ratios. Distinguish generation19 CRIU failure from scientific timeouts. No new execution after expired authorization. Total active time and spending remain unknown; producer-verified controls are not independent replay.
+
+### Open threads
+
+Independent terminal review and scientific replay remain absent; delegated agents hit a usage limit. Full1260 pencil cohort remains incomplete. PR2957 current checks and publication readback require reconciliation.
+
+### Errors
+
+Native export and semantic checks each return1 with completeness findings; preserved unchanged. Controller3 ended07:54:08.858UTC, before its normal timeout, with CRIU dump failure. No fourth controller ran. A long interruption preceded14:46 reconciliation; all old cutoffs remain binding.
