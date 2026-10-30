@@ -1,6 +1,8 @@
 setring inverseBaseCertificate50;short=0;option(redSB);
 matrix numeratorMatrix50=matrix(basis50);
 if(nrows(numeratorMatrix50)!=32 || ncols(numeratorMatrix50)!=32 || normalizationIndex50!=376){ERROR("RR_MULT50_DONOR_SHAPE");quit;}
+if(matrix(integerColumns50)*originalLift50!=numeratorMatrix50 || numeratorMatrix50*reverseLift50!=matrix(integerColumns50)){ERROR("RR_MULT50_RELOADED_ORIGINAL_LIFTS");quit;}
+print("RR_MULT50_STAGE saved_PID_data_reloaded=true both_original_module_products_checked=true");
 module productNumerators50;int pair50=0;int left50;int right50;int row50;int column50;
 intmat parents50[528][2];string vectorString50;
 ring multiplicationSource50=2,(l,v,u),wp(4,2,1);short=0;option(redSB);
@@ -17,7 +19,8 @@ for(column50=1;column50<=32;column50++){
 }
 poly product50;poly remaining50;poly reconstructed50;vector columnVector50;intvec exponent50;int position50;
 link productOut50="ASCII:w rr-products50.sing";open(productOut50);
-write(productOut50,"// u denotes z=1/original_u.\nring productPidCertificate50=2,(u),(c,dp);module productNumerators50;intmat parents50[528][2];");
+write(productOut50,"// u denotes z=1/original_u.");
+write(productOut50,"ring productPidCertificate50=2,(u),(c,dp);module productNumerators50;intmat parents50[528][2];");
 for(left50=1;left50<=32;left50++){
  for(right50=left50;right50<=32;right50++){
   pair50++;product50=reduce(numeratorFunctions50[left50]*numeratorFunctions50[right50],actualStd50);
@@ -54,7 +57,8 @@ if(matrix(denominatorBasis50)*corruptTable50==productMatrix50){ERROR("RR_MULT50_
 matrix sourcePowerMatrix50[32][32];for(column50=1;column50<=32;column50++){sourcePowerMatrix50[column50,column50]=commonDenominator50;}
 if(numeratorMatrix50*sourceLift50!=sourcePowerMatrix50){ERROR("RR_MULT50_SOURCE_EMBEDDING_PRODUCT");quit;}
 link tableOut50="ASCII:w rr-table50.sing";open(tableOut50);
-write(tableOut50,"// u denotes z=1/original_u; e_i=basis50[i]/commonDenominator50.\nring tablePidCertificate50=2,(u),(c,dp);matrix table50[32][528];matrix sourceLift50[32][32];intmat parents50[528][2];");
+write(tableOut50,"// u denotes z=1/original_u; e_i=basis50[i]/commonDenominator50.");
+write(tableOut50,"ring tablePidCertificate50=2,(u),(c,dp);matrix table50[32][528];matrix sourceLift50[32][32];intmat parents50[528][2];");
 for(column50=1;column50<=528;column50++){
  write(tableOut50,"parents50["+string(column50)+",1]="+string(parents50[column50,1])+";parents50["+string(column50)+",2]="+string(parents50[column50,2])+";");
  for(row50=1;row50<=32;row50++){write(tableOut50,"table50["+string(row50)+","+string(column50)+"]="+string(table50[row50,column50])+";");}
