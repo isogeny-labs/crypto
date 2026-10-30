@@ -1144,3 +1144,21 @@ ControllerPID1255083,exec30852,admin/home/ec2-user/ecbench-e2e-20261030-v19. Do 
 
 ### Errors
 V17balanceandV18capacityrefusals retained separately. PR2996auditshard8failedonunrelatedpencil_large_primecheckpointg9missinghost.json; no repairorclaimofallCIgreen.
+
+### 2026-10-30 21:49 UTC — verified 4090 results and smaller-base preparation
+
+What was done: V19 raw results committed e1db39a661f3; inspected two-page report
+861a7fd27a89. Eight 52-bit recoveries replayed and four 63-bit memory/work limits
+retained. Final archive verified; pod deleted and complete inventory empty.
+
+Decisions: V20 uses m12 with three explicit thresholds, a bounded query-budget
+API retaining default20, and combined full/partial-cache fallback. Cache
+construction/storage stays charged. Native ladder/analyzer compilation and
+shell syntax pass locally. New Rust/CUDA tests must pass on GPU before data.
+
+Open threads: freeze V20, prepare original-Git source archive, run one4090,
+collect and publish exact outcomes and PR. No task GPU active at this entry.
+
+Errors: default system Python lacks the required jsonschema API; canonical
+protocol validation passes using the existing tools venv. Initial draft lacked
+the required draft-freeze block; corrected before freeze or data.

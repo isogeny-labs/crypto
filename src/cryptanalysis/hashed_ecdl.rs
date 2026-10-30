@@ -994,7 +994,15 @@ pub fn solve_with_oracle(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
 ) -> Result<Certificate, Error> {
-    solve_reduction::<false>(curve, p, q, config, oracle, &mut ReductionStats::default())
+    solve_reduction::<false>(
+        curve,
+        p,
+        q,
+        config,
+        oracle,
+        &mut ReductionStats::default(),
+        20,
+    )
 }
 
 /// Descriptive stage clocks, accumulated across all attempted trials.
@@ -1022,7 +1030,25 @@ pub fn solve_with_oracle_profile(
     oracle: &mut impl DecompositionOracle,
     stats: &mut ReductionStats,
 ) -> Result<Certificate, Error> {
-    solve_reduction::<true>(curve, p, q, config, oracle, stats)
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, 20)
+}
+
+/// Profile a reduction with an explicit per-trial target-query budget.
+/// Each trial permits at most `attempts_per_column * (columns + 1)` queries.
+/// The multiplier must be in 1..=256; ordinary entry points retain 20.
+/// Smaller bases may need more queries to collect a complete relation matrix.
+/// This changes only exhaustion: every returned relation and certificate is
+/// checked in exactly the same way as the ordinary reduction.
+pub fn solve_with_oracle_profile_budget(
+    curve: &Curve,
+    p: Point,
+    q: Point,
+    config: &Config,
+    oracle: &mut impl DecompositionOracle,
+    stats: &mut ReductionStats,
+    attempts_per_column: usize,
+) -> Result<Certificate, Error> {
+    solve_reduction::<true>(curve, p, q, config, oracle, stats, attempts_per_column)
 }
 
 // One reduction body preserves identical random draws, bounds and verification.
@@ -1034,12 +1060,14 @@ fn solve_reduction<const PROFILE: bool>(
     config: &Config,
     oracle: &mut impl DecompositionOracle,
     stats: &mut ReductionStats,
+    attempts_per_column: usize,
 ) -> Result<Certificate, Error> {
     use std::time::Instant;
     if p.is_none() || !curve.contains(p) || !curve.contains(q) {
         return Err(Error::Invalid("generator or target"));
     }
     if !(2..=MAX_SLOTS).contains(&config.m)
+        || !(1..=256).contains(&attempts_per_column)
         || config.max_trials == 0
         || config.max_trials > 1000
         || config.max_columns == 0
@@ -1123,7 +1151,10 @@ fn solve_reduction<const PROFILE: bool>(
             continue;
         }
         let mut relations = Vec::new();
-        for _ in 0..20 * (n + 1) {
+        let query_limit = (n + 1)
+            .checked_mul(attempts_per_column)
+            .ok_or(Error::Limit("target-query budget overflow"))?;
+        for _ in 0..query_limit {
             attempts += 1;
             let stage = PROFILE.then(Instant::now);
             let (u, v) = (rng.below(curve.r), rng.below(curve.r));
@@ -1627,9 +1658,16 @@ mod tests {
                     linear: marker,
                     replay: marker,
                 };
-                let no_clocks =
-                    solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
-                        .unwrap();
+                let no_clocks = solve_reduction::<false>(
+                    &curve,
+                    p,
+                    q,
+                    &config,
+                    &mut Enumerate,
+                    &mut untouched,
+                    20,
+                )
+                .unwrap();
                 assert_eq!(no_clocks, expected);
                 for clock in [
                     untouched.bases,
@@ -2358,6 +2396,77 @@ mod tests {
             let mut bad = cert;
             bad.hashes[0].alpha = 0;
             assert!(verify(&c, p, q, &bad).is_err());
+        }
+    }
+
+    #[test]
+    fn explicit_query_budget_preserves_default_and_bounds_exhaustion() {
+        // A deliberately non-solving mock isolates query-budget control flow;
+        // it is not used as decomposition or recovery evidence.
+        #[derive(Default)]
+        struct MissCounter {
+            calls: usize,
+            columns: usize,
+        }
+        impl DecompositionOracle for MissCounter {
+            fn find(
+                &mut self,
+                _curve: &Curve,
+                bases: &[Vec<Point>],
+                _target: Point,
+                _max_work: u64,
+            ) -> Result<Option<Vec<Point>>, Error> {
+                self.calls += 1;
+                self.columns = bases.iter().map(Vec::len).sum();
+                Ok(None)
+            }
+        }
+        let (c, p) = fixture();
+        let q = c.mul(p, 42).unwrap();
+        let config = Config {
+            tau: Some(40),
+            max_trials: 1,
+            ..Config::default()
+        };
+        let mut default = MissCounter::default();
+        assert!(matches!(
+            solve_with_oracle(&c, p, q, &config, &mut default),
+            Err(Error::Limit(_))
+        ));
+        assert!(default.columns > 0);
+        assert_eq!(default.calls, 20 * (default.columns + 1));
+        for multiplier in [1, 3, 20, 128] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Limit(_))
+            ));
+            assert_eq!(oracle.columns, default.columns);
+            assert_eq!(oracle.calls, multiplier * (oracle.columns + 1));
+        }
+        for multiplier in [0, 257, usize::MAX] {
+            let mut oracle = MissCounter::default();
+            assert!(matches!(
+                solve_with_oracle_profile_budget(
+                    &c,
+                    p,
+                    q,
+                    &config,
+                    &mut oracle,
+                    &mut ReductionStats::default(),
+                    multiplier,
+                ),
+                Err(Error::Invalid(_))
+            ));
+            assert_eq!(oracle.calls, 0);
         }
     }
 
