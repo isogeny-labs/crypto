@@ -11,3 +11,6 @@ Add and test per-template limits and partial retention before the full42 frozen 
 
 ## Errors
 Initial reservation included metrics held byT916; narrowed development scope to the free study and recovery paths, then claimedT920. No source edit occurred under the conflicting reservation. No native test or build failure in this stage.
+
+## Development custody
+Source and executable archive ca6766d8dfb53542f141f02372db0a44346aa3d9ef40dce69c839adf14f87be6 round-tripped from S3; 24 payloads verify. Restored test executable passes all23 tests, with unchanged manifest before/after. This validates development controls only. Production has not started.
