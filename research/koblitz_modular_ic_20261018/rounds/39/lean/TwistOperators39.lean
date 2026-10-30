@@ -23,8 +23,13 @@ theorem annihilate_conjugate_negative_cm_root (a u : A) (h : a^2-a+2=0) :
 
 theorem twist_fixed_equivalence (d f : A) (h : d^5 = -1) :
     d^5*f=1 ↔ f = -1 := by
-  rw [h]
-  simp
+  rw [h, neg_one_mul]
+  constructor
+  · intro hf
+    have hn := congrArg (fun z : A => -z) hf
+    simpa using hn
+  · intro hf
+    rw [hf, neg_neg]
 
 end RingIdentities
 
