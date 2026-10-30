@@ -8,9 +8,9 @@ complete native transfer remain open. Strict timing qualification is blocked
 by missing PSI and incomplete CPU reservation. The sections below preserve
 the scope of the original historical import.
 
-This PR preserves the completed study requested by the owner. It imports the
-existing SageMath 10.6 source snapshot, recorded results, and compact exact
-certificates. It adds no native execution path or new research measurement.
+The original import preserved the existing SageMath 10.6 source snapshot,
+recorded prototype results and compact exact certificates. That import added
+no native execution path or new research measurement.
 The historical Python files are retained as provenance under AGENTS.md's
 "Preserve frozen inputs, historical measurements, source snapshots, and
 certificates as evidence" rule, rather than presented as a native replacement.
@@ -60,24 +60,29 @@ measurements, calibrated operation counts, a strongest-folded-rho comparison,
 or leaderboard-admitted evidence. No performance promotion, fastest-tool
 claim, new attack exponent, or cryptographic-size recovery is made.
 
-Five original files exceed the artifact-store thresholds and await unchanged
-S3 upload and readback. Their exact hashes and sizes are in PUBLICATION.json
-and the snapshot's .artifacts.json. No remote upload is claimed. The complete
+All five original files that exceed the artifact-store thresholds were uploaded
+unchanged on 2026-10-28 and downloaded through a fresh cache. Every downloaded
+size and SHA-256 matches PUBLICATION.json and the snapshot's .artifacts.json.
+The [publication receipt](ARTIFACT_PUBLICATION_RECEIPT.json) records all five
+content-addressed S3 locations and verification scope. The complete
 original 164-file bundle remains preserved with SHA-256
 `6c6e079c8ebb64b52f03039bad743dc0948d0f1953b9f528b76e684959405aba`.
-Until hydration, historical links or scripts needing those five files cannot
-be fully replayed from this checkout. The compact order and transfer
-certificates linked above are included.
+The repository artifact tool can now hydrate those five files. Publication and
+byte verification do not constitute a new algorithm replay. The compact order
+and transfer certificates linked above remain unchanged.
 
-After upload, hydrate with the repository artifact tool, then verify every
+Hydrate with the repository artifact tool, then verify every
 file against PUBLICATION.json before replay. Do not execute new research
 comparisons with this historical Python path: a native implementation and
 the repository's matched validation protocol are still required.
 
 At the historical-import stage, Conductor, Cargo/Rust, and Lean/Lake were
 not available. The follow-up installed Rust and passed standalone native tests;
-the root release test is still unavailable in this partial import checkout
-because Cargo.toml is absent. Conductor and Lean/Lake remain unavailable. A later read-only CLI check with permitted proxy access verified
+the earlier root release attempt was blocked by the original partial checkout's
+absent Cargo.toml. The 2026-10-28 continuation uses a proper sparse clone;
+its release-validation outcome is tracked in the
+[shared log](../../docs/session-logs/2026-10-28.md). Conductor and Lean/Lake
+remain unavailable. A later read-only CLI check with permitted proxy access verified
 the GitHub login; the earlier authentication warning was caused by blocked
 network access. No repository-wide native test run is claimed. Existing Sage execution records are
 preserved; repository-wide release tests and formal proof checks are not
@@ -91,7 +96,7 @@ admitted row.
 
 | Requirement | Status | Evidence or gap |
 | --- | --- | --- |
-| Preserve the requested code and results | Partial publication | 159 original files included byte-for-byte; five need S3 upload |
+| Preserve the requested code and results | Published / bytes verified | 159 original files in Git; five in S3 with fresh-cache readback; original hashes preserved |
 | Certified total-step counterexample | Recorded exact certificate | Twelve target orders and explicit divisor witnesses retained |
 | Complete toy transfer | Recorded complete | Ten source answers; one automatic two-step example |
 | Universal extra-step bound | Open | Bounded searches do not decide it |
