@@ -1152,3 +1152,98 @@ PR2869 factor-base CLI CI passed; harness unit-test job remained live at this en
 First comparator run encountered decimal-string seeds in records. Subsequent review
 found plan-binding/replay uniqueness/array traversal/count/timestamp/report-dimension
 gaps; all were corrected before claiming a reviewed consistency result.
+
+## 2026-10-30 — Publication reconciliation and continuation source review
+
+### What was done
+Reconciled the repeated scoped publication approval against saved receipts.
+Both publication and runtime-permission SHA256 manifests verify. The saved
+CodeBuild project before/after documents match after removing only source.location,
+sourceVersion and lastModified. No publication, controller update or job was repeated.
+PR2905 merged at 01:41:52Z as 1d7bfb2fc41e8a141794828a60251ff55537ba75.
+The older PR2869 harness and factor-base CLI jobs passed; its dependent evidence
+matrix then started and remained pending at this entry.
+
+### Decisions made
+Continue disjoint-cohort preparation on codex/pencil-disjoint-preparation-20261030.
+Keep existing audit packets unchanged and add the actual reviewer-authored record
+separately. Review requires complete certificate instrument bindings and exact
+native specification identity, in addition to the workload/slot bijection.
+
+### Open threads
+Preparation source review and software tests, followed by plan-only validation.
+Analysis/export integration, prospective scientific admission, later-stage compute
+ceiling and absolute deadline, remaining pencil cohort and timing remain incomplete.
+No new solver execution or cloud job occurred during this reconciliation.
+
+### Errors
+A read-only jq comparison command had a shell typo; reran it correctly and the
+preserved project fields compared equal. Review found partial certificate field
+checks and missing derived-specification identity validation; corrections are
+required before generation or relying on the new certificate.
+
+## 2026-10-30 — Exact disjoint enrollment plan check
+
+### What was done
+Independent review cleared disjoint_enrollment.rs SHA256
+583377eed49f1f6d409376d8f57040379be95671e9274613f579319225ff19ae
+and request 6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2.
+Root invoked prepare-disjoint-enrollment once and check-disjoint-enrollment once;
+both exited zero. Output preserves 1260 workloads,22680 slots,18900 measured
+executions and3780 warmups across the original7 and enrolled8 plans. This is
+one plan-only invocation and zero solver executions.
+
+### Decisions made
+Package the exact request, outputs, mappings and source review with a neutral
+PDF/SVG and standardized receipt. Large mapping files go to the artifact store.
+No old record, session identity, protocol, cost or clock result is rewritten.
+
+### Open threads
+Native analysis/export integration and prospective admission remain separate.
+Later-stage resource ceiling/deadline and full pencil data/timing remain missing.
+PR2869 dependent evidence audit matrix is still running; no failures observed.
+
+### Errors
+The source review defects were corrected before this invocation. The plan-only
+and solver-free verification commands reported no error.
+
+## 2026-10-30 — Preparation packet publication
+
+### What was done
+Packaged neutral PDF/SVG/JSON and immutable source/input/output bindings.
+Published both mapping JSONL files (11226297 and426070 bytes) to the artifact
+store and independently downloaded and hash-verified both. All packet hashes pass.
+
+### Decisions made
+Keep large mapping bytes outside Git with maintained manifests; retain PDFs and
+small certificates in the PR. Link the report and publication receipt from the
+study index. Original software review predates generation and retains that scope.
+
+### Open threads
+PR delivery/CI and the previously recorded scientific/resource/integration gaps.
+
+### Errors
+The artifact helper's directory push enumerates tracked files, so its dry-run
+reported an untracked directory missing. Explicit mapping-file paths uploaded
+successfully. No existing object or frozen record was replaced.
+
+## 2026-10-30 — PR2908 delivery
+
+### What was done
+Opened https://github.com/isogeny-labs/crypto/pull/2908 for the disjoint preparation
+implementation, reviewed software evidence and neutral report packet. Auto-merge
+is enabled. Initial published head was7c2a7674fab97559a4e815f8f59fcd1a16a6278e;
+CI is pending, not reported passed. Artifact policy check passed. Generated plan
+and both mappings have content-addressed storage with independent byte readback.
+
+### Decisions made
+Preserve raw logs and source snapshots exactly, including their recorded trailing
+whitespace. Active implementation/docs whitespace checks pass. No scientific result
+or execution authorization is inferred from source delivery or future CI.
+
+### Open threads
+CI/review, analyzer/exporter support, prospective reuse admission, later-stage
+resource envelope, remaining empirical cohort and timing requirements.
+
+### Errors
+No failed CI observed at delivery; old PR2869 evidence shards remain pending.

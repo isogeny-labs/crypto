@@ -7,6 +7,8 @@ use std::io::{Cursor, Read};
 use std::path::Path;
 use std::process::Command;
 
+pub mod disjoint_enrollment;
+
 pub const ARCHIVE_SHA256: &str = "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339";
 pub const BITS: [u64; 7] = [16, 20, 24, 28, 32, 36, 40];
 const EXPECTED_ARCHIVE_ROWS: usize = 1260;

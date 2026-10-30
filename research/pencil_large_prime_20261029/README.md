@@ -480,3 +480,21 @@ These audits execute no solver and generate no new plan or measurement. They do
 not by themselves admit gate reuse, change native aggregation/export enrollment,
 or authorize remaining cohort execution. The prospective continuation contract,
 resource ceiling/deadline and full1260-target pencil completion remain open.
+
+## Disjoint enrollment preparation (2026-10-30)
+
+The [preparation packet](validation/disjoint_enrollment_20261030/README.md)
+preserves one native remainder-plan generation and its successful solver-free
+verification. The original seven plans and enrolled eight plans match across
+1,260 workloads and 22,680 slots, including 18,900 measured executions and 3,780
+warmups. The gate and remainder do not overlap. Original and enrolled sequence
+numbers and workload indices remain in the exact mappings.
+
+Review the [PDF](validation/disjoint_enrollment_20261030/report/report.pdf),
+[graph](validation/disjoint_enrollment_20261030/report/enrollment.svg),
+[standardized report](validation/disjoint_enrollment_20261030/report/report.json)
+and [artifact publication receipt](validation/disjoint_enrollment_20261030/artifact-publication.json).
+Both mapping files were uploaded and downloaded again to verify their hashes.
+This is preparation equivalence, with zero solver executions. Scientific reuse
+admission, analysis/export integration, later-stage resources, full pencil data
+and timing requirements remain unresolved.
