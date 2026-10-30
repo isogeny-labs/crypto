@@ -4,7 +4,15 @@
 - **Kind:** remaining formal implementation gap; coordination tool/access limit
 - **Affected work:** [quadratic-twist study](../research/quadratic_twist_evidence_20261021/README.md)
 - **Next action owner:** authoring session for PR #2381; shared coordination unassigned
-- **Last updated:** 2026-10-29
+- **Last updated:** 2026-10-30
+
+## 2026-10-30: executed F37 transfer and full size-two frontier
+
+[New report](../research/quadratic_twist_evidence_20261021/reports/cm8-37-20261030/README.md): actual E/F37(7,19) and nonsquare35 twist T(28,33), P=(1,8), U=(32,29), order19. Native independent paths check38+38 points,2888 addition pairs,19 scalar images/inverses. New actual-point Lean source passes19 named/22 audited declarations, no extra trusted axioms; explicit cyclic-domain source-DLP equivalence and kernel controls, not generic classification.
+
+All144 size-two arms ×2 encodings ×9 caps run:2592 configurations/46656 repeated source attempts,19440 verified recoveries,1512 blocked setups.55230 unmatched high-rank/lower-requested-cap pair records reduce to ZERO against strongest source policy. Ten changed controls reject101/no receipt;22 backend tests pass. Original-source reduction is real; stronger useful-yield/degree/regularity/cost benefit remains open. Previous dates and receipts below remain historical.
+
+Next: complete size-three policy cohort over this verified route,84 canonical bases per curve plus controls. Preregister new source/coverage/budget; cubic membership leaves S3 unchanged, so declare equality control explicitly. This next study is not implemented/executed. Do not repeat the completed size-two census or another redundant conditional transport proof. Existing registry1921, incomplete root5140-suite, naming, CI/review/integration and Conductor127/no lease holds remain. Keep PR open/non-draft/auto-merge off; only approved same-branch checkpoints, existing local resources/no paid compute.
 
 Current executed status: [uniform full census](../research/quadratic_twist_evidence_20261021/reports/uniform-20261029/README.md)
 passes96arms/896main-source recoveries/210policy comparisons,536states,172failed

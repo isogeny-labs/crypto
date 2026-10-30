@@ -1,5 +1,7 @@
 # Quadratic twists: executed uniform S3 census and conditional collection laws
 
+Latest new-field result: [F37 actual source transfer and complete size-two frontier](reports/cm8-37-20261030/README.md),2592 configurations/19440 verified original-source recoveries,zero strongest-source joint gains,19 new named/22 audited Lean declarations. The original useful-yield/degree advantage remains open; next size-three cohort is not executed.
+
 2026-10-29: [explicit F13 rational dual](reports/cm8-dual-20261029/README.md) now
 checks14+14points,392addition pairs,both compositions=[2],all7subgroup inverses,
 all12S3arms/72source recoveries byte-identical,9controls/22backend tests. New
