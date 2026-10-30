@@ -1357,6 +1357,27 @@ impl FixedPair {
     }
 }
 
+// Inputs have already passed point and base-membership checks. For fields
+// without an inverse cache, compare X=x*Z^2 and Y=y*Z^3 directly, avoiding
+// affine inversions for the sum and its normalization.
+fn relation_sum_matches(curve: &Curve, points: &[Point], target: Point) -> bool {
+    if !curve.inverses.is_empty() {
+        return points.iter().fold(None, |sum, &p| curve.add_valid(sum, p)) == target;
+    }
+    let sum = points.iter().fold(Jacobian::from_affine(None), |sum, &p| {
+        sum.add_affine(p, curve.a, curve.field)
+    });
+    match target {
+        None => sum.z == 0,
+        Some((x, y)) => {
+            let z2 = curve.field.mul(sum.z, sum.z);
+            sum.z != 0
+                && sum.x == curve.field.mul(x, z2)
+                && sum.y == curve.field.mul(y, curve.field.mul(z2, sum.z))
+        }
+    }
+}
+
 // Collection already computed target=[u]P+[v]Q immediately before the query.
 // Check every returned point and the affine tuple sum against that exact target.
 // Only the collector uses this helper; independent certificate replay below
@@ -1370,14 +1391,12 @@ fn check_collected_relation(
     if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
         return Err(Error::Verification);
     }
-    let mut sum = None;
     for (base, &point) in bases.iter().zip(&rel.points) {
         if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
             return Err(Error::Verification);
         }
-        sum = curve.add_valid(sum, point);
     }
-    if sum != target {
+    if !relation_sum_matches(curve, &rel.points, target) {
         return Err(Error::Verification);
     }
     Ok(())
@@ -1392,14 +1411,12 @@ fn check_relation(
     if rel.u >= curve.r || rel.v >= curve.r || rel.points.len() != bases.len() {
         return Err(Error::Verification);
     }
-    let mut sum = None;
     for (base, &point) in bases.iter().zip(&rel.points) {
         if point.is_none() || !curve.contains(point) || base.binary_search(&point).is_err() {
             return Err(Error::Verification);
         }
-        sum = curve.add_valid(sum, point);
     }
-    if sum != fixed.evaluate(curve, rel.u, rel.v) {
+    if !relation_sum_matches(curve, &rel.points, fixed.evaluate(curve, rel.u, rel.v)) {
         return Err(Error::Verification);
     }
     Ok(())
@@ -1468,6 +1485,34 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn projective_relation_sums_match_affine_with_cancellation_and_doubling() {
+        let (cached, generator) = fixture();
+        let mut uncached = cached.clone();
+        uncached.inverses.clear();
+        let multiples: Vec<_> = (0..cached.r)
+            .map(|k| cached.mul(generator, k).unwrap())
+            .collect();
+        for (i, &p) in multiples.iter().enumerate() {
+            for &q in &multiples {
+                // Identity, doubling, inverse cancellation, and unequal sums.
+                let inverse_p = multiples[(cached.r as usize - i) % multiples.len()];
+                let sequence = [p, q, inverse_p, q, p, p, inverse_p, inverse_p];
+                let mut expected = None;
+                for n in 0..=sequence.len() {
+                    if n != 0 {
+                        expected = cached.add_valid(expected, sequence[n - 1]);
+                    }
+                    assert!(relation_sum_matches(&uncached, &sequence[..n], expected));
+                    assert!(relation_sum_matches(&cached, &sequence[..n], expected));
+                    let wrong = cached.add_valid(expected, generator);
+                    assert!(!relation_sum_matches(&uncached, &sequence[..n], wrong));
+                    assert!(!relation_sum_matches(&cached, &sequence[..n], wrong));
+                }
+            }
+        }
+    }
+
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
     }
