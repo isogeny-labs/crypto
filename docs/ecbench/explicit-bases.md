@@ -1130,3 +1130,17 @@ Launch oneV18aftercheckpointgate; fullnewarityRust/device/sanitizerchecks preced
 
 ### Errors
 FirstV18draftliteratureentry failedschema; corrected before freeze,zero findings. Sourceindex-pack on sharedfilesystem failedbadfiledescriptor; local scratch rehearsal passed. Firstadministrativefaultfixture omittedrgfromPATH; corrected fixture passed; no provider call occurred in these tests.
+
+## 2026-10-30T21:18Z — RTX4090 launched
+
+### What was done
+Owner-authorized4090fallback allocated oneNVIDIAGeForceRTX4090 pod25f10of8l9nl6i at21:17:08.633UTC,US-NC-1,0.89USD/hour. Sourcee8e1c819df8901100db0254a849271130e6cca90,archive95a046ed6b1a064109024976c775468e138ca96c045eebbe763f5c17bd7cd58d,protocolv19b58d0dfe47bc039a6160ea7912374d37ff30f595e2daea262490beef58ac5422. Original1149blobIDsverified andS3freshGETequal. Checkpointgatepassed20261030T211514Z-c7444548f1d1 beforeallocation.
+
+### Decisions made
+Use sm89 acrossvalidator and aritylauncher; fixedCUDA13.2image unchanged. Sixmodel/architectureguards pass andcontrollerhealthy/absentfaulttests pass. Preservealladmissionlimits/timeouts andsamearitycert/crossarityscalarchecks.
+
+### Open threads
+ControllerPID1255083,exec30852,admin/home/ec2-user/ecbench-e2e-20261030-v19. Do notrestart. Preflight/fullpanelpending. Partialuploads60s configured; verifyfirstactualupload. Collectfinalorpartialarchiveanddeleteownpod beforecompletion.
+
+### Errors
+V17balanceandV18capacityrefusals retained separately. PR2996auditshard8failedonunrelatedpencil_large_primecheckpointg9missinghost.json; no repairorclaimofallCIgreen.
