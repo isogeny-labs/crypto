@@ -3271,3 +3271,64 @@ change to the index calculus: every row is `1.45×` further from rho at `0` GAE 
 noise of anything else in this note), because its `F_{p⁴}` work is `≈ 2 %` of `S`.  **Distance remaining:**
 `6.39·10³`–`4.06·10⁵×` at `0` GAE.  The rho walk is now the stronger reference for E28–E30 and for any
 later row on these curves.
+
+### 9.30 E28 measured: the `ψ` fold carries over to E19's line with `h = 4`, and the line stays two orders behind the `V₄` line
+
+*2026-10-30.*  Code `789dc2ff6` (Stage 0, Stage A, registered control; binary `789dc2ff6`,
+`experiments/33_tau_stage_a/binary_commit.txt`), supplementary control and tables `0e4fccce1`.  **Stage 0:**
+`examples/e28_tau.rs --stage 0`, `40` curves (`stage0.{json,log}`).  **Stage A:** `run_stage_a.sh`, `10` curves
+(`stage_a_p*s*.json`, `stage_a.log`).  **Supplementary control:** `--stage c` (`control_decomposed.{json,log}`).
+Tables `examples/e28_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.
+
+**One deviation, recorded.**  The registered control drew `3` uniform targets per curve; none had a
+decomposition, so its agreement check (`0 = 0` on all `30` calls) was vacuous.  A supplementary control was added
+after the run: `3` targets per curve that the exact oracle decomposes (`30` calls), with the same solver.
+
+**Stage 0.**  All `40` curves (`8` seeds × `5` sizes) built; `ψ² = −1`, `ψ(G) = [λ]G`, `λ² ≡ −1`, `ψ(T) = T`
+on points on every one; every base point's `ψ`-, `τ_T`- and `τ_Tψ`-image is a base point with the derived action
+`u ↦ −u, c²/u, −c²/u`; `4` points a column under `τ_T` and `8` under `⟨τ_T, ψ⟩` (with `±`) on the same points;
+`j ∈ F_{p²}` throughout; **`h = 4` on all `40`**; density pooled `0.50`–`0.52` per size.
+
+**Stage A** (same stream, both arms, exact oracle):
+
+| p | seed | cols τ / τψ | residuals to the log τ / τψ | ratio | y τ / τψ | control `C` median (uniform / decomposed) |
+|--:|--:|:--|:--|--:|:--|:--|
+| 53 | 1 | 8 / 4 | 5,519 / 4,055 | 1.36 | 613 / 811 | `1.36` / `1.37·10⁹` |
+| 53 | 2 | 16 / 8 | 748 / 292 | 2.56 | 44 / 32 | `1.39` / `1.38·10⁹` |
+| 101 | 1 | 24 / 12 | 2,273 / 1,261 | 1.80 | 91 / 97 | `1.40` / `1.42·10⁹` |
+| 101 | 2 | 32 / 16 | 1,183 / 481 | 2.46 | 36 / 28 | `1.37` / `1.40·10⁹` |
+| 149 | 1 | 36 / 18 | 4,288 / 2,306 | 1.86 | 116 / 121 | `1.38` / `1.40·10⁹` |
+| 149 | 2 | 48 / 24 | 1,570 / 696 | 2.26 | 32 / 28 | `1.40` / `1.48·10⁹` |
+| 197 | 1 | 42 / 21 | 8,804 / 4,738 | 1.86 | 205 / 215 | `1.38` / `1.41·10⁹` |
+| 197 | 2 | 52 / 26 | 4,307 / 2,166 | 1.99 | 81 / 80 | `1.41` / `1.46·10⁹` |
+| 269 | 1 | 80 / 40 | 3,493 / 1,986 | 1.76 | 43 / 48 | `1.44` / `1.44·10⁹` |
+| 269 | 2 | 66 / 33 | 8,564 / 5,364 | 1.60 | 128 / 158 | `1.38` / `1.41·10⁹` |
+
+Every log recovered on both arms; all `640` walks correct; decompositions per decomposed target: median `8`
+on every curve.  Pooled: residuals `40,749 / 23,345` (`1.75`), `y` `98.4 / 110.1` (`1.12`).  The `30`
+supplementary calls returned exactly the oracle's decompositions (`2` or `8` each).
+
+**Stage A2 (a model, not a measured `S`).**  `S_model = R·C + R·g + 16·LA` (`R` the arm's residuals to its log,
+`C` the control's median call, `g` the measured generation per target), against the matched walk in E25's
+arithmetic: the τψ arm `6.99·10⁵`–`1.74·10⁷×` the `⟨±ψ⟩` walk at `0` GAE (`7.32·10⁵`–`1.92·10⁷` at `0.1`,
+`9.09·10⁵`–`3.19·10⁷` at `1`); against E27's walk (iii) `1.02·10⁶`–`2.55·10⁷` at `0` GAE.  On the same curve,
+the τψ arm against the `⟨±ψ⟩` walk is `1.30`–`2.82×` below the τ arm against the negation walk.  Against E19's
+measured `S/rho` at the same `p` (E19's other curves, mean of its two seeds): `0.45`–`6.98×` per curve; by size
+(geometric mean of the two seeds) `1.77, 4.29, 2.39, 1.83, 3.65` at `p = 53 … 269`.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.100 | every check on all `40` curves; `h = 4` on all `40`; density `0.50`–`0.52` | **holds** (gate passed) |
+| G2.101 | columns `2.00`; decompositions per target median `8`; `y` ratio pooled `1.12`; residuals ratio pooled `1.75`; every log recovered | **holds** (pooled, as registered; per curve the residuals ratio is `1.36`–`2.56`, the noise of `8`–`80` columns) |
+| G2.102 | `C` median `1.36`–`1.44·10⁹` (uniform) and `1.37`–`1.48·10⁹` (decomposed); agreement on all `30` decomposed calls (the registered uniform calls agree vacuously) | **holds**, with the deviation above |
+| G2.103 | E19/E28 `0.45`–`6.98` per curve, by size `1.77`–`4.29`; E28's best row (`6.99·10⁵`) against E31 A's rows at the same `p`: `≥ 16.6×` at `p = 101`, `≥ 52×` at `197`, `≥ 21×` at `269`, but only `3.3×` above E31 A's worst row at `p = 149` (`2.79·10⁵`, a high-`y` curve) | **falsified** per curve and at `p = 101` by size (`4.29 > 4.0`); holds by size at the other four; the `≥ 10×` gap to E31 A **fails at `p = 149`** under the strict reading (best E28 row against worst E31 row), holds at the other matched sizes and by a factor `≈ 100` between medians |
+
+**What it says.**  On GLS twists over `F_{p⁴}` built on E19's line (`σ(x₀) = −x₀`, `c ∈ F_p`), `ψ` keeps `T` and
+the line and acts as `u ↦ −u`, and every one of `40` curves has `h = 4`: the cofactor penalty §9.17 found on
+the `V₄` line does not arise here.  The fold halves the columns exactly and cuts the residuals to the log
+`1.75×` (pooled) with an unchanged solve (`C ≈ 1.4·10⁹`, the same decompositions).  Modelled with that solve, the
+line moves by `≈ 2`–`4×` against its own matched walks relative to E19.  **Class: engineering on the `D₄`/`τ_T`
+line, and a model (Stage A2), not a measured end-to-end `S`; not an improvement of the baseline.**  **Distance
+remaining (model):** `≥ 7·10⁵×` the matched rho in E25's arithmetic, `≥ 1.0·10⁶×` against E27's walk; E31 A on
+E25's curves is two orders of magnitude closer.  A Stage B is not justified: what this line needs is a cheaper
+solve, which the `V₄` line already has.
