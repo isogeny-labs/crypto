@@ -50,3 +50,19 @@ The complete example builds; binary/source hashes are in validation.json. Root
 crypto/CUDA is not built locally under the user's disk constraint. Changes to
 FixedPair affect arithmetic used by both collection and replay, while each
 replay independently reconstructs tables and validates every relation.
+
+## Upstream synchronization, 2026-10-30 19:00 UTC
+
+Hosted CI on 53e5703cff9a failed before reaching this change because of an
+unclosed delimiter in binary_semaev_chain_sat.rs. Upstream main repaired it;
+merge d49b9e22f637 incorporates that repair without editing the other task's
+owned file. The merge also imports upstream wide-field arithmetic and tensor
+module changes. The old 38-test record is retained as historical validation,
+not asserted to cover this newer source.
+
+Fresh validation of the merged source passes 39 standalone release tests,
+strict all-target Clippy, formatting and the complete example build.
+main-sync-validation.json records the exact merged revision, local Rust inputs
+and new preserved binary hash. Round18's files remain byte-identical, and its
+frozen binaries were not replaced. No performance execution occurred. Hosted
+workspace CI must rerun on the pushed head; it is not yet established passing.
