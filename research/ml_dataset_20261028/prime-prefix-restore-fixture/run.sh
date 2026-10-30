@@ -36,7 +36,7 @@ for item in inputs expected; do
   [[ -z $(find "$output/$item" -type l -print -quit) ]]
 done
 input=$output/inputs/runs
-expected=$output/expected/prefix-cli-fixture-run-01
+expected=$output/expected
 (cd "$input" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$output/input-before.sha256"
 for shard in 62 63; do
   phase=verify-$shard
