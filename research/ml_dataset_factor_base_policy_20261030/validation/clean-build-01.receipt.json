@@ -1,0 +1,32 @@
+{
+  "schema": "ml-dataset.clean-software-build/v1",
+  "started_utc": "2026-10-30T21:43:27Z",
+  "finished_utc": "2026-10-30T21:48:46Z",
+  "stage": "completed",
+  "source_commit": "1d858fb9e4b8035b38f93db4423880627b09211f",
+  "source_package": "/home/ec2-user/ml-dataset-work-20261028/clean-source-package-01",
+  "package_receipt_sha256": "5f59c981a8eaa4a1cdee927ba836e80af0d8dfc6b5eecfa7ae4b76dd30052c44",
+  "runner_sha256": "8a3854d3c17d7e1faeee4b7ea550107482215dcbe12812613f896f8291d232a1",
+  "log_sha256": "b6e9e972968ab0b06954a380b4e29d3ce86ad7c0cfa9476019591f8e0c4dfb8a",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "--bin",
+    "crypto",
+    "--example",
+    "dataset_startup_cli_fixture"
+  ],
+  "exit_code": 0,
+  "command_exit_code": 0,
+  "source_preflight_matches": true,
+  "source_readback_matches": true,
+  "build_git_dirty": false,
+  "wall_timeout_seconds": 1800,
+  "cargo_jobs": 8,
+  "rayon_threads": 8,
+  "source_identity": "standalone validation source closure; not upstream delivery",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

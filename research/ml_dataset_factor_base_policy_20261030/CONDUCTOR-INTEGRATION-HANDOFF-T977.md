@@ -127,3 +127,12 @@ root Git bundle verified. Source package archive SHA39cf38c008b681cafd4a3c2a38d8
 This is validation-source provenance, not upstream delivery or owner integration.
 Build01 of actualcryptoCLI/nativecontroller has been admitted with realcommit and
 clean-source guards; binary result pending. No shared source reservation changed.
+
+Update2026-10-30T21:50Z: cleanbuild01 PASS0 with sourcebefore/afterguards; retained
+crypto SHA4402eb3744e5961e7bce4ebb9e15e3d6567c10a7834f2677470cf6a9ca2cac80 and
+controller SHA84c2c735ebb546c77da777752aa13b65461b85d35e785383cde633fe997aef89.
+All4 CLI surfacecommands passed0 with retained outputs and unchanged binaries.
+Build/CLI archives freshGET verified; see validation/clean-build-01* and
+validation/clean-cli-surface-01*. Actual26-cell/control workflow remainspending
+its applicable test/lint/schema/runtimepreflight inputs. Thisdoesnotchange
+sharedsourceownership or assertowneracknowledgment/upstreamdelivery.
