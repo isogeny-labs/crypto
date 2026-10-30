@@ -144,3 +144,18 @@ Cumulative: 493124 -> 61317 edges (8.0x smaller), ~75 ms -> ~5-8 ms (~12x).
 The programme mode is now essentially the two required curve-validity checks
 (~30k edges each); everything else is <1k.
 --check-fast: 4/4 still agree with brute force.
+
+=== derived-parameter decomposition (structural)
+A2 = T - A1 instead of a free second point. (A1,A2)->A1 is a bijection on
+solutions, so the exact count is unchanged; only A1 needs curve validity and
+the interface halves.
+
+61-bit, simple seeds:
+mode                         edges   verts  degree  interface  build
+faithful, two free points    118163  25219  520     246        ~12 ms
+faithful, derived            94788   20746  520     123        ~9.3 ms
+programme, two free points   61317   9028   520     246        ~5.2 ms
+programme, derived           31865   5307   520     123        ~3.2 ms
+
+Cumulative: 493124 -> 31865 edges (15.5x smaller), ~75 ms -> ~3.2 ms (~23x).
+--check-fast: 16/16 combinations agree with brute force.

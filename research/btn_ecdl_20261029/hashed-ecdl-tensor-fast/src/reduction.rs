@@ -884,3 +884,31 @@ pub fn decomposition_network_program(
     encoder.assert_point_equal(&sum, &Encoder::constant_point(curve, target)?, meter)?;
     encoder.finish(meter)
 }
+
+/// Derived-parameter decomposition: A1 free and validated, A2 = T - A1.
+/// (A1,A2) -> A1 is a bijection on solutions, so the exact count is unchanged,
+/// while only one curve-validity check is needed and the interface halves.
+pub fn decomposition_network_derived(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    program: bool,
+    meter: &mut Meter,
+) -> Result<Network> {
+    if bases.len() != 2 || !curve.in_subgroup(target, meter)? {
+        return Err(invalid("derived decomposition arity or target"));
+    }
+    let mut encoder = Encoder::new();
+    let (a1, _a1_square) = encoder.input_point_with_square(curve, meter)?;
+    encoder.hash_member(curve, &a1, &bases[0].prime, &bases[0].seed.alpha, &bases[0].seed.beta, &bases[0].threshold, meter)?;
+    encoder.mark_point_interface(&a1, meter)?;
+    let neg_a1 = encoder.point_negate(curve, &a1, meter)?;
+    let target_words = Encoder::constant_point(curve, target)?;
+    let a2 = if program {
+        encoder.point_add_program_raw(curve, &target_words, &neg_a1, meter)?
+    } else {
+        encoder.point_add_raw_with(curve, &target_words, &neg_a1, None, meter)?
+    };
+    encoder.hash_member(curve, &a2, &bases[1].prime, &bases[1].seed.alpha, &bases[1].seed.beta, &bases[1].threshold, meter)?;
+    encoder.finish(meter)
+}

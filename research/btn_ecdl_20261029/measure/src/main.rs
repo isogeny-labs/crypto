@@ -167,19 +167,25 @@ fn main() {
         return;
     }
     if args.iter().any(|a| a == "--check-fast") {
-        fp61_fast::check_small(false);
-        fp61_fast::check_small(true);
+        for simple in [false, true] {
+            for derived in [false, true] {
+                for program in [false, true] {
+                    fp61_fast::check_small(simple, derived, program);
+                }
+            }
+        }
         return;
     }
     if args.iter().any(|a| a == "--p61-fast") {
-        fp61_fast::run((1u128 << 61) - 1, false, false);
+        fp61_fast::run((1u128 << 61) - 1, false, false, false);
         return;
     }
     if let Some(pos) = args.iter().position(|a| a == "--fp-fast") {
         let p: u128 = args[pos + 1].parse().expect("prime in decimal");
         let simple = args.iter().any(|a| a == "--simple");
         let program = args.iter().any(|a| a == "--program");
-        fp61_fast::run(p, simple, program);
+        let derived = args.iter().any(|a| a == "--derived");
+        fp61_fast::run(p, simple, program, derived);
         return;
     }
     if let Some(pos) = args.iter().position(|a| a == "--fp") {

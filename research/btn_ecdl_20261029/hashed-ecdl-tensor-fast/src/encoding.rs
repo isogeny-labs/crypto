@@ -868,6 +868,20 @@ impl Encoder {
         Ok(PointWords { infinity, x, y })
     }
 
+    /// Point negation: (x, y) -> (x, p - y), identity unchanged.
+    pub fn point_negate(
+        &mut self,
+        curve: &Curve,
+        a: &PointWords,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let p = curve.modulus();
+        let width = p.bits() as usize;
+        let zero = Self::constant(width, &BigUint::zero())?;
+        let ny = self.modular_subtract(&zero, &a.y, p, meter)?;
+        Ok(PointWords { infinity: a.infinity.clone(), x: a.x.clone(), y: ny })
+    }
+
     /// Corollary 2's point-addition network. All expressions are evaluated
     /// unconditionally, including inactive branches. The inactive slope is zero,
     /// so auxiliary assignments remain unique in identity and inverse cases.
