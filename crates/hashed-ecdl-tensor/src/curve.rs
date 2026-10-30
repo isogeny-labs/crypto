@@ -1,9 +1,10 @@
 //! Arbitrary-precision, certified short-Weierstrass curves and subgroups.
 
-use crate::arithmetic::{floor_root, inverse, is_prime, modpow, square_root, RandomSource};
-use crate::{integrity, invalid, BigUint, Meter, Result};
+use crate::arithmetic::{floor_root, inverse, is_prime, modpow, RandomSource, SquareRootContext};
+use crate::{integrity, invalid, overflow, BigUint, Meter, Result};
 use num_integer::Integer;
 use num_traits::{One, Zero};
+use std::collections::BTreeSet;
 
 /// Canonical point representation; the identity has no affine coordinates.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -31,44 +32,58 @@ impl serde::Serialize for Point {
         serde::Serialize::serialize(&value, serializer)
     }
 }
+
+struct AffineCoordinates {
+    x: BigUint,
+    y: BigUint,
+}
+json_record!(AffineCoordinates, required { x, y }, optional {});
+
 impl<'de> serde::Deserialize<'de> for Point {
     fn deserialize<D: serde::Deserializer<'de>>(
         deserializer: D,
     ) -> std::result::Result<Self, D::Error> {
-        let value = <serde_json::Value as serde::Deserialize>::deserialize(deserializer)?;
-        if value == "Infinity" {
-            return Ok(Self::Infinity);
+        struct PointVisitor;
+        impl<'de> serde::de::Visitor<'de> for PointVisitor {
+            type Value = Point;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("\"Infinity\" or a single Affine object")
+            }
+
+            fn visit_str<E: serde::de::Error>(
+                self,
+                variant: &str,
+            ) -> std::result::Result<Point, E> {
+                if variant == "Infinity" {
+                    Ok(Point::Infinity)
+                } else {
+                    Err(serde::de::Error::unknown_variant(variant, &["Infinity"]))
+                }
+            }
+
+            fn visit_map<A: serde::de::MapAccess<'de>>(
+                self,
+                mut map: A,
+            ) -> std::result::Result<Point, A::Error> {
+                match map.next_key::<String>()?.as_deref() {
+                    Some("Affine") => {
+                        let AffineCoordinates { x, y } = map.next_value()?;
+                        if let Some(field) = map.next_key::<String>()? {
+                            return Err(if field == "Affine" {
+                                serde::de::Error::duplicate_field("Affine")
+                            } else {
+                                serde::de::Error::unknown_field(&field, &["Affine"])
+                            });
+                        }
+                        Ok(Point::Affine { x, y })
+                    }
+                    Some(variant) => Err(serde::de::Error::unknown_variant(variant, &["Affine"])),
+                    None => Err(serde::de::Error::missing_field("Affine")),
+                }
+            }
         }
-        let mut outer = value
-            .as_object()
-            .cloned()
-            .ok_or_else(|| serde::de::Error::custom("point object"))?;
-        let value = outer
-            .remove("Affine")
-            .ok_or_else(|| serde::de::Error::custom("point variant"))?;
-        if !outer.is_empty() {
-            return Err(serde::de::Error::custom("unknown point variant"));
-        }
-        let mut fields = value
-            .as_object()
-            .cloned()
-            .ok_or_else(|| serde::de::Error::custom("affine object"))?;
-        let x = serde_json::from_value(
-            fields
-                .remove("x")
-                .ok_or_else(|| serde::de::Error::missing_field("x"))?,
-        )
-        .map_err(serde::de::Error::custom)?;
-        let y = serde_json::from_value(
-            fields
-                .remove("y")
-                .ok_or_else(|| serde::de::Error::missing_field("y"))?,
-        )
-        .map_err(serde::de::Error::custom)?;
-        if !fields.is_empty() {
-            return Err(serde::de::Error::custom("unknown affine field"));
-        }
-        Ok(Self::Affine { x, y })
+        deserializer.deserialize_any(PointVisitor)
     }
 }
 
@@ -82,6 +97,9 @@ pub struct Curve {
     r: BigUint,
     cofactor: BigUint,
     generator: Point,
+    // Only the checked proof verifier populates this private context. Retain
+    // auxiliary hash primes as well as p/r for construction and replay.
+    certified_primes: BTreeSet<BigUint>,
 }
 
 impl Curve {
@@ -154,6 +172,7 @@ impl Curve {
             r,
             cofactor,
             generator,
+            certified_primes: primes,
         };
         if curve.generator == Point::Infinity
             || !curve.contains(&curve.generator)
@@ -191,6 +210,19 @@ impl Curve {
             return Err(invalid("declared order is not full cardinality"));
         }
         Ok(curve)
+    }
+
+    pub(crate) fn certifies_prime(&self, value: &BigUint, meter: &mut Meter) -> Result<bool> {
+        if self.certified_primes.contains(value) {
+            meter.bits(
+                usize::try_from(value.bits()).map_err(|_| overflow("certified prime width"))?,
+                "certified prime width",
+            )?;
+            meter.charge(1, "checked prime reuse")?;
+            Ok(true)
+        } else {
+            is_prime(value, meter)
+        }
     }
 
     /// Field modulus.
@@ -324,21 +356,53 @@ impl Curve {
         rng: &mut impl RandomSource,
         meter: &mut Meter,
     ) -> Result<Option<Point>> {
-        if z >= &(&self.p << 1) {
+        self.decoder()?.decode(z, rng, meter)
+    }
+
+    /// Prepare a decoder that reuses square-root setup for many encodings of
+    /// this certified curve. Randomness and work are consumed lazily by decode.
+    pub fn decoder(&self) -> Result<PointDecoder<'_>> {
+        Ok(PointDecoder {
+            curve: self,
+            roots: SquareRootContext::new(&self.p)?,
+        })
+    }
+}
+
+/// Batch compressed-point decoding tied to one certified curve.
+/// Modulus parameters and one lazily sampled nonresidue are reused; coordinate
+/// parity and the curve equation are checked for every decoded point.
+pub struct PointDecoder<'curve> {
+    curve: &'curve Curve,
+    roots: SquareRootContext<'curve>,
+}
+
+impl PointDecoder<'_> {
+    /// Decode one nonidentity encoding, preserving canonical point selection.
+    /// Nonsquares and out-of-range encodings return `None`; exhausted resources
+    /// and random-source failures remain errors.
+    pub fn decode(
+        &mut self,
+        z: &BigUint,
+        rng: &mut impl RandomSource,
+        meter: &mut Meter,
+    ) -> Result<Option<Point>> {
+        let curve = self.curve;
+        if z >= &(&curve.p << 1) {
             return Ok(None);
         }
         let x = z >> 1;
-        let Some(mut y) = square_root(&self.rhs(&x), &self.p, rng, meter)? else {
+        let Some(mut y) = self.roots.root(&curve.rhs(&x), rng, meter)? else {
             return Ok(None);
         };
         if y.bit(0) != z.bit(0) {
-            y = (&self.p - y) % &self.p;
+            y = (&curve.p - y) % &curve.p;
         }
         if y.bit(0) != z.bit(0) {
             return Ok(None);
         }
         let point = Point::Affine { x, y };
-        if !self.contains(&point) {
+        if !curve.contains(&point) {
             return Err(integrity("compressed point replay"));
         }
         Ok(Some(point))

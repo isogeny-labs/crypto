@@ -9,7 +9,7 @@
 //!   -seed N     random seed, default current time in nanoseconds
 //!   -q          suppress progress output
 //!   -gadgets    use low-degree arithmetic gadgets (slow; keep -bits small)
-//!   -window K   with -gadgets: constrain x < p>>K in every factor base (0 = off)
+//!   -window K   constrain x < p>>K in every factor base (0 = off; works with or without -gadgets)
 //!   -mitm       find relations by meeting in the middle (~sqrt(2r) additions per attempt)
 //!   -threads N  relation-search workers with -mitm (0 = one per core, 1 = sequential)
 
@@ -51,7 +51,9 @@ fn usage() {
     eprintln!("    \tnumber of factor bases (default 2)");
     eprintln!("  -q\tsuppress progress output");
     eprintln!("  -window int");
-    eprintln!("    \twith -gadgets: constrain x < p>>k in every factor base (0 = off)");
+    eprintln!(
+        "    \tconstrain x < p>>k in every factor base (0 = off; works with or without -gadgets)"
+    );
     eprintln!("  -seed int");
     eprintln!("    \trandom seed (default <current time in ns>)");
 }
@@ -249,8 +251,8 @@ fn main() {
     if flags.gadgets {
         s.gadgets = true;
         s.counter = Box::new(DFSCounter);
-        s.window_bits = usize::try_from(flags.window).unwrap_or(0);
     }
+    s.window_bits = usize::try_from(flags.window).unwrap_or(0);
     s.mitm = flags.mitm;
     s.threads = usize::try_from(flags.threads).unwrap_or(0);
     if !flags.quiet {
