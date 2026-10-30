@@ -946,3 +946,17 @@ Corrected runtime publication/independent verification and pre-data retry amendm
 
 ### Errors
 The original publication verified archive and executable bytes but did not catch restrictive executable modes in the image. Archive extraction under a restrictive umask removed UID1000 execute access. The failed cloud attempt is retained and will not be relabeled as a successful launch.
+
+## 2026-10-30 — Permission-corrected infrastructure replacement submitted
+
+### What was done
+Published runtime e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd using the old immutable image and COPY --chmod=0755 of the same progress bytes. Complete inventories prove only that file mode changed. Independent review passed; UID1000/no-network/read-only/no-capabilities invocation reaches native usage (exit1), versus original EACCES(exit126), without a workload. Metadata and new neutral report are under validation/runtime_permission_correction_20261030/ and validation/accounting/reports/review-20261030T0016Z-permission-native/.
+
+### Decisions made
+Reserved180seconds conservatively for the failed attempt (observed controller elapsed162.316seconds is a separate observation), leaving14220seconds, with unchanged original outerdeadline and operationalguard. Frozen retry protocol body cf8f76eadc42ff487644ea13b3392af1fd31c94e4629eecd6ad7b9a18820badb committed atdcc05bb71 before submission. New immutable infrastructure replacement pencil-p739-20261030-a1 uses canonicalrequest e48a8e03ea1ddbaeb9512b57c3215703485c739c199db0dfc506aa0520cea6a2, build9b9db044-d233-497a-a92a-3830195b9692. Parentfailedrun remains preserved; no trial was silently repeated.
+
+### Open threads
+Native receipt observer session71729 waits on the replacement (read-only), while leasekeeper99874 owns heartbeats through03:40Z. Reconcile existing build/state/receipts before any future action; no third infrastructure attempt is authorized by this protocol. Collect actual outcomes, independent replay/L2/A-A and cost observations before claiming completion. A general publisher-script permission/tag-identity fix is proposed but not implemented; the corrected per-run image is verified.
+
+### Errors
+The first runtime publication's bytes-only audit missed executable permission metadata. The correction and original failure are both retained. A retry-draft schema field was initially misplaced; its failed check and corrected validation statement are preserved in the protocol amendment rather than represented as an uninterrupted pass.
