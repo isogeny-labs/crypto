@@ -88,3 +88,18 @@ Commit data/navigation/metrics,render and inspect report,publish support and upd
 
 ### Errors (what went wrong, how it was handled)
 No restored replay or post-manifest failures. Retained interrupted startup and lease-renewal records; heartbeat remains active for publication.
+
+
+## 2026-10-30 04:57 UTC — Report, support and delivery verified
+
+### What was done (commands, files, features)
+Data commit a5320f7f1cd20554938bd692edd52bb6c04e512d pushed. All156 exported metrics match the committed summary. Rendered and inspected both PDF pages; SHA841ecc0bbfbe5d41f6e9950551d176d44decb5455c85cfcee3b2d74c5f4ec6a9. All6 report files downloaded byte-identical. Support archive732432bytes,SHA67c118a8e2430e2dbfa098886800ecfe8b87df901970552196e756b979e63af7; download hash and all2327 manifest payloads verified. Support sealed; subsequent receipts in degree4-quartic-final. Wrote SR-20261030-44734c process receipt.
+
+### Decisions made (and why)
+Keep report separate from underlying native dataset and cite its immutable data commit. Preserve every failed/interrupted attempt. No native computation repeated for publication. Goal remains active.
+
+### Open threads (unfinished, pick up next time)
+Delivery commit/PR update,current-head checks,checkpoint and final Git-metadata/receipt S3 readback. Future science must address pending quartic work or another justified certificate; no same-cap rerun.
+
+### Errors (what went wrong, how it was handled)
+Session-receipt CLI rejected two argument orders; inspected parser and used its default write mode successfully. Failure records retained in final. Metrics export completed on shared filesystem in over one minute; matching values verified,not a timing claim.

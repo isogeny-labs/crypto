@@ -12,7 +12,9 @@ Read the [native summary](evidence/degree4-quartic/summary.json),
 [binary and JSON formats](DEGREE4_QUARTIC_FORMAT.json),
 [unified export](experiment-degree4-quartic.export.json),
 [S3 objects](evidence/degree4-quartic-storage.json), and
-[restored verification](evidence/degree4-quartic-publication.json).
+[restored verification](evidence/degree4-quartic-publication.json),
+[inspected report](reports/run-20261029T2048Z/report.pdf), and
+[publication receipts](evidence/degree4-quartic-delivery.json).
 The raw archive retains all attempted cases, rows, reductions, pending queues
 and affine checks. Replay requires the four immutable parent archives.
 
