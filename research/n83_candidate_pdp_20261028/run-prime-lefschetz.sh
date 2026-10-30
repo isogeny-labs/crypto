@@ -54,6 +54,6 @@ phase(){
  [[ "$code" == 0 ]]
 }
 phase source-producer "$out/instrument" run "$out" "$out/protocol-prime-lefschetz.json" "$out/source-audit"
-phase certificate-producer python3 "$out/source/prime_lefschetz_certificate.py" run "$out" "$out/protocol-prime-lefschetz.json" "$out/results"
+phase certificate-producer python3 -B "$out/source/prime_lefschetz_certificate.py" run "$out" "$out/protocol-prime-lefschetz.json" "$out/results"
 phase source-replay "$out/instrument" replay "$out" "$out/protocol-prime-lefschetz.json" "$out/source-audit"
-phase certificate-replay python3 "$out/source/prime_lefschetz_certificate.py" replay "$out" "$out/protocol-prime-lefschetz.json" "$out/results"
+phase certificate-replay python3 -B "$out/source/prime_lefschetz_certificate.py" replay "$out" "$out/protocol-prime-lefschetz.json" "$out/results"
