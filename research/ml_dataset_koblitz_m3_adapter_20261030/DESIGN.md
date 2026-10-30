@@ -147,3 +147,31 @@ No cloud execution or budget renewal is part of this increment. Preserve the
 original total USD 200 ceiling and expired campaign deadline. Software evidence
 and failures continue through the existing authorized S3 custody path, with
 conditional immutable upload and fresh byte/hash readback.
+
+## Implemented resource-ledger increment
+
+`src/ml_dataset/koblitz_m3.rs` now implements the cumulative ledger; runtime
+registration remains pending the original-input binder and adapter pipeline.
+`budget_harness.rs` compiles that exact module with Rust 1.98, edition 2021 and
+warnings denied. Nine boundary controls pass. This is direct module validation,
+not the repository integration suite or dataset generation.
+
+The extraction allowance is fixed at the original configured `work_limit` actual
+group additions, matching the existing prime adapter's separate addition limit.
+Native modeled work is capped at the checked 1024 conversion and shared across
+construction/matrix. These are two explicitly different units and limits, not a
+single retired-instruction budget. Byte and trace reservations never refund;
+callback-owned memory reduces the remaining native headroom. Exact end-cursor
+validation remains the extraction caller's responsibility.
+
+The ledger accepts an already admitted original deadline and original limits.
+It does not itself certify provenance. The next increment must bind these inputs
+to `SolverExecutionContext` and validate original config/attempt/capture before
+calling it. Adapter-specific allocation constants, typed serialization, native
+observer wiring and independent replay are still required before activation.
+
+Controls cover shared phase work/memory, repeated/regressing cumulative reports,
+callback allocations after a native allowance is issued, setup time inside the
+construction deadline, the unchanged original matrix deadline, exact versus
+one-extra group additions, phase order, arithmetic overflow, zero limits, trace
+caps, sticky observer errors, and rejection before mutation at native caps.
