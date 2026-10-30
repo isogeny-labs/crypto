@@ -150,15 +150,16 @@ fn full_checks(f:&Field,polys:&BTreeMap<String,Vec<Poly>>,coords:&[Series;6])->(
 
 fn xor(a:&mut [u64],b:&[u64]){for (x,y) in a.iter_mut().zip(b){*x^=*y;}}
 fn highest(a:&[u64])->Option<usize>{a.iter().enumerate().rev().find(|(_,x)|**x!=0).map(|(i,x)|i*64+63-x.leading_zeros() as usize)}
-fn rank_checked(columns:&[Vec<u64>],dimension:usize)->usize{
+fn rank_checked(columns:&[Vec<u64>],dimension:usize,path:&str)->usize{
  let mut piv:Vec<Option<(Vec<u64>,Vec<u64>)>>=vec![None;dimension];let mut rank=0;
  for (k,c) in columns.iter().enumerate(){let mut x=c.clone();let mut label=vec![0u64;(columns.len()+63)/64];label[k/64]|=1u64<<(k%64);
   loop{let Some(p)=highest(&x) else{break};assert!(p<dimension);
    if let Some((y,l))=&piv[p]{xor(&mut x,y);xor(&mut label,l);}else{piv[p]=Some((x,label));rank+=1;break;}
   }
  }
- for entry in piv.into_iter().flatten(){let (x,l)=entry;let mut rebuilt=vec![0u64;x.len()];for (k,c) in columns.iter().enumerate(){if (l[k/64]>>(k%64))&1!=0{xor(&mut rebuilt,c);}}assert_eq!(rebuilt,x);}
- rank
+ let mut out=BufWriter::new(fs::File::create(path).unwrap());
+ for (p,entry) in piv.into_iter().enumerate(){let Some((x,l))=entry else{continue};write!(out,"{p} ").unwrap();for v in &x{write!(out,"{v:016x},").unwrap();}write!(out," ").unwrap();for v in &l{write!(out,"{v:016x},").unwrap();}writeln!(out).unwrap();let mut rebuilt=vec![0u64;x.len()];for (k,c) in columns.iter().enumerate(){if (l[k/64]>>(k%64))&1!=0{xor(&mut rebuilt,c);}}assert_eq!(rebuilt,x);}
+ out.flush().unwrap();rank
 }
 fn save(path:&str,tag:&str,rows:&[Series]){let mut out=BufWriter::new(fs::File::create(path).unwrap());for(i,row)in rows.iter().enumerate(){write!(out,"{tag} {} ",i+1).unwrap();for(k,x)in row.iter().enumerate(){if k>0{write!(out,",").unwrap();}assert_eq!(x[1],0);write!(out,"{}",x[0]).unwrap();}writeln!(out).unwrap();}out.flush().unwrap();}
 fn reference(path:&str)->BTreeMap<(String,usize),Vec<u8>>{let text=fs::read_to_string(path).unwrap();let mut out=BTreeMap::new();for line in text.lines(){let w:Vec<_>=line.split_whitespace().collect();assert_eq!(w.len(),3);let values:Vec<u8>=w[2].split(',').map(|x|x.parse().unwrap()).collect();assert_eq!(values.len(),154);assert!(values.iter().all(|x|*x<32));assert!(out.insert((w[0].to_string(),w[1].parse().unwrap()),values).is_none());}out}
@@ -181,7 +182,7 @@ fn main(){
  println!("JET43_REGRESSION coordinates=6 units=8 inverses=8 sections=68 quadratics=196 cubics=324 old_precision=154 every_coefficient=pass");
  fs::create_dir(&args[7]).unwrap();save(&format!("{}/coordinates615.txt",args[7]),"C",&coords);save(&format!("{}/units615.txt",args[7]),"U",&units);save(&format!("{}/inverses615.txt",args[7]),"I",&inverses);
  let mut ranks=vec![];
- for(g,space)in spaces.iter().enumerate(){save(&format!("{}/space{}.txt",args[7],g+1),&(g+1).to_string(),space);let columns:Vec<_>=space.iter().map(|a|{let mut bits=vec![0u64;(3075+63)/64];for(k,x)in a.iter().enumerate(){assert_eq!(x[1],0);for b in 0..5{if(x[0]>>b)&1!=0{let pos=5*k+b;bits[pos/64]^=1u64<<(pos%64);}}}bits}).collect();let rank=rank_checked(&columns,3075);assert_eq!(rank,[68,196,324][g]);ranks.push(rank);}
+ for(g,space)in spaces.iter().enumerate(){save(&format!("{}/space{}.txt",args[7],g+1),&(g+1).to_string(),space);let columns:Vec<_>=space.iter().map(|a|{let mut bits=vec![0u64;(3075+63)/64];for(k,x)in a.iter().enumerate(){assert_eq!(x[1],0);for b in 0..5{if(x[0]>>b)&1!=0{let pos=5*k+b;bits[pos/64]^=1u64<<(pos%64);}}}bits}).collect();let rank=rank_checked(&columns,3075,&format!("{}/pivots{}.txt",args[7],g+1));assert_eq!(rank,[68,196,324][g]);ranks.push(rank);}
  fs::write(&args[8],format!("precision=615\nresidue_degree=5\nevaluation_dimension=3075\nrank1={}\nrank2={}\nrank3={}\nregression_precision=154\nregression_rows=610\n",ranks[0],ranks[1],ranks[2])).unwrap();
  println!("JET43_RESULT precision=615 residue_degree=5 evaluation_dimension=3075 ranks=68,196,324 all_pivot_recombinations=checked full_reference_rows=610 every_original_source_equation=pass all_unit_inverses=pass coefficient_descent_conjugates=5 complete_larger_RR_spaces_constructed=false geometric_transfer_evaluated=false");println!("JET43_ALL_CHECKS_PASS");
 }
