@@ -1,0 +1,49 @@
+{
+  "schema": "projective-law-point-allocation/v1",
+  "scope": "proof-side affine field points; no Rust execution or divisor-class translation",
+  "results": [
+    {
+      "id": "evaluated_norm",
+      "lean": "Common22PointAllocation.source_style_eval_norm",
+      "status": "proved",
+      "conditions": ["valid Mumford polynomial congruences", "B != 0", "monic quintic with zero X^4 coefficient", "y^2 = f(x)"],
+      "conclusion": "(n(x)-B*y)*(n(x)+B*y)=u1(x)*u2(x)*support(x)"
+    },
+    {
+      "id": "nonbranch_allocation",
+      "lean": "Common22PointAllocation.exactly_one_nonbranch",
+      "status": "proved",
+      "conditions": ["evaluated norm identity", "2 != 0", "B != 0", "y != 0", "u1(x)*u2(x)*support(x)=0"],
+      "conclusion": "exactly one conjugate factor is zero"
+    },
+    {
+      "id": "branch_overlap",
+      "lean": "Common22PointAllocation.branch_overlap",
+      "status": "proved",
+      "conditions": ["evaluated norm identity", "y = 0", "u1(x)*u2(x)*support(x)=0"],
+      "conclusion": "both conjugate factors are zero"
+    },
+    {
+      "id": "C_zero_degree_drop",
+      "lean": "Common22PointAllocation.cubic_degree_le_two_of_c_zero; Common22PointAllocation.support_degree_le_one_of_c_zero",
+      "status": "proved",
+      "conditions": ["C = 0"],
+      "conclusion": "degree(n)<=2 and degree(support)<=1"
+    },
+    {
+      "id": "B_gate_does_not_force_C",
+      "lean": "Common22PointAllocation.b_ne_zero_c_zero_witness",
+      "status": "proved",
+      "conditions": ["q1=q2=0", "r1=1", "r2=2", "s1=s2=0", "t1=t2=1"],
+      "conclusion": "B=-1 !=0 and C=0; coefficient-only witness"
+    }
+  ],
+  "open_obligations": [
+    "smooth projective curve and function-field embedding",
+    "scheme-theoretic zero multiplicities and output Mumford reduction",
+    "conditional pole orders 6 at C!=0 and 5 at C=0 at infinity",
+    "principal divisor and Pic0 class equation",
+    "Rust-to-Lean runtime semantics"
+  ],
+  "numerical_cost_change": null
+}
