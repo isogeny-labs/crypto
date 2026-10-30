@@ -38,6 +38,13 @@ for this follow-up.
   `research/prime_tensor_variants_20261030/receipts/ROOT-VALIDATION.md` concerns
   another pinned source and does not discharge this run.
 
+An additional isolated replay on the identical pinned source/executable used
+an explicit 180-second development deadline. GNU timeout returned 124 after
+terminating the case; no test result was produced. This establishes only
+non-completion under that declared policy. It neither explains the original
+SIGKILL nor establishes an algorithmic obstruction. The small complete replay
+record is committed separately in the study's `parent-validation` directory.
+
 Raw parent output, inventory, fixture reruns and process observation are
 preserved locally; the full archive's upload failed for missing AWS credentials.
 The [archive status](../research/hashed_ecdl_primality_fast_paths_20261030/parent-validation/README.md)

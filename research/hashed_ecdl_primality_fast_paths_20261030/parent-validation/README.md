@@ -11,6 +11,12 @@ same executable after restoring tracked files. This is not a fresh green full
 suite and does not discharge the remaining case. Default ignored tests were
 not enabled or reclassified.
 
+The additional `isolated-replay.json` / `isolated-replay.txt` record uses the
+same source and executable with a declared 180-second development deadline.
+The case produced no result before GNU timeout terminated it, exit 124. This
+bounded retry does not explain the original SIGKILL or make the parent scope
+green. Its complete small output is committed independently of the archive.
+
 The complete log, inventory, both fixture-replay records and process observation
 are preserved in `runs.tar.xz`, produced with the repository's deterministic
 raw-tree recipe. `RAW-SHA256SUMS` identifies every uncompressed record. The

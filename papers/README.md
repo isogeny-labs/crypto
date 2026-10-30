@@ -21,6 +21,8 @@ directory per paper.
 | [`ecdlp-ic-improvement-ledger/`](ecdlp-ic-improvement-ledger/) | Ratcheting Elliptic-Curve Index Calculus Toward Pollard Rho: A Ledger of Verified Improvements, the Distance That Remains, and the Claims That Did Not Survive (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence through 2026-10-23, no new measurement; every improvement against its own incumbent with its distance to matched rho; 0 of 28 IC leaderboard rows validated at writing |
 | [`ecdlp-index-calculus-treatise/`](ecdlp-index-calculus-treatise/) | Index Calculus for the Elliptic-Curve Discrete Logarithm: Theory, Algorithms, and a Measured Frontier | research draft, anonymized, not submitted; 87-page synthesis through 2026-10-29 (theory: summation cover, fall degrees with certified bounds, obstructions; algorithms; frontier; open problems); the submittable core is its fall-degree chapter |
 
+| [`ecdlp-boundaries-20261018/`](ecdlp-boundaries-20261018/) | Scoped Boundaries for Elliptic-Curve Index Calculus: Counterexamples, Conservation, and Oracle Models | source-bound research draft, anonymized, not independently reviewed, not submitted or published; six-result scope audit and two-target Lean inventory, no new trials |
+
 Markdown drafts that are not yet typeset stay with their notes and are listed
 here so they are not lost: `research/ecdlp_autolab/PAPER_DRAFT.md` (An Empirical
 Resistance Map for Prime-Field ECDLP) and `research/iso1_weak_classes_20261007/REPORT.tex`
