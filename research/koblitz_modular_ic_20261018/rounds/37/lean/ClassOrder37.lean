@@ -3,6 +3,8 @@ import Mathlib.NumberTheory.Divisors
 
 /-! Conditional finite-group interpretation of the scalar certificates.
 The concrete source Picard group and native arrays are not imported. -/
+set_option maxRecDepth 100000
+
 namespace ClassOrder37
 variable {A : Type*} [AddGroup A]
 
@@ -55,13 +57,14 @@ theorem order_40931_of_nonannihilation (x : A) (h : 40931 • x = 0)
 theorem scalar_to_eleven_iff (x : A) (horder : addOrderOf x = 671) (k : ℕ) :
     11 • (k • x) = 0 ↔ 61 ∣ k := by
   rw [← mul_nsmul, ← addOrderOf_dvd_iff_nsmul_eq_zero, horder]
-  change 11 * 61 ∣ 11 * k ↔ 61 ∣ k
+  change 11 * 61 ∣ k * 11 ↔ 61 ∣ k
+  rw [Nat.mul_comm k 11]
   exact Nat.mul_dvd_mul_iff_left (by decide : 0 < 11)
 
 theorem finite_projector_idempotent (x : A) (h : 671 • x = 0) :
     122 • (122 • x) = 122 • x := by
   rw [← mul_nsmul]
-  have hnum : 122 * 122 = 122 + 22 * 671 := by decide
+  have hnum : 122 * 122 = 122 + 671 * 22 := by decide
   rw [hnum, add_nsmul, mul_nsmul, h, nsmul_zero, add_zero]
 
 end ClassOrder37
