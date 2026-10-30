@@ -15,7 +15,7 @@ use crate::cryptanalysis::koblitz_index_calculus::{
 use crate::cryptanalysis::p256_structural::deep_factor;
 use crate::cryptanalysis::prime_fast::FastCurve;
 use crate::cryptanalysis::residual_walk::is_prime_u64;
-use crate::ecc::curve::CurveParams;
+use crate::ecc::field::FieldElement;
 use crate::ecc::point::Point;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -24,6 +24,67 @@ use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 
 pub(super) type WPoint = Option<(u64, u64)>;
+
+/// Exact dataset domain metadata. The legacy public `CurveParams` uses a u32
+/// cofactor, while these word-field research populations can have larger ones.
+/// Keep the selected domain intact and reuse the existing textbook point API.
+#[derive(Clone, Debug)]
+pub struct ExactPrimeCurve {
+    pub p: BigUint,
+    pub a: BigUint,
+    pub b: BigUint,
+    pub gx: BigUint,
+    pub gy: BigUint,
+    pub n: BigUint,
+    pub cofactor: u64,
+}
+
+impl ExactPrimeCurve {
+    pub fn fe(&self, value: BigUint) -> FieldElement {
+        FieldElement::new(value, self.p.clone())
+    }
+    pub fn a_fe(&self) -> FieldElement {
+        self.fe(self.a.clone())
+    }
+    pub fn generator(&self) -> Point {
+        Point::Affine {
+            x: self.fe(self.gx.clone()),
+            y: self.fe(self.gy.clone()),
+        }
+    }
+    pub fn group_order(&self) -> BigUint {
+        &self.n * BigUint::from(self.cofactor)
+    }
+    pub fn is_on_curve(&self, point: &Point) -> bool {
+        match point {
+            Point::Infinity => true,
+            Point::Affine { x, y } => {
+                x.modulus == self.p
+                    && y.modulus == self.p
+                    && x.value < self.p
+                    && y.value < self.p
+                    && y.mul(y)
+                        == x.mul(&x.mul(x))
+                            .add(&self.a_fe().mul(x))
+                            .add(&self.fe(self.b.clone()))
+            }
+        }
+    }
+    fn fast(&self) -> Result<FastCurve, String> {
+        let p = self.p.to_u64().ok_or("prime modulus exceeds u64")?;
+        let n = self.n.to_u64().ok_or("prime subgroup exceeds u64")?;
+        if p >= 1u64 << 62 || n == 0 || n >= 1u64 << 62 {
+            return Err("unsupported prime arithmetic parameters".into());
+        }
+        Ok(FastCurve::new(
+            "ml-dataset synthetic",
+            p,
+            self.a.to_u64().ok_or("prime a exceeds u64")?,
+            self.b.to_u64().ok_or("prime b exceeds u64")?,
+            n,
+        ))
+    }
+}
 
 #[derive(Clone)]
 pub(super) enum Arithmetic {
@@ -729,9 +790,6 @@ pub fn generate(config: &CaseConfig) -> Result<CaseData, String> {
         return Err("unsupported: no odd prime subgroup on selected curve".into());
     }
     let cofactor = order / subgroup;
-    if config.family == "prime" && cofactor > u32::MAX as u64 {
-        return Err("unsupported: prime CurveParams cofactor exceeds u32; exact curve retained in configuration".into());
-    }
     let mut setup_rng = StdRng::seed_from_u64(
         config.curve_seed
             ^ (config.n as u64).rotate_left(17)
@@ -946,7 +1004,7 @@ pub fn binary_point(v: &Value, n: u32) -> Result<BinaryPoint, String> {
         _ => Err("noncanonical binary point coordinates".into()),
     }
 }
-pub fn prime_curve(v: &Value) -> Result<CurveParams, String> {
+pub fn prime_curve(v: &Value) -> Result<ExactPrimeCurve, String> {
     let p = number(&v["field"]["modulus"], "modulus")?;
     if p <= 3 || p >= 1u64 << 62 || !is_prime_u64(p) || v["field"]["characteristic"] != u(p) {
         return Err("invalid prime field".into());
@@ -969,20 +1027,27 @@ pub fn prime_curve(v: &Value) -> Result<CurveParams, String> {
     if gx >= p || gy >= p {
         return Err("noncanonical generator".into());
     }
-    Ok(CurveParams {
-        name: "ml-dataset synthetic",
+    let subgroup = number(&v["curve"]["subgroup_order"], "subgroup order")?;
+    let cofactor = number(&v["curve"]["cofactor"], "cofactor")?;
+    let group_order = number(&v["curve"]["group_order"], "group order")?;
+    if subgroup == 0 || cofactor == 0 {
+        return Err("invalid zero subgroup or cofactor".into());
+    }
+    let curve = ExactPrimeCurve {
         p: p.into(),
         a: a.into(),
         b: b.into(),
         gx: gx.into(),
         gy: gy.into(),
-        n: number(&v["curve"]["subgroup_order"], "subgroup order")?.into(),
-        h: number(&v["curve"]["cofactor"], "cofactor")?
-            .try_into()
-            .map_err(|_| "cofactor exceeds native u32")?,
-    })
+        n: subgroup.into(),
+        cofactor,
+    };
+    if curve.group_order() != BigUint::from(group_order) {
+        return Err("prime subgroup and cofactor do not match group order".into());
+    }
+    Ok(curve)
 }
-pub fn prime_point(v: &Value, c: &CurveParams) -> Result<Point, String> {
+pub fn prime_point(v: &Value, c: &ExactPrimeCurve) -> Result<Point, String> {
     match point_words(v)? {
         None => Ok(Point::Infinity),
         Some((x, y)) if BigUint::from(x) < c.p && BigUint::from(y) < c.p => Ok(Point::Affine {
@@ -995,9 +1060,7 @@ pub fn prime_point(v: &Value, c: &CurveParams) -> Result<Point, String> {
 
 pub(super) fn arithmetic(v: &Value) -> Result<Arithmetic, String> {
     match v["family"].as_str() {
-        Some("prime") => Ok(Arithmetic::Prime(
-            FastCurve::from_params(&prime_curve(v)?).ok_or("unsupported prime parameters")?,
-        )),
+        Some("prime") => Ok(Arithmetic::Prime(prime_curve(v)?.fast()?)),
         Some("koblitz" | "binary") => {
             let c = binary_curve(v)?;
             Ok(Arithmetic::Binary {
@@ -1503,6 +1566,157 @@ mod tests {
             solver: "enumerate".into(),
         }
     }
+    #[test]
+    fn exact_prime_context_matches_legacy_small_cofactor_arithmetic() {
+        use crate::ecc::curve::CurveParams;
+        for twist in [false, true] {
+            let data = generate(&config("prime", 11, twist)).unwrap();
+            let exact = prime_curve(&data.public_instance).unwrap();
+            let legacy = CurveParams {
+                name: "compatibility fixture",
+                p: exact.p.clone(),
+                a: exact.a.clone(),
+                b: exact.b.clone(),
+                gx: exact.gx.clone(),
+                gy: exact.gy.clone(),
+                n: exact.n.clone(),
+                h: u32::try_from(exact.cofactor).unwrap(),
+            };
+            assert_eq!(exact.generator(), legacy.generator());
+            let old_fast = FastCurve::from_params(&legacy).unwrap();
+            let new_fast = exact.fast().unwrap();
+            assert_eq!(
+                (old_fast.f.p, old_fast.a, old_fast.b, old_fast.n),
+                (new_fast.f.p, new_fast.a, new_fast.b, new_fast.n)
+            );
+            for scalar in [0u64, 1, 2, 7, 31] {
+                let old = legacy
+                    .generator()
+                    .scalar_mul_vartime(&scalar.into(), &legacy.a_fe());
+                let new = exact
+                    .generator()
+                    .scalar_mul_vartime(&scalar.into(), &exact.a_fe());
+                assert_eq!(old, new);
+                assert_eq!(legacy.is_on_curve(&old), exact.is_on_curve(&new));
+            }
+            verify(&data.public_instance, &data.private_witness).unwrap();
+        }
+    }
+
+    #[test]
+    fn exact_prime_cofactor_above_u32_replays_and_solves_without_witness() {
+        // A deterministic, bounded software fixture, not campaign sampling.
+        // Certify the actual order instead of attaching a made-up cofactor.
+        let h = 1u64 << 33;
+        // Frozen from the first prime r in the declared odd 3..=1023 search.
+        let r = 31;
+        let p = 266_287_972_351;
+        assert!(is_prime_u64(r) && is_prime_u64(p));
+        assert_eq!(p + 1, r * h);
+        let c = Arithmetic::Prime(FastCurve::new("large-cofactor fixture", p, p - 1, 0, r));
+        let (order, certificate) =
+            certify_count(&c, &mut StdRng::seed_from_u64(0xeca0fac7)).unwrap();
+        assert_eq!(order, p + 1);
+        verify_certificate(&c, &certificate, order, p - 1, 0, false).unwrap();
+        let factors = factor(order).unwrap();
+        assert_eq!(factors, vec![(2, 33), (r, 1)]);
+        let generator = (1..=1024)
+            .flat_map(|x| c.lift(x))
+            .find_map(|point| {
+                let (projected, multiplier) = prime_projection(&c, point, order, r, false);
+                assert_eq!(projected, c.reference_mul(point, multiplier));
+                projected
+            })
+            .expect("bounded nonzero subgroup generator");
+        let generator = Some(generator);
+        assert_eq!(c.reference_mul(generator, r), None);
+        let public = json!({
+            "schema":"ml-ecdlp-instance/v1", "family":"prime",
+            "n":64-p.leading_zeros(), "m":2, "twist":false,
+            "field":{"characteristic":u(p),"degree":1,"modulus":u(p)},
+            "curve":{"a":u(p-1),"b":"0","base_a":u(p-1),"base_b":"0",
+                "twist_parameter":u(p-1),"group_order":u(order),
+                "subgroup_order":u(r),"cofactor":u(h),
+                "group_order_factorization":factors_json(&factors),"order_certificate":certificate},
+            "generator":point_json(generator),"target":point_json(c.reference_mul(generator,2)),
+            "symmetry":{"coefficient_field_degree":1,"frobenius_power":1}
+        });
+        let witness = json!({"schema":"ml-ecdlp-private-witness/v1", "scalar":"2",
+            "generator_multiplier":"1","base_generator":point_json(generator)});
+        verify(&public, &witness).unwrap();
+        let exact = prime_curve(&public).unwrap();
+        assert!(exact.cofactor > u32::MAX as u64);
+        assert_eq!(exact.cofactor, h);
+        assert_eq!(exact.group_order(), BigUint::from(order));
+        assert_eq!(exact.fast().unwrap().n, r);
+        let case = CaseData {
+            public_instance: public,
+            private_witness: Value::Null,
+            // BSGS needs only a public domain. This minimal adapter fixture is
+            // not a claimed factor-base construction transcript or export.
+            factor_base: json!({"points":[point_json(generator)]}),
+        };
+        let mut cfg = config("prime", 64 - p.leading_zeros(), false);
+        cfg.solver = "bsgs".into();
+        let solved = super::super::solvers::solve(&cfg, &case).unwrap();
+        assert_eq!(solved.outcome["scalar_recovered_without_witness"], true);
+        assert_eq!(solved.outcome["scalar_replay_verified"], true);
+        let label = solved
+            .artifacts
+            .iter()
+            .find(|a| a.role == "restricted-independent-scalar-label")
+            .unwrap();
+        let mut value: Value = serde_json::from_slice(&label.bytes).unwrap();
+        assert_eq!(value["scalar"], "2");
+        super::super::solvers::verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &label.role,
+            &value,
+        )
+        .unwrap();
+        value["scalar"] = json!("3");
+        assert!(super::super::solvers::verify_solution_artifact(
+            &case.public_instance,
+            &case.factor_base,
+            &label.role,
+            &value
+        )
+        .is_err());
+        for solver in ["f4", "pkm"] {
+            cfg.solver = solver.into();
+            let result = super::super::solvers::solve(&cfg, &case).unwrap();
+            assert_eq!(
+                result.outcome["status"], "unsupported",
+                "{solver}: {}",
+                result.outcome
+            );
+        }
+        eprintln!(
+            "exact-cofactor fixture p={p} r={r} h={h} public={}",
+            case.public_instance
+        );
+    }
+
+    #[test]
+    fn exact_prime_cofactor_rejects_invalid_metadata_without_overflow() {
+        let data = generate(&config("prime", 11, false)).unwrap();
+        for bad in ["0", "01", "-1", "18446744073709551616"] {
+            let mut public = data.public_instance.clone();
+            public["curve"]["cofactor"] = json!(bad);
+            assert!(prime_curve(&public).is_err(), "accepted {bad}");
+        }
+        let mut public = data.public_instance.clone();
+        public["curve"]["group_order"] = u(1);
+        assert!(prime_curve(&public).is_err());
+        public["curve"]["group_order"] = u(u64::MAX);
+        public["curve"]["cofactor"] = u(u64::MAX);
+        public["curve"]["subgroup_order"] = u(3);
+        assert!(prime_curve(&public).is_err());
+        public["curve"]["subgroup_order"] = u(0);
+        assert!(prime_curve(&public).is_err());
+    }
+
     #[test]
     fn independent_replay_rejects_tampering() {
         for family in ["koblitz", "binary", "prime"] {
