@@ -1052,3 +1052,28 @@ Migration receipt remains unreadable (permission denied); no access change was
 attempted. Existing independently retained receipts and live job/project state
 were reconciled. Whole-worktree Git scans are slow on the shared filesystem;
 scoped reads and merge-tree inspection are used without deleting active locks.
+
+## 2026-10-30 — Timing audit and current-main merge
+
+### What was done
+Committed the neutral timing audit PDF/SVG/JSON with exact source snapshots and
+native extractor. All25 packet hashes verify; extractor fmt, strictClippy and3tests
+pass. Two fresh report generations matched byte-for-byte; pages inspected.
+Fetched main into a dedicated review ref at986365365ac2fcb587ef421aadfdf6ed4bb546a0
+because local origin/main was stale. Merged upstream and resolved the sole content
+conflict in tools/progress_metrics.py by retaining both independent functions and
+both calls. Scoped real committed-data validation emitted six metric series:
+three pencil counts and three incoming aimed-gather observations.
+
+### Decisions made
+Use existing T865 fence for progress-export conflict. Preserve immutable native
+logs/source snapshots, including their reported trailing whitespace. No scientific
+record, pricing rule or timing qualification changed. Original failed gate remains.
+
+### Open threads
+Push merged delivery and inspect exact-head checks; required ruleset contexts are
+gate, size and artifacts. Later-stage resource question remains pending.
+
+### Errors
+Initial merge preview used stale origin/main. Dedicated fetched ref revealed the
+actual progress-export conflict; both contributors are retained and checked.
