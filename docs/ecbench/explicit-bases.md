@@ -752,3 +752,30 @@ replacements; inspected the partial edit and corrected the interval comparison.
 A candidate hash-fixture integer was composite; the host fixture selected and
 checked6917529027641081737 before it was recorded in the pending Rust test.
 No GPU result is claimed for this extension.
+
+## 2026-10-30T17:38UTC — current-main arithmetic reconciliation
+
+### What was done
+Merged main3c13bc691a87 into the pushed width-extension branch. Resolved three
+shared Rust conflicts by retaining main's cached field context, small inverse
+table, incremental inverse-hash enumeration and locally reused primality facts.
+Composed the new full-width bounds and overflow-safe addmod with those paths;
+updated the two private arithmetic fixtures for the added Curve fields.
+
+### Decisions made
+Preserve both source histories; no rebase or discarded optimization. V11/v13
+remain pinned. Full Rust/GPU tests are pending on the next appropriate worker.
+
+### Open threads
+Await v11 final62 result, then collect/delete and execute pinnedv13. PR2985
+requires checks on the reconciled head and subsequent GPU validation.
+
+### Errors
+Main advanced in the same arithmetic functions and changed Curve internals;
+the automatic merge correctly stopped. Conflict resolution was scoped to
+T967 after a clear ownership check; syntax/format checks follow.
+
+The initial whole-merge whitespace check also scanned historical SVG/raw
+artifacts imported from main and reported existing trailing spaces. Those
+immutable artifacts are preserved; the corrected check is scoped to this
+change's source and handoff files.

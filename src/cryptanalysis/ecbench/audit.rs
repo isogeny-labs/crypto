@@ -124,7 +124,7 @@ pub enum Determinism {
 
 /// The determinism the registry gives a resolved method.
 pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
-    if m.id.starts_with("ic.cm_folded_") {
+    if m.id.starts_with("ic.cm_folded_") || m.id == super::aps::ID {
         return Determinism::Never;
     }
     let budget = m
@@ -569,6 +569,7 @@ pub fn replay_input_json(
     let w = &p.workloads[ex.workload];
     let input = ChildInput {
         schema: CHILD_INPUT_SCHEMA.into(),
+        diagnostics: None,
         curve: w.curve_spec.for_child(p.instance(ex.workload)),
         target_seed: w.target_seed,
         target_index: w.target_index,

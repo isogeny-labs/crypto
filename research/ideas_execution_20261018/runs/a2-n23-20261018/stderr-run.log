@@ -1,0 +1,112 @@
+== census ==
+K_1/F_2^11: p = 23, γ = 0xa7, #E = 1982, r = 991, h = 2
+  cyclotomic w=1: |C_w|=23 (C(p,w)=23) stable=true points=44 in_subgroup=22 orbits=4 signed=2 projected_cols=11 [1 ms]
+  matched ONB OnbWeight { w: 2 }: abscissae=22 points=44 in_subgroup=0 signed=2 projected_cols=22 retained=Some(2)
+  cyclotomic w=2: |C_w|=253 (C(p,w)=253) stable=true points=220 in_subgroup=154 orbits=20 signed=10 projected_cols=110 [1 ms]
+  matched ONB OnbWeight { w: 4 }: abscissae=110 points=220 in_subgroup=0 signed=10 projected_cols=110 retained=Some(10)
+  cyclotomic w=3: |C_w|=1771 (C(p,w)=1771) stable=true points=1716 in_subgroup=814 orbits=156 signed=78 projected_cols=484 [10 ms]
+  matched ONB: no ONB weight up to n/2 reaches 78 signed orbits
+K_0/F_2^23: p = 47, γ = 0x910be, #E = 8383412, r = 2095853, h = 4
+  cyclotomic w=1: |C_w|=47 (C(p,w)=47) stable=true points=2 in_subgroup=0 orbits=2 signed=1 projected_cols=0 [0 ms]
+  matched ONB OnbWeight { w: 2 }: abscissae=23 points=46 in_subgroup=46 signed=1 projected_cols=23 retained=Some(1)
+  cyclotomic w=2: |C_w|=1081 (C(p,w)=1081) stable=true points=782 in_subgroup=184 orbits=34 signed=17 projected_cols=391 [7 ms]
+  matched ONB OnbWeight { w: 3 }: abscissae=391 points=782 in_subgroup=0 signed=17 projected_cols=391 retained=Some(17)
+  cyclotomic w=3: |C_w|=16215 (C(p,w)=16215) stable=true points=16882 in_subgroup=4554 orbits=734 signed=367 projected_cols=8441 [174 ms]
+  matched ONB OnbWeight { w: 5 }: abscissae=8441 points=16882 in_subgroup=0 signed=367 projected_cols=8418 retained=Some(367)
+K_1/F_2^23: p = 47, γ = 0x910be, #E = 8393806, r = 4196903, h = 2
+  cyclotomic w=1: |C_w|=47 (C(p,w)=47) stable=true points=92 in_subgroup=46 orbits=4 signed=2 projected_cols=23 [1 ms]
+  matched ONB OnbWeight { w: 2 }: abscissae=46 points=92 in_subgroup=0 signed=2 projected_cols=46 retained=Some(2)
+  cyclotomic w=2: |C_w|=1081 (C(p,w)=1081) stable=true points=1380 in_subgroup=782 orbits=60 signed=30 projected_cols=690 [8 ms]
+  matched ONB OnbWeight { w: 3 }: abscissae=690 points=1380 in_subgroup=1380 signed=30 projected_cols=690 retained=Some(30)
+  cyclotomic w=3: |C_w|=16215 (C(p,w)=16215) stable=true points=15548 in_subgroup=8418 orbits=676 signed=338 projected_cols=7774 [139 ms]
+  matched ONB OnbWeight { w: 5 }: abscissae=7774 points=15548 in_subgroup=15548 signed=338 projected_cols=7774 retained=Some(338)
+== yields ==
+  K_1/n11 w=2 Cyclotomic { w: 2 } m=2: coverage 1.0000 (64/64), mean witnesses 14.609, per column 1.000e-1, columns 10, points 220 [compact table]
+  K_1/n11 w=2 Cyclotomic { w: 2 } m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.000e-1, columns 10, points 220 [compact table]
+  K_1/n11 w=2 Cyclotomic { w: 2 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 24.484, per column 9.091e-3, columns 110, points 220 [compact table]
+  K_1/n11 w=2 Cyclotomic { w: 2 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 9.091e-3, columns 110, points 220 [compact table]
+  K_1/n11 w=2 OnbWeight { w: 4 } m=2: coverage 1.0000 (64/64), mean witnesses 24.219, per column 1.000e-1, columns 10, points 220 [compact table]
+  K_1/n11 w=2 OnbWeight { w: 4 } m=3: coverage 0.0000 (0/64), mean witnesses 0.000, per column 0.000e0, columns 10, points 220 [compact table]
+  K_1/n11 w=2 OnbWeight { w: 4 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 24.328, per column 9.091e-3, columns 110, points 220 [compact table]
+  K_1/n11 w=2 OnbWeight { w: 4 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 9.091e-3, columns 110, points 220 [compact table]
+  K_1/n11 w=3 Cyclotomic { w: 3 } m=2: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.282e-2, columns 78, points 1716 [compact table]
+  K_1/n11 w=3 Cyclotomic { w: 3 } m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.282e-2, columns 78, points 1716 [compact table]
+  K_1/n11 w=3 Cyclotomic { w: 3 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 256.000, per column 2.066e-3, columns 484, points 968 [compact table]
+  K_1/n11 w=3 Cyclotomic { w: 3 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 2.066e-3, columns 484, points 968 [compact table]
+  K_0/n23 w=2 Cyclotomic { w: 2 } m=2: coverage 0.0781 (5/64), mean witnesses 0.078, per column 4.596e-3, columns 17, points 782 [compact table]
+  K_0/n23 w=2 Cyclotomic { w: 2 } m=3: coverage 1.0000 (64/64), mean witnesses 9.594, per column 5.882e-2, columns 17, points 782 [compact table]
+  K_0/n23 w=2 Cyclotomic { w: 2 } [projected] m=2: coverage 0.0938 (6/64), mean witnesses 0.094, per column 2.398e-4, columns 391, points 782 [compact table]
+  K_0/n23 w=2 Cyclotomic { w: 2 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 38.438, per column 2.558e-3, columns 391, points 782 [compact table]
+  K_0/n23 w=2 OnbWeight { w: 3 } m=2: coverage 0.1562 (10/64), mean witnesses 0.188, per column 9.191e-3, columns 17, points 782 [compact table]
+  K_0/n23 w=2 OnbWeight { w: 3 } m=3: coverage 0.0000 (0/64), mean witnesses 0.000, per column 0.000e0, columns 17, points 782 [compact table]
+  K_0/n23 w=2 OnbWeight { w: 3 } [projected] m=2: coverage 0.1562 (10/64), mean witnesses 0.156, per column 3.996e-4, columns 391, points 782 [compact table]
+  K_0/n23 w=2 OnbWeight { w: 3 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 42.156, per column 2.558e-3, columns 391, points 782 [compact table]
+  K_0/n23 w=3 Cyclotomic { w: 3 } m=2: coverage 1.0000 (64/64), mean witnesses 16.703, per column 2.725e-3, columns 367, points 16882 [compact table]
+  K_0/n23 w=3 Cyclotomic { w: 3 } m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 2.725e-3, columns 367, points 16882 [compact table]
+  K_0/n23 w=3 Cyclotomic { w: 3 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 66.578, per column 1.185e-4, columns 8441, points 16882 [compact table]
+  K_0/n23 w=3 Cyclotomic { w: 3 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.185e-4, columns 8441, points 16882 [compact table]
+  K_0/n23 w=3 OnbWeight { w: 5 } m=2: coverage 1.0000 (64/64), mean witnesses 34.250, per column 2.725e-3, columns 367, points 16882 [compact table]
+  K_0/n23 w=3 OnbWeight { w: 5 } m=3: coverage 0.0000 (0/64), mean witnesses 0.000, per column 0.000e0, columns 367, points 16882 [compact table]
+  K_0/n23 w=3 OnbWeight { w: 5 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 67.844, per column 1.188e-4, columns 8418, points 16836 [compact table]
+  K_0/n23 w=3 OnbWeight { w: 5 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.188e-4, columns 8418, points 16836 [compact table]
+  K_1/n23 w=2 Cyclotomic { w: 2 } m=2: coverage 0.0625 (4/64), mean witnesses 0.062, per column 2.083e-3, columns 30, points 1380 [compact table]
+  K_1/n23 w=2 Cyclotomic { w: 2 } m=3: coverage 1.0000 (64/64), mean witnesses 52.750, per column 3.333e-2, columns 30, points 1380 [compact table]
+  K_1/n23 w=2 Cyclotomic { w: 2 } [projected] m=2: coverage 0.2969 (19/64), mean witnesses 0.344, per column 4.303e-4, columns 690, points 1380 [compact table]
+  K_1/n23 w=2 Cyclotomic { w: 2 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 102.875, per column 1.449e-3, columns 690, points 1380 [compact table]
+  K_1/n23 w=2 OnbWeight { w: 3 } m=2: coverage 0.1719 (11/64), mean witnesses 0.188, per column 5.729e-3, columns 30, points 1380 [compact table]
+  K_1/n23 w=2 OnbWeight { w: 3 } m=3: coverage 1.0000 (64/64), mean witnesses 103.906, per column 3.333e-2, columns 30, points 1380 [compact table]
+  K_1/n23 w=2 OnbWeight { w: 3 } [projected] m=2: coverage 0.2656 (17/64), mean witnesses 0.281, per column 3.850e-4, columns 690, points 1380 [compact table]
+  K_1/n23 w=2 OnbWeight { w: 3 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 102.219, per column 1.449e-3, columns 690, points 1380 [compact table]
+  K_1/n23 w=3 Cyclotomic { w: 3 } m=2: coverage 1.0000 (64/64), mean witnesses 13.984, per column 2.959e-3, columns 338, points 15548 [compact table]
+  K_1/n23 w=3 Cyclotomic { w: 3 } m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 2.959e-3, columns 338, points 15548 [compact table]
+  K_1/n23 w=3 Cyclotomic { w: 3 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 28.891, per column 1.286e-4, columns 7774, points 15548 [compact table]
+  K_1/n23 w=3 Cyclotomic { w: 3 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.286e-4, columns 7774, points 15548 [compact table]
+  K_1/n23 w=3 OnbWeight { w: 5 } m=2: coverage 1.0000 (64/64), mean witnesses 28.156, per column 2.959e-3, columns 338, points 15548 [compact table]
+  K_1/n23 w=3 OnbWeight { w: 5 } m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 2.959e-3, columns 338, points 15548 [compact table]
+  K_1/n23 w=3 OnbWeight { w: 5 } [projected] m=2: coverage 1.0000 (64/64), mean witnesses 27.734, per column 1.286e-4, columns 7774, points 15548 [compact table]
+  K_1/n23 w=3 OnbWeight { w: 5 } [projected] m=3: coverage 1.0000 (64/64), mean witnesses 256.000, per column 1.286e-4, columns 7774, points 15548 [compact table]
+== wdsat: "unavailable" ==
+== solver cells (5 × 16 targets, 150 s each) ==
+-- K0/n23/w1/m2/cyclotomic
+   0 targets, timed_out=true, unsupported=0, {"targets":0}
+-- K0/n23/w1/m2/onb_matched
+    [K0/n23/w1/m2/onb_matched] target 0 F4 1998 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 1 F4 3306 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 2 F4 3274 ms deg None/3 roots 4 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 3 F4 3167 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 4 F4 3795 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 5 F4 1933 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 6 F4 2422 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 7 F4 2164 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 8 F4 2572 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 9 F4 1179 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 10 F4 4685 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 11 F4 1231 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 12 F4 582 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 13 F4 511 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 14 F4 1115 ms deg None/3 roots 0 lifted false wdsat None
+    [K0/n23/w1/m2/onb_matched] target 15 F4 829 ms deg None/3 roots 0 lifted false wdsat None
+   16 targets, timed_out=false, unsupported=0, {"boolean_roots_total":4,"equations":3567,"f4_exhausted":0,"f4_max_degree_built":3,"f4_mean_ms":2172.6729189999996,"f4_mean_splits":231.375,"f4_mean_word_xors":142088363.625,"f4_median_ms":2164.188296,"lifted_decompositions":0,"macaulay_degree_reached_max":3,"macaulay_mean_ms":1888.4223510624997,"macaulay_solving_degree_max":null,"macaulay_solving_degree_min":null,"macaulay_solving_degree_resolved":0,"n_vars":46,"system_degree":3,"targets":16,"wdsat_lifted":0,"wdsat_mean_ms":null,"wdsat_models_valid":0,"wdsat_runs":0,"wdsat_verdicts":{}}
+-- K1/n23/w1/m2/cyclotomic
+   0 targets, timed_out=true, unsupported=0, {"targets":0}
+-- K1/n23/w1/m2/onb_matched
+    [K1/n23/w1/m2/onb_matched] target 0 F4 1488 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 1 F4 970 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 2 F4 2326 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 3 F4 1782 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 4 F4 2024 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 5 F4 2843 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 6 F4 816 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 7 F4 729 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 8 F4 1141 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 9 F4 1121 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 10 F4 838 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 11 F4 1504 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 12 F4 1666 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 13 F4 1814 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 14 F4 1538 ms deg None/3 roots 0 lifted false wdsat None
+    [K1/n23/w1/m2/onb_matched] target 15 F4 1440 ms deg None/3 roots 0 lifted false wdsat None
+   16 targets, timed_out=false, unsupported=0, {"boolean_roots_total":0,"equations":3567,"f4_exhausted":0,"f4_max_degree_built":3,"f4_mean_ms":1502.4974391875003,"f4_mean_splits":231.3125,"f4_mean_word_xors":140160877.625,"f4_median_ms":1503.766924,"lifted_decompositions":0,"macaulay_degree_reached_max":3,"macaulay_mean_ms":1504.7522445625,"macaulay_solving_degree_max":null,"macaulay_solving_degree_min":null,"macaulay_solving_degree_resolved":0,"n_vars":46,"system_degree":3,"targets":16,"wdsat_lifted":0,"wdsat_mean_ms":null,"wdsat_models_valid":0,"wdsat_runs":0,"wdsat_verdicts":{}}
+-- K0/n23/w2/m2/cyclotomic
+   0 targets, timed_out=false, unsupported=16, {"targets":0}
+wrote research/ideas_execution_20261018/runs/a2-n23-20261018/a2_results_execution-20261018.json after 1069.9 s

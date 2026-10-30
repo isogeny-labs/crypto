@@ -380,7 +380,7 @@ impl Scratch {
         if !active {
             return 0;
         }
-        let mut inverse = paper::inverse(product, p);
+        let mut inverse = curve.field_inverse(product);
         for i in (0..points.len()).rev() {
             let den = self.denominators[i];
             if den == 0 {

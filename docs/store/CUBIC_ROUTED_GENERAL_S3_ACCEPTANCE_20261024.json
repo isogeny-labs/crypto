@@ -1,0 +1,79 @@
+{
+  "schema": "crypto.cubic-routed-general-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T06:26:26.858286+00:00",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-routed-general-20261024T062626Z-68d711d6",
+  "checks": {
+    "target_push": {
+      "sha256": "b90f3c468af6e614f3cc0e003a4a9a615c73881b2e334f1109996e1674fe91cc",
+      "bytes": 162,
+      "status": "ok"
+    },
+    "target_remote_verify": {
+      "checked": 1,
+      "download_checked": true,
+      "entries": [
+        {
+          "bytes": 162,
+          "cache": {
+            "status": "ok"
+          },
+          "name": "cubic-routed/f11-target.json",
+          "remote": {
+            "status": "bytes_ok"
+          },
+          "sha256": "b90f3c468af6e614f3cc0e003a4a9a615c73881b2e334f1109996e1674fe91cc"
+        }
+      ],
+      "problems": 0,
+      "remote_checked": true,
+      "status": "ok"
+    },
+    "route_push": {
+      "sha256": "b46bb54a3bc9357eabe781566bfa0fb51af4f678a3b6edeed1738a17943fa973",
+      "bytes": 844,
+      "status": "ok"
+    },
+    "route_remote_verify": {
+      "checked": 1,
+      "download_checked": true,
+      "entries": [
+        {
+          "bytes": 844,
+          "cache": {
+            "status": "ok"
+          },
+          "name": "cubic-routed/f11-route.json",
+          "remote": {
+            "status": "bytes_ok"
+          },
+          "sha256": "b46bb54a3bc9357eabe781566bfa0fb51af4f678a3b6edeed1738a17943fa973"
+        }
+      ],
+      "problems": 0,
+      "remote_checked": true,
+      "status": "ok"
+    },
+    "fresh_cache_ic": {
+      "status": "complete",
+      "verified": true,
+      "ic_scalar": 5,
+      "rho_scalar": 5,
+      "route_edges": 1
+    },
+    "icx": {
+      "status": "complete",
+      "verified": true,
+      "ic_scalar": 5,
+      "rho_scalar": 5,
+      "route_edges": 1
+    },
+    "pull": "ok"
+  },
+  "cleanup": {
+    "keys": [
+      "ic/v1/acceptance/cubic-routed-general-20261024T062626Z-68d711d6/sha256/b4/b46bb54a3bc9357eabe781566bfa0fb51af4f678a3b6edeed1738a17943fa973",
+      "ic/v1/acceptance/cubic-routed-general-20261024T062626Z-68d711d6/sha256/b9/b90f3c468af6e614f3cc0e003a4a9a615c73881b2e334f1109996e1674fe91cc"
+    ],
+    "objects_after": 0
+  }
+}

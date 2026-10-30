@@ -40,14 +40,58 @@ No manufactured `solved`, instruction-count, first-fall, or last-fall labels.
 | Root solving | coefficient sequence, field, factorization state | verified factors and roots, multiplicities, completeness certificate where available |
 | SAT heuristics | CNF/XOR graph, current trail, clause activity, restart state | decisions, propagation, conflicts, learned clauses, backjumps, proof-checked outcomes |
 | Double-large-prime selection | partial-relation graph and actual group identities | cycles with signed elimination witnesses, rank contribution and total graph cost |
+| Polynomial consequence proposal | pre-native source equation graph, explicit ring, active variables, fixed bindings and initial public instance | nonzero target polynomial and separately searched generator-multiple witness, admitted by direct identity replay; witness-dependent degree reduction stays restricted |
 | Algebraic conjectures | exact systems and certified algebraic invariants | falsifiable formulas, independently checked witnesses/counterexamples, proof obligations |
 
 The [prime-chain ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md) specifies
 a concrete lossless equation graph and causal decision-prefix view, including
 exact wide integers and independent replay prerequisites. The static prime-chain
 graph is now implemented in the native exporter, with current validation status
-recorded in [remaining coverage](REMAINING-COVERAGE.md). Decision-prefix replay,
-action examples and trained models remain separate implementation obligations.
+recorded in [remaining coverage](REMAINING-COVERAGE.md). The new
+[prefix certificate implementation](PREFIX-REPLAY-CERTIFICATES.md) adds bounded
+semantic replay and observed recursive branch examples; its validation is still
+in progress. Intra-F4 decision views and trained models remain open obligations.
+
+The [checked consequence contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md)
+adds a concrete algebraic learning target through export policy
+`strict-structural-allowlist-v6`. Its eligible input files are `features.jsonl`
+for static public problems, `prefix-features.jsonl` for observed branch contexts,
+and `algebraic-features.jsonl` for pre-native polynomial contexts. The latter
+uses task `prime-polynomial-consequence/v1`: the network sees an exact source
+equation graph, ordinary ring with explicit empty quotient rules, original
+variable map, fixed bindings and the initial public projection. Coefficients,
+modulus and field bindings use decimal strings. All target rows for an identical
+context share one feature identity; target choice, event/node IDs, costs and
+native outcomes cannot change those input bytes.
+
+Supervision in `restricted/algebraic-records.jsonl` supplies a target polynomial
+g and explicit coefficients and monomials witnessing
+`g = sum(c_i X^a_i F[j_i])`. A graph or sequence model can learn to propose
+consequences, represent multiplier combinations, or prioritize candidates with
+observed cancellation. Exact arithmetic must check every generated proposal.
+This task supplies neither an optimal consequence policy nor counterfactual
+solver costs: the retained targets were selected by the native computation,
+then admitted by bounded certificate search and direct replay. Training reports
+must preserve that selection bias. Learning a useful consequence also does not
+establish a complete solver, a SAT heuristic improvement or an ECDLP recovery.
+
+The implemented extraction is limited to already ideal-equality-certified
+recursive prime native nodes, m=3..15 and p<2^32. The direct identity API supports
+p<2^62, but wide-field arithmetic support alone does not widen native trace
+coverage. Unsuccessful whole-node equality searches provide no individual
+consequence examples in this increment. Nonzero verified rows receive feature
+occurrences; zero rows and capped suffixes remain restricted, with no public
+feature occurrence for those rows. Unknown checks cannot become negative
+examples. A separate cumulative operation/row/payload budget preserves admitted
+rows and allows the original branch channel to continue. See
+[operations](OPERATIONS.md) for the exact accounting scope and limits.
+
+This v6 implementation and its tests are authored; new-source runtime tests
+have not yet executed after an initial manifest-macro compilation failure. The [status record](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md)
+tracks that gate separately from historical v4/v5 passes. The static and branch
+identity rules are preserved, but their byte stability must be checked by the
+new actual-CLI fixture. No corpus growth, learned advantage or new theorem is
+claimed by source implementation alone.
 
 Start with supervised cost/routing baselines, graph encoders, and sequence models
 of solver events. Train branching/reduction policies only after deterministic
@@ -123,7 +167,21 @@ definition and complete lower-degree exclusion certificates. The maximum degree
 visited is an algorithm/ordering-dependent solving-degree observation, not last
 fall degree. An exact last-fall label requires sufficient closure/span evidence
 and a justification that later falls cannot occur. Otherwise use an observed
-lower bound, a bounded-search interval, or `unknown`, with the degree budget.
+event or `unknown`, with the degree budget. A lower bound or bounded-search
+interval requires its own valid exclusion evidence; a capped generator-multiple
+search alone supplies neither.
+
+For the v6 consequence task, `witnessed_degree_drop` means only that the largest
+degree of a nonzero generator-multiple summand in the checked representation
+exceeds the nonzero target degree. Zero generators do not contribute to that
+maximum, and zero targets have null degree and no drop claim. This
+representation-dependent cancellation does not show that the representation is
+minimal. The bounded closure in Huang–Kosters–Yang–Yeo permits multiplying
+already derived polynomials; checking one identity in original generators does
+not establish that closure or exclude other derivations. Consequently exact
+first/last fall degrees and minimal derivation degree stay null, and closure
+completeness stays false in these records. A searched identity is also distinct
+from a trace of native F4 operations.
 
 Theoretical motivation includes [Huang–Kosters–Yang–Yeo,
 On the last fall degree of zero-dimensional Weil descent systems](https://arxiv.org/abs/1505.02532)

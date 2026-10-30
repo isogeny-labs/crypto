@@ -1,0 +1,31 @@
+{
+  "schema": "pencil-infrastructure-budget-reservation/v1",
+  "attempt": 0,
+  "run_name": "pencil-p739-20261029",
+  "source": {
+    "path": "failed-attempt0/build-final.json",
+    "sha256": "ee6e93d633f22c0ce9e917b79ad5ba7a792405cb4ab9bd4f72b8f5b2cb19c5d5"
+  },
+  "controller_observation": {
+    "start": "2026-10-30T00:03:51.937000+00:00",
+    "end": "2026-10-30T00:06:34.253000+00:00",
+    "elapsed_seconds": 162.316,
+    "status": "FAILED",
+    "classification": "controller elapsed, not mathematical payload elapsed"
+  },
+  "reservation": {
+    "seconds": 180,
+    "kind": "conservative admission budget reservation for entire failed attempt and setup",
+    "measured_worker_seconds": false,
+    "refund_permitted": false,
+    "original_allowance_seconds": 14400,
+    "remaining_allowance_seconds": 14220
+  },
+  "interpretation": "Reservation is a conservative admission charge, not a measured worker-time observation or proof that all resource lifetimes equal controller duration. Missing payload PID establishes neither zero resource cost nor a refund. Parent attempt costs and observations must accompany every retry report.",
+  "unchanged": {
+    "outer_deadline_utc": "2026-10-30T03:32:22Z",
+    "internal_guard_deadline_utc": "2026-10-30T01:44:17Z",
+    "budget_reset": false
+  },
+  "retry_status": "draft pending corrected runtime image and review"
+}
