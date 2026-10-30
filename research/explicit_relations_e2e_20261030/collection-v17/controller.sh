@@ -8,6 +8,9 @@ api_get() { curl -sS --fail-with-body --max-time 30 --config private/auth.curl "
 cleanup() {
     local prior=$? code=0
     trap - EXIT INT TERM
+    if [[ "$prior" != 0 ]]; then
+        (eval "$(aws configure export-credentials --format env)"; aws s3 cp s3://setec-astronomy-artifacts/validation/ecbench-explicit-x/e2e-20261030-v17/partial-latest.tgz partial-collected.tgz --only-show-errors) && sha256sum partial-collected.tgz > partial-collected.sha256 || true
+    fi
     if [[ -n "$pod_id" ]]; then
         for attempt in 1 2 3; do
             code=$(curl -sS --max-time 30 --config private/auth.curl -X DELETE -o delete-response.json -w '%{http_code}' "$api/pods/$pod_id") || code=0
@@ -77,6 +80,14 @@ while (( $(date +%s) - started < 18300 )); do
     # A failed read must not trigger deletion of a potentially healthy worker.
     if ! api_get "pods/$pod_id" > private/pod-current.json; then
         printf 'POD_READ_FAILED; retaining worker until reconciled or deadline\n'
+        if api_get pods > private/pods-reconcile-missing.json && jq -e --arg id "$pod_id" '.pagination.hasNextPage == false and all(.pods[]; .id != $id)' private/pods-reconcile-missing.json >/dev/null; then
+            sleep 10
+            if api_get pods > private/pods-reconcile-missing2.json && jq -e --arg id "$pod_id" '.pagination.hasNextPage == false and all(.pods[]; .id != $id)' private/pods-reconcile-missing2.json >/dev/null; then
+                printf 'POD_ABSENT_TWICE; preserving available partial artifacts\n'
+                cp logs-latest.txt logs-final.txt
+                exit 93
+            fi
+        fi
         sleep 10
         continue
     fi
