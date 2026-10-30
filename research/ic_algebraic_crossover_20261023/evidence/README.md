@@ -22,3 +22,17 @@ requests; no browser policy was changed.
 All PDFs in `reports/INSPECTION.json` were opened page by page after
 rendering. Native operation observations, incomplete cost bands, physical
 timings and historical extrapolations remain separate.
+
+## Correction and external-CAS checks, 2026-10-25
+
+`check-logs-correction-20261025.tar.xz` retains the exact original native
+fixture-audit tests, pricing-audit lint check, strengthened CAS tests/lint
+and archive replay, site tests and dashboard generation check. Its adjacent
+SHA-256 file verifies it. The browsable fixture test log drops only blank
+lines at EOF; the raw archived log is unchanged. Native results and sealed
+records are never normalized.
+
+`runs-external-cas-20261025-01.tar.xz` is the complete separate CAS run tree
+and launch provenance, with deterministic packing and an adjacent SHA-256.
+It does not replace or modify the first 33-run archive. Run the study's
+`verify-external-cas.sh` to re-enumerate every equation and returned basis.

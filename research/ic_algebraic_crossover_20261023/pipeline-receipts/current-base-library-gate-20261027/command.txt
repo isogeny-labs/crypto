@@ -1,0 +1,1 @@
+taskset -c 2,3 timeout --kill-after=30 2700 cargo test --locked --offline --release --lib -- --test-threads=2

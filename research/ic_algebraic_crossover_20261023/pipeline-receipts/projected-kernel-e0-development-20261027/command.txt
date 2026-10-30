@@ -1,0 +1,2 @@
+taskset -c 4 timeout 900 rustc --edition 2021 --test examples/ic_projected_query_law.rs --extern crypto_lib=/workspace/crypto-integration-target/release/deps/libcrypto_lib-a4349316239e4e97.rlib -L dependency=/workspace/crypto-integration-target/release/deps -L native=/workspace/crypto-integration-target/release/build/blake3-6d304e0d8c3c3997/out -L native=/workspace/crypto-integration-target/release/build/libsqlite3-sys-b838caf68ed61ad3/out -C opt-level=3 -o /workspace/ic-kernel-e0-tests-20261027
+taskset -c 4 timeout 600 /workspace/ic-kernel-e0-tests-20261027 --test-threads=1

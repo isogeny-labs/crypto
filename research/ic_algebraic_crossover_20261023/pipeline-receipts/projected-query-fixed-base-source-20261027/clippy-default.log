@@ -1,0 +1,14 @@
+    Checking isogeny_algos v0.1.0 (/workspace/crypto-current-base-20261026/isogeny_algos)
+    Checking volcano-cli v0.1.0 (/workspace/crypto-current-base-20261026/tools/volcano-cli)
+    Checking crypto v0.1.0 (/workspace/crypto-current-base-20261026)
+warning: manual implementation of `.is_multiple_of()`
+    --> src/cryptanalysis/sat.rs:1343:20
+     |
+1343 |                 && self.trail_lim.len() % self.xor_decision_cadence != 0
+     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!self.trail_lim.len().is_multiple_of(self.xor_decision_cadence)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+     = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: `crypto` (lib) generated 1 warning (run `cargo clippy --fix --lib -p crypto -- ` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1m 06s

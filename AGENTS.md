@@ -59,6 +59,16 @@ implementing, running experiments, or making recommendations.
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Check research proposals into a PR before handing them off** (owner,
+  2026-10-28). Lead nominations, literature reviews, experiment plans, reports,
+  diagrams, and reproducible sources are finished work. Commit them and open
+  a regular PR, or update the appropriate existing regular PR, before the final
+  response. Include required report PDFs under the current artifact policy.
+  Local commits, workspace links, and private checkpoints are intermediate
+  records until the PR contains the intended files. Verify the remote commit
+  and PR contents. If publication is blocked, report the exact blocker and
+  keep the check-in obligation open. Preserve the distinctions between proposed,
+  proved, and measured work, and honor existing merge and experiment limits.
 - **Use regular PRs.** Create pull requests with `draft=false` and mark an
   existing draft ready for review when you update it. Record pending CI,
   review, and follow-up work in the PR description; draft status is not a
