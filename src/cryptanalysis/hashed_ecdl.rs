@@ -593,11 +593,10 @@ pub struct HashBase {
 }
 
 impl HashBase {
-    fn validate(&self, curve: &Curve) -> Result<(), Error> {
+    fn validate_parameters(&self, curve: &Curve) -> Result<(), Error> {
         if self.s >= (1u64 << 63)
             || self.s < 2 * curve.p
             || self.s > 4 * curve.p
-            || !prime(self.s)
             || self.alpha == 0
             || self.alpha >= self.s
             || self.beta >= self.s
@@ -609,23 +608,59 @@ impl HashBase {
         Ok(())
     }
 
+    fn validate(&self, curve: &Curve) -> Result<(), Error> {
+        self.validate_parameters(curve)?;
+        if !prime(self.s) {
+            return Err(Error::Invalid("hash parameters"));
+        }
+        Ok(())
+    }
+
     /// Enumerate by inverse hashing, not by scanning all curve points (§3.5).
     pub fn enumerate(&self, curve: &Curve) -> Result<Vec<Point>, Error> {
         self.validate(curve)?;
+        self.enumerate_validated(curve)
+    }
+
+    // Callers must establish all parameters and the primality of s locally.
+    fn enumerate_validated(&self, curve: &Curve) -> Result<Vec<Point>, Error> {
         if self.tau > MAX_HASH_CANDIDATES {
             return Err(Error::Limit("inverse-hash candidate bound"));
         }
         let inv = inverse(self.alpha, self.s);
         let mut points = Vec::new();
-        for t in 0..self.tau {
-            let z = mulmod(inv, sub(t, self.beta, self.s), self.s);
+        // z(t) = alpha^-1 * (t-beta) mod s, so z(t+1)=z(t)+inv mod s.
+        // Both operands are canonical and s<2^63: the addition cannot overflow.
+        let mut z = mulmod(inv, sub(0, self.beta, self.s), self.s);
+        for _ in 0..self.tau {
             if let Some(point) = curve.decode(z) {
                 points.push(Some(point));
             }
+            z = addmod(z, inv, self.s);
         }
         points.sort_unstable();
         Ok(points)
     }
+}
+
+// Each invocation establishes its own prime-modulus facts; no fact is shared
+// between collection and independent certificate replays. Only consecutive
+// identical moduli reuse primality, while every hash's bounds are checked.
+fn enumerate_hash_bases(curve: &Curve, hashes: &[HashBase]) -> Result<Vec<Vec<Point>>, Error> {
+    let mut checked_prime = None;
+    hashes
+        .iter()
+        .map(|h| {
+            h.validate_parameters(curve)?;
+            if checked_prime != Some(h.s) {
+                if !prime(h.s) {
+                    return Err(Error::Invalid("hash parameters"));
+                }
+                checked_prime = Some(h.s);
+            }
+            h.enumerate_validated(curve)
+        })
+        .collect()
 }
 
 /// Deterministic decomposition interface. The oracle receives no `u`, `v`,
@@ -642,7 +677,7 @@ pub trait DecompositionOracle {
         curve: &Curve,
         hashes: &[HashBase],
     ) -> Result<Vec<Vec<Point>>, Error> {
-        hashes.iter().map(|h| h.enumerate(curve)).collect()
+        enumerate_hash_bases(curve, hashes)
     }
 
     /// Find an ordered slot-specific decomposition of `target`.
@@ -1356,11 +1391,7 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
     if !(2..=8).contains(&cert.hashes.len()) {
         return Err(Error::Verification);
     }
-    let bases: Vec<_> = cert
-        .hashes
-        .iter()
-        .map(|h| h.enumerate(curve))
-        .collect::<Result<_, _>>()?;
+    let bases = enumerate_hash_bases(curve, &cert.hashes)?;
     let n: usize = bases.iter().map(Vec::len).sum();
     if n > MAX_COLUMNS
         || bases.iter().any(Vec::is_empty)
@@ -1978,6 +2009,103 @@ mod tests {
         assert_eq!(c.add(p, c.neg(p)).unwrap(), None);
         assert_eq!(c.add(None, p).unwrap(), p);
         assert_eq!(c.add(p, p).unwrap(), c.mul(p, 2).unwrap());
+    }
+
+    #[test]
+    fn inverse_hash_progression_matches_direct_products() {
+        fn direct(h: &HashBase, c: &Curve) -> Vec<Point> {
+            let inv = pow(h.alpha, h.s - 2, h.s);
+            let mut out = Vec::new();
+            for t in 0..h.tau {
+                let z = (u128::from(inv) * u128::from((t + h.s - h.beta) % h.s) % u128::from(h.s))
+                    as u64;
+                if let Some(point) = c.decode(z) {
+                    out.push(Some(point));
+                }
+            }
+            out.sort_unstable();
+            out
+        }
+        let c = Curve::new(17, 2, 2, 19).unwrap();
+        for s in [37, 41, 43] {
+            for alpha in 1..s {
+                for beta in 0..s {
+                    for tau in [1, s / 2, s] {
+                        let h = HashBase {
+                            s,
+                            alpha,
+                            beta,
+                            tau,
+                        };
+                        assert_eq!(h.enumerate(&c).unwrap(), direct(&h, &c));
+                    }
+                }
+            }
+        }
+        let p = 1_099_511_627_563;
+        let c =
+            Curve::with_order_witness(p, p - 3, 56, 1_099_512_551_701, Some((1, 15_267_301_451)))
+                .unwrap();
+        let s = (2 * p..4 * p).find(|&s| prime(s)).unwrap();
+        for alpha in [1, 7, s / 2, s - 1] {
+            for beta in [0, 1, s / 2, s - 1] {
+                let h = HashBase {
+                    s,
+                    alpha,
+                    beta,
+                    tau: 64,
+                };
+                assert_eq!(h.enumerate(&c).unwrap(), direct(&h, &c));
+            }
+        }
+    }
+
+    #[test]
+    fn grouped_hash_validation_matches_standalone_enumeration() {
+        let (c, _) = fixture();
+        let first = HashBase {
+            s: 431,
+            alpha: 7,
+            beta: 19,
+            tau: 44,
+        };
+        let second = HashBase {
+            s: 433,
+            alpha: 11,
+            beta: 29,
+            tau: 64,
+        };
+        for hashes in [
+            vec![],
+            vec![first],
+            vec![first, first, second, second, first],
+        ] {
+            let expected: Result<Vec<_>, _> = hashes.iter().map(|h| h.enumerate(&c)).collect();
+            assert_eq!(enumerate_hash_bases(&c, &hashes), expected);
+        }
+        for bad in [
+            HashBase { s: 432, ..first },
+            HashBase {
+                s: 1u64 << 63,
+                ..first
+            },
+            HashBase { s: 421, ..first },
+            HashBase { s: 853, ..first },
+            HashBase { alpha: 0, ..first },
+            HashBase {
+                alpha: 431,
+                ..first
+            },
+            HashBase { beta: 431, ..first },
+            HashBase { tau: 0, ..first },
+            HashBase { tau: 432, ..first },
+        ] {
+            assert!(bad.enumerate(&c).is_err());
+            for hashes in [vec![bad, first], vec![first, bad], vec![first, first, bad]] {
+                let expected: Result<Vec<_>, _> = hashes.iter().map(|h| h.enumerate(&c)).collect();
+                assert_eq!(enumerate_hash_bases(&c, &hashes), expected);
+            }
+        }
     }
 
     #[test]
