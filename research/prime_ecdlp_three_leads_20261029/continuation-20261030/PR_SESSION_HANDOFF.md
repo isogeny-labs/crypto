@@ -102,3 +102,48 @@ continue this full goal and collect the existing job at17:03UTC. New activity
 resets unchanged count0. Follow AGENTS bounded cadence; no foreground CI wait
 or fast polling, rearm about4h on unchanged check, stop after3 unchanged or
 user stop. A software merge does not finish the research goal.
+
+## Update2026-10-30T17:22Z — scoped checks collected; remote changed
+
+Read this update before treating earlier launch-state text as current.
+Commit9c0dd0934e8224c2f6e9f56e0e1e72a5bffaf9a7 records23passing integrated
+examples(15+4+4),strictlint/fmt,CLIbuild/refusal-message+exit1,backlog and
+librarybuild. New receipt validation/scoped-20261030T1703Z/receipt.json binds
+17clean source objects and six binary hashes. Library declares5646,started
+16:47:54UTC,active at17:03 and17:16; no terminal/full pass. At17:16 unchanged
+JV case active; exact bounded telemetry in library-active-20261030T1716Z.json.
+Do NOT repeat completed scoped phases on unchanged source. Collect existing
+supervisor31539/timeout36924/cargo36925/test36932 and phase/supervisor terminals.
+
+RemotePR2949 now0cc5e0d23a37a502dd363e41d866ec4991d3afb3,OPEN/MERGEABLE,
+auto paused at17:04snapshot. Reviewed three intervening merges against both
+parents;179study blobs unchanged;777/777,777/1024,1024/1140 parent paragraphs
+preserved. Eight source/dependency bindings changed:src,crates,Cargo.toml,
+Cargo.lock,tools/factor-base,tools/volcano-cli,tools/lean,tests. Current run
+DOES NOT validate0cc5. No bound source changed or newer merge performed while
+active. See validation/remote-0cc5-review-snapshot.json. Coordination comment
+6528819834 posted. Read-only lazy blob failures resolved with exact-SHA GitHub
+connector hydration; no source worktree mutation.
+
+After currentrun terminal,write its immutable finalreceipt/counts/artifactgap,
+then ordinary-merge reviewed remote into existing history,preserving bothlogs/
+indexrows/allfrozen evidence; no rebase/force. Actualconflicts use applicable
+Copilot-first/fallback without racing resolver; local unpublished history is
+not available to a remote resolver,record actual limitation if fallbackneeded.
+Fresh affected checks REQUIRED for changedCargo/src/deps and changedLean gate.
+No historicalpass for newcode,absentCI neverpass. Onlyaftervalidationnormalpush/
+update sameopenPR,title/body,currenthead3checks/reviews,SHAguard beforemerge.
+
+G2_ACCOUNTING_AUDIT.md identifies actual lost validation counts,GroupOps fields
+skipped by serde,expandedinverse/wholecall doublecharging risk,partial F4/root/
+logical work and missing durablefailedcall/runtime scope. It is not an emitter
+fix,complete pricing or panel. After this implementation delivery continue
+native count-emission/ownership fixes and meaningful conservation tests. Full
+G1–G6 acceptance unchanged,G4/G5 unrun,comparison_admissible=false. Initial
+report/proofreceipt unchanged; newtwo-page followupPDF/SVG inspected.
+
+Existing automation6ae43610206c819191f9555f72e5a160 updated/enabled for18:22UTC
+collection and fullgoal continuation. New actualscopedresults/remotechanges
+reset unchangedcount0. Bounded4h cadence on unchanged,stopafter3unchanged or
+userstop; merge/closure stops oldPR maintenance. No scientificlaunch/access/
+funding/lease/quota/pool changes. All localnewcommits remain UNPUSHED.
