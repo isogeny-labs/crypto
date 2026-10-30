@@ -176,3 +176,21 @@ All existing query/reprepare/recovery tests run for full, cached and compact
 variants; full and compact queries each receive memcheck/racecheck/synccheck.
 Host syntax and native instrument metadata checks passed locally. CUDA
 compilation and this panel's device results remain pending until executed.
+
+### V6 failure and v7 pre-data correction
+
+V6 pod `oazm8b2kvq0wvz` passed all three service builds, the Rust/reduction
+checks and full/compact query sanitizers, then aborted on its first solve:
+the service header still enforced max_rows <= 2^30. The frozen contract
+requested 2^31. No ladder row was recorded; the failed attempt, complete
+archive and verified deletion remain in `failed-launch-v6/`.
+
+Frozen v7 hash
+`b34f5721ad1b074e85e556fb2d8c7a92acaf2d42f6dc22bf03c385a7c6b7dd18`
+authorizes a new run after making that explicit service limit consistent.
+The planner and device use checked u64 cardinalities; memory admission and
+sort reserve remain in force, and the cap does not allocate memory itself.
+New tests cover the upper cap, zero, overflow and oversized chunks. The new
+`run-compact-v7.sh` also sends the actual 2^31-cap service header to both
+measured binaries before any ladder data. Inputs, arms, seeds, solver limits,
+ladder and analyzer are unchanged. V6 remains a failed run with zero rows.

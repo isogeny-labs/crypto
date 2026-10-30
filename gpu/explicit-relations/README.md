@@ -159,7 +159,7 @@ response lines are flushed. Use a dedicated service process per curve.
 
 | Command | Meaning / response |
 | --- | --- |
-| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^30`, chunk no larger than cap. |
+| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^31`, chunk no larger than cap. |
 | `xs n x0 ...` | Strict distinct x list, `n <= max_rows/2`; `BASE npoints x y ...`, sorted by full coordinates, both signs. A missing lift is an error. |
 | `hash s alpha beta tau` | Signed base construction, `tau <= max_rows`; same `BASE` response, possibly empty. |
 | `bases m n0 x y ... n1 x y ...` | 2–8 sorted, distinct signed point lists; `PREPARED split left_rows right_rows`. Empty slot lists are allowed and certify no relation. |
