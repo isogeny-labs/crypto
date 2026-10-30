@@ -82,3 +82,8 @@ Final pipeline archival is recorded in [final-readback.json](final-readback.json
 comparison. This includes the combined binary, CLI output archive, all phase
 logs/receipts and terminal pipeline log/receipt. The endpoint and portability
 fixture indexes are separate and retain their own readback records.
+
+A subsequent delivery review identified a row/term/degree-cap error-path mismatch in the
+polynomial parser. The correction is governed by
+[cap-fix-validation-plan.json](cap-fix-validation-plan.json). Earlier-source
+passes above remain intact; they do not establish the follow-up's validation.

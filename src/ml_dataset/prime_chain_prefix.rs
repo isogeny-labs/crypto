@@ -60,10 +60,33 @@ fn inverse(a: u64, p: u64) -> u64 {
     pow(a, (p - 2) as u32, p)
 } // Native replay admits p<2^32.
 
-fn polys(value: &Value, n: usize, p: u64, source: bool) -> Result<Vec<Poly>, String> {
+enum PolynomialError {
+    SizeCap(&'static str),
+    Invalid(String),
+}
+impl PolynomialError {
+    fn message(self) -> String {
+        match self {
+            Self::SizeCap(message) => message.into(),
+            Self::Invalid(message) => message,
+        }
+    }
+}
+impl From<String> for PolynomialError {
+    fn from(message: String) -> Self {
+        Self::Invalid(message)
+    }
+}
+impl From<&str> for PolynomialError {
+    fn from(message: &str) -> Self {
+        Self::Invalid(message.into())
+    }
+}
+
+fn polys(value: &Value, n: usize, p: u64, source: bool) -> Result<Vec<Poly>, PolynomialError> {
     let rows = array(value)?;
     if rows.len() > 4096 {
-        return Err("prefix polynomial row cap".into());
+        return Err(PolynomialError::SizeCap("prefix polynomial row cap"));
     }
     let mut total = 0;
     rows.iter()
@@ -73,7 +96,7 @@ fn polys(value: &Value, n: usize, p: u64, source: bool) -> Result<Vec<Poly>, Str
             for term in array(row)? {
                 total += 1;
                 if total > 16_384 {
-                    return Err("prefix polynomial term cap".into());
+                    return Err(PolynomialError::SizeCap("prefix polynomial term cap"));
                 }
                 let (ev, c) = if source {
                     (
@@ -95,15 +118,14 @@ fn polys(value: &Value, n: usize, p: u64, source: bool) -> Result<Vec<Poly>, Str
                     .iter()
                     .map(|v| u32::try_from(uint(v)?).map_err(|_| "prefix exponent overflow".into()))
                     .collect::<Result<Vec<_>, String>>()?;
-                if e.len() != n
-                    || e.iter()
-                        .try_fold(0u32, |a, b| a.checked_add(*b))
-                        .is_none_or(|d| d > 64)
-                    || c == 0
-                    || c >= p
-                    || !seen.insert(e.clone())
-                {
+                if e.len() != n || c == 0 || c >= p || !seen.insert(e.clone()) {
                     return Err("invalid prefix polynomial".into());
+                }
+                if e.iter()
+                    .try_fold(0u32, |a, b| a.checked_add(*b))
+                    .is_none_or(|d| d > 64)
+                {
+                    return Err(PolynomialError::SizeCap("prefix polynomial degree cap"));
                 }
                 out.push((e, c));
             }
@@ -301,6 +323,24 @@ fn graph(polynomials: &[Poly], n: usize) -> Value {
         "monomials":monomials,"coefficient_edges":coefficients})
 }
 
+fn replay_summary(
+    examples: u64,
+    certified_nodes: u64,
+    events: u64,
+    bytes: u64,
+    reason: Option<String>,
+    verifier_work: &VerifierWork,
+) -> Value {
+    json!({"schema":"ml-dataset.prime-chain-prefix-replay/v1","verified_branch_examples":examples,
+        "ideal_equality_certified_nodes":certified_nodes,"events_read":events,"bytes_read":bytes,
+        "admission_status":if reason.is_some(){"bounded_unknown_suffix"}else{"retained_prefix_checked"},"reason":reason,
+        "source_completion_claimed":false,"native_execution_trace_verified":false,
+        "native_instruction_count_verified":false,"exact_fall_degree_verified":false,
+        "verifier_work":verifier_work,"verifier_work_scope":"certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions",
+        "limits":{"events":MAX_EVENTS,"event_bytes":MAX_EVENT_BYTES,"stream_bytes":MAX_STREAM_BYTES,
+            "certificate_plus_root_coefficient_operations":MAX_VERIFIER_COEFFICIENT_OPS}})
+}
+
 /// Caller has already reconstructed the source against public curve/base inputs.
 /// emit receives (public feature, restricted observed label) or a restricted audit.
 /// Search caps stop admission from that point; earlier valid prefixes are retained.
@@ -324,7 +364,23 @@ pub(super) fn replay(
     {
         return Err("unsupported native prefix ring".into());
     }
-    let original = polys(&input["polynomials"], n, p, true)?;
+    let original = match polys(&input["polynomials"], n, p, true) {
+        Ok(polynomials) => polynomials,
+        // No prefix has been verified when the public source itself exceeds
+        // admission bounds. The uninspected suffix remains unknown; a cap does
+        // not certify that the rest of an oversized payload is well formed.
+        Err(PolynomialError::SizeCap(message)) => {
+            return Ok(replay_summary(
+                0,
+                0,
+                0,
+                0,
+                Some(message.into()),
+                &VerifierWork::default(),
+            ));
+        }
+        Err(error) => return Err(error.message()),
+    };
     let domains: Vec<Option<Vec<u64>>> = array(&input["domains"])?
         .iter()
         .map(|v| {
@@ -443,7 +499,14 @@ pub(super) fn replay(
                         return Err("stale or invalid fixed binding".into());
                     }
                 }
-                let system = polys(&event["polynomials"], active.len(), p, false)?;
+                let system = match polys(&event["polynomials"], active.len(), p, false) {
+                    Ok(polynomials) => polynomials,
+                    Err(PolynomialError::SizeCap(message)) => {
+                        reason = Some(message.into());
+                        break;
+                    }
+                    Err(error) => return Err(error.message()),
+                };
                 if id == 0 {
                     if !event["parent_id"].is_null()
                         || !stack.is_empty()
@@ -483,7 +546,14 @@ pub(super) fn replay(
                     return Err("invalid native result position".into());
                 }
                 let report = &event["report"];
-                let basis = polys(&report["basis"], frame.active.len(), p, false)?;
+                let basis = match polys(&report["basis"], frame.active.len(), p, false) {
+                    Ok(polynomials) => polynomials,
+                    Err(PolynomialError::SizeCap(message)) => {
+                        reason = Some(message.into());
+                        break;
+                    }
+                    Err(error) => return Err(error.message()),
+                };
                 let audit = prefix_algebra::equivalent(
                     &frame.system,
                     &basis,
@@ -625,16 +695,14 @@ pub(super) fn replay(
             _ => return Err("unknown prime-chain event kind".into()),
         }
     }
-    Ok(
-        json!({"schema":"ml-dataset.prime-chain-prefix-replay/v1","verified_branch_examples":examples,
-        "ideal_equality_certified_nodes":certified_nodes,"events_read":events,"bytes_read":bytes,
-        "admission_status":if reason.is_some(){"bounded_unknown_suffix"}else{"retained_prefix_checked"},"reason":reason,
-        "source_completion_claimed":false,"native_execution_trace_verified":false,
-        "native_instruction_count_verified":false,"exact_fall_degree_verified":false,
-        "verifier_work":verifier_work,"verifier_work_scope":"certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions",
-        "limits":{"events":MAX_EVENTS,"event_bytes":MAX_EVENT_BYTES,"stream_bytes":MAX_STREAM_BYTES,
-            "certificate_plus_root_coefficient_operations":MAX_VERIFIER_COEFFICIENT_OPS}}),
-    )
+    Ok(replay_summary(
+        examples,
+        certified_nodes,
+        events,
+        bytes,
+        reason,
+        &verifier_work,
+    ))
 }
 
 #[cfg(test)]
@@ -773,5 +841,145 @@ mod tests {
         assert!(features.is_empty());
         assert_eq!(report["admission_status"], "bounded_unknown_suffix");
         assert_eq!(report["exact_fall_degree_verified"], false);
+    }
+
+    #[test]
+    fn polynomial_size_caps_preserve_prior_prefixes_for_system_and_native_result() {
+        let (input, rows) = fixture(false);
+        let (expected, _) = run(&input, &rows).unwrap();
+        for (kind, field) in [("system", "polynomials"), ("native_result", "report")] {
+            let index = rows
+                .iter()
+                .position(|row| row["event"]["kind"] == kind && row["event"]["node_id"] == 1)
+                .unwrap();
+            for term_cap in [false, true] {
+                let mut oversized = rows.clone();
+                let replacement = if term_cap {
+                    // Each row is valid over F5 in the three child variables;
+                    // 3277 * 5 terms exceeds the term cap but not the row cap.
+                    let row = json!([
+                        [[0, 0, 0], 1],
+                        [[1, 0, 0], 1],
+                        [[2, 0, 0], 1],
+                        [[0, 1, 0], 1],
+                        [[0, 2, 0], 1]
+                    ]);
+                    json!(vec![row; 3277])
+                } else {
+                    json!(vec![json!([[[1, 0, 0], 1]]); 4097])
+                };
+                if kind == "system" {
+                    oversized[index]["event"][field] = replacement;
+                } else {
+                    oversized[index]["event"][field]["basis"] = replacement;
+                }
+                let (features, report) = run(&input, &oversized).unwrap();
+                assert_eq!(features, expected[..1]);
+                assert_eq!(report["verified_branch_examples"], 1);
+                assert_eq!(report["ideal_equality_certified_nodes"], 1);
+                assert_eq!(report["admission_status"], "bounded_unknown_suffix");
+                assert_eq!(
+                    report["reason"],
+                    if term_cap {
+                        "prefix polynomial term cap"
+                    } else {
+                        "prefix polynomial row cap"
+                    }
+                );
+                assert_eq!(report["source_completion_claimed"], false);
+                assert_eq!(report["exact_fall_degree_verified"], false);
+            }
+        }
+    }
+
+    #[test]
+    fn initial_polynomial_size_cap_returns_unknown_without_admitting_events() {
+        let (mut input, rows) = fixture(false);
+        input["polynomials"] = json!(vec![input["polynomials"][0].clone(); 4097]);
+        let (features, report) = run(&input, &rows).unwrap();
+        assert!(features.is_empty());
+        assert_eq!(report["admission_status"], "bounded_unknown_suffix");
+        assert_eq!(report["reason"], "prefix polynomial row cap");
+        assert_eq!(report["events_read"], 0);
+        assert_eq!(report["ideal_equality_certified_nodes"], 0);
+        assert_eq!(report["source_completion_claimed"], false);
+    }
+
+    #[test]
+    fn polynomial_degree_caps_preserve_prior_prefixes_including_degree_sum_overflow() {
+        let (input, rows) = fixture(false);
+        let (expected, _) = run(&input, &rows).unwrap();
+        for kind in ["system", "native_result"] {
+            let index = rows
+                .iter()
+                .position(|row| row["event"]["kind"] == kind && row["event"]["node_id"] == 1)
+                .unwrap();
+            for exponents in [[65, 0, 0], [u32::MAX, u32::MAX, 0]] {
+                let mut oversized = rows.clone();
+                let replacement = json!([[[exponents, 1]]]);
+                if kind == "system" {
+                    oversized[index]["event"]["polynomials"] = replacement;
+                } else {
+                    oversized[index]["event"]["report"]["basis"] = replacement;
+                }
+                let (features, report) = run(&input, &oversized).unwrap();
+                assert_eq!(features, expected[..1]);
+                assert_eq!(report["admission_status"], "bounded_unknown_suffix");
+                assert_eq!(report["reason"], "prefix polynomial degree cap");
+                assert_eq!(report["ideal_equality_certified_nodes"], 1);
+            }
+        }
+        let mut oversized_input = input.clone();
+        oversized_input["polynomials"][0][0]["exponents"] = json!([65, 0, 0, 0]);
+        let (features, report) = run(&oversized_input, &rows).unwrap();
+        assert!(features.is_empty());
+        assert_eq!(report["reason"], "prefix polynomial degree cap");
+        assert_eq!(report["events_read"], 0);
+    }
+
+    #[test]
+    fn malformed_polynomials_within_size_caps_remain_errors() {
+        let (input, rows) = fixture(false);
+        for kind in ["system", "native_result"] {
+            let mut bad = rows.clone();
+            let index = rows
+                .iter()
+                .position(|row| row["event"]["kind"] == kind && row["event"]["node_id"] == 1)
+                .unwrap();
+            let polynomials = if kind == "system" {
+                &mut bad[index]["event"]["polynomials"]
+            } else {
+                &mut bad[index]["event"]["report"]["basis"]
+            };
+            polynomials[0][0][1] = json!(0);
+            assert_eq!(run(&input, &bad).unwrap_err(), "invalid prefix polynomial");
+        }
+        for term in [
+            json!([[1, 0], 1]),                          // Wrong dimension.
+            json!([[u64::from(u32::MAX) + 1, 0, 0], 1]), // Invalid exponent encoding.
+        ] {
+            let mut bad = rows.clone();
+            let index = rows
+                .iter()
+                .position(|row| {
+                    row["event"]["kind"] == "native_result" && row["event"]["node_id"] == 1
+                })
+                .unwrap();
+            bad[index]["event"]["report"]["basis"] = json!([[term]]);
+            assert!(run(&input, &bad).is_err());
+        }
+        let mut duplicate = rows.clone();
+        let index = rows
+            .iter()
+            .position(|row| row["event"]["kind"] == "native_result" && row["event"]["node_id"] == 1)
+            .unwrap();
+        duplicate[index]["event"]["report"]["basis"] = json!([[[[1, 0, 0], 1], [[1, 0, 0], 1]]]);
+        assert!(run(&input, &duplicate).is_err());
+        let mut bad_input = input.clone();
+        bad_input["polynomials"][0][0]["coefficient"] = json!("0");
+        assert_eq!(
+            run(&bad_input, &rows).unwrap_err(),
+            "invalid prefix polynomial"
+        );
     }
 }

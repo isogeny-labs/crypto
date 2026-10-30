@@ -140,3 +140,17 @@ entry accounting bounds the search representation; no total-process RSS bound is
 claimed. Verification does not import native F4 pivots or trust reported native
 costs. Original trace completeness, missing native internals, comprehensive
 measurements and the full campaign remain open.
+
+## Review follow-up: polynomial parser caps
+
+A read-only delivery review found that row/term and degree caps in the polynomial
+parser propagated as export errors, unlike the documented bounded-unknown policy.
+The follow-up distinguishes these caps from malformed admitted payloads. A cap
+in initial equations produces zero certified examples; a cap in a later system
+or native basis retains earlier verified prefixes and marks the suffix unknown.
+Malformed data encountered within admitted bounds remains an error. Oversized
+suffix content is not certified or scanned beyond the verifier budget.
+
+The prior source113526 validation remains evidence for that exact source. The
+follow-up has a separate frozen validation plan and receipts; until they pass,
+prior full-suite and CLI results do not validate the changed implementation.
