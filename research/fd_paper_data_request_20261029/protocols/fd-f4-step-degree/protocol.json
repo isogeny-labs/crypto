@@ -434,14 +434,15 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "crypto:papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py",
-      "sha256": null
+      "path": "crypto:examples/fd_m2_analyze.rs",
+      "sha256": "7de7d79b3ac23dd1b58f0c4e3be060c79c234fbe50a8d2f86d29882cefc28260"
     },
     "inputs": [
       "export.json"
     ],
     "outputs": [
-      "Table 6.3 with a measured D_reg column"
+      "fd_m2_analyze <study dir> > analysis.json (c0, aa, negative, closure_d4, closure_d5, p1, p2, f4)",
+      "Tables 6.1-6.3 regenerated from analysis.json by papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py (layout only)"
     ],
     "blinded": false,
     "frozen_before_data": true
