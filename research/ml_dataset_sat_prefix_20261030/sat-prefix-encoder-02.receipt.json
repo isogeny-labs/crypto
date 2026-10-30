@@ -1,0 +1,24 @@
+{
+  "kind": "software-validation",
+  "source_commit": "8bddd785ff0d44f50b6710649ed403401075f5cb",
+  "started_utc": "2026-10-30T15:02:47Z",
+  "finished_utc": "2026-10-30T15:03:37Z",
+  "stage": "completed",
+  "exit_code": 0,
+  "command_started": true,
+  "command_exit_code": 0,
+  "source_preflight_matches": true,
+  "source_readback_matches": true,
+  "materialization_inventory_sha256": "d72f4ce44858dd813031eba098b618a0c02c58d2f521c655cfbbc647455eb004",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "cryptanalysis::binary_semaev_chain_sat::",
+    "--",
+    "--test-threads=1"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

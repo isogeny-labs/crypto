@@ -17,6 +17,36 @@ WORK_KEYS = {"literal_visits", "parity_word_operations", "raw_events", "raw_byte
              "derived_bytes", "retained_logical_peak_bytes", "source_payload_logical_bytes"}
 
 
+
+EXPORT_ROLES = {
+    "features.jsonl": "allowlisted-model-inputs",
+    "prefix-features.jsonl": "allowlisted-causal-model-inputs",
+    "algebraic-features.jsonl": "allowlisted-polynomial-consequence-inputs",
+    "sat-features.jsonl": "allowlisted-causal-sat-inputs",
+    "restricted/targets.jsonl": "restricted-supervised-labels",
+    "restricted/index.jsonl": "restricted-source-provenance",
+    "restricted/prefix-records.jsonl": "restricted-prefix-labels-certificates-and-provenance",
+    "restricted/algebraic-records.jsonl": "restricted-checked-polynomial-consequences-certificates-and-provenance",
+    "restricted/sat-records.jsonl": "restricted-checked-sat-decisions-and-provenance",
+}
+
+
+def checked_export_inventory(destination, manifest):
+    members = artifacts(destination, manifest)
+    require(set(members) == set(EXPORT_ROLES), "export manifest must bind exactly all nine channel artifacts")
+    for name, role in EXPORT_ROLES.items():
+        require(members[name]["role"] == role and members[name]["encoding"] == "jsonl",
+                "export artifact role/encoding differs: " + name)
+    for key in ("prefix_feature_occurrences", "unique_prefix_feature_rows", "restricted_prefix_record_rows",
+                "algebraic_feature_occurrences", "unique_algebraic_feature_rows", "restricted_algebraic_record_rows"):
+        require(type(manifest[key]) is int and manifest[key] == 0, "nonzero unrelated channel count: " + key)
+    for key in ("verified_nonzero_target_rows", "verified_zero_target_rows", "witnessed_degree_reduction_rows",
+                "bounded_unknown_suffix_records"):
+        require(type(manifest["algebraic_outcomes"][key]) is int and manifest["algebraic_outcomes"][key] == 0,
+                "nonzero unrelated algebraic outcome: " + key)
+    return members
+
+
 def projected_static(public, base):
     def point(value):
         return None if value is None else {k: value[k] for k in ("x", "y")}
@@ -158,9 +188,8 @@ def inspect(root, destination, index):
     require(manifest["source_run_sha256"] == sha(root / "run.json") and
             manifest["source_commit"] == run["source_commit"] and
             manifest["binary_sha256"] == run["binary_sha256"], "export source binding")
-    export_artifacts = artifacts(destination, manifest)
-    require(all(name in export_artifacts for name in INPUT_FILES + ["restricted/sat-records.jsonl"]),
-            "missing model-input/restricted artifact")
+    require(manifest["plan_sha256"] == run["plan_sha256"], "export plan binding")
+    checked_export_inventory(destination, manifest)
     component, split = expected_split()
     all_features = {}
     for name in INPUT_FILES:
@@ -188,6 +217,7 @@ def inspect(root, destination, index):
             target["solver"] == "sat" and target["labels"] == source["outcome"], "target/static join")
     require(source_index["schema"] == "ml-dataset.export-index/v1" and source_index["record_id"] == target_id and
             source_index["target_id"] == target_id and source_index["feature_id"] == static_id and
+            source_index["cell"] == f"cells/{index:012d}" and
             source_index["source_manifest_sha256"] == sha(cell / "manifest.json") and
             source_index["source_run_sha256"] == sha(root / "run.json") and
             source_index["source_artifacts"] == source["artifacts"] and
@@ -305,6 +335,9 @@ def inspect(root, destination, index):
     for summary in summaries:
         if "work" in summary:
             work, limits = summary["work"], summary["limits"]
+            require(all(type(value) is int and value >= 0 for value in work.values()), "invalid replay work counter")
+            require(type(summary["verified_decisions"]) is int and 0 <= summary["verified_decisions"] <= limits["decisions"],
+                    "decision count exceeds frozen limit")
             require(work["literal_visits"] + work["parity_word_operations"] <= limits["operations"] and
                     work["raw_events"] <= limits["raw_events"] and work["raw_bytes"] <= limits["raw_bytes"] and
                     work["derived_bytes"] <= limits["derived_bytes"] and

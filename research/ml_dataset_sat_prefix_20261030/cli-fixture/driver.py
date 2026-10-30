@@ -18,6 +18,9 @@ from common import (HERE, LIMITS, canonical, config, decode, digest_bytes, file_
 from verify import cell_directory, inspect, read_events
 
 
+CHILD_ENVIRONMENT = {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}
+
+
 class Stop(Exception):
     pass
 
@@ -52,7 +55,7 @@ def admit_protocol(path, binary):
     body = dict(protocol)
     del body["freeze"]
     require(digest_bytes(canonical(body)) == freeze.get("protocol_sha256"), "protocol canonical body hash")
-    fixture = protocol["fixture"]
+    fixture = protocol["extensions"]["ml_dataset_sat_fixture"]
     require(fixture["limits"] == LIMITS and fixture["driver_files"] == file_bindings(),
             "protocol differs from frozen driver/plan/limits")
     require(fixture["candidates"] == [{"cell_index": i, "config": config(i)} for i in range(16)],
@@ -88,6 +91,59 @@ def admit_protocol(path, binary):
                       "validation_receipt_sha256": sha(receipt_path), "checker_identity": checker}
 
 
+
+def corrupt_propagation(events, witness):
+    # Pick a retained, previously admitted propagation in the witnessed pattern.
+    # Alter its semantic implication while keeping the reference well formed.
+    choices = [e for e in events if e["pattern"] == witness["pattern"] and
+               e["sequence"] <= witness["decision_after"] and
+               e["native"]["kind"] == "assignment" and not e["native"]["initial"] and
+               e["native"]["reason"]["kind"] in ("clause", "xor")]
+    require(choices, "qualified transition lacks a propagation to corrupt")
+    event = choices[0]
+    original = decode(canonical(event["native"]))
+    if event["native"]["reason"]["kind"] == "clause":
+        # The real reason contains the original asserted literal, not its
+        # opposite; the variable remains unassigned at this preceding state.
+        event["native"]["literal"] = -event["native"]["literal"]
+        failure = "reason is not unit on preceding trail"
+    else:
+        explanation = event["native"]["reason"]["explanation"]
+        require(explanation, "admitted XOR implication lacks explanation")
+        explanation[0] = -explanation[0]
+        failure = "unchecked XOR explanation"
+    return {"pattern": event["pattern"], "event_sequence": event["sequence"],
+            "original_assignment": original, "mutated_assignment": decode(canonical(event["native"])),
+            "expected_error": f"SAT pattern {event['pattern']} event {event['sequence']}: {failure}"}
+
+
+def checked_censored_prefix(audit, changed, recipe, witness, name):
+    cut = recipe["cut_sequence"]
+    before = [d for d in audit["decision_index"] if d["assignment_sequence"] <= cut]
+    after = changed["decision_index"]
+    baseline = {(d["pattern"], d["decision_sequence"]): d["feature_id"] for d in before}
+    actual = {(d["pattern"], d["decision_sequence"]): d["feature_id"] for d in after}
+    require(len(baseline) == len(before) and len(actual) == len(after), "duplicate prefix decision occurrence")
+    require(baseline and actual == baseline,
+            "corruption changed admitted prefix identities or admitted a forbidden suffix")
+    require(name in ("unpaired-decision", "dynamic-clause"), "unknown censor control")
+    expected_sequence = None if name == "unpaired-decision" else cut + 1
+    expected_events = cut if name == "unpaired-decision" else cut + 1
+    expected_reason = {"kind": "truncated"} if name == "unpaired-decision" else {
+        "kind": "unsupported", "transition": "dynamic_clause"}
+    matching = [u for u in changed["unknown_suffixes"] if
+                u.get("scope") == "pattern" and u.get("pattern") == witness["pattern"] and
+                u.get("event_sequence") == expected_sequence and u.get("reason") == expected_reason and
+                u.get("work", {}).get("raw_events") == expected_events]
+    require(len(matching) == 1, "missing exact mutated-pattern censor at expected cut")
+    return {"passed": True, "stage": "semantic_prefix_censoring",
+            "preserved_decision_occurrences": len(actual), "unknown_suffix_records": matching}
+
+
+def fixture_exit_code(receipt):
+    return 0 if receipt["status"] == "native_fixture_passed_unified_export_pending" and not receipt.get("retention_error") else 2
+
+
 class Driver:
     def __init__(self, output, binary, protocol):
         self.out = output
@@ -97,6 +153,7 @@ class Driver:
         self.started = time.monotonic()
         self.child = None
         self.frozen_sources = {}
+        self.frozen_custody = {}
         self.receipt = {"schema": "ml-dataset.sat-cli-fixture-result/v1", "started_utc": utc(),
                         "status": "initializing", "commands": [], "candidates": [], "controls": [],
                         "selected_pair": None, "transition_witness": None, "unrun_cells": list(range(16)),
@@ -104,6 +161,58 @@ class Driver:
                         "native_execution_trace_verified": False, "native_instruction_count_verified": False,
                         "unsat_proof_checked": False, "clock_valid_for_comparison": False,
                         "unified_export_gate": {"status": "missing", "reason": "authoritative experiment.export/v1 adapter/checker not available at authoring; rows/flow below are explicitly software-validation schemas"}}
+
+    def retain_protocol(self, protocol, binding):
+        # Keep the admitted bytes locally: execution must never reopen the
+        # caller's mutable protocol path or depend on external checker files.
+        receipt_path = Path(binding["validation_receipt"])
+        receipt_bytes = receipt_path.read_bytes()
+        require(digest_bytes(receipt_bytes) == binding["validation_receipt_sha256"],
+                "validation receipt changed after admission")
+        receipt = decode(receipt_bytes)
+        evidence = self.out / "protocol-evidence"
+        evidence.mkdir()
+        copies = [("binary", self.original_binary, self.binary,
+                   protocol["extensions"]["ml_dataset_sat_fixture"]["binary_sha256"]),
+                  ("protocol", self.protocol_path, self.out / "protocol.json", binding["file_sha256"]),
+                  ("validation_receipt", receipt_path, evidence / "validation.json",
+                   binding["validation_receipt_sha256"])]
+        for label in ("checker", "stdout", "stderr", "schema_file"):
+            item = receipt[label]
+            source = Path(item["path"])
+            if not source.is_absolute():
+                source = receipt_path.parent / source
+            copies.append((label, source, evidence / label, item["sha256"]))
+        retained = []
+        for label, source, destination, expected in copies:
+            require(source.is_file() and not source.is_symlink(), "nonregular frozen source: " + label)
+            with source.open("rb") as incoming, destination.open("xb") as outgoing:
+                shutil.copyfileobj(incoming, outgoing)
+                outgoing.flush()
+                os.fsync(outgoing.fileno())
+            require(sha(destination) == expected, "retained custody hash mismatch: " + label)
+            destination.chmod(0o555 if label == "binary" else 0o444)
+            relative = destination.relative_to(self.out).as_posix()
+            self.frozen_custody[relative] = expected
+            retained.append({"label": label, "original_path": str(source), "path": relative,
+                             "sha256": expected, "bytes": destination.stat().st_size})
+        self.protocol_path = self.out / "protocol.json"
+        manifest = evidence / "retained.json"
+        write(manifest, {"schema": "ml-dataset.fixture-retained-protocol/v1", "files": retained}, exclusive=True)
+        self.frozen_custody[manifest.relative_to(self.out).as_posix()] = sha(manifest)
+        self.receipt["retained_protocol"] = {"manifest": manifest.relative_to(self.out).as_posix(),
+                                            "manifest_sha256": sha(manifest),
+                                            "execution_protocol": "protocol.json",
+                                            "frozen_files": dict(self.frozen_custody)}
+        self.check_frozen_custody()
+
+    def check_frozen_custody(self):
+        require(self.frozen_custody, "frozen command custody not established")
+        for relative, expected in self.frozen_custody.items():
+            path = self.out / relative
+            require(path.is_file() and not path.is_symlink() and
+                    all(not parent.is_symlink() for parent in path.parents if parent != self.out.parent) and
+                    sha(path) == expected, "frozen command custody mismatch: " + relative)
 
     def checkpoint(self):
         write(self.out / "receipt.json", self.receipt)
@@ -129,6 +238,7 @@ class Driver:
 
     def command(self, name, args, timeout, expected_failure=False):
         require(all(row["name"] != name for row in self.receipt["commands"]), "duplicate command name")
+        self.check_frozen_custody()
         used = directory_bytes(self.out)
         if used >= LIMITS["attempt_bytes"]:
             raise Stop("attempt storage admission ceiling reached")
@@ -142,7 +252,9 @@ class Driver:
         row = {"name": name, "argv": [str(self.binary), *map(str, args)], "started_utc": utc(),
                "timeout_seconds": timeout, "expected_failure": expected_failure,
                "stdout": str(stdout.relative_to(self.out)), "stderr": str(stderr.relative_to(self.out)),
-               "status": "running", "attempt_bytes_before": used}
+               "status": "running", "attempt_bytes_before": used,
+               "child_environment_overrides": dict(CHILD_ENVIRONMENT),
+               "frozen_custody_before": "passed"}
         self.receipt["commands"].append(row)
         self.checkpoint()
         before = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -150,7 +262,7 @@ class Driver:
         try:
             with stdout.open("xb") as out, stderr.open("xb") as err:
                 self.child = subprocess.Popen(row["argv"], stdout=out, stderr=err,
-                                              start_new_session=True, env=dict(os.environ, RAYON_NUM_THREADS="8"))
+                                              start_new_session=True, env=dict(os.environ, **CHILD_ENVIRONMENT))
                 try:
                     row["exit_code"] = self.child.wait(timeout=timeout)
                     row["status"] = "completed" if row["exit_code"] == 0 else "nonzero_exit"
@@ -177,7 +289,15 @@ class Driver:
                 if stream.exists():
                     row[stream.suffix[1:] + "_sha256"] = sha(stream)
                     row[stream.suffix[1:] + "_bytes"] = stream.stat().st_size
+            try:
+                self.check_frozen_custody()
+                row["frozen_custody_after"] = "passed"
+            except Exception as error:
+                row["frozen_custody_after"] = "failed"
+                row["custody_error"] = repr(error)
             self.checkpoint()
+        if row.get("custody_error"):
+            raise Stop("frozen command custody changed during command: " + name)
         if row["status"] in ("timeout", "interrupted"):
             raise Stop("command did not complete: " + name)
         if row["attempt_bytes_after"] >= LIMITS["attempt_bytes"]:
@@ -238,13 +358,7 @@ class Driver:
             relative = "sat-native-events.jsonl"
             events = read_events(cell)
             if name == "forged-reason":
-                choices = [e for e in events if e["sequence"] <= witness["decision_after"] and
-                           e["native"]["kind"] == "assignment" and not e["native"]["initial"] and
-                           e["native"]["reason"]["kind"] in ("clause", "xor")]
-                require(choices, "qualified transition lacks a propagation to corrupt")
-                event = choices[0]
-                recipe["event_sequence"], recipe["original_reason"] = event["sequence"], event["native"]["reason"]
-                event["native"]["reason"] = {"kind": "clause", "clause_id": 4294967295}
+                recipe.update(corrupt_propagation(events, witness))
             elif name == "unpaired-decision":
                 recipe["cut_sequence"] = witness["decision_after"]
                 events = events[:witness["decision_after"]]
@@ -281,7 +395,7 @@ class Driver:
             control = {"name": name, "command": command["name"], "exit_code": command["exit_code"],
                        "mutation_sha256": sha(root.parent / "mutation.json"), "passed": False}
             if name in ("map-substitution", "forged-reason"):
-                semantic = "gate-map source substitution" in text if name == "map-substitution" else "SAT pattern " in text
+                semantic = "gate-map source substitution" in text if name == "map-substitution" else recipe["expected_error"] in text
                 control.update(passed=bool(command["exit_code"] and semantic),
                                stage="semantic_replay_rejection" if command["exit_code"] and semantic else
                                "earlier_or_unclassified_rejection" if command["exit_code"] else "unexpected_acceptance")
@@ -290,16 +404,7 @@ class Driver:
             else:
                 changed = inspect(root, destination, index)
                 write(root.parent / "audit.json", changed, exclusive=True)
-                cut = recipe["cut_sequence"]
-                baseline = {(d["pattern"], d["decision_sequence"]): d["feature_id"] for d in audit["decision_index"]
-                            if d["assignment_sequence"] <= cut}
-                actual = {(d["pattern"], d["decision_sequence"]): d["feature_id"] for d in changed["decision_index"]}
-                require(actual == baseline, "corruption changed admitted prefix identities or admitted a forbidden suffix")
-                reason = "truncated" if name == "unpaired-decision" else "unsupported"
-                matching = [u for u in changed["unknown_suffixes"] if u["reason"]["kind"] == reason and
-                            (name != "dynamic-clause" or u["reason"].get("transition") == "dynamic_clause")]
-                control.update(passed=bool(matching), stage="semantic_prefix_censoring" if matching else "missing_expected_censor",
-                               preserved_decision_occurrences=len(actual), unknown_suffix_records=matching)
+                control.update(checked_censored_prefix(audit, changed, recipe, witness, name))
             self.receipt["controls"].append(control)
             self.checkpoint()
         require(all(c["passed"] for c in self.receipt["controls"]),
@@ -308,14 +413,13 @@ class Driver:
     def run(self):
         protocol, binding = admit_protocol(self.protocol_path, self.original_binary)
         self.receipt["protocol"] = binding
-        self.receipt["fixture_bindings"] = protocol["fixture"]
-        shutil.copyfile(self.original_binary, self.binary)
-        self.binary.chmod(0o700)
-        require(sha(self.binary) == protocol["fixture"]["binary_sha256"], "copied binary hash mismatch")
-        shutil.copyfile(self.protocol_path, self.out / "protocol.json")
+        self.receipt["fixture_bindings"] = protocol["extensions"]["ml_dataset_sat_fixture"]
+        self.retain_protocol(protocol, binding)
         write(self.out / "host.json", {"platform": platform.platform(), "uname": list(platform.uname()),
               "cpu_count": os.cpu_count(), "python": sys.version, "worker_threads": 1,
-              "driver_rayon_environment": os.environ.get("RAYON_NUM_THREADS"),
+              "parent_rayon_environment": os.environ.get("RAYON_NUM_THREADS"),
+              "parent_omp_environment": os.environ.get("OMP_NUM_THREADS"),
+              "child_environment_overrides": dict(CHILD_ENVIRONMENT),
               "proc_cpuinfo": Path("/proc/cpuinfo").read_text() if Path("/proc/cpuinfo").exists() else None,
               "timing_isolation_attested": False, "clock_valid_for_comparison": False})
         self.receipt["status"] = "running"
@@ -327,8 +431,8 @@ class Driver:
         self.command("preflight", ["dataset", "preflight", "--plan", self.out / "plan.json",
                      "--protocol", self.protocol_path], 30)
         preflight = load(self.out / "logs/preflight.stdout")
-        require(preflight["source_commit"] == protocol["fixture"]["source_commit"] and
-                preflight["binary_sha256"] == protocol["fixture"]["binary_sha256"] and
+        require(preflight["source_commit"] == protocol["extensions"]["ml_dataset_sat_fixture"]["source_commit"] and
+                preflight["binary_sha256"] == protocol["extensions"]["ml_dataset_sat_fixture"]["binary_sha256"] and
                 preflight["protocol_file_sha256"] == binding["file_sha256"] and
                 preflight["planned_cells"] == 16 and preflight["generated_cells"] == 0 and
                 preflight["source_dirty"] is False, "native preflight identity mismatch")
@@ -381,16 +485,14 @@ class Driver:
                                         "replicate": 0, "warmup": False, "attempts": 1, "resumes": 0,
                                         "clock_valid_for_comparison": False, "candidate": row}) + b"\n")
         self.checkpoint()
-        files = inventory(self.out)
-        write(self.out / "inventory.json", {"schema": "software-fixture-inventory/v1",
-                                           "files": files, "excludes": ["inventory.json (self)"]})
+        self.refresh_inventory()
         archive = self.out.with_name(self.out.name + ".tar")
-        require(not archive.exists(), "archive collision; original output preserved")
         remaining = self.remaining()
         archive_receipt = {"schema": "software-fixture-local-archive/v1", "attempt": str(self.out),
                            "archive": str(archive), "remote_upload_performed": False,
                            "parent_s3_archive_and_fresh_readback_required": True}
         try:
+            require(not archive.exists() and not archive.is_symlink(), "archive collision; original output preserved")
             require(remaining > 0, "no global wall budget remains for archive; parent must archive raw tree")
             result = subprocess.run(["tar", "--sort=name", "--mtime=@0", "--owner=0", "--group=0",
                                      "--numeric-owner", "--format=gnu", "-cf", str(archive), "-C",
@@ -402,7 +504,21 @@ class Driver:
         except BaseException as error:
             archive_receipt.update(status="failed_or_interrupted", error=repr(error),
                                    partial_archive_present=archive.exists())
+            self.receipt.update(retention_error=repr(error),
+                                status_before_retention_failure=self.receipt["status"], status="failed_retention")
+            self.checkpoint()
+            self.refresh_inventory()
+        # Bind the external archive result to the final raw-tree receipt and
+        # inventory. A partial archive is retained but never called complete.
+        archive_receipt.update(source_receipt_sha256=sha(self.out / "receipt.json"),
+                               source_inventory_sha256=sha(self.out / "inventory.json"))
         write(self.out.with_name(self.out.name + ".archive.json"), archive_receipt, exclusive=True)
+
+    def refresh_inventory(self):
+        files = inventory(self.out)
+        files.pop("inventory.json", None)
+        write(self.out / "inventory.json", {"schema": "software-fixture-inventory/v1",
+                                           "files": files, "excludes": ["inventory.json (self)"]})
 
 
 def main():
@@ -435,9 +551,10 @@ def main():
         except BaseException as error:
             driver.receipt.update(retention_error=repr(error))
             driver.checkpoint()
+            driver.refresh_inventory()
         signal.alarm(0)
     print(canonical(driver.receipt).decode())
-    return 0 if driver.receipt["status"] == "native_fixture_passed_unified_export_pending" and not driver.receipt.get("retention_error") else 2
+    return fixture_exit_code(driver.receipt)
 
 
 if __name__ == "__main__":

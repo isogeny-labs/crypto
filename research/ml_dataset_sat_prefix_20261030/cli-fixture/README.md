@@ -1,12 +1,20 @@
-# Causal SAT CLI fixture work in progress
+# Causal SAT CLI fixture under development
 
-This retained driver is unfinished and has not generated or validated any dataset cells.
-The implementation draft is checkpointed so work survives interruption. It is not an
-approved executable experiment protocol. Before execution, adapt prepare.py to the
-pinned official protocol schema (custom bindings belong under extensions), validate
-and commit its frozen record, complete driver custody and semantic corruption checks,
-and integrate the coordinated producer adapter. See CLI-FIXTURE-PLAN.md and
-PROTOCOL-TOOLING.md. Standalone Rust module validation is independent of this gate.
+The integrated fixture has31 passing Python software controls: official draft
+schema checks, semantic corruption and exact censor boundaries, full artifact
+joins, copied protocol/binary/checker custody, thread settings and archive failure
+propagation. Native and archive subprocesses in these unit controls are mocked.
+Standalone Rust validation passed270 dataset tests and20 encoder tests at the
+source recorded in the phase receipts. No native PDP CLI generation has run.
 
-At resume on 2026-10-30 the four Python files passed AST parsing; this establishes
-syntax only. No native fixture execution, schema admission, or scientific claim follows.
+Before executing run.sh, complete the official unified export adapter and
+prospectively reconcile its workflow population with the conditional candidate
+search, integrate the reserved producer adapter through coordination, build the
+final binary, measure excluded runtime preflights, and validate/freeze/commit the
+final protocol. Missing preflight/binary evidence stays null. The current draft
+preparer is schema-valid, not an executable approved protocol. Do not fill missing
+measurements or executions with budget ceilings or synthetic successful records.
+
+CLI-FIXTURE-PLAN.md retains16 candidate cells,24 pattern solves and4 conditional
+corruption controls. The3GiB bound is admission between commands, not a filesystem
+quota. Parent S3 archive plus fresh readback remains required after local retention.

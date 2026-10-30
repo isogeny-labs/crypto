@@ -1,0 +1,36 @@
+{
+  "schema": "software-validation-python/v1",
+  "checked_at": "2026-10-30T15:09:41.729685+00:00",
+  "command": [
+    "/home/ec2-user/ml-dataset-work-20261028/protocol-checker-venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "research/ml_dataset_sat_prefix_20261030/cli-fixture",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "exit_code": 0,
+  "tests_passed": 31,
+  "source_files": {
+    "common.py": "8aab49a5ac708036969078778080e7a7c0bff0e169d919e50a0a2dcce451303e",
+    "test_review.py": "f0ab206f06374c204059866e952d20287e4ee0b66728421e0803cd6cd84c16bd",
+    "verify.py": "5d0086f8eb12c8f11a677853534846a382223cce859b1997c6c2d623c2df4df1",
+    "prepare.py": "5e4945957efc2d55435e5d73d0bbac33df956863577ddc4cdc8f9a59aa6e953a",
+    "run.sh": "82d6177764ac7ee07679c729c0193525487f5f207f84a89b6c17dff5669f1e85",
+    "test_prepare.py": "4d921e9b3c3016ce06e6b888e4869c7a0be1c74ca45c0e2b0a0354baefb201e4",
+    "driver.py": "cef8541a634bcd64f7341d905ed901f5c0b13ef45eb9951d0ae9526b6c37de76"
+  },
+  "log": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/sat-integrated-fixture-tests-01.log",
+    "sha256": "62ff3f2c9f80caf1e96b84bb16f515017e760fcf769707ed7777d8da89276959"
+  },
+  "scope": "Python software boundary controls with mocked native/archive calls and real official draft schema/linter; no generated dataset",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}
