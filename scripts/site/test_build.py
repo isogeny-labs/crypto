@@ -529,19 +529,32 @@ class BuildTests(unittest.TestCase):
         # tree. The workflow that runs them is path-filtered, so a document
         # it does not list can change without the pins running, and the page
         # drifts from what it cites until the next site edit. Keep every
-        # document a pin reads in the main-push filter. Publication checks
-        # run on main; the PR merge set is gate, size and artifacts.
+        # document a pin reads in both filters. PRs validate the site with
+        # read-only permissions; the publish job excludes PR events.
         workflow = read(os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml"))
         cited = ("ecc2k130/LAMBDA-PROJECTIVE.md", "ecc2k130/aws/README.md")
-        self.assertNotRegex(workflow, r"(?m)^  pull_request(?:_target)?:")
+        self.assertNotRegex(workflow, r"(?m)^  pull_request_target:")
+        self.assertRegex(workflow, r"(?m)^  pull_request:")
+        permissions = re.search(r"^permissions:\n((?:  .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(permissions)
+        self.assertIn("contents: read", permissions.group(1))
+        self.assertNotIn("write", permissions.group(1))
+        test_job = re.search(r"^  test:\n((?:    .*\n|\n)*)", workflow, re.M)
+        self.assertIsNotNone(test_job)
+        self.assertIn("if: github.event_name == 'pull_request'", test_job.group(1))
+        self.assertNotRegex(test_job.group(1), r"actions/(?:deploy-pages|upload-pages-artifact)@")
+        publish = re.search(r"^  publish:\n    if: ([^\n]+)", workflow, re.M)
+        self.assertIsNotNone(publish)
+        self.assertEqual(publish.group(1), "(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check")
         self.assertRegex(workflow, r"(?m)^  workflow_dispatch:")
-        for trigger in ("push",):
+        for trigger in ("push", "pull_request"):
             # The trigger's block is everything indented deeper than its key,
             # up to the next key at the same depth (the triggers are adjacent,
             # with no blank line between them) or the next top-level key.
             match = re.search(r"^  %s:\n((?:    .*\n|\n)*)" % trigger, workflow, re.M)
             self.assertIsNotNone(match, "no %s trigger in the status workflow" % trigger)
-            self.assertIn("branches: [main]", match.group(1))
+            if trigger == "push":
+                self.assertIn("branches: [main]", match.group(1))
             paths = re.findall(r'-\s+"([^"]+)"', match.group(1))
             self.assertIn("docs/ecc2k130-status/**", paths, trigger)
             for doc in cited:
