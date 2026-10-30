@@ -665,6 +665,7 @@ impl Ctx {
             }
         }
         let Some(iid) = iid else {
+            let market_label = if a.on_demand { "On-Demand" } else { "Spot" };
             let why = format!(
                 "no {} capacity for {} in the configured zones; try another type or later",
                 if a.on_demand { "On-Demand" } else { "Spot" },
@@ -674,6 +675,7 @@ impl Ctx {
         };
 
         eprintln!("ephemeral: job {id}");
+        let market_label = if a.on_demand { "on-demand" } else { "spot" };
         eprintln!(
             "ephemeral:   {}{} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
             a.instance_type,
@@ -1200,10 +1202,16 @@ mod tests {
         ])
         .unwrap();
         assert!(a.spot);
+        assert!(!a.on_demand);
         assert_eq!(a.paths, ["taskq", "src"]);
         assert_eq!(a.envs, ["A=1"]);
         assert_eq!(a.command, ["echo", "hi"]);
         assert_eq!(a.instance_type, "c7i.4xlarge");
+        let on_demand = RunArgs::try_parse_from_args(&["--on-demand", "--", "echo", "hi"]).unwrap();
+        assert!(on_demand.on_demand);
+        assert!(
+            RunArgs::try_parse_from_args(&["--spot", "--on-demand", "--", "echo", "hi"]).is_err()
+        );
         assert!(RunArgs::try_parse_from_args(&["echo", "hi"]).is_err());
         assert!(RunArgs::try_parse_from_args(&["--toolchain", "go", "--", "x"]).is_err());
     }

@@ -1,0 +1,147 @@
+# Validator provenance checks, 2026-10-29T03:48:19Z, worktree commit 1e7b2b7ed20dcfccaf6f9454281f042508a7d2bd
+## 1. S3 results re-downloaded into a fresh scratch dir (aws s3 cp --recursive s3://isolab-results-104186811093-us-east-2/runs/pbo-p20-xhost-20261029/e2064a35-dae6-4576-b8b8-883baa19858b/) and compared byte-for-byte with second-host/eks-results/
+SAME 4378eb34ac0f96b5754b8e30068c8e1b3d5651398297b61ecdf4d781618617e0 ./SHA256SUMS
+SAME e59fe6bae8500c6ffdefb022e987ac6860ee0328244490c66f89eb0ca37fd9f4 ./audit.json
+SAME 0ae9a9b24af6c4189bddcc584c0a4b1a3680d20f6504b403b3a14f5835bfd726 ./audit.stderr
+SAME e59fe6bae8500c6ffdefb022e987ac6860ee0328244490c66f89eb0ca37fd9f4 ./audit.stdout
+SAME ae47d7ce558199fd6bc4126701a9b12d10588559524b80e21f2ee3301dfe5299 ./binary.sha256
+SAME 49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138 ./build-info.json
+SAME c6d40a64713ff583f9e4589bc47a3f1e53e64e324e986fb2b9b56a5e7179c990 ./control-comparison.json
+SAME 7d539a9edb20ce39dc890cf796eb273439709ecaabaeb1730fd9096f276458e5 ./input-spec.json
+SAME 66aaef185546669652a244366f3ff334e4ba62c131d53f0cec57869a62b25da1 ./job-exit.json
+SAME 8084a0552f15a8bcda13e2ea6fefef6992679c3d8e592267cabba0aa572171cf ./l2-gate.json
+SAME 30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc ./pod-cpuset.txt
+SAME 4efc6b8c1c42942dc0b14cc3e42f909fcbe1a3c5cdab62678444c75262ac9fa8 ./process-status.txt
+SAME e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 ./run-summary.json
+SAME 0c7f35b4c45735fe10cfde465b47ac9c42faba6fe5264bfcbd76cfa86fe15298 ./run.stderr
+SAME 66ab61de8b560f9ac53c47e763d5fb32d4164f8cb63fa0ab869cc1b87ad962ae ./runner-identity.json
+SAME 22c01e5cfa3e4664447c82403fd268acbc54016ba943a1470892056a84236a9b ./session/host.json
+SAME 78337b820dcd7c978a58312d40245d4c06eeef63f6fc8853226ead48e020a1aa ./session/plan.json
+SAME a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924 ./session/records.jsonl
+SAME ccbf4c2ab50850c9da9abae6bf1faa2d5388c648ce6c4d414b4ae325a02abcce ./session/session.json
+SAME 7d539a9edb20ce39dc890cf796eb273439709ecaabaeb1730fd9096f276458e5 ./session/spec.json
+## 2. sha256sum -c SHA256SUMS on the S3 download
+audit.json: OK
+audit.stderr: OK
+audit.stdout: OK
+binary.sha256: OK
+build-info.json: OK
+control-comparison.json: OK
+input-spec.json: OK
+job-exit.json: OK
+l2-gate.json: OK
+pod-cpuset.txt: OK
+process-status.txt: OK
+run-summary.json: OK
+run.stderr: OK
+runner-identity.json: OK
+session/host.json: OK
+session/plan.json: OK
+session/records.jsonl: OK
+session/session.json: OK
+session/spec.json: OK
+## 3. S3 object timestamps (aws s3 ls), session ran 2026-10-29T03:18:55Z-03:19:33Z (session.json started/finished_unix_ms)
+2026-10-29 03:19:55 1568 e2064a35-dae6-4576-b8b8-883baa19858b/SHA256SUMS
+2026-10-29 03:19:55 212245 e2064a35-dae6-4576-b8b8-883baa19858b/audit.json
+2026-10-29 03:19:55 155 e2064a35-dae6-4576-b8b8-883baa19858b/audit.stderr
+2026-10-29 03:19:55 212245 e2064a35-dae6-4576-b8b8-883baa19858b/audit.stdout
+2026-10-29 03:19:55 89 e2064a35-dae6-4576-b8b8-883baa19858b/binary.sha256
+2026-10-29 03:19:55 288 e2064a35-dae6-4576-b8b8-883baa19858b/build-info.json
+2026-10-29 03:19:55 16318 e2064a35-dae6-4576-b8b8-883baa19858b/control-comparison.json
+2026-10-29 03:19:55 1855 e2064a35-dae6-4576-b8b8-883baa19858b/input-spec.json
+2026-10-29 03:19:55 157 e2064a35-dae6-4576-b8b8-883baa19858b/job-exit.json
+2026-10-29 03:19:55 181 e2064a35-dae6-4576-b8b8-883baa19858b/l2-gate.json
+2026-10-29 03:19:55 4 e2064a35-dae6-4576-b8b8-883baa19858b/pod-cpuset.txt
+2026-10-29 03:19:55 1426 e2064a35-dae6-4576-b8b8-883baa19858b/process-status.txt
+2026-10-29 03:19:55 0 e2064a35-dae6-4576-b8b8-883baa19858b/run-summary.json
+2026-10-29 03:19:55 172443 e2064a35-dae6-4576-b8b8-883baa19858b/run.stderr
+2026-10-29 03:19:55 193 e2064a35-dae6-4576-b8b8-883baa19858b/runner-identity.json
+2026-10-29 03:19:55 4814 e2064a35-dae6-4576-b8b8-883baa19858b/session/host.json
+2026-10-29 03:19:55 364886 e2064a35-dae6-4576-b8b8-883baa19858b/session/plan.json
+2026-10-29 03:19:55 11873883 e2064a35-dae6-4576-b8b8-883baa19858b/session/records.jsonl
+2026-10-29 03:19:55 3019 e2064a35-dae6-4576-b8b8-883baa19858b/session/session.json
+2026-10-29 03:19:55 1855 e2064a35-dae6-4576-b8b8-883baa19858b/session/spec.json
+2026-10-29 03:20:06 1568 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/SHA256SUMS
+2026-10-29 03:20:06 212245 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/audit.json
+2026-10-29 03:20:06 155 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/audit.stderr
+2026-10-29 03:20:06 212245 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/audit.stdout
+2026-10-29 03:20:06 89 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/binary.sha256
+2026-10-29 03:20:06 288 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/build-info.json
+2026-10-29 03:20:06 16318 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/control-comparison.json
+2026-10-29 03:20:06 1855 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/input-spec.json
+2026-10-29 03:20:06 157 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/job-exit.json
+2026-10-29 03:20:06 181 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/l2-gate.json
+2026-10-29 03:20:06 4 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/pod-cpuset.txt
+2026-10-29 03:20:06 1426 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/process-status.txt
+2026-10-29 03:20:06 0 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/run-summary.json
+2026-10-29 03:20:06 172443 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/run.stderr
+2026-10-29 03:20:06 193 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/runner-identity.json
+2026-10-29 03:20:06 4814 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/session/host.json
+2026-10-29 03:20:06 364886 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/session/plan.json
+2026-10-29 03:20:06 11873883 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/session/records.jsonl
+2026-10-29 03:20:06 3019 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/session/session.json
+2026-10-29 03:20:06 1855 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/artifacts/session/spec.json
+2026-10-29 03:20:06 390 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/download-hashes.txt
+2026-10-29 03:20:06 59 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/kubeconfig-setup.log
+2026-10-29 03:20:06 431 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/logs.json
+2026-10-29 03:20:06 0 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/logs.stderr
+2026-10-29 03:20:06 5747 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/objects.json
+2026-10-29 03:20:06 3404 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/original-request.json
+2026-10-29 03:20:06 1459 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/overview.json
+2026-10-29 03:20:06 193 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/readiness.json
+2026-10-29 03:20:06 3404 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/request.json
+2026-10-29 03:20:06 663 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/result.json
+2026-10-29 03:20:06 3109 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/status.json
+2026-10-29 03:20:06 794 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/submission.json
+2026-10-29 03:20:06 0 launcher/7569b7f7-fc24-4096-a62a-7a76bf46947e/submission.stderr
+## 4. Launcher receipts (s3 .../launcher/7569b7f7-.../): download-hashes.txt, request sha256
+audit.json: OK
+audit.stderr: OK
+audit.stdout: OK
+binary.sha256: OK
+build-info.json: OK
+control-comparison.json: OK
+input-spec.json: OK
+job-exit.json: OK
+l2-gate.json: OK
+pod-cpuset.txt: OK
+process-status.txt: OK
+run-summary.json: OK
+run.stderr: OK
+runner-identity.json: OK
+session/host.json: OK
+session/plan.json: OK
+session/records.jsonl: OK
+session/session.json: OK
+session/spec.json: OK
+cc72e6be9647049e373515d46503c0daafdfc380f63d73abaac4cb967a8944ff  launcher/request.json
+cc72e6be9647049e373515d46503c0daafdfc380f63d73abaac4cb967a8944ff  launcher/original-request.json
+ea7e437153e4cfde777a37d3409a99169a03a27d8cf8129d538001c515acca5d  launcher/result.json
+container imageID: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581
+## 5. Artifact store: tools/artifacts/artifacts.py verify --remote on the four pointer dirs
+5 entries: 5 hydrated, 0 not pulled, 0 problems
+9754f196068270bba8b44fe1dda0b147dc4f277ce70cfdac22a744d7a216fc15  research/prime_base_oracle_tuning_20261029/sessions/holdout-P20/records.jsonl
+a9bce342f9910287721eecb3c8e27239c7d8642e7e7b06456d80fc307d395924  research/prime_base_oracle_tuning_20261029/second-host/eks-results/session/records.jsonl
+e59fe6bae8500c6ffdefb022e987ac6860ee0328244490c66f89eb0ca37fd9f4  research/prime_base_oracle_tuning_20261029/second-host/eks-results/audit.stdout
+0c7f35b4c45735fe10cfde465b47ac9c42faba6fe5264bfcbd76cfa86fe15298  research/prime_base_oracle_tuning_20261029/second-host/eks-results/run.stderr
+fb04627e924ceeb8ad8a45bb6db892d1f0b1c1ab0a7612942e6e2303bd58908d  research/prime_base_oracle_tuning_20261029/second-host/figures/second_host_ratios.png
+## 6. Launch receipts in the snapshot
+4cf9306c35cf04cc76feb567148cbda575fac895a0f4a314c1a0990792c7cd6e  request.json
+cc72e6be9647049e373515d46503c0daafdfc380f63d73abaac4cb967a8944ff  validated-request.json
+ea7e437153e4cfde777a37d3409a99169a03a27d8cf8129d538001c515acca5d  result.json
+request.json job.spec == eks-results/input-spec.json == validated-request.json job.spec: True
+## 7. Frozen selection hashes (select/FROZEN.sha256)
+select/selection-P20.json: OK
+select/selection-P24.json: OK
+select/selection-P28.json: OK
+select/selection-P32.json: OK
+select/band-train-P20.json: OK
+select/band-train-P24.json: OK
+select/band-train-P28.json: OK
+select/band-train-P32.json: OK
+specs/holdout-P20.json: OK
+specs/holdout-P24.json: OK
+specs/holdout-P28.json: OK
+specs/holdout-P32.json: OK
+## 8. Other runs under the S3 runs/ prefix matching pbo|prime|xhost|holdout
+                           PRE pbo-p20-xhost-20261029/
