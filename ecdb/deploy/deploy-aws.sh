@@ -115,7 +115,10 @@ function_up() { # function_up <name> <memory MB> <timeout s> <env>
 function_up "$name-admin" 3008 900 "$admin_env"
 function_up "$name-api" 1024 30 "$api_env"
 # At most 10 concurrent API instances x 2 connections x 2 pools stays far below max_connections.
-$aws lambda put-function-concurrency --function-name "$name-api" --reserved-concurrent-executions 10 >/dev/null
+# Accounts whose total Lambda concurrency is small cannot reserve any (AWS keeps 10 unreserved);
+# their account limit already bounds the connections.
+$aws lambda put-function-concurrency --function-name "$name-api" --reserved-concurrent-executions 10 >/dev/null 2>&1 \
+  || log "reserved concurrency not set (account concurrency limit too small); the account limit bounds connections"
 
 if ! $aws lambda get-function-url-config --function-name "$name-api" >/dev/null 2>&1; then
   $aws lambda create-function-url-config --function-name "$name-api" --auth-type NONE >/dev/null
@@ -129,16 +132,18 @@ api_url=$($aws lambda get-function-url-config --function-name "$name-api" --quer
 
 # ---------------------------------------------------------------- schema and data
 admin() { # admin <event json>
-  local out; out=$(mktemp)
-  $aws lambda invoke --function-name "$name-admin" --cli-read-timeout 900 --cli-binary-format raw-in-base64-out \
-    --payload "$1" "$out" --query FunctionError --output text >&2
-  cat "$out"; echo; rm -f "$out"
+  local out ev; out=$(mktemp); ev=$(mktemp)
+  printf '%s' "$1" > "$ev"   # fileb:// sends the bytes as-is under AWS CLI v1 and v2
+  $aws lambda invoke --function-name "$name-admin" --cli-read-timeout 900 \
+    --payload "fileb://$ev" "$out" --query FunctionError --output text >&2
+  cat "$out"; echo; rm -f "$out" "$ev"
 }
 log "migrate";         admin '{"action":"migrate"}'
 log "login roles";     admin '{"action":"bootstrap_roles"}'
 if [ "${ECDB_SKIP_IMPORT:-0}" != 1 ]; then
   for what in registry walks traits covers transfers certificates derived; do
-    log "import $what"; admin "{\"action\":\"import\",\"what\":\"$what\"}" | head -c 2000; echo
+    # Keep the full report in a variable: a pipe into head would SIGPIPE the script under pipefail.
+    log "import $what"; report=$(admin "{\"action\":\"import\",\"what\":\"$what\"}"); echo "${report:0:2000}"
   done
 fi
 log "status";          admin '{"action":"status"}'
