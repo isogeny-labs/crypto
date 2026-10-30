@@ -156,6 +156,12 @@ static void wide_prefix_boundaries() {
 }
 int main() {
   try {
+#ifdef ER_CUB_SORT
+    require(merge_sort_bytes(0) == 0);
+    for (U count : {(U(1) << 31) - 1, U(1) << 31,
+                    (U(1) << 31) + 1, U(1) << 32})
+      require(merge_sort_bytes(count) >= count * sizeof(DeviceRow));
+#endif
     prefix_boundaries();
     compact_boundaries<CompactRow, CompactRowLess>();
     compact_boundaries<DenseRow, DenseRowLess>();
@@ -197,6 +203,55 @@ int main() {
       if (wide.lift(x, 0, q))
         base.push_back(q);
     }
+#ifdef ER_QUERY_PERSISTENT
+    // Force multiple grid strides, a partial final tile, late minima, complete
+    // misses and reset ordering. The check target caps the grid at two blocks.
+    {
+      std::vector<std::vector<Point>> bases(3);
+      bases[0] = {base.front()};
+      bases[1].assign(base.begin(), base.begin() + 33);
+      bases[2].assign(base.begin() + 32, base.end());
+      Plan p = plan(wide, bases, 65);
+      // A valid deliberately unbalanced split exercises long right traversals.
+      p.split = 1; p.left = 1; p.right = 33 * 33;
+      require(p.left == 1 && p.right == 1089 && p.split == 1);
+      DeviceBackend device(wide, 65, 1);
+      HostBackend host(wide, 65, 1);
+      device.prepare(p);
+      host.prepare(p);
+      Point late, absent;
+      bool have_late = false, have_absent = false;
+      for (U i = p.right; i-- > 512;) {
+        Point target = wide.affine(tuple_sum(wide, p.view(p.points.data()),
+                                            0, p.slots, i));
+        auto expected = host.find(target, p.left + p.right);
+        require(expected.found);
+        U right = expected.indices[1] * 33 + expected.indices[2];
+        if (right > 512) { late = target; have_late = true; break; }
+      }
+      for (Point target : base) {
+        if (!host.find(target, p.left + p.right).found) {
+          absent = target; have_absent = true; break;
+        }
+      }
+      require(have_late && have_absent);
+      for (unsigned repeat = 0; repeat < 8; ++repeat) {
+        for (Point target : {late, absent, late}) {
+          auto got = device.find(target, p.left + p.right);
+          auto expected = host.find(target, p.left + p.right);
+          require(got.found == expected.found && got.indices == expected.indices);
+          if (got.found) {
+            U right = expected.indices[1] * 33 + expected.indices[2];
+            require(right > 512 && got.visited >= right + 1 && got.visited <= p.right);
+          } else {
+            require(got.visited == p.right);
+          }
+        }
+      }
+      device.prepare(Plan{});
+      require(!device.find(Point{}, 0).found);
+    }
+#endif
     DeviceBackend indexed(wide, 8192, 257);
     HostBackend reference(wide, 8192, 257);
     for (unsigned size : {65, 3, 64}) {
@@ -232,7 +287,12 @@ int main() {
             U right = 0;
             for (unsigned j = p.split; j < p.slots; ++j)
               right = right * size + expected.indices[j];
+#ifdef ER_QUERY_PERSISTENT
+            require(got.visited >= right + 1 && got.visited <= p.right);
+            visited = got.visited; // Exact work varies with block scheduling.
+#else
             visited = std::min(p.right, (right / chunk + 1) * chunk);
+#endif
           }
           require(got.visited == visited);
         }
@@ -269,7 +329,12 @@ int main() {
             U right = 0;
             for (unsigned j = p.split; j < p.slots; ++j)
               right = right * size + expected.indices[j];
+#ifdef ER_QUERY_PERSISTENT
+            require(got.visited >= right + 1 && got.visited <= p.right);
+            visited = got.visited; // Exact work varies with block scheduling.
+#else
             visited = std::min(p.right, (right / chunk + 1) * chunk);
+#endif
           }
           require(got.visited == visited);
         }
