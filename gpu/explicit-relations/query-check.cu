@@ -162,6 +162,15 @@ int main() {
                     (U(1) << 31) + 1, U(1) << 32})
       require(merge_sort_bytes(count) >= count * sizeof(DeviceRow));
 #endif
+    require(right_cache_fits(40, 128, 1024, 640));
+    require(!right_cache_fits(41, 128, 1024, UINT64_MAX));
+    require(!right_cache_fits(40, 128, 1024, 639));
+    require(!right_cache_fits(1, 769, 1024, UINT64_MAX));
+    require(!right_cache_fits(UINT64_MAX, 0, UINT64_MAX, UINT64_MAX));
+    require(!right_cache_fits(0, 0, 1024, UINT64_MAX));
+    for (Point p : {Point{}, Point{0, 0, false},
+                    Point{(U(1) << 62) - 2, (U(1) << 62) - 3, false}})
+      require(equal(CachedPoint::from(p).point(), p));
     prefix_boundaries();
     compact_boundaries<CompactRow, CompactRowLess>();
     compact_boundaries<DenseRow, DenseRowLess>();
@@ -219,6 +228,12 @@ int main() {
       HostBackend host(wide, 65, 1);
       device.prepare(p);
       host.prepare(p);
+#ifdef ER_RIGHT_FULL_CACHE
+      require(device.cached_right_rows() == p.right);
+      DeviceBackend fallback(wide, 65, 1, 0);
+      fallback.prepare(p);
+      require(fallback.cached_right_rows() == 0);
+#endif
       Point late, absent;
       bool have_late = false, have_absent = false;
       for (U i = p.right; i-- > 512;) {
@@ -240,6 +255,12 @@ int main() {
           auto got = device.find(target, p.left + p.right);
           auto expected = host.find(target, p.left + p.right);
           require(got.found == expected.found && got.indices == expected.indices);
+#ifdef ER_RIGHT_FULL_CACHE
+          auto uncached = fallback.find(target, p.left + p.right);
+          require(uncached.found == got.found && uncached.indices == got.indices);
+          if (!uncached.found)
+            require(uncached.visited == p.right);
+#endif
           if (got.found) {
             U right = expected.indices[1] * 33 + expected.indices[2];
             require(right > 512 && got.visited >= right + 1 && got.visited <= p.right);
@@ -249,7 +270,14 @@ int main() {
         }
       }
       device.prepare(Plan{});
+      require(device.cached_right_rows() == 0);
       require(!device.find(Point{}, 0).found);
+      device.prepare(p);
+#ifdef ER_RIGHT_FULL_CACHE
+      require(device.cached_right_rows() == p.right);
+#endif
+      require(device.find(late, p.left + p.right).indices ==
+              host.find(late, p.left + p.right).indices);
     }
 #endif
     DeviceBackend indexed(wide, 8192, 257);
