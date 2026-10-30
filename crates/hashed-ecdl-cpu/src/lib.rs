@@ -1,8 +1,11 @@
 //! Reusable CPU decomposition for the independently verified paper reduction.
 //! Generic meet-in-the-middle enumeration, not Boolean tensor contraction.
 #[path = "../../../src/cryptanalysis/hashed_ecdl.rs"]
+#[clippy::msrv = "1.78"] // The shared reduction retains the root crate's MSRV.
 pub mod paper;
 use paper::{Curve, DecompositionOracle, Error, Point};
+mod certificate;
+pub use certificate::Archive;
 
 /// Cumulative structural counters, including discarded trials and preparation.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -18,7 +21,7 @@ pub struct Stats {
 }
 
 struct Prepared {
-    curve: Curve,
+    curve: [u64; 4],
     bases: Vec<Vec<Point>>,
     split: usize,
     prefix: Vec<Point>,
@@ -115,7 +118,7 @@ impl CachedMitm {
                 + suffix.capacity() * std::mem::size_of::<(Point, usize)>(),
         );
         self.prepared = Some(Prepared {
-            curve: curve.clone(),
+            curve: curve_key(curve),
             bases: bases.to_vec(),
             split,
             prefix,
@@ -123,6 +126,13 @@ impl CachedMitm {
         });
         Ok(())
     }
+}
+
+// Validated curve parameters determine the group law. Auxiliary square-root
+// tables are derived data: comparing/cloning them on every query is O(p).
+fn curve_key(curve: &Curve) -> [u64; 4] {
+    let (a, b) = curve.coefficients();
+    [curve.modulus(), a, b, curve.order()]
 }
 
 fn sums(curve: &Curve, bases: &[Vec<Point>]) -> Result<Vec<Point>, Error> {
@@ -159,7 +169,7 @@ impl DecompositionOracle for CachedMitm {
         if self
             .prepared
             .as_ref()
-            .is_none_or(|p| p.curve != *curve || p.bases != bases)
+            .is_none_or(|p| p.curve != curve_key(curve) || p.bases != bases)
         {
             self.prepare(curve, bases, max_work)?;
         }
@@ -308,6 +318,38 @@ mod tests {
         }
     }
     #[test]
+    fn wide_field_batch_and_tuple_witnesses_match_checked_reference() {
+        let c = Curve::with_order_witness(
+            68719476731,
+            68719476728,
+            33,
+            68719022539,
+            Some((2, 51741851039)),
+        )
+        .unwrap();
+        let p = Some((2, 51741851039));
+        let points: Vec<_> = (0..80).map(|k| c.mul(p, k).unwrap()).collect();
+        let mut scratch = Scratch::default();
+        for &target in &points {
+            scratch.subtract(&c, target, &points);
+            for (&point, &actual) in points.iter().zip(&scratch.output) {
+                let neg = point.map(|(x, y)| (x, (c.modulus() - y) % c.modulus()));
+                assert_eq!(actual, c.add(target, neg).unwrap());
+            }
+        }
+        let mut base = points[1..8].to_vec();
+        base.sort_unstable();
+        let bases = vec![base; 4];
+        let mut oracle = CachedMitm::new(10000, 64).unwrap();
+        for target in points {
+            assert_eq!(
+                oracle.find(&c, &bases, target, 10000).unwrap(),
+                paper::Enumerate.find(&c, &bases, target, 10000).unwrap()
+            );
+        }
+        assert_eq!(oracle.stats.preparations, 1);
+    }
+    #[test]
     fn exact_lexicographic_witnesses_all_targets_and_resets() {
         let (c, p) = fixture();
         for slots in 2..=6 {
@@ -364,5 +406,16 @@ mod tests {
             .find(&c, &[vec![p], vec![p]], Some((999, 0)), 100)
             .is_err());
         assert!(oracle.find(&c, &vec![vec![p]; 8], p, 1).is_err());
+    }
+    #[test]
+    fn equivalent_validated_curve_representations_reuse_tables() {
+        let (curve, generator) = fixture();
+        let witness = Curve::with_order_witness(211, 0, 7, 199, generator).unwrap();
+        let bases = vec![vec![generator]; 2];
+        let mut oracle = CachedMitm::new(10, 2).unwrap();
+        let target = curve.mul(generator, 2).unwrap();
+        let expected = oracle.find(&curve, &bases, target, 10).unwrap();
+        assert_eq!(oracle.find(&witness, &bases, target, 10).unwrap(), expected);
+        assert_eq!(oracle.stats.preparations, 1);
     }
 }

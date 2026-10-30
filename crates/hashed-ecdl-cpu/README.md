@@ -12,14 +12,16 @@ per slot before calling `find`; the shared ecbench plug-in remains separate.
 cargo test --locked --manifest-path crates/hashed-ecdl-cpu/Cargo.toml
 cargo build --locked --release --manifest-path crates/hashed-ecdl-cpu/Cargo.toml
 # Public inputs only; Q must be an affine point on this prime-order curve.
-hashed-ecdl-cpu cached p a b r Px Py Qx Qy m tau seed max_rows batch > certificate.json
+hashed-ecdl-cpu cached p a b r Px Py Qx Qy m tau seed max_rows batch [max_columns] > certificate.json
 hashed-ecdl-cpu --verify certificate.json
 ```
 
 `reference` selects the original exhaustive oracle. Both modes verify the
 complete certificate independently before emitting JSON. A limit is an error,
-never evidence that no relation exists. The current included shared reduction
-has its own field/column limits; the package does not override them.
+never evidence that no relation exists. The included shared reduction validates
+the full prime order with the generator witness and Hasse interval, supporting
+fields below 2^60. Optional `max_columns` defaults to512, at most16384. These
+are admission limits, not evidence that all admitted instances are feasible.
 
 ## Work and memory
 
