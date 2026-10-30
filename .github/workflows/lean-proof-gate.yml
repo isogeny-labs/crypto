@@ -55,24 +55,26 @@ jobs:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     outputs:
-      targets: ${{ steps.list.outputs.targets }}
+      indexes: ${{ steps.list.outputs.indexes }}
     steps:
       - uses: actions/checkout@v4
       - id: list
         run: |
-          echo "targets=$(tools/lean/proof-gate.sh --list | jq -R . | jq -sc 'map(select(length > 0))')" >> "$GITHUB_OUTPUT"
+          python3 tools/lean/test_ci_targets.py
+          indexes=$(python3 tools/lean/ci-targets.py matrix)
+          echo "indexes=$indexes" >> "$GITHUB_OUTPUT"
           tools/lean/proof-gate.sh --list | grep . || echo "no Lean targets in this repository yet; only the self-test runs"
 
   prove:
     needs: discover
-    if: ${{ needs.discover.outputs.targets != '[]' }}
+    if: ${{ needs.discover.outputs.indexes != '[]' }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJson(needs.discover.outputs.targets) }}
-    name: ${{ matrix.target }}
+        index: ${{ fromJson(needs.discover.outputs.indexes) }}
+    name: Lean target ${{ matrix.index }}
     steps:
       # Only tools/lean and the target's own directory: proof-gate.sh builds a
       # Lake project in place and a standalone file from its directory, and a
@@ -91,15 +93,18 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Pin the toolchain for a standalone file
-        if: ${{ endsWith(matrix.target, '.lean') }}
-        run: |
-          pin="$(dirname '${{ matrix.target }}')/lean-toolchain"
-          if [ -f "$pin" ]; then elan default "$(cat "$pin")"; else elan default "$(cat tools/lean/lean-toolchain)"; fi
       - name: Build and audit
+        env:
+          TARGET_INDEX: ${{ matrix.index }}
         run: |
+          target=$(python3 tools/lean/ci-targets.py select "$TARGET_INDEX")
+          printf 'Lean target %s: %s\n' "$TARGET_INDEX" "$target"
+          if [[ "$target" == *.lean ]]; then
+            pin="$(dirname "$target")/lean-toolchain"
+            if [ -f "$pin" ]; then elan default "$(cat "$pin")"; else elan default "$(cat tools/lean/lean-toolchain)"; fi
+          fi
           set +e
-          tools/lean/proof-gate.sh --out receipts '${{ matrix.target }}'
+          tools/lean/proof-gate.sh --out receipts "$target"
           rc=$?
           [ $rc -eq 3 ] && echo "::error::infrastructure failure (not evidence about the proof)"
           exit $rc

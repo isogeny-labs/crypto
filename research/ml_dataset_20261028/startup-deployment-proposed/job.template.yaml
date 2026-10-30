@@ -1,0 +1,148 @@
+# OFFLINE TEMPLATE. Placeholders deliberately make this non-deployable.
+# Requires independently approved, reconciled policy/resources/mounts/identity.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "__RESERVED_JOB_NAME__"
+  namespace: "__RESERVED_NAMESPACE__"
+  labels:
+    isolab.dev/job: "true"
+  annotations:
+    dataset.isolabs.dev/config-file-sha256: "__CONFIG_EXACT_BYTES_SHA256__"
+    dataset.isolabs.dev/reservation-sha256: "__NATIVE_RESERVATION_SHA256__"
+    dataset.isolabs.dev/resource-envelope-sha256: "__APPROVED_RESOURCE_ENVELOPE_SHA256__"
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 0
+  # Frozen pilot ceiling. This is a Job execution deadline, not EC2 billing TTL.
+  activeDeadlineSeconds: 3600
+  # Omitted finished-Job TTL: retain evidence until separately reconciled.
+  template:
+    metadata:
+      labels:
+        isolab.dev/job: "true"
+      annotations:
+        karpenter.sh/do-not-disrupt: "true"
+        dataset.isolabs.dev/config-file-sha256: "__CONFIG_EXACT_BYTES_SHA256__"
+        # Controller UID is injected by the Job controller; never forge it here.
+    spec:
+      restartPolicy: Never
+      serviceAccountName: "__EXACT_APPROVED_IRSA_SERVICE_ACCOUNT__"
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        isolab.dev/pool: cpu-spot
+        karpenter.sh/capacity-type: spot
+        node.kubernetes.io/instance-type: "__APPROVED_EXACT_INSTANCE_TYPE__"
+        kubernetes.io/arch: "__BINARY_IMAGE_ARCH__"
+      tolerations:
+        - key: isolab.dev/workload
+          value: cpu
+          operator: Equal
+          effect: NoSchedule
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  isolab.dev/job: "true"
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: task
+          image: "__IMAGE_REPOSITORY__@sha256:__ACTUAL_IMAGE_DIGEST__"
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/local/bin/crypto", "dataset", "start"]
+          workingDir: /work
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "__APPROVED_CPU_REQUEST__"
+              memory: "__APPROVED_MEMORY_REQUEST__"
+              ephemeral-storage: "__APPROVED_EPHEMERAL_STORAGE__"
+            limits:
+              cpu: "__APPROVED_CPU_LIMIT__"
+              memory: "__APPROVED_MEMORY_LIMIT__"
+              ephemeral-storage: "__APPROVED_EPHEMERAL_STORAGE__"
+          env:
+            - name: HOME
+              value: /work
+            - name: AWS_REGION
+              value: us-east-2
+            - name: AWS_DEFAULT_REGION
+              value: us-east-2
+            - name: RAYON_NUM_THREADS
+              value: "1"
+            - name: OMP_NUM_THREADS
+              value: "1"
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: JOB_CONTROLLER_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.labels['batch.kubernetes.io/controller-uid']"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            # ISOLAB_RESULTS_URI is deliberately absent: config prefix is null.
+            # No envFrom, static AWS credentials, endpoint or proxy overrides.
+            # IRSA webhook must inject the actual approved AWS_ROLE_ARN and
+            # token-file pair; verify admission output before binding the grant.
+          volumeMounts:
+            - name: work
+              mountPath: /work
+            - name: tmp
+              mountPath: /tmp
+            - name: startup-config
+              mountPath: /opt/crypto/dataset/startup-gate.json
+              subPath: startup-gate.json
+              readOnly: true
+            - name: late-grant
+              mountPath: /run/dataset-admission
+              readOnly: true
+              # No subPath: late ..data projection updates must remain visible.
+      volumes:
+        - name: work
+          emptyDir:
+            sizeLimit: "__APPROVED_WORK_VOLUME_LIMIT__"
+        - name: tmp
+          emptyDir:
+            sizeLimit: "__APPROVED_TMP_VOLUME_LIMIT__"
+        - name: startup-config
+          configMap:
+            name: "__IMMUTABLE_CONFIG_OBJECT_NAME__"
+            optional: false
+            defaultMode: 292 # decimal 0444; ordinary readonly subPath target.
+            items:
+              - key: startup-gate.json
+                path: startup-gate.json
+        - name: late-grant
+          configMap:
+            name: "__PREPROVISIONED_EXACT_GRANT_OBJECT_NAME__"
+            optional: true
+            defaultMode: 292
+            items:
+              - key: bundle.json
+                path: bundle.json
