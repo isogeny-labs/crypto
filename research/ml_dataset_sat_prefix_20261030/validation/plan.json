@@ -1,0 +1,62 @@
+{
+  "schema": "software-validation-plan/v1",
+  "purpose": "Retained causal SAT software correctness checks, not research trials or timing comparisons",
+  "execution_source": "Commit integrated runtime, fixture, validation scripts and this plan; pass exact resulting commit to run-phase.sh. No validation has been launched by preparing this plan.",
+  "prerequisite": "Preceding full-library run is terminal and shared target exclusively available. Initial scoped module tests may precede shared adapter integration; end-to-end CLI admission requires coordinated adapter integration and a new source freeze.",
+  "materialization_inventory": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/sat-prefix-materialization-01.json",
+    "sha256": "035f0bc084cd1c78bd9e08ef96015b5685db084d0a745cca3ac04e3deb0ad2fc",
+    "source_commit": "7501f38e8be1d1eb94cfd6ea203f55010e1f2a9b",
+    "files": 151,
+    "bytes": 210027745,
+    "binding": "Before and after every phase verify inventory SHA, every recorded blob against execution commit with one git ls-tree read, and each materialized file SHA and size"
+  },
+  "source_binding": "Compare all tracked paths against execution commit except docs/session-logs/** and research/ml_dataset_sat_prefix_20261030/store-index.json; require phase runner, source guard and plan committed; reject untracked Rust/Cargo/config inputs, including ignored source inputs; explicitly hash restored sparse inputs.",
+  "first_phase": {
+    "name": "sat-prefix-dataset-01",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "ml_dataset::",
+      "--",
+      "--test-threads=1"
+    ],
+    "scope": "Compiled standalone encoder, replay and exporter; shared solver adapter proposal remains unapplied. This phase cannot establish producer-to-export CLI functionality."
+  },
+  "sequence": [
+    "dataset release library tests including SAT replay",
+    "native encoder release library tests",
+    "strict maintained Clippy",
+    "release crypto CLI build",
+    "retained causal SAT curve and twist CLI fixture, including native learned/backjump coverage and negative controls",
+    "full serialized release library suite"
+  ],
+  "resource_envelope": {
+    "cargo_build_jobs": 8,
+    "rayon_threads": 8,
+    "test_threads": 1,
+    "rust_toolchain": "1.98",
+    "cargo_target_dir": "/home/ec2-user/crypto-ml-dataset-20261028/target",
+    "target_reuse": "sequential only after parent confirms previous pipeline terminal"
+  },
+  "stop_rule": "Stop on first failure. Preserve immutable phase log and receipt including source preflight/readback and original command status. Parent archives evidence with existing archive.sh and fresh byte readback; no automatic retry or build/test launch by this setup.",
+  "attempt_identity": "Explicit SAT-prefixed phase name ending in a two-digit attempt; first attempt01. Refuse existing log/receipt and symlink paths. Later attempts require a new frozen source and explicit parent decision.",
+  "claim_boundary": [
+    "No generated research samples",
+    "No cloud worker validation",
+    "No native whole-solver instruction claim",
+    "No exact fall-degree or model-efficacy claim",
+    "Retained payload accounting is not RSS"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "implementation_base": "7501f38e8be1d1eb94cfd6ea203f55010e1f2a9b",
+  "prior_work": [
+    "research/ml_dataset_algebraic_targets_20261030/validation/run-phase.sh",
+    "research/ml_dataset_algebraic_targets_20261030/validation/verify-source.sh",
+    "research/ml_dataset_algebraic_targets_20261030/validation/plan.json",
+    "research/ml_dataset_sat_prefix_20261030/CONTRACT.md"
+  ]
+}
