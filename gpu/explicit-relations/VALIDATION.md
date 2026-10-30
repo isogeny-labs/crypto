@@ -209,3 +209,43 @@ paper reductions, or a GPU port of the separate tensor backend. The bounded
 driver still requires `p <= 65521`, cofactor one and at most 512 columns.
 No EKS image was built. The RunPod pod has been deleted; no continuing GPU
 service is implied by this successful execution.
+
+## Full recovery frontier, 2026-10-30
+
+The historical validation above used the original tiny driver. The later
+source `4014622e18caef9a6b6c89d79653e7633f5aaaff` uses an exact prime-order
+witness and Tonelli–Shanks for `p < 2^60`, with explicit column, row and work
+limits. It completed the frozen v7 panel on RTX PRO 6000 pod
+`ex8tm7votw4h4g` (97,887 MiB, CUDA 13.2.51, driver 595.91.07). All 12 cells
+ran: ten independently replayed recoveries and two 60-bit timeouts at
+1,200 seconds. Both 58-bit targets recovered in 489.753544246 and
+530.119796136 seconds cold. Additional fresh replay and corruption checks
+bring their full audit times to 490.031164606 and 530.390733243 seconds.
+
+The 60-bit tables passed conservative memory admission at 57,709,730,784
+and 49,236,951,816 bytes before timing out. These are allocation bounds,
+not measured peak VRAM; the failures do not establish a hardware maximum.
+All 13 Rust tests, host and full/cached/compact device checks, Clippy,
+maximum-cap line-protocol headers and full/compact query memcheck,
+racecheck and synccheck passed. Worker/controller exited zero, the archive
+hash matched and pod deletion was verified.
+
+- [Frozen protocol](../../research/explicit_relations_e2e_20261030/protocol-v7.json)
+- [Complete raw export](../../research/explicit_relations_e2e_20261030/results-v7/export.json)
+- [Exact cell-coverage audit](../../research/explicit_relations_e2e_20261030/frontier-audit-v7.txt)
+- [Archive-member and certificate custody](../../research/explicit_relations_e2e_20261030/results-v7/archive-manifest.json)
+
+Archive SHA-256:
+`01cd78dbd5cb64410d0c02ba12473964683299f42702a7c5cb46a8f4b7c37891`.
+Earlier v1/v2/v6 setup failures and all v3/v4/v5 outcomes remain in the
+same study directory. Schema/flow/file verification passes; four canonical
+rectangular-coverage findings remain disclosed for v7's explicitly
+nonrectangular plan. Native analysis and the strict audit pass the actual
+contract. This is not an independent scientific validation-gate approval.
+
+All wall clocks remain shared-host L0 observations. The GPU relation oracle
+is generic meet-in-the-middle decomposition; the separate CPU tensor backend
+is not ported here. Root crypto/ecbench was not compiled locally. Later
+merged CPU arithmetic and the optional wider prefix index are being tested
+under separately frozen v8 on source `bbf0f2f51e73afd7e41174094feb2c56a72d3d9d`;
+v7 does not validate that later revision.

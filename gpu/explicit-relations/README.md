@@ -217,8 +217,10 @@ remains disabled in this variant. Admission charges three buffers of the
 actual row size; cold execution includes conversion, sorting and indexing.
 The matched panel and larger-field limits are frozen in
 [`protocol-v7.json`](../../research/explicit_relations_e2e_20261030/protocol-v7.json).
-V6 passed GPU preflight but failed its first service header; the separate v7
-run corrects that cap mismatch and is being collected. Both are retained.
+V6 passed GPU preflight but failed its first service header. The corrected v7
+panel completed both 58-bit targets and retained two 60-bit timeouts; all
+preflight and query sanitizers passed. See the [raw export](../../research/explicit_relations_e2e_20261030/results-v7/export.json).
+Both attempts are retained, and shared-host timings remain L0 diagnostics.
 
 ### Wider prefix index (opt-in, validation pending)
 
