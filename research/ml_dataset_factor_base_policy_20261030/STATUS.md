@@ -1,3 +1,27 @@
+# Maintained Clippy passed; full V2 integration remains open
+
+Clippy03 at655b690ef56d6869023a41326a127bf319cf4342 passed with both source
+preflight and readback matching inventory04. The terminal receipt finished
+2026-10-30T17:19:21Z. Full logs/receipt have fresh S3 readbacks. Dataset04
+remains297 passed,0 failed,1 ignored; subsequent changes are documentation and
+exact restoration of a compile-time fixture, not a new runtime implementation.
+
+Source checkpoint05 is fresh-GET/bundle/meta/HEAD verified:
+4fc2a6ed55d5570bc455f5bc1f4686ad3db1691df62564b09173722a4a92774a.
+
+T965 now owns report/restore after the former reservations were released.
+Contextual reconciliation against donor0dcfd33a found identical reader source;
+reviewed patches apply without overwriting donor changes. Storage/budget donor
+adaptations are separately retained dependency evidence, not imported.
+Dispatcher/solverT887 and captureT888 remain reserved. No external task message
+was sent without the pending coordination authorization.
+
+Root review found legitimate pre-admission budget and interrupted source cases
+that initial proposals mishandled; corrected proposals remain scratch-only.
+Independent solver review also requires deterministic PKM height binding and
+false-claim controls for unsupported profiles. Preserve these findings and
+resolve them before frozen integration; proposal tests remain unexecuted.
+
 # Dataset helper validation and V2 integration
 
 Dataset04 passed 297 tests, 0 failed, 1 ignored at source
