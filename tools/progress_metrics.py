@@ -583,6 +583,23 @@ def koblitz_degree13_characters(ref, since):
                  source=f"{path}@{commit}")
 
 
+def koblitz_affine_normalization(ref, since):
+    """Neutral exact-work counters; output computation and verification stay separate."""
+    path = "research/koblitz_modular_ic_20261018/rounds/49/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("normalization_control_cases", "control cases", "Smooth and cusp normalization API controls over F2"),
+            ("source_preparation_cases", "prepared source ideals", "Exact twisted F2 source input; not a normalization"),
+            ("normalization_outputs_computed", "normalizer outputs", "Computed affine presentations; independent exported-data checks counted separately"),
+            ("verified_affine_normalizations", "checked affine presentations", "Affine normalization only; proper projective and modular-factor geometry remain open"),
+            ("audited_conditional_declarations", "audited declarations", "Conditional field-degree lemmas; concrete native ideals not formalized"),
+        ):
+            emit("koblitz_modular.affine_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -694,6 +711,7 @@ def main():
     koblitz_root_collector(a.ref, a.since)
     koblitz_degree13_divisors(a.ref, a.since)
     koblitz_degree13_characters(a.ref, a.since)
+    koblitz_affine_normalization(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
