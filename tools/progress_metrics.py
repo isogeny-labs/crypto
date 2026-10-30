@@ -514,6 +514,23 @@ def koblitz_ordinary_orientation(ref, since):
             emit(metric, counts.get(key), date=date, problem=P_IC, unit=unit,
                  better="neutral", label=label, source=f"{path}@{commit}")
 
+def koblitz_source_collector(ref, since):
+    """Actual fixed-n5 chart enumeration; neither Picard rank nor target recovery."""
+    path = "research/koblitz_modular_ic_20261018/rounds/45/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("collector_cases", []):
+            if row.get("status") != "accepted" or row.get("role") == "control":
+                continue
+            degree = row["extension_degree"]
+            for key, unit in (("rational_source_points", "rational source points"),
+                              ("closed_points", "closed source points"),
+                              ("deck_orbits", "deck orbits")):
+                emit(f"koblitz_modular.collector_degree{degree}_{key}", row.get(key),
+                     date=date, problem=P_IC, unit=unit, better="neutral",
+                     label=f"Complete fixed chart over F2^{degree}; fixed n5 carrier, Picard images unevaluated",
+                     source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -597,7 +614,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
@@ -621,6 +638,7 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     koblitz_larger_constructions(a.ref, a.since)
     koblitz_ordinary_orientation(a.ref, a.since)
+    koblitz_source_collector(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
