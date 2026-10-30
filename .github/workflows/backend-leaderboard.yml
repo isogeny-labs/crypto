@@ -54,7 +54,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard research/ecbench_rootfind_engine_20261012/sessions/claim-n13-v2
       - name: Retain the hydrated frozen report for manual diagnosis
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
