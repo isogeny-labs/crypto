@@ -1043,3 +1043,28 @@ V16 device preflight and recovery outcomes; current-head PR2996 checks.
 ### Errors
 Artifact bot moved the large v13 validation log to its hash-addressed store;
 its commit was fast-forwarded into this branch without changing measured data.
+
+## 2026-10-30 20:27 UTC — twelve-slot implementation prepared
+
+### What was done
+Extended the native reduction/oracle/certificate bounds and GPU service plan
+arrays to12slots, keeping ordinary defaults and row/work/column caps unchanged.
+Added9/10/12slot device boundaries,13slot rejection, CPU service all-target
+checks and public known-answer Rust certificate/wire fixtures. Host C++ syntax
+and expanded all-target service checks pass; Rust/CUDA checks await the next
+separately pinned build. V16 remains on its original source and has begun its
+52-bit recovery controls after passing preflight.
+
+### Decisions made
+Read the supplied paper Section3.2 Lemmas9–10 and Section3.4 Figure2 before
+choosing this extension. More slots can reduce total base columns but change
+coverage and tuple work. ARITY.md records the concrete condition
+L >= max(r^(1/m),10m); automatic thresholds preserve it. Smaller explicit
+thresholds require empirical coverage accounting in a separate frozen panel.
+
+### Open threads
+Measure m10/m12 configurations only after correctness validation and a frozen
+comparison. Continue existing v16 filter/63-bit panel without modification.
+
+### Errors
+No host check failure. New Rust and device tests are not yet executed.

@@ -157,11 +157,20 @@ static void selftest() {
         break;
       }
     require(missing_rejected, "nonlifting x accepted");
-    for (unsigned slots = 2; slots <= 8; ++slots) {
+    bool excess_slots_rejected = false;
+    try {
+      plan(c, std::vector<std::vector<Point>>(MAX_SLOTS + 1, {all[0]}), 100000);
+    } catch (const std::runtime_error &e) {
+      excess_slots_rejected = std::string(e.what()) == "invalid base slots or row cap";
+    }
+    require(excess_slots_rejected, "excess slot count accepted");
+    for (unsigned slots = 2; slots <= MAX_SLOTS; ++slots) {
       std::vector<std::vector<Point>> bases(slots);
       for (unsigned j = 0; j < slots; ++j) {
         // Same points in separate slots, both signs, duplicated sums.
-        bases[j] = {all[0], all[1], all[2], all[3], all[4], all[5], all[6]};
+        bases[j] = slots <= 8
+            ? std::vector<Point>{all[0], all[1], all[2], all[3], all[4], all[5], all[6]}
+            : std::vector<Point>{all[0], all[1]};
       }
       Plan p = plan(c, bases, 100000);
       device.prepare(p);
@@ -243,8 +252,8 @@ static void serve() {
     }
     if (cmd == "bases") {
       U m = number(in);
-      if (m < 2 || m > 8)
-        throw std::runtime_error("slot count must be 2..8");
+      if (m < 2 || m > MAX_SLOTS)
+        throw std::runtime_error("slot count must be 2..12");
       std::vector<std::vector<Point>> bases(m);
       for (auto &base : bases) {
         U n = number(in);
