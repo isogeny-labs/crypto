@@ -1344,10 +1344,10 @@ impl Instance {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
         if let Instance::Fp4(_)
-            | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_)
-            | Instance::ThreeLeads(_)
-            | Instance::Hyper(_) = self
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::ThreeLeads(_)
+        | Instance::Hyper(_) = self
         {
             // Planted targets only on E(F_{p^4}), the tower, the three-leads
             // study and the hyperelliptic Jacobians: no public-target law yet.
