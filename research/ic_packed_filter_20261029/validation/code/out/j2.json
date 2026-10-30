@@ -1,0 +1,781 @@
+{
+ "P24-counted": {
+  "audit": {
+   "audit_file_hashes_match_sums": true,
+   "audit_stdout_equals_audit_json": true,
+   "auditor_binary": true,
+   "measured_records": 1152,
+   "ok": true,
+   "problems": 0,
+   "records": 1344,
+   "regraded": true,
+   "replay_candidates": 1152,
+   "replay_selection": "all",
+   "replay_seqs_are_all_measured": true,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "session_status": "complete",
+   "verified_records": 1344
+  },
+  "gate": {
+   "EXIT42_CLAUSE": true,
+   "EXIT43_CLAUSE": false,
+   "accepted": false,
+   "below_l2_from_gate": {
+    "all_too_short_only": true,
+    "count": 672,
+    "levels": {
+     "L1": 672
+    },
+    "per_arm": {
+     "rho-neg": 336,
+     "rho-neg-aa": 336
+    }
+   },
+   "below_l2_from_records_equal_gate": true,
+   "cond1_audit": true,
+   "cond2": true,
+   "cond2_rho_aa": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   },
+   "cond3_spec_build": true,
+   "cond4_ic_all_L2_L3": true,
+   "cond5_rho": true,
+   "cond6_invalid_outcomes_empty": true,
+   "conditions_1_to_6": true,
+   "executions": 1344,
+   "gate_grades_equal_record_counts": true,
+   "level_from_blockers_mismatches": [],
+   "note": "the solve-time range of the waived rho executions is not reported: it is rho wall time (PROTOCOL 10)",
+   "records_levels": {
+    "L1": 672,
+    "L2": 672
+   },
+   "route_satisfied": true
+  },
+  "job_exit": {
+   "exit_code": 42,
+   "job_name": "ic-dgbf-rho-p24-20261029",
+   "job_name_expected": true,
+   "single_pod_uid": true
+  },
+  "sha256sums": {
+   "bad": [],
+   "files": 18,
+   "ok": true
+  },
+  "spec_build": {
+   "algorithm_seed_shared_by_all_arms_per_key": true,
+   "binary_sha256_file": true,
+   "build_info_ecbench_sha256": true,
+   "build_info_revision": true,
+   "curve_seeds": true,
+   "curves_are_section3": true,
+   "executions_planned": 1344,
+   "frozen_spec": "spec-P24-rho.json",
+   "frozen_spec_sha256": "c98bf0c914efceef796be5f00a86e18c75e426a1ca8cf9e63fab748c23db0321",
+   "grading_version": 3,
+   "input_spec_json_equal_frozen": true,
+   "order_seed_in_spec": true,
+   "records_binary_sha256_all": true,
+   "records_in_file": 1344,
+   "records_session_id_all": true,
+   "records_written": 1344,
+   "session_binary_sha256": true,
+   "session_plan_sha256_matches_file": true,
+   "session_records_sha256_matches_file": true,
+   "session_spec_json_equal_frozen": true,
+   "session_status": "complete",
+   "spec_rounds_warmup_order_level": [
+    6,
+    1,
+    "alternate",
+    "L2",
+    1800
+   ],
+   "target_seed": true
+  }
+ },
+ "P24-wall": {
+  "audit": {
+   "audit_file_hashes_match_sums": true,
+   "audit_stdout_equals_audit_json": true,
+   "auditor_binary": true,
+   "measured_records": 1152,
+   "ok": true,
+   "problems": 0,
+   "records": 1344,
+   "regraded": true,
+   "replay_candidates": 1152,
+   "replay_selection": "all",
+   "replay_seqs_are_all_measured": true,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "session_status": "complete",
+   "verified_records": 1344
+  },
+  "cond1_exit": true,
+  "cond2_audit": true,
+  "cond3": true,
+  "cond3_counted_aa": {
+   "dgb->dgb-aa": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   },
+   "dgbf-edge->dgbf": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   }
+  },
+  "cond4": true,
+  "cond5": true,
+  "cond6": true,
+  "cond6_control_comparison": {
+   "a": "dgbf-edge",
+   "aa_arms": [
+    "dgbf-edge",
+    "dgbf"
+   ],
+   "aa_ci95": [
+    0.9962699451378215,
+    1.0005574525481946
+   ],
+   "aa_pairs": 288,
+   "aa_ratio": 0.9984113973495236,
+   "aa_selection": "includes arm A",
+   "b": "dgb-aa",
+   "ci95": [
+    0.9925651109882333,
+    0.9978963280310436
+   ],
+   "ci_method": "linearised_t_pairs",
+   "corrected_ci95": [
+    0.9934015712635701,
+    1.0002314996777746
+   ],
+   "corrected_dof": 548.064595147222,
+   "corrected_ratio": 0.9968106858412075,
+   "ops_band": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "ops_ratio": 1.0,
+   "pairs": 288,
+   "pairs_below_level": 0,
+   "ratio_b_over_a": 0.9952271497436569,
+   "resample_seed": 20261002,
+   "self_aa": false,
+   "status": "admitted"
+  },
+  "job_exit": {
+   "exit_code": 0,
+   "job_name": "ic-dgbf-p24-20261029",
+   "job_name_expected": true,
+   "single_pod_uid": true
+  },
+  "l2_gate": {
+   "accepted": true,
+   "below_l2": 0,
+   "blocker_kinds": {
+    "L3: governor is None, not performance": 1344,
+    "L3: not known to be bare metal": 1344,
+    "L3: turbo/boost is not known to be off": 1344
+   },
+   "executions": 1344,
+   "gate_grades_equal_record_counts": true,
+   "grades": [
+    {
+     "count": 1344,
+     "level": "L2"
+    }
+   ],
+   "invalid_outcomes": [],
+   "level_from_blockers_mismatches": [],
+   "records_levels": {
+    "L2": 1344
+   }
+  },
+  "positions": {
+   "block_sizes": {
+    "4": 336
+   },
+   "blocks": 336,
+   "blocks_consecutive_seq": true,
+   "measured_orders": {
+    "dgb dgb-aa dgbf dgbf-edge": 144,
+    "dgbf-edge dgbf dgb-aa dgb": 144
+   },
+   "positions": {
+    "dgb": {
+     "0": 144,
+     "3": 144
+    },
+    "dgb-aa": {
+     "1": 144,
+     "2": 144
+    },
+    "dgbf": {
+     "1": 144,
+     "2": 144
+    },
+    "dgbf-edge": {
+     "0": 144,
+     "3": 144
+    }
+   },
+   "predecessor_within_block": {
+    "dgb": {
+     "(block start)": 144,
+     "dgb-aa": 144
+    },
+    "dgb-aa": {
+     "dgb": 144,
+     "dgbf": 144
+    },
+    "dgbf": {
+     "dgb-aa": 144,
+     "dgbf-edge": 144
+    },
+    "dgbf-edge": {
+     "(block start)": 144,
+     "dgbf": 144
+    }
+   }
+  },
+  "raw_regrade": {
+   "disagreements": [],
+   "flag_counts": {},
+   "note": "partial re-grade: L1/L2 gates that depend only on record fields; preflight, capsule and eviction gates are session-level and read from session.json",
+   "records": 1344,
+   "thresholds": {
+    "max_other_cpu": 0.1,
+    "max_preemptions_per_second": 50.0,
+    "max_psi": 5.0,
+    "settle_seconds": 2.0
+   },
+   "ticks_per_second": 100
+  },
+  "sha256sums": {
+   "bad": [],
+   "files": 19,
+   "ok": true
+  },
+  "spec_build": {
+   "algorithm_seed_shared_by_all_arms_per_key": true,
+   "binary_sha256_file": true,
+   "build_info_ecbench_sha256": true,
+   "build_info_revision": true,
+   "curve_seeds": true,
+   "curves_are_section3": true,
+   "executions_planned": 1344,
+   "frozen_spec": "spec-P24.json",
+   "frozen_spec_sha256": "ce9510367b95c5038b4b200675943b2e81bc9f395921cfe10f87973ab7f151e7",
+   "grading_version": 3,
+   "input_spec_json_equal_frozen": true,
+   "order_seed_in_spec": true,
+   "records_binary_sha256_all": true,
+   "records_in_file": 1344,
+   "records_session_id_all": true,
+   "records_written": 1344,
+   "session_binary_sha256": true,
+   "session_plan_sha256_matches_file": true,
+   "session_records_sha256_matches_file": true,
+   "session_spec_json_equal_frozen": true,
+   "session_status": "complete",
+   "spec_rounds_warmup_order_level": [
+    6,
+    1,
+    "alternate",
+    "L2",
+    1800
+   ],
+   "target_seed": true
+  }
+ },
+ "P28-counted": {
+  "audit": {
+   "audit_file_hashes_match_sums": true,
+   "audit_stdout_equals_audit_json": true,
+   "auditor_binary": true,
+   "measured_records": 1152,
+   "ok": true,
+   "problems": 0,
+   "records": 1344,
+   "regraded": true,
+   "replay_candidates": 1152,
+   "replay_selection": "all",
+   "replay_seqs_are_all_measured": true,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "session_status": "complete",
+   "verified_records": 1344
+  },
+  "gate": {
+   "EXIT42_CLAUSE": true,
+   "EXIT43_CLAUSE": false,
+   "accepted": false,
+   "below_l2_from_gate": {
+    "all_too_short_only": true,
+    "count": 199,
+    "levels": {
+     "L1": 199
+    },
+    "per_arm": {
+     "rho-neg": 100,
+     "rho-neg-aa": 99
+    }
+   },
+   "below_l2_from_records_equal_gate": true,
+   "cond1_audit": true,
+   "cond2": true,
+   "cond2_rho_aa": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   },
+   "cond3_spec_build": true,
+   "cond4_ic_all_L2_L3": true,
+   "cond5_rho": true,
+   "cond6_invalid_outcomes_empty": true,
+   "conditions_1_to_6": true,
+   "executions": 1344,
+   "gate_grades_equal_record_counts": true,
+   "level_from_blockers_mismatches": [],
+   "note": "the solve-time range of the waived rho executions is not reported: it is rho wall time (PROTOCOL 10)",
+   "records_levels": {
+    "L1": 199,
+    "L2": 1145
+   },
+   "route_satisfied": true
+  },
+  "job_exit": {
+   "exit_code": 42,
+   "job_name": "ic-dgbf-rho-p28-20261029-r2",
+   "job_name_expected": true,
+   "single_pod_uid": true
+  },
+  "sha256sums": {
+   "bad": [],
+   "files": 18,
+   "ok": true
+  },
+  "spec_build": {
+   "algorithm_seed_shared_by_all_arms_per_key": true,
+   "binary_sha256_file": true,
+   "build_info_ecbench_sha256": true,
+   "build_info_revision": true,
+   "curve_seeds": true,
+   "curves_are_section3": true,
+   "executions_planned": 1344,
+   "frozen_spec": "spec-P28-rho.json",
+   "frozen_spec_sha256": "55a403714d9cb353eb1fe644eb9e04e628ef46b1a1ada5b8575709db40cc349a",
+   "grading_version": 3,
+   "input_spec_json_equal_frozen": true,
+   "order_seed_in_spec": true,
+   "records_binary_sha256_all": true,
+   "records_in_file": 1344,
+   "records_session_id_all": true,
+   "records_written": 1344,
+   "session_binary_sha256": true,
+   "session_plan_sha256_matches_file": true,
+   "session_records_sha256_matches_file": true,
+   "session_spec_json_equal_frozen": true,
+   "session_status": "complete",
+   "spec_rounds_warmup_order_level": [
+    6,
+    1,
+    "alternate",
+    "L2",
+    1800
+   ],
+   "target_seed": true
+  }
+ },
+ "P32-counted": {
+  "audit": {
+   "audit_file_hashes_match_sums": true,
+   "audit_stdout_equals_audit_json": true,
+   "auditor_binary": true,
+   "measured_records": 1152,
+   "ok": true,
+   "problems": 0,
+   "records": 1344,
+   "regraded": true,
+   "replay_candidates": 1152,
+   "replay_selection": "all",
+   "replay_seqs_are_all_measured": true,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "session_status": "complete",
+   "verified_records": 1344
+  },
+  "gate": {
+   "EXIT42_CLAUSE": true,
+   "EXIT43_CLAUSE": false,
+   "accepted": false,
+   "below_l2_from_gate": {
+    "all_too_short_only": true,
+    "count": 14,
+    "levels": {
+     "L1": 14
+    },
+    "per_arm": {
+     "rho-neg": 7,
+     "rho-neg-aa": 7
+    }
+   },
+   "below_l2_from_records_equal_gate": true,
+   "cond1_audit": true,
+   "cond2": true,
+   "cond2_rho_aa": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   },
+   "cond3_spec_build": true,
+   "cond4_ic_all_L2_L3": true,
+   "cond5_rho": true,
+   "cond6_invalid_outcomes_empty": true,
+   "conditions_1_to_6": true,
+   "executions": 1344,
+   "gate_grades_equal_record_counts": true,
+   "level_from_blockers_mismatches": [],
+   "note": "the solve-time range of the waived rho executions is not reported: it is rho wall time (PROTOCOL 10)",
+   "records_levels": {
+    "L1": 14,
+    "L2": 1330
+   },
+   "route_satisfied": true
+  },
+  "job_exit": {
+   "exit_code": 42,
+   "job_name": "ic-dgbf-rho-p32-20261029",
+   "job_name_expected": true,
+   "single_pod_uid": true
+  },
+  "sha256sums": {
+   "bad": [],
+   "files": 18,
+   "ok": true
+  },
+  "spec_build": {
+   "algorithm_seed_shared_by_all_arms_per_key": true,
+   "binary_sha256_file": true,
+   "build_info_ecbench_sha256": true,
+   "build_info_revision": true,
+   "curve_seeds": true,
+   "curves_are_section3": true,
+   "executions_planned": 1344,
+   "frozen_spec": "spec-P32-rho.json",
+   "frozen_spec_sha256": "2095978592b5d21713d5de32dec6c1b862cc7e0d3810c3f82f8399c4a2c45389",
+   "grading_version": 3,
+   "input_spec_json_equal_frozen": true,
+   "order_seed_in_spec": true,
+   "records_binary_sha256_all": true,
+   "records_in_file": 1344,
+   "records_session_id_all": true,
+   "records_written": 1344,
+   "session_binary_sha256": true,
+   "session_plan_sha256_matches_file": true,
+   "session_records_sha256_matches_file": true,
+   "session_spec_json_equal_frozen": true,
+   "session_status": "complete",
+   "spec_rounds_warmup_order_level": [
+    6,
+    1,
+    "alternate",
+    "L2",
+    1800
+   ],
+   "target_seed": true
+  }
+ },
+ "P32-wall": {
+  "audit": {
+   "audit_file_hashes_match_sums": true,
+   "audit_stdout_equals_audit_json": true,
+   "auditor_binary": true,
+   "measured_records": 1152,
+   "ok": true,
+   "problems": 0,
+   "records": 1344,
+   "regraded": true,
+   "replay_candidates": 1152,
+   "replay_selection": "all",
+   "replay_seqs_are_all_measured": true,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "session_status": "complete",
+   "verified_records": 1344
+  },
+  "cond1_exit": true,
+  "cond2_audit": true,
+  "cond3": true,
+  "cond3_counted_aa": {
+   "dgb->dgb-aa": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   },
+   "dgbf-edge->dgbf": {
+    "exactly_1_at_all_weights": true,
+    "pairs": 288,
+    "unpaired": 0,
+    "w=0.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=0.1": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    },
+    "w=1.0": {
+     "every_pair_equal": true,
+     "ratio_b_over_a": 1.0
+    }
+   }
+  },
+  "cond4": true,
+  "cond5": true,
+  "cond6": true,
+  "cond6_control_comparison": {
+   "a": "dgbf-edge",
+   "aa_arms": [
+    "dgbf-edge",
+    "dgbf"
+   ],
+   "aa_ci95": [
+    0.9976482538842644,
+    1.0007488063343546
+   ],
+   "aa_pairs": 288,
+   "aa_ratio": 0.9991973274665173,
+   "aa_selection": "includes arm A",
+   "b": "dgb-aa",
+   "ci95": [
+    1.0383306330187851,
+    1.0431021946602121
+   ],
+   "ci_method": "linearised_t_pairs",
+   "corrected_ci95": [
+    1.038675785737916,
+    1.0444315712030794
+   ],
+   "corrected_dof": 504.32550246250617,
+   "corrected_ratio": 1.041549702543688,
+   "ops_band": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "ops_ratio": 1.0,
+   "pairs": 288,
+   "pairs_below_level": 0,
+   "ratio_b_over_a": 1.0407136792051992,
+   "resample_seed": 20261002,
+   "self_aa": false,
+   "status": "admitted"
+  },
+  "job_exit": {
+   "exit_code": 0,
+   "job_name": "ic-dgbf-p32-20261029",
+   "job_name_expected": true,
+   "single_pod_uid": true
+  },
+  "l2_gate": {
+   "accepted": true,
+   "below_l2": 0,
+   "blocker_kinds": {
+    "L3: governor is None, not performance": 1344,
+    "L3: not known to be bare metal": 1344,
+    "L3: turbo/boost is not known to be off": 1344
+   },
+   "executions": 1344,
+   "gate_grades_equal_record_counts": true,
+   "grades": [
+    {
+     "count": 1344,
+     "level": "L2"
+    }
+   ],
+   "invalid_outcomes": [],
+   "level_from_blockers_mismatches": [],
+   "records_levels": {
+    "L2": 1344
+   }
+  },
+  "positions": {
+   "block_sizes": {
+    "4": 336
+   },
+   "blocks": 336,
+   "blocks_consecutive_seq": true,
+   "measured_orders": {
+    "dgb dgb-aa dgbf dgbf-edge": 144,
+    "dgbf-edge dgbf dgb-aa dgb": 144
+   },
+   "positions": {
+    "dgb": {
+     "0": 144,
+     "3": 144
+    },
+    "dgb-aa": {
+     "1": 144,
+     "2": 144
+    },
+    "dgbf": {
+     "1": 144,
+     "2": 144
+    },
+    "dgbf-edge": {
+     "0": 144,
+     "3": 144
+    }
+   },
+   "predecessor_within_block": {
+    "dgb": {
+     "(block start)": 144,
+     "dgb-aa": 144
+    },
+    "dgb-aa": {
+     "dgb": 144,
+     "dgbf": 144
+    },
+    "dgbf": {
+     "dgb-aa": 144,
+     "dgbf-edge": 144
+    },
+    "dgbf-edge": {
+     "(block start)": 144,
+     "dgbf": 144
+    }
+   }
+  },
+  "raw_regrade": {
+   "disagreements": [],
+   "flag_counts": {},
+   "note": "partial re-grade: L1/L2 gates that depend only on record fields; preflight, capsule and eviction gates are session-level and read from session.json",
+   "records": 1344,
+   "thresholds": {
+    "max_other_cpu": 0.1,
+    "max_preemptions_per_second": 50.0,
+    "max_psi": 5.0,
+    "settle_seconds": 2.0
+   },
+   "ticks_per_second": 100
+  },
+  "sha256sums": {
+   "bad": [],
+   "files": 19,
+   "ok": true
+  },
+  "spec_build": {
+   "algorithm_seed_shared_by_all_arms_per_key": true,
+   "binary_sha256_file": true,
+   "build_info_ecbench_sha256": true,
+   "build_info_revision": true,
+   "curve_seeds": true,
+   "curves_are_section3": true,
+   "executions_planned": 1344,
+   "frozen_spec": "spec-P32.json",
+   "frozen_spec_sha256": "9f950f3bcba5e4729798c82bcca1a1d665104329b5ed9368c9d98b6addbc30ab",
+   "grading_version": 3,
+   "input_spec_json_equal_frozen": true,
+   "order_seed_in_spec": true,
+   "records_binary_sha256_all": true,
+   "records_in_file": 1344,
+   "records_session_id_all": true,
+   "records_written": 1344,
+   "session_binary_sha256": true,
+   "session_plan_sha256_matches_file": true,
+   "session_records_sha256_matches_file": true,
+   "session_spec_json_equal_frozen": true,
+   "session_status": "complete",
+   "spec_rounds_warmup_order_level": [
+    6,
+    1,
+    "alternate",
+    "L2",
+    1800
+   ],
+   "target_seed": true
+  }
+ }
+}
