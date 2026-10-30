@@ -1496,3 +1496,21 @@ race restored original exact bytes; post-restoration check has the same five
 findings and no binding error. Optional CairoSVG import failed; installed
 rsvg-convert rendered the graph successfully. Git push warned about unrelated
 historical large blobs; no history rewrite was performed.
+
+## 2026-10-30T07:27Z — Additive controller continuity evidence
+
+### What was done
+
+Reconciled the third automatic controller with its terminal predecessor and unchanged worker, Pod and request. Published hash-bound lineage and an independent scope clarification as additive resource-support files. Verified checkpoint14 archive, manifest and selected records privately; records are byte-identical to checkpoint9.
+
+### Decisions made
+
+Continue under the existing T-913 lease. Preserve the original admission and all scientific data. Remaining distinct scheduled rows are not retries; the warmup timeout blocks later-cohort admission. Optional fourth controller remains conditional on fresh checks after controller3 terminates; no fourth was invoked.
+
+### Open threads
+
+Current controller remains live. PR2957 artifacts and harness checks remain pending. Terminal accounting, independent scientific replay and full1260 pencil coverage remain incomplete.
+
+### Errors
+
+Private checkpoint14 custody summary initially read outcome at the row root, producing null summaries; an additive correction uses nested producer outcomes and preserves the original receipt. Hash checks were unaffected. Python lacked hashlib.file_digest; streaming SHA256 completed the same archive check. Conductor check reported this task's own reservation; task show confirmed the same live T-913 owner and epoch before editing.
