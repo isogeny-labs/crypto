@@ -24,7 +24,7 @@ fn config(m: &ResolvedMethod) -> Result<native_solver::Config, String> {
         denominator: parse("small_denominator")?,
         matrix_coefficient_cap: parse("matrix_coefficient_cap")?,
     };
-    config.validate().map_err(str::to_string)?;
+    config.validate().map_err(|error| error.to_string())?;
     Ok(config)
 }
 
@@ -69,11 +69,14 @@ pub(super) fn solve(
     target: Point,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    let adapter_start = Instant::now();
+    let geometry_start = engine::geometry_events::snapshot();
     let config = config(m)?;
     let start = Instant::now();
     // Root ecbench has no installed ObservedSystem. Never fabricate zero memory.
-    let result =
-        native_solver::solve_one(inst, target, seed, config, None).map_err(str::to_string)?;
+    let result = native_solver::solve_one(inst, target, seed, config, None)
+        .map_err(|error| error.to_string())?;
+    let geometry_after_solver = engine::geometry_events::snapshot();
     let mut group: Counts = serde_json::from_value(result.detail["counts"].clone())
         .map_err(|e| format!("pencil group ledger: {e}"))?;
     let mut verifier_counts = Counts::default();
@@ -87,11 +90,14 @@ pub(super) fn solve(
     }
     let solve_wall_ns =
         u64::try_from(start.elapsed().as_nanos()).map_err(|_| "pencil interval overflow")?;
+    let geometry_after_verification = engine::geometry_events::snapshot();
     let unit = inst.fresh();
     let twice = unit.curve.mul(unit.generator, 2);
+    let calibration_preparation = unit.curve.f.counts();
     unit.curve.f.reset();
     let _ = unit.curve.add(unit.generator, twice);
     let source_add = unit.curve.f.counts();
+    let geometry_after_calibration = engine::geometry_events::snapshot();
     let price = |c: Counts| c.m as f64 + 0.75 * c.s as f64 + 10.0 * c.i as f64;
     if price(source_add) <= 0.0 {
         return Err("zero source-addition unit".into());
@@ -110,7 +116,7 @@ pub(super) fn solve(
     {
         counters.insert(format!("pencil_replay_ledger_sha256_word_{i}"), word);
     }
-    Ok(SolveReport {
+    let mut report = SolveReport {
         recovered: result.recovered.map(u128::from),
         exhausted: result.recovered.is_none(),
         phases: vec![PhaseRecord {
@@ -144,7 +150,40 @@ pub(super) fn solve(
         online_error: None,
         solver: None,
         field_ops: None,
-    })
+    };
+    let geometry_end = engine::geometry_events::snapshot();
+    report.detail["adapter_accounting"] = json!({
+        "schema":"pencil-adapter-accounting/v1-draft",
+        "geometry": engine::geometry_events::partition(geometry_start, &[
+            ("solver_including_cold_setup", geometry_after_solver),
+            ("additional_source_verification", geometry_after_verification),
+            ("source_unit_calibration", geometry_after_calibration),
+            ("report_assembly", geometry_end),
+        ]).ok_or("invalid adapter geometry partition")?,
+        "source_unit_calibration_arithmetic": {
+            "preparation":calibration_preparation,"addition":source_add,
+            "total":calibration_preparation+source_add,
+            "included_in_legacy_group_total":false
+        },
+        "adapter_elapsed_ns_before_accounting_attachment":adapter_start.elapsed().as_nanos(),
+        "coverage_complete":false,
+        "report_allocation_and_serialization_counted":false,
+        "partition_policy":"whole geometry is total; named segments partition it and must not be added again",
+        "accounting_attachment_is_observer_overhead":true
+    });
+    let accounting_replay = json!({
+        "geometry":report.detail["adapter_accounting"]["geometry"],
+        "calibration":report.detail["adapter_accounting"]["source_unit_calibration_arithmetic"]
+    });
+    for (i, word) in ledger_digest(&accounting_replay, &Value::Null)
+        .into_iter()
+        .enumerate()
+    {
+        report
+            .counters
+            .insert(format!("adapter_accounting_sha256_word_{i}"), word);
+    }
+    Ok(report)
 }
 
 #[cfg(test)]

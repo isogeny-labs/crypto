@@ -191,3 +191,41 @@ quotas were zero. No GPU instance was created. A CPU build submission with
 `--ref HEAD` initially stopped because this checkout tracks only main's
 remote ref; fetching the already-pushed feature ref resolved that admission
 check without changing the source.
+
+## RunPod device validation follow-up — 2026-10-29 Pacific
+
+### What was done
+
+Ran the pinned PR #2889 source on RunPod pod `09ollojw9j8vbo`, one full RTX PRO
+6000 Blackwell Server Edition. Host and device service tests, all 10 standalone
+Rust tests, bounded reduction/certificate replay and Clippy passed. Compute
+Sanitizer memcheck reported zero errors. Collected the result archive and raw
+provider logs, uploaded them to the task's S3 validation prefix, and verified
+pod deletion. Exact source, image, toolchain and artifact identities are in
+[the validation record](../../gpu/explicit-relations/VALIDATION.md).
+PR #2889 merged while this validation was running.
+
+### Decisions made
+
+Follow the owner's RunPod selection instead of waiting for AWS quota. Reconcile
+existing pods before launch and leave the unrelated ECC2K-130 workload alone.
+Use a controller deadline and collect artifacts before deleting this task's
+pod. Record correctness results without promoting them to a speedup claim.
+The implementation sources are unchanged from the tested revision.
+
+### Open threads
+
+Root crypto/ecbench integration checks are outside this standalone run.
+Comparative performance, wider fields, the GPU tensor backend, and measured
+ecbench GPU accounting remain separate unresolved work. Any EKS deployment
+still requires an image built from crypto main. This validation pod is gone;
+there is no background GPU workload from this task.
+
+### Errors
+
+No compilation, device correctness or memcheck error occurred on RunPod.
+The first detached local controller invocation exited before creating a pod;
+a managed exec session launched the one recorded pod after reconciliation.
+The shared daily log remains reserved by T-827, so this scoped handoff carries
+the entry under Conductor T-861. AWS quota blocks are historical and no longer
+block this completed device validation.
