@@ -7716,6 +7716,28 @@ mod tests {
             assert!(
                 file_verified.first_witness_verified && file_verified.witness_capture_committed
             );
+            if !exceptional {
+                assert!(!file_verified.independent_group_domain_complete);
+                assert!(!file_verified.solver_completed_verified);
+                assert!(!file_verified.negative_verified);
+                let terminal_index = file_artifacts
+                    .iter()
+                    .position(|a| a.path == "prime-f4-wide-dynamic-result.json")
+                    .unwrap();
+                let mut forged = file_artifacts.clone();
+                let mut terminal: serde_json::Value = serde_json::from_slice(&raw[7]).unwrap();
+                terminal["disposition"] = serde_json::json!("complete");
+                terminal["claims"]["solver_completed"] = serde_json::json!(true);
+                let bytes = serde_json::to_vec(&terminal).unwrap();
+                std::fs::write(cell.join(&forged[terminal_index].path), &bytes).unwrap();
+                forged[terminal_index].bytes = bytes.len() as u64;
+                forged[terminal_index].sha256 = crate::ml_dataset::digest(&bytes);
+                assert!(
+                    check_files(&forged).is_err(),
+                    "positive prefix cannot be promoted to completed search"
+                );
+                std::fs::write(cell.join(&forged[terminal_index].path), &raw[7]).unwrap();
+            }
             let mut duplicate = file_artifacts.clone();
             duplicate.push(duplicate[0].clone());
             assert!(check_files(&duplicate).is_err());

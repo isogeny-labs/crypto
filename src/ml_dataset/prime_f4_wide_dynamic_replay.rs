@@ -464,6 +464,8 @@ pub(super) struct Verified {
     pub first_witness_verified: bool,
     pub witness_capture_committed: bool,
     pub independent_group_domain_complete: bool,
+    pub solver_completed_verified: bool,
+    pub negative_verified: bool,
     pub independent_derivation_verified: bool,
     pub operation_trajectory_verified: bool,
 }
@@ -2577,7 +2579,12 @@ fn terminal(
         || (claims.get("group_domain_complete")?.yes()? && !complete)
         || (claims.get("negative_verified")?.yes()? && (!complete || rows.first.is_some()))
         || (claims.get("solver_completed")?.yes()?
-            && (disposition != "complete"
+            && (!complete
+                || !claims.get("group_domain_complete")?.yes()?
+                || disposition != "complete"
+                || j.get("search_phase")?.s()? != "finished"
+                || j.get("group_stop")?.s()? != "independent_traversal_finished"
+                || j.get("cause")?.s()? != "none"
                 || (positive && !durable)
                 || (!positive && !claims.get("negative_verified")?.yes()?)))
     {
@@ -2841,6 +2848,8 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
     let mut local = false;
     let mut durable = false;
     let mut complete = false;
+    let mut solver_completed = false;
+    let mut negative_verified = false;
     if let Some(artifact) = &bundle.slots[7] {
         let result = parse(artifact.bytes, &mut b)?;
         snapshot(
@@ -2856,6 +2865,8 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
         local = l;
         durable = d;
         complete = terminal(&result, e, bundle, &rows, &ev, &n, l, d, new)?;
+        solver_completed = result.get("claims")?.get("solver_completed")?.yes()?;
+        negative_verified = result.get("claims")?.get("negative_verified")?.yes()?;
         if local {
             let first = rows.first.as_ref().ok_or(Error::Claim)?;
             if !first.matched
@@ -2893,6 +2904,8 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
         first_witness_verified: local,
         witness_capture_committed: durable,
         independent_group_domain_complete: complete,
+        solver_completed_verified: solver_completed,
+        negative_verified,
         independent_derivation_verified: false,
         operation_trajectory_verified: false,
     })
