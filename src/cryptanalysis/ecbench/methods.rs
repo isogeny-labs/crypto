@@ -452,6 +452,14 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl {
+            id: super::aps::ID,
+            family: "ic",
+            summary: "bounded APS summation-polynomial instrument: exclusive cold/online wall accounting, retained failures, separate affine witness checks; native operation pricing is incomplete",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS,
+        },
         MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v2",family:"ic",summary:"Point-driven pencil with signed symbolic elimination; cold setup per target; cost remains explicitly incomplete",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
@@ -1322,6 +1330,13 @@ const HYPER_GENUS2_V2_ENTRY: &str = "hyperelliptic_index_calculus::hec_index_cal
 /// integer-valued when its default is a canonical integer).  `summands`
 /// also takes `n-1`, which the lexeme rule below leaves alone.
 const INTEGER_PARAMS_WITHOUT_DEFAULT: &[&str] = &[
+    "subset_size",
+    "attempts",
+    "degree",
+    "budget_ms",
+    "sampling_draws",
+    "beta",
+    "lambda",
     "large_primes",
     "max_trials",
     "target_max_attempts",
@@ -2314,6 +2329,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
+        Instance::Prime(i) if id == super::aps::ID => super::aps::applicable(m, i),
         Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_) => {
             jacobian_applicable(id, m.params.get("inner").map(String::as_str), inst, curve)
         }
@@ -2627,6 +2643,9 @@ fn solve_inner(
         ));
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if m.id == super::aps::ID => {
+            super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Prime(i), _)
             if m.id == "ic.known_log_mitm2_v1" || m.id == "ic.known_log_ksum_v1" =>
         {
