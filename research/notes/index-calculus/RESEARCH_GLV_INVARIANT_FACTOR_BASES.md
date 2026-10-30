@@ -3332,3 +3332,55 @@ line, and a model (Stage A2), not a measured end-to-end `S`; not an improvement 
 remaining (model):** `≥ 7·10⁵×` the matched rho in E25's arithmetic, `≥ 1.0·10⁶×` against E27's walk; E31 A on
 E25's curves is two orders of magnitude closer.  A Stage B is not justified: what this line needs is a cheaper
 solve, which the `V₄` line already has.
+
+### 9.31 E29 measured: `ψ_p` has order `24` on all of E18's curves; the order-24 walk as built is not cheaper; the order-24 base fold moves the `S₅` handover by `≈ 10` bits, to `2^{135}`–`2^{142}`
+
+*2026-10-30.*  Code and binary `0e4fccce1` (`experiments/34_twist24_stage_r/binary_commit.txt`):
+`examples/e29_twist.rs` (`kill.{json,log}`, `stage_r_*.{json,log}`, `stage_a_p{241,337,541}.{json,log}`), tables
+`examples/e29_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container; operation counts only.
+Total compute: under `10` core-minutes (the red team budgeted `≈ 0.3` core-hours for one curve's Stage R).
+
+**Kill test** (E18's own models, `generate_psi_instance(p, 1)`): on all eight curves `ψ_p = (u²x^p, u³y^p)`,
+`u = b^{−(p−1)/6}`, maps `E` to `E`; `λ_p` is a 24th root of unity mod `n` of **order `24`**, `χ₆(b)` has order
+`6` (so `ord λ_p = 4·ord χ₆(b)`, as derived), `λ_ω` order `3`, and `|⟨λ_p, λ_ω, −1⟩| = 24`.  `u² ∉ F_p` on every
+E18 model (its base is not kept).  Each curve has a canonical model `y² = x³ + b₀t³` of the same order (least
+`b₀`: `3, 3, 3, 9, 9, 2, 17, 3`).  **Not killed.**
+
+**Stage R** (canonical models, `16` walks per order, both arithmetics, all `256` walks correct): steps order 6 /
+order 24 per curve `1.29`–`2.10`, pooled per `√n` **`1.701`**; but the order-24 walk's class representative (three
+Frobenius images, twelve candidates) costs `191`–`210` `F_p` multiplications a step against `109`–`122` (schoolbook),
+so its `F_p` cost ratio, order 6 / order 24, is `0.743`–`1.202` per curve, **`0.962` pooled** (Karatsuba: `0.684`–
+`1.107`, pooled `0.884`).  `S_rho` per `√n`: `52.9` (order 6) and `55.0` (order 24), schoolbook; E18's `ψ` walk
+measured `54.1`.
+
+**Stage A** (the lane's `run_k4_twist24`, E18's exact oracle, one stream, flat / cubic / twist24 arms, logs
+recovered on all nine arms, all walks correct):
+
+| p | log₂ n | cols cubic / twist24 | LA cubic / twist24 | y cubic / twist24 | `r` twist24 (order-24 walk) | `n*` cubic | `n*` twist24 (order-6 / order-24 walk) |
+|--:|--:|:--|--:|:--|--:|:--|:--|
+| 241 | 31.7 | 32 / 8 | 13.3 | 79.9 / 65.2 | 0.0058 | `2^{151.9}` | `2^{142.2}` / `2^{141.8}` |
+| 337 | 33.6 | 60 / 15 | 15.2 | 19.8 / 15.6 | 0.0103 | `2^{145.7}` | `2^{135.3}` / `2^{135.0}` |
+| 541 | 36.3 | 88 / 22 | 13.9 | 29.8 / 27.8 | 0.0083 | `2^{147.9}` | `2^{138.8}` / `2^{137.9}` |
+
+(`n*` is §11.16's model with §11.17's `C₄ = 1.213·10¹²` and each arm's own `y`, `cols/p`, `r` and walk; an
+extrapolation, driven mostly by `y`, which here rests on `9`–`89` relations.)
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.104 | group of order `24` on all eight; `ord λ_p = 24 = 4·ord χ₆(b)`; canonical `b₀` for every curve; `u² ∉ F_p` everywhere | **holds** (not killed) |
+| G2.105 | pooled `1.701`; per curve `1.29`–`2.10` (five of eight below `1.7`) | **holds pooled** (at the band's edge); per curve falsified (16 walks a curve) |
+| G2.106 | `F_p` ratio `0.74`–`1.20` (schoolbook), `0.68`–`1.11` (Karatsuba); pooled `0.96` / `0.88` | **falsified**: as built, the order-24 walk costs more than the order-6 walk; its representative costs `1.8×` a step |
+| G2.107 | the matched reference stays the order-6 walk (cheaper pooled); on three curves (`p = 601, 997, 1069`, schoolbook) the order-24 walk is `1.04`–`1.20×` cheaper, which would move E18's handover there later by `≤ 1.1` bits | no correction of E18's `ψ` rows at the pooled level |
+| G2.108 | columns `4.00`; LA `13.3`–`15.2`; `r_24` `0.0058`–`0.0103`; every log recovered | **holds** except `r_24`, **falsified low** at `p = 241, 541` (below `0.01`) |
+| G2.109 | `n*` twist24 `2^{135.0}`–`2^{142.2}`; `2^{44.9}`–`2^{52.1}` above E24's `2^{90.1}` | **holds at `p = 241`**, **falsified low** at `337`, `541`; the `≥ 2^{45}` clause misses by `0.1` bit at `p = 337` |
+
+**What it says.**  The red team's question has a clean answer: on every one of E18's `j = 0` curves the
+Frobenius-derived `ψ_p` has order `24` and, with the automorphisms, acts as a cyclic group of order `24` on
+`⟨G⟩` (proved in §9.27 and checked on points).  Two consequences differ.  **The walk:** an order-24 walk takes
+`1.70×` fewer steps, but with the lane's class representative it pays more than that per step, so it is not a
+stronger reference; E18's `ψ`-arm distances stand.  A cheaper representative (comparing abscissae first, `x`-only
+images) is the obvious next step and is not built here.  **The base:** on the canonical model the order-24 fold
+divides the columns by `4.00` and the linear algebra by `13`–`15` against E18's cubic fold, and moves the modelled
+`S₅` handover by `≈ 9`–`10` bits on the same curves, to `2^{135}`–`2^{142}`.  **Class: engineering on the `j = 0`
+/ `S₅` line, and a model (no `S₅` solve was run); not an improvement of the baseline**, whose modelled handover
+(E24, `2^{90.1}`; E25 `2^{88.0}`) is `≥ 2^{45}` earlier.
