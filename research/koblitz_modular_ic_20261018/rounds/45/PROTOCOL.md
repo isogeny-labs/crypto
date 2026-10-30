@@ -10,3 +10,6 @@ Exact enumeration, deterministic complete fixed chart, not statistical or compar
 Lean proves mixed zero from sign-pair fixation and from two-step scalar fixation, then nonzero implies both fail. Conditional additive-group statements only; no native arrays or proper geometry imported. Degree500/580are therefore not newly promising targets. A larger residue field on fixed n5does not constitute larger-n transfer or attack scaling.
 
 Record Git source revision, source/binary hashes, UTC times, raw logs, exits, all output points; raw receipts frozen before publication. This checkout lacks tools/experiment_protocol.py and the example schema, so protocol.json is the explicit prospective local contract rather than claiming canonical cross-repo schema validation. No scientific ledger promotion.
+
+## Prospective amendmentA, after9/11data before13data
+Both9/11runs passed with60/260closedpoints and6/26deckorbits. Extend the same exact collector to degree13,modulus0x201b; no old run repeated and no resource cap increased. u16coordinates/u32convolution support this degree; table8192squared entries stays below4GiB. The full product/inverse/no-zero-divisor/closure gates are unchanged. New13outcome is a separate exploratory fixed-size enumeration, not an unbiased success-rate sample. Preserve old source hashes in each earlier run.
