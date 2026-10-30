@@ -55,3 +55,18 @@ attempt-03-readback.json. A fixture-only continuation04 will bind a new immutabl
 materialization inventory, first run the failed test, then the complete release
 library suite. It changes no Rust runtime and does not weaken the test. No
 continuation04 has run yet.
+
+## Continuation04 completed
+
+Continuation04 is terminal: the restored archive test passed, then the complete
+release library suite passed with **5459 passed, 0 failed, 123 ignored** at
+2026-10-30T07:28:55Z. Source preflight and readback both matched execution commit
+4ed26d60bb3a8dd2e8facaa5093453af21f28bd4 and inventory02. Pipeline exit0 was recorded
+at07:29:01Z. Runtime remains db9bd045e38f; the corrected CLI fixture is e935f7d9e4af.
+The failed03 record remains immutable. Attempt04 receipts and content-addressed
+S3 fresh-download comparisons are retained in attempt-04-readback.json.
+
+Validation now includes254 scoped dataset tests, strict maintained Clippy, the
+release binary build, actual curve/twist export-and-retry CLI checks, corruption
+rejection and full library tests. These receipts cover this isolated runtime;
+they do not claim validation of later changes on main. Verified cloud cells remain0.
