@@ -4,3 +4,5 @@ Only after compact49-01 is strictly accepted, copy its per-entry compact-source 
 Verification of this chart requires adapted original variable maps (n,l,b,c), full norTest, prime equality, and normalized generic degree computed from b+c=u*c² after inverting c. Merely putting the fourth map image equal to u is incorrect for this chart. Inverse u=(b+c)/c² and v=(b*u³+c)/((u+1)*c) are valid only on their indicated open; boundary charts remain an explicit obligation. No reuse of the plane verifier without adaptation.
 
 compact49-01 accepted with strict zero native errors and its exact marker. The per-entry compact-source export and concatenated normalizer input are now copied literally to source-data before compact-normal49-01.
+
+VERIFY_COMPACT49.sing is frozen prospectively: use b-image+1 as corruption control; compute normalized generic degree by normap(b)+normap(c)+parameter*normap(c)^2 and invC*normap(c)-1. Require prime equality and full norTest as in the plane verifier. This verifies only the compact affine chart, with remaining projective/boundary obligations explicit. No verifier may consume failed producer output.
