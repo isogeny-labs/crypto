@@ -49,7 +49,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/iso1_weak_classes_20261007 research/weak_curve_catalog_20261010 research/weak_curve_properties_20261010
       - uses: dtolnay/rust-toolchain@stable
       - name: Install independent point counter
         run: sudo apt-get update && sudo apt-get install -y pari-gp

@@ -99,6 +99,28 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -144,6 +166,28 @@ jobs:
             /research/factor_base_shape_leads_20261018/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Materialize native fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@1.98
@@ -228,6 +272,26 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -597,6 +661,26 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"

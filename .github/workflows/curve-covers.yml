@@ -89,7 +89,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -167,7 +167,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - name: Retain immutable inputs for local assessment replay
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
@@ -247,7 +247,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
