@@ -170,7 +170,15 @@ fn main() {
                         }
                         continue;
                     }
-                    if &rk[key] != va {
+                    // A field the older record lacks (`recovered`, added to
+                    // ArmReport after E31) is not a disagreement.
+                    let same = match (va, &rk[key]) {
+                        (Value::Object(oa), Value::Object(ok)) => {
+                            oa.iter().all(|(k2, v2)| &ok[k2] == v2)
+                        }
+                        (a, b) => a == b,
+                    };
+                    if !same {
                         equal = false;
                         differing_fields.insert(format!("{key} (UNEXPECTED)"));
                     }

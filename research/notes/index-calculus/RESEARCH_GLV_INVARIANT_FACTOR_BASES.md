@@ -3207,3 +3207,67 @@ distance to rho at `0`, `0.1` and `1` GAE, before and after the audit.
 | G2.111 | IC side | `S` falls by `[0.01 %, 1 %]` (trivial products in the invariant system's evaluation and in powering) | outside |
 | G2.112 | walk | the `⟨±ψ⟩` walk's cost falls by `[0 %, 1 %]` on E25's curves (its `ψ` multipliers are not expected in `F_p`) | outside |
 | G2.113 | distance | `S/rho` moves by less than `1 %` at every weight on every row (red team's estimate for the lost draft: `≈ 0.6 %`) | `≥ 1 %` on any row |
+
+### 9.29 E27 measured: the matched walk was `1.45×` too expensive; every row moves `1.45×` further from rho
+
+*2026-10-30.*  Code `6490d0fac` (with the compile repairs `af2504ef1`), binary `af2504ef1`
+(`experiments/32_walk_karatsuba/binary_commit.txt`).  **Stage W:** `examples/e27_walk.rs` on E25's ten
+curves, `16` `⟨±ψ⟩` and `16` negation walks each, three arithmetics (`stage_w.{json,log}`).  **IC side:**
+`experiments/32_walk_karatsuba/run_e2e.sh` (E31's solver-A command plus `--karatsuba`,
+`RAYON_NUM_THREADS=4`), ten curves, both arms (`e2e_chain_karatsuba_p*s*.json`, log).  Tables:
+`examples/e27_tables.rs` → `tables.md`, `summary.json`.  Host: the 4-vCPU container (isolab-eks is not
+reachable from it); operation counts only, no wall-time claim.
+
+**A finding about the reference before E27 touched it.**  Replaying E25's walks with today's code
+reproduced every step, group operation and collision but charged `+31` group operations and `+3,309`
+`F_p` multiplications per walk at `p = 101` seed 1.  The difference is the `[d]G = Q` check after the
+collision: main's `652238c03` (2026-10-24, the twist lane) began charging it inside `rho4_folded`, which
+E25's and E31's records did not.  It is `0.13`–`0.78 %` of a `⟨±ψ⟩` walk on these curves, and it raises
+the matched rho of every pipeline run since that commit.  E27 records it per walk (`verify_fp_muls`) and
+prices every walk without it, as E25 did.
+
+**Per operation** (`F_p` multiplications): `Fp4::mul` `19 → 13`; affine addition of distinct points
+`97` → `79` (Karatsuba, unbatched) → `66.3`–`66.7` (batched: the norm-inversion share is `3.27`–`3.75`
+per inversion over the twenty walk pools); doubling `116 → 92` unbatched; the GLS map `ψ` `38 → 26`.
+
+**Stage W.**  All `320` walks gave the same steps, group operations, cycle escapes, recovered logarithms,
+correctness and visit digests under the three arithmetics; arithmetic (i) reproduced all `320` E25 walk
+records field for field (E25's convention).  The walk's `F_p` cost, (i) over (iii): **`1.4533`–`1.4634`**
+(`⟨±ψ⟩` `1.4559`–`1.4634`, negation `1.4533`–`1.4621`); (i)/(ii) (Karatsuba alone) `≈ 1.27`.
+
+**IC side.**  Every field of E31 A's twenty records was reproduced except the multiplication counts and what
+derives from them (`call` includes the Weil restriction, which uses `F_{p⁴}` products; `solve_muls` is
+unchanged, as it is over `F_p`), wall times, and the walks.  `S_A / S_{A,K}` = **`1.00475`–`1.00566`**: the
+non-solve `F_{p⁴}` work is `2.00`–`2.48 %` of `S_A`.  Batching the IC side's `F_p` inversions too
+(`4.7·10⁵`–`2.6·10⁷` per run) could save at most a further `0.127`–`0.170 %` of `S` (bound, not built).
+
+**Distance to the matched `⟨±ψ⟩` rho** (`S/rho` over the twenty rows; E31 A against E25's walk, E27 against
+walk (iii); band as §9.24, one GAE `= 97` per Macaulay entry and per walk step):
+
+| GAE | E31 A (§9.24) | E27 (A with Karatsuba, walk (iii)) | growth per row |
+|--:|:--|:--|:--|
+| 0 | `4.42·10³`–`2.79·10⁵` | `6.39·10³`–`4.06·10⁵` | `1.4477`–`1.4564` |
+| 0.1 | `1.50·10⁴`–`9.77·10⁵` | `2.13·10⁴`–`1.39·10⁶` | `1.4150`–`1.4427` |
+| 1 | `7.33·10⁴`–`5.22·10⁶` | `9.07·10⁴`–`6.64·10⁶` | `1.2364`–`1.3252` |
+
+With the GAE itself re-measured under (iii) (`66.3`–`66.7` instead of `97`) on the E27 side, the `1`-GAE
+growth is `1.016`–`1.017`: at that weight the band's price per step dominates both sides.  The best row,
+`p = 397` seed 1 arm B (E31's solver A): `4.42·10³ → 6.39·10³×` at `0` GAE.  Rho is ahead of every row
+at every weight.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.95 | all `320` walks identical under (i), (ii), (iii); (i) = E25's records; unit tests `e27_tests` (Karatsuba = schoolbook with a perturbed-factor control; batched additions = serial with a perturbed-inverse control; batched walks = serial walks; digests distinguish walks) | **holds** for the runs; the unit tests are run with the session's final test build (§9.32 records the result) |
+| G2.96 | `13` exactly; distinct addition `66.3`–`66.7`; per group operation (i)/(iii) `1.453`–`1.463` | **holds** |
+| G2.97 | `1.4533`–`1.4634` on every curve, both walks | **holds** (red team's `1.03`–`1.3` was low: every component, not only the addition, falls `1.45×`) |
+| G2.98 | `1.00475`–`1.00566`; non-solve share `2.00`–`2.48 %`; every other field reproduced | **holds** |
+| G2.99 | `1.448`–`1.456` (0), `1.415`–`1.443` (0.1), `1.236`–`1.325` (1 GAE); rho ahead everywhere | **holds** at `0` and `0.1`; **falsified high at `1` GAE on the two `p = 101` seed 2 rows** (`1.3252`, band `≤ 1.30`): their walks are the shortest (`1,192` steps), so the per-step price is a smaller share |
+
+**What it says.**  The rho reference of §9.14–§9.24 used `19`-multiplication products and one `F_p`
+inversion per addition.  A Karatsuba tower and Montgomery-batched norm inversions make the same walks
+(same points, collisions and logarithms) `1.45×` cheaper.  **This is a correction of the reference, not a
+change to the index calculus: every row is `1.45×` further from rho at `0` GAE than §9.24 said**
+(`1.24`–`1.33×` at `1` GAE).  The same products make the IC side `0.5 %` cheaper (engineering, below the
+noise of anything else in this note), because its `F_{p⁴}` work is `≈ 2 %` of `S`.  **Distance remaining:**
+`6.39·10³`–`4.06·10⁵×` at `0` GAE.  The rho walk is now the stronger reference for E28–E30 and for any
+later row on these curves.
