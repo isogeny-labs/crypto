@@ -1,11 +1,6 @@
-mod arithmetic;
-mod evaluate;
-mod recipe;
-mod store;
-#[cfg(test)]
-mod tests;
 use crate::{recipe::Config, store::*};
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
+use factor_base::{arithmetic, evaluate, recipe, store};
 use serde_json::{json, Value};
 use std::{path::Path, time::Instant};
 
@@ -96,7 +91,7 @@ fn run() -> Result<()> {
                 .iter()
                 .map(|p| read_json::<Value>(Path::new(p)))
                 .collect::<Result<Vec<_>>>()?;
-            emit(&compare(&receipts)?)
+            emit(&evaluate::compare(&receipts)?)
         }
         ("upload-plan", 4) => emit(&plan(Path::new(&a[1]), &a[2], &a[3])?),
         ("fetch", 5) => emit(&fetch(Path::new(&a[1]), &a[2], &a[3], &a[4])?),
@@ -106,68 +101,6 @@ fn run() -> Result<()> {
         }
         _ => bail!("invalid command or argument count\n{HELP}"),
     }
-}
-fn compare(receipts: &[Value]) -> Result<Value> {
-    let first = receipts.first().context("no receipts")?;
-    let mut eligible = Vec::new();
-    let mut excluded = Vec::new();
-    for r in receipts {
-        let s = &r["semantic"];
-        anyhow::ensure!(
-            r["semantic_sha256"] == digest(&canonical(s)?),
-            "receipt semantic digest mismatch"
-        );
-        anyhow::ensure!(
-            s["schema"] == "factor-base-evaluation/v1"
-                && s["curve_sha256"] == first["semantic"]["curve_sha256"]
-                && s["workload_sha256"] == first["semantic"]["workload_sha256"]
-                && s["targets"] == first["semantic"]["targets"],
-            "comparison requires identical curve, workload, and sampled points"
-        );
-        let regs = s["regularity"]
-            .as_array()
-            .context("missing regularity array")?;
-        if s["relation_yield"].is_null()
-            || regs.is_empty()
-            || regs.iter().any(|r| r["status"] != "measured")
-        {
-            excluded.push(json!({"manifest_sha256":s["manifest_sha256"],"reason":"yield_or_regularity_unmeasured","relation_yield":s["relation_yield"]}));
-            continue;
-        }
-        let d = regs
-            .iter()
-            .map(|r| r["degree_of_regularity"].as_u64().context("invalid degree"))
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .max()
-            .unwrap();
-        anyhow::ensure!(
-            s["relation_yield"]
-                .as_f64()
-                .is_some_and(|y| (0.0..=1.0).contains(&y))
-                && s["base_points"].as_u64().is_some_and(|n| n > 0),
-            "invalid yield or base size in receipt"
-        );
-        eligible.push(json!({"manifest_sha256":s["manifest_sha256"],"yield":s["relation_yield"],"max_measured_regularity":d,"base_points":s["base_points"]}));
-    }
-    let frontier = eligible
-        .iter()
-        .filter(|a| {
-            !eligible.iter().any(|b| {
-                let ya = a["yield"].as_f64().unwrap();
-                let yb = b["yield"].as_f64().unwrap();
-                let da = a["max_measured_regularity"].as_u64().unwrap();
-                let db = b["max_measured_regularity"].as_u64().unwrap();
-                let ba = a["base_points"].as_u64().unwrap();
-                let bb = b["base_points"].as_u64().unwrap();
-                yb >= ya && db <= da && bb <= ba && (yb > ya || db < da || bb < ba)
-            })
-        })
-        .cloned()
-        .collect::<Vec<_>>();
-    Ok(
-        json!({"schema":"factor-base-screen/v1","frontier":frontier,"excluded":excluded,"candidate_id":null,"selected_best_total_runtime":null,"interpretation":"descriptive_pareto_screen_not_statistical_or_total_cost_selection","split":first["semantic"]["workload"]["split"]}),
-    )
 }
 fn main() {
     if let Err(e) = run() {

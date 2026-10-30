@@ -1,0 +1,47 @@
+{
+  "amendments": [
+    {
+      "date": "2026-10-29T15:28:42.715934+00:00",
+      "failed_output": "graph-export-cli-fixture-run",
+      "prior_runner_sha256": "1c57ceb4faca585c4ecd24bbd0137d8198da7f022778701b4e42646e707f63ac",
+      "reason": "Host Python3.9 lacks zip(strict=True); first export command passed but consumer raised TypeError. Require explicit equal lengths then zip. Same semantic acceptance criteria; retain failed output and use a fresh output path."
+    },
+    {
+      "date": "2026-10-29T15:30:22.832030+00:00",
+      "failed_output": "graph-export-cli-fixture-run-02",
+      "prior_runner_sha256": "9dc9d4bcb17ba0817e849e412bf009c8d40087223d171668a3347ef5166af1ae",
+      "reason": "Scratch size polling raced with normal atomic export-staging removal. Ignore only vanished paths while walking; other errors still fail. Also check size after process exit. Acceptance criteria unchanged; failed attempt retained."
+    }
+  ],
+  "checks": [
+    "artifact lengths and SHA256",
+    "independent Python polynomial reconstruction",
+    "exact decimal coefficients and domains",
+    "public feature content hash",
+    "private label fields excluded",
+    "source inventory and binary unchanged"
+  ],
+  "classification": "software_correctness_fixture",
+  "clock_valid_for_comparison": false,
+  "commands": 5,
+  "corpus_rows_added": 0,
+  "limits": {
+    "address_space_bytes": 536870912,
+    "command_wall_seconds": 60,
+    "file_size_bytes": 16777216,
+    "polled_scratch_bytes": 67108864
+  },
+  "negative_control": "existing rehashed coefficient/domain corruption must exit 1 and publish no manifest",
+  "positive_controls": [
+    "shard-62 curve export",
+    "shard-63 twist export"
+  ],
+  "purpose": "Validate native prime-chain static graph export against retained curve and twist cells",
+  "repeat_controls": "identical immutable export retry for both cells",
+  "runner_sha256": "837094001871cdbcad39e8095909dd76a48633dc1623e80db856ecbae4e89fcc",
+  "schema": "ml-dataset.software-fixture-protocol/v1",
+  "source_commit_binding": "Separate immutable build receipt required; supplied commit alone is not attestation",
+  "source_fixture_receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "source_inventory_files": 158,
+  "verified_cloud_dataset_cells": 0
+}
