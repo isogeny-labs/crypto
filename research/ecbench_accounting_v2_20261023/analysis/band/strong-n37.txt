@@ -1,0 +1,20 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-frob | 32/32 | 0.205 | 0.223 | 0.386 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-frob-v2 | 32/32 | 0.183 | 0.199 | 0.344 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-strong-frozen | 32/32 | 0.291 | 0.331 | 0.691 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-strong-v2 | 32/32 | 0.197 | 0.234 | 0.560 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-strong-v2-aa | 32/32 | 0.197 | 0.234 | 0.560 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m37-tm534059-32aad96b | rho-frob vs rho-frob-v2 | rho-frob-v2 < rho-frob |
+| icv1-f2m37-tm534059-32aad96b | rho-frob vs rho-strong-frozen | rho-frob < rho-strong-frozen |
+| icv1-f2m37-tm534059-32aad96b | rho-frob vs rho-strong-v2 | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | rho-frob vs rho-strong-v2-aa | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | rho-frob-v2 vs rho-strong-frozen | rho-frob-v2 < rho-strong-frozen |
+| icv1-f2m37-tm534059-32aad96b | rho-frob-v2 vs rho-strong-v2 | rho-frob-v2 < rho-strong-v2 |
+| icv1-f2m37-tm534059-32aad96b | rho-frob-v2 vs rho-strong-v2-aa | rho-frob-v2 < rho-strong-v2-aa |
+| icv1-f2m37-tm534059-32aad96b | rho-strong-frozen vs rho-strong-v2 | rho-strong-v2 < rho-strong-frozen |
+| icv1-f2m37-tm534059-32aad96b | rho-strong-frozen vs rho-strong-v2-aa | rho-strong-v2-aa < rho-strong-frozen |
+| icv1-f2m37-tm534059-32aad96b | rho-strong-v2 vs rho-strong-v2-aa | unresolved inside the band |
