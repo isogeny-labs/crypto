@@ -45,6 +45,17 @@ is preserved separately pending validation admission.
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
+has documentary browsing copies (0.040s / 0.170s / 0.458s; n=1 per phase,
+shared host, no admitted performance comparison). It remains outside the
+admitted table because no matched rho reference or timing validation exists.
+
+The [29 October strict-splitting self-test planning record](20261029-strict-elkies-preflight/)
+has documentary PDF/graph copies (0.005s / 0.004s / 0.024s, n=1 per
+phase, shared host). It remains outside the admitted table: these are
+planning controls with no validated performance comparison or matched rho.
+
+
 The [2026-10-26 full-D18 cadence-32 constructed control](20261026-n83-d18-cadence32-control/)
 records 85.564 s import, 0.153 s formula construction, 0.352 s SAT search,
 and 86.603 s worker wall on the shared Apple M4 Pro (L0), with group, row,
@@ -53,6 +64,15 @@ macOS `kern.clockrate` query, and the natural arm was held. The report PDF,
 SVG and PNG are copied there from the [study directory](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-5/REPORT.md).
 It has no matched rho or cold total-runtime row and remains outside the
 admitted table under the validation gate.
+
+The [2026-10-30 RTX PRO 6000 explicit-relation diagnostics](20261030-explicit-relations-gpu/)
+retain normalization and query reports, SVG/PNG copies and their source hashes.
+Each earlier panel contains 120 executions (12 warmups and 108 measured),
+with a separate strict coverage audit. They are L0 observations; the full
+recovery ladder and its failures are linked from the same entry. These
+records remain outside the admitted table: matched rho and independent
+scientific validation have not been supplied. No fastest-tool or certified
+speedup claim follows from these diagnostic copies.
 
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|

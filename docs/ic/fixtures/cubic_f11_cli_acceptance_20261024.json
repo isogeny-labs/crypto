@@ -1,0 +1,95 @@
+{
+  "schema": "crypto.general-cubic-cli-acceptance/v1",
+  "checked_at_utc": "2026-10-24T06:14:17.576377+00:00",
+  "source_base_commit": "28f80f176b089ca8e7e57662137804a18bf0a66b",
+  "source_sha256": {
+    "src/cryptanalysis/gaudry_cubic.rs": "60eafa77b73b5acbea76f285b052bd5bd75f0014d7bb4729552a258c9aa0f9f7",
+    "src/bin/icx/cubic_external.rs": "5824a526ca15baf96d1832bcdc3f783f04dac161bdd9b6c7e7a8fe0e3c98430c"
+  },
+  "fixture_sha256": "7e7cfa388822a562ecd47641bcbc7778620cdbcaadbed759c6f4e5b137c7ba31",
+  "independent_check_sha256": "0e19dd1c2d0af5226e0a0b756a317ba6b8941844f54c6cfa18a8eb9869246a43",
+  "binary_sha256": {
+    "ic": "ea7716ba07bca5953b54173da9f2c27dc1d81365c62606d2024a7ef556d7f4d8",
+    "icx": "051c62cf391a35760844245d9bfd7d46a24440c2cb1794d37cc599ede49381bb",
+    "crax": "4e5cb94e09b14ed1845b1f9239a52300df17a9b3c070d29314e67b557baa2230"
+  },
+  "positive": {
+    "ic": {
+      "exit_code": 0,
+      "envelope_status": "complete",
+      "status": "complete",
+      "verified": true,
+      "scalar": 5,
+      "rho_scalar": 5,
+      "curve_order": 1289,
+      "rank": 7,
+      "input_sha256": "7e7cfa388822a562ecd47641bcbc7778620cdbcaadbed759c6f4e5b137c7ba31"
+    },
+    "icx": {
+      "exit_code": 0,
+      "envelope_status": "complete",
+      "status": "complete",
+      "verified": true,
+      "scalar": 5,
+      "rho_scalar": 5,
+      "curve_order": 1289,
+      "rank": 7,
+      "input_sha256": "7e7cfa388822a562ecd47641bcbc7778620cdbcaadbed759c6f4e5b137c7ba31"
+    },
+    "crax_ic": {
+      "exit_code": 0,
+      "envelope_status": "ok",
+      "status": "complete",
+      "verified": true,
+      "scalar": 5,
+      "rho_scalar": 5,
+      "curve_order": 1289,
+      "rank": 7,
+      "input_sha256": "7e7cfa388822a562ecd47641bcbc7778620cdbcaadbed759c6f4e5b137c7ba31"
+    },
+    "crax_icx": {
+      "exit_code": 0,
+      "envelope_status": "ok",
+      "status": "complete",
+      "verified": true,
+      "scalar": 5,
+      "rho_scalar": 5,
+      "curve_order": 1289,
+      "rank": 7,
+      "input_sha256": "7e7cfa388822a562ecd47641bcbc7778620cdbcaadbed759c6f4e5b137c7ba31"
+    },
+    "legacy_binomial": {
+      "exit_code": 0,
+      "envelope_status": "complete",
+      "status": "complete",
+      "verified": true,
+      "scalar": 5,
+      "rho_scalar": 5,
+      "curve_order": 347,
+      "rank": 4,
+      "input_sha256": "0c25e85a200879a26e26692eebc866f5a88d72ece24c88033a34f54c72950a57"
+    }
+  },
+  "negative": {
+    "reducible": {
+      "exit_code": 1,
+      "expected_error": "reducible"
+    },
+    "noncanonical": {
+      "exit_code": 1,
+      "expected_error": "less than p"
+    },
+    "both": {
+      "exit_code": 1,
+      "expected_error": "exactly one"
+    },
+    "missing": {
+      "exit_code": 1,
+      "expected_error": "exactly one"
+    },
+    "general_modulus_route": {
+      "exit_code": 1,
+      "expected_error": "require the t^3-c field presentation"
+    }
+  }
+}
