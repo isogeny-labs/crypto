@@ -129,3 +129,9 @@ small ring-valued tensors, while separately checking the source's construction
 and space accounting. Preserve any first mismatch as a regression fixture.
 The existing [general audit problem](https://github.com/isogeny-labs/crypto/blob/main/problems/hashed-ecdl-tensor-backend.md)
 remains open; a small passing panel does not resolve it.
+
+Publication update (2026-10-30): both combined native panels pass40core,5runner,
+3panel-unit and3JSON tests; bindings20/19/14 and lint/MSRV/docs pass. The complete
+[root union receipt](root-union-complete.txt) records5430passes with actual exit0.
+The [publication manifest](sources-merged-peer.sha256) matches all28 actual
+merged peer files. Earlier PDF/manifests/transcripts remain historical snapshots.

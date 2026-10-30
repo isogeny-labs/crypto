@@ -406,6 +406,7 @@ impl Counter {
         }
         Ok(Some(word))
     }
+
     /// Sample an interface word by the exact prefix-count probabilities of
     /// Lemma 1, using uniform caller bytes. For a parsimonious encoding this
     /// is uniform over accepted words. For an arbitrary encoding, each word
