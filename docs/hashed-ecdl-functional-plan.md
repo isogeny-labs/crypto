@@ -176,20 +176,27 @@ The following SHA-256 digests agree across the two modified native copies:
 | `src/reduction.rs` | `43f1b2f5c7768d8bd5921698f8375cc3a4b85962395e21209fcc2b8347f47dba` |
 
 See the [validation transcript](hashed-ecdl-functional-validation.txt),
-[compressed complete root test log](hashed-ecdl-functional-root-tests.log.xz),
+[compressed complete root test log](hashed-ecdl-functional-logs/hashed-ecdl-functional-root-tests.log.xz),
 [editable diagram](hashed-ecdl-functional-pruning.svg),
 [rendering source](hashed-ecdl-functional-pruning.typ) and
 [inspected one-page PDF](hashed-ecdl-functional-pruning.pdf).
 
 The complete root log is stored under its SHA-256 in the repository artifact
-store, with its pointer in `docs/.artifacts.json`. Hydrate it with
-`python3 tools/artifacts/artifacts.py pull docs/hashed-ecdl-functional-root-tests.log.xz`.
+store, with its pointer in `docs/hashed-ecdl-functional-logs/.artifacts.json`.
+Hydrate it with
+`python3 tools/artifacts/artifacts.py pull docs/hashed-ecdl-functional-logs`.
 The 80,320-byte compressed object has SHA-256
 `73d7c10554f63add39cbb7bb651675a27392ad339553b145f1c50d56c165cc98`;
 the 503,849-byte uncompressed log has SHA-256
 `978ab375720353a81580dec0b99f262c0e13f324fdd727698b510c55a5d6aace`.
 Remote HEAD verification passed; an independent S3 download matched the
 compressed bytes and its decompressed output matched the original log.
+
+The log manifest and ignore rule now live in this study-specific directory.
+The initial validation transcript retains the original `docs/` location as
+historical evidence; the content-addressed object, digest and byte count are
+unchanged. This avoids making every workflow that reads an unrelated document
+hydrate this test log.
 
 The paired [cryptanalysis PR #1307](https://github.com/isogeny-labs/cryptanalysis/pull/1307)
 merged as `0fd71e100cef049176895395d7ecd0bda780f55b`. Its five returned
