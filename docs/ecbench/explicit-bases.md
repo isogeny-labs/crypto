@@ -672,3 +672,155 @@ A default-ref diagnostic invocation completed successfully within55s. Moving
 the script outside sparse checkout first lacked its repository selector;
 PM_REPO_PATH fixed that administrative invocation. No metrics source change
 was made, and no failed invocation is treated as a pass.
+
+## 2026-10-30T16:51Z — exact full-right reuse and separate controls
+
+### What was done
+
+V11 live logs show both61-bit targets verified:1123.455s and1405.366s total,
+with full exact values pending final archive collection. Its first62-bit case
+is running. Added an optional16-byte exact affine right-sum cache, constructed
+once per bases after sort scratch is freed. The selected phase peak preserves
+the existing25%free-memory rule; insufficient cache capacity selects an
+explicit uncached fallback. Host round-trip, admission-boundary/overflow and
+syntax checks pass. CUDA validation remains pending.
+
+### Decisions made
+
+Read NVIDIA memory optimization guidance before implementation; sources and
+lifetime argument are in FULL-RIGHT-CACHE.md. Preserve v5's partial-cache loss.
+V12 was never executed. V13 retains b/u persistent-query andu/v full-cache
+controls, withv/x repeat at52bits, then probes the larger frontier once. It
+requires the intended cache mode for every successful52-bit control. Frozen
+hash9ab5b955afbc2ba7f9878793a8012b0b740b29fa5107c40b5d8adb23fb012413.
+Native instruments typecheck and schema/freeze checks pass; no new data yet.
+
+### Open threads
+
+Collect/publish/delete v11 before any new GPU. V13 is the next panel; v12 must
+not launch. Preserve every failure/fallback and charge full construction.
+Run all new device differentials and sanitizers before data, then collect,
+strictly audit, export, report and deliver exact current-head CI. GPU tensor
+backend and independent scientific audit remain unresolved.
+
+### Errors
+
+No new CUDA build has been performed locally. The initial persistent host
+fixture cap error was corrected before this combined protocol. The earlier
+V12 plan and source remain unchanged; supersession is not a failed run.
+
+## 2026-10-30T17:00UTC — v13 launch wiring correction
+
+### What was done
+Removed a duplicate full-cache compile before the launcher enters the CUDA
+source directory. The intended compile remains after validation/build setup.
+Shell syntax and administrative pin checks pass; no v13 GPU was launched.
+
+### Decisions made
+Frozen protocol, analyzer, arms, inputs and bounds remain unchanged. This
+corrects launch wiring only, before affected data. PR2983 records CUDA pending.
+
+### Open threads
+Collect and delete active v11 before v13 CUDA validation and execution.
+
+### Errors
+Static syntax alone missed a valid shell command in the wrong working
+directory. Launch review caught it before deployment. T957 is cancelled and
+cannot reopen; scoped correction is owned by T961.
+
+## 2026-10-30T17:28UTC — separate 63-bit arithmetic preparation
+
+### What was done
+Prepared p<2^63 and full-u64 hash support under T966; retainedr<2^63.
+Overflow-safe hash operations, widened Hasse radicand, modular affine formulas
+and a direct terminal prefix offset remove identified width hazards. Host
+fixtures pass; new native Rust/device boundary tests await GPU execution.
+
+### Decisions made
+HAC14.32/14.33 reviewed before changes; see FIELD63.md. Shared Montgomery
+operations are unchanged; their documented bound widens with explicit argument
+and differential fixtures. V11/v13 source pins and frozen designs are untouched.
+No new frontier protocol is frozen until the current cache panel is collected.
+
+### Open threads
+V11 final62-bit target remains running; collect/delete, then execute pinnedv13.
+Only afterward validate this width extension and freeze any larger probe.
+
+### Errors
+A guarded source-edit script stopped on a changed text match after earlier
+replacements; inspected the partial edit and corrected the interval comparison.
+A candidate hash-fixture integer was composite; the host fixture selected and
+checked6917529027641081737 before it was recorded in the pending Rust test.
+No GPU result is claimed for this extension.
+
+## 2026-10-30T17:38UTC — current-main arithmetic reconciliation
+
+### What was done
+Merged main3c13bc691a87 into the pushed width-extension branch. Resolved three
+shared Rust conflicts by retaining main's cached field context, small inverse
+table, incremental inverse-hash enumeration and locally reused primality facts.
+Composed the new full-width bounds and overflow-safe addmod with those paths;
+updated the two private arithmetic fixtures for the added Curve fields.
+
+### Decisions made
+Preserve both source histories; no rebase or discarded optimization. V11/v13
+remain pinned. Full Rust/GPU tests are pending on the next appropriate worker.
+
+### Open threads
+Await v11 final62 result, then collect/delete and execute pinnedv13. PR2985
+requires checks on the reconciled head and subsequent GPU validation.
+
+### Errors
+Main advanced in the same arithmetic functions and changed Curve internals;
+the automatic merge correctly stopped. Conflict resolution was scoped to
+T967 after a clear ownership check; syntax/format checks follow.
+
+The initial whole-merge whitespace check also scanned historical SVG/raw
+artifacts imported from main and reported existing trailing spaces. Those
+immutable artifacts are preserved; the corrected check is scoped to this
+change's source and handoff files.
+
+## 2026-10-30T17:54UTC — v11 complete through62bits
+
+### What was done
+Collected12of12verifiedrecoveries, including both61and62-bit targets.
+Archive hash matched; controller/worker0 and podjees49ew9dkfd7deletion verified.
+Uploaded public receipts, retained credential onlyforauthorizednextv13, then
+removedv11privatefiles. Packaged raw hashes, certificate audit and export.
+
+### Decisions made
+Native exactplan audit plus8mutationcontrols passes. Schema/flow/filehashes
+pass. Preserve5canonicalrectangularcoveragefindingsinCHECKER-NOTE.md.
+ClocksremainL0; 62islargestcompleteprescribedrung, nothardwaremaximum.
+Push raw before report. Nextv13pins e9e87ffb8380; widthPR2985is separate.
+
+### Open threads
+Render/inspectv11report and catalog copies, verifycommittedmetrics, runv13
+GPUcorrectness/sanitizers and boundedpanel, then evaluate63-bitfollow-up.
+Fresh RunPod catalog2.49/hour; noold/newtaskpodpresent in readinesslist.
+
+### Errors
+No v11 execution failed. Canonicalchecker assumes rectangulararms×sizes and
+retains5findingsagainstthefrozenstagedplan; no full canonicalpassclaimed.
+
+## 2026-10-30T17:59UTC — v11 report and v13 launch
+
+### What was done
+Rendered the separate two-page v11 report after raw commit 099dff2edd81 and
+visually inspected both pages. Added versioned PDF/SVG/PNG catalog copies and
+hashes. Preserved artifact-bot migration of the raw validation log.
+Launched frozen v13 on pod 7tugqyoxyvnikm at 17:57:20 UTC; controller 25269
+owns collection and deletion. One RTX PRO 6000, EUR-IS-2, USD 2.49/hour.
+
+### Decisions made
+V13 remains pinned to e9e87ffb8380, separate from the newer 63-bit source.
+Its correctness and sanitizer preflight must finish before measurements.
+Reports preserve L0 timing limits and five canonical coverage findings.
+
+### Open threads
+Collect, audit, publish and delete v13; then validate the separate width
+extension and freeze any larger probe. Recheck PR2985 at its final head.
+
+### Errors
+Poppler reported a tagged-PDF metadata warning; both pages rendered and were
+visually inspected successfully. No v13 result is claimed during preflight.
