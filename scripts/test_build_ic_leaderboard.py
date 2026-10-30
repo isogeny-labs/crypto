@@ -4,6 +4,7 @@ import copy
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_ic_leaderboard as builder  # noqa: E402
@@ -103,6 +104,37 @@ curves:
         records = data["curve_records"]["current_board_records"]
         self.assertEqual(len(records), 24)
         self.assertTrue(all(record["curves_yaml_key"] for record in records.values()))
+
+
+class FrozenEngineeringComponent(unittest.TestCase):
+    def test_f4_fp_result_is_rendered_with_its_engineering_scope(self):
+        data = builder.build()
+        study = data["f4_fp_ic_component"]
+        self.assertEqual(study["class"], "engineering")
+        self.assertEqual(len(study["dlp"]), 4)
+        for row in study["dlp"]:
+            self.assertEqual(row["solved"], [True, True])
+            self.assertEqual(row["correct"], [True, True])
+        md = builder.markdown(data)
+        html = builder.page(data, standalone=True)
+        self.assertIn("## F_p Gröbner engine (`f4_fp`)", md)
+        self.assertIn("S/rho is a lower-bound comparison", md)
+        self.assertIn('id="f4-fp-ic-component"', html)
+        self.assertIn("Frozen engineering summary", html)
+
+    def test_incorrect_frozen_result_fails_closed(self):
+        bad = copy.deepcopy(builder.f4_fp_ic_component())
+        bad["dlp"][0]["correct"] = [True, False]
+        with patch.object(builder, "load", return_value=bad):
+            with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
+                builder.f4_fp_ic_component()
+
+    def test_corrupt_frozen_ratio_fails_closed(self):
+        bad = copy.deepcopy(builder.f4_fp_ic_component())
+        bad["dlp"][0]["s_ratio"] += 1
+        with patch.object(builder, "load", return_value=bad):
+            with self.assertRaisesRegex(SystemExit, "incomplete or inconsistent"):
+                builder.f4_fp_ic_component()
 
 
 if __name__ == "__main__":
