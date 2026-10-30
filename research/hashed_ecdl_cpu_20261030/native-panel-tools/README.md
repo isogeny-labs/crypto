@@ -1,7 +1,7 @@
 # Native CPU panel validation and export
 
 This Rust crate is the active correctness-test and export path for round18 and
-round19. It replaces the Python execution paths identified in PR2980 review.
+round19 and round20. It replaces the Python execution paths identified in PR2980 review.
 Historical Python source is preserved byte-for-byte under legacy/ for provenance;
 it is not an execution entry point. The historical validation logs remain as
 recorded, with their Python provenance visible.
@@ -66,6 +66,12 @@ six arms, three fixtures and ten rounds. It preserves the existing export schema
 and full-cost boundary; it introduces no statistical inference.
 
 ## Validation and handoff
+
+Round20 support was added under T-1028. Twelve synthetic tests now pass against
+both round18 and round20, including an explicit unknown-study rejection and
+assertions binding every exported backend reference to the actual study name.
+New logs reside in ../round20/. Historical logs below remain unchanged. This
+extension does not execute the solver or grant launch authorization.
 
 Both eleven-test synthetic suites pass, and the historical parity test passes.
 Strict all-target release Clippy and formatting pass. The first round19 native

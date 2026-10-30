@@ -1,7 +1,7 @@
 # Round20: matched CPU panel preparation
 
-Status: **software preparation and design only; not frozen, not admitted and
-not executed**. This directory contains no launch command. It does not authorize
+Status: **native-validated and frozen; not admitted or executed**. This
+directory contains a frozen worker runner but no submission command. It does not authorize
 a replacement for the terminal round19 attempt. The current 10x goal keeps its
 original baseline and all three fixtures.
 
@@ -45,12 +45,13 @@ this panel. Freeze the final analysis source/hash before any measurement.
 
 ## Execution and acceptance dependencies
 
-A valid diagnostic execution still needs a new experiment.protocol/v1 record,
-native schema and semantic validation, an immutable pre-data freeze, admission,
-and an explicit bounded placement. The old Python protocol checker is not an
-active path under AGENTS.md. The current Rust exporter supports only round18
-and round19 and must explicitly support/test the new panel before use; do not
-rename a study to bypass that guard.
+A valid diagnostic execution still needs admission and an eligible bounded
+placement. The protocol now passes the existing Rust canonical schema and
+semantic checker, rebuilt from commit dac149f065de. The freeze wrapper uses
+that library's canonical hash, validates before and after freezing, and creates
+output exclusively. No Python checker is invoked. Native export now explicitly
+supports round20; its synthetic tests check job identity and reject unknown
+study names. Do not rename a study to bypass the supported-study guard.
 
 This design does not choose a paid host or submit a job. The previously
 approved single cloud attempt was consumed by round19. Its frozen deadline
@@ -79,3 +80,25 @@ Preparation references: round19's frozen contract and terminal outcome,
 streamed-matrix/README.md, batch-endpoints/README.md, and the retained native
 analyzer correctness tests. This is a matched engineering comparison, with
 no new mathematical algorithm or novelty claim. T-1027 owns preparation only.
+
+## Native qualification (T-1028)
+
+Protocol SHA-256: `2b263251e9c81fb7f7da12e4a3387e9f1f5c44529f5977a49a90553904017b8b`.
+Both validation and freeze receipts retain launch_authorized=false. The earlier
+readiness.json records the historical pre-freeze preparation; qualification.json
+records the later current state. Historical draft and preparation records remain.
+
+The checker source snapshot is pinned by protocol-checker-source.sha256 and its
+binary by protocol-tools.sha256. The existing implementation is under
+research/pencil_large_prime_20261029/native_canonical_export; only its generic
+protocol validation/hash functions are reused, not its experiment-specific
+exporter. The schema and supported semantic rules are checked. Unsupported
+blinding is explicitly false in this new panel; neutral labels are not human
+blinding. prepare-protocol logic is retained as protocol-draft.jq.
+
+Seven synthetic negative checks reject altered frozen contents, unknown arms,
+duplicate identities, unsupported blinding, changed analysis source, refreezing,
+and overwrites. Twelve synthetic native analyzer/export tests pass for round20
+and round18; the historical parity test remains an explicit ignored test in
+these invocations. Strict native-tool Clippy, formatting and CLI build pass.
+These are software checks and generate no solver timing data.

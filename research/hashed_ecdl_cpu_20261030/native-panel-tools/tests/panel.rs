@@ -216,8 +216,22 @@ fn complete_export_and_no_overwrite() {
     assert_eq!(runs.iter().filter(|r| r["warmup"] == true).count(), 18);
     assert_eq!(d["arms"].as_array().unwrap().len(), 6);
     assert_eq!(d["flow"]["planned"], 180);
+    let round = f.study.file_name().unwrap().to_str().unwrap();
+    let job = format!("hashed-ecdl-cpu-{round}-20261030");
+    assert_eq!(d["host"]["class_id"], job);
+    assert!(runs.iter().all(|run| run["backend_ref"] == job));
     assert!(f.export().is_err());
     assert_eq!(fs::read(f.out.join("export.json")).unwrap(), original);
+}
+#[test]
+fn unsupported_study_is_not_relabelled() {
+    let mut f = Fixture::new();
+    let renamed = f.root.join("round999");
+    fs::rename(&f.study, &renamed).unwrap();
+    f.study = renamed;
+    f.out = f.study.join("results");
+    assert!(f.export().is_err());
+    assert!(!f.out.join("export.json").exists());
 }
 #[test]
 fn wrong_returned_manifest_rejected() {

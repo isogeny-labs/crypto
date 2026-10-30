@@ -105,7 +105,10 @@ pub fn export(study: &Path, analyzer: &Path, created: &str) -> Result<()> {
         .file_name()
         .and_then(|s| s.to_str())
         .ok_or("invalid study name")?;
-    check(matches!(round, "round18" | "round19"), "unsupported study")?;
+    check(
+        matches!(round, "round18" | "round19" | "round20"),
+        "unsupported study",
+    )?;
     let job = format!("hashed-ecdl-cpu-{round}-20261030");
     let host_ref = file_ref(&out.join("cpuinfo.txt"), "cpuinfo.txt")?;
     for key in ["path", "sha256"] {
