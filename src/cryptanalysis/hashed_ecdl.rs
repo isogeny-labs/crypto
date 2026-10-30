@@ -81,17 +81,58 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
         (u128::from(a) * u128::from(b) % u128::from(p)) as u64
     }
 }
-fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
-    let mut r = 1;
-    while n != 0 {
-        if n & 1 != 0 {
-            r = mulmod(r, a, p);
-        }
-        a = mulmod(a, a, p);
-        n >>= 1;
-    }
-    r
+// Reciprocal reduction amortizes division across products (HAC 14.3.3).
+// This ceiling-reciprocal variant is restricted to canonical 32-bit residues.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Modulus {
+    p: u64,
+    reciprocal: u64,
 }
+impl Modulus {
+    fn new(p: u64) -> Self {
+        assert!(p > 1);
+        Self {
+            p,
+            reciprocal: if p <= u64::from(u32::MAX) {
+                u64::MAX / p + 1
+            } else {
+                0
+            },
+        }
+    }
+    fn mul(self, a: u64, b: u64) -> u64 {
+        debug_assert!(a < self.p && b < self.p);
+        if self.reciprocal == 0 {
+            return mulmod(a, b, self.p);
+        }
+        let x = a * b;
+        // With R=ceil(2^64/p), floor(xR/2^64) is floor(x/p) or one
+        // larger, since x<2^64. The wrapped residual is either in [0,p)
+        // or [2^64-p,2^64). These intervals are disjoint for p<2^32.
+        let q = ((u128::from(x) * u128::from(self.reciprocal)) >> 64) as u64;
+        let residual = x.wrapping_sub(q.wrapping_mul(self.p));
+        if residual >= self.p {
+            residual.wrapping_add(self.p)
+        } else {
+            residual
+        }
+    }
+    fn pow(self, mut a: u64, mut n: u64) -> u64 {
+        let mut r = 1;
+        while n != 0 {
+            if n & 1 != 0 {
+                r = self.mul(r, a);
+            }
+            a = self.mul(a, a);
+            n >>= 1;
+        }
+        r
+    }
+}
+fn pow(a: u64, n: u64, p: u64) -> u64 {
+    Modulus::new(p).pow(a, n)
+}
+
 fn sub(a: u64, b: u64, p: u64) -> u64 {
     if a >= b {
         a - b
@@ -182,6 +223,7 @@ fn sqrtmod(a: u64, p: u64) -> Option<u64> {
 // candidate root, residual and Legendre test; the final square is checked.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct SqrtContext {
+    modulus: Modulus,
     m: u32,
     q: u64,
     c: u64,
@@ -198,22 +240,27 @@ impl SqrtContext {
                 .expect("validated odd prime has a quadratic nonresidue");
             pow(z, q, p)
         };
-        Self { m, q, c }
+        Self {
+            modulus: Modulus::new(p),
+            m,
+            q,
+            c,
+        }
     }
     fn root(&self, a: u64, p: u64) -> Option<u64> {
         if a == 0 {
             return Some(0);
         }
         if self.m == 1 {
-            let x = pow(a, (p + 1) / 4, p);
-            return (mulmod(x, x, p) == a).then_some(x);
+            let x = self.modulus.pow(a, (p + 1) / 4);
+            return (self.modulus.mul(x, x) == a).then_some(x);
         }
-        let w = pow(a, self.q / 2, p);
-        let mut x = mulmod(w, a, p);
-        let mut t = mulmod(w, x, p);
+        let w = self.modulus.pow(a, self.q / 2);
+        let mut x = self.modulus.mul(w, a);
+        let mut t = self.modulus.mul(w, x);
         let mut legendre = t;
         for _ in 1..self.m {
-            legendre = mulmod(legendre, legendre, p);
+            legendre = self.modulus.mul(legendre, legendre);
         }
         if legendre != 1 {
             return None;
@@ -222,7 +269,7 @@ impl SqrtContext {
         while t != 1 {
             let (mut power, mut i) = (t, 0);
             while power != 1 && i < m {
-                power = mulmod(power, power, p);
+                power = self.modulus.mul(power, power);
                 i += 1;
             }
             if i == m {
@@ -230,14 +277,14 @@ impl SqrtContext {
             }
             let mut b = c;
             for _ in 0..m - i - 1 {
-                b = mulmod(b, b, p);
+                b = self.modulus.mul(b, b);
             }
-            x = mulmod(x, b, p);
-            c = mulmod(b, b, p);
-            t = mulmod(t, c, p);
+            x = self.modulus.mul(x, b);
+            c = self.modulus.mul(b, b);
+            t = self.modulus.mul(t, c);
             m = i;
         }
-        (mulmod(x, x, p) == a).then_some(x)
+        (self.modulus.mul(x, x) == a).then_some(x)
     }
 }
 
@@ -733,7 +780,8 @@ impl PivotTail {
             Self::Dense(row.to_vec())
         }
     }
-    fn subtract_from(&self, row: &mut [u64], k: u64, r: u64) {
+    fn subtract_from(&self, row: &mut [u64], k: u64, modulus: Modulus) {
+        let r = modulus.p;
         let update = |a: &mut u64, b| {
             if b != 0 {
                 let product = if k == 1 {
@@ -741,7 +789,7 @@ impl PivotTail {
                 } else if b == 1 {
                     k
                 } else {
-                    mulmod(k, b, r)
+                    modulus.mul(k, b)
                 };
                 *a = sub(*a, product, r);
             }
@@ -765,6 +813,7 @@ impl PivotTail {
 // of updating a full provenance vector at every pivot; reconstruct once by
 // triangular back-substitution when the first dependent row is reached.
 fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
+    let modulus = Modulus::new(r);
     struct Pivot {
         tail: PivotTail,
         source: usize,
@@ -783,7 +832,9 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
             }
             factors.push((index, k));
             row[col] = 0; // the normalized pivot entry is exactly one
-            pivots[index].tail.subtract_from(&mut row[col + 1..], k, r);
+            pivots[index]
+                .tail
+                .subtract_from(&mut row[col + 1..], k, modulus);
         }
         match row.iter().position(|&a| a != 0) {
             None => {
@@ -795,11 +846,11 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 }
                 for j in (0..pivots.len()).rev() {
                     let pivot = &pivots[j];
-                    let k = mulmod(weights[j], pivot.inverse, r);
+                    let k = modulus.mul(weights[j], pivot.inverse);
                     combination[pivot.source] = k;
                     if k != 0 {
                         for &(ancestor, factor) in &pivot.factors {
-                            weights[ancestor] = sub(weights[ancestor], mulmod(k, factor, r), r);
+                            weights[ancestor] = sub(weights[ancestor], modulus.mul(k, factor), r);
                         }
                     }
                 }
@@ -809,7 +860,7 @@ fn dependency(rows: &[Vec<u64>], r: u64) -> Option<Vec<u64>> {
                 let inv = inverse(row[col], r);
                 for a in &mut row[col + 1..] {
                     if *a != 0 && inv != 1 {
-                        *a = mulmod(*a, inv, r);
+                        *a = modulus.mul(*a, inv);
                     }
                 }
                 columns.insert(col, pivots.len());
@@ -1138,6 +1189,44 @@ mod tests {
     use super::*;
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
+    }
+
+    #[test]
+    fn reciprocal_products_match_wide_remainders() {
+        let reference =
+            |a: u64, b: u64, p: u64| (u128::from(a) * u128::from(b) % u128::from(p)) as u64;
+        for p in 2..256 {
+            let m = Modulus::new(p);
+            for a in 0..p {
+                for b in 0..p {
+                    assert_eq!(m.mul(a, b), reference(a, b, p));
+                }
+            }
+        }
+        let mut rng = Rng(0x126799);
+        for p in [
+            65521,
+            65536,
+            65563,
+            (1 << 31) - 1,
+            1 << 31,
+            (1 << 32) - 5,
+            (1 << 32) - 1,
+            1 << 32,
+            (1 << 40) + 87,
+            u64::MAX,
+        ] {
+            let m = Modulus::new(p);
+            for a in [0, 1, p / 2, p - 2, p - 1] {
+                for b in [0, 1, p / 2, p - 2, p - 1] {
+                    assert_eq!(m.mul(a, b), reference(a, b, p));
+                }
+            }
+            for _ in 0..10000 {
+                let (a, b) = (rng.below(p), rng.below(p));
+                assert_eq!(m.mul(a, b), reference(a, b, p));
+            }
+        }
     }
 
     #[test]
