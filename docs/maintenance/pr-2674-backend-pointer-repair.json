@@ -85,5 +85,27 @@
     "unchanged_frozen_lock_sha256": true,
     "only_metadata_and_journal_changes": true,
     "wire_check": "pass"
+  },
+  "session_guard_repair": {
+    "failed_job": 124263188505,
+    "comparison_base": "11173ecd0230a9ceedc4d833736402934fdcb95e",
+    "only_changed_paths": [
+      "taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n20/session/.gitignore",
+      "taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n24/session/.gitignore",
+      "taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n28/session/.gitignore",
+      "taskq/deploy/eks-karpenter/validation/ic-size-sweep-20261026/n32/session/.gitignore"
+    ],
+    "old_failure_reason": "generated artifact-store ignore directive !.artifacts.json is metadata, no original session bytes changed",
+    "new_exception": "**/.gitignore only",
+    "session_capsules_records_and_pointers_still_frozen": true,
+    "actual_parent_comparison_after_exception": [],
+    "fixture_tests": 4,
+    "controls_include": "modify session.json, records.jsonl, spec.json, host.json or .artifacts.json; delete records; add new session; modify generated ignore",
+    "sources": [
+      ".github/workflows/ecbench.yml",
+      "tools/artifacts/artifacts.py",
+      ".github/scripts/test-ecbench-session-freeze.py"
+    ],
+    "scientific_replay_or_promotion": false
   }
 }
