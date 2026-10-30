@@ -52,6 +52,16 @@ different acceptance requirements.
 
 ## Resolution and history
 
+2026-10-30T17:03Z follow-up: fresh pinned-source23 example tests, strict lint/
+format, CLI refusal, backlog validation and library build pass; full library
+execution is active, not passed. The [G2 source audit](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_ACCOUNTING_AUDIT.md)
+locates discarded validation counts, query `GroupOps` fields skipped by serde
+and inverse/expanded-multiplication overlap. These require explicit count
+emission and a nonoverlapping hierarchy before any pricing; no source fix or
+comparison is claimed by the audit. New remote0cc5 changes source/dependencies
+and is not validated by this pinned-source receipt. All scientific criteria
+and execution blockers remain in force.
+
 2026-10-30: opened for the explicitly activated G1–G6 goal. The mixed-fiber PKM
 problem is related prior work, not the same symmetric presentation. Original
 receipt directories and scientific records are preserved. Unresolved.

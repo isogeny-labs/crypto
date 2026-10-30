@@ -13,6 +13,11 @@ strengthen useful-rank and target-recovery checks. Fresh proof audit passes18
 declarations with zero trusted exceptions; fresh native integration is pending.
 G1–G3/G6 remain partial and G4/G5 unrun; no performance comparison is admitted.
 
+At17:03UTC, [23 fresh example tests and scoped checks pass](continuation-20261030/validation/scoped-20261030T1703Z/receipt.json);
+the5646-case library execution remains active. Newer remote0cc5 changes source/
+dependencies and requires its own affected validation. [G2's accounting gap map](continuation-20261030/G2_ACCOUNTING_AUDIT.md)
+now identifies concrete lost/overlapping counter paths; full pricing stays open.
+
 The research ranking remains: **symmetric PKM for a possible algebraic exponent
 improvement; five-sum for demonstrated generic implementation progress; Hecke
 for exploratory relation structure.** None currently establishes a sub-rho

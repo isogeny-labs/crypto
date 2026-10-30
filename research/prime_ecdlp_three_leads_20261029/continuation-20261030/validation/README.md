@@ -1,8 +1,17 @@
-# Continuation validation: proof complete, integrated native run pending
+# Continuation validation: proof and scoped checks pass; library run active
 
 2026-10-30. Source commit `faade165a46fd51e5a0903ba8e4df85a134c68db`.
 [Proof receipt](proof-final-receipt.json) binds final source objects and exact
 captured-byte hashes. It is not a final native integration receipt.
+
+At17:03UTC the [fresh scoped receipt](scoped-20261030T1703Z/receipt.json) records
+**23 example passes, zero failures/ignored**, strict clippy/rustfmt, CLI build,
+actual checkpoint-refusal message/expected exit1, backlog build/validate and
+library build passes. It binds17 clean committed objects and six binary hashes.
+The library declares5646 tests and remains active from16:47:54UTC, with a
+40-minute execution cap. Final outcomes/digest/size remain pending termination.
+Remote0cc5 changes eight original bound paths; this receipt does not validate
+that integration. The launch description below is historical, not current phase.
 
 - Final `lake build +ThreeLeads.PKMScalarCertificates` passes for all five new
   contracts. Each printed axiom set contains only the standard foundations.

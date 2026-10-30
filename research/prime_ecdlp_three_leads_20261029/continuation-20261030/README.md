@@ -6,6 +6,16 @@ result. The original acceptance criteria in [PKM_GOALS.md](../PKM_GOALS.md)
 remain in force. [Goal state](goal-state.json), [proof map](proof-map.md),
 [diagram](scalar-certificates.svg), and [PDF](report.pdf) accompany this record.
 
+**17:03UTC follow-up:** [23 integrated example tests and all scoped checks pass](validation/scoped-20261030T1703Z/receipt.json).
+The 5646-case library execution is still active; no terminal outcome is claimed.
+Those results bind sourcefaade, not newer remote0cc5. [Remote merge review](validation/remote-0cc5-review-snapshot.json)
+preserves all179 earlier study blobs and both parent logs; eight bound
+source/dependency paths changed and need affected validation after integration.
+The [G2 accounting audit](G2_ACCOUNTING_AUDIT.md) identifies discarded validation
+counts, serialized query-count gaps and overlapping high-level/expanded counters.
+Its closure map is implementation work still owed. [Follow-up report](followup-20261030T1703Z.pdf)
+records the new status; the initial report/receipts are preserved unchanged.
+
 ## What changed
 
 The cold toy control previously replayed rank with the producer's elimination
