@@ -321,3 +321,23 @@ Broader local validation, follow-up PR and exact-head checks. No scientific exec
 ### Errors (what went wrong, how it was handled)
 
 No report transport/hash failures. All earlier generator, hashing-driver and compiler warnings remain recorded. Producer proof objects were moved into content-addressed storage without changing their bytes; their remote verification passed.
+
+## 2026-10-30 23:17 UTC shutdown check and capsule restoration
+
+### What was done (commands, files, features)
+
+Full workspace/all-targets compilation and maintained Clippy passed on 6dbeeb50. One private-container check observed the unchanged watchdog terminate its detached child by signal9 and PID1 exit125; cleanup returned0. Independent review and a two-page PDF, SVG and structured evidence are retained in reports/private-backstop-v2.
+
+PR3004 CI found two observation packets missing host capsules. Restored exact host.json and plan.json from the original hash-pinned g9/g18 archives, checking both generation manifests and original session digests. The exact CI verifier with replay0 accepted both as interrupted unbound prefixes (ok=true, records_bound=false). No raw outcomes or original manifests were changed.
+
+### Decisions made (and why)
+
+Recorded the newly approved seven-worker-hour ceiling and 2026-10-31 06:00 UTC deadline separately as planning limits. Previous campaigns remain unchanged; no new scientific execution admission. T954 expired after its heartbeat ended; T1032 owns this new delivery/capsule-repair scope.
+
+### Open threads (unfinished, pick up next time)
+
+Push additive receipts and restoration, then inspect current-head CI. Complete exact preflight bindings, production runtime qualification and prospective review before scientific continuation. Word-refinement source is private and remains unqualified pending dependency resolution and Lean replay.
+
+### Errors (what went wrong, how it was handled)
+
+Agents hit a usage limit; root reconciled their files. Scratch-image build succeeded; ordinary iidfile read failed due root ownership and was reconciled without rebuild. Independent review retains missing contemporaneous command receipts; later command reconstruction is labelled post-hoc. Report-v2 copy refused an existing partial directory; root used the saved v2 source and inspected its completed render. Two Lean attempts stopped before elaboration on missing dependency objects; both remain recorded.
