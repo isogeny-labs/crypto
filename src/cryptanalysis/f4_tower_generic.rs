@@ -2040,9 +2040,9 @@ mod tests {
             n_free: 2,
         };
         let input = vec![
-            ring.from_raw(&vec![(vec![1, 0], 1), (vec![0, 0], 2)]),
-            ring.from_raw(&vec![(vec![0, 1], 1), (vec![0, 0], 3)]),
-            ring.from_raw(&vec![(vec![1, 0], 1), (vec![0, 1], 1), (vec![0, 0], 5)]),
+            ring.from_raw(&[(vec![1, 0], 1), (vec![0, 0], 2)]),
+            ring.from_raw(&[(vec![0, 1], 1), (vec![0, 0], 3)]),
+            ring.from_raw(&[(vec![1, 0], 1), (vec![0, 1], 1), (vec![0, 0], 5)]),
         ];
         let mut opts = TowerF4Options::new(6);
         opts.full_rank_exit = false;
