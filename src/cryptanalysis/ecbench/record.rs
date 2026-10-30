@@ -107,6 +107,9 @@ pub const UNIT: &str = "ecbench.gae";
 /// What the runner sends a measured child on stdin.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ChildInput {
+    /// Reserved explicit diagnostic context; producer execution remains disabled.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub diagnostics: Option<super::diagnostics::Context>,
     pub schema: String,
     pub curve: CurveSpec,
     pub target_seed: u64,
@@ -408,6 +411,15 @@ pub fn child_main(input: &str) -> ChildOutput {
             return out;
         }
     };
+    // Explicit rejection before workload construction: this slice cannot activate
+    // an unreviewed producer or run an algorithm to test diagnostic plumbing.
+    if let Some(context) = &job.diagnostics {
+        out.error = Some(match context.validate() {
+            Ok(()) => "diagnostic producer is not enabled or admitted".into(),
+            Err(error) => error,
+        });
+        return out;
+    }
     #[allow(clippy::type_complexity)]
     let result = (|| -> Result<
         (
@@ -2129,6 +2141,7 @@ mod allocator_tests {
         let m = resolve(&method).unwrap();
         ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
+            diagnostics: None,
             curve: w.curve_spec.for_child(&inst),
             target_seed: 7,
             target_index: 0,
@@ -2220,5 +2233,32 @@ mod allocator_tests {
             wall > 1.3 && wall > gae / 8.0,
             "wall ratio {wall:.2} (small {w_small} ns, big {w_big} ns) does not follow the work ratio {gae:.2}"
         );
+    }
+}
+
+#[cfg(test)]
+mod diagnostic_context_tests {
+    use super::*;
+    #[test]
+    fn explicit_context_rejected_before_workload_build() {
+        let input = serde_json::json!({"schema":CHILD_INPUT_SCHEMA,
+            "curve":{"kind":"prime_explicit","p":0,"a":0,"b":0,"group_order":0,"r":0,"gx":0,"gy":0},
+            "target_seed":0,"target_index":0,"expected_workload_id":"invalid-on-purpose",
+            "method":{"id":"invalid-on-purpose","params":{}},"expected_method_id":"invalid-on-purpose","algorithm_seed":0});
+        let old: ChildInput = serde_json::from_value(input.clone()).unwrap();
+        assert!(old.diagnostics.is_none());
+        assert!(serde_json::to_value(&old)
+            .unwrap()
+            .get("diagnostics")
+            .is_none());
+        let mut with_context = input;
+        with_context["diagnostics"] = serde_json::json!({"schema":"ecbench.diagnostic_context/v1","relative_leaf":"leaf","identity":{"session":"fixture","execution":0,"seed":0,"attempt":0,"workload_sha256":"a".repeat(64),"binary_sha256":"b".repeat(64),"protocol_sha256":"c".repeat(64),"source_sha256":"d".repeat(64),"method_config_sha256":"e".repeat(64)}});
+        let result = child_main(&serde_json::to_string(&with_context).unwrap());
+        assert_eq!(
+            result.error.as_deref(),
+            Some("diagnostic producer is not enabled or admitted")
+        );
+        assert!(result.report.is_none());
+        assert!(result.workload_id.is_none());
     }
 }
