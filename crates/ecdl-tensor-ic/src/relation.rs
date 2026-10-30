@@ -347,3 +347,93 @@ pub fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<
     n.num_edges = next;
     (n, a)
 }
+
+// ---------------------------------------------------------------------------
+// Meet-in-the-middle relation search.
+//
+// The relation network fixes an order in which its edges are eliminated: a
+// forward contraction enumerates F_1 x ... x F_m, which is the whole product.
+// The same network can be eliminated from both ends toward the middle instead.
+// For a chain that changes the cost from |F_1| x ... x |F_m| to
+// |F|^{ceil(m/2)} + |F|^{floor(m/2)}, which for |F_i| ~ (2r)^(1/m) is about
+// 2 sqrt(2r) instead of 2r. Nothing about the count changes; this is only a
+// different elimination order, and it returns one witness instead of counting.
+
+fn mitm_left(
+    c: &Curve,
+    sets: &[Vec<Point>],
+    i: usize,
+    sum: Point,
+    picks: &mut Vec<u32>,
+    out: &mut HashMap<Point, Vec<u32>>,
+) {
+    if i == sets.len() {
+        out.entry(sum).or_insert_with(|| picks.clone());
+        return;
+    }
+    for (j, &a) in sets[i].iter().enumerate() {
+        picks.push(j as u32);
+        mitm_left(c, sets, i + 1, c.add(sum, a), picks, out);
+        picks.pop();
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn mitm_right(
+    c: &Curve,
+    sets: &[Vec<Point>],
+    i: usize,
+    sum: Point,
+    r: Point,
+    picks: &mut Vec<u32>,
+    table: &HashMap<Point, Vec<u32>>,
+) -> Option<(Point, Vec<u32>)> {
+    if i == sets.len() {
+        let need = c.add(r, c.neg(sum));
+        if table.contains_key(&need) {
+            return Some((need, picks.clone()));
+        }
+        return None;
+    }
+    for (j, &a) in sets[i].iter().enumerate() {
+        picks.push(j as u32);
+        if let found @ Some(_) = mitm_right(c, sets, i + 1, c.add(sum, a), r, picks, table) {
+            picks.pop();
+            return found;
+        }
+        picks.pop();
+    }
+    None
+}
+
+/// mitm_find_relation returns A_1 + ... + A_m = r with A_i in F_i, if one
+/// exists, by meeting in the middle: the first half of the factor bases is
+/// enumerated into a table keyed by its partial sum, then the second half is
+/// enumerated and its complement is looked up. It performs about
+/// |F|^(m/2) + |F|^(m/2) point additions instead of the product over all m
+/// sets, so it is the same relation network contracted from both ends. The
+/// witness is not checked here; callers verify membership and the sum.
+pub fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point) -> Option<Vec<Point>> {
+    let m = fb.sets.len();
+    if m < 2 {
+        return None;
+    }
+    if fb.sets.iter().any(|s| s.is_empty()) {
+        return None;
+    }
+    let h = m / 2;
+    let mut table: HashMap<Point, Vec<u32>> = HashMap::new();
+    let mut picks: Vec<u32> = Vec::with_capacity(h);
+    mitm_left(c, &fb.sets[..h], 0, INFINITY, &mut picks, &mut table);
+    let mut rpicks: Vec<u32> = Vec::with_capacity(m - h);
+    let (need, right) = mitm_right(c, &fb.sets[h..], 0, INFINITY, r, &mut rpicks, &table)?;
+    let left = table.get(&need)?.clone();
+    let mut pts: Vec<Point> = Vec::with_capacity(m);
+    for (i, &j) in left.iter().enumerate() {
+        pts.push(fb.sets[i][j as usize]);
+    }
+    for (i, &j) in right.iter().enumerate() {
+        pts.push(fb.sets[h + i][j as usize]);
+    }
+    Some(pts)
+}
