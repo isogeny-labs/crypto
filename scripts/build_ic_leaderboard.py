@@ -456,6 +456,10 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
             recipe["log2_total_gae"] = math.log2(total_gae)
 
 
+# These engineering components also carry validation gates outside tables A-C.
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+
+
 def require_materialized_gate_inputs(board: list[dict]) -> None:
     """Do not demote validated rows because their certificates are sparse-excluded.
 
@@ -467,8 +471,9 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
     sparse = {item[2:].decode("utf-8", "surrogateescape")
               for item in raw.split(b"\0") if item.startswith(b"S ")}
     needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
-    for row in board:
-        evidence = REPO / gate.board_evidence_dir(row)
+    evidence_dirs = {gate.board_evidence_dir(row) for row in board} | set(COMPONENT_EVIDENCE_DIRS)
+    for directory in sorted(evidence_dirs):
+        evidence = REPO / directory
         manifest = evidence / gate.MANIFEST
         needed.add(str(manifest.relative_to(REPO)))
         if not manifest.is_file():
@@ -490,7 +495,7 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
                         raw_path = (evidence / name).resolve()
                         if raw_path.is_relative_to(REPO):
                             needed.add(str(raw_path.relative_to(REPO)))
-    missing = sorted(needed & sparse)
+    missing = sorted(path for path in needed & sparse if not (REPO / path).is_file())
     if missing:
         raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
                          "committed paths before generating:\n" + "\n".join(missing))

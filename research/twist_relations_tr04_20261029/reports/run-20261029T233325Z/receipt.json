@@ -1,0 +1,207 @@
+{
+  "schema": "tr04.failed-workflow-evidence/v1",
+  "collected_at": "2026-10-30T00:29:16Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 2890,
+  "run_id": 40973940936,
+  "run_attempt": 1,
+  "source": "85fc870c96a3ea707afe11e06cf884eba6f957ce",
+  "workflow_source": "85fc870c96a3ea707afe11e06cf884eba6f957ce",
+  "dispatch_at": "2026-10-29T23:33:25Z",
+  "completed_at": "2026-10-29T23:41:34Z",
+  "workflow_conclusion": "failure",
+  "preflight_job_id": 123797235834,
+  "checkpoint": {
+    "exit_code": 1,
+    "message": "checkpoint: no way to upload: no AWS profile 'ecc-challenges-new', no CHECKPOINT_UPLOAD_TOKEN, no /home/runner/.config/checkpoint/upload-token\ncheckpoint: cannot upload, so nothing was checkpointed\n",
+    "source_unchanged": true,
+    "bypassed": false
+  },
+  "primary": {
+    "field_attempts": 0,
+    "completed_rows": 0,
+    "expected_rows": 27,
+    "missing_rows": 27,
+    "scientific_data_present": false,
+    "primary_verifier_run": false,
+    "control_receipts": 0
+  },
+  "artifact": {
+    "id": 12941208365,
+    "name": "tr04-preflight-40973940936-1",
+    "path": "raw/tr04-preflight-40973940936-1.zip",
+    "bytes": 19654,
+    "sha256": "3005f6c178558119459e3553f28bc7fa842ec7251123fcd6d432c35fb66f0570",
+    "github_digest": "sha256:3005f6c178558119459e3553f28bc7fa842ec7251123fcd6d432c35fb66f0570",
+    "downloaded_via": "GitHub connector binary-download then provided file URL through normal proxy",
+    "digest_verified": true,
+    "files": [
+      {
+        "path": "preflight/RESUME.md",
+        "bytes": 1944,
+        "sha256": "42aad8ccd1545b2b25d7e31107a91316687805180b55e9f7e527bf5d84c9c028"
+      },
+      {
+        "path": "preflight/artifact-delivery-readiness.txt",
+        "bytes": 111,
+        "sha256": "f8223a1152a9e67b05f39ab5b9fef83d04bc3c9376364ea4d1377abe23d80031"
+      },
+      {
+        "path": "preflight/checkpoint.exit",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "preflight/checkpoint.log",
+        "bytes": 198,
+        "sha256": "366e7cfee7d301495b7900107acb1ae408c7d908eb80d04a73d9c9128a0f78fe"
+      },
+      {
+        "path": "preflight/clippy.log",
+        "bytes": 1995,
+        "sha256": "3921354e8478fa8f102e7866c7c651d148b3a1bf83db24414a52bc696dde4fec"
+      },
+      {
+        "path": "preflight/execution.json",
+        "bytes": 355,
+        "sha256": "1bd3377798bf803edc7d1ca4231fcb7725f115628de16ce33bac729ed0cccfcb"
+      },
+      {
+        "path": "preflight/fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "preflight/protocol-build.log",
+        "bytes": 75,
+        "sha256": "4ab0b3a4c53276403ec3772f9323b219a1c2155d8559abe5416a871343b43e79"
+      },
+      {
+        "path": "preflight/protocol-schema-source-check.log",
+        "bytes": 78,
+        "sha256": "70c8999fcd1779ce4da0f0cb232a85723cf7cb22b590843316062e8a7f425449"
+      },
+      {
+        "path": "preflight/protocol-schema-source.json",
+        "bytes": 329,
+        "sha256": "45470df47a3d653c482478075b39a14fa45aa64c374c69395595120667c464ca"
+      },
+      {
+        "path": "preflight/protocol-schema.log",
+        "bytes": 578,
+        "sha256": "7ec032f09c4f061fa061b013345f65b1b483121f8e4b33cfcf815fcd558ba693"
+      },
+      {
+        "path": "preflight/protocol-validation.log",
+        "bytes": 81,
+        "sha256": "23125ab2af37cb33ede8eb585d19b30b55e01790a02cc98176af16a595137a22"
+      },
+      {
+        "path": "preflight/protocol.json",
+        "bytes": 49150,
+        "sha256": "a9e631608a486eac8e6be711cbe621f8bfdff84fa49b22d741e7c50f6d3b60fe"
+      },
+      {
+        "path": "preflight/protocol.sha256",
+        "bytes": 119,
+        "sha256": "388a1e9af23f1772ed8afb0207bf2eac26b0207fd29f6a3eeb6ee599072f1409"
+      },
+      {
+        "path": "preflight/tests.log",
+        "bytes": 5799,
+        "sha256": "ce711b3ba46adeadb992ba2ed7d7718b15088aa61c9957cec49382ea331e5aae"
+      }
+    ]
+  },
+  "archive": {
+    "path": "evidence.tar.xz",
+    "bytes": 57552,
+    "sha256": "602d56577e400bce3c988f0eb23cb38040e443bfa8d6d7c879ff9f38d13924d9"
+  },
+  "validation": {
+    "schema": "tr04.postrun-validation/v1",
+    "source": "85fc870c96a3ea707afe11e06cf884eba6f957ce",
+    "primary_research_launched": false,
+    "workflow_dispatches_by_this_check": 0,
+    "checkpoint_exit": 1,
+    "posthoc_native_summarize_exit": 1,
+    "posthoc_native_report_exit": 1,
+    "export_schema_exit": 0,
+    "portable_file_hashes_verified": true,
+    "actual_rows": 0,
+    "missing_rows": 27,
+    "pattern_regression_exit": 0,
+    "actionlint_shellcheck_exit": 0,
+    "frozen_source_and_protocol_unchanged": true,
+    "native_pdf": {
+      "pages": 2,
+      "visually_inspected": true,
+      "clipping_observed": false
+    },
+    "failure_report_pdf": {
+      "pages": 1,
+      "visually_inspected": true,
+      "clipping_observed": false
+    },
+    "failure_svg_inspected_in_pdf": true,
+    "first_typst_render_exit": 1,
+    "typst_final_render_exit": 0,
+    "full_library_rerun": false,
+    "remote_store_upload": false,
+    "independent_remote_store_download": false
+  },
+  "native_analysis_binaries": [
+    {
+      "path": "twist-tr04",
+      "bytes": 2150424,
+      "sha256": "e7a9f110ffa1d6aff1d979e14ed582c03cbb4aad6f2cf46435063d263c8d2272"
+    },
+    {
+      "path": "tr04-report",
+      "bytes": 1458512,
+      "sha256": "5ec13eab80b63b348fa55689d30f0760dd606978baaa75dbb9c92baf5c3fbc6d"
+    }
+  ],
+  "protocol": {
+    "version": 3,
+    "canonical_sha256": "a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce",
+    "raw": {
+      "path": "protocol.json",
+      "bytes": 49150,
+      "sha256": "a9e631608a486eac8e6be711cbe621f8bfdff84fa49b22d741e7c50f6d3b60fe"
+    },
+    "matches_downloaded_preflight": true,
+    "unchanged": true
+  },
+  "analysis_source": {
+    "path": "tools/twist-relations/src/tr04_report.rs",
+    "sha256": "dbff251e6ede8244f1ff6f9519d88830be5c3076ed9ae8d906d4fb6abe37b923",
+    "unchanged": true
+  },
+  "review_fix": {
+    "thread": "PRRT_kwDOSMdswM6xzHgB",
+    "comment": 4419135390,
+    "scope": "Artifact download routing only; not the observed checkpoint failure",
+    "review_thread_resolved_by_author": false,
+    "new_workflow_dispatched": false
+  },
+  "remote_store": {
+    "experiment_upload": false,
+    "independent_download": false,
+    "authorization_verified": false
+  },
+  "root_archive": {
+    "path": "/workspace/tr04-root-validation-445d84bf7.tar.xz",
+    "bytes": 80316,
+    "sha256": "d87dcae1c1a91d66535b1e14f675d8575ed938bd0d0a871ec71708523518b72b",
+    "remote_upload": false,
+    "independent_download": false
+  },
+  "limitations": [
+    "No primary relation/rank/work comparison",
+    "No hardware timing or GAE admission",
+    "No end-to-end DLP/scalar recovery or generic-security claim",
+    "Primitive counters not independently recomputed",
+    "PR gates not verified passing; reviewer resolution remains required"
+  ]
+}
