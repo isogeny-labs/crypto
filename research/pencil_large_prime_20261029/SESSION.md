@@ -1460,3 +1460,39 @@ builds report45min, cause not established. AutoRetryLimit2 allows three total
 builds, discovered during reconciliation. First amendment metadata candidate
 used timestamp for date-only field; native checker rejected it; corrected before
 review/admission. Manual takeover proposal was never executed.
+
+## 2026-10-30T07:03Z — C1 generation9 interim report
+
+### What was done
+
+Preserved and published selected non-memory checkpoint9 files at799fff06e;
+versioned archive, manifest and selected payload hashes were checked. Four rows
+are retained: two control warmups producer-verified, pencil warmup timeout
+(watchdog expired, signal9), one measured rho producer-verified. Native accounting
+retains18planned/4observed/14missing, five incomplete pairs and36null ratio cells.
+Rendered and visually inspected native four-page PDF and a five-page review
+packet with coverage graph; CSV/JSON/LaTeX/SVG retained. Independent observation
+and presentation reviews found no scope defect. PDFs stored content-addressed.
+
+### Decisions made
+
+This is explicitly an interim snapshot of a still-running gate, not full1260
+completion or a cost-ratio claim. All timings remain unqualified, all required
+scientific replays remain unperformed. Keep v4 scientific identity and v5
+controller-only amendment separate. No additional scientific run was launched.
+
+### Open threads
+
+Follow existing controller592e9381 and potential exact same-request third
+controller; immutable08:10:24 cutoff and11:17:54 outer expiry remain. Publish
+terminal accounting and report separately when actual terminal evidence exists.
+The full four-lead objective and full-cohort requirements remain active.
+
+### Errors
+
+Canonical package exits1 with four shortfalls; semantic check exits1 with five
+incompleteness findings. These are retained, not suppressed. Root resource-update
+race restored original exact bytes; post-restoration check has the same five
+findings and no binding error. Optional CairoSVG import failed; installed
+rsvg-convert rendered the graph successfully. Git push warned about unrelated
+historical large blobs; no history rewrite was performed.
