@@ -4,11 +4,11 @@
   "purpose": "Retained software correctness checks, not research trials or timing comparisons",
   "prerequisite": "Original cap-fix pipeline terminal success; materialized exact-HEAD dependencies and full maintained examples; live Conductor ownership",
   "materialization_inventory": {
-    "path": "/home/ec2-user/ml-dataset-work-20261028/algebraic-materialization-01.json",
-    "sha256": "545a5dc37792d621a0617e6f20177763b1d0dce236fada3550978ca52293fe85",
-    "source_commit": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
-    "files": 145,
-    "bytes": 210016693,
+    "path": "/home/ec2-user/ml-dataset-work-20261028/algebraic-materialization-02.json",
+    "sha256": "e76e3a7ea2d287da89e6b52fa96f5c51ae8823f719675fa768b6126a768e2844",
+    "source_commit": "51e0c7abe7350a0da83e27b42b181117c9395590",
+    "files": 151,
+    "bytes": 210027745,
     "binding": "Before and after every phase, verify inventory SHA, every recorded blob against the execution commit with one git ls-tree read, and every materialized file SHA and size"
   },
   "source_binding": "Compare all tracked paths against execution commit except docs/session-logs/** and this task's exact store-index.json; reject untracked Rust/Cargo/config inputs. Restored sparse inputs also require explicit byte checks.",
@@ -46,7 +46,7 @@
     "failure": "JSON macro recursion limit in exporter manifest; no tests executed",
     "retained_receipt": "algebraic-pipeline-01.receipt.json"
   },
-  "manual_continuation": {
+  "prior_manual_continuation": {
     "attempt": "03",
     "runner": "run-cli-continuation.sh",
     "reason": "attempt02 runtime checks passed; CLI fixture jq helper shadowed builtin keys",
@@ -58,6 +58,20 @@
     "runtime_source": "db9bd045e38f2e55039d02372b92b5bee3f29ba0",
     "fixture_validation_source": "exact committed revision passed to continuation runner",
     "failure_receipt": "algebraic-pipeline-02.receipt.json",
+    "no_automatic_retry": true
+  },
+  "manual_continuation": {
+    "attempt": "04",
+    "runner": "run-full-continuation.sh",
+    "reason": "attempt03 CLI passed; full release suite failed only on missing tracked wide-archive manifests",
+    "reuse_scope": "unchanged runtime/build and CLI fixture bytes; prior successful dataset/clippy/build02 and CLI03 receipts retained; materialization02 is exact union of01 plus six tracked manifests",
+    "remaining_sequence": [
+      "exact previously failed wide-archive test",
+      "full serialized release library suite"
+    ],
+    "runtime_source": "db9bd045e38f2e55039d02372b92b5bee3f29ba0",
+    "fixture_validation_source": "exact committed revision passed to continuation runner",
+    "failure_receipt": "algebraic-pipeline-03.receipt.json",
     "no_automatic_retry": true
   }
 }

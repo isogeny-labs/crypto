@@ -35,3 +35,23 @@ changes were performed.
 Original prefix-export PR2942 merged at2026-10-30T05:57:42Z as
 01df67aa7108e9d23810bae2065e1728220fa1b0. This consequence increment remains separate;
 newer main runtime changes are not covered by these isolated validation receipts.
+
+## Continuation03 terminal result
+
+The corrected CLI fixture passed at06:08:49Z using the unchanged frozen runtime:
+four export/retry commands, 10 curve and 1 twist nonzero checked consequences,
+all feature joins/hashes, unchanged static/branch bytes and rejection of changed
+restricted output. Source checks passed before and after.
+
+Full release library suite ended at06:45:40Z with5458 passed,1 failed,123 ignored
+and exit101. The sole failure, wide_archive_is_rejected_without_truncation,
+received ENOENT when reading tools/factor-base/validation/archive/manifests.
+Six exact tracked manifests are outside the selected sparse paths; no width
+assertion ran. The source preflight and readback both matched. This is a failed
+full validation and prevents delivery until corrected validation passes.
+
+All03 receipts/logs and CLI outputs are retained with fresh S3 readback; see
+attempt-03-readback.json. A fixture-only continuation04 will bind a new immutable
+materialization inventory, first run the failed test, then the complete release
+library suite. It changes no Rust runtime and does not weaken the test. No
+continuation04 has run yet.
