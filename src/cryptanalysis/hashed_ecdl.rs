@@ -186,8 +186,8 @@ impl Curve {
         {
             return Err(Error::Invalid("prime field/order witness parameters"));
         }
-        if (mulmod(4, mulmod(mulmod(a, a, p), a, p), p) + mulmod(27 % p, mulmod(b, b, p), p)) % p
-            == 0
+        if (mulmod(4, mulmod(mulmod(a, a, p), a, p), p) + mulmod(27 % p, mulmod(b, b, p), p))
+            .is_multiple_of(p)
         {
             return Err(Error::Invalid("singular curve"));
         }
