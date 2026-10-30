@@ -45,5 +45,19 @@
     "exit_code": 101,
     "failure": "JSON macro recursion limit in exporter manifest; no tests executed",
     "retained_receipt": "algebraic-pipeline-01.receipt.json"
+  },
+  "manual_continuation": {
+    "attempt": "03",
+    "runner": "run-cli-continuation.sh",
+    "reason": "attempt02 runtime checks passed; CLI fixture jq helper shadowed builtin keys",
+    "reuse_scope": "unchanged runtime/build inputs and exact frozen02 binary; prior successful dataset/clippy/build receipts retained",
+    "remaining_sequence": [
+      "corrected full CLI fixture",
+      "full serialized release library suite"
+    ],
+    "runtime_source": "db9bd045e38f2e55039d02372b92b5bee3f29ba0",
+    "fixture_validation_source": "exact committed revision passed to continuation runner",
+    "failure_receipt": "algebraic-pipeline-02.receipt.json",
+    "no_automatic_retry": true
   }
 }

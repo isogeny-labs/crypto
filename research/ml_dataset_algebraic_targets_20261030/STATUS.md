@@ -1,44 +1,37 @@
 # Implementation status
 
-Contract committed9bf58b486058 before source edits. Native single-identity verifier,
-separately bounded consequence channel, recursive replay integration and v6 export
-installation are implemented in the isolated worktree. Thirteen API/channel tests
-and one native-event integration test are authored. Rustfmt and whitespace checks
-passed. The source review names exact file hashes and found no blocking defect;
-this is not execution validation or independent scientific review.
+The native polynomial identity verifier, bounded consequence channel and v6
+exporter are implemented. Contract9bf58b486058 preceded runtime implementation.
+Runtime correction db9bd045e38f splits manifest macro construction while keeping
+its schema unchanged. Current validation is software evidence on retained
+synthetic fixtures; verified cloud dataset cells remain0.
 
-The new actual CLI fixture is frozen separately from the historical v5 fixture.
-It will check all three input files, restricted joins/counts, immutable retry,
-static/branch feature stability and rejection of rehashed changed output by native
-regeneration. The protocol names frozen source/reference hashes. It does not
-provide an independent implementation or standalone external-record verifier.
+Attempt01 at6e1e0d0db9f2 failed during compilation because the large manifest JSON
+macro exceeded recursion depth. No tests executed. Its immutable receipts remain
+in this directory and S3.
 
-All new-source runtime validation remains pending. No competing build has been
-started while the parent cap-fix pipeline runs in the original worktree. No new
-research samples, cloud dataset cells, cloud jobs or IAM changes were produced.
+Attempt02 on db9bd045e38f passed254 dataset tests (0failed,1ignored), strict
+maintained Clippy and the release CLI build. Each phase passed source preflight
+and readback. The actual CLI successfully exported and immutably retried curve
+shard62, including10 checked nonzero consequences. Artifact hashes, all feature
+identities and static/branch byte equality checks passed before the fixture
+stopped at its public-schema assertion. It did not reach the twist, corruption
+check or full library suite. Terminal exit1 is preserved in attempt-02 receipts.
 
-Continuation preparation: source73225d26b175 was checkpointed to S3 and its fresh
-downloaded Git bundle verified (source-checkpoint-readback.json). The v6 fixture
-now pins each source manifest and historical equality-audit digest, requires10
-curve consequences and1 twist consequence without censoring, and checks exact
-public structural keys against the frozen static inputs. These assertions remain
-unexecuted. The operations/design documents describe this task and its limits.
+The schema assertion defect is in the jq fixture: its helper argument `$keys`
+shadows jq's builtin `keys`, so expected-key arrays are compared to their own
+sorted versions. Rename the argument while preserving exact-key equality. No
+runtime source change is indicated. A separately named continuation will bind
+the corrected fixture to unchanged runtime and retained binary, then run the
+complete CLI fixture and required full library suite. It must preserve attempt02
+and cannot claim full validation until its own terminal receipts pass.
 
-The isolated checkout has145 exact-source fixture files restored (210,016,693
-bytes); its frozen inventory SHA is545a5dc37792d621a0617e6f20177763b1d0dce236fada3550978ca52293fe85.
-Offline locked Cargo metadata succeeded and identified716 maintained examples
-and840 total targets. This is manifest readiness, not compilation. The finite
-validation scripts now bind all tracked inputs and sparse fixture hashes,
-reject untracked Rust/Cargo inputs, retain preflight failures and partial CLI
-output, and enforce eight Rayon threads. Shell syntax checks passed. Runtime
-source hashes still match the independent source review.
+Source checkpoint04 was freshly downloaded and its Git bundle verified; see
+source-checkpoint-04-readback.json. All attempt02 phase logs/receipts and partial
+CLI output were archived with fresh S3 readback. The S3 store index retains their
+content-addressed references. No new research generation, cloud jobs or IAM
+changes were performed.
 
-Attempt01 executed on6e1e0d0db9f2 after the parent pipeline completed. Both source
-checks passed, but compilation failed with exit101 at the expanded exporter
-manifest's JSON macro recursion limit. No dataset tests executed. Its phase and
-terminal pipeline logs/receipts are retained in S3 with fresh byte comparisons;
-see attempt-01-readback.json. A local manifest-construction refactor is being
-prepared without changing schema or raising the crate-wide recursion limit.
-The next manually initiated attempt will use a distinct02 namespace so failed
-artifacts remain intact. The source preflight passed separately; this establishes
-source/fixture identity only.
+Original prefix-export PR2942 merged at2026-10-30T05:57:42Z as
+01df67aa7108e9d23810bae2065e1728220fa1b0. This consequence increment remains separate;
+newer main runtime changes are not covered by these isolated validation receipts.

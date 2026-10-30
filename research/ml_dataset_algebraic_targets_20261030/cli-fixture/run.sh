@@ -46,7 +46,7 @@ for shard in 62 63; do
     done < "$destination/$name"
   done
   jq -n -e --argjson expected "$expected_cell" --slurpfile static "$reference_root/export-$shard/features.jsonl" --slurpfile features "$destination/algebraic-features.jsonl" --slurpfile records "$destination/restricted/algebraic-records.jsonl" --slurpfile manifests "$destination/manifest.json" '
-    def exact_keys($keys): type=="object" and keys==($keys|sort);
+    def exact_keys($expected_keys): type=="object" and keys==($expected_keys|sort);
     def natural: type=="number" and .>=0 and floor==.;
     $manifests[0] as $m |
     ($static|length)==1 and
