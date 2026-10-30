@@ -10,6 +10,21 @@ use super::prefix_algebra::{self, Poly};
 const MAX_EVENT_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_EVENTS: u64 = 4096;
 const MAX_STREAM_BYTES: u64 = 64 * 1024 * 1024;
+const MAX_VERIFIER_COEFFICIENT_OPS: u64 = 100_000_000;
+
+#[derive(Default, serde::Serialize)]
+struct VerifierWork {
+    certificate_coefficient_operations: u64,
+    root_coefficient_operations: u64,
+    finite_domain_evaluations: u64,
+}
+impl VerifierWork {
+    fn remaining(&self) -> u64 {
+        MAX_VERIFIER_COEFFICIENT_OPS.saturating_sub(
+            self.certificate_coefficient_operations + self.root_coefficient_operations,
+        )
+    }
+}
 
 fn uint(v: &Value) -> Result<u64, String> {
     v.as_u64().ok_or("prefix integer missing".into())
@@ -173,6 +188,7 @@ fn iterator(
     active: &[usize],
     domains: &[Option<Vec<u64>>],
     p: u64,
+    work: &mut VerifierWork,
 ) -> Result<Option<IteratorState>, String> {
     let mut best: Option<(usize, Vec<u64>)> = None;
     for f in basis {
@@ -190,6 +206,7 @@ fn iterator(
         }
         let var = *vars.first().unwrap();
         let roots = if let Some(domain) = &domains[active[var]] {
+            work.finite_domain_evaluations += domain.len() as u64;
             domain
                 .iter()
                 .copied()
@@ -205,7 +222,16 @@ fn iterator(
             for (e, c) in f {
                 coefficients[e[var] as usize] = *c;
             }
-            prefix_algebra::roots(&coefficients, p)?
+            let mut root_work = prefix_algebra::Work::default();
+            let result = prefix_algebra::roots(
+                &coefficients,
+                p,
+                &mut root_work,
+                work.remaining()
+                    .min(prefix_algebra::Limits::default().operations),
+            );
+            work.root_coefficient_operations += root_work.coefficient_operations;
+            result?
         };
         if best.as_ref().is_none_or(|(_, old)| roots.len() < old.len()) {
             best = Some((var, roots));
@@ -331,14 +357,13 @@ pub(super) fn replay(
     let mut bytes = 0;
     let mut examples = 0;
     let mut certified_nodes = 0;
+    let mut verifier_work = VerifierWork::default();
     let mut stopped = false;
     let mut reason = None;
     loop {
         let cut = bytes;
         let mut line = Vec::new();
-        let read = reader
-            .by_ref()
-            .take(MAX_EVENT_BYTES + 1)
+        let read = std::io::Read::take(&mut reader, MAX_EVENT_BYTES + 1)
             .read_until(b'\n', &mut line)
             .map_err(|e| e.to_string())?;
         if read == 0 {
@@ -464,8 +489,15 @@ pub(super) fn replay(
                     &basis,
                     frame.active.len(),
                     p,
-                    prefix_algebra::Limits::default(),
+                    prefix_algebra::Limits {
+                        operations: verifier_work
+                            .remaining()
+                            .min(prefix_algebra::Limits::default().operations),
+                        ..prefix_algebra::Limits::default()
+                    },
                 )?;
+                verifier_work.certificate_coefficient_operations +=
+                    audit.work.coefficient_operations;
                 let verified = audit.certificate.is_some();
                 let audit_reason = audit.reason.clone();
                 emit(
@@ -488,7 +520,7 @@ pub(super) fn replay(
                 } else if inconsistent {
                     frame.terminal = true;
                 } else {
-                    match iterator(&basis, &frame.active, &domains, p) {
+                    match iterator(&basis, &frame.active, &domains, p, &mut verifier_work) {
                         Ok(value) => {
                             frame.terminal = value.is_none();
                             frame.iterator = value;
@@ -599,7 +631,9 @@ pub(super) fn replay(
         "admission_status":if reason.is_some(){"bounded_unknown_suffix"}else{"retained_prefix_checked"},"reason":reason,
         "source_completion_claimed":false,"native_execution_trace_verified":false,
         "native_instruction_count_verified":false,"exact_fall_degree_verified":false,
-        "limits":{"events":MAX_EVENTS,"event_bytes":MAX_EVENT_BYTES,"stream_bytes":MAX_STREAM_BYTES}}),
+        "verifier_work":verifier_work,"verifier_work_scope":"certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions",
+        "limits":{"events":MAX_EVENTS,"event_bytes":MAX_EVENT_BYTES,"stream_bytes":MAX_STREAM_BYTES,
+            "certificate_plus_root_coefficient_operations":MAX_VERIFIER_COEFFICIENT_OPS}}),
     )
 }
 

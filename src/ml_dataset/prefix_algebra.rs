@@ -461,7 +461,12 @@ fn power_mod(ring: &mut Ring, a: &[u64], mut e: u64, f: &[u64]) -> Result<Vec<u6
 
 /// Deterministic capped splitter. Gcd(f,X^p-X) certifies distinct-root completeness;
 /// no claim is made about the original native factorization trace or its costs.
-pub(super) fn roots(coefficients: &[u64], p: u64) -> Result<Vec<u64>, String> {
+pub(super) fn roots(
+    coefficients: &[u64],
+    p: u64,
+    work: &mut Work,
+    operation_limit: u64,
+) -> Result<Vec<u64>, String> {
     if coefficients.len() > 65
         || coefficients.iter().any(|c| *c >= p)
         || !(5..1u64 << 62).contains(&p)
@@ -477,88 +482,103 @@ pub(super) fn roots(coefficients: &[u64], p: u64) -> Result<Vec<u64>, String> {
     let mut ring = Ring {
         p,
         n: 1,
-        limits: Limits::default(),
+        limits: Limits {
+            operations: operation_limit,
+            ..Limits::default()
+        },
         work: Work::default(),
     };
-    let mut xp = power_mod(&mut ring, &[0, 1], p, &f)?;
-    xp.resize(xp.len().max(2), 0);
-    xp[1] = ring.add(xp[1], p - 1)?;
-    trim(&mut xp);
-    let g = gcd(&mut ring, &f, &xp)?;
-    let expected = g.len().saturating_sub(1);
-    let mut pending = vec![g];
-    let mut roots = Vec::new();
-    while let Some(h) = pending.pop() {
-        if h.len() <= 1 {
-            continue;
-        }
-        if h.len() == 2 {
-            let inv = ring.inverse(h[1])?;
-            roots.push(ring.mul(if h[0] == 0 { 0 } else { p - h[0] }, inv)?);
-            continue;
-        }
-        let mut factors = None;
-        for delta in 0..p.min(256) {
-            // First isolate a possible zero of x+delta, then quadratic characters.
-            let linear = vec![delta, 1];
-            let mut d = gcd(&mut ring, &h, &linear)?;
-            if d.len() <= 1 || d.len() == h.len() {
-                let mut s = power_mod(&mut ring, &linear, (p - 1) / 2, &h)?;
-                if s.is_empty() {
-                    s.push(0);
-                }
-                s[0] = ring.add(s[0], p - 1)?;
-                trim(&mut s);
-                d = gcd(&mut ring, &h, &s)?;
+    let result = (|| {
+        let mut xp = power_mod(&mut ring, &[0, 1], p, &f)?;
+        xp.resize(xp.len().max(2), 0);
+        xp[1] = ring.add(xp[1], p - 1)?;
+        trim(&mut xp);
+        let g = gcd(&mut ring, &f, &xp)?;
+        let expected = g.len().saturating_sub(1);
+        let mut pending = vec![g];
+        let mut roots = Vec::new();
+        while let Some(h) = pending.pop() {
+            if h.len() <= 1 {
+                continue;
             }
-            if d.len() > 1 && d.len() < h.len() {
-                let mut r = h.clone();
-                let mut q = vec![0; h.len() - d.len() + 1];
-                // d is monic. Check exact quotient, including its remainder.
-                while r.len() >= d.len() {
-                    let offset = r.len() - d.len();
-                    let c = *r.last().unwrap();
-                    q[offset] = c;
-                    for (i, dc) in d.iter().enumerate() {
-                        let product = ring.mul(c, *dc)?;
-                        r[i + offset] =
-                            ring.add(r[i + offset], if product == 0 { 0 } else { p - product })?;
+            if h.len() == 2 {
+                let inv = ring.inverse(h[1])?;
+                roots.push(ring.mul(if h[0] == 0 { 0 } else { p - h[0] }, inv)?);
+                continue;
+            }
+            let mut factors = None;
+            for delta in 0..p.min(256) {
+                // First isolate a possible zero of x+delta, then quadratic characters.
+                let linear = vec![delta, 1];
+                let mut d = gcd(&mut ring, &h, &linear)?;
+                if d.len() <= 1 || d.len() == h.len() {
+                    let mut s = power_mod(&mut ring, &linear, (p - 1) / 2, &h)?;
+                    if s.is_empty() {
+                        s.push(0);
                     }
-                    trim(&mut r);
+                    s[0] = ring.add(s[0], p - 1)?;
+                    trim(&mut s);
+                    d = gcd(&mut ring, &h, &s)?;
                 }
-                if !r.is_empty() {
-                    return Err("root factor quotient failed".into());
+                if d.len() > 1 && d.len() < h.len() {
+                    let mut r = h.clone();
+                    let mut q = vec![0; h.len() - d.len() + 1];
+                    // d is monic. Check exact quotient, including its remainder.
+                    while r.len() >= d.len() {
+                        let offset = r.len() - d.len();
+                        let c = *r.last().unwrap();
+                        q[offset] = c;
+                        for (i, dc) in d.iter().enumerate() {
+                            let product = ring.mul(c, *dc)?;
+                            r[i + offset] = ring
+                                .add(r[i + offset], if product == 0 { 0 } else { p - product })?;
+                        }
+                        trim(&mut r);
+                    }
+                    if !r.is_empty() {
+                        return Err("root factor quotient failed".into());
+                    }
+                    trim(&mut q);
+                    factors = Some((d, q));
+                    break;
                 }
-                trim(&mut q);
-                factors = Some((d, q));
-                break;
+            }
+            let (a, b) = factors.ok_or("deterministic root split cap")?;
+            pending.push(a);
+            pending.push(b);
+        }
+        roots.sort_unstable();
+        roots.dedup();
+        if roots.len() != expected {
+            return Err("distinct-root completeness failed".into());
+        }
+        for x in &roots {
+            let mut value = 0;
+            for c in f.iter().rev() {
+                value = ring.mul(value, *x)?;
+                value = ring.add(value, *c)?;
+            }
+            if value != 0 {
+                return Err("root evaluation failed".into());
             }
         }
-        let (a, b) = factors.ok_or("deterministic root split cap")?;
-        pending.push(a);
-        pending.push(b);
-    }
-    roots.sort_unstable();
-    roots.dedup();
-    if roots.len() != expected {
-        return Err("distinct-root completeness failed".into());
-    }
-    for x in &roots {
-        let mut value = 0;
-        for c in f.iter().rev() {
-            value = ring.mul(value, *x)?;
-            value = ring.add(value, *c)?;
-        }
-        if value != 0 {
-            return Err("root evaluation failed".into());
-        }
-    }
-    Ok(roots)
+        Ok(roots)
+    })();
+    *work = ring.work;
+    result
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn roots(coefficients: &[u64], p: u64) -> Result<Vec<u64>, String> {
+        super::roots(
+            coefficients,
+            p,
+            &mut Work::default(),
+            Limits::default().operations,
+        )
+    }
     fn poly(terms: &[(&[u32], u64)]) -> Poly {
         terms.iter().map(|(e, c)| (e.to_vec(), *c)).collect()
     }
