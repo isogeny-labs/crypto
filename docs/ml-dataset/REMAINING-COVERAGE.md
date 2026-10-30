@@ -152,8 +152,9 @@ enormous corpus.
 Source `113526b577044a6283be81acb1a847c89c96aa4e` imports newer native libraries
 from main `bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. The table above records
 the prior validated scope. The combined revision subsequently passed 236 dataset
-tests (0 failures, 1 ignored); full-library, lint and actual CLI checks remain
-pending. Additional imported capabilities and their limits are:
+tests (0 failures, 1 ignored), the explicit 360-case endpoint test and the full
+release library suite (5,441 passed, 0 failed, 123 ignored). Combined lint and
+actual CLI checks remain pending. Additional imported capabilities and limits are:
 
 - Prime F4 has a supervised wide-field **m = 2** adapter through
   `p = 2^61 - 1`, requiring the original execution context. Recursive
@@ -170,7 +171,7 @@ pending. Additional imported capabilities and their limits are:
 - Prefix source `06773dcf28f` passed four actual CLI export/retry checks on
   retained curve/twist fixtures, producing four curve branch examples and
   zero twist branch examples. These checks added no scientific samples.
-  Combined dataset tests passed; full-library and combined CLI validation are
+  Combined dataset and full-library tests passed; combined CLI validation is
   still pending. Three failed combined attempts document sparse-checkout
   omissions and a corrected restoration-helper bug. The initially ignored
   360-cell endpoint integration sweep was subsequently run explicitly and

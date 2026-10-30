@@ -103,7 +103,9 @@ export/retry checks on retained curve/twist cells, producing four branch prefixe
 for the curve and zero for the twist's certified inconsistent root. Combined
 source `113526b5770` passed 236 dataset tests, with 0 failures and 1 ignored;
 this includes both subsequently added certificate/cap regression tests.
-Full-library, combined lint and release CLI validation remain pending.
+The same combined runtime then passed the full release library suite
+(5,441 passed, 0 failed, 123 ignored) and the explicitly selected 360-case
+endpoint integration test. Combined lint and release CLI validation remain pending.
 The initial build failed on Rust reader ownership; that failure is retained.
 
 `crypto dataset export` now stages `prefix-features.jsonl` alongside static

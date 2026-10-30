@@ -19,8 +19,11 @@ that bookkeeping error and restored 126 hash-checked blobs (34,801,774 bytes)
 from the exact combined revision. These failures and both helper versions are
 retained. Attempt four passed **236 dataset tests, 0 failed, 1 ignored**, including
 both added regression tests, with exit code 0 and matching runtime-source
-readback. Full-library validation, maintained Clippy and combined release CLI
-replay are the next phases in [combined-validation-plan.json](combined-validation-plan.json).
+readback. The combined full release library suite subsequently passed
+**5,441 tests, 0 failed, 123 ignored**, with exit0 and matching runtime-source
+readback; see [full-library.receipt.json](full-library.receipt.json). Maintained
+Clippy and combined release CLI replay are the remaining phases in
+[combined-validation-plan.json](combined-validation-plan.json).
 The ignored test subsequently passed all **360 endpoint combinations** when run
 explicitly against the same combined-source binary (one test, zero failures,
 exit0). Its binary hash matched before/after and runtime-source readback matched.
@@ -33,8 +36,7 @@ remain non-solutions. It does not exercise supervised wide-F4 admission or the
 entire requested size/arity cross-product. Its separate
 [endpoint artifact index](endpoint-store-index.json) avoids concurrent writes
 with the running full-suite archiver.
-The full serialized suite is running under the finite plan, followed by lint,
-build and CLI only if preceding phases pass.
+The pipeline continues with lint, build and CLI only if preceding phases pass.
 
 Initial source5d4336b45d2 failed compilation because of
 a bounded-reader ownership error; its log and exit101 receipt are retained.
