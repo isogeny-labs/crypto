@@ -22,6 +22,7 @@ verification are recorded in `clean-source-package-01.receipt.json`.
 Use a new directory and the configured artifact-store credentials:
 
 ```bash
+umask 077
 mkdir dataset-source-restore
 cd dataset-source-restore
 aws s3 cp s3://setec-astronomy-artifacts/store/sha256/39/39cf38c008b681cafd4a3c2a38d84c64455c6d3bb05f55e0ae749093fd060d8f package.tar.gz
@@ -38,8 +39,10 @@ git -C source ls-files -z | sort -z | cmp final-paths.bin -
 test -z "$(git -C source status --porcelain --untracked-files=all)"
 ```
 
-The original preparation checked POSIX file modes too. On a restored Unix
-checkout, check `source-modes.tsv` before using it as a build source:
+The original preparation checked POSIX file modes too: source files use 0600
+or 0700. The explicit `umask 077` preserves those modes during Git checkout.
+On a restored Unix checkout, check `source-modes.tsv` before using it as a build
+source:
 
 ```bash
 while IFS=$'\t' read -r path expected; do
