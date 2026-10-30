@@ -1,7 +1,26 @@
 # n83 spike40 factor bases and matched PDP work
 
 
-## Latest: propagation of degree-four consequences
+## Latest: hybrid quartic closure
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. Complete V4 normal forms and a global LFD upper certificate are distinct claims. A cap gives no full-closure conclusion or higher-fall bound. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+Read the [native summary](evidence/degree4-quartic/summary.json),
+[certificate design](DEGREE4_QUARTIC_DESIGN.md),
+[binary and JSON formats](DEGREE4_QUARTIC_FORMAT.json),
+[unified export](experiment-degree4-quartic.export.json),
+[S3 objects](evidence/degree4-quartic-storage.json), and
+[restored verification](evidence/degree4-quartic-publication.json).
+The raw archive retains all attempted cases, rows, reductions, pending queues
+and affine checks. Replay requires the four immutable parent archives.
+
+Original point manifests, targets, equations and the 48-row fixed-base regularity
+view remain unchanged. Every base remains fixed across m2–9. The full n83
+three-family FFD/LFD characterization and held-out elite-base search remain open.
+
+## Earlier: propagation of degree-four consequences
 
 12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 2988 new independent rows and 2988 operations. Global upper certificates: 0; exact LFD certificates: 0.
 

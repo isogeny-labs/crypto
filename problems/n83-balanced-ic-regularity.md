@@ -144,3 +144,17 @@ and [restored checks](../research/n83_candidate_pdp_20261028/evidence/degree4-pr
 Only a verified unit or exhaustive affine ideal equality can certify global
 upper4 under this protocol. Prime/higher-m global LFD, independent review and
 held-out matched elite-base selection remain separate unresolved requirements.
+
+
+## Fixed ell27 hybrid quartic closure, 2026-10-29
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. Complete V4 normal forms and a global LFD upper certificate are distinct claims. A cap gives no full-closure conclusion or higher-fall bound. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+See the [native results](../research/n83_candidate_pdp_20261028/evidence/degree4-quartic/summary.json),
+[upper-certificate argument](../research/n83_candidate_pdp_20261028/DEGREE4_QUARTIC_DESIGN.md)
+and [restored checks](../research/n83_candidate_pdp_20261028/evidence/degree4-quartic-publication.json).
+Only a verified unit or exhaustive affine ideal equality can certify global
+upper4 under this protocol. Prime/higher-m global LFD, independent review and
+held-out matched elite-base selection remain separate unresolved requirements.

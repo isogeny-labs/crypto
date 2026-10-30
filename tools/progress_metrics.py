@@ -129,7 +129,7 @@ def _prefetch_histories(ref, since):
     ] + ["research/n83_candidate_pdp_20261028/" + path for path in (
         "data/index.json", "evidence/pdp/paired-summary.json",
         "evidence/degree3/summary.json", "evidence/top/verified-summary.json",
-        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json", "evidence/degree4-propagation/summary.json")]
+        "evidence/hilbert/verified-summary.json", "evidence/binary-pair/verified-summary.json", "evidence/chain/verified-summary.json", "evidence/degree3-m3/summary.json", "evidence/degree3-continuation/summary.json", "evidence/chain-exact/verified-summary.json", "evidence/degree4-witness/summary.json", "evidence/degree4-propagation/summary.json", "evidence/degree4-quartic/summary.json")]
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda path: _history_log(ref, path, since), paths))
 
@@ -610,6 +610,31 @@ def n83_candidate_datasets(ref, since):
                 emit(f"n83.m3_propagation.{row['key']}.{field}", value,
                      date=date, problem="n83-m3-fall-degree", unit=unit,
                      label=f"Retained m3 V4 consequences {row['key']}: {field}; stop={row['state']['stop_reason']}; lower inherited; no unrestricted V4; review pending",
+                     source=f"{path}@{commit}")
+
+
+    path = f"{study}/evidence/degree4-quartic/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        for row in json.loads(text).get("rows", []):
+            if (row.get("verified") is not True or row.get("run_exit_code") != 0
+                    or row.get("replay_exit_code") != 0):
+                continue
+            values = {field: row.get(field) for field in (
+                "linear_rank", "last_fall_lower_bound", "last_fall_upper_bound", "last_fall_degree",
+                "complete_v4_normal_forms")}
+            values.update({field: row["state"][field] for field in (
+                "added_rows", "attempted_products", "completed_products", "pending_products",
+                "new_basis_payload_bytes")})
+            values.update({f"added_degree_{degree}_rows": count
+                           for degree, count in enumerate(row["state"]["added_rows_by_degree"])})
+            for field, value in values.items():
+                unit = ("degree" if field.startswith("last_fall") else "rank" if field == "linear_rank"
+                        else "flag" if field == "complete_v4_normal_forms"
+                        else "bytes" if field.endswith("bytes")
+                        else "rows" if field.endswith("rows") else "products")
+                emit(f"n83.m3_quartic.{row['key']}.{field}", value,
+                     date=date, problem="n83-m3-fall-degree", unit=unit,
+                     label=f"Retained m3 quartic closure {row['key']}: {field}; stop={row['state']['stop_reason']}; global upper requires separate certificate; no base-quality ranking; review pending",
                      source=f"{path}@{commit}")
 
 

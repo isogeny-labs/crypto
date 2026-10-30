@@ -196,3 +196,16 @@ Original fixed-base regularity values and all older datasets are preserved.
 Where no upper certificate exists, the next method must enlarge the admitted
 consequence family or supply a different global ideal certificate. Repeating
 the exhausted restricted queue alone cannot resolve that obligation.
+
+
+## 2026-10-29: hybrid quartic closure of retained systems
+
+12/12 producer/fresh replays and 12/12 S3-restored replays passed. The native results record 50122 new independent rows and 50134 product attempts; 0 cases completed the V4 normal-form closure. Global upper certificates: 0; exact LFD certificates: 0.
+
+Lower4 is inherited from the strict witness dataset. Complete V4 normal forms and a global LFD upper certificate are distinct claims. A cap gives no full-closure conclusion or higher-fall bound. Counts do not rank factor-base quality; independent scientific review remains pending.
+
+All twelve retained m3 original/baseline/spike40 Koblitz/binary identities were
+attempted. See DEGREE4_QUARTIC_DESIGN.md, DEGREE4_QUARTIC_FORMAT.json,
+evidence/degree4-quartic/summary.json and experiment-degree4-quartic.export.json.
+Original fixed-base regularity values and all older datasets are preserved.
+Where work remains pending, continue the exact saved hybrid basis and queue under a new frozen contract. Where full V4 completes without a global upper, a larger closure or a separate ideal certificate is still required. Preserve all prefixes and caps.

@@ -56,3 +56,35 @@ Remaining restored checks and all5 post-replay manifests, metadata/export, navig
 
 ### Errors (what went wrong, how it was handled)
 Original publication process disappeared after3 successful restored checks; partial fourth log retained. Detached resume retained completed checks. No production retry and no new mathematical bound inferred.
+
+
+## 2026-10-30 04:42 UTC — Retention checks during restored verification
+
+### What was done (commands, files, features)
+Verified eleven successful restored replays and the live final case under supervisor3288425. Recomputed saved raw totals:50122 rows,50134 attempts,71013702 pending products,25759716016 new basis payload bytes,zero complete V4 closures. Publication helper syntax checks pass. Added a terminal-success guard and inclusion of all scratch quartic launcher/publication logs to support packing; preserved the prior helper. PR2706 is open, regular, auto-merge enabled, and head matches dfa30afb811cebc00da837fa0d8cc19abb94254f at this snapshot.
+
+### Decisions made (and why)
+Keep exact pending work and blocked candidates. No count under the frozen byte cap is interpreted as a quality ranking or full closure. Finish current archive verification before deriving publication metadata.
+
+### Open threads (unfinished, pick up next time)
+Final restored case,post-replay manifests,derived data/navigation/metrics commit,report inspection/support publication and final delivery remain. Broad goal remains active.
+
+### Errors (what went wrong, how it was handled)
+Git refused to stage ignored .resume/RESUME.md; kept that local recovery handoff for checkpoint storage and committed the tracked study log instead. No force-add or history rewrite.
+
+Task-lease correction04:44UTC: another claim was rejected with retry budget4/4, without changing the live lease. Inspected the installed Conductor source and successfully renewed our existing fence through POST /v1/leases/heartbeat. Bounded heartbeat helper PID3354516 renews every45s for at most7200s or until final publication readback exists; credentials are read in process and not logged. Receipts/log/helper retained. Native production and restored replay unaffected. Use heartbeat rather than task claim to renew this same lease.
+
+
+## 2026-10-30 04:48 UTC — Restored verification and export complete
+
+### What was done (commands, files, features)
+Publication supervisor finished exit0 at04:48:16UTC. All12 S3-restored replays passed. All1447 payload entries across new raw and four parent manifests match before/after replay. Unified export file verification passes with zero findings. Preserved one interrupted verification attempt. No producer rerun.
+
+### Decisions made (and why)
+Publish exact observed rows, pending queues and cap status. Original point/base bindings and fixed-base regularity view remain unchanged. Full V4 and global upper/exact LFD remain unknown.
+
+### Open threads (unfinished, pick up next time)
+Commit data/navigation/metrics,render and inspect report,publish support and update PR/checkpoint/final receipts. Broad goal remains active.
+
+### Errors (what went wrong, how it was handled)
+No restored replay or post-manifest failures. Retained interrupted startup and lease-renewal records; heartbeat remains active for publication.
