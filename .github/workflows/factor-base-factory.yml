@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths:
       - 'tools/factor-base/**'
+      - 'tools/complexity-catalog/**'
+      - 'research/hexagon_cscc_20261030/**'
       - 'docs/ic/FACTOR_BASE_FACTORY.md'
       - '.github/workflows/factor-base-factory.yml'
   workflow_dispatch:
@@ -34,7 +36,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
-          sparse-checkout: tools/factor-base
+          sparse-checkout: |
+            tools/factor-base
+            tools/complexity-catalog
+            research/hexagon_cscc_20261030
+            crates/hashed-ecdl-tensor
+            src
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.93.1'
@@ -46,6 +53,12 @@ jobs:
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --release --locked
       - run: cargo build --release --locked
+      - name: Check complete complexity-source coverage and finite controls
+        working-directory: tools/complexity-catalog
+        run: |
+          cargo fmt --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked
       - name: Regenerate every frozen archive and replay the relation receipt
         shell: bash
         run: |
