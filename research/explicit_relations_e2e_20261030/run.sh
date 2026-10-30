@@ -14,8 +14,8 @@ cd "$root/gpu/explicit-relations"
 timeout 120 compute-sanitizer --tool racecheck --error-exitcode 86 build/query-check > "$out/racecheck.log" 2>&1
 timeout 120 compute-sanitizer --tool synccheck --error-exitcode 86 build/query-check > "$out/synccheck.log" 2>&1
 c++ -O3 -std=c++17 "$study/target.cpp" -o "$out/target"
-rustc -O "$study/ladder.rs" -o "$out/ladder"
-rustc -O "$study/analyze.rs" -o "$out/analyze"
+rustc --edition=2021 -D warnings -O "$study/ladder.rs" -o "$out/ladder"
+rustc --edition=2021 -D warnings -O "$study/analyze.rs" -o "$out/analyze"
 jq -r '.curves[] | [.name[-2:],.p,.a,.b,.group_order,.generator.x,.generator.y] | join(" ")' "$study/curves.json" > "$out/curves.txt"
 timeout 180 gp -q "$study/extend-curves.gp" > "$out/extended-curves.txt" 2> "$out/curve-generation.log"
 test "$(wc -l < "$out/extended-curves.txt")" = 4

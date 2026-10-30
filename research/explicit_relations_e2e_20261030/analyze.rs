@@ -76,7 +76,7 @@ fn main() {
     }
     for e in -2..=3 {
         let y = 440.0 - 80.0 * (e as f64 + 2.0);
-        svg.push_str(&format!("<line x1=\"80\" x2=\"930\" y1=\"{y}\" y2=\"{y}\" stroke=\"#ccd4db\"/><text x=\"18\" y=\"{}\">{}s</text>",y+5,10f64.powi(e)));
+        svg.push_str(&format!("<line x1=\"80\" x2=\"930\" y1=\"{y}\" y2=\"{y}\" stroke=\"#ccd4db\"/><text x=\"18\" y=\"{}\">{}s</text>",y+5.0,10f64.powi(e)));
     }
     for bits in (20..=56).step_by(4) {
         let x = 100 + (bits - 20) * 22;
