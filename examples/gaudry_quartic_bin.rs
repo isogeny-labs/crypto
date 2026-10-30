@@ -53,6 +53,7 @@ fn main() {
         frobenius: flag("--frobenius"),
         sparsest: flag("--sparsest"),
         replay: flag("--replay"),
+        frob_roots: flag("--frob-roots"),
     };
     let macaulay = get(
         "--macaulay",

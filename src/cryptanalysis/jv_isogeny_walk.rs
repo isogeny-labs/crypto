@@ -1084,6 +1084,12 @@ pub struct Walk2Trial {
     pub order: u128,
     pub trace: i128,
     pub kronecker: [i8; 3],
+    /// `v₂(4q³ − t²)`; the class's 2-volcano has depth 1 iff this is 5
+    /// (`t = 2t′` with `t′` odd, `q³ ≡ 1 mod 8`, depth 1 iff `v₂(t′² − q³) = 3`).
+    pub v2_disc: u32,
+    /// Refused before any enumeration: depth-1 classes hold no weak curve
+    /// (PR #1556, exact at p = 5…19).  Only the point count was charged.
+    pub refused: bool,
     pub degrees_used: Vec<u64>,
     pub found: bool,
     /// Met `cap` distinct curves without a weak one.
@@ -1125,6 +1131,13 @@ pub struct Walk2Report {
     pub closure_mode: bool,
     pub from_weak_class: bool,
     pub weak_class_moves: usize,
+    pub refuse_depth1: bool,
+    /// Trials refused by the depth-1 test; counted as not found in
+    /// `success_fraction`, excluded from `success_fraction_admitted`.
+    pub refused: usize,
+    pub success_fraction_admitted: f64,
+    pub mean_muls_admitted: f64,
+    pub mean_muls_refused: f64,
     pub found: usize,
     pub capped: usize,
     pub exhausted: usize,
@@ -1264,6 +1277,7 @@ pub fn run_walk2(
     closure_mode: bool,
     from_weak_class: bool,
     weak_class_moves: usize,
+    refuse_depth1: bool,
 ) -> Walk2Report {
     let start = Instant::now();
     let ctx = WalkCtx::new(p);
@@ -1309,6 +1323,19 @@ pub fn run_walk2(
         row.trace = q3 + 1 - row.order as i128;
         let disc = row.trace * row.trace - 4 * q3;
         row.kronecker = [kronecker(disc, 3), kronecker(disc, 5), kronecker(disc, 7)];
+        row.v2_disc = if disc < 0 {
+            ((-disc) as u128).trailing_zeros()
+        } else {
+            64
+        };
+        if refuse_depth1 && row.v2_disc == 5 {
+            row.refused = true;
+            row.curves = seen.len() as u64;
+            row.muls = f.muls();
+            row.ms = t0.elapsed().as_secs_f64() * 1e3;
+            rows.push(row);
+            continue;
+        }
         let degrees: Vec<u64> = jumps
             .iter()
             .copied()
@@ -1443,6 +1470,22 @@ pub fn run_walk2(
     let exhausted = rows.iter().filter(|r| r.exhausted).count();
     let start_weak = rows.iter().filter(|r| r.start_weak).count();
     let proper: Vec<&Walk2Trial> = rows.iter().filter(|r| r.found && !r.start_weak).collect();
+    let refused = rows.iter().filter(|r| r.refused).count();
+    let admitted = rows.iter().filter(|r| !r.refused && !r.start_weak).count();
+    let mean_muls_admitted = mean(
+        &rows
+            .iter()
+            .filter(|r| !r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
+    let mean_muls_refused = mean(
+        &rows
+            .iter()
+            .filter(|r| r.refused)
+            .map(|r| r.muls as f64)
+            .collect::<Vec<_>>(),
+    );
     let mut curves: Vec<f64> = proper.iter().map(|r| r.curves as f64).collect();
     curves.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let total_curves: u64 = rows.iter().map(|r| r.curves).sum();
@@ -1468,6 +1511,11 @@ pub fn run_walk2(
         closure_mode,
         from_weak_class,
         weak_class_moves,
+        refuse_depth1,
+        refused,
+        success_fraction_admitted: proper.len() as f64 / admitted.max(1) as f64,
+        mean_muls_admitted,
+        mean_muls_refused,
         found,
         capped,
         exhausted,
@@ -2346,6 +2394,41 @@ pub fn characterize_weak(reports: &[ExactCensus]) -> String {
                 cells.join(" · ")
             );
         }
+        // §18.6's registered readout for rule R-v2 (weak iff v₂(D) ≥ 6)
+        let v2_of = |t: i128| val(t * t - 4 * q3, 2);
+        let weak_v5 = weak.iter().filter(|&&t| v2_of(t) == 5).count();
+        let bucket = |pred: &dyn Fn(u32) -> bool| -> (u64, u64) {
+            let mut w = 0u64;
+            let mut n = 0u64;
+            for &t in &classes {
+                if pred(v2_of(t)) {
+                    n += 1;
+                    w += weak.contains(&t) as u64;
+                }
+            }
+            (w, n)
+        };
+        let (w6, n6) = bucket(&|v| v == 6);
+        let (w7, n7) = bucket(&|v| (7..99).contains(&v));
+        let (w5, n5) = bucket(&|v| v == 5);
+        let sampled = r.random_traces.len().max(1) as f64;
+        let pred_reach =
+            r.random_traces.iter().filter(|&&t| v2_of(t) >= 6).count() as f64 / sampled;
+        let _ = writeln!(
+            out,
+            "- **R-v2 readout**: V1 weak traces with v₂(D) = 5: {}/{} ({:.2} %) · V2 weak share at v₂ = 6: {:.3} ({}), at v₂ ≥ 7: {:.3} ({}), at v₂ = 5: {:.3} ({}) · V3 predicted reach (sampled curves with v₂ ≥ 6) {:.4} against census reach {:.4}",
+            weak_v5,
+            weak.len(),
+            100.0 * weak_v5 as f64 / weak.len().max(1) as f64,
+            w6 as f64 / n6.max(1) as f64,
+            n6,
+            w7 as f64 / n7.max(1) as f64,
+            n7,
+            w5 as f64 / n5.max(1) as f64,
+            n5,
+            pred_reach,
+            r.random_in_weak_classes
+        );
     }
     out
 }
@@ -2742,7 +2825,18 @@ mod tests {
     #[test]
     fn the_rebuilt_walk_reaches_weak_curves_at_p7_and_p13() {
         for (p, trials) in [(7u64, 20usize), (13, 12)] {
-            let r = run_walk2(p, 1, trials, 3 * p * p, &[3, 5, 7], 1000, false, false, 8);
+            let r = run_walk2(
+                p,
+                1,
+                trials,
+                3 * p * p,
+                &[3, 5, 7],
+                1000,
+                false,
+                false,
+                8,
+                false,
+            );
             // every walk ends found, capped or exhausted; at these sizes many
             // closures hold no weak curve, so exhaustion is common
             assert_eq!(
