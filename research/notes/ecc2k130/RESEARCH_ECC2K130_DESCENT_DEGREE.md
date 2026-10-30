@@ -95,6 +95,29 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
      degree-4 row (`2^68.43`) is contradicted.
    - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+   - **Update 2026-10-23.** Another session measured m = 4, ℓ = 6 (N = 54)
+     on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): the degree-4 closure
+     refutes on 2 of 2 unsatisfiable draws. So **m·ℓ ≥ 21 is refuted and
+     ℓ = 7 is what survives.** The m = 4 degree-4 row stays contradicted,
+     because the rise at ℓ = 7 is still far below the priced ℓ = 33.
+9. **Guess-then-degree-4 survives to ℓ = 8, with k ≤ 4 (§9, §10).**
+   - At m = 3, ℓ = 8, four guessed variables make degree 4 refute on all 64
+     branches of 4 draws. The linear rule `m·(ℓ−6)` (6 guesses) fails.
+   - At the priced m = 4, ℓ = 33 cell the hybrid beats degree 5 only if
+     k ≤ 6. Linear growth in ℓ gives about 105; a bounded k is not
+     excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
+10. **Three guesses at ℓ = 8 do not suffice for variables 7, 15, 23 (§11).**
+    - Three of four draws have a branch that saturates degree 4; four guesses
+      (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
+      pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
+      a result. No row moves.
+11. **The three-guess failure is the ℓ = 7 rise (§12).**
+    - The unspecialised (22, 7) system, same N = 43 and 136,698 columns as the
+      3-set, does not refute at degree 4 on 4 of 4 draws; 12 of 12 unspecialised
+      ℓ = 7 draws do not refute over surplus −2, 0, +1.
+    - The pattern fits `m·(ℓ−7)+1` guesses: 4 at ℓ = 8, 105 at the priced
+      m = 4, ℓ = 33 cell, against a break-even of 6. An extrapolation from ℓ = 7
+      and 8. No row moves.
 
 ## 1. What is measured
 
@@ -482,6 +505,68 @@ m = 3, ℓ = 7 draws that do not refute at degree 4.
   - The measurement that would decide it is k at ℓ = 8 and 9.
 - **No row beats rho.**
 
+## 10. Guesses at ℓ = 8 (2026-10-22)
+
+`research/dreg_closure_guess_20261022/` guessed four variables (one per
+summand and one intermediate coordinate) on 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 46), all 16 branches each.
+
+- **All 64 branches refute at degree 4**, and the dimension-6 positive
+  control refutes on 4 of 4. So k ≤ 4 at ℓ = 8; fewer is not measurable
+  in the 16 GB container.
+- **The price.** At w = 1 and the m = 4, ℓ = 33 cell (N = 394), the oracle
+  ratio `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2 at k = 0, 5.09 at k = 4,
+  1.30 at k = 6 and 0.66 at k = 7. The hybrid beats degree 5 there only if
+  k ≤ 6.
+- **What would move a row:** k measured to stay bounded as ℓ grows (k = 3
+  at ℓ = 8, then ℓ = 9). Even then its best case is the degree-4 row
+  `2^68.43`, `2^+7.62` over rho. The free-oracle floor binds every row.
+
+## 11. Three guesses at ℓ = 8 (2026-10-23)
+
+`research/dreg_closure_guess3_20261023/` guessed variables 7, 15 and 23 (the
+top coordinate of each summand) on the same 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 43, 136,698 columns), 8 branches per draw.
+
+- **Three do not suffice for this set.** Draws 0, 3 and 5 each have a branch
+  that saturates degree 4 without refuting; draw 6 refutes on 8 of 8. The
+  controls are valid (the ℓ = 7 identity control matches its committed
+  record; the dimension-6 control refutes on 4 of 4).
+- **Four did (§10).** So the set matters or the count does, and this study
+  does not separate them.
+- **Reading (not registered).** The 3-set leaves each summand in dimension 7
+  at N = 43: structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (§7, §8). The result fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8.
+  Extended linearly that is 105 at the priced m = 4, ℓ = 33 cell, against
+  the break-even of 6 with degree 5. It rests on two values of ℓ and is the
+  first evidence leaning toward a count that grows with ℓ. The matched null
+  (unspecialised (22, 7), same matrix size) and a 3-set that leaves one
+  summand at dimension 8 would test it.
+- **The price is unchanged.** At the m = 4, ℓ = 33 cell (N = 394) the ratio
+  `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
+  k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
+- **No row moves** and none beats rho.
+
+## 12. The matched null at (22, 7) (2026-10-28)
+
+`research/dreg_closure_null22_7_20261028/` measured the unspecialised
+m = 3, (n, ℓ) = (22, 7) system: the same N = 43, 44 equations and 136,698
+columns as the three-guess set of §11, on four unsatisfiable draws (surplus +1).
+
+- **It does not refute at degree 4 on 4 of 4 draws** (registered verdict: the
+  pure ℓ = 7 reading). Identity, dimension-6 positive and satisfiable soundness
+  controls are valid.
+- **So the earlier ℓ = 7 failure is not a surplus artefact:** 12 of 12
+  unspecialised ℓ = 7 draws fail over surplus −2, 0, +1.
+- **What follows (derived).** Fixing the top coordinate of each summand takes
+  ℓ = 8 to ℓ = 7, and ℓ = 7 is where degree 4 stops refuting, so the guess count
+  is about `m·(ℓ−7)` plus the one that ℓ = 7 itself needs: 4 at ℓ = 8, which is
+  what §10 and §11 measured. Linear extrapolation gives 4·(33−7)+1 = 105 guesses
+  at the priced m = 4, ℓ = 33 cell, far above the break-even k ≤ 6, so the
+  hybrid does not beat degree 5 there. It rests on ℓ = 7 and ℓ = 8.
+- **Not measured:** a 3-set leaving one summand at dimension 8 (the reading
+  predicts failure); degree 5 at ℓ = 7. No row moves, and none beats rho.
+
 ## Scope and disclosures
 
 - **System.** `m = 3`, the chained `S₃`, with `b = 1`.
@@ -517,6 +602,95 @@ m = 3, ℓ = 7 draws that do not refute at degree 4.
 - **Units.** Oracle costs are in monomial-column touches and rho is in
   group operations, unconverted (§2).
 
+## Pair invariant `p = x₁x₂` inside the chain (2026-10-28): no lower degree at ℓ = 6, unresolved at ℓ = 7
+
+`research/dreg_pair_invariant_20261028/` (pre-registered; `RESULTS.md`,
+`results.pdf`) asks whether the summand-swap invariant lowers the m = 3
+closure degree.
+
+- **The construction.** At m = 3 every cubic monomial comes from `x₁x₂e₁`.
+  Adding `p = x₁x₂` as unknowns over `span{v_i v_j}` turns the first link
+  into the quadratic `s²e₁² + p e₁ + p² + b`, so every equation is
+  quadratic. A matched control adds the non-invariant `r = x₁e₁`.
+- **Draws.** The same committed draws at (22, 6) and (21, 7).
+- **Result.** Neither arm refutes at degree 3 on any of 8 unsatisfiable
+  draws (registered verdict: H_none in both cells).
+  - Degree 4 is unmeasured for the new arms: a sparse run capped at 10⁹
+    entries.
+  - Their degree-4 matrices have 5.1–5.5 times the columns of the plain
+    system's.
+  - So the invariant arm refutes no earlier than the plain chain (which
+    refutes at 4 at (22, 6)), at a larger matrix.
+- **Measured at (22, 6), open at (21, 7).**
+  - At (22, 6), where the plain chain refutes at 4, the invariant arm does
+    not help: no lower degree, and a larger matrix.
+  - At (21, 7) the plain chain does not refute at 4 (degree-5 matrix: 974,982
+    columns). Q's degree 4 (637,393 columns) is unmeasured, so a lower degree
+    there is not excluded. That measurement needs a large-memory host.
+  - At m = 4 the second cubic link has no summand symmetry.
+- **Untried.**
+  - The invariants as a *replacement* for the summand coordinates, so that N
+    falls.
+  - The orbit-aware split rule (`RESEARCH_EXOTIC_COORDINATES.md` §18).
+
+## Invariant guess at ℓ = 8 (2026-10-29): never worse than a raw guess, not reliably enough
+
+`research/dreg_invariant_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) compares two three-guess sets on the committed (22, 8) draws.
+
+- **The arms.**
+  - The invariant arm fixes `a₇ + b₇`, a coordinate of `s = x₁ + x₂`, which
+    the first link sees in place of the two summands.
+  - The raw arm fixes `a₇`.
+  - Both also fix `c₇` and one intermediate coordinate, so they differ only
+    in the guess that touches the first link.
+- **Result.** The invariant arm refutes at degree 4 on every branch of draws
+  5 and 6; the raw arm does so on draw 6 only.
+  - The registered verdict is mixed (invariant split 2/4, raw fails 1/4).
+  - Paired by draw, the invariant guess is never worse.
+- **Comparison.** The committed raw set `{7, 15, 23}`, which spends two
+  guesses on the pair, suffices on 1 of 4.
+- **What it weakens.** The summand-dimension reading (§12), since the
+  invariant arm leaves both summands at dimension 8.
+- **What it is not.** No row moves: the extrapolated guess count at
+  ℓ = 33 stays far above the break-even of 6.
+- **Disclosure.** The soundness rule was replaced after the data, because the
+  satisfiable branches holding solutions ran out of memory (Amendment 1).
+
+## Invariant guess, eight more draws (2026-10-29): the invariant guess is better (p = 0.031)
+
+`research/dreg_invariant_guess_more_20261029/` (pre-registered on fresh draws
+7–39 of the same seeded sequence; `RESULTS.md`, `results.pdf`).
+
+- **Result.** On the 8 registered unsatisfiable draws, guessing `a₇ + b₇`
+  suffices on 5 and guessing `a₇` on 0.
+  - All 5 discordant draws favour the invariant (one-sided exact sign test
+    p = 0.031).
+  - With the four earlier draws: 6 of 6, p = 0.016, and 7 of 12 draws
+    against 1 of 12.
+- **What it contradicts.** The summand-dimension reading of §12 does not hold
+  at this cell: what governs refutation is the coordinate of `s`, not the
+  dimension of the summands.
+- **What it is.** A measured stage-level improvement in the guess-then-degree-4
+  oracle's guess choice.
+- **What it is not.** No row moves: the guess count at ℓ = 33 is still
+  extrapolated far above the break-even of 6.
+- **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
+## A second invariant guess (2026-10-29): not a substitute for the raw guess on x₃
+
+`research/dreg_invariant_pair_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with a second invariant coordinate of the
+pair, `a₆ + b₆`, on the same 12 draws.
+
+- **Result.** The new arm suffices on 2 of 12 draws, against S3's 7 of 12.
+  - All 5 discordant draws favour S3. The registered two-sided sign test gives
+    p = 0.0625, so the verdict is no detected difference.
+  - It is never better on any draw.
+- **What it means.** One invariant guess per summand pair is the useful part,
+  and the raw guess on the third summand still carries weight.
+- **What it is not.** No row moves.
+
 ## Reproducing
 
 ```sh
@@ -529,4 +703,5 @@ cargo run --release --example descent_degree_cost                        # §2's
 cargo run --release --example dreg_score -- closure research/dreg_closure_mutantxl_20261016/runs/*.jsonl  # §6
 cargo run --release --example dreg_score -- scale research/dreg_closure_scale_20261016/runs/*.d*.jsonl  # §7
 cargo run --release --example dreg_score -- scale research/dreg_closure_driver_20261016/runs/*.d*.jsonl  # §8
+cargo run --release --example dreg_invariant_score -- research/dreg_pair_invariant_20261028/runs  # pair invariant
 ```

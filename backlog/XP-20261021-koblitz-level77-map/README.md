@@ -55,3 +55,14 @@ ordinary-support source fibers remain explicit acceptance tests in the
 Round21 leaves this integral-map lane open and does not rerun the ansatz. Its
 sharp equivariant CM denominator5 belongs to another presentation and is
 not an obstruction to the modular factor map. See [Round21 CM](../../research/koblitz_modular_ic_20261018/rounds/21/CM.md).
+
+Round22 checks the genus-one Tate base,complete base coordinate/denominator
+divisors,the degree5 supersingular exceptional support,the generic QR
+presentation and its exact8-by2 trace tower. The original SS5 affine fiber
+has four degree20 closed points over F2,certified by both ideal lifts,all
+registered units,the relative Jacobian and q32 Frobenius. Full lifted normalization,
+divisors,complete prescribed RR and the subgroup-preserving factor map are
+still required. The exact augmentation recovery scalar1 is a separate
+CM-category result,not an evaluated modular transfer. See
+[Round22 CM](../../research/koblitz_modular_ic_20261018/rounds/22/CM.md)
+and its bounded CAS attempt receipts. No new future executor is scheduled.

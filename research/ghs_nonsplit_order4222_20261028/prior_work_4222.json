@@ -1,0 +1,74 @@
+{
+  "schema": "ghs-order4222-prior-work-v1",
+  "review_date_utc": "2026-10-28",
+  "candidate": {
+    "source_order": 4222,
+    "subgroup_prime": 2111,
+    "jacobian_isogeny_class": "3.16.a_a_ev",
+    "weil_polynomial_low_to_high": [1, 0, 0, 125, 0, 0, 4096]
+  },
+  "catalog": {
+    "url": "https://www.lmfdb.org/Variety/Abelian/Fq/3/16/a_a_ev",
+    "live_sql_table": "av_fq_isog",
+    "live_sql_has_jacobian": 0,
+    "live_sql_jacobian_count": null,
+    "semantics": "0 means unknown; -1 means definitely absent; 1 means definitely present",
+    "semantics_source": "https://github.com/LMFDB/lmfdb-inventory/blob/master/db-abvar.md",
+    "local_snapshot_extracted_utc": "2026-10-19T16:45:24Z to 2026-10-19T16:45:49Z",
+    "local_snapshot_matches_live": true,
+    "claim": "The retained explicit smooth plane quartic is a positive witness in a class whose catalog status is unknown; this is a candidate catalog addition, not a correction of a proved nonexistence result."
+  },
+  "literature": [
+    {
+      "url": "https://eprint.iacr.org/2006/347",
+      "authors": "F. Momose and J. Chao",
+      "year": 2006,
+      "relevance": "Classification of Weil restrictions obtained by (2,...,2) covers of P1; likely subsumes the geometric quadratic-pole case.",
+      "full_text_reviewed": false
+    },
+    {
+      "url": "https://www.iwsec.org/scis/2022/_abst/1A3-2.pdf",
+      "authors": "K. Murai, M. Shimura, T. Iijima, J. Chao",
+      "year": 2022,
+      "relevance": "Abstract states a complete classification under the genus-equals-extension-degree isogeny condition; its excerpt does not enumerate this exact curve.",
+      "full_text_reviewed": false
+    },
+    {
+      "url": "https://www.iacr.org/archive/eurocrypt2012/72370010/72370010.pdf",
+      "authors": "A. Joux and V. Vitse",
+      "year": 2012,
+      "relevance": "Cover-and-decomposition work for binary curves, genus-three routes, and isogeny walks; not an exact source equation match in the inspected sections.",
+      "full_text_reviewed": false
+    },
+    {
+      "url": "https://arxiv.org/abs/2508.16885",
+      "authors": "M. Borodin and L. May",
+      "year": 2025,
+      "relevance": "Studies hyperelliptic Jacobian obstructions in dimension three; our witness is nonhyperelliptic.",
+      "full_text_reviewed": false
+    }
+  ],
+  "repository_prior_witness": {
+    "path": "research/ghs_twisted_v4_triangle_20261027/REPORT.md",
+    "source_parameters_in_its_field_basis": [32, 853],
+    "source_order": 4222,
+    "jacobian_isogeny_class": "3.16.a_a_ev",
+    "implication": "The present exact source is an additional witness and first complete attack measurement for this audited class, not the first repository class witness."
+  },
+  "exact_searches": [
+    "3.16.a_a_ev Jacobian genus 3",
+    "1+125T^3+4096T^6 curve",
+    "4222 GHS genus 3",
+    "2111 genus 3 16"
+  ],
+  "exact_search_result": "No indexed publication with this label, Weil polynomial, or source order was located in these queries. This does not establish global novelty.",
+  "classification": {
+    "new_exact_curve_in_this_audit": true,
+    "first_repository_class_witness": false,
+    "additional_class_witness": true,
+    "globally_new_exact_curve": "unverified",
+    "new_eligible_family": false,
+    "new_attack_method": false,
+    "measured_faster_than_same_target_rho": false
+  }
+}

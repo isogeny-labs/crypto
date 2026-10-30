@@ -57,6 +57,7 @@ SOURCES = {
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
     "progress_timeline": "docs/ic/progress-timeline.json",
+    "native_tournament26": "research/ic_candidate_tournament_20260915/runs/round-0026/measurements.json",
     "koblitz_s20": "research/ic_exponent_20260926/analysis.json",
     "koblitz_s21": "research/ic_constructions_20260926/analysis.json",
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
@@ -452,6 +453,10 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
             recipe["log2_total_gae"] = math.log2(total_gae)
 
 
+# These engineering components also carry validation gates outside tables A-C.
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+
+
 def require_materialized_gate_inputs(board: list[dict]) -> None:
     """Do not demote validated rows because their certificates are sparse-excluded.
 
@@ -463,8 +468,9 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
     sparse = {item[2:].decode("utf-8", "surrogateescape")
               for item in raw.split(b"\0") if item.startswith(b"S ")}
     needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
-    for row in board:
-        evidence = REPO / gate.board_evidence_dir(row)
+    evidence_dirs = {gate.board_evidence_dir(row) for row in board} | set(COMPONENT_EVIDENCE_DIRS)
+    for directory in sorted(evidence_dirs):
+        evidence = REPO / directory
         manifest = evidence / gate.MANIFEST
         needed.add(str(manifest.relative_to(REPO)))
         if not manifest.is_file():
@@ -486,7 +492,7 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
                         raw_path = (evidence / name).resolve()
                         if raw_path.is_relative_to(REPO):
                             needed.add(str(raw_path.relative_to(REPO)))
-    missing = sorted(needed & sparse)
+    missing = sorted(path for path in needed & sparse if not (REPO / path).is_file())
     if missing:
         raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
                          "committed paths before generating:\n" + "\n".join(missing))
@@ -791,6 +797,48 @@ NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. 
                  "validator report or §5a-banded matched-rho reference is filed for this study (no "
                  "VALIDATION.json), so this is an engineering component, not a validated row, and its "
                  "benchmarks/README.md row is withheld until it validates.")
+
+
+def prime_base_size_component() -> dict:
+    """Prime-field factor-base size and oracle tuning, research/prime_base_oracle_tuning_20261029
+    (backlog XP-20261016, frozen protocol, holdout decided per size): the paired selected/incumbent
+    ratio of totals and the gap to the same-session rho.negation at w = 0, 0.1 and 1, copied from
+    the study's saved `ecbench compare --weight` outputs, and the holdout means from its
+    `ecbench band` table. Selected cells use the incumbent ic-pair oracle; only N changes. Its
+    standing comes from the study's VALIDATION.json."""
+    study = "research/prime_base_oracle_tuning_20261029"
+    means = {}
+    for r in load(f"{study}/analysis/band-holdout.json")["rows"]:
+        means[(int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"])] = r["mean_s"]
+    rows = []
+    for bits, n_inc, n_sel, reading in ((20, 32, 45, "improvement: new prime-field IC baseline"),
+                                        (24, 162, 115, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (28, 407, 288, "relabelling (falls at w = 0, rises at w = 1); incumbent kept"),
+                                        (32, 1024, 1024, "selection = incumbent; null")):
+        ratio, inc_rho, sel_rho = [], [], []
+        for w in ("0", "0.1", "1"):
+            for key, acc in (("inc__sel", ratio), ("rho-neg__inc", inc_rho), ("rho-neg__sel", sel_rho)):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+        rows.append({"bits": bits, "n_inc": n_inc, "n_sel": n_sel, "reading": reading,
+                     "inc": means[(bits, "inc")], "sel": means[(bits, "sel")], "ratio": ratio,
+                     "inc_over_rho": inc_rho, "sel_over_rho": sel_rho})
+    m = load(f"{study}/second-host/analysis/match-original.json")
+    sh = {w: load(f"{study}/second-host/analysis/compare-inc__sel-w{w}.json")["ops"] for w in ("0", "0.1", "1")}
+    second_host = (f"Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another "
+                   f"host class and ecbench build); {m['matched_identical']} of {m['original_records']} original records "
+                   "identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent "
+                   + " / ".join(f"{sh[w]['ratio_b_over_a']:.3f}" for w in ("0", "0.1", "1"))
+                   + f" at w = 0 / 0.1 / 1 ({sh['0']['pairs']} pairs); report {study}/second-host/README.pdf.")
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
+            "second_host": second_host,
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
 
 
 def lazy_members_component() -> dict:
@@ -1740,6 +1788,18 @@ def build(allow_unvalidated: bool = False) -> dict:
         "fully_priced_cold_speedup": None,
     }
     ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+    native_tournament = load(SOURCES["native_tournament26"])
+    if (native_tournament.get("schema") != "ic-native-tournament-measurements/1"
+            or native_tournament.get("round") != "round-0026"
+            or native_tournament.get("audit", {}).get("status") != "VERIFIED"
+            or native_tournament.get("audit", {}).get("trial_receipts") != 1632
+            or native_tournament.get("decision", {}).get("winner") != "batch16"
+            or native_tournament.get("decision", {}).get("status") != "promoted"
+            or len([r for r in native_tournament["rows"]
+                    if r["stage"] == "confirmation" and r["arm"] == "batch16"]) != 5):
+        raise ValueError("native tournament round 0026 is incomplete")
+    native_tournament["source"] = SOURCES["native_tournament26"]
+    native_tournament["report"] = "research/ic_candidate_tournament_20260915/runs/round-0026/REPORT.md"
     timeline = load(SOURCES["progress_timeline"])
     progress = next(series for series in timeline["series"] if series["id"] == "ec-cold")
     board = ladder + kob1 + kob
@@ -1791,6 +1851,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "progress": {"source": SOURCES["progress_timeline"], "updated": timeline["updated"],
                      "series_id": progress["id"], "label": progress["label"],
                      "points": progress["points"]},
+        "native_tournament_pilot": native_tournament,
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
         "jv_sieve_weak_class": jv_sieve_table(),
@@ -1853,6 +1914,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "prime_base_size_component": prime_base_size_component(),
         "lazy_members_component": lazy_members_component(),
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
@@ -2097,6 +2159,37 @@ def markdown(doc: dict) -> str:
     for point in doc["progress"]["points"]:
         L.append(f"| {point['date']} | [{point['label']}]({point['source']}) | "
                  f"{times(point['value'])} | {point['reference']} | {point.get('unit') or 'source-specific; see result'} |")
+    L.append("")
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    L += ["## Native candidate tournament, round 0026 (separate Ir unit)", "",
+          f"[Frozen per-cell data](../../{pilot['source']}) and [full result](../../{pilot['report']}) "
+          "retain all arms and the exact ICV1 curve identities. One target is charged cold per job. "
+          "The selected `batch16` configuration improves the incumbent, but its matched worker rho "
+          "is still cheaper on every curve; this rho is not qualified as globally strongest. "
+          "The factor base was fixed within each paired arm, so this panel does not choose a new base. "
+          "`2^x Ir` is guest instructions, with no measured curve-addition conversion. "
+          "The hosted wall times lack core-reservation and contention receipts, so the native "
+          "wall condition is unqualified and promotion awaits an isolated new round. "
+          "The rank floor is the deliberately weak `Ir >= K`; no scaling exponent was promoted.", "",
+          "| ICV1 curve | Signed base B | Was: incumbent | batch16 | S (Ir/√r) | IC/incumbent | IC/rho (1.0× parity) |",
+          "|:--|--:|--:|--:|--:|--:|--:|"]
+    for r in confirmed:
+        L.append(f"| `{r['curve_slug']}` | {r['signed_base_sizes'][0]} | "
+                 f"2^{before[r['cell']]['log2_mean_ir']:.2f} Ir | 2^{r['log2_mean_ir']:.2f} Ir | "
+                 f"{r['mean_s_ir_per_sqrt_r']:,.0f} | {saved[r['cell']]:.3f}× | {paired[r['cell']]:.3f}× |")
+    L += ["", "All smoke recipes in the same Ir unit, each with 12 verified jobs; "
+          "the ratios below are descriptive ratios of per-cell mean Ir:", "",
+          "| ICV1 curve | Arm | 2^x Ir | IC/incumbent | IC/rho |",
+          "|:--|:--|--:|--:|--:|"]
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            L.append(f"| `{r['curve_slug']}` | `{r['arm']}` | 2^{r['log2_mean_ir']:.2f} Ir | "
+                     f"{r['ratio_to_incumbent_mean_ir']:.3f}× | {r['ratio_to_rho_mean_ir']:.3f}× |")
     L.append("")
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
@@ -2417,6 +2510,23 @@ def markdown(doc: dict) -> str:
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
     L.append("")
+    pb = doc["prime_base_size_component"]
+    L += ["## Prime-field baseline: factor-base size and oracle tuning (2026-10-29, engineering)", "",
+          "Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact "
+          "decomposition oracle, selected on train curves, decided per size on a fresh holdout curve "
+          "(48 targets × 2 rounds, every arm in one session). Train picked the incumbent `ic-pair` oracle "
+          "(`mitm:negation_folded=1`) at every size; only N changed. "
+          f"{pb['unit']}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.", "",
+          "| bits | N incumbent → selected | S incumbent → selected (w = 0 / 0.1 / 1) | selected ÷ incumbent (w = 0 / 0.1 / 1) | IC ÷ rho-neg incumbent → selected (w = 0 / 0.1 / 1) | reading |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        L.append(f"| {r['bits']} | {r['n_inc']} → {r['n_sel']} | {s_txt} | {q_txt} | {g_txt} | {r['reading']} |")
+    L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
+          pb["second_host"], "",
+          f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -2984,6 +3094,65 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{esc(point["reference"])}</td>'
                  f'<td>{esc(point.get("unit") or "source-specific; see result")}</td></tr>')
     P.append('</tbody></table></div></section>')
+    pilot = doc["native_tournament_pilot"]
+    pilot_rows = pilot["rows"]
+    confirmed = [r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "batch16"]
+    before = {r["cell"]: r for r in pilot_rows if r["stage"] == "confirmation" and r["arm"] == "incumbent"}
+    paired = pilot["decision"]["winner_over_rho"]["confirmation"]["per_cell"]
+    saved = pilot["decision"]["confirmation"]["per_cell"]
+    repo_link = "https://github.com/isogeny-labs/crypto/blob/main/"
+    P.append('<section class="panel" id="native-tournament-round-0026"><h2>Native tournament round 0026 · every recipe and curve</h2>'
+             '<p>The selected <code>batch16</code> configuration reduces complete cold instruction cost '
+             'against the same-fixture incumbent. Its matched worker rho remains cheaper on all five '
+             'curves. This panel has its own Valgrind Ir unit and is outside the GAE-ranked tables. '
+             '<strong>1.0× IC/rho is parity.</strong> Guest instruction counts have no measured '
+             'curve-addition conversion. The factor base was fixed between paired arms; this round '
+             'does not choose a different base. The rank floor is the weak Ir ≥ K, and no scaling '
+             'exponent was promoted. Hosted wall times lack isolation receipts; the native wall '
+             'condition is unqualified and promotion awaits an isolated new round.</p>'
+             f'<p><a href="{esc(repo_link + pilot["report"])}">Full result</a> · '
+             f'<a href="{esc(repo_link + pilot["source"])}">Frozen per-cell data</a> · '
+             f'{pilot["audit"]["trial_receipts"]:,} native-audited trial receipts.</p>'
+             '<div class="scroll"><table><caption>Confirmation, one public target per cold job. '
+             'Was = incumbent on the same targets; B = verified signed factor-base size. '
+             'Ratios are native paired decision values.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>B</th><th>Was: incumbent</th>'
+             '<th>batch16</th><th>S (Ir/√r)</th><th>IC/incumbent</th><th>IC/rho</th><th>Verified</th>'
+             '</tr></thead><tbody>')
+    for r in confirmed:
+        P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                 f'<td>{r["signed_base_sizes"][0]}</td>'
+                 f'<td>2<sup>{before[r["cell"]]["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                 f'<td>{r["mean_s_ir_per_sqrt_r"]:,.0f}</td>'
+                 f'<td>{saved[r["cell"]]:.3f}×</td><td>{paired[r["cell"]]:.3f}×</td>'
+                 f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    P.append('</tbody></table></div><div class="scroll"><table>'
+             '<caption>All smoke recipes, each with 12 verified jobs. Ratios are per-cell mean Ir '
+             'quotients, not pooled paired intervals.</caption>'
+             '<thead><tr><th>ICV1 curve</th><th>Arm</th><th>2^x Ir</th>'
+             '<th>Ir/incumbent</th><th>Ir/rho</th><th>Verified</th></tr></thead><tbody>')
+    for r in pilot_rows:
+        if r["stage"] == "smoke":
+            P.append(f'<tr><td><code>{esc(r["curve_slug"])}</code></td>'
+                     f'<td><code>{esc(r["arm"])}</code></td>'
+                     f'<td>2<sup>{r["log2_mean_ir"]:.2f}</sup> Ir</td>'
+                     f'<td>{r["ratio_to_incumbent_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["ratio_to_rho_mean_ir"]:.3f}×</td>'
+                     f'<td>{r["verified"]}/{r["verified"]}</td></tr>')
+    center = next(r for r in confirmed if r["cell"] == "n19a0")
+    prior = before["n19a0"]
+    P.append('</tbody></table></div>'
+             f'<p>On <code>{esc(center["curve_slug"])}</code>, factor-base/table setup is '
+             f'{center["phase_mean_ir"]["factor_base_and_tables"] / 1e6:.3f} million Ir in both '
+             'arms. Collection and decomposition fall from '
+             f'{prior["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["collection_and_decomposition"] / 1e6:.3f} million Ir; '
+             'verification/filtering/linear algebra fall from '
+             f'{prior["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} to '
+             f'{center["phase_mean_ir"]["verify_filter_and_linear_algebra"] / 1e6:.3f} million Ir. '
+             'PDP and linear algebra are grouped with neighboring work by the worker, so their '
+             'individual slopes remain unset. This constant change does not discharge m=83.</p></section>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -3191,6 +3360,28 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
 
+    pb = doc["prime_base_size_component"]
+    P.append('<section class="card" id="prime-base-size"><h2>Prime-field baseline · factor-base size and oracle '
+             'tuning <span class="chip">engineering</span></h2>'
+             '<p>Frozen protocol (backlog XP-20261016): joint choice of the low-x factor-base size N and the exact '
+             'decomposition oracle, selected on train curves, decided per size on a fresh holdout curve (48 targets '
+             '× 2 rounds, every arm in one session). Train picked the incumbent <code>ic-pair</code> oracle '
+             '(<code>mitm:negation_folded=1</code>) at every size; only N changed. '
+             f'{esc(pb["unit"])}. Ratios are paired Σ selected ÷ Σ incumbent with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>N</th><th>S incumbent → selected '
+             '(w = 0 / 0.1 / 1)</th><th>selected ÷ incumbent</th><th>IC ÷ rho-neg incumbent → selected</th>'
+             '<th>Reading</th></tr></thead><tbody>')
+    for r in pb["rows"]:
+        s_txt = " / ".join(f"{a:.2f} → {b:.2f}" for a, b in zip(r["inc"], r["sel"]))
+        q_txt = " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in r["ratio"])
+        g_txt = " / ".join(f"{a['ratio']:.2f} → {b['ratio']:.2f}" for a, b in zip(r["inc_over_rho"], r["sel_over_rho"]))
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{r["n_inc"]} → {r["n_sel"]}</td><td>{s_txt}</td>'
+                 f'<td>{q_txt}</td><td>{g_txt}</td><td>{esc(r["reading"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.</p>'
+             f'<p>{esc(pb["second_host"])}</p>'
+             f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pb["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '

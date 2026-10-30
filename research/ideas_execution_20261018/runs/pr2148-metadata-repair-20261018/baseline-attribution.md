@@ -1,0 +1,25 @@
+# PR2148: attribution of two observed CI failures
+
+Both observed failure conditions are **deterministic defects already present at actual base `b7cafe04485eb97d873dffef698e7337cfb38cfe`**, not introduced by head `55da3adf5dc96be86687583c5ae967a686bc1a09`. This is a source/input attribution, **not a claim that either failing workflow was rerun on base**. No scientific instrument, validator or builder was executed for this review, and no source/PR changes were made.
+
+Both jobs actually checked out PR merge `58f87d063808217b0caa072310cc139607544ba5`. Saved logs identify that merge and its base/head. A read-only GitHub head→merge comparison reports one merge commit and **no changed files**, with head 55da3ad also the merge base; local ancestry inspection confirms b7cafe is already an ancestor of head. Thus comparing the relevant base/head blobs covers the tree tested by these logs. Full blob lists, source locations, derived counts, API comparison and log digests are retained in `baseline-attribution.json`.
+
+| Check | Observed job / workflow | Exact error |
+|---|---|---|
+| Cover transfer assessment | [job 117613565927](https://github.com/aburan28/crypto/actions/runs/39106562573/job/117613565927), [Curve cover certificates run 39106562573](https://github.com/aburan28/crypto/actions/runs/39106562573) | `Error: unexpected covers row count`; exit 1. |
+| Backlog validate | [job 117613565304](https://github.com/aburan28/crypto/actions/runs/39106562496/job/117613565304), [backlog run 39106562496](https://github.com/aburan28/crypto/actions/runs/39106562496) | `outputs.verify: placeholder {artifact} in "{artifact}" has no value`; exit 1. |
+
+The cover workflow runs `node scripts/build_cover_transfer_assessments.mjs --check` at [workflow line 145](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/.github/workflows/curve-covers.yml#L145). The builder [reads its two catalogs at 1120–1123 and asserts 2100 at 1124](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/scripts/build_cover_transfer_assessments.mjs#L1120). Base and head each contain **2,572 covers.curves rows, 2,572 graph.maps, 2,570 graph.covers and 2,572 graph.curves**; the unchanged assertions require 2,100/2,100/2,098/2,100. The first assertion therefore necessarily throws, before later source-artifact hashing or output comparison. Its entire failure prefix is the unchanged script plus two unchanged JSON inputs; all 52 static builder file-input/output/workflow/attribute paths compared additionally have identical Git blobs.
+
+| Relevant cover path | Same Git blob at base and head |
+|---|---|
+| `scripts/build_cover_transfer_assessments.mjs` | `3fcb6ab9cd82c8e1d745b6365e8a21ec1505baf7` |
+| `docs/curves/covers.json` | `022b411a2bb35644155c2b1c36c07c7c78281382` |
+| `docs/curves/cover-links.yaml` | `751bfa2a9da16e70efa30c2e044eff50d7854114` |
+| `.github/workflows/curve-covers.yml` | `1ab33ca4156e4cb4e2f940a884f5563eebb0f7e3` |
+
+The backlog workflow validates **all cards** at [workflow line 97](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/.github/workflows/backlog.yml#L97). The pre-existing blocked quintic card places `{artifact}` in [outputs.verify at line 112](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/backlog/XP-20261017-quintic-support-frobenius/card.json#L112). The unchanged [validator at 769–774](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/src/bin/backlog/card.rs#L769) resolves that list even for blocked cards. Its last-shard map is exactly `{shard:"2",out:"OUT",checkpoint:"OUT/checkpoint.json",mode:"odd-support",seed:"2026101703"}`. No `artifact` variable exists, so [substitute at 349](https://github.com/aburan28/crypto/blob/b7cafe04485eb97d873dffef698e7337cfb38cfe/src/bin/backlog/card.rs#L349) necessarily returns the recorded error. The separate Cairn checker convention does not add a variable to this call; `--merged-into` cannot fix placeholder expansion.
+
+Sixteen relevant card/protocol/schema/CLI/validator/expansion/workflow/materialization/build/library/SHA1/problem files are byte-identical at base and head. The card's protocol Git-blob binding also matches. Card blob: `7789a2821deb79218e4144b1993ddb64bfa14c72` (SHA256 `f30f79c4ea8a179cca24b06f537f90e65c2d0d79b39b736a791456cc0f7fc4e7`); validator blob: `29e21eb055369dee09e741798f4123b5efa70aa5`. This is complete relevant control-flow/input identity for the observed expansion failure, not an inference from unchanged filenames.
+
+Saved decoded evidence: cover log 2958–2967 (merge checkout 2882–2885); backlog log 815–818 (merge checkout 246–249). The supplied base check snapshot has 39 checks, none failed, but neither exact failing workstream is represented. It supplies no observed base-run result and does not refute either deterministic source/input defect. Attribution is limited to these two errors; it does not waive the checks, prove all downstream checks pass or establish complete PR readiness. Working-tree fixes owned by bounded_memory were not read.

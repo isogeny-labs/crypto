@@ -1,0 +1,37 @@
+{
+  "schema": "ml-dataset.cli-fixture-independent-audit/v1",
+  "verdict": "passed_limited_software_audit",
+  "reviewer": "startup_review",
+  "source_commit": "f4249f62df082b401717a03ae2cae1b7b1aeddd3",
+  "fixture_commit": "127ab13b48e1ec70b54fd189a2fe8c3c87430a26",
+  "receipt_sha256": "e3f0d56284a7c32c90ead0f0ad9049801c809b2362f8c8caf07e2baf064e9d3f",
+  "archive_sha256": "937e0c59108d438807c25ecb938903889cd36a7553ad968ff9a1811a1fb2221f",
+  "verified_inventory_files": 158,
+  "verified_archive_members": 159,
+  "verified_commands": 10,
+  "twists": [
+    false,
+    true
+  ],
+  "outcomes": [
+    "verified_positive_stop",
+    "encoding_search_complete_without_verified_lift"
+  ],
+  "tampered_copy_changes": [
+    "prime-f4-input.json auxiliary domain and one coefficient",
+    "manifest.json corresponding hashes/sizes"
+  ],
+  "tampered_status_exit": 0,
+  "tampered_verify_exit": 1,
+  "semantic_rejection": "prime F4 chain input differs at domains",
+  "source_binding_verified": true,
+  "binary_binding_verified": true,
+  "frozen_files_match_commit": true,
+  "canonical_protocol_body_verified": true,
+  "rerun_performed": false,
+  "checkpoint_caveat": "Top-level checkpoint_mid_call reports live exposed-prefix sink persistence; supervisor reports false. No native-call or process recovery established.",
+  "corpus_rows_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "created_utc": "2026-10-29T06:39:19.068426+00:00",
+  "binary_sha256": "1f4bae481e114bb081acd595722431112610f2253d4b4037cfc1317299d5a5fc"
+}

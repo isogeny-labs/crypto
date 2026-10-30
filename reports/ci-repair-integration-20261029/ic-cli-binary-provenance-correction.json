@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-10-30T05:59:48.375708+00:00",
+  "earlier_run": "current-main21f-ic-cli-tests-20261030 / main21f-ic-cli-tests-status.json",
+  "actual_test_harness_source": "f04b49bff31e5769e9610cf9b2bc7dbeb89f10dd",
+  "actual_result": "92passed/0failed/1existing ignored",
+  "limitation": "Some framework contracts spawn an external production CLI. The selected-bin local command omitted IC_TEST_BINARY, so the helper could use the existing older target/release/ic. The92real passed tests do not establish fresh production-CLI validation. Earlier raw log/status remain unchanged.",
+  "external_binary": {
+    "path": "/workspace/crypto/target/release/ic",
+    "sha256": "12a7dcfcca2e953111d2916ab56bce6212eb514ef0436f981eaf93e15e75fa3f",
+    "modified_at": "2026-10-29T21:46:18.632618+00:00",
+    "source": "Exact source provenance not established; older than the test harness build."
+  },
+  "correction": "Run the existing dedicated CI pattern: build the exact production ic first, explicitly set IC_TEST_BINARY, then execute all selected-bin contracts. Current-source library5434 and actual proof126 successes are independent and remain complete."
+}

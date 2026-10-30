@@ -1,0 +1,22 @@
+{
+ "schema":"pencil-checkpoint-observation-independent-review/v1",
+ "reviewer":"/root/four_lead_state",
+ "status":"reviewed_interim_incomplete_observation_no_scope_defect_found",
+ "directory":"/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/checkpoint-g9-observations",
+ "selected_manifest_checks":[
+ {"member":"compute/session/records.jsonl","sha256":"bdaed8329657b05bb7fa45140b4eb883c584e5fa8e7be88e158c0bbaf5baa451","bytes":35778,"matches_manifest":true},
+ {"member":"compute/session/session.json","sha256":"e35272db888368e9c45f140a76b5bc9310e3da83966c8161ae814e86985b5518","bytes":1764,"matches_manifest":true},
+ {"member":"compute/session/spec.json","sha256":"8de495385bbfcfbe34366d7e2a97403914434f52e0410558a354e1b933a5c6d2","bytes":1707,"matches_manifest":true}
+ ],
+ "observed_rows":[{"seq":0,"arm":"rho","round":0,"warmup":true,"status":"verified"},{"seq":1,"arm":"rho_AA","round":0,"warmup":true,"status":"verified"},{"seq":2,"arm":"pencil","round":0,"warmup":true,"status":"timeout","error":"watchdog expired"},{"seq":3,"arm":"rho","round":1,"warmup":false,"status":"verified"}],
+ "raw_state":{"session_status":"running","finished_at":null,"records_sha256":null,"controller_phase":"running","worker_attempt":0,"restores":0},
+ "denominators":{"expected_slots":18,"expected_measured":15,"expected_pairs":5,"observed_slots":4,"observed_measured":1,"missing_slots":14,"complete_admitted_pairs":0},
+ "analysis_checks":{"cells":36,"all_algorithm_ratios_null":true,"all_calibration_inclusive_ratios_null":true,"all_qualified_ratios_null":true,"data_protocol_body_sha256":"18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9","controller_amendment_separate":"version5"},
+ "resource_binding":{"restored_original_sha256":"0f25401a77a5e09e3f2da704e3189f1a93920fbf47a3c70075f6834ee07de181","supported_update_separate_sha256":"0cea563aa6dea9791792534f725c31369df13128bcbae90f17fb64cc0afdc9f8","both_actual_hashes_checked":true,"post_restoration_check_exit":1,"post_restoration_findings":["export has 1 measured rows; protocol plans 15","arm pencil instance shortfall","arm rho replicate shortfall","arm rho_AA instance shortfall","measured instance identities differ across arms"],"qualified":false},
+ "findings":[],
+ "limits":["Read retained files only; no native scientific verification/replay or accounting rerun performed by reviewer.","Manifest-selected file integrity checked, not a fresh download or full archive reconstruction.","This is checkpoint-time partial computation, not terminal or fresh-measurement evidence.","No candidate solve, completed measured pair, or independent candidate replay established.","PDF/graph visual review is separate."],
+ "new_solver_executions":0,
+ "new_scientific_replays":0,
+ "cloud_calls":0,
+ "repository_edits":0
+}

@@ -1,0 +1,473 @@
+name: Native twist and factor-base experiments
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/twist-relations/**'
+      - '.github/workflows/twist-relations.yml'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Diagnostic scope (performance admission is separate)
+        type: choice
+        options: [smoke, benchmark, exhaustive, all, tr04]
+        default: all
+      seeds:
+        description: Legacy suites' benchmark trials per curve; TR-04 uses its frozen protocol
+        type: string
+        default: '30'
+      seed_start:
+        description: Legacy suites' first seed; TR-04 uses its frozen protocol
+        type: string
+        default: '0'
+      runner:
+        description: Explicit runner backend
+        type: choice
+        options: [crypto-eks-linux, ubuntu-latest]
+        default: crypto-eks-linux
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    if: github.event_name != 'workflow_dispatch' || inputs.suite != 'tr04'
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    env:
+      TWIST_SOURCE_REVISION: ${{ github.sha }}
+      TWIST_SUITE: ${{ inputs.suite || 'smoke' }}
+      TWIST_SEEDS: ${{ inputs.seeds || '2' }}
+      TWIST_SEED_START: ${{ inputs.seed_start || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/twist-relations
+            backlog/XP-20261029-twist-factor-base
+            research/twist_relations_tr04_20261029
+            scripts
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - name: Native correctness, formatting, and accounting checks
+        shell: bash
+        run: |
+          cargo fmt --manifest-path tools/twist-relations/Cargo.toml --check
+          cargo clippy --release --locked --manifest-path tools/twist-relations/Cargo.toml --all-targets -- -D warnings
+          cargo test --release --locked --manifest-path tools/twist-relations/Cargo.toml
+      - name: Checkpoint the manual diagnostic before execution
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+        run: |
+          mkdir -p .resume
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Execute the native twist/factor-base diagnostic suite selected by this workflow.
+          ## Lead / hypothesis
+          Test whether public twist-coordinate selection reduces charged original-curve relation work.
+          ## Spec
+          backlog/XP-20261029-twist-factor-base/PROTOCOL.md at source $GITHUB_SHA.
+          Suite $TWIST_SUITE, seed count $TWIST_SEEDS, first seed $TWIST_SEED_START.
+          ## State
+          Native correctness checks passed; no diagnostic records produced yet.
+          ## Next steps
+          Run tools/twist-relations/target/release/twist-relations with these parameters and a fresh output directory.
+          ## Runs in flight
+          GitHub run $GITHUB_RUN_ID, attempt $GITHUB_RUN_ATTEMPT; no other submissions by this workflow.
+          ## Stop and success conditions
+          Thirty-minute job deadline; stop on budget or invariant failure. Success means verified diagnostic artifacts, not an admitted speedup.
+          EOF
+          scripts/checkpoint.sh gate
+      - name: Execute selected native diagnostics
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          tools/twist-relations/target/release/twist-relations \
+            --suite "$TWIST_SUITE" --seeds "$TWIST_SEEDS" \
+            --seed-start "$TWIST_SEED_START" --output-dir artifacts/twist-relations
+          if test -f artifacts/twist-relations/benchmark.json; then
+            tools/twist-relations/target/release/twist-relations verify artifacts/twist-relations/benchmark.json
+          fi
+          if test -f artifacts/twist-relations/exhaustive.json; then
+            tools/twist-relations/target/release/twist-relations verify artifacts/twist-relations/exhaustive.json
+          fi
+      - name: Upload diagnostic records and provenance
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: twist-relations-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/twist-relations
+          if-no-files-found: warn
+  tr04_preflight:
+    if: github.event_name == 'workflow_dispatch' && inputs.suite == 'tr04'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_revision: ${{ steps.pin.outputs.source_revision }}
+    env:
+      TR04_SOURCE_REVISION: ${{ github.sha }}
+      TR04_SELECTED_RUNNER: ${{ inputs.runner }}
+      TR04_LEGACY_SEEDS: ${{ inputs.seeds }}
+      TR04_LEGACY_SEED_START: ${{ inputs.seed_start }}
+      CARGO_TARGET_DIR: ${{ github.workspace }}/tools/twist-relations/target
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/twist-relations
+            research/twist_relations_tr04_20261029
+            scripts
+      - uses: dtolnay/rust-toolchain@1.99.1
+        with:
+          components: rustfmt, clippy
+      - name: Validate frozen source and protocol
+        id: pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$TR04_SELECTED_RUNNER" != crypto-eks-linux ]]; then
+            echo 'TR-04 is frozen to crypto-eks-linux; a hosted experiment was not requested by this protocol.' >&2
+            exit 2
+          fi
+          if [[ "$TR04_LEGACY_SEEDS" != 30 || "$TR04_LEGACY_SEED_START" != 0 ]]; then
+            echo 'TR-04 does not accept the legacy seed overrides; use its frozen protocol.' >&2
+            exit 2
+          fi
+          [[ "$TR04_SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$(git rev-parse HEAD)" == "$TR04_SOURCE_REVISION" ]]
+          [[ -z "$(git status --porcelain --untracked-files=no)" ]]
+          test -f research/twist_relations_tr04_20261029/protocol.json
+          jq -e 'type=="object"' research/twist_relations_tr04_20261029/protocol.json >/dev/null
+          mkdir -p artifacts/tr04-preflight
+          cp research/twist_relations_tr04_20261029/protocol.json artifacts/tr04-preflight/protocol.json
+          sha256sum research/twist_relations_tr04_20261029/protocol.json > artifacts/tr04-preflight/protocol.sha256
+          jq -n --arg source "$TR04_SOURCE_REVISION" --arg workflow "$GITHUB_WORKFLOW_SHA" \
+            --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            '{source_revision:$source,workflow_revision:$workflow,run_id:$run,run_attempt:$attempt,
+              fields:[7,11,19],base_sizes:[2,3],thresholds:[1,2,3,4],selector_budget:8,walk_length:8}' \
+            > artifacts/tr04-preflight/execution.json
+          printf 'source_revision=%s\n' "$TR04_SOURCE_REVISION" >> "$GITHUB_OUTPUT"
+      - name: Validate the complete protocol JSON Schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/twist_relations_tr04_20261029/schema/SOURCE.json artifacts/tr04-preflight/protocol-schema-source.json
+          schema=research/twist_relations_tr04_20261029/schema/experiment-protocol.v1.json
+          printf '%s  %s\n' "$(jq -er .sha256 research/twist_relations_tr04_20261029/schema/SOURCE.json)" "$schema" \
+            | sha256sum -c - > artifacts/tr04-preflight/protocol-schema-source-check.log 2>&1
+          npm exec --yes --package=ajv-cli@5.0.0 -- ajv validate --spec=draft2020 --strict=false \
+            -s "$schema" \
+            -d research/twist_relations_tr04_20261029/protocol.json \
+            > artifacts/tr04-preflight/protocol-schema.log 2>&1
+      - name: Native development correctness and lint checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --manifest-path tools/twist-relations/Cargo.toml --check > artifacts/tr04-preflight/fmt.log 2>&1
+          cargo clippy --release --locked --manifest-path tools/twist-relations/Cargo.toml --all-targets -- -D warnings > artifacts/tr04-preflight/clippy.log 2>&1
+          cargo test --release --locked --manifest-path tools/twist-relations/Cargo.toml > artifacts/tr04-preflight/tests.log 2>&1
+      - name: Validate the frozen protocol and analysis-source identities natively
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --release --locked --manifest-path tools/twist-relations/Cargo.toml --bin tr04-protocol > artifacts/tr04-preflight/protocol-build.log 2>&1
+          tools/twist-relations/target/release/tr04-protocol validate research/twist_relations_tr04_20261029/protocol.json > artifacts/tr04-preflight/protocol-validation.log 2>&1
+      - name: Require the existing artifact-delivery credential bindings before primary execution
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]]; then
+            echo 'An existing artifact-store credential binding is unavailable; no field census has started.' > artifacts/tr04-preflight/artifact-delivery-readiness.txt
+            exit 1
+          fi
+          echo 'Existing artifact-store credential bindings are present; S3 authorization and byte readback remain unverified.' > artifacts/tr04-preflight/artifact-delivery-readiness.txt
+      - name: Checkpoint the complete finite experiment before any shard starts
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p .resume
+          protocol_hash=$(sha256sum research/twist_relations_tr04_20261029/protocol.json | cut -d ' ' -f 1)
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Exhaust the frozen TR-04 finite relation-finding scope, retaining selection failures and all paid-work counters.
+          ## Lead / hypothesis
+          Test bounded twist-guided selection against equal-size random, progression and generic collision-avoiding controls. All matched arms run inside each field shard. This is generic decomposition, not algebraic or L2 speedup admission.
+          ## Spec
+          research/twist_relations_tr04_20261029/protocol.json at source $TR04_SOURCE_REVISION; SHA-256 $protocol_hash. Fields 7, 11, 19; B 2, 3; thresholds 1 through 4; selector budget 8; walk length 8. No algorithm parameters may be overridden by workflow inputs.
+          ## State
+          Native development checks passed. No research shard has started. Source, protocol and workflow are pinned to GitHub run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT.
+          ## Next steps
+          For each p in 7, 11, 19, run bash tools/twist-relations/run-tr04-workflow.sh field p on crypto-eks-linux. The wrapper builds the locked release binary, invokes twist-tr04 --prime p --output-dir artifacts/tr04/p<prime>/results and verifies that directory. Aggregate all three immutable artifacts with the native summarize subcommand.
+          ## Runs in flight
+          None. Three field jobs may start only after this checkpoint succeeds. GitHub workflow $GITHUB_WORKFLOW_REF, run $GITHUB_RUN_ID, attempt $GITHUB_RUN_ATTEMPT will retain each command, source/binary/protocol hash, runner identity, log, output and exit status.
+          ## Stop and success conditions
+          Maximum three parallel field jobs, each with a 30-minute workflow deadline and no automatic retry. Exhaust the declared finite cases and reject accounting/replay errors or missing/duplicate shards. Failed or interrupted prefixes never establish complete coverage or a passing final clock. All records are operation-count diagnostics, not admitted performance results.
+          EOF
+          checkpoint_exit=0
+          if scripts/checkpoint.sh gate > "$RUNNER_TEMP/tr04-checkpoint.log" 2>&1; then
+            checkpoint_exit=0
+          else
+            checkpoint_exit=$?
+          fi
+          cp "$RUNNER_TEMP/tr04-checkpoint.log" artifacts/tr04-preflight/checkpoint.log
+          cp .resume/RESUME.md artifacts/tr04-preflight/RESUME.md
+          printf '%s\n' "$checkpoint_exit" > artifacts/tr04-preflight/checkpoint.exit
+          exit "$checkpoint_exit"
+      - name: Retain preflight evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr04-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04-preflight
+          if-no-files-found: warn
+  tr04:
+    name: TR-04 exhaustive p${{ matrix.prime }}
+    needs: tr04_preflight
+    if: github.event_name == 'workflow_dispatch' && inputs.suite == 'tr04'
+    runs-on: crypto-eks-linux
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        prime: [7, 11, 19]
+    env:
+      TR04_SOURCE_REVISION: ${{ needs.tr04_preflight.outputs.source_revision }}
+      TR04_WORKFLOW_REVISION: ${{ github.workflow_sha }}
+      TR04_REQUESTED_RUNNER: crypto-eks-linux
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tr04_preflight.outputs.source_revision }}
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/twist-relations
+            research/twist_relations_tr04_20261029
+            scripts
+      - uses: dtolnay/rust-toolchain@1.99.1
+      - name: Record and verify the actual assigned runner label
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TR04_JOB_NAME: TR-04 exhaustive p${{ matrix.prime }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tr04/p${{ matrix.prime }}
+          metadata_response="$RUNNER_TEMP/tr04-p${{ matrix.prime }}-jobs.json"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --max-time 30 \
+            -H "Authorization: Bearer $GITHUB_TOKEN" -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs?per_page=100" \
+            -o "$metadata_response" 2> artifacts/tr04/p${{ matrix.prime }}/runner-metadata.stderr.log
+          jq --arg name "$TR04_JOB_NAME" '[.jobs[] | select(.name==$name) | {id,run_id,run_attempt,name,head_sha,status,conclusion,labels,runner_name,runner_group_name,started_at,html_url}]' "$metadata_response" > artifacts/tr04/p${{ matrix.prime }}/assigned-job.json
+          jq -e --arg revision "$TR04_SOURCE_REVISION" 'length==1 and .[0].head_sha==$revision and (.[0].labels | index("crypto-eks-linux") != null) and (.[0].runner_name | length>0)' artifacts/tr04/p${{ matrix.prime }}/assigned-job.json >/dev/null
+      - name: Checkpoint the field start before executing any census
+        id: start_checkpoint
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          CHECKPOINT_PREFIX: checkpoints/tr04/${{ github.run_id }}/${{ github.run_attempt }}/p${{ matrix.prime }}/start
+          TR04_PRIME: ${{ matrix.prime }}
+        run: |
+          set -euo pipefail
+          mkdir -p .resume
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Exhaust the frozen TR-04 p=$TR04_PRIME field shard, preserving failed selectors, rank failures and all paid-work counters.
+          ## Lead / hypothesis
+          Test bounded twist-guided selection against the same frozen random, progression and collision-avoiding controls. This is generic decomposition and operation-count evidence, not L2 or speedup admission.
+          ## Spec
+          research/twist_relations_tr04_20261029/protocol.json at source $TR04_SOURCE_REVISION, workflow $TR04_WORKFLOW_REVISION. Frozen fields 7, 11, 19; this shard is p=$TR04_PRIME, B=2,3, thresholds 1,2,3,4, selector budget 8 and walk length 8.
+          ## State
+          The shared preflight and source checkpoint passed. This field census has not started. Assigned runner metadata is artifacts/tr04/p$TR04_PRIME/assigned-job.json; physical host facts and binary hash will be recorded by the wrapper.
+          ## Next steps
+          Run bash tools/twist-relations/run-tr04-workflow.sh field $TR04_PRIME. It builds the locked binary, executes twist-tr04 --prime $TR04_PRIME --output-dir artifacts/tr04/p$TR04_PRIME/results, then independently verifies the retained directory.
+          ## Runs in flight
+          GitHub run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT, runner $RUNNER_NAME, field p=$TR04_PRIME. The other two declared fields may run concurrently under max-parallel 3. Collect each tr04-p<prime>-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT artifact, even on failure; no other submission is implied.
+          ## Stop and success conditions
+          Thirty-minute job deadline, no automatic retry. Reject source/protocol, accounting or independent-verification failures. Full success requires all three complete verified field artifacts and the aggregate. This source/evidence checkpoint is not application or process-memory recovery; hard pod loss may prevent final upload.
+          EOF
+          checkpoint_exit=0
+          if scripts/checkpoint.sh gate > "$RUNNER_TEMP/tr04-p$TR04_PRIME-start-checkpoint.log" 2>&1; then
+            checkpoint_exit=0
+          else
+            checkpoint_exit=$?
+          fi
+          cp "$RUNNER_TEMP/tr04-p$TR04_PRIME-start-checkpoint.log" "artifacts/tr04/p$TR04_PRIME/checkpoint-start.log"
+          cp .resume/RESUME.md "artifacts/tr04/p$TR04_PRIME/RESUME-start.md"
+          printf '%s\n' "$checkpoint_exit" > "artifacts/tr04/p$TR04_PRIME/checkpoint-start.exit"
+          exit "$checkpoint_exit"
+      - name: Build, execute every matched arm and verify the complete field shard
+        id: execute
+        shell: bash
+        run: bash tools/twist-relations/run-tr04-workflow.sh field ${{ matrix.prime }}
+      - name: Checkpoint the field outcome and any partial evidence
+        if: always() && steps.start_checkpoint.outcome == 'success'
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          CHECKPOINT_PREFIX: checkpoints/tr04/${{ github.run_id }}/${{ github.run_attempt }}/p${{ matrix.prime }}/finish
+          TR04_PRIME: ${{ matrix.prime }}
+          TR04_EXECUTE_OUTCOME: ${{ steps.execute.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p .resume
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Preserve the completed or partial TR-04 p=$TR04_PRIME field evidence and its actual outcome.
+          ## Lead / hypothesis
+          All frozen selectors share the same public relation finder. Failed or missing cases remain evidence; successful upload alone establishes no relation-finding gain.
+          ## Spec
+          research/twist_relations_tr04_20261029/protocol.json at source $TR04_SOURCE_REVISION, workflow $TR04_WORKFLOW_REVISION. This is the originally declared p=$TR04_PRIME shard, not a rerun or an amended protocol.
+          ## State
+          The native wrapper step outcome is $TR04_EXECUTE_OUTCOME. Inspect artifacts/tr04/p$TR04_PRIME/outcome.json for build/run/verification exits if present, execution.json and binary.sha256 for provenance, and results/ for complete or partial native records. Absent receipts do not imply success. Checkpoint untracked-file limits may list large payloads without copying them; the GitHub artifact is collected independently.
+          ## Next steps
+          Upload tr04-p$TR04_PRIME-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT with always() retention. Aggregate the three declared artifacts and verify every census, control and source identity. Preserve all failures and do not automatically retry or resume the experiment.
+          ## Runs in flight
+          GitHub run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT, runner $RUNNER_NAME, field p=$TR04_PRIME wrapper has outcome $TR04_EXECUTE_OUTCOME. Other declared fields may still be active; inspect their own immutable artifact receipts rather than inferring completion here.
+          ## Stop and success conditions
+          The existing thirty-minute deadline remains. A failed execution or failed finish checkpoint keeps this job failed. Only all complete independently verified shards plus aggregate can establish finite coverage. No process-memory recovery, uninterrupted clock, L2 admission or speedup is claimed; hard pod loss can prevent this final checkpoint and upload.
+          EOF
+          checkpoint_exit=0
+          if scripts/checkpoint.sh gate > "$RUNNER_TEMP/tr04-p$TR04_PRIME-finish-checkpoint.log" 2>&1; then
+            checkpoint_exit=0
+          else
+            checkpoint_exit=$?
+          fi
+          cp "$RUNNER_TEMP/tr04-p$TR04_PRIME-finish-checkpoint.log" "artifacts/tr04/p$TR04_PRIME/checkpoint-finish.log"
+          cp .resume/RESUME.md "artifacts/tr04/p$TR04_PRIME/RESUME-finish.md"
+          printf '%s\n' "$checkpoint_exit" > "artifacts/tr04/p$TR04_PRIME/checkpoint-finish.exit"
+          exit "$checkpoint_exit"
+      - name: Retain every completed or partial field record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr04-p${{ matrix.prime }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04/p${{ matrix.prime }}
+          if-no-files-found: warn
+  tr04_aggregate:
+    name: TR-04 aggregate and independent verification
+    needs: [tr04_preflight, tr04]
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.suite == 'tr04' && needs.tr04_preflight.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TR04_SOURCE_REVISION: ${{ needs.tr04_preflight.outputs.source_revision }}
+      TR04_WORKFLOW_REVISION: ${{ github.workflow_sha }}
+      TR04_REQUESTED_RUNNER: ubuntu-latest
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        id: aggregate_checkout
+        with:
+          ref: ${{ needs.tr04_preflight.outputs.source_revision }}
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/twist-relations
+            tools/artifacts
+            .artifacts
+            research/twist_relations_tr04_20261029
+            scripts
+      - uses: dtolnay/rust-toolchain@1.99.1
+      - name: Download this attempt's preflight evidence separately from the field inputs
+        uses: actions/download-artifact@v4
+        with:
+          name: tr04-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04-preflight-input
+      - name: Download all field artifacts from this run and attempt
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tr04-p[0-9]*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04-inputs
+      - name: Summarize all declared shards, including absent or failed inputs
+        id: aggregate
+        if: always()
+        shell: bash
+        run: bash tools/twist-relations/run-tr04-workflow.sh aggregate artifacts/tr04-inputs
+      - name: Checkpoint aggregate results and failure evidence
+        id: aggregate_checkpoint
+        if: always() && steps.aggregate_checkout.outcome == 'success'
+        shell: bash
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          CHECKPOINT_PREFIX: checkpoints/tr04/${{ github.run_id }}/${{ github.run_attempt }}/aggregate
+          TR04_AGGREGATE_OUTCOME: ${{ steps.aggregate.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p .resume artifacts/tr04-summary
+          cat > .resume/RESUME.md <<EOF
+          ## Goal
+          Preserve the TR-04 aggregate, native report/export and all available failure evidence.
+          ## Lead / hypothesis
+          Compare independent relation rank and paid primitive-work vectors under the frozen selectors. No pooled winner, elapsed-time gain or scalar-recovery claim is inferred from submission or workflow success.
+          ## Spec
+          research/twist_relations_tr04_20261029/protocol.json at source $TR04_SOURCE_REVISION, workflow $TR04_WORKFLOW_REVISION. The declared fields remain 7,11,19 and no failed or absent shard is replaced.
+          ## State
+          Aggregate wrapper step outcome is $TR04_AGGREGATE_OUTCOME. Inspect artifacts/tr04-summary/outcome.json and retained logs for actual native summarize/report exits. Native results/ and report/ may be partial or absent. Downloaded field artifacts are under artifacts/tr04-inputs/. Checkpoint file/total limits may list large files without including them; GitHub artifacts are collected separately.
+          ## Next steps
+          Retain tr04-summary-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT, the three field artifacts and preflight artifact. Inspect source/binary/protocol hashes, all 531 model dispositions, independent verification, the six actual controls and the 27 actual logical export rows when complete. Inspect every PDF page before publishing any result. Missing attempts cannot become fabricated successful export rows.
+          ## Runs in flight
+          GitHub run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT aggregate analysis on runner $RUNNER_NAME. The field matrix has reached its terminal GitHub dependency outcomes; inspect individual receipts to distinguish completion, failure or cancellation.
+          ## Stop and success conditions
+          No automatic retry or replacement run. A failed aggregate or failed checkpoint keeps the job failed. Only complete reconciled inputs establish finite coverage. All report output is analysis of retained field records, not a new scientific backend or an admitted timing result.
+          EOF
+          checkpoint_exit=0
+          if scripts/checkpoint.sh gate > "$RUNNER_TEMP/tr04-aggregate-checkpoint.log" 2>&1; then
+            checkpoint_exit=0
+          else
+            checkpoint_exit=$?
+          fi
+          cp "$RUNNER_TEMP/tr04-aggregate-checkpoint.log" artifacts/tr04-summary/checkpoint.log
+          cp .resume/RESUME.md artifacts/tr04-summary/RESUME.md
+          printf '%s\n' "$checkpoint_exit" > artifacts/tr04-summary/checkpoint.exit
+          exit "$checkpoint_exit"
+      - name: Archive retained inputs and verify a fresh artifact-store byte download
+        if: always() && steps.aggregate_checkout.outcome == 'success'
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+          TR04_AGGREGATE_OUTCOME: ${{ steps.aggregate.outcome }}
+          TR04_CHECKPOINT_OUTCOME: ${{ steps.aggregate_checkpoint.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/tr04-delivery
+          bash tools/twist-relations/run-tr04-delivery.sh > artifacts/tr04-delivery/driver.stdout.log 2> artifacts/tr04-delivery/driver.stderr.log
+      - name: Retain artifact-store pointers and delivery failures without duplicating the raw archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr04-delivery-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: |
+            artifacts/tr04-delivery
+            !artifacts/tr04-delivery/**/runs.tar.xz
+            !artifacts/tr04-delivery/**/runs.tar.xz.tmp
+          if-no-files-found: warn
+      - name: Retain the complete or partial aggregate and its failure logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tr04-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/tr04-summary
+          if-no-files-found: warn
