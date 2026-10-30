@@ -1,0 +1,10 @@
+proc frobFormula44(list p,poly kpoly,poly L,int d){
+ ideal base44=std(ideal(kpoly,Z,T));ideal q44=std(ideal(kpoly,L,T));poly aa44=reduce(1+p[2],base44);poly C44=reduce(subst(L,Z,0)*inv44(aa44^2,base44),base44);
+ poly xf44=X;int k44;for(k44=1;k44<=d;k44++){xf44=reduce(xf44^2,base44);}
+ poly rho44=0;poly partial44=0;for(k44=1;k44<=5*d;k44++){rho44=reduce(rho44^2+C44,base44);if(k44==d){partial44=rho44;}}
+ poly aF44=reduce(subst(aa44,X,xf44),base44);poly lF44=reduce(aF44*(Z*inv44(aa44,base44)+partial44),q44);
+ list fp44=list(reduce(subst(p[1],X,xf44),q44),reduce(subst(p[2],X,xf44),q44),lF44,reduce(subst(subst(p[4],X,xf44),Z,lF44),q44));
+ if(reduce(subst(kpoly,X,xf44),q44)!=0 || reduce(subst(subst(L,X,xf44),Z,lF44),q44)!=0){ERROR("FROB44_QUOTIENT_MAP");}
+ return(list(fp44,xf44,lF44,rho44));
+}
+proc applyFrobMap44(list p,poly xf,poly lf,ideal q){list out;int i;for(i=1;i<=4;i++){out[i]=reduce(subst(subst(p[i],X,xf),Z,lf),q);}return(out);}
