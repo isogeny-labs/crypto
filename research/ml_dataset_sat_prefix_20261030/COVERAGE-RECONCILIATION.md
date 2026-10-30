@@ -69,11 +69,12 @@ introduce an explicit schema version.
 
 ## Delivery gates still open
 
-The consequence CLI has passed retained curve/twist and corruption checks; its
-complete library rerun is active after exact missing-fixture restoration. SAT
-source and review corrections are committed, but the first execution attempt
-stopped before compilation on a missing local dependency manifest. Complete
-dependency restoration, scoped tests, adapter coordination, actual nonzero
-PDP learning-transition fixture, full checks and PR delivery remain open.
+The consequence merged-source pipeline05 has passed 264 dataset tests, strict
+Clippy, release build and retained curve/twist CLI checks; the full library suite
+is still running. Standalone SAT validation02 passed 270 dataset and 20 encoder
+tests. Integrated workflow/export Python attempt03 passed 57 tests; the failed
+attempt02 remains retained. These checks do not replace shared producer
+coordination, a final binary, excluded runtime preflight and frozen protocol,
+actual nonzero PDP learning-transition fixture, full SAT checks or PR delivery.
 Worker S3 access, fresh cumulative resource/budget admission and independent
 worker output restore/replay remain separate prerequisites to a cloud wave.
