@@ -1,0 +1,67 @@
+ring integralCandidate50=2,(t,u),dp;short=0;ideal candidateIdeal50;candidateIdeal50[1]=t^32+(u^8+1)*t^24+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^20+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t^17+(u^64+u^54+u^53+u^50+u^49+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*t^16+(u^73+u^71+u^69+u^65+u^64+u^62+u^59+u^57+u^56+u^54+u^53+u^48+u^47+u^46+u^45+u^41+u^40+u^38+u^37+u^35)*t^12+(u^85+u^84+u^83+u^82+u^80+u^76+u^75+u^74+u^71+u^69+u^66+u^65+u^64+u^63+u^62+u^61+u^54+u^50+u^49+u^47+u^45+u^44+u^43+u^39+u^36+u^35)*t^9+(u^86+u^84+u^82+u^81+u^77+u^75+u^74+u^72+u^71+u^69+u^64+u^62+u^61+u^59+u^57+u^56+u^55+u^52+u^51+u^50+u^49+u^48+u^47+u^46+u^44+u^43+u^42+u^41+u^40+u^39+u^38+u^37+u^36+u^24)*t^8+(u^94+u^90+u^87+u^86+u^82+u^81+u^80+u^77+u^76+u^75+u^71+u^70+u^66+u^65+u^64+u^62+u^61+u^60+u^59+u^58)*t^5+(u^105+u^103+u^101+u^97+u^96+u^95+u^94+u^93+u^92+u^90+u^89+u^88+u^87+u^86+u^82+u^81+u^80+u^79+u^78+u^77+u^74+u^73+u^67+u^66+u^61+u^60+u^59+u^56+u^55+u^54+u^49+u^47)*t^4+(u^109+u^108+u^107+u^106+u^105+u^104+u^102+u^101+u^100+u^97+u^94+u^92+u^87+u^86+u^85+u^84+u^83+u^81+u^78+u^77+u^75+u^74+u^73+u^72+u^71+u^67)*t^2+(u^117+u^116+u^115+u^114+u^112+u^108+u^107+u^106+u^104+u^100+u^99+u^98+u^96+u^93+u^92+u^90+u^89+u^88+u^87+u^83+u^82+u^81+u^75+u^72+u^71+u^70+u^69+u^67+u^65+u^62+u^61+u^58+u^57+u^56)*t+(u^128+u^118+u^117+u^114+u^113+u^111+u^109+u^108+u^107+u^102+u^99+u^98+u^96+u^95+u^93+u^92+u^90+u^86+u^85+u^83+u^81+u^80+u^77+u^74+u^71+u^70+u^68+u^67+u^63+u^61+u^60+u^56+u^48);
+ring weightedFinite50=2,(t,u),wp(4,1);short=0;
+ideal finiteWeighted50=imap(integralCandidate50,candidateIdeal50);
+if(lead(finiteWeighted50[1])!=t^32 || deg(finiteWeighted50[1])!=128){ERROR("CHART50_WEIGHTED_MONIC_DEGREE");quit;}
+print("CHART50_STAGE finite_weighted_degree=128 leading_term=t^32 infinity_transform_begin=true");
+ring infinityField50=(2,z),(T),dp;short=0;
+map infinitySub50=weightedFinite50,T/z^4,1/z;
+ideal infinityImage50=infinitySub50(finiteWeighted50);
+poly infinityPolynomial50=z^128*infinityImage50[1];
+if(deg(infinityPolynomial50)!=32 || leadcoef(infinityPolynomial50)!=1){ERROR("CHART50_INFINITY_MONIC_DEGREE");quit;}
+int term50;
+for(term50=1;term50<=size(infinityPolynomial50);term50++){if(denominator(leadcoef(infinityPolynomial50[term50]))!=1){ERROR("CHART50_INFINITY_NOT_INTEGRAL");quit;}}
+link infinityOut50="ASCII:w infinity-candidate50.sing";open(infinityOut50);
+write(infinityOut50,"ring infinityIntegral50=2,(T,z),wp(4,1);short=0;ideal infinityIdeal50;infinityIdeal50[1]="+string(infinityPolynomial50)+";");close(infinityOut50);
+execute(read("infinity-candidate50.sing"));
+if(lead(infinityIdeal50[1])!=T^32){ERROR("CHART50_INFINITY_WEIGHTED_LEADING_TERM");quit;}
+print("CHART50_STAGE infinity_chart_exported=true overlap_products_begin=true");
+ring finiteOverlap50=2,(t,u,s),dp;short=0;
+map finiteEmbed50=integralCandidate50,t,u;
+ideal finiteEquation50=finiteEmbed50(candidateIdeal50);
+map infinityToFinite50=infinityIntegral50,t*s^4,s;
+ideal infinityImageFinite50=infinityToFinite50(infinityIdeal50);
+poly finiteUnit50=u*s+1;
+poly finiteDifference50=infinityImageFinite50[1]+s^128*finiteEquation50[1];
+poly finiteQuotient50=finiteDifference50/finiteUnit50;
+if(finiteQuotient50*finiteUnit50!=finiteDifference50){ERROR("CHART50_FINITE_OVERLAP_PRODUCT");quit;}
+ideal finiteCoordinates50=t,u,s;
+ring infinityOverlap50=2,(T,z,r),dp;short=0;
+map infinityEmbed50=infinityIntegral50,T,z;
+ideal infinityEquation50=infinityEmbed50(infinityIdeal50);
+map finiteToInfinity50=integralCandidate50,T*r^4,r;
+ideal finiteImageInfinity50=finiteToInfinity50(candidateIdeal50);
+poly infinityUnit50=z*r+1;
+poly infinityDifference50=finiteImageInfinity50[1]+r^128*infinityEquation50[1];
+poly infinityQuotient50=infinityDifference50/infinityUnit50;
+if(infinityQuotient50*infinityUnit50!=infinityDifference50){ERROR("CHART50_INFINITY_OVERLAP_PRODUCT");quit;}
+ideal infinityCoordinates50=T,z,r;
+map forwardOverlap50=finiteOverlap50,T*r^4,r,z;
+ideal forwardCoordinates50=forwardOverlap50(finiteCoordinates50);
+poly forwardUnit50=forwardOverlap50(finiteUnit50);
+if(forwardUnit50!=infinityUnit50){ERROR("CHART50_FORWARD_UNIT_MAP");quit;}
+setring finiteOverlap50;
+map reverseOverlap50=infinityOverlap50,t*s^4,s,u;
+ideal reverseCoordinates50=reverseOverlap50(infinityCoordinates50);
+poly reverseUnit50=reverseOverlap50(infinityUnit50);
+if(reverseUnit50!=finiteUnit50){ERROR("CHART50_REVERSE_UNIT_MAP");quit;}
+ideal finiteComposition50=reverseOverlap50(forwardCoordinates50);
+link overlapOut50="ASCII:w overlap-certificate50.sing";open(overlapOut50);
+write(overlapOut50,"ring finiteOverlapCertificate50=2,(t,u,s),dp;short=0;poly unit50=u*s+1;poly difference50="+string(finiteDifference50)+";poly quotient50="+string(finiteQuotient50)+";ideal coordinateDifferences50;ideal coordinateQuotients50;");
+int index50;poly difference50;poly quotient50;
+for(index50=1;index50<=3;index50++){
+ difference50=finiteComposition50[index50]+finiteCoordinates50[index50];quotient50=difference50/finiteUnit50;
+ if(quotient50*finiteUnit50!=difference50){ERROR("CHART50_FINITE_COORDINATE_PRODUCT");quit;}
+ write(overlapOut50,"coordinateDifferences50["+string(index50)+"]="+string(difference50)+";coordinateQuotients50["+string(index50)+"]="+string(quotient50)+";");
+}
+setring infinityOverlap50;
+ideal infinityComposition50=forwardOverlap50(reverseCoordinates50);
+write(overlapOut50,"ring infinityOverlapCertificate50=2,(T,z,r),dp;short=0;poly unit50=z*r+1;poly difference50="+string(infinityDifference50)+";poly quotient50="+string(infinityQuotient50)+";ideal coordinateDifferences50;ideal coordinateQuotients50;");
+poly difference50;poly quotient50;
+for(index50=1;index50<=3;index50++){
+ difference50=infinityComposition50[index50]+infinityCoordinates50[index50];quotient50=difference50/infinityUnit50;
+ if(quotient50*infinityUnit50!=difference50){ERROR("CHART50_INFINITY_COORDINATE_PRODUCT");quit;}
+ write(overlapOut50,"coordinateDifferences50["+string(index50)+"]="+string(difference50)+";coordinateQuotients50["+string(index50)+"]="+string(quotient50)+";");
+}
+close(overlapOut50);
+print("CHART50_RESULT monic_charts=2 polynomial_degree=32 weighted_degree=128 overlap_products=8 unit_maps=2 inverse_transition_verified=true");
+print("CHART50_ALL_CHECKS_PASS");quit;

@@ -43,4 +43,10 @@ theorem field_map_bijective_of_equal_finrank
   refine ⟨f.toRingHom.injective, ?_⟩
   exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
     (f := f.toLinearMap) h).mp f.toRingHom.injective
+/-- The nontrivial coordinate round trip on the two-chart overlap. -/
+theorem overlap_coordinate_roundtrip {K : Type*} [CommRing K]
+    (t u s : K) (h : u*s = 1) : (t*s^4)*u^4 = t := by
+  calc
+    _ = t*(u*s)^4 := by ring
+    _ = t := by rw [h]; ring
 end Rational50
