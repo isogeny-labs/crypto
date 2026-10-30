@@ -973,3 +973,29 @@ The full paper GPU tensor backend and matched-rho/external comparisons remain op
 ### Errors
 No v13 process failure. Canonical checker assumes rectangular arms by sizes,
 so its five findings remain explicit; no full checker-pass claim is made.
+
+## 2026-10-30 20:14 UTC — v13 report and v15 infrastructure failure
+
+### What was done
+Published v13 raw commit `84d5159e3635` before rendering the two-page report at
+`research/explicit_relations_e2e_20261030/reports/run-20261030T1757Z`.
+Both PDF pages were visually inspected; versioned catalog copies retain hashes.
+V15 stopped with bootstrap exit128 before compilation: partial-clone lazy
+checkout could not fetch Git blob `52a224ca9141900ae3779a85a56f3e810251d6d3`
+(`.artifacts.json`) because the public GitHub fetch requested authentication.
+
+### Decisions made
+Preserve the failed archive and delete the pod; do not label this a recovery
+panel or alter v15's one-attempt contract. Prepare a new frozen infrastructure
+attempt using the same measured source and unchanged instruments, with an
+offline-rehearsed source object pack instead of runtime GitHub lazy fetches.
+
+### Open threads
+Publish v15 failure custody and v16 freeze before another GPU launch. The
+63-bit arithmetic/filter remain unvalidated on GPU; no new recovery data exists.
+
+### Errors
+V15 pod `ndiwvrvehbf4hy` deleted with verified absence; controller1, bootstrap128.
+Failure archive SHA256 `ce7b1a34a7059c30331e4a9f9e3b34473c101be74d51c603cd2fd7db0ebe6554`.
+Typst CLI was absent; the existing Python Typst binding rendered the report.
+Poppler emitted a tagged-metadata warning but rendered both pages successfully.

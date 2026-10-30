@@ -46,3 +46,11 @@ row. Both report pages were visually inspected after raw commit `099dff2edd81`.
 These are unadmitted L0 observations with no matched rho or independent
 scientific validation; 62 bits is the complete prescribed rung, not a global
 hardware maximum. Earlier panels and their failures remain unchanged.
+
+V13 also completed all 12 prescribed executions, with complete right caches
+in both 61-bit and both 62-bit cells. The [two-page v13 report](e2e-v13-report.pdf),
+[SVG](e2e-scaling-v13.svg) and [150-dpi PNG](e2e-scaling-v13.png) retain every
+execution. Both PDF pages were visually inspected after raw commit `84d5159e3635`.
+These remain unadmitted L0 observations; no cross-version timing advantage,
+matched-rho result or global hardware maximum is inferred. V15 failed source
+checkout before compilation or trials; its failure is preserved separately.
