@@ -1,0 +1,65 @@
+{
+ "schema": "ic-cover-weakclass.exact-reproduction/v1",
+ "source_commit": "1f006b002f02e28ad1626338dc504960d6a1dd92",
+ "local_binary_sha256": "adcdc17f8bdbe268091350b269eb0fa129baaab9d3672d3b658e63f2f3652444",
+ "recorded_binary_sha256": "223902e28201ce9a468769ec37fe7e50e7b6330afc21f05a2de36c6c08652543",
+ "why": "same source commit, rebuilt on this host; the p=53 seed=1 pair reproduces every counted field exactly, so the rho reference is measured with the same program/process as the recorded IC runs",
+ "cells": [
+  {
+   "p": 53,
+   "seed": 1,
+   "arm": "A",
+   "local": {
+    "total_muls": 18025767851,
+    "s": 731.5903153798725,
+    "relation_digest": 18437055082642787566,
+    "f4_native_ops": 990946124
+   },
+   "recorded": {
+    "total_muls": 18025767851,
+    "s": 731.5903153798725,
+    "relation_digest": 18437055082642787566,
+    "f4_native_ops": 990946124
+   },
+   "local_sha256": "6c0e2a8f813c9c16d20d972b9d2b298dc734f0c503acf12d5cc747c953a68d6e",
+   "recorded_sha256": "4003ba0e595a6c18b97709470e88844bbc74aba5b19874e158fb7c80eb704283",
+   "equal": {
+    "total_muls": true,
+    "s": true,
+    "relation_digest": true,
+    "f4_native_ops": true,
+    "residuals": true,
+    "relations": true,
+    "stop_mode": true
+   }
+  },
+  {
+   "p": 53,
+   "seed": 1,
+   "arm": "B",
+   "local": {
+    "total_muls": 9775539375,
+    "s": 396.74814373956696,
+    "relation_digest": 18437055082642787566,
+    "f4_native_ops": 979268186
+   },
+   "recorded": {
+    "total_muls": 9775539375,
+    "s": 396.74814373956696,
+    "relation_digest": 18437055082642787566,
+    "f4_native_ops": 979268186
+   },
+   "local_sha256": "48a529e45f76faedcc2209430d3475b1290d50186bbd811d7f221feaf66c10d5",
+   "recorded_sha256": "b2d3cbad69c15f50b0b8f5fbfb6e575c1953bb3e54307e9946cec36d3149d081",
+   "equal": {
+    "total_muls": true,
+    "s": true,
+    "relation_digest": true,
+    "f4_native_ops": true,
+    "residuals": true,
+    "relations": true,
+    "stop_mode": true
+   }
+  }
+ ]
+}

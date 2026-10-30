@@ -1,5 +1,69 @@
 # Symbolic signed-graph reduction for pencil relations
 
+## Observed first gate — 30 October 2026
+
+The fresh p739 gate now contains all 60 prescribed workloads, 1,080 execution
+records and 300 measured candidate/reference pairs. All outcomes verified;
+native replay reproduced all 900 measured records. The unchanged native finite
+analyzer admits all 300 pairs in every one of the 36 price cells. Exact ratios,
+summed costs and model boundaries are in the
+[PDF report](validation/accounting/reports/run-20261030T0015Z-finite-costs/report.pdf),
+[graph](validation/accounting/reports/run-20261030T0015Z-finite-costs/cost-grid.svg),
+[CSV](validation/covered_gate_results_20261030/cost-grid-exact.csv) and
+[structured receipt](validation/covered_gate_results_20261030/covered-analysis-receipt.json).
+
+The fresh timing gate was rejected: the 360 pencil records reached L2, while
+the 720 rho/control records were L1 with sub-millisecond solve intervals.
+Qualified paired clocks remain unavailable. The separate computation epoch is
+retained with invalid clocks and is not additional distinct target coverage.
+[Canonical packaging and reconstruction](validation/canonical_gate_export_20261030/receipt.json)
+passed with no findings and `qualified:false`. Frozen v5 remains unchanged;
+the report-provenance correction is explicitly post-data. Raw S3 object versions
+and hashes are in the [locator manifest](validation/actual_gate_results_20261030/versioned-raw-locators.json).
+
+The first gate's approved four-hour envelope and original deadline applied only
+to that gate. Its two infrastructure attempts are terminal. The frozen stop rule
+does not permit extension after the rejected measurement. The upper gate and
+full 1,260-target pencil cohort remain incomplete; a prospective continuation
+must retain the old outcome and resolve its protocol and resource conditions.
+The preparation and implementation sections below retain earlier validation
+history; their original unrun statements do not describe the completed gate.
+
+## Current native preparation and review tools
+
+The supported preparation, export and report paths are Rust:
+
+- [Native preparation](native_preparation/README.md) extracts the retained
+  archive projection, generates the prescribed specifications, and checks
+  native plans against the archived workload identities and prepared bytes.
+- [Native canonical export](native_canonical_export/README.md) packages
+  hash-bound observations with explicit execution history and canonical
+  validation. It recomputes the complete native analysis from the bound inputs
+  and reconstructs exports from immutable requests. Packaging does not qualify
+  a clock or infer missing counts. The [original review](validation/native_export_review_08e8ab38d/review.json)
+  and [correction review](validation/native_export_correction_fc96a3d1/review.json)
+  preserve the findings and their scoped software checks separately.
+- [Native review reports](native_review_report/README.md) renders the
+  preparation evidence as JSON, SVG and PDF using Rust and native LaTeX.
+  Its current contract is a zero-observation preparation report, not an
+  empirical cohort report.
+
+The earlier Python preparation scripts, canonical adapter and report generator
+are retained only as historical source and evidence. They are superseded
+execution paths, not alternatives to the native tools. The native replacements
+must retain their input, validation and accounting contracts; a software test
+result is never relabelled as a mathematical cohort measurement.
+
+The user approved the first gate's 25,000,000 coefficient cap and 3,600 seconds
+per execution for all 60 prescribed p739 targets on 29 October 2026. The
+[authorization record](protocol_draft/accounting_amendment_20261029/first_gate_authorization.json)
+limits that approval to the first gate. The later four-hour authorization,
+frozen gate protocols and publication receipts resolved the first-gate execution
+conditions. The full-cohort execution envelope remains unresolved; the current
+observed gate status is recorded above.
+
+## Implementation and retained validation history
+
 This is a mathematical implementation step toward the still-incomplete
 1,260-target pencil cohort. It contains an exact finite-field row reducer,
 independent unit tests, and four field-identity Lean lemmas. Its library
@@ -8,6 +72,38 @@ library into the existing synthetic pencil cohort path; it is compile-tested,
 not yet run as a cohort.
 No cohort, EKS job, or timing experiment was run for this packet. Candidate/rho
 cost and the remaining 717 candidate outcomes are unmeasured here.
+
+## Benchmark adapter integration (T-807 / T-808)
+
+This work concerns mathematical algorithms on public synthetic instances.
+It does not assert recovery of deployed keys. The root method
+`ic.three_leads_genus2_pencil_symbolic_v2` requires explicit small-base
+selection and coefficient cap, repeats cold setup, and retains the full
+native and symbolic ledgers. Its group-only GAE is a lower bound; full costs,
+qualified online intervals and candidate/rho ratios remain unavailable.
+
+The root dependency enables only the `reporting` feature. The shared solver
+uses the root arithmetic engine and installs no allocator. Replay binds the
+deterministic JSON ledger to four exact SHA-256 words in audited counters;
+only explicitly named clock and allocation observations are excluded. These
+digest words are identifiers, not operation counts. Independent source review
+checked routing, replay coverage and the cost boundaries. The root release library check passed. The full root run recorded 5,146 passes, seven failures and 123 ignored
+tests. Six failures lacked tracked checkout fixtures; one reported a test-lock
+conflict. After materialization, all eight selected tests passed serially on
+the same compiled binary. Both logs are retained; the initial run is not
+relabelled as passing.
+The retained reporting-feature test log has 15 passing library tests.
+
+The root harness now uses the existing exclusive phase clock. Target-blind
+setup precedes target validation; query/control owns gaps between sieve,
+relation verification, elimination and the first source check. A checked
+export invariant requires the five phases to sum to the window. Additional
+adapter verification stays outside online and inside cold group counts.
+The matched rho hook opens at the first target multiplication or target
+transfer. A regression checks one hook call and identical recorded work in
+plain, negation and transferred modes. The standalone driver does not start
+a clock session, so these hooks do not yet export online times there.
+Instrumentation overhead is included; qualified runtime evidence is still absent.
 
 ## Reusable per-target solver (T-802)
 
@@ -20,8 +116,8 @@ incompatible engine types. The standalone binary owns input selection, known
 answer checks, matched rho, and the global allocator.
 
 Output is now `pencil-symbolic-cohort-target/v2`, with nested per-target cold
-setup. Setup is physically repeated for each target and includes target
-validity checking. The exact 16-walk rule and signed relation processing are
+setup. Setup is physically repeated for each target. Target validation now follows
+target-blind setup and is charged in the candidate query stage. The exact 16-walk rule and signed relation processing are
 unchanged; archived trial_cap remains rho's cap. Result storage retains graph
 and solver allocations, but setup temporaries drop before rho. This is a new
 live-memory baseline, not an identical v1 allocation boundary. No v2 cohort
@@ -30,10 +126,9 @@ for a measured execution even though a guard restores the observation flag.
 
 New development checks reject unsupported configuration/source metadata,
 check unavailable-observer serialization and flag cleanup. There are 14 default
-library tests and 21 producer-feature library tests (including six extracted
-solver tests); binary tests now live with the shared implementation. Root
-method registration, serialization-only kernel feature, and full cohort
-execution remain open. Costs remain incomplete and ratios null.
+library tests and 28 passing producer-feature library tests with one ignored
+shared-clock test (including eight solver tests); binary tests now live with the shared implementation. Root method registration and the serialization-only kernel feature are
+implemented, with root validation and prerequisite rechecks retained. Full cohort execution remains open. Costs remain incomplete and ratios null.
 
 ## Execution-route reconciliation (T-801)
 
@@ -106,7 +201,8 @@ The implementation follows the official
 ordered traversal and consistent lookup ordering. A read-only peer review
 identified lost iterator size hints; forwarding and regression assertions
 were added before delivery. Current validation is 14 default library tests,
-21 producer-feature library tests, including six shared-solver tests. Cohort
+28 passing producer-feature library tests with one ignored shared-clock test,
+including eight shared-solver tests. Cohort
 execution and a complete frozen pricing model remain open.
 
 ## Inputs and outputs
@@ -360,3 +456,45 @@ prove this additional Rust module.
 The report, graph and `checks.csv` expose these boundaries for review. No
 claim of lower memory, lower runtime, sub-rho cost, or full-cohort completion
 is made.
+
+## Retained-data admission audits (2026-10-30)
+
+The [enrollment audit](validation/p739_enrollment_audit_20261030/README.md)
+verifies the60 gate workloads, three resolved arms and1080 exact execution slots
+against the cohort16 subset. Its correctedv2 preserves900 differing sequence
+positions, rejects unexpected execution fields and retains the original packet.
+See its [PDF](validation/p739_enrollment_audit_20261030/v2/output/report.pdf),
+[graph](validation/p739_enrollment_audit_20261030/v2/output/mapping.svg) and
+[exact mapping](validation/p739_enrollment_audit_20261030/v2/output/audit.json).
+
+The [cross-session audit](validation/p739_cross_session_audit_20261030/README.md)
+checks deterministic solver outcomes and operation accounting between the retained
+computation and fresh sessions. It joins records to their original plans and
+checks distinct measured replay coverage. Its [PDF](validation/p739_cross_session_audit_20261030/output/report.pdf),
+[graph](validation/p739_cross_session_audit_20261030/output/equivalence.svg) and
+[JSON](validation/p739_cross_session_audit_20261030/output/audit.json) preserve
+timing, observed resource and environment exclusions. This is same-instrument
+consistency, not independent-implementation agreement or clock qualification.
+
+These audits execute no solver and generate no new plan or measurement. They do
+not by themselves admit gate reuse, change native aggregation/export enrollment,
+or authorize remaining cohort execution. The prospective continuation contract,
+resource ceiling/deadline and full1260-target pencil completion remain open.
+
+## Disjoint enrollment preparation (2026-10-30)
+
+The [preparation packet](validation/disjoint_enrollment_20261030/README.md)
+preserves one native remainder-plan generation and its successful solver-free
+verification. The original seven plans and enrolled eight plans match across
+1,260 workloads and 22,680 slots, including 18,900 measured executions and 3,780
+warmups. The gate and remainder do not overlap. Original and enrolled sequence
+numbers and workload indices remain in the exact mappings.
+
+Review the [PDF](validation/disjoint_enrollment_20261030/report/report.pdf),
+[graph](validation/disjoint_enrollment_20261030/report/enrollment.svg),
+[standardized report](validation/disjoint_enrollment_20261030/report/report.json)
+and [artifact publication receipt](validation/disjoint_enrollment_20261030/artifact-publication.json).
+Both mapping files were uploaded and downloaded again to verify their hashes.
+This is preparation equivalence, with zero solver executions. Scientific reuse
+admission, analysis/export integration, later-stage resources, full pencil data
+and timing requirements remain unresolved.

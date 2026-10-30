@@ -214,6 +214,9 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
+ecdl-tensor-ic = { path = "crates/ecdl-tensor-ic" }
+pencil-symbolic-graph = { path = "research/pencil_large_prime_20261029", features = ["reporting"] }
 factor-base = { path = "tools/factor-base" }
 volcano-cli = { path = "tools/volcano-cli" }
 # Durable per-vertex IC campaign checkpoints; matches volcano-cli's backend.

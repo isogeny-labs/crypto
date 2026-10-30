@@ -64,6 +64,7 @@
 
 pub mod archive;
 pub mod cm_orbit;
+pub mod explicit_base;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
@@ -923,12 +924,12 @@ mod tests {
     /// has `k` summands, and the table holds one entry per negation orbit
     /// of the signed `k`-sums of the base.
     #[test]
-    fn ksum_oracle_recovers_logs_with_three_and_four_summands() {
+    fn ksum_oracle_recovers_logs_with_three_four_and_five_summands() {
         use super::plugins::{KSumOracle, PrimeAbscissaBase};
         use crate::cryptanalysis::ic_boundary::prime_instance_for;
         let inst = prime_instance_for(24, 5);
         let (ctx, planted) = ctx_and_planted(&inst);
-        for (k, size) in [(3u32, 40u64), (4, 16)] {
+        for (k, size) in [(3u32, 40u64), (4, 16), (5, 10)] {
             let mut spec = PipelineSpec {
                 factor_base: "prime-abscissa".into(),
                 oracle: "ksum".into(),
