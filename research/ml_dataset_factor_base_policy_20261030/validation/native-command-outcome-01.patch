@@ -1,0 +1,53 @@
+--- a/research/ml_dataset_20261028/startup-integration-cli-fixture-native/run.rs
++++ b/research/ml_dataset_20261028/startup-integration-cli-fixture-native/run.rs
+@@ -278,6 +278,12 @@
+     }
+ }
+ 
++// Process admission only: semantic negative controls additionally require their
++// pinned diagnostic. A signal death is reported by supervised() as -1.
++fn expected_process_exit(code: i32, timed_out: bool, interrupted: bool, success: bool) -> bool {
++    code >= 0 && !timed_out && !interrupted && (code == 0) == success
++}
++
+ struct Runner<'a> {
+     args: &'a Args,
+     root: PathBuf,
+@@ -359,7 +365,7 @@
+                 record["exit_status"] = json!(code);
+                 record["timed_out"] = json!(timeout);
+                 record["cancelled"] = json!(interrupted);
+-                passed = !timeout && !interrupted && (code == 0) == success;
++                passed = expected_process_exit(code, timeout, interrupted, success);
+             }
+             Err(error) => {
+                 record["spawn_or_wait_error"] = json!(error.to_string());
+@@ -718,6 +724,28 @@
+ mod tests {
+     use super::*;
+     use std::sync::atomic::AtomicU64;
++
++    #[test]
++    fn expected_negative_exit_never_accepts_signal_timeout_or_cancellation() {
++        for success in [false, true] {
++            for code in [-1, 0, 1, 2, 137] {
++                for timed_out in [false, true] {
++                    for interrupted in [false, true] {
++                        let expected = matches!(
++                            (code, timed_out, interrupted, success),
++                            (0, false, false, true) | (1 | 2 | 137, false, false, false)
++                        );
++                        assert_eq!(
++                            expected_process_exit(code, timed_out, interrupted, success),
++                            expected,
++                            "code={code} timed_out={timed_out} interrupted={interrupted} success={success}"
++                        );
++                    }
++                }
++            }
++        }
++    }
++
+     static NEXT: AtomicU64 = AtomicU64::new(0);
+     struct Scratch(PathBuf);
+     impl Scratch {
