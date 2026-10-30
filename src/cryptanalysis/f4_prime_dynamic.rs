@@ -186,6 +186,213 @@ struct Gate<'a, O> {
     events: usize,
     observer: &'a mut O,
 }
+// Requested helper state, not measured stack/RSS. The Vec's own gate.vec
+// allocation tariff remains separate from this 128-byte envelope.
+#[derive(Default)]
+struct FrontierScratch {
+    hash: u64,
+    slot: u64,
+    probes: u64,
+    decoded_front_index: u64,
+    axis: u64,
+    left_exponent: u64,
+    right_exponent: u64,
+    init_position: u64,
+    init_end: u64,
+    publish_code: u64,
+    active_variables: u64,
+    logical_column_limit: u64,
+}
+struct FrontierIndex {
+    slots: Vec<u32>,
+    mask: usize,
+    scratch: FrontierScratch,
+}
+const _: () = assert!(size_of::<usize>() == 8);
+const _: () = assert!(size_of::<Mono28>() == 56);
+const _: () = assert!(size_of::<FrontierScratch>() == 96);
+const _: () = assert!(size_of::<FrontierIndex>() <= 128);
+const _: () = assert!(size_of::<Option<FrontierIndex>>() <= 128);
+
+impl FrontierIndex {
+    fn new<O: FnMut(Event) -> Result<(), ()>>(
+        gate: &mut Gate<'_, O>,
+        variables: usize,
+    ) -> Result<Self, Stop> {
+        if gate.limits.columns == 0 {
+            return Err(Stop::ColumnLimit);
+        }
+        if gate.limits.columns > 8192 || !(1..=MAX_VARIABLES).contains(&variables) {
+            return Err(Stop::InvalidInput);
+        }
+        // These bounded admission calculations precede creation of helper state.
+        let slots = gate
+            .limits
+            .columns
+            .checked_mul(2)
+            .and_then(usize::checked_next_power_of_two)
+            .ok_or(Stop::StorageLimit)?;
+        if !(2..=16384).contains(&slots) {
+            return Err(Stop::InvalidInput);
+        }
+        gate.permit(0, 128)?;
+        let mut index = Self {
+            slots: Vec::new(),
+            mask: slots - 1,
+            scratch: FrontierScratch {
+                active_variables: variables as u64,
+                logical_column_limit: gate.limits.columns as u64,
+                init_end: slots as u64,
+                ..FrontierScratch::default()
+            },
+        };
+        index.slots = gate.vec::<u32>(index.scratch.init_end as usize)?;
+        gate.permit(
+            index
+                .scratch
+                .init_end
+                .checked_mul(16)
+                .ok_or(Stop::WorkLimit)?,
+            0,
+        )?;
+        while index.scratch.init_position < index.scratch.init_end {
+            #[cfg(test)]
+            frontier_test_expiry(
+                gate,
+                FrontierCheckpoint::Initialize,
+                index.scratch.init_position,
+            );
+            gate.check()?;
+            index.scratch.axis = (index.scratch.init_position + 64).min(index.scratch.init_end);
+            while index.scratch.init_position < index.scratch.axis {
+                // Capacity S was admitted. Exactly S logical stores; allocator
+                // overcapacity is neither initialized nor a legal column grant.
+                index.slots.push(0);
+                index.scratch.init_position += 1;
+            }
+        }
+        gate.check()?;
+        Ok(index)
+    }
+    fn add<O: FnMut(Event) -> Result<(), ()>>(
+        &mut self,
+        gate: &mut Gate<'_, O>,
+        frontier: &mut Vec<Mono28>,
+        mono: &Mono28,
+    ) -> Result<(), Stop> {
+        gate.permit(
+            self.scratch
+                .active_variables
+                .checked_add(1)
+                .and_then(|v| v.checked_mul(64))
+                .ok_or(Stop::WorkLimit)?,
+            0,
+        )?;
+        self.scratch.hash = 0xcbf29ce484222325 ^ self.scratch.active_variables;
+        self.scratch.axis = 0;
+        while self.scratch.axis < self.scratch.active_variables {
+            #[cfg(test)]
+            frontier_test_expiry(gate, FrontierCheckpoint::Hash, self.scratch.axis);
+            gate.check()?;
+            self.scratch.hash = (self.scratch.hash
+                ^ u64::from(mono.exponents[self.scratch.axis as usize]))
+            .wrapping_mul(0x00000100000001b3);
+            self.scratch.axis += 1;
+        }
+        self.scratch.hash ^= self.scratch.hash >> 32;
+        #[cfg(test)]
+        FRONTIER_TEST_HASH.with(|override_hash| {
+            if let Some(hash) = override_hash.get() {
+                self.scratch.hash = hash;
+            }
+        });
+        self.scratch.slot = (self.scratch.hash as usize & self.mask) as u64;
+        self.scratch.probes = 0;
+        while self.scratch.probes < self.slots.len() as u64 {
+            #[cfg(test)]
+            frontier_test_expiry(gate, FrontierCheckpoint::Probe, self.scratch.probes);
+            gate.check()?;
+            gate.permit(
+                self.scratch
+                    .active_variables
+                    .checked_add(1)
+                    .and_then(|v| v.checked_mul(64))
+                    .and_then(|v| v.checked_add(32))
+                    .ok_or(Stop::WorkLimit)?,
+                0,
+            )?;
+            self.scratch.decoded_front_index = u64::from(self.slots[self.scratch.slot as usize]);
+            if self.scratch.decoded_front_index == 0 {
+                if frontier.len() as u64 >= self.scratch.logical_column_limit {
+                    return Err(Stop::ColumnLimit);
+                }
+                gate.permit(16 * ((size_of::<Mono28>() as u64).div_ceil(8) + 1) + 32, 0)?;
+                self.scratch.publish_code = u64::from(
+                    u32::try_from(frontier.len().checked_add(1).ok_or(Stop::InvalidInput)?)
+                        .map_err(|_| Stop::InvalidInput)?,
+                );
+                // Commit as a pair: gate.push may refuse before append. Once it
+                // succeeds, publication has no intervening fallible operation.
+                gate.push(frontier, *mono)?;
+                self.slots[self.scratch.slot as usize] = self.scratch.publish_code as u32;
+                return Ok(());
+            }
+            self.scratch.decoded_front_index -= 1;
+            if self.scratch.decoded_front_index as usize >= frontier.len() {
+                return Err(Stop::InvalidInput);
+            }
+            self.scratch.axis = 0;
+            while self.scratch.axis < self.scratch.active_variables {
+                #[cfg(test)]
+                frontier_test_expiry(gate, FrontierCheckpoint::Compare, self.scratch.axis);
+                gate.check()?;
+                self.scratch.left_exponent = u64::from(
+                    frontier[self.scratch.decoded_front_index as usize].exponents
+                        [self.scratch.axis as usize],
+                );
+                self.scratch.right_exponent = u64::from(mono.exponents[self.scratch.axis as usize]);
+                if self.scratch.left_exponent != self.scratch.right_exponent {
+                    break;
+                }
+                self.scratch.axis += 1;
+            }
+            if self.scratch.axis == self.scratch.active_variables {
+                return Ok(());
+            }
+            self.scratch.slot = (self.scratch.slot + 1) & self.mask as u64;
+            self.scratch.probes += 1;
+        }
+        Err(Stop::InvalidInput)
+    }
+}
+
+#[cfg(test)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum FrontierCheckpoint {
+    Initialize,
+    Hash,
+    Probe,
+    Compare,
+}
+#[cfg(test)]
+thread_local! {
+    static INVERSE_TEST_LEGACY: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static INVERSE_TEST_OPS: std::cell::Cell<(u64,u64)> = const { std::cell::Cell::new((0,0)) };
+    static FRONTIER_TEST_HASH: std::cell::Cell<Option<u64>> = const { std::cell::Cell::new(None) };
+    static FRONTIER_TEST_EXPIRY: std::cell::Cell<Option<(FrontierCheckpoint,u64)>> = const { std::cell::Cell::new(None) };
+    static FRONTIER_TEST_LEGACY: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static FRONTIER_TEST_BATCHES: std::cell::RefCell<Option<Vec<Vec<(usize,usize)>>>> = const { std::cell::RefCell::new(None) };
+}
+#[cfg(test)]
+fn frontier_test_expiry<O: FnMut(Event) -> Result<(), ()>>(
+    gate: &mut Gate<'_, O>,
+    checkpoint: FrontierCheckpoint,
+    index: u64,
+) {
+    if FRONTIER_TEST_EXPIRY.with(|target| target.get() == Some((checkpoint, index))) {
+        gate.deadline = Instant::now();
+    }
+}
 impl<O: FnMut(Event) -> Result<(), ()>> Gate<'_, O> {
     fn check(&self) -> Result<(), Stop> {
         if Instant::now() >= self.deadline {
@@ -296,6 +503,20 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
         if a == 0 {
             return Err(Stop::InvalidInput);
         }
+        #[cfg(test)]
+        let dispatch = !INVERSE_TEST_LEGACY.with(|flag| flag.get());
+        #[cfg(not(test))]
+        let dispatch = true;
+        if dispatch {
+            // Load, compare, branch/control and return: four scalar actions.
+            // Montgomery identity is field.one(), not canonical integer 1.
+            self.gate.permit(32, 0)?;
+            let one = self.field.one();
+            if a == one {
+                return Ok(one);
+            }
+        }
+        // General inversion retains its full original tariff and algorithm.
         self.gate.permit(4096, 0)?;
         let mut e = self.field.p() - 2;
         let mut x = a;
@@ -304,8 +525,18 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
             self.gate.check()?;
             if e & 1 != 0 {
                 r = self.field.mul(r, x);
+                #[cfg(test)]
+                INVERSE_TEST_OPS.with(|ops| {
+                    let (m, s) = ops.get();
+                    ops.set((m + 1, s));
+                });
             }
             x = self.field.sqr(x);
+            #[cfg(test)]
+            INVERSE_TEST_OPS.with(|ops| {
+                let (m, s) = ops.get();
+                ops.set((m, s + 1));
+            });
             e >>= 1;
         }
         Ok(r)
@@ -453,22 +684,45 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
         self.gate.event(Stage::Basis)?;
         Ok(lm.degree() == 0)
     }
-    fn add_frontier(&mut self, front: &mut Vec<Mono28>, m: Mono28) -> Result<(), Stop> {
-        self.gate
-            .permit(16 * (self.v as u64 + 1) * (front.len() as u64 + 1), 0)?;
-        if front.contains(&m) {
-            return Ok(());
+    fn add_frontier(
+        &mut self,
+        index: &mut Option<FrontierIndex>,
+        front: &mut Vec<Mono28>,
+        m: &Mono28,
+    ) -> Result<(), Stop> {
+        #[cfg(test)]
+        if FRONTIER_TEST_LEGACY.with(|legacy| legacy.get()) {
+            // Exact former membership path, test-only differential oracle.
+            self.gate
+                .permit(16 * (self.v as u64 + 1) * (front.len() as u64 + 1), 0)?;
+            if front.contains(m) {
+                return Ok(());
+            }
+            if front.len() >= self.gate.limits.columns {
+                return Err(Stop::ColumnLimit);
+            }
+            return self.gate.push(front, *m);
         }
-        if front.len() >= self.gate.limits.columns {
-            return Err(Stop::ColumnLimit);
+        if index.is_none() {
+            *index = Some(FrontierIndex::new(&mut self.gate, self.v)?);
         }
-        self.gate.push(front, m)
+        index
+            .as_mut()
+            .ok_or(Stop::InvalidInput)?
+            .add(&mut self.gate, front, m)
     }
     fn batch(&mut self, selected: &[Pair]) -> Result<(), Stop> {
+        #[cfg(test)]
+        FRONTIER_TEST_BATCHES.with(|batches| {
+            if let Some(batches) = batches.borrow_mut().as_mut() {
+                batches.push(selected.iter().map(|p| (p.a, p.b)).collect());
+            }
+        });
         self.gate.event(Stage::Batch)?;
         let mut srows = self.gate.vec(selected.len())?;
         let mut reducers = self.gate.vec(0)?;
         let mut frontier = self.gate.vec(0)?;
+        let mut frontier_index = None;
         for pair in selected {
             self.gate.permit(2 * self.mono_cost(), 0)?;
             let a = pair
@@ -483,7 +737,7 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
             let pb = self.shift(pair.b, b, self.field.one())?;
             let s = self.subtract(&pa, &pb)?;
             for t in &s.terms {
-                self.add_frontier(&mut frontier, t.mono)?;
+                self.add_frontier(&mut frontier_index, &mut frontier, &t.mono)?;
             }
             srows.push(s);
         }
@@ -508,11 +762,14 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
                 let row = self.shift(index, q, self.field.one())?;
                 // Each processed monomial has exactly one deterministic reducer multiple.
                 for t in &row.terms {
-                    self.add_frontier(&mut frontier, t.mono)?;
+                    self.add_frontier(&mut frontier_index, &mut frontier, &t.mono)?;
                 }
                 self.gate.push(&mut reducers, row)?;
             }
         }
+        // Table entries name append positions, so retire the index before sort.
+        // Requested reservations are cumulative and are never refunded here.
+        drop(frontier_index);
         let c = frontier.len();
         self.peak_columns = self.peak_columns.max(c);
         self.peak_rows = self.peak_rows.max(reducers.len() + srows.len());
@@ -840,6 +1097,406 @@ mod tests {
     use crate::cryptanalysis::{groebner_f4 as reference, symmetrized_semaev::MPoly};
     use crate::ecc::field::FieldElement;
     use num_bigint::BigUint;
+    struct FrontierTestReset;
+    impl Drop for FrontierTestReset {
+        fn drop(&mut self) {
+            FRONTIER_TEST_HASH.with(|v| v.set(None));
+            FRONTIER_TEST_EXPIRY.with(|v| v.set(None));
+            FRONTIER_TEST_LEGACY.with(|v| v.set(false));
+            FRONTIER_TEST_BATCHES.with(|v| *v.borrow_mut() = None);
+        }
+    }
+    fn frontier_gate<O: FnMut(Event) -> Result<(), ()>>(
+        observer: &mut O,
+        columns: usize,
+    ) -> Gate<'_, O> {
+        Gate {
+            limits: Limits {
+                columns,
+                ..Limits::default()
+            },
+            reserved: Reserved::default(),
+            deadline: deadline(),
+            events: 0,
+            observer,
+        }
+    }
+    fn assert_frontier_index(index: &FrontierIndex, frontier: &[Mono28]) {
+        let mut seen = vec![false; frontier.len()];
+        for &code in &index.slots {
+            if code != 0 {
+                let id = code as usize - 1;
+                assert!(id < frontier.len());
+                assert!(!seen[id]);
+                seen[id] = true;
+            }
+        }
+        assert!(seen.into_iter().all(|v| v));
+    }
+    #[test]
+    fn dynamic_f4_frontier_append_order_collision_and_all_coordinates() {
+        let _reset = FrontierTestReset;
+        for forced in [None, Some(127)] {
+            FRONTIER_TEST_HASH.with(|v| v.set(forced));
+            let mut observer = |_: Event| Ok(());
+            let mut gate = frontier_gate(&mut observer, 64);
+            let mut index = FrontierIndex::new(&mut gate, 28).unwrap();
+            let mut frontier = Vec::new();
+            let mut legacy = Vec::new();
+            let mut sequence = Vec::new();
+            for axis in (0..28).rev() {
+                sequence.push(mono(28, &[(axis, u16::MAX)]));
+                sequence.push(mono(28, &[(axis, 1)]));
+                sequence.push(mono(28, &[(axis, u16::MAX)]));
+            }
+            sequence.extend([
+                mono(28, &[]),
+                mono(28, &[(0, 1), (27, u16::MAX)]),
+                mono(28, &[]),
+            ]);
+            for m in sequence {
+                index.add(&mut gate, &mut frontier, &m).unwrap();
+                if !legacy.contains(&m) {
+                    legacy.push(m);
+                }
+                assert_eq!(frontier, legacy);
+                assert_frontier_index(&index, &frontier);
+            }
+            if forced.is_some() {
+                assert_ne!(index.slots[127], 0);
+                assert_ne!(index.slots[0], 0);
+            }
+        }
+    }
+    #[test]
+    fn dynamic_f4_frontier_column_zero_one_max_and_full_duplicates() {
+        let _reset = FrontierTestReset;
+        let mut observer = |_: Event| Ok(());
+        let mut gate = frontier_gate(&mut observer, 0);
+        assert!(matches!(
+            FrontierIndex::new(&mut gate, 1),
+            Err(Stop::ColumnLimit)
+        ));
+        assert_eq!(gate.reserved, Reserved::default());
+        for columns in [1, 8192] {
+            let mut gate = frontier_gate(&mut observer, columns);
+            let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+            assert_eq!(index.slots.len(), (2 * columns).next_power_of_two());
+            let mut frontier = Vec::new();
+            for value in 0..columns {
+                index
+                    .add(&mut gate, &mut frontier, &mono(1, &[(0, value as u16)]))
+                    .unwrap();
+            }
+            assert_frontier_index(&index, &frontier);
+            let old = frontier.clone();
+            let slots = index.slots.clone();
+            index
+                .add(&mut gate, &mut frontier, &mono(1, &[(0, 0)]))
+                .unwrap();
+            assert_eq!(
+                index.add(&mut gate, &mut frontier, &mono(1, &[(0, u16::MAX)])),
+                Err(Stop::ColumnLimit)
+            );
+            assert_eq!(frontier, old);
+            assert_eq!(index.slots, slots);
+        }
+        // Spare allocator capacity does not grant a second logical column.
+        let mut gate = frontier_gate(&mut observer, 1);
+        let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+        let mut frontier = Vec::with_capacity(32);
+        index.add(&mut gate, &mut frontier, &mono(1, &[])).unwrap();
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &mono(1, &[(0, 1)])),
+            Err(Stop::ColumnLimit)
+        );
+        assert_eq!(frontier.len(), 1);
+    }
+    #[test]
+    fn dynamic_f4_frontier_exact_initialization_and_insertion_tickets() {
+        let _reset = FrontierTestReset;
+        FRONTIER_TEST_HASH.with(|v| v.set(Some(0)));
+        let mut observer = |_: Event| Ok(());
+        // Cmax1 => S2, helper128 + gate.vec(128+8), initialization32.
+        for (work, bytes, expected, paid_work, paid_bytes) in [
+            (32, 127, Stop::StorageLimit, 0, 0),
+            (32, 263, Stop::StorageLimit, 0, 128),
+            (31, 264, Stop::WorkLimit, 0, 264),
+        ] {
+            let mut gate = frontier_gate(&mut observer, 1);
+            gate.limits.work = work;
+            gate.limits.bytes = bytes;
+            assert!(matches!(FrontierIndex::new(&mut gate,1),Err(s) if s==expected));
+            assert_eq!(
+                gate.reserved,
+                Reserved {
+                    work: paid_work,
+                    bytes: paid_bytes
+                }
+            );
+        }
+        let mut gate = frontier_gate(&mut observer, 1);
+        gate.limits.work = 32;
+        gate.limits.bytes = 264;
+        let index = FrontierIndex::new(&mut gate, 1).unwrap();
+        assert_eq!(index.slots, [0, 0]);
+        assert_eq!(
+            gate.reserved,
+            Reserved {
+                work: 32,
+                bytes: 264
+            }
+        );
+        // Hash128, each probe160, append160. All prior reservations persist.
+        for (available, paid) in [
+            (127, 0),
+            (128, 128),
+            (128 + 159, 128),
+            (128 + 160, 288),
+            (128 + 160 + 159, 288),
+        ] {
+            let mut gate = frontier_gate(&mut observer, 1);
+            let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+            gate.limits.work = 32 + available;
+            let mut frontier = Vec::new();
+            assert_eq!(
+                index.add(&mut gate, &mut frontier, &mono(1, &[])),
+                Err(Stop::WorkLimit)
+            );
+            assert!(frontier.is_empty());
+            assert_eq!(index.slots, [0, 0]);
+            assert_eq!(
+                gate.reserved,
+                Reserved {
+                    work: 32 + paid,
+                    bytes: 264
+                }
+            );
+        }
+        for bytes in [615, 616] {
+            let mut gate = frontier_gate(&mut observer, 1);
+            let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+            gate.limits.work = 480;
+            gate.limits.bytes = bytes;
+            let mut frontier = Vec::new();
+            let result = index.add(&mut gate, &mut frontier, &mono(1, &[]));
+            assert_eq!(gate.reserved.work, 480);
+            if bytes == 615 {
+                assert_eq!(result, Err(Stop::StorageLimit));
+                assert!(frontier.is_empty());
+                assert_eq!(index.slots, [0, 0]);
+                assert_eq!(gate.reserved.bytes, 264);
+            } else {
+                assert_eq!(result, Ok(()));
+                assert_eq!(gate.reserved.bytes, 616);
+                assert_frontier_index(&index, &frontier);
+            }
+        }
+    }
+    #[test]
+    fn dynamic_f4_frontier_growth_refusal_is_transactional_and_probe_bounded() {
+        let _reset = FrontierTestReset;
+        FRONTIER_TEST_HASH.with(|v| v.set(Some(7)));
+        let mut observer = |_: Event| Ok(());
+        let mut gate = frontier_gate(&mut observer, 4);
+        let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+        let mut frontier = Vec::with_capacity(1);
+        index.add(&mut gate, &mut frontier, &mono(1, &[])).unwrap();
+        // Fill precisely the actual reported capacity, without assuming allocator behavior.
+        while frontier.len() < frontier.capacity() {
+            let value = frontier.len() as u16;
+            index
+                .add(&mut gate, &mut frontier, &mono(1, &[(0, value)]))
+                .unwrap();
+        }
+        assert!(frontier.len() < 4);
+        let before = frontier.clone();
+        let slots = index.slots.clone();
+        let before_work = gate.reserved.work;
+        let lookup_and_append = 128 + 160 * (frontier.len() as u64 + 1) + 160;
+        gate.limits.work = before_work + lookup_and_append + frontier.len() as u64 - 1;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &mono(1, &[(0, 31)])),
+            Err(Stop::WorkLimit)
+        );
+        assert_eq!(gate.reserved.work, before_work + lookup_and_append);
+        assert_eq!(frontier, before);
+        assert_eq!(index.slots, slots);
+        gate.limits.work = MAX_WORK;
+        gate.limits.bytes = gate.reserved.bytes;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &mono(1, &[(0, 31)])),
+            Err(Stop::StorageLimit)
+        );
+        assert_eq!(frontier, before);
+        assert_eq!(index.slots, slots);
+        gate.limits.bytes = MAX_BYTES;
+        index
+            .add(&mut gate, &mut frontier, &mono(1, &[(0, 31)]))
+            .unwrap();
+        assert_frontier_index(&index, &frontier);
+        // Corrupt diagnostic state must fail finitely, not reseed or fall back.
+        index.slots.fill(1);
+        let before_work = gate.reserved.work;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &mono(1, &[(0, 99)])),
+            Err(Stop::InvalidInput)
+        );
+        assert_eq!(gate.reserved.work - before_work, 128 + 8 * 160);
+        index.slots[7] = u32::MAX;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &mono(1, &[(0, 99)])),
+            Err(Stop::InvalidInput)
+        );
+    }
+    #[test]
+    fn dynamic_f4_frontier_deadlines_cover_initialization_hash_probe_and_equality() {
+        let _reset = FrontierTestReset;
+        let mut observer = |_: Event| Ok(());
+        let mut gate = frontier_gate(&mut observer, 64);
+        gate.deadline = Instant::now();
+        assert!(matches!(
+            FrontierIndex::new(&mut gate, 28),
+            Err(Stop::Deadline)
+        ));
+        assert_eq!(gate.reserved, Reserved::default());
+        FRONTIER_TEST_EXPIRY.with(|v| v.set(Some((FrontierCheckpoint::Initialize, 64))));
+        let mut gate = frontier_gate(&mut observer, 64);
+        assert!(matches!(
+            FrontierIndex::new(&mut gate, 28),
+            Err(Stop::Deadline)
+        ));
+        assert_eq!(
+            gate.reserved,
+            Reserved {
+                work: 16 * 128,
+                bytes: 128 + 128 + 4 * 128
+            }
+        );
+        FRONTIER_TEST_EXPIRY.with(|v| v.set(None));
+        FRONTIER_TEST_HASH.with(|v| v.set(Some(0)));
+        for (checkpoint, at, distinct) in [
+            (FrontierCheckpoint::Hash, 27, false),
+            (FrontierCheckpoint::Probe, 1, true),
+            (FrontierCheckpoint::Compare, 27, false),
+        ] {
+            let mut gate = frontier_gate(&mut observer, 64);
+            let mut index = FrontierIndex::new(&mut gate, 28).unwrap();
+            let mut frontier = Vec::new();
+            let m = mono(28, &[(27, u16::MAX)]);
+            index.add(&mut gate, &mut frontier, &m).unwrap();
+            let old = frontier.clone();
+            let slots = index.slots.clone();
+            FRONTIER_TEST_EXPIRY.with(|v| v.set(Some((checkpoint, at))));
+            let next = if distinct { mono(28, &[(0, 1)]) } else { m };
+            assert_eq!(
+                index.add(&mut gate, &mut frontier, &next),
+                Err(Stop::Deadline)
+            );
+            assert_eq!(frontier, old);
+            assert_eq!(index.slots, slots);
+            FRONTIER_TEST_EXPIRY.with(|v| v.set(None));
+        }
+    }
+    #[test]
+    fn dynamic_f4_frontier_collision_probe_exact_one_less_and_full_duplicate() {
+        let _reset = FrontierTestReset;
+        FRONTIER_TEST_HASH.with(|v| v.set(Some(3)));
+        let mut observer = |_: Event| Ok(());
+        let mut gate = frontier_gate(&mut observer, 2);
+        let mut index = FrontierIndex::new(&mut gate, 1).unwrap();
+        let mut frontier = Vec::with_capacity(4);
+        let first = mono(1, &[]);
+        let second = mono(1, &[(0, 1)]);
+        index.add(&mut gate, &mut frontier, &first).unwrap();
+        let slots = index.slots.clone();
+        let before = gate.reserved.work;
+        gate.limits.work = before + 128 + 160 + 159;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &second),
+            Err(Stop::WorkLimit)
+        );
+        assert_eq!(gate.reserved.work, before + 128 + 160);
+        assert_eq!(index.slots, slots);
+        assert_eq!(frontier, [first]);
+        let before = gate.reserved.work;
+        gate.limits.work = before + 128 + 2 * 160 + 160;
+        index.add(&mut gate, &mut frontier, &second).unwrap();
+        assert_eq!(gate.reserved.work, gate.limits.work);
+        let slots = index.slots.clone();
+        let before = gate.reserved.work;
+        gate.limits.work = before + 128 + 2 * 160 - 1;
+        assert_eq!(
+            index.add(&mut gate, &mut frontier, &second),
+            Err(Stop::WorkLimit)
+        );
+        assert_eq!(gate.reserved.work, before + 128 + 160);
+        let before = gate.reserved.work;
+        gate.limits.work = before + 128 + 2 * 160;
+        index.add(&mut gate, &mut frontier, &second).unwrap();
+        assert_eq!(gate.reserved.work, gate.limits.work);
+        assert_eq!(index.slots, slots);
+        assert_eq!(frontier, [first, second]);
+    }
+    #[test]
+    fn dynamic_f4_frontier_native_completed_differential_preserves_batches_and_basis() {
+        let _reset = FrontierTestReset;
+        for v in [2, 4, 8] {
+            let f = field(17);
+            let input = fixed(v, 17);
+            let limits = Limits::default();
+            let mut outcomes = Vec::new();
+            for legacy in [true, false] {
+                FRONTIER_TEST_LEGACY.with(|flag| flag.set(legacy));
+                FRONTIER_TEST_BATCHES.with(|batches| *batches.borrow_mut() = Some(Vec::new()));
+                let mut stages = Vec::new();
+                let report = run(&f, v as u8, &input, &limits, deadline(), &mut |event| {
+                    stages.push((event.stage, event.sequence));
+                    Ok(())
+                });
+                let batches = FRONTIER_TEST_BATCHES.with(|b| b.borrow_mut().take().unwrap());
+                assert!(matches!(report.stop, Stop::Complete | Stop::UnitDerived));
+                assert!(report.native_statistics_complete);
+                assert!(report.matrix_rows_reduced > 0);
+                assert!(report.pivot_updates > 0);
+                check_linear_ideal(&report, v, 17);
+                outcomes.push((report, stages, batches));
+            }
+            let (a, stages_a, batches_a) = &outcomes[0];
+            let (b, stages_b, batches_b) = &outcomes[1];
+            assert_eq!(a.basis, b.basis);
+            assert_eq!(a.stop, b.stop);
+            assert_eq!(stages_a, stages_b);
+            assert_eq!(batches_a, batches_b);
+            assert_eq!(
+                (
+                    a.matrix_rows_reduced,
+                    a.pivot_updates,
+                    a.pairs_pending,
+                    a.pairs_selected_unfinished,
+                    a.maximum_rows_admitted,
+                    a.maximum_columns_admitted,
+                    a.maximum_pending_pairs,
+                    a.completed_steps,
+                    a.maximum_input_degree,
+                    a.maximum_processed_row_degree
+                ),
+                (
+                    b.matrix_rows_reduced,
+                    b.pivot_updates,
+                    b.pairs_pending,
+                    b.pairs_selected_unfinished,
+                    b.maximum_rows_admitted,
+                    b.maximum_columns_admitted,
+                    b.maximum_pending_pairs,
+                    b.completed_steps,
+                    b.maximum_input_degree,
+                    b.maximum_processed_row_degree
+                )
+            );
+            assert_ne!(a.reserved, b.reserved); // different reservation model, not measured speed
+        }
+    }
     fn deadline() -> Instant {
         Instant::now() + Duration::from_secs(5)
     }
@@ -1411,5 +2068,165 @@ mod tests {
         assert_eq!(high.maximum_input_degree, 32);
         assert_eq!(high.maximum_processed_row_degree, 32);
         assert_eq!(high.basis[0].terms[0].coefficient, 1);
+    }
+    struct InverseTestReset;
+    impl Drop for InverseTestReset {
+        fn drop(&mut self) {
+            INVERSE_TEST_LEGACY.with(|f| f.set(false));
+            INVERSE_TEST_OPS.with(|o| o.set((0, 0)));
+        }
+    }
+    fn inverse_control(
+        field: &Fp64Arithmetic,
+        a: u64,
+        work: u64,
+        until: Instant,
+    ) -> (Result<u64, Stop>, Reserved, (u64, u64)) {
+        let mut observer = |_: Event| Ok(());
+        let mut e = Engine {
+            field,
+            v: 1,
+            gate: Gate {
+                limits: Limits {
+                    work,
+                    ..Limits::default()
+                },
+                reserved: Reserved::default(),
+                deadline: until,
+                events: 0,
+                observer: &mut observer,
+            },
+            basis: Vec::new(),
+            pairs: Vec::new(),
+            selected: 0,
+            invoked: false,
+            matrix_rows: 0,
+            updates: 0,
+            max_row_degree: 0,
+            peak_rows: 0,
+            peak_columns: 0,
+            peak_pairs: 0,
+            steps: 0,
+        };
+        INVERSE_TEST_OPS.with(|o| o.set((0, 0)));
+        let result = e.inverse(a);
+        (result, e.gate.reserved, INVERSE_TEST_OPS.with(|o| o.get()))
+    }
+    #[test]
+    fn dynamic_f4_unit_inverse_exact_limits_deadline_and_montgomery_identity() {
+        let _reset = InverseTestReset;
+        for p in [101, (1u64 << 61) - 1] {
+            let f = field(p);
+            assert_ne!(f.one(), 1);
+            assert_eq!(f.to_u64(f.one()), 1);
+            for (work, expected, charged) in [(31, Err(Stop::WorkLimit), 0), (32, Ok(f.one()), 32)]
+            {
+                let (result, reserved, ops) = inverse_control(&f, f.one(), work, deadline());
+                assert_eq!(result, expected);
+                assert_eq!(reserved.work, charged);
+                assert_eq!(reserved.bytes, 0);
+                assert_eq!(ops, (0, 0));
+            }
+            let a = f.from_u64(2);
+            let (result, reserved, ops) = inverse_control(&f, a, 4127, deadline());
+            assert_eq!(result, Err(Stop::WorkLimit));
+            assert_eq!(reserved.work, 32);
+            assert_eq!(ops, (0, 0));
+            let (result, reserved, ops) = inverse_control(&f, a, 4128, deadline());
+            assert_eq!(f.mul(a, result.unwrap()), f.one());
+            assert_eq!(reserved.work, 4128);
+            assert_eq!(reserved.bytes, 0);
+            assert!(ops.0 > 0 && ops.1 > 0);
+            let (result, reserved, ops) = inverse_control(&f, 1, 4128, deadline());
+            assert_eq!(f.mul(1, result.unwrap()), f.one());
+            assert_eq!(reserved.work, 4128);
+            assert!(ops.1 > 0);
+            let (result, reserved, ops) = inverse_control(&f, f.one(), MAX_WORK, Instant::now());
+            assert_eq!(result, Err(Stop::Deadline));
+            assert_eq!(reserved.work, 0);
+            assert_eq!(ops, (0, 0));
+            let (result, reserved, ops) = inverse_control(&f, 0, 0, Instant::now());
+            assert_eq!(result, Err(Stop::InvalidInput));
+            assert_eq!(reserved.work, 0);
+            assert_eq!(ops, (0, 0));
+        }
+    }
+    #[test]
+    fn dynamic_f4_inverse_general_path_matches_legacy_operations() {
+        let _reset = InverseTestReset;
+        for p in [101, (1u64 << 61) - 1] {
+            let f = field(p);
+            for a in [1, f.from_u64(2), f.from_u64(7), f.from_u64(p - 1), f.one()] {
+                INVERSE_TEST_LEGACY.with(|v| v.set(true));
+                let old = inverse_control(&f, a, MAX_WORK, deadline());
+                INVERSE_TEST_LEGACY.with(|v| v.set(false));
+                let new = inverse_control(&f, a, MAX_WORK, deadline());
+                assert_eq!(old.0, new.0);
+                assert_eq!(f.mul(a, new.0.unwrap()), f.one());
+                assert_eq!(old.1.work, 4096);
+                assert_eq!(new.1.bytes, 0);
+                if a == f.one() {
+                    assert_eq!(new.1.work, 32);
+                    assert_eq!(new.2, (0, 0));
+                    assert!(old.2 .1 > 0);
+                } else {
+                    assert_eq!(new.1.work, 4128);
+                    assert_eq!(new.2, old.2);
+                }
+            }
+        }
+    }
+    #[test]
+    fn dynamic_f4_unit_inverse_preserves_basis_batches_and_pivot_semantics() {
+        let _reset = InverseTestReset;
+        let _frontier_reset = FrontierTestReset;
+        for v in [2, 4] {
+            let f = field(17);
+            let input = fixed(v, 17);
+            let mut results = Vec::new();
+            for legacy in [true, false] {
+                INVERSE_TEST_LEGACY.with(|b| b.set(legacy));
+                FRONTIER_TEST_BATCHES.with(|b| *b.borrow_mut() = Some(Vec::new()));
+                let mut stages = Vec::new();
+                let report = run(
+                    &f,
+                    v as u8,
+                    &input,
+                    &Limits::default(),
+                    deadline(),
+                    &mut |event| {
+                        stages.push((event.stage, event.sequence));
+                        Ok(())
+                    },
+                );
+                let batches = FRONTIER_TEST_BATCHES.with(|b| b.borrow_mut().take().unwrap());
+                assert!(matches!(report.stop, Stop::Complete | Stop::UnitDerived));
+                check_linear_ideal(&report, v, 17);
+                results.push((report, stages, batches));
+            }
+            let (a, sa, ba) = &results[0];
+            let (b, sb, bb) = &results[1];
+            assert_eq!(a.basis, b.basis);
+            assert_eq!(a.stop, b.stop);
+            assert_eq!(sa, sb);
+            assert_eq!(ba, bb);
+            assert_eq!(
+                (
+                    a.matrix_rows_reduced,
+                    a.pivot_updates,
+                    a.pairs_pending,
+                    a.pairs_selected_unfinished,
+                    a.completed_steps
+                ),
+                (
+                    b.matrix_rows_reduced,
+                    b.pivot_updates,
+                    b.pairs_pending,
+                    b.pairs_selected_unfinished,
+                    b.completed_steps
+                )
+            );
+            assert_eq!(a.reserved.bytes, b.reserved.bytes);
+        }
     }
 }

@@ -2510,12 +2510,6 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     telemetry::checked::verify_artifacts(dir, &manifest.artifacts)?;
     verify_capture_context(dir, &manifest.artifacts)?;
     execution::verify(dir, &manifest.artifacts)?;
-    let wide_prime_replay = solvers::verify_prime_f4_wide(
-        dir,
-        &manifest.config,
-        &manifest.outcome,
-        &manifest.artifacts,
-    )?;
     for required in [
         "config.json",
         "run.json",
@@ -2537,6 +2531,13 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("cell provenance differs from frozen plan".into());
     }
+    // Bind the original cell before admitting any specialized replay claim.
+    let wide_prime_replay = solvers::verify_prime_f4_wide(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
     let has = |path: &str| manifest.artifacts.iter().any(|a| a.path == path);
     let complete_known_answer = has("public.json") && has("witness.json");
     let complete_factor_base = has("public.json") && has("factor-base.json");
