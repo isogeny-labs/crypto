@@ -264,3 +264,45 @@ unobserved unmasking timestamp; raw rows are unchanged. A concurrent Git
 staging attempt hit the index lock and was retried after the first commit
 finished; the frozen protocol was verified committed before the GPU launch.
 Conductor T-863 replaced the expired/cancelled T-862 reservation.
+
+## Query transfer optimization — 2026-10-30 02:24 UTC
+
+### What was done
+
+Implemented radix-packed deterministic query winners, overflow fallback and
+device-side reset. This removes the match buffer for encodable batches and
+the extra witness readback without changing explicit chunk/work limits.
+Added repeated-query/prepare, empty-plan, chunk-tail and integer-boundary
+regression checks to `make test-cuda`. RunPod pod `bbrl08j1o8gizz` executed
+pinned source `68be1081e696c232881b2da8d864d93b297e5092`: all 120 fixed rows,
+host/CUDA/reduction tests, 10 Rust tests, Clippy and all three sanitizers passed.
+The pod was deleted, archived evidence was downloaded back with matching
+SHA-256, and the temporary local credential was removed. The checked export,
+full ranges and inspected PDF are in the new
+[query study](../../research/explicit_relations_query_20261030/RESULTS.md).
+
+### Decisions made
+
+Keep the new path as default with the previous array path for unencodable
+radix products. The observed query medians fell by 14.24%, 18.43% and 5.81%
+on the three fixed sizes; these remain descriptive L0 observations. Query
+API payloads fell from 80 to 32 bytes on each small case and 800 to 392 on
+the largest, excluding preparation and physical bus framing. Preserve A/A
+variation and preparation/cold outliers; no leaderboard claim is promoted.
+
+### Open threads
+
+Repeated right-side tuple construction is the next optimization target;
+charge caching to preparation and explicit memory limits under a new frozen
+panel. No further GPU run is scheduled. Root integration, general paper
+reduction and the GPU tensor backend remain outside this change. PR #2896
+contains both optimization stages; check current-head CI separately.
+
+### Errors
+
+No device/compiler/sanitizer failure occurred. The canonical CSV adapter
+requires mapping native `passed` to schema `verified` in export metadata;
+the completed export has zero checker findings and raw data is unchanged.
+GitHub's artifact migration may move large validation logs to its manifest;
+retain that commit and verify the manifest against the archived log. The
+shared daily log remains reserved, so this scoped handoff is under T-869.
