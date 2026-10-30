@@ -1,4 +1,6 @@
 //! Centered terminal arithmetic. Filtered-space conclusions live in the reviewed proof.
+#[path = "../prime_centered_binding.rs"]
+mod binding;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, path::Path};
@@ -287,6 +289,9 @@ fn value(v: &Value) -> u128 {
     v.as_str().expect("decimal string").parse().unwrap()
 }
 fn prepare(input: &Value) -> (Ring, u128, u128) {
+    if input.get("binding").is_some() {
+        binding::validate(input);
+    }
     let p = value(&input["modulus"]);
     let witness = prime_witness(p);
     let w = input["weights"]
@@ -317,7 +322,7 @@ fn payloads(input: &Value) -> BTreeMap<String, Vec<u8>> {
         }
     }
     let coords = |a: [[u128; 2]; 3]| a.map(|row| row.map(|x| x.to_string()));
-    let cert = json!({"schema":"n83.centered-witness/v1","modulus":r.p.to_string(),"ell":r.w.len(),"weights":r.w.iter().map(|x|x.to_string()).collect::<Vec<_>>(),"target":t.to_string(),"center":r.c.to_string(),"centered_target":t==r.c,"primality_lucas_witness":witness.to_string(),"remainder_degree":d.degree,"a_degrees":d.a.iter().map(degree).collect::<Vec<_>>(),"a_terms":d.a.iter().map(|a|a.len()).collect::<Vec<_>>(),"f_degrees":d.f.iter().map(degree).collect::<Vec<_>>(),"f_terms":d.f.iter().map(|a|a.len()).collect::<Vec<_>>(),"projection_u_coefficients":coords(d.projection),"expected_projection_u_coefficients":coords(d.expected),"projection_nonzero":true,"derivation_degree_upper_bound":r.w.len()/2+4,"full_polynomial_formalization_verified":false,"exact_lfd":null,"regularity":null,"source_binding":"terminal equation S(U,X,t), curve a=2,b=3; full per-m source and factor-base binding not performed by this instrument","payload_hashes":out.iter().map(|(k,v)|(k.clone(),sha(v))).collect::<BTreeMap<_,_>>()});
+    let cert = json!({"schema":"n83.centered-witness/v1","modulus":r.p.to_string(),"ell":r.w.len(),"weights":r.w.iter().map(|x|x.to_string()).collect::<Vec<_>>(),"target":t.to_string(),"center":r.c.to_string(),"centered_target":t==r.c,"primality_lucas_witness":witness.to_string(),"remainder_degree":d.degree,"a_degrees":d.a.iter().map(degree).collect::<Vec<_>>(),"a_terms":d.a.iter().map(|a|a.len()).collect::<Vec<_>>(),"f_degrees":d.f.iter().map(degree).collect::<Vec<_>>(),"f_terms":d.f.iter().map(|a|a.len()).collect::<Vec<_>>(),"projection_u_coefficients":coords(d.projection),"expected_projection_u_coefficients":coords(d.expected),"projection_nonzero":true,"derivation_degree_upper_bound":r.w.len()/2+4,"full_polynomial_formalization_verified":false,"exact_lfd":null,"regularity":null,"source_binding":if input.get("binding").is_some() {json!({"status":"full_source_and_base_identity_verified","binding":input["binding"],"m":input["m"],"arm":input["arm"],"target_origin":input["target_origin"]})}else{json!("terminal equation S(U,X,t), curve a=2,b=3; full per-m source and factor-base binding not performed by this instrument")},"payload_hashes":out.iter().map(|(k,v)|(k.clone(),sha(v))).collect::<BTreeMap<_,_>>()});
     out.insert(
         "certificate.json".into(),
         (serde_json::to_string_pretty(&cert).unwrap() + "\n").into_bytes(),
@@ -355,6 +360,18 @@ fn verify(out: &Path) -> bool {
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
+        Some("prepare-panel") => {
+            assert_eq!(
+                args.len(),
+                5,
+                "prepare-panel PARENT_ROOT CASES_JSON FRESH_OUTPUT"
+            );
+            binding::prepare(
+                Path::new(&args[2]),
+                Path::new(&args[3]),
+                Path::new(&args[4]),
+            );
+        }
         Some("generate") => {
             assert_eq!(args.len(), 4, "generate INPUT OUTPUT");
             let input: Value = serde_json::from_slice(&fs::read(&args[2]).unwrap()).unwrap();
