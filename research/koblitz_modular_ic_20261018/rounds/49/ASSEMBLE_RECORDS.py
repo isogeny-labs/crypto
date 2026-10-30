@@ -2,9 +2,12 @@ from pathlib import Path
 import hashlib,json,re
 h=Path(__file__).resolve().parent
 rows=[]
-markers={"control49-01":"CONTROL49_ALL_CHECKS_PASS","prep49-01":"PREP49_ALL_CHECKS_PASS","prep49-02":"PREP49_ALL_CHECKS_PASS","normal49-01":"NORMAL49_PRODUCER_PASS"}
+failed=json.loads((h/"failed-launches.json").read_text())
+markers={"control49-01":"CONTROL49_ALL_CHECKS_PASS","prep49-01":"PREP49_ALL_CHECKS_PASS","prep49-02":"PREP49_ALL_CHECKS_PASS","normal49-01":"NORMAL49_PRODUCER_PASS","compact49-01":"COMPACT49_ALL_CHECKS_PASS","compact-normal49-01":"COMPACT_NORMAL49_PRODUCER_PASS"}
 for p in sorted((h/"runs").iterdir()):
  if not p.is_dir():continue
+ if p.name in failed:
+  rows.append({"attempt":p.name,"kind":"Lean","status":"rejected",**failed[p.name]});continue
  row={"attempt":p.name,"source_revision":(p/"source-revision.txt").read_text().strip()}
  if p.name.startswith("lean"):
   assert (p/"compile.exit").exists(), "nonterminal Lean compile"
@@ -21,10 +24,10 @@ for p in sorted((h/"runs").iterdir()):
   row["exports"]={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in p.glob("*.sing") if f.name!="input.sing"}
  rows.append(row)
 accepted={x["attempt"] for x in rows if x["status"]=="accepted"}
-producer="normal49-01" in accepted
+producer=bool({"normal49-01","compact-normal49-01"}&accepted)
 verified=producer and any(x.startswith("verify49") for x in accepted)
 normalLog=(h/"runs/normal49-01/native.log").read_text()
 components=[{"index":int(a),"generic_degree":int(b)} for a,b in re.findall(r"^NORMAL49_COMPONENT index=(\d+) generic_degree=(-?\d+)$",normalLog,re.M)]
-r={"schema":"koblitz.results/v1","round":49,"runs":rows,"construction_counts":{"normalization_control_cases":2 if "control49-01" in accepted else 0,"source_preparation_cases":1 if "prep49-02" in accepted else 0,"registered_generic_units":8 if "prep49-02" in accepted else None,"generic_source_degree":32 if "prep49-02" in accepted else None,"normalization_outputs_computed":int(producer),"verified_affine_normalizations":int(verified),"audited_conditional_declarations":sum(x.get("audited_declarations",0) for x in rows if x["status"]=="accepted")},"component_descriptors":components,"normalization_output_computed":producer,"affine_normalization_verified":verified,"proper_projective_geometry_complete":False,"chosen_modular_factor_map_evaluated":False,"nonzero_target_order11_action_verified":False,"native_arrays_formalized":False,"independent_scientific_replay":False,"independent_semantic_review":False,"performance_measured":False,"larger_n_geometric_transfer":False,"IC_relation_rank":None}
+r={"schema":"koblitz.results/v1","round":49,"runs":rows,"construction_counts":{"normalization_control_cases":2 if "control49-01" in accepted else 0,"source_preparation_cases":1 if "prep49-02" in accepted else 0,"registered_generic_units":8 if "prep49-02" in accepted else None,"generic_source_degree":32 if "prep49-02" in accepted else None,"compact_source_preparation_cases":int("compact49-01" in accepted),"normalization_outputs_computed":len({"normal49-01","compact-normal49-01"}&accepted),"verified_affine_normalizations":int(verified),"audited_conditional_declarations":sum(x.get("audited_declarations",0) for x in rows if x["status"]=="accepted")},"component_descriptors":components,"failed_launches":failed,"normalization_output_computed":producer,"affine_normalization_verified":verified,"proper_projective_geometry_complete":False,"chosen_modular_factor_map_evaluated":False,"nonzero_target_order11_action_verified":False,"native_arrays_formalized":False,"independent_scientific_replay":False,"independent_semantic_review":False,"performance_measured":False,"larger_n_geometric_transfer":False,"IC_relation_rank":None}
 (h/"results.json").write_text(json.dumps(r,indent=2)+"\n")
 print(json.dumps({"attempts":len(rows),"accepted":len(accepted),"normalization_output_computed":producer,"affine_normalization_verified":verified}))
