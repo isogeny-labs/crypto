@@ -532,3 +532,39 @@ An initial sparse git add excluded tools/progress_metrics.py; it is staged
 explicitly with --sparse in the subsequent metadata commit. A ready T-906
 reservation was initially mistaken for another live worker; inspection and
 successful claim resolved it without overriding ownership.
+
+## 2026-10-30T15:06Z — bounded wider probe and exporter runtime repair
+
+### What was done
+
+Committed/pushed e1a38ce4bc586050c3faa67a3ab79f312eb549b5 with p<2^62,
+r<2^63 and checked hash s<2^63. Frozen v9 hash
+bf1e4a2dddbfdadb2cb8de32a0c659bbcdd528cc2851c63864c66d009f4e5142
+was committed before launching pod nd5qev6envru7z at 15:02:46UTC. One full
+RTX PRO6000 in US-NC-1 at catalog2.49USD/hour, pinned CUDA image; worker18000s,
+controller18300s, single-object upload expires after21600s. Existing unrelated
+pods were inspected and left untouched. All19 Rust tests and initial CUDA,
+Clippy/memcheck controls passed; first52-bit execution succeeded. Larger
+outcomes remain pending. No second taskGPU is authorized concurrently.
+
+### Decisions made
+
+Preserve fast Montgomery hashing below2^62; use exact canonical add/double
+only for wider hash moduli. Retain25%free-memory reserve and conservative
+sort admission. The new row cap2^32 allocates no memory by itself. Frozen
+52-bit controls precede two fixed61/62-bit targets; stop after the first
+incomplete rung, recording every refusal/timeout.
+
+### Open threads
+
+Collect, hash, replay-audit, export and report v9; verify deletion before
+any further GPU launch. Its source is distinct from the completed v8 record.
+Current-head CI and independent scientific review remain separate.
+
+### Errors
+
+The full progress exporter previously exceeded55s due to repeated Git
+processes. Persistent cat-file reads now preserve exact git-show bytes,
+missing-source behavior and cleanup. Default command with --since2026-10-01
+passed in24.17s; HEAD export also passed within55s with675records. The prior
+runtime limitation is resolved for these observed checks, not hidden.
