@@ -1,0 +1,73 @@
+{
+ "schema": "ecbench-instrument-defects.replay-check/v1",
+ "date": "2026-10-30",
+ "host": "Apple M4 Pro, macOS, L0 (--cpus none --allow-busy)",
+ "binaries": {
+  "main_11173ecd02": "b0f743bfd11c14d559d216ed79fd0c153530bb20febf290fd512e2070cca794a",
+  "branch": "f1bbe6e5fc98ad765cdd79580dc4496aed85875b44c5455c25b53cce0b4851d9"
+ },
+ "committed_session_replay": {
+  "session": "research/f4_pricing_jump_20261018/leaderboard_rerun/f4_f5_f6_cross_family_20261011-K13 (recorded 2026-10-18 on main abee07ee7)",
+  "replayed_seqs": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "branch": "0/4 reproduced: differs in total_gae, phase counts, phase gae",
+  "main_11173ecd02": "0/4 reproduced: same four problems",
+  "reading": "solver-count drift on main between 2026-10-18 and 2026-10-30, present without this branch's changes"
+ },
+ "paired_session": {
+  "spec": "K13 spec reduced to rho-negation, inherited-f4, f6-ic; 2 targets; 1 round",
+  "main_session": "ECBS1h8194e92d541f",
+  "branch_session": "ECBS1he17aaca2d83b",
+  "records_identical_in_cost_phases_counters_solver_outcome_excluding_wall": "6/6",
+  "branch_verify_replay_all": "audit OK: 6 records, 6 replays reproduced, 0 problems",
+  "main_binary_verifies_branch_session": "audit OK: 6 records, 0 problems",
+  "branch_process_hw": [
+   {
+    "arm": "rho-negation",
+    "instructions": 265456790,
+    "cycles": 71817442,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   },
+   {
+    "arm": "inherited-f4",
+    "instructions": 2132763708,
+    "cycles": 529717703,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   },
+   {
+    "arm": "f6-ic",
+    "instructions": 980888697,
+    "cycles": 236306539,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   },
+   {
+    "arm": "rho-negation",
+    "instructions": 254262336,
+    "cycles": 64705289,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   },
+   {
+    "arm": "inherited-f4",
+    "instructions": 2079781608,
+    "cycles": 515389101,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   },
+   {
+    "arm": "f6-ic",
+    "instructions": 971093991,
+    "cycles": 233725659,
+    "source": "macos.proc_pid_rusage.v4",
+    "descendants_uncounted": false
+   }
+  ]
+ }
+}

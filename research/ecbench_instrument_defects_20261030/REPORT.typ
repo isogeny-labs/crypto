@@ -407,11 +407,27 @@ runs covered.
 - `python3 scripts/build_ic_leaderboard.py --check` on the builder's own
   output, `scripts/check_ic_leaderboard_paths.py` (covers all 965 files
   the builder reads), and `scripts/test_build_ic_leaderboard.py` (8 OK).
-- Replay of a committed solver session with this binary: see "Replay
-  check" below.
+- Replay check (`replay_check.json`). This branch's release `ecbench`
+  was built alongside today's main (`11173ecd02`), both on Rust 1.98.0.
+  - #strong[Committed session.] The K13 re-run session was recorded on
+    2026-10-18. Replaying its seqs 4, 5, 10 and 11 (inherited F4, F6-IC)
+    fails with #emph[both] binaries, identically: "differs in
+    total\_gae, phase counts, phase gae". That is solver-count drift on
+    main since 2026-10-18, present without these changes, and worth its
+    own look.
+  - #strong[Paired session.] I ran the K13 spec reduced to rho-negation,
+    inherited F4 and F6-IC, on 2 targets, once with each binary. The 6
+    records are identical in cost, phases, counters, solver block (wall
+    times excluded) and outcome. Only the branch records carry
+    `time.process_hw`: the inherited-F4 child retired 2.1 × 10⁹
+    instructions, with no descendants.
+  - #strong[Audits.] The branch session passes
+    `ecbench verify --replay-all` (6/6 reproduced). Main's binary also
+    verifies it, so the new optional field does not break older
+    auditors.
 
 == Files
 <files>
 `README.md` (this note), `REPORT.pdf`, `plot.py`,
 `k13_correction.{svg,png,pdf}`, `d1_links.{svg,png,pdf}`,
-`d1_census.json`, `d1_unlink_worktree.sh`.
+`d1_census.json`, `d1_unlink_worktree.sh`, `replay_check.json`.
