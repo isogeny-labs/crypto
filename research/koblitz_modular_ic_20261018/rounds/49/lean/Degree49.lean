@@ -1,3 +1,4 @@
+import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 namespace Degree49

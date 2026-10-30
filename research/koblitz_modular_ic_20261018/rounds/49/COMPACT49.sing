@@ -2,7 +2,8 @@ ring compactGamma49=2,(n,l,b,c,g),dp;
 map compactTwist49=original49,n+b*g,l+(1+c)*g,b,c;
 ideal gammaIdeal49=std(ideal(g^2+g+1));
 ideal compactGammaIdeal49=reduce(compactTwist49(sourceS49),gammaIdeal49);
-if(size(subst(compactGammaIdeal49,g,0)-compactGammaIdeal49)!=0){ERROR("COMPACT49_NOT_DESCENDED");quit;}
+int compactCheck49;
+for(compactCheck49=1;compactCheck49<=size(compactGammaIdeal49);compactCheck49++){if(subst(compactGammaIdeal49[compactCheck49],g,0)!=compactGammaIdeal49[compactCheck49]){ERROR("COMPACT49_NOT_DESCENDED");quit;}}
 link compactOut49="ASCII:w compact-source49.sing";open(compactOut49);
 write(compactOut49,"ring compact49=2,(n,l,b,c),dp;ideal compactSource49;");
 int compactIndex49;
