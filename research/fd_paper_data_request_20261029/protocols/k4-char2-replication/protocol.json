@@ -11,7 +11,8 @@
   "links": {
     "plan": "crypto:research/gaudry_k4_char2_redteam_20261026/REPORT.md section 3 (Frozen replication plan)",
     "paper": "crypto:papers/ecdlp-index-calculus-treatise/sections/extension.tex and prog_openproblems.tex item 6; conclusion item 3",
-    "prerequisite": "rho-strong: negation-map rho with distinguished points, batched (Montgomery) inversion and charged canonicalisation, added with the ecbench-extend skill before freeze"
+    "prerequisite": "rho-strong: registered as rho.negation_strong (src/cryptanalysis/ecbench/methods.rs registry; ecbench::negation_strong), commit 6e04a8dec015faef6d923a68d59e271584756681. Second prerequisite, open: f2m4_torsion and gaudry_quartic_bin take m <= 15 (u16 F_q elements, 4m-bit packed points), so the decisive m = 16, 17 refuse at plan time until the tower is widened",
+    "spec": "crypto:research/fd_paper_data_request_20261029/protocols/k4-char2-replication/spec.json"
   },
   "question": "On k=4 characteristic-two curves E/F_{2^{4m'}} (Gaudry D4, binary oracle), is index calculus below the strongest legitimate rho in counted F_q multiplications at m=16 and m=17, across the pricing band, with 8 fresh targets per arm?",
   "claims": [
@@ -71,10 +72,10 @@
     {
       "id": "ic-wied",
       "role": "candidate",
-      "description": "gaudry-d4-bin, plain Wiedemann, macaulay=11, frobenius=1, sparsest=1, replay=1, unchanged binary",
+      "description": "ic.pipeline + bin-t-line + gaudry-d4-bin (macaulay=11, frobenius=1, sparsest=1, replay=1, charge_unsolved=1: degenerate systems charged), plain Wiedemann",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "6e04a8dec015faef6d923a68d59e271584756681",
         "build": [
           [
             "cargo",
@@ -93,20 +94,19 @@
         "threads": 1
       },
       "parameters": {
-        "method": "ic.gaudry_d4_bin",
-        "macaulay": 11,
-        "frobenius": 1,
-        "sparsest": 1,
-        "replay": 1
+        "method": "ic.pipeline",
+        "factor_base": "bin-t-line",
+        "oracle": "gaudry-d4-bin:macaulay=11,frobenius=1,sparsest=1,replay=1,charge_unsolved=1",
+        "linalg": "wiedemann"
       }
     },
     {
       "id": "rho-strong",
       "role": "reference",
-      "description": "negation-map rho, distinguished points, batched inversion, canonicalisation charged (new; ecbench-extend)",
+      "description": "rho.negation_strong: negation-map rho, 32-jump additive walk, fruitless-cycle escape by doubling, distinguished points, 64 lanes per Montgomery-batched F_(q^4) inversion; every F_q multiplication counted, canonicalisation charged one F_q multiplication; GAE = F_q mults / fq_muls_per_add",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "6e04a8dec015faef6d923a68d59e271584756681",
         "build": [
           [
             "cargo",
@@ -125,7 +125,10 @@
         "threads": 1
       },
       "parameters": {
-        "method": "rho.negation_strong"
+        "method": "rho.negation_strong",
+        "lanes": "64",
+        "dp_bits": "auto",
+        "step_cap_factor": "64"
       },
       "same_instrument_as": "ic-wied"
     },
@@ -135,7 +138,7 @@
       "description": "the existing rho.negation, regression control against old records",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "6e04a8dec015faef6d923a68d59e271584756681",
         "build": [
           [
             "cargo",
@@ -164,7 +167,7 @@
       "description": "rho.negation under a second arm name: the A/A noise floor",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "6e04a8dec015faef6d923a68d59e271584756681",
         "build": [
           [
             "cargo",
@@ -212,7 +215,7 @@
       {
         "name": "method",
         "levels": [
-          "ic.gaudry_d4_bin",
+          "ic.pipeline",
           "rho.negation_strong",
           "rho.negation"
         ]
@@ -347,7 +350,7 @@
         3417181369803324029
       ],
       "nonce": null,
-      "note": "target seed = first 8 bytes (big-endian) of sha256(UTF-8 'gaudry-k4-redteam-v2|<m>|<i>'), m in 14..17, i in 0..7, listed in m-major order; the plan wrote '||' without an encoding, this record fixes it before any data"
+      "note": "target seed = first 8 bytes (big-endian) of sha256(UTF-8 'gaudry-k4-redteam-v2|<m>|<i>'), m in 14..17, i in 0..7, listed in m-major order; the plan wrote '||' without an encoding, this record fixes it before any data; spec.json: one f2m4_torsion curve per listed seed (max_cofactor 16), one target each; target_seed 5767072793004074763 and measurement.seed 2122451695701588788 are the first 8 bytes of sha256('gaudry-k4-redteam-v2|target_seed') and sha256('gaudry-k4-redteam-v2|measurement_seed')"
     },
     "instance_sampling": {
       "rule": "a fresh curve and target per seed from the existing constructor, independent of arm; all arms run on the same 8 targets per m",
@@ -362,7 +365,7 @@
   "sample_size": {
     "instances": 32,
     "replicates": 1,
-    "warmups": 1,
+    "warmups": 0,
     "power": {
       "method": "paired_bootstrap",
       "alpha": 0.05,
@@ -399,7 +402,7 @@
         "name": "IC / rho-strong",
         "unit": "ratio",
         "kind": "derived",
-        "formula": "sum_targets(fq_muls[ic-wied] + w*unpriced[ic-wied]) / sum_targets(fq_muls[rho-strong] + w*unpriced[rho-strong]) for w in {0,0.1,1}",
+        "formula": "sum_targets(total_gae[ic-wied] + w*unpriced[ic-wied]) / sum_targets(total_gae[rho-strong] + w*unpriced[rho-strong]) for w in {0,0.1,1}; total_gae = counted F_q mults / fq_muls_per_add on both arms",
         "definition": "summed paired cost ratio per m and weight",
         "source": "export rows",
         "aggregation": "paired_ratio",
@@ -423,8 +426,8 @@
   },
   "measurement": {
     "isolation_required": "L2",
-    "warmups": 1,
-    "order": "alternate",
+    "warmups": 0,
+    "order": "randomized",
     "clock": "counted",
     "counters": [
       "fq_muls",
@@ -472,7 +475,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "fixed design: 4 arms x 4 m x 8 targets (+1 warmup per arm); preflight ecbench verify --replay on one old clean session first",
+      "rule": "fixed design: 4 arms x 4 m x 8 targets, no warm-up round (an ecbench warm-up round repeats every workload and would double the 30 h; the counted primary metric does not depend on it); preflight ecbench verify --replay on one old clean session first",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -485,7 +488,8 @@
   "invalidation_rules": [
     "rows below L1 isolation are excluded from timing; counted units stand",
     "a wrong_answer row is reported and excluded from the decisive ratio",
-    "rho-strong not built before freeze: the study does not start"
+    "rho-strong not built before freeze: the study does not start",
+    "the frozen instrument refuses m = 16, 17 (f2m4_torsion takes m <= 15); widening the tower is an instrument change, filed as an amendment with its commit before any m >= 16 row, and the m = 14, 15 arms are rerun on the widened binary only if its replay of this instrument's records differs"
   ],
   "decision_rule": {
     "text": "C2 supported at m when the Holm-corrected 95% paired-bootstrap interval of ic_over_rho lies below 1 at w=0, 0.1 and 1; 'trades' if the band straddles; 'loses' if above 1 at every w.",
@@ -507,13 +511,14 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "crypto:research/gaudry_k4_char2_redteam_20261026/replication/estimate.py",
-      "sha256": null
+      "path": "crypto:examples/k4_replication_decide.rs",
+      "sha256": "e4a2953fd64a617e3afc84688a6f1c218466b4950109010ad75126c06e2e8d64"
     },
     "inputs": [
       "sessions/*/records.jsonl"
     ],
     "outputs": [
+      "cargo run --release --example k4_replication_decide -- SESSION_DIR... (JSON: ratio, 95% paired-bootstrap interval and one-sided p per m and w, Holm over m = 16, 17, verdict per m, A/A and C3 controls)",
       "ecbench compare --a rho-strong --b ic-wied per m and w",
       "ecbench compare --a rho-neg --b rho-neg-aa"
     ],

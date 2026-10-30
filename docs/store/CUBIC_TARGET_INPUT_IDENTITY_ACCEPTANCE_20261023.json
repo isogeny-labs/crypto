@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "cubic-target-input-identity-acceptance",
+  "checked_at_utc": "2026-10-23T17:59:54.151773+00:00",
+  "source_parent_commit": "25d703e714e5f1a917266d1b89ed0bb7c9e863bf",
+  "ic_release_sha256": "aecf2b190b6e0e8adc1e0dec6877a5eedb8ed7249d88e61cf80ba9c19b2655c8",
+  "crypto_store_binary_sha256": "427fe8748681d76c6179a1186b11c2740806d99e687aa5dc60cf0d6c87587e04",
+  "fixture": {
+    "path": "docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+    "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+    "bytes": 146
+  },
+  "local": {
+    "verified": true,
+    "recovered_scalar": 5,
+    "input_artifact": {
+      "bytes": 146,
+      "reference": "/Volumes/SSD990-2/codex/crypto-store-bridge-20261023/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+      "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+    },
+    "route_edges_verified": 1
+  },
+  "oversized_input": {
+    "bytes": 65537,
+    "rejected": true,
+    "json_error": "cubic target input exceeds 64 KiB"
+  },
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-target-identity-20261023T175954Z-05b2a4ea",
+  "store_name": "evidence/cubic-target-identity/20261023T175954Z-05b2a4ea/target.json",
+  "object_key": "ic/v1/acceptance/cubic-target-identity-20261023T175954Z-05b2a4ea/sha256/8b/8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+  "s3": {
+    "head_size_matches": true,
+    "downloaded_bytes_match": true,
+    "fresh_name": {
+      "verified": true,
+      "recovered_scalar": 5,
+      "input_artifact": {
+        "bytes": 146,
+        "reference": "store:evidence/cubic-target-identity/20261023T175954Z-05b2a4ea/target.json",
+        "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+      }
+    },
+    "fresh_digest_with_route": {
+      "verified": true,
+      "recovered_scalar": 5,
+      "input_artifact": {
+        "bytes": 146,
+        "reference": "sha256:8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+        "sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967"
+      },
+      "route_edges_verified": 1
+    }
+  },
+  "cleanup": {
+    "delete_exit": 0,
+    "head_after_delete_404": true
+  },
+  "validation": {
+    "release_library_tests": "4488 passed, 0 failed, 119 ignored",
+    "release_ic_cubic_tests": "4 passed, 0 failed",
+    "release_ic_build": "passed",
+    "release_ic_binary_tests": "34 passed, 0 failed",
+    "release_icx_binary_tests": "21 passed, 0 failed",
+    "release_icx_build": "passed",
+    "release_icx_local_target_replay": "verified scalar 5 and matching input digest",
+    "rustfmt_check": "passed",
+    "git_diff_check": "passed",
+    "json_parse_check": "passed"
+  },
+  "source_file_sha256": "16bcea8251c21e3567787f6deb7509207138ca560b6573ba13950109e77132bb"
+}
