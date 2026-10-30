@@ -1,0 +1,94 @@
+[
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity",
+    "exit": 101,
+    "reason": [
+      "thread 'cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity' (470118) panicked at src/cryptanalysis/ecbench/compare.rs:2448:9:",
+      "assertion failed: zero.legacy_comparison_id.is_none()"
+    ]
+  },
+  {
+    "test": "cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians",
+    "exit": 101,
+    "reason": [
+      "thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians' (470144) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:",
+      "called `Result::unwrap()` on an `Err` value: \"method `ic.hyperelliptic` has no parameter `branches`\""
+    ]
+  },
+  {
+    "test": "cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed",
+    "exit": 101,
+    "reason": [
+      "thread 'cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed' (470153) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1126:37:",
+      "called `Result::unwrap()` on an `Err` value: \"method `ic.hyperelliptic` has no parameter `branches`\""
+    ]
+  },
+  {
+    "test": "cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them",
+    "exit": 101,
+    "reason": [
+      "thread 'cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them' (470158) panicked at src/cryptanalysis/ecbench/hyper_ic.rs:1203:55:",
+      "called `Result::unwrap()` on an `Err` value: \"method `ic.hyperelliptic` has no parameter `branches`\""
+    ]
+  },
+  {
+    "test": "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+    "exit": 0,
+    "reason": []
+  },
+  {
+    "test": "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+    "exit": 0,
+    "reason": []
+  }
+]

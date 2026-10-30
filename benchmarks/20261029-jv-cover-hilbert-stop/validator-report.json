@@ -1,0 +1,451 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "method": "validate_independently.py recomputes S = total_muls/(c_add_E*sqrt(l)), the pooled plain rho S per p, per-p means of S/rho, the paired S_A/S_B, the log-log slope, the A/A identity, the B0 relabelling ratios and the replay scalars from raw/*.json; claimed values are read from the frozen summary.json",
+ "raw_data": [
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s1_A.json",
+   "sha256": "2c68dc0aca9b9a559530ff6305c6ba8b635a830f07a4cab5dfe927b592c57ea8"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s1_A2.json",
+   "sha256": "c36316ecaa4de153eb437c0db67a0d733506fef688ee6a4759acee37f032dab2"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s1_B.json",
+   "sha256": "099c6dd73b7048c4eda15b69a58cad4d597c1fa9bf6fe0d09019052559129217"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s1_B0.json",
+   "sha256": "5ded16d7dc8d957e9d7f85d3350b72c0593bd5b3c08df17eba6f7b55753d1d32"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s2_A.json",
+   "sha256": "e6c75ccc2bf411a09f8c4a679e15b5d3d2f017eeaf46705b784e8f99946e5bc8"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s2_B.json",
+   "sha256": "dd974fc4f841738982f612aa1f2b29161aa16fdaaa91ec9ab674749172722bc9"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s3_A.json",
+   "sha256": "e9140f52410c7eea772b4476a68f9e7a38f0ecc6861b92c21148b3b24ed4b475"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s3_B.json",
+   "sha256": "1baa56cfe91d8a2bfd93ea9bb785388f178fddf452744b4a7982c6dbd6ebf043"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s4_A.json",
+   "sha256": "b83ceeaf81d4a5aef72f32fbf99d428a443c05331d8d31ae532732c5c49abf0e"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s4_B.json",
+   "sha256": "a0a947c4600676dd11da1e3a42f7ccdd22fdc70f1fe5bcfc5e1df916e760ba24"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s5_A.json",
+   "sha256": "416eed895bfd54a7637f3f02d6725406224b3106bdd36f47627640ba5cfb9385"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s5_B.json",
+   "sha256": "36b07b99ddacb7fd4d57a293af872b927eb92454df3f1398841839f16df080fe"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s6_A.json",
+   "sha256": "b1932338b57f76dff29bf5dd56b1b6675c60e1fd6ff36ea74ff40e751f48efa0"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s6_B.json",
+   "sha256": "f66eb957f9a0ab866d2918becd88afc682f272955f3c1e532cd8143c43a6e5d1"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s7_A.json",
+   "sha256": "403dcc49b0d9d4077a42d20212861bb5c1fb43f4461427de8ec1536b564cb2a8"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s7_B.json",
+   "sha256": "a225d3687a22d3403d4240a815bfaa9c15916e9805ba7a82fd367de9fa45d662"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s8_A.json",
+   "sha256": "5d463a2a270f1ab5c0e5e4d720d7dbe37f434403c74cfb16375a87ce81d84cdc"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p101_s8_B.json",
+   "sha256": "b729b6c11a4dc22986fec766543cbce39ac953b91c3d478979217bc1dff7a2e3"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s1_A.json",
+   "sha256": "c9b654f6ff054f9f0cde7dd002a9f6d893f984dc9898ff2a426ad4d55b4a6a2c"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s1_B.json",
+   "sha256": "b4720a8d8a83f06b95d8717926ac9290d9c5df0ea49cc5ae867b53e5a4ddd7bb"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s2_A.json",
+   "sha256": "458c9f016cbddb71b3c7333ce698ee85fc0a849a6c0eb9662319142523af40d8"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s2_B.json",
+   "sha256": "0342e58b8fa5619e14a07c68b8bbd6edc2dd26781d1e086ed0d7d508e3b503cd"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s3_A.json",
+   "sha256": "8eeac179c11eb952ac631466cbf386ec6659fe3f7e43f8e09fd28976d0e240ae"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s3_B.json",
+   "sha256": "473955c37aa0d0c3d83996b99a56fb9590ebd886464c858842030e78fb9fc775"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s4_A.json",
+   "sha256": "c6829bf5cadbc20eabfbb1796509755a808fe28a681b42aa1f35f2f5cd817cb8"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s4_B.json",
+   "sha256": "ef879d7cecf398ade460e7cc654b19ee5762f2086cf19d6200b434b20eb3c3bf"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s5_A.json",
+   "sha256": "b798e17b6a09fce379a13e7941f01b577b06d1d5ba9db44840dd4dd4f43fc86a"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s5_B.json",
+   "sha256": "d49f672025d98d2c423ef528c13d4db06f0d4080ba4b0ce0a151cd7f9ee3bf0f"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s6_A.json",
+   "sha256": "51bebcf721f3fb7066190ab0198543b95a868f51ce6eb61a144bba1efb755184"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p251_s6_B.json",
+   "sha256": "b011f098e9bb304755a2d149e6f5b6f1ec1906473681f85ef650168f76fe8aeb"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s1_A.json",
+   "sha256": "3840529b0691905e42048845aa18111f4c0107e92c9fbb2424c9b6048c3bd9f2"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s1_B.json",
+   "sha256": "8ba3247cad969bf1d05127c8ca3b967792156fb7cb6727b75d1d160a5e8f6890"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s2_A.json",
+   "sha256": "a2e66188387d60768ee70ad9715c662f04ad89b25d654c0e82a00944f3e317a1"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s2_B.json",
+   "sha256": "2c0ca9a81fdfa9dbffd8f5545f819f74943b5934f42c641cd3cbe445f0013efb"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s3_A.json",
+   "sha256": "8d685ea243c824fbdf29cd21b6d80e340bb62859acc0a3bacc2627f7139b570a"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p503_s3_B.json",
+   "sha256": "06eb8abd72bcf5cb140c3882a768878d4892f2ee521ef7e841dd95ac940d58c4"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s1_A.json",
+   "sha256": "4003ba0e595a6c18b97709470e88844bbc74aba5b19874e158fb7c80eb704283"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s1_A2.json",
+   "sha256": "cea3b0014ccb5833931b88dc09d2d745311665b666baab81298886a32fdc2298"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s1_B.json",
+   "sha256": "b2d3cbad69c15f50b0b8f5fbfb6e575c1953bb3e54307e9946cec36d3149d081"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s1_B0.json",
+   "sha256": "e109e251e3fd62421ffddf0f14548d7e1488cd5079061fddcec494060c1b0784"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s2_A.json",
+   "sha256": "be0f8f4162de4339636113e0a1fc209d5d4e9587ed157a8eac74756ef64dc8a2"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s2_A2.json",
+   "sha256": "6dd795ec4a16373dc1ac95742e097dcded3921095a77c058ad5f7dc3025e6edd"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s2_B.json",
+   "sha256": "bfdf3711fc7193c633554ff62240ae2d9f61abe7a6912f18d800af461e3b8642"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s2_B0.json",
+   "sha256": "fb9ca53d91143864f0ea73c8c37dab2e7b1c213ae2ea049d09b27e73c30ab8c2"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s3_A.json",
+   "sha256": "ac067d779d2f79ba40503f131e142a35c9c585c6301a7b3eb97fbb228f224259"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s3_B.json",
+   "sha256": "0e27724c47b05c29fd6a081cb63e5dd0aa5c1449fd98cff7f24c8b1fc06c8518"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s4_A.json",
+   "sha256": "2c2c60805a6853d0d72df6fb73fd491e975fc939566c5061ad98aa383b37fbd0"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s4_B.json",
+   "sha256": "63d250d3cac77cfe71d2a344536ff741a528e7537fc67208aa88e43c4dfd95eb"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s5_A.json",
+   "sha256": "a83db2b6e63497d8ee5f01f4db78c5570d7a4501cd1c2612806f863de830096a"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s5_B.json",
+   "sha256": "0c54da503ff5594d7328709e541dd0f854b3874c8a62f25d1bb18a10ebacbf5b"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s6_A.json",
+   "sha256": "4af1b76f6f0ef9a5b8b853b94b6819a2a97e949f745784afe6401504a3bdcd8d"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s6_B.json",
+   "sha256": "8d2ee8e3f80385ff7e0ab81f1fd92830dd901a41de00993cd85b41f78c897349"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s7_A.json",
+   "sha256": "c25b570485a08196b08e44b376a17b03fc5ca8eaef4e7f4926c53267e6241576"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s7_B.json",
+   "sha256": "7eca09587622c967b219a990bd889dd8a4f73ab3576ff541322e47274639ed47"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s8_A.json",
+   "sha256": "cafaab4f8a18f2422229b2c52d18077800bea787a0ccdce7d9c816f429ba9ce2"
+  },
+  {
+   "path": "../../research/ic_cover_weakclass_20261023/raw/p53_s8_B.json",
+   "sha256": "1c49c5dd7749a2a237d9a260e57df38e91d9f014af4fe449e1e31d230f056dd4"
+  }
+ ],
+ "headline": [
+  {
+   "name": "mean S (A) at p=53",
+   "claimed": 1980.4587050012294,
+   "recomputed": 1980.4587050012294,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (A) at p=53",
+   "claimed": 1361.1579684936805,
+   "recomputed": 1361.1579684936808,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (B) at p=53",
+   "claimed": 1061.5356105674716,
+   "recomputed": 1061.5356105674716,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (B) at p=53",
+   "claimed": 729.587368580261,
+   "recomputed": 729.5873685802611,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S_A/S_B at p=53",
+   "claimed": 1.8480471970642922,
+   "recomputed": 1.8480471970642924,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (A) at p=101",
+   "claimed": 259.8062394408024,
+   "recomputed": 259.8062394408024,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (A) at p=101",
+   "claimed": 204.6867291155263,
+   "recomputed": 204.68672911552628,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (B) at p=101",
+   "claimed": 138.49233181786627,
+   "recomputed": 138.49233181786627,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (B) at p=101",
+   "claimed": 109.11032186292142,
+   "recomputed": 109.11032186292141,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S_A/S_B at p=101",
+   "claimed": 1.87496972016593,
+   "recomputed": 1.8749697201659303,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (A) at p=251",
+   "claimed": 47.90397324979549,
+   "recomputed": 47.90397324979549,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (A) at p=251",
+   "claimed": 35.21640170875329,
+   "recomputed": 35.21640170875328,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (B) at p=251",
+   "claimed": 25.638266193679442,
+   "recomputed": 25.638266193679442,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (B) at p=251",
+   "claimed": 18.847862090362586,
+   "recomputed": 18.847862090362586,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S_A/S_B at p=251",
+   "claimed": 1.8681529268477395,
+   "recomputed": 1.8681529268477393,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (A) at p=503",
+   "claimed": 9.785789787347165,
+   "recomputed": 9.785789787347165,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (A) at p=503",
+   "claimed": 7.185709809759206,
+   "recomputed": 7.185709809759206,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S (B) at p=503",
+   "claimed": 5.29115359226986,
+   "recomputed": 5.29115359226986,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S/rho (B) at p=503",
+   "claimed": 3.8852964450632492,
+   "recomputed": 3.8852964450632492,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "mean S_A/S_B at p=503",
+   "claimed": 1.8492998777754022,
+   "recomputed": 1.8492998777754022,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "slope of log S/rho (A) over p",
+   "claimed": -2.272728504293694,
+   "recomputed": -2.2727285042936947,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "slope of log S/rho (B) over p",
+   "claimed": -2.268714035299878,
+   "recomputed": -2.2687140352998783,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "fraction of A/B cells with equal relations and verified logarithms",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "A/A total_muls ratio at p=53 seed=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 relabelling S_A/S_B0 at p=53 seed=1",
+   "claimed": 2.560581778689831,
+   "recomputed": 2.560581778689831,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 native ops / A at p=53 seed=1",
+   "claimed": 8.471186897745008,
+   "recomputed": 8.471186897745008,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "A/A total_muls ratio at p=53 seed=2",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 relabelling S_A/S_B0 at p=53 seed=2",
+   "claimed": 2.5294782409278667,
+   "recomputed": 2.5294782409278667,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 native ops / A at p=53 seed=2",
+   "claimed": 8.477049822652338,
+   "recomputed": 8.477049822652338,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "A/A total_muls ratio at p=101 seed=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 relabelling S_A/S_B0 at p=101 seed=1",
+   "claimed": 2.637590454285197,
+   "recomputed": 2.637590454285197,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "B0 native ops / A at p=101 seed=1",
+   "claimed": 8.342513090077233,
+   "recomputed": 8.342513090077233,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "p53_s2_B replay total_muls",
+   "claimed": 4423274119.0,
+   "recomputed": 4423274119.0,
+   "rel_tol": 0.0
+  },
+  {
+   "name": "p53_s2_B replay relation_digest",
+   "claimed": 3.844607112822951e+18,
+   "recomputed": 3.844607112822951e+18,
+   "rel_tol": 0.0
+  },
+  {
+   "name": "p101_s4_B replay total_muls",
+   "claimed": 12436296272.0,
+   "recomputed": 12436296272.0,
+   "rel_tol": 0.0
+  },
+  {
+   "name": "p101_s4_B replay relation_digest",
+   "claimed": 4.5274085597744553e+18,
+   "recomputed": 4.5274085597744553e+18,
+   "rel_tol": 0.0
+  }
+ ],
+ "errors": []
+}

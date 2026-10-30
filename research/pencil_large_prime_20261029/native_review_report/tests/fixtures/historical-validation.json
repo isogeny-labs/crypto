@@ -1,0 +1,48 @@
+{
+  "schema": "pencil-accounting-review-report/v1",
+  "software_tests": [
+    {
+      "name": "producer",
+      "passed": 49,
+      "failed": 0,
+      "ignored": 1,
+      "evidence": "E3"
+    },
+    {
+      "name": "native analyzer",
+      "passed": 28,
+      "failed": 0,
+      "ignored": 0,
+      "evidence": "E4"
+    },
+    {
+      "name": "isolated strict measurement",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "evidence": "E5"
+    }
+  ],
+  "full_root_release_tests": {
+    "status": "passed",
+    "passed": 5277,
+    "failed": 0,
+    "ignored": 123,
+    "source_files_unchanged": 20,
+    "owner": "root/ci_audit",
+    "session_id": 15062,
+    "log_prefix": "validation/accounting/post-closure-root-release-lib-20261029T1855Z",
+    "terminal_result": {
+      "command": "cargo +1.99.1 test --release --lib",
+      "exit_code": 0,
+      "summary": "5277 passed; 0 failed; 123 ignored; 0 measured; 0 filtered out; finished in 540.13s",
+      "release_build": "Finished release profile in 3m 50s",
+      "stdout": "post-closure-root-release-lib-20261029T1855Z.stdout.log",
+      "stdout_sha256": "33a2ad7a0e8a6b6f3e8d4f3737471316fc4432887e9b961b55d81cdd87ff7be0",
+      "stderr": "post-closure-root-release-lib-20261029T1855Z.stderr.log",
+      "stderr_sha256": "95b8ecd10643ab60bc63365ac4708f4f79dbb2814609677260fd000ec280757c",
+      "finished_utc": "2026-10-29T19:08:48Z"
+    }
+  },
+  "new_cohort_targets_executed": 0
+}

@@ -32,6 +32,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 TOOL = ROOT / "tools" / "isolated_bench.py"
+sys.path.insert(0, str(ROOT / "tools"))
+import result_switches  # noqa: E402
 SUITE = HERE.parent / "suite" / "v1"
 CPUS = "2"
 RETRIES = 2
@@ -252,6 +254,8 @@ def host_manifest(out: Path, binaries: dict[str, dict]) -> dict:
         "arch": platform.machine(),
         "glibc": " ".join(platform.libc_ver()),
         "binaries": binaries,
+        # R9: every price run inherits ENV; record its result-affecting part.
+        "result_switches": result_switches.record(ENV),
         "isolation_tool": {"path": "tools/isolated_bench.py", "sha256": sha256(TOOL)},
         "pinning": ("tools/isolated_bench.py run --wait --cpus 2 with RAYON_NUM_THREADS=1, after PSI some "
                     "avg10 falls below 4.0; the tool's defaults (settle 2 s, other processes at most 0.10 "
