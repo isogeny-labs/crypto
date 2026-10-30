@@ -1,0 +1,91 @@
+{
+  "schema": "pencil-native-review-report-request/v1",
+  "title": "Mathematical experiment preparation: gate software and published runtime",
+  "snapshot": "2026-10-29T23:58:29Z",
+  "plan_summary": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/aggregate/actual-plan-only-summary-final.json",
+    "sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+  },
+  "observations": [
+    {
+      "id": "gate-software",
+      "scope": "Software validation only. The full 1260 design remains intact; the exact p739 gate has 60 planned targets. Counts refer to software tests, not empirical targets.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/receipt.json",
+        "sha256": "14a482e87682761cbe6a29b777714fb5dc7c700cb5152745a7aa3a859e232d8e"
+      },
+      "fields": {
+        "native_unit_tests": "/price_tests/unit",
+        "native_cli_tests": "/price_tests/cli",
+        "export_private_units": "/export_tests/private_units",
+        "export_production_scope_tests": "/export_tests/production_scope_tests",
+        "planned_gate_targets": "/gate/workloads",
+        "planned_gate_pairs": "/gate/measured_pairs",
+        "planned_gate_slots": "/gate/execution_slots",
+        "solver_executions": "/solver_executions",
+        "qualified_ratios": "/qualified_ratios"
+      }
+    },
+    {
+      "id": "gate-review",
+      "scope": "Independent read-only software scope review. No mathematical workload, timing observation or cost ratio was replayed; source-commit binding is a separate record.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/publication_binding_audit_20261029T2358Z/gate-independent-review.json",
+        "sha256": "8d53fd6fde1a9b2f30608620aa64b1e72901b4ce84a187d42755e8cca0f33140"
+      },
+      "fields": {
+        "review_result": "/verdict",
+        "source_commit": "/source_commit",
+        "findings": "/findings",
+        "solver_executions": "/solver_executions"
+      }
+    },
+    {
+      "id": "controller-publication",
+      "scope": "Retained CodeBuild source-update receipt. The CloudFormation change set was not executed. Its source parameters remain old, so later stack changes require reconciliation.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/controller_publication_20261029/receipt.json",
+        "sha256": "ef0fc0a6f3665173a769187c7a130561cc727051f539ae3862c2c9367ab13980"
+      },
+      "fields": {
+        "source_update_completed": "/controller_update_completed",
+        "other_project_properties_unchanged": "/all_other_project_properties_unchanged",
+        "inline_policy_unchanged": "/inline_iam_policy_unchanged",
+        "change_set_executed": "/change_set_executed",
+        "experiment_launched_at_receipt": "/experiment_launched"
+      }
+    },
+    {
+      "id": "image-publication",
+      "scope": "Approved FROM/COPY image publication and stopped-container extraction. Elapsed time is infrastructure publication/verification, not mathematical performance. No workload was started.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/controller_publication_20261029/image-publication-receipt.json",
+        "sha256": "f5fa87421c688ac0fda54105306c5442cae8229287d583469a6da347c09b6409"
+      },
+      "fields": {
+        "publication_seconds": "/elapsed_wall_seconds",
+        "image_digest_pull_verified": "/digest_pull_verified",
+        "stopped_extraction_verified": "/stopped_container_extraction_verified",
+        "runtime_bytes_equal": "/all_runtime_archive_bytes_equal",
+        "solver_executions": "/solver_executions",
+        "historical_qualification_transferred": "/historical_runtime_qualification_transferred"
+      }
+    },
+    {
+      "id": "bytebinding-audit",
+      "scope": "Separate check of retained archive and image bytes plus API receipts. This auditor also published the image; it is not an independent-personnel audit or live cluster check.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/publication_binding_audit_20261029T2358Z/receipt.json",
+        "sha256": "98c9f93c4b9bfa7acac7375b092f4207ecb4bd1e52c6226c98cbab5f0be434dc"
+      },
+      "fields": {
+        "archive_readback_matches": "/archive_readback_checks_passed",
+        "image_runtime_bytes_equal": "/runtime_archive_all_image_bytes_equal",
+        "source_only_project_match": "/source_only_project_match",
+        "inline_policy_bytes_equal": "/inline_policy_bytes_equal",
+        "cloud_mutations_in_audit": "/cloud_mutations",
+        "empirical_ratios": "/empirical_ratios"
+      }
+    }
+  ]
+}

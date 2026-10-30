@@ -1,0 +1,86 @@
+// Input: original ring r/circuit and nuEquation, then O24-charts prefix in o.
+ring s=2,(w),dp;
+int precision=192;
+ideal cutoff=std(ideal(w^precision));
+ideal checkcut=std(ideal(w^100));
+proc tr(poly p){return(reduce(p,cutoff));}
+proc invUnit(poly p){
+ poly answer=1;int k;
+ if(subst(p,w,0)!=1){ERROR("inverse input is not a unit");}
+ for(k=1;k<=9;k++){answer=tr(p*answer^2);}
+ if(tr(p*answer)!=1){ERROR("truncated unit inverse failed");}
+ return(answer);
+}
+proc wVal(poly p){
+ if(p==0){ERROR("order unresolved at retained precision");return(-999);}
+ // In this univariate global ordering the last term has least exponent.
+ return(deg(p[size(p)]));
+}
+proc recordOrder(string name,poly p){
+ int value=wVal(p);
+ print("ORDER "+name+" "+string(value)+" LEAD "+string(subst(p/w^value,w,0)));
+ if(value<0 || value>=100){ERROR("valuation outside certified precision");}
+}
+int kind;int branch;int k;int j;
+poly tt;poly qq;poly xx;poly yy;poly zz;poly bb;poly cc;poly aa;poly dd;poly ee;
+poly ll;poly nnum;poly nden;poly nu;poly residue;int denorder;int numorder;
+ideal lifted;ideal evaluatedUnits;
+print("VALUATION_HELPER_CONTROLS");wVal(1+w^191);wVal(w+w^3);wVal(w^7+w^179);
+if(wVal(1+w^191)!=0 || wVal(w+w^3)!=1 || wVal(w^7+w^179)!=7){ERROR("univariate valuation controls failed");}
+for(kind=0;kind<=1;kind++){
+ qq=1;xx=1;yy=1;
+ if(kind==0){
+  tt=w;
+  for(k=1;k<=10;k++){qq=tr(1+(1+tt)*tt^3*qq^2);}
+  map base=o,qq,0,0,tt;
+  bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+  for(k=1;k<=10;k++){yy=tr((tt^10*yy^8+tt^3*dd*yy^2+ee)*invUnit(tr(aa^2*dd)));}
+  zz=tr(tt^3*yy);
+  residue=tr(tt^10*yy^8+tt^3*dd*yy^2+aa^2*dd*yy+ee);
+ }else{
+  for(k=1;k<=12;k++){
+   tt=tr(w^7*xx^2);
+   for(j=1;j<=10;j++){qq=tr(1+(1+tt)*tt^3*qq^2);}
+   map base=o,qq,0,0,tt;
+   bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+   xx=tr((1+(w^11*dd+w^10*ee)*xx^4)*invUnit(tr(aa^2*dd)));
+  }
+  tt=tr(w^7*xx^2);zz=tr(w^11*xx^3);
+  map base=o,qq,0,0,tt;
+  bb=tr(base(b));cc=tr(base(c));aa=tr(base(A));dd=tr(base(d));ee=tr(base(e));
+  residue=tr(1+aa^2*dd*xx+w^11*dd*xx^4+w^10*ee*xx^4);
+ }
+ print("CHART "+string(kind)+" PARAMETER_SERIES");tt;qq;xx;yy;zz;
+ print("BASE_AND_TOWER_SERIES_RESIDUALS");tr(qq+1+(1+tt)*tt^3*qq^2);residue;
+ if(tr(qq+1+(1+tt)*tt^3*qq^2)!=0 || residue!=0){ERROR("implicit chart series residual");}
+ for(branch=0;branch<=1;branch++){
+  ll=branch;
+  for(k=1;k<=10;k++){ll=tr((ll^2+zz+bb)*invUnit(aa));}
+  print("BRANCH "+string(kind)+" "+string(branch));
+  print("LAMBDA_SERIES");ll;
+  if(tr(ll^2+aa*ll+zz+bb)!=0){ERROR("lambda series residual");}
+  map getnu=r,0,ll,bb,cc;
+  nnum=tr(getnu(nuEquation));nden=tr(getnu(nuCoefficient));
+  numorder=wVal(nnum);denorder=wVal(nden);
+  print("NU_NUMERATOR_DENOMINATOR_ORDERS");numorder;denorder;
+  if(numorder<denorder){ERROR("nu has a pole; Laurent adaptation not frozen");}
+  nu=tr((nnum/w^denorder)*invUnit(nden/w^denorder));
+  print("NU_SERIES");nu;
+  map evaluate=r,nu,ll,bb,cc;
+  lifted=evaluate(original);
+  print("ALL_FIVE_ORIGINAL_RESIDUALS_MOD_W100");
+  for(j=1;j<=5;j++){
+   residue=reduce(lifted[j],checkcut);residue;
+   if(residue!=0){ERROR("original source residual failed");}
+  }
+  recordOrder("t",tt);recordOrder("b",bb);recordOrder("c",cc);
+  recordOrder("lambda",ll);recordOrder("nu",nu);recordOrder("A",aa);
+  recordOrder("Z",zz);
+  evaluatedUnits=evaluate(registered);
+  for(j=1;j<=8;j++){
+   poly entry=tr(evaluatedUnits[j]);
+   recordOrder("unit"+string(j),entry);
+  }
+ }
+}
+print("O24_SERIES_ALL_CHECKS_PASS");quit;

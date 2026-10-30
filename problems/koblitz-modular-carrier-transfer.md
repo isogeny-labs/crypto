@@ -4,7 +4,7 @@
 - **Kind:** implementation gap; low-genus existence question; partial formalization
 - **Affected work:** [investigation](../research/koblitz_modular_ic_20261018/REPORT.md), [original construction](../research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-28
 
 ## Problem
 
@@ -953,3 +953,171 @@ See [receipt](../research/koblitz_modular_ic_20261018/rounds/21/ARTIFACT_PUBLICA
 and [download command](../research/koblitz_modular_ic_20261018/rounds/21/RELEASE.md).
 Only the artifact access/publication gap is closed;all mathematical
 acceptance criteria above remain open as previously recorded.
+
+## Round22: exact augmentation recovery and actual pole supports
+
+[Round22](../research/koblitz_modular_ic_20261018/rounds/22/REPORT.md)
+solves the complete integral equivariant recovery system after replacing
+regular target cycles by their trace-zero factors. The8-by32 Smith lattice
+has eight invariant factors1 and a24-column integral kernel basis;the least
+recovery scalar is1. A small exact certificate uses M1 and M3=7I only.
+Native CM and independent integer products,source bindings and22 both-sign
+order11 fixtures pass. The inherited polarization has Smith1,1,1,5 and its
+actual weighted Gram is retained. This does not contradict the regular-
+target denominator5 theorem or construct the final polarized quotient.
+
+The actual Tate/QR curve has a checked genus-one base,complete base divisors,
+a generic degree16 QR model,an irreducible plane projection,a smooth
+registered incidence open and an exact degree8-by2 trace tower. The degree5
+supersingular exceptional support of1+c must be included in proper nu
+geometry. Full lifted normalization/divisors,complete prescribed RR and a
+nonconstant descended map acting nontrivially on order11 remain open.
+Bounded normalization/place/integral-basis failures are retained and do not
+prove nonexistence. The smaller trace-subfield attempt is separately recorded.
+
+All four old node187 scalar points are excluded by simultaneous ordinary
+Miller valuations and complete coefficient descent under explicit written
+DVR/proper/pole bridges. The source binding checks80 conjugated functions
+and every required product/descent gate. No explicit polynomial separator
+or verified h-power ideal membership has been extracted;full saturation
+and the proper polarized quotient embedding remain separate obligations.
+
+The next decisive steps remain normalized lifted branches and complete RR,
+source-bound polynomial membership for node187,and an arbitrary modular-
+divisor reverse evaluator with complete ordinary460/367 fibers/images.
+The n3 and same-field n5 controls do not establish the F2 modular-factor
+acceptance test. Exact proof/test counts and failure receipts are in
+[VALIDATION.md](../research/koblitz_modular_ic_20261018/rounds/22/VALIDATION.md).
+No new relation rank or IC efficiency assessment is supplied.
+
+Round22 also certifies the original supersingular SS5 affine incidence fiber,
+keeping nu and every registered unit:four degree20 closed points over F2,
+with both ideal-inclusion lifts,nonzero relative Jacobian and exact Frobenius
+matrix. The full proper normalized branch table remains open;see the Round22
+CM and validation records. No relation-rank or IC cost claim follows.
+
+## Round23: exceptional lifted source geometry
+
+[Round23](../research/koblitz_modular_ic_20261018/rounds/23/REPORT.md) records
+exact original-source neighborhoods at SS5 and regular closure points at Z5.
+Using the written proper-curve/DVR bridge,the complete exceptional fibers are
+four degree20 unramified points above SS5 and two degree10 points of ramification
+1 and7 above Z5. The two final registered polynomial denominator entries have
+orders4 and6 at the ramified Z5 point. The original unsaturated20-dimensional
+fiber and saturated16-dimensional fiber are kept distinct. Native membership,
+unit,component,intersection and Jacobian certificates support the derivation;
+15 new Lean implications/identities expose the remaining geometric bridge.
+
+This narrows the next construction to lifted charts above the five rational
+base supports,including infinity,followed by complete global divisors and a
+prescribed complete Riemann–Roch space. It does not resolve the F2 modular-factor
+map,nonzero order11 action,node187 polynomial membership,full quotient geometry
+or arbitrary-divisor reverse evaluation. A second migration lost earlier
+ignored raw output;literal source certificates survived and missing verification
+receipts were replayed. The failure ledger marks that evidence gap explicitly.
+
+Round23 scope clarification:the five rational polar charts do not by themselves
+complete every zero divisor. Additional zero supports of the original functions
+must be enumerated by exact norms and source fibers;see
+[DIVISOR_SCOPE_ADDENDUM.md](../research/koblitz_modular_ic_20261018/rounds/23/DIVISOR_SCOPE_ADDENDUM.md).
+
+## Round24: explicit infinity charts and constant field
+
+[Round24 geometry](../research/koblitz_modular_ic_20261018/rounds/24/CM.md)
+constructs source-bound charts above the rational base point at infinity.
+The exact substitutions t=w^7*x^2,Z=w^11*x^3 and their rational inverses,
+together with the two unramified charts Z=t^3*y, have four unit Jacobian
+residues. Under the written proper/source bridge they give four rational
+normalized points of indices1,1,7,7, exhausting the degree16 fiber. This also
+forces the full constant field to be F2. The unchanged plane polynomial
+independently remains irreducible over F4 with product and field controls.
+
+The accepted O24-series-02 evaluates the original nu equation and all8 actual
+registered polynomial entries on all4 branches. The e1 branches have nu
+order0 and S,N orders0,0. The e7 branches have nu orders32,21 and S,N
+orders44,66 at both; the generic nu numerator/denominator pairs are109/77
+and98/77. All five original residuals vanish modulo w100, within the
+certified implicit lifts. The first incorrect series helper is rejected.
+
+The remaining rational polar supports are A0,B0,C0,D0. Additional zero
+supports and complete global divisors/RR/F2 factor map remain open, as do
+all node187/quotient/reverse obligations above. No IC performance or new
+relation rank is claimed. The shared index was initially reserved; a later
+clear scope check permits its existing Koblitz row to reflect this result.
+
+## Round25: original involution and registered affine quotient
+
+[Round25](../research/koblitz_modular_ic_20261018/rounds/25/CM.md) certifies
+sigma(lambda,nu)=(lambda+1+c,nu+b) on all five original equations and eight
+registered entries. With U=(1+c)*nu+b*lambda and V=nu^2+b*nu, thirteen exact
+polynomial pullbacks produce a complete registered-open quotient presentation
+B[nu]/(nu^2+b*nu+V), b*lambda=U+(1+c)*nu. Its derivative b is a registered
+unit; no division by1+c is needed, including at SS5. This written affine
+scheme/invariant-ring argument preserves the whole original registered
+source algebra; it does not supply the missing proper boundary equations,
+full coupled quotient saturation or proper polarized embedding.
+
+The fixed field is the retained degree8 intermediate field. Generic U,V
+numerators have Z-degree7; actual trace/norm identities and14 audited Lean
+algebra proofs are retained. The desired order11 action remains untested:
+pullback after norm is1+sigma and can annihilate that factor. Determine its
+actual subgroup/matrix action before using this cover for direct relations.
+No arbitrary collected-divisor reverse evaluator or new relation rank is
+established. The remaining four polar supports, additional zero supports,
+complete global divisors/RR/F2 map, node187 membership and460/367 images
+remain open. Every failed native/Lean/gate/storage attempt is retained.
+
+## Round26: Prym direction, rational cusp transport and fixed RR target
+
+[Round26](../research/koblitz_modular_ic_20261018/rounds/26/CM.md) connects
+R25's actual quotient to the already known R15/R16 diamond character: all
+nontrivial diamond quotient norms annihilate the intended CM factor under
+that written modular/specialization bridge. Native and kernel finite checks
+verify all4primitive characters and subgroup orders2,5,10. The group direction
+is1-sigma:it doubles actual minus11-torsion and6 recovers it. An actual factor
+inclusion/subgroup evaluator is still unconstructed;functions in characteristic2
+are not split into ordinary plus/minus eigenspaces.
+
+Exact base translation and all original affine lambda/nu coefficients are
+checked through5steps,T^5=sigma,T^10=1. Transport of verified O charts gives
+four rational branches e1,1,7,7 at each O,A0,C0,D0,B0 under the written proper
+source bridge. Complete lifted base divisors now cover registered slots
+1,12,2,2,20,37. Lambda,nu,S,N source-specific valuations/zeros still need
+calculation. The failed unshifted C/D ansatz is explicitly rejected.
+
+A precise next RR target is D=7*pi^*A0+pi^*B0,degree128,dimension68 under the
+genus61/Riemann-Roch bridge. A complete basis with independent dimension check
+must precede map search. Six native attempts and both Lean attempts are
+retained;16named proofs/17audited declarations pass0failing0trusted-native.
+Node187,full coupled quotient saturation/proper polarized embedding,arbitrary
+reverse and ordinary460/367 images remain open. No new IC cost/rank claim.
+
+## R27–R29 construction observations, 2026-10-29 UTC
+
+The manually authorized continuation has complete original pole divisors,
+20 actual cusp charts, 68/34 complete RR sections, new source/quotient curve
+ideals with 2,150/497 complete quadrics, and an actual source order-11 class
+with T=6. The new saturated-ideal result is for the complete-linear-system
+P67/P33 curve models under written RR/very-ampleness/quadratic-generation
+bridges. It does not close the older coupled quotient or det19 theta task.
+The written mixed Prym24 polarization has type(1^18,5^6). A source-bound
+proper-chart node187 separator is checked on all80function/conjugate instances;
+original-ring h-power membership is still missing.
+
+Actual first/second adjugate norms resolve all ordinary paired images of the
+460/367 pushed supports. Degree12 is one second point with multiplicity2.
+The436/12 pairs are Frobenius218/6 conjugates, so the ordinary460 difference
+vanishes as base E49 closed divisors. The284/83 pairs are distinct under the
+four tested base actions. Colored C5 deck offsets, actual source branches,
+complete signed reverse divisors and modular-factor projected columns remain
+required; no IC-rank conclusion follows. The admitted455-equation F32 map
+solve passes910controls then hits4GiB/exit14. No nonexistence is inferred.
+
+The actual degree14 QR cubic is irreducible and yields exact77torsion over
+F2^42 with CRT56/22anddiamond23. The independent X1(77) source is archived;
+its global function-field match is still unverified. The batch has40named
+Lean results/41current audited declarations,0failing/0trustednative. R22d=1
+recovery remains complete without rerun. Source/raw records,reports and
+remaining acceptance tests are in rounds/27–29,especially rounds/29/NEXT.md.
+These are construction observations, not an official hypothesis promotion or
+an IC efficiency assessment. No new cloud job, fifth claim or merge is made.
