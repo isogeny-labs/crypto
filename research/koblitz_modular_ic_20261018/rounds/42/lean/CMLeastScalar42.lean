@@ -1,4 +1,7 @@
 import CMRecovery42
+import Mathlib.Algebra.BigOperators.Ring.Finset
+
+open scoped BigOperators
 
 namespace CMLeastScalar42
 
