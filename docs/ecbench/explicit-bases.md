@@ -359,3 +359,62 @@ without removing a lock or rewriting history. Artifact-bot migrations are
 preserved and checked against archived log hashes. T884owns this continuation;
 T882was released after its implementation phase. The shared daily log remains
 outside this task's scope, so this is the committed project handoff.
+
+## 2026-10-30 05:58 UTC — compact-row continuation
+
+### What was done
+
+V5 completed ten executions: nine independently replayed recoveries and one
+58-bit timeout. The largest two-target rung was 56 bits; seed 101 recovered
+at 58 bits in 595.862060 seconds cold, while seed 202 reached 600 seconds.
+Raw records, archive hash and verified deletion are committed under
+`research/explicit_relations_e2e_20261030/results-v5/`.
+
+Exact x/parity compression now provides an opt-in 16-byte table row instead
+of 32 bytes, retaining original tuple IDs and deterministic witnesses.
+`make cuda-compact ARCH=sm_120` selects it. Full/cached/compact service builds,
+13 Rust tests, reduction replay, exhaustive compact/full lookup checks and
+query sanitizers passed on RTX PRO 6000. The corrected maximum row-cap
+header also passed in the active retry before timing began.
+
+Separate post-run audits validate the earlier 120-row normalization/query
+panels and v3/v4/v5 frontier coverage. Their regression controls reject
+missing and duplicate executions, wrong inputs/flags and truncated successful
+prefixes. Frozen analyzers and measurements are unchanged. Unadmitted
+benchmark visual copies and a clearly labeled catalog link are committed;
+the admitted benchmark table remains byte-identical.
+
+### Decisions made
+
+The cache showed no matched 52-bit timing benefit, so it remains opt-in.
+Compact storage is exact on a fixed validated odd-prime curve (SEC 1 v2,
+section 2.3.3), not a probabilistic key. New protocol-v7 keeps the v6 fixtures,
+arms and explicit limits, while correcting the service-header cap. Only one
+task GPU runs at a time. All clocks remain L0 diagnostics; no external-tool,
+matched-rho or conditional tensor-contraction result is claimed.
+
+### Open threads
+
+V7 pod `ex8tm7votw4h4g` is active, controller session `16482`, local bundle
+`/home/ec2-user/ecbench-e2e-20261030-v7`, pinned source
+`4014622e18caef9a6b6c89d79653e7633f5aaaff`. Reconcile it before any launch.
+The six 52-bit cells and both 56-bit targets passed; 58/60-bit outcomes are
+pending. Collect the complete archive, verify deletion, run the strict
+frontier audit and publish raw records before the final inspected report.
+The draft report covers v1–v6; its final chapter and benchmark copies await
+v7. T894 owns this continuation; T895 owns the visual catalog. The shared
+progress exporter remains reserved by T890 and has not been edited.
+
+### Errors
+
+V6 passed preflight but failed its first solver header: the protocol requested
+2^31 rows while the service still enforced 2^30. No CSV data row was recorded.
+The failed archive and deletion receipt remain in `failed-launch-v6/`.
+Source 4014622 adds consistent cap admission, boundary tests and actual header
+preflight under a new frozen protocol. The initial push was rejected after
+an artifact-bot update; that update was merged without rewriting history,
+and moved log/PNG hashes were verified. Canonical rectangular-coverage
+findings remain disclosed; the separate audit verifies the actual frozen
+nonrectangular plans. The separate CPU tensor implementation and its open
+independent audit are documented in `problems/hashed-ecdl-tensor-backend.md`;
+this CUDA service does not port that backend.
