@@ -586,7 +586,9 @@ pub(super) fn prepare_s3_publication(
                 ));
             }
         }
-        None => backend.put(key, source, &artifact.sha256)?,
+        None => {
+            backend.put(key, source, &artifact.sha256)?;
+        }
     }
     Ok(())
 }
