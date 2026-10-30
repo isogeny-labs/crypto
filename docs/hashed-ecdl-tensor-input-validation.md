@@ -66,7 +66,7 @@ solve, cloud resource, benchmark or artifact-store upload was launched.
 | Same runner, 16 MiB + 1 byte file | exit 1; `input file exceeds 16 MiB runner policy` |
 | Mirror tree comparison | identical, excluding build directories |
 | Existing artifact policy against the complete staged tree | exit 0; no data files committed, no waiver |
-| Crypto root release library | not claimed by this binding receipt; the paired crypto PR records its separate current validation |
+| Crypto root release library | initial run interrupted by SIGKILL after the environment restart; uncapped retry is running, not yet a full pass; [compact receipt](hashed-ecdl-tensor-input-root-tests.txt) |
 
 An intermediate selected-package run passed the 27 core, 20 binding and 19
 FFI tests, but one new runner assertion failed because its expected JSON
@@ -75,6 +75,13 @@ Corrected the test's expected value without changing serialization. The entire
 selected-package command then passed, including all eight new tests. The
 [initial panel](hashed-ecdl-tensor-input-initial-panel.txt) retains that failure.
 The final compact transcript omits only the terminal separator blank line.
+
+The initial broad root run has no complete parent result. Its 301088-byte
+trace is preserved locally with SHA-256
+`3f576c29d308c47a31f45df1ff7d426acc65db9c2a3332dea0f8c715e87ee4c5`;
+the receipt records the SIGKILL observations and NOT_UPLOADED status. Its
+passing nested one-test result is not a full-library pass. The retry uses
+the same compiled source, no time cap, and a distinct raw log/status marker.
 
 The new [source manifest](hashed-ecdl-tensor-input-sources.sha256) covers the
 17 Cargo/source/test files and has SHA-256
