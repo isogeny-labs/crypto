@@ -1,0 +1,27 @@
+LIB "primdec.lib";
+ring genericControl49=(2,u),(x),dp;
+ideal positive49=x^2+x+u;list positivePrimes49=minAssGTZ(positive49);
+ideal negative49=x^2+x;list negativePrimes49=minAssGTZ(negative49);
+if(size(positivePrimes49)!=1 || size(negativePrimes49)!=2){ERROR("GENERIC49_PRIME_CONTROLS");quit;}
+if(size(reduce(positive49,std(positivePrimes49[1])))!=0 || size(reduce(positivePrimes49[1],std(positive49)))!=0){ERROR("GENERIC49_POSITIVE_EQUALITY");quit;}
+print("GENERIC49_CONTROLS positive_prime_components=1 negative_prime_components=2");
+ring genericSourceRing49=(2,u),(n,l,v),dp;
+map toGeneric49=affine49,n,l,v,u;
+ideal sourceGeneric49=std(toGeneric49(sourceIdeal49));
+if(vdim(sourceGeneric49)!=32){ERROR("GENERIC49_INPUT_DEGREE");quit;}
+print("GENERIC49_STAGE generic_minimal_primes_begin=true");
+list sourcePrimes49=minAssGTZ(sourceGeneric49);
+link genericOut49="ASCII:w generic-primes49.sing";open(genericOut49);
+write(genericOut49,"ring genericCertificate49=(2,u),(n,l,v),dp;");
+int sourceIndex49;int entry49;ideal onePrime49;
+for(sourceIndex49=1;sourceIndex49<=size(sourcePrimes49);sourceIndex49++){
+ onePrime49=sourcePrimes49[sourceIndex49];
+ print("GENERIC49_COMPONENT index="+string(sourceIndex49)+" degree="+string(vdim(std(onePrime49))));
+ write(genericOut49,"ideal prime49_"+string(sourceIndex49)+";");
+ for(entry49=1;entry49<=size(onePrime49);entry49++){write(genericOut49,"prime49_"+string(sourceIndex49)+"["+string(entry49)+"]="+string(onePrime49[entry49])+";");}
+}
+close(genericOut49);
+int primeEquality49=0;
+if(size(sourcePrimes49)==1){if(size(reduce(sourcePrimes49[1],sourceGeneric49))==0 && size(reduce(sourceGeneric49,std(sourcePrimes49[1])))==0){primeEquality49=1;}}
+print("GENERIC49_RESULT components="+string(size(sourcePrimes49))+" original_ideal_prime="+string(primeEquality49)+" affine_contraction_checked=false normalization_performed=false");
+print("GENERIC49_ALL_CHECKS_PASS");quit;
