@@ -196,6 +196,15 @@
           "backend"
         ],
         "design": "one_factor"
+      },
+      {
+        "id": "C-complete",
+        "arms": [
+          "u"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Every reported succeeded execution has one independently replayed recovery and rejected corrupt scalar."
       }
     ],
     "aa_not_applicable": null,
@@ -343,7 +352,7 @@
   "decision_rule": {
     "text": "Report verified executions and largest rung completed by both seeds and A/A; retain incomplete rung and record higher rungs as unattempted. No global maximum, speedup or fastest-tool conclusion.",
     "comparison_ids": [
-      "C-aa"
+      "C-complete"
     ],
     "threshold": "every reported recovery independently replayed; all attempted rung cells accounted for",
     "statistic": "exact completed recovery count and descriptive per-execution stage clocks",
@@ -409,10 +418,10 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "20d752c659619505a0b9f323196644ff8739eb3fb2b61be70805db8fff8e69b9",
+    "commit": "7b6125f8e9494c4bc79570da94cecad8b91492c1",
+    "frozen_at": "2026-10-30T03:02:12Z",
+    "filed_before_affected_data": true
   }
 }
