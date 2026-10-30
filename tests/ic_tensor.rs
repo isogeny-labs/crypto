@@ -1,9 +1,27 @@
 //! `ic tensor`: the ecdl-tensor-ic crate through the research CLI.
 use serde_json::Value;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
+
+fn ic_binary() -> PathBuf {
+    option_env!("CARGO_BIN_EXE_ic")
+        .or(option_env!("IC_TEST_BINARY"))
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            // Selected-bin unit tests do not get CARGO_BIN_EXE. Full target
+            // builds put the CLI next to deps; the dedicated CI step sets the
+            // exact freshly built path explicitly.
+            std::env::current_exe()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join(format!("ic{}", std::env::consts::EXE_SUFFIX))
+        })
+}
 
 fn ic(args: &[&str]) -> (bool, Value) {
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(args)
         .arg("--json")
         .output()
