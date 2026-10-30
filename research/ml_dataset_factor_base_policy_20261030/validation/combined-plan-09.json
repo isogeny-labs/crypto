@@ -1,0 +1,44 @@
+{
+  "schema": "proposal-software-validation-plan/v1",
+  "base_commit": "655b690ef56d6869023a41326a127bf319cf4342",
+  "overlay": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/unified-v2-runtime-candidate-09/combined.patch",
+    "sha256": "8ce140a8527b61fdb50be78eadd44e172afaa3348bb6b8c9e909d5bc946afc5f"
+  },
+  "scope": "Native copied-control workflow integration example tests; 25 library overlay records unchanged from08; expected31 tests",
+  "snapshot_directory": "/home/ec2-user/ml-dataset-work-20261028/unified-v2-runtime-snapshot-09",
+  "source_binding": "Every copied input matches base Git blob and mode before overlay; final file-set, byte hashes and modes guarded before/after execution",
+  "build_git_dirty": true,
+  "wall_timeout_seconds": 1800,
+  "kill_grace_seconds": 30,
+  "cargo_jobs": 8,
+  "rayon_threads": 8,
+  "test_threads": 1,
+  "shared_target": "/home/ec2-user/crypto-ml-dataset-20261028/target",
+  "admission": "Require terminal combined-full-01 and retained outcome; diagnose any failure before proceeding. Require snapshot09 archive/readback, committed plan, source guards, and no parallel own Cargo. A focused controller result never overrides a full-library failure.",
+  "stop_rule": "Run phases sequentially; stop first failing phase and retain immutable evidence. No automatic retry.",
+  "remaining_requirements": [
+    "Owner donor reconciliation",
+    "Executed native CLI acceptance including startup/restore and all controls",
+    "Full library and PR delivery",
+    "Whole-worker instructions and cloud pilot"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0,
+  "commands": [
+    [
+      "cargo",
+      "test",
+      "--locked",
+      "--release",
+      "--example",
+      "dataset_startup_cli_fixture",
+      "--",
+      "--test-threads=1"
+    ]
+  ],
+  "phase_order": [
+    "fixture"
+  ],
+  "supersedes": "Prospective controller-only increment after26 passing tests on08; implements16-slot ledger and CLI control calls, source binding and signal rejection. No actual acceptance workflow invoked by unit phase."
+}

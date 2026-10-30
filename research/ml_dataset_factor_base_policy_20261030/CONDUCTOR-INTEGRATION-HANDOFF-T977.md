@@ -80,3 +80,23 @@ It must be integrated before actual copied negative commands are qualified.
 Donor HEAD3adc85e5 was rechecked unchanged at20:26Z; T887 remains claimed andT977
 proposed without acknowledgment. No shared source or reservation changed. This
 committed handoff update is not a direct-message delivery receipt.
+
+Update 2026-10-30T21:05Z - native control workflow source increment:
+
+Candidate09 implements the16-slot copied-control workflow, strict diagnostic
+classification, storage admission before copying, original-source readback,
+explicit native/control workflow intervals, missing/stopped ledgers and compiled
+control/custody source bindings. Signal patch01 is integrated. Slot7 preserves
+PDP-witness claims to reach route-preflight validation; slot9 removes both capture
+companions. All25 library records equal08. Four controller sources changed/added;
+expected example suite31 tests. Formatting, parent review,36file hash/size checks
+and complete patch apply checks passed; compilation and actual workflow execution
+are pending. Full-library08 run remains active and separate.
+
+Complete overlay8ce140a8527b61fdb50be78eadd44e172afaa3348bb6b8c9e909d5bc946afc5f;
+candidate archive freshGETbcc6dfd525a9fd575dcc7cbd37fafab8b551f06273f6eb836a5ce2279181d26d.
+Source/contract/review archive freshGETf6f19961f56b922ce7076c9212fe9d9a2249d25b9bc324fa1ff69ca3737b7f0b.
+Local: /home/ec2-user/ml-dataset-work-20261028/native-control-workflow-01 and
+unified-v2-runtime-candidate-09. Validation plan: combined-plan-09.json.
+Snapshot09 preparation is in progress. Native acceptance API/export gates are
+recorded explicitly in the implementation; no source owner acknowledgment assumed.
