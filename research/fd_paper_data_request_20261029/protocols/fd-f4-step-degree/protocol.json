@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "FD-F4-STEP-DEGREE-20261029",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-29",
   "repository": "crypto",
   "study_dir": "research/fd_paper_data_request_20261029/protocols/fd-f4-step-degree",
@@ -10,8 +10,12 @@
   ],
   "links": {
     "paper": "crypto:papers/ecdlp-index-calculus-treatise/sections/falldegree.tex (Table 6.3)",
-    "instances": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json and FD-BINARY-CLOSURE-EXT instances",
-    "prerequisite": "examples/f4_f2_sysfile_degree.rs (to be written before freeze): reads a .sys file, runs cryptanalysis::pq_f4_f2::groebner_basis_f4, prints the degree of every F4 step, the maximal step degree D_reg, the step at which 1 appears, and the counted units"
+    "instances": "inputs/instances_m2_recorded.json (crypto-autoresearcher instances.json @ 4d3b9a29) and P draws n=34-48",
+    "instrument": "crypto:examples/fd_m2_degrees.rs --f4 (builds the descent natively and reports F4Stats.degree_reached = D_reg, solving_degree, refuted, counted word XORs)",
+    "runner": "crypto:.github/workflows/fd-paper-degrees.yml stage f4",
+    "pilot": "2026-10-30: on R11a, R13a, R15a, R19a, P17a, P21a, P21c the F4 basis is {1} with degree_reached equal to the recorded d_F",
+    "v1_freeze": "protocol_sha256 3ede7e827fc457c340f761f5d8e87b1303484be3c3793e68c34f132ce9db9418 at commit 5e8c0fbe (superseded by amendment A1 before any data)",
+    "export": "runs/<stage>/executions.jsonl -> experiment_protocol.py from-rows -> runs/<stage>/export.json; check-export --verify-files. Named cells (recorded instance names, R41, sat33, f4-P34, ...) sit outside the tool's numeric seed table and each arm covers its own instance set by design; those check-export findings are expected and reported, not suppressed."
   },
   "question": "On the same binary S_3 descent systems whose last fall degree d_F is known, what maximal step degree D_reg does an F4 run reach, and does it reproduce Kousidis and Wiemers' published D_reg (4 at n=34-36, 5 at n=37-48) on Semaev's polynomial subspace?",
   "claims": [
@@ -81,18 +85,20 @@
           [
             "cargo",
             "build",
+            "--locked",
             "--release",
             "--example",
-            "f4_f2_sysfile_degree"
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
-        "flags": {},
-        "env": {
-          "RAYON_NUM_THREADS": "1",
-          "OMP_NUM_THREADS": "1"
+        "flags": {
+          "engine": "cryptanalysis::pq_f4_f2::groebner_basis_f4 (normal selection, MAX_MATRIX_WORDS 2^27 per step)"
         },
-        "threads": 1
+        "env": {
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
       },
       "parameters": {
         "selection": "normal"
@@ -122,35 +128,6 @@
       }
     },
     {
-      "id": "f4-aa",
-      "role": "control_aa",
-      "description": "f4 rerun on every instance with a different input variable order (reverse): D_reg must be unchanged, or the dependence on order is reported.",
-      "instrument": {
-        "repo": "crypto",
-        "commit": null,
-        "build": [
-          [
-            "cargo",
-            "build",
-            "--release",
-            "--example",
-            "f4_f2_sysfile_degree"
-          ]
-        ],
-        "binary_sha256": null,
-        "flags": {},
-        "env": {
-          "RAYON_NUM_THREADS": "1",
-          "OMP_NUM_THREADS": "1"
-        },
-        "threads": 1
-      },
-      "parameters": {
-        "variable_order": "reversed"
-      },
-      "same_instrument_as": "f4"
-    },
-    {
       "id": "pos-small",
       "role": "control_positive",
       "description": "Instances with d_F = 3 (P17, R11, R13): F4 must refute with D_reg >= 3 and return 1.",
@@ -161,18 +138,20 @@
           [
             "cargo",
             "build",
+            "--locked",
             "--release",
             "--example",
-            "f4_f2_sysfile_degree"
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
-        "flags": {},
-        "env": {
-          "RAYON_NUM_THREADS": "1",
-          "OMP_NUM_THREADS": "1"
+        "flags": {
+          "engine": "cryptanalysis::pq_f4_f2::groebner_basis_f4 (normal selection, MAX_MATRIX_WORDS 2^27 per step)"
         },
-        "threads": 1
+        "env": {
+          "OMP_NUM_THREADS": "4"
+        },
+        "threads": 4
       },
       "parameters": {},
       "same_instrument_as": "f4"
@@ -180,9 +159,9 @@
   ],
   "controls": {
     "aa": {
-      "present": true,
-      "comparison": "C-aa",
-      "not_applicable_reason": null
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "F4 is deterministic for a fixed input and thread-independent in its step degrees; the closure protocol's A/A covers the shared build. A variable-order sweep would be a second factor, not a noise floor"
     },
     "positive": {
       "present": true,
@@ -241,8 +220,8 @@
       },
       {
         "name": "variable_order",
-        "treatment": "crossed",
-        "how": "default and reversed on every instance (A/A arm)"
+        "treatment": "fixed",
+        "how": "build_decomposition_system's order (summand 1 then summand 2, basis order)"
       },
       {
         "name": "engine",
@@ -272,20 +251,9 @@
         ],
         "design": "absolute",
         "threshold": "D_reg equal at every n where both exist"
-      },
-      {
-        "id": "C-aa",
-        "arms": [
-          "f4",
-          "f4-aa"
-        ],
-        "differs_in": [
-          "variable_order"
-        ],
-        "design": "aa"
       }
     ],
-    "aa_not_applicable": null,
+    "aa_not_applicable": "see controls.aa",
     "crosses_map": false
   },
   "randomization": {
@@ -295,10 +263,10 @@
       "method": "protocol_hash_sha256",
       "seeds": [],
       "nonce": null,
-      "note": "seeds for the new P instances only"
+      "note": "one seed per n: first 8 bytes of sha256(protocol_sha256 \\n f4 \\n f4-P<n> \\n 0), written to seeds.tsv after freeze"
     },
     "instance_sampling": {
-      "rule": "all 93 recorded m=2 instances with n>=11, the 12 chain instances, plus 2 new P instances per n=34-48 not already present",
+      "rule": "all 93 recorded m=2 instances plus 2 P draws per n=34-48 (fd_m2_degrees --draw n:P:2, seed per n from seeds.tsv, solvable draws reported and replaced)",
       "independent_of_arm": true
     },
     "blinding": {
@@ -308,7 +276,7 @@
     }
   },
   "sample_size": {
-    "instances": 135,
+    "instances": 123,
     "replicates": 1,
     "warmups": 0,
     "power": {
@@ -322,11 +290,11 @@
       "note": "exact per-instance values; C2 is an equality check per n"
     },
     "preflight_runtime": {
-      "fixed_seconds": 30,
+      "fixed_seconds": 600,
       "per_sample_seconds": 3600,
-      "threads": 1,
-      "estimated_total_seconds": 600000,
-      "measured_on": "not measured for this driver; Kousidis-Wiemers report 188-103,200 s and 1.2-208 GB per n=34-48 in Magma. A pilot at n=34 and n=40 sets the budget before freeze"
+      "threads": 4,
+      "estimated_total_seconds": 400000,
+      "measured_on": "pilot at n<=21 only (seconds); Kousidis-Wiemers report 188-103,200 s and 1.2-208 GB per n=34-48 in Magma. The engine caps one step at 2^27 words (1 GiB); a larger step stops the run as oversize (censored)"
     }
   },
   "metrics": {
@@ -410,11 +378,11 @@
     "timed_primary_justification": null
   },
   "execution": {
-    "backend": "isolab-k8s",
-    "queue": "isolab-eks spot (throughput pool)",
+    "backend": "ephemeral",
+    "queue": "GitHub Actions ARC runner crypto-eks-highmem (Karpenter Spot on EKS, 16 CPU, 120 GiB pod), workflow fd-paper-degrees.yml stage f4",
     "placement": {
-      "instance_type": "memory-optimised, up to 256 GiB for n>=45",
-      "cpus": 2,
+      "instance_type": "Karpenter-chosen x86 Spot node",
+      "cpus": 16,
       "spot": true
     },
     "measurement_class": "search",
@@ -447,8 +415,7 @@
     }
   ],
   "invalidation_rules": [
-    "a run stopped by memory or time yields D_reg >= (last completed step degree), censored",
-    "an A/A difference is reported, and C2 then uses the default order only"
+    "a run stopped by its budget (timed_out) or the step cap (oversize) yields D_reg >= degree_reached, censored, and does not enter C2"
   ],
   "decision_rule": {
     "text": "C2 is supported at n when our P-instance D_reg equals the published value at n; it is reported per n, with no pooling.",
@@ -469,14 +436,16 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "crypto:papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py",
-      "sha256": null
+      "path": "crypto:examples/fd_m2_analyze.rs",
+      "sha256": "36503114f56b273db8af83866cae2edbe3e983bc8d9745df798994f20d9a0d38"
     },
     "inputs": [
-      "export.json"
+      "export.json",
+      "runs/<stage>/executions.jsonl (one row per execution attempt)"
     ],
     "outputs": [
-      "Table 6.3 with a measured D_reg column"
+      "fd_m2_analyze <study dir> > analysis.json (c0, aa, negative, closure_d4, closure_d5, p1, p2, f4)",
+      "Tables 6.1-6.3 regenerated from analysis.json by papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py (layout only)"
     ],
     "blinded": false,
     "frozen_before_data": true
@@ -508,12 +477,30 @@
       "verified_by": null
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Code review of the frozen analysis (PR #2902, Codex findings) before any run: the admission gate checked only C0, replaced satisfiable draws could enter P1, P1/P2 could be decided on a partial panel, and no execution rows existed for the unified export.",
+      "changes": [
+        "analysis_plan.script.sha256: fd_m2_analyze.rs revised; every substantive verdict now requires C0 pass, the A/A reruns present and agreeing, and no refuted planted control (instrument.admitted); the F4 comparison requires C0 and C1",
+        "replaced (satisfiable) draws are diagnostics only and enter no verdict",
+        "P1 holds only on all 18 planned R instances (one exact d_F <= 4 refutes it); P2 fails only when all 8 panel instances are exactly 5; otherwise undecided",
+        "run.sh writes runs/<stage>/executions.jsonl (status succeeded/failed/interrupted, wall seconds, exit code) and continues past a failed instance; the export is built from it with from-rows"
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256",
+        "version",
+        "freeze"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "99204dfea3165cddfbc2c14a89f079ea73a72bd29e0a13306e1033b5ac51b625",
+    "commit": "c58d38506131b50c410d16e7b4aeba0f4eaedf36",
+    "frozen_at": "2026-10-30T01:42:52Z",
+    "filed_before_affected_data": true
   }
 }
