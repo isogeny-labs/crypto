@@ -6531,7 +6531,10 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if let Instance::Fp4(_) = &inst {
+    if matches!(
+        &inst,
+        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
+    ) {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
     if let Instance::Ghs(_) = &inst {
