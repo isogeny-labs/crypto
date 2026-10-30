@@ -1247,3 +1247,32 @@ resource envelope, remaining empirical cohort and timing requirements.
 
 ### Errors
 No failed CI observed at delivery; old PR2869 evidence shards remain pending.
+
+## 2026-10-30 — Continuation consumer validation and resource admission
+
+### What was done
+The disjoint native analyzer and canonical exporter passed their final source-held validation. Native price:34 library tests,2CLI tests and an explicit retained1080-record integration preserving21600missing future slots. Exporter:54library,1CLI,1historical hash,3production tests and separately hydrated exact7-plan1260-workload replay passed; formatting and strict Clippy passed. Raw development failures and final receipts are retained. The prior CI run40984336538 finished successfully including16evidence-audit shards.
+
+### Decisions made
+Recorded the user's3hrs as10800cumulative active worker seconds and conservative outer expiry2026-10-30T05:05:50Z from recording at02:05:50Z. No reset of first-gate authorization. The revised conditional operational guard uses internal03:28:20Z and900secondsreserve, reviewed against four bounded kube calls and normal scheduling/Kubernetes enforcement. This is resource admission only; source/protocol/coverage admission remains distinct.
+
+### Open threads
+Commit reviewed consumers, bind postcommit source receipts, finish prospective protocol/source coverage, freeze and commit before any affected observations, then reconcile live jobs before submission. All1260 targets and qualified timing remain the original completion scope. No new experiment was launched by these software checks.
+
+### Errors
+The exporter's first hydrated integration overlapped a source edit and correctly failed its source-integrity check. Sources were then held unchanged through the successful final replay; both logs remain. The initial180-second guard missed cumulative bounded API delays; its review and the corrected900-second version remain separate records.
+
+### Prospective upper gate freeze
+Frozen the reviewed p186379target0 finite-count protocol before data: canonical body009499bc14e0ff3355a2373e621f73f0d5f1755b1cafb4f9d7e3e07d9cc2d091, file709cb1b8dca094588db8e85429e186db2580d45f996f20c1388a365bdf38b133. Native frozen validation passes. Exact source848f495fa7031f0d0b5ac0d811ec07aa29fed9e7 and additive postcommit build attestation are bound. No launch follows from validator success; independent exact-body coverage, committed publication and live owner/resource admission remain required. Software PR2912 created after branch push and auto-merge enabled. Initial PR creation ran before push completed and failed without creating a PR; the successful retry is the only PR.
+
+### Pre-data binary-size correction
+The solver-free actual upper-gate packaging check rejected version1 because analyzer byte-size fields were absent despite correct hashes. Preserved version1 and its failed diagnostic. Version2 adds only verified pair874424/cohort1653848byte metadata plus amendment/parent/freeze identity. Canonical body5762e40132c75a0a3d1cbc9ec6d64b777e2235ebc6d3c3364d9bdd299af45040, file65ad107e3d341e7783ed06942cc82b6c1b3a9084f9d88c92202b31fec7509746; native frozen validation passes. External coverage and actual missing-slot packaging are being rebound before launch. Scientific inputs, binary bytes, costs, resource caps, request and deadlines are unchanged. No experiment has started.
+
+### Upper-gate submission
+After corrected frozenprotocol and reviews were committed asf6c80df6e and pushed, submitted the exact reviewed request once. Runpencil-p186379-20261030-b1; controllerbuild3071de75-eb33-43ca-ba92-b44fd357c7de; nativecanonicalrequestdaf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a; internaldeadline03:28:20Z unchanged. Initial durable state is provisioning with0restores and no benchmark job. This is a submission/infrastructure receipt, not a completed mathematical result. SourcePR2912 merged; protocolPR2913 open with auto-merge enabled. No remaining-cohort launch is authorized by this gate submission.
+
+### Native observation reports
+Added a separate presentation-only native renderer for dynamic workload counts and incomplete outcomes; historical60-target renderer unchanged. Hash-bound native analysis becomes exactJSON/CSV, editableSVG/TeX andPDF. Eight tests, strictClippy andformatting pass; independentreviewc290a14f... inspected4PDFpages/2SVGs. Allmissingfixture0/18records and36nullcells; mixedsoftwarefixture18records,2completecells/34null. These are software examples, not empirical results. The renderer does not authenticate upstream pricing/admission or qualify timing. Uppergate is still running, attempt0/0restores, with generation1committed and readback verified; no result ratio yet.
+
+### Finite-cost graph and standalone provenance
+Added a separate36-cell ratioSVG with algorithm-only/calibration-inclusive series, explicit unavailable values, exact-fraction metadata and a shared axis. JSON/CSV remain exact; plotcoordinates are labelled visual approximations. Added visible title/run/scope to prevent standalone fixture misidentification. Final9tests, strictClippy andformatting pass; independentreviewaeded733... verified unchanged numericalprojection and visually inspected native raster. Root installed native librsvg2-tools2.59.2 and independently inspected the graph. Priorv2 andv3 softwarefixture packets remain separate; no experimental ratio is inferred. ProtocolPR2913 merged; reportdelivery continues on codex/pencil-observation-report-20261030.
