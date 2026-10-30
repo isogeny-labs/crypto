@@ -1088,3 +1088,59 @@ and fresh preflight remain. New twelve-slot tests still need Rust/device executi
 
 ### Errors
 No new failure. The current shared-host GPU is active; no duplicate task pod.
+
+## 2026-10-30T20:56Z — V16 interruption and V17 collection repair
+
+### What was done
+V16 console recorded six52-bit completions and63-101-u at1148.950seconds. Provider GET then returned404; DELETE also404, and a fresh complete list had no task pods. S3 had only source-checkout.tgz, no results archive. Preserved console bytes/hash, receipts and controller exit22 under interrupted-v16. PR2996 merged at83720a2463b2; current CI checked separately.
+
+### Decisions made
+Do not promote console-only cells into audited recovery rows: certificates were not collected. V17 source/targets/caps remain frozen. A dated collection addendum adds60-second partial artifact copies and tolerates failed status reads without deleting a potentially healthy worker. No process restore. All clocks remain L0. Reviewed RunPod APIv2 overview and repository artifact/checkpoint rules.
+
+### Open threads
+Run V17 on one GPU after fresh absence/capacity/checkpoint gate; collect final or partial artifacts, independently verify actual certificates, then publish outcomes.
+
+### Errors
+Cause of provider disappearance unknown; no result archive exists. V16 is closed as interrupted, not silently retried.
+
+## 2026-10-30T21:00Z — V17 allocation refused
+
+### What was done
+Created one V17 allocation request after checkpoint gate and fresh inventory/capacity checks. RunPod returned HTTP402 Payment Required: account balance too low. Complete reconciliation found zero matching pods; controller91. Zero experimental trials started. Recorded sanitized response, request template and source/protocol/collection hashes in launch-refused-v17.
+
+### Decisions made
+No blind POST retry and no payment changes. User notified that top-up is required. No new run report required for a refused allocation with no run directory; V16 report rendered and its one page inspected.
+
+### Open threads
+After account funding, reconcile live inventory and prepare a fresh bounded attempt with new signed artifact URLs. Twelve-slot device/Rust validation and the full arity panel remain queued.
+
+### Errors
+HTTP402 is an external funding dependency; no GPU allocated.
+
+## 2026-10-30T21:10Z — Requested RTX5090 panel
+
+### What was done
+Owner reported account replenished and requested5090or4090. Selected32GB RTX5090 secure catalog1.19/hour; cap1.20. NVIDIA compute-capability table confirms5090 andPRO6000Blackwell both12.0, so kernels/build remain sm_120. Added explicitGPU selector, one-device and capability guards; five guardfixtures pass. Both controllerfault-injectionpaths pass. Protocolv18 frozen26446177ac80fae9ef001edef438e3a104c6bd73ae40bb0cf2a283463841038e; sourcee2cdde6d6f1fd5c316d2e8c5b5dfc24723e80eff. OriginalGit sourcearchive b597dd5d362d2fcd8327496e64ed5408d859a8f9c4bb9763a2ed902d1b5cef41 uploaded and freshGETbyteequal.
+
+### Decisions made
+Same52/63-bit targets,m8/m10/m12 and limits as unexecutedV17; lowerVRAM admission is part of this distinct hardwarepanel. No cross-run timing comparison. Prefer5090;4090wouldrequireseparatesm_89build/contract. Partial artifact copies are not restorecheckpoints.
+
+### Open threads
+Launch oneV18aftercheckpointgate; fullnewarityRust/device/sanitizerchecks precede data. PR2996 now has an evidence-audit shard8failure and other auditshards pending; inspect actual failure logs whenavailable, do not call its CIgreen. PR2997 carries current work.
+
+### Errors
+FirstV18draftliteratureentry failedschema; corrected before freeze,zero findings. Sourceindex-pack on sharedfilesystem failedbadfiledescriptor; local scratch rehearsal passed. Firstadministrativefaultfixture omittedrgfromPATH; corrected fixture passed; no provider call occurred in these tests.
+
+## 2026-10-30T21:18Z — RTX4090 launched
+
+### What was done
+Owner-authorized4090fallback allocated oneNVIDIAGeForceRTX4090 pod25f10of8l9nl6i at21:17:08.633UTC,US-NC-1,0.89USD/hour. Sourcee8e1c819df8901100db0254a849271130e6cca90,archive95a046ed6b1a064109024976c775468e138ca96c045eebbe763f5c17bd7cd58d,protocolv19b58d0dfe47bc039a6160ea7912374d37ff30f595e2daea262490beef58ac5422. Original1149blobIDsverified andS3freshGETequal. Checkpointgatepassed20261030T211514Z-c7444548f1d1 beforeallocation.
+
+### Decisions made
+Use sm89 acrossvalidator and aritylauncher; fixedCUDA13.2image unchanged. Sixmodel/architectureguards pass andcontrollerhealthy/absentfaulttests pass. Preservealladmissionlimits/timeouts andsamearitycert/crossarityscalarchecks.
+
+### Open threads
+ControllerPID1255083,exec30852,admin/home/ec2-user/ecbench-e2e-20261030-v19. Do notrestart. Preflight/fullpanelpending. Partialuploads60s configured; verifyfirstactualupload. Collectfinalorpartialarchiveanddeleteownpod beforecompletion.
+
+### Errors
+V17balanceandV18capacityrefusals retained separately. PR2996auditshard8failedonunrelatedpencil_large_primecheckpointg9missinghost.json; no repairorclaimofallCIgreen.
