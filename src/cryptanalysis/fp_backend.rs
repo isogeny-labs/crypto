@@ -2703,6 +2703,37 @@ mod bounded_arithmetic_tests {
             assert_eq!(failure.reserved_work, FP64_ARITHMETIC_SETUP_WORK);
         }
     }
+
+    #[test]
+    fn bounded_fp64_setup_complete_callback_expiry_withholds_field() {
+        let deadline = Instant::now() + Duration::from_secs(1);
+        let mut stages = Vec::new();
+        let failure = Fp64Arithmetic::try_new(
+            17,
+            FP64_ARITHMETIC_SETUP_WORK,
+            FP64_ARITHMETIC_SETUP_BYTES,
+            deadline,
+            &mut |event| {
+                stages.push(event.stage);
+                if event.stage == FieldSetupStage::Complete {
+                    // Construction is ready, but a late acknowledged callback
+                    // must not publish a usable field past the original limit.
+                    while Instant::now() < deadline {
+                        std::thread::yield_now();
+                    }
+                }
+                Ok(())
+            },
+        )
+        .unwrap_err();
+        assert_eq!(
+            stages,
+            [FieldSetupStage::Admitted, FieldSetupStage::Complete]
+        );
+        assert_eq!(failure.stop, FieldSetupStop::Deadline);
+        assert_eq!(failure.reserved_work, FP64_ARITHMETIC_SETUP_WORK);
+        assert_eq!(failure.reserved_bytes, FP64_ARITHMETIC_SETUP_BYTES);
+    }
 }
 
 #[cfg(test)]
