@@ -824,3 +824,87 @@ extension and freeze any larger probe. Recheck PR2985 at its final head.
 ### Errors
 Poppler reported a tagged-PDF metadata warning; both pages rendered and were
 visually inspected successfully. No v13 result is claimed during preflight.
+
+## 2026-10-30T19:06UTC — separate 63-bit probe prepared
+
+### What was done
+Reconciled v13 pod7tugqyoxyvnikm and its existing controller process; no duplicate
+launch. Eight52-bit controls and both61-bit targets have completed;62-bit data
+is still running on pinnede9e87ffb8380. PR2985 merged at5c0dd7ee432f. Its head
+later showed four failed CI checks; merged status is not a green-CI claim.
+Upstream2c8f16e2eca1 carries the owner's binary_semaev_chain_sat delimiter fix.
+Prepared separate native launcher/ladder/analyzer and protocol-v14 for52/63bits.
+
+### Decisions made
+Read FIELD63.md, existing validation/fixture code, and HAC14.32/14.33/14.36
+https://cacr.uwaterloo.ca/hac/about/chap14.pdf before the new plan. Use the fixed
+63-bit modulus rule precprime(2^63-2^34) to leave full-u64 hash and order room.
+Preserve all four52-bit controls, then two63-bit full-cache/fallback targets;
+7200s per63-bit solve,18000s worker,18300s controller. Same25%free-memory
+reserve and row/work caps. Launch only after v13 archive/deletion. Complete
+Rust/host/CUDA arithmetic and all query sanitizers before new data. No root
+crypto build locally, no cross-version speed claim, no global maximum claim.
+
+### Open threads
+V13 archive/certificates/cache-admission details, raw publication and report.
+V14 GPU/Rust validation and actual recovery are unexecuted; protocol preparation
+is not evidence of63-bit success. Preserve scalar-corruption rejection and
+complete-rung stopping. Update exact-current-head CI on the follow-up PR.
+
+### Errors
+Initial protocol validation caught the required draft freeze block omitted by
+metadata copying; restored before freeze/data. A stray nonexistent helper path
+returned127 after successful native-instrument compilation; no run occurred.
+
+## 2026-10-30T19:12UTC — optional negative GPU prefilter
+
+### What was done
+Added opt-in blocked Bloom prefilter before exact relation lookup. Every left
+point key is inserted using atomic OR after sort completion; only definite
+misses bypass the existing exact comparison. Added bounded word sizing,
+phase-aware storage accounting, TABLE filter_bytes, host fixtures and CUDA
+fixtures including a deliberately saturated filter. Existing deterministic
+witness, infinity, empty-plan, late-hit and reprepare tests remain enabled.
+
+### Decisions made
+Read the primary GPU Bloom paper, NVIDIA cuCollections interface/policies and
+Vigna SplitMix source before implementation; links and argument are in
+NEGATIVE-FILTER.md. Keep frozenv13/v14 source pins unchanged. This candidate
+requires a separately frozen panel and GPU checks; no measured gain claimed.
+Filter storage is charged before right-cache admission; any fallback must be
+reported. Preserve exact certificate replay and corrupt-scalar rejection.
+
+### Open threads
+CUDA build and sanitizer validation, full-pipeline matched controls, and any
+larger probe. V13 first62-bit target still runs; v14 prepared but not launched.
+No automatic default change or claim of fastest external implementation.
+
+### Errors
+None in the standalone filter fixture or host syntax check. GPU checks have
+not run; pending validation is not a pass.
+
+## 2026-10-30T19:30UTC — first-rung stopping audit
+
+### What was done
+Fixed the post-run checker's regression controls to accept a complete first
+rung containing a recorded limit. Previously its own truncation test assumed
+that first rung was successful, causing the audit to panic on a valid stop.
+Added a check rejecting any later execution after that stopping boundary and
+made the verification-label corruption invalid for successful and failed rows.
+
+### Decisions made
+This is an audit correction; no frozen protocol, measurement, solver or active
+GPU source changes. Native checker compiles with warnings denied and passes
+retained v11 and v9 records plus an explicitly synthetic, temporary first-rung
+limit fixture. Do not publish the synthetic fixture as experiment data.
+
+### Open threads
+V13 has11verified rows; final62-bit target runs on pod7tugqyoxyvnikm. V15 pins
+23dc8a61ca92 and remains unexecuted. PR2991 merged after13success/5skip checks.
+After collection, publish raw evidence before the fresh report and inspect all
+pages. The updated audit includes one positive stop and nine negative controls
+when the first rung succeeds; a valid first-rung stop is itself accepted.
+
+### Errors
+The old regression-control assumption was the error; exact plan validation
+already recognized first-rung stops. No recorded data was changed.

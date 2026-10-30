@@ -1,0 +1,20 @@
+# Falsifier 2 raw results, 2026-10-30. Shared Mac, load average ~21-23 during runs, CPU time (gp gettime) / monotonic clock (C).
+# PARI/GP 2.17.3 qflll (NOT fplll). Proxy lattices (see DESIGN.md §5.2). Single run each; no spread estimated.
+# lll.gp  (dim 9: batched over 3000 prebuilt matrices; dim 49: 3-5 reps)
+dim=9 bits(p)=60 modulus=p^1 B=2^3.3  qflll cpu = 0.1563 ms/call (reps=3000)
+dim=9 bits(p)=100 modulus=p^1 B=2^5.5  qflll cpu = 0.2437 ms/call (reps=3000)
+dim=9 bits(p)=160 modulus=p^1 B=2^8.9  qflll cpu = 0.3850 ms/call (reps=3000)
+dim=9 bits(p)=256 modulus=p^1 B=2^14.2  qflll cpu = 0.6613 ms/call (reps=3000)
+dim=49 bits(p)=60 modulus=p^1 B=2^3.3  qflll cpu = 6.800 ms/call (reps=5)
+dim=49 bits(p)=100 modulus=p^1 B=2^5.5  qflll cpu = 10.400 ms/call (reps=5)
+dim=49 bits(p)=160 modulus=p^1 B=2^8.9  qflll cpu = 16.400 ms/call (reps=5)
+dim=49 bits(p)=60 modulus=p^3 B=2^3.3  qflll cpu = 51.333 ms/call (reps=3)
+dim=49 bits(p)=100 modulus=p^3 B=2^5.6  qflll cpu = 88.333 ms/call (reps=3)
+dim=49 bits(p)=160 modulus=p^3 B=2^8.8  qflll cpu = 117.333 ms/call (reps=3)
+# lookup.c  (cc -O3 -march=native; p ~ 2^62, Montgomery 64-bit; synthetic keys)
+table 2^16 entries (1 MB): lookup 13.6 ns
+   direct-subtraction candidate (both signs, 2 lookups): 49.2 ns/candidate
+table 2^20 entries (17 MB): lookup 22.8 ns
+   direct-subtraction candidate (both signs, 2 lookups): 74.9 ns/candidate
+table 2^24 entries (268 MB): lookup 43.2 ns
+   direct-subtraction candidate (both signs, 2 lookups): 122.9 ns/candidate

@@ -188,6 +188,61 @@ static void field_boundary_checks() {
     }
   }
 }
+#ifdef ER_NEGATIVE_FILTER
+__global__ void check_filtered(const DeviceRow *rows, U size,
+                                const Point *queries, U count, U *answers,
+                                NegativeFilter filter) {
+  U i = U(blockIdx.x) * BLOCK + threadIdx.x;
+  RightPartials partials;
+  partials.filter = filter;
+  if (i < count)
+    answers[i] = relation_lookup(rows, size, queries[i], nullptr, 0, partials);
+}
+static void negative_filter_boundaries() {
+  Curve c = curve(65521, 0, 7);
+  std::vector<Row> full{{Point{}, 9}, {Point{}, 2}};
+  std::vector<Point> queries{Point{}};
+  for (U x = 0; x < c.f.p; ++x) {
+    Point q;
+    if (!c.lift(x, 0, q)) continue;
+    for (Point point : {q, c.neg(q)}) {
+      queries.push_back(point);
+      if (x % 13 == 0)
+        for (U id : {U(9), U(2), U(UINT32_MAX)}) full.push_back({point, id});
+    }
+  }
+  std::sort(full.begin(), full.end(), RowLess{});
+  std::vector<DeviceRow> rows;
+  for (const auto &r : full) rows.push_back(device_row(r.point, r.id));
+  std::sort(rows.begin(), rows.end(), DeviceRowLess{});
+  thrust::device_vector<DeviceRow> drows(rows.begin(), rows.end());
+  thrust::device_vector<Point> dqueries(queries.begin(), queries.end());
+  thrust::device_vector<U> answers(queries.size());
+  const U words = filter_word_count(rows.size());
+  thrust::device_vector<unsigned long long> bits(words, 0);
+  build_negative_filter<<<(rows.size() + BLOCK - 1) / BLOCK, BLOCK>>>(
+      data(drows), rows.size(), data(bits), words - 1);
+  cuda_check(cudaGetLastError());
+  for (unsigned mode = 0; mode < 3; ++mode) {
+    if (mode == 1)
+      cuda_check(cudaMemsetAsync(data(bits), 0xff, words * sizeof(U)));
+    NegativeFilter filter{mode == 2 ? nullptr : data(bits), words - 1};
+    check_filtered<<<(queries.size() + BLOCK - 1) / BLOCK, BLOCK>>>(
+        data(drows), rows.size(), data(dqueries), queries.size(), data(answers), filter);
+    cuda_check(cudaGetLastError());
+    std::vector<U> got(queries.size());
+    cuda_check(cudaMemcpy(got.data(), data(answers), got.size() * sizeof(U),
+                          cudaMemcpyDeviceToHost));
+    U misses = 0;
+    for (size_t i = 0; i < queries.size(); ++i) {
+      U expected = lookup(full.data(), full.size(), queries[i]);
+      require(got[i] == expected);
+      misses += expected == UINT64_MAX;
+    }
+    require(misses > 0); // Saturation forces false positives through exact lookup.
+  }
+}
+#endif
 int main() {
   try {
     field_boundary_checks();
@@ -213,6 +268,9 @@ int main() {
     require(U(DenseRow(0, UINT32_MAX).id) != UINT64_MAX);
     wide_prefix_boundaries(62);
     wide_prefix_boundaries(63);
+#ifdef ER_NEGATIVE_FILTER
+    negative_filter_boundaries();
+#endif
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
     require(packed_winner_fits(UINT64_MAX, 1));
@@ -340,6 +398,9 @@ int main() {
           base.assign(ps.begin(), ps.begin() + size);
         Plan p = plan(c, bases, 4096);
         device.prepare(p);
+#ifdef ER_NEGATIVE_FILTER
+        require(device.negative_filter_bytes() == filter_word_count(p.left) * sizeof(U));
+#endif
         host.prepare(p);
         for (Point target : {ps.front(), Point{}, ps.back(), ps.front()}) {
           Result got = device.find(target, p.left + p.right);
