@@ -11,7 +11,8 @@ list omits can change the page's numbers with no check run, and the page goes
 stale until some unrelated change happens to trigger one.  The list is kept by
 hand and the builder's inputs grow with every round, so this runs the builder
 under a read recorder and tests every file it opened against the workflow's
-`pull_request` and `push` lists.  The builder is itself on both lists, so the
+`pull_request` and `push` lists (an event the workflow does not declare is
+skipped).  The builder is itself on each list, so the
 change that adds an input also runs this check.
 
 Stdlib only; the workflow's filter is read as text.  Only the glob forms the
@@ -99,6 +100,11 @@ def glob_regex(pat: str) -> re.Pattern:
     return re.compile("^" + out + "$")
 
 
+def event_declared(workflow: Path, event: str) -> bool:
+    """Whether `on:` names the event; an undeclared event runs nothing to cover."""
+    return any(re.match(rf"^  {re.escape(event)}:", line) for line in workflow.read_text().splitlines())
+
+
 def event_paths(workflow: Path, event: str) -> list[str]:
     """The `paths:` list under `on: <event>:` of a workflow, read as text."""
     patterns: list[str] = []
@@ -137,6 +143,9 @@ def main() -> int:
     for wf in workflows:
         rel = wf.relative_to(REPO) if wf.is_relative_to(REPO) else wf
         for event in EVENTS:
+            if not event_declared(wf, event):
+                print(f"{rel}: no {event} trigger; nothing to cover")
+                continue
             patterns = event_paths(wf, event)
             if not patterns:
                 print(f"{rel}: no `paths:` list for {event}", file=sys.stderr)
