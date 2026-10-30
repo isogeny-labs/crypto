@@ -229,3 +229,57 @@ Commit this merge and its V11 validation driver, run V11, then publish the regul
 ### Errors (what went wrong, how it was handled)
 
 The broad preliminary git status scan spent minutes in filesystem access. Stopped only that exact read-only process; the queued single merge then ran and completed. No duplicate merge, rebase, force-push or evidence overwrite occurred.
+
+## 2026-10-30 21:35 UTC same-support proofs and merged library verified
+
+### What was done (commands, files, features)
+
+V11 at merge commit 57c1449cf8c3afdf7df7224da0a7fd13fa75c8aa completed the full library suite: 5782 passed, zero failed, 125 ignored. CLI/example and strict Clippy validation remain in progress. Delivered the three-page same-support-v2 PDF, dependency graph, standardized claims and evidence. Independent fresh Lean replay rebuilt both helper modules and both candidate modules, then checked theorem types and axioms; all five native steps exited zero.
+
+### Decisions made (and why)
+
+Report the coefficient identities and abstract same-support classifier exclusion at their exact hypotheses. Preserve the preceding failed attempts and independent source-fidelity reviews. The weighted-coordinate normalization and compiled Rust refinement remain separate proof obligations. Preserve source and HEAD until V11 terminates. Artifact delivery uses only the repository content-addressed review store; no runtime publication or scientific execution occurs.
+
+### Open threads (unfinished, pick up next time)
+
+Complete CLI/example and Clippy, deliver the compact independent-review archive, commit finished reports and terminal receipts, and open the regular PR. Preserve the campaign's 25200-second cumulative ceiling, 21:38:40 UTC scientific stop and 22:08:40 UTC absolute deadline.
+
+### Errors (what went wrong, how it was handled)
+
+The proof packet preserves the NFS timeout, missing import closure, failed first candidate and missing patch utility attempt. Successful corrected sources have distinct hashes and receipts. Source-fidelity review and independent replay were separate. No scientific cost ratio was created from software validation or proof compilation.
+
+## 2026-10-30 21:39 UTC proof delivery and scientific cutoff
+
+### What was done (commands, files, features)
+
+The independent-review archive was uploaded and fresh-download verified at SHA256 8a3bc72d274f5c890b4480619f2df78fd22204c4307db5c5f150bad86adef074. All thirteen archived Lean copies match its member hashes. They remain in archive custody; four canonical successful modules now have a pinned Lake project under integration/lean/same-support. The repository gate discovers that single project. Lake configuration elaboration passed with the pinned runtime; full Lake dependency resolution was not repeated.
+
+### Decisions made (and why)
+
+Keep failed and repeated historical sources out of executable target discovery without changing the proof gate or their bytes. Source manifests identify the exact successful modules. The 21:38:40 UTC scientific cutoff has passed; this lane launched no scientific payload. Continue software validation and repository delivery only.
+
+### Open threads (unfinished, pick up next time)
+
+V11 CLI/example compilation and strict Clippy remain in progress. Commit completed delivery after terminal checks, then create the PR and inspect applicable CI.
+
+### Errors (what went wrong, how it was handled)
+
+The first Lake configuration probe lacked its dynamic elaboration library and failed; the corrected bounded probe passed, with both receipts retained. The agent initially copied the project to a top-level integration directory; moved it into the owned research integration subtree and verified all seven source/context hashes. An additive relocation receipt preserves the original path record.
+
+## 2026-10-30 21:42 UTC V11 terminal validation passed
+
+### What was done (commands, files, features)
+
+All three V11 commands exited zero and their post-command source checks passed. The merged library has 5782 passing tests, zero failures and 125 ignored tests; owner-intake CLI has four passing tests; the example built and completed with zero defined tests. Strict library/CLI Clippy passed. The additive software-validation-final-v11.json binds terminal receipts to the merge commit and exact source hashes.
+
+### Decisions made (and why)
+
+Release the V11 HEAD/source freeze and commit completed reports, archive pointers, canonical proof project and terminal software receipts for PR review. No source tested by V11 changed during validation.
+
+### Open threads (unfinished, pick up next time)
+
+Push the branch, open the regular PR, enable auto-merge and inspect exact-head applicable checks and review state.
+
+### Errors (what went wrong, how it was handled)
+
+No V11 test or Clippy failures. The staged-tree artifact check passed. The size-check script requires a commit rather than a tree object; its preliminary invocation returned an interface error and will run on the delivery commit. No validation rule was changed.
