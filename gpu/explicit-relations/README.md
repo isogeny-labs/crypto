@@ -57,10 +57,14 @@ The hash-construction mode requires `p < 2^60`, prime `2p <= s <= 4p`,
 and lifts `x=z/2` with y parity `z mod 2`. It never closes signed hash bases
 under negation. Every `(slot, point)` remains a distinct matrix column.
 
-The existing Rust reduction retains its stricter bounds: `p <= 65521`, exact
-prime full group cardinality, cofactor one, 2–8 slots, at most 512 dense
-columns. This driver supports public nonidentity affine generator/target
-inputs and outputs a complete, independently replayable certificate.
+The Rust reduction retains its original exhaustive tiny-curve constructor
+and 512-column default. The standalone driver now uses an exact order witness:
+prime `5 <= p < 2^60`, prime `r < 2^61`, a nonzero on-curve P with `[r]P=O`,
+and a unique multiple of r in the integer Hasse interval. Ambiguous large
+orders are rejected. Tonelli–Shanks avoids an O(p) root table. There are 2–8
+slots; explicit limits allow up to 16384 columns and 2^24 hash candidates.
+The driver accepts public affine P/Q and emits an independently replayable
+certificate. These are implementation limits, not demonstrated scale claims.
 
 ## Implementation choices intended to reduce GPU work
 
@@ -74,7 +78,11 @@ inputs and outputs a complete, independently replayable certificate.
 - Keep the left table resident across targets from the same bases. The Rust
   adapter sends bases only when their exact contents change.
 - Stream right tuples in capped batches. Probe the sorted left table on the
-  device; return only witness indices. Preserve duplicate sums and select
+  device; return only witness indices. Large tables use at most 65537 u64
+  prefix offsets to restrict full-key binary search to one high-x-bit bucket.
+  Index setup and storage count toward cold preparation and memory admission;
+  `ER_QUERY_BINARY_REFERENCE` retains the unindexed path. Infinity uses the
+  full table. Preserve duplicate sums and select
   the minimum right ID, then minimum matching left ID, deterministically.
 - Check tuple products, grid bounds, explicit row caps, a conservative GPU
   allocation reserve, every CUDA error, every returned index and point sum.
@@ -117,7 +125,7 @@ recovery and serialized certificate replay.
 ## Complete bounded paper reduction
 
 ```text
-paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows
+paper-driver SERVICE p a b r Px Py Qx Qy m tau seed max_rows chunk_rows [max_columns max_work max_trials]
 paper-driver --verify CERTIFICATE
 ```
 
@@ -172,8 +180,9 @@ and CPU cost ledger do not silently invoke this external CUDA service.
 Use the validation record to distinguish source checks from device tests. Record
 the commit, source/binary hashes, CUDA/driver/compiler versions and actual GPU.
 For EKS, build an image from the resulting `crypto/main` commit, retaining its
-digest. No benchmark protocol was frozen and no performance comparison was
-run. The separate `crates/hashed-ecdl-tensor` implementation on main remains
+digest. Frozen diagnostic panels and the bounded full-recovery ladder are
+linked from the validation record and research studies. Their shared RunPod
+wall clocks are L0 observations, not certified speedups. The separate `crates/hashed-ecdl-tensor` implementation on main remains
 CPU code; this GPU service accelerates the bounded meet-in-the-middle path.
 The standalone Cargo manifest resolves that crate because the included
 reference module re-exports it, without building the root crypto package.

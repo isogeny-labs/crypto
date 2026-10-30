@@ -1,5 +1,6 @@
 #pragma once
 #include "host.hpp"
+#include <cstdio>
 #include <cuda_runtime.h>
 #ifdef ER_NORMALIZE_CUB_REFERENCE
 #include <cub/block/block_scan.cuh>
@@ -110,10 +111,38 @@ __global__ void build_left(Curve c, Bases b, unsigned split, U count,
 inline bool packed_winner_fits(U left, U count) {
   return left && count <= UINT64_MAX / left;
 }
+// Index the high x bits of the sorted full-point table. Each bucket retains
+// the original row order (including duplicate-point ids). Infinity sorts
+// before finite points and deliberately uses the unindexed lookup.
+__global__ void build_prefix(const Row *rows, U size, U bins, unsigned shift,
+                             U *offsets) {
+  U bucket = U(blockIdx.x) * BLOCK + threadIdx.x;
+  if (bucket > bins)
+    return;
+  Point key{bucket << shift, 0, false};
+  U lo = 0, hi = size;
+  while (lo < hi) {
+    U mid = lo + (hi - lo) / 2;
+    if (compare(rows[mid].point, key) < 0)
+      lo = mid + 1;
+    else
+      hi = mid;
+  }
+  offsets[bucket] = lo;
+}
+RF_HD U indexed_lookup(const Row *rows, U size, Point key, const U *offsets,
+                       unsigned shift) {
+  if (!offsets || key.inf)
+    return lookup(rows, size, key);
+  U bucket = key.x >> shift;
+  U first = offsets[bucket], last = offsets[bucket + 1];
+  return lookup(rows + first, last - first, key);
+}
 template <bool Packed>
 __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
                              U start, U count, const Row *left, U left_size,
-                             U *matches, unsigned long long *winner) {
+                             U *matches, unsigned long long *winner,
+                             const U *offsets, unsigned shift) {
   U local = U(blockIdx.x) * BLOCK + threadIdx.x;
   // Form target - sum(right) in Jacobian coordinates, then normalize once.
   Jac sum =
@@ -124,7 +153,7 @@ __global__ void search_right(Curve c, Bases b, unsigned split, Point target,
     sum = c.mixed(sum, target);
   Point residual = normalize_block(c, sum);
   if (local < count) {
-    U l = lookup(left, left_size, residual);
+    U l = indexed_lookup(left, left_size, residual, offsets, shift);
     if constexpr (!Packed)
       matches[local] = l;
     if (l != UINT64_MAX) {
@@ -172,6 +201,8 @@ class DeviceBackend {
   thrust::device_vector<Point> points;
   thrust::device_vector<Row> rows;
   thrust::device_vector<U> matches;
+  thrust::device_vector<U> prefixes;
+  unsigned prefix_shift = 0;
   thrust::device_vector<unsigned long long> winner;
   void admission(U bytes) {
     size_t free = 0, total = 0;
@@ -214,16 +245,40 @@ public:
     matches.shrink_to_fit();
     winner.clear();
     winner.shrink_to_fit();
+    prefixes.clear();
+    prefixes.shrink_to_fit();
     p = next;
     packed = packed_winner_fits(p.left, std::min(chunk, p.right));
 #ifdef ER_QUERY_REFERENCE
     packed = false;
 #endif
+    U bins = 0;
+#ifndef ER_QUERY_BINARY_REFERENCE
+    if (p.left >= 4096) {
+      unsigned bits = 0;
+      for (U v = c.f.p - 1; v; v >>= 1)
+        ++bits;
+      bins = 1;
+      unsigned index_bits = 0;
+      while (bins < 65536 && bins * 2 <= p.left / 32 && index_bits < bits) {
+        bins *= 2;
+        ++index_bits;
+      }
+      prefix_shift = bits - index_bits;
+    }
+#endif
     // 3 row buffers cover the retained table and conservative sort scratch.
     U bytes = product(p.left, 3 * sizeof(Row)) +
               product(p.points.size(), sizeof(Point)) +
-              (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U);
+              (packed ? 0 : product(chunk, sizeof(U))) + sizeof(U) +
+              (bins ? product(bins + 1, sizeof(U)) : 0);
     admission(bytes);
+#ifdef ER_TABLE_DIAGNOSTICS
+    std::fprintf(stderr,
+                 "TABLE left=%llu right=%llu bins=%llu admission_bytes=%llu\n",
+                 (unsigned long long)p.left, (unsigned long long)p.right,
+                 (unsigned long long)bins, (unsigned long long)bytes);
+#endif
     points.assign(p.points.begin(), p.points.end());
     rows.resize(p.left);
     if (!packed)
@@ -234,6 +289,12 @@ public:
                                             p.left, data(rows));
       cuda_check(cudaGetLastError());
       thrust::sort(rows.begin(), rows.end(), RowLess{});
+      if (bins) {
+        prefixes.resize(bins + 1);
+        build_prefix<<<blocks(bins + 1), BLOCK>>>(data(rows), p.left, bins,
+                                                  prefix_shift, data(prefixes));
+        cuda_check(cudaGetLastError());
+      }
       cuda_check(cudaDeviceSynchronize());
     }
   }
@@ -257,11 +318,13 @@ public:
       if (packed)
         search_right<true><<<blocks(n), BLOCK>>>(
             c, p.view(data(points)), p.split, target, start, n, data(rows),
-            p.left, nullptr, data(winner));
+            p.left, nullptr, data(winner),
+            prefixes.empty() ? nullptr : data(prefixes), prefix_shift);
       else
         search_right<false><<<blocks(n), BLOCK>>>(
             c, p.view(data(points)), p.split, target, start, n, data(rows),
-            p.left, data(matches), data(winner));
+            p.left, data(matches), data(winner),
+            prefixes.empty() ? nullptr : data(prefixes), prefix_shift);
       cuda_check(cudaGetLastError());
       cuda_check(cudaMemcpy(&best, data(winner), sizeof(best),
                             cudaMemcpyDeviceToHost));
