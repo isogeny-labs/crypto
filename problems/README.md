@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
 | [ECDLP dataset worker publication and cumulative admission](ml-ecdlp-dataset-durable-launch.md) | open | first durable native cloud cell and admitted large-corpus launch | approved scoped worker access, real PUT/GET/hash preflight, cumulative budget reservations, fresh restore and independent replay |
 
 | [Guarded fall-degree exact-pair Lean proof](guarded-fall-degree-lean-exact-pair.md) | open | a complete formal proof of the ordinary guarded three-abscissa pair `(4,5)` | checked degree-five normalization/resultant/grid/point bridges and the weighted syzygy/Koszul definition; the uniform degree-four obstruction is now formalized || [E12b On-Demand launch denied](fall-degree-e12b-on-demand-launch.md) | open | completion of registered fall-degree cell 3:24:7 after two Spot interruptions | administrator-authorized On-Demand execution environment, successful launch preflight, then unchanged Amendment 12 gates and four draws |
