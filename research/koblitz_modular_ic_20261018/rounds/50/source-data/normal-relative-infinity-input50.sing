@@ -1,4 +1,5 @@
 ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]=V^2+(z^2)*V+(z^3+z);relativeInfinityIdeal50[2]=T^16+(z^30+z^22)*T^8*V+(z^32+z^31+z^30+z^29+z^28+z^26+z^23+z^22+z^21+z^18+z^12+z^8+1)*T^8+(z^35+z^33+z^32+z^30+z^29+z^27+z^16+z^15+z^14+z^9+z^7+z^5)*T^4*V+(z^37+z^36+z^34+z^33+z^32+z^31+z^30+z^29+z^27+z^26+z^25+z^24+z^23+z^22+z^20+z^17+z^14+z^11+z^9+z^6)*T^4+(z^47+z^46+z^43+z^37+z^33+z^32+z^31+z^30+z^29+z^28+z^27+z^26+z^23+z^22+z^20+z^17+z^13+z^10+z^8+z^7+z^6+z^5)*T*V+(z^49+z^45+z^40+z^38+z^37+z^32+z^30+z^29+z^27+z^26+z^19+z^18+z^17+z^14+z^13+z^6)*T+(z^62+z^54+z^50+z^49+z^48+z^47+z^46+z^45+z^44+z^43+z^41+z^38+z^32+z^26+z^24+z^23+z^22+z^19+z^17+z^14+z^13+z^12+z^9+z^8)*V+(z^64+z^63+z^62+z^61+z^60+z^58+z^55+z^54+z^53+z^52+z^48+z^47+z^44+z^42+z^40+z^39+z^38+z^36+z^35+z^33+z^32+z^31+z^29+z^27+z^24+z^20+z^19+z^15+z^14+z^13+z^12+z^11+z^9+z^8+1);
+
 ring normalizationInput50=2,(x,y,p),wp(4,2,1);short=0;map actualModel50=relativeInfinity50,x,y,p;ideal sourceIdeal50=actualModel50(relativeInfinityIdeal50);
 LIB "normal.lib";
 LIB "primdec.lib";
@@ -41,7 +42,8 @@ for(gen50=1;gen50<=size(module50);gen50++){write(moduleOut50,"module50["+string(
 write(moduleOut50,"int delta50="+string(normalizedOutput50[3][2])+";");close(moduleOut50);
 int sourceDelta50=normalizedOutput50[3][2];
 def normalRing50=normalizedOutput50[1][1];setring normalRing50;
-if(charstr(basering)!="2"){ERROR("NORMAL_RELATIVE50_COEFFICIENT_DESCENT");quit;}
+print("NORMAL_RELATIVE50_COEFFICIENT_FIELD charstr="+charstr(basering)+" characteristic="+string(char(basering))+" parameters="+string(npars(basering)));
+if(char(basering)!=2 || npars(basering)!=0){ERROR("NORMAL_RELATIVE50_COEFFICIENT_DESCENT");quit;}
 link normalOut50="ASCII:w normalization50.sing";open(normalOut50);
 write(normalOut50,"ring normalized50=2,("+varstr(basering)+"),("+ordstr(basering)+");ideal norid;ideal normap;");
 int entry50;

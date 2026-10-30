@@ -3,6 +3,8 @@ option(redSB);short=0;
 execute(read("selected-prime50.sing"));
 execute(read("fractional-module50.sing"));
 execute(read("normalization50.sing"));
+print("VERIFY_RELATIVE50_COEFFICIENT_FIELD charstr="+charstr(basering)+" characteristic="+string(char(basering))+" parameters="+string(npars(basering)));
+if(char(basering)!=2 || npars(basering)!=0){ERROR("VERIFY_RELATIVE50_COEFFICIENT_DESCENT");quit;}
 ideal normalStd50=std(norid);
 map sourceMap50=selected50,normap;
 if(size(reduce(sourceMap50(selectedPrime50),normalStd50))!=0 || size(reduce(sourceMap50(originalIdeal50),normalStd50))!=0){ERROR("VERIFY_RELATIVE50_SOURCE_IDENTITIES");quit;}

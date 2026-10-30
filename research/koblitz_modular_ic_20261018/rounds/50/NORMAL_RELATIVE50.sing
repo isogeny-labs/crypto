@@ -39,7 +39,8 @@ for(gen50=1;gen50<=size(module50);gen50++){write(moduleOut50,"module50["+string(
 write(moduleOut50,"int delta50="+string(normalizedOutput50[3][2])+";");close(moduleOut50);
 int sourceDelta50=normalizedOutput50[3][2];
 def normalRing50=normalizedOutput50[1][1];setring normalRing50;
-if(charstr(basering)!="2"){ERROR("NORMAL_RELATIVE50_COEFFICIENT_DESCENT");quit;}
+print("NORMAL_RELATIVE50_COEFFICIENT_FIELD charstr="+charstr(basering)+" characteristic="+string(char(basering))+" parameters="+string(npars(basering)));
+if(char(basering)!=2 || npars(basering)!=0){ERROR("NORMAL_RELATIVE50_COEFFICIENT_DESCENT");quit;}
 link normalOut50="ASCII:w normalization50.sing";open(normalOut50);
 write(normalOut50,"ring normalized50=2,("+varstr(basering)+"),("+ordstr(basering)+");ideal norid;ideal normap;");
 int entry50;
