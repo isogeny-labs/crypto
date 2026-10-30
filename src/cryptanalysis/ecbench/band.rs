@@ -68,12 +68,14 @@ pub fn solver_unit_recognised(op_unit: &str) -> bool {
     })
 }
 
-/// Whether `r`'s solver did work in an unrecognised unit.  A solver block
-/// with no calls and no operations did no work and is never flagged.
+/// Whether `r`'s solver counted operations in an unrecognised unit.  A
+/// solver block with no operations charges nothing at any `w` and is never
+/// flagged.  (Only `ops` and `op_unit` are read: the backend-leaderboard
+/// reader's `SolverStats` carries no more.)
 pub fn has_unrecognised_solver_unit(r: &Record) -> bool {
     r.solver
         .as_ref()
-        .is_some_and(|s| (s.ops > 0 || s.calls > 0) && !solver_unit_recognised(&s.op_unit))
+        .is_some_and(|s| s.ops > 0 && !solver_unit_recognised(&s.op_unit))
 }
 
 /// The count behind each unpriced counter of `r`, `None` where the record
@@ -434,15 +436,19 @@ mod tests {
         let r = records
             .iter()
             .find(|r| {
-                r.arm == "inherited-f4"
-                    && r.cost.unpriced.iter().any(|u| u.starts_with("solver_"))
+                r.arm == "inherited-f4" && r.cost.unpriced.iter().any(|u| u.starts_with("solver_"))
             })
             .expect("an inherited-F4 record with uncharged solver work")
             .clone();
         let ops = r.solver.as_ref().unwrap().ops;
         assert!(ops > 0);
         assert!(!has_unrecognised_solver_unit(&r));
-        let tag = r.cost.unpriced.iter().find(|u| u.starts_with("solver_")).unwrap();
+        let tag = r
+            .cost
+            .unpriced
+            .iter()
+            .find(|u| u.starts_with("solver_"))
+            .unwrap();
         assert_eq!(unpriced_counts(&r)[tag], Some(ops));
         assert!(priced_gae(&r, 0.1).unwrap().is_some());
 
@@ -453,7 +459,10 @@ mod tests {
         let counts = unpriced_counts(&x);
         assert_eq!(counts[tag], None);
         assert_eq!(counts[UNRECOGNISED_SOLVER_UNIT], None);
-        assert_eq!(priced_gae(&x, 0.0).unwrap(), Some(x.cost.total_gae.unwrap()));
+        assert_eq!(
+            priced_gae(&x, 0.0).unwrap(),
+            Some(x.cost.total_gae.unwrap())
+        );
         assert_eq!(priced_gae(&x, 0.1).unwrap(), None);
         assert_eq!(priced_gae(&x, 1.0).unwrap(), None);
     }

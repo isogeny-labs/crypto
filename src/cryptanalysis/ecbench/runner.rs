@@ -1265,8 +1265,7 @@ mod process_hw_tests {
         assert!(direct.instructions > 0 && direct.cycles > 0);
         assert_eq!(direct.source, "macos.proc_pid_rusage.v4");
         assert!(!direct.descendants_uncounted);
-        let nested =
-            counts("/bin/sh -c 'i=0; while [ $i -lt 200000 ]; do i=$((i+1)); done'; true");
+        let nested = counts("/bin/sh -c 'i=0; while [ $i -lt 200000 ]; do i=$((i+1)); done'; true");
         assert!(nested.descendants_uncounted);
     }
 }

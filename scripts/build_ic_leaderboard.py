@@ -2520,10 +2520,12 @@ def markdown(doc: dict) -> str:
         L += [f"**Correction {c['date']} ({c['session']}, `{c['curve']}`).** The {c['session']} row above was "
               "recorded on 2026-10-11, before PR #1774 (2026-10-14) charged inherited-F4 / pdp3 word XORs at the "
               "pinned `ns_per_word_xor` (0.002304 GAE per word XOR on this curve). Its IC `S` are lower bounds and "
-              "are kept as recorded. The same spec re-run on main (2026-10-18, "
+              "are kept as recorded. The same spec re-run on main as of 2026-10-18 (`abee07ee7`, "
               f"[records](../../{c['source']}), [note](../../{c['note']})) charges that work; medians over "
               "8 verified targets with ranges. This is accounting, not a change in the work done. "
-              "It is complete only under the pinned word-XOR ratio.", "",
+              "It is complete only under the pinned word-XOR ratio. Today's main does not reproduce those "
+              "solver counts exactly ([replay check](../../research/ecbench_instrument_defects_20261030/"
+              "replay_check.json)).", "",
               "| arm | median S on main [range] | lower bound | archived S |",
               "|:--|--:|:--|--:|"]
         row = next(z for z in y["rows"] if z["session"] == c["session"])
@@ -3386,11 +3388,14 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<p><strong>Correction {esc(c["date"])} ({esc(c["session"])}, <code>{esc(c["curve"])}</code>).</strong> '
                  f'The {esc(c["session"])} row above was recorded on 2026-10-11, before PR #1774 (2026-10-14) charged '
                  'inherited-F4 / pdp3 word XORs at the pinned <code>ns_per_word_xor</code> (0.002304 GAE per word XOR on '
-                 'this curve). Its IC S are lower bounds and are kept as recorded. The same spec re-run on main '
-                 f'(2026-10-18, <a href="https://github.com/aburan28/crypto/blob/main/{esc(c["source"])}">records</a>, '
+                 'this curve). Its IC S are lower bounds and are kept as recorded. The same spec re-run on main as of '
+                 '2026-10-18 (<code>abee07ee7</code>, '
+                 f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c["source"])}">records</a>, '
                  f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c["note"])}">note</a>) charges that work; '
                  'medians over 8 verified targets with ranges. This is accounting, not a change in the work done. '
-                 'It is complete only under the pinned word-XOR ratio.</p>')
+                 'It is complete only under the pinned word-XOR ratio. Today\'s main does not reproduce those solver '
+                 'counts exactly (<a href="https://github.com/aburan28/crypto/blob/main/research/'
+                 'ecbench_instrument_defects_20261030/replay_check.json">replay check</a>).</p>')
         P.append('<table><thead><tr><th>Arm</th><th>Median S on main [range]</th><th>Lower bound</th>'
                  '<th>Archived S</th></tr></thead><tbody>')
         for arm, s in c["arms"].items():

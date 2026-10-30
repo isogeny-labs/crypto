@@ -190,17 +190,28 @@ so:
   monomial operations, monomial tests and conflicts, each bare or
   qualified as `family (…)`. `solver_unit_recognised` and
   `has_unrecognised_solver_unit` read it.
-- #strong[Refusal.] A record whose solver did work (`ops > 0` or
-  `calls > 0`) in any other unit has no count for its `solver_*`
-  entries. The band gives it no priced cost above `w = 0`, so `compare`
-  and `band` report "unrankable (uncounted unpriced work)" instead of
-  ranking it. This also covers records written before this change.
-- `methods.rs` (`ic_report`): such a record also carries
-  `unrecognised_solver_unit` in `cost.unpriced` (hence `lower_bound`),
-  so the record itself says why.
+- #strong[Refusal.] A record whose solver counted operations (`ops > 0`)
+  in any other unit has no count for its `solver_*` entries. The band
+  gives it no priced cost above `w = 0`, so `compare` and `band` report
+  "unrankable (uncounted unpriced work)" instead of ranking it. This
+  also covers records written before this change. `band.rs` reads only
+  `ops` and `op_unit`, the only solver fields the backend-leaderboard
+  reader has.
+- `methods.rs` (`ic_report`): such a record (`ops > 0` or `calls > 0`)
+  also carries `unrecognised_solver_unit` in `cost.unpriced`, hence
+  `lower_bound`, so the record itself says why.
 - `ic_framework` pricing, `detail` fields and every recognised unit are
-  unchanged. A replay of a committed record therefore produces the same
-  bytes (checked below).
+  unchanged. Records with recognised units come out identical (checked
+  below).
+- #strong[Effect on committed evidence: none.] I scanned all 10,910
+  committed `ecbench.record` lines on main (120 `.jsonl` files): 3,278
+  have a solver block, and 0 have `ops > 0` in an unrecognised unit. No
+  row of `docs/ic/LEADERBOARD.md` or `docs/backend-leaderboard/` moves.
+- #strong[Consequence for msolve arms.] Records of an msolve arm (the
+  published-IC-reference-arm work) become unrankable above `w = 0`.
+  Records committed before this change also fail an exact replay
+  afterwards, because the replay adds `unrecognised_solver_unit` to
+  `cost.unpriced`.
 
 Adding a new solver unit now needs a deliberate entry in the list. That
 entry is where to decide whether the unit is a native operation count.
@@ -219,8 +230,8 @@ it is now corrected with a dated note and kept.]
   did not match the pinned `ns_per_word_xor`. The word XORs were
   uncharged and the row is a lower bound, as its label says.
 - #strong[630.859 \[492.449, 806.366\]] is the same spec on the same 8
-  targets, re-run on main on 2026-10-18
-  (`research/f4_pricing_jump_20261018/leaderboard_rerun/`, session
+  targets, re-run on main #emph[as of 2026-10-18] (`abee07ee7`\;
+  `research/f4_pricing_jump_20261018/leaderboard_rerun/`, session
   `ECBS1h4badc043049a`, `lower_bound: false`). It charges the word XORs
   at the pinned 0.002304 GAE each. The pilot's `B13r` (631, 492 to 806,
   aarch64) reproduces it. Both rho arms are identical to the archive,
@@ -233,6 +244,9 @@ it is now corrected with a dated note and kept.]
   fairly is the cross-unit question owned by the
   published-IC-reference-arm work (the pilot's instruction-based control
   disagreed by ×20). It is not settled here.
+- #strong[Not today's main.] Today's main (`11173ecd02`) does not
+  reproduce the 2026-10-18 solver counts exactly (see "Replay check").
+  That drift is outside this verdict: it is not a 39-fold effect.
 - #strong[Distance to rho] (success criterion, owner 2026-10-15):
   inherited F4 at 630.859 is 275× rho-negation (2.290) and 44× strong
   rho (14.318) on this cell.
@@ -253,13 +267,28 @@ and the pricing-jump note are new builder sources, added to the workflow
 #emph[`k13_correction.svg` / `.png` / `.pdf` (source `plot.py`): every
 K13 arm, archived median against each target on main, log scale.]
 
-Generated-file note: main's committed `docs/ic/LEADERBOARD.md` and HTML
-already differ from what main's builder produces. Main's builder drops
-the `f4_fp` component section, changes one validation-standing line, and
-refreshes the `curves.yaml` hash. Those differences come from merges of
-`f4-fp-ic-effect`. This branch applies only the difference between
-main's builder output and this builder's output, so that drift is
-neither fixed nor made worse here.
+Generated-file note. In this sparse tree, main's builder output differs
+from main's committed `docs/ic/LEADERBOARD.md` and HTML. It drops the
+`f4_fp` component section, changes one validation-standing line, and
+refreshes the `curves.yaml` hash. Some of that may come from inputs the
+sparse set lacks. This branch applies only the difference between main's
+builder output and this builder's output (same tree) onto main's
+committed files. That drift is therefore neither fixed nor made worse
+here, and `build_ic_leaderboard.py --check` fails on this branch exactly
+as it does on main in the same tree.
+
+The backend leaderboard (`docs/backend-leaderboard/`) compiles `band.rs`
+and pins its bytes, and those of `methods.rs`, in
+`reproduction.lock.json`. Main's lock is already stale on four other
+producer inputs (`curve_aliases.json`, `canonical.rs`, the tool's
+`main.rs` and `reproduction.rs`), so its `--check` already fails; this
+branch adds `band.rs` and `methods.rs` to that list. I did not reseal
+the reviewed lock. To show nothing else changes, I sealed two scratch
+copies, main's sources against this branch's: `leaderboard.json` differs
+only in the two `producer_input_hashes`, and every row is identical. The
+tool's CI steps pass with this `band.rs`: `cargo fmt --check`,
+`cargo test` (33 passed) and `cargo clippy -D warnings`, all on rustc
+1.99.1.
 
 == D5. Per-run child cost
 <d5.-per-run-child-cost>
@@ -404,9 +433,14 @@ runs covered.
     (existing)
   - `runner::process_hw_tests::the_exited_child_is_counted_and_a_descendant_is_flagged`
   - `runner::exact_record_reader_tests::…` (existing)
-- `python3 scripts/build_ic_leaderboard.py --check` on the builder's own
-  output, `scripts/check_ic_leaderboard_paths.py` (covers all 965 files
-  the builder reads), and `scripts/test_build_ic_leaderboard.py` (8 OK).
+- `scripts/check_ic_leaderboard_paths.py` covers all 965 files the
+  builder reads, and `scripts/test_build_ic_leaderboard.py` passes (8
+  OK). `build_ic_leaderboard.py --check` fails here, as on main, because
+  of the pre-existing drift described above.
+- Backend leaderboard on rustc 1.99.1: fmt, tests (33) and clippy pass.
+  The rows are identical to main's (lock not resealed).
+- `rustfmt --check` passes for the four changed files, as it does for
+  main's versions.
 - Replay check (`replay_check.json`). This branch's release `ecbench`
   was built alongside today's main (`11173ecd02`), both on Rust 1.98.0.
   - #strong[Committed session.] The K13 re-run session was recorded on
