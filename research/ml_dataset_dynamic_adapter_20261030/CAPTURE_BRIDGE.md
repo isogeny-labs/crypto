@@ -21,3 +21,8 @@ Source references: approved contracts/RESOURCE_BOUNDS.md and
 contracts/STAGE3_ADAPTER_DESIGN.md; typed capture design and source1eb1fef3624f.
 This follows the existing envelope/hash mechanism, introducing no new
 mathematical algorithm or cryptanalytic claim.
+
+The same bridge control also captures the committed prefix into an immutable
+snapshot after the sticky refusal and runs verify_captured_delta on it. This
+checks compatibility with the existing snapshot consumer, not only raw JSON
+parsing. It remains an authored, unexecuted control until the runtime gate.

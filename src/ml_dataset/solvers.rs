@@ -3143,10 +3143,10 @@ mod tests {
             cell_index: 0,
             attempt_sha256: "7".repeat(64),
         };
-        let live = directory.join("bound");
+        let live = directory.join("live");
         let emitter = CaptureEmitter::create(
             &live,
-            binding,
+            binding.clone(),
             super::super::capture::capture_limits(64).unwrap(),
         )
         .unwrap();
@@ -3164,6 +3164,19 @@ mod tests {
         .is_err());
         assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &8u64, &mut buffer).is_err());
         assert_eq!(fs::read(live.join("events.jsonl")).unwrap(), original);
+        let initial = super::super::capture::CaptureCursor::initial(&binding).unwrap();
+        let snapshot = directory.join("snapshot");
+        let delta = super::super::capture::capture_committed_delta(
+            &directory,
+            &snapshot,
+            &binding,
+            &initial,
+            &super::super::capture::capture_limits(64).unwrap(),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(delta.cursor.event_count, 1);
+        super::super::capture::verify_captured_delta(&snapshot, &delta, &initial).unwrap();
         drop(guard);
         assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
         fs::remove_dir_all(directory).unwrap();
