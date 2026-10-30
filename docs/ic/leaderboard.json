@@ -24,7 +24,7 @@
   },
   "progress_timeline": {
    "path": "docs/ic/progress-timeline.json",
-   "sha256": "c9f599087e972db2387fa285a0deb615ea45257b579b16b636cde1692c5599ad"
+   "sha256": "3c2c88213b816db9b8499765fad37d5c89f532401f30d404667225e8b7fc9f12"
   },
   "koblitz_s20": {
    "path": "research/ic_exponent_20260926/analysis.json",
@@ -118,6 +118,30 @@
    "path": "research/postgb_linear_stage_20261026/analysis/summary.json",
    "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
   },
+  "ic_cover_weakclass": {
+   "path": "research/ic_cover_weakclass_20261023/summary.json",
+   "sha256": "3fa28e7ff48dc590ba14ff82c592c5fbc2dc09d09807513ba07d6838634e1a3b"
+  },
+  "ic_cover_weakclass_rho_neg": {
+   "path": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+   "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
+  },
+  "d4_char2_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+   "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
+  },
+  "d4_char2_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
+   "sha256": "5c8e0a776a8d99a85e7b66416ae2c1823a716286a63ca524209df1862c89e9e0"
+  },
+  "d4_char2_cmp_m12": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
+   "sha256": "b17171b59d16d34fa504a59c71b784b84ceebabd37dfbfb6ba917f9b97313e3b"
+  },
+  "d4_char2_cmp_m14": {
+   "path": "research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json",
+   "sha256": "f0a9ddb6f02528e6221a0922d6f06a894890464e6e2c308650a03e173ca25165"
+  },
   "ic_m2_linear_ladder": {
    "path": "research/ic_m2_linear_ladder_20261024/fit.json",
    "sha256": "f69558da047b752ad3a3952ad6680d73fa6984e92b66561717db29e6f8475203"
@@ -125,6 +149,18 @@
   "pair_table_setup": {
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
+  },
+  "aimed_gather": {
+   "path": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+   "sha256": "4be9dd4755ad6bb2024e85505b89b5000851707ef69746deaec4631729c740ee"
+  },
+  "aimed_gather_first": {
+   "path": "research/ic_aimed_gather_20261023/summary.json",
+   "sha256": "a3e06802bada65df50d0e5fc8d05fa76c37b756c5a07ba94c9fd082947c8b338"
+  },
+  "aimed_gather_corrected": {
+   "path": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
+   "sha256": "6df1dfcc98784b7b0d74b4e09aaaebcf0d8f68ff62dcce364355dd8f4b81fe8c"
   },
   "quartic_tagged_p13": {
    "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
@@ -300,7 +336,7 @@
   },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "842a28358e7e39075d63136e0e848642fe0970a14f6e7e6a5b5ac9b1e077758a"
+   "sha256": "53fe929b9b971fa2c74ee29fcd5cea7fca969d411ae28e8cbf413c9550f3032e"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -723,7 +759,7 @@
  },
  "progress": {
   "source": "docs/ic/progress-timeline.json",
-  "updated": "2026-10-28",
+  "updated": "2026-10-29",
   "series_id": "ec-cold",
   "label": "Elliptic curve, whole method, cold, one target",
   "points": [
@@ -11430,6 +11466,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-f2m8-tm17-ec7ed2e8",
+   "family": "binary",
+   "field": "GF(2^8)",
+   "coefficients": "a = 0x25, b = 0x4",
+   "order_bits": 9,
+   "standard": [],
+   "ec1": [
+    "EC1N8Crbhe076b2f017ec"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-f2m8-tm17-ec7ed2e8"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-f2m12-t105-e1752bea",
    "family": "binary",
    "field": "GF(2^12)",
@@ -16317,6 +16371,42 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp20-tm979-7535758a",
+   "family": "prime",
+   "field": "GF(p), p = 684557",
+   "coefficients": "a = 524451, b = 256308",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfph6c4c80aa2689"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp20-tm979-7535758a"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm1195-26505147",
+   "family": "prime",
+   "field": "GF(p), p = 759371",
+   "coefficients": "a = 425665, b = 129843",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfph84298849e049"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp20-tm1195-26505147"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp20-tm1026-6076e3c6",
    "family": "prime",
    "field": "GF(p), p = 792257",
@@ -16326,6 +16416,42 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm565-6d7d1d32",
+   "family": "prime",
+   "field": "GF(p), p = 803441",
+   "coefficients": "a = 232725, b = 341758",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfpha4afd98076ce"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp20-tm565-6d7d1d32"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm1319-e428a267",
+   "family": "prime",
+   "field": "GF(p), p = 819823",
+   "coefficients": "a = 796189, b = 504631",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfpha75e722d601a"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp20-tm1319-e428a267"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -16494,6 +16620,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm39-90315544",
+   "family": "prime",
+   "field": "GF(p), p = 984421",
+   "coefficients": "a = 348381, b = 691194",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfph4ce127a6e92b"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp20-tm39-90315544"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -17963,6 +18107,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp24-t553-4d349218",
+   "family": "prime",
+   "field": "GF(p), p = 8416129",
+   "coefficients": "a = 1040051, b = 1713668",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [
+    "EC1P24Cfph51a846526f16"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp24-t553-4d349218"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp24-tm1119-da50644b",
    "family": "prime",
    "field": "GF(p), p = 8489473",
@@ -18042,6 +18204,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm589-5e500858",
+   "family": "prime",
+   "field": "GF(p), p = 8822717",
+   "coefficients": "a = 5904289, b = 1857337",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [
+    "EC1P24Cfpha225b4861c3c"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp24-tm589-5e500858"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -18154,6 +18334,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm1013-0c7556ce",
+   "family": "prime",
+   "field": "GF(p), p = 9253267",
+   "coefficients": "a = 9014437, b = 8604106",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [
+    "EC1P24Cfphd4a3e12e31de"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp24-tm1013-0c7556ce"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -67326,6 +67524,24 @@
    "ec1_unresolved": null,
    "legacy": [
     "generated-24bit-11921101"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm4739-bb3c4b72",
+   "family": "prime",
+   "field": "GF(p), p = 11942297",
+   "coefficients": "a = 7271853, b = 278044",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [
+    "EC1P24Cfpha5dd6f8c8bbe"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp24-tm4739-bb3c4b72"
    ],
    "on_board": false,
    "curves_yaml_key": null,
@@ -262312,6 +262528,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp28-tm13337-3a482fe3",
+   "family": "prime",
+   "field": "GF(p), p = 155901469",
+   "coefficients": "a = 67774287, b = 48365344",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfph833e37f05b2f"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp28-tm13337-3a482fe3"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp28-t10772-e235a88b",
    "family": "prime",
    "field": "GF(p), p = 157142431",
@@ -262321,6 +262555,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp28-tm12605-c71cc691",
+   "family": "prime",
+   "field": "GF(p), p = 157218301",
+   "coefficients": "a = 119649881, b = 106155159",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfph993f4e3ebf63"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp28-tm12605-c71cc691"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -262666,6 +262918,42 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp28-tm1499-56171ddc",
+   "family": "prime",
+   "field": "GF(p), p = 198726023",
+   "coefficients": "a = 40994317, b = 95729377",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfph483e74ef3bda"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp28-tm1499-56171ddc"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp28-tm5065-1146b4a5",
+   "family": "prime",
+   "field": "GF(p), p = 212738657",
+   "coefficients": "a = 165004078, b = 55568895",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfph4728cf1cf7ec"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp28-tm5065-1146b4a5"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp28-t22132-03311e55",
    "family": "prime",
    "field": "GF(p), p = 214809031",
@@ -262940,6 +263228,24 @@
    "ec1_unresolved": null,
    "legacy": [
     "isogeny-gap-prime-D4-l3-h6-26b-crater-L0"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp28-tm24531-24294e5d",
+   "family": "prime",
+   "field": "GF(p), p = 259182139",
+   "coefficients": "a = 256310742, b = 86097094",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfphf3858e185b35"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp28-tm24531-24294e5d"
    ],
    "on_board": false,
    "curves_yaml_key": null,
@@ -263660,6 +263966,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp32-tm11535-8e4578de",
+   "family": "prime",
+   "field": "GF(p), p = 2469181963",
+   "coefficients": "a = 574625700, b = 1622048318",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfph644370d5c4de"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp32-tm11535-8e4578de"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp32-tm46399-b8790b49",
    "family": "prime",
    "field": "GF(p), p = 2486429123",
@@ -263762,6 +264086,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp32-tm86293-2d8c0ae9",
+   "family": "prime",
+   "field": "GF(p), p = 3221061227",
+   "coefficients": "a = 2708394380, b = 2584888744",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfph1c2550cff2d1"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp32-tm86293-2d8c0ae9"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp32-t49785-c7011f8d",
    "family": "prime",
    "field": "GF(p), p = 3221225473",
@@ -263850,6 +264192,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp32-t93403-ef655380",
+   "family": "prime",
+   "field": "GF(p), p = 3642104651",
+   "coefficients": "a = 3608834951, b = 2170327929",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfph2584c99c5fb3"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp32-t93403-ef655380"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp32-tm18500-3997b214",
    "family": "prime",
    "field": "GF(p), p = 3844840117",
@@ -263859,6 +264219,42 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp32-tm36751-2eaac89e",
+   "family": "prime",
+   "field": "GF(p), p = 3852015119",
+   "coefficients": "a = 2100959240, b = 443615254",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfphffeecbbb5377"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp32-tm36751-2eaac89e"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp32-t46781-77aa234d",
+   "family": "prime",
+   "field": "GF(p), p = 3855283769",
+   "coefficients": "a = 2746834144, b = 2818779974",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfpha8ad3fd8b045"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp32-t46781-77aa234d"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -263950,6 +264346,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp36-t360541-9f646956",
+   "family": "prime",
+   "field": "GF(p), p = 39688394183",
+   "coefficients": "a = 18505017641, b = 23501859795",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [
+    "EC1P36Cfph6759c525562b"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp36-t360541-9f646956"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -264193,6 +264607,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp40-tm62443-8b49d5b3",
+   "family": "prime",
+   "field": "GF(p), p = 909903817187",
+   "coefficients": "a = 567284737849, b = 258589946179",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [
+    "EC1P40Cfph31cce15ed966"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "icv1-fp40-tm62443-8b49d5b3"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -307501,6 +307933,192 @@
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
   "validated": true
  },
+ "ic_cover_weakclass_component": {
+  "rows": [
+   {
+    "p": 53,
+    "cells": 8,
+    "base": 1980.458705,
+    "lever": 1061.53561057,
+    "ratio": 1.84804719706,
+    "ratio_min": 1.82470423583,
+    "ratio_max": 1.87777739344,
+    "before": [
+     506.609390005,
+     424.408791755,
+     172.502351179
+    ],
+    "after": [
+     271.545125773,
+     227.48520065,
+     92.462109016
+    ]
+   },
+   {
+    "p": 101,
+    "cells": 8,
+    "base": 259.806239441,
+    "lever": 138.492331818,
+    "ratio": 1.87496972017,
+    "ratio_min": 1.87028855644,
+    "ratio_max": 1.87949929987,
+    "before": [
+     132.86902203,
+     110.994808868,
+     44.7258705166
+    ],
+    "after": [
+     70.8271699976,
+     59.1669004291,
+     23.8415756056
+    ]
+   },
+   {
+    "p": 251,
+    "cells": 6,
+    "base": 47.9039732498,
+    "lever": 25.6382661937,
+    "ratio": 1.86815292685,
+    "ratio_min": 1.86597508833,
+    "ratio_max": 1.86994522347,
+    "before": [
+     46.6723824224,
+     38.951475484,
+     15.6503928402
+    ],
+    "after": [
+     24.9791172477,
+     20.8468782305,
+     8.37610975564
+    ]
+   },
+   {
+    "p": 503,
+    "cells": 3,
+    "base": 9.78578978735,
+    "lever": 5.29115359227,
+    "ratio": 1.84929987778,
+    "ratio_min": 1.84833048216,
+    "ratio_max": 1.85004443959,
+    "before": [
+     10.1028057283,
+     8.43006079832,
+     3.38536151594
+    ],
+    "after": [
+     5.4625633682,
+     4.55811410682,
+     1.83045703367
+    ]
+   }
+  ],
+  "slope": -2.27272850429,
+  "slope_engineer": -2.2687140353,
+  "class": "engineering",
+  "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
+  "study": "research/ic_cover_weakclass_20261023/",
+  "report": "research/ic_cover_weakclass_20261023/REPORT.pdf",
+  "source": "research/ic_cover_weakclass_20261023/summary.json",
+  "validation": "validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)",
+  "validated": true
+ },
+ "d4_char2_frob_roots_component": {
+  "rows": [
+   {
+    "m": 12,
+    "target": 0,
+    "base": 44.0338071586,
+    "lever": 37.6181988912,
+    "ratio": 0.854302666943,
+    "base_over_rho": [
+     47.2333729676,
+     42.9397677659,
+     23.6177083507
+    ],
+    "lever_over_rho": [
+     40.3515964949,
+     36.6835581203,
+     20.1766712311
+    ]
+   },
+   {
+    "m": 12,
+    "target": 1,
+    "base": 42.5916166108,
+    "lever": 36.385813154,
+    "ratio": 0.854295188806,
+    "base_over_rho": [
+     50.2949002185,
+     45.7230602911,
+     25.1487319424
+    ],
+    "lever_over_rho": [
+     42.9666912781,
+     39.0609904242,
+     21.4844407029
+    ]
+   },
+   {
+    "m": 12,
+    "target": 2,
+    "base": 41.4671913386,
+    "lever": 35.4261486254,
+    "ratio": 0.854317533497,
+    "base_over_rho": [
+     39.8839629278,
+     36.2584122428,
+     19.9427804731
+    ],
+    "lever_over_rho": [
+     34.0735688346,
+     30.9761973158,
+     17.0374670248
+    ]
+   },
+   {
+    "m": 14,
+    "target": 0,
+    "base": 5.37011348377,
+    "lever": 4.37864554447,
+    "ratio": 0.815373000533,
+    "base_over_rho": [
+     4.26844358013,
+     3.88040396669,
+     2.13422394393
+    ],
+    "lever_over_rho": [
+     3.48037364954,
+     3.1639766256,
+     1.74018858097
+    ]
+   }
+  ],
+  "paired": {
+   "12": {
+    "ratio": 0.854304993137,
+    "ci95": [
+     0.854295188806,
+     0.854317533497
+    ],
+    "pairs": 3
+   },
+   "14": {
+    "ratio": 0.815373000533,
+    "ci95": [
+     0.815373000533,
+     0.815373000533
+    ],
+    "pairs": 1
+   }
+  },
+  "class": "engineering",
+  "unit": "S = counted cost in GAE per sqrt(r), ecbench",
+  "study": "research/ic_d4_char2_lever_20261023/",
+  "report": "research/ic_d4_char2_lever_20261023/REPORT.pdf",
+  "source": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)",
+  "validated": true
+ },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",
   "study": "research/ic_m2_linear_ladder_20261024/",
@@ -307877,6 +308495,167 @@
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "aimed_gather_component": {
+  "rows": [
+   {
+    "metric": "collect phase",
+    "session": {
+     "ab": {
+      "median": 1.09308780762,
+      "ci95": [
+       1.06772029655,
+       1.13647065083
+      ],
+      "n": 42,
+      "above_one": 38,
+      "ci95_as_run": [
+       1.08982882862,
+       1.15972934411
+      ]
+     },
+     "aa": {
+      "median": 0.999423708512,
+      "ci95": [
+       0.97687976741,
+       1.02576715487
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
+       0.977119451945,
+       1.02965317261
+      ]
+     },
+     "margin": 0.0419531416824,
+     "established": true,
+     "established_as_run": true
+    },
+    "before": {
+     "ab": {
+      "median": 1.11132879368,
+      "ci95": [
+       1.08205913963,
+       1.14924506362
+      ],
+      "n": 30,
+      "above_one": 28,
+      "ci95_as_run": [
+       1.06478310166,
+       1.1603953138
+      ]
+     },
+     "aa": {
+      "median": 0.997665980456,
+      "ci95": [
+       0.944458829852,
+       1.08735820385
+      ],
+      "n": 5,
+      "above_one": 2,
+      "ci95_as_run": [
+       0.944458829852,
+       1.08735820385
+      ]
+     },
+     "margin": -0.00529906422176,
+     "established": false,
+     "established_as_run": false
+    }
+   },
+   {
+    "metric": "whole set-up",
+    "session": {
+     "ab": {
+      "median": 1.0416402202,
+      "ci95": [
+       1.02035468256,
+       1.0824004507
+      ],
+      "n": 42,
+      "above_one": 29,
+      "ci95_as_run": [
+       1.02052260114,
+       1.11589169838
+      ]
+     },
+     "aa": {
+      "median": 0.984586396814,
+      "ci95": [
+       0.945934974309,
+       1.01494893988
+      ],
+      "n": 42,
+      "above_one": 20,
+      "ci95_as_run": [
+       0.940907875559,
+       1.03541549806
+      ]
+     },
+     "margin": 0.00540574267808,
+     "established": true,
+     "established_as_run": false
+    },
+    "before": {
+     "ab": {
+      "median": 1.03722009497,
+      "ci95": [
+       1.01790624879,
+       1.07976658536
+      ],
+      "n": 30,
+      "above_one": 26,
+      "ci95_as_run": [
+       1.01790624879,
+       1.06849417711
+      ]
+     },
+     "aa": {
+      "median": 0.992713691781,
+      "ci95": [
+       0.952561674495,
+       1.12096272326
+      ],
+      "n": 5,
+      "above_one": 1,
+      "ci95_as_run": [
+       0.952561674495,
+       1.12096272326
+      ]
+     },
+     "margin": -0.103056474466,
+     "established": false,
+     "established_as_run": false
+    }
+   }
+  ],
+  "curve": "icv1-f2m53-tm56619371-dac20a85",
+  "callgrind_ratio": {
+   "k0n53": 1.0231123543,
+   "k0n61": 1.02948205463
+  },
+  "median_ms": {
+   "a": {
+    "collect": 230.3337535,
+    "total": 419.5670235
+   },
+   "c": {
+    "collect": 212.4524455,
+    "total": 398.809739
+   },
+   "q": {
+    "collect": 235.2093155,
+    "total": 428.2749685
+   }
+  },
+  "processes": 126,
+  "refused": 71,
+  "class": "engineering",
+  "study": "research/ic_aimed_gather_20261023/",
+  "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+  "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "quartic_twist_pair_component": {
   "rows": [
