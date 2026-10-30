@@ -57,15 +57,15 @@ proc pointResidual23(list pt){
 proc add23(list left,list right){
  if(pointResidual23(left)!=0 || pointResidual23(right)!=0){ERROR("MARK23_POINT_INPUT_RESIDUAL");return(list());}
  if(left[1]==1){return(right);}if(right[1]==1){return(left);}
- poly xx=left[2];poly yy=left[3];poly xxx=right[2];poly yyy=right[3];poly slope;poly intercept;poly denominator;
+ poly xx=left[2];poly yy=left[3];poly xxx=right[2];poly yyy=right[3];poly slope;poly intercept;poly pointDen23;
  if(xx==xxx){
   if(yy!=yyy){
    if(mr23(yy+yyy+a123*xx+b23)!=0){ERROR("MARK23_SAME_X_NOT_INVERSE");return(list());}
    return(list(1,poly(0),poly(0)));
   }
-  denominator=mr23(a123*xx+b23);
-  if(denominator==0){return(list(1,poly(0),poly(0)));}
-  slope=mr23((xx^2+a123*yy)*mi23(denominator));
+  pointDen23=mr23(a123*xx+b23);
+  if(pointDen23==0){return(list(1,poly(0),poly(0)));}
+  slope=mr23((xx^2+a123*yy)*mi23(pointDen23));
  }else{slope=mr23((yy+yyy)*mi23(xx+xxx));}
  intercept=mr23(yy+slope*xx);
  poly outX=mr23(slope^2+a123*slope+b23+xx+xxx);
