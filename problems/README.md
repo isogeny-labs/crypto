@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |
 | [Exact compact scalar-predicate splitting](prime-scalar-exact-splitting.md) | open | an essentially new compact scalar-verification route to sub-exponential prime-field ECDLP | constructible exact splitting/weighted extension with complete network, recursive, cost and formal proof bounds |
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | requested novel sub-exponential algorithm; current complete PDP has an explicit p² loop | fixed-base procedure with a proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |

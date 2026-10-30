@@ -64,7 +64,7 @@ use crate::cryptanalysis::ic_boundary::{
     PrimeCurve, PrimeInstance, PrimePoint, Relation,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
-use crate::cryptanalysis::koblitz_fast::FastPoint;
+use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
 use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
 use crate::cryptanalysis::koblitz_groebner::{f4_word_ops_thread, FieldStructure, SolverEngine};
 use crate::cryptanalysis::koblitz_index_calculus::build_frobenius_factor_base_from_divisor;
@@ -884,6 +884,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
     fn parameters(&self) -> &[(&str, &str)] {
         &[
             (
+                "halftrace_tables",
+                "0 (default) preserves legacy halftrace squarings; 1 builds a lazy byte-table cache in the charged factor-base phase, preserving ordered points",
+            ),
+            (
                 "divisor",
                 "`;`-separated indices into the factorisation of the Frobenius characteristic \
                  polynomial, e.g. `divisor=1;2` (a `,` would end the parameter on the command \
@@ -916,8 +920,15 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
             .as_ref()
             .ok_or("this instance is not a Koblitz curve, so it has no Frobenius to fold by")?;
         let idx = divisor_indices(params)?;
-        let frob = build_frobenius_factor_base_from_divisor(kc, &idx)
-            .ok_or_else(|| format!("no invariant subspace for divisor {idx:?} on this curve"))?;
+        let cached = match params.u64_or("halftrace_tables", 0)? {
+            0 => false,
+            1 => true,
+            _ => return Err("halftrace_tables must be 0 or 1".into()),
+        };
+        let frob = with_cached_point_lifts(cached, || {
+            build_frobenius_factor_base_from_divisor(kc, &idx)
+        })
+        .ok_or_else(|| format!("no invariant subspace for divisor {idx:?} on this curve"))?;
         let fold = if params.flag("no_fold") {
             ColumnFold::Abscissa
         } else if params.flag("projected") {
@@ -4023,6 +4034,27 @@ mod tests {
             name: inst.name.clone(),
             field_degree: Some(inst.n),
         }
+    }
+
+    #[test]
+    fn cached_halftrace_factor_base_preserves_order_columns_and_coefficients() {
+        let inst = koblitz_instance(1, 9).unwrap();
+        let group = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &group);
+        let builder = KoblitzOrbitBase { instance: &inst };
+        let (_, baseline) = Params::parse_spec("koblitz-orbit:divisor=2").unwrap();
+        let (_, candidate) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=1").unwrap();
+        let mut ops = GroupOps::default();
+        let old = builder.build(&ctx, &baseline, &mut ops).unwrap();
+        let new = builder.build(&ctx, &candidate, &mut ops).unwrap();
+        assert_eq!(new.points, old.points);
+        assert_eq!(new.col_of, old.col_of);
+        assert_eq!(new.coef_of, old.coef_of);
+        assert_eq!(new.columns, old.columns);
+        let (_, invalid) =
+            Params::parse_spec("koblitz-orbit:divisor=2,halftrace_tables=2").unwrap();
+        assert!(builder.build(&ctx, &invalid, &mut ops).is_err());
     }
 
     /// Every relation the chained oracle returns re-sums to its target,
