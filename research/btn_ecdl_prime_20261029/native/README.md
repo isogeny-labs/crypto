@@ -23,6 +23,8 @@ $B report native_runs                                                      > nat
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
 | `solve P SEED XI` | `reduction::solve` with a known scalar, then `reduction::verify` |
 | `size-json FILE` | network size for a JSON problem (e.g. the bundled ECCp-131 input) |
+| `multtime W...` | time one Fourier integer-multiply network construction per bit width |
+| `primetime W...` | time `is_prime` on a w-bit prime (shows the AKS cliff above 64 bits) |
 | `report DIR` | derived values from the recorded `*.jsonl`: all read, nothing re-measured |
 
 Each line of output is one JSON object. Curves are the first prime-order
@@ -35,6 +37,12 @@ Each line of output is one JSON object. Curves are the first prime-order
   assignments equal 2^(4d) exactly. Recursive backend used: never.
 * **Solves correct.** p = 5 (two seeds) and p = 7 recover the scalar and pass
   `reduction::verify`.
+* **Setup bottleneck (primality).** `is_prime` (called by `Curve::new` and
+  `FactorBase::new`) uses a fast u64 path at <= 64 bits and AKS above. At <= 64
+  bits certification is <= 17 us; at 65 bits (AKS) it did not finish in 180 s.
+  So a curve whose prime exceeds 64 bits (ECCp-131's is 131-bit) cannot even be
+  set up, before any contraction. Network construction, by contrast, is fast at
+  every width (131-bit multiply builds in 2.5 ms). `multtime`/`primetime` modes.
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least

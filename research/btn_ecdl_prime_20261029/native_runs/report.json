@@ -222,10 +222,10 @@
     "pollard_rho_log2_group_ops": 65.32574806473616
   },
   "inputs": {
-    "counts": "./counts.jsonl",
-    "eccp131_size": "./eccp131_size.json",
-    "sizes": "./sizes.jsonl",
-    "solves": "./solves.jsonl"
+    "counts": "../native_runs/counts.jsonl",
+    "eccp131_size": "../native_runs/eccp131_size.json",
+    "sizes": "../native_runs/sizes.jsonl",
+    "solves": "../native_runs/solves.jsonl"
   },
   "notes": [
     "steps are hashed-ecdl-tensor Meter charges: deterministic diagnostics, not calibrated time units",
@@ -242,6 +242,118 @@
   },
   "recursive_backend_used": false,
   "schema": "btn-prime-native-report/v1",
+  "setup_bottleneck": {
+    "is_prime": {
+      "aks_at_65_bits": {
+        "did_not_finish_seconds": 180,
+        "micros_lower_bound": 180000000,
+        "op": "is_prime",
+        "path": "aks",
+        "width": 65
+      },
+      "consequence": "Curve::new and FactorBase::new certify the prime, so no curve with a prime above 64 bits (ECCp-131's is 131-bit) can even be set up; this blocks before the contraction cost matters",
+      "dispatch": "is_prime uses a fast u64 path at <= 64 bits and AKS above (arithmetic.rs); AKS is impractical, so a prime above 64 bits cannot be certified in reasonable time",
+      "rows": [
+        {
+          "micros": 11,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 32
+        },
+        {
+          "micros": 6,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 48
+        },
+        {
+          "micros": 5,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 56
+        },
+        {
+          "micros": 16,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 60
+        },
+        {
+          "micros": 17,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 63
+        },
+        {
+          "micros": 9,
+          "op": "is_prime",
+          "path": "u64",
+          "width": 64
+        },
+        {
+          "did_not_finish_seconds": 180,
+          "micros_lower_bound": 180000000,
+          "op": "is_prime",
+          "path": "aks",
+          "width": 65
+        }
+      ],
+      "u64_path_max_micros": 17
+    },
+    "multiply_construction": {
+      "rows": [
+        {
+          "micros": 229,
+          "op": "multiply",
+          "product_width": 16,
+          "width": 8
+        },
+        {
+          "micros": 447,
+          "op": "multiply",
+          "product_width": 64,
+          "width": 32
+        },
+        {
+          "micros": 674,
+          "op": "multiply",
+          "product_width": 128,
+          "width": 64
+        },
+        {
+          "micros": 1244,
+          "op": "multiply",
+          "product_width": 256,
+          "width": 128
+        },
+        {
+          "micros": 2508,
+          "op": "multiply",
+          "product_width": 262,
+          "width": 131
+        },
+        {
+          "micros": 1610,
+          "op": "multiply",
+          "product_width": 512,
+          "width": 256
+        },
+        {
+          "micros": 4550,
+          "op": "multiply",
+          "product_width": 1024,
+          "width": 512
+        },
+        {
+          "micros": 9950,
+          "op": "multiply",
+          "product_width": 2048,
+          "width": 1024
+        }
+      ],
+      "verdict": "fast at every width (linear); not a bottleneck"
+    }
+  },
   "sizes": {
     "growth": {
       "d_from": 3,

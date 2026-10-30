@@ -286,6 +286,47 @@ fn size_json(path: &str) -> Res<Value> {
     Ok(json!({ "file": path, "d": p.bits(), "networks": net_rec, "build_steps": m.used }))
 }
 
+/// Time one Fourier integer-multiply network construction at each bit width.
+/// Prints each line immediately so partial results survive a timeout.
+fn multtime(widths: &[u64]) -> Res<()> {
+    use hashed_ecdl_tensor::encoding::Encoder;
+    use std::io::Write;
+    use std::time::Instant;
+    for &w in widths {
+        let w = w as usize;
+        let m = meter(u64::MAX / 2);
+        let mut enc = Encoder::new();
+        let a = enc.input_word(w, &m).map_err(e)?;
+        let b = enc.input_word(w, &m).map_err(e)?;
+        let t = Instant::now();
+        let prod = enc.integer_multiply(&a, &b, &m).map_err(e)?;
+        println!("{}", json!({ "op": "multiply", "width": w,
+            "micros": t.elapsed().as_micros(), "product_width": prod.width() }));
+        std::io::stdout().flush().ok();
+    }
+    Ok(())
+}
+
+/// Time is_prime on one prime at each bit width (smallest prime >= 2^(w-1)).
+/// Prints each line immediately; the AKS fallback above 64 bits is the point.
+fn primetime(widths: &[u64]) -> Res<()> {
+    use std::io::Write;
+    use std::time::Instant;
+    for &w in widths {
+        let w = w as usize;
+        let mut n = (BigUint::one() << (w - 1)) | BigUint::one();
+        let mut mp = meter(u64::MAX / 2);
+        let t = Instant::now();
+        while !is_prime(&n, &mut mp).map_err(e)? {
+            n += 2u8;
+        }
+        println!("{}", json!({ "op": "is_prime", "width": w,
+            "micros": t.elapsed().as_micros(), "path": if w <= 64 { "u64" } else { "aks" } }));
+        std::io::stdout().flush().ok();
+    }
+    Ok(())
+}
+
 fn read_jsonl(path: &str) -> Res<Vec<Value>> {
     let text = std::fs::read_to_string(path).map_err(|err| format!("{path}: {err}"))?;
     text.lines().filter(|l| !l.trim().is_empty()).map(|l| serde_json::from_str(l).map_err(e)).collect()
@@ -335,6 +376,25 @@ fn report(dir: &str) -> Res<Value> {
         "max_degree_values": sizes.iter().map(|s| u(s, "max_degree")).collect::<std::collections::BTreeSet<_>>(),
     });
 
+    // Setup bottleneck: is_prime dispatches to a fast u64 path at <= 64 bits
+    // and to AKS above, so certifying a cryptographic-size prime (in Curve::new
+    // / FactorBase::new) is impractical.  Multiply-network construction, by
+    // contrast, is fast at every width.  Read from multtime/primetime.jsonl.
+    let mult = read_jsonl(&format!("{dir}/multtime.jsonl")).unwrap_or_default();
+    let primes = read_jsonl(&format!("{dir}/primetime.jsonl")).unwrap_or_default();
+    let prime_u64_max = primes.iter().filter(|r| r["path"] == json!("u64")).filter_map(|r| r.get("micros").and_then(Value::as_u64)).max();
+    let prime_aks = primes.iter().find(|r| r["path"] == json!("aks"));
+    let setup = json!({
+        "multiply_construction": { "rows": mult, "verdict": "fast at every width (linear); not a bottleneck" },
+        "is_prime": {
+            "rows": primes,
+            "u64_path_max_micros": prime_u64_max,
+            "aks_at_65_bits": prime_aks,
+            "dispatch": "is_prime uses a fast u64 path at <= 64 bits and AKS above (arithmetic.rs); AKS is impractical, so a prime above 64 bits cannot be certified in reasonable time",
+            "consequence": "Curve::new and FactorBase::new certify the prime, so no curve with a prime above 64 bits (ECCp-131's is 131-bit) can even be set up; this blocks before the contraction cost matters",
+        },
+    });
+
     // Extrapolation to ECCp-131 under the backend actually used (Functional):
     // one contraction visits 2^(free input bits) assignments, 4*131 for two
     // slots.  Pollard rho: sqrt(pi*n/4) group operations, n = 2^131.
@@ -369,6 +429,7 @@ fn report(dir: &str) -> Res<Value> {
                     "all_functional_backend": all_functional,
                     "functional_assignments_equal_2_pow_4d": assignments_rule, "rows": per_count },
         "solves": { "n": solves.len(), "all_ok": !solves.is_empty() && solves.iter().all(|s| s["ok"] == json!(true)), "rows": solves },
+        "setup_bottleneck": setup,
         "recursive_backend_used": any_recursion,
         "recursion_crossover": {
             "epsilon_denominator": EPSILON_DENOM,
@@ -405,7 +466,9 @@ fn main() {
         }
         Some("size-json") => size_json(&args[2]).map(|r| println!("{r}")),
         Some("report") => report(&args[2]).map(|r| println!("{}", serde_json::to_string_pretty(&r).unwrap())),
-        _ => Err("usage: btn-prime-scaling sizes P... | counts P... | solve P SEED XI | size-json FILE | report DIR".into()),
+        Some("multtime") => multtime(&nums(2)),
+        Some("primetime") => primetime(&nums(2)),
+        _ => Err("usage: btn-prime-scaling sizes P... | counts P... | solve P SEED XI | size-json FILE | report DIR | multtime W... | primetime W...".into()),
     };
     if let Err(err) = result {
         eprintln!("error: {err}");

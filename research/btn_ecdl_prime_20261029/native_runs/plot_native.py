@@ -14,7 +14,7 @@ sizes = R["sizes"]["rows"]
 counts = R["counts"]["rows"]
 eccp = R["eccp131"]
 
-fig, ax = plt.subplots(1, 3, figsize=(14, 4.2))
+fig, ax = plt.subplots(1, 4, figsize=(18, 4.2))
 
 d = [s["d"] for s in sizes]
 ax[0].plot(d, [s["edges"] for s in sizes], "o-", color="#2a6fdb", label="edges")
@@ -42,6 +42,26 @@ for i, v in enumerate([eccp["functional_backend_log2_assignments_per_contraction
     ax[2].text(i, v + 8, f"2^{v:.1f}", ha="center", fontsize=9)
 ax[2].set_ylabel("log2 operations"); ax[2].set_title("ECCp-131 (d = 131), derived")
 ax[2].set_ylim(0, 600)
+
+# Panel 4: setup bottleneck — multiply construction (flat) vs is_prime (AKS cliff).
+S = R["setup_bottleneck"]
+mult = S["multiply_construction"]["rows"]
+primes = S["is_prime"]["rows"]
+mw = [m["width"] for m in mult]; mus = [m["micros"] for m in mult]
+pw = [p["width"] for p in primes if p.get("micros") is not None]
+pus = [p["micros"] for p in primes if p.get("micros") is not None]
+ax[3].semilogy(mw, mus, "o-", color="#2a6fdb", label="multiply construction")
+ax[3].semilogy(pw, pus, "s-", color="#27ae60", label="is_prime (u64 path, ≤64 bit)")
+aks = next((p for p in primes if p.get("path") == "aks"), None)
+if aks:
+    lb = aks["micros_lower_bound"]
+    ax[3].semilogy([aks["width"]], [lb], "v", color="#c0392b", markersize=10)
+    ax[3].annotate(f"is_prime 65-bit:\nAKS, >{lb//1_000_000}s\n(did not finish)",
+                   xy=(aks["width"], lb), xytext=(70, lb / 50), fontsize=8, color="#c0392b",
+                   arrowprops=dict(arrowstyle="->", color="#c0392b"))
+ax[3].axvline(64.5, color="#888", ls=":", lw=1)
+ax[3].set_xlabel("bit width"); ax[3].set_ylabel("microseconds (log)")
+ax[3].set_title("Setup: multiply vs primality (AKS cliff at 65)"); ax[3].legend(fontsize=7, loc="center left")
 
 fig.suptitle("hashed-ecdl-tensor, native measurements (research/btn_ecdl_prime_20261029/native_runs)", fontsize=9)
 fig.tight_layout()
