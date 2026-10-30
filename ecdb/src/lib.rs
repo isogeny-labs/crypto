@@ -11,5 +11,6 @@ pub mod db;
 pub mod field;
 pub mod import;
 pub mod json;
+pub mod lambda;
 pub mod math;
 pub mod migrate;
