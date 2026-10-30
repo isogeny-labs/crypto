@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-29T22:27:16.275927+00:00",
+  "runs": [
+    {
+      "id": 40945140871,
+      "head_sha": "e435a4d2097d832b01dae80fb6015d4b57456ff9",
+      "status": "queued",
+      "conclusion": null,
+      "created_at": "2026-10-29T20:00:29Z",
+      "cancel_exit": 0,
+      "cancel_response": "{}",
+      "reason": "Superseded by sourceea31b9b0 hosted audit40962505458, all124 jobs passed. Every old proof/context byte is unchanged; source diff adds only new three-leads context already included in that successful run."
+    },
+    {
+      "id": 40949376781,
+      "head_sha": "4eb4eb45d7cb104b85735c521e656a1fba112f13",
+      "status": "pending",
+      "conclusion": null,
+      "created_at": "2026-10-29T20:28:42Z",
+      "cancel_exit": 0,
+      "cancel_response": "{}",
+      "reason": "Superseded by sourceea31b9b0 hosted audit40962505458, all124 jobs passed. Every old proof/context byte is unchanged; source diff adds only new three-leads context already included in that successful run."
+    }
+  ],
+  "correction": {
+    "at": "2026-10-29T22:27:39.545106+00:00",
+    "run": 40949376781,
+    "source": "4eb4eb45d7cb104b85735c521e656a1fba112f13",
+    "error": "This newer main run has additional guarded exact-pair proofs and context repairs absent from successfulea31 audit. Its initial supersession classification was wrong; cancellation is not validation.",
+    "action": "Requested a complete rerun of the same original run/source; additional current contexts remain pending."
+  }
+}

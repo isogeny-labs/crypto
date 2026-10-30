@@ -1,0 +1,62 @@
+\section{Conservation is an exact statement about multiplicity}
+
+The conservation identity is the least assumption-sensitive result in
+this inventory \cite{yieldSource}. It is a finite-fibre count.
+
+\begin{proposition}[Finite-pattern conservation]
+Let $M$ and $G$ be finite sets and $s:M\to G$ a function. Put
+$c(g)=|s^{-1}(g)|$. Then
+\[
+ \sum_{g\in G}c(g)=|M|.
+\]
+If $G$ is nonempty and the target is uniform, its mean multiplicity is
+$|M|/|G|$.
+\end{proposition}
+\begin{proof}
+Each element of $M$ belongs to exactly one fibre of $s$. The fibres
+partition $M$, so their cardinalities sum to $|M|$. Division by the
+number of targets gives the stated uniform mean.
+\end{proof}
+
+For a finite abelian group $G$, a set $D$ of $B$ distinct elements and
+$m\geq1$, choose $M$ according to the declared counting convention:
+\begin{align*}
+ \text{ordered tuples with repetition:}\quad &|M|=B^m,\\
+ \text{unordered multisets with repetition:}\quad
+ &|M|=\binom{B+m-1}{m},\\
+ \text{one element from each typed set }D_i:\quad
+ &|M|=\prod_{i=1}^m |D_i|.
+\end{align*}
+The sum is well defined for multisets because the group is abelian.
+Comparing two conventions without changing the denominator is not a
+violation of conservation. Signed decompositions similarly require
+specifying whether signs are separate labels or whether $D\cup(-D)$ is
+a deduplicated set.
+
+Coverage $p=|\{g:c(g)>0\}|/|G|$ is not the mean $\mu$.
+Exactly,
+\[
+ p=\mu-\frac1{|G|}\sum_g(c(g)-1)_+\leq\min(1,\mu).
+\]
+When $\mu\leq1$, equality $p=\mu$ requires every count to be zero or one;
+when $\mu>1$, equality with the bound $1$ requires coverage of every
+target and permits repeated decompositions. Conservation therefore
+leaves coverage, concentration and useful relation rank free. A claimed
+universal numerical bound on a structured base's gain over a random base
+would additionally require a model or bound for that random comparator;
+it does not follow from this double count alone.
+
+\paragraph{What is not conserved.}
+The identity is not about the cost of finding a decomposition, the rank
+of resulting rows, a nonuniform target law, or the mean over a selected
+proper subset of $G$. A learned filter can redistribute work across
+targets without contradicting it. A target-dependent base is another
+experiment and must charge its selection. These are genuine open axes,
+not exceptions to the stated identity.
+
+The corpus already formalizes the general finite-pattern core in
+\art{FactorBaseDesigns.sum_count}. It uses a list domain and a
+nonduplicated target list covering its image, so domain repetitions
+count as labelled multiplicities. The ordinary tuple or multiset
+cardinality formula is a separate instantiation. Section~\ref{sec:formal}
+records that boundary precisely.
