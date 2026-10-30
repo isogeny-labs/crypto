@@ -1,5 +1,6 @@
 use pencil_native_canonical_export::{
-    adapter_hash, check_export, load, package, validate_protocol, write_exclusive,
+    adapter_hash, check_export, load, package, prepare_reviewed_provenance_erratum,
+    validate_protocol, write_exclusive,
 };
 use std::path::Path;
 fn main() {
@@ -21,6 +22,20 @@ fn run() -> Result<(), String> {
         println!(
             "{}",
             serde_json::json!({"schema":"pencil-native-protocol-validation/v1","passed":true,"freeze_status":protocol["freeze"]["status"],"launch_authorized":false,"document_modified":false})
+        );
+        return Ok(());
+    }
+    if a.len() == 8 && a[1] == "prepare-provenance-erratum" && a[6] == "--out" {
+        let protocol = prepare_reviewed_provenance_erratum(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            Path::new(&a[4]),
+            Path::new(&a[5]),
+        )?;
+        write_exclusive(Path::new(&a[7]), &protocol)?;
+        println!(
+            "{}",
+            serde_json::json!({"schema":"pencil-native-provenance-erratum-preparation/v1","protocol":a[7],"protocol_sha256":protocol["freeze"]["protocol_sha256"],"filed_before_affected_data":false,"parent_protocol_sha256":protocol["extensions"]["analysis_provenance_erratum"]["parent_protocol"]["protocol_sha256"],"document_modified":false})
         );
         return Ok(());
     }

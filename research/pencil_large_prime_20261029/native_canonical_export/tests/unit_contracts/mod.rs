@@ -72,7 +72,14 @@ impl Fixture {
                 .collect::<String>(),
         )
         .unwrap();
-        let m = json!({"schema":"pencil-price-cohort-input/v1","protocol_sha256":self.p["freeze"]["protocol_sha256"],"binary_sha256":self.p["arms"][0]["instrument"]["binary_sha256"],"prepared_plan_validation":binding(&self.path("receipt.json")),"plans":[{"path":self.path("plan.json"),"sha256":digest(&self.path("plan.json")).unwrap(),"name":"plan.json","session_id":"software-session","records":binding(&self.path("records.jsonl"))}],"separate_resources":binding(&self.path("resources.json"))});
+        let data_protocol_sha256 = self.p["extensions"]["analysis_provenance_erratum"]
+            ["parent_protocol"]["protocol_sha256"]
+            .as_str()
+            .map_or_else(
+                || self.p["freeze"]["protocol_sha256"].clone(),
+                |sha| json!(sha),
+            );
+        let m = json!({"schema":"pencil-price-cohort-input/v1","protocol_sha256":data_protocol_sha256,"binary_sha256":self.p["arms"][0]["instrument"]["binary_sha256"],"prepared_plan_validation":binding(&self.path("receipt.json")),"plans":[{"path":self.path("plan.json"),"sha256":digest(&self.path("plan.json")).unwrap(),"name":"plan.json","session_id":"software-session","records":binding(&self.path("records.jsonl"))}],"separate_resources":binding(&self.path("resources.json"))});
         let pins = &self.p["extensions"]["analysis_support_sha256"];
         self.write("native.json",&json!({"schema":"pencil-price-cohort-output/v1","input_manifest":m,"input_manifest_integrity_sha256":hash(&canonical(&m).unwrap()),"expected_executions":18,"observed_executions":self.rows.len(),"missing_executions":vec![json!({});18-self.rows.len()],"separate_resource_observations":load(&self.path("resources.json")).unwrap(),"aggregate_source_sha256":pins["native_price/src/aggregate.rs"],"paired_export_source_sha256":pins["paired_export/src/lib.rs"],"paired_export_plan_source_sha256":pins["paired_export/src/plan.rs"],"mapping":{"mapping_sha256":self.p["extensions"]["finite_cost_model"]["mapping_sha256"]}}));
         let mut native = load(&self.path("native.json")).unwrap();
@@ -82,7 +89,7 @@ impl Fixture {
             &self.rows,
         );
         self.write("native.json", &native);
-        self.write("history.json",&json!({"schema":"pencil-execution-history/v1","protocol_sha256":self.p["freeze"]["protocol_sha256"],"binary_sha256":m["binary_sha256"],"records":self.rows.iter().map(|r|json!({"record_id":r["record_id"],"session_id":r["session_id"],"seq":r["seq"],"attempts":1,"resumed":0,"checkpoint":null,"evidence":[binding(&self.path("resources.json"))]})).collect::<Vec<_>>()}));
+        self.write("history.json",&json!({"schema":"pencil-execution-history/v1","protocol_sha256":data_protocol_sha256,"binary_sha256":m["binary_sha256"],"records":self.rows.iter().map(|r|json!({"record_id":r["record_id"],"session_id":r["session_id"],"seq":r["seq"],"attempts":1,"resumed":0,"checkpoint":null,"evidence":[binding(&self.path("resources.json"))]})).collect::<Vec<_>>()}));
         let study = Path::new(env!("CARGO_MANIFEST_DIR"));
         self.req = json!({"schema":"pencil-canonical-package-input/v1","canonical_tool":binding(&study.join("tools/experiment_protocol.reference.txt")),"protocol":binding(&self.path("protocol.json")),"native_analysis":binding(&self.path("native.json")),"analysis_script":self.p["analysis_plan"]["script"],"analysis_provenance":self.provenance,"execution_history":binding(&self.path("history.json")),"export_id":"software-fixture-export","created":"2026-10-29T00:00:00Z"});
     }
@@ -98,6 +105,295 @@ impl Fixture {
         self.write(name, &v);
         self.req[field] = binding(&self.path(name));
     }
+    fn post_data_provenance_erratum(&mut self) {
+        const PREFIX: &str = "research/pencil_large_prime_20261029/";
+        let corrected_sources: serde_json::Map<_, _> = self.p["extensions"]
+            ["analysis_support_sha256"]
+            .as_object()
+            .unwrap()
+            .iter()
+            .filter(|(name, _)| {
+                name.starts_with("native_price/") || name.starts_with("paired_export/")
+            })
+            .map(|(name, sha)| (name.clone(), sha.clone()))
+            .collect();
+        self.provenance["sources"]
+            .as_object_mut()
+            .unwrap()
+            .retain(|name, _| {
+                name.starts_with("native_price/") || name.starts_with("paired_export/")
+            });
+        let mut full_sources = serde_json::Map::new();
+        for (name, sha) in &corrected_sources {
+            full_sources.insert(format!("{PREFIX}{name}"), sha.clone());
+        }
+        self.p["extensions"]["analysis_support_sha256"] = V::Object(full_sources.clone());
+        for name in ["analyze_pair", "analyze_cohort"] {
+            self.p["extensions"]["analysis_build"]["binaries"][name]
+                .as_object_mut()
+                .unwrap()
+                .remove("bytes");
+            self.p["extensions"]["finite_cost_model"]["analyzer_binaries_sha256"][name] =
+                json!("0".repeat(64));
+        }
+        self.p["extensions"]["analysis_build"]["receipt"] = json!("bindings.json");
+        self.p["extensions"]["analysis_build"]["receipt_sha256"] = json!("1".repeat(64));
+        self.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&self.p).unwrap());
+        let parent = self.p.clone();
+        self.write("parent-protocol.json", &parent);
+
+        let source_lines = full_sources
+            .iter()
+            .map(|(name, sha)| format!("{}  {name}\n", sha.as_str().unwrap()))
+            .collect::<String>();
+        fs::write(self.path("predata-sources.sha256"), source_lines).unwrap();
+        let receipt_path =
+            PathBuf::from(self.provenance["build_receipt"]["path"].as_str().unwrap());
+        let mut receipt = load(&receipt_path).unwrap();
+        receipt["sources"].as_array_mut().unwrap().retain(|entry| {
+            let name = entry["path"].as_str().unwrap();
+            name.starts_with("native_price/") || name.starts_with("paired_export/")
+        });
+        fs::write(&receipt_path, serde_json::to_vec(&receipt).unwrap()).unwrap();
+        self.provenance["build_receipt"] = binding(&receipt_path);
+        let binary_lines = receipt["binaries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|b| {
+                format!(
+                    "{}  target/release/{}\n",
+                    b["sha256"].as_str().unwrap(),
+                    b["name"].as_str().unwrap()
+                )
+            })
+            .collect::<String>();
+        fs::write(self.path("predata-binaries.sha256"), binary_lines).unwrap();
+
+        self.p["version"] = json!(n(&parent["version"]).unwrap() + 1);
+        self.p["extensions"]["analysis_support_sha256"] = V::Object(corrected_sources);
+        self.p["extensions"]["analysis_build"]["receipt"] = json!(receipt_path);
+        self.p["extensions"]["analysis_build"]["receipt_sha256"] =
+            json!(digest(&receipt_path).unwrap());
+        for b in receipt["binaries"].as_array().unwrap() {
+            let name = b["name"].as_str().unwrap();
+            self.p["extensions"]["analysis_build"]["binaries"][name]["bytes"] = b["bytes"].clone();
+            self.p["extensions"]["finite_cost_model"]["analyzer_binaries_sha256"][name] =
+                b["sha256"].clone();
+        }
+        let amendment = json!({
+            "id":"A-analysis-provenance-erratum-20261030",
+            "filed":"2026-10-30",
+            "filed_before_affected_data":false,
+            "reason":"Truthful post-data correction of analysis provenance metadata only; frozen parent and observations remain unchanged.",
+            "changes":["Correct four reviewed provenance metadata defects from pre-data manifests."],
+            "supersedes_fields":erratum::FIELDS
+        });
+        self.p["amendments"].as_array_mut().unwrap().push(amendment);
+        let mut parent_binding = binding(&self.path("parent-protocol.json"));
+        parent_binding["protocol_sha256"] = parent["freeze"]["protocol_sha256"].clone();
+        erratum::register_test_reviewed((
+            parent_binding["sha256"].as_str().unwrap().to_owned(),
+            parent_binding["protocol_sha256"]
+                .as_str()
+                .unwrap()
+                .to_owned(),
+            digest(&self.path("predata-sources.sha256")).unwrap(),
+            digest(&self.path("predata-binaries.sha256")).unwrap(),
+            digest(&receipt_path).unwrap(),
+        ));
+        self.p["extensions"]["analysis_provenance_erratum"] = json!({
+            "schema":"pencil-analysis-provenance-erratum/v1",
+            "amendment_id":"A-analysis-provenance-erratum-20261030",
+            "filed_before_affected_data":false,
+            "adapter_sha256":adapter_hash(),
+            "parent_protocol":parent_binding,
+            "predata_source_manifest":binding(&self.path("predata-sources.sha256")),
+            "predata_binary_manifest":binding(&self.path("predata-binaries.sha256")),
+            "reconciled_build_receipt":binding(&receipt_path)
+        });
+        self.p["freeze"]["frozen_at"] = json!("2026-10-30T00:30:00Z");
+        self.p["freeze"]["filed_before_affected_data"] = json!(false);
+        self.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&self.p).unwrap());
+        self.refresh();
+    }
+}
+
+#[test]
+fn exact_post_data_provenance_erratum_is_exported_truthfully() {
+    let mut f = Fixture::new();
+    f.post_data_provenance_erratum();
+    let (e, _) = f.run().unwrap();
+    assert_eq!(
+        e["backend_record"]["post_data_provenance_erratum"]["filed_before_affected_data"],
+        false
+    );
+    assert_eq!(
+        e["backend_record"]["post_data_provenance_erratum"]["changed_fields"],
+        json!(erratum::FIELDS)
+    );
+    assert_eq!(
+        e["backend_record"]["post_data_provenance_erratum"]["data_protocol_sha256"],
+        f.p["extensions"]["analysis_provenance_erratum"]["parent_protocol"]["protocol_sha256"]
+    );
+    assert_eq!(
+        e["backend_record"]["post_data_provenance_erratum"]["metadata_protocol_sha256"],
+        f.p["freeze"]["protocol_sha256"]
+    );
+}
+
+fn erratum_with_change(change: impl FnOnce(&mut V)) -> String {
+    let mut f = Fixture::new();
+    f.post_data_provenance_erratum();
+    change(&mut f.p);
+    f.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&f.p).unwrap());
+    f.refresh();
+    f.run().unwrap_err()
+}
+
+#[test]
+fn post_data_erratum_rejects_changed_method() {
+    assert!(!erratum_with_change(
+        |p| p["arms"][0]["parameters"]["method"] = json!("changed-method")
+    )
+    .is_empty());
+}
+
+#[test]
+fn post_data_erratum_rejects_changed_prices() {
+    assert!(
+        !erratum_with_change(
+            |p| p["extensions"]["finite_cost_model"]["inversion_per_multiply"] =
+                json!([2, 20, 200, 2000])
+        )
+        .is_empty()
+    );
+}
+
+#[test]
+fn post_data_erratum_rejects_changed_seed_contract() {
+    assert!(!erratum_with_change(
+        |p| p["randomization"]["seed_derivation"]["method"] = json!("changed-after-data")
+    )
+    .is_empty());
+}
+
+#[test]
+fn unsupported_post_data_amendment_is_rejected() {
+    let mut f = Fixture::new();
+    f.p["amendments"].as_array_mut().unwrap().push(json!({"id":"A-unsupported","filed":"2026-10-30","filed_before_affected_data":false,"reason":"unsupported","changes":["unsupported"]}));
+    f.p["freeze"]["filed_before_affected_data"] = json!(false);
+    f.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&f.p).unwrap());
+    f.refresh();
+    assert!(f.run().unwrap_err().contains("erratum extension"));
+}
+
+#[test]
+fn post_data_erratum_rejects_wrong_parent_hash() {
+    let mut f = Fixture::new();
+    f.post_data_provenance_erratum();
+    f.p["extensions"]["analysis_provenance_erratum"]["parent_protocol"]["sha256"] =
+        json!("0".repeat(64));
+    f.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&f.p).unwrap());
+    f.refresh();
+    assert!(f
+        .run()
+        .unwrap_err()
+        .contains("exact independently reviewed binding"));
+}
+
+#[test]
+fn post_data_erratum_rejects_caller_rehashed_changed_parent() {
+    let mut f = Fixture::new();
+    f.post_data_provenance_erratum();
+    let mut parent = load(&f.path("parent-protocol.json")).unwrap();
+    parent["arms"][0]["parameters"]["method"] = json!("changed-parent-method");
+    parent["freeze"]["protocol_sha256"] = json!(protocol_hash(&parent).unwrap());
+    f.write("parent-protocol.json", &parent);
+    f.p["arms"][0]["parameters"]["method"] = json!("changed-parent-method");
+    f.p["extensions"]["analysis_provenance_erratum"]["parent_protocol"]["sha256"] =
+        json!(digest(&f.path("parent-protocol.json")).unwrap());
+    f.p["extensions"]["analysis_provenance_erratum"]["parent_protocol"]["protocol_sha256"] =
+        parent["freeze"]["protocol_sha256"].clone();
+    f.p["freeze"]["protocol_sha256"] = json!(protocol_hash(&f.p).unwrap());
+    f.refresh();
+    assert!(f
+        .run()
+        .unwrap_err()
+        .contains("exact independently reviewed binding"));
+}
+
+#[test]
+fn post_data_erratum_rejects_changed_predata_manifest() {
+    let mut f = Fixture::new();
+    f.post_data_provenance_erratum();
+    fs::write(f.path("predata-sources.sha256"), "changed\n").unwrap();
+    assert!(f.run().unwrap_err().contains("hash mismatch"));
+}
+
+#[test]
+fn reviewed_frozen_v5_admits_exact_metadata_only_v6_diagnostic() {
+    let study = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let parent_path =
+        study.join("protocol_draft/first_gate_p739_infrastructure_retry_20261030/protocol.json");
+    let source_manifest = study.join("validation/gate60_analysis_20261029/analysis-support.sha256");
+    let binary_manifest = study.join("validation/gate60_analysis_20261029/binaries.sha256");
+    let receipt_path =
+        study.join("validation/analysis_provenance_erratum_20261030/reconciled-build-receipt.json");
+    let parent = load(&parent_path).unwrap();
+    let receipt = load(&receipt_path).unwrap();
+    let mut child = parent.clone();
+    child["version"] = json!(n(&parent["version"]).unwrap() + 1);
+    let normalized = parent["extensions"]["analysis_support_sha256"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(name, sha)| {
+            (
+                name.strip_prefix("research/pencil_large_prime_20261029/")
+                    .unwrap()
+                    .to_owned(),
+                sha.clone(),
+            )
+        })
+        .collect();
+    child["extensions"]["analysis_support_sha256"] = V::Object(normalized);
+    child["extensions"]["analysis_build"]["receipt"] = json!(receipt_path);
+    child["extensions"]["analysis_build"]["receipt_sha256"] = json!(digest(&receipt_path).unwrap());
+    for binary in receipt["binaries"].as_array().unwrap() {
+        let name = binary["name"].as_str().unwrap();
+        child["extensions"]["analysis_build"]["binaries"][name]["bytes"] = binary["bytes"].clone();
+        child["extensions"]["finite_cost_model"]["analyzer_binaries_sha256"][name] =
+            binary["sha256"].clone();
+    }
+    child["amendments"].as_array_mut().unwrap().push(json!({
+        "id":"A-analysis-provenance-erratum-20261030",
+        "filed":"2026-10-30",
+        "filed_before_affected_data":false,
+        "reason":"Truthful post-data correction of four reviewed analysis provenance metadata defects only.",
+        "changes":["Use pre-data manifests and reconciled analysis build receipt without changing observations or scientific design."],
+        "supersedes_fields":erratum::FIELDS
+    }));
+    let mut parent_binding = binding(&parent_path);
+    parent_binding["protocol_sha256"] = parent["freeze"]["protocol_sha256"].clone();
+    child["extensions"]["analysis_provenance_erratum"] = json!({
+        "schema":"pencil-analysis-provenance-erratum/v1",
+        "amendment_id":"A-analysis-provenance-erratum-20261030",
+        "filed_before_affected_data":false,
+        "adapter_sha256":adapter_hash(),
+        "parent_protocol":parent_binding,
+        "predata_source_manifest":binding(&source_manifest),
+        "predata_binary_manifest":binding(&binary_manifest),
+        "reconciled_build_receipt":binding(&receipt_path)
+    });
+    child["freeze"]["frozen_at"] = json!("2026-10-30T00:35:00Z");
+    child["freeze"]["filed_before_affected_data"] = json!(false);
+    child["freeze"]["protocol_sha256"] = json!(protocol_hash(&child).unwrap());
+    let admitted = protocol_admission(&child).unwrap().unwrap();
+    assert_eq!(
+        admitted.parent_protocol_sha256,
+        parent["freeze"]["protocol_sha256"]
+    );
 }
 #[test]
 fn complete_schema() {
@@ -116,6 +412,13 @@ fn complete_schema() {
         .unwrap()
         .iter()
         .all(|r| r["measurements"]["wall_valid"] == false));
+}
+
+#[test]
+fn valid_draft_protocol_still_validates_without_frozen_admission() {
+    let draft =
+        load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/protocol-draft.json")).unwrap();
+    validate_protocol(&draft, None).unwrap();
 }
 #[test]
 fn missing_no_fake_attempt() {

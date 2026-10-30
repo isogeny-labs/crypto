@@ -988,3 +988,37 @@ cannot substitute for it. PR2869 artifacts workflow needs its standard data pull
 Frozen metadata used incompatible build receipt, omitted binary sizes, stale
 duplicate analyzer hashes and prefixed source keys. Predata source/binary manifests
 resolve the intended identities but do not turn a later correction into preregistration.
+
+## 2026-10-30 — Exact cost grid and canonical observation export
+
+### What was done
+Independent binding review preserved all17 audited source files and verified the
+instrument/build/protocol identities. The unchanged pinned analyzer admitted all300
+measured pairs in all36 finite cells. Method-only ratios span16.424524–67.416795;
+calibration-inclusive ratios span16.382345–67.242171. Exactfractions, immutablefull
+outputs, S3readbacks, PDF/SVG/JSON/CSV and all60target identities are retained.
+Actual canonical packaging and check-export both exit0 with nofindings, retaining
+v5dataidentity and truthful v6postdata correction, qualifiedfalse and allwallinvalid.
+
+### Decisions made
+The scoped exporter correction requires exact reviewed evidence and canonical-diff
+allowlisting; raw observed records and pinned pricing arithmetic were not changed.
+Source review found and corrected an insufficient arbitrary-parent check and a
+draft-validation regression before packaging. Full native exporter validation:
+47library tests,1CLI,1historical and2production tests passed; fmt/strictClippy pass.
+The repaired artifact workflow passes its complete standard wiring check and11
+focused tests. All artifacts preserve scope and failures without a general verdict.
+
+### Open threads
+Exact-current-head remoteCI and merge remain. Full1260target pencil work remains
+outside this60target gate. Rejected clocks were not retried. The whole existing
+progress-export history scan exceeded60seconds and was terminated; only the new
+committed-observation extractor is validated. Other three leads retain their prior
+completed cohorts and explicit finite/proof-scope limitations.
+
+### Errors
+Initial canonical history template omitted session_id/seq and failed closed;
+corrected history copies actual record identities and retains the rejection.
+Raw TeX failure logs contain native trailing spaces, preserved byte-for-byte.
+Artifact helper index cleanup raced an active parentGit lock after successful
+uploads; no lock was removed, and complete readbacks verified the stored objects.

@@ -86,3 +86,20 @@ The narrowly scoped p739 first gate is also supported: a frozen protocol with
 60 existing targets; arbitrary smaller denominator values are rejected. The
 full 1,260-workload route requires no gate scope marker and remains the default.
 Both routes use the same cost aggregation implementation and retain missing rows.
+
+# Post-data provenance correction
+
+The gate's frozen version 5 is retained unchanged. A narrowly supported version 6
+corrects only its analysis receipt binding, analyzer byte sizes, stale duplicate
+binary hashes, and analysis source-key prefixes. `prepare-provenance-erratum`
+requires the exact independently reviewed parent and evidence hashes. It writes a
+new document with `filed_before_affected_data: false`; it never refreezes the
+original or authorizes another experiment.
+
+Canonical packaging validates the complete allowed diff and source/binary
+evidence. The analysis and execution history continue to bind the original v5
+data protocol; the export additionally binds the v6 metadata protocol and retains
+the explicit post-data annotation. Other post-data changes, including altered
+methods, prices, seeds or a caller-rehashed replacement parent, are rejected.
+Clock and finite-price qualification remain separate checks. A structurally valid
+export does not turn the gate's rejected paired clocks into accepted timing.

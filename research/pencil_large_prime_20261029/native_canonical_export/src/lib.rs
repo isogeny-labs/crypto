@@ -1,4 +1,5 @@
 //! Native packaging of existing observations. This module never executes experiments.
+mod erratum;
 mod output_contract;
 mod protocol_lint;
 #[cfg(test)]
@@ -74,6 +75,7 @@ pub fn adapter_hash() -> String {
             include_str!("main.rs"),
             include_str!("protocol_lint.rs"),
             include_str!("output_contract.rs"),
+            include_str!("erratum.rs"),
             include_str!("../Cargo.lock"),
             include_str!("../Cargo.toml"),
             include_str!("../schemas/experiment-protocol.v1.json"),
@@ -81,6 +83,14 @@ pub fn adapter_hash() -> String {
         )
         .as_bytes(),
     )
+}
+pub fn prepare_reviewed_provenance_erratum(
+    parent: &Path,
+    source_manifest: &Path,
+    binary_manifest: &Path,
+    receipt: &Path,
+) -> Result<V> {
+    erratum::prepare(parent, source_manifest, binary_manifest, receipt)
 }
 fn source_pins(p: &V, native: &V) -> Result<()> {
     for (field, file) in [
@@ -136,12 +146,6 @@ pub fn online_reasons(r: &V) -> Vec<String> {
 pub fn validate_protocol(p: &V, base: Option<&Path>) -> Result<()> {
     validate_schema(p, true)?;
     protocol_lint::lint(p)?;
-    for amendment in arr(&p["amendments"])? {
-        check(
-            amendment["filed_before_affected_data"] == true,
-            "amendment after data",
-        )?;
-    }
     if let Some(base) = base {
         let script = &p["analysis_plan"]["script"];
         if let (Some(path), Some(expected)) = (script["path"].as_str(), script["sha256"].as_str()) {
@@ -156,10 +160,17 @@ pub fn validate_protocol(p: &V, base: Option<&Path>) -> Result<()> {
     }
     if p["freeze"]["status"] == "frozen" {
         protocol_admission(p)?;
+    } else {
+        for amendment in arr(&p["amendments"])? {
+            check(
+                amendment["filed_before_affected_data"] == true,
+                "amendment after data",
+            )?;
+        }
     }
     Ok(())
 }
-fn protocol_admission(p: &V) -> Result<()> {
+fn basic_protocol_admission(p: &V, allow_post_data: bool) -> Result<()> {
     validate_schema(p, true)?;
     protocol_lint::lint(p)?;
     check(
@@ -191,11 +202,19 @@ fn protocol_admission(p: &V) -> Result<()> {
     }
     for am in arr(&p["amendments"])? {
         check(
-            am["filed_before_affected_data"] == true,
+            allow_post_data || am["filed_before_affected_data"] == true,
             "amendment after data",
         )?;
     }
     Ok(())
+}
+fn protocol_admission(p: &V) -> Result<Option<erratum::Admitted>> {
+    basic_protocol_admission(p, true)?;
+    let admitted = erratum::admit(p)?;
+    if admitted.is_none() {
+        basic_protocol_admission(p, false)?;
+    }
+    Ok(admitted)
 }
 fn attach(files: &mut BTreeMap<PathBuf, V>, p: &Path, kind: &str) -> Result<V> {
     let p = fs::canonicalize(p).map_err(|e| e.to_string())?;
@@ -303,10 +322,14 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
     let helper = bound(&req["canonical_tool"])?;
     let pp = bound(&req["protocol"])?;
     let p = load(&pp)?;
-    protocol_admission(&p)?;
+    let provenance_erratum = protocol_admission(&p)?;
     let pin = &p["extensions"]["canonical_packaging"];
+    let adapter_pin = provenance_erratum
+        .as_ref()
+        .map(|_| &p["extensions"]["analysis_provenance_erratum"]["adapter_sha256"])
+        .unwrap_or(&pin["adapter_sha256"]);
     check(
-        pin["adapter_sha256"] == adapter_hash()
+        *adapter_pin == adapter_hash()
             && pin["canonical_tool_sha256"] == req["canonical_tool"]["sha256"],
         "native adapter/helper not pinned by protocol",
     )?;
@@ -317,6 +340,10 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
         "unsupported native output",
     )?;
     let m = &native["input_manifest"];
+    let data_protocol_sha256 = provenance_erratum
+        .as_ref()
+        .map(|a| a.parent_protocol_sha256.as_str())
+        .unwrap_or(s(&p["freeze"]["protocol_sha256"])?);
     check(
         native["input_manifest_integrity_sha256"] == hash(&canonical(m)?),
         "native manifest integrity mismatch",
@@ -324,7 +351,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
     source_pins(&p, &native)?;
     check(
         m["schema"] == "pencil-price-cohort-input/v1"
-            && m["protocol_sha256"] == p["freeze"]["protocol_sha256"],
+            && m["protocol_sha256"] == data_protocol_sha256,
         "native protocol identity mismatch",
     )?;
     let binary = &m["binary_sha256"];
@@ -359,6 +386,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
             "src/output_contract.rs",
             include_bytes!("output_contract.rs").as_slice(),
         ),
+        ("src/erratum.rs", include_bytes!("erratum.rs").as_slice()),
         (
             "src/protocol_lint.rs",
             include_bytes!("protocol_lint.rs").as_slice(),
@@ -374,6 +402,11 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
         attach(&mut files, &path, "analysis")?;
     }
     output_contract::provenance(req, &p, &mut files)?;
+    if let Some(a) = &provenance_erratum {
+        for (path, kind) in &a.attachments {
+            attach(&mut files, path, kind)?;
+        }
+    }
     let schema_dir = helper
         .parent()
         .and_then(Path::parent)
@@ -424,7 +457,7 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
     let history = load(&hp)?;
     check(
         history["schema"] == "pencil-execution-history/v1"
-            && history["protocol_sha256"] == p["freeze"]["protocol_sha256"]
+            && history["protocol_sha256"] == data_protocol_sha256
             && &history["binary_sha256"] == binary,
         "execution history identity mismatch",
     )?;
@@ -630,7 +663,8 @@ fn package_core(req: &V, replay: fn(&V, &V) -> Result<()>) -> Result<(V, Vec<Str
         .iter()
         .map(|a| json!({"id":a["id"],"role":a["role"],"binary_sha256":binary,"commit":commit}))
         .collect();
-    let e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"request_binding":req["_request_binding"],"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?}});
+    let post_data = provenance_erratum.as_ref().map(|a| json!({"applied":true,"filed_before_affected_data":false,"amendment_id":a.amendment_id,"parent_protocol_sha256":a.parent_protocol_sha256,"data_protocol_sha256":a.parent_protocol_sha256,"metadata_protocol_sha256":p["freeze"]["protocol_sha256"],"changed_fields":erratum::FIELDS}));
+    let e = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs,true),"protocol":{"path":pp,"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"native-rust","model":null,"session":null,"role":"executor"},"source":{"repo":p["repository"],"commit":commit,"dirty":null},"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&runs),"runs":runs,"files":files.into_values().collect::<Vec<_>>(),"analysis":{"script":script_entry,"blinded":false,"blinding_key_sha256":null,"outputs":[native_entry],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"request_binding":req["_request_binding"],"schema":"pencil-canonical-packaging/v1","qualified":false,"expected_execution_slots":expected,"missing_slots":missing,"diagnostics":diagnostics,"resource_observations_present":resources.is_some(),"flow_scope":"Observed records with explicit known attempt/restore counts; missing slots are not fabricated attempts; separate infrastructure attempts remain in resource sidecars.","native_analysis_sha256":digest(&np)?,"post_data_provenance_erratum":post_data}});
     validate_schema(&e, false)?;
     check_files(&e)?;
     let findings = lint_rows(&e, &p)?;
