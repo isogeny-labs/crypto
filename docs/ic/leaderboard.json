@@ -306,6 +306,10 @@
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
   },
+  "n83_dense_root_primary": {
+   "path": "research/n83_dense_root_20261013/analysis_primary.json",
+   "sha256": "0c77bd465e8d4acc37e2ab5be640ff4bf6106707d0bf428c9bdca41d5a2c8790"
+  },
   "n83_tier1_cold_holdout": {
    "path": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
    "sha256": "4c296ed1a4e145cfaeff850b0a8882c5721971f607f2be2b4119d7e210c85600"
@@ -9028,6 +9032,11 @@
    "targets": 64,
    "setup_seconds_approx": 28.0,
    "status": "superseded (empty-table rho)",
+   "generic_bound": {
+    "status": "not recorded",
+    "source": "research/ecbench_frontier_20261013/frontier-data.json",
+    "note": "S and T are in no committed file. The row's evidence directory `research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/` (`docs/ic/BOUNDARY_TARGETS.md`, `vs_rho` row) is not in the repository, and `research/ecbench_frontier_20261013/frontier-data.json` holds only the ratio, interval, target count and setup seconds. That run's record would have to carry the advice-state count and the mean online probes"
+   },
    "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected."
   },
   "exploratory_online": {
@@ -9038,7 +9047,19 @@
    "setup_inclusive_class": "diagnostic: complete IC process divided by reported rho online time; not a matched cold ratio",
    "first_integer_break_even_under_model": 306,
    "status": "superseded (empty-table rho)",
-   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected."
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected.",
+   "generic_bound": {
+    "status": "computed",
+    "states": 268322732,
+    "probes": 111004.0,
+    "subgroup_order": 8569786107849059,
+    "aut": 166,
+    "log2_s_t2": 61.5198983205,
+    "log2_r_over_aut": 45.5531411887,
+    "distance_bits": 15.9667571318,
+    "source": "research/n83_dense_root_20261013/analysis_primary.json",
+    "note": "S = regular_states, T = the one target's probes (`mean_target_probes`, targets = 1) in the frozen primary analysis; derived, not measured here"
+   }
   },
   "replay_block": {
    "identical": 120,
