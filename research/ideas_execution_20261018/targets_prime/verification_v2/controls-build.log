@@ -1,0 +1,19 @@
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp: In function ‘int main(int, char**)’:
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:10:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   10 |  if(argc!=2)throw std::runtime_error("usage: controls FRESH_CONTROL_DIRECTORY");Path dir=argv[1];if(std::filesystem::exists(dir))throw std::runtime_error("control directory exists");std::filesystem::create_directories(dir);
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:10:81: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   10 |  if(argc!=2)throw std::runtime_error("usage: controls FRESH_CONTROL_DIRECTORY");Path dir=argv[1];if(std::filesystem::exists(dir))throw std::runtime_error("control directory exists");std::filesystem::create_directories(dir);
+      |                                                                                 ^~~~
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:19:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   19 |  if(position==rows.size())throw std::runtime_error("control binding missing");U p=rows[position]["p"].get<U>();
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:19:79: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   19 |  if(position==rows.size())throw std::runtime_error("control binding missing");U p=rows[position]["p"].get<U>();
+      |                                                                               ^
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:23:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   23 |  if(base.inf)throw std::runtime_error("repeat-point control has empty base");P target=curve.mul(4,base);if(target.inf)throw std::runtime_error("repeat-point control infinity");
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/controls.cpp:23:78: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   23 |  if(base.inf)throw std::runtime_error("repeat-point control has empty base");P target=curve.mul(4,base);if(target.inf)throw std::runtime_error("repeat-point control infinity");
+      |                                                                              ^
