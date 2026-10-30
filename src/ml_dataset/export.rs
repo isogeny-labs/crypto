@@ -16,6 +16,13 @@ use serde_json::{json, Value};
 use super::storage;
 use super::types::Artifact;
 
+#[path = "prefix_algebra.rs"]
+mod prefix_algebra;
+#[path = "prime_chain_graph.rs"]
+mod prime_chain_graph;
+#[path = "prime_chain_prefix.rs"]
+mod prime_chain_prefix;
+
 const CHUNK_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RECORD_BYTES: usize = 64 * 1024 * 1024;
 const MERGE_FAN_IN: usize = 8;
@@ -744,6 +751,16 @@ fn output_directory(root: &Path, requested: &Path) -> Result<PathBuf, String> {
 /// Export local canonical records into a projection safe from known-answer and
 /// solver-outcome leakage. This does not download remote sources or train a model.
 pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
+    export_with_graph_projector(root, out, prime_chain_graph::project)
+}
+
+type GraphProjector = fn(&Value, &Value, &Value) -> Result<Option<Value>, String>;
+
+fn export_with_graph_projector(
+    root: &Path,
+    out: &Path,
+    graph_projector: GraphProjector,
+) -> Result<Value, String> {
     let root = super::checked_directory(root, false)?;
     let _source_lease = super::Lease::acquire(&root)?;
     let (plan, binding, plan_sha) = super::bound_run(&root)?;
@@ -765,12 +782,18 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let mut features = Sorter::new(&scratch.0, "feature");
     let mut targets = Sorter::new(&scratch.0, "target");
     let mut index = Sorter::new(&scratch.0, "index");
+    let mut prefix_features = Sorter::new(&scratch.0, "prefix-feature");
+    let mut prefix_records = Sorter::new(&scratch.0, "prefix-record");
+    let mut prefix_occurrences = 0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
     let mut unavailable = 0u64;
     let mut missing_alternative_base = 0u64;
     let mut missing_large_prime_domain = 0u64;
+    let mut missing_prime_chain_graph = 0u64;
+    let mut oversized_prime_chain_graph = 0u64;
+    let mut prime_chain_graph_occurrences = 0u64;
     let mut domain_counts = std::collections::BTreeMap::<String, u64>::new();
     let mut split_counts = std::collections::BTreeMap::<String, u64>::new();
     let shard_count = integer(&binding["shard_count"], "shard_count")?;
@@ -866,6 +889,41 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                             feature_status = "missing_verified_large_prime_domain_or_transcript";
                         }
                         inputs
+                    } else if manifest.config.family == "prime"
+                        && manifest.config.solver == "f4"
+                        && (3..=15).contains(&manifest.config.m)
+                    {
+                        if let Some(artifact) = manifest
+                            .artifacts
+                            .iter()
+                            .find(|a| a.path == "prime-f4-input.json")
+                        {
+                            if artifact.role != "complete-prime-field-polynomial-system"
+                                || artifact.encoding != "json"
+                            {
+                                return Err(
+                                    "invalid prime-chain input artifact role or encoding".into()
+                                );
+                            }
+                            let input: Value = super::read_json(&dir.join(&artifact.path))?;
+                            match graph_projector(&public, &base, &input)? {
+                                Some(graph) => {
+                                    let mut projected = feature_projection(&public, &base)?;
+                                    projected["prime_chain_graph"] = graph;
+                                    prime_chain_graph_occurrences += 1;
+                                    Some(projected)
+                                }
+                                None => {
+                                    oversized_prime_chain_graph += 1;
+                                    feature_status = "prime_chain_graph_size_limit";
+                                    None
+                                }
+                            }
+                        } else {
+                            missing_prime_chain_graph += 1;
+                            feature_status = "missing_verified_prime_chain_input";
+                            None
+                        }
                     } else {
                         Some(feature_projection(&public, &base)?)
                     }
@@ -875,6 +933,64 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
                     let domain = text(&inputs["pdp_domain"], "PDP domain")?;
                     let id = super::digest(bounded_json(&inputs, MAX_RECORD_BYTES)?.as_bytes());
                     let (group, partition) = split_for_size(integer(&inputs["n"], "n")?);
+                    if inputs.get("prime_chain_graph").is_some() {
+                        let event_artifact = manifest
+                            .artifacts
+                            .iter()
+                            .find(|a| a.path == "prime-f4-chain-events.jsonl");
+                        let replay = if let Some(artifact) = event_artifact {
+                            if artifact.role
+                                != "restricted-native-prime-f4-recursion-and-lift-events"
+                                || artifact.encoding != "jsonl"
+                            {
+                                return Err(
+                                    "invalid prime-chain event artifact role or encoding".into()
+                                );
+                            }
+                            let input: Value = super::read_json(&dir.join("prime-f4-input.json"))?;
+                            let reader = BufReader::new(
+                                File::open(dir.join(&artifact.path)).map_err(|e| e.to_string())?,
+                            );
+                            let mut occurrence = 0u64;
+                            prime_chain_prefix::replay(
+                                &input,
+                                &inputs,
+                                reader,
+                                |feature, record| {
+                                    occurrence += 1;
+                                    let record_id = super::digest(
+                                        format!("{target_id}\nprefix-record\n{occurrence}")
+                                            .as_bytes(),
+                                    );
+                                    let prefix_id = if let Some(feature) = feature {
+                                        let prefix_id = super::digest(
+                                            bounded_json(&feature, MAX_RECORD_BYTES)?.as_bytes(),
+                                        );
+                                        prefix_features.push(&prefix_id, &json!({"schema":"ml-dataset.prefix-features/v1",
+                                        "feature_id":prefix_id,"split_component":group,"split":partition,"inputs":feature}))?;
+                                        prefix_occurrences += 1;
+                                        Some(prefix_id)
+                                    } else {
+                                        None
+                                    };
+                                    prefix_records.push(&record_id, &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                                    "record_id":record_id,"source_target_id":target_id,"source_event_artifact":artifact,
+                                    "feature_id":prefix_id,"split_component":group,"split":partition,"record":record}))
+                                },
+                            )?
+                        } else {
+                            json!({"schema":"ml-dataset.prime-chain-prefix-replay/v1","admission_status":"no_retained_native_events",
+                                "verified_branch_examples":0,"source_completion_claimed":false})
+                        };
+                        let record_id =
+                            super::digest(format!("{target_id}\nprefix-replay-summary").as_bytes());
+                        prefix_records.push(
+                            &record_id,
+                            &json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                            "record_id":record_id,"source_target_id":target_id,"feature_id":null,
+                            "split_component":group,"split":partition,"record":replay}),
+                        )?;
+                    }
                     let row = json!({"schema":"ml-dataset.features/v1","feature_id":id,"split_component":group,"split":partition,"inputs":inputs});
                     features.push(&id, &row)?;
                     feature_occurrences += 1;
@@ -937,6 +1053,10 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
     let unique_features = features.finish(&features_staged)?;
     let target_rows = targets.finish(&targets_staged)?;
     let index_rows = index.finish(&index_staged)?;
+    let prefix_features_staged = scratch.0.join("prefix-features.jsonl");
+    let prefix_records_staged = scratch.0.join("prefix-records.jsonl");
+    let unique_prefix_features = prefix_features.finish(&prefix_features_staged)?;
+    let prefix_record_rows = prefix_records.finish(&prefix_records_staged)?;
     if target_rows != sealed || index_rows != sealed + unsealed {
         return Err("export lost or duplicated source identities".into());
     }
@@ -959,18 +1079,40 @@ pub fn export(root: &Path, out: &Path) -> Result<Value, String> {
             "restricted/index.jsonl",
             "restricted-source-provenance",
         )?,
+        install(
+            &out,
+            &prefix_features_staged,
+            "prefix-features.jsonl",
+            "allowlisted-causal-model-inputs",
+        )?,
+        install(
+            &out,
+            &prefix_records_staged,
+            "restricted/prefix-records.jsonl",
+            "restricted-prefix-labels-certificates-and-provenance",
+        )?,
     ];
     let manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
         "sealed_source_cells":sealed,"unsealed_attempts_excluded":unsealed,"cells_without_verified_features":unavailable,
         "cells_without_verified_alternative_factor_base":missing_alternative_base,"feature_occurrences_by_pdp_domain":domain_counts,
         "cells_without_verified_large_prime_domain":missing_large_prime_domain,
+        "cells_without_verified_prime_chain_graph":missing_prime_chain_graph,
+        "cells_excluded_by_prime_chain_graph_size_limit":oversized_prime_chain_graph,
+        "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
+        "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
+        "restricted_prefix_record_rows":prefix_record_rows,
         "feature_occurrences":feature_occurrences,"unique_feature_rows":unique_features,"restricted_target_rows":target_rows,
-        "feature_identity":"SHA256 of canonical strictly projected public inputs, actual small/residual factor bases, column actions and PDP/relation-query domain; solver and source provenance excluded",
+        "feature_identity":"SHA256 of canonical strictly projected public inputs, optional exact equation graph and mathematical encoding, actual small/residual factor bases, column actions and PDP/relation-query domain; solver and source provenance excluded",
         "split_policy":{"domain":SPLIT_DOMAIN,"component":"field-size-nN","assignment":"first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
             "occurrences_by_partition":split_counts,"all_same_size_families_twists_generators_keys_stay_together":true,
             "cross_size_algebraic_links_merged":false,"row_random_split_permitted":false},
-        "feature_policy":{"version":"strict-structural-allowlist-v3","only_features_jsonl_is_model_input":true,
+        "feature_policy":{"version":"strict-structural-allowlist-v5","only_features_jsonl_is_model_input":false,
+            "model_input_files":["features.jsonl","prefix-features.jsonl"],
+            "prefix_task":"prime-chain-next-branch-attempt/v1; replayed recursive state and independently derived iterator; observed imitation labels only, no optimality or counterfactual cost",
+            "prefix_claim_limits":["bounded ideal-certificate search can exclude a suffix","no complete native execution or instruction proof","no exact first/last fall degree","no complete Groebner basis claim"],
+            "prime_chain_graph":"prime-chain-graph/v1 static equations/domains and signed-point incidence, reconstructed before publication; no solver-prefix/action features; missing or oversized graphs excluded with restricted provenance",
+            "prime_chain_graph_capabilities":prime_chain_graph::capabilities(),
             "pkm_domain":"verified exact alternative Kummer base; missing base excluded from matched routing features",
             "large_prime_domain":"exact saved small/residual domains bound to independently replayed transcript; signed Frobenius and identity/sign routes have distinct identities; missing domain or transcript excluded with provenance retained",
             "cross_domain_routing_labels_matched":false,
@@ -1007,6 +1149,17 @@ mod tests {
             self.source_with_method("prime", if pkm { "pkm" } else { "bsgs" }, include_pkm_base)
         }
         fn source_with_method(&self, family: &str, method: &str, run_solver: bool) -> PathBuf {
+            self.source_with_parameters(family, method, run_solver, 11, 2, 8)
+        }
+        fn source_with_parameters(
+            &self,
+            family: &str,
+            method: &str,
+            run_solver: bool,
+            n: u32,
+            m: usize,
+            factor_base_size: usize,
+        ) -> PathBuf {
             let source = self.0.join("source");
             fs::create_dir(&source).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1","purpose":"native export correctness fixture"});
@@ -1018,17 +1171,17 @@ mod tests {
             let protocol = serde_json::to_vec(&protocol).unwrap();
             let plan = DatasetPlan {
                 schema: "crypto.ml-dataset.plan/v1".into(),
-                field_sizes: vec![11],
-                arities: vec![2],
+                field_sizes: vec![n],
+                arities: vec![m],
                 families: vec![family.into()],
                 solvers: vec!["enumerate".into(), method.into()],
                 curve_seeds: 8,
                 generators: 2,
                 keys: 2,
                 seed: 42,
-                factor_base_size: 8,
-                degree_bound: 4,
-                work_limit: 1000,
+                factor_base_size,
+                degree_bound: if method == "f4" && m >= 3 { 1 } else { 4 },
+                work_limit: if method == "f4" && m >= 3 { 1 } else { 1000 },
                 twists: true,
                 protocol_sha256: Some(crate::ml_dataset::digest(&protocol)),
                 split_rule: "curve-twist-component-sha256-v1".into(),
@@ -1039,11 +1192,21 @@ mod tests {
             storage::write_json(&source, "plan.json", "plan", &plan).unwrap();
             storage::write_json(&source, "run.json", "run", &binding).unwrap();
             storage::write_bytes(&source, "protocol.json", "protocol", "json", &protocol).unwrap();
-            let case = curves::generate(&plan.cell(124).unwrap()).unwrap();
-            for cell_index in [124, 125] {
+            let first_case = curves::generate(&plan.cell(124).unwrap()).unwrap();
+            let cell_indices: &[u64] = if method == "f4" && m >= 3 {
+                &[124, 125, 126, 127]
+            } else {
+                &[124, 125]
+            };
+            for &cell_index in cell_indices {
                 let dir = source.join("cells").join(format!("{cell_index:012}"));
                 fs::create_dir_all(&dir).unwrap();
                 let config = plan.cell(cell_index).unwrap();
+                let case = if config.twist {
+                    curves::generate(&config).unwrap()
+                } else {
+                    first_case.clone()
+                };
                 let mut artifacts = vec![
                     storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
                     storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
@@ -1082,6 +1245,8 @@ mod tests {
                     let result = crate::ml_dataset::solvers::solve(&config, &solver_case).unwrap();
                     let required_role = if method == "pkm" {
                         "explicit-alternative-kummer-factor-base"
+                    } else if method == "f4" {
+                        "complete-prime-field-polynomial-system"
                     } else {
                         LARGE_PRIME_DOMAIN_ROLE
                     };
@@ -1247,6 +1412,223 @@ mod tests {
         fs::write(source.join("cells/000000000124/witness.json"), b"corrupt").unwrap();
         assert!(export(&source, &f.0.join("bad-export")).is_err());
         assert!(!f.0.join("bad-export/manifest.json").exists());
+    }
+
+    #[test]
+    fn legacy_prime_f4_m2_export_keeps_the_shared_generic_identity() {
+        let f = Fixture::new();
+        let source = f.source_with_parameters("prime", "f4", true, 7, 2, 2);
+        let out = f.0.join("training");
+        let result = export(&source, &out).unwrap();
+        assert_eq!(result["export"]["prime_chain_graph_occurrences"], 0);
+        assert_eq!(result["export"]["unique_feature_rows"], 1);
+        assert_eq!(result["export"]["feature_occurrences"], 2);
+        let row: Value = serde_json::from_str(
+            fs::read_to_string(out.join("features.jsonl"))
+                .unwrap()
+                .trim(),
+        )
+        .unwrap();
+        assert!(row["inputs"].get("prime_chain_graph").is_none());
+    }
+
+    #[test]
+    fn graph_resource_refusal_retains_labels_without_generic_feature_fallback() {
+        let f = Fixture::new();
+        let source = f.source_with_parameters("prime", "f4", true, 7, 3, 2);
+        let out = f.0.join("training");
+        // Inject only a projector resource refusal after real sealed-cell replay.
+        // This checks exporter behavior independently of the codec's cap tests.
+        let result = export_with_graph_projector(&source, &out, |_, _, _| Ok(None)).unwrap();
+        assert_eq!(
+            result["export"]["cells_excluded_by_prime_chain_graph_size_limit"],
+            2
+        );
+        assert_eq!(result["export"]["prime_chain_graph_occurrences"], 0);
+        assert_eq!(result["export"]["unique_feature_rows"], 2);
+        let rows: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|s| serde_json::from_str(s).unwrap())
+            .collect();
+        for row in rows.iter().filter(|r| r["solver"] == "f4") {
+            assert!(row["feature_id"].is_null());
+            assert_eq!(row["feature_status"], "prime_chain_graph_size_limit");
+            assert!(row["known_answer_scalar"].is_null());
+            assert!(row["witness_artifact"].is_object());
+        }
+    }
+
+    #[test]
+    fn prime_chain_export_preserves_both_twists_and_unsupported_wide_equations() {
+        for n in [7, 61] {
+            let f = Fixture::new();
+            let source = f.source_with_parameters("prime", "f4", true, n, 3, 2);
+            let out = f.0.join("training");
+            let result = export(&source, &out).unwrap();
+            assert_eq!(result["export"]["prime_chain_graph_occurrences"], 2);
+            assert_eq!(result["export"]["unique_feature_rows"], 4);
+            assert_eq!(result["export"]["restricted_target_rows"], 4);
+            assert_eq!(
+                result["export"]["feature_policy"]["version"],
+                "strict-structural-allowlist-v5"
+            );
+            let bytes = fs::read_to_string(out.join("features.jsonl")).unwrap();
+            let rows: Vec<Value> = bytes
+                .lines()
+                .map(|s| serde_json::from_str(s).unwrap())
+                .collect();
+            let graphs: Vec<_> = rows
+                .iter()
+                .filter(|r| r["inputs"].get("prime_chain_graph").is_some())
+                .collect();
+            assert_eq!(graphs.len(), 2);
+            assert!(graphs.iter().any(|r| r["inputs"]["twist"] == false));
+            assert!(graphs.iter().any(|r| r["inputs"]["twist"] == true));
+            assert!(rows
+                .iter()
+                .all(|r| r["split_component"] == format!("field-size-n{n}")));
+            for row in graphs {
+                assert_eq!(
+                    row["inputs"]["prime_chain_graph"]["schema"],
+                    "prime-chain-graph/v1"
+                );
+                let expected = super::super::digest(
+                    bounded_json(&row["inputs"], MAX_RECORD_BYTES)
+                        .unwrap()
+                        .as_bytes(),
+                );
+                assert_eq!(row["feature_id"], expected);
+            }
+            for forbidden in [
+                "known_answer_scalar",
+                "native_backend_invoked",
+                "solver_completed",
+                "source_commit",
+                "curve_seed",
+                "private_witness",
+                "elapsed_ms",
+            ] {
+                assert!(!bytes.contains(forbidden), "leaked {forbidden}");
+            }
+            if n == 61 {
+                assert!(bytes.contains("\"2305843009213693951\""));
+                let labels: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+                    .unwrap()
+                    .lines()
+                    .map(|s| serde_json::from_str(s).unwrap())
+                    .collect();
+                for row in labels.iter().filter(|r| r["solver"] == "f4") {
+                    assert_eq!(row["labels"]["native_backend_invoked"], false);
+                    assert_eq!(row["labels"]["status"], "unsupported");
+                    assert!(row["feature_id"].is_string());
+                }
+            }
+            assert_eq!(
+                result["manifest"],
+                export(&source, &out).unwrap()["manifest"]
+            );
+        }
+    }
+
+    fn reseal_export_cell(dir: &Path, manifest: &mut CellManifest) {
+        for artifact in &mut manifest.artifacts {
+            (artifact.sha256, artifact.bytes) =
+                crate::store::hash_file(&dir.join(&artifact.path)).unwrap();
+        }
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec(manifest).unwrap(),
+        )
+        .unwrap();
+        storage::verify_manifest(dir, &manifest.artifacts).unwrap();
+    }
+
+    #[test]
+    fn prime_chain_export_ignores_private_metadata_and_rejects_rehashed_algebra() {
+        let f = Fixture::new();
+        let source = f.source_with_parameters("prime", "f4", true, 7, 3, 2);
+        let clean_out = f.0.join("clean");
+        export(&source, &clean_out).unwrap();
+        let clean_features = fs::read(clean_out.join("features.jsonl")).unwrap();
+        let dir = source.join("cells/000000000125");
+        let mut manifest: CellManifest =
+            super::super::read_json(&dir.join("manifest.json")).unwrap();
+        let marker = "PRIVATE_FUTURE_GRAPH_EXPORT_SENTINEL";
+        for name in [
+            "public.json",
+            "factor-base.json",
+            "prime-f4-input.json",
+            "witness.json",
+        ] {
+            let path = dir.join(name);
+            let mut value: Value = super::super::read_json(&path).unwrap();
+            value["unknown_private_metadata"] =
+                json!({"seed":marker,"scalar":marker,"future_outcome":marker});
+            fs::write(path, serde_json::to_vec(&value).unwrap()).unwrap();
+        }
+        manifest.outcome["unknown_future_cost"] = json!(marker);
+        reseal_export_cell(&dir, &mut manifest);
+        let injected_out = f.0.join("injected");
+        export(&source, &injected_out).unwrap();
+        assert_eq!(
+            clean_features,
+            fs::read(injected_out.join("features.jsonl")).unwrap()
+        );
+        assert!(
+            fs::read_to_string(injected_out.join("restricted/targets.jsonl"))
+                .unwrap()
+                .contains(marker)
+        );
+
+        let input_path = dir.join("prime-f4-input.json");
+        let original: Value = super::super::read_json(&input_path).unwrap();
+        for mutation in 0..4 {
+            let mut input = original.clone();
+            let mut bad_manifest: CellManifest =
+                serde_json::from_value(serde_json::to_value(&manifest).unwrap()).unwrap();
+            match mutation {
+                0 => input["polynomials"][0][0]["coefficient"] = json!("0"),
+                1 => input["domains"][3] = input["domains"][0].clone(),
+                2 => input["schema"] = json!("legacy-filename-is-not-admission"),
+                _ => {
+                    bad_manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == "prime-f4-input.json")
+                        .unwrap()
+                        .role = "unverified-input".into()
+                }
+            }
+            fs::write(&input_path, serde_json::to_vec(&input).unwrap()).unwrap();
+            reseal_export_cell(&dir, &mut bad_manifest);
+            let rejected = f.0.join(format!("rejected-{mutation}"));
+            assert!(export(&source, &rejected).is_err(), "mutation {mutation}");
+            assert!(!rejected.join("manifest.json").exists());
+        }
+    }
+
+    #[test]
+    fn missing_prime_chain_input_retains_restricted_exclusion_without_generic_fallback() {
+        let f = Fixture::new();
+        let source = f.source_with_parameters("prime", "f4", false, 7, 3, 2);
+        let out = f.0.join("training");
+        let result = export(&source, &out).unwrap();
+        assert_eq!(
+            result["export"]["cells_without_verified_prime_chain_graph"],
+            2
+        );
+        assert_eq!(result["export"]["prime_chain_graph_occurrences"], 0);
+        assert_eq!(result["export"]["unique_feature_rows"], 2);
+        let rows: Vec<Value> = fs::read_to_string(out.join("restricted/targets.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|s| serde_json::from_str(s).unwrap())
+            .collect();
+        for row in rows.iter().filter(|r| r["solver"] == "f4") {
+            assert!(row["feature_id"].is_null());
+            assert_eq!(row["feature_status"], "missing_verified_prime_chain_input");
+        }
     }
 
     #[test]

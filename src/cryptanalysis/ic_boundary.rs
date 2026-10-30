@@ -1361,6 +1361,41 @@ impl RhoWalk {
     }
 }
 
+/// What a tuned walk does beyond its [`RhoWalk`] shape.  [`WalkPolicy::legacy`]
+/// is every committed walk, bit for bit; [`WalkPolicy::v2`] is the walk of the
+/// `_v2` method ids.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct WalkPolicy {
+    /// Brent-style cycle detection, one stored checkpoint at powers of two,
+    /// beside the `cycle_window` ring: a cycle longer than the window is
+    /// found when the walk returns to its checkpoint and is left from the
+    /// member of least key, as a short one is.  Without it such a cycle
+    /// runs to the walk cap (`20·2^dp + 64` steps) and the walk is lost.
+    pub brent: bool,
+    /// Report the walk operations lost in walks that never reached a
+    /// distinguished point (by how they ended) and the distinguished-point
+    /// table's queries and inserts (counted, not charged).
+    pub extra_counters: bool,
+}
+
+impl WalkPolicy {
+    /// The walk every committed `rho.*` record was made with.
+    pub const fn legacy() -> Self {
+        Self {
+            brent: false,
+            extra_counters: false,
+        }
+    }
+
+    /// Brent detection and the extra counters.
+    pub const fn v2() -> Self {
+        Self {
+            brent: true,
+            extra_counters: true,
+        }
+    }
+}
+
 /// Jumps in the tuned walk's table for a subgroup of order `r`.
 ///
 /// The table is set-up cost, about `1.75·w` operations a jump for
@@ -2036,9 +2071,40 @@ struct WalkTally {
     abandoned: u64,
     capped: u64,
     canonicalisations: u64,
+    /// Cycles longer than the window that the Brent detector found
+    /// ([`WalkPolicy::brent`]).
+    cycles_long: u64,
+    /// Walk operations spent in walks that never reached a distinguished
+    /// point, by how they ended.  Always tallied (they are inside
+    /// `walk_ops`, so already charged); reported only under
+    /// [`WalkPolicy::extra_counters`].
+    lost_identity: u64,
+    lost_abandoned: u64,
+    lost_capped: u64,
+    lost_budget: u64,
+}
+
+/// How a walk that never reached a distinguished point ended.
+#[derive(Clone, Copy)]
+enum LostHow {
+    Identity,
+    Abandoned,
+    Capped,
+    Budget,
 }
 
 impl WalkTally {
+    /// Book the operations a lost walk spent since `ops0`.
+    fn lose(&mut self, ops0: u64, how: LostHow) {
+        let spent = self.walk_ops() - ops0;
+        match how {
+            LostHow::Identity => self.lost_identity += spent,
+            LostHow::Abandoned => self.lost_abandoned += spent,
+            LostHow::Capped => self.lost_capped += spent,
+            LostHow::Budget => self.lost_budget += spent,
+        }
+    }
+
     /// The charged walk operations: steps, the look-ahead's rejected
     /// additions, and the escapes' doublings.
     fn walk_ops(&self) -> u64 {
@@ -2055,6 +2121,11 @@ impl WalkTally {
         self.abandoned += o.abandoned;
         self.capped += o.capped;
         self.canonicalisations += o.canonicalisations;
+        self.cycles_long += o.cycles_long;
+        self.lost_identity += o.lost_identity;
+        self.lost_abandoned += o.lost_abandoned;
+        self.lost_capped += o.lost_capped;
+        self.lost_budget += o.lost_budget;
     }
 }
 
@@ -2081,6 +2152,8 @@ struct TunedWalker<'a, G: CountedGroup, C: RhoClasses<G>> {
     walk_cap: u64,
     look_ahead: bool,
     window: usize,
+    /// Brent detection on ([`WalkPolicy::brent`]).
+    brent: bool,
     /// `(key, point, a, b)` of the walk's most recent points, oldest first.
     recent: VecDeque<(u64, G::Elt, u64, u64)>,
 }
@@ -2103,8 +2176,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             walk_cap: shape.walk_cap,
             look_ahead: walk.look_ahead && !classes.trivial(),
             window: walk.cycle_window,
+            brent: false,
             recent: VecDeque::with_capacity(walk.cycle_window + 1),
         }
+    }
+
+    /// The same walker under `policy` ([`WalkPolicy::legacy`] changes nothing).
+    fn with_policy(mut self, policy: WalkPolicy) -> Self {
+        self.brent = policy.brent;
+        self
     }
 
     fn index(&self, x: &G::Elt) -> usize {
@@ -2139,6 +2219,14 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         let mut len = 0u64;
         // `mix(key(x))`, carried from the previous step's tests.
         let mut hash = mix(g.key(&x));
+        // The walk operations at the start: what a lost walk has spent.
+        let ops0 = tally.walk_ops();
+        // Brent's checkpoint: the key of the point the walk stood on at the
+        // last power-of-two step, the least-key point since (a cycle's
+        // escape point, as the window picks it), and the steps since.
+        let mut checkpoint = if self.brent { g.key(&x) } else { 0 };
+        let mut since_min = (checkpoint, x, a, b);
+        let (mut since, mut power) = (0u64, 1u64);
         loop {
             // One step, with the look-ahead when it is on.
             let j0 = ((hash >> 24) % jump_count as u64) as usize;
@@ -2175,6 +2263,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             tally.steps += 1;
             len += 1;
             if g.is_identity(&x) {
+                tally.lose(ops0, LostHow::Identity);
                 return WalkEnd::Lost;
             }
             let mut key = g.key(&x);
@@ -2198,6 +2287,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                         .expect("a cycle has members");
                     if last_escape == Some(min_key) {
                         tally.abandoned += 1;
+                        tally.lose(ops0, LostHow::Abandoned);
                         return WalkEnd::Lost;
                     }
                     last_escape = Some(min_key);
@@ -2218,9 +2308,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     self.recent.clear();
                     if g.is_identity(&x) {
+                        tally.lose(ops0, LostHow::Identity);
                         return WalkEnd::Lost;
                     }
                     key = g.key(&x);
+                    if self.brent {
+                        checkpoint = g.key(&x);
+                        since_min = (checkpoint, x, a, b);
+                        (since, power) = (0, 1);
+                    }
                 }
                 self.recent.push_back((key, x, a, b));
                 if self.recent.len() > self.window {
@@ -2231,11 +2327,64 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             if hash & self.dp_mask == 0 {
                 return WalkEnd::Distinguished(x, a, b);
             }
+            if self.brent {
+                // The walk is a function of its point, so a point seen twice
+                // closes a cycle.  `since_min` runs over every point since the
+                // checkpoint, which on a return to it is the whole cycle.
+                let key = g.key(&x);
+                since += 1;
+                if key < since_min.0 {
+                    since_min = (key, x, a, b);
+                }
+                if key == checkpoint {
+                    tally.cycles_long += 1;
+                    let (min_key, mp, ma, mb) = since_min;
+                    if last_escape == Some(min_key) {
+                        tally.abandoned += 1;
+                        tally.lose(ops0, LostHow::Abandoned);
+                        return WalkEnd::Lost;
+                    }
+                    last_escape = Some(min_key);
+                    let d2 = g.double(ops, mp);
+                    tally.escapes += 1;
+                    let (e, ea, eb, _) = rho_canon(
+                        g,
+                        self.classes,
+                        ops,
+                        d2,
+                        addmod(ma, ma, r),
+                        addmod(mb, mb, r),
+                        r,
+                        &mut tally.canonicalisations,
+                    );
+                    x = e;
+                    a = ea;
+                    b = eb;
+                    self.recent.clear();
+                    if g.is_identity(&x) {
+                        tally.lose(ops0, LostHow::Identity);
+                        return WalkEnd::Lost;
+                    }
+                    if self.window > 0 {
+                        self.recent.push_back((g.key(&x), x, a, b));
+                    }
+                    checkpoint = g.key(&x);
+                    since_min = (checkpoint, x, a, b);
+                    (since, power) = (0, 1);
+                } else if since == power {
+                    checkpoint = key;
+                    since_min = (key, x, a, b);
+                    since = 0;
+                    power *= 2;
+                }
+            }
             if len > self.walk_cap {
                 tally.capped += 1;
+                tally.lose(ops0, LostHow::Capped);
                 return WalkEnd::Lost;
             }
             if tally.walk_ops() >= budget {
+                tally.lose(ops0, LostHow::Budget);
                 return WalkEnd::Lost;
             }
         }
@@ -2276,6 +2425,26 @@ fn tuned_counters(
     counters
 }
 
+/// The counters [`WalkPolicy::extra_counters`] adds: Brent-detected cycles
+/// and the walk operations lost, by how the walk ended.  The lost operations
+/// are inside the charged `walk_operations`; they are listed apart so a
+/// reader sees what cycles and caps cost.
+fn extra_walk_counters(counters: &mut BTreeMap<String, u64>, tally: &WalkTally) {
+    for (k, v) in [
+        ("cycles_longer_than_window", tally.cycles_long),
+        ("steps_in_walks_capped", tally.lost_capped),
+        ("steps_in_walks_abandoned_in_a_cycle", tally.lost_abandoned),
+        ("steps_in_walks_ending_at_the_identity", tally.lost_identity),
+        ("steps_in_walks_out_of_budget", tally.lost_budget),
+        (
+            "lost_walk_steps",
+            tally.lost_capped + tally.lost_abandoned + tally.lost_identity + tally.lost_budget,
+        ),
+    ] {
+        counters.insert(k.to_string(), v);
+    }
+}
+
 /// [`rho_reference_walk`] on any [`RhoClasses`]: the same walk, the same
 /// draws from the seed, the same counters, moving between the classes'
 /// representatives.  `walk.negation` is ignored here; the classes decide.
@@ -2289,6 +2458,34 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
     seed: u64,
     max_steps: u64,
     walk: RhoWalk,
+) -> RhoResult {
+    rho_walk_with_policy(
+        g,
+        classes,
+        generator,
+        target,
+        r,
+        seed,
+        max_steps,
+        walk,
+        WalkPolicy::legacy(),
+    )
+}
+
+/// [`rho_walk_with`] under a [`WalkPolicy`]: with [`WalkPolicy::legacy`] it
+/// is that walk exactly; [`WalkPolicy::v2`] adds Brent cycle detection and
+/// the lost-walk and table counters.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+    policy: WalkPolicy,
 ) -> RhoResult {
     let start = Instant::now();
     let mut ops = GroupOps::default();
@@ -2322,8 +2519,9 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
     }
     let setup = ops;
 
-    let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk);
+    let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk).with_policy(policy);
     let mut table: FastMap<(u64, u64)> = fast_map(1024);
+    let (mut table_queries, mut table_inserts) = (0u64, 0u64);
     let automorphisms = classes.automorphisms();
     let expected = generic_floor_ops(r as f64, automorphisms as f64);
     let mut tally = WalkTally::default();
@@ -2351,6 +2549,7 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
         };
         dps += 1;
         let key = g.key(&x);
+        table_queries += 1;
         match table.get(&key) {
             Some(&(a2, b2)) => {
                 if b2 != b {
@@ -2372,6 +2571,7 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
             }
             None => {
                 table.insert(key, (a, b));
+                table_inserts += 1;
             }
         }
     }
@@ -2393,7 +2593,22 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
         wall_ns,
         verified: recovered.is_some(),
         recovered,
-        counters: tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless),
+        counters: {
+            let mut counters =
+                tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
+            if policy.extra_counters {
+                extra_walk_counters(&mut counters, &tally);
+                counters.insert(
+                    "distinguished_point_table_queries_uncharged".into(),
+                    table_queries,
+                );
+                counters.insert(
+                    "distinguished_point_table_inserts_uncharged".into(),
+                    table_inserts,
+                );
+            }
+            counters
+        },
     }
 }
 
@@ -3082,6 +3297,241 @@ pub fn rho_batch_with<G: CountedGroup, C: RhoClasses<G>>(
     }
 }
 
+/// A preprocessing-rho table ([`PreprocessingRho::build`]) and the
+/// walker it was built with.
+pub struct PreprocessingRho<'a, G: CountedGroup, C: RhoClasses<G>> {
+    g: &'a G,
+    generator: G::Elt,
+    r: u64,
+    shape: WalkShape,
+    walker: TunedWalker<'a, G, C>,
+    table: FastMap<u64>,
+    /// The jump table and the precomputation stride: target-blind.
+    pub setup_ops: GroupOps,
+    /// The precomputation's walks: target-blind.
+    pub precompute_ops: GroupOps,
+    pub entries: u64,
+    pub dp_bits: u32,
+    pub precompute_wall_ns: u64,
+    pub counters: BTreeMap<String, u64>,
+}
+
+/// One target's online walk against a [`PreprocessingRho`] table.
+#[derive(Clone, Debug, Default)]
+pub struct PreprocessingOnline {
+    pub recovered: Option<u64>,
+    /// Everything after the target arrives, verification included.
+    pub ops: GroupOps,
+    pub verification_ops: u64,
+    pub wall_ns: u64,
+    pub counters: BTreeMap<String, u64>,
+}
+
+impl<'a, G: CountedGroup, C: RhoClasses<G>> PreprocessingRho<'a, G, C> {
+    /// **Preprocessing rho** (Bernstein–Lange 2013): a table of `entries`
+    /// distinguished points built from walks in `G` alone; [`Self::solve`]
+    /// then walks one target until a walk ends on a stored point.
+    ///
+    /// The walk is [`rho_batch_with`]'s: the tuned walker on `classes`,
+    /// jumps `[c_j]G` only, so a point's trail does not depend on any
+    /// target.  The table and every online walk use this one
+    /// [`TunedWalker`] and jump table, escapes included, so they are the
+    /// same map.  Jumps and the precomputation's starts come from
+    /// `table_seed`.  Precomputation starts are `[k·t]G` with `b = 0`; each
+    /// new distinguished point is stored with its `a`, and a repeated one is
+    /// counted and dropped.  The build stops at `entries` points or after
+    /// `max_precompute` walk operations.
+    ///
+    /// With `dp_bits = None` the walk length is `2^d ≈ √(N/entries)` for
+    /// `N = r/A` classes, which puts the online cost near `2√(N/S)`.
+    /// Generic: it sits on `S·T² ≈ N`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build(
+        g: &'a G,
+        classes: &'a C,
+        generator: G::Elt,
+        r: u64,
+        entries: u64,
+        dp_bits: Option<u32>,
+        table_seed: u64,
+        max_precompute: u64,
+        walk: RhoWalk,
+    ) -> Self {
+        let n = (r as f64) / f64::from(classes.automorphisms().max(1));
+        let d = dp_bits.unwrap_or_else(|| {
+            let w = (n / entries.max(1) as f64).sqrt();
+            w.log2().round().max(0.0) as u32
+        });
+        let walk = RhoWalk {
+            dp_bits: Some(d),
+            ..walk
+        };
+        let shape = WalkShape::of(r, walk);
+        let mut setup_ops = GroupOps::default();
+        let mut precompute_ops = GroupOps::default();
+        let mut rng = StdRng::seed_from_u64(table_seed);
+        let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
+            .map(|_| {
+                let c = rng.gen_range(1..r.max(2));
+                (g.mul(&mut setup_ops, generator, c), c % r, 0)
+            })
+            .collect();
+        let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk);
+        let t0 = Instant::now();
+        let mut table: FastMap<u64> = fast_map(entries as usize + 1);
+        let mut tally = WalkTally::default();
+        let mut ta = rng.gen_range(1..r.max(2));
+        let mut stride = g.mul(&mut setup_ops, generator, ta);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            stride = g.mul(&mut setup_ops, generator, ta);
+        }
+        let (mut sx, mut sa) = (stride, ta % r);
+        let (mut walks, mut starts, mut repeats) = (0u64, 0u64, 0u64);
+        while (table.len() as u64) < entries && tally.walk_ops() < max_precompute {
+            walks += 1;
+            if walks > 1 {
+                sx = g.add(&mut precompute_ops, sx, stride);
+                sa = addmod(sa, ta, r);
+                starts += 1;
+            }
+            if g.is_identity(&sx) {
+                continue;
+            }
+            // The walker's budget bounds the tally's running total.
+            if let WalkEnd::Distinguished(x, a, _) =
+                walker.walk(&mut precompute_ops, &mut tally, sx, sa, 0, max_precompute)
+            {
+                if table.insert(g.key(&x), a).is_some() {
+                    repeats += 1;
+                }
+            }
+        }
+        let mut counters = BTreeMap::new();
+        for (name, v) in [
+            ("jumps", shape.jumps as u64),
+            ("jump_coefficient_bits", u64::from(shape.coefficient_bits)),
+            ("distinguished_point_bits", u64::from(shape.dp_bits)),
+            ("setup_additions", setup_ops.adds),
+            ("setup_doublings", setup_ops.doubles),
+            ("table_entries", table.len() as u64),
+            ("table_entries_requested", entries),
+            ("precompute_walks", walks),
+            ("precompute_start_additions", starts),
+            ("precompute_walk_operations", tally.walk_ops()),
+            ("precompute_repeated_points", repeats),
+            ("precompute_walks_capped", tally.capped),
+            ("precompute_walks_abandoned", tally.abandoned),
+            (
+                "precompute_canonicalisations_uncharged",
+                tally.canonicalisations,
+            ),
+            ("table_inserts_uncharged", walks),
+        ] {
+            counters.insert(name.to_string(), v);
+        }
+        Self {
+            g,
+            generator,
+            r,
+            dp_bits: shape.dp_bits,
+            shape,
+            walker,
+            entries: table.len() as u64,
+            table,
+            setup_ops,
+            precompute_ops,
+            precompute_wall_ns: t0.elapsed().as_nanos() as u64,
+            counters,
+        }
+    }
+
+    /// One target: walks from `[k]([t_a]G + [t_b]Q)`, seeded by `seed`,
+    /// until one ends at a stored `[a₂]G` and `[a]G + [b]Q = [a₂]G` gives
+    /// the logarithm; a walk ending at an unstored point is a miss.  The
+    /// table is not changed, so targets are independent.
+    pub fn solve(&mut self, target: G::Elt, seed: u64, max_steps: u64) -> PreprocessingOnline {
+        let (g, r, generator) = (self.g, self.r, self.generator);
+        let t0 = Instant::now();
+        let mut out = PreprocessingOnline::default();
+        let mut rng = StdRng::seed_from_u64(seed);
+        let mut tally = WalkTally::default();
+        let ops = &mut out.ops;
+        let gq = g.add(ops, generator, target);
+        let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+        let mut stride = joint_mul(g, ops, generator, target, gq, ta, tb);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            tb = rng.gen_range(1..r.max(2));
+            stride = joint_mul(g, ops, generator, target, gq, ta, tb);
+        }
+        let (mut x0, mut a0, mut b0) = (stride, ta % r, tb % r);
+        let (mut walks, mut starts, mut misses, mut useless) = (0u64, 0u64, 0u64, 0u64);
+        while tally.walk_ops() < max_steps && walks < max_steps {
+            walks += 1;
+            if walks > 1 {
+                x0 = g.add(ops, x0, stride);
+                a0 = addmod(a0, ta, r);
+                b0 = addmod(b0, tb, r);
+                starts += 1;
+            }
+            if g.is_identity(&x0) {
+                continue;
+            }
+            let WalkEnd::Distinguished(x, a, b) =
+                self.walker.walk(ops, &mut tally, x0, a0, b0, max_steps)
+            else {
+                continue;
+            };
+            let Some(&a2) = self.table.get(&g.key(&x)) else {
+                misses += 1;
+                continue;
+            };
+            // [a]G + [b]Q = [a₂]G  ⇒  d = (a₂ − a)/b
+            if let Some(inv) = invmod(b, r) {
+                let d = mulmod(submod(a2, a, r), inv, r);
+                let before = ops.gae();
+                let check = g.mul(ops, generator, d);
+                out.verification_ops += (ops.gae() - before) as u64;
+                if check == target {
+                    out.recovered = Some(d);
+                    break;
+                }
+            }
+            useless += 1;
+        }
+        out.wall_ns = t0.elapsed().as_nanos() as u64;
+        let mut counters = tuned_counters(
+            &self.shape,
+            GroupOps::default(),
+            starts,
+            &tally,
+            out.verification_ops,
+            useless,
+        );
+        // The walk's shape and set-up are the table's, reported once by
+        // `build`; a caller merging both ledgers must not count them twice.
+        for name in [
+            "jumps",
+            "jump_coefficient_bits",
+            "distinguished_point_bits",
+            "setup_additions",
+            "setup_doublings",
+        ] {
+            counters.remove(name);
+        }
+        for (name, v) in [
+            ("online_walks", walks),
+            ("online_misses", misses),
+            ("table_lookups_uncharged", walks),
+        ] {
+            counters.insert(name.to_string(), v);
+        }
+        out.counters = counters;
+        out
+    }
+}
+
 /// The matched reference for `A = 2`: [`rho_reference_walk`] with
 /// [`RhoWalk::negation`].
 pub fn rho_reference_negation<G: CountedGroup>(
@@ -3214,6 +3664,30 @@ pub fn signed_frobenius_rho_tuned(
         seed,
         max_steps,
         RhoWalk::negation(),
+    ))
+}
+
+/// [`signed_frobenius_rho_tuned`] under a [`WalkPolicy`] (the walk of
+/// `rho.signed_frobenius_v2` is [`WalkPolicy::v2`]).
+pub fn signed_frobenius_rho_tuned_policy(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    max_steps: u64,
+    policy: WalkPolicy,
+) -> Option<RhoResult> {
+    let classes = SignedFrobeniusClasses::new(inst)?;
+    let g = BinaryGroup(&inst.fast);
+    Some(rho_walk_with_policy(
+        &g,
+        &classes,
+        inst.generator,
+        target,
+        inst.r,
+        seed,
+        max_steps,
+        RhoWalk::negation(),
+        policy,
     ))
 }
 
@@ -6576,20 +7050,26 @@ impl PairTable {
     }
 }
 
-/// **A table of every signed `k`-sum of a base** (`k = 3` or `4`), keyed by
+/// Largest arity a [`KSumTable`] builds, and the bits each packed summand
+/// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
+const KSUM_MAX_K: u32 = 5;
+const KSUM_INDEX_BITS: u32 = 12;
+
+/// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
 /// `k`-summand decomposition.  The pair table's two-summand search costs a
 /// table of `|F|²` entries and needs about `0.4·|F|` relations; this one
 /// trades a smaller base for a table of about `2^{k−1}·C(|F|, k)` entries,
 /// so the generic cost `|F|^k + |F|·p/|F|^k` falls from `p^{2/3}` (pairs)
-/// to `p^{3/5}` (`k = 3`) and `p^{4/7}` (`k = 4`).  Still generic: as `k`
+/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`) and `p^{5/9}` (`k = 5`).  Still generic: as `k`
 /// grows it approaches baby-step giant-step, never below it.
 ///
 /// One sum per orbit under negation: summands above strictly increasing
 /// abscissae, the first with a fixed sign.  Each partial sum is one
 /// addition, reused by every completion below it.
 pub struct KSumTable {
-    map: FastMap<[u32; 4]>,
+    /// The summands of each kept sum, [`KSUM_INDEX_BITS`] bits apiece.
+    map: FastMap<u64>,
     pub k: u32,
     pub entries: u64,
     pub build_ops: GroupOps,
@@ -6606,8 +7086,14 @@ impl KSumTable {
         fb: &FactorBase<G::Elt>,
         k: u32,
     ) -> Result<Self, String> {
-        if !(3..=4).contains(&k) {
-            return Err(format!("a k-sum table needs k = 3 or 4, not {k}"));
+        if !(3..=KSUM_MAX_K).contains(&k) {
+            return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
+        }
+        if fb.points.len() >= 1 << KSUM_INDEX_BITS {
+            return Err(format!(
+                "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
+                fb.points.len()
+            ));
         }
         let start = Instant::now();
         let groups: Vec<&Vec<usize>> = fb
@@ -6616,7 +7102,8 @@ impl KSumTable {
             .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
             .collect();
         let a = groups.len() as u64;
-        let estimate = (1u64 << (k - 1)) * (a.pow(k) / if k == 3 { 6 } else { 24 });
+        let combinations = (0..u64::from(k)).fold(1u64, |c, i| c * (a - i) / (i + 1));
+        let estimate = (1u64 << (k - 1)) * combinations;
         let mut t = Self {
             map: fast_map(estimate as usize + 1),
             k,
@@ -6626,7 +7113,7 @@ impl KSumTable {
             insert_attempts: 0,
             index_lookups: a,
         };
-        let mut idx = [u32::MAX; 4];
+        let mut idx = [u32::MAX; KSUM_MAX_K as usize];
         t.extend(g, fb, &groups, 0, 0, None, &mut idx);
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
@@ -6642,7 +7129,7 @@ impl KSumTable {
         depth: usize,
         from: usize,
         partial: Option<G::Elt>,
-        idx: &mut [u32; 4],
+        idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
         let last = depth + 1 == self.k as usize;
         for (ai, group) in groups.iter().enumerate().skip(from) {
@@ -6657,7 +7144,11 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
-                    self.map.entry(g.key(&s) >> 1).or_insert(*idx);
+                    let packed = idx[..self.k as usize]
+                        .iter()
+                        .rev()
+                        .fold(0u64, |w, &i| (w << KSUM_INDEX_BITS) | u64::from(i));
+                    self.map.entry(g.key(&s) >> 1).or_insert(packed);
                     self.insert_attempts += 1;
                 } else {
                     self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
@@ -6691,8 +7182,11 @@ impl KSumTable {
         target: G::Elt,
     ) -> Option<Vec<usize>> {
         *lookups += 1;
-        let idx = self.map.get(&(g.key(&target) >> 1))?;
-        let summands: Vec<usize> = idx[..self.k as usize].iter().map(|&i| i as usize).collect();
+        let packed = *self.map.get(&(g.key(&target) >> 1))?;
+        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
+        let summands: Vec<usize> = (0..self.k)
+            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
+            .collect();
         let mut s = fb.points[summands[0]];
         for &i in &summands[1..] {
             s = g.add(ops, s, fb.points[i]);
@@ -7485,6 +7979,16 @@ pub enum TargetSource {
     /// a new stride per relation makes equal step counts unequal
     /// differences.
     StrideRenew,
+    /// `StrideRenew` with the guard moved after the decomposition: only
+    /// a target that yields a relation is probed and remembered.  The
+    /// guard exists so that no decomposed target is decomposed again
+    /// (see [`TargetSource::is_guarded`]); a repeat that does not
+    /// decompose adds nothing either way, and a renewed stride steps past
+    /// a repeat rather than restarting, so the target stream, the rows
+    /// and the answer are those of `StrideRenew`.  What changes is one
+    /// probe per trial, now one per decomposing trial, and one oracle
+    /// lookup per non-decomposing repeat, which the eager guard skipped.
+    StrideRenewDeferredGuard,
 }
 
 impl TargetSource {
@@ -7499,6 +8003,7 @@ impl TargetSource {
             TargetSource::WalkSharedJumps => "walk_shared_jumps",
             TargetSource::Stride => "stride",
             TargetSource::StrideRenew => "stride_renew",
+            TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -7508,6 +8013,13 @@ impl TargetSource {
                 | TargetSource::WalkPrimeFast
                 | TargetSource::WalkPrimeLanes { .. }
                 | TargetSource::WalkSharedJumps
+        )
+    }
+    /// Whether `S` is renewed after every relation-bearing target.
+    pub fn renews_stride(&self) -> bool {
+        matches!(
+            self,
+            TargetSource::StrideRenew | TargetSource::StrideRenewDeferredGuard
         )
     }
     /// **Whether a target the run has already decomposed is skipped.**
@@ -7531,6 +8043,7 @@ impl TargetSource {
                 | TargetSource::WalkPrimeLanes { .. }
                 | TargetSource::Stride
                 | TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
         )
     }
 }
@@ -7944,6 +8457,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     let pool_count = 16usize;
     let shared_jumps = targets == TargetSource::WalkSharedJumps;
     let guarded = targets.is_guarded();
+    let defer_guard = targets == TargetSource::StrideRenewDeferredGuard;
     let mut jumps: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool_rng = StdRng::seed_from_u64(seed ^ 0x504F_4F4C_5F4F_4646);
@@ -7995,7 +8509,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
     // And the rows: the zeroed vector, the support count, the column-part
     // key's scan and mixes, the coefficient sums and the target column.
     let (mut row_build_words, mut row_key_mixes, mut row_build_modr_adds) = (0u64, 0u64, 0u64);
-    let striding = matches!(targets, TargetSource::Stride | TargetSource::StrideRenew);
+    let striding = matches!(targets, TargetSource::Stride) || targets.renews_stride();
     let (mut stride, mut stride_steps, mut stride_restarts, mut stride_renewals) =
         ((g.identity(), 0u64, 0u64), 0u64, 0u64, 0u64);
     let mut renew_by = (g.identity(), 0u64, 0u64);
@@ -8015,7 +8529,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
             rng_draws += 2;
         }
     }
-    if targets == TargetSource::StrideRenew {
+    if targets.renews_stride() {
         while g.is_identity(&renew_by.0) {
             renew_by = draw_jumps(
                 g,
@@ -8238,7 +8752,9 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
                 }
                 (walk_point, wa, wb, None)
             }
-            TargetSource::Stride | TargetSource::StrideRenew => {
+            TargetSource::Stride
+            | TargetSource::StrideRenew
+            | TargetSource::StrideRenewDeferredGuard => {
                 if walk_fresh {
                     rng_draws += 2;
                     wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
@@ -8272,13 +8788,13 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         // The guard: a target this run has already decomposed carries no
         // relation the matrix does not hold, and taking it again would
         // pin the logarithm by collision rather than by relation.
-        if guarded {
+        if guarded && !defer_guard {
             guard_probes += 1;
             if seen.insert(g.key(&point), ()).is_some() {
                 repeats_skipped += 1;
                 if let Some(index) = lane_id {
                     lanes[index].fresh = true;
-                } else if targets != TargetSource::StrideRenew {
+                } else if !targets.renews_stride() {
                     walk_fresh = true;
                 }
                 // A renewed stride crosses an earlier progression in at
@@ -8291,7 +8807,17 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         if relations.is_empty() {
             continue;
         }
-        if targets == TargetSource::StrideRenew {
+        // The deferred guard: the same skip as above, taken only by a
+        // target that decomposed, so `seen` holds exactly the decomposed
+        // targets and the skipped repeat neither renews nor enters a row.
+        if defer_guard {
+            guard_probes += 1;
+            if seen.insert(g.key(&point), ()).is_some() {
+                repeats_skipped += 1;
+                continue;
+            }
+        }
+        if targets.renews_stride() {
             loop {
                 stride = (
                     g.add(&mut rel.group_ops, stride.0, renew_by.0),
@@ -8425,7 +8951,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         rel.count("stride_steps", stride_steps);
         rel.count("stride_restarts", stride_restarts);
     }
-    if targets == TargetSource::StrideRenew {
+    if targets.renews_stride() {
         rel.count("stride_renewals", stride_renewals);
     }
     if targets.is_walk() {
@@ -11479,6 +12005,68 @@ mod tests {
         );
     }
 
+    /// Preprocessing rho: the table is target-blind (same ledger and
+    /// entries for every target), every target is recovered, and the
+    /// online walks cost about `2√(N/S)`, far below plain rho's
+    /// `√(πr/4)` — which they could not if the online map differed from
+    /// the precomputation's.
+    #[test]
+    fn preprocessing_rho_table_is_target_blind_and_online_walks_are_short() {
+        let r = 1_000_000_007u64;
+        let grp = Cyclic(r);
+        let gen = 5u64;
+        let classes = NegationClasses { r };
+        let entries = 4096u64;
+        let runs = 24u64;
+        let build = || {
+            PreprocessingRho::build(
+                &grp,
+                &classes,
+                gen,
+                r,
+                entries,
+                None,
+                20261028,
+                1 << 34,
+                RhoWalk::negation(),
+            )
+        };
+        let mut table = build();
+        assert_eq!(table.entries, entries);
+        let again = build();
+        assert_eq!(
+            (
+                table.setup_ops,
+                table.precompute_ops,
+                table.counters.clone()
+            ),
+            (
+                again.setup_ops,
+                again.precompute_ops,
+                again.counters.clone()
+            )
+        );
+        let mut online = 0.0f64;
+        for seed in 0..runs {
+            let d = 1 + mix(seed + 77) % (r - 1);
+            let res = table.solve(mulmod(gen, d, r), seed, 1 << 32);
+            assert_eq!(res.recovered, Some(d), "seed {seed}");
+            assert!(!res.counters.contains_key("distinguished_point_bits"));
+            assert!(!res.counters.contains_key("jumps"));
+            online += res.counters["walk_operations"] as f64 / runs as f64;
+        }
+        let bl = 2.0 * ((r as f64 / 2.0) / entries as f64).sqrt();
+        let plain = (std::f64::consts::PI * r as f64 / 4.0).sqrt();
+        assert!(
+            online < 3.0 * bl,
+            "online {online:.0} against 2√(N/S) = {bl:.0}"
+        );
+        assert!(
+            online < plain / 10.0,
+            "online {online:.0} against plain {plain:.0}"
+        );
+    }
+
     /// The batch law on a group where the walk is the only cost: sixteen
     /// targets cost each about `Σ_{i<16} C(2i, i)/4^i / 16 ≈ 0.28` of one
     /// target alone (Kuhn–Struik).
@@ -13898,10 +14486,12 @@ mod generator_coupling_tests {
     }
 
     const SOURCES: [TargetSource; 8] = [
+    const SOURCES: [TargetSource; 7] = [
         TargetSource::Random,
         TargetSource::Walk,
         TargetSource::Stride,
         TargetSource::StrideRenew,
+        TargetSource::StrideRenewDeferredGuard,
         TargetSource::WalkPrimeFast,
         TargetSource::WalkPrimeLanes {
             lanes: 4,
