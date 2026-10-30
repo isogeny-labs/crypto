@@ -1,0 +1,40 @@
+{
+  "schema": "software-validation-plan/v1",
+  "runtime_source": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
+  "execution_source": "CLI and validation scripts must be committed; pass exact resulting commit to run-pipeline.sh",
+  "purpose": "Retained software correctness checks, not research trials or timing comparisons",
+  "prerequisite": "Original cap-fix pipeline terminal success; materialized exact-HEAD dependencies and full maintained examples; live Conductor ownership",
+  "materialization_inventory": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/algebraic-materialization-01.json",
+    "sha256": "545a5dc37792d621a0617e6f20177763b1d0dce236fada3550978ca52293fe85",
+    "source_commit": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
+    "files": 145,
+    "bytes": 210016693,
+    "binding": "Before and after every phase, verify inventory SHA, every recorded blob against the execution commit with one git ls-tree read, and every materialized file SHA and size"
+  },
+  "source_binding": "Compare all tracked paths against execution commit except docs/session-logs/** and this task's exact store-index.json; reject untracked Rust/Cargo/config inputs. Restored sparse inputs also require explicit byte checks.",
+  "sequence": [
+    "dataset release library tests",
+    "strict maintained Clippy",
+    "release crypto CLI build",
+    "v6 retained curve and twist CLI fixture with negative control",
+    "full serialized release library suite"
+  ],
+  "resource_envelope": {
+    "cargo_build_jobs": 8,
+    "rayon_threads": 8,
+    "test_threads": 1,
+    "rust_toolchain": "1.98",
+    "cargo_target_dir": "/home/ec2-user/crypto-ml-dataset-20261028/target",
+    "target_reuse": "sequential only, original binary already frozen separately"
+  },
+  "stop_rule": "Stop on first failure; preserve preflight/command/readback stage and exit status in log and receipt. Upload both with fresh byte readback. For CLI failure also archive partial fixture outputs and frozen binary before propagating the original failure. No automatic retry.",
+  "claim_boundary": [
+    "No generated research samples",
+    "No cloud worker validation",
+    "No whole-solver instruction claim",
+    "No exact fall-degree or model-efficacy claim"
+  ],
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

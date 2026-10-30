@@ -28,6 +28,32 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
+  "source_cells": [
+    {
+      "shard": 62,
+      "manifest_path": "shard-62/cells/000000000062/manifest.json",
+      "manifest_sha256": "d24a740d0838388c68ae0696b966c3967f1ab13123955305e9deafff925a5862",
+      "reference_audit_path": "export-62/restricted/prefix-records.jsonl",
+      "reference_audit_sha256": "69834ca66f179913d3eab67c4fc590bbffddda18db4f0abb722a7181c39f0aa3",
+      "expected_basis_rows_by_node": [{"node":0,"rows":4},{"node":1,"rows":3},{"node":2,"rows":2},{"node":3,"rows":1}],
+      "expected_verified_nonzero_rows": 10,
+      "expected_verified_zero_rows": 0,
+      "expected_unknown_suffix_records": 0
+    },
+    {
+      "shard": 63,
+      "manifest_path": "shard-63/cells/000000000063/manifest.json",
+      "manifest_sha256": "93e236822a4edb2b65c7baa0794e9642bb1915cf031bb2fa28db628de0fb70e9",
+      "reference_audit_path": "export-63/restricted/prefix-records.jsonl",
+      "reference_audit_sha256": "e0f31260fe9d5ab1be155024f725f6885d54d1cb6459f529d6eba2b58cd092fd",
+      "expected_basis_rows_by_node": [{"node":0,"rows":1}],
+      "expected_verified_nonzero_rows": 1,
+      "expected_verified_zero_rows": 0,
+      "expected_unknown_suffix_records": 0
+    }
+  ],
+  "source_binding_scope": "Pinned receipt and cell manifests; native export verifies each manifest-bound artifact. Archive hashes identify durable restore objects but this local fixture does not download or hash archives.",
+  "expected_row_count_basis": "Retained v5 ideal-equality certificates have 4+3+2+1 nonempty right_from_left identities on the curve and one on the twist; expect all eleven rows admitted without consequence-channel censoring.",
   "commands": [
     "export curve",
     "immutable curve retry",
@@ -41,7 +67,7 @@
     "all artifact hashes/sizes",
     "all feature identities",
     "algebraic joins and outcome counts",
-    "no target/proof/provenance in public inputs",
+    "exact public input, ring, binding and graph structural keys; initial inputs equal frozen static reference",
     "static and branch feature bytes equal frozen reference",
     "source inventory unchanged"
   ],
