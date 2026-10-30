@@ -37,7 +37,8 @@ post-creation delivery route in the generic launcher permissions and mounts. It
 documents an unapplied exact-object ConfigMap proposal and its required issuer
 permission. A projected file alone does not grant the launcher write access. The
 [proposed native startup gate](STARTUP-GATE-PROPOSAL.md) specifies a local
-nonrenewable wait and activation/generation handoff; it remains unimplemented.
+nonrenewable wait and activation/generation handoff. Its source is now written
+and independently reviewed; CLI registration and runtime validation are pending.
 
 The benchmark bridge and recovery controller are tied to ecbench. They do not
 provide a generic dataset startup gate or establish CRIU recovery for this CLI.

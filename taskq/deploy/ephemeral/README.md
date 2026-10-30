@@ -138,7 +138,7 @@ behind an HTTPS proxy:
 | `run --detach -- sleep 600`, then `ls`, `kill last`, `status last`, `logs last` | listed as running, killed, status stays `killed`, instance shutting down (job `20261017-043746-sleep-76db6b`) |
 
 Not run against AWS through the Rust CLI yet: `bake`, `shell`, Spot launches,
-GPU types, and the capacity retry across zones. `cargo test` covers the pure parts:
+On-Demand launches, GPU types, and the capacity retry across zones. `cargo test` covers the pure parts:
 id and slug rules, TTL spans, bash quoting of the command and `env` (checked
 by running bash), the user data (`bash -n`, deadline armed first) and the
 exit-status table.
