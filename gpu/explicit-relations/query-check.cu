@@ -91,28 +91,30 @@ static void compact_boundaries() {
   require(point_key(Point{0, 1, false}) == 3);
   require(point_key(Point{(U(1) << 62) - 1, 1, false}) ==
           (U(1) << 63) + 1);
-  // The largest prefix endpoint is representable too (not a curve point).
+  require(point_key(Point{(U(1) << 63) - 2, 1, false}) == UINT64_MAX);
+  // The old 62-bit prefix endpoint is representable (not a curve point).
   require(point_key(Point{U(1) << 62, 0, false}) == (U(1) << 63) + 2);
 }
 // Exercise the largest new offset array with sparse exact keys, long empty
 // ranges, endpoint buckets and duplicates. Compare every offset on CPU;
 // query both row layouts independently against the original full lookup.
-static void wide_prefix_boundaries() {
-  const auto layout = prefix_layout((U(1) << 62) - 1, U(1) << 31);
+static void wide_prefix_boundaries(unsigned bits) {
+  const auto layout = prefix_layout((U(1) << bits) - 1, U(1) << 31);
 #ifdef ER_WIDE_INDEX
-  require(layout.bins == (U(1) << 24) && layout.shift == 38);
+  require(layout.bins == (U(1) << 24) && layout.shift == bits - 24);
 #else
-  require(layout.bins == (U(1) << 16) && layout.shift == 46);
+  require(layout.bins == (U(1) << 16) && layout.shift == bits - 16);
 #endif
   require(prefix_layout(65521, 4095).bins == 0);
   require(prefix_layout(65521, 4096).bins == 128);
   const U bins = U(1) << 24;
-  const unsigned shift = 38; // domain endpoint 2^62, including compact key
+  const unsigned shift = bits - 24; // terminal offset does not encode the endpoint
   std::vector<Row> full{{Point{}, 7}, {Point{}, 3}};
   std::vector<Point> queries{Point{}};
   for (U bucket : {U(0), U(1), U(65535), U(65536), bins / 2, bins - 1}) {
     for (U delta : {U(0), U(1), (U(1) << shift) - 1}) {
       U x = (bucket << shift) + delta;
+      if (x >= (U(1) << 63) - 1) continue; // outside every supported prime field
       for (U parity : {U(0), U(1)}) {
         Point q{x, parity, false};
         queries.push_back(q);
@@ -154,20 +156,63 @@ static void wide_prefix_boundaries() {
   for (size_t i = 0; i < queries.size(); ++i)
     require(got[i] == lookup(full.data(), full.size(), queries[i]));
 }
+__global__ void field_boundary_kernel(Fp64Ctx f, const U *pairs, U *out, U n) {
+  U i = U(blockIdx.x) * blockDim.x + threadIdx.x;
+  if (i >= n) return;
+  U a = fp64_to_mont(f, pairs[2*i]), b = fp64_to_mont(f, pairs[2*i+1]);
+  out[3*i] = fp64_from_mont(f, fp64_mul(f,a,b));
+  out[3*i+1] = fp64_from_mont(f, fp64_add(f,a,b));
+  out[3*i+2] = fp64_from_mont(f, fp64_sub(f,a,b));
+}
+static void field_boundary_checks() {
+  U seed = 0x123456789abcdefULL;
+  auto next = [&]() { seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17; return seed; };
+  for (U p : {(U(1)<<62)-57, (U(1)<<63)-25}) {
+    while (!prime(p)) p-=2;
+    Curve c = curve(p,p-3,7);
+    std::vector<U> pairs;
+    for (U a : {U(0),U(1),p/2,p-2,p-1})
+      for (U b : {U(0),U(1),p/2,p-2,p-1}) { pairs.push_back(a); pairs.push_back(b); }
+    for (unsigned i=0;i<4096;++i) { pairs.push_back(next()%p); pairs.push_back(next()%p); }
+    U n=pairs.size()/2;
+    thrust::device_vector<U> input(pairs.begin(),pairs.end()), output(3*n);
+    field_boundary_kernel<<<(n+BLOCK-1)/BLOCK,BLOCK>>>(c.f,data(input),data(output),n);
+    cuda_check(cudaGetLastError());
+    std::vector<U> got(3*n);
+    cuda_check(cudaMemcpy(got.data(),data(output),got.size()*sizeof(U),cudaMemcpyDeviceToHost));
+    for(U i=0;i<n;++i) {
+      U a=pairs[2*i],b=pairs[2*i+1];
+      require(got[3*i]==modmul(a,b,p));
+      require(got[3*i+1]==U(((unsigned __int128)a+b)%p));
+      require(got[3*i+2]==U(((unsigned __int128)a+p-b)%p));
+    }
+  }
+}
 int main() {
   try {
+    field_boundary_checks();
 #ifdef ER_CUB_SORT
     require(merge_sort_bytes(0) == 0);
     for (U count : {(U(1) << 31) - 1, U(1) << 31,
                     (U(1) << 31) + 1, U(1) << 32})
       require(merge_sort_bytes(count) >= count * sizeof(DeviceRow));
 #endif
+    require(right_cache_fits(40, 128, 1024, 640));
+    require(!right_cache_fits(41, 128, 1024, UINT64_MAX));
+    require(!right_cache_fits(40, 128, 1024, 639));
+    require(!right_cache_fits(1, 769, 1024, UINT64_MAX));
+    require(!right_cache_fits(UINT64_MAX, 0, UINT64_MAX, UINT64_MAX));
+    require(!right_cache_fits(0, 0, 1024, UINT64_MAX));
+    for (Point p : {Point{}, Point{0, 0, false},
+                    Point{(U(1) << 62) - 2, (U(1) << 62) - 3, false}})
+      require(equal(CachedPoint::from(p).point(), p));
     prefix_boundaries();
     compact_boundaries<CompactRow, CompactRowLess>();
     compact_boundaries<DenseRow, DenseRowLess>();
     require(DenseRow((U(1) << 63) + 1, UINT32_MAX).key() == (U(1) << 63) + 1);
     require(U(DenseRow(0, UINT32_MAX).id) != UINT64_MAX);
-    wide_prefix_boundaries();
+    wide_prefix_boundaries(62);
+    wide_prefix_boundaries(63);
     require(!packed_winner_fits(0, 1));
     require(packed_winner_fits(1, UINT64_MAX));
     require(packed_winner_fits(UINT64_MAX, 1));
@@ -219,6 +264,12 @@ int main() {
       HostBackend host(wide, 65, 1);
       device.prepare(p);
       host.prepare(p);
+#ifdef ER_RIGHT_FULL_CACHE
+      require(device.cached_right_rows() == p.right);
+      DeviceBackend fallback(wide, 65, 1, 0);
+      fallback.prepare(p);
+      require(fallback.cached_right_rows() == 0);
+#endif
       Point late, absent;
       bool have_late = false, have_absent = false;
       for (U i = p.right; i-- > 512;) {
@@ -240,6 +291,12 @@ int main() {
           auto got = device.find(target, p.left + p.right);
           auto expected = host.find(target, p.left + p.right);
           require(got.found == expected.found && got.indices == expected.indices);
+#ifdef ER_RIGHT_FULL_CACHE
+          auto uncached = fallback.find(target, p.left + p.right);
+          require(uncached.found == got.found && uncached.indices == got.indices);
+          if (!uncached.found)
+            require(uncached.visited == p.right);
+#endif
           if (got.found) {
             U right = expected.indices[1] * 33 + expected.indices[2];
             require(right > 512 && got.visited >= right + 1 && got.visited <= p.right);
@@ -249,7 +306,14 @@ int main() {
         }
       }
       device.prepare(Plan{});
+      require(device.cached_right_rows() == 0);
       require(!device.find(Point{}, 0).found);
+      device.prepare(p);
+#ifdef ER_RIGHT_FULL_CACHE
+      require(device.cached_right_rows() == p.right);
+#endif
+      require(device.find(late, p.left + p.right).indices ==
+              host.find(late, p.left + p.right).indices);
     }
 #endif
     DeviceBackend indexed(wide, 8192, 257);
