@@ -1,0 +1,68 @@
+execute(read("../rr-pid50-01/rr-pid50.sing"));
+ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]=V^2+(z^2)*V+(z^3+z);relativeInfinityIdeal50[2]=T^16+(z^30+z^22)*T^8*V+(z^32+z^31+z^30+z^29+z^28+z^26+z^23+z^22+z^21+z^18+z^12+z^8+1)*T^8+(z^35+z^33+z^32+z^30+z^29+z^27+z^16+z^15+z^14+z^9+z^7+z^5)*T^4*V+(z^37+z^36+z^34+z^33+z^32+z^31+z^30+z^29+z^27+z^26+z^25+z^24+z^23+z^22+z^20+z^17+z^14+z^11+z^9+z^6)*T^4+(z^47+z^46+z^43+z^37+z^33+z^32+z^31+z^30+z^29+z^28+z^27+z^26+z^23+z^22+z^20+z^17+z^13+z^10+z^8+z^7+z^6+z^5)*T*V+(z^49+z^45+z^40+z^38+z^37+z^32+z^30+z^29+z^27+z^26+z^19+z^18+z^17+z^14+z^13+z^6)*T+(z^62+z^54+z^50+z^49+z^48+z^47+z^46+z^45+z^44+z^43+z^41+z^38+z^32+z^26+z^24+z^23+z^22+z^19+z^17+z^14+z^13+z^12+z^9+z^8)*V+(z^64+z^63+z^62+z^61+z^60+z^58+z^55+z^54+z^53+z^52+z^48+z^47+z^44+z^42+z^40+z^39+z^38+z^36+z^35+z^33+z^32+z^31+z^29+z^27+z^24+z^20+z^19+z^15+z^14+z^13+z^12+z^11+z^9+z^8+1);
+
+setring inverseBaseCertificate50;short=0;option(redSB);
+matrix numeratorMatrix50=matrix(basis50);
+if(nrows(numeratorMatrix50)!=32 || ncols(numeratorMatrix50)!=32 || normalizationIndex50!=376){ERROR("RR_MULT50_DONOR_SHAPE");quit;}
+module productNumerators50;int pair50=0;int left50;int right50;int row50;int column50;
+intmat parents50[528][2];string vectorString50;
+ring multiplicationSource50=2,(l,v,u),wp(4,2,1);short=0;option(redSB);
+map sourceInfinity50=relativeInfinity50,l,v,u;
+ideal actualSource50=sourceInfinity50(relativeInfinityIdeal50);ideal actualStd50=std(actualSource50);
+if(lead(actualSource50[1])!=v^2 || lead(actualSource50[2])!=l^16){ERROR("RR_MULT50_SOURCE_POWER_BASIS");quit;}
+map pidIntoSource50=inverseBaseCertificate50,u;
+matrix numeratorSource50=pidIntoSource50(numeratorMatrix50);poly denominatorSource50=pidIntoSource50(commonDenominator50);
+ideal numeratorFunctions50;poly numeratorFunction50;
+for(column50=1;column50<=32;column50++){
+ numeratorFunction50=0;
+ for(row50=1;row50<=32;row50++){numeratorFunction50=numeratorFunction50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);}
+ numeratorFunctions50[column50]=numeratorFunction50;
+}
+poly product50;poly remaining50;poly reconstructed50;vector columnVector50;intvec exponent50;int position50;
+link productOut50="ASCII:w rr-products50.sing";open(productOut50);
+write(productOut50,"// u denotes z=1/original_u.\nring productPidCertificate50=2,(u),(c,dp);module productNumerators50;intmat parents50[528][2];");
+for(left50=1;left50<=32;left50++){
+ for(right50=left50;right50<=32;right50++){
+  pair50++;product50=reduce(numeratorFunctions50[left50]*numeratorFunctions50[right50],actualStd50);
+  remaining50=product50;columnVector50=0;
+  while(remaining50!=0){
+   exponent50=leadexp(remaining50);
+   if(exponent50[1]>=16 || exponent50[2]>=2){ERROR("RR_MULT50_NONSTANDARD_REMAINDER");quit;}
+   position50=exponent50[1]+16*exponent50[2]+1;
+   columnVector50=columnVector50+leadcoef(remaining50)*u^exponent50[3]*gen(position50);
+   remaining50=remaining50-lead(remaining50);
+  }
+  reconstructed50=0;
+  for(row50=1;row50<=32;row50++){reconstructed50=reconstructed50+columnVector50[row50]*l^((row50-1)%16)*v^((row50-1) div 16);}
+  if(reconstructed50!=product50){ERROR("RR_MULT50_FULL_COLUMN_RECONSTRUCTION");quit;}
+  vectorString50=string(columnVector50);
+  setring inverseBaseCertificate50;
+  execute("productNumerators50["+string(pair50)+"]="+vectorString50+";");
+  parents50[pair50,1]=left50;parents50[pair50,2]=right50;
+  setring multiplicationSource50;
+  write(productOut50,"productNumerators50["+string(pair50)+"]="+vectorString50+";parents50["+string(pair50)+",1]="+string(left50)+";parents50["+string(pair50)+",2]="+string(right50)+";");
+  print("RR_MULT50_PRODUCT pair="+string(pair50)+" left="+string(left50)+" right="+string(right50)+" full_column_checked=true");
+ }
+}
+close(productOut50);
+if(pair50!=528){ERROR("RR_MULT50_PAIR_COUNT");quit;}
+setring inverseBaseCertificate50;
+module denominatorBasis50=commonDenominator50*basis50;
+print("RR_MULT50_STAGE all_product_columns_exported=528 complete_table_lift_begin=true");
+matrix table50=lift(denominatorBasis50,productNumerators50);
+matrix productMatrix50=matrix(productNumerators50);
+if(nrows(table50)!=32 || ncols(table50)!=528 || matrix(denominatorBasis50)*table50!=productMatrix50){ERROR("RR_MULT50_COMPLETE_TABLE_PRODUCT");quit;}
+matrix corruptTable50=table50;corruptTable50[1,1]=corruptTable50[1,1]+1;
+if(matrix(denominatorBasis50)*corruptTable50==productMatrix50){ERROR("RR_MULT50_CORRUPTION_ACCEPTED");quit;}
+matrix sourcePowerMatrix50[32][32];for(column50=1;column50<=32;column50++){sourcePowerMatrix50[column50,column50]=commonDenominator50;}
+if(numeratorMatrix50*sourceLift50!=sourcePowerMatrix50){ERROR("RR_MULT50_SOURCE_EMBEDDING_PRODUCT");quit;}
+link tableOut50="ASCII:w rr-table50.sing";open(tableOut50);
+write(tableOut50,"// u denotes z=1/original_u; e_i=basis50[i]/commonDenominator50.\nring tablePidCertificate50=2,(u),(c,dp);matrix table50[32][528];matrix sourceLift50[32][32];intmat parents50[528][2];");
+for(column50=1;column50<=528;column50++){
+ write(tableOut50,"parents50["+string(column50)+",1]="+string(parents50[column50,1])+";parents50["+string(column50)+",2]="+string(parents50[column50,2])+";");
+ for(row50=1;row50<=32;row50++){write(tableOut50,"table50["+string(row50)+","+string(column50)+"]="+string(table50[row50,column50])+";");}
+}
+for(column50=1;column50<=32;column50++){for(row50=1;row50<=32;row50++){write(tableOut50,"sourceLift50["+string(row50)+","+string(column50)+"]="+string(sourceLift50[row50,column50])+";");}}
+close(tableOut50);
+print("RR_MULT50_RESULT PID_algebra_rank=32 complete_product_pairs=528 full_table_product=true source_power_basis_embedding=true corruption_rejected=true normalization_index=376 proper_RR_bridge_recorded=true");
+print("RR_MULT50_ALL_CHECKS_PASS");quit;
