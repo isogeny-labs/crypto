@@ -1,3 +1,3 @@
 # Weighted same-support bridge
 
-Producer compilation and separate axiom readback passed. Independent semantic review and fresh replay are pending. This is the literal field-expression bridge, not a compiled Rust equivalence or full addition-law theorem. The review plan was frozen before receiving candidate results.
+Producer compilation and separate axiom readback passed. Independent statement-only derivation, source semantic review and fresh six-process replay passed. Exact report, source-path mapping and checks are in ../reports/same-support-v3/. The theorem concerns literal field expressions and the abstract classifier; next is concrete Rust field-operation correspondence and runtime invariant preservation.
