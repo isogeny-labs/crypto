@@ -53,6 +53,14 @@ pub struct MixedOrbitDomains<'a> {
     residual_index: HashMap<PointKey, usize>,
 }
 
+/// Symmetry policy for the ordered mixed-domain summands.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MixedOrbitOrdering {
+    Unordered,
+    FirstPair,
+    EqualDomainRuns,
+}
+
 /// Materialise the residual signed-orbit suffix of two replayed, ordered bases.
 ///
 /// The smaller point record and both of its orbit maps must be exact prefixes
