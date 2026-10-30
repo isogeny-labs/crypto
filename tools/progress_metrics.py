@@ -13,6 +13,18 @@ Sources (all committed, read at --ref unless noted):
                                 certified factorization status and recorded raw relation counts
   research/nist_skip_criterion_20261025/factor_followup_20261026/results/factor-summary.json
                                 proved complete integer records in the all-21 selection census
+  research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json
+                                retained original orders in the period-software trial
+  research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json
+                                distinct original orders in the recovered FreeLIP replay
+  research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json
+                                independently checked saved work-count cells, not security
+  research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json
+                                verified point-trait cells on 21 choices; repeated controls, not security
+  research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
+                                verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
@@ -244,6 +256,16 @@ def nist_selection_factor_census(ref, since):
                  label=f"NIST all-21 census: complete {family} records", source=source)
 
 
+def nist_selection_period_ecpp(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_ecpp_20261026/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_ecpp.retained_rows", data.get("rows"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Period ECPP trial: original cohort rows retained, including indeterminate",
+             source=f"{path}@{commit}")
+
+
 def nist_selection_exact_embedding(ref, since):
     path = "research/nist_skip_criterion_20261025/exact_embedding_20261026/results/verification.json"
     for date, commit, text in file_history(ref, path, since):
@@ -252,6 +274,79 @@ def nist_selection_exact_embedding(ref, since):
              date=date, problem="nist-candidate-selection", unit="curves", better="higher",
              label="NIST all-21 census: exact embedding degrees with direct-power certificates",
              source=f"{path}@{commit}")
+
+
+def nist_selection_freelip(ref, since):
+    path = "research/nist_skip_criterion_20261025/freelip_replay_20261027/results/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_freelip.distinct_orders", data.get("distinct_orders"),
+             date=date, problem="nist-candidate-selection", unit="orders", better="neutral",
+             label="Recovered FreeLIP replay: distinct original orders, not repeated-call count",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_period_work(ref, since):
+    path = "research/nist_skip_criterion_20261025/period_work_20261027/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_period_work.verified_cells", data.get("cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="Saved ECPP work: independently checked count cells; no historical-rule claim",
+             source=f"{path}@{commit}")
+
+
+
+
+def nist_selection_generator_traits(ref, since):
+    """Export recorded coverage only; do not compute curve traits or estimates."""
+    path = "research/nist_skip_criterion_20261025/generator_b_execution_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_generator_traits.verified_cells", data.get("trait_cells_checked"),
+             date=date, problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: verified point-trait cells under repeated controls; not security",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_strict_elkies(ref, since):
+    """Export recorded exact-character coverage, without recomputing a result."""
+    path = "research/nist_skip_criterion_20261025/strict_elkies_20261029/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        emit("nist.selection_strict_elkies.verified_character_cells",
+             data.get("odd_prime_character_cells_checked"), date=date,
+             problem="nist-candidate-selection", unit="cells", better="neutral",
+             label="21 curve choices: strict-character cells verified; no historical-use or security claim",
+             source=f"{path}@{commit}")
+
+
+def nist_selection_expanded_cutoff(ref, since):
+    """Export independently verified coverage from committed records only."""
+    path = "research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_five_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("integer_cutoffs", "cutoffs")):
+            emit(f"nist.selection_expanded_cutoff.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Fixed 21-curve cohort: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
 
 
 def koblitz_modular_augmentation(ref, since):
@@ -481,7 +576,16 @@ def main():
     photo_volcano(a.ref)
     nist_factorization(a.ref, a.since)
     nist_selection_factor_census(a.ref, a.since)
+    nist_selection_period_ecpp(a.ref, a.since)
     nist_selection_exact_embedding(a.ref, a.since)
+    nist_selection_freelip(a.ref, a.since)
+    nist_selection_period_work(a.ref, a.since)
+    nist_selection_generator_traits(a.ref, a.since)
+    nist_selection_strict_elkies(a.ref, a.since)
+    nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
+
+
     ghs_ipsec_archive(a.ref, a.since)
     fall_degree(a.ref)
     curve_traits(a.ref)

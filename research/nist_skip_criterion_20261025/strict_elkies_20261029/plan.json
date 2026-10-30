@@ -1,0 +1,33 @@
+{
+  "kind": "strict-elkies-exact-run-plan/v1",
+  "source_revision": "043a568661ebf1c40a4ead333889d814c32d045c",
+  "script": "run.sh",
+  "argv": [
+    "sh",
+    "research/nist_skip_criterion_20261025/strict_elkies_20261029/run.sh"
+  ],
+  "environment": {
+    "ED_BUILD": "/workspace/nist-strict-elkies-build-001",
+    "ED_RUN": "/workspace/nist-strict-elkies-run-001",
+    "NIST_CHECKPOINT_WRAPPER": "/tmp/nist-checkpoint-run"
+  },
+  "native_environment": {
+    "PATH": "/usr/bin:/bin",
+    "LANG": "C",
+    "LC_ALL": "C"
+  },
+  "limits_seconds": [
+    30,
+    120,
+    120,
+    30,
+    30,
+    30
+  ],
+  "virtual_address_bytes": 1610612736,
+  "attempts": 1,
+  "original_rows": 21,
+  "phase_count": 6,
+  "protocol": "protocol.json",
+  "preparation": "evidence/preparation-delivery.json"
+}

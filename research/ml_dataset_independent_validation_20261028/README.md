@@ -16,6 +16,23 @@ see [POLICY_COMPATIBILITY.md](POLICY_COMPATIBILITY.md). The native consumer
 accepts strict plan/v2 and factor-base/v2 bindings and emits its own static
 routing view/v2. This is not conformance to the producer's v4 training export.
 
+Sealed cells with the exact checked-phase policy also receive an independent
+recorded-contract check. It reconstructs the attempt binding, verifies protocol
+freeze hashes with number-preserving canonicalization, checks the finite native
+syscall lifecycle, and recomputes each recorded counter projection. The new
+`labels.checked_phase_contract` result remains restricted; public feature bytes
+and legacy v1 labels are unchanged. Policy-only, unavailable, operation-error and
+start-only prefixes remain explicit. Successful checks do not establish hardware
+truth, complete execution, whole-worker counts or admitted training cost.
+
+This component uses a conservative32MiB cumulative modeled-storage allowance,
+in addition to strict file/array bounds. `consumer_resource_limit` is a consumer
+refusal, not a producer outcome. Partial snapshots and their lineage are not
+accepted as sealed cells. See the
+[frozen contract](../ml_dataset_consumer_checked_phase_20261029/IMPLEMENTATION_FREEZE.md)
+and [validation record](../ml_dataset_consumer_checked_phase_20261029/VALIDATION.md)
+for exact scope, evidence and remaining interoperability limits.
+
 ## Native commands
 
 ```sh
