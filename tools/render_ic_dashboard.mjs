@@ -286,7 +286,12 @@ const rhoGraph = `<div class="rho-plot" data-measurement-chart role="group" aria
 let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
-const threeLeads = section(oldFront, 'three-leads-e2e');
+// Recover the exact historical panel from its canonical committed source,
+// rather than depending on a previous render retaining it. These bytes come
+// from 0a0cb3e8f9:docs/index-calculus-scoreboard.html without recomputation.
+const threeLeadsRaw = readFileSync(resolve(ROOT, 'docs/ic/three-leads-e2e-panel.html'));
+assert.equal(sha(threeLeadsRaw), '23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084', 'Historical three-leads panel changed; review its original evidence before changing the pin');
+const threeLeads = threeLeadsRaw.toString('utf8');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 // GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
 // summaries only (no arithmetic beyond formatting).
@@ -339,6 +344,17 @@ const retainedPanels = [
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
     html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
+    const timeline = JSON.parse(progressRaw);
+    const table = /(<summary>Every plotted point as a table<\/summary>[\s\S]*?<tbody>)[\s\S]*?(<\/table>)/;
+    assert.ok(table.test(html), 'Progress panel has no plotted-point table');
+    const rows = timeline.series.flatMap(series => series.points.map(point => {
+      assert.ok(Number.isFinite(point.value), `Invalid progress value: ${point.label}`);
+      const unit = point.unit ? `<br><small>${escape(point.unit)}</small>` : '';
+      // Keep each result's cost boundary, uncertainty and reference limitations
+      // beside its value; these are recorded descriptions, not new estimates.
+      return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
+    })).join('\n');
+    html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
   }
   return {id,label,html};
 });

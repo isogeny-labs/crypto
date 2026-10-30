@@ -1,0 +1,29 @@
+warning: unused import: `crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase`
+  --> src/cryptanalysis/ecbench/methods.rs:46:5
+   |
+46 | use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::cryptanalysis::gaudry_quartic::Pt4`
+  --> src/cryptanalysis/ecbench/workload.rs:24:5
+   |
+24 | use crate::cryptanalysis::gaudry_quartic::Pt4;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `PtB`
+  --> src/cryptanalysis/ecbench/workload.rs:25:74
+   |
+25 | use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
+   |                                                                          ^^^
+
+warning: unused import: `unpack_e4`
+  --> src/cryptanalysis/ecbench/workload.rs:26:71
+   |
+26 | use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4, D4Curve};
+   |                                                                       ^^^^^^^^^
+
+warning: `crypto` (lib) generated 4 warnings (run `cargo fix --lib -p crypto` to apply 4 suggestions)
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 4.97s

@@ -161,6 +161,30 @@ pub(crate) fn inverse(a: u64, p: u64) -> u64 {
     }
 }
 
+// For a validated prime p <= 4096, p = q*a + r gives
+// a^-1 = -q*r^-1 mod p, where 0 < r < a. Charge this bounded
+// (at most 32 KiB) field-arithmetic table to each Curve construction.
+fn small_inverses(p: u64) -> Vec<u64> {
+    if p > 4096 {
+        return Vec::new();
+    }
+    let mut table = vec![0; p as usize];
+    table[1] = 1;
+    for a in 2..p {
+        table[a as usize] = p - (p / a * table[(p % a) as usize]) % p;
+    }
+    table
+}
+
+fn inverse_with_table(a: u64, p: u64, table: &[u64]) -> u64 {
+    debug_assert!(a > 0 && a < p);
+    if table.is_empty() {
+        inverse(a, p)
+    } else {
+        table[a as usize]
+    }
+}
+
 fn addmod(a: u64, b: u64, p: u64) -> u64 {
     let sum = a + b;
     if sum >= p {
@@ -306,9 +330,15 @@ pub struct Curve {
     // Tiny constructor's lookup; empty for the order-witness constructor.
     roots: Vec<Option<u64>>,
     sqrt: Option<SqrtContext>,
+    inverses: Vec<u64>,
+    field: Modulus,
 }
 
 impl Curve {
+    pub(crate) fn field_inverse(&self, a: u64) -> u64 {
+        inverse_with_table(a, self.p, &self.inverses)
+    }
+
     /// Certify cofactor one without scanning the field. A nonzero point killed
     /// by prime r has exact order r. The unique multiple of r in the integer
     /// Hasse interval must be r itself. No unverified cardinality is accepted.
@@ -340,6 +370,8 @@ impl Curve {
             r,
             roots: Vec::new(),
             sqrt: Some(SqrtContext::new(p)),
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
@@ -376,6 +408,8 @@ impl Curve {
                 r,
                 roots: Vec::new(),
                 sqrt: Some(SqrtContext::new(p)),
+                inverses: small_inverses(p),
+                field: Modulus::new(p),
             };
             let witness = (0..p).find_map(|x| curve.decode(2 * x));
             if witness.is_some() && curve.mul(witness, r)?.is_none() {
@@ -406,6 +440,8 @@ impl Curve {
             r,
             roots,
             sqrt: None,
+            inverses: small_inverses(p),
+            field: Modulus::new(p),
         };
         // Finite differences of x^3+a*x+b: first difference at zero
         // is 1+a, second is 6, and the third difference is constant 6.
@@ -442,14 +478,22 @@ impl Curve {
         self.r
     }
     fn rhs(&self, x: u64) -> u64 {
-        (mulmod(mulmod(x, x, self.p), x, self.p) + mulmod(self.a, x, self.p) + self.b) % self.p
+        addmod(
+            addmod(
+                self.field.mul(self.field.mul(x, x), x),
+                self.field.mul(self.a, x),
+                self.p,
+            ),
+            self.b,
+            self.p,
+        )
     }
 
     /// Test canonical coordinates and the curve equation; accepts the identity.
     pub fn contains(&self, point: Point) -> bool {
         match point {
             None => true,
-            Some((x, y)) => x < self.p && y < self.p && mulmod(y, y, self.p) == self.rhs(x),
+            Some((x, y)) => x < self.p && y < self.p && self.field.mul(y, y) == self.rhs(x),
         }
     }
 
@@ -493,17 +537,21 @@ impl Curve {
             Some(p) => p,
         };
         let p = self.p;
-        if x == xx && (y + yy) % p == 0 {
+        if x == xx && addmod(y, yy, p) == 0 {
             return None;
         }
         let (num, den) = if x == xx {
-            ((3 * mulmod(x, x, p) + self.a) % p, 2 * y % p)
+            let square = self.field.mul(x, x);
+            (
+                addmod(addmod(addmod(square, square, p), square, p), self.a, p),
+                addmod(y, y, p),
+            )
         } else {
             (sub(yy, y, p), sub(xx, x, p))
         };
-        let slope = mulmod(num, inverse(den, p), p);
-        let nx = sub(sub(mulmod(slope, slope, p), x, p), xx, p);
-        Some((nx, sub(mulmod(slope, sub(x, nx, p), p), y, p)))
+        let slope = self.field.mul(num, self.field_inverse(den));
+        let nx = sub(sub(self.field.mul(slope, slope), x, p), xx, p);
+        Some((nx, sub(self.field.mul(slope, sub(x, nx, p)), y, p)))
     }
 
     /// Checked affine addition, including identity, inverses, and doubling.
@@ -1098,18 +1146,18 @@ impl Jacobian {
     fn from_affine(point: Point) -> Self {
         point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
     }
-    fn affine(self, modulus: Modulus) -> Point {
+    fn affine(self, modulus: Modulus, inverses: &[u64]) -> Point {
         if self.z == 0 {
             return None;
         }
-        let iz = inverse(self.z, modulus.p);
+        let iz = inverse_with_table(self.z, modulus.p, inverses);
         let iz2 = modulus.mul(iz, iz);
         Some((
             modulus.mul(self.x, iz2),
             modulus.mul(self.y, modulus.mul(iz, iz2)),
         ))
     }
-    fn batch_affine(points: &[Self], modulus: Modulus) -> Vec<Point> {
+    fn batch_affine(points: &[Self], modulus: Modulus, inverses: &[u64]) -> Vec<Point> {
         let mut prefix = Vec::with_capacity(points.len());
         let mut product = 1;
         for point in points {
@@ -1118,7 +1166,7 @@ impl Jacobian {
                 product = modulus.mul(product, point.z);
             }
         }
-        let mut inv = inverse(product, modulus.p);
+        let mut inv = inverse_with_table(product, modulus.p, inverses);
         let mut out = vec![None; points.len()];
         for (i, point) in points.iter().enumerate().rev() {
             if point.z == 0 {
@@ -1198,7 +1246,7 @@ struct FixedPair {
 impl FixedPair {
     fn new(curve: &Curve, p: Point, q: Point) -> Self {
         let windows = (64 - (curve.r - 1).leading_zeros()).div_ceil(4) as usize;
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
             for window in 0..windows {
@@ -1208,7 +1256,7 @@ impl FixedPair {
                     row[digit] = row[digit - 1].add_affine(base, curve.a, modulus);
                 }
                 // Include 16*base in the same inversion for the next window.
-                let affine = Jacobian::batch_affine(&row, modulus);
+                let affine = Jacobian::batch_affine(&row, modulus, &curve.inverses);
                 let mut table_row = [None; 16];
                 table_row.copy_from_slice(&affine[..16]);
                 if window + 1 < windows {
@@ -1219,7 +1267,7 @@ impl FixedPair {
             out
         };
         Self {
-            modulus: Modulus::new(curve.p),
+            modulus: curve.field,
             p: table(p),
             q: table(q),
         }
@@ -1233,7 +1281,7 @@ impl FixedPair {
             u >>= 4;
             v >>= 4;
         }
-        out.affine(self.modulus)
+        out.affine(self.modulus, &curve.inverses)
     }
 }
 
@@ -1491,7 +1539,7 @@ mod tests {
     #[test]
     fn jacobian_mixed_add_matches_affine_with_nonunit_scales() {
         let (curve, generator) = fixture();
-        let modulus = Modulus::new(curve.p);
+        let modulus = curve.field;
         let points: Vec<_> = (0..curve.r)
             .map(|k| curve.mul(generator, k).unwrap())
             .collect();
@@ -1505,7 +1553,7 @@ mod tests {
                     z,
                 }
             });
-            assert_eq!(projective.affine(modulus), point);
+            assert_eq!(projective.affine(modulus, &curve.inverses), point);
             assert_eq!(
                 Jacobian::batch_affine(
                     &[
@@ -1513,7 +1561,8 @@ mod tests {
                         projective,
                         projective.double(curve.a, modulus)
                     ],
-                    modulus
+                    modulus,
+                    &curve.inverses
                 ),
                 vec![None, point, curve.add(point, point).unwrap()]
             );
@@ -1521,14 +1570,17 @@ mod tests {
                 assert_eq!(
                     projective
                         .add_affine(other, curve.a, modulus)
-                        .affine(modulus),
+                        .affine(modulus, &curve.inverses),
                     curve.add(point, other).unwrap()
                 );
             }
         }
         // A point with y=0 doubles to identity, including a nonunit scale.
         let m = Modulus::new(7);
-        assert_eq!(Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m), None);
+        assert_eq!(
+            Jacobian { x: 0, y: 0, z: 3 }.double(1, m).affine(m, &[]),
+            None
+        );
     }
 
     #[test]
@@ -1567,6 +1619,108 @@ mod tests {
                 assert_eq!(m.mul(a, b), reference(a, b, p));
             }
         }
+    }
+
+    #[test]
+    fn cached_curve_arithmetic_matches_independent_remainders() {
+        // Test oracle uses wide integer remainder and Fermat inversion, neither
+        // the reciprocal reducer nor the inverse cache used by production.
+        fn product(a: u64, b: u64, p: u64) -> u64 {
+            (u128::from(a) * u128::from(b) % u128::from(p)) as u64
+        }
+        fn power(mut a: u64, mut n: u64, p: u64) -> u64 {
+            let mut r = 1;
+            while n != 0 {
+                if n & 1 != 0 {
+                    r = product(r, a, p);
+                }
+                a = product(a, a, p);
+                n >>= 1;
+            }
+            r
+        }
+        fn add(a: Point, b: Point, c: &Curve) -> Point {
+            let (Some((x, y)), Some((xx, yy))) = (a, b) else {
+                return a.or(b);
+            };
+            let p = c.p;
+            if x == xx && (y + yy) % p == 0 {
+                return None;
+            }
+            let (n, d) = if x == xx {
+                ((3 * product(x, x, p) + c.a) % p, 2 * y % p)
+            } else {
+                ((yy + p - y) % p, (xx + p - x) % p)
+            };
+            let slope = product(n, power(d, p - 2, p), p);
+            let nx = (product(slope, slope, p) + 2 * p - x - xx) % p;
+            Some((nx, (product(slope, (x + p - nx) % p, p) + p - y) % p))
+        }
+        for (p, a, b, r, g) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+            (65521, 65518, 3, 65563, Some((0, 64894))),
+            (
+                1_099_511_627_563,
+                1_099_511_627_560,
+                56,
+                1_099_512_551_701,
+                Some((1, 15_267_301_451)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, g).unwrap();
+            let mut points = vec![None];
+            for _ in 1..r.min(200) {
+                points.push(add(*points.last().unwrap(), g, &c));
+            }
+            for &x in &points {
+                assert!(c.contains(x));
+                for &y in &points {
+                    assert_eq!(c.add(x, y).unwrap(), add(x, y, &c));
+                }
+            }
+            let mut rng = Rng(0x9c43);
+            for x in [0, 1, p / 2, p - 1]
+                .into_iter()
+                .chain((0..256).map(|_| rng.below(p)))
+            {
+                let rhs = (product(product(x, x, p), x, p) + product(a, x, p) + b) % p;
+                assert_eq!(c.rhs(x), rhs);
+                for y in [0, 1, p / 2, p - 1] {
+                    assert_eq!(c.contains(Some((x, y))), product(y, y, p) == rhs);
+                }
+            }
+            for invalid in [Some((p, 0)), Some((0, p)), Some((u64::MAX, u64::MAX))] {
+                assert!(!c.contains(invalid));
+                assert!(c.add(invalid, g).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn bounded_inverse_tables_match_independent_references() {
+        for p in [5, 7, 17, 211, 4093] {
+            assert!(prime(p));
+            let table = small_inverses(p);
+            assert_eq!(table.len(), p as usize);
+            for a in 1..p {
+                let actual = inverse_with_table(a, p, &table);
+                assert_eq!(actual, inverse(a, p));
+                assert_eq!(actual, pow(a, p - 2, p));
+                assert_eq!(a * actual % p, 1);
+            }
+        }
+        for p in [4099, 65521, 2_305_843_009_213_693_951] {
+            let table = small_inverses(p);
+            assert!(table.is_empty());
+            for a in [1, 2, p / 2, p - 1] {
+                assert_eq!(inverse_with_table(a, p, &table), pow(a, p - 2, p));
+            }
+        }
+        let (curve, generator) = fixture();
+        let witnessed =
+            Curve::with_order_witness(curve.p, curve.a, curve.b, curve.r, generator).unwrap();
+        assert_eq!(curve.inverses, witnessed.inverses);
     }
 
     #[test]

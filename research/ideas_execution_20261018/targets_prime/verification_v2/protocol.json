@@ -1,0 +1,18 @@
+{
+  "schema":"targets-prime-verifier-amendment/v2",
+  "frozen_before_verification":true,
+  "scope":"Additive verification of existing frozen target/decomposition records; no scientific trials or status changes",
+  "source_runs":["../runs/run-20261018-native-v1","../runs/run-20261018-strict4-v1"],
+  "expected_actual_target_rows":{"ordered":517,"strict":482},
+  "expected_certificates":{"ordered":76,"strict":3},
+  "unavailable_control_rows":{"ordered":2,"strict":0},
+  "binding":"The caller supplies a preregistered SHA256 for source results. Every certificate binds item, curve_id, target_id (implicit zero only for the sole Fp2 target per curve), exact target point, and the source hit flag. Strict natural targets additionally bind the original ordered workload.",
+  "coverage":"Reject missing, duplicate, extra and wrong-target certificates; reject empty certificate input whenever source results contain hits",
+  "constraints":"Replay on-curve points and sums in Jacobian coordinates; prime interval bound; all four strict abscissae distinct; Fp2 projected-base membership; exact point counts, prime subgroup order and generator checks where supplied",
+  "independence":"Group addition/doubling uses Jacobian formulas, independently from the scientific affine solver. Finite-field arithmetic remains shared with diagnostic.cpp; this is internal cross-track review, not external formal certification.",
+  "json":"Vendored nlohmann/json v3.12.0; duplicate object keys rejected",
+  "dependency":{"url":"https://raw.githubusercontent.com/nlohmann/json/v3.12.0/single_include/nlohmann/json.hpp","sha256":"aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63","license":"MIT, vendor/LICENSE.MIT"},
+  "adversarial_controls":["wrong recorded target ID","four repeated points with false strictness claim on a consistent copied planted target","missing all certificates","missing one certificate","duplicate certificate","extra unknown target certificate","altered on-curve target","wrong source-result digest","duplicate JSON key"],
+  "limits":{"address_space_mib":512,"cpu_seconds_per_call":30},
+  "preservation":"Original verifier, raw outputs, protocols and reports are never overwritten. Root will amend the original report after this additive verification succeeds."
+}

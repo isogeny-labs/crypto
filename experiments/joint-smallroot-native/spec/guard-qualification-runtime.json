@@ -1,0 +1,83 @@
+{
+  "schema": "native-guard-runtime-lock-v1",
+  "source_pin": "86ddd19f67e08160c22a0d8ba9a32a92321d18ad",
+  "image": "debian:trixie-slim@sha256:62bd423aeee912639ca8ee681c2b762cb3e25137e0a92b20be455898a9f034ad",
+  "image_id": "sha256:133aec7ab1411181567fef7fc3f4512123e1f9660090b49851de4b698b4ff772",
+  "docker_server": "28.4.0",
+  "cgroup_version": 2,
+  "driver": "vfs",
+  "binaries": [
+    {
+      "path": "/workspace/native-smallroot-guard-build-6374dd/guard-qualification",
+      "sha256": "2738ade011be6b544d403d58ebe8f2245bbd973e4ce3269aa7f45e5807491c15"
+    },
+    {
+      "path": "/workspace/native-smallroot-guard-build-6374dd/guard-worker",
+      "sha256": "f06e008bb405bbbf11a3f85fafb10fb95e6c781e321ed1e11ffb787721f2afdb"
+    }
+  ],
+  "read_only_prefix_libraries": [
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libcrypto.so.3",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libcrypto.so.3",
+      "sha256": "1a8cc605fb88783cc0e69effd9bb1c9fe4b5ddf38aa5f0b0ccdb119298ce89f6"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libstdc++.so.6",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libstdc++.so.6.0.36",
+      "sha256": "10f0d3c46c070acd4abea2ccf2500ff0ec77e9b90154b82ea2720dba05510cb9"
+    },
+    {
+      "path": "/workspace/skeleton_sage-runtime/lib/libgcc_s.so.1",
+      "realpath": "/workspace/skeleton_sage-runtime/lib/libgcc_s.so.1",
+      "sha256": "5444fbe71e8cfe3bd05cdf2b44bd8c2e553e6e7e276977089b5e4e1a1ceed531"
+    }
+  ],
+  "pinned_image_libraries": [
+    {
+      "image_path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    {
+      "image_path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+      "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3"
+    },
+    {
+      "image_path": "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+      "sha256": "295fa521a03cd2faa99974f378c9e23dd622021ec7d32bcad4f8ea61aec8a872"
+    },
+    {
+      "image_path": "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+      "sha256": "85e21f7dba0394411d00959176fd18b470e575b0b05f1f4f41e5636802ce0500"
+    },
+    {
+      "image_path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307"
+    }
+  ],
+  "script": "experiments/joint-smallroot-native/spec/guard-qualification-runtime.sh",
+  "script_sha256": "77781fea2591c9a9dd9dd63568c29f78dbe8aedcadddb064b8dfe534126e92f6",
+  "resource_request": {
+    "parent_memory": 17179869184,
+    "parent_memory_swap_total": 17179869184,
+    "child_memory": 8589934592,
+    "cpus": 2,
+    "pids": 64,
+    "network": "none",
+    "rootfs": "read-only",
+    "cgroup_namespace": "private",
+    "privileged_except_readonly_negative": true,
+    "host_network": false,
+    "socket_inside": false
+  },
+  "visibility": "actual visible outer/enclosing/container mappings recorded per case; hidden ancestors unobserved",
+  "cache_preparation": {
+    "exact_authorized_subset": "largest80 distinct device/inode files",
+    "bytes": 4557159684,
+    "allowlist_sha256": "abfdb5ee964e68f1ff49baf4b42f9c7ad61e98ad42a98f7ee790dfb36806c761",
+    "tsv_sha256": "98af56609374d475abc6b4023eb31b787281e4157e7c57409064373b7b136181",
+    "passes": 1,
+    "advice_performed": false,
+    "preparation_not_proof_of_reclamation": true
+  }
+}
