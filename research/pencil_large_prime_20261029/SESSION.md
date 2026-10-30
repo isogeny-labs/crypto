@@ -1532,3 +1532,21 @@ Independent terminal review and scientific replay remain absent; delegated agent
 ### Errors
 
 Native export and semantic checks each return1 with completeness findings; preserved unchanged. Controller3 ended07:54:08.858UTC, before its normal timeout, with CRIU dump failure. No fourth controller ran. A long interruption preceded14:46 reconciliation; all old cutoffs remain binding.
+
+## 2026-10-30T14:55Z — Supervisor receipt and artifact automation
+
+### What was done
+
+Downloaded the saved versioned supervisor receipt: failed generation19, exit137, original request, attempt0, update07:53:56UTC. Added a separate supplement without changing bound terminal report inputs. Fast-forwarded artifact automation52f0617a0 and hydrated analysis.stdout; bytes equal native-analysis.json.
+
+### Decisions made
+
+The receipt corroborates terminal failure but does not prove OOM, exact worker termination, active runtime or spending. Leave those values unresolved.
+
+### Open threads
+
+Exact-head CI, independent review/replay and full pencil cohort remain outstanding. No execution authorization remains.
+
+### Errors
+
+The single-branch fetch populated FETCH_HEAD without a remote-tracking ref; initial ff-only merge by remote name failed without mutation. Merged the fetched commit via FETCH_HEAD. No rebase or evidence rewrite.
