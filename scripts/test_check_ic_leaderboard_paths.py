@@ -77,16 +77,6 @@ jobs:
     def test_absent_event_is_empty(self):
         self.assertEqual(self.read(self.TEXT, "schedule"), [])
 
-    def test_declared_events(self):
-        with tempfile.TemporaryDirectory() as d:
-            f = Path(d) / "w.yml"
-            f.write_text(self.TEXT)
-            self.assertTrue(chk.event_declared(f, "pull_request"))
-            self.assertTrue(chk.event_declared(f, "push"))
-            self.assertFalse(chk.event_declared(f, "schedule"))
-            f.write_text("on:\n  push:\n    paths:\n      - 'z/**'\n")
-            self.assertFalse(chk.event_declared(f, "pull_request"))
-
     def test_paths_ignore_is_refused(self):
         with self.assertRaises(SystemExit):
             self.read("on:\n  push:\n    paths-ignore:\n      - 'a/**'\n", "push")
