@@ -2588,6 +2588,128 @@ fn terminal(
     }
     Ok(complete)
 }
+/// Outer custody adapter. `e`, `binding`, and `capture_limits` must be derived
+/// from the verified original run; this function does not select a profile or
+/// authenticate an arbitrary caller's Expected. No output files are written.
+/// Raw file buffers belong to outer custody, separately from parser accounting.
+pub(super) fn verify_files(
+    dir: &std::path::Path,
+    e: &Expected<'_>,
+    artifacts: &[crate::ml_dataset::types::Artifact],
+    binding: &crate::ml_dataset::capture::AttemptBinding,
+    capture_limits: &crate::ml_dataset::capture::CaptureLimits,
+    limits: ReplayLimits,
+) -> Result<Verified, String> {
+    use crate::ml_dataset::{capture, storage};
+    let dir = storage::root_dir(dir, false)?;
+    let caps = slot_caps(e.trace_bytes).map_err(|x| format!("dynamic slot limits: {x:?}"))?;
+    let mut descriptors = [None; 8];
+    let mut raw: [Vec<u8>; 8] = std::array::from_fn(|_| Vec::new());
+    let mut hashes = [[0u8; 32]; 8];
+    let mut total = 0u64;
+    for i in 0..8 {
+        let matching: Vec<_> = artifacts
+            .iter()
+            .filter(|a| a.path == PATHS[i] || a.role == ROLES[i])
+            .collect();
+        if matching.is_empty() {
+            continue;
+        }
+        if matching.len() != 1 {
+            return Err(format!("duplicate dynamic slot identity: {}", PATHS[i]));
+        }
+        let a = matching[0];
+        let encoding = if i == 3 || i == 5 { "jsonl" } else { "json" };
+        if a.path != PATHS[i] || a.role != ROLES[i] || a.encoding != encoding || a.bytes > caps[i] {
+            return Err(format!(
+                "dynamic slot identity or size mismatch: {}",
+                PATHS[i]
+            ));
+        }
+        total = total
+            .checked_add(a.bytes)
+            .ok_or("dynamic file size overflow")?;
+        if total > e.memory_bytes || total > e.trace_bytes {
+            return Err("dynamic file buffers exceed original allowance".into());
+        }
+        // Containment also rejects symlinks; bounded reader rechecks regularity
+        // and catches growth before the child hashes these exact returned bytes.
+        storage::contained_path(&dir, &a.path, false)?;
+        raw[i] = super::prime_f4_wide::read_bounded(
+            &dir,
+            &a.path,
+            usize::try_from(caps[i]).map_err(|_| "dynamic cap exceeds usize")?,
+        )?;
+        if raw[i].len() as u64 != a.bytes {
+            return Err("dynamic file length differs from manifest".into());
+        }
+        hashes[i] = hex::decode(&a.sha256)
+            .map_err(|_| "invalid dynamic digest")?
+            .try_into()
+            .map_err(|_| "invalid dynamic digest length")?;
+        descriptors[i] = Some(a);
+    }
+    let prefix = capture::verify_live_committed_prefix(&dir, binding, capture_limits)?;
+    let mut committed = None;
+    if let Some(prefix) = &prefix {
+        let matching: Vec<_> = prefix
+            .payloads
+            .iter()
+            .filter(|(_, a)| a.path == "payloads/pdp-witness.json" || a.role == ROLES[6])
+            .collect();
+        if matching.len() > 1 {
+            return Err("duplicate committed dynamic witness identity".into());
+        }
+        if let Some((sequence, a)) = matching.first().copied() {
+            let canonical =
+                descriptors[6].ok_or("committed dynamic witness lacks final artifact")?;
+            if a.path != "payloads/pdp-witness.json"
+                || a.role != ROLES[6]
+                || a.encoding != "json"
+                || a.sha256 != canonical.sha256
+                || a.bytes != canonical.bytes
+            {
+                return Err("dynamic witness differs from committed publication".into());
+            }
+            committed = Some(CapturedWitness {
+                bytes: &raw[6],
+                sha256: hashes[6],
+                original_sequence: *sequence,
+            });
+        }
+    }
+    if descriptors[6].is_some() && committed.is_none() {
+        return Err("dynamic witness lacks bound committed publication".into());
+    }
+    let slots = std::array::from_fn(|i| {
+        descriptors[i].map(|a| Artifact {
+            path: &a.path,
+            role: &a.role,
+            encoding: &a.encoding,
+            bytes: &raw[i],
+            sha256: hashes[i],
+        })
+    });
+    verify(
+        e,
+        &Bundle {
+            slots,
+            committed_witness: committed,
+        },
+        limits,
+    )
+    .map_err(|x| format!("dynamic mathematical replay: {x:?}"))
+}
+
+fn slot_caps(trace_bytes: u64) -> R<[u64; 8]> {
+    let encoded = (trace_bytes / 32).min(4 * 1024 * 1024);
+    if encoded <= 4 * 65536 {
+        return Err(Error::Storage);
+    }
+    let a = encoded - 65536 - 4096;
+    Ok([a / 3, 4096, a / 4, a / 12, a / 12, a / 6, a / 12, 65536])
+}
+
 /// Strict replay of a bound artifact bundle. Missing terminal evidence remains a
 /// checked prefix and cannot produce durable-negative or completion assurance.
 /// Parent must OR-trigger this profile from original config and reserved roles;
@@ -2637,12 +2759,7 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
             return Err(Error::Identity);
         }
     }
-    let encoded = (e.trace_bytes / 32).min(4 * 1024 * 1024);
-    if encoded <= 4 * 65536 {
-        return Err(Error::Storage);
-    }
-    let a = encoded - 65536 - 4096;
-    let caps = [a / 3, 4096, a / 4, a / 12, a / 12, a / 6, a / 12, 65536];
+    let caps = slot_caps(e.trace_bytes)?;
     for (i, artifact) in bundle.slots.iter().enumerate() {
         if let Some(f) = artifact {
             if f.path != PATHS[i]

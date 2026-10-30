@@ -7683,6 +7683,60 @@ mod tests {
             )
             .unwrap();
             assert!(verified.first_witness_verified && verified.witness_capture_committed);
+            let mut file_artifacts = Vec::new();
+            for a in descriptors.iter().flatten() {
+                let mut canonical = (*a).clone();
+                canonical.path = canonical
+                    .path
+                    .strip_prefix("payloads/")
+                    .unwrap()
+                    .to_string();
+                std::fs::write(
+                    cell.join(&canonical.path),
+                    std::fs::read(snapshot.join(&a.path)).unwrap(),
+                )
+                .unwrap();
+                file_artifacts.push(canonical);
+            }
+            let check_files = |artifacts: &[crate::ml_dataset::types::Artifact]| {
+                replay::verify_files(
+                    &cell,
+                    &expected,
+                    artifacts,
+                    &binding,
+                    &limits,
+                    replay::ReplayLimits {
+                        work: 10_000_000_000,
+                        allocation_bytes: 128 * 1024 * 1024,
+                        deadline: Instant::now() + Duration::from_secs(20),
+                    },
+                )
+            };
+            let file_verified = check_files(&file_artifacts).unwrap();
+            assert!(
+                file_verified.first_witness_verified && file_verified.witness_capture_committed
+            );
+            let mut duplicate = file_artifacts.clone();
+            duplicate.push(duplicate[0].clone());
+            assert!(check_files(&duplicate).is_err());
+            let mut moved = file_artifacts.clone();
+            moved[0].path = "moved-input.json".into();
+            assert!(check_files(&moved).is_err());
+            let witness_index = file_artifacts
+                .iter()
+                .position(|a| a.path == "pdp-witness.json")
+                .unwrap();
+            let mut altered = file_artifacts.clone();
+            let mut altered_bytes = raw[6].clone();
+            altered_bytes.push(b' ');
+            std::fs::write(cell.join("pdp-witness.json"), &altered_bytes).unwrap();
+            altered[witness_index].bytes = altered_bytes.len() as u64;
+            altered[witness_index].sha256 = crate::ml_dataset::digest(&altered_bytes);
+            assert_eq!(
+                check_files(&altered).unwrap_err(),
+                "dynamic witness differs from committed publication"
+            );
+            std::fs::write(cell.join("pdp-witness.json"), &raw[6]).unwrap();
             assert!(
                 !verified.independent_derivation_verified
                     && !verified.operation_trajectory_verified
