@@ -161,7 +161,10 @@ impl FactorBases {
     /// predicate.
     pub(crate) fn list(&mut self, c: &Curve) {
         let m = self.sets.len();
-        for pt in c.points() {
+        let points = c.points();
+        crate::opcount::bump("fb_points_listed_uncharged", points.len() as u64);
+        crate::opcount::bump("fb_membership_evals_uncharged", (points.len() * m) as u64);
+        for pt in points {
             for i in 0..m {
                 if self.member(i, pt) {
                     self.sets[i].push(pt);

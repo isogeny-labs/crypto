@@ -41,3 +41,38 @@ fn sha_factor_bases_are_never_empty() {
         }
     }
 }
+
+#[test]
+fn opcount_tally_is_deterministic_and_off_by_default() {
+    use ecdl_tensor_ic::field::rand_below;
+    use ecdl_tensor_ic::opcount;
+    use ecdl_tensor_ic::Solver;
+
+    let run = |tally: bool| {
+        let mut rng = StdRng::seed_from_u64(11);
+        let c = random_prime_order_curve(&mut rng, 9).unwrap();
+        let xi = rand_below(&mut rng, c.order);
+        let q = c.mul(xi, c.g);
+        if tally {
+            opcount::start();
+        }
+        let mut s = Solver::new(c, 2, Box::new(SparseContractor::default()), rng);
+        let (got, _) = s.solve(q).unwrap();
+        assert_eq!(got, xi);
+        opcount::take()
+    };
+    assert!(run(false).is_empty());
+    let a = run(true);
+    assert_eq!(a, run(true));
+    for key in [
+        "factor_base.fb_points_listed_uncharged",
+        "relation_target.adds",
+        "relation_target.doubles",
+        "relation_search.adds",
+        "relation_search.contraction_rows_uncharged",
+        "linear_algebra.linalg_mulmod_uncharged",
+        "recovery_check.doubles",
+    ] {
+        assert!(a.get(key).copied().unwrap_or(0) > 0, "missing {key}: {a:?}");
+    }
+}

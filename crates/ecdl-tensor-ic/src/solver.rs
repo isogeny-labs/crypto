@@ -111,6 +111,7 @@ impl Solver {
             st.restarts = restart;
 
             // Step 1: factor-base selection.
+            crate::opcount::set_phase("factor_base");
             let fb = if self.gadgets {
                 new_affine_factor_bases(&c, self.m, &mut self.rng)
             } else {
@@ -132,7 +133,9 @@ impl Solver {
                 st.attempts += 1;
                 let u = rand_below(&mut self.rng, r);
                 let v = rand_below(&mut self.rng, r);
+                crate::opcount::set_phase("relation_target");
                 let target = c.add(c.mul(u, c.g), c.mul(v, q));
+                crate::opcount::set_phase("relation_search");
                 let (rel, ns) = match self.find_relation(&fb, target) {
                     Ok(v) => v,
                     Err(e) => return (Err(e), st),
@@ -157,6 +160,7 @@ impl Solver {
             st.relations += rels.len();
 
             // Step 3: linear algebra over F_r.
+            crate::opcount::set_phase("linear_algebra");
             let mut rows: Vec<HashMap<usize, u64>> = Vec::with_capacity(rels.len());
             for rel in &rels {
                 let mut row: HashMap<usize, u64> = HashMap::new();
@@ -189,6 +193,7 @@ impl Solver {
                 continue;
             }
             let xi = sub_mod(0, mul_mod(uu, inv_mod(vv, r), r), r);
+            crate::opcount::set_phase("recovery_check");
             if c.mul(xi, c.g) == q {
                 st.elapsed = start.elapsed();
                 return (Ok(xi), st);
