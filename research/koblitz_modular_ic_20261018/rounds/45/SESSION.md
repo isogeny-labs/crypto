@@ -11,3 +11,6 @@ Arbitrary-divisor evaluation on new supports; proper level77factor map and chose
 
 ## Errors
 Initial read requested nonexistent FILTER_PROTOCOL.md/REPLAY_TRACE.sh and stale run-skill path; located actual files without running anything. Canonical experiment protocol tool/example is absent here, disclosed in local prospective contract. Widened Rust has retained unused-loop-variable warning; no cap or native acceptance bypass. Native/proof outcomes are indexed separately once terminal.
+
+## Terminal outcomes
+All4native runs accepted, plus Lean compile/audit0. New9/11/13cases:60/260/580closedpoints,6/26/58deckorbits. All3source sizes remain fixed n5. Lean4audited declarations=3named+1generated,0failing/trusted. No native failures/caps. Donor hashes and complete7point-set equality verified by ASSEMBLE_RECORDS. R46root-method controls are separate.

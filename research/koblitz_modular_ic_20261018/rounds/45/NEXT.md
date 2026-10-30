@@ -7,3 +7,11 @@ R44NEXT's recommendation to screen500/580supports was stale: R13already exhauste
 3. Evaluate signed classes through arbitrary-divisor reverse transfer, including principal-divisor controls and base-degree dependence. Verify Picard nonzero and separate both residual characters as in R41. Ten distinct deck/Frobenius classes avoid the two immediate stabilizer cancellations; this is necessary only and does not prove independence or even nonprincipality.
 4. Preserve the proper level77factor map and nonzero subgroup action as main geometry obligation. Do not infer it from residual systems, matching L-polynomials or new collector points. Full quotient saturation, polarization, theta descent, node187and all exceptional divisors remain separate.
 5. For genuinely larger Koblitz n, continue R42integral CMannihilator/recovery proofs and construct actual maps; the present larger residue fields are on fixed n5and do not establish larger-ntransfer or ICscaling.
+
+Degree-compatible padding candidates for the existing degree128representation:
+P9+21Q+2R0, P11+22Q+R0, P13+23Q, with degQ=5,degR0=7.
+The existing Qprecision154and R0precision17exceed the indicated multiplicities.
+These are degree identities, not yet prescribed-space dimension certificates;
+function evaluation, kernel rank and divisor-class checks remain required.
+R46separately freezes a polynomial-root collector eliminating the costly lambda
+scan, with complete7/9/11point-set equality gates before larger use.

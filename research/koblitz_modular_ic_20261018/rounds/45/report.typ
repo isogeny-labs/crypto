@@ -12,7 +12,11 @@ physical coefficient descent. Every accepted source point passes all five
 original equations, eight registered units, exact Tate order 11 and the local
 rank-two check. All deck and coefficient Frobenius images are rechecked.
 The degree-7 control reproduces the complete old point export byte for byte.
-The exact larger counts and complete point records are in results.json and
+The accepted cases are 420/540/2860/7540 rational points, respectively,
+60/60/260/580 closed points and 6/6/26/58 deck orbits for degrees 7/9/11/13.
+Four native attempts and one Lean workflow pass. Three named theorems and
+one generated equation pass the audit, with zero failing or trusted declarations.
+The exact complete point records are in results.json and
 runs/*/points/closed-points.txt. All attempts, caps and exits are retained.
 
 Degrees 9 and 11 were frozen before data. Degree 13 was added by a prospective
