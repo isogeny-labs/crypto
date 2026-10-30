@@ -18,6 +18,6 @@ for name in contents:
   assert not p.is_symlink()
   if p.is_file():members.append(p)
 (h/'runs.sha256').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+str(p.relative_to(h))+'\n' for p in sorted(members)))
-flags=['--format=gnu','--sort=name','--mtime=@0','--owner=0','--group=0','--numeric-owner'];subprocess.run(['tar',*flags,'-cJf',str(h/'runs.tar.xz'),'-C',str(h),*contents],check=True)
+flags=['--hard-dereference','--format=gnu','--sort=name','--mtime=@0','--owner=0','--group=0','--numeric-owner'];subprocess.run(['tar',*flags,'-cJf',str(h/'runs.tar.xz'),'-C',str(h),*contents],check=True)
 raw=h/'runs.tar.xz';digest=hashlib.sha256(raw.read_bytes()).hexdigest();(h/'runs.tar.xz.sha256').write_text(digest+'  runs.tar.xz\n')
 m={'schema':'koblitz.raw-meta/v1','round':rid,'source_revision':revision,'source_pins':len(files),'archive_contents':contents,'tar_flags':flags,'raw_sha256':digest,'bytes':raw.stat().st_size,'regular_files':len(members),'fresh_download_verified':False,'state':'sealed locally; remote verification follows'};(h/'raw-meta.json').write_text(json.dumps(m,indent=2)+'\n');print(json.dumps(m))

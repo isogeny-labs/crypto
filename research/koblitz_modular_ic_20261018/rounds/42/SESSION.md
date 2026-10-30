@@ -30,3 +30,10 @@ The initial PDF render rejected an unescaped underscore. Repaired the report
 source, rendered two pages, and visually inspected both PNGs before commit.
 All final four Lean audits have terminal exit0 receipts:54 declarations,
 zero failing/trusted. No independent review is inferred from these audits.
+
+Archive packaging attempt01 was uploaded but rejected by the strict restore
+verifier because Cargo generated hard-linked build outputs. Retained its
+S3 digest/metadata/source pins in publication-attempts/01-hardlink-rejection.json
+and its named artifact pointer. Added tar --hard-dereference for the corrected
+seal; all raw scientific run directories remain unchanged. This is a package
+repair, not another scientific run.

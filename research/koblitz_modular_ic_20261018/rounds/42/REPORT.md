@@ -103,3 +103,9 @@ attempts; the raw artifact contains complete native matrices, both operator
 signs, logs and proof sources. Source byte custody is separate from scientific
 replay. The figure plots recorded lattice dimensions and inverse degrees;
 it is not a cost or attack scaling graph.
+
+The first archive packaging attempt was rejected by the strict restore
+checker because Cargo build products were hard-linked. Its digest and
+source-pin record are retained under publication-attempts. The corrected
+package expands hard links to ordinary files; it reuses identical raw runs.
+This operational failure does not change a scientific outcome.
