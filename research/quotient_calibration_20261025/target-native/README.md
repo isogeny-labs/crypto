@@ -3,11 +3,15 @@
 This implements the next target-side steps of the fixed quotient-map lead.
 The source case, training frame and 32 challenges remain unchanged.
 
-**Status:** 18 focused tests pass, including the three historical target
+**Status:** 21 focused tests pass, including the three historical target
 fixtures. The target divisor engine and nine-point/32-point pipeline compile
 but have not been run on the certified anchor. A required S3 checkpoint is
-blocked on upload authorization and configured AWS access. See the
-[preparation report](../reports/preparation-20261026T1824Z/REPORT.md).
+approved by the user on 2026-10-30 but remains blocked on configured AWS
+access. The draft execution record now selects the repository's EKS Spot
+backend; a matching target-binary image and command-job route remain to be
+qualified. See the
+[current review report](../reports/review-20261030T1540Z/REPORT.md) and the
+historical [preparation report](../reports/preparation-20261026T1824Z/REPORT.md).
 
 The exact trace-tensor identity has certificate
 [`IDC1h368ff5f1ba01b556`](certificates/trace-three-slots.json), checked by the
@@ -51,20 +55,32 @@ cargo test --release --offline --locked \
   --manifest-path research/quotient_calibration_20261025/native/Cargo.toml
 ```
 
-The target package has five component tests and nine canonical certificate
+The target package has eight component tests and nine canonical certificate
 tests; the original source package has four tests. These do not execute the
 new target frame, challenge oracle or inversion.
+
+The review correction rejects unequal projective vector lengths and validates
+all 32 prediction rows before constructing a target divisor. All three output
+vectors must contain exactly eight coordinates over the declared field and
+must be nonzero as vectors; case IDs, points and successors must match the
+frozen inputs.
+Regression controls include truncated/extended vectors, zero vectors, invalid
+field coefficients, missing/extra rows and duplicate or mismatched cases.
 
 ## Run after the gate is satisfied
 
 Complete the ignored resume note and run `scripts/checkpoint.sh gate` before
-launching the experiment. The execution record in `protocol.json` is a valid
+launching the experiment. Upload approval is recorded; it need not be requested
+again. The execution record in `protocol.json` is a valid
 draft; record the declared preflight diagnostics and instrument hashes,
 freeze it with the canonical sibling tool, and commit it before affected
 target data. [PROTOCOL.md](PROTOCOL.md) gives the exact phase boundaries.
 
 Build the native binary, then run `calibrate`, `evaluate` and `validate`
-with their declared positional paths. Use fresh paths, keep the generated
+on the qualified EKS command-job image with their declared positional paths.
+The standard GitHub Iso Lab workflow currently builds `ecbench`, not this
+standalone target executable; do not dispatch its integration fixture as a
+substitute. Use fresh paths, keep the generated
 matrix immutable and checkpoint it before opening target validation data.
 `run-stage.sh RUN_DIRECTORY STAGE ARGUMENTS...` is a thin launcher that
 checks the frozen binary, requires the checkpoint gate, enforces a shared

@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Quotient target-calibration checkpoint gate](quotient-target-calibration-checkpoint-gate.md) | open | first native certified-anchor target frame and 32-point challenge | explicit same-branch checkpoint upload authorization, configured AWS access, successful gate, then frozen execution record |
+| [Quotient target-calibration checkpoint gate](quotient-target-calibration-checkpoint-gate.md) | open; uploads approved 2026-10-30 | first native certified-anchor target frame and 32-point challenge | configured AWS/token access, successful checkpoint, qualified EKS target image/command route, then frozen execution record |
 | [IC campaign frontier implementation and validation gaps](ic-campaign-frontier-obstructions-20261018.md) | open | full F4/closure frontier trials, large certified replay, realistic Boolean c fits and GPU/distributed execution | closure-preserving disk integration, wider canonical monomials/adapters, independent certificates and prospective scaling/calibration, usable bounded cloud lifecycle |
 | [Transport-oracle exact simulation](transport-oracle-exact-simulation-gap.md) | open | R6.8 general simulation and closure claim | correct identity/kernel handling, complete lifting costs, and a proof of adaptive instance independence |
 | [Correlated packets with one common deformation](correlated-packet-common-kernel.md) | open | the selected two-axis contraction improvement for a new prime-field route | construct one low-degree kernel with compatible levelwise factorizations, charged mode density and complete recursive proof |

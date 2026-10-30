@@ -100,6 +100,20 @@ No translation attempts or inverse systems are executed by this version.
 
 ## Controls, accounting and stopping
 
+The execution record remains a draft; no target frame or holdout data has
+been taken. As required by the current repository instructions, the pending
+run uses Iso Lab on EKS Spot (`isolab-k8s`, `cpu-spot`, region `us-east-2`).
+Qualify a digest-pinned image containing the tested standalone target binary
+and a supported custom-command submission route before freezing the record.
+The existing GitHub ecbench build/fixture is not this experiment. Record the
+source, workflow, image and binary identities separately. Local unit tests,
+static checks and replay of the existing identity certificate remain development
+checks, not a target experiment or performance evidence.
+
+Checkpoint uploads for this branch were explicitly approved on 2026-10-30.
+The normal S3 gate must still succeed using configured access before launch;
+do not reuse the earlier pasted credentials or bypass a failed gate.
+
 Claims are exact finite computations. A/A statistical noise, p-values and
 performance isolation are inapplicable: no comparative timing or scaling
 claim is made. Three previously recorded F49 triples are positive controls;

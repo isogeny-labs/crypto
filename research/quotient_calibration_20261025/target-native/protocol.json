@@ -263,6 +263,10 @@
     "record": [
       "source_commit",
       "binary_sha256",
+      "oci_digest",
+      "workflow_revision",
+      "job_uid",
+      "pod_uid",
       "input_hashes",
       "matrix_hash",
       "host",
@@ -273,11 +277,15 @@
     "timed_primary_justification": null
   },
   "execution": {
-    "backend": "local",
-    "queue": null,
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
     "measurement_class": "search",
     "timeout_seconds": 3600,
     "placement": {
+      "cluster": "isolab",
+      "namespace": "isolab",
+      "region": "us-east-2",
+      "target_image_qualified": false,
       "address_space_bytes": 2147483648,
       "threads": 1
     },

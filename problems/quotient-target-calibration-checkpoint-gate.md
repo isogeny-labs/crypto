@@ -1,10 +1,10 @@
 # Native quotient target calibration cannot launch before its S3 checkpoint
 
 - **Status:** `open`
-- **Kind:** upload authorization and configured access
+- **Kind:** configured access; upload authorization is recorded
 - **Affected work:** [native target continuation](../research/quotient_calibration_20261025/target-native/README.md)
-- **Next action owner:** user for checkpoint authorization and environment connection; then the repository operator
-- **Last updated:** 2026-10-26
+- **Next action owner:** user for the environment connection; then the repository operator
+- **Last updated:** 2026-10-30
 
 ## Requirement and observed blocker
 
@@ -47,10 +47,23 @@ It contains a branch bundle at `caec72812`, the protocol and the resume note;
 no credentials, source/image lookup table or other-repository state.
 The preview is not a successful S3 checkpoint.
 
+On 2026-10-30 the user explicitly approved the ongoing same-branch uploads
+described above. No further approval is needed for that scope. The resumed
+environment (configuration revision34) reports current observations with no
+secret, runtime-variable or outbound-identity bindings, and the normal gate
+again exits1 with the same missing-transport error. The authorization part
+is complete; configured access remains open. No raw-key helper was retried.
+
+Current repository instructions route the pending target experiment to EKS
+Spot. The draft record retains the same inputs, one-thread/2-GiB/3600-second
+bounds and acceptance threshold. Its matching target image and supported
+custom-command route still need qualification; the standard GitHub workflow
+builds ecbench and does not execute this standalone target binary.
+
 ## Exit criteria and next discriminating step
 
-1. Obtain explicit checkpoint-upload authorization and a supported AWS
-   connection in environment settings; do not request another key in chat.
+1. Configure a supported AWS connection or checkpoint upload token through
+   environment settings; upload authorization is already recorded.
 2. Use the normal checkpoint gate and retain its actual successful receipt.
 3. Record preflight diagnostics, instrument hashes and the analysis hash;
    freeze and commit the execution record before affected target data.

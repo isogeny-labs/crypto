@@ -45,8 +45,10 @@ The [native target continuation](target-native/README.md) now implements
 section-space divisor arithmetic, target Kummer evaluation and separate
 calibration/evaluator/reference interfaces. Its fixed historical checks
 pass; its certified-anchor frame and challenge runs remain unexecuted
-pending the required S3 checkpoint. See the
-[dated preparation report](reports/preparation-20261026T1824Z/REPORT.md).
+pending configured checkpoint access and a qualified EKS target image/route.
+Same-branch checkpoint uploads were approved on 2026-10-30. See the
+[current review report](reports/review-20261030T1540Z/REPORT.md) and historical
+[preparation report](reports/preparation-20261026T1824Z/REPORT.md).
 
 The [run report](reports/run-20261025T1845Z/REPORT.md),
 [one-page PDF](reports/run-20261025T1845Z/REPORT.pdf) and
