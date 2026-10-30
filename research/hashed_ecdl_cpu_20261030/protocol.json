@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "HASHED-ECDL-CPU-20261030",
-  "version": 2,
+  "version": 3,
   "created": "2026-10-30",
   "repository": "crypto",
   "study_dir": "research/hashed_ecdl_cpu_20261030",
@@ -536,13 +536,22 @@
       "changes": [
         "Use per-object presigned artifact transport after zero-data staging failure; one fresh job."
       ]
+    },
+    {
+      "id": "A2-archive-runtime",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Second staging job verified bundle hash but lacked tar executable; no instrument ran. Runtime probe confirms python3 tarfile and all benchmark shell tools. Permit one fresh measurement job.",
+      "changes": [
+        "Use standard python3 -m tarfile for artifact extraction/collection only. Native frozen benchmark and analyzer unchanged."
+      ]
     }
   ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "84115a8e1149b1a668f8a029d504142be8578e0bd1ca77ec95262f916a16f785",
-    "commit": "ef932acd46171b85966216bf2ed401575705a58c",
-    "frozen_at": "2026-10-30T03:10:02Z",
+    "protocol_sha256": "83ad81c97c9919b34f918bdfa0d3d1a6d645512f4a6dfa4f97f16a16804bfcea",
+    "commit": "01cca8412c646424a0f5c2f0acc3371ee2055781",
+    "frozen_at": "2026-10-30T03:14:12Z",
     "filed_before_affected_data": true
   }
 }
