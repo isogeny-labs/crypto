@@ -11,6 +11,17 @@ curves, graph construction, compact arithmetic/point/hash encodings, exact
 contraction, deterministic witness extraction, relation collection and
 independent algebraic certificate replay. Resource exhaustion is an error.
 
+The `factoring` module also implements divisor-prefix counting, smallest-prime-
+factor search and complete factorization from
+[Hexagon 2610.00600v1](https://hexagonmath.org/2610.00600v1), using this crate's
+existing exact counter. `tensor-factor N [MAX_STEPS]` is its native CLI. This
+ports the reduction, not the paper's Anthropic engine or its Lean runtime proof.
+The `weighted` module provides an exhaustive local-cost generating-polynomial
+reference with exact coefficient counts, hard constraints and min/max extraction.
+It does not implement subexponential weighted contraction. Source assumptions,
+tests and open obligations are in the
+[integration report](../../research/hexagon_cscc_20261030/README.md).
+
 ```sh
 cargo test --locked --release
 cargo clippy --locked --all-targets -- -D warnings

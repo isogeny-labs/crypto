@@ -46,7 +46,19 @@ independent-host validation.
 | `binary_explicit` | basis, offsets | Import an independent basis in the exact polynomial representation |
 | `frobenius_orbits` | seeds, seed | Distinct Koblitz point orbits, including both signs and every Frobenius image |
 | `prime_progression` | start, step, count | An interval when step=1, otherwise a progression modulo p |
+| `prime_multiplicative_coset` | order, generator, coset | `coset * <generator>` in Fp*, with exact supplied order dividing p-1 |
+| `prime_norm_one_trace` | order, generator_real, generator_imag, nonsquare, scale, shift | Affine images of traces of an exact-order subgroup of the nonsplit norm-one torus; order divides p+1 |
+| `prime_dickson_image` | degree, parameter, start, step, count | Distinct images of a progression under `D_degree(x,parameter)`; degree times count is bounded by max_candidates |
 | `random_x` | count, seed | Distinct seeded x-coordinates, over either supported field type |
+
+The three additional prime recipes are exact construction alternatives, not
+new decomposition algorithms. Coset and torus generators are supplied and
+checked, including exclusion of proper-divisor orders; the factory does not
+hide a generator search. Torus traces identify inverse pairs before curve
+lifting. Dickson images need not have low-degree membership or improved yield.
+Actual rational/subgroup point counts remain distinct from recipe order or
+input count. See the [literature integration](../../research/hexagon_cscc_20261030/README.md)
+for prior art and the distinction from multiplicative-field factor bases.
 
 For every candidate x, the generator solves the curve equation, stores both
 rational signs, checks the curve equation again, and retains only points with
