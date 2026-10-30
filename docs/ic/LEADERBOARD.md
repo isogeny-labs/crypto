@@ -65,6 +65,21 @@ The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
+## Component improvement: Hilbert early stop in the Joux–Vitse cover IC (2026-10-28, engineering)
+
+On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–503), the Hilbert stop certifies the leading forms are a regular sequence and drops every pending F4 pair the complete intersection's Hilbert function proves reduces to zero; the reduced basis is unchanged. The baseline arm reproduces the recorded S; every cell has equal residuals, relations, decompositions and relation digest, every logarithm is verified, and A/A is 1.000. The as-found form (B0) is a relabelling: S fell 2.53–2.64× while the emitted native-ops counter rose 8.3–8.5×. Counted F_p multiplications only (`S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread`), a lower bound: the F4 driver's pair selection, matrix assembly and table lookups are unpriced, and the IC side's unpriced work is not emitted. These curves have no row in tables A–C. The log–log slope of S/rho over p is -2.27 (full F4) and -2.27 (Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a gate, and no cross-method rank is claimed.
+
+| p | cells | S before → after | S_A/S_B | IC ÷ rho-neg after (w = 0 / 0.1 / 1) | IC ÷ rho-neg before |
+|---:|--:|:--|:--|:--|:--|
+| 53 | 8 | 1980 → 1062 | **1.848** [1.825, 1.878] | 271.5 / 227.5 / 92.5 | 506.6 / 424.4 / 172.5 |
+| 101 | 8 | 259.8 → 138.5 | **1.875** [1.870, 1.879] | 70.8 / 59.2 / 23.8 | 132.9 / 111.0 / 44.7 |
+| 251 | 6 | 47.9 → 25.64 | **1.868** [1.866, 1.870] | 25.0 / 20.8 / 8.4 | 46.7 / 39.0 / 15.7 |
+| 503 | 3 | 9.786 → 5.291 | **1.849** [1.848, 1.850] | 5.5 / 4.6 / 1.8 | 10.1 / 8.4 / 3.4 |
+
+[Report](../../research/ic_cover_weakclass_20261023/REPORT.pdf) · [study](../../research/ic_cover_weakclass_20261023/) · [data](../../research/ic_cover_weakclass_20261023/summary.json).
+
+validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
+
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 
 On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
@@ -753,6 +768,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
+- `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
+- `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
