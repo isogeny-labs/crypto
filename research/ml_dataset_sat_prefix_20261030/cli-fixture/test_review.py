@@ -1,7 +1,7 @@
 """Local Python boundary checks only; no native CLI, solver, build, tar or cloud calls.
 
 Archive subprocess outcomes are explicitly mocked; they are not archive evidence.
-All generated fixture files live in temporary directories under this scratch copy.
+All generated fixture files live in temporary directories and are removed after each test.
 """
 import copy
 import json
@@ -164,9 +164,15 @@ class ArchiveChecks(unittest.TestCase):
         (self.out / "payload.txt").write_text("retained mock-test payload")
         self.driver = Driver(self.out, self.out / "not-executed", self.out / "not-used.json")
         self.driver.receipt["status"] = "native_fixture_passed_unified_export_pending"
+        self.driver.receipt["fixture_bindings"] = {"unified_export_tooling": {
+            "path": "mock-tooling-not-executed", "checker_python": "mock-python-not-executed"}}
+        self.export_patch = patch("driver.export_attempt", return_value={
+            "status": "passed", "fixture_acceptance": True, "software_unit_mock": True})
+        self.export_mock = self.export_patch.start()
+        self.addCleanup(self.export_patch.stop)
         self.driver.checkpoint()
 
-    def assert_custody(self, complete):
+    def assert_custody(self, complete, expected_status=None, before_retention="native_fixture_passed"):
         receipt = load(self.out / "receipt.json")
         inv = load(self.out / "inventory.json")
         self.assertNotIn("inventory.json", inv["files"])
@@ -176,10 +182,12 @@ class ArchiveChecks(unittest.TestCase):
         self.assertEqual(external["source_receipt_sha256"], sha(self.out / "receipt.json"))
         self.assertEqual(external["source_inventory_sha256"], sha(self.out / "inventory.json"))
         self.assertEqual(external["status"], "complete" if complete else "failed_or_interrupted")
-        self.assertEqual(fixture_exit_code(receipt), 0 if complete else 2)
+        expected_status = expected_status or ("native_fixture_passed" if complete else "failed_retention")
+        self.assertEqual(receipt["status"], expected_status)
+        self.assertEqual(fixture_exit_code(receipt), 0 if complete and expected_status == "native_fixture_passed" else 2)
         if not complete:
             self.assertEqual(receipt["status"], "failed_retention")
-            self.assertEqual(receipt["status_before_retention_failure"], "native_fixture_passed_unified_export_pending")
+            self.assertEqual(receipt["status_before_retention_failure"], before_retention)
             self.assertTrue(receipt["retention_error"])
 
     def test_mock_archive_nonzero_is_failed_and_partial_output_preserved(self):
@@ -201,7 +209,8 @@ class ArchiveChecks(unittest.TestCase):
         with patch.object(self.driver, "remaining", return_value=0), patch("driver.subprocess.run") as run:
             self.driver.finish()
             run.assert_not_called()
-        self.assert_custody(False)
+        self.export_mock.assert_not_called()
+        self.assert_custody(False, before_retention="failed_unified_export")
 
     def test_existing_archive_is_preserved_and_rejected(self):
         archive = self.out.with_name("attempt.tar")
@@ -219,6 +228,41 @@ class ArchiveChecks(unittest.TestCase):
         with patch("driver.subprocess.run", side_effect=passed):
             self.driver.finish()
         self.assert_custody(True)
+        self.export_mock.assert_called_once()
+        self.assertEqual(load(self.out / "receipt.json")["unified_export_gate"]["status"], "passed")
+
+    def successful_mock_archive(self, *args, **kwargs):
+        self.out.with_name("attempt.tar").write_bytes(b"mock archive, never native tar")
+        return types.SimpleNamespace(returncode=0, stderr=b"")
+
+    def test_failed_unified_gate_cannot_be_rescued_by_successful_archive(self):
+        self.export_mock.return_value = {"status": "failed", "error": "constructed checker rejection"}
+        with patch("driver.subprocess.run", side_effect=self.successful_mock_archive):
+            self.driver.finish()
+        self.assert_custody(True, expected_status="failed_unified_export")
+        self.assertEqual(load(self.out / "receipt.json")["unified_export_gate"]["status"], "failed")
+        self.assertTrue((self.out / "payload.txt").is_file())
+
+    def test_export_exception_retains_raw_evidence_and_fails_gate(self):
+        self.export_mock.side_effect = ValueError("constructed admission rejection")
+        with patch("driver.subprocess.run", side_effect=self.successful_mock_archive):
+            self.driver.finish()
+        self.assert_custody(True, expected_status="failed_unified_export")
+        self.assertTrue(load(self.out / "receipt.json")["unified_export_gate"]["raw_evidence_retained"])
+
+    def test_passing_schema_gate_with_unaccepted_fixture_is_not_success(self):
+        self.export_mock.return_value = {"status": "passed", "fixture_acceptance": False}
+        with patch("driver.subprocess.run", side_effect=self.successful_mock_archive):
+            self.driver.finish()
+        self.assert_custody(True, expected_status="failed_unified_export")
+
+    def test_missing_fixture_stays_missing_after_valid_export_and_archive(self):
+        self.driver.receipt["status"] = "missing_fixture"
+        self.export_mock.return_value = {"status": "passed", "fixture_acceptance": False}
+        with patch("driver.subprocess.run", side_effect=self.successful_mock_archive):
+            self.driver.finish()
+        self.assert_custody(True, expected_status="missing_fixture")
+        self.export_mock.assert_called_once()
 
 
 class ProtocolCustodyChecks(unittest.TestCase):

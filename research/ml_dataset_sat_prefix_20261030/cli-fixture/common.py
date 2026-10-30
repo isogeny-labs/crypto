@@ -6,7 +6,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PLAN = HERE.parent / "CLI-FIXTURE-PLAN.md"
-SCRIPT_NAMES = ("run.sh", "common.py", "prepare.py", "verify.py", "driver.py")
+SCRIPT_NAMES = ("run.sh", "common.py", "prepare.py", "verify.py", "driver.py", "adapter.py", "workflow.py", "protocol_population.py")
 LIMITS = {
     "driver_seconds": 1800, "attempt_bytes": 3 * 1024**3,
     "generate_seconds": 60, "verify_seconds": 30, "status_seconds": 10,

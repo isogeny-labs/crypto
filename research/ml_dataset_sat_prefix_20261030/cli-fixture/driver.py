@@ -16,6 +16,8 @@ import traceback
 from common import (HERE, LIMITS, canonical, config, decode, digest_bytes, file_bindings,
                     inventory, jsonl, load, require, sha, write)
 from verify import cell_directory, inspect, read_events
+from workflow import execute as execute_workflows
+from adapter import export_attempt, assert_checker_runtime
 
 
 CHILD_ENVIRONMENT = {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}
@@ -56,6 +58,7 @@ def admit_protocol(path, binary):
     del body["freeze"]
     require(digest_bytes(canonical(body)) == freeze.get("protocol_sha256"), "protocol canonical body hash")
     fixture = protocol["extensions"]["ml_dataset_sat_fixture"]
+    checker_runtime = assert_checker_runtime(fixture["unified_export_tooling"])
     require(fixture["limits"] == LIMITS and fixture["driver_files"] == file_bindings(),
             "protocol differs from frozen driver/plan/limits")
     require(fixture["candidates"] == [{"cell_index": i, "config": config(i)} for i in range(16)],
@@ -88,7 +91,8 @@ def admit_protocol(path, binary):
     metadata_command(["git", "-C", str(repo), "merge-base", "--is-ancestor", commit, "HEAD"])
     return protocol, {"path": str(path), "file_sha256": sha(path), "body_sha256": freeze["protocol_sha256"],
                       "protocol_commit": commit, "validation_receipt": str(receipt_path),
-                      "validation_receipt_sha256": sha(receipt_path), "checker_identity": checker}
+                      "validation_receipt_sha256": sha(receipt_path), "checker_identity": checker,
+                      "unified_export_checker_runtime": checker_runtime}
 
 
 
@@ -141,7 +145,7 @@ def checked_censored_prefix(audit, changed, recipe, witness, name):
 
 
 def fixture_exit_code(receipt):
-    return 0 if receipt["status"] == "native_fixture_passed_unified_export_pending" and not receipt.get("retention_error") else 2
+    return 0 if receipt["status"] == "native_fixture_passed" and receipt.get("unified_export_gate", {}).get("status") == "passed" and not receipt.get("retention_error") else 2
 
 
 class Driver:
@@ -387,13 +391,16 @@ class Driver:
     def controls(self, index, audit):
         witness = audit["transition_witness"]
         for name in ("map-substitution", "forged-reason", "unpaired-decision", "dynamic-clause"):
+            control = {"name": name, "status": "started", "started_utc": utc()}
+            self.receipt["controls"].append(control)
+            self.checkpoint()
             root, recipe = self.copied_mutation(index, name, witness)
             destination = root.parent / "export"
             command = self.command("control-" + name, ["dataset", "export", "--out", root,
                                    "--destination", destination], LIMITS["export_seconds"], expected_failure=True)
             text = (self.out / command["stderr"]).read_text(errors="replace")
-            control = {"name": name, "command": command["name"], "exit_code": command["exit_code"],
-                       "mutation_sha256": sha(root.parent / "mutation.json"), "passed": False}
+            control.update(command=command["name"], exit_code=command["exit_code"],
+                           mutation_sha256=sha(root.parent / "mutation.json"), passed=False)
             if name in ("map-substitution", "forged-reason"):
                 semantic = "gate-map source substitution" in text if name == "map-substitution" else recipe["expected_error"] in text
                 control.update(passed=bool(command["exit_code"] and semantic),
@@ -405,7 +412,7 @@ class Driver:
                 changed = inspect(root, destination, index)
                 write(root.parent / "audit.json", changed, exclusive=True)
                 control.update(checked_censored_prefix(audit, changed, recipe, witness, name))
-            self.receipt["controls"].append(control)
+            control.update(status="completed", finished_utc=utc())
             self.checkpoint()
         require(all(c["passed"] for c in self.receipt["controls"]),
                 "semantic CLI controls incomplete; earlier custody rejections are not substituted")
@@ -424,6 +431,16 @@ class Driver:
               "timing_isolation_attested": False, "clock_valid_for_comparison": False})
         self.receipt["status"] = "running"
         self.checkpoint()
+        # Freeze these adapter/tooling paths and hashes before candidate data.
+        analysis = self.out / "analysis"
+        analysis.mkdir()
+        shutil.copyfile(HERE / "verify.py", analysis / "verify.py")
+        require(sha(analysis / "verify.py") == protocol["analysis_plan"]["script"]["sha256"],
+                "retained analysis script differs from frozen protocol")
+        execute_workflows(self, lambda: self.native_selection(protocol, binding),
+                          lambda rich: self.controls(rich["cell_index"], rich))
+
+    def native_selection(self, protocol, binding):
         self.command("plan", ["dataset", "plan", "--out", self.out / "plan.json", "--n", "7", "--m", "2,3",
                      "--families", "koblitz,binary", "--solvers", "sat", "--curve-seeds", "1", "--generators", "1",
                      "--keys", "2", "--seed", "20261030", "--factor-base-size", "8", "--degree-bound", "3",
@@ -447,11 +464,10 @@ class Driver:
                 self.checkpoint()
                 self.retry(first)
                 self.retry(first + 1)
-                self.controls(rich["cell_index"], rich)
-                self.receipt["status"] = "native_fixture_passed_unified_export_pending"
-                return
+                return rich
         self.receipt["status"] = "missing_fixture"
         self.receipt["unrun_reason"] = "table_exhausted"
+        return None
 
     def finish(self):
         self.stop_child()
@@ -485,9 +501,30 @@ class Driver:
                                         "replicate": 0, "warmup": False, "attempts": 1, "resumes": 0,
                                         "clock_valid_for_comparison": False, "candidate": row}) + b"\n")
         self.checkpoint()
+        # This gate runs within the existing deadline, preserving the archive
+        # reserve. Failure never discards raw evidence or bypasses retention.
+        prior_status = self.receipt["status"]
+        try:
+            settings = self.receipt["fixture_bindings"]["unified_export_tooling"]
+            remaining = self.remaining() - 120
+            require(remaining > 0, "no budget remains for unified export gate")
+            gate = export_attempt(self.out, self.out / "unified-export", settings["path"],
+                                  settings["checker_python"], min(30, remaining))
+            self.receipt["unified_export_gate"] = gate
+            require(directory_bytes(self.out) < LIMITS["attempt_bytes"], "unified export exceeded attempt storage ceiling; overshoot retained")
+            if prior_status == "native_fixture_passed_unified_export_pending":
+                self.receipt["status"] = "native_fixture_passed" if gate["status"] == "passed" and gate.get("fixture_acceptance") else "failed_unified_export"
+        except Exception as error:
+            self.receipt["unified_export_gate"] = {"status": "failed", "error": repr(error), "raw_evidence_retained": True}
+            if prior_status == "native_fixture_passed_unified_export_pending":
+                self.receipt["status"] = "failed_unified_export"
+        self.checkpoint()
         self.refresh_inventory()
         archive = self.out.with_name(self.out.name + ".tar")
         remaining = self.remaining()
+        archive_started = time.monotonic()
+        archive_cpu_before = resource.getrusage(resource.RUSAGE_SELF)
+        archive_child_before = resource.getrusage(resource.RUSAGE_CHILDREN)
         archive_receipt = {"schema": "software-fixture-local-archive/v1", "attempt": str(self.out),
                            "archive": str(archive), "remote_upload_performed": False,
                            "parent_s3_archive_and_fresh_readback_required": True}
@@ -510,6 +547,19 @@ class Driver:
             self.refresh_inventory()
         # Bind the external archive result to the final raw-tree receipt and
         # inventory. A partial archive is retained but never called complete.
+        archive_cpu_after = resource.getrusage(resource.RUSAGE_SELF)
+        archive_child_after = resource.getrusage(resource.RUSAGE_CHILDREN)
+        archive_receipt.update(
+            cost_scope="archive admission, tar, archive hashing and retention-error checkpoint only; excludes native workflows and unified export; diagnostic clocks",
+            elapsed_seconds_diagnostic=time.monotonic() - archive_started,
+            parent_cpu_user_seconds_diagnostic=archive_cpu_after.ru_utime - archive_cpu_before.ru_utime,
+            parent_cpu_system_seconds_diagnostic=archive_cpu_after.ru_stime - archive_cpu_before.ru_stime,
+            archive_child_cpu_user_seconds_diagnostic=archive_child_after.ru_utime - archive_child_before.ru_utime,
+            archive_child_cpu_system_seconds_diagnostic=archive_child_after.ru_stime - archive_child_before.ru_stime,
+            cumulative_child_peak_rss_native=archive_child_after.ru_maxrss,
+            rss_scope="process-lifetime child high-water mark; not archive-specific memory",
+            driver_elapsed_through_retention_seconds_diagnostic=time.monotonic() - self.started,
+            clock_valid_for_comparison=False)
         archive_receipt.update(source_receipt_sha256=sha(self.out / "receipt.json"),
                                source_inventory_sha256=sha(self.out / "inventory.json"))
         write(self.out.with_name(self.out.name + ".archive.json"), archive_receipt, exclusive=True)

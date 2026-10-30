@@ -5,6 +5,7 @@ Missing binary/runtime evidence stays null. Supply the final binary SHA and an
 actual preflight receipt before requesting the official freeze operation.
 """
 import argparse
+from protocol_population import amend as amend_workflow_population
 import datetime
 import math
 import re
@@ -102,7 +103,7 @@ def prepare(source, binary=None, preflight_path=None):
                "coverage_prerequisite": "Scoped positive unit/nonunit entailment and native mixed-stream detector controls must pass; no unqualified absence result becomes evidence",
                "scientific_samples_added": 0, "verified_cloud_dataset_cells": 0,
                "clock_valid_for_comparison": False}
-    return {
+    draft = {
         "schema": "experiment.protocol/v1", "protocol_id": "SAT-PDP-CLI-20261030", "version": 1,
         "created": datetime.date.today().isoformat(), "repository": "crypto",
         "study_dir": "research/ml_dataset_sat_prefix_20261030/cli-fixture",
@@ -161,6 +162,7 @@ def prepare(source, binary=None, preflight_path=None):
         "amendments": [], "freeze": {"status": "draft", "protocol_sha256": None, "commit": None, "frozen_at": None, "filed_before_affected_data": None},
         "extensions": {"ml_dataset_sat_fixture": fixture},
     }
+    return amend_workflow_population(draft)
 
 
 def main():

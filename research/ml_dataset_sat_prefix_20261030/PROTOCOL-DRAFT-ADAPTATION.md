@@ -1,3 +1,7 @@
+# Historical draft adaptation — superseded population
+
+This note preserves the earlier schema-only draft. Its 2-arm × 16-instance population was not compatible with the official export checker and is superseded by `cli-fixture/protocol_population.py`: two explicitly entered software workflows, one instance and one replicate, with all actual commands/cells in hashed subordinate ledgers. No old draft was frozen or executed. Command preflight observations do not by themselves supply the new derived workflow estimate. See `cli-fixture/README.md` for current readiness.
+
 # Official SAT fixture protocol draft adaptation
 
 Only this scratch directory was edited. No frozen SAT worktree source changed;
