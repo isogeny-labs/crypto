@@ -13,3 +13,46 @@ Commit source, freeze protocol, checkpoint and launch12 unchanged m3 cases. Then
 
 ### Errors (what went wrong, how it was handled)
 First test compilation used nonexistent fixture formatting helpers; corrected only the new fixture and retained the failed log. All subsequent tests pass. Conductor unscoped renewal lost scopes; release defaulted T-852 to cancelled and reopen was rejected. Created scoped successor T-853; preserved all prior task records and implementation. Shared daily session log is held by T-827, so this scoped handoff is used. No production trial has yet run.
+
+## 2026-10-29T20:48:44.702781+00:00 — Frozen run launched
+
+### What was done (commands, files, features)
+Source2b9a04ffecce07bf46606e5751f28f8a80792b31 and protocolc93a65b8b28d pushed. Protocol identity514afddfda129310ee67ace84defbfabac5631506bff9c392b41b247a0b84700 frozen20:41:57UTC. S3 source round-trip checks all5 payloads. Corrected checkpoint gate passed20261029T204638Z-c93a65b8b28d. Launched run-degree4-quartic.sh once under48000s timeout, session17417, raw degree4-quartic-r1. Automatic raw upload every30 seconds.
+
+### Decisions made (and why)
+Continue all12 retained cases and a fresh replay of each successful producer. Do not infer any result from launch or from a partial progress file.
+
+### Open threads (unfinished, pick up next time)
+Monitor the existing producer; no duplicate run. Archive/replay/publication/report remain after the frozen batch. Four immutable parent archives required.
+
+### Errors (what went wrong, how it was handled)
+Initial checkpoint gate rejected missing required headings in the abbreviated handoff. Preserved the old handoff and failed gate; repaired headings and gate passed. Source/protocol unchanged. No production outcome yet.
+
+## 2026-10-30 03:38 UTC — All twelve cases completed and publication started
+
+### What was done (commands, files, features)
+Verified terminal exit0 and all12 producer/fresh statuses. Batch20:48:10–21:55:27UTC Oct29. Recorded50122 new quartic rows and50134 attempts, no lower-degree additions; every case stopped at the frozen2GiB payload cap. All linear ranks remain1; no exhaustive affine assignments checked, no unit/global upper/exact result. Existing session17417 is terminal; no duplicate run launched. Started archive/S3/restored-replay publication session38547.
+
+### Decisions made (and why)
+Preserve all admitted rows,12 blocked independent remainders and complete pending queues. Treat results as verified V4 membership prefixes, not complete V4 or a base-quality ranking. Broader n83 three-family m2–9 FFD/LFD and elite-base objective remains active. T853 claimed study/problem/handoff scopes; defer exporter path held byT865 and daily log held byT881.
+
+### Open threads (unfinished, pick up next time)
+Complete content-addressed raw upload/download, all four-parent restored replays and before/after manifest checks. Then export/navigation/metrics/data commit, inspected report, PR2706 update and final checkpoint/readback. Do not restart production or the existing publication pipeline.
+
+### Errors (what went wrong, how it was handled)
+No producer or fresh replay failure. All12 deliberate payload caps remain explicit. Scope checks rejected exporter/daily-log reservations, so publication proceeds on uncontested paths and the scoped session log records this work.
+
+
+## 2026-10-30 04:34 UTC — Publication resumed and raw archive committed
+
+### What was done (commands, files, features)
+Reconciled the live detached supervisor PID3288425; eight restored replays passed and ninth remains active. Raw archive metadata and replay instructions pushed in f1377304bf73037710352ac61518a3b05213a0d2. Recovery snapshot degree4-quartic-recovery-20261030T043038Z.tar.xz uploaded and downloaded with matching SHAb99c7410990e556768bc141ef9dadce317c41c7ed823d18aeb6cc1c824c70702,22268bytes. Reclaimed T853 scopes including metrics after clear check.
+
+### Decisions made (and why)
+Continue the existing verification process; do not duplicate native production. Preserve original failed/interrupted publication logs and snapshot the old handoff before correcting its current-state sections.
+
+### Open threads (unfinished, pick up next time)
+Remaining restored checks and all5 post-replay manifests, metadata/export, navigation/data commit, committed metrics, report rendering/inspection, support/PR/checkpoint/final delivery. Broader fixed-base m2–9 three-family FFD/LFD objective remains active.
+
+### Errors (what went wrong, how it was handled)
+Original publication process disappeared after3 successful restored checks; partial fourth log retained. Detached resume retained completed checks. No production retry and no new mathematical bound inferred.
