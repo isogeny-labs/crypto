@@ -43,3 +43,18 @@ Data commit,committed metrics check,inspected report,support archive,PR/checkpoi
 
 ### Errors (what went wrong, how it was handled)
 No production,fresh replay or S3-restored replay failure. All six affine functionals nonzero;exceptional controls remain retained. Prior source/schema development corrections occurred before production and remain in support.
+
+
+## Publication resumed — report and support verified
+
+### What was done (commands, files, features)
+Reconciled pushed data8e6dc2ac8986 and existing T890 lease/fence; no native computation repeated. Viewed both report pages individually. All six report files round-tripped through S3 byte-identically. Support archive retains64 manifest payloads,all restored and verified. All18 new metrics match committed native summary.
+
+### Decisions made (and why)
+Continue existing owned T890; conductor check identifies that same active task, not a second writer. Preserve highest-formFFD17,strict fall17,LFD lower17 as distinct from unknown global upper/exact. Publish report after data.
+
+### Open threads (unfinished, pick up next time)
+Independent review and full formalization pending; global prime LFD upper/exact,higher-m work,binary quartic frontier and elite-base search remain open. Finish PR/checkpoint/final metadata readback.
+
+### Errors (what went wrong, how it was handled)
+Initial Typst footer lacked context; retained failed render and corrected renderer. No native result changed.

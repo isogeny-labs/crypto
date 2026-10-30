@@ -16,7 +16,9 @@ Read the [native summary](evidence/prime-first-fall/summary.json),
 [byte layouts and reconstruction](PRIME_FIRST_FALL_FORMAT.json),
 [unified export](experiment-prime-first-fall.export.json),
 [S3 objects](evidence/prime-first-fall-storage.json), and
-[restored verification](evidence/prime-first-fall-publication.json).
+[restored verification](evidence/prime-first-fall-publication.json),
+[inspected report](reports/run-20261030T0530Z/report.pdf), and
+[publication receipts](evidence/prime-first-fall-delivery.json).
 The earlier FFD>=5 records are preserved as historical lower bounds.
 Actual point manifests, targets, original equations and the fixed-base regularity
 view are unchanged. Each point base remains fixed across m2–9.
