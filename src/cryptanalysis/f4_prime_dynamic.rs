@@ -622,20 +622,19 @@ impl<O: FnMut(Event) -> Result<(), ()>> Engine<'_, '_, O> {
         }
         self.peak_rows = input.len();
         self.gate.event(Stage::Initial)?;
-        self.invoked = true;
         for raw in input {
             let mut p = self.copy_poly(raw)?;
             self.gate.permit(32 * p.terms.len() as u64, 0)?;
-            for t in &mut p.terms {
-                t.coefficient = self.field.from_u64(t.coefficient);
+            for chunk in p.terms.chunks_mut(256) {
+                self.gate.check()?;
+                for t in chunk {
+                    t.coefficient = self.field.from_u64(t.coefficient);
+                    // An acknowledged Initial event or admitted copy alone is
+                    // not native arithmetic. Empty generators do not set this.
+                    self.invoked = true;
+                    self.max_row_degree = self.max_row_degree.max(t.mono.active_degree(self.v));
+                }
             }
-            self.max_row_degree = self.max_row_degree.max(
-                p.terms
-                    .iter()
-                    .map(|t| t.mono.active_degree(self.v))
-                    .max()
-                    .unwrap_or(0),
-            );
             let p = self.normal_reduce(p)?;
             if self.insert(p)? {
                 return Ok(Stop::UnitDerived);
@@ -777,22 +776,21 @@ pub fn run<O: FnMut(Event) -> Result<(), ()>>(
         )?;
         for p in input {
             e.gate.check()?;
-            for t in &p.terms {
-                if !t.mono.valid(v)
-                    || t.coefficient == 0
-                    || t.coefficient >= field.p()
-                    || t.mono.active_degree(v) > 32
-                {
-                    return Err(Stop::InvalidInput);
+            let mut previous: Option<Mono28> = None;
+            for chunk in p.terms.chunks(256) {
+                e.gate.check()?;
+                for t in chunk {
+                    if !t.mono.valid(v)
+                        || t.coefficient == 0
+                        || t.coefficient >= field.p()
+                        || t.mono.active_degree(v) > 32
+                        || previous.is_some_and(|m| m.cmp(&t.mono, v) != Ordering::Greater)
+                    {
+                        return Err(Stop::InvalidInput);
+                    }
+                    maximum_input_degree = maximum_input_degree.max(t.mono.active_degree(v));
+                    previous = Some(t.mono);
                 }
-                maximum_input_degree = maximum_input_degree.max(t.mono.active_degree(v));
-            }
-            if !p
-                .terms
-                .windows(2)
-                .all(|w| w[0].mono.cmp(&w[1].mono, v) == Ordering::Greater)
-            {
-                return Err(Stop::InvalidInput);
             }
         }
         e.gate.event(Stage::Begin)?;
@@ -1269,6 +1267,120 @@ mod tests {
             run(&f, 4, &bad, &Limits::default(), deadline(), &mut |_| Ok(())).stop,
             Stop::InvalidInput
         );
+    }
+    #[test]
+    fn dynamic_f4_invocation_requires_actual_admitted_arithmetic() {
+        let f = field(17);
+        let input = fixed(4, 17);
+        for limits in [
+            Limits {
+                work: 1472,
+                ..Limits::default()
+            },
+            Limits {
+                work: 1504,
+                ..Limits::default()
+            },
+            Limits {
+                bytes: 4608,
+                ..Limits::default()
+            },
+        ] {
+            let mut stages = Vec::new();
+            let r = run(&f, 4, &input, &limits, deadline(), &mut |e| {
+                stages.push(e.stage);
+                Ok(())
+            });
+            assert!(matches!(r.stop, Stop::WorkLimit | Stop::StorageLimit));
+            assert_eq!(stages, vec![Stage::Begin, Stage::Initial]);
+            assert!(!r.native_backend_invoked);
+            assert_eq!(r.matrix_rows_reduced, 0);
+            assert!(!r.native_statistics_complete);
+        }
+        let r = run(
+            &f,
+            4,
+            &input,
+            &Limits {
+                work: 1568,
+                ..Limits::default()
+            },
+            deadline(),
+            &mut |_| Ok(()),
+        );
+        assert_eq!(r.stop, Stop::WorkLimit);
+        assert!(r.native_backend_invoked);
+        assert_eq!(r.matrix_rows_reduced, 0);
+        assert!(!r.native_statistics_complete);
+        for input in [vec![], vec![Poly { terms: vec![] }]] {
+            let r = run(&f, 1, &input, &Limits::default(), deadline(), &mut |_| {
+                Ok(())
+            });
+            assert_eq!(r.stop, Stop::Complete);
+            assert!(!r.native_backend_invoked);
+        }
+    }
+    #[test]
+    fn dynamic_f4_validation_preserves_adjacency_across_chunk_boundary() {
+        let f = field(17);
+        let raw = (0..17)
+            .flat_map(|a| (0..17).map(move |b| (mono(2, &[(0, a), (1, b)]), 1)))
+            .collect();
+        let mut p = poly(2, raw);
+        p.terms.truncate(257);
+        let r = run(
+            &f,
+            2,
+            &[p.clone()],
+            &Limits {
+                events: 0,
+                ..Limits::default()
+            },
+            deadline(),
+            &mut |_| panic!("event cap"),
+        );
+        assert_eq!(r.stop, Stop::EventLimit); // All 257 canonical terms were admitted.
+        p.terms.swap(255, 256);
+        let r = run(&f, 2, &[p], &Limits::default(), deadline(), &mut |_| {
+            panic!("invalid cross-chunk order")
+        });
+        assert_eq!(r.stop, Stop::InvalidInput);
+        assert!(!r.native_backend_invoked);
+    }
+    #[test]
+    fn dynamic_f4_acknowledged_callback_expiry_overrides_success() {
+        let f = field(17);
+        let input = fixed(4, 17);
+        for target in [Stage::Initial, Stage::Terminal] {
+            let original = Instant::now() + Duration::from_secs(1);
+            let mut reached = false;
+            let mut calls = 0;
+            let mut accepted = None;
+            let r = run(&f, 4, &input, &Limits::default(), original, &mut |e| {
+                assert!(!reached, "callback after expired acknowledged boundary");
+                calls += 1;
+                if e.stage == target {
+                    reached = true;
+                    accepted = Some(e.reserved);
+                    while Instant::now() < original {
+                        std::thread::yield_now();
+                    }
+                }
+                Ok(())
+            });
+            assert!(
+                reached,
+                "intended boundary {target:?} was not reached: {r:?}"
+            );
+            assert_eq!(r.stop, Stop::Deadline);
+            assert!(!r.native_statistics_complete);
+            assert_eq!(r.acknowledged_events, calls);
+            assert_eq!(Some(r.reserved), accepted);
+            assert_eq!(r.native_backend_invoked, target == Stage::Terminal);
+            if target == Stage::Terminal {
+                assert!(r.pivot_updates > 0);
+            }
+        }
     }
     #[test]
     fn dynamic_f4_zero_constant_nonmonic_and_high_input_degree() {
