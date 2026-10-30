@@ -65,10 +65,13 @@ targets. It is not a tuning gap.
 2. **Relations is the only phase that matters** at both sizes. For the 20-bit
    prime arm the two independent sub-levers are per-trial cost (1.39 GAE) and
    yield (0.73%). A 20% cut in either is a 14% cut in `S`.
-3. **The biggest already-measured lever is the factor base, not the code.**
-   XP-20261016 showed `prime-abscissa:size=64` at 0.818 / 0.798 / 0.726 of the
-   N=45 pipeline at w = 0 / 0.1 / 1. Re-running that arm in this session shape
-   is the cheapest real `S` reduction available, and it needs no new code.
+3. **The factor-base lever is now measured, and it loses at 20 bits.** An
+   earlier version of this file claimed XP-20261016 measured `size=64` at
+   0.818 / 0.798 / 0.726 of `size=45`; that was wrong. Those ratios were
+   `size=45` against `size=32`. XP-20261029-p20-large-n records N=64 against
+   N=45 as mixed (lower at w = 1, higher at w = 0.1) and never held it out.
+   The holdout ran on 2026-10-30 at w = 0 (below): **N=64 is 8.9% worse**, so a
+   bigger base is not the lever at this size.
 4. **Setup is 28% at 20 bits and unbounded at 131.** Above 64 bits the certified
    prime path cannot set an instance up at all. Per instruction, primality is
    left alone in this work: that means the 131-bit arm stays unprofileable by
@@ -77,11 +80,37 @@ targets. It is not a tuning gap.
    spread is an oracle/yield problem that no constant-factor work reaches. It is
    a candidate for `abandoned` with this record as the evidence.
 
-## Next discriminating run
+## Result: N=64 loses at 20 bits
 
-One admitted session on the same host, three arms: `ic-n45` (baseline),
-`ic-n64` (candidate), `ic-n45-aa` (control), plus the priced §5a band. Success:
-the 95% upper bound of `S_n64 / S_n45` below 1 at w = 0, 0.1 and 1. That is the
-only change in view that plausibly moves the 20-bit prime `S` by more than noise.
-The Koblitz arm gets exactly one rerun purely to clear admission; if it lands
-the same order of magnitude, it is retired rather than optimised.
+Two sessions on the latest-main ecbench (`ce9868bb…`, built from `9edcbe73`,
+image `…/isolab/tasks@sha256:3accbd75…`): the frozen spec
+[`spec-prime-n45-n64.json`](spec-prime-n45-n64.json), 8 targets x 5 rounds,
+192 records per session, **192/192 verified** in both. Summary in
+[`prime/session-n64-20261030.json`](prime/session-n64-20261030.json).
+
+| arm | S median | S min | S max |
+|:--|--:|--:|--:|
+| `rho-neg` | 1.077 | 0.385 | 2.275 |
+| `ic-n45` | 9.929 | 6.392 | 14.122 |
+| `ic-n64` | 10.794 | 8.891 | 13.361 |
+| `ic-n45-aa` | 9.929 | 6.392 | 14.122 |
+
+Paired by workload and round, `S_n64 / S_n45` has median **1.089** over 40
+pairs (min 0.744, max 1.437). The mechanism is in the phases: setup rises
+2,070 -> 4,160 GAE (+109%) while relations fall 5,348 -> 3,907 (-27%). At one
+cold target the base pays for itself in the relation phase and loses more than
+it gains in setup.
+
+**Admission.** Wall time is refused at this size: a 20-bit solve is 186.9 us and
+L2 requires at least 1 ms, so 176/192 and 181/192 executions grade L1. The
+comparison above is in counted GAE, which is deterministic and unchanged from
+the 2026-10-19 binary session for `rho-neg` and `ic-n45` (medians 1.077 and
+9.929 in both). It is a counts-only comparison: no wall-time claim, and the two
+launcher receipts are `failed` on the admission rule, not on correctness or
+verification.
+
+**What this leaves.** Setup is the tax. The next lever is not a bigger base but
+a cheaper or amortised one: many targets sharing a cold setup (the setup is
+per-solve here), or a relation-phase change that does not double the base. The
+Koblitz arm still gets one rerun for admission only; if it lands the same order
+of magnitude it is retired.

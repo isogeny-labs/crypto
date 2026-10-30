@@ -66,6 +66,7 @@ pub mod archive;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
 pub mod pkm_semaev;
@@ -608,12 +609,29 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         outcome.verified &= audit.audit.invalid_rows == 0;
         audit.audit
     });
-    let cost_qualification = audit_enabled.then(|| {
-        if archive_import {
-            "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
-        } else {
-            "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
-        }
+    let mut unpriced_work = Vec::new();
+    if base_builder.name() == "hashed-affine" {
+        unpriced_work.push(
+            "hashed-affine setup has uncalibrated hashed_tensor_steps and omitted tensor-curve certification work",
+        );
+    }
+    if oracle.name() == "hashed-tensor" {
+        unpriced_work.push(
+            "tensor-contraction primitive steps are uncalibrated, so S excludes most of the relation phase",
+        );
+    }
+    if archive_import {
+        unpriced_work.push(
+            "archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced",
+        );
+    } else if audit_enabled {
+        unpriced_work.push("rank normalization is unpriced");
+    }
+    let cost_qualification = (!unpriced_work.is_empty()).then(|| {
+        format!(
+            "partial_counted_cost: {}; total-cost and speedup unknown",
+            unpriced_work.join("; ")
+        )
     });
 
     // ── The report ─────────────────────────────────────────────────
@@ -773,7 +791,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
     if rows.iter().any(|r| r.cost_qualification.is_some()) {
-        out.push_str("Archive/rank-audit rows report partial counted cost only. Original generation/transfer and unpriced work prevent total-cost or speedup claims.\n\n");
+        out.push_str(
+            "Rows with a cost qualification report partial counted cost only; total-cost and speedup claims are unavailable.\n\n",
+        );
     }
     out.push_str(
         "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n",
@@ -816,6 +836,14 @@ pub fn format_markdown(rows: &[RunReport]) -> String {
                 "NO"
             },
         ));
+    }
+    for r in rows {
+        if let Some(qualification) = &r.cost_qualification {
+            out.push_str(&format!(
+                "\n- **{} / {}**: {}\n",
+                r.instance, r.label, qualification
+            ));
+        }
     }
     out
 }
@@ -865,6 +893,43 @@ mod tests {
         spec.factor_base_params.set("size", size.to_string());
         spec.oracle_params.set("negation_folded", "1");
         spec
+    }
+
+    #[test]
+    fn hashed_affine_setup_qualification_is_independent_of_oracle() {
+        use super::hashed::HashedAffineBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let inst = prime_instance_for(24, 11);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = HashedAffineBase { instance: &inst };
+        let mut oracle = SubtractOracle;
+        let spec = PipelineSpec {
+            factor_base: "hashed-affine".into(),
+            oracle: "subtract".into(),
+            targets: Targets::Walk,
+            max_trials: 1,
+            ..Default::default()
+        };
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &base,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            Some(1.0),
+        )
+        .expect("the bounded hashed-affine pipeline should report its costs");
+
+        let qualification = report
+            .cost_qualification
+            .as_deref()
+            .expect("hashed-affine setup is not fully priced");
+        assert!(qualification.contains("hashed_tensor_steps"));
+        assert!(qualification.contains("tensor-curve certification"));
+        assert!(report.s_over_rho.is_none());
+        assert!(format_markdown(std::slice::from_ref(&report)).contains(qualification));
     }
 
     /// **The known-log base recovers the planted logarithm on a 24-bit
