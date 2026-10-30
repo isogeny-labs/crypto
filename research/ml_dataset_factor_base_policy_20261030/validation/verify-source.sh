@@ -48,7 +48,7 @@ fi
 
 printf '%s  %s\n' "$inventory_sha" "$inventory" | sha256sum -c -
 jq -e '
-  .schema=="exact-source-materialization/v1" and
+  .schema=="exact-source-materialization/v2" and
   (.entries|length)==.files and
   ([.entries[].bytes]|add)==.bytes and
   ([.entries[].path]|unique|length)==.files and
@@ -56,6 +56,7 @@ jq -e '
     (.path|test("^[A-Za-z0-9._/-]+$")) and
     (.path|startswith("/")|not) and
     (.path|split("/")|all(. != ".." and . != "")) and
+    (.git_mode=="100644" or .git_mode=="100755") and
     (.git_blob|test("^[0-9a-f]{40}$")) and
     (.sha256|test("^[0-9a-f]{64}$")) and
     (.bytes|type=="number" and .>=0 and floor==.))
@@ -65,17 +66,31 @@ mapfile -t paths < <(jq -r '.entries[].path' "$inventory")
 # deliberately permits a newer docs-only execution commit than the restoration.
 git ls-tree -rz "$source_commit" -- "${paths[@]}" > "$temporary/tree"
 jq -Rs '[split("\u0000")[] | select(length>0) | split("\t") |
-  {path:.[1],blob:(.[0]|split(" ")|.[2]),type:(.[0]|split(" ")|.[1])}]' \
+  {path:.[1],mode:(.[0]|split(" ")|.[0]),blob:(.[0]|split(" ")|.[2]),type:(.[0]|split(" ")|.[1])}]' \
   "$temporary/tree" > "$temporary/tree.json"
 jq -e --slurpfile tree "$temporary/tree.json" '
   (.entries|length)==($tree[0]|length) and
   all(.entries[]; . as $entry |
-    any($tree[0][]; .path==$entry.path and .type=="blob" and .blob==$entry.git_blob))
+    any($tree[0][]; .path==$entry.path and .type=="blob" and .blob==$entry.git_blob and .mode==$entry.git_mode))
 ' "$inventory" >/dev/null
 # Explicit byte hashes catch modifications hidden by sparse skip-worktree bits.
 jq -r '.entries[]|.sha256+"  "+.path' "$inventory" > "$temporary/hashes"
 sha256sum -c "$temporary/hashes"
-while IFS=$'\t' read -r path bytes; do
+while IFS=$'\t' read -r path bytes git_mode; do
   [[ ! -L "$path" && -f "$path" ]]
   [[ $(stat -c %s -- "$path") == "$bytes" ]]
-done < <(jq -r '.entries[]|[.path,(.bytes|tostring)]|@tsv' "$inventory")
+  # Git regular-file mode tracks the owner execute bit, not exact POSIX
+  # read/write permissions. 0600/0644 and 0700/0755 are equivalent pairs.
+  filesystem_mode=$(stat -c %a -- "$path")
+  [[ "$filesystem_mode" =~ ^[0-7]{3,4}$ ]]
+  if (( (8#$filesystem_mode & 0100) != 0 )); then
+    observed_git_mode=100755
+  else
+    observed_git_mode=100644
+  fi
+  if [[ "$observed_git_mode" != "$git_mode" ]]; then
+    printf 'Materialized mode mismatch: %s expected %s observed %s (POSIX %s)\n' \
+      "$path" "$git_mode" "$observed_git_mode" "$filesystem_mode" >&2
+    exit 1
+  fi
+done < <(jq -r '.entries[]|[.path,(.bytes|tostring),.git_mode]|@tsv' "$inventory")

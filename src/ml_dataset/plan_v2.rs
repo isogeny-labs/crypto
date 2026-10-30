@@ -7,7 +7,7 @@
 
 use super::CaseConfig;
 use crate::ml_dataset::{digest, DatasetPlan, JSON_INPUT_MAX_BYTES};
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::BTreeSet;
 
 pub const PLAN_V1_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
@@ -24,7 +24,7 @@ pub const MAX_ARTIFACT_BYTES: u64 = 64 * 1024 * 1024;
 
 /// Concrete construction choices. Signed-union parameters must all be present
 /// in JSON; defaults are an explicit constructor choice, never a parsing rule.
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(tag = "kind", deny_unknown_fields)]
 pub enum FactorBasePolicy {
     #[serde(rename = "legacy-small-x-projected/v1")]
@@ -36,6 +36,42 @@ pub enum FactorBasePolicy {
         max_action_steps: u64,
         max_artifact_bytes: u64,
     },
+}
+
+// Serde's internally tagged unit visitor ignores remaining map entries even
+// with deny_unknown_fields. Use an empty struct only on the input wire so the
+// public unit variant and its existing serialized representation stay unchanged.
+impl<'de> Deserialize<'de> for FactorBasePolicy {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(tag = "kind", deny_unknown_fields)]
+        enum WirePolicy {
+            #[serde(rename = "legacy-small-x-projected/v1")]
+            LegacySmallXProjectedV1 {},
+            #[serde(rename = "signed-frobenius-union/v1")]
+            SignedFrobeniusUnionV1 {
+                max_candidates: u64,
+                max_points: usize,
+                max_action_steps: u64,
+                max_artifact_bytes: u64,
+            },
+        }
+
+        Ok(match WirePolicy::deserialize(deserializer)? {
+            WirePolicy::LegacySmallXProjectedV1 {} => Self::LegacySmallXProjectedV1,
+            WirePolicy::SignedFrobeniusUnionV1 {
+                max_candidates,
+                max_points,
+                max_action_steps,
+                max_artifact_bytes,
+            } => Self::SignedFrobeniusUnionV1 {
+                max_candidates,
+                max_points,
+                max_action_steps,
+                max_artifact_bytes,
+            },
+        })
+    }
 }
 
 impl FactorBasePolicy {
@@ -514,6 +550,28 @@ mod tests {
         }
         let legacy_extra = LEGACY_PLAN.replacen('{', "{\"extra\":1,", 1);
         assert!(PlanDocument::parse_json(legacy_extra.as_bytes()).is_err());
+    }
+
+    #[test]
+    fn legacy_policy_wire_rejects_extra_and_duplicate_fields_without_changing_bytes() {
+        let canonical = r#"{"kind":"legacy-small-x-projected/v1"}"#;
+        let policy: FactorBasePolicy = serde_json::from_str(canonical).unwrap();
+        assert_eq!(policy, FactorBasePolicy::LegacySmallXProjectedV1);
+        assert_eq!(serde_json::to_string(&policy).unwrap(), canonical);
+        for invalid in [
+            r#"{"kind":"legacy-small-x-projected/v1","extra":1}"#,
+            r#"{"extra":{"nested":1},"kind":"legacy-small-x-projected/v1"}"#,
+            r#"{"kind":"legacy-small-x-projected/v1","max_points":4096}"#,
+            r#"{"kind":"legacy-small-x-projected/v1","kind":"legacy-small-x-projected/v1"}"#,
+            r#"{"kind":"legacy-small-x-projected/v1","extra":1,"extra":2}"#,
+        ] {
+            assert!(serde_json::from_str::<FactorBasePolicy>(invalid).is_err());
+            let plan = format!(
+                r#"{{"schema":"crypto.ml-dataset.plan/v2","axes":{},"factor_base_policies":[{}]}}"#,
+                LEGACY_PLAN, invalid
+            );
+            assert!(PlanDocument::parse_json(plan.as_bytes()).is_err());
+        }
     }
 
     #[test]

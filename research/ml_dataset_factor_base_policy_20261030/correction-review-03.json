@@ -1,0 +1,24 @@
+{
+  "schema": "source-correction-review/v1",
+  "prior_source": "e1ffaf5b81b605a8f117f2e5f15f756ec65905d4",
+  "source_sha256": {
+    "src/ml_dataset/factor_base_policy.rs": "0a170c5626751bcd2b0549a1feffbed788fa1e2474ebb5246e9a1acbb5479a3a",
+    "src/ml_dataset/plan_v2.rs": "ed748eacf5159f0064c121591f417e3e86f91cce8c3e453b0b0df4a3c5275d89"
+  },
+  "observed_prior_dataset_result": {
+    "passed": 283,
+    "failed": 8,
+    "ignored": 1
+  },
+  "plan_independent_reviewer": "consequence_contract",
+  "plan_review_blockers": [],
+  "native_representation_review": "Matches numeric JSON field in existing producer and verify_public; root inspected exact diff",
+  "corrected_native_tests_executed": false,
+  "installed_mode_tests": {
+    "command": "python3 -m unittest -v test_inventory_modes.py test_bash_mode_guard.py",
+    "passed": 10,
+    "exit_code": 0,
+    "log_sha256": "efce08b312f29381220e650cc09836535c8a1975d71fb573d6f008a34284fbc4"
+  },
+  "full_cli_integration_complete": false
+}

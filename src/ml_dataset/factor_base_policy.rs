@@ -88,7 +88,9 @@ struct Population {
 }
 
 fn action(public: &Value, c: &Arithmetic) -> Result<(u32, u32), String> {
-    let d = number(&public["symmetry"]["frobenius_power"], "Frobenius power")?;
+    let d = public["symmetry"]["frobenius_power"]
+        .as_u64()
+        .ok_or("Frobenius power must be an unsigned JSON integer")?;
     match c {
         Arithmetic::Prime(_) if d == 1 => Ok((1, 1)),
         Arithmetic::Binary { fast, .. }
@@ -694,6 +696,25 @@ mod tests {
             solver: "enumerate".into(),
         }
     }
+    #[test]
+    fn action_uses_existing_numeric_public_frobenius_degree() {
+        for family in ["prime", "binary", "koblitz"] {
+            let case = generate(&config(family, 7, false)).unwrap();
+            let c = arithmetic(&case.public_instance).unwrap();
+            let expected = case.public_instance["symmetry"]["frobenius_power"]
+                .as_u64()
+                .unwrap();
+            assert_eq!(
+                action(&case.public_instance, &c).unwrap().0 as u64,
+                expected
+            );
+            let mut wrong = case.public_instance.clone();
+            wrong["symmetry"]["frobenius_power"] = json!(expected.to_string());
+            assert!(action(&wrong, &c).is_err());
+            assert!(verify_public(&wrong).is_err());
+        }
+    }
+
     fn policy() -> FactorBasePolicy {
         FactorBasePolicy::signed_frobenius_union_v1_defaults()
     }
