@@ -23,6 +23,8 @@ Sources (all committed, read at --ref unless noted):
                                 verified point-trait cells on 21 choices; repeated controls, not security
   research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/results/verification.json
                                 verified fixed-cohort cutoff coverage, not random sampling or security
+  research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json
+                                verified broader recorded-census coverage, not historical use or security
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 """
 # ---- progress-metrics exporter boilerplate (copied verbatim into each repo's tools/progress_metrics.py) ----
@@ -331,6 +333,20 @@ def nist_selection_expanded_cutoff(ref, since):
                  source=f"{path}@{commit}")
 
 
+def nist_selection_broader_census(ref, since):
+    """Export recorded exact coverage only, without computing a new curve trait."""
+    path = "research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/results/verification.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        if data.get("all_six_files_equal") is not True:
+            continue
+        for field, unit in (("character_cells", "cells"), ("seed_positions", "positions")):
+            emit(f"nist.selection_broader_census.verified_{field}", data.get(field),
+                 date=date, problem="nist-candidate-selection", unit=unit, better="neutral",
+                 label="Broader recorded census: independently verified coverage; not security or sampling",
+                 source=f"{path}@{commit}")
+
+
 def koblitz_modular_augmentation(ref, since):
     """Export the recorded scalar for the fixed n=5 augmentation presentation."""
     path = "research/koblitz_modular_ic_20261018/rounds/22/ledger.json"
@@ -525,6 +541,7 @@ def main():
     nist_selection_generator_traits(a.ref, a.since)
     nist_selection_strict_elkies(a.ref, a.since)
     nist_selection_expanded_cutoff(a.ref, a.since)
+    nist_selection_broader_census(a.ref, a.since)
 
 
     ghs_ipsec_archive(a.ref, a.since)

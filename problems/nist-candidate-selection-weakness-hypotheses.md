@@ -5,11 +5,25 @@
 - **Affected work:** [selected/skipped comparison and protocol](../research/curve_candidates_dissect_20261021/hypotheses/REPORT.md)
 - **Next action owner:** unassigned
 - **Last updated:** 2026-10-30
-- **Latest search:** [30 October verified expanded-cutoff reanalysis](../research/nist_skip_criterion_20261025/expanded_cutoff_reanalysis_20261030/RESULTS.md)
+- **Latest search:** [30 October verified broader-census check](../research/nist_skip_criterion_20261025/broader_census_reanalysis_20261030/RESULTS.md)
 
 ## Problem
 
-**Latest result, 30 October:** the complete100--5000integer cutoff reanalysis
+**Latest result, 30 October, broader scope:** the fixed strict-splitting rule
+fails throughout100--5000on the recorded69position prime-order census. All82
+branches are retained, and the independent PARI verifier proves all76distinct
+field/order primes, checks the point certificates and reconstructs six output
+files. At691there are22unpublished positions at or below their field's published
+maximum:14other-root-only and8width-only. P192,p239,P256have no positive-margin
+cutoff individually. Original21subset reproduces691--718and769--772exactly.
+The broader result limits splitting alone. Applying the additional root/width
+screens first still permits the narrow fitted criterion, whose historical
+use and motive remain unverified. No actual original visits are inferred.
+All ten phases match expectations, including three corruption refusals.
+No new curves, point counts, DLP or performance measurement. Full random
+baseline and authenticated historical explanation remain open.
+
+**Earlier result, 30 October, narrow scope:** the complete100--5000integer cutoff reanalysis
 retains all21rows and independently reconstructs all five native output files.
 Joint strict separation occurs only at691--718and769--772:32of4901integer
 positions (0.6529%), with no successful cutoff above772. Including ramified
@@ -28,8 +42,9 @@ exception documented before execution; no S3 checkpoint or remote custody is
 claimed. The raw176member archive is delivered locally with full hash readback.
 
 This establishes cutoff sensitivity, not the historical selector or an ECDLP
-advantage. The60000accepted random-curve baseline and broader69position
-classification remain open, and the original visit/acceptance record is absent.
+advantage. At that stage the60000accepted random-curve baseline and broader
+69position classification remained open; the later scope check above addresses
+the latter. The random baseline remains unrun, and original decision logs absent.
 No new curve, point count, DLP or performance measurement was run.
 
 **Prior result, 29 October afternoon:** an externally reported empirical
