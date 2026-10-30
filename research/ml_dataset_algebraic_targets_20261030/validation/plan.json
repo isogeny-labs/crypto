@@ -1,6 +1,5 @@
 {
   "schema": "software-validation-plan/v1",
-  "runtime_source": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
   "execution_source": "CLI and validation scripts must be committed; pass exact resulting commit to run-pipeline.sh",
   "purpose": "Retained software correctness checks, not research trials or timing comparisons",
   "prerequisite": "Original cap-fix pipeline terminal success; materialized exact-HEAD dependencies and full maintained examples; live Conductor ownership",
@@ -36,5 +35,15 @@
     "No exact fall-degree or model-efficacy claim"
   ],
   "scientific_samples_added": 0,
-  "verified_cloud_dataset_cells": 0
+  "verified_cloud_dataset_cells": 0,
+  "implementation_base": "73225d26b1752aef7e2a0c2e24fd9467dc22eaa5",
+  "runtime_source": "The exact execution commit passed to run-pipeline.sh; all tracked source and restored-input hashes checked before and after each phase",
+  "attempt_identity": "Explicit two-digit argument, default01; attempt02 follows a recorded compile failure and local manifest refactor. Never reuse existing logs/receipt/output.",
+  "prior_attempt": {
+    "execution_source": "6e1e0d0db9f256dccff1eaa1d550f26c77e523af",
+    "attempt": "01",
+    "exit_code": 101,
+    "failure": "JSON macro recursion limit in exporter manifest; no tests executed",
+    "retained_receipt": "algebraic-pipeline-01.receipt.json"
+  }
 }

@@ -1165,7 +1165,8 @@ fn export_with_graph_projector(
             "restricted-checked-polynomial-consequences-certificates-and-provenance",
         )?,
     ];
-    let manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
+    // Keep each object expansion bounded without changing manifest keys or order.
+    let mut manifest = json!({"schema":"ml-dataset.training-export/v1","source_run_sha256":source_run_sha,"plan_sha256":plan_sha,
         "source_commit":binding["source_commit"],"binary_sha256":binding["binary_sha256"],"artifacts":artifacts,
         "sealed_source_cells":sealed,"unsealed_attempts_excluded":unsealed,"cells_without_verified_features":unavailable,
         "cells_without_verified_alternative_factor_base":missing_alternative_base,"feature_occurrences_by_pdp_domain":domain_counts,
@@ -1174,7 +1175,8 @@ fn export_with_graph_projector(
         "cells_excluded_by_prime_chain_graph_size_limit":oversized_prime_chain_graph,
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
-        "restricted_prefix_record_rows":prefix_record_rows,
+        "restricted_prefix_record_rows":prefix_record_rows});
+    let manifest_tail = json!({
         "algebraic_feature_occurrences":algebraic_occurrences,"unique_algebraic_feature_rows":unique_algebraic_features,
         "restricted_algebraic_record_rows":algebraic_record_rows,
         "algebraic_outcomes":{"verified_nonzero_target_rows":algebraic_verified_nonzero,"verified_zero_target_rows":algebraic_verified_zero,
@@ -1200,6 +1202,13 @@ fn export_with_graph_projector(
         "sort":{"implementation":"bounded Rust external merge","chunk_bytes":CHUNK_BYTES,"merge_fan_in":MERGE_FAN_IN,"max_row_bytes":MAX_RECORD_BYTES,
             "source_cell_values_materialized":true,"total_process_rss_bound_claimed":false},
         "source_artifacts_modified":false,"remote_download_performed":false});
+    let Value::Object(tail_fields) = manifest_tail else {
+        unreachable!("manifest tail is an object literal");
+    };
+    manifest
+        .as_object_mut()
+        .expect("manifest is an object literal")
+        .extend(tail_fields);
     let manifest_artifact =
         storage::write_json(&out, "manifest.json", "training-export-manifest", &manifest)?;
     storage::verify_manifest(&out, &artifacts)?;

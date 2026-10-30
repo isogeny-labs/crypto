@@ -465,7 +465,7 @@ node equality work includes both search and prior identity checking and is
 shared across target rows; do not sum it once per target. Neither counter is a
 counterfactual policy cost. See the [frozen consequence contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md).
 
-The v6 source and tests are authored; runtime validation has not yet run. Its
+The v6 source and tests are authored; runtime tests have not yet executed after an initial manifest-macro compilation failure. Its
 frozen CLI fixture will check both retained curve/twist cells, all three input
 files, restricted joins/counts, immutable retry and unchanged static/branch
 feature bytes. Earlier v4/v5 evidence validates only its recorded source.

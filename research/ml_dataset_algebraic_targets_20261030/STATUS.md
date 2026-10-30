@@ -32,3 +32,13 @@ validation scripts now bind all tracked inputs and sparse fixture hashes,
 reject untracked Rust/Cargo inputs, retain preflight failures and partial CLI
 output, and enforce eight Rayon threads. Shell syntax checks passed. Runtime
 source hashes still match the independent source review.
+
+Attempt01 executed on6e1e0d0db9f2 after the parent pipeline completed. Both source
+checks passed, but compilation failed with exit101 at the expanded exporter
+manifest's JSON macro recursion limit. No dataset tests executed. Its phase and
+terminal pipeline logs/receipts are retained in S3 with fresh byte comparisons;
+see attempt-01-readback.json. A local manifest-construction refactor is being
+prepared without changing schema or raising the crate-wide recursion limit.
+The next manually initiated attempt will use a distinct02 namespace so failed
+artifacts remain intact. The source preflight passed separately; this establishes
+source/fixture identity only.

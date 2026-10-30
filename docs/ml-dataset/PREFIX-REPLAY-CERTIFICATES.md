@@ -134,7 +134,7 @@ channel has its own cumulative limits and does not consume the branch verifier
 budget. Its witnessed cancellation label establishes no exact fall degree or
 closure result. See the [frozen contract](../../research/ml_dataset_algebraic_targets_20261030/CONTRACT.md)
 and [implementation status](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md).
-New-source runtime validation has not yet run; the v5 receipts above remain
+New-source runtime tests have not yet executed after an initial manifest-macro compilation failure; the v5 receipts above remain
 evidence only for their recorded revisions.
 
 The reader admits at most4096 events,8MiB per event and64MiB per source stream.

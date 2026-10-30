@@ -86,8 +86,8 @@ examples. A separate cumulative operation/row/payload budget preserves admitted
 rows and allows the original branch channel to continue. See
 [operations](OPERATIONS.md) for the exact accounting scope and limits.
 
-This v6 implementation and its tests are authored; new-source runtime validation
-has not yet run. The [status record](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md)
+This v6 implementation and its tests are authored; new-source runtime tests
+have not yet executed after an initial manifest-macro compilation failure. The [status record](../../research/ml_dataset_algebraic_targets_20261030/STATUS.md)
 tracks that gate separately from historical v4/v5 passes. The static and branch
 identity rules are preserved, but their byte stability must be checked by the
 new actual-CLI fixture. No corpus growth, learned advantage or new theorem is
