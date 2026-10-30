@@ -94,6 +94,13 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+A new [nonscalar-origin/jet-completion proposal](../research/prime_jet_completion_20261030/README.md)
+uses `W_new=W_base+C H` to preserve all node values while optimizing crossing
+jets. Ordinary derivative flattening supplies a finite control:5440 nodal
+checks pass, but the tested first crossing coefficient gains only2valuation
+bits as degree roughly doubles. The matrix completion is not implemented;
+its integral factorization, higher jets and adjusted costs remain open.
+
 - **Action:** construct a fixed kernel with different valid local factorizations
   at different valuation levels; prove an actual common-family/jet identity
   before trying a relation search or fitting timing exponents.
