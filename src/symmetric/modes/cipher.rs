@@ -10,9 +10,10 @@
 //! Modes share a lot of code (CTR chaining, GHASH, CMAC, …).  Pushing
 //! the cipher behind a trait means each mode is written once, against
 //! `impl BlockCipher<N>`, and the user picks the underlying cipher at
-//! call site.  At toy-library scale we accept the indirection cost;
-//! production crates monomorphise via generics, which the compiler
-//! handles for us.
+//! call site. Concrete providers use generic dispatch; `dyn BlockCipher<N>`
+//! and `dyn BlockCipher128` permit application-selected runtime providers.
+//! The traits make no timing guarantee about an implementation: callers must
+//! choose and review the backend appropriate to their threat model.
 
 /// Generic block cipher with a compile-time-known block size of `N`
 /// bytes.  Implementors expose `encrypt_block` and `decrypt_block` on
@@ -32,7 +33,26 @@ pub trait BlockCipher<const N: usize> {
 /// CCM, SIV, GCM, GCM-SIV, OCB3, XTS, KW, EAX, and PMAC all require
 /// a 16-byte block, so we collect them under this alias.
 pub trait BlockCipher128: BlockCipher<16> {}
-impl<T: BlockCipher<16>> BlockCipher128 for T {}
+impl<T: BlockCipher<16> + ?Sized> BlockCipher128 for T {}
+
+/// Forward through application-owned trait objects or borrowed providers.
+impl<T: BlockCipher<N> + ?Sized, const N: usize> BlockCipher<N> for Box<T> {
+    fn encrypt_block(&self, block: &mut [u8; N]) {
+        (**self).encrypt_block(block);
+    }
+    fn decrypt_block(&self, block: &mut [u8; N]) {
+        (**self).decrypt_block(block);
+    }
+}
+
+impl<T: BlockCipher<N> + ?Sized, const N: usize> BlockCipher<N> for &T {
+    fn encrypt_block(&self, block: &mut [u8; N]) {
+        (**self).encrypt_block(block);
+    }
+    fn decrypt_block(&self, block: &mut [u8; N]) {
+        (**self).decrypt_block(block);
+    }
+}
 
 // ── BlockCipher impls for our shipping primitives ────────────────────
 

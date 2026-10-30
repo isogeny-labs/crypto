@@ -25,7 +25,7 @@ use super::cipher::BlockCipher;
 
 /// **OFB encrypt / decrypt** — same operation, since OFB is an XOR
 /// keystream.  Arbitrary-length input.
-pub fn ofb_apply<C: BlockCipher<N>, const N: usize>(
+pub fn ofb_apply<C: BlockCipher<N> + ?Sized, const N: usize>(
     cipher: &C,
     iv: &[u8; N],
     data: &[u8],

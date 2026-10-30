@@ -33,22 +33,7 @@
 
 use crate::symmetric::aes::AesKey;
 use crate::symmetric::cmac::aes_cmac;
-
-/// Double in GF(2^128) — left-shift by 1, XOR with R = 0x...87 if MSB
-/// was 1.  Same operation CMAC uses for subkey generation.
-fn dbl(input: &[u8; 16]) -> [u8; 16] {
-    let mut out = [0u8; 16];
-    let mut carry = 0u8;
-    for i in (0..16).rev() {
-        let new_carry = (input[i] >> 7) & 1;
-        out[i] = (input[i] << 1) | carry;
-        carry = new_carry;
-    }
-    if (input[0] >> 7) & 1 == 1 {
-        out[15] ^= 0x87;
-    }
-    out
-}
+use crate::symmetric::gf128::double_be as dbl;
 
 fn xor_blocks(a: &[u8; 16], b: &[u8; 16]) -> [u8; 16] {
     let mut out = [0u8; 16];

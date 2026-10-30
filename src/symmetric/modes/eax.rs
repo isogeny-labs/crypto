@@ -38,7 +38,7 @@ use crate::symmetric::cmac::cmac;
 
 /// OMAC^t_K(X): CMAC of `[t]^128 || X` (16 zero bytes + the byte `t`
 /// in position 15, then `X` concatenated).
-fn omac_t<C: BlockCipher128>(cipher: &C, t: u8, x: &[u8]) -> [u8; 16] {
+fn omac_t<C: BlockCipher128 + ?Sized>(cipher: &C, t: u8, x: &[u8]) -> [u8; 16] {
     let mut buf = Vec::with_capacity(16 + x.len());
     let mut prefix = [0u8; 16];
     prefix[15] = t;
@@ -48,7 +48,7 @@ fn omac_t<C: BlockCipher128>(cipher: &C, t: u8, x: &[u8]) -> [u8; 16] {
 }
 
 /// CTR with a 16-byte initial counter (incremented big-endian).
-fn ctr<C: BlockCipher128>(cipher: &C, init_counter: &[u8; 16], data: &[u8]) -> Vec<u8> {
+fn ctr<C: BlockCipher128 + ?Sized>(cipher: &C, init_counter: &[u8; 16], data: &[u8]) -> Vec<u8> {
     let mut counter = *init_counter;
     let mut out = Vec::with_capacity(data.len());
     let mut idx = 0;
@@ -75,7 +75,7 @@ fn ctr<C: BlockCipher128>(cipher: &C, init_counter: &[u8; 16], data: &[u8]) -> V
 /// `ciphertext || tag` where `tag_len ≤ 16`.  Arbitrary `nonce` length
 /// is allowed (≥ 1 byte recommended); `header` (associated data) and
 /// `plaintext` may be empty.
-pub fn eax_encrypt<C: BlockCipher128>(
+pub fn eax_encrypt<C: BlockCipher128 + ?Sized>(
     cipher: &C,
     nonce: &[u8],
     header: &[u8],
@@ -99,7 +99,7 @@ pub fn eax_encrypt<C: BlockCipher128>(
 
 /// **EAX decrypt + verify**.  Generic over any 16-byte block cipher.
 /// Returns `None` on tag mismatch.
-pub fn eax_decrypt<C: BlockCipher128>(
+pub fn eax_decrypt<C: BlockCipher128 + ?Sized>(
     cipher: &C,
     nonce: &[u8],
     header: &[u8],

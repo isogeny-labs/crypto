@@ -144,10 +144,44 @@ pub fn similar<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cryptanalysis::curve_traits::TraitFile;
+    use crate::cryptanalysis::curve_traits::{Input, TraitFile, SCHEMA};
 
     fn committed() -> TraitFile {
         serde_json::from_str(include_str!("../../../docs/curves/traits.json")).unwrap()
+    }
+
+    #[test]
+    fn committed_catalog_uses_current_schema_and_binds_its_inputs() {
+        let file = committed();
+        assert_eq!(file.schema, SCHEMA);
+        // Explicit compile-time inputs also let sparse CI restore exactly the
+        // source files this catalog binds, without loading research archives.
+        let inputs = [
+            ("docs/curves/registry.json", include_str!("../../../docs/curves/registry.json")),
+            ("docs/curves/factor-hints.txt", include_str!("../../../docs/curves/factor-hints.txt")),
+            ("docs/curves/trait-sources.json", include_str!("../../../docs/curves/trait-sources.json")),
+            (
+                "research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json",
+                include_str!("../../../research/isogeny_walk_20261004/runs/p256-ell31-radius2/isogeny_routes.json"),
+            ),
+            (
+                "research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json",
+                include_str!("../../../research/isogeny_walk_20261004/runs/p224-ell61-radius2/isogeny_routes.json"),
+            ),
+            ("docs/curves/ic/curves.yaml", include_str!("../../../docs/curves/ic/curves.yaml")),
+        ];
+        let digests: Vec<_> = inputs
+            .into_iter()
+            .map(|(path, text)| {
+                Input {
+                    path: path.into(),
+                    text: text.into(),
+                }
+                .digest()
+            })
+            .collect();
+        assert_eq!(file.registry_sha256, digests[0].sha256);
+        assert_eq!(file.inputs, digests);
     }
 
     #[test]

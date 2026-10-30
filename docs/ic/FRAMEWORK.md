@@ -24,6 +24,11 @@ is visible where it lands, not only in the total.
 
 ## 1. Quick start
 
+For library consumers, see [Rust extension and hardening](../rust-extension-hardening.md)
+and the runnable [`ic_custom_pipeline` example](../../examples/ic_custom_pipeline.rs).
+Application-owned registries and matrix factories allow downstream composition
+without editing the CLI's built-in lists.
+
 For one-command structured-base search with live CADO-style progress, exact
 inventories, verified decomposition probes and resumable attempts, see
 [the native factor-base sweeper](factor-base-sweep/README.md). Its live rates

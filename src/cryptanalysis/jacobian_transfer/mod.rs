@@ -1238,6 +1238,55 @@ mod tests {
     }
 
     #[test]
+    fn calibrated_genus_eight_cost_consumes_the_c2pnb304w1_margin() {
+        let c = by_name("c2pnb304w1");
+        let model = CostModel::default();
+        let current = screen(&c, &model, DEFAULT_FACTOR_BUDGET);
+        let best = &current.routes[current.best_route.unwrap()];
+        assert_eq!(best.invariants["base_degree"], 76);
+        assert_eq!(best.destination.genus, "8");
+        assert_eq!(best.transport, Transport::SizeAdmits);
+        assert_eq!(
+            best.cost.destination.solver,
+            DestinationSolver::HyperellipticIndexCalculus
+        );
+        assert_eq!(best.class, RouteClass::Boundary);
+        assert!((current.reference_log2 - 160.226).abs() < 0.001);
+        assert!((best.cost.log2_total - 160.259).abs() < 0.001);
+        assert!((best.cost.ratio_log2 + 0.033).abs() < 0.001);
+
+        // Replay the superseded 10*g^2 price at this genus alone. Geometry,
+        // subgroup, solver and every other model parameter stay identical.
+        // The measured 2620.9 versus 640 multiplications adds 2.034 bits,
+        // explaining why the old 2.001-bit margin disappears.
+        let mut legacy = model;
+        legacy
+            .jacobian_group_op_mults_measured
+            .iter_mut()
+            .find(|(g, _)| *g == 8)
+            .unwrap()
+            .1 = 640.0;
+        let old = screen(&c, &legacy, DEFAULT_FACTOR_BUDGET);
+        let old_route = old
+            .routes
+            .iter()
+            .find(|r| r.kind == best.kind && r.invariants == best.invariants)
+            .unwrap();
+        assert_eq!(old_route.destination, best.destination);
+        assert_eq!(old_route.transport, best.transport);
+        assert_eq!(
+            old_route.cost.destination.solver,
+            best.cost.destination.solver
+        );
+        assert_eq!(old_route.class, RouteClass::FormulaMarginal);
+        assert!((old_route.cost.ratio_log2 - 2.001).abs() < 0.001);
+        assert!(
+            (best.cost.log2_total - old_route.cost.log2_total - (2620.9_f64 / 640.0).log2()).abs()
+                < 0.001
+        );
+    }
+
+    #[test]
     fn koblitz_curves_degenerate_and_random_b_sits_at_the_maximum() {
         let k = screen(
             &by_name("sect163k1"),
