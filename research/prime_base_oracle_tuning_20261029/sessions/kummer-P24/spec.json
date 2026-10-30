@@ -1,0 +1,87 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage K (coset control), PKM-ladder 24-bit prime-order curve",
+  "description": "Secondary, non-decision control of PROTOCOL.md section 4.5: Kummer multiplicative-coset base against the low-x base at the same actual column count, incumbent oracle. Public synthetic curve and targets.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 10940417,
+        "a": 10128206,
+        "b": 867458,
+        "group_order": 10937713,
+        "r": 10937713,
+        "gx": 3240781,
+        "gy": 414610
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 20261018311,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "kummer-t8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=8",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "4243777"
+        }
+      }
+    },
+    {
+      "name": "lowx-c119",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=119",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "4243777"
+        }
+      }
+    },
+    {
+      "name": "kummer-t9",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=9",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "4243777"
+        }
+      }
+    },
+    {
+      "name": "lowx-c245",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=245",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "4243777"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261018321,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

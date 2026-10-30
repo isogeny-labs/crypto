@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "reservation arithmetic matches retained AWS rates",
+    "exact ceiling accepted",
+    "rejected extra 11.6113",
+    "rejected extra -0.01",
+    "rejected extra NaN",
+    "rejected extra Infinity",
+    "tampered rate rejected"
+  ],
+  "passed": 7,
+  "result": {
+    "schema": "dataset-budget-check/v1",
+    "reserved_usd": "188.3888000000",
+    "remaining_usd": "11.6112000000",
+    "authorized_ceiling_usd": "200.00",
+    "billing_verified": false,
+    "launch_performed": false
+  }
+}

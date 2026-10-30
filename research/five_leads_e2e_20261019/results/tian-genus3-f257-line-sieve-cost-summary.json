@@ -1,0 +1,103 @@
+{
+  "schema": "tian-genus3-f257-line-sieve-cost-analysis/v1",
+  "fixture": "one published F257 P1/P2 pair; mapped source formulas evaluated in solver",
+  "source_order": 690212,
+  "prime_relation_modulus": 172553,
+  "source_order_cofactor": 4,
+  "fully_split_lines": 2458,
+  "factor_base_size": 250,
+  "relation_rank": 249,
+  "recovered": 86241,
+  "source_and_destination_verified": true,
+  "lift_tests": [
+    {
+      "destination_match": true,
+      "scalar": 86241
+    }
+  ],
+  "count_order": [
+    "M",
+    "S",
+    "I",
+    "field_adds"
+  ],
+  "initial_curve_counts": [
+    3985355.0,
+    0.0,
+    0.0,
+    1098725.0
+  ],
+  "mapped_setup_descent_and_destination_verification_counts": [
+    503411833.0,
+    36928.0,
+    35362.0,
+    476957051.0
+  ],
+  "scalar_relation_and_recovery_counts": [
+    12079948.0,
+    0.0,
+    251.0,
+    12048574.0
+  ],
+  "source_verification_counts": [
+    5852.0,
+    0.0,
+    127.0,
+    10080.0
+  ],
+  "mapped_cold_total_counts": [
+    519482988.0,
+    36928.0,
+    35740.0,
+    490114430.0
+  ],
+  "mean_conventional_rho_counts": [
+    505937.0,
+    0.0,
+    11207.0,
+    866587.0
+  ],
+  "mean_negation_walk_counts": [
+    539673.2,
+    0.0,
+    11953.4,
+    926968.4
+  ],
+  "source_order_discovery_counts": [
+    433537.0,
+    0.0,
+    9911.0,
+    742194.0
+  ],
+  "representative": {
+    "S_per_M": 0.5,
+    "I_per_M": 10.0,
+    "add_per_M": 0.1,
+    "mapped_line_sieve_GAE": 568870295.0,
+    "source_rho_GAE": 704665.7,
+    "source_negation_walk_GAE": 751904.0399999999,
+    "best_source_rho_GAE": 704665.7,
+    "mapped_over_best_rho": 807.2910246660225,
+    "best_source_rho_with_order_discovery_GAE": 1311532.1,
+    "mapped_over_rho_with_order_discovery": 433.7448507741442,
+    "mapped_over_mapped_bsgs": 0.04811902144978952
+  },
+  "mapped_over_best_rho_band": [
+    47.40254199267016,
+    1004.6634128985351
+  ],
+  "mapped_over_rho_with_discovery_band": [
+    25.171648757242103,
+    540.8702716658061
+  ],
+  "mapped_over_bsgs_band": [
+    0.04800252356877727,
+    0.04814975321339132
+  ],
+  "rho_losses": 36,
+  "rho_wins": 0,
+  "bsgs_losses": 0,
+  "bsgs_wins": 36,
+  "scope": "fixed published positive control only; Smith-negative holdout untested",
+  "unpriced": "memory, hashing, comparisons, control flow and qualified wall time; scalar-field M/I priced as single-word base-field M/I"
+}

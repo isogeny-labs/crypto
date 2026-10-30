@@ -405,6 +405,8 @@ def launch_single(arguments: Any, lab: Any) -> dict[str, Any]:
         env = os.environ.copy()
         env["RAYON_NUM_THREADS"] = "1"
         rho_env = dict(env, **{k: str(v) for k, v in producers["rho"].get("env", {}).items()})
+        lab.write_switches(run, env, arguments, rho_env=lab.result_switches.result_env(rho_env),
+                           producer_env={arm: pr.get("env", {}) for arm, pr in producers.items()})
         fixture_base = dict(beat["curve_fixture"])
         curve = cached_curve(fixture_base)
         r = curve.r

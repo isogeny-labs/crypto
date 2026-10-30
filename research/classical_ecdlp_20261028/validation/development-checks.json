@@ -1,0 +1,337 @@
+{
+  "schema": "archive-development-checks/v1",
+  "tested_base_revision": "6187036c049b6de2b1521b014f575952e4f1705c",
+  "publication_parent_revision": "7be0960b07b222b54b32c5a7813e649d9563071a",
+  "upstream_update": "Fast-forwarded before publication; library, Cargo, reused solver, crates and tools are byte-identical to the tested base. Upstream changes concern separate study records and src/bin/icprog.",
+  "native_source": {
+    "path": "examples/classical_ecdlp_archive.rs",
+    "sha256": "1f3932e79d612a69186eb6603f9947a7398357cdbcdfbb2e2ad9f01ba49638d8"
+  },
+  "cargo_lock_sha256": "849c5ba217dc935f808028833d146d2487af1756c311e026e287c01413a69c83",
+  "toolchain": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "host": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.55",
+    "visible_cpus": 5,
+    "scope": "development correctness checks; not historical timing metadata"
+  },
+  "checks": [
+    {
+      "name": "example-tests",
+      "command": "cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --release --locked --example classical_ecdlp_archive -- -D warnings",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "format",
+      "command": "rustfmt --check --edition 2021 --config skip_children=true examples/classical_ecdlp_archive.rs",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "native-cli-receipts",
+      "commands": [
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- check",
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- summary",
+        "cargo run --quiet --release --locked --example classical_ecdlp_archive -- solve"
+      ],
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "library-suite",
+      "command": "cargo test --release --lib --locked -- --test-threads=4",
+      "status": "completed_with_initial_fixture_failures",
+      "missing_runtime_fixture_failures": 26,
+      "all_missing_fixture_failures_passed_after_restoration": true,
+      "note": "All 4994 non-ignored tests pass across the full run and exact focused reruns. The original full invocation itself failed on missing sparse-checkout inputs; no clean full-suite invocation is claimed.",
+      "first_full_run": {
+        "exit_code": 101,
+        "passed": 4968,
+        "failed": 26,
+        "ignored": 122,
+        "seconds": 2576.51
+      },
+      "formerly_remaining_test": {
+        "name": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+        "status": "passed_in_full_run"
+      },
+      "clean_full_suite_pass": false
+    },
+    {
+      "name": "restored-runtime-fixture-tests",
+      "status": "passed",
+      "tests": [
+        "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+        "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+        "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+        "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+        "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+        "cryptanalysis::ecbench::band::tests::exact_sums_reproduce_the_band_means",
+        "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+        "cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible",
+        "cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too",
+        "cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples",
+        "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+        "cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band",
+        "cryptanalysis::ecbench::challenge::tests::the_committed_verdicts_read_as_version_1_and_a_new_one_is_version_2",
+        "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+        "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+        "cryptanalysis::ecbench::koblitz_descent::tests::the_rule_v8_defaults_are_the_parameter_files",
+        "cryptanalysis::ecbench::work::tests::fixture_records_reprice_to_their_committed_blocks",
+        "cryptanalysis::ic_framework::planner::tests::every_cited_file_exists",
+        "cryptanalysis::ic_framework::plugins::tests::compact_orbit_scan_matches_archived_n37_source42",
+        "ecc::cryptopro_b_chain_set::tests::a_step_that_does_not_compose_is_refused",
+        "ecc::cryptopro_b_chain_set::tests::frozen_chains_are_multiplication_by_lambda_and_orderings_agree",
+        "ecc::cryptopro_b_chain_set::tests::frozen_set_loads_and_every_chain_prepares",
+        "ecc::cryptopro_b_chain_set::tests::frozen_set_reproduces_its_test_vectors",
+        "ecc::cryptopro_b_chain_set::tests::tampered_sets_are_refused",
+        "ecc::endo_generic_chain_set::tests::cryptopro_b_set_loads_and_reproduces_its_vectors_on_the_generic_path",
+        "ecc::endo_generic_chain_set::tests::tampered_sets_are_refused"
+      ],
+      "passed": 26,
+      "failed": 0,
+      "note": "Each missing-input failure was rerun with the same compiled library-test binary after materializing the original tracked inputs. No source or test assertion was changed."
+    },
+    {
+      "name": "historical-integrity",
+      "command": "sha256sum -c HISTORICAL.sha256",
+      "status": "passed",
+      "files": 19,
+      "byte_equal_to_original_bundles": true
+    },
+    {
+      "name": "remote-historical-blob-integrity",
+      "status": "passed",
+      "blobs": 20,
+      "note": "GitHub blob IDs match local git hash-object for 19 historical files and their manifest."
+    },
+    {
+      "name": "report-inspection",
+      "status": "passed",
+      "pages": 2,
+      "renderer": "Typst 0.15.0",
+      "plotter": "Matplotlib 3.10.8",
+      "all_pages_visually_inspected": true,
+      "final_page_renders_match_inspected_bytes": true
+    },
+    {
+      "name": "artifact-policy",
+      "command": "python3 tools/artifacts/artifacts.py plan research/classical_ecdlp_20261028",
+      "status": "passed",
+      "files_requiring_store": 0,
+      "note": "Administrative file-policy check; no cryptographic research computation."
+    }
+  ],
+  "initial_build_preconditions": {
+    "status": "resolved",
+    "reason": "Sparse checkout initially omitted path dependency isogeny_algos and tracked compile-time fixture inputs. Materialized tracked files and reran the original command."
+  },
+  "conductor": {
+    "status": "unavailable",
+    "reason": "Local control plane connection refused at localhost:8080; no lease claimed."
+  },
+  "original_engine_and_cargo_unchanged": true,
+  "new_performance_experiments": 0,
+  "historical_timings_remeasured": false,
+  "benchmark_admission": false,
+  "upstream_merge": {
+    "base": "bd58c75eb86efe9bec36868ac01b9a152bd298e3",
+    "library_cargo_reused_engine_crates_tools_unchanged": true
+  },
+  "isolated_diagnostic": {
+    "test": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+    "environment": "RAYON_NUM_THREADS=1",
+    "status": "cancelled_after_original_test_passed",
+    "reason": "The full-suite test completed successfully; the duplicate diagnostic was no longer needed."
+  },
+  "landing_followups": [
+    {
+      "checked_at": "2026-10-28T18:48:36Z",
+      "previous_pr_head": "08db2b60d8ac6ba19c9e96cae3de6c8bb75ea52c",
+      "merged_main": "a988ff46a9346f6a128e75fd23c0a50a9e619a24",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/curve_traits/mod.rs",
+        "src/cryptanalysis/curve_traits/modular_polynomials.txt",
+        "src/cryptanalysis/curve_traits/walk.rs"
+      ],
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "example_tests": {
+        "command": "cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2",
+        "exit_code": 0,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "review": {
+        "source_commit": "4cfcece6a5b54e7b714760bb8e88699417b464a8",
+        "completed_without_findings": true,
+        "unresolved_threads": 0
+      },
+      "previous_head_required_checks": {
+        "gate": "success",
+        "size": "success",
+        "artifacts": "cancelled"
+      },
+      "cancelled_artifact_job": {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/40738229477/job/122993102314",
+        "stage": "repository checkout",
+        "artifact_assertions_ran": false
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "The original full-library counts above remain tied to tested_base_revision. This follow-up reruns the archive's 14 tests against the merged library; it does not claim a new full-suite pass or new performance experiment."
+    },
+    {
+      "checked_at": "2026-10-28T20:04:12Z",
+      "previous_pr_head": "6f37ee30f8ab885c24237ff2bcdc46604591baa1",
+      "merged_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/aps_single_relation.rs",
+        "src/cryptanalysis/f4_fp.rs",
+        "src/cryptanalysis/glv_invariant_base.rs"
+      ],
+      "upstream_touched_example": "examples/aps_single_relation_check.rs",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_tests": {
+        "command": "cargo test --release --locked --example classical_ecdlp_archive -- --test-threads=2",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T20:04:40Z",
+        "exit_code": 0,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "combined_output_sha256": "e5e791c3e3a6596ca34cd4e74670510cf5191eabb1d823babb0e125daff268b5"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "review": {
+        "source_commit": "4cfcece6a5b54e7b714760bb8e88699417b464a8",
+        "completed_without_findings": true,
+        "unresolved_threads": 0
+      },
+      "previous_head_required_checks": {
+        "gate": "success",
+        "size": "success",
+        "artifacts": "success"
+      },
+      "optional_cancelled_parity_job": {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/40749129893/job/123030768311",
+        "stage": "repository checkout",
+        "assertions_ran": false
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "Upstream adds separate APS solver encodings, streaming domains and rational-root extraction. This integration check does not rerun the full library suite, execute historical Python paths or add a performance experiment. The earlier library counts remain tied to base 6187036."
+    },
+    {
+      "checked_at": "2026-10-28T20:09:27Z",
+      "previous_pr_head": "f2912961cd16ed12bc914fbb0cd0ccbd8694b82c",
+      "merged_main": "0d839d5b7780148439b1d6929b7fc440fda2dcbe",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/mod.rs",
+        "src/cryptanalysis/hky_fp_tower.rs"
+      ],
+      "upstream_change_scope": "One new module declaration and a separate additive HKY tower module, examples and study. No existing arithmetic implementation changes.",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_regression": {
+        "tested_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "note": "The completed invocation is the previous follow-up's regression. The archive and its dependencies are unchanged by this additive module integration; no new 14-test invocation is claimed here."
+      },
+      "compile_check": {
+        "command": "cargo check --release --locked --example classical_ecdlp_archive",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T20:11:27Z",
+        "exit_code": 0,
+        "combined_output_sha256": "e7d8f6510444bf2f6de435eedc1a4ad89ac5f494b7ccc215a2fc1201a3dc9111"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "previous_head_required_checks": {
+        "gate": "in_progress",
+        "size": "in_progress",
+        "artifacts": "in_progress"
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "Main advanced again during the preceding build/publication. Integrate the current base, preserve the completed test's actual revision, and obtain fresh required checks. No full-suite invocation, historical Python execution or performance experiment was added."
+    },
+    {
+      "checked_at": "2026-10-28T21:05:29Z",
+      "previous_pr_head": "519d9ece5a1c9514712b1205e3893a42caf44255",
+      "merged_main": "7fe71c4a85aa65a3e4fd1ba9b11b90374fcbadfd",
+      "merge_conflicts": false,
+      "upstream_library_changes": [
+        "src/cryptanalysis/ecbench/cm_folded.rs",
+        "src/cryptanalysis/ecbench/cover_quartic.rs",
+        "src/cryptanalysis/ecbench/hyper_ic.rs",
+        "src/cryptanalysis/ecbench/methods.rs",
+        "src/cryptanalysis/hyperelliptic_index_calculus.rs"
+      ],
+      "upstream_change_scope": "Separate ecbench method accounting, applicability checks and hyperelliptic report accounting (PR #2798).",
+      "archive_engine_label_arithmetic_and_cargo_unchanged": true,
+      "native_source_unchanged_since_review": true,
+      "example_regression": {
+        "tested_main": "8177cd083ed4b07e76a1ddba5df175b01fa34451",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "note": "Retain the completed regression's actual revision. The later ecbench update changes none of the archive's execution dependencies; no new test invocation is claimed here."
+      },
+      "compile_check": {
+        "command": "cargo check --release --locked --example classical_ecdlp_archive",
+        "status": "passed",
+        "completed_observed_at": "2026-10-28T21:06:41Z",
+        "exit_code": 0,
+        "combined_output_sha256": "47f86418590260fbc374bc0878887192caa5631628aa8259995400d9fbddfd97"
+      },
+      "historical_files_sha256_verified": 19,
+      "scoped_rustfmt": "passed",
+      "artifact_policy_files_requiring_store": 0,
+      "previous_head_required_checks": {
+        "gate": "failure",
+        "size": "success",
+        "artifacts": "success"
+      },
+      "required_gate_failure": {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/40761280409/job/123073990717",
+        "stage": "artifact download setup",
+        "error": "ConnectionResetError(104, 'Connection reset by peer')",
+        "exit_code": 2,
+        "validation_assertions_ran": false,
+        "failed_evidence_outside_this_pr_scope": true,
+        "workflow_controls_changed": false
+      },
+      "review": {
+        "source_commit": "4cfcece6a5b54e7b714760bb8e88699417b464a8",
+        "completed_without_findings": true,
+        "unresolved_threads": 0,
+        "copilot_review": "Unable to review due to quota; COMMENTED state, not an approval or finding."
+      },
+      "resulting_head_required_checks": "not yet observed",
+      "conductor": "unavailable; local control plane connection refused",
+      "note": "The failed required gate is not a pass. Integrate the new main and require fresh current-head checks; do not change unrelated download/workflow controls or bypass protections. No full-suite invocation, historical Python execution or performance experiment was added."
+    }
+  ]
+}

@@ -49,8 +49,9 @@ degree, intermediate subfield degrees, and ord_n(2) separately.
    target panel where the algebraic encoding and caps permit it. Record every
    unsupported or censored combination explicitly.
 6. Retain the Pareto frontier in yield, actual base size, regularity, and eventually
-   useful relation rank and complete charged cost. The current CLI implements the
-   first three dimensions; it cannot choose on unmeasured cost or rank.
+   useful relation rank and complete charged cost. The factory CLI implements the first three dimensions; the
+   [archive IC adapter](ARCHIVE_FACTOR_BASE_COMPARISON.md) adds verified useful
+   rank. Neither selects on unmeasured complete cost.
 7. Freeze finalists before evaluating a separately seeded held-out panel. Re-run
    construction, lifting, subgroup tests, and relation replay on another
    implementation/host before research promotion. A changed candidate requires
@@ -147,7 +148,7 @@ unbounded search or select an end-to-end winner.
 | Natural relation yield | Bounded implementation | Arity 2..8 enumeration, independent target seed, witness replay |
 | Binary degree of regularity | Bounded implementation | Exact S3-chain ANF and homogeneous rank, at most 14 variables |
 | Prime-field regularity | Partial | Generation works; algebraic encoding and solver remain unimplemented |
-| Useful rank and total-cost selection | Not implemented | Null metrics and no selected total-runtime candidate |
+| Useful rank and total-cost selection | Rank implemented; total-cost selection unavailable | Archive IC audit and replay; explicit missing prices and null speedup ratio |
 | Measured improvement in yield/regularity | Not established by acceptance tests | Requires the matched frozen campaign described above |
 
 The canonical IC scoreboards and graphs remain unchanged: acceptance tests do

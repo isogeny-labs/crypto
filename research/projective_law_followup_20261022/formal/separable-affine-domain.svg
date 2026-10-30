@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="480" viewBox="0 0 1100 480" role="img" aria-labelledby="title desc">
+  <title id="title">Separable quintic to actual projective-stalk domain</title>
+  <desc id="desc">Blue nodes are checked in Lean under separability. Gray nodes are later open gates. Arrows show dependencies, without performance data.</desc>
+  <style>
+    text { font-family: DejaVu Sans, Arial, sans-serif; fill:#182436; }
+    .title { font-size:22px; font-weight:700; }
+    .sub { font-size:13px; fill:#536075; }
+    .label { font-size:16px; font-weight:600; }
+    .detail { font-size:12px; }
+    .checked { fill:#e8f3ff; stroke:#2372b8; stroke-width:2; }
+    .open { fill:#f1f3f6; stroke:#788596; stroke-width:2; }
+    .line { fill:none; stroke:#596579; stroke-width:2; }
+    .tip { fill:#596579; }
+  </style>
+  <rect width="1100" height="480" fill="white"/>
+  <text x="30" y="38" class="title">Separable quintic: actual affine and projective domain gate</text>
+  <text x="30" y="60" class="sub">Lean 4.34.1 · source SHA-256 897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602 · no measurements</text>
+
+  <rect x="35" y="92" width="310" height="68" rx="8" class="checked"/>
+  <text x="55" y="120" class="label">Separable monic quintic</text><text x="55" y="142" class="detail">visible hypothesis</text>
+  <rect x="395" y="92" width="310" height="68" rx="8" class="checked"/>
+  <text x="415" y="120" class="label">Simple prime factor exists</text><text x="415" y="142" class="detail">squarefree + irreducible factor</text>
+  <rect x="755" y="92" width="310" height="68" rx="8" class="checked"/>
+  <text x="775" y="120" class="label">Actual affine ring is a domain</text><text x="775" y="142" class="detail">Eisenstein for Y² − f(X)</text>
+  <path d="M345 126 H395 M705 126 H755" class="line"/>
+  <path d="M395 126 L385 121 L385 131 Z M755 126 L745 121 L745 131 Z" class="tip"/>
+
+  <rect x="35" y="224" width="310" height="68" rx="8" class="checked"/>
+  <text x="55" y="252" class="label">Rational-point localization</text><text x="55" y="274" class="detail">domain at any point on the curve</text>
+  <rect x="395" y="224" width="310" height="68" rx="8" class="checked"/>
+  <text x="415" y="252" class="label">Actual weighted-Proj stalk</text><text x="415" y="274" class="detail">domain by checked stalk equivalence</text>
+  <rect x="755" y="224" width="310" height="68" rx="8" class="open"/>
+  <text x="775" y="252" class="label">Principal nonbranch ideal</text><text x="775" y="274" class="detail">show generator x − a</text>
+  <path d="M910 160 V192 H190 V224 M345 258 H395" class="line"/>
+  <path d="M190 224 L185 214 L195 214 Z M395 258 L385 253 L385 263 Z" class="tip"/>
+
+  <rect x="35" y="358" width="310" height="68" rx="8" class="open"/>
+  <text x="55" y="386" class="label">Actual nonbranch DVR</text><text x="55" y="408" class="detail">needs principal ideal + domain</text>
+  <rect x="395" y="358" width="310" height="68" rx="8" class="open"/>
+  <text x="415" y="386" class="label">Common 2+2 norm transport</text><text x="415" y="408" class="detail">local numerator and factors</text>
+  <rect x="755" y="358" width="310" height="68" rx="8" class="open"/>
+  <text x="775" y="386" class="label">Global Pic0 and runtime</text><text x="775" y="408" class="detail">divisor class and compiled semantics</text>
+  <path d="M550 292 V325 H190 V358 M910 292 V337 H190 V358 M345 392 H395 M705 392 H755" class="line"/>
+  <path d="M190 358 L185 348 L195 348 Z M395 392 L385 387 L385 397 Z M755 392 L745 387 L745 397 Z" class="tip"/>
+  <text x="35" y="458" class="sub">Blue: checked under separability · gray: open · arrows: proof dependencies</text>
+</svg>

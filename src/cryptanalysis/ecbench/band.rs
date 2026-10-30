@@ -325,7 +325,9 @@ pub fn markdown(rep: &BandReport) -> String {
     s
 }
 
-#[cfg(test)]
+// The read-only backend-leaderboard tool compiles this file without the runner
+// or the repository-root session data (its build sets `ecbench_reader`).
+#[cfg(all(test, not(ecbench_reader)))]
 mod tests {
     use super::*;
 

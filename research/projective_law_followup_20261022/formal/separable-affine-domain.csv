@@ -1,0 +1,14 @@
+item,status,scope,assumptions,source_sha256,dependency_or_gate
+innerF_equiv,checked,one-variable polynomial representation,field K,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,MvPolynomial.uniqueAlgEquiv
+quintic_natDegree,checked,monic quintic degree five,field K,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,quintic degree bound and coefficient five equals one
+quintic_not_unit,checked,monic quintic nonunit,field K,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,natDegree five
+exists_simple_prime_factor,checked,prime factor occurring once,separable monic quintic,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,Separable.squarefree and irreducible-factor extraction
+affine_ring_domain_of_separable,checked,actual affine quintic quotient,separable monic quintic,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,Common22AffineOddDomain Eisenstein theorem
+point_local_domain_of_separable,checked,localization at any rational curve point,separable monic quintic and point equation,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,localization of a domain
+projective_point_domain_of_separable,checked,actual weighted-Proj point stalk,separable monic quintic and point equation,897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602,checked projective-stalk ring equivalence
+odd_degree_without_separability,open,all odd-degree quintics,odd degree alone,,alternative nonsquare proof in K(x)
+nonbranch_maximal_principal,open,local maximal ideal at rational nonbranch point,y nonzero,,show x-a generates after y plus point value becomes a unit
+nonbranch_local_dvr,open,actual weighted-Proj nonbranch stalk,domain and principal maximal ideal,,apply local DVR criterion
+source_norm_transport,open,proof-side common 2+2 numerator,actual nonbranch DVR,,map numerator and norm factors into point stalk
+global_principal_divisor_Pic0,open,global genus-two law,all finite and infinity local orders,,principal divisor and Pic0 class equation
+compiled_Rust_semantics,open,all runtime law branches,formal global law,,establish compiled implementation corresponds to proof-side hypotheses

@@ -1,0 +1,88 @@
+{
+  "schema": "pencil-open-inventory-receipt/v1",
+  "execution_class": "metadata_only",
+  "source_evidence_revision": "cf346160f1ef472c2182663c891611a73a92c953",
+  "generator": {
+    "path": "tools/freeze_pencil_open_inventory.py",
+    "sha256": "a5438179d6cbd6cf0f354f3ffde84824aa8d6b37f89ea9b891c22a47da7b5295"
+  },
+  "inputs": [
+    {
+      "path": "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+      "bytes": 1737313,
+      "sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+      "git_blob": "2454e764dad579295e68e4e79b79c199f02dcc3c"
+    },
+    {
+      "path": "research/pencil_sparse_20261022/results/targets.jsonl",
+      "bytes": 991431,
+      "sha256": "18f48596af6f3d724eebd7cb710798477dc6f927fa510eae78dc54228c5d5e23",
+      "git_blob": "65c12ec1835af341b23ed7ab6cd5ec49abdef856"
+    },
+    {
+      "path": "research/pencil_markowitz_20261022/results/targets.jsonl",
+      "bytes": 82072,
+      "sha256": "5a4f2e3de2b4c896af0aabd4e32244aba5a49ae78aeb84f801acf6ba5459d503",
+      "git_blob": "8a2605810b700f985cca0bd3efafd13be0352e0f"
+    },
+    {
+      "path": "research/four_followups_review_20261022/results/pencil-coverage.csv",
+      "bytes": 190076,
+      "sha256": "738083bd44d9a1e5133701b37985fd7c9f5e293065ddcbc3876a0082948169af",
+      "git_blob": "b5af1ee2883ac972cb203edbcb4b59087498dc00"
+    }
+  ],
+  "assertions": {
+    "archive_records": 3780,
+    "archive_workloads": 1260,
+    "archive_records_per_workload": 3,
+    "archive_arms": [
+      "genus_choice2:candidate",
+      "genus_projective:candidate",
+      "rho_neg:reference"
+    ],
+    "verified_candidate_workloads": 543,
+    "cap_only_workloads": 1,
+    "no_indexed_pencil_record_workloads": 716,
+    "open_workloads": 717,
+    "open_by_bits": {
+      "28": 177,
+      "32": 180,
+      "36": 180,
+      "40": 180
+    },
+    "cap_only_identity": {
+      "bits": 32,
+      "p": 186379,
+      "target_index": 0,
+      "workload_id": "Wa0fc1e72d7a0"
+    }
+  },
+  "artifact": {
+    "path": "research/four_followups_review_20261022/open-pencil-inventory/open-workloads.jsonl",
+    "store_uri": "s3://setec-astronomy-artifacts/store/sha256/ef/efd504b64437309408c3f199fcf3ed85e94322ef01d7d1545d87f6bf1409ae3e",
+    "bytes": 434290,
+    "sha256": "efd504b64437309408c3f199fcf3ed85e94322ef01d7d1545d87f6bf1409ae3e",
+    "rows": 717,
+    "schema": "pencil-open-workload/v1",
+    "required_seed_fields": [
+      "algorithm_seed",
+      "planted",
+      "target_seed"
+    ],
+    "supersedes_incomplete_sha256": "16d33685b156b3ba753fff577c11c4958335a4ce80384ca292100bc5bbadda5a"
+  },
+  "validation": {
+    "command": "python3 tools/freeze_pencil_open_inventory.py --check",
+    "expected_schema": "pencil-open-inventory-check/v1",
+    "expected_exit": 0
+  },
+  "scope_boundary": {
+    "collector_invoked": false,
+    "replay_invoked": false,
+    "matrix_code_invoked": false,
+    "nullspace_code_invoked": false,
+    "solver_invoked": false,
+    "open_workloads_executed": false
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "arms": [
+    {
+      "name": "filtered_ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.three_leads_decomposition_v2",
+        "params": {
+          "base_seed": "20261018",
+          "oracle": "linearized_filtered",
+          "random_base": "0",
+          "trial_cap": "1648400"
+        }
+      }
+    }
+  ],
+  "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+  "label": "three-leads-binary-128-0-restart-target-v2-trace-filter",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 3,
+        "b": 2,
+        "family": "subfield",
+        "group_order": 16256,
+        "gx": 1211,
+        "gy": 14184,
+        "kind": "three_leads",
+        "modulus": 16417,
+        "n": 14,
+        "p": 2,
+        "parameter": 7,
+        "r": 127
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 8
+  }
+}

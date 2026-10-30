@@ -30,6 +30,10 @@
 //!   §23's `run.py`, `claims.py` and `analyse.py`, ported): its rows on the
 //!   native runner, each row's identities, independent replay and checked
 //!   claim, and the figures read from the checked rows.
+//! - `icprog tournament prepare|run|status|verify|propose`: the IC
+//!   candidate tournament's schema-1 protocol (`tournament.py` 1e5b2774…
+//!   and its `oracle.py`), ported; `verify` re-derives a historical round
+//!   from its committed evidence archive.
 #[path = "icprog/autolab.rs"]
 mod autolab;
 #[path = "icprog/b2.rs"]
@@ -96,6 +100,14 @@ mod sat_source;
 mod stats;
 #[path = "icprog/suite.rs"]
 mod suite;
+#[path = "icprog/tournament.rs"]
+mod tournament;
+#[path = "icprog/tournament_exec.rs"]
+mod tournament_exec;
+#[path = "icprog/tournament_oracle.rs"]
+mod tournament_oracle;
+#[path = "icprog/tournament_store.rs"]
+mod tournament_store;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -613,6 +625,12 @@ enum Command {
     /// class and 3 outside it, so a chain can check before it starts a
     /// round; `run` refuses outside it.
     HostClass { round: Round },
+    /// The IC candidate tournament's schema-1 protocol, natively
+    /// (`research/ic_candidate_tournament_20260915/NATIVE_PORT.md`).
+    Tournament {
+        #[command(subcommand)]
+        step: tournament::Step,
+    },
     /// One of a round's declared steps, natively (R05, R02b, R06, R07, R08, R09, R10, R11, R12).
     Run {
         round: Round,
@@ -1595,6 +1613,7 @@ fn main() -> ExitCode {
             isolate,
         }),
         Command::OrdinaryPreparationAudit { input, out } => ordinary_preparation::run(&input, &out),
+        Command::Tournament { step } => tournament::main(step),
         Command::F5ControlReplayCustody {
             publication,
             registration_sha256,

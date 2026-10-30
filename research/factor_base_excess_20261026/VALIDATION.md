@@ -1,5 +1,7 @@
 # Native implementation validation — 2026-10-26
 
+**Storage update (2026-10-26):** The owner approved canonical S3 use. The original validation archive is now uploaded and fully read back; the resume checkpoint passed and its contents were verified. [Publication receipt](publication-20261026/README.md) supersedes the historical storage/authorization blockers below. No new research result or broader native-validation pass follows from publication.
+
 Final native source: `7d340f8710e4c22cb8a1a3be356f85f10944467a`, based on
 main `4355e5c648b67a679729ac7963f3c054d8362d30`. Later documentation changes
 must not be described as new native measurements. **No new research panel

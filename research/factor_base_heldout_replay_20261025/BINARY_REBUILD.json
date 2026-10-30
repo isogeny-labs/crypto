@@ -1,0 +1,36 @@
+{
+  "schema": "factor-base-heldout-replay-binary-rebuild/v1",
+  "observed_utc": "2026-10-27T05:24:00Z",
+  "purpose": "read-only source-to-executable provenance check; no target trial rerun",
+  "frozen_input_object": "s3://isolab-results-104186811093-us-east-2/inputs/n12-heldout-replay-20261025/files-7f510189/bin/heldout",
+  "frozen_binary_sha256": "58a70ac65f088cf24948cfb77e6144e8727296fd1a908cb02a82e7cda2e0e86e",
+  "frozen_binary_bytes": 1920248,
+  "source": {
+    "checkout_head_at_build": "f6b65e555940e9bcf83d23800c44939665dd766e",
+    "heldout_rs_sha256": "33968a365ca815b25de7d52ddde6749d10d4f2992819a550200ad7a768a42e03",
+    "cost_rs_sha256": "a283f799f171156d81bc85932ac44a280a71f911219b93eecb6ecfcb6d53585a",
+    "cargo_lock_sha256": "e4ff7ef98c9c493efd9fe59f273b371e0444c6d90aabb2d8ce158e1231d3bdee",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "dependency": "divisor-arithmetic 87e2ebc1b59e5313b67bf81d11e42ec094251518"
+  },
+  "builds": [
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist",
+      "command": "cargo build --release --locked --offline --manifest-path research/factor_base_heldout_20261025/Cargo.toml --bin heldout",
+      "sha256": "c3b5700c39449a7cb5483eb6ff2f6d2d6dc9aa32ccf8b8e4ef9343d07f9245a0",
+      "bytes": 1920248,
+      "matches_frozen": false
+    },
+    {
+      "path": "/var/tmp/crypto-n12-replay-20261025",
+      "command": "CARGO_TARGET_DIR=/tmp/n12-rebuild-symlink-target cargo build --release --locked --offline --manifest-path /var/tmp/crypto-n12-replay-20261025/research/factor_base_heldout_20261025/Cargo.toml --bin heldout",
+      "sha256": "58a70ac65f088cf24948cfb77e6144e8727296fd1a908cb02a82e7cda2e0e86e",
+      "bytes": 1920248,
+      "matches_frozen": true,
+      "cmp_exit_code": 0
+    }
+  ],
+  "build_path_effect": "The original-path rebuild matches byte for byte; the ordinary checkout-path build does not. The only differing printable rodata strings identified in the first build were absolute source paths and an adjacent concatenated path fragment.",
+  "cost_ratio_changed": false,
+  "target_trials_rerun": 0
+}

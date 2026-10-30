@@ -1,0 +1,24 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Genus-2 principal-open equation: common-ambient quotient}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+Let $R$ be any commutative ring and $xs=1$. Write
+\[F=y^2-(x^5+a_3x^3+a_2x^2+a_1x+a_0),\quad
+G=(ys^3)^2-s(1+a_3s^2+a_2s^3+a_1s^4+a_0s^5).\]
+The pinned Lean source proves $G=s^6F$, so $F=0\iff G=0$ and $(F)=(G)$ in this common ambient ring. It constructs $R/(G)\simeq R/(F)$, then instantiates $R$ as the localization of $K[X,Y]$ away from $X$, with $s=X^{-1}$. The Lean 4.34.1 compile exits zero, and theorem axiom audits contain only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound} or a subset.
+
+\begin{center}\begin{tabular}{p{0.53\linewidth}p{0.35\linewidth}}\toprule
+Gate & Status\\\midrule
+Unit multiple, ideal equality, same-ambient quotient & Checked\\
+Concrete $K[X,Y]_X$ instance & Checked\\
+Isomorphism of separately presented chart localizations & Open\\
+Principal-open scheme isomorphism & Open\\
+Smooth projective completion, infinity stalk, divisor/$\operatorname{Pic}^0$ & Open\\
+Rust semantic equivalence and rho cost & Open / not measured\\\bottomrule\end{tabular}\end{center}
+
+\noindent The checked quotient equivalence does not yet identify the affine curve's localized coordinate ring with the infinity chart's localized coordinate ring. That requires the affine quotient presentation, localization--quotient interchange, and inverse variable-change homomorphisms; scheme gluing and stalk transport remain subsequent steps. See \texttt{Common22PrincipalOpenEquation.lean}, \texttt{principal-open-equation.csv}, and \texttt{principal-open-equation.svg}.
+\end{document}

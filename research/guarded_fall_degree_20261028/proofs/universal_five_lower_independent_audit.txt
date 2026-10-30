@@ -1,0 +1,105 @@
+Independent audit of the uniform degree-four obstruction, B=3
+Date: 2026-10-28
+
+Conclusion
+----------
+The proposed lower argument is sound. For every p>3 and every three-element
+set S in F_p, the ordinary degree-four closure of the explicit inverse-
+guarded chain excludes 1. In particular, every unsatisfiable instance in
+the rational-curve class has d_F>=5. Combined with the independently audited
+upper bound, every such unsatisfiable instance has exactly d_F=5.
+The existing leading-syzygy argument gives d_ff=4 as well.
+
+Set-up
+------
+Write x=x1, y=x2, z=x3, d=x-y, and let u,v be the auxiliary variables.
+Let g(T)=product_(s in S)(T-s), h=v*(x-y)-1, and define
+  I0=(g(x),g(y),g(z),h),
+  f1=S3(x,y,u), f2=S3(u,z,r).
+Every input has total degree at most four. The coefficients of u^2 in
+f1 and f2 are respectively d^2 and (z-r)^2. No other feature of the
+curve coefficients is needed for this lower bound.
+
+Define the finite-dimensional subspace of polynomials of degree at most 4
+  W=(I0 intersect R_(<=4)) + F_p*f1 + F_p*f2.
+It contains every input. We show that W is closed under every multiplication
+permitted at degree four and does not contain 1.
+
+Lemma: the degree-at-most-three part of W lies in I0
+--------------------------------------------------
+Let w=i+c1*f1+c2*f2 belong to W, with degree(w)<=3 and i in I0.
+The coefficient of u^2 in w is an affine polynomial
+  ell=L0+Lx*x+Ly*y+Lz*z+Lv*v.
+Evaluate only the base coordinates, setting x=a,y=b,z=c,v=1/(a-b)
+for arbitrary distinct a,b in S and arbitrary c in S. Keep u as a FORMAL
+indeterminate. Every generator of I0 then vanishes, so the entire evaluated
+i is identically zero as a polynomial in u. Comparing the u^2 coefficients
+therefore gives
+  ell(a,b,c,1/(a-b)) = c1*(a-b)^2+c2*(c-r)^2.
+This coefficient comparison does not rely on evaluating a polynomial
+function at finitely many values of u.
+
+For a fixed ordered pair a,b, varying c over the three distinct elements
+of S gives a degree-at-most-two polynomial in c with three distinct roots.
+Its quadratic coefficient is -c2, so c2=0. Its linear coefficient then
+gives Lz=0.
+
+The remaining right-hand side is symmetric in a,b. Comparing the two
+ordered pairs (a,b) and (b,a), with v changing to -v, gives
+  (Lx-Ly)*(a-b)^2+2*Lv=0.
+The three squared unordered-pair differences cannot all be equal when
+char(F_p)>3. Indeed, after translation write two differences as t and q.
+Equality t^2=q^2 for distinct roots forces q=-t. The remaining difference
+is 2t, so equality of its square with t^2 would imply 3*t^2=0, impossible.
+Thus at least two squared differences differ, yielding Lx=Ly and Lv=0.
+
+Write sigma1=sum(S), sigma2=sum_(a<b in S)(a*b), and let s be the unique
+third root of S other than a,b. Then a+b=sigma1-s and
+  (a-b)^2=-3*s^2+2*sigma1*s+sigma1^2-4*sigma2.
+Consequently, for each of the three distinct s in S,
+  c1*(-3*s^2+2*sigma1*s+sigma1^2-4*sigma2)
+      = L0+Lx*(sigma1-s).
+This quadratic has three distinct roots, so its leading coefficient
+-3*c1 is zero. Since p>3, c1=0. We already had c2=0; hence w=i belongs
+to I0, proving the lemma.
+
+Closure of W
+------------
+Let w in W and let a polynomial m satisfy degree(m*w)<=4. If m is
+constant, closure follows from linearity. If w=0 the product is zero.
+Otherwise, if m is nonconstant, ordinary polynomial degree is additive
+in this integral domain, so degree(w)<=3. The lemma gives w in I0.
+Therefore m*w belongs to I0 and has degree at most four, hence belongs
+to W. Thus W satisfies the full closure condition, including arbitrary
+polynomial multipliers, not only variable multiplication.
+
+Separation from 1
+-----------------
+The ideal I0 is proper: choose any distinct a,b in S, any c in S, put
+v=1/(a-b), and leave u arbitrary. This supplies a rational common zero
+of its generators. If 1 belonged to W, its degree is at most three, so
+the lemma would imply 1 in I0, a contradiction. Hence 1 is not in W.
+
+Since W contains all inputs and is closed at degree four, the least such
+closed space V(F,4) is contained in W. Therefore 1 is not in V(F,4).
+For unsatisfiable rational guarded systems, the ideal is the unit ideal;
+last fall equals the least degree deriving 1, so d_F>=5.
+
+Combined exact result
+---------------------
+The separate normalized-quadratic/resultant proof puts 1 in V(F,5) for
+every unsatisfiable instance in the original rational-curve class. Thus
+  d_F=5.
+For the first fall, the degree-at-most-three top map on the three cubic
+memberships and quadratic guard has no syzygy. The identity
+  v*(g(x)-g(y))-Q*h=Q,
+where Q=(g(x)-g(y))/(x-y) has degree two, supplies a non-Koszul top syzygy
+in degree four; the first possible Koszul degree is five. Its consequence
+Q is genuinely new below degree three. Hence the stated syzygy-defined
+first fall is exactly four, giving the uniform pair
+  (d_ff,d_F)=(4,5)
+for every unsatisfiable inverse-guarded B=3 instance under the explicit
+ordinary-ring convention and original hypotheses.
+
+This is a three-abscissa fixed-cardinality theorem, not a bound for an
+arbitrary increasing factor base or an unguarded presentation.

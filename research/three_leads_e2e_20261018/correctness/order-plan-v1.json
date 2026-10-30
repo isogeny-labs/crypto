@@ -1,0 +1,202 @@
+{
+  "arms": [
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_plain_v1",
+        "method_id": "ECM1hb5aefa4a64ea",
+        "method_sha256": "b5aefa4a64eaf8ccde98755f10c694eec344e3e419c1911b0e42f1d8e60debbe",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "rho_plain",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_negation_v1",
+        "method_id": "ECM1h9e7a53f7cf15",
+        "method_sha256": "9e7a53f7cf15c4071d27e8ddba48cf699a471e37968a386229e5c31dbfb45a45",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_rho",
+        "family": "rho",
+        "id": "rho.three_leads_jacobian_v1",
+        "method_id": "ECM1hf7410f77bffa",
+        "method_sha256": "f7410f77bffa594d68f0df088f2ba73c66d3427c8d1bc08edaab2ca0ab78756e",
+        "params": {
+          "trial_cap": "297231900"
+        }
+      },
+      "name": "jac_rho",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "three_leads::solve_genus2_v2",
+        "family": "ic",
+        "id": "ic.three_leads_genus2_v2",
+        "method_id": "ECM1h148dd07f396c",
+        "method_sha256": "148dd07f396c98652c58c438208c93645ab1be8b26d9d7d12c8b0b490770b385",
+        "params": {
+          "independent": "0",
+          "trial_cap": "297231900",
+          "unique_relations": "1"
+        }
+      },
+      "name": "genus_ic",
+      "role": "candidate"
+    }
+  ],
+  "executions": 12,
+  "spec_id": "ECS1hc9f4b6591eba",
+  "spec_sha256": "c9f4b6591eba5d7093d76173d8df8c5554640d0ae1b717a4805588305114cb61",
+  "workloads": [
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 16,
+        "construction": "three_leads_explicit(p=2967343,n=2,a=4255430436932,b=1351106155619,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 22,
+        "field_degree": 2,
+        "generator": [
+          "0x3a76967ebe6",
+          "0x7eab038fcc0"
+        ],
+        "group_order": 8805124221808,
+        "icv1": "ICV1:fpk-2967343-2-a41f55bf:257842:8805124221808:575231,2152147:unk:unk:r:22b4afd42d3c",
+        "r": 550320263863,
+        "registered": true,
+        "slug": "icv1-fp22k2-t257842-22b4afd4"
+      },
+      "curve_spec": {
+        "a": 4255430436932,
+        "b": 1351106155619,
+        "family": "scholten",
+        "group_order": 8805124221808,
+        "gx": 4017562840038,
+        "gy": 8704560266432,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2967343,
+        "parameter": 0,
+        "r": 550320263863
+      },
+      "planted": 99486879249,
+      "target": [
+        "0xeeab036cf",
+        "0x6b767b96cdf"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "W5244b55e55e8",
+      "workload_sha256": "5244b55e55e8abb8ed695171e5be7f9ee6b380103c3adfe59f134da001e7e768"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 16,
+        "construction": "three_leads_explicit(p=2968367,n=2,a=6216410651083,b=105219825096,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 22,
+        "field_degree": 2,
+        "generator": [
+          "0x412fe2246b",
+          "0x6eb7bcce0e"
+        ],
+        "group_order": 8811205326608,
+        "icv1": "ICV1:fpk-2968367-2-4e0c88b8:-2679918:8811205326608:1143004,2476124:unk:unk:r:af2f93a5d7dc",
+        "r": 550700332913,
+        "registered": true,
+        "slug": "icv1-fp22k2-tm2679918-af2f93a5"
+      },
+      "curve_spec": {
+        "a": 6216410651083,
+        "b": 105219825096,
+        "family": "scholten",
+        "group_order": 8811205326608,
+        "gx": 279976223851,
+        "gy": 475529006606,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2968367,
+        "parameter": 0,
+        "r": 550700332913
+      },
+      "planted": 273546942600,
+      "target": [
+        "0x593b0b2d086",
+        "0x719e03858d"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "We6ce9e1626cf",
+      "workload_sha256": "e6ce9e1626cf599089c82ce3a361b8e1d0c994f77934d59387473726fe3c0430"
+    },
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 16,
+        "construction": "three_leads_explicit(p=2972219,n=2,a=8234028488351,b=345840987380,family=scholten,parameter=0)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "extension",
+        "field_bits": 22,
+        "field_degree": 2,
+        "generator": [
+          "0x526ed6c4b3f",
+          "0x34aed6a9467"
+        ],
+        "group_order": 8834088069232,
+        "icv1": "ICV1:fpk-2972219-2-6d2bdb04:-2285270:8834088069232:1556743,1464177:unk:unk:r:ec08dabc1e63",
+        "r": 552130504327,
+        "registered": true,
+        "slug": "icv1-fp22k2-tm2285270-ec08dabc"
+      },
+      "curve_spec": {
+        "a": 8234028488351,
+        "b": 345840987380,
+        "family": "scholten",
+        "group_order": 8834088069232,
+        "gx": 5664750193471,
+        "gy": 3620345648231,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 2972219,
+        "parameter": 0,
+        "r": 552130504327
+      },
+      "planted": 283248702600,
+      "target": [
+        "0x789cb9a9533",
+        "0x47e7c992dbd"
+      ],
+      "target_index": 0,
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 202610181260,
+      "workload_id": "Wf1245852492b",
+      "workload_sha256": "f1245852492b87a8baab1d10f27ab58b99202c4f3deab935cc5f0fb5df642639"
+    }
+  ]
+}

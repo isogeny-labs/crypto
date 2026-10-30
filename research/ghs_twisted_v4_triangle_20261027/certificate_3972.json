@@ -1,0 +1,101 @@
+{
+  "schema": "ghs-frobenius-cycled-v4-triangle-v2",
+  "script_sha256": "93f3099fba57220eee48203c5d659f383c9fffa173dd313e7df12223aeb3e84f",
+  "field_modulus": "w^12+w^7+w^6+w^5+w^3+w+1",
+  "base_q": 16,
+  "source_a": 0,
+  "source_b": 51,
+  "source_order": 3972,
+  "subgroup_prime": 331,
+  "source_G": [
+    1226,
+    1765
+  ],
+  "source_Q": [
+    1143,
+    3210
+  ],
+  "delta": 14,
+  "t_orbit": [
+    574,
+    560,
+    3373
+  ],
+  "A_orbit": [
+    3205,
+    870,
+    4067
+  ],
+  "normalization": {
+    "beta": 4091,
+    "gamma": 1704,
+    "sqrt_b": 3995,
+    "c": 2387,
+    "h": 2478
+  },
+  "family_gate": {
+    "exponent_d": 1084,
+    "lambda": 1439,
+    "trace_lambda": 0,
+    "trace_a": 0
+  },
+  "cover": {
+    "f0": "((w^11 + w^10 + w^9 + w^8 + w^7 + w^6 + w^5 + w + 1)*x + w^11 + w^10 + w^9 + w^8 + w^6 + w^5 + w^3 + w^2 + w)/(x^2 + (w^3 + w^2 + w)*x + w^9 + w^8 + w^5 + w^4 + w^2 + w)",
+    "f1": "((w^11 + w^10 + w^7 + w^2 + 1)*x + w^10 + w^8 + w^7 + w^6 + w^5 + w^2 + 1)/(x^2 + (w^11 + w^10 + w^9 + w^8 + w^4 + w^3 + w^2 + 1)*x + w^10 + w^9 + w^7 + w^5 + w^3 + w^2 + w)",
+    "f2": "((w^9 + w^8 + w^6 + w^5 + w^2 + w)*x + w^8 + w^7 + w^6 + 1)/(x^2 + (w^11 + w^10 + w^9 + w^8 + w^4 + w + 1)*x + w^9 + w^7 + w^2)",
+    "relation": "f0+f1+f2=0",
+    "descent": "sigma(x)=x, sigma(y0)=y1, sigma(y1)=y0+y1"
+  },
+  "curve_point_counts": {
+    "F16": 17,
+    "F256": 257,
+    "F4096": 3722
+  },
+  "F4096_fibers": {
+    "unramified": 3712,
+    "three_poles": 6,
+    "infinity": 4
+  },
+  "F16_affine_lifts": {
+    "0": 1609,
+    "1": 3762,
+    "372": 2468,
+    "373": 2664,
+    "1640": 3427,
+    "1641": 2662,
+    "1820": 501,
+    "1821": 2388,
+    "2622": 2489,
+    "2623": 554,
+    "2890": 2278,
+    "2891": 3195,
+    "3158": 1887,
+    "3159": 227,
+    "3362": 1555,
+    "3363": 3762
+  },
+  "jacobian_order": 3972,
+  "pullback_fibers": {
+    "G": {
+      "x": 1564,
+      "y0": 209,
+      "f1": 796,
+      "split_y1": [],
+      "pushforward_twice": [
+        4015,
+        2870
+      ]
+    },
+    "Q": {
+      "x": 488,
+      "y0": 2561,
+      "f1": 1746,
+      "split_y1": [],
+      "pushforward_twice": [
+        4085,
+        3288
+      ]
+    }
+  },
+  "subgroup_map": "sum of the three Galois-conjugate degree-two pullbacks; quotient projection is [2] on each elliptic factor"
+}

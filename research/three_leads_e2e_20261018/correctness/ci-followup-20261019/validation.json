@@ -1,0 +1,84 @@
+{
+  "schema": "three-leads.ci-followup-validation/v1",
+  "tested_revision": "0a0cb3e8f902d3ca2a86308d83fddba426fe248e",
+  "checks": [
+    {
+      "command": "cargo test --release --lib",
+      "status": "failed",
+      "passed": 4413,
+      "failed": 1,
+      "ignored": 118,
+      "exit_code": 101,
+      "log": "library-parallel.log.gz",
+      "failure": "unchanged global profiling-counter assertion: calls 2 instead of 1"
+    },
+    {
+      "command": "cargo test --release --lib cryptanalysis::koblitz_groebner::tests::support_local_timers_preserve_rows_and_count_delegation -- --exact",
+      "status": "passed",
+      "passed": 1,
+      "log": "profile-test-alone.log"
+    },
+    {
+      "command": "cargo test --release --lib -- --test-threads=1",
+      "status": "incomplete",
+      "exit_code": null,
+      "raw_log_available": false,
+      "note": "Tool session was lost; the temporary partial log disappeared before a completion status could be retained. No passing result is claimed."
+    },
+    {
+      "command": "cargo test --release --lib",
+      "status": "passed_on_complete_retry",
+      "passed": 4414,
+      "failed": 0,
+      "ignored": 118,
+      "exit_code": 0,
+      "log": "library-complete-retry.log.gz"
+    },
+    {
+      "command": "node tools/check_ic_dashboard_browser.mjs",
+      "status": "failed_before_mobile_fix",
+      "log": "browser-initial-failure.log"
+    },
+    {
+      "command": "node tools/check_ic_dashboard_browser.mjs",
+      "status": "passed_after_mobile_fix",
+      "viewport_widths": [
+        1280,
+        390,
+        320
+      ],
+      "log": "browser-pass.json"
+    },
+    {
+      "command": "node tools/render_ic_dashboard.mjs --check; python3 scripts/site/panel_index.py --check",
+      "status": "passed",
+      "panels": 306,
+      "log": "dashboard-generation-check.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/site -p 'test_build.py'",
+      "status": "passed",
+      "tests": 49,
+      "log": "site-tests.log"
+    },
+    {
+      "command": "target/release/jacobian_transfers check; target/release/jacobian_transfers table (compared with committed table)",
+      "status": "passed",
+      "catalog_rows": 2771,
+      "previous_rows_unchanged": 2572,
+      "log": "jacobian-catalog-check.log"
+    },
+    {
+      "command": "bash .github/scripts/ecbench-audit-sessions.sh (all four pinned incomplete sessions)",
+      "status": "passed_classification",
+      "audited_passes": 0,
+      "explicitly_incomplete": 4,
+      "log": "incomplete-session-classification.log"
+    }
+  ],
+  "historical_github_head": "20cc7f30a72d0b5dbfcb1d15cccb93ad59b1bff2",
+  "historical_github_snapshot": "github-head-20cc7f30.json",
+  "historical_failed_actions_logs": "failed-actions-logs.tar.xz",
+  "inherited_failure_bindings": "source-bindings.json",
+  "limits": "Local checks do not substitute for applicable GitHub CI. No merge is authorized by these receipts alone; all applicable checks must pass. Original experiment observations and numerical verdicts are unchanged."
+}

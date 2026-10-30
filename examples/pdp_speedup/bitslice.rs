@@ -5,8 +5,6 @@
 //! lane ([`Tape`]) that emits the straight-line program for hashing and for
 //! the GPU kernel generator.
 
-#![allow(dead_code)]
-
 // The recording lane, the lane accessors and `from_planes_u64` are the interface
 // PS-2 (program export and hash) and PS-3 (hit extraction) build on; PS-1 only
 // counts gates and runs 64 lanes.

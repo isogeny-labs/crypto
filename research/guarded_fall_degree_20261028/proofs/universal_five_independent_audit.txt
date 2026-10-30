@@ -1,0 +1,133 @@
+Independent audit of the universal degree-five guarded B=3 theorem
+Date: 2026-10-28
+
+Conclusion
+----------
+The proof proposed in this session is valid. Under the exact inverse-guarded
+prime-field presentation previously specified, EVERY unsatisfiable instance
+with three distinct rational factor-base abscissas has d_F <= 5.
+The argument is uniform in p>3 and in the nonsingular curve and target. It
+uses ordinary total degree and explicit input equations. It does not extend
+to the unguarded presentation or growing factor-base cardinality merely by
+changing notation.
+
+Hypotheses and definition
+-------------------------
+Let K=F_p, p>3, E:y^2=x^3+a*x+b nonsingular, S={s1,s2,s3} three distinct
+abscissas of K-rational affine points, both point signs allowed, and R an
+affine K-rational target, r=x(R). Put g(T)=product_(s in S)(T-s) and
+
+ F={g(x1),g(x2),g(x3), f3(x1,x2,u), f3(u,x3,r), h},
+ h=v*(x1-x2)-1.
+
+V_D means the smallest K-vector space containing eligible inputs of total
+degree <=D and closed under every multiplication whose ordinary product
+has degree <=D. The target is 1 in V_5. For a unit ideal the last fall degree
+is exactly the least refutation degree: if 1 is available at D, multiplying
+it by any f puts f in V_(max(D,deg f)).
+
+1. Rationality and the excluded target slice
+--------------------------------------------
+All algebraic-closure solutions of F are rational. Membership fixes xi to S;
+the guard makes x1 != x2 and v=(x1-x2)^(-1). The first f3 polynomial has
+leading coefficient (x1-x2)^2 and roots x(P1+P2),x(P1-P2), counted with
+multiplicity. Both sums are affine and rational. Hence u is rational.
+
+If r belonged to S, choose a factor-base point P with x(P)!=r. The triple
+R,P,-P decomposes R and has distinct first abscissas. It gives a solution
+of F, with affine intermediate R+P. Thus unsatisfiability implies r notin S.
+No discriminant invertibility is asserted or needed; repeated u roots and
+rational 2-torsion are allowed.
+
+2. Replace the ordered pair by its missing root
+-----------------------------------------------
+Let sigma1=sum(S), w=sigma1-x1-x2, and z=x3. Define
+ Q=(g(x1)-g(x2))/(x1-x2), of degree two.
+The exact identity v*(g(x1)-g(x2))-Q*h=Q puts Q in V_4.
+
+The ideal J_pair=(Q,g(x2)) is the radical ideal of ordered distinct pairs
+from S. In lex order x1>x2 its generators are monic with coprime leading
+monomials x1^2,x2^3. Their division preserves total degree. On this locus
+w is precisely the remaining element of S. Consequently g(w) belongs to
+J_pair and hence to V_4, using a division expression of degree <=3.
+
+The symmetric first f3 equation is represented on this pair locus by a
+polynomial q1(w,u)=alpha(w)u^2+beta(w)u+gamma(w), with each coefficient
+of w-degree <=2 (interpolate on the three missing roots). Both the original
+and the representative have total degree <=4. Their difference belongs to
+J_pair, so q1 is available in V_4 by degree-preserving division.
+For each w in S, alpha(w)=(s_i-s_j)^2 !=0 for the complementary pair.
+
+The second equation q2(z,u)=f3(u,z,r) already has z-degree <=2 and
+u-degree <=2. Its leading u coefficient is (z-r)^2, nonzero at every z in S.
+Thus each q_i has an invertible leading u coefficient modulo its cubic g.
+
+3. Normalize both quadratics inside degree five
+------------------------------------------------
+For any q(t,u) with t-degree <=2, u-degree <=2, and available in V_4,
+put q_k=NF_g(t^k q). These normal forms all have t-degree <=2 and u-degree
+<=2, hence total degree <=4. Starting from q_0=q, multiply once by t,
+costing at most five, and reduce by the monic cubic g. The result returns
+to degree <=4 and can be multiplied once more by t. Therefore q_0,q_1,q_2
+are all in V_5.
+
+If alpha(t) is the leading u coefficient, its inverse modulo g has degree
+<=2. A scalar linear combination of q_0,q_1,q_2 therefore gives a monic
+quadratic H=u^2+A(t)u+B(t), where deg A,deg B<=2. It has total degree <=3
+and is available in V_5. This repeated reduction avoids the invalid direct
+multiplication of a quartic q by a quadratic inverse, which would cost six.
+Multiplication by w is legitimate in the original ring because w is linear.
+
+Apply this to obtain
+ H1=u^2+A(w)u+B(w), H2=u^2+C(z)u+D(z), both in V_5.
+All following normal forms are modulo g(w),g(z), preserving total degree.
+
+4. Construct the scalar resultant without exceeding degree five
+---------------------------------------------------------------
+Set E=A-C, J=B-D and L=H1-H2=E*u+J (degree <=3). Then
+ N=NF(2uL-E*(H1+H2))=F*u+G,
+ F=NF(2J-A^2+C^2), G=NF(-E*(B+D)).
+
+This construction costs at most five: uL has degree <=4 and E*(H1+H2)
+has degree <=5. Crucially F is a SUM of a polynomial in w and a polynomial
+in z, each degree <=2. G is scalar with degree <=2 in each state variable,
+hence total degree <=4. Thus N itself has total degree <=4.
+
+To obtain NF(E*N), direct multiplication might cost six. Instead form
+NF(wN) and NF(zN): each multiplication costs <=5 and each normal form has
+total degree <=4. For the u term this follows from separability of F:
+w*F(w,z)*u reduces to degree <=4; the scalar term is always degree <=4
+on the 3x3 grid. Multiply these two reduced rows once more by w or z,
+respectively, costing <=5. Linear combinations now produce NF(E*N), since
+E is separable quadratic. No mixed second multiplier is required.
+
+Also F*L has degree <=5 directly. Subtracting gives
+ NF(E*N-F*L)=NF(E*G-F*J)=-2*NF(Res),
+ Res=J^2-A*E*J+B*E^2=Res_u(H1,H2).
+The scalar resultant, reduced on the 3x3 grid, is therefore in V_5 and has
+total degree <=4. The identity follows by expansion and uses only 2!=0.
+
+5. Invert the scalar resultant by degree-five grid closure
+---------------------------------------------------------
+At every (w,z) in S^2, the two monic quadratics have no common root: such
+a root would give a solution of F. This remains valid for repeated roots.
+Thus Res is nonzero at all nine points. Its class is a unit in
+ K[w,z]/(g(w),g(z)) ~= K^9.
+
+Every scalar normal form in this quotient has degree <=4. Starting from
+the available reduced Res, multiply by w or z one step at a time (cost <=5)
+and reduce back to degree <=4. All polynomial multiples of Res in the
+quotient are thereby available in V_5. In particular its interpolation
+inverse produces 1 in V_5. This proves d_F<=5.
+
+Validation of the constructive algebra
+--------------------------------------
+constructive_normalized_five.py implements the normalization, the staged
+E*N construction, and scalar inversion as explicit arithmetic proof DAGs;
+it never calls the closure-search engine. Every node is input, scalar
+multiple, addition, or permitted variable multiplication. Independent sparse
+replay in proof_trace.verify_refutation checked 60 such degree-five traces
+over p17,p31,p101, including repeated quadratic roots and arbitrary nonzero
+leading-coefficient functions. See normalized_five_constructive_validation.json.
+This is a stress check of the proof operations, not a substitute for the
+universal mathematical argument. No Lean formalization is claimed.

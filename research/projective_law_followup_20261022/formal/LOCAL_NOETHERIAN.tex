@@ -1,0 +1,40 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,landscape,margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,hyperref}
+\title{Local Noetherianity of the actual weighted-Proj curve}
+\author{Formal proof packet}
+\date{28 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet reports checked statements and open proof obligations. It makes no DLP trial, cost, or attack claim. The curve is $X=\operatorname{Proj}(\mathrm{degreeSubmodule}(a_3,a_2,a_1,a_0))$ over a field $K$.
+
+\section*{Checked declarations}
+\begin{itemize}
+\item The actual infinity-chart ring and affine-chart ring are Noetherian. Each is a quotient of a two-variable polynomial ring over $K$.
+\item Their scheme isomorphisms transport local Noetherianity to the two actual basic opens. The existing two-open cover then proves $\mathrm{IsLocallyNoetherian}(X)$ for every field and coefficient tuple, without a separability hypothesis.
+\item Pinned Lean 4.34.1 printed only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound} for the three new declarations. The source and direct compiler receipt are retained beside this report.
+\end{itemize}
+
+\section*{Scope boundary}
+The earlier whole-curve integrality theorem separately assumes separability of the quintic. Together these two results supply Mathlib's typeclass prerequisites for order-of-vanishing machinery, but this packet does not identify every closed support point as coheight one, allocate orders of the source function, prove finite support or an infinity pole, construct a principal divisor, prove a Picard-class equality, or link the proof to compiled Rust. The accompanying CSV marks each step individually.
+
+\clearpage
+\section*{Dependency diagram}
+\noindent Blue in the accompanying SVG denotes checked declarations; gray denotes open proof gates. The diagram below records dependencies, not measured performance.
+\begin{center}
+\setlength{\unitlength}{1mm}
+\begin{picture}(240,125)
+\put(2,80){\framebox(67,25){Infinity chart Noetherian}}
+\put(2,30){\framebox(67,25){Affine chart Noetherian}}
+\put(86,55){\framebox(67,25){Whole curve locally Noetherian}}
+\put(174,80){\framebox(65,25){Closed-point orders: open}}
+\put(174,30){\framebox(65,25){Principal divisor / Pic$^0$: open}}
+\put(69,92){\vector(2,-1){17}}
+\put(69,42){\vector(2,1){17}}
+\put(153,67){\vector(2,1){21}}
+\put(206,80){\vector(0,-1){25}}
+\put(2,8){\makebox(235,12)[l]{Existing chart isomorphisms and two-open cover are used; the global divisor and runtime bridge remain open.}}
+\end{picture}
+\end{center}
+\end{document}

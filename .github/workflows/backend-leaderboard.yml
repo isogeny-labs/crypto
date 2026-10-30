@@ -14,12 +14,13 @@ permissions:
 
 jobs:
   current:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|backend-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|backend-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
+          fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /.gitignore
@@ -33,12 +34,27 @@ jobs:
             /docs/backend-leaderboard/
             /docs/ecbench/BACKEND_REPRODUCTION.md
             /tools/artifacts/
+            /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/backend-leaderboard
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.99.1'
@@ -55,9 +71,7 @@ jobs:
           cargo +1.99.1 fmt --manifest-path tools/backend-leaderboard/Cargo.toml --check
           cargo +1.99.1 test --locked --manifest-path tools/backend-leaderboard/Cargo.toml
           cargo +1.99.1 clippy --locked --manifest-path tools/backend-leaderboard/Cargo.toml --all-targets -- -D warnings
-      - name: All generated views match their sealed sources
+      - name: Frozen report matches its reviewed source snapshot and sealed outputs
         run: |
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- --check
-          lock_sha=$(sha256sum docs/backend-leaderboard/reproduction.lock.json | cut -d ' ' -f 1)
-          cargo +1.99.1 run --locked --manifest-path tools/backend-leaderboard/Cargo.toml -- reproduce --expected-lock-sha256 "$lock_sha" > /tmp/backend-reproduction.json
-          cat /tmp/backend-reproduction.json
+          python3 tools/backend-leaderboard/test_check_frozen_report.py
+          python3 tools/backend-leaderboard/check_frozen_report.py

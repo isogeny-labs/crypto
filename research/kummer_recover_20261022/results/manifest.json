@@ -1,0 +1,19 @@
+{
+  "schema": "kummer-recover-manifest/v1",
+  "study_id": "KUMMER-RECOVER-20261022",
+  "protocol_frozen_before_run": "PROTOCOL.md",
+  "target_input": "research/kummer_coordinates_20261022/results/target-gate-{16,20,24,28,32,36,40}.jsonl",
+  "theta_input": "research/kummer_theta_20261022/results/theta-models.jsonl",
+  "theta_input_sha256": "b76424d8195335452c679c69b7c759a22e5721ce4811ff005304a61ab5bbab87",
+  "zero_input": "research/kummer_coordinates_20261022/results/coordinate-exceptions.jsonl",
+  "zero_input_sha256": "90d0762ae23346d982168f0bde85cf1f367ad09bebe723c646ee0f8cc8d81a6e",
+  "producer_commands": ["research/kummer_recover_20261022/target/release/kummer-recover-gate", "research/kummer_recover_20261022/target/release/recover"],
+  "validator_command": "python3 research/kummer_recover_20261022/validate.py",
+  "target_files": "results/recover-target-{16,20,24,28,32,36,40}.jsonl",
+  "literal_failure_files": "results/literal-recover-failures/recover-target-{16,20,24,28,32,36,40}.jsonl",
+  "zero_file": "results/zero-shift.jsonl",
+  "aggregate": "results/summary.json",
+  "pdf": "RECOVER_GATE.pdf",
+  "graph": ["recover-cohort.svg", "recover-cohort.png"],
+  "cost_status": "unmeasured; candidate/rho cost fields null"
+}

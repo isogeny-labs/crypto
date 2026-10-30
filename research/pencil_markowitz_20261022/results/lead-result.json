@@ -1,0 +1,51 @@
+{
+  "cohort": {
+    "models": 21,
+    "source_verified_distinct_targets": 543,
+    "still_open": 717,
+    "target_count": 1260,
+    "targets_per_model": 60
+  },
+  "id": "point_driven_pencil_exact_sparse_pivot",
+  "native_validation": {
+    "nonwall_rows_checked": 124,
+    "null_candidate_price_cells": 36,
+    "price_cells_checked": 4320,
+    "source_scalars_checked": 241,
+    "status": "pass"
+  },
+  "p186379_target0": {
+    "candidate_over_rho": null,
+    "candidate_source_verified": false,
+    "failure": "sparse_matrix_cap",
+    "independent_process_replay": true,
+    "process_status": "complete",
+    "raw_rows": 2,
+    "rho_source_verified": true
+  },
+  "p739_repeated_gate": {
+    "candidate_source_verified": 60,
+    "independent_replay": true,
+    "markowitz_over_peel": 1.204855074770064,
+    "markowitz_over_peel_max": 1.2489518243235935,
+    "markowitz_over_peel_min": 1.0,
+    "markowitz_over_rho": 13.99482210594926,
+    "peel_over_rho": 11.61535723175673,
+    "price_cells": 36,
+    "price_cells_below_peel": 0,
+    "price_cells_below_rho": 0,
+    "rho_source_verified": 60,
+    "targets": 60
+  },
+  "paired_price_grid": "results/p739-markowitz-vs-peel.csv",
+  "price_cell": {
+    "inverse_per_multiply": 10,
+    "native_GAE_per_logical": 0.1,
+    "square_per_multiply": 0.5
+  },
+  "price_grid": "results/price-grid.csv",
+  "raw": "results/p739-markowitz.jsonl",
+  "schema": "pencil-markowitz-review-record/v1",
+  "status": "partial",
+  "upper_raw": "results/p186379-markowitz-t0.jsonl"
+}

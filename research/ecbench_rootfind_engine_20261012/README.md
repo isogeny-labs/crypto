@@ -24,7 +24,8 @@ finder. No security claim; no ECC2K-130 inference.
 |---|---|---:|---|---|
 | [`sessions/smoke-koblitz`](sessions/smoke-koblitz) | `ECBS1hd86e5cfc2b77` | 42/42 verified | OK | `1cb597b686e68d783c8c370806686740ef316e862ebd191b6482470f2605c2b5` |
 | [`sessions/smoke-prime`](sessions/smoke-prime) | `ECBS1hb8f2623c82e2` | 36/36 verified | OK | `bfb3f0207a2ae4f57ee8e176bd3cd05e44b8eb0d108340f70d4323e647188a1f` |
-| [`sessions/claim-n13`](sessions/claim-n13) | `ECBS1hfd5bf1885227` | 224/224 verified | OK, 168/168 replays identical | `8e6a76596041d9a182e2584b9844ecf4846d827e32fbb1c9e3bd3d68e36a19ae` |
+| [`sessions/claim-n13`](sessions/claim-n13) | `ECBS1hfd5bf1885227` | 224/224 verified | OK at `2245b75`, 168/168 replays identical; **pre-#2043**: replayable only by its recording binary (lazy inherited-F4 charge) | `8e6a76596041d9a182e2584b9844ecf4846d827e32fbb1c9e3bd3d68e36a19ae` |
+| [`sessions/claim-n13-v2`](sessions/claim-n13-v2) | `ECBS1h396db1437f4a` | 224/224 verified | OK on `main` `2b9f3f72f`, 168/168 replays identical, run twice; accounting version 2 | `59e7e2bf46ffaa1716e069e1a400d0f77e5bff43b87b0729b4e7f902d76e3bac` |
 | [`sessions/panel-prime`](sessions/panel-prime) | `ECBS1h045961daac5c` | 768/768 verified | OK, 576/576 replays identical | `19d4aba584a99a48c46fd7b70262d31972a6d11770771826e2c5ac10a49d74ce` |
 | [`sessions/claim-n19`](sessions/claim-n19) | `ECBS1h52e3269d5dab` | 224/224 verified | OK, 168/168 replays identical | `f3a3105be311cee69d7c2328a283a3c7632739136d832fd86d9de6e30998136d` |
 
@@ -57,6 +58,16 @@ Full `ecbench table` output: [`tables/`](tables/). Headline cells:
 (complete count over a lower bound). Descriptive solve-wall sums over the
 24 measured runs: F4-m3 5.70 s vs rootfind-m3 0.13 s (~43×); F4-m2 0.45 s
 vs rootfind-m2 0.12 s (~3.6×). Not admitted (L0).
+
+**Re-recorded under accounting version 2 (`claim-n13-v2`, 2026-10-28).** The owner made
+the eager inherited-F4 charge (post-#2043, version 2) the method identity, so the table above
+is pre-#2043. The same spec on `main` gives identical rho and root-finder S. The inherited-F4
+arms are now complete counts rather than lower bounds: `ic-f4-m3` 534.859 [476.5, 600.4]
+(37.9× strong rho), `ic-f4-m2` 35.758 [30.5, 41.9] (2.53×). That is an accounting change, not a
+regression. With both engines complete, `ic-rootfind / ic-f4` ops is 0.0726 (m3) and 0.7938 (m2),
+but the §5a band (0, 0.1 and 1 GAE per unpriced operation) is unresolved for both pairs, so
+neither engine ranks above the other. Report, graph and PDF:
+[`reports/run-20261028T0403Z/`](reports/run-20261028T0403Z/REPORT.md).
 
 Smoke Koblitz: `ic-rootfind-m2 / ic-mitm-m2` ops = **1.000** [1.000, 1.000]
 (identical `S` and query stream).

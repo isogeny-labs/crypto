@@ -178,6 +178,44 @@ static void toy_solve(){
  }
 }
 
+/* Check scalar replay after every phase, including cycle-detection/seek
+ * iterations that do not increment a DP's logical step count. */
+static void toy_replay(){
+ using C=CurveToy; using H=RhoHost<C>; using F=SmallField;
+ auto G=toyG(),Q=toyQ(); Zn zn(ToyMod::N);
+ rho_params prm{};prm.r_bits=8;prm.fold=RHO_FOLD_NEG;prm.order_bits=21;
+ prm.table_seed=31415;prm.walk_seed=20261027;
+ auto table=H::build_table(G,Q,prm,zn);std::vector<nap<F>> t;
+ for(const auto&e:table)t.push_back(e.P);
+ uint32_t restart=0;H::Walk w;H::seed(w,0,restart,G,Q,prm,zn);
+ int subtracts=0,escapes=0,skipped=0;
+ for(int it=0;it<4000;it++){
+  F::elt den;uint32_t j;int mode=rho_phase_a<C>(w.st,t.data(),prm,den,j);
+  if(mode==RHO_MODE_INF){restart++;H::seed(w,0,restart,G,Q,prm,zn);continue;}
+  int aut;int status=rho_phase_b<C>(w.st,t.data(),prm,mode,j,F::inv(den),&aut);
+  if(mode==RHO_MODE_ESCAPE){w.a=zn.add(w.a,w.a);w.b=zn.add(w.b,w.b);escapes++;}
+  else if(aut&RHO_AUT_MINUS){w.a=zn.sub(w.a,table[j].c);w.b=zn.sub(w.b,table[j].d);subtracts++;}
+  else {w.a=zn.add(w.a,table[j].c);w.b=zn.add(w.b,table[j].d);}
+  if(aut&1){w.a=zn.neg(w.a);w.b=zn.neg(w.b);}
+  skipped+=status!=RHO_STEP_ADVANCED;
+  uint32_t a=(uint32_t)w.a,b=(uint32_t)w.b;
+  auto check=C::double_scalar_mul(G,&a,Q,&b,21);
+  CHECK(pteq<C>(check,w.st.P),"per-phase scalar replay");
+ }
+ CHECK(escapes>0&&skipped>0,"replay covers cycle escapes/seeks");
+ CHECK(!RHO_BEST2||subtracts>0,"replay covers subtraction");
+ // Force the first start to O; the restart recorded by host and device
+ // must both name the subsequent non-infinite start.
+ uint32_t a,b;rho_walk_seed<1>(0,0,&a,&b,21,prm.walk_seed);
+ uint32_t k=(uint32_t)zn.mul(zn.neg(a),zn.inv(b));
+ auto specialQ=C::scalar_mul(G,&k,21);
+ uint32_t host_restart=0;H::seed(w,0,host_restart,G,specialQ,prm,zn);
+ uint32_t device_restart=0;rho_ctx<C> ctx{};ctx.G=G;ctx.Q=specialQ;ctx.prm=prm;ctx.restarts=&device_restart;
+ rho_state<C> st;rho_seed_walk<C>(ctx,0,st);
+ CHECK(host_restart>0&&host_restart==device_restart&&pteq<C>(w.st.P,st.P),"infinity restart replay identity");
+ std::cout<<"per-phase scalar replay: subtraction="<<subtracts<<" escapes="<<escapes<<" skipped="<<skipped<<"; infinity restart retained\n";
+}
+
 static int toy_on_curve(const nap<SmallField>&P){
  if(P.inf) return 1;
  auto x=P.x,y=P.y; uint32_t av=ToyMod::A,bv=ToyMod::B;
@@ -254,6 +292,7 @@ static void batch_step_w_equiv_test(){
   cmp(8,[&](auto&c,uint32_t t,auto,auto){rho_batch_step_w<CurveToy,8>(c,t);});
   cmp(16,[&](auto&c,uint32_t t,auto,auto){rho_batch_step_w<CurveToy,16>(c,t);});
   cmp(32,[&](auto&c,uint32_t t,auto,auto){rho_batch_step_w<CurveToy,32>(c,t);});
+  cmp(64,[&](auto&c,uint32_t t,auto,auto){rho_batch_step_w<CurveToy,64>(c,t);});
   CHECK(same==tot,"compile-time-W stepper matches generic stepper bit-for-bit");
   std::cout<<"batch step W-variant equivalence: "<<same<<"/"<<tot<<" identical\n";
   /* batch_inv_w (array references, unrolled) against batch_inv (pointers). */
@@ -277,6 +316,7 @@ static void batch_step_w_equiv_test(){
    tryW(std::integral_constant<int,8>{});
    tryW(std::integral_constant<int,16>{});
    tryW(std::integral_constant<int,32>{});
+   tryW(std::integral_constant<int,64>{});
    CHECK(allok,"batch_inv_w matches batch_inv");
   }
 }
@@ -301,6 +341,6 @@ int main(){
  group_test<CurveP256>("P-256",P256X,P256Y); group_test<CurveP384>("P-384",P384X,P384Y);
  fold_test<CurveP256>("P-256",gen<CurveP256>(P256X,P256Y)); fold_test<CurveP384>("P-384",gen<CurveP384>(P384X,P384Y));
  step_test<CurveP256>("P-256",gen<CurveP256>(P256X,P256Y)); step_test<CurveP384>("P-384",gen<CurveP384>(P384X,P384Y));
- toy_sanity(); batch_step_test(); batch_step_w_equiv_test(); toy_solve();
+ toy_sanity(); batch_step_test(); batch_step_w_equiv_test(); toy_solve(); toy_replay();
  if(fails){std::cerr<<fails<<" failures\n";return 1;} std::cout<<"ALL PASSED\n"; return 0;
 }

@@ -1,0 +1,50 @@
+{
+  "schema": "three-leads.main-backlog-repair/v1",
+  "tested_revision": "1641cce39a7a113f18bb984af8246e9e4cd32f1b",
+  "imported_main": "3eb078b089609389b0af0a07cb04330f6a79d281",
+  "imported_pr": "https://github.com/aburan28/crypto/pull/2255",
+  "conductor_check": "Attempted before merge; local coordinator refused the connection. Imported merge only touches the six backlog metadata paths; no known dashboard reservation overlap.",
+  "all_cards": {
+    "command": "target/release/backlog --root . validate --all --merged-into origin/main",
+    "exit_code": 0,
+    "valid_cards": 20,
+    "log": "all-cards-merged-main.log"
+  },
+  "pinned_tests": {
+    "command": "PATH=<isolated-cairn9>/bin:$PATH BACKLOG_REQUIRE_CAIRN=1 cargo test --release --bin backlog --bin backlog_check_aux2t --test backlog_cli -- --nocapture",
+    "cairn_revision": "b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54",
+    "cairn_version": "9.1.0",
+    "exit_code": 101,
+    "unit_results": [
+      {
+        "passed": 16,
+        "failed": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0
+      }
+    ],
+    "integration_results": {
+      "passed": 14,
+      "failed": 1,
+      "ignored": 0
+    },
+    "failing_test": "concurrent_claims_resolve_to_one_holder_after_sync",
+    "failure_location": "tests/backlog_cli.rs:401",
+    "failure": "Expected the never-claimed shard-1 status row; output only contains shard-0.",
+    "same_failure_in_prior_ci": "https://github.com/aburan28/crypto/actions/runs/39197463012/job/117883214098",
+    "unchanged_test_git_blob": "5c8fdcc2f2a74d1802172815e09624d53c46c20d",
+    "log": "tests-with-pinned-cairn9.log.gz"
+  },
+  "unsupported_environment_attempt": {
+    "cairn_version": "12.1.0",
+    "integration_passed": 9,
+    "integration_failed": 6,
+    "exit_code": 101,
+    "reason": "The native backlog CLI rejects versions outside 8.0.0 <= v < 10.0.0.",
+    "log": "tests-with-unsupported-cairn12.log.gz"
+  },
+  "scope": "Only main backlog metadata and new validation receipts changed after 6d352b48. Rust source, tests, build files and original numerical observations are unchanged.",
+  "limits": "The inherited lab failure remains a merge blocker. Local validation is not a successful GitHub CI verdict."
+}

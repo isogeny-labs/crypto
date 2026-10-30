@@ -1,0 +1,228 @@
+{
+  "schema": "fall-degree-proof-map/v1",
+  "verification_date": "2026-10-29",
+  "formalization_status": "partial: algebraic identities and local conditional dependencies only; no complete degree theorem",
+  "toolchain": "leanprover/lean4:v4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "source": "FallDegreeIdentities.lean",
+  "verified": [
+    {
+      "declaration": "FallDegreeIdentities.quadratic_resultant_bezout",
+      "hypotheses": "R is a commutative ring; A,B,C,D,u are arbitrary elements",
+      "claim": "explicit scalar quadratic-resultant expression has the displayed Bezout identity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.common_root_implies_resultant_zero",
+      "hypotheses": "R is a commutative ring; u^2+A*u+B=0 and u^2+C*u+D=0",
+      "claim": "the explicit scalar resultant expression is zero",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_linear_remainder",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the odd construction cancels u^2 and yields its displayed linear remainder",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_resultant_cancellation",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the staged scalar-cancellation expression equals minus two times the resultant expression",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_full_construction",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the unreduced full odd expression equals minus two times the resultant expression",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.inverse_guard_divided_difference",
+      "hypotheses": "R is a commutative ring and gx-gy=d*q",
+      "claim": "v*(gx-gy)-q*(v*d-1)=q",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.cubic_missing_root",
+      "hypotheses": "R is a commutative ring; cubic coefficients and x,y arbitrary",
+      "claim": "the exact missing-root cubic identity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_integer_lift",
+      "hypotheses": "R is any commutative ring; no characteristic assumption",
+      "claim": "the characteristic-two construction equals its scalar expression plus the explicit integer multiple 2*(E^2*u^2+A*E^2*u+E*J*u), where E=A+C and J=B+D",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_square_sum",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "(A+C)^2=A^2+C^2",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.binary_s3_as_quadratic",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the binary S3 expression collects as the specified quadratic in u",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_cancellation",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the displayed characteristic-two cancellation equals the scalar resultant expression",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_agrees",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the subtraction and addition versions of the scalar resultant expression agree",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "PrimeBitLocal.quadratic_linear_cancellation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "H(u)-u*(u-alpha)-(A+alpha)*(u-alpha)=alpha^2+A*alpha+B",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The explicit odd S3(t,t,u) formula is linear in u with the stated cubic coefficient and constant term",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.diagonal_constant_relation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The diagonal constant equals (3*t^2+a)^2-8*t*(t^3+a*t+b)",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0",
+      "claim": "S3(t,t,u)=(3*t^2+a)^2",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.derivative_ne_zero_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "3*t^2+a != 0",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal_ne_zero",
+      "hypotheses": "Field; cubic root with explicitly nonzero derivative",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal_ne_zero_of_discriminant",
+      "hypotheses": "Field; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.normalized_quadratic_linear_refutation",
+      "hypotheses": "Field; alpha^2+A*alpha+B != 0",
+      "claim": "Multiplying the quadratic-linear cancellation by the evaluation's inverse yields one",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    }
+  ],
+  "not_formalized": [
+    "The V_(F,D) definition and the filtered-closure derivation rules.",
+    "Degree-preserving monic division, staged normalization, and every intermediate total-degree bound.",
+    "The bridge from the explicit scalar expression to Mathlib.Polynomial.resultant.",
+    "The converse zero-resultant-to-common-root implication over an algebraic closure.",
+    "The scalar-grid quotient, interpolation, and invertibility argument.",
+    "The elliptic-curve rational-lift and compatible-sign interpretation.",
+    "The uniform degree-four obstruction and the exact last-fall/first-fall theorems.",
+    "Growing-factor-base and characteristic-two last-fall upper bounds.",
+    "The fully Boolean one-auxiliary upper bound: support-aware assignment localization, affine-system inconsistency certificates, and the 3*ell+1 cap.",
+    "Standard large-curve parameter provenance, affine group arithmetic, and the public small-multiple UNSAT witnesses.",
+    "The complete prime-field bit-restricted upper theorem: support-aware localization, rational roots, auxiliary encoding, and the 3*ell+2 cap."
+  ],
+  "forbidden_proof_shortcuts": "No sorry, admit, custom axiom, native_decide, or kernel bypass is used.",
+  "logs": {
+    "direct_compile": "compile.log",
+    "lake_build": "build.log",
+    "fresh_recheck": "fresh-check.log",
+    "additional_local_module": {
+      "lake_build": "prime-bit-build.log",
+      "fresh_recheck": "prime-bit-fresh-check.log"
+    }
+  },
+  "additional_sources": [
+    {
+      "source": "PrimeBitLocal.lean",
+      "sha256": "d93729a96a0e92c5ad381980ff6ed0d0ba1219f14e13beb24e9addb61a7bfb01",
+      "receipt": "prime-bit-verification.json",
+      "checked_theorems": 8
+    }
+  ]
+}

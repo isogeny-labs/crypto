@@ -1,0 +1,32 @@
+{
+  "source_b": "0x7338f",
+  "degree": 3,
+  "map": {
+    "D": "x+q",
+    "A": "1+q/D^2",
+    "x_image": "x*A",
+    "y_image": "y*A+q*x^2/D^3+q^3/D^2+q",
+    "target_b": "b+q+q^2"
+  },
+  "maps": [
+    {
+      "kernel_x_hex": "0x165834955535b363895b67b666a6d1283bb2a0c",
+      "target_b_hex": "0x4db9c0ccb886ba025a08f134fdb9b972ae07aea",
+      "target_j_hex": "0x73cf89cbe7553a1fa96bfcc96b53284e5e98e1f",
+      "rational_function_identity": "exactly verified",
+      "group_law_point_checks": 8,
+      "target_order_annihilation_checks": 8
+    },
+    {
+      "kernel_x_hex": "0x7c7b6c361b7090c4c7bd181479cbaf4af774a30",
+      "target_b_hex": "0x466dcc2d4744f2f4e838d5e9eb9b0a6a166d101",
+      "target_j_hex": "0x37e2c60ac18d32aa6b98dd2bca7ffec9200439b",
+      "rational_function_identity": "exactly verified",
+      "group_law_point_checks": 8,
+      "target_order_annihilation_checks": 8
+    }
+  ],
+  "candidate_a0_models_order_checked": 41,
+  "order_check_scope": "sample-point annihilation, not independent point counting",
+  "all_checks_passed": true
+}

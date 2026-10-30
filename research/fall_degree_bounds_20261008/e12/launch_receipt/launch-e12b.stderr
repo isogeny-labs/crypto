@@ -1,0 +1,4 @@
+ephemeral: job 20261027-145158-fd-e12b-ell-20261027-c48268
+ephemeral:   m7a.4xlarge spot i-0d26404168552b54c (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 24h (terminates by 2026-10-28T14:52:00Z)
+ephemeral:   command: set -euo pipefail; mkdir -p "$HOME/fdsrc"; cd "$HOME/fdsrc"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo "4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >"$EPHEMERAL_OUT/source_commit"; LEAN=1 KEEP=4 CMAX=4 research/fall_degree_bounds_20261008/e12/run_par.sh "$EPHEMERAL_OUT" 3:30:4 3:27:5 3:24:6 3:24:7
+ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-145158-fd-e12b-ell-20261027-c48268/

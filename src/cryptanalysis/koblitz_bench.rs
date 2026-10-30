@@ -1333,6 +1333,98 @@ pub fn chained_solution_count(
     count
 }
 
+/// [`chained_solution_count`] with each link solved by one Artin–Schreier
+/// lookup instead of a scan of `F_{2^n}`, as
+/// [`chained_s3_solution_count_fast`] does at `m = 3`: about
+/// `2^{(m−1)ℓ + m − 2}·n` field operations instead of `2^{(m−1)ℓ + n + m − 2}`.
+/// Exactly the same count (`fast_chained_count_matches_the_reference`); `b`
+/// must be non-zero.
+pub fn chained_solution_count_fast(
+    m: usize,
+    basis: &[F2mElement],
+    x_r: &F2mElement,
+    b: &F2mElement,
+    irr: &crate::binary_ecc::IrreduciblePoly,
+) -> u64 {
+    use crate::cryptanalysis::ic_boundary::ArtinSchreier;
+    use crate::cryptanalysis::semaev_decomp::Gf2;
+    assert!(m >= 3, "a chained system needs m >= 3");
+    let gf = Gf2::new(irr);
+    let ash = ArtinSchreier::new(&gf);
+    let n = irr.degree;
+    let word = |e: &F2mElement| e.raw_bits().first().copied().unwrap_or(0);
+    let words: Vec<u64> = basis.iter().map(word).collect();
+    let (xr, bb) = (word(x_r), word(b));
+    assert!(bb != 0, "b = 0 is not an elliptic curve");
+    let mut ech: Vec<u64> = Vec::new();
+    for &w in &words {
+        let mut v = w;
+        for &e in &ech {
+            v = v.min(v ^ e);
+        }
+        if v != 0 {
+            ech.push(v);
+            ech.sort_unstable_by(|a, b| b.cmp(a));
+        }
+    }
+    let in_span = |x: u64| ech.iter().fold(x, |v, &e| v.min(v ^ e)) == 0;
+    let span: Vec<u64> = (0..1u64 << words.len())
+        .map(|c| {
+            (0..words.len())
+                .filter(|t| (c >> t) & 1 == 1)
+                .fold(0, |acc, t| acc ^ words[t])
+        })
+        .collect();
+    // Every c with S₃(a, c, d) = (a+d)²c² + (ad)c + (ad)² + b = 0, at most two.
+    let roots = |a: u64, d: u64| -> ([u64; 2], usize) {
+        let (lead, mid) = (gf.sqr(a ^ d), gf.mul(a, d));
+        let tail = gf.sqr(mid) ^ bb;
+        if lead == 0 {
+            return if mid == 0 {
+                ([0, 0], 0)
+            } else {
+                ([gf.mul(tail, gf.inv(mid)), 0], 1)
+            };
+        }
+        if mid == 0 {
+            return ([gf.sqr_k(gf.mul(tail, gf.inv(lead)), n - 1), 0], 1);
+        }
+        let scale = gf.mul(mid, gf.inv(lead));
+        let rhs = gf.mul(gf.mul(tail, lead), gf.inv(gf.sqr(mid)));
+        match ash.solve(rhs) {
+            Some(z) => ([gf.mul(scale, z), gf.mul(scale, z ^ 1)], 2),
+            None => ([0, 0], 0),
+        }
+    };
+    // Intermediate points after the first link, with multiplicity.
+    let mut frontier: Vec<u64> = Vec::new();
+    for &x1 in &span {
+        for &x2 in &span {
+            let (es, k) = roots(x1, x2);
+            frontier.extend_from_slice(&es[..k]);
+        }
+    }
+    // Middle links S₃(e_i, x_{i+2}, e_{i+1}), each a quadratic in e_{i+1}.
+    for _ in 0..m - 3 {
+        let mut next = Vec::new();
+        for &e in &frontier {
+            for &x in &span {
+                let (es, k) = roots(e, x);
+                next.extend_from_slice(&es[..k]);
+            }
+        }
+        frontier = next;
+    }
+    // Closing link S₃(e_{m−2}, x_m, x_R): x_m is a root that lies in span.
+    frontier
+        .iter()
+        .map(|&e| {
+            let (xs, k) = roots(e, xr);
+            xs[..k].iter().filter(|&&x| in_span(x)).count() as u64
+        })
+        .sum()
+}
+
 /// The semi-regular degree of regularity over F₂ with the field equations:
 /// the index of the first non-positive coefficient of
 /// `(1+z)^N / ∏(1+z^{d_i})` (Bardet, Faugère, Salvy and Yang), for `N =
@@ -2233,6 +2325,44 @@ mod tests {
             sat > 0 && unsat > 0,
             "both kinds of draw exercised: {sat} sat, {unsat} unsat"
         );
+    }
+
+    /// The Artin–Schreier chain walk counts exactly what the scan counts.
+    #[test]
+    fn fast_chained_count_matches_the_reference() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        let mut rng = StdRng::seed_from_u64(0xFA57_C4A1);
+        let (mut sat, mut unsat) = (0usize, 0usize);
+        for (m, n, ell) in [
+            (3usize, 5u32, 2usize),
+            (3, 7, 3),
+            (4, 5, 1),
+            (4, 6, 2),
+            (4, 7, 2),
+            (5, 6, 1),
+            (5, 6, 2),
+            (6, 5, 1),
+        ] {
+            let irr = find_irreducible_sparse(n).unwrap();
+            for t in 0..8 {
+                let bw = if t % 2 == 0 {
+                    1
+                } else {
+                    (rng.gen::<u64>() & ((1u64 << n) - 1)) | 2
+                };
+                let b = F2mElement::from_biguint(&BigUint::from(bw), n);
+                let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+                let slow = chained_solution_count(m, &basis, &x_r, &b, &irr);
+                let fast = chained_solution_count_fast(m, &basis, &x_r, &b, &irr);
+                assert_eq!(fast, slow, "m={m} n={n} ℓ={ell} b={bw:#x}");
+                if slow == 0 {
+                    unsat += 1
+                } else {
+                    sat += 1
+                }
+            }
+        }
+        assert!(sat > 0 && unsat > 0, "{sat} sat, {unsat} unsat");
     }
 
     /// At `m = 3` the general chained count is the `S₃` count it generalises.

@@ -1,0 +1,340 @@
+{
+  "experiment": "E6-genus2-gluing",
+  "preregistration": "PREREGISTRATION.md",
+  "outcome": "prediction_confirmed (all numeric predictions P1-P8 held; no falsifier F1-F6 triggered; H5 'no gain' is model-derived, not measured)",
+  "driver": "run.sh (controls first, then main runs, then summary); raw outputs out/main_p*.txt, out/ctrl_p*.txt, out/summary.txt, out/totals.txt, out/rc.txt",
+  "totals_over_all_p": {
+    "curves_total": 221,
+    "stageA_all_ok": 221,
+    "B0_n": 221,
+    "B0_ok": 221,
+    "B1_identity_nosol": 221,
+    "B1_g2zero": 0,
+    "B1_singular": 0,
+    "B1_sextic_not_squarefree": 0,
+    "C_target_records": 580,
+    "match_target": 580,
+    "nJ_eq_prod": 580,
+    "quotients_ok": 580,
+    "nE_div_nJ": 580,
+    "ident_ok": 580,
+    "C_control_records": 580,
+    "match_control": 580,
+    "control_nJ_eq_prod": 11,
+    "control_nJ_eq_prod_all_have_t0": true,
+    "brute_force_records": 112,
+    "brute_eq_pari": 112,
+    "N1_eq_p_plus_1_target_records": "56 of 56",
+    "wilson95_lower_bound_for_all_pass": {
+      "n=221": 0.98291,
+      "n=580": 0.99342,
+      "n=56": 0.93581,
+      "n=112": 0.96684
+    }
+  },
+  "per_p": {
+    "101": {
+      "curves": 56,
+      "target_records": 140,
+      "control_records": 140,
+      "brute_records": 64,
+      "ctie_full_min": 0.11373,
+      "ctie_full_med": 0.12471,
+      "ctie_full_max": 0.13593,
+      "bound_full": 0.13712,
+      "ctie_med": 0.041156,
+      "nJ_over_p2_min": 0.98814,
+      "nJ_over_p2_max": 1.0199,
+      "note": "N=20 per pattern unattainable for [1,1,1] (16 distinct j); process hit 900 s timeout (rc=124) after printing all 56 curves"
+    },
+    "211": {
+      "curves": 60,
+      "target_records": 160,
+      "control_records": 160,
+      "brute_records": 48,
+      "ctie_full_min": 0.080791,
+      "ctie_full_med": 0.086486,
+      "ctie_full_max": 0.092020,
+      "bound_full": 0.092222,
+      "ctie_med": 0.024491,
+      "nJ_over_p2_min": 0.99189,
+      "nJ_over_p2_max": 1.0095
+    },
+    "409": {
+      "curves": 45,
+      "target_records": 120,
+      "control_records": 120,
+      "brute_records": 0,
+      "ctie_full_min": 0.058944,
+      "ctie_full_med": 0.062500,
+      "ctie_full_max": 0.064860,
+      "bound_full": 0.065037,
+      "ctie_med": 0.016502,
+      "nJ_over_p2_min": 0.99533,
+      "nJ_over_p2_max": 1.0049
+    },
+    "1009": {
+      "curves": 30,
+      "target_records": 80,
+      "control_records": 80,
+      "brute_records": 0,
+      "ctie_full_min": 0.038366,
+      "ctie_full_med": 0.039181,
+      "ctie_full_max": 0.040536,
+      "bound_full": 0.040698,
+      "ctie_med": 0.0079535,
+      "nJ_over_p2_min": 0.99890,
+      "nJ_over_p2_max": 1.0020
+    },
+    "4001": {
+      "curves": 15,
+      "target_records": 40,
+      "control_records": 40,
+      "brute_records": 0,
+      "ctie_full_min": 0.019692,
+      "ctie_full_med": 0.019812,
+      "ctie_full_max": 0.020104,
+      "bound_full": 0.020127,
+      "ctie_med": 0.0025641,
+      "nJ_over_p2_min": 0.99964,
+      "nJ_over_p2_max": 1.00050
+    },
+    "10007": {
+      "curves": 12,
+      "target_records": 32,
+      "control_records": 32,
+      "brute_records": 0,
+      "ctie_full_min": 0.012421,
+      "ctie_full_med": 0.012508,
+      "ctie_full_max": 0.012650,
+      "bound_full": 0.012654,
+      "ctie_med": 0.0015288,
+      "nJ_over_p2_min": 0.99983,
+      "nJ_over_p2_max": 1.00019
+    },
+    "20011": {
+      "curves": 3,
+      "target_records": 8,
+      "control_records": 8,
+      "brute_records": 0,
+      "ctie_full_min": 0.0088272,
+      "ctie_full_med": 0.0088727,
+      "ctie_full_max": 0.0088888,
+      "bound_full": 0.0089225,
+      "ctie_med": 0.00086558,
+      "nJ_over_p2_min": 1.0000452,
+      "nJ_over_p2_max": 1.0000918
+    }
+  },
+  "slopes_log_median_vs_log_p": {
+    "ctie_full": -0.50050,
+    "ctie_largest_prime": -0.73605,
+    "n_primes": 7
+  },
+  "controls": {
+    "PC1_positive_hits": "1300 of 1300 (p=101,211,409,1009: 300 each; p=4001: 100); Wilson95 lower 0.99705 pooled",
+    "NC1_neggal_flagged_isomorphic": "0 of 1300 pairs; Wilson95 upper 0.0126 (n=300), 0.0370 (n=100)",
+    "NC2_null_hits": {
+      "101": "6/3000",
+      "211": "3/3000",
+      "409": "2/2000",
+      "1009": "0/1000",
+      "4001": "0/200"
+    },
+    "NC2_null_wilson95": {
+      "101": [
+        0.000917,
+        0.004357
+      ],
+      "211": [
+        0.000340,
+        0.002936
+      ],
+      "409": [
+        0.000274,
+        0.003639
+      ],
+      "1009": [
+        0.0,
+        0.003827
+      ],
+      "4001": [
+        0.0,
+        0.018845
+      ]
+    },
+    "NC3_identity_pi_nosolution": "221 of 221 curves (identity interpolant has g2=0)"
+  },
+  "deviations": [
+    "run.sh instead of run_all.sh and controls before main (order only)",
+    "p=101: [1,1,1] only 16 distinct j, 56 curves not 60, main run cut by timeout rc=124 after all records printed, no DONE line",
+    "p=20011: 3 curves (N=1/pattern) as registered",
+    "post-hoc scripts e6_totals.sh, e6_wilson.gp, e6_diag_p101.gp, plot_e6.py added; frozen scripts unchanged (sha256 verified)",
+    "run.sh v2 adds E6_REDUCED/E6_OUT/E6_POSTONLY modes and post-processing (v1 kept as run_v1.sh); e6_wilson.gp no longer prints the two n=0 error rows",
+    "operation counts and cross-checks added post hoc (read-only derived)"
+  ],
+  "operation_counts": {
+    "source": "out/opcounts.txt (derived by e6_opcounts.sh from out/main_p*.txt and out/ctrl_p*.txt; no new experiment)",
+    "primary_metric_note": "operation counts; wall time is secondary and contention-affected",
+    "not_counted": [
+      "field multiplications inside PARI (hyperellcharpoly, ellcard, factormod, matsolve)",
+      "F_{p^2} Legendre exponentiations",
+      "unlogged rejection-sampling attempts of sampleE"
+    ],
+    "group_operations_executed": 0,
+    "group_operations_note": "no Jacobian or elliptic group law is executed; group operations appear only as model counts (rho sqrt(pi*l/2), exponent-1 IC = p, constant 1), not measured",
+    "per_p": [
+      {
+        "p": 101,
+        "curves": 56,
+        "candidate_root_perm_tuples": 532,
+        "stageC_records": 280,
+        "brute_records": 64,
+        "poly_evals_Fp_deg3_stageC": 56560,
+        "poly_evals_Fp_deg6_brute": 6464,
+        "poly_evals_Fp2_deg6_brute": 652864,
+        "model_rho_ops_median_largest_prime": 4.15677,
+        "model_rho_ops_median_full_group": 12.5957,
+        "model_rho_ops_median_on_Jac": 127.222,
+        "model_IC_ops_exponent1": 101,
+        "model_ratio_IC_over_rho_full_median": 8.01864,
+        "model_ratio_IC_over_rho_largest_prime_median": 24.2977
+      },
+      {
+        "p": 211,
+        "curves": 60,
+        "candidate_root_perm_tuples": 580,
+        "stageC_records": 320,
+        "brute_records": 48,
+        "poly_evals_Fp_deg3_stageC": 135040,
+        "poly_evals_Fp_deg6_brute": 10128,
+        "poly_evals_Fp2_deg6_brute": 2137008,
+        "model_rho_ops_median_largest_prime": 5.16755,
+        "model_rho_ops_median_full_group": 18.2485,
+        "model_rho_ops_median_on_Jac": 265.277,
+        "model_IC_ops_exponent1": 211,
+        "model_ratio_IC_over_rho_full_median": 11.5626,
+        "model_ratio_IC_over_rho_largest_prime_median": 40.8318
+      },
+      {
+        "p": 409,
+        "curves": 45,
+        "candidate_root_perm_tuples": 435,
+        "stageC_records": 240,
+        "brute_records": 0,
+        "poly_evals_Fp_deg3_stageC": 196320,
+        "poly_evals_Fp_deg6_brute": 0,
+        "poly_evals_Fp2_deg6_brute": 0,
+        "model_rho_ops_median_largest_prime": 6.7493,
+        "model_rho_ops_median_full_group": 25.5627,
+        "model_rho_ops_median_on_Jac": 513.363,
+        "model_IC_ops_exponent1": 409,
+        "model_ratio_IC_over_rho_full_median": 15.9999,
+        "model_ratio_IC_over_rho_largest_prime_median": 60.5988
+      },
+      {
+        "p": 1009,
+        "curves": 30,
+        "candidate_root_perm_tuples": 290,
+        "stageC_records": 160,
+        "brute_records": 0,
+        "poly_evals_Fp_deg3_stageC": 322880,
+        "poly_evals_Fp_deg6_brute": 0,
+        "poly_evals_Fp2_deg6_brute": 0,
+        "model_rho_ops_median_largest_prime": 8.02513,
+        "model_rho_ops_median_full_group": 39.5341,
+        "model_rho_ops_median_on_Jac": 1265.43,
+        "model_IC_ops_exponent1": 1009,
+        "model_ratio_IC_over_rho_full_median": 25.5223,
+        "model_ratio_IC_over_rho_largest_prime_median": 125.73
+      },
+      {
+        "p": 4001,
+        "curves": 15,
+        "candidate_root_perm_tuples": 145,
+        "stageC_records": 80,
+        "brute_records": 0,
+        "poly_evals_Fp_deg3_stageC": 640160,
+        "poly_evals_Fp_deg6_brute": 0,
+        "poly_evals_Fp2_deg6_brute": 0,
+        "model_rho_ops_median_largest_prime": 10.2588,
+        "model_rho_ops_median_full_group": 79.2665,
+        "model_rho_ops_median_on_Jac": 5015.53,
+        "model_IC_ops_exponent1": 4001,
+        "model_ratio_IC_over_rho_full_median": 50.4753,
+        "model_ratio_IC_over_rho_largest_prime_median": 390.006
+      },
+      {
+        "p": 10007,
+        "curves": 12,
+        "candidate_root_perm_tuples": 116,
+        "stageC_records": 64,
+        "brute_records": 0,
+        "poly_evals_Fp_deg3_stageC": 1280896,
+        "poly_evals_Fp_deg6_brute": 0,
+        "poly_evals_Fp2_deg6_brute": 0,
+        "model_rho_ops_median_largest_prime": 15.2986,
+        "model_rho_ops_median_full_group": 125.168,
+        "model_rho_ops_median_on_Jac": 12542.5,
+        "model_IC_ops_exponent1": 10007,
+        "model_ratio_IC_over_rho_full_median": 79.9483,
+        "model_ratio_IC_over_rho_largest_prime_median": 654.11
+      },
+      {
+        "p": 20011,
+        "curves": 3,
+        "candidate_root_perm_tuples": 29,
+        "stageC_records": 16,
+        "brute_records": 0,
+        "poly_evals_Fp_deg3_stageC": 640352,
+        "poly_evals_Fp_deg6_brute": 0,
+        "poly_evals_Fp2_deg6_brute": 0,
+        "model_rho_ops_median_largest_prime": 17.3211,
+        "model_rho_ops_median_full_group": 177.551,
+        "model_rho_ops_median_on_Jac": 25080.8,
+        "model_IC_ops_exponent1": 20011,
+        "model_ratio_IC_over_rho_full_median": 112.706,
+        "model_ratio_IC_over_rho_largest_prime_median": 1155.29
+      }
+    ],
+    "totals": {
+      "curves": 221,
+      "candidate_root_perm_tuples": 2127,
+      "stageC_records": 1160,
+      "brute_records": 112,
+      "poly_evals_Fp_deg3_stageC": 3272208,
+      "poly_evals_Fp_deg6_brute": 16592,
+      "poly_evals_Fp2_deg6_brute": 2789872,
+      "hyperellcharpoly_calls_stageC": 1160,
+      "PC1_samples": 1300,
+      "PC1_hyperellcharpoly_calls": 1300,
+      "PC1_poly_evals_Fp_deg3": 1838200,
+      "NC1_pairs": 1300,
+      "NC2_accepted_charpolys": 9200,
+      "NC2_sampler_tries": 9240
+    }
+  },
+  "reproduction": {
+    "driver": "run.sh",
+    "full": "bash run.sh (~30 min wall under contention)",
+    "reduced": {
+      "cmd": "E6_REDUCED=1 E6_OUT=out_reduced bash run.sh",
+      "wall_seconds_contention_affected": 1611,
+      "curves": 105,
+      "raw_files_byte_identical_to_full": "9 of 9"
+    },
+    "quick": {
+      "cmd": "E6_REDUCED=2 E6_OUT=out_quick bash run.sh",
+      "wall_seconds_contention_affected": 334,
+      "curves": 90,
+      "raw_files_byte_identical_to_full": "7 of 7"
+    },
+    "rederive_only": "E6_POSTONLY=1 [E6_OUT=dir] bash run.sh"
+  },
+  "xchecks": {
+    "xcheck1_mu_scan_seed777": "100 curves (p=101,211,409,1009 x 25): count_mismatch=0, bad=0",
+    "xcheck2_distinct_j": "p=101: [34,49,16]; p=211: [70,105,34]",
+    "xcheck3_own_legendre_counts": "p=4001,10007,20011: 30 curves, all nE,nEt,t equal logged values"
+  },
+  "deviations_file": "DEVIATIONS.md"
+}

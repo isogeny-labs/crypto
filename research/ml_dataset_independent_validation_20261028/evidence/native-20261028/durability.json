@@ -1,0 +1,29 @@
+{
+  "schema": "ml-dataset.consumer-durability/v1",
+  "recorded_utc": "2026-10-28T07:04:00Z",
+  "verification": "Successful S3 GET, byte comparison against local original, and SHA-256 recomputation",
+  "objects": [
+    {
+      "uri": "s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/native-consumer/native-validation-20261028.tar.gz",
+      "bytes": 4600,
+      "sha256": "30cf225e430e2636215f847b939ae8ba422f7a39d408829999daa506a5f743e7",
+      "scope": "Native validation reports, source hashes, software publication receipt and test output; this durability record is added afterward"
+    },
+    {
+      "uri": "s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/native-consumer/binaries/ac486bb0062673d304ee4c03ea60cc4b8264f77e7969adfa19f8c5f84c6c245b/dataset-consumer",
+      "bytes": 1337016,
+      "sha256": "ac486bb0062673d304ee4c03ea60cc4b8264f77e7969adfa19f8c5f84c6c245b",
+      "scope": "Linux x86_64 native consumer release binary"
+    },
+    {
+      "uri": "s3://setec-astronomy-artifacts/research/ml-dataset/validation/20261028/native-consumer/superseded-python-arithmetic-draft.tar.gz",
+      "bytes": 27154,
+      "sha256": "5457479f629afc34b19baf573f69b2a4e5b6ccc53878f8df70dd19c538cf0a15",
+      "scope": "Superseded historical draft, not supported execution or native validation evidence"
+    }
+  ],
+  "controller_role_only": true,
+  "worker_role_verified": false,
+  "new_compute_workers": 0,
+  "retention_policy_changed": false
+}

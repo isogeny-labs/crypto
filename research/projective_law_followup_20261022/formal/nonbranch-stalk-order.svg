@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="680" viewBox="0 0 1180 680" role="img" aria-labelledby="title desc">
+  <title id="title">Nonbranch weighted-Proj local-order proof dependencies</title>
+  <desc id="desc">Blue nodes are checked, amber is a checked theorem with explicit hypotheses, and gray nodes are open. Arrows show proof dependencies, not measured performance.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#596579"/></marker>
+    <style>
+      text { font-family: DejaVu Sans, Arial, sans-serif; fill:#182436; }
+      .heading { font-size:22px; font-weight:700; }
+      .sub { font-size:13px; fill:#536075; }
+      .node { stroke-width:2; rx:9; }
+      .checked { fill:#e8f3ff; stroke:#2372b8; }
+      .conditional { fill:#fff1d8; stroke:#a66b0a; }
+      .open { fill:#f1f3f6; stroke:#788596; }
+      .label { font-size:15px; font-weight:600; }
+      .detail { font-size:12px; }
+      .edge { fill:none; stroke:#596579; stroke-width:2; }
+      .tip { fill:#596579; }
+    </style>
+  </defs>
+  <rect width="1180" height="680" fill="white"/>
+  <text x="30" y="39" class="heading">Actual nonbranch weighted-Proj stalk: checked boundary and open gates</text>
+  <text x="30" y="62" class="sub">Lean 4.34.1 · source SHA-256 3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910 · no target measurements</text>
+
+  <rect x="35" y="102" width="300" height="75" class="node checked"/>
+  <text x="55" y="130" class="label">Rational curve point</text><text x="55" y="152" class="detail">pointEval; maximal evaluation kernel</text>
+  <rect x="435" y="102" width="300" height="75" class="node checked"/>
+  <text x="455" y="130" class="label">Actual projective stalk</text><text x="455" y="152" class="detail">isomorphic to affine localization</text>
+  <rect x="835" y="102" width="300" height="75" class="node checked"/>
+  <text x="855" y="130" class="label">Pulled-back y is a unit</text><text x="855" y="152" class="detail">requires nonzero point value y</text>
+  <path d="M335 140 H425" class="edge"/><path d="M735 140 H825" class="edge"/>
+  <path d="M425 140 L415 135 L415 145 Z M825 140 L815 135 L815 145 Z" class="tip"/>
+
+  <rect x="35" y="260" width="300" height="75" class="node open"/>
+  <text x="55" y="288" class="label">Affine quotient is a domain</text><text x="55" y="310" class="detail">odd quintic; no simple-root premise</text>
+  <rect x="435" y="260" width="300" height="75" class="node open"/>
+  <text x="455" y="288" class="label">Local maximal ideal principal</text><text x="455" y="310" class="detail">generator x − a at nonbranch point</text>
+  <rect x="835" y="260" width="300" height="75" class="node open"/>
+  <text x="855" y="288" class="label">Actual local DVR</text><text x="855" y="310" class="detail">domain + principal maximal ideal</text>
+  <path d="M335 298 V360 H985 V335" class="edge"/><path d="M735 298 H825" class="edge"/>
+  <path d="M985 335 L980 345 L990 345 Z M825 298 L815 293 L815 303 Z" class="tip"/>
+
+  <rect x="35" y="410" width="300" height="75" class="node open"/>
+  <text x="55" y="438" class="label">Common 2+2 norm transport</text><text x="55" y="460" class="detail">numerator and factorization in stalk</text>
+  <rect x="435" y="410" width="300" height="75" class="node conditional"/>
+  <text x="455" y="438" class="label">Norm-order theorem</text><text x="455" y="460" class="detail">checked with explicit DVR + norm inputs</text>
+  <rect x="835" y="410" width="300" height="75" class="node open"/>
+  <text x="855" y="438" class="label">Discharged local order</text><text x="855" y="460" class="detail">actual formula at nonbranch zeros</text>
+  <path d="M735 448 H825" class="edge"/><path d="M985 335 V410" class="edge"/>
+  <path d="M1135 140 H1155 V390 H760 V448 H735" class="edge"/>
+  <path d="M335 485 V515 H985 V485" class="edge"/>
+  <path d="M825 448 L815 443 L815 453 Z M985 410 L980 400 L990 400 Z M735 448 L745 443 L745 453 Z M985 485 L980 495 L990 495 Z" class="tip"/>
+
+  <rect x="35" y="550" width="300" height="75" class="node open"/>
+  <text x="55" y="578" class="label">Global principal divisor</text><text x="55" y="600" class="detail">all local orders + infinity</text>
+  <rect x="435" y="550" width="300" height="75" class="node open"/>
+  <text x="455" y="578" class="label">Pic0 class transport</text><text x="455" y="600" class="detail">global class equation</text>
+  <rect x="835" y="550" width="300" height="75" class="node open"/>
+  <text x="855" y="578" class="label">Compiled Rust semantics</text><text x="855" y="600" class="detail">all runtime law branches</text>
+  <path d="M985 485 V530 H185 V550" class="edge"/><path d="M335 588 H425" class="edge"/>
+  <path d="M185 550 L180 540 L190 540 Z M425 588 L415 583 L415 593 Z" class="tip"/>
+  <text x="35" y="654" class="sub">Blue: checked · amber: checked conditional statement · gray: open · arrows: mathematical dependencies</text>
+</svg>

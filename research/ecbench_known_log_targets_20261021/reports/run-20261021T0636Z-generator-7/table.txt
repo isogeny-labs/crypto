@@ -1,0 +1,8 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|
+| ECBS1h94182c19bcb0 | rho-neg | rho.negation | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 1.922 | [1.617, 2.332] | 0.886 | 2.169 | 2.169 | 1.000 | yes | 4.252 | L0×40 |
+| ECBS1h94182c19bcb0 | abscissa | ic.pipeline | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 10.484 | [10.080, 10.903] | – | – | 11.830 | 5.455 | yes | 0.451 | L0×40 |
+| ECBS1h94182c19bcb0 | known-log | ic.known_log_mitm2_v1 | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 7.579 | [7.531, 7.639] | – | – | 8.552 | 3.943 | yes | 4.129 | L0×40 |
+| ECBS1h94182c19bcb0 | known-log-aa | ic.known_log_mitm2_v1 | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 7.579 | [7.531, 7.639] | – | – | 8.552 | 3.943 | yes | 4.210 | L0×40 |
+| ECBS1h94182c19bcb0 | abscissa-aa | ic.pipeline | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 10.484 | [10.080, 10.903] | – | – | 11.830 | 5.455 | yes | 0.429 | L0×40 |
+| ECBS1h94182c19bcb0 | transported | ic.known_log_mitm2_v1 | icv1-fp16-t295-8d3c3165 | 15.70 | 40/40 | 7.613 | [7.591, 7.638] | – | – | 8.590 | 3.961 | yes | 4.155 | L0×40 |

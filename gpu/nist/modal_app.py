@@ -9,7 +9,7 @@ GPU=os.environ.get("NIST_GPU","RTX-PRO-6000")
 ROOT="/root/nist";LOCAL=pathlib.Path(__file__).parent
 image=(modal.Image.from_registry(f"nvidia/cuda:{CUDA}-devel-ubuntu24.04",add_python="3.12")
  .entrypoint([]).apt_install("build-essential","libboost-dev")
-  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","test_cpu","test_rho","*.ptx","__pycache__"])
+  .add_local_dir(LOCAL,remote_path=ROOT,copy=True,ignore=["bench","bench-b*","test_cpu","test_rho","test_cpu_b*","test_rho_b*","*.ptx","__pycache__"])
  .run_commands(f"cd {ROOT} && make test"))
 app=modal.App("nist-prime-gpu-arithmetic")
 def sh(cmd,timeout=3600):
@@ -183,3 +183,19 @@ def tune(repeats:int=3):
    ranked=sorted(((statistics.median(v),k,v) for k,v in groups.items()),reverse=True)
    if ranked:print(curve,op,{"median_Mop_s":ranked[0][0],"config":ranked[0][1],"samples":ranked[0][2]})
  return {"gpu":info.strip(),"rows":rows}
+
+# Best of P+M and P-M (RHO_BEST2): best2_ab.sh builds, tests and runs the
+# interleaved cells; this only launches it and saves its raw output.  The
+# rho-walk-leads harness parses the log (`rho_walk_leads gpuab --log`).
+#   modal run modal_app.py::best2_main --iters 2048 --reps 3 --out <file.log>
+@app.function(image=image,gpu=GPU,timeout=4*3600)
+def best2_ab(iters:int=2048,reps:int=3):
+ rc,out=sh(f"./best2_ab.sh {iters} {reps}",timeout=4*3600)
+ if rc: raise RuntimeError(out[-2000:])
+ return out
+
+@app.local_entrypoint()
+def best2_main(iters:int=2048,reps:int=3,out:str="best2.log"):
+ commit=subprocess.run(["git","rev-parse","HEAD"],capture_output=True,text=True,cwd=LOCAL).stdout.strip()
+ pathlib.Path(out).write_text(f"COMMIT {commit}\n"+best2_ab.remote(iters,reps))
+ print("wrote",out)

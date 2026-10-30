@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 
 fn main() {
+    // Shared ecbench sources skip tests that need the full harness under this cfg.
+    println!("cargo:rustc-check-cfg=cfg(ecbench_reader)");
+    println!("cargo:rustc-cfg=ecbench_reader");
     let compiler = std::process::Command::new(std::env::var_os("RUSTC").unwrap())
         .arg("--version")
         .output()

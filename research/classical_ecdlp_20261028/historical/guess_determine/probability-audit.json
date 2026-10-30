@@ -1,0 +1,38 @@
+{
+  "source": "https://arxiv.org/html/2607.09814v2#S6",
+  "scope": "Separate known-exponent scalar calibration, not EC timings.",
+  "distinct_subset_formula": "sum(binomial(h,j)^2,j=0..d)",
+  "occurrence_formula": "binomial(h,d)*binomial(h+d,d)",
+  "cases": [
+    {
+      "r": 991,
+      "h": 6,
+      "defect": 2,
+      "trials": 3000,
+      "hits": 745,
+      "candidate_occurrences": 420,
+      "distinct_candidate_subsets": 262,
+      "paper_independence_model": 0.34503353952522287,
+      "observed_probability": 0.24833333333333332,
+      "observed_wilson_95": [
+        0.23320142464472454,
+        0.2641089292136895
+      ]
+    },
+    {
+      "r": 991,
+      "h": 6,
+      "defect": 3,
+      "trials": 3000,
+      "hits": 1448,
+      "candidate_occurrences": 1680,
+      "distinct_candidate_subsets": 662,
+      "paper_independence_model": 0.8156585794334572,
+      "observed_probability": 0.4826666666666667,
+      "observed_wilson_95": [
+        0.4648190698176409,
+        0.5005585969381705
+      ]
+    }
+  ]
+}

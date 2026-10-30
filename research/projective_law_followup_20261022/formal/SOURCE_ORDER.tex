@@ -1,0 +1,39 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,landscape,margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,hyperref}
+\title{Source-function order on the actual weighted-Proj curve}
+\author{Formal proof packet}
+\date{28 October 2026}
+\begin{document}
+\maketitle
+\noindent This packet concerns the actual scheme $X=\operatorname{Proj}(\mathrm{degreeSubmodule}(a_3,a_2,a_1,a_0))$ over a field $K$. It reports conditional formal declarations, not a new DLP run or cost result.
+\section*{Source and hypotheses}
+The existing source-shaped common 2+2 function $N/B-y$ is embedded in $K(X)$ under separability of the quintic. The already checked $\mathrm{IsIntegral}(X)$ theorem uses separability; the checked $\mathrm{IsLocallyNoetherian}(X)$ theorem requires only that $K$ be a field. These are Mathlib's typeclass prerequisites for $\operatorname{ord}_z(f)$.
+\section*{New declarations}
+\begin{itemize}
+\item \texttt{sourceOrder} specializes $\operatorname{ord}_z$ to the source function at any point $z\in X$.
+\item \texttt{sourceOrder\_zero\_of\_coheight\_ne\_one} records the API's zero value when $\operatorname{coheight}(z)\ne1$.
+\item \texttt{sourceOrder\_eq\_ordHom\_of\_coheight\_one} identifies it with Mathlib's stalk valuation when $\operatorname{coheight}(z)=1$.
+\end{itemize}
+Pinned Lean 4.34.1 exited zero. Direct axiom prints for all three new declarations list only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}; the compiler receipt is retained with the source.
+\section*{Open gates}
+Neither closed-point coheight nor nonvanishing of the source function is inferred. Finite support, the infinity pole, the principal divisor, the $\operatorname{Pic}^{0}$ equation, and compiled Rust correspondence remain open. The CSV lists every gate separately; a zero returned by $\operatorname{ord}$ is not by itself an order calculation.
+\clearpage
+\section*{Dependency diagram}
+\begin{center}
+\setlength{\unitlength}{1mm}
+\begin{picture}(240,115)
+\put(2,77){\framebox(65,22){Integral curve (checked)}}
+\put(2,29){\framebox(65,22){Locally Noetherian (checked)}}
+\put(83,55){\framebox(68,23){Source order (Lean checked)}}
+\put(170,77){\framebox(69,22){Closed-point order (open)}}
+\put(170,29){\framebox(69,22){Divisor / Pic$^0$ (open)}}
+\put(67,88){\vector(2,-1){16}}
+\put(67,40){\vector(2,1){16}}
+\put(151,67){\vector(2,1){19}}
+\put(204,77){\vector(0,-1){26}}
+\put(2,8){\makebox(235,12)[l]{The source function's nonvanishing, finite support, infinity pole, and compiled semantics are separate obligations.}}
+\end{picture}
+\end{center}
+\end{document}

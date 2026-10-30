@@ -379,7 +379,10 @@ mod tests {
             let base = [e1[0] & !((1u64 << k) - 1), 0, 0];
             let mut got = Vec::new();
             SymmetricOracle::new(&c, lp_dim).sweep(&r, base, k, |d| got.push(d));
-            assert!(got.contains(&Decomp::new(p1.x, p2.x)), "planted pair missed");
+            assert!(
+                got.contains(&Decomp::new(p1.x, p2.x)),
+                "planted pair missed"
+            );
         }
     }
 }

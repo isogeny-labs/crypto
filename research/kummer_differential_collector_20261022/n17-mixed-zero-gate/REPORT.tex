@@ -1,0 +1,41 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.76in]{geometry}
+\usepackage{amsmath,booktabs,graphicx}
+\title{N17: Differential-Pair Mixed-Zero Gate}
+\author{Exact frozen-model audit}
+\date{25 October 2026}
+\begin{document}\maketitle
+\noindent On all 21 frozen Rosenhain models, the direct degree-two matrix $C_2$
+and the source conversion matrix $C_1$ differ but encode the same degree-two
+chart. Let $\sigma=1+\lambda+\mu+\nu=-f_4$. The exact identity is
+\[
+ C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T.
+\]
+The native diagnostic checks this matrix identity and a valid branch-point
+divisor $u=(x-1)(x-\lambda),v=0$ on every model. Both determinants are
+nonzero in every field. Thus the interim concern that N15 inverts the wrong
+degree-two matrix is withdrawn; its 138,095 finite rows and costs are unchanged.
+
+\begin{center}\begin{tabular}{lr}\toprule Quantity & Recorded result\\\midrule
+Exact basis identities & 21 / 21\\
+Valid degree-two inversion checks & 21 / 21\\
+Historical N15 finite states & 138,095\\
+Historical cached theta xADD calls & 414,285\\
+All-state geometric/xADD fallback & open\\
+New signed collector targets & 0 of requested 1,260\\
+New matched-rho ratio & null\\\bottomrule\end{tabular}\end{center}
+
+\noindent With nonzero fixed difference and theta constants, a mixed xADD
+returns zero exactly if the Hadamard supports of $K(D)$ and $K(D+G)$ are
+disjoint coordinatewise. A constructive conditional fallback lifts the
+differential pair to signed $D$, forms $2D$, $2D+G$, and $2D+2G$ with three
+Jacobian additions, then projects the required next pair. Its lift and
+projection identities, totality, and complete cold costs must be certified
+before a new cohort or rho ratio is attributed to this route. N16 proves
+torsion action only relative to the declared charts, not their independent
+geometric interpretation.
+
+\begin{center}\includegraphics[width=0.95\linewidth]{research/kummer_differential_collector_20261022/n17-mixed-zero-gate/status-graph.png}\end{center}
+\noindent The standardized 21-row CSV, source, protocol, and source digests
+accompany this report. Null means unmeasured, not a zero cost.
+\end{document}

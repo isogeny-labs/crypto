@@ -1,0 +1,72 @@
+{
+  "price_cells_below_rho": 0,
+  "pricing": "cold setup included in each raw target; variable-order logical work added; wall time excluded",
+  "pricing_cells": 4356,
+  "raw_files": 3,
+  "requested_cohort_targets_per_order": 1260,
+  "schema": "pencil-sparse-price-summary/v1",
+  "slices": [
+    {
+      "bits": 16,
+      "failures": 0,
+      "max_price_cell_ratio": 22.2580207576787,
+      "min_price_cell_ratio": 5.866920203084588,
+      "order": "identity",
+      "p": 739,
+      "price_cells_below_rho": 0,
+      "raw_path": "research/pencil_sparse_20261022/results/p739-peel.jsonl",
+      "representative": {
+        "pencil_GAE": 3881713.942857142,
+        "pencil_over_rho": 11.61535723175673,
+        "rho_GAE": 334188.08095238096
+      },
+      "solver_index_ops": 9475326,
+      "solver_mode": "peel",
+      "solver_node_order_ops": 0,
+      "solver_row_updates": 1336284,
+      "targets": 60,
+      "verified": 60
+    },
+    {
+      "bits": 16,
+      "failures": 0,
+      "max_price_cell_ratio": 30.69588804564413,
+      "min_price_cell_ratio": 5.866920203084588,
+      "order": "identity",
+      "p": 739,
+      "price_cells_below_rho": 0,
+      "raw_path": "research/pencil_markowitz_20261022/results/p739-markowitz.jsonl",
+      "representative": {
+        "pencil_GAE": 4676902.742857141,
+        "pencil_over_rho": 13.99482210594926,
+        "rho_GAE": 334188.08095238096
+      },
+      "solver_index_ops": 17513708,
+      "solver_mode": "markowitz",
+      "solver_node_order_ops": 0,
+      "solver_row_updates": 1307655,
+      "targets": 60,
+      "verified": 60
+    },
+    {
+      "bits": 32,
+      "failures": 1,
+      "max_price_cell_ratio": null,
+      "min_price_cell_ratio": null,
+      "order": "identity",
+      "p": 186379,
+      "price_cells_below_rho": 0,
+      "raw_path": "research/pencil_markowitz_20261022/results/p186379-markowitz-t0.jsonl",
+      "representative": null,
+      "solver_index_ops": 36545252445,
+      "solver_mode": "markowitz",
+      "solver_node_order_ops": 0,
+      "solver_row_updates": 95648928,
+      "targets": 1,
+      "verified": 0
+    }
+  ],
+  "source_verified_pairs": 120,
+  "status": "partial_with_failures",
+  "target_rows": 121
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Exact MITM reference only, trace line d=4; not algebraic C1",
+  "description": "Prospective blocked reference; native work unpriced. Not an end-to-end C1 cost experiment.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 16,
+        "seed": 20261027,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "binary_random",
+        "n": 16,
+        "seed": 20261127,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261027,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "standard",
+      "role": "baseline",
+      "method": {
+        "id": "ic.trace_line_2lp",
+        "params": {
+          "line": "standard",
+          "d": "4",
+          "small_dimension": "3",
+          "max_u": "65535",
+          "max_trials": "10000",
+          "max_states": "1000000"
+        }
+      }
+    },
+    {
+      "name": "selected",
+      "role": "candidate",
+      "method": {
+        "id": "ic.trace_line_2lp",
+        "params": {
+          "line": "trace",
+          "d": "4",
+          "small_dimension": "3",
+          "max_u": "65535",
+          "max_trials": "10000",
+          "max_states": "1000000"
+        }
+      }
+    },
+    {
+      "name": "standard-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.trace_line_2lp",
+        "params": {
+          "line": "standard",
+          "d": "4",
+          "small_dimension": "3",
+          "max_u": "65535",
+          "max_trials": "10000",
+          "max_states": "1000000"
+        }
+      }
+    },
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261027,
+    "isolation_required": "L2",
+    "timeout_seconds": 120
+  }
+}

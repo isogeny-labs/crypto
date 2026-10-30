@@ -1,0 +1,557 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TRACE-C1-2LP-20261027",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/trace_c1_2lp_20261027",
+  "authors": [
+    "native IC research"
+  ],
+  "links": {
+    "source_pr": "https://github.com/isogeny-labs/crypto/pull/2686",
+    "specs": [
+      "research/trace_c1_2lp_20261027/reference-d2.json",
+      "research/trace_c1_2lp_20261027/reference-d3.json",
+      "research/trace_c1_2lp_20261027/reference-d4.json",
+      "research/trace_c1_2lp_20261027/reference-d5.json"
+    ],
+    "note": "Prospective design; execution blocked. Exact MITM reference is not an algebraic C1 cost measurement."
+  },
+  "question": "Does the trace-selected x-line reduce fully priced cold one-target algebraic C1 2LP cost against the standard subfield line?",
+  "claims": [
+    {
+      "id": "construction",
+      "class": "exact_computation",
+      "text": "Development tests verify line lifts and accepted-relation algebra on stated toy fixtures.",
+      "decided_by": []
+    },
+    {
+      "id": "pipeline",
+      "class": "comparative",
+      "text": "The selected line lowers complete cold C1 cost.",
+      "decided_by": [
+        "C-bases"
+      ],
+      "if_supported": "only on completed, independently verified, fully priced matched workloads",
+      "if_not_supported": "inconclusive or within control distribution; no improvement established"
+    },
+    {
+      "id": "model",
+      "class": "heuristic_estimate",
+      "text": "The upstream 16x relation count and approximately 0.50-bit optimised model delta are predictions, not measured savings.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Does the trace-selected x-line reduce fully priced cold one-target algebraic C1 2LP cost against the standard subfield line?",
+      "mechanism": "Trace-selected line changes lift density; construction, decomposition and larger-base costs may cancel the yield benefit.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "cold_cost",
+          "direction": "lower",
+          "minimum_effect": "95% paired interval below 1 after Holm correction and exceeds A/A noise",
+          "provenance": {
+            "written_at": "2026-10-27",
+            "data_seen": [
+              {
+                "path": "PR2686",
+                "measured": "upstream construction and yield study; no C1 pipeline data"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "confirmatory"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "standard",
+      "role": "baseline",
+      "description": "standard",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--example",
+            "trace_line_replay"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "specs": [
+          "research/trace_c1_2lp_20261027/reference-d2.json",
+          "research/trace_c1_2lp_20261027/reference-d3.json",
+          "research/trace_c1_2lp_20261027/reference-d4.json",
+          "research/trace_c1_2lp_20261027/reference-d5.json"
+        ],
+        "oracle": "exact MITM reference pending C1 replacement by prospective amendment"
+      }
+    },
+    {
+      "id": "selected",
+      "role": "candidate",
+      "description": "selected",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--example",
+            "trace_line_replay"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "specs": [
+          "research/trace_c1_2lp_20261027/reference-d2.json",
+          "research/trace_c1_2lp_20261027/reference-d3.json",
+          "research/trace_c1_2lp_20261027/reference-d4.json",
+          "research/trace_c1_2lp_20261027/reference-d5.json"
+        ],
+        "oracle": "exact MITM reference pending C1 replacement by prospective amendment"
+      },
+      "same_instrument_as": "standard"
+    },
+    {
+      "id": "standard-aa",
+      "role": "control_aa",
+      "description": "standard-aa",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--example",
+            "trace_line_replay"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "specs": [
+          "research/trace_c1_2lp_20261027/reference-d2.json",
+          "research/trace_c1_2lp_20261027/reference-d3.json",
+          "research/trace_c1_2lp_20261027/reference-d4.json",
+          "research/trace_c1_2lp_20261027/reference-d5.json"
+        ],
+        "oracle": "exact MITM reference pending C1 replacement by prospective amendment"
+      },
+      "same_instrument_as": "standard"
+    },
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho-neg",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--example",
+            "trace_line_replay"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "specs": [
+          "research/trace_c1_2lp_20261027/reference-d2.json",
+          "research/trace_c1_2lp_20261027/reference-d3.json",
+          "research/trace_c1_2lp_20261027/reference-d4.json",
+          "research/trace_c1_2lp_20261027/reference-d5.json"
+        ],
+        "oracle": "rho.negation"
+      },
+      "same_instrument_as": "standard"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Required known-answer unit tests use both bases and the same collector before admission; a dedicated measurement-control spec is still pending."
+    },
+    "negative": {
+      "present": true,
+      "arm": "standard",
+      "null_population": {
+        "matched_on": [
+          "curve",
+          "target",
+          "binary",
+          "caps",
+          "small-base dimension",
+          "summands"
+        ],
+        "rule": "untreated standard subfield line; no claim of unusual population structure"
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "line",
+        "levels": [
+          "standard",
+          "trace"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instance",
+        "treatment": "fixed",
+        "value": "N=8,12,16,20; seeds 20261027 and 20261127; exact representations frozen before timing",
+        "how": "binary_random, max_cofactor 16, independent of arm"
+      },
+      {
+        "name": "target",
+        "treatment": "fixed",
+        "value": "8 public targets per curve; target_seed 20261027",
+        "how": "one-target ecbench workload"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "same native binary and one thread; hashes pending",
+        "how": "commit/image/binary pinned before launch"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "L2, CPU model, SMT, NUMA, frequency, kernel, pressure, steal and foreign ticks per record"
+      },
+      {
+        "name": "layout",
+        "treatment": "randomized",
+        "how": "fresh child processes, ASLR and environment recorded"
+      },
+      {
+        "name": "order",
+        "treatment": "randomized",
+        "how": "alternate interleaved arms, one warmup"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "frozen ecbench plan; A/A shares the matched stream and samples fresh process layout"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "how": "counts retained, clock invalid; no automatic measurement retry"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "frozen analysis then masked labels; analysis implementation pending"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-bases",
+        "arms": [
+          "standard",
+          "selected"
+        ],
+        "differs_in": [
+          "line"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-rho",
+        "arms": [
+          "selected",
+          "rho-neg"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "standard",
+          "standard-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench plan with measurement.seed=20261027, per-record algorithm_seed retained; public target law independent of arm"
+    },
+    "instance_sampling": {
+      "rule": "binary_random constructor seeds 20261027 and holdout 20261127 at each size; retain all instances",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Required before confirmatory data; blinded analysis implementation is pending",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 64,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "Holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Power unknown; authorised independent pilot and prospective amendment required before confirmatory launch."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "not measured; infrastructure and C1 implementation blocked"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold_cost",
+        "name": "cold_cost",
+        "unit": "GAE",
+        "kind": "counted",
+        "definition": "All setup, queries, failed trials, decomposition, extraction, relation checks, LP combination, rank, LA, recovery and independent verification; null until every phase priced",
+        "source": "future complete pricing receipt; existing cost.total_gae is only a lower bound",
+        "aggregation": "paired_ratio",
+        "resolution": "calibrated native work",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "accepted_relations",
+        "name": "accepted_relations",
+        "unit": "relations",
+        "kind": "counted",
+        "definition": "Accepted full/1LP/2LP rows, not ordered decompositions",
+        "source": "detail.counters",
+        "aggregation": "paired_ratio",
+        "resolution": "calibrated native work",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "line construction",
+      "trials",
+      "accepted relations by class",
+      "LP merges and pivots",
+      "matrix rank",
+      "LA",
+      "all unpriced native counters"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "image_digest",
+      "resource_envelope",
+      "host",
+      "isolation",
+      "protocol_sha256",
+      "spec_sha256",
+      "raw relation transcript"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "S3 resume checkpoint before launch; ordinary non-resumable execution",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "new measurement epoch required",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "64 separate targets * 4 arms * (1 warmup+6 rounds)=1792 records; caps/timeouts retained; no favourable-size selection",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Failed positive controls or invalid relation/scalar verification invalidate the comparison; retain every failure",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "No total cost or speedup from unpriced work or incomplete phases.",
+    "No admitted wall time below L2 or after interruption.",
+    "No wins from timeouts, OOMs, wrong answers or incomplete workloads."
+  ],
+  "decision_rule": {
+    "text": "A pipeline gain requires fully priced complete cold costs, verified answers and relations, independent-host replay, Holm-adjusted 95% paired intervals below 1 and effect exceeding A/A noise. Otherwise no gain established.",
+    "comparison_ids": [
+      "C-bases"
+    ],
+    "threshold": "candidate/baseline <1 beyond A/A uncertainty",
+    "statistic": "per-target cold cost ratio",
+    "interval": "paired bootstrap over independent workloads",
+    "multiple_comparison_correction": "Holm over four sizes",
+    "effect_size_measure": "cost ratio and S, per target and size",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "session/records.jsonl",
+      "independent replay",
+      "pricing receipts"
+    ],
+    "outputs": [
+      "per-target cold-cost ratios and uncertainty",
+      "A/A",
+      "matched rho band 0,0.1,1",
+      "experiment.export/v1"
+    ],
+    "blinded": true,
+    "frozen_before_data": false,
+    "note": "Implementation and hash pending; this blocks launch."
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "per-phase cost and matched rho",
+      "yield, LP combination and rank"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Treating exact MITM as measured algebraic C1 trial cost",
+    "Treating 16x relation count as 16x complete savings",
+    "Replacing missing prices with zero",
+    "Retuning from confirmatory samples",
+    "Dropping failures",
+    "Inferring ECC2K-130 applicability"
+  ],
+  "literature": [
+    {
+      "ref": "https://github.com/isogeny-labs/crypto/pull/2686",
+      "provenance": "internal",
+      "claim": "conditional trace construction and unresolved C1 measurement",
+      "verified_by": "source head 76fc6b286358e9c51515cb3e03427d5ccc290e10"
+    },
+    {
+      "ref": "src/cryptanalysis/ecbench_large_prime.rs",
+      "provenance": "internal",
+      "claim": "exact bounded 2LP reference and explicit unpriced counters",
+      "verified_by": "source inspection 2026-10-27"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": true
+  }
+}

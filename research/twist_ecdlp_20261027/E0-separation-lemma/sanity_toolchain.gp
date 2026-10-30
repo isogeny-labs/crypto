@@ -1,0 +1,16 @@
+default(parisizemax,2000000000);
+print("version ", version());
+g=ffgen(7^2,'w); E=ellinit([1,3]*g^0); print("E over F49 ok, card=",ellcard(E));
+d=3*g^0; print("issquare(3) in F49: ",issquare(d)," sqrt: ", sqrt(d));
+P=random(E); print("random pt: ",P, " 2P=",ellmul(E,P,2)," add ",elladd(E,P,P));
+print("ordinate: ", ellordinate(E,2*g^0));
+print("ellgroup F49: ", ellgroup(E));
+E7=ellinit([1,3],7); print("E/F7 card ",ellcard(E7)," group ",ellgroup(E7));
+h=ffgen(2^6,'z); Eb=ellinit([1,h,0,0,h^3+1]); print("binary ok card=",ellcard(Eb)," ord(0)=",ellordinate(Eb,0*h));
+h3=ffgen(2^3,'u); Eb3=ellinit([1,0,0,0,h3]); print("F8 card=",ellcard(Eb3));
+print("elldivpol F7 deg: ", poldegree(elldivpol(E7,3)));
+print("factormod: ", factor(elldivpol(E7,3)*Mod(1,7)));
+K=elldivpol(E7,2); print("2-div: ",K);
+print("polmodular present: ", poldegree(polmodular(2)));
+iota=ellisogeny(E7, x^3+1); print("ellisogeny ok: ", iota[1]);
+print("ellisomat avail: ", type(ellisomat));

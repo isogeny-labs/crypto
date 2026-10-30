@@ -995,6 +995,27 @@ pub struct HecIndexCalculusReport {
     pub smoothness_field_ops: usize,
     pub solve_row_ops: usize,
     pub solved: bool,
+    /// Doublings and additions the verification's `d1.scalar_mul(k)`
+    /// executed (`⌊log₂ k⌋ + 1` doublings, one addition per set bit;
+    /// `MumfordDivisorP::checked_scalar_mul` doubles the identity first).
+    /// Not in `jacobian_ops`, which the frozen `ic.hyperelliptic` records
+    /// are computed from; `ic.hyperelliptic_v2` charges them.
+    pub verification_doubles: usize,
+    pub verification_adds: usize,
+}
+
+impl HecIndexCalculusReport {
+    /// Record the Jacobian operations of one `scalar_mul(k)`.
+    fn charge_scalar_mul(&mut self, k: &BigUint) {
+        if !k.is_zero() {
+            self.verification_doubles += k.bits() as usize;
+            self.verification_adds += k
+                .to_u64_digits()
+                .iter()
+                .map(|d| d.count_ones() as usize)
+                .sum::<usize>();
+        }
+    }
 }
 
 impl HecIndexCalculusReport {
@@ -1624,6 +1645,7 @@ pub fn hec_index_calculus_dlp(
         drop(solve_phase);
         let _verify_phase = ops::enter(Phase::Verification);
         if let Some(candidate) = solved {
+            report.charge_scalar_mul(&candidate);
             if &d1.scalar_mul(&candidate, curve) == d2 {
                 k = Some(candidate);
                 break;
@@ -1639,6 +1661,7 @@ pub fn hec_index_calculus_dlp(
     };
 
     let _verify_phase = ops::enter(Phase::Verification);
+    report.charge_scalar_mul(&k);
     if &d1.scalar_mul(&k, curve) == d2 {
         report.solved = true;
         (Some(k), report)

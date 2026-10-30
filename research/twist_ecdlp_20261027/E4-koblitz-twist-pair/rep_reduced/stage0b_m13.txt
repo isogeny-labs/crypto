@@ -1,0 +1,15 @@
+  ***   Warning: new maximum stack size = 2000003072 (1907.352 Mbytes).
+# stage0b_fq2 m=13 seed=2039102101 modulus_poly=b^26 + b^25 + b^24 + b^19 + b^18 + b^17 + b^16 + b^11 + b^8 + b + 1 gp=[2, 15, 4]
+CHECK S_cuberoot m=13 PASS s^2+s=1, s not in F_q, T=(0,1) on both curves
+CHECK S_type_vs_rationality m=13 PASS x sampled=200 type0=97 type1=103 violations=0
+STAGE0B m=13 class=K0xK0 n=200 x_in_Fq=200 isO=0
+CHECK PC3_K0xK0 m=13 PASS x(P1+P2) in F_q for 200/200
+STAGE0B m=13 class=K1xK1 n=200 x_in_Fq=200 isO=0 x_same_on_K0_via_phi=200
+CHECK PC3_K1xK1 m=13 PASS x(P1+P2) in F_q for 200/200
+STAGE0B m=13 class=K1xT n=200 x_in_Fq=200
+CHECK PC3_K1xT m=13 PASS x(P1+T) in F_q for 200/200
+STAGE0B m=13 class=K0xT n=200 x_in_Fq=200
+CHECK PC3_K0xT m=13 PASS x(P1+T) in F_q for 200/200
+STAGE0B m=13 class=K0xK1 n=200 x_in_Fq=0 isO=0 pi_S_equals_P1_minus_P2=200
+CHECK F2_mixed_not_rational m=13 PASS x(P1+P2) in F_q for 0/200; pi(S)=P1-P2 for 200/200
+# stage0b done m=13

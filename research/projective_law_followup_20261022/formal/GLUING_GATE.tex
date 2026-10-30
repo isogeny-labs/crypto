@@ -1,0 +1,23 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Two-chart gluing: pinned API audit and open obligations}
+\author{Formal proof-gap packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+The prior pinned Lean theorem identifies the two principal-open overlap spectra and their open immersions into the separate chart spectra. This packet checks the pinned Mathlib scheme-gluing interfaces. It does not construct a glued curve.
+
+\texttt{Scheme.GlueData} requires chart schemes $U_i$, overlap schemes $V_{ij}$, open immersions $f_{ij}$, transition maps $t_{ij}$, maps $t'_{ijk}$ between pullbacks, diagonal isomorphisms and identity transitions, factorization, and a triple cocycle. The checked overlap gives off-diagonal candidates; it does not fill all gluing fields. A constructed glued scheme would still need an independent isomorphism to a chosen smooth projective genus-2 completion.
+
+\begin{center}\begin{tabular}{p{0.69\linewidth}p{0.2\linewidth}}\toprule
+Gate & Status\\\midrule
+Pinned gluing API and previous overlap theorem & Checked API\\
+Full two-chart \texttt{GlueData} and cocycle & Open\\
+Glued scheme for this datum & Open\\
+Identification with chosen smooth projective completion & Open\\
+Infinity stalk, divisor/$\operatorname{Pic}^0$ & Open\\
+Rust semantics and rho cost & Open; unmeasured\\\bottomrule\end{tabular}\end{center}
+
+The remaining proof is not a consequence of the localized ring equivalence alone. The exact fields and checked API output are recorded in \texttt{Common22GluingApi.lean} and \texttt{gluing-api-build.log}; the standardized gate data and graph are \texttt{gluing-gate.csv} and \texttt{gluing-gate.svg}. No operation-count or rho ratio follows.
+\end{document}

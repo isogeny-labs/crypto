@@ -1,0 +1,18 @@
+{
+  "field": {"characteristic": 2, "degree": 4, "modulus": 19},
+  "n": 5,
+  "polynomials": [
+    [[1,[3,0,0,0,0]],[1,[0,0,0,0,0]]],
+    [[1,[0,3,0,0,0]],[1,[0,0,0,0,0]]],
+    [[1,[0,0,3,0,0]],[1,[0,0,0,0,0]]],
+    [[1,[2,2,0,0,0]],[1,[2,0,0,2,0]],[1,[0,2,0,2,0]],[1,[1,1,0,1,0]],[1,[0,0,0,0,0]]],
+    [[1,[0,0,2,2,0]],[12,[0,0,0,2,0]],[12,[0,0,2,0,0]],[8,[0,0,1,1,0]],[1,[0,0,0,0,0]]],
+    [[1,[1,0,0,0,1]],[1,[0,1,0,0,1]],[1,[0,0,0,0,0]]]
+  ],
+  "variables": ["x","y","z","u","v"],
+  "curve": {"a2": 0, "a6": 1},
+  "factor_base_abscissas": [1,6,7],
+  "target": [8,15],
+  "field_encoding": "alpha^4+alpha+1=0; element integers are polynomial bits",
+  "ground_truth_argument": "The base lifts belong to the GF4 subfield {0,1,6,7}, while R=(8,15) is outside E(GF4); rational group closure excludes any full three-summand decomposition. No degree closure computation is asserted by this fixture."
+}

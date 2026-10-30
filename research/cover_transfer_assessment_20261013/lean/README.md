@@ -35,7 +35,7 @@ lake env lean AxiomAudit.lean
 allowlist (`propext`, `Classical.choice`, and `Quot.sound`) and also prints the
 kernel's transitive axiom report for the theorem.
 
-### Local validation status (2026-10-13)
+### Original local attempt (2026-10-13)
 
 The session installed and identified Lean `v4.34.1`, and `lake update`
 completed in a temporary copy and produced the included manifest.  The
@@ -49,8 +49,21 @@ XDG_CACHE_HOME=/tmp/cover-transfer-cache lake exe cache get
 Its last captured progress was 2,536 of 8,908 cache files; the sandbox then
 reported `No space left on device` while creating a workspace mount.  The
 temporary downloader and its files were stopped and removed.  Consequently,
-`lake build` and `lake env lean AxiomAudit.lean` remain unexecuted locally and
-must run in CI before this source is described as kernel-verified.
+`lake build` and `lake env lean AxiomAudit.lean` were not executed in that
+session, so the original attempt did not establish kernel verification.
+
+### Pinned replay (2026-10-22)
+
+The five source and dependency files were copied byte-for-byte to local scratch
+storage, where the pinned Mathlib cache completed. The [cache log](evidence/2026-10-22-cache-get.log)
+records 8,908 downloaded and decompressed files. The [build log](evidence/2026-10-22-build.log)
+records a successful `lake build` of 1,131 jobs. The [axiom audit](evidence/2026-10-22-axiom-audit.log)
+completed with only `propext`, `Classical.choice`, and `Quot.sound` for
+`pull_injective_on_subgroup`. The exact input hashes, commands, and the failed
+mounted-home checkout attempt are in the [replay receipt](evidence/2026-10-22-replay.json).
+
+This verifies the named conditional theorem under the pinned Lean and Mathlib
+dependencies. It does not discharge any per-cover premise below.
 
 ## Boundary
 

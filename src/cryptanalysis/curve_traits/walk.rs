@@ -39,7 +39,7 @@ use super::torsion::{monic, ppow, psub, trim, Big2, Field, Fp, FpK, Poly, Small2
 use super::Model;
 use crate::cryptanalysis::semaev_decomp::Gf2;
 
-/// `Φ_l(X, Y)` for the primes `3 ≤ l ≤ 19`, from PARI/GP's `polmodular`.
+/// `Φ_l(X, Y)` for the primes `2 ≤ l ≤ 19`, from PARI/GP's `polmodular`.
 const MODULAR_POLYNOMIALS: &str = include_str!("modular_polynomials.txt");
 
 /// Work allowed for one walk, in base-field word products.
@@ -497,6 +497,244 @@ fn walk_word(p: u64, j0: u64, l: u64, max_steps: u32) -> Option<Result<u32, u32>
     Some(Err(max_steps))
 }
 
+/// Polynomials over `GF(p)`, `p < 2^63`, low degree first, for
+/// [`height_above_floor`].
+struct Word {
+    p: u64,
+}
+
+impl Word {
+    fn m(&self, a: u64, b: u64) -> u64 {
+        (u128::from(a) * u128::from(b) % u128::from(self.p)) as u64
+    }
+    fn add(&self, a: u64, b: u64) -> u64 {
+        ((u128::from(a) + u128::from(b)) % u128::from(self.p)) as u64
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        self.add(a, self.p - b % self.p)
+    }
+    fn pow(&self, mut b: u64, mut e: u64) -> u64 {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = self.m(acc, b);
+            }
+            b = self.m(b, b);
+            e >>= 1;
+        }
+        acc
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.pow(a, self.p - 2)
+    }
+    fn strip(mut v: Vec<u64>) -> Vec<u64> {
+        while v.last() == Some(&0) {
+            v.pop();
+        }
+        v
+    }
+    fn rem(&self, a: &[u64], b: &[u64]) -> Vec<u64> {
+        let mut r = Self::strip(a.to_vec());
+        let lead = self.inv(*b.last().expect("non-zero"));
+        while r.len() >= b.len() {
+            let c = self.m(*r.last().expect("non-empty"), lead);
+            let shift = r.len() - b.len();
+            for (i, &x) in b.iter().enumerate() {
+                r[shift + i] = self.sub(r[shift + i], self.m(c, x));
+            }
+            r = Self::strip(r);
+        }
+        r
+    }
+    /// The monic gcd; empty when both are zero.
+    fn gcd(&self, a: &[u64], b: &[u64]) -> Vec<u64> {
+        let (mut a, mut b) = (Self::strip(a.to_vec()), Self::strip(b.to_vec()));
+        while !b.is_empty() {
+            let r = self.rem(&a, &b);
+            a = b;
+            b = r;
+        }
+        match a.last() {
+            None => a,
+            Some(&lead) => {
+                let lead = self.inv(lead);
+                a.iter().map(|&c| self.m(c, lead)).collect()
+            }
+        }
+    }
+    fn mulmod(&self, a: &[u64], b: &[u64], f: &[u64]) -> Vec<u64> {
+        if a.is_empty() || b.is_empty() {
+            return Vec::new();
+        }
+        let mut t = vec![0u64; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                t[i + j] = self.add(t[i + j], self.m(x, y));
+            }
+        }
+        self.rem(&t, f)
+    }
+    /// `base^e mod f`.
+    fn powmod(&self, base: &[u64], e: u64, f: &[u64]) -> Vec<u64> {
+        let mut acc = vec![1u64];
+        for i in (0..64 - e.leading_zeros()).rev() {
+            acc = self.mulmod(&acc, &acc, f);
+            if (e >> i) & 1 == 1 {
+                acc = self.mulmod(&acc, base, f);
+            }
+        }
+        acc
+    }
+    /// The roots of a squarefree `g` that splits into linear factors
+    /// (Cantor–Zassenhaus with the shifts `Y + 1, Y + 2, …`).
+    fn split(&self, g: &[u64], out: &mut Vec<u64>) {
+        match g.len() {
+            0 | 1 => {}
+            2 => out.push(self.sub(0, g[0])),
+            _ => {
+                for a in 1..self.p {
+                    let mut h = self.powmod(&[a, 1], (self.p - 1) / 2, g);
+                    h.resize(h.len().max(1), 0);
+                    h[0] = self.sub(h[0], 1);
+                    let d = self.gcd(g, &h);
+                    if d.len() > 1 && d.len() < g.len() {
+                        let mut q = Vec::new();
+                        let mut r = g.to_vec();
+                        // g / d, exact.
+                        while r.len() >= d.len() {
+                            let c = *r.last().expect("non-empty");
+                            let shift = r.len() - d.len();
+                            q.push((shift, c));
+                            for (i, &x) in d.iter().enumerate() {
+                                r[shift + i] = self.sub(r[shift + i], self.m(c, x));
+                            }
+                            r = Self::strip(r);
+                        }
+                        let mut quo = vec![0u64; g.len() - d.len() + 1];
+                        for (i, c) in q {
+                            quo[i] = c;
+                        }
+                        self.split(&d, out);
+                        self.split(&quo, out);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    /// The roots of `f` in `GF(p)` with their multiplicities, ascending.
+    fn roots(&self, f: &[u64]) -> Vec<(u64, u32)> {
+        let mut d = self.powmod(&[0, 1], self.p, f);
+        d.resize(d.len().max(2), 0);
+        d[1] = self.sub(d[1], 1);
+        let g = self.gcd(f, &d);
+        let mut found = Vec::new();
+        self.split(&g, &mut found);
+        found.sort_unstable();
+        found
+            .into_iter()
+            .map(|r| {
+                // Multiplicity: divide by Y − r while it divides.
+                let mut h = Self::strip(f.to_vec());
+                let mut k = 0;
+                loop {
+                    let mut q = vec![0u64; h.len().saturating_sub(1)];
+                    let mut carry = 0u64;
+                    for i in (0..h.len()).rev() {
+                        let c = self.add(h[i], self.m(carry, r));
+                        if i > 0 {
+                            q[i - 1] = c;
+                        }
+                        carry = c;
+                    }
+                    if carry != 0 {
+                        break;
+                    }
+                    k += 1;
+                    h = q;
+                }
+                (r, k)
+            })
+            .collect()
+    }
+}
+
+/// The height of `j0` above the floor of its `l`-isogeny volcano over
+/// `GF(p)`, for `l | v` (depth at least 1), by descending walks
+/// (Kohel; Fouquet–Morain).  `None` when `j0` is 0 or 1728, when
+/// `Φ_l(j, Y)` degenerates, or when no walk reaches the floor within
+/// `depth` steps.
+///
+/// With `l | v`, every vertex above the floor has `l + 1` rational
+/// `l`-isogenies (counted with multiplicity) and a floor vertex exactly
+/// one. Below the crater one edge goes up and `l` go down, so a walk that
+/// has stepped down and never steps back along the edge it arrived by
+/// keeps going down. From every rational neighbour of `j0` the walk takes
+/// the smallest root of `Φ_l(j, Y)` other than one copy of the previous
+/// `j`, and stops at a vertex with a single rational `l`-isogeny. At
+/// least one first step goes down (at the crater, `l − 1`, `l` or `l + 1`
+/// edges do), and that walk reaches the floor in exactly the height `h`;
+/// each step changes the level by at most one, so no walk is shorter.
+/// The level is `depth − h`. A descending walk never meets `j = 0` or
+/// `1728`, whose curves have `End(E) = O_K` (the crater), so a walk that
+/// does is dropped.
+pub fn height_above_floor(p: u64, j0: u64, l: u64, depth: u32) -> Option<u32> {
+    if depth == 0 || j0 == 0 || j0 == 1728 % p {
+        return None;
+    }
+    let w = Word { p };
+    let phi: Vec<(usize, usize, u64)> = modular_polynomial(l)
+        .into_iter()
+        .map(|(i, j, c)| {
+            (
+                i,
+                j,
+                c.mod_floor(&BigInt::from(p)).to_u64().expect("reduced"),
+            )
+        })
+        .collect();
+    if phi.is_empty() {
+        return None;
+    }
+    let top = l as usize + 1;
+    let neighbours = |j: u64| -> Option<Vec<(u64, u32)>> {
+        let mut powers = vec![1u64];
+        for _ in 0..top {
+            powers.push(w.m(*powers.last().expect("non-empty"), j));
+        }
+        let mut f = vec![0u64; top + 1];
+        for &(i, k, c) in &phi {
+            f[k] = w.add(f[k], w.m(c, powers[i]));
+        }
+        let f = Word::strip(f);
+        (f.len() == top + 1).then(|| w.roots(&f))
+    };
+    let start = neighbours(j0)?;
+    if start.iter().map(|r| r.1).sum::<u32>() == 1 {
+        return Some(0);
+    }
+    let mut best: Option<u32> = None;
+    for &(first, _) in &start {
+        let (mut prev, mut cur, mut len) = (j0, first, 1u32);
+        while len <= best.unwrap_or(depth).min(depth) {
+            if cur == 0 || cur == 1728 % p {
+                break;
+            }
+            let mut roots = neighbours(cur)?;
+            if roots.iter().map(|r| r.1).sum::<u32>() == 1 {
+                best = Some(best.map_or(len, |b| b.min(len)));
+                break;
+            }
+            roots.iter_mut().find(|r| r.0 == prev)?.1 -= 1;
+            let &(next, _) = roots.iter().find(|r| r.1 > 0)?;
+            prev = cur;
+            cur = next;
+            len += 1;
+        }
+    }
+    best
+}
+
 /// `α = (x + y√d)/2` as `(x, y)`.
 type Quad = (BigInt, BigInt);
 
@@ -889,6 +1127,78 @@ fn short_j<F: Field>(f: &F, a: &F::E, b: &F::E) -> Option<F::E> {
 
 #[cfg(test)]
 mod tests {
+    /// Heights against a breadth-first search of the `Φ_l` graph in
+    /// PARI/GP (distance to the nearest vertex with one rational
+    /// `l`-isogeny), on 40 random curves over 17- to 20-bit prime fields.
+    #[test]
+    fn descending_walks_match_a_breadth_first_search() {
+        // (p, a, b, l, depth, height)
+        const CASES: &[(u64, u64, u64, u64, u32, u32)] = &[
+            (63997, 14953, 26535, 3, 2, 0),
+            (582541, 293850, 386764, 2, 2, 1),
+            (298733, 282426, 110710, 2, 2, 0),
+            (827681, 578163, 172359, 2, 6, 0),
+            (391337, 290710, 94154, 2, 2, 2),
+            (175277, 50224, 95537, 2, 2, 0),
+            (640369, 109626, 14329, 2, 2, 1),
+            (578209, 566373, 101558, 2, 2, 1),
+            (418129, 159098, 353813, 2, 2, 0),
+            (263761, 151180, 89233, 3, 2, 0),
+            (560149, 537703, 457772, 2, 2, 2),
+            (912469, 566171, 600647, 2, 2, 0),
+            (137477, 111048, 12654, 2, 2, 0),
+            (277513, 61178, 16536, 2, 2, 0),
+            (876013, 424696, 272294, 2, 2, 2),
+            (761669, 250841, 614474, 2, 2, 1),
+            (154417, 34830, 131579, 2, 2, 2),
+            (698053, 368930, 664259, 2, 2, 2),
+            (698053, 368930, 664259, 3, 2, 0),
+            (378241, 148163, 175597, 2, 2, 1),
+            (87121, 38069, 35438, 2, 3, 0),
+            (378593, 300038, 159028, 2, 2, 0),
+            (413533, 228861, 206252, 2, 2, 1),
+            (530249, 190518, 244435, 2, 3, 2),
+            (664933, 389392, 622137, 2, 2, 0),
+            (235273, 36181, 175337, 2, 4, 1),
+            (285101, 138183, 200045, 2, 2, 0),
+            (28649, 8402, 15973, 2, 2, 2),
+            (28649, 8402, 15973, 5, 2, 0),
+            (139457, 45461, 127410, 2, 2, 1),
+            (853949, 532277, 86782, 2, 2, 1),
+            (511057, 257500, 258486, 2, 2, 1),
+            (47717, 37740, 47605, 2, 2, 2),
+            (218249, 48782, 207490, 2, 2, 0),
+            (106013, 70496, 40990, 2, 2, 0),
+            (226553, 79397, 88695, 2, 2, 0),
+            (208697, 119751, 149967, 2, 2, 0),
+            (24709, 8611, 9985, 2, 2, 2),
+            (872177, 83603, 642755, 2, 3, 0),
+            (224131, 14960, 190216, 5, 2, 0),
+        ];
+        for &(p, a, b, l, depth, height) in CASES {
+            let m = |x: u64, y: u64| (u128::from(x) * u128::from(y) % u128::from(p)) as u64;
+            let a3 = m(4, m(a, m(a, a)));
+            let den = (a3 + m(27, m(b, b))) % p;
+            let inv = (0..p - 2).fold((1u64, den, p - 2), |(acc, base, e), _| {
+                if e == 0 {
+                    (acc, base, e)
+                } else {
+                    (
+                        if e & 1 == 1 { m(acc, base) } else { acc },
+                        m(base, base),
+                        e >> 1,
+                    )
+                }
+            });
+            let j = m(m(1728 % p, a3), inv.0);
+            assert_eq!(
+                height_above_floor(p, j, l, depth),
+                Some(height),
+                "p = {p}, a = {a}, b = {b}, l = {l}"
+            );
+        }
+    }
+
     use super::*;
     use crate::cryptanalysis::curve_traits::torsion::{frobenius_is_scalar, scalar_on_power};
 

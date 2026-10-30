@@ -664,6 +664,116 @@ fn specialise(paths: &[String]) {
     }
 }
 
+/// Outcome of one `dreg_closure --fix` record: the closure refutes at ≤ 4,
+/// does not (degree 4 saturated without `1`), or is unmeasured (empty or cut).
+fn fix_outcome(path: &str) -> &'static str {
+    let text = std::fs::read_to_string(path).unwrap_or_default();
+    let Some(line) = text.lines().find(|l| !l.trim().is_empty()) else {
+        return "unmeasured";
+    };
+    let v: Value = serde_json::from_str(line).expect("json");
+    match v["closure_degree"].as_u64() {
+        Some(d) if d <= 4 => "refutes",
+        _ => {
+            let sat4 = v["scan"].as_array().unwrap().iter().any(|s| {
+                s["degree"] == 4 && s["saturated"] == true && s["closure_refuted"] == false
+            });
+            if sat4 {
+                "does not"
+            } else {
+                "unmeasured"
+            }
+        }
+    }
+}
+
+/// Score `research/dreg_closure_guess_20261022` (its PREREGISTRATION.md): one
+/// `dreg_closure --fix` output per `<cell>.d<K>.<arm>.jsonl`, arm `G6` (the
+/// positive control) or `G<K>b<B>` (branch B, 0..2^K, of the K guessed
+/// variables; K is `--k K`, default 4).  Per draw, K guesses suffice when all
+/// 2^K branches refute at ≤ 4 and fail once one branch does not; the run stops
+/// a draw's branches at its first failure.  Controls are valid when G6 refutes
+/// on ≥ 3 of the 4 draws; then ≥ 3 draws sufficing reads "K guesses suffice at
+/// ℓ = 8", ≥ 3 failing reads "K guesses do not suffice", anything else is mixed.
+fn guess(args: &[String]) {
+    let mut k: u32 = 4;
+    let mut paths: Vec<String> = Vec::new();
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if a == "--k" {
+            k = it.next().expect("--k K").parse().expect("K");
+        } else {
+            paths.push(a.clone());
+        }
+    }
+    let nb = 1u32 << k;
+    let words = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    ];
+    let kw = words
+        .get(k as usize)
+        .map_or_else(|| k.to_string(), |w| w.to_string());
+    let mut grid: BTreeMap<(String, u64), BTreeMap<String, &'static str>> = BTreeMap::new();
+    for path in &paths {
+        let name = std::path::Path::new(path)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or("")
+            .trim_end_matches(".jsonl")
+            .to_string();
+        let parts: Vec<&str> = name.split('.').collect();
+        assert_eq!(parts.len(), 3, "{path}: want <cell>.d<K>.<arm>.jsonl");
+        let draw: u64 = parts[1].trim_start_matches('d').parse().expect("d<K>");
+        grid.entry((parts[0].to_string(), draw))
+            .or_default()
+            .insert(parts[2].to_string(), fix_outcome(path));
+    }
+    println!("| cell | draw | G6 (6,6,6) | G{k} branches refuting | G{k} branches not refuting | G{k} unmeasured | {kw} guesses |");
+    println!("|---|--:|---|--:|--:|--:|---|");
+    let (mut g6_ref, mut suffice, mut fail, mut draws) = (0, 0, 0, 0);
+    for ((cell, draw), row) in &grid {
+        draws += 1;
+        let g6 = *row.get("G6").unwrap_or(&"missing");
+        if g6 == "refutes" {
+            g6_ref += 1;
+        }
+        let (mut r, mut n, mut u) = (0, 0, 0);
+        for b in 0..nb {
+            match row.get(&format!("G{k}b{b}")).copied() {
+                Some("refutes") => r += 1,
+                Some("does not") => n += 1,
+                _ => u += 1,
+            }
+        }
+        let verdict = if n > 0 {
+            fail += 1;
+            "do not suffice"
+        } else if r == nb {
+            suffice += 1;
+            "suffice"
+        } else {
+            "incomplete"
+        };
+        println!("| {cell} | {draw} | {g6} | {r} | {n} | {u} | {verdict} |");
+    }
+    println!();
+    let valid = g6_ref >= 3;
+    println!(
+        "Control: G6 refutes on {g6_ref} of {draws} (need ≥ 3) → {}",
+        if valid { "valid" } else { "NOT valid" }
+    );
+    let v = if !valid {
+        "uninformative (control not valid)".to_string()
+    } else if suffice >= 3 {
+        format!("{kw} guesses suffice at ℓ = 8")
+    } else if fail >= 3 {
+        format!("{kw} guesses do not suffice at ℓ = 8")
+    } else {
+        "mixed".to_string()
+    };
+    println!("Draws: {suffice} suffice, {fail} do not → {v}");
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
@@ -674,9 +784,10 @@ fn main() {
         Some("closure") => closure(&args[1..]),
         Some("scale") => scale(&args[1..]),
         Some("specialise") => specialise(&args[1..]),
+        Some("guess") => guess(&args[1..]),
         _ => {
             eprintln!(
-                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES…"
+                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | guess [--k K] FILES…"
             );
             std::process::exit(2);
         }

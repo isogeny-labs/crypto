@@ -1300,7 +1300,9 @@ mod tests {
                 let irr = field(n);
                 let gf = Gf2::new(&irr);
                 for a6v in 1u64..40 {
-                    let Some(curve) = Curve::new(n, &irr, 0, a6v) else { continue };
+                    let Some(curve) = Curve::new(n, &irr, 0, a6v) else {
+                        continue;
+                    };
                     if curve.order % ell != 0 || curve.order % (ell * ell) == 0 {
                         continue;
                     }
@@ -1324,7 +1326,8 @@ mod tests {
                     let mut h = F2mPoly::from_coeffs(vec![F2mElement::one(n)], n);
                     let mut multiple = p;
                     for _ in 0..(ell - 1) / 2 {
-                        let lin = F2mPoly::from_coeffs(vec![elt(multiple.x, n), F2mElement::one(n)], n);
+                        let lin =
+                            F2mPoly::from_coeffs(vec![elt(multiple.x, n), F2mElement::one(n)], n);
                         h = h.mul(&lin, &irr);
                         multiple = curve.fast.add(multiple, p);
                     }
@@ -1334,17 +1337,29 @@ mod tests {
                     assert_ne!(a6p_v, 0, "ell={ell} n={n} a6={a6v}: singular codomain");
                     let jp = gf.inv(a6p_v);
                     let phi = phi_l_mod2_in_x(ell as u32, &elt(gf.inv(a6v), n), n, &irr);
-                    let jroots: Vec<u64> = find_roots_in_f2m(&phi, n, &irr).iter().map(to_u64).collect();
-                    assert!(jroots.contains(&jp), "ell={ell} n={n} a6={a6v}: j'={jp} not a root of Phi_ell");
+                    let jroots: Vec<u64> = find_roots_in_f2m(&phi, n, &irr)
+                        .iter()
+                        .map(to_u64)
+                        .collect();
+                    assert!(
+                        jroots.contains(&jp),
+                        "ell={ell} n={n} a6={a6v}: j'={jp} not a root of Phi_ell"
+                    );
                     let codomain = Curve::new(n, &irr, 0, a6p_v).expect("codomain curve");
-                    assert_eq!(codomain.order, curve.order, "ell={ell} n={n} a6={a6v}: order changed");
+                    assert_eq!(
+                        codomain.order, curve.order,
+                        "ell={ell} n={n} a6={a6v}: order changed"
+                    );
                     tested += 1;
                     if tested >= 3 {
                         break 'search;
                     }
                 }
             }
-            assert!(tested >= 1, "no rational order-{ell} kernel found in the search range");
+            assert!(
+                tested >= 1,
+                "no rational order-{ell} kernel found in the search range"
+            );
         }
     }
 

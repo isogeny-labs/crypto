@@ -34,17 +34,25 @@
 //!
 //! ## Honest scope
 //!
-//! - **Polynomial-IOP level only.**  We implement the prover/verifier
-//!   in terms of polynomial *values* at random challenge `ζ` — not
-//!   in terms of pairing-based KZG opening proofs.  The KZG-binding
-//!   layer is in [`super::kzg`]; combining the two requires a
-//!   working pairing primitive, which our `bls12_381::pairing`
-//!   does not yet provide (see Groth16 notes).  The polynomial-IOP
-//!   verifier here accepts iff the combined identity holds at `ζ` —
-//!   this is the actual soundness-relevant check; KZG just binds
-//!   the polynomial choices.
-//!   The standalone [`verify`] API is therefore an educational identity checker,
-//!   not a complete binding SNARK verifier.
+//! - **Polynomial-IOP level only; the polynomials stand in for their
+//!   commitments.**  The proof carries `a, b, c, Z, t` in the clear (so
+//!   it is neither succinct nor zero-knowledge) and no KZG opening
+//!   proofs: the KZG layer is in [`super::kzg`], and combining the two
+//!   needs a working pairing, which `bls12_381::pairing` does not yet
+//!   provide (see the Groth16 notes).  [`verify`] absorbs every
+//!   polynomial, checks each sent evaluation `a(ζ), b(ζ), c(ζ), Z(ζω)`
+//!   against the polynomial it was sent (the step KZG openings would
+//!   do), and checks
+//!   `gate(ζ) + α·perm(ζ) + α²·L₁(ζ)·(Z(ζ) − 1) = t(ζ)·Z_H(ζ)` from
+//!   those evaluations: the gate equation, the copy constraints (`σ`
+//!   polynomials, coset constants 1, 2, 3) and `Z(1) = 1`.  Before
+//!   2026-10-28 the sent evaluations were never checked and the
+//!   quotient left out the permutation, so a forger could solve for
+//!   `Z(ζω)` and pass any circuit (sheriff case SHF-20261028-0f3f64,
+//!   S2N-10).  Soundness is the usual Schwartz–Zippel bound over a
+//!   random-oracle Fiat–Shamir transcript; this is an educational,
+//!   unaudited verifier with no stated security level and must not back
+//!   a research claim.
 //!
 //! - **Single multiplicative-subgroup domain.**  We use a small
 //!   power-of-2 domain `H` with a primitive root of unity `ω` over
@@ -245,6 +253,15 @@ pub fn prove(circuit: &Circuit, witness: &Witness) -> PlonkProof {
         circuit.is_satisfied(witness),
         "witness does not satisfy circuit (prover would fail anyway; flagged early)"
     );
+    let (proof, rem) = prove_unchecked(circuit, witness);
+    assert!(rem.coeffs.is_empty(), "Z_H divides the combined identity");
+    proof
+}
+
+/// The prover without the witness check: also returns the remainder of
+/// the combined identity modulo `Z_H`, which is zero iff the witness
+/// satisfies the circuit (the tests build cheating proofs with it).
+fn prove_unchecked(circuit: &Circuit, witness: &Witness) -> (PlonkProof, Poly) {
     let n = circuit.n;
     let h_domain = domain(n);
 
@@ -266,12 +283,11 @@ pub fn prove(circuit: &Circuit, witness: &Witness) -> PlonkProof {
     let z_poly = lagrange_from_evaluations(&h_domain, &z_values);
 
     // Construct the quotient polynomial t(X) such that
-    //   t(X) · Z_H(X) = combined_identity(X)
-    // where combined_identity is gate_constraint + α·perm_constraint.
+    //   t(X) · Z_H(X) = combined_identity(X).
     transcript.append_poly("z", &z_poly);
     let alpha = transcript.challenge("alpha");
 
-    let t_poly = compute_quotient(
+    let (t_poly, rem) = compute_quotient(
         circuit, &h_domain, &a_poly, &b_poly, &c_poly, &z_poly, &beta, &gamma, &alpha,
     );
 
@@ -281,29 +297,22 @@ pub fn prove(circuit: &Circuit, witness: &Witness) -> PlonkProof {
     let omega = primitive_nth_root(n);
     let zeta_omega = fr_mul(&zeta, &omega);
 
-    PlonkProof {
-        a_poly: a_poly.clone(),
-        b_poly: b_poly.clone(),
-        c_poly: c_poly.clone(),
-        z_poly: z_poly.clone(),
-        t_poly: t_poly.clone(),
+    let proof = PlonkProof {
         a_zeta: a_poly.evaluate(&zeta),
         b_zeta: b_poly.evaluate(&zeta),
         c_zeta: c_poly.evaluate(&zeta),
         z_zeta_omega: z_poly.evaluate(&zeta_omega),
-    }
+        a_poly,
+        b_poly,
+        c_poly,
+        z_poly,
+        t_poly,
+    };
+    (proof, rem)
 }
 
-/// Verify a [`PlonkProof`] against the circuit.  Replays the
-/// transcript to recover `(β, γ, α, ζ)`, then checks the combined
-/// polynomial identity at `ζ`.
-pub fn verify(circuit: &Circuit, proof: &PlonkProof) -> bool {
-    if !circuit.is_well_formed() {
-        return false;
-    }
-    let n = circuit.n;
-    let h_domain = domain(n);
-
+/// The Fiat-Shamir challenges `(β, γ, α, ζ)` of `proof`.
+fn challenges(proof: &PlonkProof) -> (BigUint, BigUint, BigUint, BigUint) {
     let mut transcript = Transcript::new();
     transcript.append_poly("a", &proof.a_poly);
     transcript.append_poly("b", &proof.b_poly);
@@ -314,62 +323,168 @@ pub fn verify(circuit: &Circuit, proof: &PlonkProof) -> bool {
     let alpha = transcript.challenge("alpha");
     transcript.append_poly("t", &proof.t_poly);
     let zeta = transcript.challenge("zeta");
+    (beta, gamma, alpha, zeta)
+}
 
-    let omega = primitive_nth_root(n);
+/// Verify a [`PlonkProof`] against the circuit.  Rejects non-canonical
+/// values, replays the transcript to recover `(β, γ, α, ζ)`, checks
+/// every evaluation the proof sends against the polynomial it was sent
+/// (`a(ζ), b(ζ), c(ζ), Z(ζω)`), then checks the combined identity
+/// (gate, copy constraints, `Z(1) = 1`) at `ζ` from those evaluations.
+/// Returns `false`, never panics, on malformed input.
+pub fn verify(circuit: &Circuit, proof: &PlonkProof) -> bool {
+    if !circuit.is_well_formed() {
+        return false;
+    }
+    let r = scalar_modulus();
+    let polys = [
+        &proof.a_poly,
+        &proof.b_poly,
+        &proof.c_poly,
+        &proof.z_poly,
+        &proof.t_poly,
+    ];
+    let evals = [
+        &proof.a_zeta,
+        &proof.b_zeta,
+        &proof.c_zeta,
+        &proof.z_zeta_omega,
+    ];
+    if polys.iter().any(|p| p.coeffs.iter().any(|c| *c >= r)) || evals.iter().any(|v| **v >= r) {
+        return false;
+    }
+    let (_, _, _, zeta) = challenges(proof);
+    let zeta_omega = fr_mul(&zeta, &primitive_nth_root(circuit.n));
+    // Each sent evaluation is the sent polynomial's (the polynomials
+    // stand in for their commitments; see "Honest scope").
+    if proof.a_zeta != proof.a_poly.evaluate(&zeta)
+        || proof.b_zeta != proof.b_poly.evaluate(&zeta)
+        || proof.c_zeta != proof.c_poly.evaluate(&zeta)
+        || proof.z_zeta_omega != proof.z_poly.evaluate(&zeta_omega)
+    {
+        return false;
+    }
+    identity_residual(circuit, proof).is_zero()
+}
 
-    // Recompute the selector and identity-permutation values at ζ
-    // (the verifier knows the circuit, so this is "preprocessing").
-    let q_l_poly = lagrange_from_evaluations(&h_domain, &circuit.q_l);
-    let q_r_poly = lagrange_from_evaluations(&h_domain, &circuit.q_r);
-    let q_o_poly = lagrange_from_evaluations(&h_domain, &circuit.q_o);
-    let q_m_poly = lagrange_from_evaluations(&h_domain, &circuit.q_m);
-    let q_c_poly = lagrange_from_evaluations(&h_domain, &circuit.q_c);
+/// `combined(ζ) − t(ζ)·Z_H(ζ)` computed from the proof's sent
+/// evaluations, where
+///   `combined = gate + α·perm + α²·L₁·(Z − 1)`.
+/// Zero is the identity check of [`verify`]; on its own it is the
+/// pre-2026-10-28 verifier, which never tied the sent evaluations to
+/// the polynomials (SHF-20261028-0f3f64, S2N-10).
+fn identity_residual(circuit: &Circuit, proof: &PlonkProof) -> BigUint {
+    let n = circuit.n;
+    let h_domain = domain(n);
+    let (beta, gamma, alpha, zeta) = challenges(proof);
 
+    // Recompute the selector and permutation values at ζ (the verifier
+    // knows the circuit, so this is "preprocessing").
+    let [q_l, q_r, q_o, q_m, q_c] = selector_polys(circuit, &h_domain);
     let a_z = &proof.a_zeta;
     let b_z = &proof.b_zeta;
     let c_z = &proof.c_zeta;
-    let q_l_z = q_l_poly.evaluate(&zeta);
-    let q_r_z = q_r_poly.evaluate(&zeta);
-    let q_o_z = q_o_poly.evaluate(&zeta);
-    let q_m_z = q_m_poly.evaluate(&zeta);
-    let q_c_z = q_c_poly.evaluate(&zeta);
 
     // Gate identity at ζ:
     //   gate(ζ) = q_M·a·b + q_L·a + q_R·b + q_O·c + q_C.
     let gate_zeta = fr_add(
         &fr_add(
-            &fr_add(&fr_mul(&q_m_z, &fr_mul(a_z, b_z)), &fr_mul(&q_l_z, a_z)),
-            &fr_add(&fr_mul(&q_r_z, b_z), &fr_mul(&q_o_z, c_z)),
+            &fr_add(
+                &fr_mul(&q_m.evaluate(&zeta), &fr_mul(a_z, b_z)),
+                &fr_mul(&q_l.evaluate(&zeta), a_z),
+            ),
+            &fr_add(
+                &fr_mul(&q_r.evaluate(&zeta), b_z),
+                &fr_mul(&q_o.evaluate(&zeta), c_z),
+            ),
         ),
-        &q_c_z,
+        &q_c.evaluate(&zeta),
     );
 
-    // Permutation identity at ζ (simplified — full PLONK uses
-    // σ_a, σ_b, σ_c polynomials and the grand-product check):
-    //   perm(ζ) = Z(ζ·ω) · ∏_i (wire_i(ζ) + β·σ_i(ζ) + γ)
-    //           − Z(ζ)   · ∏_i (wire_i(ζ) + β·k_i·ζ + γ).
+    // Permutation identity at ζ:
+    //   perm(ζ) = Z(ζ)·∏_i (wire_i(ζ) + β·k_i·ζ + γ)
+    //           − Z(ζω)·∏_i (wire_i(ζ) + β·σ_i(ζ) + γ).
     let z_z = proof.z_poly.evaluate(&zeta);
-    let z_zw = &proof.z_zeta_omega;
     let perm_check = permutation_identity_at_zeta(
-        circuit, &h_domain, &zeta, &beta, &gamma, a_z, b_z, c_z, &z_z, z_zw,
+        circuit,
+        &h_domain,
+        &zeta,
+        &beta,
+        &gamma,
+        a_z,
+        b_z,
+        c_z,
+        &z_z,
+        &proof.z_zeta_omega,
+    );
+    // Z(1) = 1: L₁(ζ)·(Z(ζ) − 1).
+    let boundary = fr_mul(
+        &lagrange_first(&h_domain).evaluate(&zeta),
+        &fr_sub(&z_z, &BigUint::one()),
     );
 
-    // Combined identity:
-    //   combined(ζ) = gate(ζ) + α·perm(ζ).
-    let combined = fr_add(&gate_zeta, &fr_mul(&alpha, &perm_check));
+    let combined = fr_add(
+        &gate_zeta,
+        &fr_add(
+            &fr_mul(&alpha, &perm_check),
+            &fr_mul(&fr_mul(&alpha, &alpha), &boundary),
+        ),
+    );
 
     // Vanishing polynomial Z_H(X) = X^n − 1 at ζ.
     let zeta_n = fr_pow(&zeta, &BigUint::from(n as u64));
     let z_h_zeta = fr_sub(&zeta_n, &BigUint::one());
-
-    // Check: combined(ζ) = t(ζ) · Z_H(ζ).
-    let t_zeta = proof.t_poly.evaluate(&zeta);
-    let rhs = fr_mul(&t_zeta, &z_h_zeta);
-    let _ = omega;
-    combined == rhs
+    let rhs = fr_mul(&proof.t_poly.evaluate(&zeta), &z_h_zeta);
+    fr_sub(&combined, &rhs)
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
+
+/// The coset constants `k_a, k_b, k_c` of the three wire columns.
+fn wire_ks() -> [BigUint; 3] {
+    [BigUint::one(), BigUint::from(2u32), BigUint::from(3u32)]
+}
+
+/// Selector polynomials `[q_L, q_R, q_O, q_M, q_C]`.
+fn selector_polys(circuit: &Circuit, h_domain: &[BigUint]) -> [Poly; 5] {
+    [
+        &circuit.q_l,
+        &circuit.q_r,
+        &circuit.q_o,
+        &circuit.q_m,
+        &circuit.q_c,
+    ]
+    .map(|q| lagrange_from_evaluations(h_domain, q))
+}
+
+/// Permutation polynomials `[σ_a, σ_b, σ_c]`: column `j` takes
+/// `k_col · ω^row` of the wire that wire `j·n + i` is wired to.
+fn sigma_polys(circuit: &Circuit, h_domain: &[BigUint]) -> [Poly; 3] {
+    let n = circuit.n;
+    let [k_a, k_b, k_c] = wire_ks();
+    [0, 1, 2].map(|col| {
+        let evals: Vec<BigUint> = (0..n)
+            .map(|i| {
+                wire_id_to_omega(
+                    circuit.permutation[col * n + i],
+                    n,
+                    h_domain,
+                    &k_a,
+                    &k_b,
+                    &k_c,
+                )
+            })
+            .collect();
+        lagrange_from_evaluations(h_domain, &evals)
+    })
+}
+
+/// `L₁(X)`: 1 at `ω⁰ = 1`, 0 elsewhere on `H`.
+fn lagrange_first(h_domain: &[BigUint]) -> Poly {
+    let mut e = vec![BigUint::zero(); h_domain.len()];
+    e[0] = BigUint::one();
+    lagrange_from_evaluations(h_domain, &e)
+}
 
 /// Build the polynomial of degree `< n` that takes `evals[i]` at
 /// `domain[i]`.  Uses naive Lagrange interpolation; for small `n`
@@ -406,9 +521,7 @@ fn compute_z(
     gamma: &BigUint,
 ) -> Vec<BigUint> {
     let n = circuit.n;
-    let k_a = BigUint::one();
-    let k_b = BigUint::from(2u32);
-    let k_c = BigUint::from(3u32);
+    let [k_a, k_b, k_c] = wire_ks();
     let mut z = Vec::with_capacity(n);
     z.push(BigUint::one()); // Z(ω^0) = 1
     let mut acc = BigUint::one();
@@ -468,12 +581,13 @@ fn wire_id_to_omega(
     fr_mul(k, &h_domain[row])
 }
 
-/// Compute the quotient polynomial `t(X)` such that
-///   `(gate_constraint(X) + α · perm_constraint(X)) = t(X) · Z_H(X)`.
-///
-/// We do this by computing the LHS as a polynomial and dividing by
-/// `Z_H(X) = X^n − 1`.  For the witness/permutation we use,
-/// the division leaves zero remainder iff the witness is valid.
+/// Compute the quotient polynomial `t(X)` and remainder of
+///   `gate(X) + α·perm(X) + α²·L₁(X)·(Z(X) − 1)` divided by
+/// `Z_H(X) = X^n − 1`, where
+///   `perm(X) = Z(X)·∏_i (w_i(X) + β·k_i·X + γ)
+///            − Z(ωX)·∏_i (w_i(X) + β·σ_i(X) + γ)`.
+/// The remainder is zero iff the witness satisfies the gates, the copy
+/// constraints and `Z(1) = 1` on `H`.
 fn compute_quotient(
     circuit: &Circuit,
     h_domain: &[BigUint],
@@ -484,41 +598,51 @@ fn compute_quotient(
     beta: &BigUint,
     gamma: &BigUint,
     alpha: &BigUint,
-) -> Poly {
+) -> (Poly, Poly) {
     let n = circuit.n;
-    let q_l_poly = lagrange_from_evaluations(h_domain, &circuit.q_l);
-    let q_r_poly = lagrange_from_evaluations(h_domain, &circuit.q_r);
-    let q_o_poly = lagrange_from_evaluations(h_domain, &circuit.q_o);
-    let q_m_poly = lagrange_from_evaluations(h_domain, &circuit.q_m);
-    let q_c_poly = lagrange_from_evaluations(h_domain, &circuit.q_c);
+    let [q_l, q_r, q_o, q_m, q_c] = selector_polys(circuit, h_domain);
 
     // Gate(X) = q_M·a·b + q_L·a + q_R·b + q_O·c + q_C.
-    let ab = a_poly.mul(b_poly);
-    let gate = q_m_poly
-        .mul(&ab)
-        .add(&q_l_poly.mul(a_poly))
-        .add(&q_r_poly.mul(b_poly))
-        .add(&q_o_poly.mul(c_poly))
-        .add(&q_c_poly);
+    let gate = q_m
+        .mul(&a_poly.mul(b_poly))
+        .add(&q_l.mul(a_poly))
+        .add(&q_r.mul(b_poly))
+        .add(&q_o.mul(c_poly))
+        .add(&q_c);
 
-    // For the educational version: just verify the polynomial-IOP
-    // identity by computing the combined LHS and dividing by Z_H.
-    // The permutation part is omitted from the simplified quotient
-    // (replaced by a direct evaluation check in verify()).
-    // This shortcut is intentional — the gate constraint is the
-    // load-bearing soundness component; the permutation is verified
-    // separately via Z(ω·ζ) / Z(ζ) at the challenge point.
-
-    let _ = (z_poly, beta, gamma, alpha);
+    // perm(X), with w + β·s + γ for s = k·X (identity) or σ (wiring).
+    let x = Poly::from_coeffs(vec![BigUint::zero(), BigUint::one()]);
+    let gamma_c = Poly::constant(gamma.clone());
+    let term = |w: &Poly, s: &Poly| w.add(&s.scale(beta)).add(&gamma_c);
+    let wires = [a_poly, b_poly, c_poly];
+    let ks = wire_ks();
+    let sigmas = sigma_polys(circuit, h_domain);
+    let mut num = Poly::constant(BigUint::one());
+    let mut den = Poly::constant(BigUint::one());
+    for i in 0..3 {
+        num = num.mul(&term(wires[i], &x.scale(&ks[i])));
+        den = den.mul(&term(wires[i], &sigmas[i]));
+    }
+    // Z(ωX): scale coefficient j by ω^j.
+    let omega = primitive_nth_root(n);
+    let mut w_j = BigUint::one();
+    let mut z_shift = Vec::with_capacity(z_poly.coeffs.len());
+    for c in &z_poly.coeffs {
+        z_shift.push(fr_mul(c, &w_j));
+        w_j = fr_mul(&w_j, &omega);
+    }
+    let z_shift = Poly::from_coeffs(z_shift);
+    let perm = z_poly.mul(&num).sub(&z_shift.mul(&den));
+    let boundary = lagrange_first(h_domain).mul(&z_poly.sub(&Poly::constant(BigUint::one())));
+    let combined = gate
+        .add(&perm.scale(alpha))
+        .add(&boundary.scale(&fr_mul(alpha, alpha)));
 
     // Z_H(X) = X^n − 1.
     let mut z_h_coeffs = vec![BigUint::zero(); n + 1];
     z_h_coeffs[0] = fr_neg(&BigUint::one());
     z_h_coeffs[n] = BigUint::one();
-    let z_h = Poly::from_coeffs(z_h_coeffs);
-
-    let (t, _rem) = gate.divmod(&z_h);
-    t
+    combined.divmod(&Poly::from_coeffs(z_h_coeffs))
 }
 
 fn permutation_identity_at_zeta(
@@ -533,45 +657,22 @@ fn permutation_identity_at_zeta(
     z_z: &BigUint,
     z_zw: &BigUint,
 ) -> BigUint {
-    let n = circuit.n;
-    let k_a = BigUint::one();
-    let k_b = BigUint::from(2u32);
-    let k_c = BigUint::from(3u32);
-    // Permutation polynomials σ_a, σ_b, σ_c interpolated on H.
-    let sigma_a_evals: Vec<BigUint> = (0..n)
-        .map(|i| wire_id_to_omega(circuit.permutation[i], n, h_domain, &k_a, &k_b, &k_c))
-        .collect();
-    let sigma_b_evals: Vec<BigUint> = (0..n)
-        .map(|i| wire_id_to_omega(circuit.permutation[n + i], n, h_domain, &k_a, &k_b, &k_c))
-        .collect();
-    let sigma_c_evals: Vec<BigUint> = (0..n)
-        .map(|i| {
-            wire_id_to_omega(
-                circuit.permutation[2 * n + i],
-                n,
-                h_domain,
-                &k_a,
-                &k_b,
-                &k_c,
-            )
-        })
-        .collect();
-    let sigma_a_poly = lagrange_from_evaluations(h_domain, &sigma_a_evals);
-    let sigma_b_poly = lagrange_from_evaluations(h_domain, &sigma_b_evals);
-    let sigma_c_poly = lagrange_from_evaluations(h_domain, &sigma_c_evals);
-    let sigma_a_z = sigma_a_poly.evaluate(zeta);
-    let sigma_b_z = sigma_b_poly.evaluate(zeta);
-    let sigma_c_z = sigma_c_poly.evaluate(zeta);
-
-    let num_a = fr_add(a_z, &fr_add(&fr_mul(beta, &fr_mul(&k_a, zeta)), gamma));
-    let num_b = fr_add(b_z, &fr_add(&fr_mul(beta, &fr_mul(&k_b, zeta)), gamma));
-    let num_c = fr_add(c_z, &fr_add(&fr_mul(beta, &fr_mul(&k_c, zeta)), gamma));
-    let num = fr_mul(&fr_mul(&num_a, &num_b), &num_c);
-
-    let den_a = fr_add(a_z, &fr_add(&fr_mul(beta, &sigma_a_z), gamma));
-    let den_b = fr_add(b_z, &fr_add(&fr_mul(beta, &sigma_b_z), gamma));
-    let den_c = fr_add(c_z, &fr_add(&fr_mul(beta, &sigma_c_z), gamma));
-    let den = fr_mul(&fr_mul(&den_a, &den_b), &den_c);
+    let ks = wire_ks();
+    let sigmas = sigma_polys(circuit, h_domain);
+    let wires = [a_z, b_z, c_z];
+    let mut num = BigUint::one();
+    let mut den = BigUint::one();
+    for i in 0..3 {
+        let w_gamma = fr_add(wires[i], gamma);
+        num = fr_mul(
+            &num,
+            &fr_add(&w_gamma, &fr_mul(beta, &fr_mul(&ks[i], zeta))),
+        );
+        den = fr_mul(
+            &den,
+            &fr_add(&w_gamma, &fr_mul(beta, &sigmas[i].evaluate(zeta))),
+        );
+    }
 
     // Identity: Z(ζ)·num − Z(ζω)·den = 0  (rearranged from
     // Z(ζω)/Z(ζ) = num/den).
@@ -655,6 +756,41 @@ mod tests {
         (circuit, witness)
     }
 
+    /// `x · y = c₀` then `c₀ + 5 = c₁`, with the copy constraint
+    /// `c₀ = a₁` (wires 8 and 1 swapped in the permutation).
+    fn copy_circuit() -> (Circuit, Witness) {
+        let (mut circuit, _) = toy_circuit();
+        circuit.permutation.swap(1, 8);
+        let v = |x: [u32; 4]| x.map(BigUint::from).to_vec();
+        let witness = Witness {
+            a: v([3, 12, 0, 0]),
+            b: v([4, 5, 0, 0]),
+            c: v([12, 17, 0, 0]),
+        };
+        (circuit, witness)
+    }
+
+    /// The four evaluations a proof sends.
+    fn evals(p: &mut PlonkProof) -> [&mut BigUint; 4] {
+        [
+            &mut p.a_zeta,
+            &mut p.b_zeta,
+            &mut p.c_zeta,
+            &mut p.z_zeta_omega,
+        ]
+    }
+
+    /// Set evaluation `j` so the identity at ζ holds (the residual is
+    /// affine in each sent evaluation); `None` if its slope is zero.
+    fn solve_eval(circuit: &Circuit, proof: &mut PlonkProof, j: usize) -> Option<()> {
+        *evals(proof)[j] = BigUint::zero();
+        let r0 = identity_residual(circuit, proof);
+        *evals(proof)[j] = BigUint::one();
+        let slope = fr_sub(&identity_residual(circuit, proof), &r0);
+        *evals(proof)[j] = fr_mul(&fr_neg(&r0), &fr_inv(&slope)?);
+        Some(())
+    }
+
     /// **Direct R1CS-style check** that the witness satisfies the
     /// circuit's gate equations.
     #[test]
@@ -695,6 +831,103 @@ mod tests {
         for (d, e) in dom.iter().zip(&evals) {
             assert_eq!(&p.evaluate(d), e);
         }
+    }
+
+    /// Copy constraints are now part of the quotient: an honest proof
+    /// for a circuit with a non-identity permutation verifies.
+    #[test]
+    fn plonk_prove_verify_with_copy_constraint() {
+        let (circuit, witness) = copy_circuit();
+        assert!(verify(&circuit, &prove(&circuit, &witness)));
+    }
+
+    /// S2N-10 (SHF-20261028-0f3f64): each sent evaluation is checked
+    /// against its polynomial.  Shifting one by 1 is rejected; so is the
+    /// finding's forgery, which shifts one and solves another (`Z(ζω)`,
+    /// or `c(ζ)` when `Z(ζω)` is the one shifted) so the identity at ζ
+    /// still holds.  Control: the forged identity residual is zero, so
+    /// the identity check alone (the old verifier) accepts it.
+    #[test]
+    fn rejects_tampered_evaluations() {
+        for (circuit, witness) in [toy_circuit(), copy_circuit()] {
+            let proof = prove(&circuit, &witness);
+            assert!(identity_residual(&circuit, &proof).is_zero());
+            for i in 0..4 {
+                let mut p = proof.clone();
+                let shifted = fr_add(evals(&mut p)[i], &BigUint::one());
+                *evals(&mut p)[i] = shifted.clone();
+                assert!(!verify(&circuit, &p), "eval {i} + 1");
+                let j = if i == 3 { 2 } else { 3 };
+                solve_eval(&circuit, &mut p, j).expect("non-zero slope");
+                assert_eq!(*evals(&mut p)[i], shifted);
+                assert!(identity_residual(&circuit, &p).is_zero(), "control {i}");
+                assert!(!verify(&circuit, &p), "forged eval {i}");
+            }
+        }
+    }
+
+    /// Witnesses that break a gate, a copy constraint, or `Z(1) = 1`
+    /// (an all-zero accumulator satisfies the grand-product recursion
+    /// trivially) leave a remainder mod `Z_H`; their proofs, with
+    /// honest evaluations, are rejected.
+    #[test]
+    fn rejects_unsatisfying_witnesses() {
+        let (circuit, mut witness) = toy_circuit();
+        witness.c[0] = BigUint::from(99u32);
+        let (p, rem) = prove_unchecked(&circuit, &witness);
+        assert!(!rem.coeffs.is_empty());
+        assert!(!verify(&circuit, &p));
+        // Gates hold, the copy c₀ = a₁ does not.
+        let (circuit, mut witness) = copy_circuit();
+        witness.a[1] = BigUint::from(11u32);
+        witness.c[1] = BigUint::from(16u32);
+        let (p, rem) = prove_unchecked(&circuit, &witness);
+        assert!(!rem.coeffs.is_empty());
+        assert!(!verify(&circuit, &p));
+        // Z ≡ 0 with the true witness, t the floor quotient.
+        let (circuit, witness) = copy_circuit();
+        let mut p = prove(&circuit, &witness);
+        let h = domain(circuit.n);
+        let z_poly = Poly::zero();
+        let mut t = Transcript::new();
+        for (l, q) in [("a", &p.a_poly), ("b", &p.b_poly), ("c", &p.c_poly)] {
+            t.append_poly(l, q);
+        }
+        let (beta, gamma) = (t.challenge("beta"), t.challenge("gamma"));
+        t.append_poly("z", &z_poly);
+        let alpha = t.challenge("alpha");
+        let (t_poly, rem) = compute_quotient(
+            &circuit, &h, &p.a_poly, &p.b_poly, &p.c_poly, &z_poly, &beta, &gamma, &alpha,
+        );
+        assert!(!rem.coeffs.is_empty(), "L₁·(Z − 1) leaves a remainder");
+        p.z_poly = z_poly;
+        p.t_poly = t_poly;
+        let (_, _, _, zeta) = challenges(&p);
+        p.a_zeta = p.a_poly.evaluate(&zeta);
+        p.b_zeta = p.b_poly.evaluate(&zeta);
+        p.c_zeta = p.c_poly.evaluate(&zeta);
+        p.z_zeta_omega = BigUint::zero();
+        assert!(!verify(&circuit, &p));
+    }
+
+    /// Non-canonical evaluations or coefficients (`v + r`, `2^300`)
+    /// return false instead of panicking in the transcript.
+    #[test]
+    fn rejects_non_canonical_values_without_panic() {
+        let (circuit, witness) = toy_circuit();
+        let proof = prove(&circuit, &witness);
+        let r = scalar_modulus();
+        for i in 0..4 {
+            let mut p = proof.clone();
+            *evals(&mut p)[i] += &r;
+            assert!(!verify(&circuit, &p));
+        }
+        let mut p = proof.clone();
+        p.a_poly.coeffs[0] = BigUint::one() << 300;
+        assert!(!verify(&circuit, &p));
+        let mut p = proof.clone();
+        p.t_poly.coeffs.push(r.clone());
+        assert!(!verify(&circuit, &p));
     }
 
     /// **Polynomial-IOP prover and verifier** on the toy circuit.

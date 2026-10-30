@@ -24,6 +24,7 @@ use rand::SeedableRng;
 use serde_json::json;
 
 use crypto_lib::binary_ecc::curve::BinaryCurve;
+use crypto_lib::ecc::certicom::prime_challenge;
 
 use crypto_lib::cryptanalysis::ecdlp_nist::{
     self as nist, anomalous, audit, curve_by_name, curve_names, nist_curves, solve, Audit, Curve,
@@ -35,7 +36,7 @@ use crypto_lib::cryptanalysis::ecdlp_nist::{
     name = "ecdlp-nist",
     version,
     about = "ECDLP solvers and structural audit across NIST and Certicom curves",
-    long_about = "Solve Q = [k]G on the NIST P, K and B curves and Certicom prime/binary \
+    long_about = "Solve Q = [k]G on the NIST P, K and B curves and Certicom prime and binary \
                   challenges by the \
                   branch the curve calls for (Smart on anomalous prime curves, \
                   Pohlig–Hellman on composite orders, BSGS/kangaroo on an interval, \
@@ -290,15 +291,14 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     };
     // Target: planted or supplied.
     let (target, planted): (nist::AnyPoint, Option<BigUint>) = if args.challenge {
-        if curve.name.eq_ignore_ascii_case("ECCp-131") {
-            let (x, y) = crypto_lib::ecc::curve::CurveParams::certicom_eccp131_target();
-            let target = curve.parse_point(&x.to_str_radix(16), &y.to_str_radix(16))?;
-            (target, None)
+        let target = if let Some((_, target)) = prime_challenge(&curve.name) {
+            nist::AnyPoint::Prime(target)
+        } else if let Some((_, target)) = BinaryCurve::certicom_challenge(&curve.name) {
+            nist::AnyPoint::Binary(target)
         } else {
-            let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
-                .ok_or_else(|| format!("{} is not a supported Certicom challenge", curve.name))?;
-            (nist::AnyPoint::Binary(target), None)
-        }
+            return Err(format!("{} is not a Certicom challenge", curve.name));
+        };
+        (target, None)
     } else if let Some(pt) = &args.point {
         let (x, y) = pt
             .split_once(',')

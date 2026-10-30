@@ -1,0 +1,18 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-leads-audit)
+error: possible buggy implementation of `bit_width`
+   --> src/symmetric/modes/pmac.rs:112:9
+    |
+112 |         (usize::BITS - (m as u32 - 1).leading_zeros()) as usize
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: in order to calculate the bit width, `T::BITS` should match the type of the value calling `.leading_zeros()`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#mismatched_bit_width_type
+    = note: `-D clippy::mismatched-bit-width-type` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::mismatched_bit_width_type)]`
+help: if you meant to use `u32::BITS`, use
+    |
+112 -         (usize::BITS - (m as u32 - 1).leading_zeros()) as usize
+112 +         (m as u32 - 1).bit_width() as usize
+    |
+
+error: could not compile `crypto` (lib) due to 1 previous error

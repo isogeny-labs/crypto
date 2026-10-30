@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "scope": "native development controls only",
+  "controls": [
+    {
+      "control": "bad_target",
+      "expected": "rejected",
+      "actual_stderr": "INDEPENDENT_REPLAY_ERROR independent target recovery failed"
+    },
+    {
+      "control": "bad_rank",
+      "expected": "rejected",
+      "actual_stderr": "INDEPENDENT_REPLAY_ERROR rank metadata mismatch"
+    },
+    {
+      "control": "bad_bounds",
+      "expected": "rejected",
+      "actual_stderr": "INDEPENDENT_REPLAY_ERROR coefficient outside frozen box"
+    },
+    {
+      "control": "bad_identity",
+      "expected": "rejected",
+      "actual_stderr": "INDEPENDENT_REPLAY_ERROR mixed or duplicate input/config identity"
+    },
+    {
+      "control": "missing_target",
+      "expected": "rejected",
+      "actual_stderr": "INDEPENDENT_REPLAY_ERROR incomplete recovery journal"
+    },
+    {
+      "control": "forbidden_input",
+      "expected": "rejected",
+      "actual_stderr": "BOUNDED_IC_ERROR unrecognized field (witness inputs are forbidden)"
+    },
+    {
+      "control": "low_memory",
+      "expected": "rejected",
+      "actual_stderr": "BOUNDED_IC_ERROR table exceeds memory budget"
+    }
+  ]
+}

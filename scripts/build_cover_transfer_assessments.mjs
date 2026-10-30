@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { catalogSnapshotBytes } from "./catalog_snapshot.mjs";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
@@ -35,11 +36,11 @@ function membershipHash(domain, members) {
 }
 
 async function readJson(path) {
-  return JSON.parse(await readFile(resolve(ROOT, path), "utf8"));
+  return JSON.parse(catalogSnapshotBytes(ROOT, path, CATALOG_COMMIT).toString("utf8"));
 }
 
 async function fileHash(path) {
-  return sha256Bytes(await readFile(resolve(ROOT, path)));
+  return sha256Bytes(catalogSnapshotBytes(ROOT, path, CATALOG_COMMIT));
 }
 
 function assert(condition, message) {
@@ -852,7 +853,7 @@ async function buildSourceArtifacts() {
       freshness(
         "supported",
         "the exact input registry for all 15,791 assessed map rows",
-        "The digest is computed from the current file and every membership is joined through its model hash.",
+        "The digest binds the catalog_commit snapshot and every membership is joined through its model hash; later live-catalog additions are outside this assessment.",
         ["docs/curves/registry.json"],
       ),
     ),
@@ -1067,6 +1068,10 @@ async function buildSourceArtifacts() {
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
       "independent catalog-wide assessment verifier",
+    ),
+    integrityArtifact(
+      "scripts/catalog_snapshot.mjs",
+      "exact dated-catalog input selector; Git failures never fall back to live inputs",
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",

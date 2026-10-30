@@ -1,0 +1,5 @@
+Completed development lint checks (all exit 0):
+Rust 1.98.0: cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings
+Rust 1.99.1: cargo clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings
+The final additional shipped-certificate example test also passed Rust 1.98.0 strict lint.
+Detailed Clippy build outputs are retained locally, with hashes in receipt-sha256.json; they are not included because automatic review rejected their broad toolchain/dependency metadata.

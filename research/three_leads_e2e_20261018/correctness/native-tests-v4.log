@@ -1,0 +1,11 @@
+   Compiling three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error[E0425]: cannot find value `base` in this scope
+   --> ../../../src/cryptanalysis/three_leads.rs:695:45
+    |
+695 | ...   ("rng_draws_uncharged".into(),draws+base.draws),("scalar_adds_uncharged".into(),scalar.add),("scalar_muls_uncharged".into(),s...
+    |                                           ^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `three-leads-study` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `three-leads-study` (lib test) due to 1 previous error

@@ -1,0 +1,13 @@
+diff --git a/scripts/build_curve_registry.py b/scripts/build_curve_registry.py
+index b6e9fc0aee..e6c07714f2 100644
+--- a/scripts/build_curve_registry.py
++++ b/scripts/build_curve_registry.py
+@@ -489,7 +489,7 @@ def harvest_curve_records(reg: Registry) -> None:
+     """EC1 records the threads keep (curve_records.json, written by
+     examples/koblitz_curve_records.rs): each is one exact representation,
+     taken verbatim so its UID is the thread's."""
+-    for path in tracked("*curve_records.json"):
++    for path in tracked("*curve_records.json", "*curve_ids.json"):
+         rel = str(path.relative_to(REPO))
+         try:
+             doc = json.loads(path.read_text())

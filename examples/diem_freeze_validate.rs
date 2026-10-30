@@ -2,6 +2,15 @@
 //! This checks identities, arithmetic constraints and recorded producer controls;
 //! it does not independently replay point enumeration or prove the L-polynomial.
 use crypto_lib::cryptanalysis::diem_quartic::{is_prime_u64, q_of_k, SplitMix64};
+// The read-only consumer deliberately does not call the producer's save/publish API.
+// Its tests still exercise that shared API without suppressing dead-code diagnostics.
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "shared producer checkpoint API in a read-only consumer"
+    )
+)]
 #[path = "diem_support/checkpoint.rs"]
 mod checkpoint;
 use serde_json::{json, Value};

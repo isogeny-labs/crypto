@@ -1,0 +1,135 @@
+{
+  "observedAt": "2026-10-26T18:30:38.358Z",
+  "scope": "Host CPU/emulator correctness; no physical GPU or performance claim",
+  "mergeParents": [
+    "4f0a505dc69d15989e341332cfb03f5e28f55037",
+    "e8fcadf62cd0b674c40ebc4e76dfe88e26e71f5c"
+  ],
+  "sharedCoreFileParity": 21,
+  "sourceOnlyLedgerPinsChanged": 9,
+  "ledgerOtherJsonValuesUnchanged": true,
+  "semanticVerifier": {
+    "mergedProblems": 6,
+    "unmodifiedBaseProblems": 14,
+    "allSixReproducedOnBase": true
+  },
+  "taskFocused": {
+    "passed": 14,
+    "failed": 0,
+    "ignored": 0
+  },
+  "certicomCli": [
+    {
+      "name": "cli-cpu",
+      "started": "2026-10-26T18:14:01.743Z",
+      "ended": "2026-10-26T18:20:52.917Z",
+      "status": 0,
+      "signal": null,
+      "log": "/tmp/crypto-certicom-oct26-e8-cli-cpu.log"
+    },
+    {
+      "name": "emulator-build",
+      "started": "2026-10-26T18:20:52.920Z",
+      "ended": "2026-10-26T18:20:53.492Z",
+      "status": 0,
+      "signal": null,
+      "log": "/tmp/crypto-certicom-oct26-e8-emulator-build.log"
+    },
+    {
+      "name": "cli-emulator",
+      "started": "2026-10-26T18:20:53.492Z",
+      "ended": "2026-10-26T18:20:56.581Z",
+      "status": 0,
+      "signal": null,
+      "log": "/tmp/crypto-certicom-oct26-e8-cli-emulator.log"
+    }
+  ],
+  "nist": {
+    "at": "2026-10-26T18:25:37.719Z",
+    "binary": "/workspace/crypto/target/release/ecdlp-nist",
+    "results": [
+      {
+        "step": "build actual NIST binary",
+        "status": 0,
+        "signal": null
+      },
+      {
+        "step": "compile checked-in NIST integration assertions",
+        "status": 0,
+        "signal": null
+      },
+      {
+        "step": "run all actual NIST integration assertions",
+        "status": 0,
+        "signal": null
+      }
+    ],
+    "log": "/tmp/certicom-oct26-e8-nist-integration.log"
+  },
+  "fixtureControls": {
+    "firstReplay": [
+      {
+        "name": "bounds",
+        "status": 101,
+        "log": "/tmp/certicom-oct26-1823-bounds-controls.log",
+        "result": [
+          "test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 4983 filtered out; finished in 1.82s"
+        ]
+      }
+    ],
+    "remainingReplays": [
+      {
+        "filter": "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version",
+        "status": 0,
+        "log": "/tmp/certicom-oct26-1826-fixture-0.log",
+        "result": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4998 filtered out; finished in 0.05s"
+        ]
+      },
+      {
+        "filter": "cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload",
+        "status": 0,
+        "log": "/tmp/certicom-oct26-1826-fixture-1.log",
+        "result": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4998 filtered out; finished in 0.17s"
+        ]
+      },
+      {
+        "filter": "cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup",
+        "status": 0,
+        "log": "/tmp/certicom-oct26-1826-fixture-2.log",
+        "result": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4998 filtered out; finished in 0.09s"
+        ]
+      }
+    ],
+    "uniquePassingCasesAcrossReplays": 18,
+    "verifiedRestoredInputs": 105
+  },
+  "fullLibrary": {
+    "registeredTests": 4999,
+    "command": "cargo test --release --lib",
+    "receipt": null,
+    "state": "running",
+    "fullPass": false,
+    "log": "/tmp/crypto-certicom-oct26-merged-e8-lib-restored.log",
+    "observedFixtureFailures": [
+      "test cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload ... FAILED",
+      "test cryptanalysis::ecbench::bounds::tests::a_filter_that_drops_failed_runs_cannot_make_a_bound_admissible ... FAILED",
+      "test cryptanalysis::ecbench::bounds::tests::a_session_counted_twice_is_refused_and_a_copy_of_its_draws_too ... FAILED",
+      "test cryptanalysis::ecbench::bounds::tests::admissibility_needs_a_complete_session_an_audit_and_the_default_resamples ... FAILED",
+      "test cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version ... FAILED",
+      "test cryptanalysis::ecbench::bounds::tests::version_2_sizes_carry_the_axes_and_the_pricing_band ... FAILED",
+      "test cryptanalysis::ecbench::claim::tests::a_claim_carries_every_paired_round_of_its_workload ... FAILED",
+      "test cryptanalysis::ecbench::claim::tests::the_checker_does_not_present_a_single_run_as_the_speedup ... FAILED"
+    ],
+    "sessionId": 90796
+  },
+  "longRunningSource": {
+    "path": "src/cryptanalysis/jv_isogeny_walk.rs",
+    "base": "e8fcadf62cd0b674c40ebc4e76dfe88e26e71f5c",
+    "baseBlob": "89d0cf283fa964487e22469ad85ec2e494d6d0c1",
+    "indexBlob": "89d0cf283fa964487e22469ad85ec2e494d6d0c1",
+    "identicalToBase": true
+  }
+}

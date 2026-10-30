@@ -1,0 +1,119 @@
+{
+  "card_id": "CARD-fall-degree-e12-20261027-2",
+  "card_path": "research/fall_degree_bounds_20261008/e12/launch2.card.yaml",
+  "card_sha256": "5d1cdee773f9532785c87a467543294ee44cb70f972c94c57417a31c35860948",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "r6a.8xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "48h",
+        "--name",
+        "fd-e12a-deg5-20261027-r2",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; KEEP=2 CMAX=5 research/fall_degree_bounds_20261008/e12/run_par.sh \"$EPHEMERAL_OUT\" 3:21:7"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 24.777,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "relaunch-e12a",
+      "index": 1,
+      "outputs": {},
+      "seconds": 24.777,
+      "stderr_sha256": "875b4dd885ec866e416739673deaf834dab7088662aca9313a367f31c5823607",
+      "stderr_tail": [
+        "ephemeral: subnet-099b728cddebaf99b: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): We currently do not have sufficient r6a.8xlarge capacity in the Availability Zone you requested (us-eas; trying the next zone",
+        "ephemeral: job 20261027-154812-fd-e12a-deg5-20261027-r2-ed78b2",
+        "ephemeral:   r6a.8xlarge spot i-07035de7f55c562a8 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 48h (terminates by 2026-10-29T15:48:14Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; KEEP=2 CMAX=5 research/fall_degree_bounds_20261008/e12/run_par.sh \"$EPHEMERAL_OUT\" 3:21:7",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-154812-fd-e12a-deg5-20261027-r2-ed78b2/"
+      ],
+      "stdout_sha256": "72f198251bc9eef35b6b880a7a9edf31731b2a1c6a49125b400d5d22f8df0cff",
+      "stdout_tail": [
+        "20261027-154812-fd-e12a-deg5-20261027-r2-ed78b2"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "bash",
+        "research/fall_degree_bounds_20261008/e10/aws_env.sh",
+        "taskq/deploy/ephemeral/ephemeral",
+        "run",
+        "--detach",
+        "--no-source",
+        "--type",
+        "r7i.4xlarge",
+        "--toolchain",
+        "rust",
+        "--ttl",
+        "48h",
+        "--name",
+        "fd-e12c-window-20261027-r2",
+        "--",
+        "set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e12/run_window.sh \"$EPHEMERAL_OUT\" 4:28:7"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 43.687,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "relaunch-e12c",
+      "index": 2,
+      "outputs": {},
+      "seconds": 43.687,
+      "stderr_sha256": "e35437661485f11e92454273ba438a46e3d9d5e7b6dda21d803b637a48c616ce",
+      "stderr_tail": [
+        "ephemeral: subnet-00f1fb4997c2b0c28: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): There is no Spot capacity available that matches your request.; trying the next zone",
+        "ephemeral: subnet-05d4e28f2c7a467ec: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): There is no Spot capacity available that matches your request.; trying the next zone",
+        "ephemeral: subnet-0c343d40111cce085: (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 4): We currently do not have sufficient r7i.4xlarge capacity in the Availability Zone you requested (us-eas; trying the next zone",
+        "ephemeral: job 20261027-154837-fd-e12c-window-20261027--5a12f5",
+        "ephemeral:   r7i.4xlarge spot i-0bb95faedec283aa6 (resolve:ssm:/ephemeral/ami/rust-x86_64), ttl 48h (terminates by 2026-10-29T15:48:39Z)",
+        "ephemeral:   command: set -euo pipefail; mkdir -p \"$HOME/fdsrc\"; cd \"$HOME/fdsrc\"; aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/fd-src-371035216942.tgz src.tgz --only-show-errors; echo \"4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f  src.tgz\" | sha256sum -c -; tar xzf src.tgz; rm src.tgz; echo 371035216942660c4615dfbb88d85a14afaf5c16 >\"$EPHEMERAL_OUT/source_commit\"; research/fall_degree_bounds_20261008/e12/run_window.sh \"$EPHEMERAL_OUT\" 4:28:7",
+        "ephemeral:   s3://ephemeral-runs-104186811093-us-east-1/jobs/20261027-154837-fd-e12c-window-20261027--5a12f5/"
+      ],
+      "stdout_sha256": "31265c14ac1c451ec9ee8dcb393841a55218c0bfd1c8223c6dca5476c326b13a",
+      "stdout_tail": [
+        "20261027-154837-fd-e12c-window-20261027--5a12f5"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 2,
+  "commit": "83e8e94e4d89c34b2b764d3d5dd554a4dcb878af",
+  "dirty_after": [
+    "research/fall_degree_bounds_20261008/e12/launch2.card.yaml",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12a.stderr",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12a.stdout",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12c.stderr",
+    "research/fall_degree_bounds_20261008/e12/launch_receipt2/relaunch-e12c.stdout"
+  ],
+  "dirty_before": [
+    "research/fall_degree_bounds_20261008/e12/launch2.card.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

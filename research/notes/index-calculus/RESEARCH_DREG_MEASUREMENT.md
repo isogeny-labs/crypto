@@ -857,6 +857,10 @@ closure measurement on its cells. It has 16 unsatisfiable draws at degree 4.
 - **For ECC2K-130.** `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §8: both
   survivors put the m = 4 rise at ℓ ≤ 7, so the m = 4 degree-4 row is
   contradicted.
+- **Update 2026-10-23.** The separating cell was measured by another
+  session on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): m = 4, ℓ = 6
+  (N = 54) refutes at degree 4 on 2 of 2 unsatisfiable draws. So
+  **m·ℓ ≥ 21 is refuted and ℓ = 7 survives.**
 
 ## Result 14: one fixed variable usually brings the ℓ = 7 draws back to degree 4
 
@@ -876,6 +880,49 @@ specialises the 8 m = 3, ℓ = 7 draws whose degree-4 closure does not refute
   refutation: about 100k columns per branch, against about 760k–1M at
   degree 5.
 - **The open question.** It is how many guesses degree 4 needs as ℓ grows.
+
+## Result 15: four guessed variables bring every ℓ = 8 draw back to degree 4
+
+`research/dreg_closure_guess_20261022/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8), N = 46, it guesses four variables (one coordinate per
+summand and one intermediate coordinate) on 4 unsatisfiable draws, all 16
+branches each, and runs the degree-4 closure on every branch.
+
+- **Registered verdict: four guesses suffice at ℓ = 8.** All 64 branches
+  refute at degree 4. The positive control (one more coordinate per summand,
+  dimensions 6, 6, 6) refutes on 4 of 4.
+- **The rule `m·(ℓ−6)` is rejected for this guess set:** it predicted 6.
+- **An upper bound only.** k = 4 is the fewest guesses the 130k-column
+  dense closure can measure at N = 46. A k that stays bounded as ℓ grows,
+  as k ≈ 1 at ℓ = 7 would suggest, is not excluded.
+- **Instrument fix.** `dreg_closure` now reads `--max-cols` against the
+  variables that occur after `--fix`. The engine's columns already ran over
+  those, and unspecialised systems are unchanged.
+
+## Result 16: three guessed variables do not suffice at ℓ = 8 for this set
+
+`research/dreg_closure_guess3_20261023/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8) on the same 4 unsatisfiable draws, it guesses variables 7,
+15 and 23 (the top coordinate of each summand, no intermediate coordinate),
+8 branches per draw, N = 43, 136,698 degree-4 columns.
+
+- **Registered verdict: three guesses do not suffice at ℓ = 8 (for this
+  guess set).** 1 draw suffices (draw 6, 8 of 8 branches refute) and 3 do not
+  (draws 0, 3, 5: the first branch saturates degree 4 without the constant
+  `1`; the other 7 branches were not run, by the registered stop rule).
+- **Controls valid.** The unspecialised ℓ = 7 draw matches the committed
+  scale-study record on every non-timing field; the dimension-6 control
+  refutes on 4 of 4.
+- **What it says.** Three do not suffice for variables 7, 15, 23; four
+  (7, 15, 23, 24) did in Result 15. Another three-variable set is unmeasured.
+- **Reading (not registered).** The 3-set leaves every summand in dimension 7
+  with N = 43, structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (Results 12 and 13), so its failure is what that result
+  predicts. The pattern fits `m·(ℓ−7)+1` guesses (4 at ℓ = 8), which would be
+  105 at the priced m = 4, ℓ = 33 cell against a break-even of 6. That is an
+  extrapolation from two values of ℓ, not a result.
+- **Memory.** Peak 7.04 GB under the 15 GB limit; the earlier 10.6 GB was one
+  outlier (median 7.0 GB over 68 runs).
 
 ## Reproducing
 
