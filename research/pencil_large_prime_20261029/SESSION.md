@@ -1226,3 +1226,24 @@ PR delivery/CI and the previously recorded scientific/resource/integration gaps.
 The artifact helper's directory push enumerates tracked files, so its dry-run
 reported an untracked directory missing. Explicit mapping-file paths uploaded
 successfully. No existing object or frozen record was replaced.
+
+## 2026-10-30 — PR2908 delivery
+
+### What was done
+Opened https://github.com/isogeny-labs/crypto/pull/2908 for the disjoint preparation
+implementation, reviewed software evidence and neutral report packet. Auto-merge
+is enabled. Initial published head was7c2a7674fab97559a4e815f8f59fcd1a16a6278e;
+CI is pending, not reported passed. Artifact policy check passed. Generated plan
+and both mappings have content-addressed storage with independent byte readback.
+
+### Decisions made
+Preserve raw logs and source snapshots exactly, including their recorded trailing
+whitespace. Active implementation/docs whitespace checks pass. No scientific result
+or execution authorization is inferred from source delivery or future CI.
+
+### Open threads
+CI/review, analyzer/exporter support, prospective reuse admission, later-stage
+resource envelope, remaining empirical cohort and timing requirements.
+
+### Errors
+No failed CI observed at delivery; old PR2869 evidence shards remain pending.
