@@ -6,7 +6,7 @@ manual-is-multiple-of lint; both source checks passed. All receipts are retained
 
 Reviewed case_binding.rs is now implemented under contract6364cbd94bb7. It binds
 original plan bytes, full typed plan, explicit origin/policy/global index and
-restricted sidecar custody; five authored tests remain unexecuted. V2 worker
+restricted sidecar custody; four helper tests remain unexecuted. V2 worker
 activation stays disabled in this helper until all CLI readers are integrated.
 The SAT lint is corrected without changing the bitmask condition's semantics.
 No new native pass is attributed to these changes before the next attempt.
