@@ -1,4 +1,5 @@
 import CM8Dual
+import PhaseRecovery
 import Mathlib
 
 /-! Actual F13 relation rows. Complete matched-row equality does not imply
@@ -142,6 +143,46 @@ theorem qualified_span_inclusion {b : ℕ} (V : Finset (Coeff b))
   intro v hv
   simp only [admitted,Finset.mem_filter] at hv ⊢
   exact ⟨hv.1,hcompress v hv.1 hv.2⟩
+
+/-- Public setup logs and an actual accepted shifted relation recover the
+original main scalar. The log values are hypotheses on public base points,
+not a definition or lookup of the unknown target logarithm. -/
+theorem actual_signed_known_log_recovery {b : ℕ} (A : Fin b → T.Point)
+    (Q : E.Point) (hQ : (7:ℕ) • Q=0) (v logs : Coeff b) (shift : ℤ)
+    (hlogs : ∀ i, A i=logs i • U)
+    (hrel : ∑ i, v i • A i=phi Q+shift • U) :
+    Q=((∑ i, v i*logs i)-shift) • P := by
+  have hI : inverseHom U=P := by
+    change CM8Dual.inverse7 U=P
+    rw [← generator_image]
+    exact CM8Dual.inverse7_left P source_order.1
+  have hh := congrArg inverseHom hrel
+  simp only [map_sum,map_add,map_zsmul] at hh
+  change (∑ i, v i • inverseHom (A i))=
+    CM8Dual.inverse7 (phi Q)+shift • inverseHom U at hh
+  rw [CM8Dual.inverse7_left Q hQ] at hh
+  have hs : (∑ i, v i • inverseHom (A i))=(∑ i, v i*logs i) • P := by
+    calc
+      _ = ∑ i, (v i*logs i) • P := by
+        apply Finset.sum_congr rfl
+        intro i hi
+        rw [hlogs i,map_zsmul,hI,mul_zsmul]
+      _ = _ := by rw [Finset.sum_zsmul]
+  rw [hs,hI] at hh
+  rw [sub_zsmul,hh]
+  abel
+
+theorem actual_signed_known_log_recovery_mod7 {b : ℕ} (A : Fin b → T.Point)
+    (Q : E.Point) (hQ : (7:ℕ) • Q=0) (v logs : Coeff b) (shift : ℤ)
+    (hlogs : ∀ i, A i=logs i • U)
+    (hrel : ∑ i, v i • A i=phi Q+shift • U) :
+    Q=(((∑ i, v i*logs i)-shift)%7) • P := by
+  have hP : (7:ℤ) • P=0 := by decide +kernel
+  exact PhaseRecovery.annihilator_mod P Q ((∑ i, v i*logs i)-shift) 7 hP
+    (actual_signed_known_log_recovery A Q hQ v logs shift hlogs hrel)
+
+#print axioms actual_signed_known_log_recovery
+#print axioms actual_signed_known_log_recovery_mod7
 
 /-- One actual relation-collection step under a supplied seven-torsion query
 rule. Different degree-admitted oracles are deliberately not identified here. -/

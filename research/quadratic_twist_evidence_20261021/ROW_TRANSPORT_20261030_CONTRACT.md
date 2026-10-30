@@ -63,3 +63,10 @@ source/receipt. Extend the same complete matched-row statement to equal
 collection-step functions and their finite iterates under any supplied
 state-dependent7torsion query rule. This is deterministic coupled-oracle state
 equality,not iid stopping-time/absorption/integrability or capped-solver semantics.
+
+## Checked adaptive stage and explicit scalar-recovery corollary
+Stage3passes18named/22audited,0extra trusted;source/receipt retained. Add signed
+finite-family shifted relation recovery with explicit PUBLIC base-log hypotheses,
+unknown sourceQ7ann and reduction modulo7 using the unchanged PhaseRecovery
+annihilator theorem. This is the actual F13 main-DLP bridge for any admitted
+valid relation,not a proof that a lower-budget native solver finds that relation.
