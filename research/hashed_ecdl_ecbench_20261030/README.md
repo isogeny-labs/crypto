@@ -146,3 +146,15 @@ protocol schema/checker in crypto-autoresearcher, and Iso Lab's
 [harness](../../taskq/deploy/eks-karpenter/HARNESS.md) contracts. Generic finite
 decomposition is not a new algebraic sub-rho theorem. The literal source
 packet/recursion guards, frozen evidence and leaderboard graphs are unchanged.
+
+Active protocol **v2** is frozen against complete source commit
+`0c80eded0a095c4be39e58a9e18823baa1c64c92`, before scientific data. Canonical
+protocol hash is `7c190b2d666fe3c1d648d085457cf81ef0b87c96d81454a575a69c415c126e2e`.
+The publication inventory caught two already-tested checkpoint helpers missing
+from the first staged commit; they were committed before upload. The earlier
+[frozen v1](protocol.v1.superseded-before-data.json) is preserved byte-for-byte,
+superseded before data rather than rewritten. Amendment A1 changes source
+publication binding only: the algorithm, panel, seeds, controls, resources and
+analysis are unchanged. The following commit records frozen metadata only;
+its native and runner/control source hashes remain equal. Exact input-file
+hashes are in [frozen-input-files.sha256](frozen-input-files.sha256).
