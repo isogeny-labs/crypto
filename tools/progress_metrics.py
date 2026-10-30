@@ -531,6 +531,27 @@ def koblitz_source_collector(ref, since):
                      source=f"{path}@{commit}")
 
 
+def koblitz_root_collector(ref, since):
+    """Exact candidate counts and equality controls, not measured execution cost."""
+    path = "research/koblitz_modular_ic_20261018/rounds/46/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        record = json.loads(text)
+        for row in record.get("collector_cases", []):
+            if row.get("status") == "accepted":
+                degree = row["extension_degree"]
+                emit(f"koblitz_modular.root_collector_degree{degree}_candidates",
+                     row.get("lambda_candidates"), date=date, problem=P_IC,
+                     unit="algebraic root candidates", better="neutral",
+                     label="Exact root collector; total cost and Picard images unevaluated",
+                     source=f"{path}@{commit}")
+        comparisons = record.get("point_set_comparisons", [])
+        emit("koblitz_modular.root_collector_complete_set_controls",
+             sum(x.get("byte_identical") is True for x in comparisons),
+             date=date, problem=P_IC, unit="complete point-set comparisons",
+             better="neutral", label="Compared with exhaustive fixed-chart detector; not IC rank",
+             source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -614,7 +635,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
@@ -639,6 +660,7 @@ def main():
     koblitz_larger_constructions(a.ref, a.since)
     koblitz_ordinary_orientation(a.ref, a.since)
     koblitz_source_collector(a.ref, a.since)
+    koblitz_root_collector(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
