@@ -1215,7 +1215,7 @@ mod lock_and_capsule_tests {
     }
 
     fn options(d: &Path, lock: &str) -> GpuOptions {
-        let true_binary = ["/usr/bin/true", "/bin/true"]
+        let _true_binary = ["/usr/bin/true", "/bin/true"]
             .into_iter()
             .find(|path| Path::new(path).is_file())
             .expect("system true executable");
