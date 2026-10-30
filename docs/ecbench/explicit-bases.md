@@ -1068,3 +1068,23 @@ comparison. Continue existing v16 filter/63-bit panel without modification.
 
 ### Errors
 No host check failure. New Rust and device tests are not yet executed.
+
+## 2026-10-30 20:31 UTC — arity panel frozen
+
+### What was done
+Prepared/froze v17 at `d0c604c4d92ac0350f935547fe62247083698924c9c9e80eb68ceddbd39cc967`.
+The native instruments compile with warnings denied; shell and schema checks
+pass. ARITY-PANEL.md specifies all12cells, controls, bounds and threshold scope.
+
+### Decisions made
+Use one identical filtered service binary across m8/m10/m12 configurations.
+Compare recovered scalars across arities and certificate bytes only within the
+same arity. Upper-rung m10/m12 solves cap3600s each, preserving all four prescribed
+cells within the18000s worker envelope. Launch only after current v16 closes.
+
+### Open threads
+V16 first63-bit target is running. V17 has no pod/data; source/package preparation
+and fresh preflight remain. New twelve-slot tests still need Rust/device execution.
+
+### Errors
+No new failure. The current shared-host GPU is active; no duplicate task pod.
