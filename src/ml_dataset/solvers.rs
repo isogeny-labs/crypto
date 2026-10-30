@@ -12,6 +12,9 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+#[path = "prime_f4_wide.rs"]
+mod prime_f4_wide;
+
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use serde_json::{json, Value};
@@ -177,6 +180,15 @@ pub fn solve_with_event_sink(
     case: &CaseData,
     directory: &Path,
 ) -> Result<SolverData, String> {
+    solve_with_event_sink_context(config, case, directory, None)
+}
+
+pub(super) fn solve_with_event_sink_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
         return Err("nested live solver sink".into());
     }
@@ -202,12 +214,15 @@ pub fn solve_with_event_sink(
         }))
     });
     let _guard = LiveSinkGuard;
-    live_event(
+    let begin = live_event(
         &json!({"kind":"solver_begin","solver":config.solver,"family":config.family,"n":config.n,"m":config.m,"work_limit":config.work_limit,"degree_bound":config.degree_bound,"format":"ml-dataset.live-events/v1","sync_policy":"fsync every emitted event and complete payload"}),
-    )?;
-    let mut result = solve(config, case);
+    );
+    if let Err(error) = begin {
+        return wide_begin_failure(config, case, context, error);
+    }
+    let mut result = solve_with_context(config, case, context);
     match &mut result {
-        Ok(data) if is_prime_chain(data) => {
+        Ok(data) if retains_canonical_artifacts(data) => {
             flush_prime_chain_payloads(data);
             let terminal_write = if data.outcome.get("live_persistence_errors").is_none() {
                 live_event(&json!({"kind":"solver_return","outcome":data.outcome,"error":null}))
@@ -246,21 +261,35 @@ pub fn solve_with_bound_event_sink(
     binding: AttemptBinding,
     limits: CaptureLimits,
 ) -> Result<SolverData, String> {
+    solve_with_bound_event_sink_context(config, case, directory, binding, limits, None)
+}
+
+pub(super) fn solve_with_bound_event_sink_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    directory: &Path,
+    binding: AttemptBinding,
+    limits: CaptureLimits,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if LIVE_SINK.with(|slot| slot.borrow().is_some()) {
         return Err("nested live solver sink".into());
     }
     let emitter = CaptureEmitter::create(directory, binding, limits)?;
     LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(emitter)));
     let _guard = LiveSinkGuard;
-    live_event(&json!({"kind":"solver_begin","solver":config.solver,
+    let begin = live_event(&json!({"kind":"solver_begin","solver":config.solver,
         "family":config.family,"n":config.n,"m":config.m,
         "work_limit":config.work_limit,"degree_bound":config.degree_bound,
         "format":"crypto.ml-dataset.live-event/v2",
         "sync_policy":"event fsync followed by atomic committed watermark",
-        "solver_state_restorable":false}))?;
-    let mut result = solve(config, case);
+        "solver_state_restorable":false}));
+    if let Err(error) = begin {
+        return wide_begin_failure(config, case, context, error);
+    }
+    let mut result = solve_with_context(config, case, context);
     if let Ok(data) = &mut result {
-        if is_prime_chain(data) {
+        if retains_canonical_artifacts(data) {
             flush_prime_chain_payloads(data);
             if data.outcome.get("live_persistence_errors").is_none() {
                 if let Err(error) =
@@ -302,7 +331,7 @@ pub fn capabilities() -> Value {
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["prime-field elimination at p>=2^32","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 only","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
@@ -499,6 +528,14 @@ fn set_witness_with_definition(
 }
 
 pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String> {
+    solve_with_context(config, case, None)
+}
+
+pub(super) fn solve_with_context(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: Option<&super::execution::SolverExecutionContext>,
+) -> Result<SolverData, String> {
     if !(2..=15).contains(&config.m) {
         return Err("decomposition arity must be 2..15".into());
     }
@@ -514,7 +551,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "bsgs" => bsgs(config, case, &group, &target)?,
         "sat" => sat_solve(config, &group, &points, &target)?,
         "f4" if matches!(group, Group::Prime(_)) => {
-            let result = prime_f4(config, &group, &points, &target)?;
+            let result = prime_f4(config, &group, &points, &target, context)?;
             if let Some(input) = result
                 .artifacts
                 .iter()
@@ -551,7 +588,7 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
         "complete_machine_instruction_count":false
     });
     let solver_domain = json!({"points":points.iter().map(Element::json).collect::<Vec<_>>(),"negation_closed":true,"repetitions_allowed":true});
-    if is_prime_chain(&result) {
+    if retains_canonical_artifacts(&result) {
         result.artifacts.push(ArtifactPayload::json(
             "solver-domain.json",
             "exact-signed-factor-base",
@@ -1660,10 +1697,18 @@ fn pkm_solve(
 const PRIME_CHAIN_STRATEGY: &str = "prime-affine-s3-chain-f4-visitor/v1";
 const PRIME_CHAIN_TRACE_CAP: &str = "prime F4 chain event or byte limit reached";
 
-fn is_prime_chain(data: &SolverData) -> bool {
+fn retains_canonical_artifacts(data: &SolverData) -> bool {
     data.outcome["strategy"] == PRIME_CHAIN_STRATEGY
+        || data.outcome["strategy"] == prime_f4_wide::STRATEGY
 }
 fn record_prime_chain_persistence_error(data: &mut SolverData, phase: &str, error: &str) {
+    if data.outcome["strategy"] == prime_f4_wide::STRATEGY {
+        data.outcome["solver_completed"] = json!(false);
+        data.outcome["status"] = json!("partial");
+        if data.outcome.get("live_persistence_errors").is_some() {
+            return;
+        }
+    }
     data.outcome["live_persistence_complete"] = json!(false);
     data.outcome["exposed_event_stream_complete"] = json!(false);
     data.outcome["canonical_artifact_write_required"] = json!(true);
@@ -2195,6 +2240,7 @@ fn prime_f4(
     group: &Group,
     domain: &[Element],
     target: &Element,
+    context: Option<&super::execution::SolverExecutionContext>,
 ) -> Result<SolverData, String> {
     use crate::cryptanalysis::f4_fp::{self, F4Options};
     use crate::cryptanalysis::groebner_f4::Ordering;
@@ -2214,6 +2260,9 @@ fn prime_f4(
         return Ok(unsupported("Prime F4 needs an affine target"));
     };
     let p = curve.p.to_u64().ok_or("modulus exceeds u64")?;
+    if p >= 1u64 << 32 && context.is_some() {
+        return prime_f4_wide::solve(config, group, domain, target, context);
+    }
     let a = curve.a.to_u64().ok_or("a exceeds u64")?;
     let b = curve.b.to_u64().ok_or("b exceeds u64")?;
     let mul = |x: u64, y: u64| ((x as u128 * y as u128) % p as u128) as u64;
@@ -4018,6 +4067,15 @@ mod tests {
             .find(|entry| entry["id"] == "f4")
             .unwrap();
         assert_eq!(f4["prime_modulus_limit_exclusive"], "4294967296");
+        assert_eq!(f4["supervised_wide_prime_profile"]["m"], json!([2, 2]));
+        assert_eq!(
+            f4["supervised_wide_prime_profile"]["modulus_max_inclusive"],
+            "2305843009213693951"
+        );
+        assert_eq!(
+            f4["supervised_wide_prime_profile"]["requires_original_execution_context"],
+            true
+        );
     }
 
     #[test]
@@ -4218,4 +4276,44 @@ mod tests {
         assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
         fs::remove_dir_all(dir).unwrap();
     }
+}
+
+/// Semantic wide-prime replay, independent of native basis derivation.
+pub(super) fn verify_prime_f4_wide(
+    dir: &Path,
+    config: &CaseConfig,
+    outcome: &Value,
+    artifacts: &[super::types::Artifact],
+) -> Result<(), String> {
+    prime_f4_wide::verify(dir, config, outcome, artifacts)
+}
+
+fn wide_begin_failure(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: Option<&super::execution::SolverExecutionContext>,
+    error: String,
+) -> Result<SolverData, String> {
+    let Some(context) = context else {
+        return Err(error);
+    };
+    if config.family != "prime" || config.solver != "f4" || config.m != 2 {
+        return Err(error);
+    }
+    let group = Group::read(case)?;
+    let Group::Prime(curve) = &group else {
+        return Err(error);
+    };
+    if curve.p.to_u64().is_none_or(|p| p < 1u64 << 32) {
+        return Err(error);
+    }
+    let target = group.point(&case.public_instance["target"])?;
+    prime_f4_wide::begin_failure(
+        config,
+        &group,
+        &domain(&group, case)?,
+        &target,
+        context,
+        &error,
+    )
 }
