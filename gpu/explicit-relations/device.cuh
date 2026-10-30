@@ -1,6 +1,9 @@
 #pragma once
 #include "host.hpp"
 #include <cuda_runtime.h>
+#ifdef ER_NORMALIZE_CUB_REFERENCE
+#include <cub/block/block_scan.cuh>
+#endif
 #include <thrust/device_vector.h>
 #include <thrust/remove.h>
 #include <thrust/sort.h>
@@ -11,9 +14,19 @@ inline void cuda_check(cudaError_t e) {
     throw std::runtime_error(cudaGetErrorString(e));
 }
 constexpr unsigned BLOCK = 256;
+static_assert(BLOCK >= 2 && (BLOCK & (BLOCK - 1)) == 0,
+              "normalization requires a power-of-two block");
+#ifdef ER_NORMALIZE_CUB_REFERENCE
+struct FieldProduct {
+  Curve c;
+  __device__ U operator()(U a, U b) const { return c.mul(a, b); }
+};
+#endif
 // One inversion per block, including partially active blocks and infinity.
-// Every thread participates in both scans and barriers. Infinity contributes 1.
+// Infinity and inactive lanes contribute 1. No lane may skip a barrier.
 __device__ Point normalize_block(Curve c, Jac p) {
+#ifdef ER_NORMALIZE_SCAN_REFERENCE
+  // Retained only for matched baseline builds and differential tests.
   __shared__ U prefix[BLOCK], suffix[BLOCK], inverse;
   unsigned t = threadIdx.x;
   U z = p.z ? p.z : c.f.one;
@@ -34,6 +47,54 @@ __device__ Point normalize_block(Curve c, Jac p) {
   U iz = c.mul(inverse, c.mul(t ? prefix[t - 1] : c.f.one,
                               t + 1 < BLOCK ? suffix[t + 1] : c.f.one));
   return c.affine(p, iz);
+#elif defined(ER_NORMALIZE_CUB_REFERENCE)
+  // External work-efficient scan reference, with the same inversion and
+  // affine conversion as both native implementations.
+  using Scan = cub::BlockScan<U, BLOCK>;
+  __shared__ typename Scan::TempStorage storage;
+  __shared__ U values[BLOCK], reverse[BLOCK], inverse;
+  unsigned t = threadIdx.x;
+  U z = p.z ? p.z : c.f.one, prefix, suffix, total;
+  values[t] = z;
+  __syncthreads();
+  Scan(storage).ExclusiveScan(z, prefix, c.f.one, FieldProduct{c}, total);
+  __syncthreads();
+  if (!t)
+    inverse = fp64_inv(c.f, total);
+  Scan(storage).ExclusiveScan(values[BLOCK - 1 - t], suffix, c.f.one,
+                              FieldProduct{c});
+  reverse[BLOCK - 1 - t] = suffix;
+  __syncthreads();
+  return c.affine(p, c.mul(inverse, c.mul(prefix, reverse[t])));
+#else
+  // Product tree: BLOCK-1 multiplies up, 2*(BLOCK-1) down. The previous
+  // two inclusive scans used 2*BLOCK*log2(BLOCK)+2*BLOCK multiplies.
+  // Each parent inverse times its sibling product is the child's inverse.
+  __shared__ U tree[2 * BLOCK];
+  unsigned t = threadIdx.x;
+  tree[BLOCK + t] = p.z ? p.z : c.f.one;
+  __syncthreads();
+  for (unsigned width = BLOCK / 2; width; width /= 2) {
+    if (t < width) {
+      unsigned node = width + t;
+      tree[node] = c.mul(tree[2 * node], tree[2 * node + 1]);
+    }
+    __syncthreads();
+  }
+  if (!t)
+    tree[1] = fp64_inv(c.f, tree[1]);
+  __syncthreads();
+  for (unsigned width = 1; width < BLOCK; width *= 2) {
+    if (t < width) {
+      unsigned node = width + t;
+      U inverse = tree[node], left = tree[2 * node], right = tree[2 * node + 1];
+      tree[2 * node] = c.mul(inverse, right);
+      tree[2 * node + 1] = c.mul(inverse, left);
+    }
+    __syncthreads();
+  }
+  return c.affine(p, tree[BLOCK + t]);
+#endif
 }
 __global__ void build_left(Curve c, Bases b, unsigned split, U count,
                            Row *rows) {
