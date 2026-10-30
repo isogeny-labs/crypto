@@ -1,0 +1,125 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp0-k440 | 16/16 | 6.371 | 7.596 | 18.615 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp1-k20-c10 | 16/16 | 19.051 | 30.423 | 132.768 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp1-k40-c10 | 16/16 | 9.706 | 15.305 | 65.695 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp2-k20-c10 | 16/16 | 3.957 | 5.997 | 24.354 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp2-k20-c30 | 16/16 | 5.458 | 6.063 | 11.502 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp2-k40-c10 | 16/16 | 3.849 | 4.820 | 13.560 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp2-k40-c3 | 16/16 | 6.087 | 9.571 | 40.931 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | lp2-k80-c3 | 16/16 | 4.094 | 5.865 | 21.805 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k220 | 16/16 | 10.684 | 12.847 | 32.314 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k320 | 16/16 | 7.704 | 9.248 | 23.144 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k440 | 16/16 | 6.371 | 7.596 | 18.615 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k440-aa | 16/16 | 6.371 | 7.596 | 18.615 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k660 | 16/16 | 6.797 | 7.926 | 18.088 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | plain-k80 | 16/16 | 27.824 | 33.411 | 83.688 | — |
+| icv1-f2m53-tm56619371-dac20a85 | 44.26 | rho-strong | 16/16 | 0.134 | 0.161 | 0.402 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp1-k20-c10 | lp0-k440 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp1-k40-c10 | lp0-k440 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp2-k20-c10 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp2-k20-c30 | lp2-k20-c30 < lp0-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp2-k40-c10 | lp2-k40-c10 < lp0-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp2-k40-c3 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs lp2-k80-c3 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k220 | lp0-k440 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k320 | lp0-k440 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k440 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs plain-k80 | lp0-k440 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp0-k440 vs rho-strong | rho-strong < lp0-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp1-k40-c10 | lp1-k40-c10 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp2-k20-c10 | lp2-k20-c10 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp2-k20-c30 | lp2-k20-c30 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp2-k40-c10 | lp2-k40-c10 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp2-k40-c3 | lp2-k40-c3 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs lp2-k80-c3 | lp2-k80-c3 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k220 | plain-k220 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k320 | plain-k320 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k440 | plain-k440 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k440-aa | plain-k440-aa < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k660 | plain-k660 < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs plain-k80 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k20-c10 vs rho-strong | rho-strong < lp1-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs lp2-k20-c10 | lp2-k20-c10 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs lp2-k20-c30 | lp2-k20-c30 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs lp2-k40-c10 | lp2-k40-c10 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs lp2-k40-c3 | lp2-k40-c3 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs lp2-k80-c3 | lp2-k80-c3 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k220 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k320 | plain-k320 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k440 | plain-k440 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k440-aa | plain-k440-aa < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k660 | plain-k660 < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs plain-k80 | lp1-k40-c10 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp1-k40-c10 vs rho-strong | rho-strong < lp1-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs lp2-k20-c30 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs lp2-k40-c10 | lp2-k40-c10 < lp2-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs lp2-k40-c3 | lp2-k20-c10 < lp2-k40-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs lp2-k80-c3 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k220 | lp2-k20-c10 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k320 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k440 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs plain-k80 | lp2-k20-c10 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c10 vs rho-strong | rho-strong < lp2-k20-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs lp2-k40-c10 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs lp2-k40-c3 | lp2-k20-c30 < lp2-k40-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs lp2-k80-c3 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k220 | lp2-k20-c30 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k320 | lp2-k20-c30 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k440 | lp2-k20-c30 < plain-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k440-aa | lp2-k20-c30 < plain-k440-aa |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k660 | lp2-k20-c30 < plain-k660 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs plain-k80 | lp2-k20-c30 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k20-c30 vs rho-strong | rho-strong < lp2-k20-c30 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs lp2-k40-c3 | lp2-k40-c10 < lp2-k40-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs lp2-k80-c3 | lp2-k40-c10 < lp2-k80-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k220 | lp2-k40-c10 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k320 | lp2-k40-c10 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k440 | lp2-k40-c10 < plain-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k440-aa | lp2-k40-c10 < plain-k440-aa |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k660 | lp2-k40-c10 < plain-k660 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs plain-k80 | lp2-k40-c10 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c10 vs rho-strong | rho-strong < lp2-k40-c10 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs lp2-k80-c3 | lp2-k80-c3 < lp2-k40-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k220 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k320 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k440 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs plain-k80 | lp2-k40-c3 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k40-c3 vs rho-strong | rho-strong < lp2-k40-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k220 | lp2-k80-c3 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k320 | lp2-k80-c3 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k440 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs plain-k80 | lp2-k80-c3 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | lp2-k80-c3 vs rho-strong | rho-strong < lp2-k80-c3 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs plain-k320 | plain-k320 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs plain-k440 | plain-k440 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs plain-k440-aa | plain-k440-aa < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs plain-k660 | plain-k660 < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs plain-k80 | plain-k220 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k220 vs rho-strong | rho-strong < plain-k220 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k320 vs plain-k440 | plain-k440 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k320 vs plain-k440-aa | plain-k440-aa < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k320 vs plain-k660 | plain-k660 < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k320 vs plain-k80 | plain-k320 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k320 vs rho-strong | rho-strong < plain-k320 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440 vs plain-k440-aa | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440 vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440 vs plain-k80 | plain-k440 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440 vs rho-strong | rho-strong < plain-k440 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440-aa vs plain-k660 | unresolved inside the band |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440-aa vs plain-k80 | plain-k440-aa < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k440-aa vs rho-strong | rho-strong < plain-k440-aa |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k660 vs plain-k80 | plain-k660 < plain-k80 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k660 vs rho-strong | rho-strong < plain-k660 |
+| icv1-f2m53-tm56619371-dac20a85 | plain-k80 vs rho-strong | rho-strong < plain-k80 |
