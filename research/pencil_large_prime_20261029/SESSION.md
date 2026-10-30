@@ -1097,3 +1097,32 @@ cohort and timing requirement remain open. Exact-head CI is running on867e04616.
 ### Errors
 The prior completion wording was ambiguous about unresolved clock status; the
 prospective draft now distinguishes reporting from satisfying that requirement.
+
+## 2026-10-30 — Retained-plan enrollment audit and merged delivery
+
+### What was done
+PR2869 merged at2026-10-30T01:17:44Z as31f31e0f5b40b45b0a5d475111790d79f6c6acfe.
+Requiredgate/size/artifacts and compilation, Clippy, formatting, replay, parity,
+contracts and other completed checks passed. Two additional ecbench jobs remained
+live after automatic merge; their outcome is not inferred from merge status.
+A new native retained-plan checker verified60 full workload objects,3resolvedarms
+and1080 slots against cohort16 with exactu64 seeds. It preserves900 differing
+sequence positions. Fresh retained plan equals the gate plan.
+
+### Decisions made
+Root source review required strict execution keys and invalid CLI exit behavior.
+Original packet/source retained; additivev2 passed10tests, fmt and strictClippy.
+Root verified allv2 and preservation hashes. This proves plan membership only;
+record rewriting, cohort admission, timing qualification and new execution remain
+outside its scope. No solver or plan generation occurred.
+
+### Open threads
+Cross-session deterministic solver/operation-accounting audit is in preparation.
+Its exclusions include elapsed times and observed resource/environment fields.
+Publish completed audits in a follow-upPR because2869 has merged. Remaining
+1260-target pencil completion and later-stage resource authorization remain open.
+
+### Errors
+Initial enrollment checker ignored future execution keys and returned success
+for nonbijective diagnostic output. Corrected version fails closed; both versions
+and their validation evidence are preserved.
