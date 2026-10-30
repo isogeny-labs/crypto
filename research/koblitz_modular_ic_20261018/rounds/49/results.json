@@ -1,0 +1,264 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 49,
+  "runs": [
+    {
+      "attempt": "compact-normal49-01",
+      "source_revision": "7526525bf4e2f8edf8b6de725639b5c815c6999c",
+      "kind": "Singular",
+      "native_exit": 124,
+      "status": "rejected",
+      "timeout": true,
+      "native_errors": [],
+      "late_marker_present": false,
+      "marker": "COMPACT_NORMAL49_PRODUCER_PASS",
+      "exports": {}
+    },
+    {
+      "attempt": "compact49-01",
+      "source_revision": "974dafb3c61327568bbec2fc00a54c763f87f94b",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "accepted",
+      "timeout": false,
+      "native_errors": [],
+      "late_marker_present": true,
+      "marker": "COMPACT49_ALL_CHECKS_PASS",
+      "exports": {
+        "accepted-plane49.sing": "665628d4aa55cfee8f9783a3d3228e2a1c4ae40f518f8b5bd0bfb67ab3da71c6",
+        "compact-source49.sing": "d5057129f8d91297bd7a0f276f8466cef372ff8e148cccd8534b2136a59f027c"
+      }
+    },
+    {
+      "attempt": "control49-01",
+      "source_revision": "1c159f666c04eb551f22d9af0bf786b6bedfb3b8",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "accepted",
+      "timeout": false,
+      "native_errors": [],
+      "late_marker_present": true,
+      "marker": "CONTROL49_ALL_CHECKS_PASS",
+      "exports": {
+        "control-normalization.sing": "0f45514b41d83e1b4e6fab00c9af4548e2f01811e25c134726c3e5bd7bd5761a"
+      }
+    },
+    {
+      "attempt": "generic49-01",
+      "source_revision": "81a0f11264cfd6dc6f9cc967c42e7c0804bb0f96",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "accepted",
+      "timeout": false,
+      "native_errors": [],
+      "late_marker_present": true,
+      "marker": "GENERIC49_ALL_CHECKS_PASS",
+      "exports": {
+        "generic-primes49.sing": "a69b2a7e6e248ed8bea23b0468053d9a1ec92457fa41ede6ab85e409e1431726"
+      }
+    },
+    {
+      "attempt": "lambda49-01",
+      "source_revision": "a1ef82fb445f754eb7ad0d86d1b0ff5c2d997ef7",
+      "kind": "Singular",
+      "native_exit": 124,
+      "status": "rejected",
+      "timeout": true,
+      "native_errors": [],
+      "late_marker_present": false,
+      "marker": "LAMBDA49_ALL_CHECKS_PASS",
+      "exports": {}
+    },
+    {
+      "attempt": "lean49-01",
+      "source_revision": "1f6a840812848d6de0a0c23929ccc229a48b8321",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_declarations": 0
+    },
+    {
+      "attempt": "lean49-02",
+      "kind": "Lean",
+      "status": "rejected",
+      "stage": "checkpoint_gate",
+      "compiler_started": false,
+      "wrapper_exit": 1,
+      "source_revision": "974dafb3c61327568bbec2fc00a54c763f87f94b",
+      "reason": "presigned checkpoint upload HTTP503; gate log preserved",
+      "runner_sha256": "c68a60cfdf96bdf22bb61c43bbe0ff53690aef3172baa522a5eb95abd9a2bdea"
+    },
+    {
+      "attempt": "lean49-03",
+      "source_revision": "c7eb40d6d3d996cb9ffe322ffbb08102446972ee",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2
+    },
+    {
+      "attempt": "normal49-01",
+      "source_revision": "9735aa8f2f7a84fad93426bfb9d77b958a0e9e96",
+      "kind": "Singular",
+      "native_exit": 124,
+      "status": "rejected",
+      "timeout": true,
+      "native_errors": [],
+      "late_marker_present": false,
+      "marker": "NORMAL49_PRODUCER_PASS",
+      "exports": {}
+    },
+    {
+      "attempt": "prep49-01",
+      "source_revision": "1c159f666c04eb551f22d9af0bf786b6bedfb3b8",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "rejected",
+      "timeout": false,
+      "native_errors": [
+        "   ? PREP49_DESCENT_IDEAL_EQUALITY",
+        "   ? ideal(...) failed",
+        "   ? error occurred in or before input.sing line 45: ` ideal unitStd49=std(ideal(descStd49,units49[i49]));`",
+        "   ? expected ideal-expression. type 'help ideal;'"
+      ],
+      "late_marker_present": true,
+      "marker": "PREP49_ALL_CHECKS_PASS",
+      "exports": {
+        "cleared-source49.sing": "6c5d0bfa273ca567ce247bc2e5a7de1ef791cc4c4a8528a56f47612bfd004609",
+        "integral-input49.sing": "665628d4aa55cfee8f9783a3d3228e2a1c4ae40f518f8b5bd0bfb67ab3da71c6"
+      }
+    },
+    {
+      "attempt": "prep49-02",
+      "source_revision": "5ee9700b77bffa85653515c3ace4b238af72dac9",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "accepted",
+      "timeout": false,
+      "native_errors": [],
+      "late_marker_present": true,
+      "marker": "PREP49_ALL_CHECKS_PASS",
+      "exports": {
+        "cleared-source49.sing": "6c5d0bfa273ca567ce247bc2e5a7de1ef791cc4c4a8528a56f47612bfd004609",
+        "integral-input49.sing": "665628d4aa55cfee8f9783a3d3228e2a1c4ae40f518f8b5bd0bfb67ab3da71c6"
+      }
+    },
+    {
+      "attempt": "primitive49-01",
+      "source_revision": "06c1b520e75fbc662b9e47a79020f8248b427463",
+      "kind": "Singular",
+      "native_exit": 0,
+      "status": "rejected",
+      "timeout": false,
+      "native_errors": [
+        "   ? The ideal primStd49 has to be given by a reduced SB",
+        "   ? error occurred in or before input.sing line 12: `ideal lexStd49=fglm(primDp49,primStd49);`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `lexStd49` is not defined",
+        "   ? error occurred in or before input.sing line 14: `poly minimal49;int entry49;int found49=0;`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? `lexStd49` is not defined",
+        "   ? error occurred in or before input.sing line 14: `forif (!(entry49<=size(lexStd49))) break;`",
+        "   ? `lexStd49` is not defined",
+        "   ? error occurred in or before input.sing line 19: `poly lValue49=reduce(l,lexStd49);poly vValue49=reduce(v,lexStd49);`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `lexStd49` is not defined",
+        "   ? error occurred in or before input.sing line 19: `poly lValue49=reduce(l,lexStd49);poly vValue49=reduce(v,lexStd49);`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `minimal49` is not defined",
+        "   ? error occurred in or before input.sing line 20: `==lValue49 && subst(vValue49,l,0)==vValue49 && subst(vValue49,v,0)==vValue49);`",
+        "   ? expected int-expression. type 'help int;'",
+        "   ? `minimal49` is not defined",
+        "   ? error occurred in or before input.sing line 21: `riate_generators=\"+string(found49)+\" minimal_degree=\"+string(deg(minimal49)));`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `shape49` is not defined",
+        "   ? error occurred in or before input.sing line 23: `imal49=minimal49/leadcoef(minimal49);ideal minimalStd49=std(ideal(minimal49));`",
+        "   ? `minimal49` is not defined",
+        "   ? error occurred in or before input.sing line 23: `imal49=minimal49/leadcoef(minimal49);ideal minimalStd49=std(ideal(minimal49));`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `lValue49` is not defined",
+        "   ? error occurred in or before input.sing line 24: `poly nValue49=t+u*lValue49+u^2*vValue49;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? can not convert $INVALID$(nValue49) -> matrix",
+        "   ? error occurred in or before input.sing line 25: `map sourceToPrimitive49=affine49,nValue49,lValue49,vValue49,u;`",
+        "   ? expected map-expression. type 'help map;'",
+        "   ? `sourceToPrimitive49` is not defined",
+        "   ? error occurred in or before input.sing line 27: `ring sourceField49=(2,u),(n,l,v),dp;`",
+        "   ? wrong type declaration. type 'help ring;'",
+        "   ? can not convert $INVALID$(n) -> matrix",
+        "   ? error occurred in or before input.sing line 28: `map fromAffine49=affine49,n,l,v,u;`",
+        "   ? expected map-expression. type 'help map;'",
+        "   ? `fromAffine49` is not defined",
+        "   ? error occurred in or before input.sing line 29: `ideal sourceStd49=std(fromAffine49(sourceIdeal49));`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `n` is not defined",
+        "   ? error occurred in or before input.sing line 30: `map back49=primLex49,l,v,n+u*l+u^2*v;`",
+        "   ? expected map-expression. type 'help map;'",
+        "   ? `back49` is not defined",
+        "   ? error occurred in or before input.sing line 33: `setring primLex49;`"
+      ],
+      "late_marker_present": true,
+      "marker": "PRIMITIVE49_ALL_CHECKS_PASS",
+      "exports": {
+        "primitive-field49.sing": "69ae6512908e202ea4e92d0394186b3331684e6b539969f27017d94b0f60be81"
+      }
+    },
+    {
+      "attempt": "primitive49-02",
+      "source_revision": "0e5d6761717ee1fbd3428f2118587d1a9a9be7a7",
+      "kind": "Singular",
+      "native_exit": 124,
+      "status": "rejected",
+      "timeout": true,
+      "native_errors": [],
+      "late_marker_present": false,
+      "marker": "PRIMITIVE49_ALL_CHECKS_PASS",
+      "exports": {}
+    }
+  ],
+  "construction_counts": {
+    "normalization_control_cases": 2,
+    "source_preparation_cases": 1,
+    "registered_generic_units": 8,
+    "generic_source_degree": 32,
+    "generic_source_prime": 1,
+    "integral_lambda_plane_models": 0,
+    "primitive_presentations": 0,
+    "compact_source_preparation_cases": 1,
+    "normalization_outputs_computed": 0,
+    "verified_affine_normalizations": 0,
+    "audited_conditional_declarations": 2
+  },
+  "component_descriptors": [],
+  "lambda_result_lines": [],
+  "primitive_result_lines": [
+    "PRIMITIVE49_SHAPE fixed_element_primitive=1 univariate_generators=1 minimal_degree=32"
+  ],
+  "generic_source_result_lines": [
+    "GENERIC49_COMPONENT index=1 degree=32",
+    "GENERIC49_RESULT components=1 original_ideal_prime=1 affine_contraction_checked=false normalization_performed=false"
+  ],
+  "failed_launches": {
+    "lean49-02": {
+      "stage": "checkpoint_gate",
+      "compiler_started": false,
+      "wrapper_exit": 1,
+      "source_revision": "974dafb3c61327568bbec2fc00a54c763f87f94b",
+      "reason": "presigned checkpoint upload HTTP503; gate log preserved",
+      "runner_sha256": "c68a60cfdf96bdf22bb61c43bbe0ff53690aef3172baa522a5eb95abd9a2bdea"
+    }
+  },
+  "normalization_output_computed": false,
+  "affine_normalization_verified": false,
+  "proper_projective_geometry_complete": false,
+  "chosen_modular_factor_map_evaluated": false,
+  "nonzero_target_order11_action_verified": false,
+  "native_arrays_formalized": false,
+  "independent_scientific_replay": false,
+  "independent_semantic_review": false,
+  "performance_measured": false,
+  "larger_n_geometric_transfer": false,
+  "IC_relation_rank": null
+}
