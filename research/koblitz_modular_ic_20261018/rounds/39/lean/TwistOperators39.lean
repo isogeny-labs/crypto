@@ -1,5 +1,5 @@
 import Mathlib.Tactic.Ring
-import Mathlib.Algebra.GroupPower.Lemmas
+import Mathlib.GroupTheory.OrderOfElement
 
 /-! Universal identities used by R39. These statements do not import the native
 source arrays or identify a geometric CM component with a chosen Koblitz model. -/
