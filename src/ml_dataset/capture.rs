@@ -520,6 +520,35 @@ impl WitnessBudget {
             reserved_bytes: 0,
         }
     }
+    /// Exclusively borrow the caller's current original parent remainder.
+    /// The caller must release and settle cumulative deltas on EVERY return;
+    /// supplied amounts are assertions, not independently authenticated grants.
+    /// Clock-independent reconciliation never changes the original deadline.
+    pub fn set_exclusive_supply(
+        &mut self,
+        remaining_work: u64,
+        remaining_bytes: u64,
+    ) -> Result<(), WitnessError> {
+        // Close stale supply even on overflow. Install both new limits atomically.
+        self.release_exclusive_supply();
+        let work_limit = self
+            .reserved_work
+            .checked_add(remaining_work)
+            .ok_or(WitnessError::Work)?;
+        let bytes_limit = self
+            .reserved_bytes
+            .checked_add(remaining_bytes)
+            .ok_or(WitnessError::Storage)?;
+        self.work_limit = work_limit;
+        self.bytes_limit = bytes_limit;
+        Ok(())
+    }
+    /// Withdraw only unreserved supply; charged reservations never refund.
+    /// Safe Rust prevents this call while a local WitnessTicket borrows us.
+    pub fn release_exclusive_supply(&mut self) {
+        self.work_limit = self.reserved_work;
+        self.bytes_limit = self.reserved_bytes;
+    }
     fn check(&self) -> Result<(), WitnessError> {
         if std::time::Instant::now() >= self.deadline {
             Err(WitnessError::Deadline)
@@ -3145,5 +3174,101 @@ mod tests {
         verify_captured_delta(&f.snapshot(0), &delta, &cursor).unwrap();
         assert_eq!(delta.head.payload_count, 1);
         assert_eq!(global, 0);
+    }
+    #[test]
+    fn witness_exclusive_supply_preserves_history_and_admits_only_parent_remainder() {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+        let mut b = WitnessBudget::new(0, 0, deadline);
+        let (mut parent_work, mut parent_bytes) = (100, 80);
+        b.set_exclusive_supply(parent_work, parent_bytes).unwrap();
+        {
+            let mut ticket = b.reserve(30, 20).unwrap();
+            ticket.spend(7).unwrap();
+        }
+        b.release_exclusive_supply();
+        parent_work -= b.reserved_work;
+        parent_bytes -= b.reserved_bytes;
+        assert_eq!(
+            (b.reserved_work, b.performed_work, b.reserved_bytes),
+            (30, 7, 20)
+        );
+        assert!(matches!(b.reserve(1, 0), Err(WitnessError::Work)));
+        assert!(matches!(b.reserve(0, 1), Err(WitnessError::Storage)));
+        b.set_exclusive_supply(parent_work, parent_bytes).unwrap();
+        assert_eq!(b.deadline, deadline);
+        assert!(matches!(
+            b.reserve(parent_work + 1, 0),
+            Err(WitnessError::Work)
+        ));
+        assert!(matches!(
+            b.reserve(0, parent_bytes + 1),
+            Err(WitnessError::Storage)
+        ));
+        let watermark = (b.reserved_work, b.performed_work, b.reserved_bytes);
+        {
+            let mut ticket = b.reserve(parent_work, parent_bytes).unwrap();
+            ticket.spend(11).unwrap();
+        }
+        b.release_exclusive_supply();
+        assert_eq!(
+            (b.reserved_work, b.performed_work, b.reserved_bytes),
+            (100, 18, 80)
+        );
+        assert_eq!(
+            (
+                b.reserved_work - watermark.0,
+                b.performed_work - watermark.1,
+                b.reserved_bytes - watermark.2
+            ),
+            (70, 11, 60)
+        );
+        b.set_exclusive_supply(0, 0).unwrap();
+        assert!(matches!(b.reserve(1, 0), Err(WitnessError::Work)));
+        assert_eq!(b.deadline, deadline);
+    }
+    #[test]
+    fn witness_exclusive_supply_overflow_closes_both_limits_without_resetting_history() {
+        for (work, bytes, expected) in [
+            (u64::MAX, 0, WitnessError::Work),
+            (0, u64::MAX, WitnessError::Storage),
+        ] {
+            let mut b = witness_budget();
+            {
+                let mut ticket = b.reserve(10, 20).unwrap();
+                ticket.spend(3).unwrap();
+            }
+            let deadline = b.deadline;
+            assert_eq!(b.set_exclusive_supply(work, bytes), Err(expected));
+            assert_eq!((b.work_limit, b.bytes_limit), (10, 20));
+            assert_eq!(
+                (b.reserved_work, b.performed_work, b.reserved_bytes),
+                (10, 3, 20)
+            );
+            assert_eq!(b.deadline, deadline);
+            assert!(matches!(b.reserve(1, 0), Err(WitnessError::Work)));
+            assert!(matches!(b.reserve(0, 1), Err(WitnessError::Storage)));
+        }
+    }
+    #[test]
+    fn witness_exclusive_supply_reconciliation_does_not_revive_expired_deadline() {
+        let deadline = std::time::Instant::now();
+        let mut b = WitnessBudget::new(0, 0, deadline);
+        b.set_exclusive_supply(100, 100).unwrap();
+        assert_eq!(b.deadline, deadline);
+        assert!(matches!(b.reserve(1, 1), Err(WitnessError::Deadline)));
+        b.release_exclusive_supply();
+        assert_eq!(
+            (
+                b.work_limit,
+                b.bytes_limit,
+                b.reserved_work,
+                b.performed_work,
+                b.reserved_bytes
+            ),
+            (0, 0, 0, 0, 0)
+        );
+        b.set_exclusive_supply(100, 100).unwrap();
+        assert_eq!(b.deadline, deadline);
+        assert!(matches!(b.reserve(0, 0), Err(WitnessError::Deadline)));
     }
 }
