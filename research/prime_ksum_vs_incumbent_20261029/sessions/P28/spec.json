@@ -1,0 +1,84 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime_ksum_vs_incumbent_20261029: same-session k-sum vs mitm incumbent, 28-bit holdout curve of prime_base_oracle_tuning_20261029",
+  "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho). Same curve, targets and measurement seed as the incumbent holdout session; k-sum base sizes frozen from prime_ksum_k5_20261028 and prime_ksum_table_20261028 train curves. Public synthetic curve and targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261018202
+      }
+    ],
+    "targets_per_curve": 48,
+    "target_seed": 20261018211,
+    "target_kind": "public"
+  },
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261018221,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "reference",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "inc",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "ksum4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=21",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=15",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    }
+  ]
+}

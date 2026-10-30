@@ -161,8 +161,45 @@ baseline. Every such improvement is a success and is reported as one.**
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
+## Tracks of index calculus
+
+Owner's rule, 2026-10-29 (`research/prime_ic_program_20261029/DECISIONS.md`
+R1, Option C as amended for D2). It refines the 2026-10-24 criterion
+(`docs/ic/SWEEPER.md`, "Tracks").
+
+Index-calculus pipelines are reported in two tracks. Each track has its own
+baseline and its own ratchet under the success criterion above.
+
+- **Algebraic.** Relations come from a solver applied to a system that
+  contains both the summation polynomial and the factor-base constraint, for
+  example ⟨S_{m+1}, F_V⟩ handed to msolve or F4, Weil descent over a subspace
+  base, or a PKM tower system. This is the headline track.
+- **Generic decomposition.** Relations come from enumerating the base,
+  computing group sums or differences, and testing them against the base or a
+  table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
+  and large primes on a pair table. Such an oracle runs identically on a
+  random base, so it is a generic algorithm bounded by √r. Improvements in
+  this track are successes under the 2026-10-15 criterion. They are labelled
+  "generic decomposition (bounded by √r; cannot beat rho)" and are never
+  described as algebraic progress.
+
+Arms of the two tracks may be ranked against each other on the same
+instances, in the same unit and across the §5a band. A gain in one track
+never ratchets the other track's baseline. Each row reports its distance to
+matched rho. Per-oracle classification:
+`research/prime_ic_program_20261029/ruling/classification.json`, column C.
+
 ## Pointers
 
+- **Shared conventions with `crypto-autoresearcher`, `cryptanalysis` and
+  `crypto-lean`:** object storage (one bucket, `setec-astronomy-artifacts`,
+  region `us-east-2`), the validation vocabulary, curve identity, the skill
+  surface and the shared-code parity list are stated once in
+  `crypto-autoresearcher:docs/lab-contract.md`. That file wins on a shared
+  convention; this file wins on anything specific to this repository.
+  `s3://setec-astronomy-artifacts` is the only writable bucket; the legacy
+  buckets (`s3://crypto-autoresearcher/**`, `ecc2k130-*`, `aburan28-n83-tier1-*`,
+  `cairn-swarm-*`) are read-only.
 - **What has already been tried against ECDLP, here and in the sibling
   repositories:** the lead atlas in aburan28/crypto-autoresearcher,
   `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
@@ -205,8 +242,6 @@ commands, and interpretation limits.
   profile, without the 18 largest `research/` archives. In a sparse checkout
   (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
-
-# AGENTS.md
 
 ## Preserve scope and report evidence
 
@@ -496,7 +531,9 @@ and `aburan28/ml-cryptanalysis`:
 revised mathematical result, include a faithful Lean 4 theorem and checked
 proof whenever formalization is feasible. Treat the formalization attempt as
 part of the requested work, and prioritize the central theorem and its
-dependencies. Keep the readable mathematical proof in the report.
+dependencies. Keep the readable mathematical proof in the report. The shared
+library and gate live in `aburan28/crypto-lean`; pin its revision with the
+toolchain, and treat a gate change as a dependency change.
 
 - Maintain a proof map from each report theorem, proposition, lemma or
   corollary to its Lean declaration, exact hypotheses and verification status.
@@ -1507,10 +1544,11 @@ artifact policy does not select. Every blob committed
 stays in every future clone. The `large-files` workflow
 (`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
 except generated text that git delta-compresses well (`docs/browser/data.json`,
-`docs/curves/*.json`). A PR that must commit one anyway carries the
-`large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
-text files to get under the limit: compressed blobs do not delta, so each
-revision costs its full size again.
+`docs/curves/*.json`) and the reviewed paths in
+`.github/large-files-allowed.txt`. A PR that must commit another one anyway
+carries the `large-file-ok` label, added by the owner or a reviewer. Do not
+pre-compress text files to get under the limit: compressed blobs do not delta,
+so each revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
@@ -1686,9 +1724,9 @@ verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
 
-# Agent rules for IC measurements
+## IC measurement rules
 
-## Primary comparison uses one target
+### Primary comparison uses one target
 
 The default elliptic-curve index-calculus (IC) question is the cost to solve
 one previously unseen public target. Every primary comparison run must use
@@ -1738,12 +1776,12 @@ Its launch interface now permits one target per run only.
 <!-- conductor:begin -->
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
-those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
+those files, it will tell you who and what to do about it. Read `docs/CONDUCTOR.md`
 and the active task card. Report scope expansion before editing outside the reserved paths.
 Do not publish chat transcripts or secrets as task metadata.
 <!-- conductor:end -->
 
-## Progress metrics (daily lab report)
+### Progress metrics (daily lab report)
 
 `tools/progress_metrics.py` exports this repo's progress KPIs as JSONL for the lab-wide daily
 report (`/Volumes/SSD990-2/progress-metrics`). It reads committed state at `origin/<default>` and

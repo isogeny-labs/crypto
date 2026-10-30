@@ -1,0 +1,19 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "audit (accounting v2): j = 0 curve floor",
+  "description": "A registered j = 0 prime curve (y^2 = x^3 + 1 over F_23736841, p = 1 mod 3, #E = 23727108 = 12 * 1977259, prime subgroup order 1977259 = 1 mod 3). The order-3 automorphism acts on the subgroup, so the floor is sqrt(pi / 12) (A = 6, boundaries.floor_rule automorphisms/v2), where the first rule read A = 2 and rho.cubic about 0.91x its floor. rho.cubic_v2 charges the set-up [kappa]G ledger the frozen id leaves out of its total. Expect rho.cubic_v2 above 1x the floor and rho.negation_v2 near sqrt(3) x rho.cubic_v2.",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 23736841, "a": 0, "b": 1, "group_order": 23727108, "r": 1977259, "gx": 19157303, "gy": 13563414}],
+    "targets_per_curve": 6,
+    "target_seed": 7
+  },
+  "arms": [
+    {"name": "rho-neg-v2", "role": "reference", "method": {"id": "rho.negation_v2"}},
+    {"name": "rho-cubic-v2", "role": "candidate", "method": {"id": "rho.cubic_v2"}},
+    {"name": "rho-cubic", "role": "baseline", "method": {"id": "rho.cubic"}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "bsgs-neg-v2", "role": "candidate", "method": {"id": "bsgs.negation_v2"}},
+    {"name": "kangaroo-v2", "role": "candidate", "method": {"id": "kangaroo.vow_v2"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 0, "order": "alternate", "seed": 1, "isolation_required": "L0", "timeout_seconds": 120}
+}
