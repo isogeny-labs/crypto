@@ -378,11 +378,14 @@ impl<'p> SquareRootContext<'p> {
         }
         let parameters = self.parameters.as_mut().unwrap();
         let one = BigUint::one();
+        if parameters.twos == 1 {
+            // For p=3 mod4, square the candidate instead of first computing a
+            // separate Legendre symbol. This also rejects every nonsquare.
+            let root = modpow(a, &parameters.root_exponent, p, meter)?;
+            return Ok((&root * &root % p == *a).then_some(root));
+        }
         if modpow(a, &parameters.legendre_exponent, p, meter)? != one {
             return Ok(None);
-        }
-        if parameters.twos == 1 {
-            return Ok(Some(modpow(a, &parameters.root_exponent, p, meter)?));
         }
         let mut c = if let Some(initial) = &parameters.nonresidue_power {
             initial.clone()
@@ -430,6 +433,31 @@ impl<'p> SquareRootContext<'p> {
 mod tests {
     use super::*;
     use crate::Limits;
+
+    #[test]
+    fn three_mod_four_roots_fit_a_single_exponentiation_budget() {
+        struct NoRandom;
+        impl RandomSource for NoRandom {
+            fn fill(&mut self, _: &mut [u8]) -> Result<()> {
+                Err(invalid("shortcut must not consume randomness"))
+            }
+        }
+        let p = BigUint::from(7u8);
+        let mut roots = SquareRootContext::new(&p).unwrap();
+        // One two-bit modular exponentiation is charged five abstract steps.
+        // Squaring the returned candidate independently certifies membership.
+        for (a, expected) in [(2u8, Some(4u8)), (3, None)] {
+            let mut meter = Meter::new(Limits {
+                steps: 5,
+                ..Limits::default()
+            });
+            let got = roots.root(&a.into(), &mut NoRandom, &mut meter).unwrap();
+            assert_eq!(got, expected.map(BigUint::from));
+            if let Some(root) = got {
+                assert_eq!(&root * &root % &p, a.into());
+            }
+        }
+    }
 
     #[test]
     fn reused_square_roots_match_independent_residue_tables_in_both_orders() {
