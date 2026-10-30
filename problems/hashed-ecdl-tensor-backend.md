@@ -68,6 +68,15 @@ the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
 
+2026-10-30 Hexagon integration: the
+[subject review](../research/hexagon_cscc_20261030/README.md) adds a divisor-prefix
+factoring reduction and an exhaustive local-cost profile reference in both
+native tensor checkouts. The factoring reduction uses the existing OpenAI-based
+counter; the Hexagon authors instead re-prove the Anthropic engine. Their Lean
+statement, compilers and stronger conjecture are not local verification of this
+Rust implementation. The general audit above remains open. The weighted
+reference does not establish a recursive coefficient-algebra extension.
+
 2026-10-30 finite-size implementation follow-up: opt-in selector-domain
 witnesses and graphs, schoolbook encodings, checked exact cutsets/elimination,
 partial-relation provenance and binary XOR/Frobenius domains are implemented.

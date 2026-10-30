@@ -46,8 +46,10 @@ The [prime-chain ML projection proposal](PRIME-CHAIN-ML-PROJECTION.md) specifies
 a concrete lossless equation graph and causal decision-prefix view, including
 exact wide integers and independent replay prerequisites. The static prime-chain
 graph is now implemented in the native exporter, with current validation status
-recorded in [remaining coverage](REMAINING-COVERAGE.md). Decision-prefix replay,
-action examples and trained models remain separate implementation obligations.
+recorded in [remaining coverage](REMAINING-COVERAGE.md). The new
+[prefix certificate implementation](PREFIX-REPLAY-CERTIFICATES.md) adds bounded
+semantic replay and observed recursive branch examples; its validation is still
+in progress. Intra-F4 decision views and trained models remain open obligations.
 
 Start with supervised cost/routing baselines, graph encoders, and sequence models
 of solver events. Train branching/reduction policies only after deterministic

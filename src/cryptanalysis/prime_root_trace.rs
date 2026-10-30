@@ -12,6 +12,10 @@ use serde::{Deserialize, Serialize};
 
 use super::residual_walk::is_prime_u64;
 
+/// Fixed-storage opt-in API; legacy solve/verify remain unchanged.
+#[path = "prime_root_bounded.rs"]
+pub mod bounded;
+
 pub const MAX_PRIME: u64 = (1u64 << 61) - 1;
 pub const MAX_DEGREE: usize = 8;
 pub const MAX_EVENTS: u64 = 100_000;
