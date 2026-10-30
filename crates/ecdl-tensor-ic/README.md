@@ -75,6 +75,12 @@ enumerating the group:
   degree.
 - The gadget relation network takes its hint candidates from the window, so a
   relation search never touches a point outside it.
+- The window does not need gadgets. The solver applies it whenever
+  `window_bits > 0`, and the meet-in-the-middle path uses it too; it is a
+  constraint on the affine hash, not on how relations are encoded.
+
+Listing cost at b = 24 (p = 8388617, m = 2), measured: k = 0 takes 859 ms and
+evaluates a hash per group point; k = 8 takes 12 ms and holds the same |F_i|.
 
 `ecdlscale` prints the same table as the Go command, byte for byte:
 
