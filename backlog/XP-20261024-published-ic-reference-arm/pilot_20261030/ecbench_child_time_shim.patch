@@ -1,0 +1,24 @@
+diff --git a/runner_head.rs b/../pubic-refarm-build/src/cryptanalysis/ecbench/runner.rs
+index fcb781c..a9a33f0 100644
+--- a/runner_head.rs
++++ b/../pubic-refarm-build/src/cryptanalysis/ecbench/runner.rs
+@@ -273,7 +273,18 @@ fn run_child(
+     input: &ChildInput,
+     timeout: Duration,
+ ) -> Result<Reaped, String> {
+-    let mut cmd = Command::new(&opts.exe);
++    // MEASUREMENT SHIM (pilot only, not committed): ECB_TIME_DIR makes every child run under
++    // `/usr/bin/time -l -o <dir>/<n>.time`, so per-run instructions retired (children included)
++    // are recorded next to the session.
++    static SHIM_N: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++    let mut cmd = if let Ok(d) = std::env::var("ECB_TIME_DIR") {
++        let n = SHIM_N.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
++        let mut c = Command::new("/usr/bin/time");
++        c.arg("-l").arg("-o").arg(format!("{d}/{n:06}.time")).arg(&opts.exe);
++        c
++    } else {
++        Command::new(&opts.exe)
++    };
+     cmd.arg("exec")
+         .stdin(Stdio::piped())
+         .stdout(Stdio::piped())

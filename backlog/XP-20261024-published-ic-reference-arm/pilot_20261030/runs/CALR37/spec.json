@@ -1,0 +1,35 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "pilot GAE-instruction calibration n37 per-run",
+ "description": "Preregistered cross-family Groebner-solver comparison (PROTOCOL.md). Public one-target workloads; IC S is a counted lower bound (solver word XORs unpriced; F6-IC geometric additions charged).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 37
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 202610111901,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-negation",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation",
+    "params": {}
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 202610111902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
