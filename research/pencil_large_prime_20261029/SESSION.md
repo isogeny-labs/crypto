@@ -904,3 +904,17 @@ The 60-target gate's frozen protocol, native accounting validation and budget ad
 
 ### Errors
 The initial runtime S3 prefix was plural; the canonical singular-prefix object was published and independently read back. Both versions remain recorded. Initial stopped-container verification lacked a command, then encountered root-owned extracted files; corrected extraction verification passed without starting a container. No IAM/RBAC permissions were expanded.
+
+## 2026-10-30 — Exact gate accounting and conservative operational stop
+
+### What was done
+Committed the exact sixty-target p739 analysis route at99b10d5c6, preserving full1260 default and common pricing arithmetic. Native analyzer30 tests and exporter41 tests passed; independent gate review found no concrete denominator, identity or pricing defect. Retained the review and software evidence separately from measured results. The new neutral publication packet is validation/accounting/reports/review-20261029T2359Z-publication-native/ and contains PDF, SVG and JSON with zero fresh empirical observations.
+
+### Decisions made
+A second controller review corrected an overstrong deadline argument: a synchronous replay/CRIU call can block the supervisor's absolute-time check, while Kubernetes pod duration is relative to start. Preserve the authorized outer deadline03:32:22Z and use internal controller guard01:44:17Z. With preparation lower bound23:59:13Z and180-second termination reserve, twice the guard minus the lower bound plus reserve is one second before the outer deadline. Only the unsubmitted request deadline changed; the original request and review remain preserved. The14,400-second budget counts active scientific computation, checkpoint/restore, replay and fresh validation; idle verified supervisor allocation is separately reported and is not claimed to have a cumulative allocation cap.
+
+### Open threads
+Freeze and commit the guarded gate protocol before submission; retain all60 targets,1080 slots and300 measured pair slots even if capped. Verify actual job/attempt histories and downloaded evidence before any empirical cost claim. All56 jobs in the latest read-only EKS overview were terminal; no existing job was stopped or repeated.
+
+### Errors
+The first controller review did not account fully for pod-start delay during blocking replay. Its corrected record is retained and supersedes that deadline conclusion. A concurrent Git index refresh temporarily blocked a metadata commit; the lock cleared naturally and the commit succeeded without removing a live lock.
