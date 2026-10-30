@@ -98,3 +98,15 @@ Source/trace/filter/inverse/period/Frob controls strictpass as indexed in
 results.json. Three capped full436runs remain. No source block regenerated
 for final completion. R44report/render/metadata prepared; finish raw seal,
 S3freshrestore/pinchecks, metrics validation, commit/push/PRupdate. Goalactive.
+
+## Publication reconciliation16:08UTC
+PR2952was owner-merged into parent2873,nowhead110476230d1a7eeaf9fe171523aa3e8eb239a5a3;
+its remote branch was deleted. Merged that parent commit without source changes,
+then switched to codex/koblitz-r44-orientation. Preserve parent owner auto.
+Initial fullmetricsread timed out60s before new counters; batched blob reads
+and cached4worker history prefetch fixed the same bound. All604old rows are
+identical. Complete HEAD/default exporters exit0within60s; R44four counters
+6/3/20/4360match native results, all neutral. Initial timeout is retained.
+Scientific runs unchanged; update sourcepins for metadata-code fix and require
+raw archive hash75ce4225486332e328af1a187f20165c127edb984ada31fc1773a80bc806223f
+unchanged. Publish R44as a new regular stacked PR against parent2873.

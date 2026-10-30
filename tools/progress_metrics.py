@@ -20,6 +20,8 @@ Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
 # problem, unit, better (higher|lower|neutral), kind (gauge|event), label, source.
 # Reads committed state at --ref via `git show`; never the working tree. stdlib only.
 import argparse
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 import datetime as dt
 import json
 import os
@@ -47,7 +49,7 @@ def ls(ref, path=""):
     return [l for l in _git("ls-tree", "-r", "--name-only", ref, "--", path, check=False).splitlines() if l]
 
 
-def file_history(ref, path, since):
+def _uncached_file_history(ref, path, since):
     """Yield (date, commit, text) for the newest commit per day touching `path`, newest first."""
     out = _git("log", "--first-parent", ref, f"--since={since}", "--format=%H %cs", "--", path, check=False)
     seen = set()
@@ -59,6 +61,45 @@ def file_history(ref, path, since):
         txt = show(h, path)
         if txt is not None:
             yield d, h[:12], txt
+
+
+@lru_cache(maxsize=None)
+def _history_rows(ref, path, since):
+    return tuple(_uncached_file_history(ref, path, since))
+
+
+def file_history(ref, path, since):
+    return iter(_history_rows(ref, path, since))
+
+
+def show_many(ref, paths):
+    """Read committed text blobs in one size-framed Git batch."""
+    if not paths:
+        return []
+    requests = "".join(f"{ref}:{path}\n" for path in paths).encode()
+    proc = subprocess.run(["git", "-C", str(REPO), "cat-file", "--batch"],
+                          input=requests, capture_output=True, check=True)
+    data = proc.stdout
+    pos = 0
+    values = []
+    for path in paths:
+        end = data.index(b"\n", pos)
+        header = data[pos:end].split()
+        pos = end + 1
+        if header[-1] == b"missing":
+            values.append(None)
+            continue
+        if len(header) != 3 or header[1] != b"blob":
+            raise ValueError(f"unexpected Git object for {path}")
+        size = int(header[2])
+        values.append(data[pos:pos + size].decode())
+        pos += size
+        if data[pos:pos + 1] != b"\n":
+            raise ValueError("invalid Git batch framing")
+        pos += 1
+    if pos != len(data):
+        raise ValueError("extra Git batch output")
+    return values
 
 
 def emit(metric, value, *, date=None, problem="misc", unit="", better="neutral", kind="gauge", label="", source=""):
@@ -500,8 +541,8 @@ def fall_degree(ref):
         or ("/out/E_" in f and (f.startswith(base + "e9/") or f.startswith(base + "e10/") or f.startswith(base + "e12/"))))]
     draws = censored = 0
     max_n = min_censored_n = None
-    for f in files:
-        for line in (show(ref, f) or "").splitlines():
+    for text in show_many(ref, files):
+        for line in (text or "").splitlines():
             if not line.startswith("{"):
                 continue
             r = json.loads(line)
@@ -552,6 +593,13 @@ def curve_traits(ref):
 
 def main():
     a = args()
+    # Independent histories are prefetched without emitting output; metric
+    # ordering and the original first-parent/per-day semantics stay unchanged.
+    base = "research/koblitz_modular_ic_20261018/rounds/"
+    paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44)]
+    pool = ThreadPoolExecutor(max_workers=4)
+    histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
@@ -566,6 +614,9 @@ def main():
     fall_degree(a.ref)
     curve_traits(a.ref)
 
+    for history in histories:
+        history.result()
+    pool.shutdown()
     koblitz_modular_augmentation(a.ref, a.since)
     koblitz_modular_geometry(a.ref, a.since)
     koblitz_larger_constructions(a.ref, a.since)
