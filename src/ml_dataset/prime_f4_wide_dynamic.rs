@@ -7465,4 +7465,200 @@ mod tests {
         altered[7] = serde_json::to_vec(&terminal).unwrap();
         assert!(verify(&altered, 7).is_err());
     }
+    #[test]
+    fn step4_real_bound_capture_restore_and_independent_witness_replay() {
+        use super::super::prime_f4_wide_dynamic_replay as replay;
+        use super::super::{EventSink, LiveSinkGuard, LIVE_SINK};
+        use crate::ml_dataset::capture;
+        use sha2::{Digest, Sha256};
+        for exceptional in [false, true] {
+            let (m, a, b, target, points, codes) = if exceptional {
+                (
+                    5,
+                    1,
+                    0,
+                    AffinePoint { x: 0, y: 0 },
+                    vec![AffinePoint { x: 0, y: 0 }],
+                    vec![0],
+                )
+            } else {
+                (
+                    4,
+                    0,
+                    7,
+                    AffinePoint { x: 84, y: 12 },
+                    vec![AffinePoint { x: 6, y: 18 }, AffinePoint { x: 6, y: 83 }],
+                    vec![6],
+                )
+            };
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root = std::env::temp_dir().join(format!(
+                "dynamic-bound-restore-{}-{nonce}",
+                std::process::id()
+            ));
+            let cell = root.join("cell");
+            std::fs::create_dir_all(&cell).unwrap();
+            let binding = capture::AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: 0,
+                attempt_sha256: "7".repeat(64),
+            };
+            let limits = capture::capture_limits(128).unwrap();
+            let sink = capture::CaptureEmitter::create(
+                &cell.join("live"),
+                binding.clone(),
+                limits.clone(),
+            )
+            .unwrap();
+            assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+            LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(sink)));
+            let guard = LiveSinkGuard;
+            let mut forward = |event: &PhaseEvent, buffer: &mut TypedEventBuffer| {
+                super::super::live_typed_event(
+                    capture::TypedEventKind::WidePrimeDynamic,
+                    event,
+                    buffer,
+                )
+                .map_err(|_| ())
+            };
+            let mut prepared = prepare_original(
+                101,
+                Parameters {
+                    m,
+                    a,
+                    b,
+                    target_x: target.x,
+                    codes: &codes,
+                },
+                target,
+                &points,
+                phase_limits(),
+                EventPersistence::BoundCapture,
+                &mut forward,
+            )
+            .unwrap();
+            let mut publisher = BoundWitnessPublisher::default();
+            prepare_step4(&mut prepared, &mut publisher).unwrap();
+            let mut phase = invoke_original(prepared, &mut forward).unwrap();
+            let linear = extract_reported_linear(&mut phase);
+            retain_linear(&mut phase, &linear).unwrap();
+            let report = run_group_step4(&mut phase, Some(&linear), &mut forward, &mut publisher);
+            assert!(
+                report.pdp_witness_verified && report.certificate_durably_persisted,
+                "real bound publication did not complete: {report:?}"
+            );
+            confirm_step4_witness(&mut phase.prepared, &mut publisher).unwrap();
+            retain_step4_terminal(&mut phase).unwrap();
+            visit_step4_retained_artifacts(&phase.prepared, |path, role, encoding, bytes| {
+                if path == "pdp-witness.json" {
+                    return Ok(());
+                }
+                super::super::live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+            })
+            .unwrap();
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
+                _ => panic!("bound sink lost"),
+            });
+            drop(guard);
+            let initial = capture::CaptureCursor::initial(&binding).unwrap();
+            let snapshot = root.join("restored");
+            let delta =
+                capture::capture_committed_delta(&cell, &snapshot, &binding, &initial, &limits)
+                    .unwrap()
+                    .unwrap();
+            capture::verify_captured_delta(&snapshot, &delta, &initial).unwrap();
+            let mut sequences = Vec::new();
+            for segment in &delta.segments {
+                let bytes = std::fs::read(snapshot.join(&segment.artifact.path)).unwrap();
+                for line in bytes.split(|&c| c == b'\n').filter(|line| !line.is_empty()) {
+                    let event: capture::EventRecord = serde_json::from_slice(line).unwrap();
+                    if event.event["kind"] == "capture_payload_committed"
+                        && event.event["artifact"]["path"] == "payloads/pdp-witness.json"
+                    {
+                        sequences.push(event.sequence);
+                    }
+                }
+            }
+            assert_eq!(
+                sequences.len(),
+                1,
+                "confirmation must not republish the witness"
+            );
+            let descriptors: [Option<&crate::ml_dataset::types::Artifact>; 8] =
+                std::array::from_fn(|i| {
+                    let path = format!("payloads/{}", SLOT_REGISTRY[i].0);
+                    let matches: Vec<_> =
+                        delta.artifacts.iter().filter(|a| a.path == path).collect();
+                    assert!(matches.len() <= 1);
+                    matches.first().copied()
+                });
+            let raw: [Vec<u8>; 8] = std::array::from_fn(|i| {
+                descriptors[i]
+                    .map_or_else(Vec::new, |a| std::fs::read(snapshot.join(&a.path)).unwrap())
+            });
+            let slots = std::array::from_fn(|i| {
+                descriptors[i].map(|a| replay::Artifact {
+                    path: a.path.strip_prefix("payloads/").unwrap(),
+                    role: &a.role,
+                    encoding: &a.encoding,
+                    bytes: &raw[i],
+                    sha256: Sha256::digest(&raw[i]).into(),
+                })
+            });
+            let replay_domain: Vec<_> = points
+                .iter()
+                .map(|q| replay::Point { x: q.x, y: q.y })
+                .collect();
+            let expected = replay::Expected {
+                p: 101,
+                a,
+                b,
+                m,
+                target: replay::Point {
+                    x: target.x,
+                    y: target.y,
+                },
+                domain: &replay_domain,
+                codes: &codes,
+                work_limit: 16384,
+                trace_bytes: 128 * 1024 * 1024,
+                memory_bytes: 256 * 1024 * 1024,
+            };
+            let verified = replay::verify(
+                &expected,
+                &replay::Bundle {
+                    slots,
+                    committed_witness: Some(replay::CapturedWitness {
+                        bytes: &raw[6],
+                        sha256: Sha256::digest(&raw[6]).into(),
+                        original_sequence: sequences[0],
+                    }),
+                },
+                replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 * 1024 * 1024,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+            .unwrap();
+            assert!(verified.first_witness_verified && verified.witness_capture_committed);
+            assert!(
+                !verified.independent_derivation_verified
+                    && !verified.operation_trajectory_verified
+            );
+            std::fs::write(snapshot.join("payloads/pdp-witness.json"), b"corrupt").unwrap();
+            assert!(capture::verify_captured_delta(&snapshot, &delta, &initial).is_err());
+            std::fs::remove_dir_all(root).unwrap();
+        }
+    }
 }
