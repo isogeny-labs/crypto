@@ -1,8 +1,9 @@
 # Explicit bases and signed relation finding on CUDA
 
-The service has been cross-compiled for Blackwell `sm_120` with CUDA 13.2.
-Host arithmetic, relation and bounded reduction/replay tests passed on a
-cloud CPU builder. **GPU device execution remains blocked by AWS quota.**
+The service passed device validation on a RunPod RTX PRO 6000 Blackwell
+Server Edition, compiled for `sm_120` with CUDA 13.2.51. Host and CUDA
+arithmetic/base/relation tests, bounded reduction/replay, standalone Rust
+tests, Clippy, and Compute Sanitizer memcheck passed (zero memory errors).
 See [the validation record](VALIDATION.md) for revisions, outcomes and limits;
 no measured performance improvement is claimed.
 
