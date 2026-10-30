@@ -136,3 +136,17 @@ Build/CLI archives freshGET verified; see validation/clean-build-01* and
 validation/clean-cli-surface-01*. Actual26-cell/control workflow remainspending
 its applicable test/lint/schema/runtimepreflight inputs. Thisdoesnotchange
 sharedsourceownership or assertowneracknowledgment/upstreamdelivery.
+
+Update 2026-10-30T23:33Z: isolated restore repair now has clean validation source
+commit c41bec150e16e4c4f9a00634002b633b821de262. Its only delta from
+package01 is restore.rs patch e3852ec4bdf5b256a7a0360b085fc0ffdb02dc8ec9dcc3f7248b0c8b5bd28cbd.
+Release build and strict maintained Clippy passed0; native fixture31/0/0,
+dataset parent479/0/2 with separately verified FIFO child1pass, and four CLI
+surface commands passed. All retained archive GET byte comparisons passed.
+Full hashes, source guards, exact scope and open gates are in
+validation/CLEAN-VALIDATION-02-RESULT.md; package02 is an isolated source
+closure, not an applied shared-head patch. Checkpoint24 Git bundle at
+s3://setec-astronomy-artifacts/checkpoints/crypto/codex__ml-dataset-factor-base-policy-20261030/20261030T233006Z-bd37ecdf202d/
+was freshly downloaded and verified. T887 currently holds mod.rs/solvers.rs;
+no source reservation was changed here. This file is a committed handoff,
+not an owner acknowledgment or direct-message delivery receipt.
