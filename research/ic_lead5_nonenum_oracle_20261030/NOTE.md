@@ -9,8 +9,8 @@ EXP-ICEX-153c34 the experiment that tests it?
 
 ## 0. Verdict
 
-**UNDECIDED, with the prior on "no gain". No construction that beats enumeration was found, and none is
-proved to be enumeration in general.** Three separate statements, each at its own evidence level:
+**UNDECIDED on current evidence, with the prior on "no gain". No construction that beats enumeration
+was found, and none is proved to be enumeration in general.** Three separate statements, each at its own evidence level:
 
 1. **A non-enumerative oracle for prime fields exists as a construction and was already built and
    measured in this repo.** It is the Petit–Kosters–Messeng (PKM) chain presentation, called the "PKM
@@ -19,22 +19,25 @@ proved to be enumeration in general.** Three separate statements, each at its ow
    shows that "escapes the theorem" is trivially true of any algebraic oracle and is not progress.
 2. **EXP-ICEX-153c34 targets the wrong object.** Its backend G1 is a Gröbner computation on the
    vanishing-polynomial ideal `(S, g_V(x_1), …, g_V(x_m))`, `deg g_V = |V|`. For that presentation
-   the cost is bounded below by a grid-sized floor (Lemma A, §4.1, and the design report's own CRT
-   collision). It cannot test the lead. The design report already predicts the result: the floor
-   is 55–229× (symmetrised) to 1,041–8,438× (unsymmetrised) the competitiveness threshold T on
-   all six v4 fixtures. Building G1 would re-measure that floor.
+   the proved facts are narrow (Lemma A, §4.1): any degree-bounded solver needs working degree
+   `≥ |V|`, and XL then has `≥ C(|V|+m, m)` columns. For lex Buchberger, which is what G1 is, nothing
+   is proved. The design report assumes a grid floor from its CRT collision (both solvers decide the
+   same predicate, which does not make them cost the same) and computes it as 55–229×
+   (symmetrised) to 1,041–8,438× (unsymmetrised) the competitiveness threshold `T` on all six v4
+   fixtures. G1 has no chain decomposition, so it cannot test the lead, and building it would at best
+   re-measure that assumed floor.
 3. **For the PKM chain the question is the solving-degree growth of F4-type solvers, and it is open.**
-   - XL/Macaulay on the chain is enumeration, exactly: columns `2^N = |V|^m` (proved at `m = 2`,
-     repo `ic_next10_20261014/03-pkm-degree`).
+   - XL/Macaulay on the chain is enumeration-sized: columns `2^N = |V|^m`, with `D_XL ≥ d + δ`
+     (Prop 2) and equality verified at `m = 2`, `N = 12–26` (repo `ic_next10_20261014/03-pkm-degree`).
    - F4 escapes XL through degree falls. At `m = 4` the break-even needs `D/N ≲ 0.04` (`w = 1`) or
      `≲ 0.017` (`w = 2`) (§5.2, derived). The recorded rows are `D = 6, 7, 7, ≥ 8` at `N = 8, 12, 16, 20`,
      a local slope of at least `1/8`.
    - The cost metric that decides it is `log2(widest matrix)/N`. It is 0.86 at the `m = 4`, `N = 16`
-     cell (symmetric arm), against a break-even of 0.25 (`w = 1`). The cells that would decide the asymptotics
+     cell (symmetric arm, in-house `f4_fp`), against an asymptotic break-even of 0.25 (`w = 1`). The cells that would decide the asymptotics
      (`m = 3, N ≥ 21`; `m = 4, N ≥ 24`) are not reachable on this host.
 
-No prototype was built (§6). The advisor-recommended label is "undecided", not "undecidable"; §6
-names what would decide it.
+Task category: **undecidable on current evidence** (i.e. undecided, not proved either way). No
+prototype was built (§6), which also names the cells that would decide it.
 
 ## 1. What the theorem says, and what "enumerative" means
 
@@ -122,11 +125,11 @@ trials (their Table 1), which is below the break-even at `m ≥ 4` but not negli
 
 | candidate | escapes the theorem? | per-query cost | status |
 |---|---|---|---|
-| **G1** (153c34): Gröbner / XL on `(S, g_V(x_i))` | yes (algebraic) | floor `≥ C(B+m, m) ≥ B^m/m!` columns (Lemma A) | enumeration-equivalent within degree-bounded solvers; not decision-relevant (§4.1) |
-| **PKM chain, XL** | yes | columns `2^N = B^m` (Prop 2, proved at `m = 2`) | enumeration, exactly |
+| **G1** (153c34): lex Buchberger on `(S, g_V(x_i))` | yes (algebraic) | XL: `≥ C(B+m, m)` columns; any degree-bounded solver: degree `≥ B` (Lemma A); Buchberger: nothing proved | design report assumes a grid floor (55–8,438× `T`); not decision-relevant (§4.1) |
+| **PKM chain, XL** | yes | columns `2^N = B^m`; Prop 2 proves a lower bound, equality verified at `m = 2`, `N = 12–26` | enumeration-sized |
+| multiplicative-subgroup base (`x = y^k` with `k = (p−1)/B` gives `μ_B`) | yes | this is PKM instance 1 with one level | folded into the PKM rows; yield covered by the census |
 | **PKM chain, F4** | yes | width `2^{H(β)N}` if `D = βN` | **open**; measured `D` and widths in §5 |
 | Coppersmith small roots (interval base) | yes | polynomial time only for `B ≤ p^{δ_max}`, `δ_max = 1/(m(m+1)2^{m−2})` | `m = 4`: `1/80` against `1/5` needed; lattice-based, derived in program note §2.2 (Jochemsz–May shape, not re-derived here; Probes B, C measured at `m = 2`) |
-| polynomial-parametrised base `x = y^k` | yes | `\|F\| ≥ p/k`; to reach `B ≤ p^{1/4}` needs `k ≥ p^{3/4}` | argument only; the sparse-power map hides the degree, but a base of size `p/k` forces `≥ p/k` relations, each costing `≥ 1` |
 | spectral / sparse-Fourier indicator | yes | none known | flat-spectrum falsifier in `Index calculus leads next steps.md` item "Mechanism"; not run here |
 | k-sum / Wagner-type | no structure to use | | needs partial-sum constraints compatible with the group law; none exists for `E(F_p)` (argument, not a theorem) |
 
@@ -146,32 +149,38 @@ solver axis.
 
 ## 4. The two presentations
 
-### 4.1 Vanishing-polynomial presentation (153c34's G1): provably at the grid floor
+### 4.1 Vanishing-polynomial presentation (153c34's G1): degree floor proved, cost floor only for XL
 
 **Lemma A.** Let `V ⊂ F_p`, `|V| = B`, `g_V = Π_{v∈V}(X − v)`, `S ∈ F_p[x_1..x_m]` non-constant, and
 `I = (S, g_V(x_1), …, g_V(x_m))`. Then every certificate `1 = h·S + Σ h_i·g_V(x_i)` has
 `max_i deg(h_i·g_V(x_i)) ≥ B`, and the same holds for every certificate of a nonzero linear form in
 the solution coordinates. Consequently any Macaulay-type solver (XL, F4, Mutant, closure) whose working
-degree is `D < B` sees only `(S)` and decides nothing, and at `D = B` the matrix has at least
-`C(B+m, m) ≥ B^m/m!` columns.
+degree is `D < B` sees only `(S)` and decides nothing. For **XL** the matrix at `D = B` has at least
+`C(B+m, m) ≥ B^m/m!` columns. That column count does not transfer to F4, whose symbolic preprocessing
+builds only the columns its selected pairs touch.
 
 *Proof.* If every `h_i·g_V(x_i)` had degree `< B`, then, as `deg g_V = B`, every `h_i` would be 0, and
 `1 = h·S` is impossible for non-constant `S`. The same argument applies to a linear form `ℓ` unless
 `S | ℓ`, which fails for `deg S ≥ 2`. The column count is the number of monomials of degree `≤ B` in
 `m` variables. ∎
 
-**Scope.** This is a floor for degree-bounded Macaulay solvers, whose cofactor degree is limited by
-the working degree. For Buchberger it shows only that some degree-`≥ B` S-pair is formed; I do not
-claim a Buchberger cost floor from it. The repo's design adds the CRT collision: `F_p[x]/(g_V(x_i))
-≅ F_p^{V^m}`, so an exact solver on this ideal decides the grid predicate (design report,
-`backend_choice.rationale`, D-3 forbids the CRT representation for that reason). The design's own
-ceiling audit puts the unsymmetrised grid floor at 1,041–8,438× the threshold `T` on the six v4
-fixtures, and the symmetrised floor at 55–229× (`design_report.yaml`, `ceiling_audit_output.json`;
-I read the design report, not the JSON). The coordinator prior recorded before any result is that the
-obstruction persists under G1. A symmetric-ring presentation lowers the column count by at most a
-further `m!`, which does not change the exponent.
+**Scope, by solver class.**
+- *XL:* hits the grid-sized floor (`≥ C(B+m, m)` columns).
+- *Any degree-bounded solver (XL, F4, Mutant):* needs working degree `≥ B`. This alone gives no
+  cost floor for F4.
+- *Buchberger (what G1 is, lex):* the lemma shows only that some degree-`≥ B` S-pair is formed. No
+  cost floor is proved.
+- *The design report's CRT collision:* `F_p[x]/(g_V(x_i)) ≅ F_p^{V^m}`, so every exact solver on
+  this ideal decides the same grid predicate (`backend_choice.rationale`; D-3 forbids the CRT
+  representation for that reason). That says the predicates coincide, not that the costs do.
+- *The 55–8,438× figures* (1,041–8,438× unsymmetrised, 55–229× symmetrised, six v4 fixtures) are the
+  design report's computed grid floor, assumed to bind G1 (`design_report.yaml`,
+  `ceiling_audit_output.json`; I read the report, not the JSON). The coordinator prior recorded
+  before any result is that the obstruction persists under G1.
+- A symmetric-ring presentation lowers the XL column count by at most a further `m!`, which does not
+  change the exponent.
 
-**Reading.** G1 is not a candidate construction; it is a control that predicts "enumeration cost".
+**Reading.** G1 is not a candidate construction; it is a control whose expected cost is the grid.
 It lacks the chain decomposition that makes PKM's membership equations low degree, so it cannot
 test the lead.
 
@@ -200,7 +209,7 @@ Construction (PKC 2016 §3.1, §3.3, §3.4, read directly in the PDF).
 The repo built this as the "PKM tower": `RESEARCH_PKM_TOWER_ORACLE.md` (design, pre-registered H0/H1),
 `ic_next10_20261014/{02,03}` (measured), `pkm_symmetric_lead1_20261026` (symmetric m = 3 and m = 4
 cells), and `prime_ecdlp_three_leads_20261029/execution-20261030` on `codex/pkm-oracle-g1-g2-20261030`
-(today; native correctness and accounting software, "no measured panel, cost improvement or
+(today; its "G1–G6" are that program's PKM goals, not 153c34's backend G1; native correctness and accounting software, "no measured panel, cost improvement or
 asymptotic result is supplied").
 
 ## 5. Evidence on the PKM chain
@@ -255,20 +264,26 @@ Two readings, each an interpretation:
 | `m = 3`, `N = 18`, symmetric | 0.83 | none | not recorded in the README table | | 262,144 |
 
 `p = 786433`, so `p^{1/4} ≈ 29.7`. At `m = 4`, `N = 16` the oracle's counted cost is about `1.6·10⁵×`
-the cost of enumerating the grid, and the widest matrix is 870× the break-even width (`2^{0.25·16}` = 16
-columns, `w = 1`). At these sizes constants dominate and the break-even is an asymptotic exponent, so
-this table shows the distance at the measured sizes, not an extrapolation. The REVIEW (§4, quoting
-`generator_effect_ic_20261019/E3.md`) reports the same pattern: the repo's own F4 needs `10³` to `10⁷`
-more operations than a brute grid on the same PKM systems.
+the cost of enumerating the grid. **Caveat:** the field-op counts and widths come from the in-house
+`f4_fp`. REVIEW §3 item 4b states that cost measured with that engine says nothing about published
+Gröbner solvers (degrees from msolve are unaffected), and widths also depend on F4's pair-selection
+strategy. So these rows bound the repo's engine, not the published state of the art. The REVIEW (§4,
+quoting `generator_effect_ic_20261019/E3.md`) reports the same pattern against the same engine: it
+needs `10³` to `10⁷` more operations than a brute grid on the same PKM systems.
 
-The width exponent, not `D`, is the right metric. It is also what `H(β)` converts to. The symmetric
+I do not compare the width with a break-even width at `N = 16`: with `p = 786433` this cell has
+`B = 2^4 = 16 ≈ p^{0.2}`, not the break-even `B = p^{1/4}`, so `2^{0.25N}` is the wrong yardstick at this
+size. The direct comparison is the counted cost against `p^{1/4} ≈ 29.7`, and at these sizes constants
+dominate, so the table shows the distance at the measured sizes and is not an extrapolation.
+
+The width exponent, not `D`, is the right metric to carry to larger cells. It is also what `H(β)` converts to. The symmetric
 arm's widths are lower than a plain arm's by up to `m!`; the table uses recorded widths and does not
 credit that factor back in either direction.
 
 ## 6. Why no prototype
 
-- G1 would re-measure a floor the design report already predicts and Lemma A proves for degree-bounded
-  solvers (55–8,438× the threshold).
+- G1 would at best re-measure the grid floor the design report assumes (55–8,438× the threshold); Lemma A
+  proves only the degree floor for degree-bounded solvers and the column floor for XL.
 - The PKM chain is already built and measured with msolve and `f4_fp` (§5.1); a new toy-field cell would
   duplicate it.
 - The decisive cells (`m = 3`, `N ≥ 21`; `m = 4`, `N ≥ 24`) need 256–512 GB (REVIEW L2) and cannot run on
