@@ -32,7 +32,8 @@ use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, To
 use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4, D4Curve};
 use crate::cryptanalysis::ic_boundary::{
     find_prime_order_curve, koblitz_instance, random_binary_instance, roster_prime_instance,
-    BinaryGroup, BinaryInstance, CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
+    BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
+    PrimePoint, QuarticClasses,
 };
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
@@ -799,8 +800,14 @@ pub struct CurveFacts {
     pub cofactor: u128,
     /// Generator coordinates as lower-case hex.
     pub generator: [String; 2],
-    /// Automorphisms a generic algorithm may use: 2 (negation), or `2n`
-    /// on a Koblitz curve (signed Frobenius).
+    /// Automorphisms a generic algorithm may use, under the floor rule
+    /// [`FLOOR_RULE_V2`] that new records are written with: 2 (negation);
+    /// `2n` on a Koblitz curve (signed Frobenius), constructed or explicit;
+    /// 6 on a `j = 0` prime curve and 4 on a `j = 1728` one when the
+    /// rational order-3 (order-4) automorphism acts on the subgroup
+    /// ([`prime_automorphisms`]).  Records written before that rule carry
+    /// [`legacy_automorphisms`] (negation only on every prime curve) and
+    /// no `floor_rule`; the audit recomputes them under it.
     pub automorphisms_available: u32,
     /// The slug is in `docs/curves/registry.json`.
     pub registered: bool,
@@ -809,6 +816,44 @@ pub struct CurveFacts {
     /// registry has no such representation (never inferred).
     pub ec1: Option<String>,
     pub curve_uid: Option<String>,
+}
+
+/// The floor rule records are written with from this version on
+/// (`boundaries.floor_rule`).  A record without the field was written under
+/// the first rule, [`legacy_automorphisms`]: `A = 2` on every prime curve.
+pub const FLOOR_RULE_V2: &str = "automorphisms/v2";
+
+/// The automorphism count the first floor rule gave a curve: 2 (negation)
+/// on every prime curve, `j = 0` and `j = 1728` included; on every other
+/// family the count [`FLOOR_RULE_V2`] also gives (`2n` on a Koblitz curve,
+/// the class size on an `extension` curve: 4 for GLS ψ, 6 for a subfield
+/// curve's π; 2 elsewhere), because the second rule changed prime curves
+/// only.  Kept so that a committed record, which carries no `floor_rule`,
+/// recomputes to the floor it was written with.
+pub fn legacy_automorphisms(curve: &CurveFacts) -> u32 {
+    if curve.family == "prime" {
+        2
+    } else {
+        curve.automorphisms_available
+    }
+}
+
+/// The automorphisms a generic algorithm may use on a prime curve's
+/// order-`r` subgroup: 6 on a `j = 0` curve with `p ≡ 1 (mod 3)` and 4 on a
+/// `j = 1728` curve with `p ≡ 1 (mod 4)`, when the rational order-3
+/// (order-4) automorphism acts on the subgroup as a scalar (verified with
+/// the same structure `rho.cubic` and `rho.quartic` need); 2 otherwise.
+/// The count includes negation, so it is the `A` of the floor
+/// `√(π / 2A)`.
+pub fn prime_automorphisms(curve: &PrimeCurve, generator: PrimePoint, r: u64) -> u32 {
+    let mut scratch = GroupOps::default();
+    if CubicClasses::new(curve, generator, r, &mut scratch).is_some() {
+        6
+    } else if QuarticClasses::new(curve, generator, r, &mut scratch).is_some() {
+        4
+    } else {
+        2
+    }
 }
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
@@ -1087,7 +1132,7 @@ impl Instance {
                 u128::from(i.cofactor),
                 u128::from(i.generator.0),
                 u128::from(i.generator.1),
-                2,
+                prime_automorphisms(&i.curve, i.generator_point(), i.r),
             ),
             Instance::Binary(i) => (
                 i.curve_id(),
