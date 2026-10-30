@@ -64,10 +64,21 @@ Only the library execution, after compilation, has a 2400-second cap.
 `RAYON_NUM_THREADS=8`, Cargo jobs 2, serial test execution. These are development
 checks, not measured scientific panels.
 
-No native pass for the refreshed Cargo configuration, or full-library pass,
-is claimed at this checkpoint. Its first example-test command was compiling
-at the last observation. The earlier 20-test pass belongs to the first Cargo
-configuration. The prior
+The refreshed Cargo configuration now passes its own 20 example tests (12 new
+plus 8 legacy), strict scoped lint/formatting, CLI build/refusal and fresh
+backlog validation. The refusal message was checked as well as its expected
+exit 1. Its library no-run build passes after exact fixture restoration.
+`refreshed-scoped-checks.json` binds these completed phases, captures and six
+binary hashes to the 16 unchanged source/fixture objects. Outputs retain exact
+captured prefixes, with explicit footers/hashes where needed for final blank
+lines. These are development checks, with no admitted timing or cost result.
+
+The 5646-case full-library execution started at 10:50:16 UTC and is still
+running under the same supervisor, with a 2400-second execution cap. No final
+suite counts, exit or full-library pass is claimed. Its growing raw log stays
+out of Git and is NOT_UPLOADED; final size/digest will be recorded only after
+termination. Do not start a duplicate. The earlier 20-test receipt remains
+separate and belongs to the previous Cargo configuration. The prior
 5553-case cap remains historical: 2173 observed passes, zero observed failures,
 47 ignored, one active and 3332 not reached; wrapper exit 124. Its raw log
 remains NOT_UPLOADED. Keep new run logs separate, preserve failures/caps and
