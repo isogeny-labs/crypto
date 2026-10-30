@@ -49,6 +49,9 @@
 //! Limits as in `f4_fp_tower`: at most 64 tower variables and 4 free
 //! variables with exponents below 256.
 
+#[path = "f4_prime_dynamic.rs"]
+pub mod dynamic;
+
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
@@ -976,7 +979,7 @@ struct State<E> {
 impl<E: Copy + PartialEq> State<E> {
     /// Becker–Weispfenning `UPDATE` plus the tower pairs (as in
     /// `f4_fp_tower`).
-    fn insert(&mut self, h_poly: Elem<E>, rep: &mut TowerF4Report) {
+    fn insert(&mut self, h_poly: Elem<E>, rep: &mut TowerF4Report, bounded_four: bool) {
         let h = self.polys.len();
         let lh = h_poly.lm();
         self.polys.push(h_poly);
@@ -1007,7 +1010,12 @@ impl<E: Copy + PartialEq> State<E> {
         }
         let mut kept: Vec<(u32, Mono)> = Vec::new();
         for (&l, &(g, has_coprime)) in &groups {
-            if any_between(lh, l, |c| groups.contains_key(&c)) {
+            let intermediate = if bounded_four {
+                bounded_four_between(lh, l, groups.keys().copied())
+            } else {
+                any_between(lh, l, |c| groups.contains_key(&c))
+            };
+            if intermediate {
                 rep.pairs_chain_skipped += 1;
                 continue;
             }
@@ -1090,6 +1098,19 @@ impl<E: Copy + PartialEq> State<E> {
             s = (s - 1) & mask;
         }
         best
+    }
+
+    /// Same shortest reducer and zero-mask odometer tie order as reducer_for,
+    /// but bounded by the stored map size rather than the exponent box volume.
+    fn reducer_for_bounded_four(&self, m: Mono) -> Option<u32> {
+        self.lm_index
+            .iter()
+            .filter(|(lm, _)| divides(**lm, m))
+            .min_by_key(|(lm, g)| {
+                let e = free_of(**lm);
+                (self.polys[**g as usize].len(), [e[3], e[2], e[1], e[0]])
+            })
+            .map(|(_, &g)| g)
     }
 
     fn active_lms(&self) -> Vec<Mono> {
@@ -1207,6 +1228,7 @@ pub struct BoundedF4Report {
     pub native_statistics_complete: bool,
 }
 struct Admission<'a> {
+    bounded_four: bool,
     limits: &'a BoundedF4Limits,
     observer: &'a mut dyn FnMut(&BoundedF4Event) -> Result<(), String>,
     stop: Option<BoundedF4Stop>,
@@ -1307,10 +1329,14 @@ impl Admission<'_> {
         if slots > 262144 {
             return self.reject(BoundedF4Stop::StorageAdmission);
         }
-        let work = (h as u64 + 1)
-            .checked_mul(h as u64 + 1)
-            .and_then(|v| v.checked_mul(65 * 65 * 8))
-            .and_then(|v| v.checked_add(state.pairs.len() as u64 * 16));
+        let work = if self.bounded_four {
+            bounded_four_insertion_work(h, state.pairs.len())
+        } else {
+            (h as u64 + 1)
+                .checked_mul(h as u64 + 1)
+                .and_then(|v| v.checked_mul(65 * 65 * 8))
+                .and_then(|v| v.checked_add(state.pairs.len() as u64 * 16))
+        };
         self.permit(
             work,
             slots
@@ -1338,7 +1364,9 @@ impl Admission<'_> {
             let e = free_of(mult);
             for &m in &p.cols[p.start as usize..p.start as usize + p.vals.len()] {
                 let f = free_of(m);
-                if (0..2).any(|k| u16::from(e[k]) + u16::from(f[k]) > 64) {
+                if (0..if self.bounded_four { 4 } else { 2 })
+                    .any(|k| u16::from(e[k]) + u16::from(f[k]) > 64)
+                {
                     return self.reject(BoundedF4Stop::StorageAdmission);
                 }
             }
@@ -1367,7 +1395,26 @@ impl Admission<'_> {
     }
 }
 
-/// Bounded ordinary-polynomial profile using the existing generic F4 kernels.
+fn bounded_four_between(lo: Mono, hi: Mono, mut keys: impl Iterator<Item = Mono>) -> bool {
+    keys.any(|c| c != hi && divides(lo, c) && divides(c, hi))
+}
+
+fn bounded_four_insertion_work(h: usize, pairs: usize) -> Option<u64> {
+    let h = u64::try_from(h).ok()?.checked_add(1)?;
+    let pairs = u64::try_from(pairs).ok()?;
+    h.checked_mul(h)?
+        .checked_mul(256)?
+        .checked_add(pairs.checked_add(h)?.checked_mul(64)?)
+}
+
+fn bounded_four_frontier_work(frontier: usize, basis: usize) -> Option<u64> {
+    u64::try_from(frontier)
+        .ok()?
+        .checked_mul(u64::try_from(basis).ok()?.checked_add(1)?)?
+        .checked_mul(128)
+}
+
+/// Bounded ordinary-polynomial profiles with two or four free variables.
 /// Observer failure is sticky. Kernel permits cover all rows concurrently;
 /// reservations deliberately overcount and do not certify executed instructions.
 pub fn f4_tower_generic_bounded(
@@ -1379,6 +1426,7 @@ pub fn f4_tower_generic_bounded(
 ) -> BoundedF4Report {
     use num_traits::ToPrimitive;
     let mut gate = Admission {
+        bounded_four: ring.n_free == 4,
         limits,
         observer,
         stop: None,
@@ -1412,15 +1460,16 @@ pub fn f4_tower_generic_bounded(
     let valid = valid_limits
         && valid_field
         && ring.rules.is_empty()
-        && ring.n_free == 2
-        && input.len() <= 3
+        && matches!(ring.n_free, 2 | 4)
+        && input.len() <= if ring.n_free == 4 { 5 } else { 3 }
         && !input.is_empty()
         && opts.max_degree <= 12
         && opts.stop_staircase.is_none()
         && !opts.full_rank_exit
         && opts.on_step.is_none()
         && opts.on_stop.is_none()
-        && input.iter().map(|p| p.monos.len()).sum::<usize>() <= 75
+        && input.iter().map(|p| p.monos.len()).sum::<usize>()
+            <= if ring.n_free == 4 { 125 } else { 75 }
         && input.iter().all(|p| {
             p.monos.len() == p.coefs.len()
                 && p.monos.len() <= 33
@@ -1432,7 +1481,7 @@ pub fn f4_tower_generic_bounded(
                     mask_of(m) == 0
                         && m == mono(0, free_of(m))
                         && degree_of(m) <= 32
-                        && free_of(m)[2..].iter().all(|&e| e == 0)
+                        && free_of(m)[ring.n_free..].iter().all(|&e| e == 0)
                 })
         });
     let native = if !valid {
@@ -1590,7 +1639,11 @@ fn f4_generic_inner<F: PrimeField>(
                 return finish(rep, s.polys.iter().map(|p| p.to_poly(zero)).collect());
             }
         }
-        s.insert(value, &mut rep);
+        s.insert(
+            value,
+            &mut rep,
+            admission.as_ref().is_some_and(|g| g.bounded_four),
+        );
     }
     let mut learned = (0u32, 0usize, 0usize);
     let mut max_cols_so_far = 0usize;
@@ -1704,17 +1757,42 @@ fn f4_generic_inner<F: PrimeField>(
                 break;
             }
             if let Some(gate) = admission.as_mut() {
-                if !gate.permit(
-                    Some(frontier.len() as u64 * 65 * 65 * 8),
-                    Some((nnz + s.pairs.len() as u64 + 1) * 4096),
-                ) {
+                let work = if gate.bounded_four {
+                    bounded_four_frontier_work(frontier.len(), s.polys.len())
+                } else {
+                    Some(frontier.len() as u64 * 65 * 65 * 8)
+                };
+                let bytes = if gate.bounded_four {
+                    nnz.checked_add(s.pairs.len() as u64)
+                        .and_then(|v| v.checked_add(1))
+                        .and_then(|v| v.checked_mul(4096))
+                        .and_then(|v| {
+                            (frontier.len() as u64)
+                                .checked_add(1)
+                                .and_then(|f| f.checked_mul(64))
+                                .and_then(|f| v.checked_add(f))
+                        })
+                } else {
+                    Some((nnz + s.pairs.len() as u64 + 1) * 4096)
+                };
+                if !gate.permit(work, bytes) {
                     aborted = true;
                     break;
                 }
             }
+            let bounded_four = admission.as_ref().is_some_and(|g| g.bounded_four);
             let found: Vec<(Mono, Option<u32>)> = frontier
                 .par_iter()
-                .map(|&m| (m, s.reducer_for(m)))
+                .map(|&m| {
+                    (
+                        m,
+                        if bounded_four {
+                            s.reducer_for_bounded_four(m)
+                        } else {
+                            s.reducer_for(m)
+                        },
+                    )
+                })
                 .collect();
             frontier.clear();
             let mut todo: Vec<(Mono, u32)> = Vec::new();
@@ -1930,7 +2008,11 @@ fn f4_generic_inner<F: PrimeField>(
                     return finish(rep, active_basis(&s));
                 }
             }
-            s.insert(p, &mut rep);
+            s.insert(
+                p,
+                &mut rep,
+                admission.as_ref().is_some_and(|g| g.bounded_four),
+            );
         }
         kept(&s, &mut tr);
         tr.ms_update = update_started.elapsed().as_secs_f64() * 1e3;
@@ -1991,6 +2073,266 @@ mod tests {
         (ring, input, opts)
     }
 
+    fn bounded_four_fixture(
+        p: u64,
+        sum: u64,
+    ) -> (GTowerRing<Fp64>, Vec<GPoly<u64>>, TowerF4Options) {
+        let ring = GTowerRing {
+            field: Fp64::new(p),
+            rules: vec![],
+            n_free: 4,
+        };
+        // x+y=sum, x and y Boolean, z=x and w=y. All four coordinates
+        // participate, and the nonlinear critical pairs require actual reduction.
+        let raw = [
+            vec![
+                (vec![1, 0, 0, 0], 1),
+                (vec![0, 1, 0, 0], 1),
+                (vec![0, 0, 0, 0], p - sum),
+            ],
+            vec![(vec![2, 0, 0, 0], 1), (vec![1, 0, 0, 0], p - 1)],
+            vec![(vec![0, 2, 0, 0], 1), (vec![0, 1, 0, 0], p - 1)],
+            vec![(vec![0, 0, 1, 0], 1), (vec![1, 0, 0, 0], p - 1)],
+            vec![(vec![0, 0, 0, 1], 1), (vec![0, 1, 0, 0], p - 1)],
+        ];
+        let input = raw.iter().map(|p| ring.from_raw(p)).collect();
+        let mut opts = TowerF4Options::new(6);
+        opts.full_rank_exit = false;
+        (ring, input, opts)
+    }
+
+    #[test]
+    fn bounded_four_fixed_systems_reduce_nontrivially_under_unchanged_caps() {
+        for p in [17, 2_305_843_009_213_693_951] {
+            for sum in [1, 3] {
+                let (ring, input, opts) = bounded_four_fixture(p, sum);
+                let old = f4_tower_generic(&input, &ring, &opts);
+                let r = f4_tower_generic_bounded(
+                    &input,
+                    &ring,
+                    &opts,
+                    &BoundedF4Limits::default(),
+                    &mut |_| Ok(()),
+                );
+                assert!(r.native_backend_invoked);
+                assert!(r.native_statistics_complete);
+                assert!(r.native.stats.steps > 0, "must execute nonlinear reduction");
+                assert!(r.native.stats.critical_pairs_reduced > 0);
+                assert_eq!(
+                    r.stop,
+                    if sum == 1 {
+                        BoundedF4Stop::Complete
+                    } else {
+                        BoundedF4Stop::UnitDerived
+                    }
+                );
+                assert_eq!(r.native.basis, old.basis);
+                assert_eq!(r.native.stats.inconsistent, sum == 3);
+                let mut roots = Vec::new();
+                for bits in 0u8..16 {
+                    let x: [u64; 4] = std::array::from_fn(|k| u64::from((bits >> k) & 1));
+                    let original_root = x[0] + x[1] == sum && x[2] == x[0] && x[3] == x[1];
+                    let basis_root = r.native.basis.iter().all(|poly| {
+                        let mut value = ring.field.zero();
+                        for (&m, &c) in poly.monos.iter().zip(&poly.coefs) {
+                            let mut term = c;
+                            for (i, e) in free_of(m).iter().enumerate() {
+                                for _ in 0..*e {
+                                    term = ring.field.mul(term, ring.field.from_u64(x[i]));
+                                }
+                            }
+                            value = ring.field.add(value, term);
+                        }
+                        ring.field.is_zero(value)
+                    });
+                    assert_eq!(basis_root, original_root);
+                    if original_root {
+                        roots.push(x);
+                    }
+                }
+                assert_eq!(roots.len(), if sum == 1 { 2 } else { 0 });
+            }
+        }
+    }
+
+    #[test]
+    fn bounded_four_searches_preserve_interval_and_odometer_representative() {
+        let ring = GTowerRing {
+            field: Fp64::new(17),
+            rules: vec![],
+            n_free: 4,
+        };
+        let mut s = State {
+            polys: Vec::new(),
+            lm: Vec::new(),
+            active: Vec::new(),
+            lm_index: MonoMap::default(),
+            pairs: Vec::new(),
+        };
+        // The degree bits rank these differently from the original odometer.
+        for e in [[3, 0, 0, 0], [0, 0, 0, 1], [0, 2, 0, 0], [3, 0, 0, 0]] {
+            let m = mono(0, e);
+            let p = GPoly::from_terms(&ring.field, vec![(m, ring.field.one())]);
+            let g = s.polys.len() as u32;
+            s.polys.push(Elem::from_poly(p));
+            s.lm.push(m);
+            s.active.push(true);
+            s.lm_index.insert(m, g);
+        }
+        assert_eq!(s.reducer_for_bounded_four(mono(0, [3, 2, 0, 1])), Some(3));
+        // Cached nonzero count, not dense-tail length, determines shortest.
+        let tail: Arc<[Mono]> = vec![
+            mono(0, [3, 0, 0, 0]),
+            mono(0, [1, 0, 0, 0]),
+            mono(0, [0; 4]),
+        ]
+        .into();
+        s.polys[3] = Elem::new(
+            ring.field.zero(),
+            tail.clone(),
+            0,
+            vec![ring.field.one(), ring.field.zero(), ring.field.zero()],
+        );
+        let query = mono(0, [3, 0, 0, 1]);
+        assert_eq!(s.reducer_for_bounded_four(query), Some(3));
+        assert_eq!(s.reducer_for_bounded_four(query), s.reducer_for(query));
+        s.polys[3] = Elem::new(
+            ring.field.zero(),
+            tail,
+            0,
+            vec![ring.field.one(), ring.field.zero(), ring.field.one()],
+        );
+        assert_eq!(s.reducer_for_bounded_four(query), Some(1));
+        assert_eq!(s.reducer_for_bounded_four(query), s.reducer_for(query));
+        for a in 0..=3 {
+            for b in 0..=2 {
+                for d in 0..=1 {
+                    let m = mono(0, [a, b, 0, d]);
+                    assert_eq!(s.reducer_for_bounded_four(m), s.reducer_for(m));
+                }
+            }
+        }
+        let lo = mono(0, [1, 0, 0, 1]);
+        let hi = mono(0, [3, 2, 1, 2]);
+        for keys in [
+            vec![hi],
+            vec![lo],
+            vec![mono(0, [2, 1, 0, 1])],
+            vec![mono(0, [0, 1, 0, 1])],
+        ] {
+            assert_eq!(
+                bounded_four_between(lo, hi, keys.iter().copied()),
+                any_between(lo, hi, |c| keys.contains(&c))
+            );
+        }
+    }
+
+    #[test]
+    fn bounded_four_work_storage_boundaries_and_sticky_observer() {
+        let (ring, input, opts) = bounded_four_fixture(17, 1);
+        let first = f4_tower_generic_bounded(
+            &input,
+            &ring,
+            &opts,
+            &BoundedF4Limits::default(),
+            &mut |_| Ok(()),
+        );
+        assert_eq!(first.stop, BoundedF4Stop::Complete);
+        for bytes in [false, true] {
+            for less in [0, 1] {
+                let mut limits = BoundedF4Limits::default();
+                if bytes {
+                    limits.bytes = first.bytes_peak_reserved - less;
+                } else {
+                    limits.work = first.work_reserved - less;
+                }
+                let r = f4_tower_generic_bounded(&input, &ring, &opts, &limits, &mut |_| Ok(()));
+                if less == 0 {
+                    assert_eq!(r.stop, BoundedF4Stop::Complete);
+                } else {
+                    assert!(!r.native_statistics_complete);
+                    assert_eq!(
+                        r.stop,
+                        if bytes {
+                            BoundedF4Stop::StorageAdmission
+                        } else {
+                            BoundedF4Stop::WorkLimit
+                        }
+                    );
+                }
+            }
+        }
+        let mut calls = 0;
+        let r = f4_tower_generic_bounded(
+            &input,
+            &ring,
+            &opts,
+            &BoundedF4Limits::default(),
+            &mut |e| {
+                calls += 1;
+                if e.boundary == "initial_echelon" {
+                    Err("fixed refusal".into())
+                } else {
+                    Ok(())
+                }
+            },
+        );
+        assert_eq!(calls, 2);
+        assert!(matches!(r.stop, BoundedF4Stop::ObserverFailure(_)));
+        assert!(!r.native_statistics_complete);
+        assert_eq!(bounded_four_insertion_work(usize::MAX, usize::MAX), None);
+        assert_eq!(bounded_four_frontier_work(usize::MAX, usize::MAX), None);
+    }
+
+    #[test]
+    fn bounded_four_coordinate_three_checks_precede_product_work() {
+        let (ring, mut input, opts) = bounded_four_fixture(17, 1);
+        input[0].monos[0] = mono(0, [0, 0, 0, 32]) & ((1u128 << 96) - 1);
+        let mut calls = 0;
+        let r = f4_tower_generic_bounded(
+            &input,
+            &ring,
+            &opts,
+            &BoundedF4Limits::default(),
+            &mut |_| {
+                calls += 1;
+                Ok(())
+            },
+        );
+        assert_eq!(r.stop, BoundedF4Stop::InvalidInput);
+        assert_eq!(calls, 0);
+        let p = GPoly::from_terms(
+            &ring.field,
+            vec![(mono(0, [0, 0, 0, 32]), ring.field.one())],
+        );
+        let s = State {
+            polys: vec![Elem::from_poly(p)],
+            lm: vec![mono(0, [0, 0, 0, 32])],
+            active: vec![true],
+            lm_index: MonoMap::default(),
+            pairs: vec![],
+        };
+        let limits = BoundedF4Limits::default();
+        let mut observer = |_: &BoundedF4Event| Ok(());
+        let mut gate = Admission {
+            bounded_four: true,
+            limits: &limits,
+            observer: &mut observer,
+            stop: None,
+            work: 0,
+            peak: 0,
+            events: 0,
+            invoked: false,
+            selected_pending: 0,
+        };
+        assert!(gate.products(&s, &[(mono(0, [0, 0, 0, 32]), 0)], 0, 0, 0));
+        // A rejected subsequent batch cannot reserve product buffers.
+        let admitted_bytes = gate.peak;
+        assert!(!gate.products(&s, &[(mono(0, [0, 0, 0, 33]), 0)], 0, 0, 0));
+        assert_eq!(gate.stop, Some(BoundedF4Stop::StorageAdmission));
+        assert_eq!(gate.peak, admitted_bytes);
+    }
+
     #[test]
     fn bounded_fp64_matches_legacy_on_fixed_positive_and_negative_systems() {
         for p in [17, 2_305_843_009_213_693_951] {
@@ -2040,9 +2382,9 @@ mod tests {
             n_free: 2,
         };
         let input = vec![
-            ring.from_raw(&vec![(vec![1, 0], 1), (vec![0, 0], 2)]),
-            ring.from_raw(&vec![(vec![0, 1], 1), (vec![0, 0], 3)]),
-            ring.from_raw(&vec![(vec![1, 0], 1), (vec![0, 1], 1), (vec![0, 0], 5)]),
+            ring.from_raw(&[(vec![1, 0], 1), (vec![0, 0], 2)]),
+            ring.from_raw(&[(vec![0, 1], 1), (vec![0, 0], 3)]),
+            ring.from_raw(&[(vec![1, 0], 1), (vec![0, 1], 1), (vec![0, 0], 5)]),
         ];
         let mut opts = TowerF4Options::new(6);
         opts.full_rank_exit = false;

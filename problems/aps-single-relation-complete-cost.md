@@ -99,3 +99,27 @@ diagnostics: its receipts explicitly set `costs_attested=false` and
 common verification interval and separately reported post-run completeness
 auditing. Full operation accounting, native export, supported parameter ladder,
 metric validation, protocol and source-checkpoint approval are still owed.
+
+## Native timing support (2026-10-30)
+
+The [measurement-instrument study](../research/aps_measurement_20261029/README.md)
+adds `ic.aps_v1` with explicit bounded parameters, retained attempts and
+pre-transcript failures, actual polynomial exports, and separate affine witness
+checks. One clock closes setup and five exclusive online phases, beginning the
+online window before live-target conversion. All failed search work remains
+inside it; post-run report aggregation/serialization is explicitly separate.
+Late verified witnesses are retained without becoming in-budget successes.
+
+This implements the timing/collection part of item 1, not its complete operation
+accounting or independent metric/full-set validation. Missing algebra reports
+leave diagnostic counts unknown. Native audit classification reflects the
+cooperative deadline; a static APS audit and deterministic rho replay do not
+attest APS count replay. The existing fixed-fixture replayer keeps its scope.
+The [checks and source-boundary receipts](../research/aps_measurement_20261029/CHECKS.md)
+distinguish completed checks, failures, cancelled builds and pending validation.
+
+The native unified export, held-out four-size ladder, frozen protocol/analysis,
+full accounting, independent replay/metric validation, source-checkpoint approval
+and EKS admission remain open. Development control specs are not that freeze.
+No performance experiment, expected-cost reduction or scaling result is claimed;
+the original panel and exit criteria above remain unresolved.
