@@ -75,3 +75,17 @@ encoder and backend were correctly recorded as an implementation gap.
 and bounded correctness controls. This record remains open specifically for
 independent general correctness and complexity audit, without reclassifying
 unit tests or code delivery as a theorem proof or performance result.
+
+2026-10-29 prime-field companion extension: the user's prime counterpart is
+officially Certicom ECCp-131. The paired
+[implementation and validation receipt](https://github.com/isogeny-labs/cryptanalysis/blob/a3e8d29f05625a38a6c5f6c1361527b782dcb43c/experiments/hashed-ecdl-tensor-reference/prime-development/README.md)
+now composes canonical prime-field arithmetic, modular Fourier multiplication,
+point validity/addition, fixed-cofactor image and affine hash constraints with
+the scalar BTN engine. Its 39 combined development tests pass, including 16
+OpenSSL multiples of published P/Q. The actual-target graph's 1,564,506 edges
+compile consistently; default u_0=0 exact summation exceeds the configured
+2,000,000-operation budget and produces no witness. The native crate was independently added on main; this companion does not
+replace it. Companion general ell, native parity, full soundness/complexity
+audit and both challenge solves remain open. Preserve the native implementation
+checkboxes above; these checks assert no speedup.
+
