@@ -84,6 +84,8 @@ pub trait Sink {
         counters: Value,
     );
 }
+// Retained standalone donor API; root always supplies an explicit sink.
+#[allow(dead_code)]
 pub struct Noop;
 impl Sink for Noop {
     fn enabled(&self) -> bool {

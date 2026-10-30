@@ -1189,6 +1189,8 @@ impl std::error::Error for ValidationError {}
 /// observer must be the process's installed global allocator, or None. The
 /// caller must serialize executions: arithmetic counters are thread-local and
 /// allocation regions are process-wide. No output or rho invocation occurs here.
+// Retained standalone donor entry point; root calls solve_one_with_progress.
+#[allow(dead_code)]
 pub fn solve_one(
     inst: &StudyInstance,
     target: Point,

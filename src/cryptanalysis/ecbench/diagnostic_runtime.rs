@@ -136,7 +136,7 @@ impl DiagnosticScope {
         }
         private_directory(directory)?;
         let token = NEXT
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
             .map_err(|_| "diagnostic ownership exhausted")?;
         OWNER.with(|o| o.set(token));
         let mut scope = Self {

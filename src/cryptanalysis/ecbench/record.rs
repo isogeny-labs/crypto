@@ -2497,9 +2497,17 @@ mod diagnostic_child_v2_tests {
         } else {
             "rho.three_leads_negation_v1"
         };
+        let params = if candidate {
+            BTreeMap::from([
+                ("small_denominator".into(), "2".into()),
+                ("matrix_coefficient_cap".into(), "1000000".into()),
+            ])
+        } else {
+            BTreeMap::from([("trial_cap".into(), "1".into())])
+        };
         let method = MethodSpec {
             id: method_name.into(),
-            params: BTreeMap::new(),
+            params,
         };
         let resolved = resolve(&method).unwrap();
         let full_hash = resolved_method_binding(&resolved).unwrap();

@@ -76,7 +76,7 @@ impl ScopedPencilProgress {
             )
             .map_err(|e| e.to_string())?;
             let token = NEXT_PREFIX
-                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
+                .try_update(Ordering::Relaxed, Ordering::Relaxed, |x| x.checked_add(1))
                 .map_err(|_| "pencil ownership exhausted")?;
             *state = Some(InstalledProgress { token, sink });
             PREFIX_OWNER.with(|owner| owner.set(token));
