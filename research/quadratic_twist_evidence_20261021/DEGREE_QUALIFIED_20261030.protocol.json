@@ -368,8 +368,14 @@
   ],
   "amendments": [
     {
-      "at": "2026-10-30T08:42:00Z",
-      "reason": "BEFORE ANY STUDY DATA:remove duplicate Clone derive;make fixed288file coverage and declared frontier/strongest-source outputs explicit. Initial C++ compile passed,Rust compile101;producer never started. Exact first sources/logs retained."
+      "id": "A1-predata",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "BEFORE ANY STUDY DATA:remove duplicate Clone derive;make fixed288file coverage and declared frontier/strongest-source outputs explicit. Initial C++ compile passed,Rust compile101;producer never started. Exact first sources/logs retained.",
+      "changes": [
+        "remove duplicate Clone derive",
+        "fix exact full case coverage and emit declared policy frontiers and deduplicated strongest-source comparisons"
+      ]
     }
   ],
   "freeze": {
