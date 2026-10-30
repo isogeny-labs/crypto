@@ -106,3 +106,38 @@ optimized baseline. Strict-isolation confirmation, independent review and the
 The downloaded archive retains its `work/results` parent; the initial copy used
 `results` and failed without changing evidence. Corrected the local copy path.
 The job itself completed successfully with no missing or failed cells.
+
+## 2026-10-29 22:46 PDT: second complete screen and next candidate
+
+### What was done
+
+The order-witness/residual screen completed all120 cells on EKS; all full
+certificates agree and its file-verifying export check passed. The source and
+reports are in `research/hashed_ecdl_cpu_20261030/round4/`. Recorded baseline /
+candidate median ratios are 2.088,3.279,2.875 on an Intel8488C host.
+The next implementation caches field-dependent square-root parameters and
+batches MITM sum-table construction. All25 release tests, fmt and strict
+Clippy pass, including exhaustive and wide-field root reference checks.
+
+### Decisions made
+
+The further10x objective remains active; the denominator remains optimized
+commit2bd4588fba60. Root parameters are immutable per curve, and each MITM row
+uses the already-checked batch arithmetic with unchanged tuple order. Keep
+constructor/setup/replay costs and full certificates in the next comparison.
+No timing claim applies to these newest changes until a fresh frozen run.
+
+### Open threads
+
+Next: freeze and execute the cached-root/batched-construction screen. Current
+run helpers and pinned baseline binary are in `/home/ec2-user/hashed-ecdl-cpu-round4/`;
+the repository protocols, adapters, raw records and reports are durable.
+All round3/round4 EKS jobs are terminal successes. T-892's lease heartbeat is
+exec session3035, scheduled for30minutes from05:26UTC; verify it on resume.
+Still missing:10x measured/certified result, strict isolation/independent review,
+matched external/rho references and the20–40-bit scale ladder.
+
+### Errors
+
+No failed solver cells. The PDF reader emits a benign tagged-PDF metadata
+warning; both rendered one-page reports were visually inspected and legible.

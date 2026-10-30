@@ -142,6 +142,7 @@ fn floor_sqrt(n: u64) -> u64 {
     lo
 }
 
+#[cfg(test)]
 fn sqrtmod(a: u64, p: u64) -> Option<u64> {
     if a == 0 {
         return Some(0);
@@ -176,6 +177,70 @@ fn sqrtmod(a: u64, p: u64) -> Option<u64> {
     (mulmod(x, x, p) == a).then_some(x)
 }
 
+// Tonelli-Shanks with the field-dependent work retained once per curve.
+// See HAC 3.34/3.36. The input-dependent exponent is shared between the
+// candidate root, residual and Legendre test; the final square is checked.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct SqrtContext {
+    m: u32,
+    q: u64,
+    c: u64,
+}
+impl SqrtContext {
+    fn new(p: u64) -> Self {
+        let m = (p - 1).trailing_zeros();
+        let q = (p - 1) >> m;
+        let c = if m == 1 {
+            0
+        } else {
+            let z = (2..p)
+                .find(|&z| pow(z, (p - 1) / 2, p) == p - 1)
+                .expect("validated odd prime has a quadratic nonresidue");
+            pow(z, q, p)
+        };
+        Self { m, q, c }
+    }
+    fn root(&self, a: u64, p: u64) -> Option<u64> {
+        if a == 0 {
+            return Some(0);
+        }
+        if self.m == 1 {
+            let x = pow(a, (p + 1) / 4, p);
+            return (mulmod(x, x, p) == a).then_some(x);
+        }
+        let w = pow(a, self.q / 2, p);
+        let mut x = mulmod(w, a, p);
+        let mut t = mulmod(w, x, p);
+        let mut legendre = t;
+        for _ in 1..self.m {
+            legendre = mulmod(legendre, legendre, p);
+        }
+        if legendre != 1 {
+            return None;
+        }
+        let (mut m, mut c) = (self.m, self.c);
+        while t != 1 {
+            let (mut power, mut i) = (t, 0);
+            while power != 1 && i < m {
+                power = mulmod(power, power, p);
+                i += 1;
+            }
+            if i == m {
+                return None;
+            }
+            let mut b = c;
+            for _ in 0..m - i - 1 {
+                b = mulmod(b, b, p);
+            }
+            x = mulmod(x, b, p);
+            c = mulmod(b, b, p);
+            t = mulmod(t, c, p);
+            m = i;
+        }
+        (mulmod(x, x, p) == a).then_some(x)
+    }
+}
+
 /// Explicit CPU reduction memory ceiling; callers must opt in above 512.
 /// Two dense triangular workspaces can require several GiB at this ceiling.
 pub const MAX_COLUMNS: usize = 16384;
@@ -193,6 +258,7 @@ pub struct Curve {
     r: u64,
     // Tiny constructor's lookup; empty for the order-witness constructor.
     roots: Vec<Option<u64>>,
+    sqrt: Option<SqrtContext>,
 }
 
 impl Curve {
@@ -226,6 +292,7 @@ impl Curve {
             b,
             r,
             roots: Vec::new(),
+            sqrt: Some(SqrtContext::new(p)),
         };
         if generator.is_none() || !curve.contains(generator) || curve.mul(generator, r)?.is_some() {
             return Err(Error::Invalid("invalid prime-order witness"));
@@ -261,6 +328,7 @@ impl Curve {
                 b,
                 r,
                 roots: Vec::new(),
+                sqrt: Some(SqrtContext::new(p)),
             };
             let witness = (0..p).find_map(|x| curve.decode(2 * x));
             if witness.is_some() && curve.mul(witness, r)?.is_none() {
@@ -284,7 +352,14 @@ impl Curve {
             square = addmod(square, delta, p);
             delta = addmod(delta, 2, p);
         }
-        let curve = Self { p, a, b, r, roots };
+        let curve = Self {
+            p,
+            a,
+            b,
+            r,
+            roots,
+            sqrt: None,
+        };
         // Finite differences of x^3+a*x+b: first difference at zero
         // is 1+a, second is 6, and the third difference is constant 6.
         let (mut rhs, mut first, mut second) = (b, (1 + a) % p, 6 % p);
@@ -348,7 +423,7 @@ impl Curve {
         }
         let x = z / 2;
         let mut y = if self.roots.is_empty() {
-            sqrtmod(self.rhs(x), self.p)?
+            self.sqrt.as_ref()?.root(self.rhs(x), self.p)?
         } else {
             self.roots[self.rhs(x) as usize]?
         };
@@ -1032,6 +1107,26 @@ mod tests {
                 .chain((0..4096).map(|_| 1 + rng.below(p - 1)))
             {
                 assert_eq!(inverse(a, p), pow(a, p - 2, p));
+            }
+        }
+    }
+
+    #[test]
+    fn cached_square_roots_match_uncached_reference() {
+        for p in [5, 13, 17, 97, 211, 65521] {
+            let context = SqrtContext::new(p);
+            for a in 0..p {
+                assert_eq!(context.root(a, p), sqrtmod(a, p));
+            }
+        }
+        for p in [1_099_511_627_563, 2_305_843_009_213_693_951] {
+            let context = SqrtContext::new(p);
+            let mut rng = Rng(456);
+            for _ in 0..4096 {
+                let a = rng.below(p);
+                assert_eq!(context.root(a, p), sqrtmod(a, p));
+                let square = mulmod(a, a, p);
+                assert_eq!(context.root(square, p), sqrtmod(square, p));
             }
         }
     }

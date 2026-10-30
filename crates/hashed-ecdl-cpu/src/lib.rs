@@ -136,12 +136,19 @@ fn curve_key(curve: &Curve) -> [u64; 4] {
 
 fn sums(curve: &Curve, bases: &[Vec<Point>]) -> Result<Vec<Point>, Error> {
     let mut sums = vec![None];
+    let mut scratch = Scratch::default();
     for base in bases {
+        // Bases have already been validated in prepare. Batch each row of
+        // sum+base using the same exceptional-case-aware subtraction kernel.
+        // Lexicographic tuple order is unchanged. This setup is fully charged.
+        let negatives: Vec<_> = base
+            .iter()
+            .map(|&point| point.map(|(x, y)| (x, sub(0, y, curve.modulus()))))
+            .collect();
         let mut next = Vec::with_capacity(sums.len() * base.len());
         for &sum in &sums {
-            for &point in base {
-                next.push(curve.add(sum, point)?);
-            }
+            scratch.subtract(curve, sum, &negatives);
+            next.extend_from_slice(&scratch.output);
         }
         sums = next;
     }
