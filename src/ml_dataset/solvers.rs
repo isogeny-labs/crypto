@@ -3322,6 +3322,176 @@ fn verify_dynamic_claims(
     Ok(())
 }
 
+/// Execute the private dynamic profile under the original worker context.
+/// Caller authenticates config/context and owns the attempt-bound sink. This
+/// function is not registered in DatasetPlan or the runtime dispatcher yet.
+#[allow(dead_code)]
+fn solve_dynamic_bound(
+    config: &CaseConfig,
+    case: &CaseData,
+    context: &super::execution::SolverExecutionContext,
+) -> Result<SolverData, String> {
+    use prime_f4_wide_dynamic as d;
+    if !LIVE_SINK.with(|slot| matches!(slot.borrow().as_ref(), Some(EventSink::Bound(_)))) {
+        return Err("dynamic runtime requires attempt-bound capture".into());
+    }
+    if Instant::now() >= context.deadline {
+        return Err("dynamic original worker deadline expired".into());
+    }
+    let original = dynamic_original(
+        config,
+        case,
+        context.launch.memory_bytes,
+        context.launch.trace_bytes,
+    )?;
+    let target = d::AffinePoint {
+        x: original.target.x,
+        y: original.target.y,
+    };
+    // Bounded original-domain reconstruction belongs to the existing outer
+    // adapter, separately from the child's admitted polynomial workspaces.
+    let points: Vec<_> = original
+        .domain
+        .iter()
+        .map(|p| d::AffinePoint { x: p.x, y: p.y })
+        .collect();
+    let mut forward = |event: &d::PhaseEvent, buffer: &mut super::capture::TypedEventBuffer| {
+        live_typed_event(
+            super::capture::TypedEventKind::WidePrimeDynamic,
+            event,
+            buffer,
+        )
+        .map_err(|_| ())
+    };
+    let mut prepared = match d::prepare_original(
+        original.p,
+        d::Parameters {
+            m: original.m,
+            a: original.a,
+            b: original.b,
+            target_x: target.x,
+            codes: &original.codes,
+        },
+        target,
+        &points,
+        d::AttemptLimits {
+            work_limit: config.work_limit,
+            memory_bytes: context.launch.memory_bytes,
+            trace_bytes: context.launch.trace_bytes,
+            degree_bound: config.degree_bound,
+            original_deadline: context.deadline,
+        },
+        d::EventPersistence::BoundCapture,
+        &mut forward,
+    ) {
+        Ok(prepared) => prepared,
+        Err(failure) => {
+            let retained =
+                d::visit_prepare_failure_artifacts(&failure, |path, role, encoding, bytes| {
+                    live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+                });
+            return Ok(dynamic_partial_result(
+                "prepare",
+                &format!("{:?}", failure.stop),
+                retained.is_err(),
+            ));
+        }
+    };
+    let mut publisher = d::BoundWitnessPublisher::default();
+    if let Err(stop) = d::prepare_step4(&mut prepared, &mut publisher) {
+        let retained =
+            d::visit_step4_retained_artifacts(&prepared, |path, role, encoding, bytes| {
+                live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+            });
+        return Ok(dynamic_partial_result(
+            "capture_admission",
+            &format!("{stop:?}"),
+            retained.is_err(),
+        ));
+    }
+    let mut phase = match d::invoke_original(prepared, &mut forward) {
+        Ok(phase) => phase,
+        Err(failure) => {
+            let retained =
+                d::visit_prepare_failure_artifacts(&failure, |path, role, encoding, bytes| {
+                    live_borrowed_payload(path, role, encoding, bytes).map_err(|_| ())
+                });
+            return Ok(dynamic_partial_result(
+                "native_admission",
+                &format!("{:?}", failure.stop),
+                retained.is_err(),
+            ));
+        }
+    };
+    let linear = d::extract_reported_linear(&mut phase);
+    let linear_retained = d::retain_linear(&mut phase, &linear);
+    if linear_retained.is_ok() {
+        d::run_group_step4(&mut phase, Some(&linear), &mut forward, &mut publisher);
+        // Confirmation records its own failure in the terminal state and uses
+        // the persistent budget and original deadline. Never silently retry.
+        let _ = d::confirm_step4_witness(&mut phase.prepared, &mut publisher);
+    }
+    let terminal = d::retain_step4_terminal(&mut phase);
+    let facts = terminal
+        .as_ref()
+        .ok()
+        .and_then(|()| d::step4_outcome(&phase).ok());
+    let artifacts = d::take_step4_artifacts(&mut phase.prepared)
+        .map_err(|e| format!("dynamic admitted owner transfer failed: {e:?}"))?;
+    let mut result = if let Some(facts) = facts {
+        let claims = facts.claims;
+        SolverData {
+            outcome: json!({
+                "strategy":DYNAMIC_STRATEGY,
+                "status":if claims.solver_completed && claims.pdp_witness_verified {"verified"} else {"partial"},
+                "solver_completed":claims.solver_completed,
+                "pdp_witness_verified":claims.pdp_witness_verified && claims.certificate_durably_persisted,
+                "certificate_durably_persisted":claims.certificate_durably_persisted,
+                "group_domain_complete":claims.group_domain_complete,
+                "exhaustive_no_decomposition":claims.negative_verified,
+                "native_backend_invoked":facts.native_backend_invoked,
+                "native_statistics_complete":facts.native_statistics_complete,
+                "algebra_completed":facts.native_statistics_complete,
+                "native_basis_derivation_verified":false,
+                "independent_derivation_verified":false,
+                "operation_trajectory_verified":false,
+                "exact_instruction_count_verified":false,
+                "full_execution_trace_verified":false,
+                "fall_degree_verified":false,
+                "scalar_recovered_without_witness":false,
+                "native_metadata_scope":"producer-reported boundary facts; independent replay required"
+            }),
+            artifacts,
+        }
+    } else {
+        let mut result =
+            dynamic_partial_result("terminal_retention", &format!("{terminal:?}"), false);
+        result.artifacts = artifacts;
+        result
+    };
+    if let Err(stop) = linear_retained {
+        result.outcome["linear_retention_stop"] = json!(format!("{stop:?}"));
+    }
+    // The parent flush preserves these owners and never republishes a dedicated
+    // witness. Outer errors suppress completion but retain acknowledged evidence.
+    flush_prime_chain_payloads(&mut result);
+    Ok(result)
+}
+#[allow(dead_code)]
+fn dynamic_partial_result(stage: &str, reason: &str, custody_failed: bool) -> SolverData {
+    let mut result = SolverData {
+        outcome: json!({"strategy":DYNAMIC_STRATEGY,"status":"partial",
+            "stage":stage,"reason":reason,"solver_completed":false,
+            "pdp_witness_verified":false,"group_domain_complete":false,
+            "exhaustive_no_decomposition":false,"scalar_recovered_without_witness":false}),
+        artifacts: Vec::new(),
+    };
+    if custody_failed {
+        record_prime_chain_persistence_error(&mut result, stage, "retained prefix capture failed");
+    }
+    result
+}
+
 pub(super) fn verify_prime_f4_wide(
     dir: &Path,
     config: &CaseConfig,
@@ -3378,6 +3548,137 @@ fn wide_begin_failure(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn dynamic_runtime_composes_actual_bound_capture_and_independent_replay() {
+        for twist in [false, true] {
+            let config = CaseConfig {
+                family: "prime".into(),
+                n: 47,
+                m: 4,
+                twist,
+                curve_seed: 7,
+                generator_index: 1,
+                key_index: 1,
+                seed: 42,
+                factor_base_size: 2,
+                degree_bound: 12,
+                work_limit: 16384,
+                solver: DYNAMIC_PROFILE.into(),
+            };
+            let mut case = curves::generate(&config).unwrap();
+            let group = Group::read(&case).unwrap();
+            let points = domain(&group, &case).unwrap();
+            let mut target = group.zero();
+            for _ in 0..config.m {
+                target = group.add(&target, &points[0]);
+            }
+            case.public_instance["target"] = target.json();
+            case.private_witness = json!({"must_not_be_consulted":true});
+            curves::verify_public(&case.public_instance).unwrap();
+            // Synthetic attempt identity for a software integration control;
+            // central frozen-run admission is deliberately a separate gate.
+            let binding = AttemptBinding {
+                schema: "crypto.ml-dataset.attempt-binding/v1".into(),
+                run_sha256: "1".repeat(64),
+                plan_sha256: "2".repeat(64),
+                protocol_sha256: "3".repeat(64),
+                config_sha256: "4".repeat(64),
+                source_commit: "5".repeat(40),
+                binary_sha256: "6".repeat(64),
+                cell_index: 0,
+                attempt_sha256: "7".repeat(64),
+            };
+            let context = super::super::execution::SolverExecutionContext {
+                launch: super::super::execution::LaunchContext {
+                    schema: "crypto.ml-dataset.execution-context/v1".into(),
+                    binding: binding.clone(),
+                    boot_id: "software-fixture".into(),
+                    start_monotonic_ns: 1,
+                    deadline_monotonic_ns: 30_000_000_001,
+                    seconds_per_case: 30,
+                    memory_bytes: 256 << 20,
+                    trace_bytes: 128 << 20,
+                },
+                deadline: Instant::now() + Duration::from_secs(30),
+            };
+            assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
+            assert!(solve_dynamic_bound(&config, &case, &context).is_err());
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let root = std::env::temp_dir()
+                .join(format!("dynamic-runtime-{}-{nonce}", std::process::id()));
+            let cell = root.join("cell");
+            fs::create_dir_all(&cell).unwrap();
+            let limits = super::super::capture::capture_limits(128).unwrap();
+            let sink = CaptureEmitter::create(&cell.join("live"), binding.clone(), limits.clone())
+                .unwrap();
+            LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(sink)));
+            let guard = LiveSinkGuard;
+            let mut expired = context.clone();
+            expired.deadline = Instant::now();
+            assert!(solve_dynamic_bound(&config, &case, &expired).is_err());
+            let result = solve_dynamic_bound(&config, &case, &context).unwrap();
+            assert_eq!(
+                result.outcome["pdp_witness_verified"], true,
+                "{:?}",
+                result.outcome
+            );
+            assert!(result.outcome.get("live_persistence_errors").is_none());
+            LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+                Some(EventSink::Bound(sink)) => sink.finish().unwrap(),
+                _ => panic!("bound sink lost"),
+            });
+            drop(guard);
+            let artifacts: Vec<_> = result
+                .artifacts
+                .iter()
+                .map(|a| {
+                    super::super::storage::write_bytes(
+                        &cell,
+                        &a.path,
+                        &a.role,
+                        &a.encoding,
+                        &a.bytes,
+                    )
+                    .unwrap()
+                })
+                .collect();
+            let original = dynamic_original(
+                &config,
+                &case,
+                context.launch.memory_bytes,
+                context.launch.trace_bytes,
+            )
+            .unwrap();
+            let verified = prime_f4_wide_dynamic_replay::verify_files(
+                &cell,
+                &original.expected(),
+                &artifacts,
+                &binding,
+                &limits,
+                prime_f4_wide_dynamic_replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 << 20,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+            .unwrap();
+            verify_dynamic_claims(&result.outcome, &verified).unwrap();
+            assert!(verified.first_witness_verified && verified.witness_capture_committed);
+            assert!(!verified.independent_derivation_verified);
+            let initial = super::super::capture::CaptureCursor::initial(&binding).unwrap();
+            let restored = root.join("restored");
+            let delta = super::super::capture::capture_committed_delta(
+                &cell, &restored, &binding, &initial, &limits,
+            )
+            .unwrap()
+            .unwrap();
+            super::super::capture::verify_captured_delta(&restored, &delta, &initial).unwrap();
+            fs::remove_dir_all(root).unwrap();
+        }
+    }
     #[test]
     fn dynamic_original_uses_verified_public_inputs_at_requested_boundaries() {
         for n in [47, 61] {
