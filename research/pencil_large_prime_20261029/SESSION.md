@@ -1298,3 +1298,21 @@ Native controller recorded deadline expiration and a last-contact error that the
 ### 2026-10-30T03:37Z — Additive shutdown reconciliation
 
 AWS DescribeInstances now reports the exact bound worker instance i-027be1b63d0a94827 as terminated, with launch 02:47:55 UTC and transition reason timestamp 03:30:41 UTC. Saved response and readback timestamp unchanged. This resolves the live-worker existence question; it does not establish exact active payload time or repair the stale supervisor receipt. The report will bind this additive resource observation without converting infrastructure lifetime into algorithm costs. Two artifact-check invocations initially used the wrong path/missing base argument; the corrected tools/artifacts/artifacts.py check HEAD~1 HEAD passed.
+
+## 2026-10-30T03:42Z — Native partial analysis and observation report
+
+### What was done
+
+Retained the native analysis, original-plan execution history, partial canonical export, resource sidecars, editable coverage diagram, exact CSV/JSON and three-page PDF. Native analysis exits 0; canonical packaging exits 1 with five completeness findings; checking exits 1 with six findings. Independent review checked source/file bindings and every PDF page. Kept the first report and added a worker-terminal update after the separate EC2 readback. Raw records were committed/pushed before reports.
+
+### Decisions made
+
+All ratios remain null; no missing pencil work is treated as zero cost or a completed failure row. No numerical or scientific conclusion follows from the operational deadline. Current report is the worker-terminal-update artifact. Timestamp companion receives an additive provenance binding; old reports/reviews are unchanged.
+
+### Open threads
+
+PR delivery and applicable CI. Upper gate and full continuation remain incomplete. Exact active payload seconds remain unknown. Coordination heartbeats only were renewed for publication after the prior keeper ended; experiment deadlines, request and budget were not extended.
+
+### Errors
+
+Expected canonical incompleteness is retained as findings rather than suppressed. A background heartbeat launch did not survive the command session; verified it was absent before starting the same finite coordination loop in a managed exec session, with successful fenced heartbeats.
