@@ -307,6 +307,101 @@ pub(super) fn admit_original(
     Ok(budget)
 }
 
+/// Canonical original mathematical inputs for the initial two-code matrix
+/// profile. Setup admission/accounting and persistence must precede runtime use.
+pub(super) struct MathInput {
+    pub curve: Box<crate::binary_ecc::BinaryCurve>,
+    pub target: (u64, u64),
+    pub codes: [u64; 2],
+    pub signed: [(u64, u64); 4],
+}
+
+/// Validate public inputs using the existing independent curve/factor-base
+/// replay. Never consult private_witness or solver-produced input artifacts.
+/// The caller authenticates case provenance; this checks mathematical content.
+pub(super) fn original_math(
+    config: &super::super::types::CaseConfig,
+    case: &super::super::types::CaseData,
+) -> Result<MathInput, String> {
+    use super::{curves, domain, Element, Group};
+    use num_traits::ToPrimitive;
+    use serde_json::json;
+    if config.family != "koblitz"
+        || config.m != 3
+        || !((23..=31).contains(&config.n) || (47..=61).contains(&config.n))
+    {
+        return Err("outside Koblitz m3 field/arity profile".into());
+    }
+    let public = &case.public_instance;
+    if public["family"] != config.family
+        || public["n"] != json!(config.n)
+        || public["m"] != json!(config.m)
+        || public["twist"] != json!(config.twist)
+        || case.factor_base["requested_size"] != json!(config.factor_base_size)
+    {
+        return Err("Koblitz original public inputs differ from configuration".into());
+    }
+    let points = case.factor_base["points"]
+        .as_array()
+        .ok_or("missing original factor base")?;
+    if points.len() > 4 || points.is_empty() {
+        return Err("Koblitz two-code profile requires at most four original signed points".into());
+    }
+    // Full mathematical checks include actual twist, certified order,
+    // irreducibility, subgroup checks and factor-base construction replay.
+    // Their setup cost is not represented by native S4 reservation counters.
+    curves::verify_public(public)?;
+    curves::verify_factor_base(public, &case.factor_base)?;
+    let group = Group::read(case)?;
+    let Group::Binary(curve) = &group else {
+        return Err("Koblitz profile requires actual binary curve".into());
+    };
+    if curve.m != config.n || curve.b.to_biguint().to_u64() != Some(1) {
+        return Err("Koblitz S4 profile requires actual b=1 and original field degree".into());
+    }
+    let word = |p: &Element| -> Result<(u64, u64), String> {
+        match p {
+            Element::Binary(crate::binary_ecc::BinaryPoint::Affine { x, y }) => Ok((
+                x.to_biguint().to_u64().ok_or("x exceeds u64")?,
+                y.to_biguint().to_u64().ok_or("y exceeds u64")?,
+            )),
+            _ => Err("Koblitz original point must be affine".into()),
+        }
+    };
+    let target = word(&group.point(&public["target"])?)?;
+    let points = domain(&group, case)?;
+    if points.len() != 4 {
+        return Err(
+            "Koblitz matrix profile requires two distinct x codes, not two signed points".into(),
+        );
+    }
+    let mut signed = [(0, 0); 4];
+    for (out, point) in signed.iter_mut().zip(&points) {
+        *out = word(point)?;
+    }
+    signed.sort_unstable();
+    if signed.windows(2).any(|p| p[0] == p[1])
+        || signed[0].0 != signed[1].0
+        || signed[2].0 != signed[3].0
+        || signed[0].0 == signed[2].0
+        || signed[0].1 ^ signed[0].0 != signed[1].1
+        || signed[2].1 ^ signed[2].0 != signed[3].1
+    {
+        return Err("noncanonical original signed two-code domain".into());
+    }
+    let codes = [signed[0].0, signed[2].0];
+    let Group::Binary(mut curve) = group else {
+        unreachable!("validated binary group")
+    };
+    curve.irreducible.low_terms.sort_unstable();
+    Ok(MathInput {
+        curve,
+        target,
+        codes,
+        signed,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -657,5 +752,99 @@ mod admission_tests {
         assert!(admit_original(&f.dir, &f.config, &f.context, &sink).is_err());
         std::fs::remove_file(f.dir.join(execution::PATH)).unwrap();
         assert!(f.admit().unwrap_err().contains("execution context missing"));
+    }
+}
+
+#[cfg(test)]
+mod mathematical_tests {
+    use super::*;
+    use crate::ml_dataset::{curves, types::CaseConfig};
+    use serde_json::{json, Value};
+
+    fn config(n: u32, twist: bool, size: usize) -> CaseConfig {
+        CaseConfig {
+            family: "koblitz".into(),
+            n,
+            m: 3,
+            twist,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: size,
+            degree_bound: 3,
+            work_limit: 16384,
+            solver: "f4".into(),
+        }
+    }
+
+    #[test]
+    fn original_math_replays_both_actual_twists_at_requested_boundaries() {
+        for n in [23, 31, 47, 53, 61] {
+            for twist in [false, true] {
+                let cfg = config(n, twist, 4);
+                let mut case = curves::generate(&cfg).unwrap();
+                case.private_witness = Value::Null;
+                let original = original_math(&cfg, &case).unwrap();
+                assert_eq!(original.curve.m, n);
+                assert!(original.codes[0] < original.codes[1]);
+                assert_eq!(
+                    original.signed.map(|p| p.0),
+                    [
+                        original.codes[0],
+                        original.codes[0],
+                        original.codes[1],
+                        original.codes[1]
+                    ]
+                );
+                assert_eq!(
+                    curves::point_words(&case.public_instance["target"]).unwrap(),
+                    Some(original.target)
+                );
+                assert_eq!(original.curve.irreducible.low_terms[0], 0);
+                case.private_witness = json!({"must_not_be_read":"deliberately unusable"});
+                assert_eq!(original_math(&cfg, &case).unwrap().signed, original.signed);
+            }
+        }
+    }
+
+    #[test]
+    fn two_signed_points_are_not_two_selector_codes() {
+        let cfg = config(23, false, 2);
+        let case = curves::generate(&cfg).unwrap();
+        assert_eq!(case.factor_base["points"].as_array().unwrap().len(), 2);
+        assert!(original_math(&cfg, &case)
+            .err()
+            .unwrap()
+            .contains("two distinct x codes"));
+    }
+
+    #[test]
+    fn original_math_rejects_curve_target_domain_and_configuration_mutations() {
+        let cfg = config(23, false, 4);
+        let case = curves::generate(&cfg).unwrap();
+        original_math(&cfg, &case).unwrap();
+        for mutation in 0..6 {
+            let mut changed = case.clone();
+            match mutation {
+                0 => changed.public_instance["curve"]["b"] = json!("2"),
+                1 => changed.public_instance["target"] = Value::Null,
+                2 => changed.public_instance["twist"] = json!(true),
+                3 => changed.factor_base["points"][0] = changed.factor_base["points"][1].clone(),
+                4 => changed.public_instance["field"]["irreducible_low_terms"] = json!([0]),
+                5 => changed.factor_base["requested_size"] = json!(2),
+                _ => unreachable!(),
+            }
+            assert!(
+                original_math(&cfg, &changed).is_err(),
+                "accepted mutation {mutation}"
+            );
+        }
+        let mut changed = cfg.clone();
+        changed.family = "binary".into();
+        assert!(original_math(&changed, &case).is_err());
+        changed = cfg;
+        changed.m = 4;
+        assert!(original_math(&changed, &case).is_err());
     }
 }

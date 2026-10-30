@@ -195,3 +195,36 @@ factor-base mathematical admission remains the next adapter stage; the function
 does not claim to validate those by reading configuration alone. It performs no
 native construction, matrix solve or dataset generation. Integration controls
 use frozen synthetic run files and the real context/capture APIs.
+
+## Original mathematical input increment
+
+`original_math` reuses existing public curve and factor-base replay, then checks
+actual binary degree and b=1, extracts the affine target, and canonicalizes the
+four signed points into exactly two sorted x codes. Both signs are checked with
+the binary negation rule `(x,y) -> (x,x XOR y)`. Field exponents are sorted only
+after the existing native irreducibility/duplicate checks have succeeded.
+Private witness data is never accessed. Runtime registration remains test-only.
+
+The original `factor_base_size` means signed-point count, not distinct-x count.
+The default generator processes both lifts at a source x before checking its
+size target. Thus a requested size of two can be exactly P,-P (one code).
+The new mathematical controls use four signed points and assert two actual
+codes; two signed points are a retained rejection control. This changes neither
+an existing frozen corpus nor any existing data. The adapter must report the
+actual signed and x-domain cardinalities separately when activated.
+
+The new controls are software input-validation checks, not the later frozen
+matrix-reduction experiment. They use fixed existing-generator parameters at
+n=23,31,47,53,61 and both actual twists, compare canonical inputs with the
+original case, alter private witness contents, and reject coefficient, target,
+twist, duplicated-point, modulus, requested-size, family and arity mutations.
+No native S4 or matrix work is performed by these controls.
+
+The existing public/factor-base verifiers include construction replay and,
+when the subgroup divides the cofactor, a cyclic-membership table. Their setup
+cost is outside S4 reservation counters. This staged function is not a proof
+that the whole adapter is resource-bounded. Runtime integration must admit and
+account for those paths (or reuse independently verified original-input state
+with an exact provenance binding) before calling them under the profile. Do not
+silently count their work as zero or grant fresh phase budgets. Typed persistence
+and independent equation/group replay are still outstanding.
