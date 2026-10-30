@@ -7,7 +7,7 @@ fn field_independent(a:u8,b:u8)->u8{let mut c=0u16;for i in 0..5{for j in 0..5{i
 fn mul(a:&Series,b:&Series,table:&[[u8;32];32])->Series{let mut c=[0;N];for i in 0..N{if a[i]!=0{for j in 0..N-i{c[i+j]^=table[a[i] as usize][b[j] as usize];}}}c}
 fn plane(a:&Series)->[[u64;10];5]{let mut p=[[0;10];5];for i in 0..N{for k in 0..5{if (a[i]>>k)&1!=0{p[k][i/64]^=1<<(i%64);}}}p}
 fn binary_conv(a:&[u64;10],b:&[u64;10])->[u64;10]{let mut c=[0;10];for i in 0..10{let mut v=a[i];while v!=0{let s=v.trailing_zeros() as usize;v&=v-1;for j in 0..10-i{c[i+j]^=b[j]<<s;if s!=0 && i+j+1<10{c[i+j+1]^=b[j]>>(64-s);}}}}c[9]&=(1u64<<39)-1;c}
-fn mul_independent(a:&Series,b:&Series)->Series{let a=plane(a);let b=plane(b);let mut p=[[0u64;3];9];for i in 0..5{for j in 0..5{let c=binary_conv(&a[i],&b[j]);for k in 0..10{p[i+j][k]^=c[k];}}}for i in (5..=8).rev(){for k in 0..10{p[i-5][k]^=p[i][k];p[i-3][k]^=p[i][k];}}let mut c=[0;N];for i in 0..N{for k in 0..5{c[i]^=(((p[k][i/64]>>(i%64))&1) as u8)<<k;}}c}
+fn mul_independent(a:&Series,b:&Series)->Series{let a=plane(a);let b=plane(b);let mut p=[[0u64;10];9];for i in 0..5{for j in 0..5{let c=binary_conv(&a[i],&b[j]);for k in 0..10{p[i+j][k]^=c[k];}}}for i in (5..=8).rev(){for k in 0..10{p[i-5][k]^=p[i][k];p[i-3][k]^=p[i][k];}}let mut c=[0;N];for i in 0..N{for k in 0..5{c[i]^=(((p[k][i/64]>>(i%64))&1) as u8)<<k;}}c}
 fn pack(a:&Series)->Bits{let mut b=[0;W];for i in 0..N{for k in 0..5{if (a[i]>>k)&1!=0{let p=5*i+k;b[p/64]^=1<<(p%64);}}}b}
 fn unpack(b:&Bits)->Series{let mut a=[0;N];for i in 0..N{for k in 0..5{let p=5*i+k;a[i]^=(((b[p/64]>>(p%64))&1) as u8)<<k;}}a}
 fn xor(a:&mut Bits,b:&Bits){for i in 0..W{a[i]^=b[i];}}
