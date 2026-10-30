@@ -102,7 +102,7 @@ keeps both old arms and adds uncached direct signs. That comparison is now
 identical ordered operand/lift/certificate behavior; direct has two fewer cold
 additions than cache in all400 records, while cache has fewer negations. No
 overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
-is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and now a [compiled native pair](reports/uniform-audit-preflight-20261026/README.md), now [executed with independent full replay](reports/uniform-20261029/README.md):96arms/896targets/210comparisons,0joint gains in both modes,536states,13rejections and a separate9named/16audited conditional recurrence proof. Approved narrow checkpoint access now works; actual-state/probability/full-cost obligations remain. The [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) remains queued to check doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
+is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. A stronger [uniform useful-yield preflight](reports/uniform-yield-preflight-20261025/README.md) now has a preregistered96arm/896target/210policy protocol and now a [compiled native pair](reports/uniform-audit-preflight-20261026/README.md), now [executed with independent full replay](reports/uniform-20261029/README.md):96arms/896targets/210comparisons,0joint gains in both modes,536states,13rejections and a separate9named/16audited conditional recurrence proof. Approved narrow checkpoint access now works; actual-state/probability/full-cost obligations remain. The [explicit dual](reports/cm8-dual-20261029/README.md) is now checked:21named/25audited,14+14points/392addition pairs/7subgroup inverses/72source recoveries;only public-base inverse enumeration is replaced. No new yield or degree gain.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
@@ -206,3 +206,18 @@ subspace bindings and iid expectation bridge remain open. See the new
 [source-only report](reports/uniform-collection-draft-20261026/README.md).
 The pending checkpoint approval/token gate still blocks activation and runs;
 no permission question is repeated. The exact runner remains unimplemented.
+
+
+## 2026-10-29 executed signed-pair dependency check
+
+[New finite census / checked kernel](reports/pair-rank-20261029/README.md):
+4,485 abstract cyclic bases/119,912 queries,0rank/count defects; both independent
+native paths also match all96old actual S3 arms/896queries. Two retained domain
+controls lose rank. Five named/five audited Lean theorems check the explicit
+symmetric-weight kernel,0extra trusted; general coefficient-matrix binding and
+universal rank/count theorem remain OPEN. No stationary yield/degree/regularity/
+work advantage follows. Canonical protocol freezes before main data and exact
+frozen analyzer bytes are replayed; initial failures/all controls retained.
+Original useful-yield/lower-degree/actual-main-source objective remains open;
+next discriminate actual matrix/probability binding or a new relevant-degree
+encoding, not another identical complete-two-summand census.

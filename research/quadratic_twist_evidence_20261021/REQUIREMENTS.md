@@ -154,3 +154,18 @@ and scoped checkpoint access now succeed. Actual-state/iid probability semantics
 complete work, active registration and full-library completion remain open.
 
 Storage/CI maintenance: [artifact migration review](validation/artifact-migration-review-20261026/README.md) verifies32frozen byte bindings, removes55unrelated newly added loose files while preserving their immutable Git history, and adds read-only input restoration without changing any old verification command. Physical S3 availability/new-head CI remain unverified; no new scientific/Lean result.
+
+
+## 2026-10-29 executed signed-pair dependency check
+
+[New finite census / checked kernel](reports/pair-rank-20261029/README.md):
+4,485 abstract cyclic bases/119,912 queries,0rank/count defects; both independent
+native paths also match all96old actual S3 arms/896queries. Two retained domain
+controls lose rank. Five named/five audited Lean theorems check the explicit
+symmetric-weight kernel,0extra trusted; general coefficient-matrix binding and
+universal rank/count theorem remain OPEN. No stationary yield/degree/regularity/
+work advantage follows. Canonical protocol freezes before main data and exact
+frozen analyzer bytes are replayed; initial failures/all controls retained.
+Original useful-yield/lower-degree/actual-main-source objective remains open;
+next discriminate actual matrix/probability binding or a new relevant-degree
+encoding, not another identical complete-two-summand census.

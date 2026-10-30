@@ -380,3 +380,18 @@ The [new source draft](../research/quadratic_twist_evidence_20261021/drafts/unif
 ## Artifact migration maintenance (2026-10-26)
 
 [Storage/CI review](../research/quadratic_twist_evidence_20261021/validation/artifact-migration-review-20261026/README.md) checks32moved payload bindings against earlier Git bytes, removes55out-of-scope loose files newly introduced by cc585a113 (bytes retained in that immutable commit), and restores read-only hydration before existing native/cover checks. Local metadata fixture succeeds for32files/19manifests; physical S3 availability and new-head CI are not established. Scientific inputs/algorithms/269historical audited declarations/17identities remain unchanged, uniform study unexecuted and recurrence draft unelaborated. Auto-merge was re-enabled externally and disabled again. Public rules now omit required_status_checks; inaccessible legacy protection and all explicit user completion gates remain, so no waiver or merge. Checkpoint approval/token still pending.
+
+
+## 2026-10-29 executed signed-pair dependency check
+
+[New finite census / checked kernel](../research/quadratic_twist_evidence_20261021/reports/pair-rank-20261029/README.md):
+4,485 abstract cyclic bases/119,912 queries,0rank/count defects; both independent
+native paths also match all96old actual S3 arms/896queries. Two retained domain
+controls lose rank. Five named/five audited Lean theorems check the explicit
+symmetric-weight kernel,0extra trusted; general coefficient-matrix binding and
+universal rank/count theorem remain OPEN. No stationary yield/degree/regularity/
+work advantage follows. Canonical protocol freezes before main data and exact
+frozen analyzer bytes are replayed; initial failures/all controls retained.
+Original useful-yield/lower-degree/actual-main-source objective remains open;
+next discriminate actual matrix/probability binding or a new relevant-degree
+encoding, not another identical complete-two-summand census.
