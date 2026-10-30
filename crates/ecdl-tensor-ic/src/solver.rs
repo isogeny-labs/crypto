@@ -55,7 +55,8 @@ pub struct Solver {
     /// e.g. DFSCounter.
     pub gadgets: bool,
     /// WindowBits > 0 (with `gadgets`) adds the coordinate window x < p >> k
-    /// to every factor base; see `new_windowed_factor_bases`.
+    /// to every factor base (with or without `gadgets`); see
+    /// `new_windowed_factor_bases`.
     pub window_bits: usize,
     /// Mitm finds relations by meeting in the middle (`mitm_find_relation`)
     /// instead of contracting the network forward. It performs about
@@ -203,7 +204,10 @@ impl Solver {
 
             // Step 1: factor-base selection.
             crate::opcount::set_phase("factor_base");
-            let fb = if self.gadgets {
+            // The coordinate window is a membership constraint on an affine
+            // hash, so it applies whether or not the relation search uses
+            // gadgets: it only changes how the sets are built and checked.
+            let fb = if self.gadgets || self.window_bits > 0 {
                 new_windowed_factor_bases(&c, self.m, &mut self.rng, self.window_bits)
             } else {
                 new_factor_bases(&c, self.m, &mut self.rng)

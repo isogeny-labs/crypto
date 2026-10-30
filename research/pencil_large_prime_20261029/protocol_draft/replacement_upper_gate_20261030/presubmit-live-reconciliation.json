@@ -1,0 +1,59 @@
+{
+  "schema": "pencil-replacement-live-reconciliation/v1",
+  "recorded_utc": "2026-10-30T05:41:10.259137+00:00",
+  "controller": {
+    "name": "isolab-recovery-controller",
+    "source": {
+      "type": "S3",
+      "location": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip",
+      "buildspec": "resume/buildspec.yml",
+      "insecureSsl": false
+    },
+    "sourceVersion": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+    "concurrentBuildLimit": 1,
+    "lastModified": "2026-10-29T23:44:09.183000+00:00"
+  },
+  "builds_inspected": 32,
+  "active_controller_builds": [],
+  "eks_observed_utc": "2026-10-30T05:38:41.805Z",
+  "active_eks_jobs": [],
+  "pencil_jobs": [
+    {
+      "name": "pencil-p739-20261030-a1-epoch-1",
+      "state": "failed"
+    }
+  ],
+  "c1_remote_status": {
+    "phase": "awaiting_controller_receipt",
+    "request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+    "run_name": "pencil-p186379-20261030-c1",
+    "schema": "isolab.eks.recovery-status/v1"
+  },
+  "images": [
+    {
+      "digest": "sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+      "bytes": 153479842,
+      "pushed": "2026-10-29T23:39:55.699000+00:00"
+    },
+    {
+      "digest": "sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+      "bytes": 158236414,
+      "pushed": "2026-10-30T00:11:12.670000+00:00"
+    }
+  ],
+  "approved_client": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/package/bin/isolab-eks-recovery",
+    "sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21"
+  },
+  "diem": {
+    "deadline_utc": 1792521741.993407,
+    "durable_records": 50,
+    "expected_records": 52,
+    "launcher_pid": null,
+    "native": true,
+    "observed": 1793333796,
+    "pending": false,
+    "state": "deadline-expired"
+  },
+  "new_scientific_payloads_launched": 0
+}
