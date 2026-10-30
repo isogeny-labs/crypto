@@ -27,8 +27,8 @@ are admission limits, not evidence that all admitted instances are feasible.
 
 For each new curve/base set, choose a contiguous split minimizing the combined
 prefix/suffix tuple counts, subject to `max_rows`. Build both sum tables once,
-sort suffix sums by full point and tuple index, and retain the tables across
-queries. Visit prefix tuples lexicographically and select the smallest matching
+index suffix sums by exact compressed point keys, and retain the tables across
+queries. The open-addressed index keeps the first tuple ID for duplicate sums. Visit prefix tuples lexicographically and select the smallest matching
 suffix index. Thus duplicate sums still produce exactly the original oracle's
 first full tuple, making whole certificates directly comparable.
 
@@ -42,7 +42,9 @@ preparation and again on warm queries. They do not cap total RSS, arithmetic or
 wall time. The original exhaustive oracle uses a different work unit.
 Preparation also stores the original bases and four curve parameters and uses
 temporary sum vectors; queries use O(batch) scratch. `peak_table_bytes` counts only retained
-sum-table capacities, excluding these other allocations. All counters include
+prefix capacity and suffix slot capacity (including empty slots), excluding these
+other allocations. Suffix slots use at most half occupancy; their count is the
+next power of two above twice the suffix tuple count. All counters include
 discarded trials. `clear()` drops tables without resetting cumulative counters.
 
 This is generic decomposition (bounded by square-root group-order methods;
