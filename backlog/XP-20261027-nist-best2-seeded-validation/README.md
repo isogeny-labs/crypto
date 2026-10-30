@@ -12,3 +12,9 @@ See [the problem](../../problems/nist-best2-dp-bias-and-gpu-validation.md) and
 The model has hashed predicates and two full additions; it does not supply
 NIST GPU solve costs. Independent seeded GPU observations, successful-collision
 replay and complete accounting remain required. BEST2 stays disabled.
+
+
+Canonical backlog verifier templates use `{out}`, the runner-chosen shard
+output directory. `outputs.verify` now addresses that ecbench session directory. The separate cairn checker retains its `{artifact}` interface.
+This template correction changes neither readiness nor the frozen protocol;
+no experiment, journal upload or checkpoint action is performed.
