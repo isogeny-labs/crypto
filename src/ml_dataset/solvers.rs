@@ -210,6 +210,23 @@ pub(super) fn publish_bound_witness(
     })
 }
 
+/// Borrowed complete artifacts from early dynamic failures use the same bound
+/// outer custody path. Dedicated witness publication is never downgraded here.
+#[allow(dead_code)] // Dormant dynamic parent integration.
+pub(super) fn live_borrowed_payload(
+    path: &str,
+    role: &str,
+    encoding: &str,
+    bytes: &[u8],
+) -> Result<(), String> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink
+            .payload_borrowed(path, role, encoding, bytes)
+            .map_err(|error| error.to_string()),
+        _ => Err("borrowed retained artifacts require an attempt-bound capture sink".into()),
+    })
+}
+
 pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
     LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
         Some(s) => s.payload(payload),
@@ -3142,6 +3159,7 @@ mod tests {
                 .unwrap();
         assert!(LIVE_SINK.with(|slot| slot.borrow().is_none()));
         assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        assert!(live_borrowed_payload("input.json", "test", "json", b"{}").is_err());
         let nonce = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -3161,6 +3179,7 @@ mod tests {
         });
         let guard = LiveSinkGuard;
         assert!(live_typed_event(TypedEventKind::WidePrimeDynamic, &7u64, &mut buffer).is_err());
+        assert!(live_borrowed_payload("input.json", "test", "json", b"{}").is_err());
         assert_eq!(fs::metadata(&legacy_path).unwrap().len(), 0);
         let binding = AttemptBinding {
             schema: "crypto.ml-dataset.attempt-binding/v1".into(),

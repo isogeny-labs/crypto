@@ -1448,26 +1448,60 @@ impl CaptureEmitter {
     }
 
     pub fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), CaptureError> {
+        self.payload_parts(
+            &payload.path,
+            &payload.role,
+            &payload.encoding,
+            &payload.bytes,
+        )
+    }
+
+    /// Outer custody boundary for complete retained bytes. No data-sized clone.
+    /// Witness publication must use its persistent dedicated budget and receipt.
+    #[allow(dead_code)] // Parent borrowed custody bridge is integrated separately.
+    pub(crate) fn payload_borrowed(
+        &mut self,
+        path: &str,
+        role: &str,
+        encoding: &str,
+        bytes: &[u8],
+    ) -> Result<(), CaptureError> {
         self.ready()?;
-        if payload.path.is_empty()
-            || payload.path.len() > 255
-            || payload.path.contains(['/', '\\'])
-            || [".", ".."].contains(&payload.path.as_str())
-            || payload.role.trim().is_empty()
-            || payload.encoding.trim().is_empty()
-            || payload.role.len() > 256
-            || payload.encoding.len() > 256
+        if path == "pdp-witness.json" || role == WITNESS_ROLE {
+            return Err(self.reject(CaptureError::Integrity(
+                "borrowed witness requires dedicated publication".into(),
+            )));
+        }
+        self.payload_parts(path, role, encoding, bytes)
+    }
+
+    fn payload_parts(
+        &mut self,
+        path: &str,
+        role: &str,
+        encoding: &str,
+        payload_bytes: &[u8],
+    ) -> Result<(), CaptureError> {
+        self.ready()?;
+        if path.is_empty()
+            || path.len() > 255
+            || path.contains(['/', '\\'])
+            || [".", ".."].contains(&path)
+            || role.trim().is_empty()
+            || encoding.trim().is_empty()
+            || role.len() > 256
+            || encoding.len() > 256
         {
             return Err(self.reject(CaptureError::Integrity(
                 "invalid capture payload identity".into(),
             )));
         }
         let artifact = Artifact {
-            path: format!("payloads/{}", payload.path),
-            role: payload.role.clone(),
-            encoding: payload.encoding.clone(),
-            sha256: super::digest(&payload.bytes),
-            bytes: payload.bytes.len() as u64,
+            path: format!("payloads/{path}"),
+            role: role.to_owned(),
+            encoding: encoding.to_owned(),
+            sha256: super::digest(payload_bytes),
+            bytes: payload_bytes.len() as u64,
         };
         if artifact.path == WITNESS_PATH && self.witness.committed {
             let expected = witness_hex(&self.witness.digest);
@@ -1507,7 +1541,7 @@ impl CaptureEmitter {
             .payload_count
             .checked_add(1)
             .ok_or_else(|| CaptureError::Integrity("payload count overflow".into()))?;
-        let payload_bytes = self
+        let next_payload_bytes = self
             .head
             .payload_bytes
             .checked_add(artifact.bytes)
@@ -1516,7 +1550,7 @@ impl CaptureEmitter {
             Ok(v) => v,
             Err(e) => return Err(self.reject(e)),
         };
-        if let Err(e) = self.check_reservation(bytes.len(), payload_count, payload_bytes) {
+        if let Err(e) = self.check_reservation(bytes.len(), payload_count, next_payload_bytes) {
             return Err(self.reject(e));
         }
         let written = storage::write_bytes(
@@ -1524,13 +1558,13 @@ impl CaptureEmitter {
             &artifact.path,
             &artifact.role,
             &artifact.encoding,
-            &payload.bytes,
+            payload_bytes,
         )
         .map_err(CaptureError::Io);
         if let Err(e) = written {
             return Err(self.reject(e));
         }
-        self.commit_event(&bytes, payload_count, payload_bytes)?;
+        self.commit_event(&bytes, payload_count, next_payload_bytes)?;
         self.payloads.insert(artifact.path.clone(), artifact);
         Ok(())
     }
@@ -3270,5 +3304,64 @@ mod tests {
         b.set_exclusive_supply(100, 100).unwrap();
         assert_eq!(b.deadline, deadline);
         assert!(matches!(b.reserve(0, 0), Err(WitnessError::Deadline)));
+    }
+    #[test]
+    fn borrowed_payload_matches_owned_custody_and_idempotence() {
+        let f = Fixture::new();
+        let g = Fixture::new();
+        let mut owned = f.emitter();
+        let mut borrowed = g.emitter();
+        let payload =
+            ArtifactPayload::json("basis.json", "exposed-basis", &json!({"rows":[1,2]})).unwrap();
+        owned.payload(&payload).unwrap();
+        borrowed
+            .payload_borrowed(
+                &payload.path,
+                &payload.role,
+                &payload.encoding,
+                &payload.bytes,
+            )
+            .unwrap();
+        for path in ["events.jsonl", "committed.json", "payloads/basis.json"] {
+            assert_eq!(
+                fs::read(f.live().join(path)).unwrap(),
+                fs::read(g.live().join(path)).unwrap()
+            );
+        }
+        let before = fs::read(g.live().join("events.jsonl")).unwrap();
+        borrowed
+            .payload_borrowed(
+                &payload.path,
+                &payload.role,
+                &payload.encoding,
+                &payload.bytes,
+            )
+            .unwrap();
+        assert_eq!(fs::read(g.live().join("events.jsonl")).unwrap(), before);
+        assert!(borrowed
+            .payload_borrowed(&payload.path, &payload.role, &payload.encoding, b"changed")
+            .is_err());
+    }
+    #[test]
+    fn borrowed_payload_preserves_cap_and_refuses_witness_route() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        assert!(matches!(
+            emitter.payload_borrowed("large.bin", "test", "bytes", &[1; 20 * 1024]),
+            Err(CaptureError::LimitReached(CaptureStop::PayloadByteLimit))
+        ));
+        assert!(!f.live().join("payloads/large.bin").exists());
+        let g = Fixture::new();
+        let mut emitter = g.emitter();
+        assert!(emitter
+            .payload_borrowed(
+                "pdp-witness.json",
+                "independently-verified-pdp",
+                "json",
+                b"{}"
+            )
+            .is_err());
+        assert!(!g.live().join("payloads/pdp-witness.json").exists());
+        assert_eq!(emitter.head.payload_count, 0);
     }
 }
