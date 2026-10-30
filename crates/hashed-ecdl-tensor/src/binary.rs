@@ -1,7 +1,7 @@
 //! Native odd-degree binary Koblitz groups, invertible XOR hashes and certified
 //! Frobenius orbit representatives. No subfield, coverage or speedup assumption.
 
-use crate::arithmetic::{floor_root, is_prime};
+use crate::arithmetic::{floor_root, inverse, is_prime, square_root, Seeded};
 use crate::curve::Point;
 use crate::finite::{Domain, Group};
 use crate::primality::{verify_certificates, PrimeCertificate};
@@ -510,6 +510,30 @@ pub struct OrbitRepresentative {
     pub coefficient: BigUint,
 }
 impl OrbitPolicy {
+    /// Derive eigenvalue candidates from the Koblitz characteristic polynomial,
+    /// then verify the chosen candidate on the generator. No subgroup DLP search.
+    pub fn derive(group: &Koblitz, negation: bool, meter: &mut Meter) -> Result<Self> {
+        let r = group.order();
+        let mu = if group.a {
+            BigUint::one()
+        } else {
+            r - BigUint::one()
+        };
+        let discriminant = (&mu * &mu % r + r - BigUint::from(8u8) % r) % r;
+        let Some(root) = square_root(&discriminant, r, &mut Seeded(0x46726f62656e6975), meter)?
+        else {
+            return Err(invalid("Frobenius eigenvalue discriminant"));
+        };
+        let half = inverse(&BigUint::from(2u8), r)?;
+        let image = group.frobenius(group.generator(), meter)?;
+        for root in [root.clone(), (r - root) % r] {
+            let candidate = (&mu + root) * &half % r;
+            if !candidate.is_zero() && group.mul(group.generator(), &candidate, meter)? == image {
+                return Self::new(group, candidate, negation, meter);
+            }
+        }
+        Err(invalid("no verified Frobenius eigenvalue candidate"))
+    }
     /// Verify the eigenvalue on the prime-order generator.
     pub fn new(
         group: &Koblitz,
@@ -665,12 +689,15 @@ mod tests {
     use std::collections::BTreeSet;
 
     fn tiny(meter: &mut Meter) -> Koblitz {
+        tiny_with_a(false, meter)
+    }
+    fn tiny_with_a(a: bool, meter: &mut Meter) -> Koblitz {
         let field = Field::new(5, 37u8.into(), meter).unwrap();
         let mut draft = Koblitz {
             field,
-            a: false,
+            a,
             order: 11u8.into(),
-            cofactor: 4u8.into(),
+            cofactor: if a { 2u8.into() } else { 4u8.into() },
             generator: Point::Infinity,
         };
         for x in 0..32u8 {
@@ -682,14 +709,14 @@ mod tests {
                 if !draft.contains(&point, meter).unwrap() {
                     continue;
                 }
-                let point = draft.mul(&point, &4u8.into(), meter).unwrap();
+                let point = draft.mul(&point, &draft.cofactor, meter).unwrap();
                 if point != Point::Infinity
                     && draft.mul(&point, &11u8.into(), meter).unwrap() == Point::Infinity
                 {
                     draft.generator = point;
                     return Koblitz::new(
                         draft.field,
-                        false,
+                        a,
                         draft.order,
                         draft.cofactor,
                         draft.generator,
@@ -716,10 +743,57 @@ mod tests {
         XorBase::new(rows, offset.into(), limit.into(), meter).unwrap()
     }
     #[test]
+    fn both_koblitz_coefficients_and_derived_eigenvalues_have_pinned_fixture_identities() {
+        let mut meter = Meter::new(Limits::default());
+        for a in [false, true] {
+            let curve = tiny_with_a(a, &mut meter);
+            let policy = OrbitPolicy::derive(&curve, true, &mut meter).unwrap();
+            let count = (0..64u8)
+                .filter(|code| curve.decode(&(*code).into(), &mut meter).unwrap().is_some())
+                .count();
+            assert_eq!(count, if a { 21 } else { 43 });
+            eprintln!(
+                "binary fixture n=5 f=37 a={} r=11 h={} G={:?} lambda={}",
+                u8::from(a),
+                curve.cofactor(),
+                curve.generator(),
+                policy.eigenvalue
+            );
+            for k in 0..11u8 {
+                let point = curve.mul(curve.generator(), &k.into(), &mut meter).unwrap();
+                assert_eq!(
+                    curve.frobenius(&point, &mut meter).unwrap(),
+                    curve.mul(&point, &policy.eigenvalue, &mut meter).unwrap()
+                );
+            }
+        }
+    }
+    #[test]
     fn binary_fields_check_irreducibility_inverse_and_official_131_polynomial() {
         let mut meter = Meter::new(Limits::default());
         assert!(Field::new(5, 33u8.into(), &mut meter).is_err());
         let field = Field::new(5, 37u8.into(), &mut meter).unwrap();
+        for a in 0..32u16 {
+            for b in 0..32u16 {
+                let mut product = 0u16;
+                for bit in 0..5 {
+                    if b & (1 << bit) != 0 {
+                        product ^= a << bit;
+                    }
+                }
+                for bit in (5..10).rev() {
+                    if product & (1 << bit) != 0 {
+                        product ^= 37u16 << (bit - 5);
+                    }
+                }
+                assert_eq!(
+                    field
+                        .mul(&BigUint::from(a), &BigUint::from(b), &mut meter)
+                        .unwrap(),
+                    BigUint::from(product)
+                );
+            }
+        }
         for a in 1..32u8 {
             let inverse = field.inverse(&a.into(), &mut meter).unwrap();
             assert_eq!(
@@ -861,6 +935,12 @@ mod tests {
             .unwrap();
         assert!(OrbitPolicy::new(&curve, 0u8.into(), true, &mut meter).is_err());
         let policy = OrbitPolicy::new(&curve, eigenvalue.into(), true, &mut meter).unwrap();
+        assert_eq!(
+            OrbitPolicy::derive(&curve, true, &mut meter)
+                .unwrap()
+                .eigenvalue,
+            policy.eigenvalue
+        );
         let base =
             OrbitBase::new(&curve, xor(32, 4, &mut meter), policy.clone(), &mut meter).unwrap();
         let mut enumerated = BTreeSet::new();

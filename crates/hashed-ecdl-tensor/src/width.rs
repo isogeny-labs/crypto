@@ -115,6 +115,7 @@ pub fn plan(
 ) -> Result<Plan> {
     network.check_pins(pins)?;
     meter.vector(network.edge_count(), "width planning edges")?;
+    meter.vector(network.vertex_count(), "width planning vertices")?;
     let mut cuts = BTreeSet::new();
     loop {
         let factors = scopes(network, pins, &cuts);
@@ -158,6 +159,7 @@ impl Plan {
     ) -> Result<()> {
         network.check_pins(pins)?;
         meter.vector(network.edge_count(), "plan graph edges")?;
+        meter.vector(network.vertex_count(), "plan graph vertices")?;
         let mut all = BTreeSet::new();
         for &edge in self.slices.iter().chain(&self.order) {
             meter.charge(1, "validate contraction plan")?;
@@ -403,8 +405,10 @@ pub fn witness(
             .find(|&e| state[e].is_none())
         {
             meter.vector(
-                (stack.len() + 2)
-                    .checked_mul(network.edge_count())
+                stack
+                    .len()
+                    .checked_add(2)
+                    .and_then(|n| n.checked_mul(network.edge_count()))
                     .ok_or_else(|| overflow("witness frontier"))?,
                 "witness frontier",
             )?;

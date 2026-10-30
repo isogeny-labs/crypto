@@ -4,8 +4,10 @@ Question: do inverse-hash selector inputs and a structured witness backend
 lower full useful-relation cost against the current native hashed-base IC
 baseline? See the [source review](../../research/hashed_ecdl_finite_size_20261030/README.md).
 
-Proposed development direction: a native selector-domain encoder/propagator,
-then a width-aware or witness-oriented exact backend. Preserve a separate
+Native selector-domain search/encoding, width-aware exact contraction,
+witness propagation, partial collection and binary/orbit components are now
+implemented; see the [implementation receipt](../../research/hashed_ecdl_finite_size_20261030/implementation/README.md).
+Their development checks do not complete this measurement card. Preserve a separate
 source-counting arm and independent curve/hash/group replay. A later frozen
 study could start with public known-answer 16--40-bit cases, specified by
 complete field/curve/subgroup/target identities, and expand only after
@@ -13,7 +15,7 @@ correctness and cost gates pass. This size interval is a proposal, not an
 empirical feasibility claim or a frozen panel. Planted targets check
 correctness; natural random relation queries are needed for yield/cost.
 
-Before ready: implement the native driver and independent checker; define
+Before ready: implement the native measurement driver and independent checker; define
 seeded cases and a development/holdout split; freeze successes, failures,
 useful matrix rank, phase costs, limits and stopping rules; pin merged
 code; name the strongest current IC/external solver and symmetry-aware rho

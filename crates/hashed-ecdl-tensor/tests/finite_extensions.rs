@@ -356,3 +356,51 @@ fn optional_schoolbook_encodings_preserve_full_products() {
         }
     }
 }
+
+#[test]
+fn selector_cli_receipt_replays_with_the_original_verifier_and_is_exclusive() {
+    use std::process::Command;
+    let nonce = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let directory = std::env::temp_dir().join(format!(
+        "hashed-selector-cli-{}-{nonce}",
+        std::process::id()
+    ));
+    std::fs::create_dir(&directory).unwrap();
+    let output = directory.join("receipt.json");
+    let input = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("examples/fixture.json");
+    let binary = env!("CARGO_BIN_EXE_hashed-ecdl");
+    let run = || {
+        Command::new(binary)
+            .arg("solve-selectors")
+            .arg(&input)
+            .arg(&output)
+            .output()
+            .unwrap()
+    };
+    let result = run();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let bytes = std::fs::read(&output).unwrap();
+    let receipt: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(receipt["diagnostics"]["backend"], "SelectorWitness");
+    assert_eq!(receipt["diagnostics"]["scalar_decimal"], "4");
+    let verified = Command::new(binary)
+        .arg("verify")
+        .arg(&output)
+        .output()
+        .unwrap();
+    assert!(
+        verified.status.success(),
+        "{}",
+        String::from_utf8_lossy(&verified.stderr)
+    );
+    assert!(!run().status.success());
+    assert_eq!(std::fs::read(&output).unwrap(), bytes);
+    std::fs::remove_dir_all(directory).unwrap();
+}

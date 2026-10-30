@@ -722,6 +722,7 @@ impl Encoder {
             .checked_add(b.width())
             .ok_or_else(|| overflow("schoolbook product"))?;
         meter.bits(width, "schoolbook output")?;
+        meter.vector(width, "schoolbook row")?;
         let mut sum = Self::constant(width, &BigUint::zero())?;
         for j in 0..b.width() {
             let mut row = vec![Bit::Constant(false); width];
