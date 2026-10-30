@@ -77,7 +77,11 @@ jobs:
             research/ic_single_target_20260930/curve_ids.json
             tools/curve_identity.py
             tools/isolated_bench.py
+            tools/result_switches.py
+            .github/scripts/ci-scope.mjs
             .github/workflows/compact-orbit-n61-isolated.yml
+      - name: Materialize compile-time inputs without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       - uses: Swatinem/rust-cache@v2
       - name: Harness tests and panel guards
         run: |
@@ -126,7 +130,11 @@ jobs:
             research/ic_single_target_20260930/curve_ids.json
             tools/curve_identity.py
             tools/isolated_bench.py
+            tools/result_switches.py
+            .github/scripts/ci-scope.mjs
             .github/workflows/compact-orbit-n61-isolated.yml
+      - name: Materialize compile-time inputs without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --locked --example koblitz_orbit_dlp_fast --example koblitz_rho_batch_ks_v2_n61
       - name: Run the panel through the autolab on a reserved core

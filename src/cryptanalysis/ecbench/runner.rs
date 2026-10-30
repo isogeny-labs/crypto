@@ -738,6 +738,7 @@ fn execute_session(
             let inst = p.instance(ex.workload);
             let input = ChildInput {
                 schema: CHILD_INPUT_SCHEMA.into(),
+                diagnostics: None,
                 curve: w.curve_spec.for_child(inst),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
@@ -806,6 +807,28 @@ fn execute_session(
                 .write_all(line.as_bytes())
                 .map_err(|e| e.to_string())?;
             records.sync_data().map_err(|e| e.to_string())?;
+            // Producer contexts are currently always None. This custody path is
+            // separate from accepted result/cost and cannot promote partial data.
+            if let Some(context) = &input.diagnostics {
+                let ingestion = super::diagnostics::ingest(out, context, line.as_bytes());
+                let attachment = match ingestion {
+                    Ok(manifest) => {
+                        let bytes = serde_json::to_vec(&manifest).map_err(|e| e.to_string())?;
+                        serde_json::json!({"schema":"ecbench.diagnostic_attachment/v1",
+                            "record_sha256":sha256_hex(line.as_bytes()),
+                            "manifest_sha256":sha256_hex(&bytes),"manifest":manifest,
+                            "accepted_result":null,"accepted_cost":null})
+                    }
+                    Err(error) => serde_json::json!({"schema":"ecbench.diagnostic_attachment/v1",
+                        "record_sha256":sha256_hex(line.as_bytes()),"manifest":null,
+                        "error":error,"accepted_result":null,"accepted_cost":null}),
+                };
+                write_json(
+                    &out.join("exec")
+                        .join(format!("{:06}.diagnostics.json", ex.seq)),
+                    &attachment,
+                )?;
+            }
             *session
                 .status_counts
                 .entry(rec.outcome.status.clone())
@@ -902,11 +925,12 @@ fn assemble(
     // execution must not also carry an accepted scalar or final cost. Preserve
     // the parsed late protocol message inside the sealed diagnostic instead.
     // Do not change historical records or weaken the auditor's status check.
-    let report = reaped
-        .output
-        .as_ref()
-        .filter(|_| !reaped.timed_out && !reaped.interrupted)
-        .and_then(|o| o.report.clone());
+    let report = super::diagnostics::accepted_after_stop(
+        reaped.output.as_ref(),
+        reaped.timed_out,
+        reaped.interrupted,
+    )
+    .and_then(|o| o.report.clone());
     let child_error = if let Some(message) = &reaped.spawn_error {
         Some(format!("spawn_error: {message}"))
     } else if reaped.timed_out {
@@ -1191,6 +1215,7 @@ mod watchdog_record_tests {
         let w = &p.workloads[ex.workload];
         let input = ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
+            diagnostics: None,
             curve: w.curve_spec.clone(),
             target_seed: w.target_seed,
             target_index: w.target_index,
@@ -1349,6 +1374,7 @@ mod robustness_tests {
     fn input() -> ChildInput {
         ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
+                diagnostics: None,
             curve: serde_json::from_str(
                 r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
             )
@@ -1548,5 +1574,136 @@ mod robustness_tests {
             &ctx,
         );
         assert_eq!(rec.outcome.status, "crashed");
+    }
+}
+
+#[cfg(test)]
+mod diagnostic_acceptance_tests {
+    use super::*;
+    #[test]
+    fn synthetic_reaped_stop_excludes_child_without_solver() {
+        let mut reaped = Reaped::spawn_failed("synthetic".into());
+        reaped.output = Some(ChildOutput {
+            schema: super::super::record::CHILD_OUTPUT_SCHEMA.into(),
+            workload_id: None,
+            method_id: None,
+            report: None,
+            method_call_wall_ns: Some(17),
+            error: None,
+            placement: Default::default(),
+            schedstat_solve: None,
+            hw_solve: None,
+            solve_obs: None,
+            allocator: None,
+        });
+        reaped.spawn_error = None;
+        for (timeout, interrupted) in [(true, false), (false, true), (true, true)] {
+            reaped.timed_out = timeout;
+            reaped.interrupted = interrupted;
+            assert!(super::super::diagnostics::accepted_after_stop(
+                reaped.output.as_ref(),
+                reaped.timed_out,
+                reaped.interrupted
+            )
+            .is_none());
+        }
+        reaped.timed_out = false;
+        reaped.interrupted = false;
+        assert!(super::super::diagnostics::accepted_after_stop(
+            reaped.output.as_ref(),
+            false,
+            false
+        )
+        .is_some());
+    }
+    #[test]
+    fn assemble_censors_complete_synthetic_late_report() {
+        // Build only a tiny known-answer unit fixture; never invoke any solver.
+        let spec=Spec::from_json(r#"{"schema":"ecbench.spec/v1","label":"diagnostic assembly fixture","workloads":{"curves":[{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}],"targets_per_curve":1,"target_seed":7,"target_kind":"planted"},"arms":[{"name":"fixture","role":"reference","method":{"id":"bsgs.textbook"}}],"measurement":{"rounds":1,"warmup":0,"seed":1,"isolation_required":"L0"}}"#).unwrap();
+        let p = plan(spec).unwrap();
+        let ex = &p.executions[0];
+        let arm = &p.arms[ex.arm];
+        let w = &p.workloads[ex.workload];
+        let late:super::super::methods::SolveReport=serde_json::from_value(serde_json::json!({
+            "recovered":w.planted.unwrap(),"exhausted":false,
+            "phases":[{"name":"synthetic","adds":3,"doubles":1,"scalar_mults":0,"gae":4.0,"wall_ns":9}],
+            "total_gae":4.0,"automorphisms_used":1,"counters":{"synthetic":99},
+            "unpriced":[],"deterministic":true,"nondeterminism":[],"solve_wall_ns":9,
+            "factor_base":null,"detail":{"synthetic":true},"online":null,"online_error":null,"solver":null,"field_ops":null
+        })).unwrap();
+        let output = ChildOutput {
+            schema: super::super::record::CHILD_OUTPUT_SCHEMA.into(),
+            workload_id: Some(w.workload_id.clone()),
+            method_id: Some(arm.method.method_id.clone()),
+            report: Some(late),
+            method_call_wall_ns: Some(17),
+            error: None,
+            placement: Default::default(),
+            schedstat_solve: None,
+            hw_solve: None,
+            solve_obs: None,
+            allocator: None,
+        };
+        let capsule = capture().unwrap();
+        let thresholds = Thresholds::default();
+        let ctx = GradeContext {
+            plan: None,
+            preflight: None,
+            eviction: None,
+            runner_on_run_cpu: false,
+            thresholds: &thresholds,
+            hz: 100.0,
+        };
+        for has_output in [false, true] {
+            for (timed_out, interrupted, status) in
+                [(true, false, "timeout"), (false, true, "interrupted")]
+            {
+                let reaped = Reaped {
+                    output: has_output.then(|| output.clone()),
+                    parse_error: None,
+                    stderr: vec![],
+                    timing: Timing::default(),
+                    exit: Some("exit 0".into()),
+                    timed_out,
+                    interrupted,
+                    spawn_error: None,
+                };
+                let record = assemble(
+                    "diagnostic-fixture",
+                    ex,
+                    1,
+                    arm,
+                    w,
+                    p.instance(ex.workload),
+                    &capsule,
+                    &reaped,
+                    conditions(&[]),
+                    conditions(&[]),
+                    &ctx,
+                );
+                assert_eq!(record.outcome.status, status);
+                assert!(record.outcome.recovered.is_none());
+                assert!(record.outcome.matches_target.is_none());
+                assert!(record.outcome.matches_planted.is_none());
+                assert!(record.cost.total_gae.is_none());
+                assert!(record.cost.s.is_none());
+                assert!(!record.cost.deterministic);
+                assert!(record.phases.is_empty());
+                assert!(record.counters.is_empty());
+                assert!(record.detail.is_null());
+                assert!(record.online.is_none());
+                assert!(record.time.parent_audit_verification_ns.is_none());
+                assert!(record.time.online_clock_diagnostics.is_none());
+            }
+        }
+        assert!(
+            super::super::diagnostics::accepted_after_stop(Some(&output), false, false)
+                .unwrap()
+                .report
+                .as_ref()
+                .unwrap()
+                .recovered
+                .is_some()
+        );
     }
 }
