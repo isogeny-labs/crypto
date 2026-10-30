@@ -3332,9 +3332,17 @@ fn solve_dynamic_bound(
     context: &super::execution::SolverExecutionContext,
 ) -> Result<SolverData, String> {
     use prime_f4_wide_dynamic as d;
-    if !LIVE_SINK.with(|slot| matches!(slot.borrow().as_ref(), Some(EventSink::Bound(_)))) {
-        return Err("dynamic runtime requires attempt-bound capture".into());
+    const MIB: u64 = 1024 * 1024;
+    if !context.launch.trace_bytes.is_multiple_of(MIB) {
+        return Err("dynamic original trace allowance is not whole MiB".into());
     }
+    let capture_limits = super::capture::capture_limits(context.launch.trace_bytes / MIB)?;
+    LIVE_SINK.with(|slot| match slot.borrow().as_ref() {
+        Some(EventSink::Bound(sink)) => {
+            sink.verify_attempt_limits(&context.launch.binding, &capture_limits)
+        }
+        _ => Err("dynamic runtime requires attempt-bound capture".into()),
+    })?;
     if Instant::now() >= context.deadline {
         return Err("dynamic original worker deadline expired".into());
     }
@@ -3616,6 +3624,15 @@ mod tests {
                 .unwrap();
             LIVE_SINK.with(|slot| *slot.borrow_mut() = Some(EventSink::Bound(sink)));
             let guard = LiveSinkGuard;
+            let before = fs::read(cell.join("live/committed.json")).unwrap();
+            let mut wrong_attempt = context.clone();
+            wrong_attempt.launch.binding.attempt_sha256 = "8".repeat(64);
+            assert!(solve_dynamic_bound(&config, &case, &wrong_attempt).is_err());
+            let mut wrong_limits = context.clone();
+            wrong_limits.launch.trace_bytes = 64 << 20;
+            assert!(solve_dynamic_bound(&config, &case, &wrong_limits).is_err());
+            assert_eq!(fs::read(cell.join("live/committed.json")).unwrap(), before);
+            assert!(fs::read(cell.join("live/events.jsonl")).unwrap().is_empty());
             let mut expired = context.clone();
             expired.deadline = Instant::now();
             assert!(solve_dynamic_bound(&config, &case, &expired).is_err());

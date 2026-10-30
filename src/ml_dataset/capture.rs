@@ -1252,6 +1252,24 @@ pub struct CaptureEmitter {
 }
 
 impl CaptureEmitter {
+    /// Read-only runtime admission. The caller must separately authenticate
+    /// execution parameters against the original run; this binds the live sink.
+    pub(super) fn verify_attempt_limits(
+        &self,
+        binding: &AttemptBinding,
+        limits: &CaptureLimits,
+    ) -> Result<(), String> {
+        binding.validate()?;
+        limits.validate()?;
+        if self.failed || self.head.stop.is_some() {
+            return Err("capture sink already refused further work".into());
+        }
+        if self.head.binding_sha256 != binding.digest()? || &self.limits != limits {
+            return Err("capture sink differs from original execution attempt or limits".into());
+        }
+        Ok(())
+    }
+
     pub fn create(
         directory: &Path,
         binding: AttemptBinding,
