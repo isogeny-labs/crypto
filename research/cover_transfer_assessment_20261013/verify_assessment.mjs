@@ -5,6 +5,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
+
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(process.argv[2] ?? path.resolve(here, "../.."));
@@ -14,7 +17,9 @@ const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
 
-const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
+const readJson = (file) => JSON.parse(catalogSnapshotBytes(
+  root, path.relative(root, file).split(path.sep).join("/"), expectedCatalogCommit,
+).toString("utf8"));
 const registry = readJson(registryPath);
 const report = readJson(reportPath);
 const graph = readJson(graphPath);
@@ -369,7 +374,7 @@ check(graph.curves.length === 15791, "unexpected graph curve-node count");
 check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
 check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
 
-const registryBytes = fs.readFileSync(registryPath);
+const registryBytes = catalogSnapshotBytes(root, "docs/curves/registry.json", expectedCatalogCommit);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
 check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
 
@@ -795,7 +800,6 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1055,6 +1059,7 @@ const requiredSourceArtifactPaths = [
   "docs/curves/cover-transfer-assessment.schema.json",
   "docs/curves/fixed-f8-genus3-order-certificate.json",
   "scripts/build_cover_transfer_assessments.mjs",
+  "scripts/catalog_snapshot.mjs",
   "src/bin/curve_cover_check/checker.rs",
   "src/bin/curve_cover_check/models.rs",
   "src/bin/curve_cover_check/links.rs",
@@ -1120,7 +1125,7 @@ for (const relativePath of [
       { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
     );
     check(
-      sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
+      sha256(committedBytes) === sha256(catalogSnapshotBytes(root, relativePath, expectedCatalogCommit)),
       `catalog file ${relativePath} does not match catalog_commit ${assessment.catalog_commit}`,
     );
   } catch (error) {
@@ -1161,11 +1166,17 @@ for (const artifact of sourceArtifacts) {
   check(absolute !== null, "unsafe source-artifact path " + String(artifact.path));
   check(absolute !== null && fs.existsSync(absolute), "missing source artifact " + String(artifact.path));
   if (absolute !== null && fs.existsSync(absolute)) {
-    check(
-      /^[0-9a-f]{64}$/u.test(artifact.sha256) &&
-        sha256(fs.readFileSync(absolute)) === artifact.sha256,
-      "source-artifact digest mismatch for " + artifact.path,
-    );
+    try {
+      const bytes = Object.hasOwn(artifact, "source_commit")
+        ? legacyFormulaSnapshotBytes(root, artifact.path, artifact.source_commit)
+        : catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit);
+      check(
+        /^[0-9a-f]{64}$/u.test(artifact.sha256) && sha256(bytes) === artifact.sha256,
+        "source-artifact digest mismatch for " + artifact.path,
+      );
+    } catch (error) {
+      check(false, `unreadable pinned source artifact ${artifact.path}: ${error.message}`);
+    }
   }
 }
 for (const requiredPath of requiredSourceArtifactPaths) {
