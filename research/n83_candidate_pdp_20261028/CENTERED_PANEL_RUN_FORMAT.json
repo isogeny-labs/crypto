@@ -29,5 +29,15 @@
   },
   "failure_semantics": "Only successfully generated/replayed case rows establish those checks. Partial uploads and absent rows remain incomplete; all failures and original attempts are retained.",
   "target_semantics": "synthetic_centered_control and synthetic_adjacent_control have no asserted rational target lift. The legacy effective target_kind=natural means non-planted source only; target_origin gives the actual origin.",
-  "degree_semantics": "Remainder degree includes unrestricted U. Exact LFD and regularity remain null in arithmetic certificates."
+  "degree_semantics": "Remainder degree includes unrestricted U. Exact LFD and regularity remain null in arithmetic certificates.",
+  "collection": {
+    "command": "python3 collect_centered_panel.py RAW_DIRECTORY protocol-centered-panel.json FRESH_OUTPUT",
+    "statuses": {
+      "missing": "No case directory observed",
+      "partial": "Case directory exists but required payloads or identity checks are incomplete/invalid",
+      "payload_hashes_verified": "Required payload hashes and frozen input identity checked; arithmetic not recomputed"
+    },
+    "native_replay_verified": "Always false in this metadata collector; native verify output is separate evidence",
+    "write_policy": "Fresh output only; raw files untouched"
+  }
 }
