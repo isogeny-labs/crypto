@@ -10,7 +10,7 @@ mkdir -p "$out/inputs" "$out/source"
 started=$(date -u +%FT%TZ)
 upload(){ aws s3 sync "$out" "$dest" --region us-east-2 --only-show-errors; }
 source "$study/lefschetz-journal.sh"
-protocol="$study/protocol-prime-lefschetz-native.json"
+protocol=${5:-"$study/protocol-prime-lefschetz-native.json"}
 [[ $(jq -r '.freeze.status' "$protocol") == frozen ]]
 printf '%s  %s\n' "$(jq -r '.arms[0].instrument.binary_sha256' "$protocol")" "$binary" | sha256sum -c -
 printf '%s  %s\n' "$(jq -r '.extensions.certificate_binary_sha256' "$protocol")" "$certificate" | sha256sum -c -
@@ -24,6 +24,7 @@ while IFS=$'\t' read -r name hash;do
 done < <(jq -r '.extensions.source_files[]|[.path,.sha256]|@tsv' "$protocol")
 cp "$study/evidence/prime-terminal/summary.json" "$out/upper-summary.json"
 while IFS=$'\t' read -r key directory inputhash systemhash;do
+ directory="$study/inputs/$key"
  mkdir "$out/inputs/$key"
  printf '%s  %s\n' "$inputhash" "$directory/input.json" "$systemhash" "$directory/system.sing" | sha256sum -c -
  cp "$directory/input.json" "$directory/system.sing" "$out/inputs/$key/"

@@ -9,8 +9,8 @@ lefschetz_finish() {
   [[ ! -f "$out/$name-status.json" ]] || status=$(cat "$out/$name-status.json")
   phases=$(jq -c --arg name "$name" --argjson status "$status" '. + {($name):$status}' <<< "$phases")
  done
- jq -n --argjson code "$code" --arg start "$started" --arg finish "$(date -u +%FT%TZ)" --argjson phases "$phases" \
-  '{exit_code:$code,started_at:$start,finished_at:$finish,wall_valid:false,phases:$phases}' > "$out/terminal.json"
+ jq -n --argjson code "$code" --arg start "$started" --arg finish "$(date -u +%FT%TZ)" --argjson phases "$phases" --arg backend "${N83_RUN_BACKEND:-development}" \
+  '{exit_code:$code,started_at:$start,finished_at:$finish,backend:$backend,wall_valid:false,phases:$phases}' > "$out/terminal.json"
  (cd "$out" && find . -type f ! -name manifest.sha256 -print0 | sort -z | xargs -0 sha256sum > manifest.sha256)
  upload || exit 91
  exit "$code"
