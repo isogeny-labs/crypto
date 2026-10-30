@@ -1,7 +1,6 @@
 //! Checked projective tuple sums for the CPU oracle boundary.
 //! Full certificate replay remains in the independent shared reduction.
 use super::{mul, reciprocal, sub};
-use crate::paper::inverse;
 use crate::paper::{Curve, Error, Point};
 
 #[derive(Clone, Copy)]
@@ -29,7 +28,10 @@ fn addmod(a: u64, b: u64, p: u64) -> u64 {
     }
 }
 
-pub(super) fn sum(curve: &Curve, points: &[Point]) -> Result<Point, Error> {
+pub(super) fn matches(curve: &Curve, points: &[Point], target: Point) -> Result<bool, Error> {
+    if !curve.contains(target) {
+        return Err(Error::Invalid("point"));
+    }
     let field = Field::new(curve.modulus());
     let mut out = Jacobian::from_affine(None);
     for &point in points {
@@ -38,7 +40,7 @@ pub(super) fn sum(curve: &Curve, points: &[Point]) -> Result<Point, Error> {
         }
         out = out.add_affine(point, curve.coefficients().0, field);
     }
-    Ok(out.affine(field))
+    Ok(out.matches_affine(target, field))
 }
 
 // Jacobian coordinates x=X/Z^2, y=Y/Z^3; Z=0 is the identity.
@@ -54,16 +56,17 @@ impl Jacobian {
     fn from_affine(point: Point) -> Self {
         point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
     }
-    fn affine(self, modulus: Field) -> Point {
-        if self.z == 0 {
-            return None;
+    fn matches_affine(self, point: Point, modulus: Field) -> bool {
+        // x=X/Z^2 and y=Y/Z^3: compare by cross multiplication, without
+        // inversion. Handle infinity separately; Z=0 is never a finite point.
+        match point {
+            None => self.z == 0,
+            Some((x, y)) if self.z != 0 => {
+                let z2 = modulus.mul(self.z, self.z);
+                self.x == modulus.mul(x, z2) && self.y == modulus.mul(y, modulus.mul(z2, self.z))
+            }
+            Some(_) => false,
         }
-        let iz = inverse(self.z, modulus.p);
-        let iz2 = modulus.mul(iz, iz);
-        Some((
-            modulus.mul(self.x, iz2),
-            modulus.mul(self.y, modulus.mul(iz, iz2)),
-        ))
     }
     fn double(self, a: u64, modulus: Field) -> Self {
         if self.z == 0 || self.y == 0 {
@@ -136,7 +139,8 @@ mod tests {
         ] {
             let curve = Curve::with_order_witness(p, a, b, r, g).unwrap();
             let points: Vec<_> = (0..limit).map(|k| curve.mul(g, k).unwrap()).collect();
-            assert_eq!(sum(&curve, &[]).unwrap(), None);
+            assert!(matches(&curve, &[], None).unwrap());
+            assert!(!matches(&curve, &[], g).unwrap());
             for &first in &points {
                 for &second in &points {
                     let neg = first.map(|(x, y)| (x, sub(0, y, p)));
@@ -145,7 +149,14 @@ mod tests {
                         .iter()
                         .try_fold(None, |acc, &point| curve.add(acc, point))
                         .unwrap();
-                    assert_eq!(sum(&curve, &sequence).unwrap(), expected);
+                    assert!(matches(&curve, &sequence, expected).unwrap());
+                    let different = curve.add(expected, g).unwrap();
+                    assert!(!matches(&curve, &sequence, different).unwrap());
+                    let opposite = expected.map(|(x, y)| (x, sub(0, y, p)));
+                    assert_eq!(
+                        matches(&curve, &sequence, opposite).unwrap(),
+                        expected == opposite
+                    );
                 }
             }
         }
@@ -154,7 +165,8 @@ mod tests {
     fn checked_sums_reject_noncanonical_and_off_curve_points() {
         let curve = Curve::new(211, 0, 7, 199).unwrap();
         for bad in [Some((211, 33)), Some((3, 211)), Some((0, 0))] {
-            assert!(sum(&curve, &[None, bad, None]).is_err());
+            assert!(matches(&curve, &[None, bad, None], None).is_err());
+            assert!(matches(&curve, &[], bad).is_err());
         }
     }
 }

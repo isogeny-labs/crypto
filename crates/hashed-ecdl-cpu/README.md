@@ -40,7 +40,8 @@ does not assume an early match or change exhaustive negative answers.
 The first match in a batch wins; all
 arithmetic already performed in that batch is charged. Every returned witness
 is replayed by a checked projective sum: validate every point, accumulate, then
-normalize once. Full certificate verification independently checks all relations
+compare directly with the affine target using cross multiplication, avoiding
+the final inversion. Full certificate verification independently checks all relations
 using the shared affine group operations.
 
 `max_rows` and `max_work` cap the combined *retained tuple count*, checked before

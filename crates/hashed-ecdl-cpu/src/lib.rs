@@ -277,8 +277,7 @@ impl DecompositionOracle for CachedMitm {
                     decode(&bases[p.split..], id, &mut tuple[p.split..]);
                     // Validate all points and independently sum at the oracle boundary.
                     // Full certificate replay still uses the shared verifier.
-                    let sum = checked_sum::sum(curve, &tuple)?;
-                    if sum != target {
+                    if !checked_sum::matches(curve, &tuple, target)? {
                         return Err(Error::Verification);
                     }
                     return Ok(Some(tuple));
