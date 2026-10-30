@@ -1135,6 +1135,52 @@ yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
   "not in the registry", never dropped or silently mapped; registering
   the curve (§11) is the fix.
 
+#### 7d. Dashboard coverage is a pre-merge contract
+
+The leaderboard, scoreboard, progress timeline and lab browser are one
+published research index. **Every PR that changes a curve, frozen IC/rho
+result, factor base, recipe, phase cost, validation status or reference must
+update all affected views in that PR.** A new study that does not qualify for
+the priced tables still needs a clearly labelled diagnostic or a documented
+exclusion. Reviewers check the dashboard diff against the frozen source,
+including losses, superseded figures and unresolved identities, before merge.
+
+- **All named curves remain findable.** The ICV1 slugs in the registry,
+  leaderboard roster and lab browser must agree exactly. The priced subset
+  is counted separately; absence of a measured whole-pipeline cost is shown
+  as unpriced, never inferred from a stage diagnostic. A new curve or result
+  must not silently fall out of search because another generated index is
+  stale.
+- **Every priced row is auditable.** Keep its ICV1 curve, exact regime and
+  target count, measured factor-base size and recipe, FB1 linkage status,
+  frozen source, validation status, phase costs, matched-rho quality, unit,
+  and the previous figure when superseded. Show counted totals as `2^x`
+  operations only when those totals are in the frozen record. Show IC/rho
+  with `1.0×` as parity; do not mix cold one-target and batch references or
+  timing and counted-operation units. A missing exact FB1 identity remains
+  explicitly unreconciled, even when a base size is known.
+- **Progress is append-only evidence.** Every new numeric comparison gets a
+  source-backed point in `docs/ic/progress-timeline.json` with merge date,
+  class, reference quality and anchor. Corrections retain the old point and
+  mark the new one `accounting`. Update the scoreboard's embedded chart and
+  point table from the canonical timeline in the same PR.
+- **Check before merge.** Run `node scripts/check_ic_dashboard_coverage.mjs`
+  and the leaderboard and browser `--check` commands on complete inputs.
+  The coverage check enforces registry/roster/browser equality, source
+  digests, required row fields and timeline metadata; the generators enforce
+  exact outputs. The `ic-leaderboard` workflow runs this on matching PRs,
+  not only after a push to `main`. A missing frozen or artifact-store input
+  is a failed check to repair or report, not a reason to call the page current.
+- **Publish and verify.** After merge, confirm the Pages workflow succeeded
+  and the public `/scoreboard/ic-leaderboard.html` and `/browser/` reflect
+  the merged source. A local preview or open PR does not establish that.
+
+The architecture and coverage limits are recorded in
+[`docs/ic/DASHBOARD_COVERAGE.md`](docs/ic/DASHBOARD_COVERAGE.md). Frozen
+files and replay receipts are the source of truth. The existing `ecbench`
+SQLite database is a rebuildable query index. Do not make a mutable hosted
+database, including RDS, the sole source for a published result.
+
 ### 8. Use the frozen benchmark to establish end-to-end speedups
 
 Every index-calculus performance iteration must use the

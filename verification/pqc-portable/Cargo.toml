@@ -1,0 +1,18 @@
+[package]
+name = "pqc-portable-checks"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+path = "harness.rs"
+
+[dependencies]
+hex = "0.4"
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = "0.8"
+subtle = "2.5"
+zeroize = { version = "1.7", features = ["zeroize_derive"] }

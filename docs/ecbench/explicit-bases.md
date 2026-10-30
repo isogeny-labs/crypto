@@ -1,9 +1,19 @@
 # Explicit x-coordinate factor bases and GPU relation finding
 
-Source implementation, 2026-10-29. Compilation, executable tests, device
-validation and performance measurements are pending. This change stops before
-opening a PR, as requested. The EKS image must eventually be built from the
-merged `crypto` `main` commit.
+Current status, 2026-10-30: the explicit-x plug-in and standalone CUDA service
+have been delivered in PRs. The [v11 panel](../../research/explicit_relations_e2e_20261030/reports/run-20261030T1550Z/report.typ)
+completed all 12 prescribed executions, including both fixed 62-bit targets,
+on one RunPod RTX PRO 6000 with fresh certificate replay. This is a bounded
+result for the recorded inputs and source, not a hardware maximum or a
+certified speedup. [GPU build and usage](../../gpu/explicit-relations/README.md)
+distinguish that validated configuration from the separate 63-bit arithmetic
+and negative-filter extensions, whose GPU validation remains pending.
+
+The ecbench x-list plug-in is CPU-compatible; the GPU pipeline uses the
+standalone service and paper driver. No root crypto/plugin build was performed
+on this disk-constrained workspace. RunPod execution superseded the initial
+source-only handoff below. Any future EKS image must be built from the merged
+`crypto/main` commit and verified separately.
 
 ## Exact x lists in ecbench
 
@@ -84,7 +94,11 @@ validate dimensions in `1..=30` before narrowing to `u32`, rejecting values
 such as `4294967299` that previously wrapped to 3. Its regression tests are
 retained along with the new x-list tests.
 
-## Source-only validation and builder handoff
+## Original source-only validation and builder handoff (2026-10-29)
+
+This dated handoff records the initial local state. Subsequent RunPod evidence
+is linked above and in the timestamped entries below; it does not retroactively
+turn the initial static checks into executable validation.
 
 Static checks: Rust formatting/parser checks, C++ `-fsyntax-only` with warnings
 as errors, diff whitespace checks and scoped curve-name lint. These do not
@@ -727,3 +741,350 @@ Collect and delete active v11 before v13 CUDA validation and execution.
 Static syntax alone missed a valid shell command in the wrong working
 directory. Launch review caught it before deployment. T957 is cancelled and
 cannot reopen; scoped correction is owned by T961.
+
+## 2026-10-30T17:28UTC — separate 63-bit arithmetic preparation
+
+### What was done
+Prepared p<2^63 and full-u64 hash support under T966; retainedr<2^63.
+Overflow-safe hash operations, widened Hasse radicand, modular affine formulas
+and a direct terminal prefix offset remove identified width hazards. Host
+fixtures pass; new native Rust/device boundary tests await GPU execution.
+
+### Decisions made
+HAC14.32/14.33 reviewed before changes; see FIELD63.md. Shared Montgomery
+operations are unchanged; their documented bound widens with explicit argument
+and differential fixtures. V11/v13 source pins and frozen designs are untouched.
+No new frontier protocol is frozen until the current cache panel is collected.
+
+### Open threads
+V11 final62-bit target remains running; collect/delete, then execute pinnedv13.
+Only afterward validate this width extension and freeze any larger probe.
+
+### Errors
+A guarded source-edit script stopped on a changed text match after earlier
+replacements; inspected the partial edit and corrected the interval comparison.
+A candidate hash-fixture integer was composite; the host fixture selected and
+checked6917529027641081737 before it was recorded in the pending Rust test.
+No GPU result is claimed for this extension.
+
+## 2026-10-30T17:38UTC — current-main arithmetic reconciliation
+
+### What was done
+Merged main3c13bc691a87 into the pushed width-extension branch. Resolved three
+shared Rust conflicts by retaining main's cached field context, small inverse
+table, incremental inverse-hash enumeration and locally reused primality facts.
+Composed the new full-width bounds and overflow-safe addmod with those paths;
+updated the two private arithmetic fixtures for the added Curve fields.
+
+### Decisions made
+Preserve both source histories; no rebase or discarded optimization. V11/v13
+remain pinned. Full Rust/GPU tests are pending on the next appropriate worker.
+
+### Open threads
+Await v11 final62 result, then collect/delete and execute pinnedv13. PR2985
+requires checks on the reconciled head and subsequent GPU validation.
+
+### Errors
+Main advanced in the same arithmetic functions and changed Curve internals;
+the automatic merge correctly stopped. Conflict resolution was scoped to
+T967 after a clear ownership check; syntax/format checks follow.
+
+The initial whole-merge whitespace check also scanned historical SVG/raw
+artifacts imported from main and reported existing trailing spaces. Those
+immutable artifacts are preserved; the corrected check is scoped to this
+change's source and handoff files.
+
+## 2026-10-30T17:54UTC — v11 complete through62bits
+
+### What was done
+Collected12of12verifiedrecoveries, including both61and62-bit targets.
+Archive hash matched; controller/worker0 and podjees49ew9dkfd7deletion verified.
+Uploaded public receipts, retained credential onlyforauthorizednextv13, then
+removedv11privatefiles. Packaged raw hashes, certificate audit and export.
+
+### Decisions made
+Native exactplan audit plus8mutationcontrols passes. Schema/flow/filehashes
+pass. Preserve5canonicalrectangularcoveragefindingsinCHECKER-NOTE.md.
+ClocksremainL0; 62islargestcompleteprescribedrung, nothardwaremaximum.
+Push raw before report. Nextv13pins e9e87ffb8380; widthPR2985is separate.
+
+### Open threads
+Render/inspectv11report and catalog copies, verifycommittedmetrics, runv13
+GPUcorrectness/sanitizers and boundedpanel, then evaluate63-bitfollow-up.
+Fresh RunPod catalog2.49/hour; noold/newtaskpodpresent in readinesslist.
+
+### Errors
+No v11 execution failed. Canonicalchecker assumes rectangulararms×sizes and
+retains5findingsagainstthefrozenstagedplan; no full canonicalpassclaimed.
+
+## 2026-10-30T17:59UTC — v11 report and v13 launch
+
+### What was done
+Rendered the separate two-page v11 report after raw commit 099dff2edd81 and
+visually inspected both pages. Added versioned PDF/SVG/PNG catalog copies and
+hashes. Preserved artifact-bot migration of the raw validation log.
+Launched frozen v13 on pod 7tugqyoxyvnikm at 17:57:20 UTC; controller 25269
+owns collection and deletion. One RTX PRO 6000, EUR-IS-2, USD 2.49/hour.
+
+### Decisions made
+V13 remains pinned to e9e87ffb8380, separate from the newer 63-bit source.
+Its correctness and sanitizer preflight must finish before measurements.
+Reports preserve L0 timing limits and five canonical coverage findings.
+
+### Open threads
+Collect, audit, publish and delete v13; then validate the separate width
+extension and freeze any larger probe. Recheck PR2985 at its final head.
+
+### Errors
+Poppler reported a tagged-PDF metadata warning; both pages rendered and were
+visually inspected successfully. No v13 result is claimed during preflight.
+
+## 2026-10-30T19:06UTC — separate 63-bit probe prepared
+
+### What was done
+Reconciled v13 pod7tugqyoxyvnikm and its existing controller process; no duplicate
+launch. Eight52-bit controls and both61-bit targets have completed;62-bit data
+is still running on pinnede9e87ffb8380. PR2985 merged at5c0dd7ee432f. Its head
+later showed four failed CI checks; merged status is not a green-CI claim.
+Upstream2c8f16e2eca1 carries the owner's binary_semaev_chain_sat delimiter fix.
+Prepared separate native launcher/ladder/analyzer and protocol-v14 for52/63bits.
+
+### Decisions made
+Read FIELD63.md, existing validation/fixture code, and HAC14.32/14.33/14.36
+https://cacr.uwaterloo.ca/hac/about/chap14.pdf before the new plan. Use the fixed
+63-bit modulus rule precprime(2^63-2^34) to leave full-u64 hash and order room.
+Preserve all four52-bit controls, then two63-bit full-cache/fallback targets;
+7200s per63-bit solve,18000s worker,18300s controller. Same25%free-memory
+reserve and row/work caps. Launch only after v13 archive/deletion. Complete
+Rust/host/CUDA arithmetic and all query sanitizers before new data. No root
+crypto build locally, no cross-version speed claim, no global maximum claim.
+
+### Open threads
+V13 archive/certificates/cache-admission details, raw publication and report.
+V14 GPU/Rust validation and actual recovery are unexecuted; protocol preparation
+is not evidence of63-bit success. Preserve scalar-corruption rejection and
+complete-rung stopping. Update exact-current-head CI on the follow-up PR.
+
+### Errors
+Initial protocol validation caught the required draft freeze block omitted by
+metadata copying; restored before freeze/data. A stray nonexistent helper path
+returned127 after successful native-instrument compilation; no run occurred.
+
+## 2026-10-30T19:12UTC — optional negative GPU prefilter
+
+### What was done
+Added opt-in blocked Bloom prefilter before exact relation lookup. Every left
+point key is inserted using atomic OR after sort completion; only definite
+misses bypass the existing exact comparison. Added bounded word sizing,
+phase-aware storage accounting, TABLE filter_bytes, host fixtures and CUDA
+fixtures including a deliberately saturated filter. Existing deterministic
+witness, infinity, empty-plan, late-hit and reprepare tests remain enabled.
+
+### Decisions made
+Read the primary GPU Bloom paper, NVIDIA cuCollections interface/policies and
+Vigna SplitMix source before implementation; links and argument are in
+NEGATIVE-FILTER.md. Keep frozenv13/v14 source pins unchanged. This candidate
+requires a separately frozen panel and GPU checks; no measured gain claimed.
+Filter storage is charged before right-cache admission; any fallback must be
+reported. Preserve exact certificate replay and corrupt-scalar rejection.
+
+### Open threads
+CUDA build and sanitizer validation, full-pipeline matched controls, and any
+larger probe. V13 first62-bit target still runs; v14 prepared but not launched.
+No automatic default change or claim of fastest external implementation.
+
+### Errors
+None in the standalone filter fixture or host syntax check. GPU checks have
+not run; pending validation is not a pass.
+
+## 2026-10-30T19:30UTC — first-rung stopping audit
+
+### What was done
+Fixed the post-run checker's regression controls to accept a complete first
+rung containing a recorded limit. Previously its own truncation test assumed
+that first rung was successful, causing the audit to panic on a valid stop.
+Added a check rejecting any later execution after that stopping boundary and
+made the verification-label corruption invalid for successful and failed rows.
+
+### Decisions made
+This is an audit correction; no frozen protocol, measurement, solver or active
+GPU source changes. Native checker compiles with warnings denied and passes
+retained v11 and v9 records plus an explicitly synthetic, temporary first-rung
+limit fixture. Do not publish the synthetic fixture as experiment data.
+
+### Open threads
+V13 has11verified rows; final62-bit target runs on pod7tugqyoxyvnikm. V15 pins
+23dc8a61ca92 and remains unexecuted. PR2991 merged after13success/5skip checks.
+After collection, publish raw evidence before the fresh report and inspect all
+pages. The updated audit includes one positive stop and nine negative controls
+when the first rung succeeds; a valid first-rung stop is itself accepted.
+
+### Errors
+The old regression-control assumption was the error; exact plan validation
+already recognized first-rung stops. No recorded data was changed.
+
+## 2026-10-30T19:45UTC — current usage documentation
+
+### What was done
+Replaced the stale opening statement that PR creation and all device validation
+were pending with the published v11 result and exact source boundary. Dated the
+original source-only handoff, updated the implemented field/hash domain and
+2^32 service cap, and added the dense-CUB service build target used by v11.
+
+### Decisions made
+Keep current source support separate from measured scale: both62-bit targets
+are verified, while63-bit and negative-filter GPU validation are pending.
+Link the reports, implementation arguments and frozen v15 plan. Preserve the
+GPU service versus CPU ecbench plug-in distinction and the root-build constraint.
+These are documentation corrections, not new performance evidence.
+
+### Open threads
+V13 final62-bit target remains active. Collect and publish its raw/report,
+then execute the separately frozen v15 probe after verified GPU deletion.
+Refresh this overview again with the actual new validation outcomes.
+
+### Errors
+The original introductory source-only status and row-cap/domain descriptions
+had become stale as later PRs landed. Historical entries remain preserved.
+
+## 2026-10-30 20:12 UTC — v13 complete, v15 launched
+
+### What was done
+Collected v13 with all 12 prescribed recoveries, including both 62-bit targets.
+Raw results and source/instrument hashes are in `results-v13`; every certificate
+passed fresh CPU replay and scalar+1 rejection. Archive SHA256 is
+`f00ea3e1ef9d32ebbf2063cb43b99939a42a19f31085c0f1ccb1d32d8e083338`.
+Pod `7tugqyoxyvnikm` was deleted, with a fresh complete provider list confirming
+absence. Schema/file hashes/native strict coverage pass; five canonical
+nonrectangular-coverage findings are retained in CHECKER-NOTE.md.
+
+### Decisions made
+Preserve diagnostic L0 timing scope and every raw row. Both 62-bit cells actually
+cached all right rows; admission estimates are not peak VRAM. V15 launched only
+after v13 collection/deletion, pinned to `23dc8a61ca928e47237f8fb5a3a8d87228649628`
+and frozen protocol `8e079c9e143ddfcb00dcf66a5d5002d22e9ce7722291e14b4f28292c8eee65ad`.
+
+### Open threads
+Publish v13 inspected report after raw commit/push. V15 pod `ndiwvrvehbf4hy`
+started 20:10:04 UTC on one RTX PRO6000 at 2.49/hour; full preflight precedes
+matched 52-bit filter controls and two 63-bit targets. No v15 result yet.
+The full paper GPU tensor backend and matched-rho/external comparisons remain open.
+
+### Errors
+No v13 process failure. Canonical checker assumes rectangular arms by sizes,
+so its five findings remain explicit; no full checker-pass claim is made.
+
+## 2026-10-30 20:14 UTC — v13 report and v15 infrastructure failure
+
+### What was done
+Published v13 raw commit `84d5159e3635` before rendering the two-page report at
+`research/explicit_relations_e2e_20261030/reports/run-20261030T1757Z`.
+Both PDF pages were visually inspected; versioned catalog copies retain hashes.
+V15 stopped with bootstrap exit128 before compilation: partial-clone lazy
+checkout could not fetch Git blob `52a224ca9141900ae3779a85a56f3e810251d6d3`
+(`.artifacts.json`) because the public GitHub fetch requested authentication.
+
+### Decisions made
+Preserve the failed archive and delete the pod; do not label this a recovery
+panel or alter v15's one-attempt contract. Prepare a new frozen infrastructure
+attempt using the same measured source and unchanged instruments, with an
+offline-rehearsed source object pack instead of runtime GitHub lazy fetches.
+
+### Open threads
+Publish v15 failure custody and v16 freeze before another GPU launch. The
+63-bit arithmetic/filter remain unvalidated on GPU; no new recovery data exists.
+
+### Errors
+V15 pod `ndiwvrvehbf4hy` deleted with verified absence; controller1, bootstrap128.
+Failure archive SHA256 `ce7b1a34a7059c30331e4a9f9e3b34473c101be74d51c603cd2fd7db0ebe6554`.
+Typst CLI was absent; the existing Python Typst binding rendered the report.
+Poppler emitted a tagged-metadata warning but rendered both pages successfully.
+
+## 2026-10-30 20:18 UTC — source delivery repaired
+
+### What was done
+V15's zero-trial failure is preserved in `failed-launch-v15`, with its inspected
+one-page report at `reports/run-20261030T2010Z`. V16 is frozen at hash
+`fe424abdd265c0ded0c191edf1c36810d86a87163502a1497c2da43ffece378f`.
+Its source archive retains exact original commit `23dc8a61ca928e47237f8fb5a3a8d87228649628`;
+all 1030 materialized files match original Git blob IDs. S3 readback is byte-identical.
+
+### Decisions made
+Use the verified sparse checkout archive and unchanged run-filter instruments.
+Keep v15's one-attempt contract closed. The owner clarified reporting style:
+lead with completed component work; state concrete dependencies once where
+needed, while retaining exact checks, measured costs and failures.
+
+### Open threads
+Launch v16 after checkpoint, run all preflight checks, then six matched 52-bit
+controls and two 63-bit targets. Update this handoff with actual outcomes.
+
+### Errors
+An administrative catalog-copy script initially used the wrong JSON key;
+corrected to `files`, completed all v13 copies, and verified every catalog hash.
+The first v16 freeze call omitted the required draft freeze object; it was
+rejected before data, then corrected and successfully frozen.
+
+## 2026-10-30 20:21 UTC — cache documentation reconciled
+
+### What was done
+Updated PERSISTENT-QUERY.md and FULL-RIGHT-CACHE.md from pending-validation
+status to the completed v13 checks, exact cache rows and report links.
+V16 source extraction passed and CUDA compilation is underway on pod
+`omb2jpo4ntoq5g`; controller PID1044437 owns collection and deletion.
+
+### Decisions made
+Keep the frozen source and active run unchanged; these edits document completed
+component validation. Timings and memory admission estimates retain their labels.
+
+### Open threads
+V16 device preflight and recovery outcomes; current-head PR2996 checks.
+
+### Errors
+Artifact bot moved the large v13 validation log to its hash-addressed store;
+its commit was fast-forwarded into this branch without changing measured data.
+
+## 2026-10-30 20:27 UTC — twelve-slot implementation prepared
+
+### What was done
+Extended the native reduction/oracle/certificate bounds and GPU service plan
+arrays to12slots, keeping ordinary defaults and row/work/column caps unchanged.
+Added9/10/12slot device boundaries,13slot rejection, CPU service all-target
+checks and public known-answer Rust certificate/wire fixtures. Host C++ syntax
+and expanded all-target service checks pass; Rust/CUDA checks await the next
+separately pinned build. V16 remains on its original source and has begun its
+52-bit recovery controls after passing preflight.
+
+### Decisions made
+Read the supplied paper Section3.2 Lemmas9–10 and Section3.4 Figure2 before
+choosing this extension. More slots can reduce total base columns but change
+coverage and tuple work. ARITY.md records the concrete condition
+L >= max(r^(1/m),10m); automatic thresholds preserve it. Smaller explicit
+thresholds require empirical coverage accounting in a separate frozen panel.
+
+### Open threads
+Measure m10/m12 configurations only after correctness validation and a frozen
+comparison. Continue existing v16 filter/63-bit panel without modification.
+
+### Errors
+No host check failure. New Rust and device tests are not yet executed.
+
+## 2026-10-30 20:31 UTC — arity panel frozen
+
+### What was done
+Prepared/froze v17 at `d0c604c4d92ac0350f935547fe62247083698924c9c9e80eb68ceddbd39cc967`.
+The native instruments compile with warnings denied; shell and schema checks
+pass. ARITY-PANEL.md specifies all12cells, controls, bounds and threshold scope.
+
+### Decisions made
+Use one identical filtered service binary across m8/m10/m12 configurations.
+Compare recovered scalars across arities and certificate bytes only within the
+same arity. Upper-rung m10/m12 solves cap3600s each, preserving all four prescribed
+cells within the18000s worker envelope. Launch only after current v16 closes.
+
+### Open threads
+V16 first63-bit target is running. V17 has no pod/data; source/package preparation
+and fresh preflight remain. New twelve-slot tests still need Rust/device execution.
+
+### Errors
+No new failure. The current shared-host GPU is active; no duplicate task pod.
