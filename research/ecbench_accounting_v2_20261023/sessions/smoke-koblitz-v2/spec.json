@@ -1,0 +1,21 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "smoke (accounting v2): generic methods on icv1-f2m17-tm101-00378d4e",
+  "description": "smoke-koblitz.json under the accounting v2 ids (README section 7): the signed-Frobenius rho with Brent cycle detection as the matched reference, the strong reference sized to r with its work recorded when it gives up, the pair claw with its recover phase inside the budget and one charged final check, and the negation BSGS with its charged check. Correctness and plumbing, not a performance claim.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 1, "n": 17}],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {"name": "rho-frob-v2", "role": "reference", "method": {"id": "rho.signed_frobenius_v2"}},
+    {"name": "rho-strong-v2", "role": "baseline", "method": {"id": "rho.signed_frobenius_strong_v2"}},
+    {"name": "rho-neg-v2", "role": "baseline", "method": {"id": "rho.negation_v2"}},
+    {"name": "bsgs-neg-v2", "role": "candidate", "method": {"id": "bsgs.negation_v2"}},
+    {"name": "claw-v2", "role": "candidate", "method": {"id": "claw.pair_table_v2", "params": {
+      "base_scale": "4.0", "table_scale": "1.0"}}},
+    {"name": "ic-frob", "role": "candidate", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "koblitz-orbit:divisor=0;1", "oracle": "mitm-frobenius:m=2"}}}
+  ],
+  "measurement": {"rounds": 3, "warmup": 1, "order": "alternate", "seed": 1, "isolation_required": "L2", "timeout_seconds": 120}
+}

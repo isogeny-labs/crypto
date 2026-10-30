@@ -1,0 +1,519 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "FD-F4-STEP-DEGREE-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/fd_paper_data_request_20261029/protocols/fd-f4-step-degree",
+  "authors": [
+    "Claude Code session (data request for the fall-degree paper)"
+  ],
+  "links": {
+    "paper": "crypto:papers/ecdlp-index-calculus-treatise/sections/falldegree.tex (Table 6.3)",
+    "instances": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json and FD-BINARY-CLOSURE-EXT instances",
+    "prerequisite": "examples/f4_f2_sysfile_degree.rs (to be written before freeze): reads a .sys file, runs cryptanalysis::pq_f4_f2::groebner_basis_f4, prints the degree of every F4 step, the maximal step degree D_reg, the step at which 1 appears, and the counted units"
+  },
+  "question": "On the same binary S_3 descent systems whose last fall degree d_F is known, what maximal step degree D_reg does an F4 run reach, and does it reproduce Kousidis and Wiemers' published D_reg (4 at n=34-36, 5 at n=37-48) on Semaev's polynomial subspace?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "decided_by": [],
+      "text": "On every instance, D_reg >= d_F (no F4 run can refute below the closure degree). A violation is an instrument or closure fault and stops the study."
+    },
+    {
+      "id": "C2",
+      "class": "comparative",
+      "decided_by": [
+        "C-kw"
+      ],
+      "text": "On polynomial-subspace instances at n=34-48, our D_reg equals Kousidis-Wiemers' Table 1 value at the same n.",
+      "if_supported": "Table 6.3 can state that the published D_reg is reproduced on named instances and that F4 overshoots the closure at n=37-43",
+      "if_not_supported": "the published table and ours differ in a stated way (subspace, selection strategy or field equations); the paper reports both and does not merge them"
+    },
+    {
+      "id": "C3",
+      "class": "heuristic_estimate",
+      "decided_by": [],
+      "text": "The gap D_reg - d_F per (family, n) is reported descriptively."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "F4 overshoots the closure by exactly one degree on polynomial subspaces at n=37-43.",
+      "mechanism": "Our closure refutes at 4 there (P41a, P43a), while Kousidis-Wiemers report D_reg = 5; F4's normal selection strategy builds degree-5 pairs before the degree-4 span closes.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "D_reg_minus_dF",
+          "direction": "equal_within",
+          "minimum_effect": "D_reg - d_F = 1 on every P instance at n=37-43",
+          "provenance": {
+            "written_at": "2026-10-29",
+            "data_seen": [
+              {
+                "path": "user-supplied photo of Kousidis-Wiemers 2019 p. 236",
+                "measured": "D_reg per n for m=2"
+              },
+              {
+                "path": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/summary.md",
+                "measured": "d_F = 4 on P at n=35, 41, 43"
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": null
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "f4",
+      "role": "candidate",
+      "description": "Boolean-ring F4 (crypto cryptanalysis::pq_f4_f2, normal selection strategy) on each .sys instance with the field equations; records every step degree.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "f4_f2_sysfile_degree"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "selection": "normal"
+      }
+    },
+    {
+      "id": "kw-published",
+      "role": "reference",
+      "description": "Kousidis and Wiemers 2019, Table 1, m=2 rows (published values, not rerun; transcription checked against the PDF before freeze).",
+      "instrument": {
+        "repo": "other",
+        "commit": null,
+        "build": [
+          [
+            "none"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "source": "J. Math. Cryptol. 2019, p. 236"
+      }
+    },
+    {
+      "id": "f4-aa",
+      "role": "control_aa",
+      "description": "f4 rerun on every instance with a different input variable order (reverse): D_reg must be unchanged, or the dependence on order is reported.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "f4_f2_sysfile_degree"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "variable_order": "reversed"
+      },
+      "same_instrument_as": "f4"
+    },
+    {
+      "id": "pos-small",
+      "role": "control_positive",
+      "description": "Instances with d_F = 3 (P17, R11, R13): F4 must refute with D_reg >= 3 and return 1.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--example",
+            "f4_f2_sysfile_degree"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {},
+      "same_instrument_as": "f4"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "pos-small",
+      "expected_detection": "1 in the basis on every d_F=3 instance",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "D_reg is a property of each system, not a test against a null population; satisfiable controls belong to FD-BINARY-CLOSURE-EXT"
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "n",
+        "levels": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
+        ]
+      },
+      {
+        "name": "subspace_family",
+        "levels": [
+          "P",
+          "R"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "existing instances.json systems plus new P instances at every n=34-48 drawn by gen2.py from protocol-hash seeds"
+      },
+      {
+        "name": "selection_strategy",
+        "treatment": "fixed",
+        "value": "normal",
+        "how": "the engine's default; recorded in every row"
+      },
+      {
+        "name": "variable_order",
+        "treatment": "crossed",
+        "how": "default and reversed on every instance (A/A arm)"
+      },
+      {
+        "name": "engine",
+        "treatment": "crossed",
+        "how": "our F4 against the published Kousidis-Wiemers values (Magma, their hardware)"
+      },
+      {
+        "name": "binary",
+        "treatment": "fixed",
+        "how": "one build, sha256 recorded"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "instance type and CPU recorded; wall time descriptive"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-kw",
+        "arms": [
+          "f4",
+          "kw-published"
+        ],
+        "differs_in": [
+          "engine"
+        ],
+        "design": "absolute",
+        "threshold": "D_reg equal at every n where both exist"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "f4",
+          "f4-aa"
+        ],
+        "differs_in": [
+          "variable_order"
+        ],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "exact step degrees; no clock is primary",
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "seeds": [],
+      "nonce": null,
+      "note": "seeds for the new P instances only"
+    },
+    "instance_sampling": {
+      "rule": "all 93 recorded m=2 instances with n>=11, the 12 chain instances, plus 2 new P instances per n=34-48 not already present",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked: exact values",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 135,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "exact per-instance values; C2 is an equality check per n"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 30,
+      "per_sample_seconds": 3600,
+      "threads": 1,
+      "estimated_total_seconds": 600000,
+      "measured_on": "not measured for this driver; Kousidis-Wiemers report 188-103,200 s and 1.2-208 GB per n=34-48 in Magma. A pilot at n=34 and n=40 sets the budget before freeze"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "D_reg",
+        "name": "maximal F4 step degree",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "largest degree of any F4 step until the basis is complete or contains 1",
+        "source": "driver JSON max_step_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "D_reg_minus_dF",
+        "name": "F4 overshoot",
+        "unit": "degree",
+        "kind": "derived",
+        "definition": "D_reg minus the instance's d_F from Table 6.1 or FD-BINARY-CLOSURE-EXT",
+        "formula": "D_reg - dF",
+        "source": "join on instance name",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "f4_word_xors",
+        "name": "counted F4 work",
+        "unit": "64-bit word XORs",
+        "kind": "counted",
+        "definition": "the engine's counted elimination work",
+        "source": "driver JSON counters",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "f4_seconds",
+        "name": "F4 wall time",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "process start to basis",
+        "source": "row clock",
+        "aggregation": "median",
+        "resolution": "0.1 s",
+        "uncertainty": "range"
+      },
+      {
+        "id": "peak_rss",
+        "name": "peak memory",
+        "unit": "GB",
+        "kind": "counted",
+        "definition": "max RSS",
+        "source": "rusage",
+        "aggregation": "max",
+        "resolution": "1 MB",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "step_degrees",
+      "word_xors",
+      "pairs"
+    ],
+    "record": [
+      "cpu_model",
+      "instance_type",
+      "binary_sha256",
+      "peak_rss"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab-eks spot (throughput pool)",
+    "placement": {
+      "instance_type": "memory-optimised, up to 256 GiB for n>=45",
+      "cpus": 2,
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 259200,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 3
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed design over the listed instances; n is run in increasing order and a cell beyond the memory or 72 h limit is censored",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "any C1 violation (D_reg < d_F) stops the study",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a run stopped by memory or time yields D_reg >= (last completed step degree), censored",
+    "an A/A difference is reported, and C2 then uses the default order only"
+  ],
+  "decision_rule": {
+    "text": "C2 is supported at n when our P-instance D_reg equals the published value at n; it is reported per n, with no pooling.",
+    "comparison_ids": [
+      "C-kw"
+    ],
+    "threshold": "exact equality per n",
+    "statistic": "D_reg per n",
+    "interval": "none (exact)",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "D_reg - published D_reg, and D_reg - d_F",
+    "verdict_vocabulary": [
+      "reproduced",
+      "differs",
+      "censored",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "crypto:papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py",
+      "sha256": null
+    },
+    "inputs": [
+      "export.json"
+    ],
+    "outputs": [
+      "Table 6.3 with a measured D_reg column"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "D_reg and d_F against n by family, with the published D_reg"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "changing the selection strategy after seeing a mismatch",
+    "pooling P and R instances in C2",
+    "reading wall time or memory as comparable to Magma's"
+  ],
+  "literature": [
+    {
+      "ref": "Kousidis and Wiemers, J. Math. Cryptol. 2019 (doi:10.1515/jmc-2017-0022), Table 1",
+      "provenance": "retrieved",
+      "claim": "D_ff = 2, D_reg = 4 (n=34-36) and 5 (n=37-48) for m=2, averages of 10 runs",
+      "verified_by": "user-supplied page image, 2026-10-29; full PDF check required before freeze"
+    },
+    {
+      "ref": "Faugere 1999, F4",
+      "provenance": "recalled",
+      "claim": "step degree and normal selection strategy",
+      "verified_by": null
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

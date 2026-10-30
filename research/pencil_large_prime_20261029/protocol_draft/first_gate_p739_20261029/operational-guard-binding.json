@@ -1,0 +1,35 @@
+{
+  "schema": "pencil-operational-guard-binding/v1",
+  "request": {
+    "path": "request.json",
+    "sha256": "f697dc415e193efe39cf538da7adbcee1c60c048967385cabaa6c101c825d981"
+  },
+  "request_validation": {
+    "path": "validated-request.json",
+    "sha256": "886829c702a1ab55e4a2f031cdd55c397a755296fbcc54307055700bba19840a"
+  },
+  "corrected_review": {
+    "path": "absolute-deadline-correction.json",
+    "sha256": "c9eef22cf7e3d383d865b606475ccc20062359d5ce7798c7c25f2be8948de1a7"
+  },
+  "eks_overview": {
+    "path": "prelaunch-eks-overview.json",
+    "sha256": "a6c14b9d94660f88f9ec09b8222fb1bc1da05af3bdb6cfd8b17f50e7bc9ad39e"
+  },
+  "prior_run_check": {
+    "path": "prior-run-object-check.json",
+    "sha256": "b86115c6f29fdead97105fd1cfa650c72bd8ea00c98823aac8dd279b4b0ec5cd"
+  },
+  "outer_authorized_deadline_utc": "2026-10-30T03:32:22Z",
+  "operational_guard_deadline_utc": "2026-10-30T01:44:17Z",
+  "preparation_lower_bound_utc": "2026-10-29T23:59:13Z",
+  "reserve_seconds": 180,
+  "arithmetic": {
+    "two_guard_minus_lower_bound_plus_reserve": 1793331141,
+    "outer_deadline_unix": 1793331142,
+    "passes": true
+  },
+  "definition": "Earlier operational stop reduces usable work window. No deadline reset or extension. Preserve all60 target and1080 execution planned rows, with missing/capped outcomes explicit.",
+  "package_or_iam_change": false,
+  "experiment_launched": false
+}
