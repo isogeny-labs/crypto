@@ -144,6 +144,10 @@ use crate::cryptanalysis::pq_groebner_f2::{
 /// `wide-vars` feature.
 pub const MAX_VARS: usize = MASK_BITS;
 
+#[path = "algebra_trace.rs"]
+pub mod algebra_trace;
+pub use algebra_trace::matrix_f4_f2_traced;
+
 // ── Symbolic F_{2^n} arithmetic ────────────────────────────────────
 
 /// Multiplication table of the polynomial basis `1, z, …, z^{n−1}`:
@@ -3411,8 +3415,32 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
     multiplier_mask: Mask,
     criterion: Option<&F5Criterion>,
     row_cap: usize,
-    mut visit: impl FnMut(&[Mask]),
+    visit: impl FnMut(&[Mask]),
 ) -> Option<(usize, usize)> {
+    visit_macaulay_rows_observed::<COUNT_PRUNED>(
+        polys,
+        n_vars,
+        degree,
+        multiplier_mask,
+        criterion,
+        row_cap,
+        None,
+        visit,
+    )
+    .expect("unobserved candidate generation cannot be cancelled")
+}
+
+#[allow(clippy::too_many_arguments)]
+fn visit_macaulay_rows_observed<const COUNT_PRUNED: bool>(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: Mask,
+    criterion: Option<&F5Criterion>,
+    row_cap: usize,
+    mut observer: Option<&mut algebra_trace::Session<'_>>,
+    mut visit: impl FnMut(&[Mask]),
+) -> Result<Option<(usize, usize)>, algebra_trace::TraceStop> {
     // The caller reads the configured cap once per build, not once per row.
     let mut selected_count = 0usize;
     let mut full_count = 0usize;
@@ -3422,7 +3450,10 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
     // sort and parity scan (the criterion's test is one more); the copy of
     // every row the visitor keeps
     let mut tally = bitop_tally::Pending::default();
-    for (i, p) in polys.iter().enumerate() {
+    for (generator, p) in polys.iter().enumerate() {
+        if let Some(trace) = observer.as_deref_mut() {
+            trace.poll(p.terms.len() as u64)?;
+        }
         tally.word_ops += p.terms.len() as u64;
         let pdeg = p
             .terms
@@ -3442,7 +3473,10 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
             }
         });
         for &mult in multipliers.iter() {
-            let pruned = criterion.is_some_and(|c| c.prunes(i, mult));
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.before_candidate(p.terms.len())?;
+            }
+            let pruned = criterion.is_some_and(|c| c.prunes(generator, mult));
             tally.hash_probes += u64::from(criterion.is_some());
             if pruned && !COUNT_PRUNED {
                 continue;
@@ -3469,6 +3503,9 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
                 i = j;
             }
             all.truncate(kept);
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.candidate(generator, mult, &all)?;
+            }
             if !all.is_empty() {
                 full_count += 1;
                 if !pruned {
@@ -3478,11 +3515,11 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
                 }
             }
             if full_count > row_cap {
-                return None;
+                return Ok(None);
             }
         }
     }
-    Some((selected_count, full_count))
+    Ok(Some((selected_count, full_count)))
 }
 
 /// Column masks of the Macaulay matrix at `degree`, in descending
@@ -3494,7 +3531,18 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
 /// what makes "leading column index ≥ the degree-≤1 boundary" equivalent
 /// to "this row is a linear consequence".
 pub(crate) fn macaulay_columns(rows_monos: &[Vec<Mask>]) -> Option<Vec<Mask>> {
-    let cap = max_f4_cols();
+    macaulay_columns_observed(rows_monos, max_f4_cols(), None)
+        .expect("unobserved column construction cannot be cancelled")
+}
+
+fn macaulay_columns_observed(
+    rows_monos: &[Vec<Mask>],
+    cap: usize,
+    mut observer: Option<&mut algebra_trace::Session<'_>>,
+) -> Result<Option<Vec<Mask>>, algebra_trace::TraceStop> {
+    if let Some(trace) = observer.as_deref_mut() {
+        trace.poll(0)?;
+    }
     // `bitop/v1`: one hash insertion a nonzero (or, for a single row, the
     // sort of its monomials), then the keyed sort of the columns
     let nonzeros: usize = rows_monos.iter().map(Vec::len).sum();
@@ -3514,21 +3562,24 @@ pub(crate) fn macaulay_columns(rows_monos: &[Vec<Mask>]) -> Option<Vec<Mask>> {
         // nonzeros. The mask hasher also handles support in high variables.
         let mut seen: crate::cryptanalysis::fx_hash::MaskMap<()> = Default::default();
         for row in rows_monos {
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.poll(row.len() as u64)?;
+            }
             for &mask in row {
                 if seen.insert(mask, ()).is_none() && seen.len() > cap {
-                    return None;
+                    return Ok(None);
                 }
             }
         }
         seen.into_keys().collect()
     };
     if cols.len() > cap {
-        return None;
+        return Ok(None);
     }
     // `mono_key` orders exactly as `cmp_mono`; the masks are distinct
     bitop_tally::word_ops(cols.len() as u64 + bitop_tally::sort_cost(cols.len()));
     cols.sort_unstable_by_key(|&m| std::cmp::Reverse(mono_key(F2BoolMono::from_mask(m))));
-    Some(cols)
+    Ok(Some(cols))
 }
 
 /// Sparse Macaulay matrix: column masks, plus one ascending list of
@@ -3939,6 +3990,16 @@ fn pack_rows_with_layout(
     layout: &F4ColumnLayout,
     verify_exact_support: bool,
 ) -> Option<Vec<Vec<u64>>> {
+    pack_rows_with_layout_observed(rows_monos, layout, verify_exact_support, None)
+        .expect("unobserved packing cannot be cancelled")
+}
+
+fn pack_rows_with_layout_observed(
+    rows_monos: &[Vec<Mask>],
+    layout: &F4ColumnLayout,
+    verify_exact_support: bool,
+    mut observer: Option<&mut algebra_trace::Session<'_>>,
+) -> Result<Option<Vec<Vec<u64>>>, algebra_trace::TraceStop> {
     let words = layout.columns.len().div_ceil(64);
     let mut seen = verify_exact_support.then(|| vec![false; layout.columns.len()]);
     let mut matrix = Vec::with_capacity(rows_monos.len());
@@ -3950,15 +4011,23 @@ fn pack_rows_with_layout(
     let verify = u64::from(verify_exact_support);
     tally.word_ops += verify * 2 * (layout.columns.len() as u64).div_ceil(8);
     for monos in rows_monos {
+        if let Some(trace) = observer.as_deref_mut() {
+            trace.poll((monos.len() + words) as u64)?;
+        }
         tally.word_ops += words as u64 + (1 + verify) * monos.len() as u64;
         tally.lookup(hashed, monos.len() as u64);
         let mut row = vec![0u64; words];
         for monomial in monos {
-            let column = layout.index.get(monomial)?;
+            let Some(column) = layout.index.get(monomial) else {
+                return Ok(None);
+            };
             row[column / 64] |= 1 << (column % 64);
             if let Some(seen) = &mut seen {
                 seen[column] = true;
             }
+        }
+        if let Some(trace) = observer.as_deref_mut() {
+            trace.matrix_row(matrix.len(), &row)?;
         }
         matrix.push(row);
     }
@@ -3966,9 +4035,9 @@ fn pack_rows_with_layout(
         .as_ref()
         .is_some_and(|seen| seen.iter().any(|present| !present))
     {
-        return None;
+        return Ok(None);
     }
-    Some(matrix)
+    Ok(Some(matrix))
 }
 
 #[derive(Default)]
@@ -4766,51 +4835,97 @@ fn echelon_f2_suffix_counted(
     word_ops: &mut u64,
     reduce_above: bool,
 ) -> usize {
+    echelon_f2_suffix_observed(matrix, n_cols, word_ops, reduce_above, None)
+        .expect("unobserved suffix elimination cannot be cancelled")
+}
+
+fn echelon_f2_suffix_observed(
+    matrix: &mut [Vec<u64>],
+    n_cols: usize,
+    word_ops: &mut u64,
+    reduce_above: bool,
+    mut observer: Option<&mut algebra_trace::Session<'_>>,
+) -> Result<usize, algebra_trace::TraceStop> {
     let words = n_cols.div_ceil(64);
     let mut pivot_row = 0usize;
     // `bitop/v1` word operations besides the XORs: every bit test of the
     // pivot searches and of the rows each pivot is cleared from, and the
     // swap; charged to this thread's tally once
     let mut aux = 0u64;
-    for c in 0..n_cols {
-        let (w, bit) = (c / 64, 1u64 << (c % 64));
-        let piv = (pivot_row..matrix.len()).find(|&r| matrix[r][w] & bit != 0);
-        let piv = match piv {
-            Some(p) => p,
-            None => {
-                aux += (matrix.len() - pivot_row) as u64;
-                continue;
-            }
-        };
-        aux += (piv - pivot_row + 2) as u64
-            + if reduce_above {
-                matrix.len() - 1
-            } else {
-                matrix.len() - pivot_row - 1
-            } as u64;
-        matrix.swap(pivot_row, piv);
-        // Earlier columns of this pivot row are zero: previous pivots
-        // eliminated them, and skipped columns were zero in all remaining
-        // rows. Whole words before w therefore need no XOR. Separating the
-        // pivot borrow also lets LLVM vectorize the contiguous suffix.
-        let (before, rest) = matrix.split_at_mut(pivot_row);
-        let (pivot, after) = rest.split_first_mut().unwrap();
-        let above = if reduce_above { before.len() } else { 0 };
-        for row in before[..above].iter_mut().chain(after.iter_mut()) {
-            if row[w] & bit != 0 {
-                for (dst, &src) in row[w..words].iter_mut().zip(&pivot[w..words]) {
-                    *dst ^= src;
+    let result = (|| {
+        for c in 0..n_cols {
+            let (w, bit) = (c / 64, 1u64 << (c % 64));
+            let mut piv = None;
+            for (r, row) in matrix.iter().enumerate().skip(pivot_row) {
+                if let Some(trace) = observer.as_deref_mut() {
+                    trace.poll(1)?;
                 }
-                *word_ops += (words - w) as u64;
+                if row[w] & bit != 0 {
+                    piv = Some(r);
+                    break;
+                }
+            }
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.pivot(c, pivot_row, piv)?;
+            }
+            let piv = match piv {
+                Some(p) => p,
+                None => {
+                    aux += (matrix.len() - pivot_row) as u64;
+                    continue;
+                }
+            };
+            aux += (piv - pivot_row + 2) as u64
+                + if reduce_above {
+                    matrix.len() - 1
+                } else {
+                    matrix.len() - pivot_row - 1
+                } as u64;
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.poll(1)?;
+            }
+            matrix.swap(pivot_row, piv);
+            if let Some(trace) = observer.as_deref_mut() {
+                trace.swapped(pivot_row, piv)?;
+            }
+            // Earlier columns of this pivot row are zero: previous pivots
+            // eliminated them, and skipped columns were zero in all remaining
+            // rows. Whole words before w therefore need no XOR. Separating the
+            // pivot borrow also lets LLVM vectorize the contiguous suffix.
+            let (before, rest) = matrix.split_at_mut(pivot_row);
+            let (pivot, after) = rest.split_first_mut().unwrap();
+            let above = if reduce_above { before.len() } else { 0 };
+            for (slot, row) in before[..above].iter_mut().enumerate().chain(
+                after
+                    .iter_mut()
+                    .enumerate()
+                    .map(|(i, row)| (pivot_row + 1 + i, row)),
+            ) {
+                if let Some(trace) = observer.as_deref_mut() {
+                    trace.poll(1)?;
+                }
+                if row[w] & bit != 0 {
+                    if let Some(trace) = observer.as_deref_mut() {
+                        trace.poll((words - w) as u64)?;
+                    }
+                    for (dst, &src) in row[w..words].iter_mut().zip(&pivot[w..words]) {
+                        *dst ^= src;
+                    }
+                    *word_ops += (words - w) as u64;
+                    if let Some(trace) = observer.as_deref_mut() {
+                        trace.xored(slot, pivot_row, w, row)?;
+                    }
+                }
+            }
+            pivot_row += 1;
+            if pivot_row == matrix.len() {
+                break;
             }
         }
-        pivot_row += 1;
-        if pivot_row == matrix.len() {
-            break;
-        }
-    }
+        Ok(pivot_row)
+    })();
     bitop_tally::word_ops(aux);
-    pivot_row
+    result
 }
 
 /// Method of Four Russians elimination over `F_2`. A small pivot block is

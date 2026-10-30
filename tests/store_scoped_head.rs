@@ -96,6 +96,7 @@ impl Fixture {
             prefix: prefix.into(),
             endpoint: endpoint.map(str::to_owned),
             aws: self.aws.to_str().unwrap().into(),
+            guard: None,
         }
     }
 

@@ -531,7 +531,7 @@ impl S3BudgetContext {
         expected: &ExpectedObject,
         scope: &BudgetScope,
         source: PutSource,
-    ) -> Result<(), String> {
+    ) -> Result<bool, String> {
         let (client, expiration) = self.client()?;
         let operation = self.operation(HttpMethod::Put, bucket, key, expected, scope);
         let checksum = crate::store::backend::hex_to_b64(&expected.sha256)?;
@@ -561,7 +561,7 @@ impl S3BudgetContext {
             );
             if result.is_ok() {
                 gate.finish(0, None)?;
-                return Ok(());
+                return Ok(true);
             }
             let status = gate.status()?;
             let retry = gate.retryable()?;
@@ -569,7 +569,7 @@ impl S3BudgetContext {
             // A 412 never establishes equality. The caller must perform a new
             // full GET against the registered digest before returning success.
             if status == Some(412) {
-                return Ok(());
+                return Ok(false);
             }
             if !retry || attempt + 1 == ATTEMPTS {
                 return Err(gate.failure("conditional PUT")?);
@@ -726,8 +726,26 @@ impl Backend for BudgetedS3Backend {
     fn head(&self, key: &str) -> Result<Option<Meta>, String> {
         let key = self.key(key)?;
         let expected = self.context.expected(&self.bucket, &key)?;
-        self.context
-            .head_object(&self.bucket, &key, &expected, &self.scope)
+        let Some(mut meta) =
+            self.context
+                .head_object(&self.bucket, &key, &expected, &self.scope)?
+        else {
+            return Ok(None);
+        };
+        if meta.sha256.is_none() {
+            // Store requires positive content identity before skipping a PUT.
+            // A missing HEAD checksum is unknown: prove it with a fresh,
+            // independently charged full GET, never with the expected value alone.
+            self.context.get_body(
+                &self.bucket,
+                &key,
+                &expected,
+                &self.scope,
+                &mut std::io::sink(),
+            )?;
+            meta.sha256 = Some(expected.sha256);
+        }
+        Ok(Some(meta))
     }
     fn put(&self, key: &str, src: &Path, digest: &str) -> Result<bool, String> {
         let key = self.key(key)?;
@@ -742,7 +760,7 @@ impl Backend for BudgetedS3Backend {
             self.context
                 .session
                 .reserve_object(&self.bucket, &key, digest, bytes, &self.scope)?;
-        self.context.put_body(
+        let created = self.context.put_body(
             &self.bucket,
             &key,
             &expected,
@@ -759,10 +777,7 @@ impl Backend for BudgetedS3Backend {
         self.context
             .session
             .verify_object(&reservation, &ticket, digest, bytes)?;
-        // The budgeted transport writes unconditionally and verifies the bytes
-        // it read back; it does not distinguish a writer that won a race, so it
-        // reports that this call performed the store.
-        Ok(true)
+        Ok(created)
     }
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
         let key = self.key(key)?;
@@ -1308,6 +1323,55 @@ mod tests {
     }
 
     #[test]
+    fn native_store_head_proves_missing_checksums_and_refuses_unpriced_or_corrupt_reads() {
+        for (download_budget, body, should_pass, expected_calls) in [
+            (6, b"abc".as_slice(), true, 4),
+            (6, b"abd".as_slice(), false, 4),
+            (0, b"abc".as_slice(), false, 3),
+        ] {
+            let fixture = fixture(2, download_budget);
+            activate(&fixture);
+            let object = expected(b"abc");
+            fixture
+                .context
+                .expect_object(
+                    "setec-astronomy-artifacts",
+                    "budget-wire/object",
+                    &object.sha256,
+                    object.bytes,
+                    BudgetScope::Work,
+                )
+                .unwrap();
+            fixture.wire.replies.lock().unwrap().push_back(Reply::Http {
+                method: "HEAD",
+                status: 200,
+                body: Vec::new(),
+                length: 3,
+            });
+            fixture.wire.push("GET", 200, body);
+            let backend = BudgetedS3Backend {
+                context: fixture.context.clone(),
+                bucket: "setec-astronomy-artifacts".into(),
+                prefix: "budget-wire".into(),
+                scope: BudgetScope::Work,
+            };
+            let result = backend.head("object");
+            if should_pass {
+                let meta = result.unwrap().unwrap();
+                assert_eq!(meta.sha256, Some(object.sha256));
+                assert_eq!(meta.bytes, 3);
+            } else {
+                assert!(
+                    result.is_err(),
+                    "unknown or corrupt content cannot prove presence"
+                );
+            }
+            // FakeWire also checks durable debit before every actual SDK request.
+            assert_eq!(fixture.wire.calls(), expected_calls);
+        }
+    }
+
+    #[test]
     fn native_sdk_retry_is_debited_and_exhaustion_never_reaches_wire() {
         let fixture = fixture(2, 6);
         activate(&fixture);
@@ -1444,7 +1508,7 @@ mod tests {
             .push_back(Reply::Ambiguous { method: "PUT" });
         fixture.wire.push("PUT", 412, b"");
         fixture.wire.push("GET", 200, b"abc");
-        fixture
+        let created = fixture
             .context
             .put_body(
                 "setec-astronomy-artifacts",
@@ -1454,6 +1518,10 @@ mod tests {
                 PutSource::Bytes(b"abc".to_vec()),
             )
             .unwrap();
+        assert!(
+            !created,
+            "a conditional collision never reports a newly created object"
+        );
         let ticket = fixture
             .context
             .get_body(

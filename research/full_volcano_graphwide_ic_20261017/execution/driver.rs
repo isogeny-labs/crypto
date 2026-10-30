@@ -251,7 +251,6 @@ fn replay_exhausted(session: &Path, out: &Path) -> Result<bool> {
             continue;
         }
         let input = ChildInput {
-            diagnostics: None,
             schema: CHILD_INPUT_SCHEMA.into(),
             curve: r.workload.curve_spec.clone(),
             target_seed: r.workload.target_seed,
@@ -264,6 +263,7 @@ fn replay_exhausted(session: &Path, out: &Path) -> Result<bool> {
             },
             expected_method_id: r.method.method_id.clone(),
             algorithm_seed: r.algorithm_seed.parse()?,
+            diagnostics: None,
         };
         let output = record::child_main(&serde_json::to_string(&input)?);
         let mut diffs = Vec::new();

@@ -50,6 +50,15 @@ Build the binary from a committed source snapshot with
 The generator refuses missing or dirty provenance. An output directory is
 bound to the exact binary, plan, source, resource limits and shard.
 
+S3 publication, partial snapshots and restore require the current owner-bound
+campaign policy, activated grant and durable SQLite worker journal, with finite
+monetary, request, byte and cell envelopes. The example paths below must name
+those actual records. Snapshot helpers inherit the original owner lease and
+charge the same journal; they never receive a second allocation. Legacy v1
+budget-init/budget-allocate utilities provide offline receipt compatibility only
+and cannot authorize live S3. Worker access and resource-lifetime admission still
+require deployment verification before a cloud launch.
+
 ```sh
 crypto dataset generate --plan pilot-plan.json --protocol protocol.json \
   --out /work/dataset --max-cases 36 --shard-index 0 --shard-count 19 \
@@ -539,3 +548,7 @@ and after every phase matched inventory03. The14 phase/pipeline/binary/CLI
 artifacts have fresh S3 readback records in
 research/ml_dataset_algebraic_targets_20261030/attempt-05-readback.json.
 These are software checks on retained synthetic fixtures; cloudcells remain0.
+
+### Combined export channels after current-main integration
+
+Exports retain the separately projected general, recursive-prefix and algebraic consequence input files from current main. A legacy-plan export names `strict-structural-allowlist-v6`; a plan/v2 export that also projects the explicit policy recipes names `strict-structural-allowlist-v7-policy-recipes`. This disambiguates the two independently introduced v6 schemas. Every channel retains its allowlist and restricted label/provenance separation. Algebraic labels remain independently checked bounded consequences and separately searched witnesses; they do not claim a complete native execution, exact first/last fall degree, or a complete Groebner basis. Original published exports and frozen input/validation artifacts are unchanged.

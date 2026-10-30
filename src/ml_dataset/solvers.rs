@@ -609,6 +609,15 @@ pub(super) fn solve_with_context(
     if !(2..=15).contains(&config.m) {
         return Err("decomposition arity must be 2..15".into());
     }
+    if case.factor_base["schema"] == "ml-ecdlp-factor-base/v2"
+        && case.factor_base["construction_status"] == "unsupported"
+    {
+        return Ok(unsupported(
+            case.factor_base["unsupported_reason"]
+                .as_str()
+                .unwrap_or("The requested factor-base policy is unsupported"),
+        ));
+    }
     let group = Group::read(case)?;
     let target = group.point(&case.public_instance["target"])?;
     if !group.on_curve(&target) {
@@ -3936,6 +3945,7 @@ mod tests {
             key_index: 1,
             seed: 42,
             factor_base_size: 8,
+            factor_base_policy: None,
             degree_bound: 4,
             work_limit: 1000,
             solver: solver.into(),
@@ -4514,6 +4524,18 @@ mod tests {
                     .unwrap();
             }
         }
+    }
+
+    #[test]
+    fn unsupported_factor_base_policy_does_not_become_empty_domain_success() {
+        let cfg = config("prime", "root");
+        let mut case = curves::generate(&cfg).unwrap();
+        case.factor_base = json!({"schema":"ml-ecdlp-factor-base/v2","construction_status":"unsupported",
+            "unsupported_reason":"binary-only policy","points":[]});
+        let result = solve(&cfg, &case).unwrap();
+        assert_eq!(result.outcome["status"], "unsupported");
+        assert_eq!(result.outcome["solver_completed"], false);
+        assert!(result.artifacts.is_empty());
     }
 
     #[test]

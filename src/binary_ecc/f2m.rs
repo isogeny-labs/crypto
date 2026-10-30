@@ -505,6 +505,7 @@ impl F2mElement {
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
+                super::operation_tally::tick(self.m, "square");
                 sq.iter_mut().for_each(|w| *w = 0);
                 for (i, &w) in acc.bits.iter().enumerate() {
                     sq[2 * i] = spread32(w);
@@ -1325,6 +1326,81 @@ mod tests {
         let sum_sq = a.add(&b).square(&irr);
         let sq_sum = a.square(&irr).add(&b.square(&irr));
         assert_eq!(sum_sq, sq_sum);
+    }
+
+    /// Batching changes scratch-buffer reuse, not the number of field squares.
+    #[test]
+    fn square_k_times_tally_matches_repeated_squaring() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::zero(m),
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                for k in [0, 1, 2, 7, m - 1, m, m + 1] {
+                    let tally = OperationTally::begin();
+                    let batched = a.square_k_times(k, &irr);
+                    let batched_counts = tally.finish();
+
+                    let tally = OperationTally::begin();
+                    let mut repeated = a.clone();
+                    for _ in 0..k {
+                        repeated = repeated.square(&irr);
+                    }
+                    let repeated_counts = tally.finish();
+
+                    assert_eq!(batched, repeated, "field degree {m}, k={k}");
+                    assert_eq!(batched_counts, repeated_counts, "degree {m}, k={k}");
+                    if k == 0 {
+                        assert_eq!(batched, a);
+                        assert!(batched_counts.is_empty());
+                    } else {
+                        assert_eq!(batched_counts.len(), 1);
+                        assert_eq!(batched_counts[&format!("f2m{m}_square")], u64::from(k));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Itoh--Tsujii inversion uses m-1 squares, including its batched steps.
+    #[test]
+    fn flt_inverse_tally_includes_all_squarings() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
+        for irr in [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_127(),
+            IrreduciblePoly::deg_163(),
+        ] {
+            let m = irr.degree;
+            for a in [
+                F2mElement::one(m),
+                F2mElement::from_bit_positions(&[0, 3, m - 1], m),
+            ] {
+                let tally = OperationTally::begin();
+                let inverse = a.flt_inverse(&irr).expect("nonzero field element");
+                let counts = tally.finish();
+
+                assert_eq!(counts[&format!("f2m{m}_square")], u64::from(m - 1));
+                assert_eq!(counts[&format!("f2m{m}_inverse_informational")], 1);
+                assert!(counts[&format!("f2m{m}_mul")] > 0);
+                assert_eq!(counts.len(), 3);
+                // Check the field result outside the inversion's counting window.
+                assert_eq!(a.mul(&inverse, &irr), F2mElement::one(m));
+            }
+        }
     }
 
     /// `a · a⁻¹ = 1` for non-zero `a`.

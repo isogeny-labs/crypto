@@ -612,6 +612,7 @@ mod tests {
             key_index: 1,
             seed: 42,
             factor_base_size: 8,
+            factor_base_policy: None,
             degree_bound: 4,
             work_limit: TRACE_EVENT_CAP,
             solver: "root".into(),

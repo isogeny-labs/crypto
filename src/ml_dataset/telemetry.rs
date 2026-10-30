@@ -96,6 +96,7 @@ mod tests {
             key_index: 0,
             seed: 20261027,
             factor_base_size: 4,
+            factor_base_policy: None,
             degree_bound: 3,
             work_limit: 20_000,
             solver: "bsgs".into(),

@@ -26,6 +26,25 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 #[path = "relations_generic.rs"]
 mod generic;
 
+pub(super) const GENERIC_V2_SCHEMA: &str = generic::V2_SCHEMA;
+pub(super) const FILTER_CERTIFICATE_ROLE: &str = generic::FILTER_ROLE;
+
+pub(super) fn verify_generic_v2_labels(
+    public: &Value,
+    base: &Value,
+    config: &CaseConfig,
+    transcript: &Value,
+    outcome: &Value,
+) -> Result<(), String> {
+    generic::verify_v2_labels(public, base, config, transcript, outcome)
+}
+
+pub(super) fn generic_v2_filter_payloads(
+    transcript: &Value,
+) -> Result<Vec<ArtifactPayload>, String> {
+    generic::expected_filter_payloads(transcript)
+}
+
 fn point(p: &BinaryPoint) -> Value {
     match p {
         BinaryPoint::Infinity => Value::Null,
@@ -605,7 +624,9 @@ pub fn solve(config: &CaseConfig, case: &CaseData) -> Result<SolverData, String>
 /// Rebuild the native graph from retained public partials and independently
 /// check every source combination, rank certificate and recovered scalar.
 pub fn verify_transcript(public: &Value, factor_base: &Value, t: &Value) -> Result<(), String> {
-    if t["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
+    if t["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1"
+        || t["schema"] == GENERIC_V2_SCHEMA
+    {
         return generic::verify(public, factor_base, t);
     }
     if t["schema"] != "ml-ecdlp-large-prime-transcript/v1" || t["target"] != public["target"] {
@@ -933,6 +954,7 @@ mod tests {
             key_index: 2,
             seed: 42,
             factor_base_size: 2,
+            factor_base_policy: None,
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),
