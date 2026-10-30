@@ -918,3 +918,17 @@ Freeze and commit the guarded gate protocol before submission; retain all60 targ
 
 ### Errors
 The first controller review did not account fully for pod-start delay during blocking replay. Its corrected record is retained and supersedes that deadline conclusion. A concurrent Git index refresh temporarily blocked a metadata commit; the lock cleared naturally and the commit succeeded without removing a live lock.
+
+## 2026-10-30 — Frozen gate submitted
+
+### What was done
+Frozen protocol body e0e7a38ae6e96aef36b0cbe92ac60c6d4a386f864e63d3072601a21c2b705d23 was committed at e85853ca5 and pushed before interpreting any experiment result. Submitted the identical bound request at00:03:49Z as pencil-p739-20261029, controller build isolab-recovery-controller:ef20ac28-6906-4185-9b06-1ab570af4ee2. Native canonical request hash85a3222af1483e0a020c65f054576b89158843f9f2e3ffea0f87770cbd887e23 differs from raw indented-file hashf697dc415e193efe39cf538da7adbcee1c60c048967385cabaa6c101c825d981; parsed documents compare equal. Receipts are under runs/p739-gate-20261030/.
+
+### Decisions made
+Reconcile this exact run/build before retrying; never submit a renamed duplicate. Controller sourceVersion is the approved Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg. Retain original outerdeadline03:32:22Z and earlier internalguard01:44:17Z. Old Diem remains expired; no other job was stopped. Coordination heartbeat session99874 maintains existing T826/T855 fences until03:40Z; prior keeper46156 was stopped and terminal before replacement.
+
+### Open threads
+Latest remote controller state is provisioning, attempt0, no failure and no benchmark job yet. Submission is not a completed measurement. PR2869 is OPEN with auto-merge enabled; exact e85853ca5 checks were in progress, review passed. Next routine CI poll should follow repository cadence unless new delivery or CI event warrants checking. Continue collecting computation/replay/freshL2 outcomes, then native analysis, independent review and neutral reports.
+
+### Errors
+No submission error occurred. Initial remote status awaited the controller receipt; it later resolved to provisioning without resubmission.
