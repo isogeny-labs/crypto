@@ -139,3 +139,8 @@ merged peer files. Earlier PDF/manifests/transcripts remain historical snapshots
 The subsequent advanced-base [complete root receipt](advanced-root-complete.txt)
 also records5430passes, actual exit0, covering the updated path dependency.
 All26 native publication files remain unchanged and match the merged peer.
+
+Current-native-main [complete root receipt](native-main-root-complete.txt):
+5444passed, actual exit0, for36-file peer-main snapshot55f65930. Strict API-doc
+generation has two upstream broken-link failures, retained in its separate
+diagnostics. Earlier snapshots and all failed/incomplete attempts stay scoped.
