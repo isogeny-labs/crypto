@@ -194,3 +194,24 @@ New tests cover the upper cap, zero, overflow and oversized chunks. The new
 `run-compact-v7.sh` also sends the actual 2^31-cap service header to both
 measured binaries before any ladder data. Inputs, arms, seeds, solver limits,
 ladder and analyzer are unchanged. V6 remains a failed run with zero rows.
+
+## Separate post-run coverage audit
+
+The frozen analyzers verify unique cells and complete observed rungs, but
+could accept a file truncated immediately after a successful earlier rung.
+They remain unchanged. `check-frontier.rs` is a separate post-run audit that
+requires either the entire prescribed plan or an explicit timeout/limit in
+the final recorded rung, with no later execution. It also checks the exact
+per-version cell set, seeds, replicates, flags, numeric fields and outcomes.
+
+The unchanged v3/v4/v5 rows pass. Deliberate duplicate, missing-cell,
+truncated-prefix, seed, replicate, warmup, arm and verification corruptions
+are rejected. The source/input hashes and audit output are retained in
+`frontier-audit-v3-v5.*`. This strengthens validation after collection; it
+neither changes frozen statistics nor resolves the canonical checker's
+rectangular-coverage findings. Run the same audit on v7 after collection:
+
+```sh
+rustc --edition=2021 -D warnings research/explicit_relations_e2e_20261030/check-frontier.rs -o /tmp/check-frontier
+/tmp/check-frontier 7 research/explicit_relations_e2e_20261030/results-v7/rows.csv
+```
