@@ -180,6 +180,33 @@ pub(super) fn live_typed_event<T: serde::Serialize + ?Sized>(
         None => Err("typed solver events require an active capture sink".into()),
     })
 }
+/// Dedicated witness preparation/publication never downgrades to Legacy.
+/// The caller supplies and reconciles remaining original checking/byte budgets;
+/// `global_acknowledged` is the SAME adapter-wide4096 counter, not a new pool.
+#[allow(dead_code)]
+pub(super) fn prepare_bound_witness(
+    budget: &mut super::capture::WitnessBudget,
+) -> Result<super::capture::WitnessCaptureWorkspace, super::capture::WitnessError> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => sink.prepare_witness(budget),
+        _ => Err(super::capture::WitnessError::Unbound),
+    })
+}
+#[allow(dead_code)]
+pub(super) fn publish_bound_witness(
+    bytes: &[u8],
+    workspace: &mut super::capture::WitnessCaptureWorkspace,
+    budget: &mut super::capture::WitnessBudget,
+    global_acknowledged: &mut usize,
+) -> Result<super::capture::WitnessReceipt, super::capture::WitnessError> {
+    LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(EventSink::Bound(sink)) => {
+            sink.publish_first_witness(bytes, workspace, budget, global_acknowledged)
+        }
+        _ => Err(super::capture::WitnessError::Unbound),
+    })
+}
+
 pub(super) fn live_payload(payload: &ArtifactPayload) -> Result<(), String> {
     LIVE_SINK.with(|slot| match slot.borrow_mut().as_mut() {
         Some(s) => s.payload(payload),
@@ -4445,5 +4472,43 @@ mod tests {
         }
         assert!(solve_with_event_sink(&cfg, &case, &dir).is_err());
         fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod bounded_witness_bridge_tests {
+    use super::*;
+    #[test]
+    fn witness_bridge_requires_bound_sink_before_allocation() {
+        LIVE_SINK.with(|slot| assert!(slot.borrow().is_none()));
+        let mut budget = super::super::capture::WitnessBudget::new(
+            16_777_216,
+            1024 * 1024,
+            std::time::Instant::now() + std::time::Duration::from_secs(30),
+        );
+        assert!(matches!(
+            prepare_bound_witness(&mut budget),
+            Err(super::super::capture::WitnessError::Unbound)
+        ));
+        assert_eq!(budget.reserved_bytes, 0);
+        #[cfg(unix)]
+        {
+            LIVE_SINK.with(|slot| {
+                *slot.borrow_mut() = Some(EventSink::Legacy(LiveSink {
+                    directory: PathBuf::new(),
+                    events: File::open("/dev/null").unwrap(),
+                    sequence: 0,
+                }))
+            });
+            let result = prepare_bound_witness(&mut budget);
+            LIVE_SINK.with(|slot| {
+                slot.borrow_mut().take();
+            });
+            assert!(matches!(
+                result,
+                Err(super::super::capture::WitnessError::Unbound)
+            ));
+            assert_eq!(budget.reserved_bytes, 0);
+        }
     }
 }

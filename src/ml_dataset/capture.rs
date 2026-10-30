@@ -429,12 +429,756 @@ struct TypedEventRecord<'a, T: Serialize + ?Sized> {
     event: TypedSolverEvent<'a, T>,
 }
 
+// Dedicated bounded first-witness publication; not a dispatched solver profile.
+const WITNESS_PATH: &str = "payloads/pdp-witness.json";
+const WITNESS_ROLE: &str = "independently-verified-pdp";
+const WITNESS_DYNAMIC_BYTES: u64 = 27_648;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum WitnessError {
+    Unbound,
+    Failed,
+    Deadline,
+    Work,
+    Storage,
+    Allocation,
+    Identity,
+    Integrity,
+    EventLimit,
+    Encoding,
+    Io(std::io::ErrorKind),
+    IndeterminateIo(std::io::ErrorKind),
+}
+impl From<std::io::Error> for WitnessError {
+    fn from(e: std::io::Error) -> Self {
+        Self::Io(e.kind())
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum WitnessCommit {
+    NewCommit,
+    AlreadyCommitted,
+}
+/// Identity provenance, not a mathematical assurance or reconstructed acknowledgement.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum WitnessProvenance {
+    Dedicated,
+    LegacyAdopted,
+}
+/// Returned only after this call acknowledges the verified durable identity.
+/// Legacy adoption has no recorded original sequence; central replay resolves it
+/// through the committed event prefix. Never substitute the current head sequence.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) struct WitnessReceipt {
+    pub commit: WitnessCommit,
+    pub payload_sha256: [u8; 32],
+    pub payload_bytes: u64,
+    pub sequence: Option<u64>,
+    pub provenance: WitnessProvenance,
+}
+#[derive(Clone, Copy, Default)]
+struct WitnessIdentity {
+    committed: bool,
+    digest: [u8; 32],
+    length: u64,
+    sequence: Option<u64>,
+}
+impl WitnessIdentity {
+    fn receipt(self, commit: WitnessCommit) -> WitnessReceipt {
+        WitnessReceipt {
+            commit,
+            payload_sha256: self.digest,
+            payload_bytes: self.length,
+            sequence: self.sequence,
+            provenance: if self.sequence.is_some() {
+                WitnessProvenance::Dedicated
+            } else {
+                WitnessProvenance::LegacyAdopted
+            },
+        }
+    }
+}
+/// Caller supplies only the remaining original checking pool and original deadline.
+/// Reconcile these cumulative receipts even on failure; never reset per retry.
+#[allow(dead_code)]
+pub(super) struct WitnessBudget {
+    work_limit: u64,
+    bytes_limit: u64,
+    deadline: std::time::Instant,
+    pub reserved_work: u64,
+    pub performed_work: u64,
+    pub reserved_bytes: u64,
+}
+#[allow(dead_code)] // Bound API remains dormant until parent integration.
+impl WitnessBudget {
+    pub fn new(work: u64, bytes: u64, deadline: std::time::Instant) -> Self {
+        Self {
+            work_limit: work,
+            bytes_limit: bytes,
+            deadline,
+            reserved_work: 0,
+            performed_work: 0,
+            reserved_bytes: 0,
+        }
+    }
+    fn check(&self) -> Result<(), WitnessError> {
+        if std::time::Instant::now() >= self.deadline {
+            Err(WitnessError::Deadline)
+        } else {
+            Ok(())
+        }
+    }
+    fn reserve(&mut self, work: u64, bytes: u64) -> Result<WitnessTicket<'_>, WitnessError> {
+        self.check()?;
+        let w = self
+            .reserved_work
+            .checked_add(work)
+            .ok_or(WitnessError::Work)?;
+        let b = self
+            .reserved_bytes
+            .checked_add(bytes)
+            .ok_or(WitnessError::Storage)?;
+        if w > self.work_limit {
+            return Err(WitnessError::Work);
+        }
+        if b > self.bytes_limit {
+            return Err(WitnessError::Storage);
+        }
+        self.reserved_work = w;
+        self.reserved_bytes = b;
+        Ok(WitnessTicket {
+            budget: self,
+            remaining: work,
+        })
+    }
+}
+struct WitnessTicket<'a> {
+    budget: &'a mut WitnessBudget,
+    remaining: u64,
+}
+impl WitnessTicket<'_> {
+    fn spend(&mut self, n: u64) -> Result<(), WitnessError> {
+        self.budget.check()?;
+        self.remaining = self.remaining.checked_sub(n).ok_or(WitnessError::Work)?;
+        self.budget.performed_work = self
+            .budget
+            .performed_work
+            .checked_add(n)
+            .ok_or(WitnessError::Work)?;
+        Ok(())
+    }
+    fn check(&self) -> Result<(), WitnessError> {
+        self.budget.check()
+    }
+}
+#[allow(dead_code)]
+pub(super) struct WitnessCaptureWorkspace {
+    event: Vec<u8>,
+    head: Vec<u8>,
+    io: Vec<u8>,
+    paths: [PathBuf; 5],
+    binding: [u8; 64],
+    #[cfg(test)]
+    fault: u8,
+}
+impl WitnessCaptureWorkspace {
+    pub fn requested_bytes() -> u64 {
+        WITNESS_DYNAMIC_BYTES
+            + std::mem::size_of::<Self>() as u64
+            + std::mem::size_of::<WitnessIdentity>() as u64
+            + std::mem::size_of::<WitnessScratchLayout>() as u64
+    }
+}
+// Explicit requested simultaneous helper layouts, not an unused owned scratch
+// array plus a second uncharged copy on the stack; not compiler stack/RSS.
+#[allow(dead_code)]
+struct WitnessScratchLayout {
+    hashes: [crate::hash::sha256::Sha256; 2],
+    schedule: [u32; 64],
+    padding: [u8; 128],
+    hex: [[u8; 64]; 2],
+    event: WitnessEventRecord<'static>,
+    head: WitnessHead<'static>,
+    writer: WitnessWriter<'static, 'static>,
+    ticket: WitnessTicket<'static>,
+    files: [File; 3],
+    receipt: WitnessReceipt,
+    scalar_cursors: [u64; 32],
+}
+fn witness_hash_work(n: usize) -> Result<u64, WitnessError> {
+    (n as u64 / 64)
+        .checked_add(2)
+        .and_then(|x| x.checked_mul(65_536))
+        .and_then(|x| x.checked_add((n as u64).checked_mul(16)?))
+        .and_then(|x| x.checked_add(1024))
+        .ok_or(WitnessError::Work)
+}
+fn witness_hex(digest: &[u8; 32]) -> [u8; 64] {
+    let mut hex = [0; 64];
+    let alphabet = b"0123456789abcdef";
+    for (i, &b) in digest.iter().enumerate() {
+        hex[2 * i] = alphabet[(b >> 4) as usize];
+        hex[2 * i + 1] = alphabet[(b & 15) as usize];
+    }
+    hex
+}
+fn witness_hash(bytes: &[u8], ticket: &mut WitnessTicket<'_>) -> Result<[u8; 32], WitnessError> {
+    let mut h = crate::hash::sha256::Sha256::new();
+    for chunk in bytes.chunks(64) {
+        ticket.spend(16 * chunk.len() as u64 + if chunk.len() == 64 { 65_536 } else { 0 })?;
+        h.update(chunk);
+    }
+    ticket.spend(2 * 65_536 + 1024)?;
+    let result = h.finalize();
+    ticket.check()?;
+    Ok(result)
+}
+struct WitnessWriter<'a, 'b> {
+    output: Option<&'a mut Vec<u8>>,
+    ticket: &'a mut WitnessTicket<'b>,
+    count: usize,
+    cap: usize,
+    error: Option<WitnessError>,
+}
+impl Write for WitnessWriter<'_, '_> {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        let result = (|| {
+            if self.error.is_some() {
+                return Err(WitnessError::Encoding);
+            }
+            let end = self
+                .count
+                .checked_add(bytes.len())
+                .ok_or(WitnessError::Encoding)?;
+            if end > self.cap {
+                return Err(WitnessError::Encoding);
+            }
+            // Empty writes are free; deterministic private serializers cannot spin.
+            for chunk in bytes.chunks(64) {
+                self.ticket.spend(40 * chunk.len() as u64)?;
+                if let Some(out) = &mut self.output {
+                    out.extend_from_slice(chunk);
+                }
+                self.count += chunk.len();
+            }
+            Ok(bytes.len())
+        })();
+        result.map_err(|e| {
+            self.error = Some(e);
+            io::ErrorKind::Other.into()
+        })
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+fn witness_encode<T: Serialize>(
+    value: &T,
+    out: Option<&mut Vec<u8>>,
+    cap: usize,
+    ticket: &mut WitnessTicket<'_>,
+) -> Result<usize, WitnessError> {
+    let mut writer = WitnessWriter {
+        output: out,
+        ticket,
+        count: 0,
+        cap: cap.checked_sub(1).ok_or(WitnessError::Encoding)?,
+        error: None,
+    };
+    serde_json::to_writer(&mut writer, value)
+        .map_err(|_| writer.error.unwrap_or(WitnessError::Encoding))?;
+    let n = writer.count.checked_add(1).ok_or(WitnessError::Encoding)?;
+    writer.cap = cap;
+    writer
+        .write_all(b"\n")
+        .map_err(|_| writer.error.unwrap_or(WitnessError::Encoding))?;
+    Ok(n)
+}
+// Legacy json! object keys are sorted. Keep exact event/artifact ordering.
+#[derive(Serialize)]
+struct WitnessArtifact<'a> {
+    bytes: u64,
+    encoding: &'static str,
+    path: &'static str,
+    role: &'static str,
+    sha256: &'a str,
+}
+#[derive(Serialize)]
+struct WitnessPayloadEvent<'a> {
+    artifact: WitnessArtifact<'a>,
+    kind: &'static str,
+}
+#[derive(Serialize)]
+struct WitnessEventRecord<'a> {
+    schema: &'static str,
+    binding_sha256: &'a str,
+    sequence: u64,
+    previous_event_sha256: &'a str,
+    event: WitnessPayloadEvent<'a>,
+}
+#[derive(Serialize)]
+struct WitnessHead<'a> {
+    schema: &'a str,
+    binding_sha256: &'a str,
+    event_count: u64,
+    byte_end: u64,
+    last_event_sha256: &'a str,
+    payload_count: u64,
+    payload_bytes: u64,
+    stop: Option<&'a CaptureStop>,
+}
+fn witness_regular(path: &Path) -> Result<(), WitnessError> {
+    let m = fs::symlink_metadata(path)?;
+    if !m.is_file() || m.file_type().is_symlink() {
+        return Err(WitnessError::Integrity);
+    }
+    Ok(())
+}
+fn witness_file_check(
+    path: &Path,
+    expected: &[u8; 32],
+    length: u64,
+    scratch: &mut Vec<u8>,
+    ticket: &mut WitnessTicket<'_>,
+) -> Result<(), WitnessError> {
+    ticket.check()?;
+    witness_regular(path)?;
+    let mut file = File::open(path)?;
+    if file.metadata()?.len() != length {
+        return Err(WitnessError::Integrity);
+    }
+    let mut h = crate::hash::sha256::Sha256::new();
+    let mut remaining = length;
+    scratch.resize(4096, 0);
+    while remaining > 0 {
+        ticket.check()?;
+        let n = remaining.min(4096) as usize;
+        file.read_exact(&mut scratch[..n])?;
+        ticket.spend(16 * n as u64)?;
+        for chunk in scratch[..n].chunks(64) {
+            ticket.spend(16 * chunk.len() as u64 + if chunk.len() == 64 { 65_536 } else { 0 })?;
+            h.update(chunk);
+        }
+        remaining -= n as u64;
+    }
+    let mut extra = [0u8; 1];
+    if file.read(&mut extra)? != 0 {
+        return Err(WitnessError::Integrity);
+    }
+    ticket.spend(2 * 65_536 + 1024)?;
+    let digest = h.finalize();
+    ticket.check()?;
+    if &digest != expected {
+        return Err(WitnessError::Integrity);
+    }
+    Ok(())
+}
+fn witness_write(
+    file: &mut File,
+    bytes: &[u8],
+    ticket: &mut WitnessTicket<'_>,
+) -> Result<(), WitnessError> {
+    for chunk in bytes.chunks(4096) {
+        ticket.spend(16 * chunk.len() as u64)?;
+        file.write_all(chunk)?;
+    }
+    Ok(())
+}
+impl CaptureEmitter {
+    /// Prepare under the caller's remaining shared byte/checking pools, before native.
+    #[allow(dead_code)]
+    pub(super) fn prepare_witness(
+        &mut self,
+        budget: &mut WitnessBudget,
+    ) -> Result<WitnessCaptureWorkspace, WitnessError> {
+        if self.failed || self.head.stop.is_some() {
+            return Err(WitnessError::Failed);
+        }
+        let result = (|| {
+            let root_len = self.directory.as_os_str().as_encoded_bytes().len();
+            if root_len > 3968
+                || self.head.binding_sha256.len() != 64
+                || self.head.last_event_sha256.len() != 64
+                || self.head.last_event_sha256.capacity() < 64
+            {
+                return Err(WitnessError::Identity);
+            }
+            let suffixes = [
+                "payloads",
+                WITNESS_PATH,
+                "payloads/.witness-payload.tmp",
+                "committed.json",
+                ".witness-head.tmp",
+            ];
+            let path_bytes = suffixes
+                .iter()
+                .try_fold(0u64, |sum, s| {
+                    sum.checked_add((root_len + 1 + s.len()) as u64)
+                })
+                .ok_or(WitnessError::Storage)?;
+            let work = 8 * WITNESS_DYNAMIC_BYTES + 4096 + 16 * path_bytes;
+            let mut ticket = budget.reserve(work, WitnessCaptureWorkspace::requested_bytes())?;
+            ticket.spend(work)?;
+            let mut event = Vec::new();
+            event
+                .try_reserve_exact(1024)
+                .map_err(|_| WitnessError::Allocation)?;
+            let mut head = Vec::new();
+            head.try_reserve_exact(1024)
+                .map_err(|_| WitnessError::Allocation)?;
+            let mut buffer = Vec::new();
+            buffer
+                .try_reserve_exact(4096)
+                .map_err(|_| WitnessError::Allocation)?;
+            buffer.resize(4096, 0); // initialization paid by preparation ticket
+            let mut paths: [PathBuf; 5] = std::array::from_fn(|_| PathBuf::new());
+            for (path, suffix) in paths.iter_mut().zip(suffixes) {
+                path.try_reserve_exact(4096)
+                    .map_err(|_| WitnessError::Allocation)?;
+                path.push(&self.directory);
+                path.push(suffix);
+                if path.as_os_str().as_encoded_bytes().len() > 4096 {
+                    return Err(WitnessError::Identity);
+                }
+            }
+            let root = fs::symlink_metadata(&self.directory)?;
+            if !root.is_dir() || root.file_type().is_symlink() {
+                return Err(WitnessError::Identity);
+            }
+            match fs::create_dir(&paths[0]) {
+                Ok(()) => File::open(&self.directory)?.sync_all()?,
+                Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {}
+                Err(e) => return Err(e.into()),
+            }
+            let dir = fs::symlink_metadata(&paths[0])?;
+            if !dir.is_dir() || dir.file_type().is_symlink() {
+                return Err(WitnessError::Identity);
+            }
+            for i in [1, 2, 3, 4] {
+                match fs::symlink_metadata(&paths[i]) {
+                    Ok(m) if i == 2 || i == 4 || !m.is_file() || m.file_type().is_symlink() => {
+                        return Err(WitnessError::Identity)
+                    }
+                    Ok(_) => {}
+                    Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                    Err(e) => return Err(e.into()),
+                }
+            }
+            let mut binding = [0; 64];
+            binding.copy_from_slice(self.head.binding_sha256.as_bytes());
+            Ok(WitnessCaptureWorkspace {
+                event,
+                head,
+                io: buffer,
+                paths,
+                binding,
+                #[cfg(test)]
+                fault: 0,
+            })
+        })();
+        if result.is_err() {
+            self.failed = true;
+        }
+        result
+    }
+    fn witness_limits(
+        &self,
+        event_bytes: usize,
+        count: u64,
+        bytes: u64,
+    ) -> Result<(), WitnessError> {
+        let stream = self
+            .head
+            .byte_end
+            .checked_add(event_bytes as u64)
+            .ok_or(WitnessError::EventLimit)?;
+        if self.head.event_count >= MAX_ITEMS
+            || stream > self.limits.max_stream_bytes
+            || count > self.limits.max_payload_count
+            || bytes > self.limits.max_payload_bytes
+        {
+            return Err(WitnessError::EventLimit);
+        }
+        // Exact existing CaptureLimits::local_peak arithmetic, without allocating errors.
+        let peak = stream
+            .checked_add(bytes)
+            .and_then(|x| x.checked_mul(2))
+            .and_then(|x| x.checked_add(self.limits.chunk_bytes))
+            .and_then(|x| x.checked_add(self.limits.metadata_reserve_bytes.checked_mul(2)?))
+            .ok_or(WitnessError::Storage)?;
+        if peak > self.limits.max_capture_bytes {
+            return Err(WitnessError::Storage);
+        }
+        Ok(())
+    }
+    #[allow(dead_code)]
+    pub(super) fn publish_first_witness(
+        &mut self,
+        bytes: &[u8],
+        workspace: &mut WitnessCaptureWorkspace,
+        budget: &mut WitnessBudget,
+        global_acknowledged: &mut usize,
+    ) -> Result<WitnessReceipt, WitnessError> {
+        if self.failed || self.head.stop.is_some() {
+            return Err(WitnessError::Failed);
+        }
+        let result =
+            self.publish_first_witness_inner(bytes, workspace, budget, global_acknowledged);
+        if result.is_err() {
+            self.failed = true;
+        }
+        result
+    }
+    fn publish_first_witness_inner(
+        &mut self,
+        bytes: &[u8],
+        w: &mut WitnessCaptureWorkspace,
+        budget: &mut WitnessBudget,
+        global: &mut usize,
+    ) -> Result<WitnessReceipt, WitnessError> {
+        {
+            let mut t = budget.reserve(4096, 0)?;
+            t.spend(4096)?;
+        }
+        if self.head.binding_sha256.as_bytes() != w.binding
+            || w.paths[3].parent() != Some(self.directory.as_path())
+        {
+            return Err(WitnessError::Identity);
+        }
+        let digest = {
+            let mut t = budget.reserve(witness_hash_work(bytes.len())?, 0)?;
+            witness_hash(bytes, &mut t)?
+        };
+        let hex = witness_hex(&digest);
+        let hex_str = std::str::from_utf8(&hex).map_err(|_| WitnessError::Encoding)?;
+        let previous = self.payloads.get(WITNESS_PATH);
+        if self.witness.committed || previous.is_some() {
+            if self.witness.committed {
+                if self.witness.digest != digest || self.witness.length != bytes.len() as u64 {
+                    return Err(WitnessError::Identity);
+                }
+            }
+            if let Some(p) = previous {
+                if p.role != WITNESS_ROLE
+                    || p.encoding != "json"
+                    || p.sha256 != hex_str
+                    || p.bytes != bytes.len() as u64
+                {
+                    return Err(WitnessError::Identity);
+                }
+            }
+            let cost = witness_hash_work(bytes.len())?
+                .checked_add(16 * bytes.len() as u64)
+                .and_then(|n| n.checked_add(4096))
+                .ok_or(WitnessError::Work)?;
+            let mut t = budget.reserve(cost, 0)?;
+            t.spend(4096)?;
+            witness_file_check(&w.paths[1], &digest, bytes.len() as u64, &mut w.io, &mut t)?;
+            self.witness = WitnessIdentity {
+                committed: true,
+                digest,
+                length: bytes.len() as u64,
+                sequence: self.witness.sequence,
+            };
+            return Ok(self.witness.receipt(WitnessCommit::AlreadyCommitted));
+        }
+        if *global >= 4096 {
+            return Err(WitnessError::EventLimit);
+        }
+        let event_count = self
+            .head
+            .event_count
+            .checked_add(1)
+            .ok_or(WitnessError::EventLimit)?;
+        let payload_count = self
+            .head
+            .payload_count
+            .checked_add(1)
+            .ok_or(WitnessError::EventLimit)?;
+        let payload_bytes = self
+            .head
+            .payload_bytes
+            .checked_add(bytes.len() as u64)
+            .ok_or(WitnessError::Storage)?;
+        let event = WitnessEventRecord {
+            schema: EVENT_SCHEMA,
+            binding_sha256: &self.head.binding_sha256,
+            sequence: event_count,
+            previous_event_sha256: &self.head.last_event_sha256,
+            event: WitnessPayloadEvent {
+                artifact: WitnessArtifact {
+                    bytes: bytes.len() as u64,
+                    encoding: "json",
+                    path: WITNESS_PATH,
+                    role: WITNESS_ROLE,
+                    sha256: hex_str,
+                },
+                kind: PAYLOAD_KIND,
+            },
+        };
+        let event_cap = 1024.min(self.limits.max_event_bytes as usize);
+        let event_len = {
+            let mut t = budget.reserve(40 * 1024, 0)?;
+            witness_encode(&event, None, event_cap, &mut t)?
+        };
+        self.witness_limits(event_len, payload_count, payload_bytes)?;
+        let byte_end = self
+            .head
+            .byte_end
+            .checked_add(event_len as u64)
+            .ok_or(WitnessError::EventLimit)?;
+        let placeholder = "0000000000000000000000000000000000000000000000000000000000000000";
+        let head = WitnessHead {
+            schema: &self.head.schema,
+            binding_sha256: &self.head.binding_sha256,
+            event_count,
+            byte_end,
+            last_event_sha256: placeholder,
+            payload_count,
+            payload_bytes,
+            stop: None,
+        };
+        let head_cap = 1024.min(self.limits.metadata_reserve_bytes as usize);
+        let head_len = {
+            let mut t = budget.reserve(40 * 1024, 0)?;
+            witness_encode(&head, None, head_cap, &mut t)?
+        };
+        let mutation = (event_len as u64 + head_len as u64)
+            .checked_mul(40)
+            .and_then(|x| x.checked_add(witness_hash_work(event_len).ok()?))
+            .and_then(|x| x.checked_add(witness_hash_work(bytes.len()).ok()?))
+            .and_then(|x| {
+                x.checked_add(
+                    (bytes.len() as u64)
+                        .checked_mul(2)?
+                        .checked_add(event_len as u64)?
+                        .checked_add(head_len as u64)?
+                        .checked_mul(16)?,
+                )
+            })
+            .and_then(|x| x.checked_add(4096 + 81920 + 4096))
+            .ok_or(WitnessError::Work)?;
+        let mut ticket = budget.reserve(mutation, 0)?;
+        ticket.spend(4096)?;
+        w.event.clear();
+        w.head.clear();
+        if witness_encode(&event, Some(&mut w.event), event_cap, &mut ticket)? != event_len {
+            return Err(WitnessError::Encoding);
+        }
+        let event_digest = witness_hash(&w.event, &mut ticket)?;
+        let event_hex = witness_hex(&event_digest);
+        let event_hex_str = std::str::from_utf8(&event_hex).map_err(|_| WitnessError::Encoding)?;
+        let head = WitnessHead {
+            last_event_sha256: event_hex_str,
+            ..head
+        };
+        if witness_encode(&head, Some(&mut w.head), head_cap, &mut ticket)? != head_len {
+            return Err(WitnessError::Encoding);
+        }
+        // All reservations/encodings completed before any payload/event/head mutation.
+        let mut payload_temp_owned = false;
+        let mut head_temp_owned = false;
+        let operation = (|| {
+            ticket.check()?;
+            match fs::symlink_metadata(&w.paths[1]) {
+                Ok(_) => witness_file_check(
+                    &w.paths[1],
+                    &digest,
+                    bytes.len() as u64,
+                    &mut w.io,
+                    &mut ticket,
+                )?,
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                    let mut temp = OpenOptions::new()
+                        .write(true)
+                        .create_new(true)
+                        .open(&w.paths[2])?;
+                    payload_temp_owned = true;
+                    witness_write(&mut temp, bytes, &mut ticket)?;
+                    ticket.check()?;
+                    temp.sync_all()?;
+                    ticket.check()?;
+                    match fs::hard_link(&w.paths[2], &w.paths[1]) {
+                        Ok(()) => {}
+                        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => witness_file_check(
+                            &w.paths[1],
+                            &digest,
+                            bytes.len() as u64,
+                            &mut w.io,
+                            &mut ticket,
+                        )?,
+                        Err(e) => return Err(e.into()),
+                    }
+                    File::open(&w.paths[0])?.sync_all()?;
+                }
+                Err(e) => return Err(e.into()),
+            }
+            #[cfg(test)]
+            if w.fault == 1 {
+                return Err(WitnessError::Io(io::ErrorKind::Other));
+            }
+            ticket.check()?;
+            witness_write(&mut self.events, &w.event, &mut ticket)?;
+            self.events.sync_data()?;
+            #[cfg(test)]
+            if w.fault == 2 {
+                return Err(WitnessError::Io(io::ErrorKind::Other));
+            }
+            ticket.check()?;
+            let mut file = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&w.paths[4])?;
+            head_temp_owned = true;
+            witness_write(&mut file, &w.head, &mut ticket)?;
+            file.sync_all()?;
+            ticket.check()?;
+            fs::rename(&w.paths[4], &w.paths[3])?;
+            head_temp_owned = false;
+            // Do not clock-check after possible head installation. A sync error
+            // is indeterminate I/O, never a clean deadline rollback.
+            File::open(&self.directory)
+                .and_then(|directory| directory.sync_all())
+                .map_err(|error| WitnessError::IndeterminateIo(error.kind()))?;
+            #[cfg(test)]
+            if w.fault == 4 {
+                return Err(WitnessError::IndeterminateIo(io::ErrorKind::Other));
+            }
+            #[cfg(test)]
+            if w.fault == 3 {
+                ticket.budget.deadline = std::time::Instant::now();
+            }
+            self.head.event_count = event_count;
+            self.head.byte_end = byte_end;
+            self.head.payload_count = payload_count;
+            self.head.payload_bytes = payload_bytes;
+            self.head.last_event_sha256.clear();
+            self.head.last_event_sha256.push_str(event_hex_str);
+            self.witness = WitnessIdentity {
+                committed: true,
+                digest,
+                length: bytes.len() as u64,
+                sequence: Some(event_count),
+            };
+            *global += 1;
+            Ok(self.witness.receipt(WitnessCommit::NewCommit))
+        })();
+        if payload_temp_owned {
+            let _ = fs::remove_file(&w.paths[2]);
+        }
+        if head_temp_owned {
+            let _ = fs::remove_file(&w.paths[4]);
+        }
+        operation
+    }
+}
+
 pub struct CaptureEmitter {
     directory: PathBuf,
     events: File,
     head: CommittedHead,
     limits: CaptureLimits,
     payloads: BTreeMap<String, Artifact>,
+    witness: WitnessIdentity,
     failed: bool,
 }
 
@@ -469,6 +1213,7 @@ impl CaptureEmitter {
             events,
             limits,
             payloads: BTreeMap::new(),
+            witness: WitnessIdentity::default(),
             failed: false,
             head: CommittedHead {
                 schema: HEAD_SCHEMA.into(),
@@ -695,6 +1440,28 @@ impl CaptureEmitter {
             sha256: super::digest(&payload.bytes),
             bytes: payload.bytes.len() as u64,
         };
+        if artifact.path == WITNESS_PATH && self.witness.committed {
+            let expected = witness_hex(&self.witness.digest);
+            if artifact.role != WITNESS_ROLE
+                || artifact.encoding != "json"
+                || artifact.bytes != self.witness.length
+                || artifact.sha256.as_bytes() != expected
+            {
+                return Err(self.reject(CaptureError::Integrity(
+                    "first witness identity collision".into(),
+                )));
+            }
+            // Legacy caller remains an allocating outer boundary, but cannot
+            // duplicate or replace the dedicated committed identity.
+            let path = match storage::contained_path(&self.directory, WITNESS_PATH, false) {
+                Ok(path) => path,
+                Err(error) => return Err(self.reject(CaptureError::Integrity(error))),
+            };
+            return match storage::check_file(&path, &artifact.sha256, artifact.bytes) {
+                Ok(()) => Ok(()),
+                Err(error) => Err(self.reject(CaptureError::Integrity(error))),
+            };
+        }
         if let Some(previous) = self.payloads.get(&artifact.path) {
             if previous != &artifact {
                 return Err(self.reject(CaptureError::Integrity(
@@ -1928,5 +2695,455 @@ mod tests {
             &limits()
         )
         .is_err());
+    }
+    fn witness_budget() -> WitnessBudget {
+        WitnessBudget::new(
+            16_777_216,
+            1024 * 1024,
+            std::time::Instant::now() + std::time::Duration::from_secs(30),
+        )
+    }
+    fn witness_payload() -> ArtifactPayload {
+        ArtifactPayload::json(
+            "pdp-witness.json",
+            WITNESS_ROLE,
+            &json!({"summands":[],"target":null}),
+        )
+        .unwrap()
+    }
+    #[test]
+    fn witness_borrowed_wire_head_and_restored_payload_match_legacy() {
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let p = witness_payload();
+        let expected = e
+            .encode_event(&json!({"kind":PAYLOAD_KIND,"artifact":{
+                "path":WITNESS_PATH,"role":WITNESS_ROLE,"encoding":"json",
+                "sha256":super::super::digest(&p.bytes),"bytes":p.bytes.len()
+            }}))
+            .unwrap();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        let pointers = (w.event.as_ptr(), w.head.as_ptr(), w.io.as_ptr());
+        let mut global = 0;
+        assert_eq!(
+            e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit),
+            Ok(WitnessCommit::NewCommit)
+        );
+        assert_eq!(w.event, expected);
+        assert_eq!(fs::read(f.live().join("events.jsonl")).unwrap(), expected);
+        assert_eq!(e.head.last_event_sha256, super::super::digest(&expected));
+        let mut expected_head = serde_json::to_vec(&e.head).unwrap();
+        expected_head.push(b'\n');
+        assert_eq!(w.head, expected_head);
+        assert_eq!(
+            fs::read(f.live().join("committed.json")).unwrap(),
+            expected_head
+        );
+        assert_eq!(pointers, (w.event.as_ptr(), w.head.as_ptr(), w.io.as_ptr()));
+        assert!(!e.payloads.contains_key(WITNESS_PATH));
+        assert_eq!(global, 1);
+        let cursor = CaptureCursor::initial(&binding()).unwrap();
+        let delta =
+            capture_committed_delta(&f.cell(), &f.snapshot(0), &binding(), &cursor, &limits())
+                .unwrap()
+                .unwrap();
+        verify_captured_delta(&f.snapshot(0), &delta, &cursor).unwrap();
+        assert_eq!(fs::read(f.snapshot(0).join(WITNESS_PATH)).unwrap(), p.bytes);
+        assert_eq!(delta.head.payload_count, 1);
+    }
+    #[test]
+    fn witness_cross_api_idempotence_both_orders_no_duplicate_events() {
+        for legacy_first in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let p = witness_payload();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            if legacy_first {
+                e.payload(&p).unwrap();
+            }
+            let expected = if legacy_first {
+                WitnessCommit::AlreadyCommitted
+            } else {
+                WitnessCommit::NewCommit
+            };
+            assert_eq!(
+                e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                    .map(|receipt| receipt.commit),
+                Ok(expected)
+            );
+            e.payload(&p).unwrap();
+            assert_eq!(
+                e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                    .map(|receipt| receipt.commit),
+                Ok(WitnessCommit::AlreadyCommitted)
+            );
+            assert_eq!(e.head.payload_count, 1);
+            assert_eq!(e.head.event_count, 1);
+            assert_eq!(global, usize::from(!legacy_first));
+        }
+    }
+    #[test]
+    fn witness_changed_identity_and_file_are_sticky_in_both_apis() {
+        for mode in 0..4 {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let p = witness_payload();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit)
+                .unwrap();
+            match mode {
+                0 => assert!(e
+                    .publish_first_witness(b"different", &mut w, &mut b, &mut global)
+                    .map(|receipt| receipt.commit)
+                    .is_err()),
+                1 => {
+                    let mut changed = p.clone();
+                    changed.role = "different".into();
+                    assert!(e.payload(&changed).is_err());
+                }
+                2 => {
+                    fs::write(f.live().join(WITNESS_PATH), b"tampered").unwrap();
+                    assert!(e
+                        .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                        .map(|receipt| receipt.commit)
+                        .is_err());
+                }
+                _ => {
+                    fs::write(f.live().join(WITNESS_PATH), b"tampered").unwrap();
+                    assert!(e.payload(&p).is_err());
+                }
+            }
+            assert!(e.failed);
+            assert_eq!(global, 1);
+            assert_eq!(e.head.event_count, 1);
+            assert_eq!(
+                e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                    .map(|receipt| receipt.commit),
+                Err(WitnessError::Failed)
+            );
+        }
+    }
+    #[test]
+    fn witness_exact_requested_storage_and_publication_work_admission() {
+        for less in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            b.bytes_limit = WitnessCaptureWorkspace::requested_bytes() - u64::from(less);
+            assert_eq!(e.prepare_witness(&mut b).is_ok(), !less);
+            assert_eq!(
+                b.reserved_bytes,
+                if less {
+                    0
+                } else {
+                    WitnessCaptureWorkspace::requested_bytes()
+                }
+            );
+        }
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let p = witness_payload();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        let before = b.reserved_work;
+        e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut 0)
+            .map(|receipt| receipt.commit)
+            .unwrap();
+        let needed = b.reserved_work - before;
+        for less in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            b.work_limit = b.reserved_work + needed - u64::from(less);
+            let mut global = 0;
+            let result = e
+                .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit);
+            if less {
+                assert_eq!(result, Err(WitnessError::Work));
+                assert!(!f.live().join(WITNESS_PATH).exists());
+                assert_eq!(global, 0);
+                assert_eq!(e.head.event_count, 0);
+            } else {
+                assert_eq!(result, Ok(WitnessCommit::NewCommit));
+                assert_eq!(global, 1);
+            }
+            assert!(b.performed_work <= b.reserved_work && b.reserved_work <= b.work_limit);
+        }
+    }
+    #[test]
+    fn witness_exact_stream_payload_and_global_event_admission() {
+        let p = witness_payload();
+        for less in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let expected=e.encode_event(&json!({"kind":PAYLOAD_KIND,"artifact":{"path":WITNESS_PATH,"role":WITNESS_ROLE,"encoding":"json","sha256":super::super::digest(&p.bytes),"bytes":p.bytes.len()}})).unwrap();
+            e.limits.max_stream_bytes = expected.len() as u64 - u64::from(less);
+            let mut global = 4095;
+            let result = e
+                .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit);
+            assert_eq!(result.is_ok(), !less);
+            if !less {
+                assert_eq!(global, 4096);
+                assert_eq!(
+                    e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                        .map(|receipt| receipt.commit),
+                    Ok(WitnessCommit::AlreadyCommitted)
+                );
+                assert_eq!(global, 4096);
+            } else {
+                assert!(!f.live().join(WITNESS_PATH).exists());
+            }
+        }
+        for failure in 0..4 {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            match failure {
+                0 => global = 4096,
+                1 => e.limits.max_payload_count = 0,
+                2 => e.limits.max_payload_bytes = p.bytes.len() as u64 - 1,
+                _ => e.limits.max_capture_bytes = 0,
+            }
+            assert!(e
+                .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit)
+                .is_err());
+            assert!(!f.live().join(WITNESS_PATH).exists());
+            assert_eq!(e.head.event_count, 0);
+        }
+    }
+    #[test]
+    fn witness_failure_prefixes_are_unacknowledged_and_restore_excludes_orphans() {
+        for fault in [1, 2] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            w.fault = fault;
+            let old_head = fs::read(f.live().join("committed.json")).unwrap();
+            let mut global = 0;
+            assert!(e
+                .publish_first_witness(&witness_payload().bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit)
+                .is_err());
+            assert!(e.failed);
+            assert!(!e.witness.committed);
+            assert_eq!(global, 0);
+            assert_eq!(fs::read(f.live().join("committed.json")).unwrap(), old_head);
+            assert!(f.live().join(WITNESS_PATH).exists());
+            let cursor = CaptureCursor::initial(&binding()).unwrap();
+            assert!(capture_committed_delta(
+                &f.cell(),
+                &f.snapshot(0),
+                &binding(),
+                &cursor,
+                &limits()
+            )
+            .unwrap()
+            .is_none());
+        }
+    }
+    #[test]
+    fn witness_deadline_before_mutation_and_after_commit_keep_acknowledgement_correct() {
+        for after_commit in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            if after_commit {
+                w.fault = 3;
+            } else {
+                b.deadline = std::time::Instant::now();
+            }
+            let result = e
+                .publish_first_witness(&witness_payload().bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit);
+            if after_commit {
+                assert_eq!(result, Ok(WitnessCommit::NewCommit));
+                assert_eq!(global, 1);
+                assert!(e.witness.committed);
+                assert!(!e.failed);
+            } else {
+                assert_eq!(result, Err(WitnessError::Deadline));
+                assert_eq!(global, 0);
+                assert!(!f.live().join(WITNESS_PATH).exists());
+            }
+        }
+    }
+    #[test]
+    fn witness_foreign_workspace_and_preexisting_temp_are_rejected() {
+        let f = Fixture::new();
+        let other = Fixture::new();
+        let mut e = f.emitter();
+        let mut e2 = other.emitter();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        assert_eq!(
+            e2.publish_first_witness(&witness_payload().bytes, &mut w, &mut b, &mut 0)
+                .map(|receipt| receipt.commit),
+            Err(WitnessError::Identity)
+        );
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        fs::write(f.live().join(".witness-head.tmp"), b"foreign").unwrap();
+        assert!(e.prepare_witness(&mut witness_budget()).is_err());
+        assert_eq!(
+            fs::read(f.live().join(".witness-head.tmp")).unwrap(),
+            b"foreign"
+        );
+    }
+    #[test]
+    fn witness_exact_event_and_head_caps_and_indeterminate_head_failure() {
+        let p = witness_payload();
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut 0)
+            .map(|receipt| receipt.commit)
+            .unwrap();
+        let event_len = w.event.len();
+        let head_len = w.head.len();
+        for head in [false, true] {
+            for less in [false, true] {
+                let f = Fixture::new();
+                let mut e = f.emitter();
+                let mut b = witness_budget();
+                let mut w = e.prepare_witness(&mut b).unwrap();
+                if head {
+                    e.limits.metadata_reserve_bytes = (head_len - usize::from(less)) as u64;
+                } else {
+                    e.limits.max_event_bytes = (event_len - usize::from(less)) as u64;
+                }
+                let result = e
+                    .publish_first_witness(&p.bytes, &mut w, &mut b, &mut 0)
+                    .map(|receipt| receipt.commit);
+                assert_eq!(result.is_ok(), !less);
+                if less {
+                    assert!(!f.live().join(WITNESS_PATH).exists());
+                    assert_eq!(e.head.event_count, 0);
+                }
+            }
+        }
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        w.fault = 4;
+        let mut global = 0;
+        assert_eq!(
+            e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .map(|receipt| receipt.commit),
+            Err(WitnessError::IndeterminateIo(io::ErrorKind::Other))
+        );
+        assert_eq!(global, 0);
+        assert!(e.failed);
+        assert!(!e.witness.committed);
+        // The possibly installed head is authoritative for recovery; a caller
+        // error is not a promise that bytes were rolled back.
+        let cursor = CaptureCursor::initial(&binding()).unwrap();
+        let delta =
+            capture_committed_delta(&f.cell(), &f.snapshot(0), &binding(), &cursor, &limits())
+                .unwrap()
+                .unwrap();
+        verify_captured_delta(&f.snapshot(0), &delta, &cursor).unwrap();
+        assert_eq!(delta.head.event_count, 1);
+    }
+    #[test]
+    fn witness_receipt_preserves_original_identity_and_sequence_across_later_events() {
+        for legacy_first in [false, true] {
+            let f = Fixture::new();
+            let mut e = f.emitter();
+            let p = witness_payload();
+            let mut b = witness_budget();
+            let mut w = e.prepare_witness(&mut b).unwrap();
+            let mut global = 0;
+            if legacy_first {
+                e.payload(&p).unwrap();
+            }
+            let first = e
+                .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .unwrap();
+            assert_eq!(
+                first.commit,
+                if legacy_first {
+                    WitnessCommit::AlreadyCommitted
+                } else {
+                    WitnessCommit::NewCommit
+                }
+            );
+            assert_eq!(first.payload_bytes, p.bytes.len() as u64);
+            assert_eq!(
+                std::str::from_utf8(&witness_hex(&first.payload_sha256)).unwrap(),
+                super::super::digest(&p.bytes)
+            );
+            assert_eq!(first.sequence, if legacy_first { None } else { Some(1) });
+            assert_eq!(
+                first.provenance,
+                if legacy_first {
+                    WitnessProvenance::LegacyAdopted
+                } else {
+                    WitnessProvenance::Dedicated
+                }
+            );
+            e.event(&json!({"kind":"unrelated_later_event"})).unwrap();
+            assert_eq!(e.head.event_count, 2);
+            let again = e
+                .publish_first_witness(&p.bytes, &mut w, &mut b, &mut global)
+                .unwrap();
+            assert_eq!(
+                again,
+                WitnessReceipt {
+                    commit: WitnessCommit::AlreadyCommitted,
+                    ..first
+                }
+            );
+            assert_eq!(e.head.event_count, 2);
+            assert_eq!(global, usize::from(!legacy_first));
+        }
+    }
+    #[test]
+    fn witness_indeterminate_publication_returns_no_receipt_or_later_synthetic_ack() {
+        let f = Fixture::new();
+        let mut e = f.emitter();
+        let p = witness_payload();
+        let mut b = witness_budget();
+        let mut w = e.prepare_witness(&mut b).unwrap();
+        let mut global = 0;
+        w.fault = 4;
+        let receipt = e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global);
+        assert_eq!(
+            receipt,
+            Err(WitnessError::IndeterminateIo(io::ErrorKind::Other))
+        );
+        assert!(!e.witness.committed);
+        assert_eq!(global, 0);
+        assert_eq!(
+            e.publish_first_witness(&p.bytes, &mut w, &mut b, &mut global),
+            Err(WitnessError::Failed)
+        );
+        let cursor = CaptureCursor::initial(&binding()).unwrap();
+        let delta =
+            capture_committed_delta(&f.cell(), &f.snapshot(0), &binding(), &cursor, &limits())
+                .unwrap()
+                .unwrap();
+        verify_captured_delta(&f.snapshot(0), &delta, &cursor).unwrap();
+        assert_eq!(delta.head.payload_count, 1);
+        assert_eq!(global, 0);
     }
 }
