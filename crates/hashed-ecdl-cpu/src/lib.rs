@@ -24,13 +24,89 @@ struct Prepared {
     bases: Vec<Vec<Point>>,
     split: usize,
     prefix: Vec<Point>,
-    suffix: Vec<(Point, usize)>,
+    suffix: Suffix,
+}
+
+// Point compression is injective on the validated odd-prime curve. Keep
+// identity separate from every compressed finite point (p < 2^62).
+fn point_key(point: Point) -> u64 {
+    point.map_or(u64::MAX - 1, |(x, y)| 2 * x + (y & 1))
+}
+fn point_bucket(mut key: u64, mask: usize) -> usize {
+    key ^= key >> 30;
+    key = key.wrapping_mul(0xbf58476d1ce4e5b9);
+    key ^= key >> 27;
+    key = key.wrapping_mul(0x94d049bb133111eb);
+    ((key ^ (key >> 31)) as usize) & mask
+}
+struct Suffix {
+    slots: Vec<(u64, usize)>,
+    rows: usize,
+}
+impl Suffix {
+    fn new(points: Vec<Point>) -> Result<Self, Error> {
+        if points.is_empty() {
+            return Ok(Self {
+                slots: vec![],
+                rows: 0,
+            });
+        }
+        let size = points
+            .len()
+            .checked_mul(2)
+            .and_then(usize::checked_next_power_of_two)
+            .ok_or(Error::Limit("CPU suffix index capacity"))?;
+        let mut slots = Vec::new();
+        slots
+            .try_reserve_exact(size)
+            .map_err(|_| Error::Limit("CPU suffix index allocation"))?;
+        slots.resize(size, (u64::MAX, 0));
+        let mut out = Self {
+            slots,
+            rows: points.len(),
+        };
+        // Tuple order is lexicographic: retain the first ID on duplicate sums.
+        for (id, point) in points.into_iter().enumerate() {
+            let key = point_key(point);
+            let mut i = point_bucket(key, size - 1);
+            loop {
+                let entry = &mut out.slots[i];
+                if entry.0 == key {
+                    break;
+                }
+                if entry.0 == u64::MAX {
+                    *entry = (key, id);
+                    break;
+                }
+                i = (i + 1) & (size - 1);
+            }
+        }
+        Ok(out)
+    }
+    fn find(&self, point: Point) -> Option<usize> {
+        if self.slots.is_empty() {
+            return None;
+        }
+        let key = point_key(point);
+        let mask = self.slots.len() - 1;
+        let mut i = point_bucket(key, mask);
+        loop {
+            let (stored, id) = self.slots[i];
+            if stored == key {
+                return Some(id);
+            }
+            if stored == u64::MAX {
+                return None;
+            }
+            i = (i + 1) & mask;
+        }
+    }
 }
 
 /// An exact CPU oracle retaining both tuple-sum tables across targets.
 ///
 /// Prefix tuples are visited in lexicographic order. Each equal suffix sum
-/// retains its smallest tuple ID. Therefore the first returned full tuple is
+/// retains its smallest tuple ID in a compressed-point index. Therefore the first returned full tuple is
 /// identical to the original `paper::Enumerate`, including duplicate sums.
 pub struct CachedMitm {
     max_rows: usize,
@@ -100,21 +176,16 @@ impl CachedMitm {
         } else {
             sums(curve, &bases[..split])?
         };
-        let mut suffix: Vec<_> = if total == 0 {
+        let suffix = Suffix::new(if total == 0 {
             vec![]
         } else {
             sums(curve, &bases[split..])?
-                .into_iter()
-                .enumerate()
-                .map(|(i, p)| (p, i))
-                .collect()
-        };
-        suffix.sort_unstable();
+        })?;
         self.stats.preparations += 1;
         self.stats.built_rows += total as u64;
         self.stats.peak_table_bytes = self.stats.peak_table_bytes.max(
             prefix.capacity() * std::mem::size_of::<Point>()
-                + suffix.capacity() * std::mem::size_of::<(Point, usize)>(),
+                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>(),
         );
         self.prepared = Some(Prepared {
             curve: curve_key(curve),
@@ -180,30 +251,27 @@ impl DecompositionOracle for CachedMitm {
             self.prepare(curve, bases, max_work)?;
         }
         let p = self.prepared.as_ref().unwrap();
-        if (p.prefix.len() + p.suffix.len()) as u64 > max_work {
+        if (p.prefix.len() + p.suffix.rows) as u64 > max_work {
             return Err(Error::Limit("CPU decomposition work; not nonexistence"));
         }
         for (batch_index, points) in p.prefix.chunks(self.batch).enumerate() {
             self.stats.query_inversions += self.scratch.subtract(curve, target, points);
             for (offset, residual) in self.scratch.output.iter().enumerate() {
                 self.stats.probed_rows += 1;
-                let index = p.suffix.partition_point(|(point, _)| point < residual);
-                if let Some(&(point, id)) = p.suffix.get(index) {
-                    if point == *residual {
-                        let mut tuple = vec![None; bases.len()];
-                        decode(
-                            &bases[..p.split],
-                            batch_index * self.batch + offset,
-                            &mut tuple[..p.split],
-                        );
-                        decode(&bases[p.split..], id, &mut tuple[p.split..]);
-                        // Keep a checked group replay at the public oracle boundary.
-                        let sum = tuple.iter().try_fold(None, |s, &q| curve.add(s, q))?;
-                        if sum != target {
-                            return Err(Error::Verification);
-                        }
-                        return Ok(Some(tuple));
+                if let Some(id) = p.suffix.find(*residual) {
+                    let mut tuple = vec![None; bases.len()];
+                    decode(
+                        &bases[..p.split],
+                        batch_index * self.batch + offset,
+                        &mut tuple[..p.split],
+                    );
+                    decode(&bases[p.split..], id, &mut tuple[p.split..]);
+                    // Keep a checked group replay at the public oracle boundary.
+                    let sum = tuple.iter().try_fold(None, |s, &q| curve.add(s, q))?;
+                    if sum != target {
+                        return Err(Error::Verification);
                     }
+                    return Ok(Some(tuple));
                 }
             }
         }
@@ -303,6 +371,25 @@ mod tests {
     fn fixture() -> (Curve, Point) {
         (Curve::new(211, 0, 7, 199).unwrap(), Some((3, 33)))
     }
+    #[test]
+    fn suffix_index_preserves_duplicates_identity_and_collision_chains() {
+        let (c, p) = fixture();
+        let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
+        let mut input = points[..150].to_vec();
+        input.extend_from_slice(&points[..50]);
+        let index = Suffix::new(input.clone()).unwrap();
+        assert_eq!(index.rows, input.len());
+        for &point in &points {
+            assert_eq!(index.find(point), input.iter().position(|&x| x == point));
+        }
+        assert!(Suffix::new(vec![]).unwrap().find(None).is_none());
+        let mut buckets = std::collections::BTreeSet::new();
+        assert!(points[..150]
+            .iter()
+            .any(|&point| !buckets.insert(point_bucket(point_key(point), index.slots.len() - 1))));
+        assert_eq!(index.find(None), Some(0));
+    }
+
     #[test]
     fn batched_subtraction_matches_every_group_pair() {
         let (c, p) = fixture();
