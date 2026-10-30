@@ -1,0 +1,6 @@
+Both instruction summaries replay byte-for-byte using the exact serde_json
+artifact selected by the root Cargo graph (arbitrary_precision/raw_value).
+Commands: cargo build --release --locked --lib --message-format=json;
+rustc -O analyze-profiles.rs / analyze-lookup.rs with that artifact;
+analyze the runs/profiles and runs/lookup-profiles trees; cmp each emitted
+summary against its tracked JSON. All commands exited0. No solver ran.

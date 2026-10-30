@@ -1,0 +1,109 @@
+name: Boolean solver qualification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/cryptanalysis/gf2_elim.rs
+      - src/cryptanalysis/koblitz_groebner.rs
+      - src/cryptanalysis/koblitz_index_calculus.rs
+      - src/cryptanalysis/ecbench/methods.rs
+      - src/bin/ecbench/pdp3_koblitz.rs
+      - src/cryptanalysis/ic_boundary.rs
+      - src/cryptanalysis/ic_framework/rootfind.rs
+      - examples/f4_f5_boolean_perf.rs
+      - tools/generalized-rootfinder/**
+      - research/f4_f5_ecbench_20261019/**
+      - .github/workflows/boolean-single-write-runtime.yml
+
+permissions:
+  contents: read
+
+jobs:
+  batch-setup-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Exact table keys, witnesses and group ledger
+        run: cargo test --release --locked --lib folded_callback_batches_preserve_every_key_witness_and_group_charge
+      - name: Binary and prime m2/m3 oracle controls
+        run: cargo test --release --locked --lib cryptanalysis::ic_framework::rootfind::tests
+      - name: Exact matrix construction and recursive-tail controls
+        run: cargo test --release --locked --lib matrix_runtime_ -- --test-threads=1
+      - name: Full pair table serial and four-worker tuples, witnesses and budgets
+        run: cargo test --release --locked --lib full_pair_table_single_worker_matches_parallel_entries_and_budgets -- --test-threads=1
+      - name: GF2 reference equality with serial clearing disabled and enabled
+        shell: bash
+        run: |
+          for workers in 1 4; do
+            for state in 0 1; do
+              RAYON_NUM_THREADS="$workers" KIC_GF2_WRITE_TABLE_ONCE=1 KIC_GF2_VECTOR_TABLES=1 KIC_GF2_SERIAL_CLEAR="$state" \
+                cargo test --release --locked --lib cryptanalysis::gf2_elim::tests -- --test-threads=1
+            done
+          done
+  native-solver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/generalized-rootfinder -> target
+      - name: Complete root and certificate tests
+        run: cargo test --release --locked --manifest-path tools/generalized-rootfinder/Cargo.toml
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build before measurement
+        run: cargo build --release --locked --example f4_f5_boolean_perf --bin isolated_bench
+      - name: A/A and alternating A/B, one worker
+        env:
+          RAYON_NUM_THREADS: '1'
+        shell: bash
+        run: |
+          set -u
+          out="$RUNNER_TEMP/boolean-runtime"
+          mkdir -p "$out"
+          git rev-parse HEAD > "$out/revision.txt"
+          rustc --version > "$out/compiler.txt"
+          lscpu > "$out/cpu.txt"
+          sha256sum target/release/examples/f4_f5_boolean_perf > "$out/binary.sha256"
+          cpu=$(lscpu -p=CPU | sed '/^#/d' | tail -1)
+          cpus=$(cat "/sys/devices/system/cpu/cpu$cpu/topology/thread_siblings_list")
+          for arm in matrix-f4 matrix-f5; do
+            for phase in aa ab; do
+              for round in 0 1 2 3 4; do
+                for side in a b; do
+                  state=0
+                  if [ "$phase" = ab ] && [ "$side" = b ]; then state=1; fi
+                  sample="$out/$arm-$phase-$round-$side"
+                  for attempt in 0 1 2; do
+                    if sudo target/release/isolated_bench run --cpus "$cpus" --out "$sample-$attempt.isolation.jsonl" --label "$arm-$phase-$round-$side" -- \
+                      env RAYON_NUM_THREADS=1 KIC_GF2_WRITE_TABLE_ONCE="$state" timeout 60 \
+                      target/release/examples/f4_f5_boolean_perf --arm "$arm" \
+                      > "$sample-$attempt.jsonl" 2> "$sample-$attempt.stderr"; then
+                      break
+                    fi
+                  done
+                done
+              done
+            done
+          done
+          rustc --edition 2021 -O research/f4_f5_boolean_perf_20261018/runtime.rs \
+            -L dependency=target/release/deps --extern serde_json="$(find target/release/deps -name 'libserde_json-*.rlib' | head -1)" \
+            -o "$out/analyze-runtime"
+          "$out/analyze-runtime" "$out" > "$out/qualification.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boolean-runtime-${{ github.run_id }}
+          path: ${{ runner.temp }}/boolean-runtime
+          if-no-files-found: error

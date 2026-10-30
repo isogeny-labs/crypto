@@ -1,0 +1,75 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-boolean-perf)
+    Finished `release` profile [optimized] target(s) in 1m 44s
+     Running unittests src/bin/ecbench.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/ecbench-fe95751347e8d36e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ecbench.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/ecbench-8e1732e88ad3a50c)
+
+running 17 tests
+test a_candidate_session_compares_against_a_baseline_session ... ok
+test a_factor_base_dump_carries_its_points ... ok
+test a_public_target_session_yields_a_checked_vs_rho_claim ... ok
+test a_resealed_hand_edited_figure_is_caught ... ok
+test a_session_runs_verifies_compares_and_loads ... ok
+test bad_specs_are_refused_before_anything_runs ... ok
+test bounds_a_frontier_and_challenge_verdicts_round_trip ... ok
+test counted_ic_sat_replays_with_different_solver_wall_times ... ok
+test field_operations_are_counted_bounded_and_judged ... ok
+test online_windows_split_into_exclusive_claim_phases ... ok
+test pdp3_binary_runs_every_engine_on_a_generic_binary_curve ... FAILED
+test pdp3_koblitz_f4_and_f6_verify_on_one_query_stream ... FAILED
+test pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver ... FAILED
+test pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len ... FAILED
+test pdp3_matrix_runtime_and_generalized_recover_and_replay ... FAILED
+test the_database_refuses_a_slug_with_another_identity ... ok
+test two_sessions_queued_for_one_directory_cannot_both_write_it ... FAILED
+
+failures:
+
+---- pdp3_binary_runs_every_engine_on_a_generic_binary_curve stdout ----
+
+thread 'pdp3_binary_runs_every_engine_on_a_generic_binary_curve' (526552) panicked at tests/ecbench.rs:1009:5:
+ecbench: No space left on device (os error 28)
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- pdp3_koblitz_f4_and_f6_verify_on_one_query_stream stdout ----
+
+thread 'pdp3_koblitz_f4_and_f6_verify_on_one_query_stream' (526666) panicked at tests/ecbench.rs:866:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+
+---- pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver stdout ----
+
+thread 'pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver' (526667) panicked at tests/ecbench.rs:1077:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+
+---- pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len stdout ----
+
+thread 'pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len' (526668) panicked at tests/ecbench.rs:1200:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+
+---- pdp3_matrix_runtime_and_generalized_recover_and_replay stdout ----
+
+thread 'pdp3_matrix_runtime_and_generalized_recover_and_replay' (526669) panicked at tests/ecbench.rs:937:6:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+
+---- two_sessions_queued_for_one_directory_cannot_both_write_it stdout ----
+
+thread 'two_sessions_queued_for_one_directory_cannot_both_write_it' (526672) panicked at tests/ecbench.rs:339:49:
+called `Result::unwrap()` on an `Err` value: Os { code: 28, kind: StorageFull, message: "No space left on device" }
+
+
+failures:
+    pdp3_binary_runs_every_engine_on_a_generic_binary_curve
+    pdp3_koblitz_f4_and_f6_verify_on_one_query_stream
+    pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver
+    pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len
+    pdp3_matrix_runtime_and_generalized_recover_and_replay
+    two_sessions_queued_for_one_directory_cannot_both_write_it
+
+test result: FAILED. 11 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 93.71s
+
+error: test failed, to rerun pass `--test ecbench`
