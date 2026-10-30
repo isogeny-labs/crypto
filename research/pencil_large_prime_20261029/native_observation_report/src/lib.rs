@@ -163,6 +163,105 @@ fn breakable(s: &str) -> String {
         .map(|c| format!("{}\\allowbreak{{}}", tex(&c.to_string())))
         .collect()
 }
+/// Floating point is used only for SVG coordinates, never for exported fractions.
+fn ratio_svg(cells: &[V], request: &V) -> Result<Option<String>> {
+    if cells
+        .iter()
+        .filter(|c| !c["algorithm_ratio_of_sums"].is_null())
+        .count()
+        < 2
+    {
+        return Ok(None);
+    }
+    let mut values = Vec::new();
+    let mut maximum = 1.0f64;
+    for c in cells {
+        let mut pair = [None, None];
+        for (j, key) in [
+            "algorithm_ratio_of_sums",
+            "ratio_of_sums_including_calibration",
+        ]
+        .iter()
+        .enumerate()
+        {
+            if !c[key].is_null() {
+                fraction(&c[key])?;
+                let n = text(&c[key]["numerator"])?
+                    .parse::<f64>()
+                    .map_err(|e| e.to_string())?;
+                let d = text(&c[key]["denominator"])?
+                    .parse::<f64>()
+                    .map_err(|e| e.to_string())?;
+                let value = n / d;
+                if !n.is_finite() || !d.is_finite() || !value.is_finite() {
+                    return Err(
+                        "fraction outside finite SVG projection range; exact inputs retained"
+                            .into(),
+                    );
+                }
+                maximum = maximum.max(value);
+                pair[j] = Some(value);
+            }
+        }
+        values.push(pair);
+    }
+    let mut svg = String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1400\" height=\"1800\"><rect width=\"1400\" height=\"1800\" fill=\"white\"/><g font-family=\"sans-serif\" fill=\"#183042\"><text x=\"20\" y=\"30\" font-size=\"22\">Derived finite-model cost ratios to rho — not timing</text><text x=\"20\" y=\"60\">Floating-point visual projection only. Exact fractions in JSON and CSV are authoritative.</text><text x=\"20\" y=\"90\">Blue: algorithm only. Orange: including calibration. Null values have no plotted position.</text>");
+    for tick in 0..=4 {
+        let x = 350 + tick * 200;
+        svg += &format!("<line x1=\"{x}\" x2=\"{x}\" y1=\"130\" y2=\"1720\" stroke=\"#ddd\"/><text x=\"{x}\" y=\"120\">{:.4}</text>", maximum * tick as f64 / 4.0);
+    }
+    let reference_x = 350.0 + 800.0 / maximum;
+    svg += &format!("<line x1=\"{reference_x}\" x2=\"{reference_x}\" y1=\"130\" y2=\"1720\" stroke=\"#777\" stroke-dasharray=\"4 4\"/>");
+    for (i, (c, pair)) in cells.iter().zip(values).enumerate() {
+        let y = 155 + i * 43;
+        svg += &format!(
+            "<g data-cell=\"{}\"><text x=\"20\" y=\"{y}\">Cell {}: S2={} I={} N10={}</text>",
+            i + 1,
+            i + 1,
+            c["square_twice"],
+            c["inversion"],
+            c["native_tenths"]
+        );
+        for (j, key) in [
+            "algorithm_ratio_of_sums",
+            "ratio_of_sums_including_calibration",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let yy = y + j * 13;
+            if let Some(value) = pair[j] {
+                let x = 350.0 + 800.0 * value / maximum;
+                let color = if j == 0 { "#2369a1" } else { "#b55c18" };
+                svg += &format!("<circle data-series=\"{key}\" cx=\"{x}\" cy=\"{yy}\" r=\"4\" fill=\"{color}\"><title>{}</title></circle><text x=\"1180\" y=\"{yy}\" fill=\"{color}\">~{value:.6}</text>",xml(&fraction(&c[key])?));
+            } else {
+                svg += &format!(
+                    "<text data-series=\"{key}\" x=\"1180\" y=\"{yy}\">null (unavailable)</text>"
+                );
+            }
+        }
+        svg += "</g>";
+    }
+    svg += "<text x=\"20\" y=\"1770\">Dashed guide: ratio 1. Price-cell ratios share observations; they are not independent samples.</text>";
+    // Extend only the caption area; numerical projection coordinates are unchanged.
+    svg = svg.replace("height=\"1800\"", "height=\"1920\"");
+    for (i, key) in ["title", "run_id", "scope"].iter().enumerate() {
+        let full = format!("{key}: {}", text(&request[key])?);
+        let short = if full.chars().count() > 130 {
+            format!("{}…", full.chars().take(129).collect::<String>())
+        } else {
+            full.clone()
+        };
+        svg += &format!(
+            "<text x=\"20\" y=\"{}\"><title>{}</title>{}</text>",
+            1810 + i * 30,
+            xml(&full),
+            xml(&short)
+        );
+    }
+    svg += "</g></svg>";
+    Ok(Some(svg))
+}
 pub fn render(report: &V, out: &Path) -> Result<()> {
     fs::create_dir(out).map_err(|e| e.to_string())?;
     let a = &report["native_analysis"];
@@ -302,6 +401,9 @@ S2 is twice S/M; N10 is ten times the native event price. Incomplete/unavailable
     ] {
         fs::write(out.join(name), data).map_err(|e| e.to_string())?;
     }
+    if let Some(svg) = ratio_svg(cells, r)? {
+        fs::write(out.join("finite-cost-ratios.svg"), svg).map_err(|e| e.to_string())?;
+    }
     for pass in 1..=2 {
         let render = Command::new("pdflatex")
             .current_dir(out)
@@ -414,6 +516,27 @@ mod tests {
         assert!(build(&r).is_err());
     }
     #[test]
+    fn ratio_caption_escapes_identity_and_retains_full_scope() {
+        let mut a = fixture(0);
+        for i in [0, 1] {
+            a["aggregate_cells"][i]["algorithm_ratio_of_sums"] =
+                json!({"numerator":"1","denominator":"2"});
+            a["aggregate_cells"][i]["ratio_of_sums_including_calibration"] =
+                json!({"numerator":"3","denominator":"4"});
+        }
+        let scope = "long scope & ".repeat(30);
+        let request =
+            json!({"title":"Software fixture <only>","run_id":"fixture&not-a-run","scope":scope});
+        let svg = ratio_svg(a["aggregate_cells"].as_array().unwrap(), &request)
+            .unwrap()
+            .unwrap();
+        assert!(svg.contains("title: Software fixture &lt;only&gt;"));
+        assert!(svg.contains("run_id: fixture&amp;not-a-run"));
+        assert!(svg.contains(&format!("<title>scope: {}</title>", xml(&scope))));
+        assert!(svg.contains('…'));
+        assert!(!svg.contains("Software fixture <only>"));
+    }
+    #[test]
     fn renders_missing_and_mixed_native_pdf() {
         let retained = std::env::var_os("REPORT_FIXTURE_DIR").map(std::path::PathBuf::from);
         let temp = tempfile::tempdir().unwrap();
@@ -450,6 +573,17 @@ mod tests {
             let r = build(&req).unwrap();
             let out = base.join(name);
             render(&r, &out).unwrap();
+            assert_eq!(out.join("finite-cost-ratios.svg").exists(), mixed);
+            if mixed {
+                let svg = fs::read_to_string(out.join("finite-cost-ratios.svg")).unwrap();
+                assert_eq!(svg.matches("data-cell=").count(), 36);
+                assert_eq!(svg.matches("<circle ").count(), 4);
+                assert_eq!(svg.matches("null (unavailable)").count(), 68);
+                assert!(svg.contains(
+                    "90071992547409931234567890123456789/70000000000000000000000000000000000"
+                ));
+                assert!(svg.contains("not timing"));
+            }
             assert!(out.join("report.pdf").metadata().unwrap().len() > 1000);
             let csv = fs::read_to_string(out.join("cost-grid-exact.csv")).unwrap();
             assert_eq!(csv.lines().count(), 37);
