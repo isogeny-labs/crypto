@@ -238,3 +238,11 @@ Cairnlease/funding. Do not repeat these proved bridges as substitute for that
 next concrete experiment. Native/proof old18identities and all dated data remain.
 Original better-yield/lower-relevant-degree objective and all registry/library/
 naming/requiredCI/review/coordination/integration holds remain open.
+
+## 2026-10-30 full bounded-solver and retained-witness experiment
+
+[Full native report](reports/degree-qualified-20261030/README.md) executes the previously drafted scope:ALL16F13arms,2encodings,caps0..8,288configs/1728separate source attempts PERinstrument. Flat bounded Macaulay/GB baseline60verified/278blockedsetups;new separately preregistered identical-row witness retention696verified/172blocked. Independent native arithmetic reconstructs every cap/certificate/row/publiclog/sourceanswer/frontier. All18changedcontrolsets reject101/no receipt;the same22backend tests pass in eachcrate. There are192unmatched lower-cap/higher-rank recovery-admitted pairrecords,0strongest-source gains. Original actualtwist advantage remains OPEN;no stationary/regularity/completecost/speed claim. No target-label oracle or unlimited setup;all failures/losses retained.
+
+Initial compile failure and first fullCPP/rejectedb3audit retained,then complete corrected-instrument replication with original288casebytes unchanged. Both full protocol/analysis hashes frozen before affected NEWdata,prior outcomes disclosed. Prior20/24actualrow/scalarproof and18IDC1records untouched. Full6251rawhashes restore/repack with canonical duplicate rehydration. Three-pagegraph/report inspected;allcases/failures/controls/export records linked. Fullroot/naming/1921registrations/requiredCI/Conductor/review/integration/broadergeometry/cost remain held. No new global metrics tool added where current head lacks it.
+
+Next useful work must test a new actually transferable fixture or algebraic encoding against its ENTIRE source frontier after atlas/literature/map checks. Do not repeat this census or another identical conditional proof. Both sources/frozen datasets stay immutable;no scope shrinking/fastestclaim/paidcompute/arbitraryresultupload.

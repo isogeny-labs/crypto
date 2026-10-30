@@ -17,3 +17,7 @@ analysis hashes before data;use current official approved checkpoint gate.
 Scope must not silently shrink to a favorable prefix;alllosses/blocked targets
 stay.600sec commandcaps/3600seciteration,twoexistinglocalworkers,no paidcompute
 or broader assetupload. A null/open theorem doesn't end the research program.
+
+## Executed local evidence, still draft for integration/coordination
+
+The full declared scope has now run in TWO separately source-bound instruments,each288configurations/1728attempts. Flat60recoveries/278blocked;retained696/172;192unmatchedjointrecords/0strongest-source gains. Both independent audits and all9controls/22backend perinstrument pass. See [actual report](../../research/quadratic_twist_evidence_20261021/reports/degree-qualified-20261030/README.md). Earlier unimplemented wording is the original preregistered draft context,now superseded by this executed LOCAL evidence. No main-ancestry/Cairn lease/funding/task promotion. Original broaderadvantage still open.
