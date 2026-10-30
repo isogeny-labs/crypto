@@ -66,6 +66,7 @@ pub mod archive;
 pub mod cm_orbit;
 pub mod explicit_base;
 pub mod fiber;
+pub mod hashed;
 pub mod large_prime;
 pub mod linalg;
 pub mod pkm_semaev;
@@ -608,8 +609,10 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         outcome.verified &= audit.audit.invalid_rows == 0;
         audit.audit
     });
-    let cost_qualification = audit_enabled.then(|| {
-        if archive_import {
+    let cost_qualification = (audit_enabled || oracle.name() == "hashed-tensor").then(|| {
+        if oracle.name() == "hashed-tensor" {
+            "partial_counted_cost: tensor-contraction primitive steps are uncalibrated, so S excludes most of the relation phase; total-cost and speedup unknown".to_string()
+        } else if archive_import {
             "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
         } else {
             "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()

@@ -75,14 +75,28 @@ pub struct Meter {
     pub limits: Limits,
     /// Primitive steps charged so far.
     pub used: u64,
+    /// Affine curve additions charged (`curve addition`).
+    pub curve_additions: u64,
+    /// Square-root extractions charged (`Tonelli-Shanks`).
+    pub square_roots: u64,
 }
 impl Meter {
     /// Start an operation with explicit bounds.
     pub fn new(limits: Limits) -> Self {
-        Self { limits, used: 0 }
+        Self {
+            limits,
+            used: 0,
+            curve_additions: 0,
+            square_roots: 0,
+        }
     }
     /// Charge before doing work; limits never wrap or become successful results.
     pub fn charge(&mut self, n: u64, phase: &str) -> Result<()> {
+        if phase == "curve addition" {
+            self.curve_additions = self.curve_additions.saturating_add(n);
+        } else if phase == "Tonelli-Shanks" {
+            self.square_roots = self.square_roots.saturating_add(n);
+        }
         self.used = self
             .used
             .checked_add(n)
