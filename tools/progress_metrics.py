@@ -591,6 +591,8 @@ def koblitz_affine_normalization(ref, since):
         for key, unit, label in (
             ("normalization_control_cases", "control cases", "Smooth and cusp normalization API controls over F2"),
             ("source_preparation_cases", "prepared source ideals", "Exact twisted F2 source input; not a normalization"),
+            ("generic_source_prime", "certified generic fields", "Exact generic primeness; affine contraction and normalization separate"),
+            ("primitive_presentations", "two-way field presentations", "Fixed primitive-element test; integral model and normalization separate"),
             ("normalization_outputs_computed", "normalizer outputs", "Computed affine presentations; independent exported-data checks counted separately"),
             ("verified_affine_normalizations", "checked affine presentations", "Affine normalization only; proper projective and modular-factor geometry remain open"),
             ("audited_conditional_declarations", "audited declarations", "Conditional field-degree lemmas; concrete native ideals not formalized"),
