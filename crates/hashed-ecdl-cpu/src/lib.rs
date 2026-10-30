@@ -350,7 +350,7 @@ impl Scratch {
         self.denominators.clear();
         self.numerators.clear();
         let mut product = 1;
-        let mut active = false;
+        let mut first_active = None;
         for (i, point) in points.iter().enumerate() {
             let (num, den) = match *point {
                 None => {
@@ -373,21 +373,34 @@ impl Scratch {
             self.denominators.push(den);
             self.numerators.push(num);
             if den != 0 {
-                product = mul(product, den);
-                active = true;
+                if first_active.is_none() {
+                    // The first nonzero factor needs no multiplication by one.
+                    first_active = Some(i);
+                    product = den;
+                } else {
+                    product = mul(product, den);
+                }
             }
         }
-        if !active {
+        let Some(first_active) = first_active else {
             return 0;
-        }
+        };
         let mut inverse = curve.field_inverse(product);
         for i in (0..points.len()).rev() {
             let den = self.denominators[i];
             if den == 0 {
                 continue;
             }
-            let iz = mul(inverse, self.prefix[i]);
-            inverse = mul(inverse, den);
+            // At the first active entry the prefix is one, and the updated
+            // running inverse would never be consumed. This also covers a
+            // single ordinary residual surrounded by exceptional points.
+            let iz = if i == first_active {
+                inverse
+            } else {
+                let iz = mul(inverse, self.prefix[i]);
+                inverse = mul(inverse, den);
+                iz
+            };
             let slope = mul(self.numerators[i], iz);
             let xx = points[i].unwrap().0;
             let nx = sub(sub(mul(slope, slope), x, p), xx, p);
@@ -472,6 +485,54 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn batch_endpoints_handle_exceptional_prefixes_and_scratch_reuse() {
+        for (p, a, b, r, generator) in [
+            (211, 0, 7, 199, Some((3, 33))),
+            (65521, 65518, 3, 65563, Some((0, 64894))),
+            (
+                68719476731,
+                68719476728,
+                33,
+                68719022539,
+                Some((2, 51741851039)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, generator).unwrap();
+            let mut scratch = Scratch::default();
+            for scalar in 1..=24 {
+                let target = c.mul(generator, scalar).unwrap();
+                let neg = target.map(|(x, y)| (x, sub(0, y, p)));
+                let other = c.mul(generator, scalar + 1).unwrap();
+                for points in [
+                    vec![other],
+                    vec![neg],
+                    vec![],
+                    vec![None, target],
+                    vec![None, target, other, None, target],
+                    vec![None, target, neg, other, target, None],
+                ] {
+                    let expected_count =
+                        u64::from(points.iter().any(|&q| q.is_some() && q != target));
+                    assert_eq!(scratch.subtract(&c, target, &points), expected_count);
+                    let expected: Vec<_> = points
+                        .iter()
+                        .map(|&q| c.add(target, q.map(|(x, y)| (x, sub(0, y, p)))).unwrap())
+                        .collect();
+                    assert_eq!(scratch.output, expected);
+                    assert_eq!(scratch.subtract(&c, None, &points), 0);
+                    assert_eq!(
+                        scratch.output,
+                        points
+                            .iter()
+                            .map(|q| q.map(|(x, y)| (x, sub(0, y, p))))
+                            .collect::<Vec<_>>()
+                    );
+                }
+            }
+        }
+    }
+
     #[test]
     fn wide_field_batch_and_tuple_witnesses_match_checked_reference() {
         let c = Curve::with_order_witness(
