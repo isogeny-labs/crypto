@@ -53,6 +53,15 @@ jobs:
         with:
           fetch-depth: 1
           filter: blob:none
+      - name: Install the pinned Rust source parser
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.99.1'
+          components: rustfmt
+      - name: Reject malformed committed Rust source
+        run: |
+          python3 -m unittest discover -s .github/scripts -p test_check_rust_syntax.py -v
+          python3 .github/scripts/check_rust_syntax.py
       - name: Pull store data this workflow reads (tools/artifacts)
         shell: bash
         working-directory: ${{ github.workspace }}
