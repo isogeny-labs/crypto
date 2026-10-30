@@ -891,8 +891,6 @@ def ff(x):
 
 def main(argv):
     write = "--write" in argv
-    read("docs/VALIDATION_GATE.md", "gate schema (policy, read for the schema)", at_snapshot=True)
-    read("scripts/validation_gate.py", "gate module (check_rho_reference, check_validator_report)", at_snapshot=True)
     read(f"{EVID}/rho-reference.json", "earlier rho reference (plain rho; strongest_available false)")
     read(f"{EVID}/validator-report.json", "earlier validator report (plain-rho numbers cross-checked)")
     read(f"{EVID}/validator_recompute.py", "earlier validator script (grepped for the cost definition only)")
