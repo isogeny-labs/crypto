@@ -1,0 +1,548 @@
+{
+  "schema": "ecbench.resources/v1",
+  "session_id": "ECBS1h004ff9612cf6",
+  "records_sha256": "01d508dae5cf8a18b7cc4022d209b2d31054dbcdbf893dd9ab103fc626776fc0",
+  "scope": "all measured attempts; solve PMU excludes process startup",
+  "arms": [
+    {
+      "arm": "abscissa",
+      "method": "ic.pipeline",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "legendre_symbols_uncharged",
+        "lookups_uncharged",
+        "row_ops_uncharged",
+        "sqrt_solves_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "total_gae_sum": 304548.0,
+      "process_wall_ns_sum": 5023347080,
+      "user_ns_sum": 4001233000,
+      "sys_ns_sum": 954804000,
+      "solve_wall_ns_sum": 64644472,
+      "peak_rss_kib": 32780,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 126720.0,
+        "relations": 175673.0,
+        "verify": 2155.0
+      },
+      "phase_wall_ns_totals": {
+        "factor_base": 17338893,
+        "linear_algebra": 1572558,
+        "oracle_setup": 7063491,
+        "relations": 24106016,
+        "verify": 149246
+      },
+      "phase_wall_covered_runs": {
+        "factor_base": 120,
+        "linear_algebra": 120,
+        "oracle_setup": 120,
+        "relations": 120,
+        "verify": 120
+      },
+      "online_wall_ns_sum": 33065069,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "target_PDP": 6035927,
+        "target_descent": 1699367,
+        "target_query": 23632094,
+        "target_recovery_check": 1697681,
+        "target_relation_check": 0
+      },
+      "phase_native_totals": {
+        "factor_base.abscissae_scanned": 7440,
+        "factor_base.legendre_symbols": 7440,
+        "factor_base.sqrt_solves": 3840,
+        "linear_algebra.columns": 3960,
+        "linear_algebra.pinned_by_repeated_row": 0,
+        "linear_algebra.rank": 1938,
+        "linear_algebra.repeated_column_rows": 0,
+        "linear_algebra.row_ops": 17854,
+        "linear_algebra.rows": 1938,
+        "linear_algebra.single_column_rows": 114,
+        "linear_algebra.two_column_rows": 1824,
+        "relations.canonicalisations": 0,
+        "relations.direct_relations_skipped": 6,
+        "relations.frobfold_mismatches": 0,
+        "relations.inversions": 0,
+        "relations.lift_failures": 0,
+        "relations.lookups": 62150,
+        "relations.relations": 1938,
+        "relations.repeated_targets_skipped": 1136,
+        "relations.s4_hits": 0,
+        "relations.s4_pairs": 0,
+        "relations.sqrt_solves": 0,
+        "relations.target_guard_probes": 63286,
+        "relations.trials": 63286,
+        "relations.unliftable_systems": 0,
+        "relations.walk_jumps": 2881,
+        "relations.walk_pool_offsets": 961,
+        "relations.walk_pool_ops": 35090,
+        "relations.walk_pool_restarts": 1142,
+        "relations.walk_restarts": 1262,
+        "relations.walk_steps": 62030
+      },
+      "method_counter_totals": {
+        "matrix_dependent": 0,
+        "matrix_rank": 1938,
+        "matrix_rows": 1938,
+        "matrix_work": 17854,
+        "relations_found": 1938,
+        "targets_tried": 63286
+      }
+    },
+    {
+      "arm": "abscissa-aa",
+      "method": "ic.pipeline",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "legendre_symbols_uncharged",
+        "lookups_uncharged",
+        "row_ops_uncharged",
+        "sqrt_solves_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "total_gae_sum": 304548.0,
+      "process_wall_ns_sum": 4970485368,
+      "user_ns_sum": 3952508000,
+      "sys_ns_sum": 940393000,
+      "solve_wall_ns_sum": 61832662,
+      "peak_rss_kib": 32780,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "factor_base": 0.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 126720.0,
+        "relations": 175673.0,
+        "verify": 2155.0
+      },
+      "phase_wall_ns_totals": {
+        "factor_base": 16403203,
+        "linear_algebra": 1448570,
+        "oracle_setup": 7199298,
+        "relations": 23769309,
+        "verify": 147947
+      },
+      "phase_wall_covered_runs": {
+        "factor_base": 120,
+        "linear_algebra": 120,
+        "oracle_setup": 120,
+        "relations": 120,
+        "verify": 120
+      },
+      "online_wall_ns_sum": 31333211,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "target_PDP": 6637423,
+        "target_descent": 1574582,
+        "target_query": 21994688,
+        "target_recovery_check": 1126518,
+        "target_relation_check": 0
+      },
+      "phase_native_totals": {
+        "factor_base.abscissae_scanned": 7440,
+        "factor_base.legendre_symbols": 7440,
+        "factor_base.sqrt_solves": 3840,
+        "linear_algebra.columns": 3960,
+        "linear_algebra.pinned_by_repeated_row": 0,
+        "linear_algebra.rank": 1938,
+        "linear_algebra.repeated_column_rows": 0,
+        "linear_algebra.row_ops": 17854,
+        "linear_algebra.rows": 1938,
+        "linear_algebra.single_column_rows": 114,
+        "linear_algebra.two_column_rows": 1824,
+        "relations.canonicalisations": 0,
+        "relations.direct_relations_skipped": 6,
+        "relations.frobfold_mismatches": 0,
+        "relations.inversions": 0,
+        "relations.lift_failures": 0,
+        "relations.lookups": 62150,
+        "relations.relations": 1938,
+        "relations.repeated_targets_skipped": 1136,
+        "relations.s4_hits": 0,
+        "relations.s4_pairs": 0,
+        "relations.sqrt_solves": 0,
+        "relations.target_guard_probes": 63286,
+        "relations.trials": 63286,
+        "relations.unliftable_systems": 0,
+        "relations.walk_jumps": 2881,
+        "relations.walk_pool_offsets": 961,
+        "relations.walk_pool_ops": 35090,
+        "relations.walk_pool_restarts": 1142,
+        "relations.walk_restarts": 1262,
+        "relations.walk_steps": 62030
+      },
+      "method_counter_totals": {
+        "matrix_dependent": 0,
+        "matrix_rank": 1938,
+        "matrix_rows": 1938,
+        "matrix_work": 17854,
+        "relations_found": 1938,
+        "targets_tried": 63286
+      }
+    },
+    {
+      "arm": "known-log",
+      "method": "ic.known_log_mitm2_v1",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "base_dedup_probes_uncharged",
+        "base_index_entries_uncharged",
+        "base_negations_uncharged",
+        "base_scalar_draws_uncharged",
+        "lookups_uncharged",
+        "query_scalar_draws_uncharged",
+        "scalar_additions_uncharged",
+        "scalar_multiplications_uncharged",
+        "table_inserts_uncharged"
+      ],
+      "total_gae_sum": 194299.0,
+      "process_wall_ns_sum": 4259565942,
+      "user_ns_sum": 3283773000,
+      "sys_ns_sum": 899900000,
+      "solve_wall_ns_sum": 642571451,
+      "peak_rss_kib": 31428,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "factor_base": 61880.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 126720.0,
+        "target_PDP": 120.0,
+        "target_descent": 0.0,
+        "target_query": 3304.0,
+        "target_recovery_check": 2155.0,
+        "target_relation_check": 120.0
+      },
+      "phase_wall_ns_totals": {
+        "factor_base": 631760961,
+        "oracle_setup": 8964576
+      },
+      "phase_wall_covered_runs": {
+        "factor_base": 120,
+        "oracle_setup": 120
+      },
+      "online_wall_ns_sum": 949827,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "target_PDP": 181704,
+        "target_descent": 96729,
+        "target_query": 435990,
+        "target_recovery_check": 157290,
+        "target_relation_check": 78114
+      },
+      "phase_native_totals": {},
+      "method_counter_totals": {
+        "base_dedup_probes_uncharged": 3840,
+        "base_index_entries_uncharged": 7680,
+        "base_negations_uncharged": 11520,
+        "base_scalar_draws_uncharged": 3840,
+        "lookups_uncharged": 1084,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 126720,
+        "pair_colliding_attempts": 8440,
+        "pair_distinct_signed_classes": 114440,
+        "pair_identity_sums": 3840,
+        "query_scalar_draws_uncharged": 120,
+        "relation_point_checks": 120,
+        "relations_found": 120,
+        "scalar_additions_uncharged": 1204,
+        "scalar_multiplications_uncharged": 120,
+        "table_inserts_uncharged": 122880,
+        "target_equation_rank": 120,
+        "targets_tried": 1084,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 120
+      }
+    },
+    {
+      "arm": "known-log-aa",
+      "method": "ic.known_log_mitm2_v1",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "base_dedup_probes_uncharged",
+        "base_index_entries_uncharged",
+        "base_negations_uncharged",
+        "base_scalar_draws_uncharged",
+        "lookups_uncharged",
+        "query_scalar_draws_uncharged",
+        "scalar_additions_uncharged",
+        "scalar_multiplications_uncharged",
+        "table_inserts_uncharged"
+      ],
+      "total_gae_sum": 194299.0,
+      "process_wall_ns_sum": 4249868793,
+      "user_ns_sum": 3192173000,
+      "sys_ns_sum": 986760000,
+      "solve_wall_ns_sum": 646011316,
+      "peak_rss_kib": 31380,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "factor_base": 61880.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 126720.0,
+        "target_PDP": 120.0,
+        "target_descent": 0.0,
+        "target_query": 3304.0,
+        "target_recovery_check": 2155.0,
+        "target_relation_check": 120.0
+      },
+      "phase_wall_ns_totals": {
+        "factor_base": 633794556,
+        "oracle_setup": 9818432
+      },
+      "phase_wall_covered_runs": {
+        "factor_base": 120,
+        "oracle_setup": 120
+      },
+      "online_wall_ns_sum": 1200321,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "target_PDP": 203890,
+        "target_descent": 120961,
+        "target_query": 482498,
+        "target_recovery_check": 241060,
+        "target_relation_check": 151912
+      },
+      "phase_native_totals": {},
+      "method_counter_totals": {
+        "base_dedup_probes_uncharged": 3840,
+        "base_index_entries_uncharged": 7680,
+        "base_negations_uncharged": 11520,
+        "base_scalar_draws_uncharged": 3840,
+        "lookups_uncharged": 1084,
+        "matrix_dependent": 0,
+        "matrix_rank": 0,
+        "matrix_rows": 0,
+        "matrix_work": 0,
+        "pair_attempts": 126720,
+        "pair_colliding_attempts": 8440,
+        "pair_distinct_signed_classes": 114440,
+        "pair_identity_sums": 3840,
+        "query_scalar_draws_uncharged": 120,
+        "relation_point_checks": 120,
+        "relations_found": 120,
+        "scalar_additions_uncharged": 1204,
+        "scalar_multiplications_uncharged": 120,
+        "table_inserts_uncharged": 122880,
+        "target_equation_rank": 120,
+        "targets_tried": 1084,
+        "unknown_base_logs": 0,
+        "useful_target_relations": 120
+      }
+    },
+    {
+      "arm": "projected",
+      "method": "ic.pipeline",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "legendre_symbols_uncharged",
+        "lookups_uncharged",
+        "projected_base_column_map_entries_uncharged",
+        "projected_base_dedup_probes_uncharged",
+        "projected_base_membership_checks_uncharged",
+        "row_ops_uncharged",
+        "sqrt_solves_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "total_gae_sum": 316764.0,
+      "process_wall_ns_sum": 4974902561,
+      "user_ns_sum": 4012683000,
+      "sys_ns_sum": 887962000,
+      "solve_wall_ns_sum": 63739466,
+      "peak_rss_kib": 32828,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "factor_base": 76800.0,
+        "linear_algebra": 0.0,
+        "oracle_setup": 126720.0,
+        "relations": 111089.0,
+        "verify": 2155.0
+      },
+      "phase_wall_ns_totals": {
+        "factor_base": 25018581,
+        "linear_algebra": 2533464,
+        "oracle_setup": 9954798,
+        "relations": 13416912,
+        "verify": 180641
+      },
+      "phase_wall_covered_runs": {
+        "factor_base": 120,
+        "linear_algebra": 120,
+        "oracle_setup": 120,
+        "relations": 120,
+        "verify": 120
+      },
+      "online_wall_ns_sum": 21862141,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "target_PDP": 2998032,
+        "target_descent": 2703972,
+        "target_query": 15135908,
+        "target_recovery_check": 1024229,
+        "target_relation_check": 0
+      },
+      "phase_native_totals": {
+        "factor_base.abscissae_scanned": 7440,
+        "factor_base.cofactor_projected_points": 3840,
+        "factor_base.legendre_symbols": 7440,
+        "factor_base.projected_base_column_map_entries_uncharged": 7680,
+        "factor_base.projected_base_dedup_probes_uncharged": 3840,
+        "factor_base.projected_base_duplicate_points": 0,
+        "factor_base.projected_base_membership_checks_uncharged": 3840,
+        "factor_base.sqrt_solves": 3840,
+        "linear_algebra.columns": 3960,
+        "linear_algebra.pinned_by_repeated_row": 0,
+        "linear_algebra.rank": 2615,
+        "linear_algebra.repeated_column_rows": 0,
+        "linear_algebra.row_ops": 29955,
+        "linear_algebra.rows": 2617,
+        "linear_algebra.single_column_rows": 81,
+        "linear_algebra.two_column_rows": 2536,
+        "relations.canonicalisations": 0,
+        "relations.direct_relations_skipped": 2,
+        "relations.frobfold_mismatches": 0,
+        "relations.inversions": 0,
+        "relations.lift_failures": 0,
+        "relations.lookups": 26303,
+        "relations.relations": 2617,
+        "relations.repeated_targets_skipped": 168,
+        "relations.s4_hits": 0,
+        "relations.s4_pairs": 0,
+        "relations.sqrt_solves": 0,
+        "relations.target_guard_probes": 26471,
+        "relations.trials": 26471,
+        "relations.unliftable_systems": 0,
+        "relations.walk_jumps": 2090,
+        "relations.walk_pool_offsets": 170,
+        "relations.walk_pool_ops": 6646,
+        "relations.walk_pool_restarts": 170,
+        "relations.walk_restarts": 290,
+        "relations.walk_steps": 26183
+      },
+      "method_counter_totals": {
+        "matrix_dependent": 2,
+        "matrix_rank": 2615,
+        "matrix_rows": 2617,
+        "matrix_work": 29955,
+        "relations_found": 2617,
+        "targets_tried": 26471
+      }
+    },
+    {
+      "arm": "rho-neg",
+      "method": "rho.negation",
+      "measured": 120,
+      "verified": 120,
+      "statuses": {
+        "verified": 120
+      },
+      "lower_bound": true,
+      "unpriced_units": [
+        "canonicalisations_uncharged"
+      ],
+      "total_gae_sum": 33653.0,
+      "process_wall_ns_sum": 4194070356,
+      "user_ns_sum": 3230632000,
+      "sys_ns_sum": 892954000,
+      "solve_wall_ns_sum": 642184132,
+      "peak_rss_kib": 31264,
+      "instructions_sum": null,
+      "cycles_sum": null,
+      "pmu_complete_runs": 0,
+      "pmu_errors": [
+        "perf_event_open: No such file or directory (os error 2)"
+      ],
+      "phase_gae_totals": {
+        "internal_verification": 2155.0,
+        "search": 21843.0,
+        "setup": 9655.0
+      },
+      "phase_wall_ns_totals": {},
+      "phase_wall_covered_runs": {},
+      "online_wall_ns_sum": 643367921,
+      "online_complete_runs": 120,
+      "online_phase_ns_totals": {
+        "rho_solve": 643367921
+      },
+      "phase_native_totals": {},
+      "method_counter_totals": {
+        "canonicalisations_uncharged": 21963,
+        "cycle_escape_doublings": 253,
+        "cycles_length_2": 39,
+        "cycles_length_4": 126,
+        "cycles_other_length": 88,
+        "distinguished_point_bits": 400,
+        "distinguished_points": 1587,
+        "jump_coefficient_bits": 840,
+        "jumps": 640,
+        "look_ahead_additions": 2187,
+        "setup_additions": 4191,
+        "setup_doublings": 5464,
+        "start_additions": 1471,
+        "steps": 17932,
+        "useless_collisions": 2,
+        "verification_operations": 2155,
+        "walk_operations": 20372,
+        "walks": 1591,
+        "walks_abandoned_in_a_cycle": 0,
+        "walks_capped": 4
+      }
+    }
+  ]
+}

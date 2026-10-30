@@ -1,0 +1,442 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-ECDLP-DATASET-PILOT-20261027",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/ml_dataset_20261028",
+  "authors": [
+    "Dataset campaign implementation"
+  ],
+  "question": "Can the native generator produce and independently verify synthetic curve/PDP/scalar records and preserve all emitted artifacts through immutable S3 publication and replay, while retaining unsupported and incomplete outcomes?",
+  "claims": [
+    {
+      "id": "C-correctness",
+      "class": "exact_computation",
+      "text": "Every record marked verified has its stated known-answer, PDP or independent scalar witness replayed against the exact declared curve and factor base; these are separate labels.",
+      "decided_by": [
+        "C-absolute"
+      ]
+    },
+    {
+      "id": "C-performance",
+      "class": "out_of_scope",
+      "text": "No speedup, fastest-solver, instruction-count completeness, security or asymptotic claim is made.",
+      "decided_by": []
+    },
+    {
+      "id": "C-falls",
+      "class": "out_of_scope",
+      "text": "No exact first/last fall degree or universal fall-degree conjecture is decided by this pilot.",
+      "decided_by": []
+    }
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1505.02532",
+      "provenance": "retrieved",
+      "claim": "Closure-space first and last fall degrees differ from solver observed degrees; zero-dimensionality hypotheses matter.",
+      "verified_by": "Read definitions and ECDLP applicability discussion before implementation."
+    },
+    {
+      "ref": "https://research.birmingham.ac.uk/en/publications/algebraic-approaches-for-the-elliptic-curve-discrete-logarithm-pr/",
+      "provenance": "retrieved",
+      "claim": "PKM concerns prime-field algebraic attacks; an audit score is not a complete solve.",
+      "verified_by": "Verified author, bibliographic and abstract record; full publisher paper was not fetched."
+    },
+    {
+      "ref": "src/cryptanalysis/{koblitz_index_calculus,binary_semaev_chain_sat,matrix_f5_f2,f6_wide_geometry,ec_index_calculus}.rs",
+      "provenance": "internal",
+      "claim": "Use actual native engines and preserve their parameter and trace limits.",
+      "verified_by": "Source API and correctness review."
+    }
+  ],
+  "arms": [
+    {
+      "id": "dataset",
+      "role": "candidate",
+      "description": "Bounded native data generation; method ID is a crossed annotation, never a performance ranking.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "provenance": "CRYPTO_BUILD_GIT_COMMIT pinned after implementation commit; clean=false prohibited"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "n": [
+          23
+        ],
+        "m": [
+          2,
+          4,
+          15
+        ],
+        "twists": true,
+        "curve_seeds": 1,
+        "generators": 2,
+        "keys": 2,
+        "factor_base_size": 4,
+        "degree_bound": 3,
+        "work_limit": 20000,
+        "solvers": [
+          "enumerate",
+          "root",
+          "sat",
+          "f4",
+          "f5",
+          "f6",
+          "weil",
+          "pkm",
+          "double-large-prime"
+        ]
+      }
+    },
+    {
+      "id": "reference-bsgs",
+      "role": "reference",
+      "description": "Independent BSGS recovers the scalar from public inputs under the same bounded work budget; each recovery is checked with separate arithmetic.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "provenance": "CRYPTO_BUILD_GIT_COMMIT pinned after implementation commit; clean=false prohibited"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "families": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "n": [
+          23
+        ],
+        "m": [
+          2,
+          4,
+          15
+        ],
+        "twists": true,
+        "curve_seeds": 1,
+        "generators": 2,
+        "keys": 2,
+        "factor_base_size": 4,
+        "degree_bound": 3,
+        "work_limit": 20000,
+        "solvers": [
+          "bsgs"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact fixture/data-integrity pilot with no timing comparison. Deterministic repeat and resume are implementation tests, not statistical A/A evidence."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No detection hypothesis. Native unit tests include known PDPs and full independent BSGS recovery; generator's known-answer scalar is verified separately for every constructed instance."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No discovery-rate or statistical significance claim. Wrong witnesses, corrupt artifacts, incorrect twist metadata and storage corruption are fail-closed software tests."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "bsgs",
+          "enumerate",
+          "root",
+          "sat",
+          "f4",
+          "f5",
+          "f6",
+          "weil",
+          "pkm",
+          "double-large-prime"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_binary",
+        "treatment": "fixed",
+        "how": "Every run binds clean source commit, executable SHA256 and frozen plan; resume rejects changed binary."
+      },
+      {
+        "name": "curve_generator_key",
+        "treatment": "crossed",
+        "how": "Frozen deterministic axes and paired twists; same public input across backends."
+      },
+      {
+        "name": "hardware_kernel_hypervisor_load",
+        "treatment": "measured",
+        "how": "Save host manifest. Shared Spot clocks are diagnostic, invalid for comparison."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Child RAYON_NUM_THREADS=1, bounded process per cell."
+      },
+      {
+        "name": "memory_environment_layout_order",
+        "treatment": "measured",
+        "how": "Record memory caps and native counters; no causal comparison from execution order."
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "how": "Retain every attempt and immutable completed-cell publication; interrupted cell is preserved and requires reconciliation."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "CLI hashes, verifies and counts statuses; no post-hoc significance test or hand-edited label."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-absolute",
+        "arms": [
+          "dataset",
+          "reference-bsgs"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "zero invalid independently checked certificates"
+      }
+    ],
+    "aa_not_applicable": "Exact identity and artifact checks only; no timing/statistical comparison.",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Reference BSGS and candidate solver cells follow the fixed mixed-radix method axis; no timing comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "CaseConfig seed=20261027; independent curve/generator/key domains in pinned source. Plan mixed-radix rule frozen before data."
+    },
+    "instance_sampling": {
+      "rule": "Synthetic known-answer targets over each certified prime subgroup; uniform nonzero rejection sampling and fixed curve-seed/generator/key axes. Retain all failed constructions.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Software validation has explicit method labels; public ML export must omit restricted witness/provenance and use field-size component holdout.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 72,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "72 distinct family/m/twist/generator/key configurations, 10 methods each =720 planned cells. No statistical inference; no claim of power. First launch is bounded to an explicitly recorded subset; remaining cells stay planned. Software preflight is excluded from the dataset and establishes no timing comparison."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 30,
+      "threads": 1,
+      "estimated_total_seconds": 21600,
+      "measured_on": "Local native unit calibration software-preflight.json: one n23 m2 Koblitz BSGS call and one enumerate call with FB4/work20000. 30s per cell and21600s total are conservative configured worker ceilings, not extrapolated measured runtimes; storage overhead is outside per-cell clocks and the job TTL bounds each wave."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "verified_records",
+        "name": "Verified records by distinct claim type",
+        "unit": "record",
+        "kind": "exact",
+        "definition": "Count receipts whose independently replayed certificate establishes the specific known-answer, PDP or scalar claim; never combine these labels.",
+        "source": "cell manifest outcome and replay certificates",
+        "aggregation": "per_row",
+        "resolution": "1 record",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "native_counters",
+        "name": "Typed native solver operation counters",
+        "unit": "backend-specific operation",
+        "kind": "counted",
+        "definition": "Counter names and scopes supplied by actual backend, with missing work explicit; never renamed as retired instructions or converted across methods.",
+        "source": "solver outcome counters and per-event artifacts",
+        "aggregation": "per_row",
+        "resolution": "one declared native operation",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "backend-native typed events",
+      "artifact bytes",
+      "record outcome"
+    ],
+    "record": [
+      "source_commit",
+      "binary_sha256",
+      "host CPU/kernel",
+      "plan/protocol hashes",
+      "limits",
+      "exit status",
+      "attempts",
+      "S3 roundtrip receipts"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab/cpu-spot",
+    "placement": {
+      "cpus": 2,
+      "memory": "4Gi",
+      "spot": true
+    },
+    "measurement_class": "throughput",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "application",
+      "interval_seconds": 60,
+      "grace_seconds": 30,
+      "restore_validation": "application_managed",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "At most720 planned pilot cells; each invocation explicitly names max_cases and disjoint shard binding. Initial wave at most36 cells per job, 3600s job TTL, 30s cell CPU-process wall deadline, 2048MiB address space and64MiB trace cap.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop publication wave on failed hash/replay/storage check; retain failed cell and all preceding receipts. Never change seeds to replace failure.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Report exact coverage and statuses; any incorrect verified label is an implementation failure to repair before scaling. A timeout, UNSAT report without proof or unsupported cell is not a mathematical conclusion.",
+    "comparison_ids": [
+      "C-absolute"
+    ],
+    "threshold": "zero invalid verified witnesses and zero missing/tampered published artifacts",
+    "statistic": "per-cell checks and counts",
+    "interval": "none: exact checks",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "verified_within_scope",
+      "incomplete",
+      "invalid",
+      "unsupported"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "cells/*/manifest.json",
+      "publication verified receipts"
+    ],
+    "outputs": [
+      "crypto dataset status",
+      "crypto dataset verify",
+      "run report"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "artifact and claim-validation DAG"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "claiming known-answer construction is an independent ECDLP solve",
+    "omitting unsupported cells or failed attempts",
+    "claiming native XOR counters are retired instructions",
+    "claiming observed solver degree is exact FFD or LFD",
+    "training on witnesses/seeds or splitting equivalent curve/twist instances across folds",
+    "calling an upload durable without readback",
+    "claiming a queued or partial wave completed the enormous corpus"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e04dac4473b72c428a1cc4cc056a0a12f9ce0271540396bfa8e74c332aa03396",
+    "commit": "3f1c7822976d29b15a01fd94e0f29c417760c6b5",
+    "frozen_at": "2026-10-28T05:42:19Z",
+    "filed_before_affected_data": true
+  }
+}
