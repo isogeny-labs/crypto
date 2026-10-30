@@ -1103,6 +1103,192 @@ fn neg_inv_u64(p: u64) -> u64 {
     inv.wrapping_neg()
 }
 
+/// Shared legacy Montgomery reduction; requires `p < 2^63`, `t < p*2^64`.
+#[inline(always)]
+fn redc64(p: u64, n_inv: u64, t: u128) -> u64 {
+    let lo = t as u64;
+    let m = lo.wrapping_mul(n_inv);
+    let mp = u128::from(m) * u128::from(p);
+    let u = ((t >> 64) as u64) + ((mp >> 64) as u64) + u64::from(lo != 0);
+    let (d, borrow) = u.overflowing_sub(p);
+    std::hint::select_unpredictable(borrow, u, d)
+}
+
+/// Fixed cumulative setup reservations, in modeled units rather than instructions.
+pub const FP64_ARITHMETIC_SETUP_WORK: u64 = 131_072;
+/// Fixed context/report/temporary allowance; not a measurement of process RSS.
+pub const FP64_ARITHMETIC_SETUP_BYTES: u64 = 4096;
+
+/// Stack-only Montgomery arithmetic for bounded native elimination.
+///
+/// This intentionally does not implement [`PrimeField`]: it has no square-root
+/// precomputation, BigUint modulus, or implicit allocating conversion methods.
+/// Arithmetic operands must be valid Montgomery words returned by this context.
+#[derive(Debug)]
+pub struct Fp64Arithmetic {
+    p: u64,
+    n_inv: u64,
+    one: u64,
+    r2: u64,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FieldSetupStage {
+    Admitted,
+    Complete,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FieldSetupEvent {
+    pub stage: FieldSetupStage,
+    pub reserved_work: u64,
+    pub reserved_bytes: u64,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FieldSetupStop {
+    InvalidModulus,
+    Composite,
+    WorkLimit,
+    StorageLimit,
+    Deadline,
+    Observer,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FieldSetupFailure {
+    pub stop: FieldSetupStop,
+    pub reserved_work: u64,
+    pub reserved_bytes: u64,
+}
+#[derive(Debug)]
+pub struct FieldSetup {
+    pub field: Fp64Arithmetic,
+    pub reserved_work: u64,
+    pub reserved_bytes: u64,
+    pub prime_verified: bool,
+}
+
+impl Fp64Arithmetic {
+    /// Admit setup once against the remaining ORIGINAL case budget/deadline.
+    ///
+    /// The existing fixed-witness primality check is one finite cooperative
+    /// chunk (at most 2184 modular products at 61 bits). No prime search,
+    /// nonresidue search, sqrt table or heap allocation occurs here. Callback
+    /// allocations are the caller's separately admitted responsibility.
+    pub fn try_new(
+        p: u64,
+        remaining_work: u64,
+        remaining_bytes: u64,
+        original_deadline: std::time::Instant,
+        observer: &mut impl FnMut(FieldSetupEvent) -> Result<(), ()>,
+    ) -> Result<FieldSetup, FieldSetupFailure> {
+        let mut reservation = (0, 0);
+        let result = (|| {
+            if p & 1 == 0 || !(3..=0x1fff_ffff_ffff_ffff).contains(&p) {
+                return Err(FieldSetupStop::InvalidModulus);
+            }
+            let check = || {
+                if std::time::Instant::now() >= original_deadline {
+                    Err(FieldSetupStop::Deadline)
+                } else {
+                    Ok(())
+                }
+            };
+            check()?;
+            if remaining_work < FP64_ARITHMETIC_SETUP_WORK {
+                return Err(FieldSetupStop::WorkLimit);
+            }
+            if remaining_bytes < FP64_ARITHMETIC_SETUP_BYTES {
+                return Err(FieldSetupStop::StorageLimit);
+            }
+            reservation = (FP64_ARITHMETIC_SETUP_WORK, FP64_ARITHMETIC_SETUP_BYTES);
+            observer(FieldSetupEvent {
+                stage: FieldSetupStage::Admitted,
+                reserved_work: reservation.0,
+                reserved_bytes: reservation.1,
+            })
+            .map_err(|_| FieldSetupStop::Observer)?;
+            check()?;
+            if !super::residual_walk::is_prime_u64(p) {
+                return Err(FieldSetupStop::Composite);
+            }
+            check()?;
+            let one = ((1u128 << 64) % u128::from(p)) as u64;
+            let r2 = ((u128::from(one) * u128::from(one)) % u128::from(p)) as u64;
+            let field = Self {
+                p,
+                n_inv: neg_inv_u64(p),
+                one,
+                r2,
+            };
+            check()?;
+            observer(FieldSetupEvent {
+                stage: FieldSetupStage::Complete,
+                reserved_work: reservation.0,
+                reserved_bytes: reservation.1,
+            })
+            .map_err(|_| FieldSetupStop::Observer)?;
+            check()?;
+            Ok(FieldSetup {
+                field,
+                reserved_work: reservation.0,
+                reserved_bytes: reservation.1,
+                prime_verified: true,
+            })
+        })();
+        result.map_err(|stop| FieldSetupFailure {
+            stop,
+            reserved_work: reservation.0,
+            reserved_bytes: reservation.1,
+        })
+    }
+    pub fn p(&self) -> u64 {
+        self.p
+    }
+    #[inline(always)]
+    pub fn zero(&self) -> u64 {
+        0
+    }
+    #[inline(always)]
+    pub fn one(&self) -> u64 {
+        self.one
+    }
+    /// Reduce any u64 to its Montgomery field representation.
+    #[inline(always)]
+    pub fn from_u64(&self, a: u64) -> u64 {
+        redc64(self.p, self.n_inv, u128::from(a) * u128::from(self.r2))
+    }
+    #[inline(always)]
+    pub fn to_u64(&self, a: u64) -> u64 {
+        redc64(self.p, self.n_inv, u128::from(a))
+    }
+    #[inline(always)]
+    pub fn add(&self, a: u64, b: u64) -> u64 {
+        let sum = a + b;
+        let (d, borrow) = sum.overflowing_sub(self.p);
+        std::hint::select_unpredictable(borrow, sum, d)
+    }
+    #[inline(always)]
+    pub fn sub(&self, a: u64, b: u64) -> u64 {
+        let (d, borrow) = a.overflowing_sub(b);
+        std::hint::select_unpredictable(borrow, d.wrapping_add(self.p), d)
+    }
+    #[inline(always)]
+    pub fn neg(&self, a: u64) -> u64 {
+        if a == 0 {
+            0
+        } else {
+            self.p - a
+        }
+    }
+    #[inline(always)]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        redc64(self.p, self.n_inv, u128::from(a) * u128::from(b))
+    }
+    #[inline(always)]
+    pub fn sqr(&self, a: u64) -> u64 {
+        self.mul(a, a)
+    }
+}
+
 impl Fp64 {
     pub fn new(p: u64) -> Self {
         assert!(
@@ -1146,12 +1332,7 @@ impl Fp64 {
     /// Montgomery reduction of `t < p·2⁶⁴`: `t·R⁻¹ mod p`, fully reduced.
     #[inline(always)]
     pub fn redc(&self, t: u128) -> u64 {
-        let lo = t as u64;
-        let m = lo.wrapping_mul(self.n_inv);
-        let mp = u128::from(m) * u128::from(self.p);
-        // lo + (mp as u64) ≡ 0 mod 2⁶⁴, carrying exactly when lo ≠ 0.
-        let u = ((t >> 64) as u64) + ((mp >> 64) as u64) + u64::from(lo != 0);
-        self.csub(u)
+        redc64(self.p, self.n_inv, t)
     }
 
     /// Montgomery form of a canonical `a < p`.
@@ -2275,6 +2456,285 @@ impl PrimeField for FpP192 {
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod bounded_arithmetic_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    fn setup(p: u64) -> FieldSetup {
+        Fp64Arithmetic::try_new(
+            p,
+            FP64_ARITHMETIC_SETUP_WORK,
+            FP64_ARITHMETIC_SETUP_BYTES,
+            Instant::now() + Duration::from_secs(5),
+            &mut |_| Ok(()),
+        )
+        .unwrap()
+    }
+
+    fn check_pair(f: &Fp64Arithmetic, legacy: &Fp64, x: u64, y: u64) {
+        let p = f.p();
+        let a = f.from_u64(x);
+        let b = f.from_u64(y);
+        assert_eq!(a, legacy.from_u64(x));
+        assert_eq!(b, legacy.from_u64(y));
+        assert_eq!(f.to_u64(a), x % p);
+        assert_eq!(f.to_u64(b), y % p);
+        assert_eq!(f.add(a, b), legacy.add(a, b));
+        assert_eq!(f.sub(a, b), legacy.sub(a, b));
+        assert_eq!(f.neg(a), legacy.neg(a));
+        assert_eq!(f.mul(a, b), legacy.mul(a, b));
+        assert_eq!(f.sqr(a), legacy.sqr(a));
+        let x = u128::from(x % p);
+        let y = u128::from(y % p);
+        let modulus = u128::from(p);
+        assert_eq!(f.to_u64(f.add(a, b)), ((x + y) % modulus) as u64);
+        assert_eq!(f.to_u64(f.sub(a, b)), ((x + modulus - y) % modulus) as u64);
+        assert_eq!(f.to_u64(f.neg(a)), ((modulus - x) % modulus) as u64);
+        assert_eq!(f.to_u64(f.mul(a, b)), ((x * y) % modulus) as u64);
+        assert_eq!(f.to_u64(f.sqr(a)), ((x * x) % modulus) as u64);
+        for value in [a, b, f.add(a, b), f.sub(a, b), f.mul(a, b), f.neg(a)] {
+            assert!(value < p);
+        }
+    }
+
+    #[test]
+    fn bounded_fp64_arithmetic_exhaustive_small_and_fixed_wide() {
+        for p in [3, 5, 17, 97] {
+            let setup = setup(p);
+            let legacy = Fp64::new(p);
+            assert!(setup.prime_verified);
+            assert_eq!(setup.field.one(), legacy.one());
+            assert_eq!(setup.field.zero(), legacy.zero());
+            for a in 0..p {
+                for b in 0..p {
+                    check_pair(&setup.field, &legacy, a, b);
+                }
+            }
+        }
+        // Fixed 47-, 53-, and 61-bit primes; no search or replacement fixture.
+        for p in [140_737_488_355_213, 9_007_199_254_740_881, (1u64 << 61) - 1] {
+            let setup = setup(p);
+            let legacy = Fp64::new(p);
+            for a in [0, 1, 2, p / 2, p - 2, p - 1, p, p + 1, u64::MAX] {
+                for b in [0, 1, 2, p / 2, p - 2, p - 1, p, p + 1, u64::MAX] {
+                    check_pair(&setup.field, &legacy, a, b);
+                }
+            }
+            for a in [1, 2, p / 2, p - 2, p - 1] {
+                // The new dynamic engine's fixed binary exponentiation route.
+                let f = &setup.field;
+                let mut power = f.from_u64(a);
+                let mut inverse = f.one();
+                let mut exponent = p - 2;
+                let mut products = 0;
+                while exponent != 0 {
+                    if exponent & 1 != 0 {
+                        inverse = f.mul(inverse, power);
+                        products += 1;
+                    }
+                    power = f.sqr(power);
+                    products += 1;
+                    exponent >>= 1;
+                }
+                assert!(products <= 122);
+                assert_eq!(f.mul(f.from_u64(a), inverse), f.one());
+                assert_eq!(inverse, legacy.inv(legacy.from_u64(a)).unwrap());
+            }
+        }
+    }
+
+    #[test]
+    fn bounded_fp64_setup_exact_and_one_less_admission() {
+        let mut events = Vec::new();
+        let deadline = Instant::now() + Duration::from_secs(5);
+        for (work, bytes, stop) in [
+            (
+                FP64_ARITHMETIC_SETUP_WORK - 1,
+                FP64_ARITHMETIC_SETUP_BYTES,
+                FieldSetupStop::WorkLimit,
+            ),
+            (
+                FP64_ARITHMETIC_SETUP_WORK,
+                FP64_ARITHMETIC_SETUP_BYTES - 1,
+                FieldSetupStop::StorageLimit,
+            ),
+            (0, 0, FieldSetupStop::WorkLimit),
+        ] {
+            let failure = Fp64Arithmetic::try_new(17, work, bytes, deadline, &mut |e| {
+                events.push(e);
+                Ok(())
+            })
+            .unwrap_err();
+            assert_eq!(failure.stop, stop);
+            assert_eq!((failure.reserved_work, failure.reserved_bytes), (0, 0));
+            assert!(events.is_empty());
+        }
+        let field = Fp64Arithmetic::try_new(
+            17,
+            FP64_ARITHMETIC_SETUP_WORK,
+            FP64_ARITHMETIC_SETUP_BYTES,
+            deadline,
+            &mut |e| {
+                events.push(e);
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0].stage, FieldSetupStage::Admitted);
+        assert_eq!(events[1].stage, FieldSetupStage::Complete);
+        for event in events {
+            assert_eq!(event.reserved_work, field.reserved_work);
+            assert_eq!(event.reserved_bytes, field.reserved_bytes);
+        }
+        let repeated = setup(17);
+        assert_eq!(field.field.n_inv, repeated.field.n_inv);
+        assert_eq!(field.field.r2, repeated.field.r2);
+        assert_eq!(field.field.one, repeated.field.one);
+    }
+
+    #[test]
+    fn bounded_fp64_setup_rejects_invalid_and_composite_without_resampling() {
+        for p in [0, 1, 2, 4, 1u64 << 61, (1u64 << 61) + 1, u64::MAX] {
+            let mut calls = 0;
+            let failure = Fp64Arithmetic::try_new(
+                p,
+                u64::MAX,
+                u64::MAX,
+                Instant::now() + Duration::from_secs(5),
+                &mut |_| {
+                    calls += 1;
+                    Ok(())
+                },
+            )
+            .unwrap_err();
+            assert_eq!(failure.stop, FieldSetupStop::InvalidModulus);
+            assert_eq!(calls, 0);
+            assert_eq!(failure.reserved_work, 0);
+        }
+        for p in [
+            9,
+            25,
+            341,
+            561,
+            1105,
+            3215031751,
+            341550071728321,
+            382512305654641305,
+        ] {
+            let mut stages = Vec::new();
+            let failure = Fp64Arithmetic::try_new(
+                p,
+                u64::MAX,
+                u64::MAX,
+                Instant::now() + Duration::from_secs(5),
+                &mut |e| {
+                    stages.push(e.stage);
+                    Ok(())
+                },
+            )
+            .unwrap_err();
+            assert_eq!(failure.stop, FieldSetupStop::Composite, "p={p}");
+            assert_eq!(stages, [FieldSetupStage::Admitted]);
+            assert_eq!(failure.reserved_work, FP64_ARITHMETIC_SETUP_WORK);
+        }
+    }
+
+    #[test]
+    fn bounded_fp64_setup_observer_failure_is_sticky() {
+        for fail_stage in [FieldSetupStage::Admitted, FieldSetupStage::Complete] {
+            let mut calls = 0;
+            let failure = Fp64Arithmetic::try_new(
+                17,
+                u64::MAX,
+                u64::MAX,
+                Instant::now() + Duration::from_secs(5),
+                &mut |e| {
+                    calls += 1;
+                    if e.stage == fail_stage {
+                        Err(())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap_err();
+            assert_eq!(failure.stop, FieldSetupStop::Observer);
+            assert_eq!(
+                calls,
+                if fail_stage == FieldSetupStage::Admitted {
+                    1
+                } else {
+                    2
+                }
+            );
+            assert_eq!(failure.reserved_bytes, FP64_ARITHMETIC_SETUP_BYTES);
+        }
+    }
+
+    #[test]
+    fn bounded_fp64_setup_original_deadline_not_reset() {
+        let mut calls = 0;
+        let failure = Fp64Arithmetic::try_new(17, u64::MAX, u64::MAX, Instant::now(), &mut |_| {
+            calls += 1;
+            Ok(())
+        })
+        .unwrap_err();
+        assert_eq!(failure.stop, FieldSetupStop::Deadline);
+        assert_eq!(calls, 0);
+        assert_eq!(failure.reserved_bytes, 0);
+        // Deliberately expire the ORIGINAL deadline inside its first callback.
+        let deadline = Instant::now() + Duration::from_millis(50);
+        let failure = Fp64Arithmetic::try_new(17, u64::MAX, u64::MAX, deadline, &mut |_| {
+            calls += 1;
+            while Instant::now() < deadline {
+                std::thread::yield_now();
+            }
+            Ok(())
+        })
+        .unwrap_err();
+        assert_eq!(failure.stop, FieldSetupStop::Deadline);
+        // If externally descheduled before entry, refusal before callback is
+        // equally valid and must never be interpreted as a renewed deadline.
+        assert!(calls <= 1);
+        if calls == 1 {
+            assert_eq!(failure.reserved_work, FP64_ARITHMETIC_SETUP_WORK);
+        }
+    }
+
+    #[test]
+    fn bounded_fp64_setup_complete_callback_expiry_withholds_field() {
+        let deadline = Instant::now() + Duration::from_secs(1);
+        let mut stages = Vec::new();
+        let failure = Fp64Arithmetic::try_new(
+            17,
+            FP64_ARITHMETIC_SETUP_WORK,
+            FP64_ARITHMETIC_SETUP_BYTES,
+            deadline,
+            &mut |event| {
+                stages.push(event.stage);
+                if event.stage == FieldSetupStage::Complete {
+                    // Construction is ready, but a late acknowledged callback
+                    // must not publish a usable field past the original limit.
+                    while Instant::now() < deadline {
+                        std::thread::yield_now();
+                    }
+                }
+                Ok(())
+            },
+        )
+        .unwrap_err();
+        assert_eq!(
+            stages,
+            [FieldSetupStage::Admitted, FieldSetupStage::Complete]
+        );
+        assert_eq!(failure.stop, FieldSetupStop::Deadline);
+        assert_eq!(failure.reserved_work, FP64_ARITHMETIC_SETUP_WORK);
+        assert_eq!(failure.reserved_bytes, FP64_ARITHMETIC_SETUP_BYTES);
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -363,6 +363,7 @@ impl<'p> SquareRootContext<'p> {
         if a >= p {
             return Err(invalid("square-root parameters"));
         }
+        meter.square_roots = meter.square_roots.saturating_add(1);
         if a.is_zero() {
             return Ok(Some(BigUint::zero()));
         }
@@ -464,6 +465,7 @@ mod tests {
             });
             let got = roots.root(&a.into(), &mut NoRandom, &mut meter).unwrap();
             assert_eq!(got, expected.map(BigUint::from));
+            assert_eq!(meter.square_roots, 1, "one count per extraction request");
             if let Some(root) = got {
                 assert_eq!(&root * &root % &p, a.into());
             }
@@ -487,6 +489,7 @@ mod tests {
                     assert_eq!(&root * &root % &modulus, a.into());
                 }
             }
+            assert_eq!(meter.square_roots, 2 * p, "p={p}: one count per request");
         }
     }
 

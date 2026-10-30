@@ -142,10 +142,60 @@ enormous corpus.
 | Measurements | Typed native counters and worker-level measurement mechanisms have distinct scopes | Admit and verify PMU instructions with event configuration, enabled/running time, thread/process coverage and readback; preserve unavailable/failed counter collection explicitly; add missing phase/peak-memory/I/O/checkpoint accounting |
 | Complete intermediate artifacts | Curve construction and several adapters still export summaries; the locally validated prime chain lane adds bounded input/native-result/useful-row/branch/candidate/lift events, with sticky sink failure; native F4 rows still materialize before event serialization | Add incremental event/chunk sinks inside long native calls, export Hasse baby/giant tables and integer-factorization internals, and test truncation/exhaustion as explicit terminal outcomes |
 | Durable publication | Native plan/lease/shard, content-addressed upload/readback, discoverable catalogs, portable restore and immutable coverage reports are implemented; historical-source software checks passed; native cumulative accounting and local startup grant/identity gating are implemented, but deployed grant delivery, EKS role access and finite resource lifetime remain unverified; retained GenerationStarted returns GenerationOutcomeUnknown without rerunning generation | Demonstrate deployed actual-UID grant delivery/identity validation and finite resource-lifetime admission, resolve worker IAM access with the prepared scoped role policy and verify its readback, then demonstrate actual worker S3 roundtrips, fresh restore/replay, kill/resume without duplication, finite budgets and committed results; retained attempts and process checkpoints are different guarantees |
-| ML consumer | Static prime-chain graph projection passed source1565b1fecd7 software checks; strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; implement separately projected admissible solver-prefix views beyond current structural routing features; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
+| ML consumer | Static prime-chain graph projection passed source1565b1fecd7 software checks; sourceadde10cad21 adds bounded ideal certificates, recursive event replay and separate causal prefix features with29 focused tests passed, with combined full-library, strict Clippy, build, CLI and 360-case endpoint validation passed; strict public feature allowlist, restricted targets/provenance, stable feature deduplication and bounded external sorting are implemented; PKM features verify the actual Kummer base; large-prime features bind actual small/residual domains and signed columns to a replayed transcript, with distinct Frobenius and identity/sign relation-query identities and matching scalar certificates; missing alternative bases or large-prime domain/transcript pairs retain provenance without a matched feature | Validate a real restored cloud training view; extend admissible solver-prefix views to other solvers and intra-native decisions; retain the conservative whole-n split while constructing merged transfer/isomorphism/isogeny components across field sizes and frozen holdouts |
 | Training and novel solvers | No trained-model efficacy or novel SAT solver is established by the generator | Materialize a validated training view, freeze held-out benchmarks and controls, train candidate policies, verify each proposed action with exact solvers, charge inference and fallback, and report failures and uncertainty |
 
 ## Next discriminating validation
+
+The subsequent cap-handling correction at runtime
+`d9a69910198d14a829b689253a62a7663b41d753` passed240 dataset tests, the explicit
+360-case adapter check, strict maintained Clippy, the release CLI build, four
+retained curve/twist export/retry commands and the full release library suite
+(5,445 passed, zero failed,123 ignored). Every phase has an exit0 receipt and
+matching runtime-source readback in the
+[prefix evidence directory](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md).
+This completes that source's local software gates. Actual worker publication,
+budgeted remote restore and full campaign/model coverage remain open; the
+[current cloud readiness record](../../research/ml_dataset_20261028/cloud-resume-readiness-20261030.md)
+keeps those operational obligations separate.
+
+### October 30 integration checkpoint
+
+Source `113526b577044a6283be81acb1a847c89c96aa4e` imports newer native libraries
+from main `bd4c2fe5e6fc5c12cbab17e3cebb8e4c2ba83991`. The table above records
+the prior validated scope. The combined revision subsequently passed 236 dataset
+tests (0 failures, 1 ignored), the explicit 360-case endpoint test and the full
+release library suite (5,441 passed, 0 failed, 123 ignored). Combined strict
+maintained Clippy, release build and four actual retained curve/twist CLI
+export/retry commands also passed with matching runtime-source readback.
+Additional imported capabilities and limits are:
+
+- Prime F4 has a supervised wide-field **m = 2** adapter through
+  `p = 2^61 - 1`, requiring the original execution context. Recursive
+  **m = 3..15** elimination still requires `p < 2^32`. The wide adapter's
+  distinct event format is outside the new recursive-prefix verifier.
+- Prime root adapters retain bounded field, power, GCD and split states;
+  binary adapters retain quadratic, trace, half-trace and matrix states.
+  Distinct-root certificates do not establish complete native execution or
+  total solver cost.
+- Native phase telemetry distinguishes unavailable PMU counters, raw counts,
+  and counts exact within the declared scope. The imported measurement and
+  capture mechanisms require validation on the actual worker before making
+  campaign-wide instruction or artifact-completeness claims.
+- Prefix source `06773dcf28f` passed four actual CLI export/retry checks on
+  retained curve/twist fixtures, producing four curve branch examples and
+  zero twist branch examples. These checks added no scientific samples.
+  Combined dataset, full-library, lint, build and CLI validation passed.
+  Three failed combined attempts document sparse-checkout
+  omissions and a corrected restoration-helper bug. The initially ignored
+  360-cell endpoint integration sweep was subsequently run explicitly and
+  passed on the combined revision, with matching binary hashes and source
+  readback. Its bounded outcome checks do not imply support or a solution for
+  every adapter/parameter pair.
+
+See [prefix software evidence](../../research/ml_dataset_20261028/validation-prime-prefix-20261030/README.md)
+for exact revisions, retained failures and S3 readback. None of these imported
+capabilities establishes a completed cloud dataset or model efficacy.
 
 1. Complete centralized checks for the final immutable source, preserving native
    tests for n = 23, 24, 31, 47, 61 for each family and twist, the n = 11/12
