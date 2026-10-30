@@ -118,6 +118,14 @@
    "path": "research/postgb_linear_stage_20261026/analysis/summary.json",
    "sha256": "ef9aae284eceddb7424b65833f5d469084fcb9a428f648691a5e4bc02feb60fc"
   },
+  "ic_cover_weakclass": {
+   "path": "research/ic_cover_weakclass_20261023/summary.json",
+   "sha256": "3fa28e7ff48dc590ba14ff82c592c5fbc2dc09d09807513ba07d6838634e1a3b"
+  },
+  "ic_cover_weakclass_rho_neg": {
+   "path": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+   "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
+  },
   "ic_m2_linear_ladder": {
    "path": "research/ic_m2_linear_ladder_20261024/fit.json",
    "sha256": "f69558da047b752ad3a3952ad6680d73fa6984e92b66561717db29e6f8475203"
@@ -306670,8 +306678,8 @@
   "report": "research/prime_base_oracle_tuning_20261029/README.pdf",
   "second_host": "Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-eks (L2, another host class and ecbench build); 1008 of 1008 original records identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent 0.836 / 0.817 / 0.746 at w = 0 / 0.1 / 1 (240 pairs); report research/prime_base_oracle_tuning_20261029/second-host/README.pdf.",
   "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
-  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/prime_base_oracle_tuning_20261029/VALIDATION.json)",
-  "validated": true
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "lazy_members_component": {
   "rows": [
@@ -307499,6 +307507,95 @@
   "report": "research/postgb_linear_stage_20261026/REPORT.pdf",
   "source": "research/postgb_linear_stage_20261026/analysis/summary.json",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (research/postgb_linear_stage_20261026/validation/VALIDATION.json)",
+  "validated": true
+ },
+ "ic_cover_weakclass_component": {
+  "rows": [
+   {
+    "p": 53,
+    "cells": 8,
+    "base": 1980.458705,
+    "lever": 1061.53561057,
+    "ratio": 1.84804719706,
+    "ratio_min": 1.82470423583,
+    "ratio_max": 1.87777739344,
+    "before": [
+     506.609390005,
+     424.408791755,
+     172.502351179
+    ],
+    "after": [
+     271.545125773,
+     227.48520065,
+     92.462109016
+    ]
+   },
+   {
+    "p": 101,
+    "cells": 8,
+    "base": 259.806239441,
+    "lever": 138.492331818,
+    "ratio": 1.87496972017,
+    "ratio_min": 1.87028855644,
+    "ratio_max": 1.87949929987,
+    "before": [
+     132.86902203,
+     110.994808868,
+     44.7258705166
+    ],
+    "after": [
+     70.8271699976,
+     59.1669004291,
+     23.8415756056
+    ]
+   },
+   {
+    "p": 251,
+    "cells": 6,
+    "base": 47.9039732498,
+    "lever": 25.6382661937,
+    "ratio": 1.86815292685,
+    "ratio_min": 1.86597508833,
+    "ratio_max": 1.86994522347,
+    "before": [
+     46.6723824224,
+     38.951475484,
+     15.6503928402
+    ],
+    "after": [
+     24.9791172477,
+     20.8468782305,
+     8.37610975564
+    ]
+   },
+   {
+    "p": 503,
+    "cells": 3,
+    "base": 9.78578978735,
+    "lever": 5.29115359227,
+    "ratio": 1.84929987778,
+    "ratio_min": 1.84833048216,
+    "ratio_max": 1.85004443959,
+    "before": [
+     10.1028057283,
+     8.43006079832,
+     3.38536151594
+    ],
+    "after": [
+     5.4625633682,
+     4.55811410682,
+     1.83045703367
+    ]
+   }
+  ],
+  "slope": -2.27272850429,
+  "slope_engineer": -2.2687140353,
+  "class": "engineering",
+  "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
+  "study": "research/ic_cover_weakclass_20261023/",
+  "report": "research/ic_cover_weakclass_20261023/REPORT.pdf",
+  "source": "research/ic_cover_weakclass_20261023/summary.json",
+  "validation": "validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)",
   "validated": true
  },
  "algebraic_ladder": {

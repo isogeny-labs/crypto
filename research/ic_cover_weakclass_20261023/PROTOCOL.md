@@ -113,3 +113,16 @@ If 1-6 hold in the stated cells: **engineering** (S falls; the floor `unknowns x
 
 `raw/p<P>_s<S>_<arm>.json|log`, `commands.txt`, `versions.txt` (git revision, binary sha256, host), `walls.txt`. Aggregation:
 `examples/jv_cover_weakclass_report.rs` (Rust). Tests: `test.log`.
+
+## Validation reference (added 2026-10-29, after the evidence run)
+
+This study was frozen as a weak-class diagnostic ("no leaderboard, no `benchmarks/README.md`").
+The result is published as a component section outside tables A–C and as a benchmark entry; the
+validation gate then requires the strongest rho reference available for the curve. For these
+ordinary prime-field non-Koblitz curves Aut(E) = {±1}, so the negation map is the strongest fold
+and `rho_e` (the plain stored-table r-adding rho named above) is not. A negation-map reference
+(`jv_cover --exp rhostrong --neg 1`, cap_multiple 64, same instances and seeds, same source) was
+therefore measured after the evidence run. It changes no A/B IC number and does not alter the L5
+plain-rho answer above; it is the §5a reference used only for the validation standing. The
+recorded IC arms used the original binary; the reference is reproducible from the same source,
+and one cell (p = 53, seed 1) reran in that tree with identical counted totals.
