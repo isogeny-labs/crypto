@@ -1378,10 +1378,7 @@ pub(super) fn verify(
     }
     Ok(())
 }
-pub(super) fn native_claim_contradicts_domain(
-    result: &ResultRecord,
-    extraction: &Extraction,
-) -> bool {
+fn native_claim_contradicts_domain(result: &ResultRecord, extraction: &Extraction) -> bool {
     (result.stop == "unit_derived"
         || result
             .native_statistics
