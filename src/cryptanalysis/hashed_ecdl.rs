@@ -1284,6 +1284,23 @@ impl FixedPair {
         let modulus = curve.field;
         let table = |mut base| {
             let mut out = Vec::with_capacity(windows);
+            // With a complete inverse table, affine addition uses a lookup
+            // rather than Euclid. Avoid projective products and normalization
+            // scratch space in this bounded-field path.
+            if !curve.inverses.is_empty() {
+                for window in 0..windows {
+                    let mut row = [None; 16];
+                    row[1] = base;
+                    for digit in 2..16 {
+                        row[digit] = curve.add_valid(row[digit - 1], base);
+                    }
+                    if window + 1 < windows {
+                        base = curve.add_valid(row[15], base);
+                    }
+                    out.push(row);
+                }
+                return out;
+            }
             for window in 0..windows {
                 let mut row = [Jacobian::from_affine(None); 17];
                 row[1] = Jacobian::from_affine(base);
@@ -1309,6 +1326,16 @@ impl FixedPair {
     }
     fn evaluate(&self, curve: &Curve, mut u: u64, mut v: u64) -> Point {
         debug_assert!(u < curve.r && v < curve.r);
+        if !curve.inverses.is_empty() {
+            let mut out = None;
+            for (p, q) in self.p.iter().zip(&self.q) {
+                out = curve.add_valid(out, p[(u & 15) as usize]);
+                out = curve.add_valid(out, q[(v & 15) as usize]);
+                u >>= 4;
+                v >>= 4;
+            }
+            return out;
+        }
         let mut out = Jacobian::from_affine(None);
         for (p, q) in self.p.iter().zip(&self.q) {
             out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
@@ -1794,6 +1821,51 @@ mod tests {
                 let square = mulmod(a, a, p);
                 assert_eq!(context.root(square, p), sqrtmod(square, p));
             }
+        }
+    }
+
+    #[test]
+    fn cached_affine_fixed_pair_matches_projective_tables_and_evaluation() {
+        for (p, a, b, r, generator) in [
+            (17, 2, 2, 19, Some((5, 1))),
+            (211, 0, 7, 199, Some((3, 33))),
+        ] {
+            let cached = Curve::new(p, a, b, r).unwrap();
+            let mut reference = cached.clone();
+            reference.inverses.clear(); // Force the preserved projective path.
+            for scalar in 0..r {
+                let target = reference.mul(generator, scalar).unwrap();
+                let fast = FixedPair::new(&cached, generator, target);
+                let slow = FixedPair::new(&reference, generator, target);
+                assert_eq!(fast.p, slow.p);
+                assert_eq!(fast.q, slow.q);
+                let scalars: Vec<_> = if p == 17 {
+                    (0..r).collect()
+                } else {
+                    vec![0, 1, 15, 16, r - 1]
+                };
+                for &u in &scalars {
+                    for &v in &scalars {
+                        let expected = reference
+                            .add(
+                                reference.mul(generator, u).unwrap(),
+                                reference.mul(target, v).unwrap(),
+                            )
+                            .unwrap();
+                        assert_eq!(fast.evaluate(&cached, u, v), expected);
+                        assert_eq!(slow.evaluate(&reference, u, v), expected);
+                    }
+                }
+            }
+            // Identity first base exercises the table's infinity cases too.
+            let fast = FixedPair::new(&cached, None, generator);
+            let slow = FixedPair::new(&reference, None, generator);
+            assert_eq!(fast.p, slow.p);
+            assert_eq!(fast.q, slow.q);
+            assert_eq!(
+                fast.evaluate(&cached, r - 1, r - 1),
+                slow.evaluate(&reference, r - 1, r - 1)
+            );
         }
     }
 
