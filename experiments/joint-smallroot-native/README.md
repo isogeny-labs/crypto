@@ -108,3 +108,20 @@ Q4 was infrastructure_not_started: measured visible enclosing headroom was
 no OOM worker was launched. All five original rows/raw records and initial source/
 runtime/seal are frozen under the task check directory. No full guard qualification
 or scientific readiness is established; any repair/replay requires separate admission.
+
+## Panel exception-accounting repair (2026-10-30)
+
+The supervisor now reports process creation to the panel before any later
+startup, accounting or receipt operation can fail. A post-launch exception
+therefore records `failed` with explicitly incomplete supervisor accounting;
+`not_started` is reserved for failures before the worker process was created.
+If the supervisor returned an outcome and the subsequent health check throws,
+the panel retains `complete`, `failed` or `censored` and discloses the failed
+post-run accounting check. Every exception stops admission of later cells.
+
+`make panel-status` runs eight injected supervisor/health-failure software
+fixtures, including all three terminal outcomes after a health-check error.
+The existing 17 CPU-accounting fixtures also pass, and the production runner
+and guard-qualification drivers compile with strict warnings. These software
+checks do not validate real delegated-cgroup behavior, launch scientific cells,
+or extend historical source-bound qualification receipts to the repaired code.
