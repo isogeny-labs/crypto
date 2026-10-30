@@ -20,3 +20,12 @@ lean_lib SameSupportClassifier
 
 @[default_target]
 lean_lib WeightedSameSupport
+
+@[default_target]
+lean_lib CanonicalResidue
+
+@[default_target]
+lean_lib UInt64Residue
+
+@[default_target]
+lean_lib InvariantBranches
