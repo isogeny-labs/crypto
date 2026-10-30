@@ -6,8 +6,10 @@ Can a small neural regressor trained on the retained prime m=2 radix census
 rank alternative encodings below the established degree-42 baseline? The
 input is the complete 3,010-row census under
 `s3://setec-astronomy-artifacts/runs/n83-radix-census-20261030-r2/raw/`, bound
-to raw manifest SHA-256
-`6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad`.
+to raw `manifest.json` SHA-256
+`5546a85f4a7e4467289bc3d167845f9054dbbfb546d75949f0a9fceec6e70e78`
+(the separate custody `manifest.sha256` digest is
+`6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad`).
 It retains 35 exact first-vanishing degrees and 2,975 certified lower bounds.
 Every row encodes the same prime candidate domain and point base. This is not
 a dataset of alternative factor-base point sets.
