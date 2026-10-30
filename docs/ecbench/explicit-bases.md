@@ -306,3 +306,56 @@ the completed export has zero checker findings and raw data is unchanged.
 GitHub's artifact migration may move large validation logs to its manifest;
 retain that commit and verify the manifest against the archived log. The
 shared daily log remains reserved, so this scoped handoff is under T-869.
+
+## Full recovery scaling — 2026-10-30 04:54 UTC
+
+### What was done
+
+Removed the standalone reduction's exhaustive tiny-field restriction with
+an exact prime-order/Hasse witness, Tonelli–Shanks roots, checked wide
+products, deferred dependency reconstruction and sparse certificate replay.
+The default tiny constructor and 512-column cap remain. Explicit driver
+arguments admit larger work/column bounds. Protocol-v3 ran all44 prescribed
+cells on one RTX PRO6000:40verified recoveries through52bits and4retained
+56-bit timeouts. Protocol-v4 added bounded high-x-bit table indexing and
+completed both56-bit targets and identical repeats in212–232s including
+audit; all4attempted58-bit cells hit explicit work limits. Both pods are
+deleted, with content-hashed archives and raw records committed under
+`research/explicit_relations_e2e_20261030/results-v3` and `results-v4`.
+
+### Decisions made
+
+The52-bit stage records put almost all cost in relation search, so the next
+change reuses two right-side partial sums, each bounded by chunk_rows, with
+all setup and storage charged. Preserve the uncached prefix path as a build
+reference and the exact witness/visited ordering. Frozen protocol-v5 compares
+at52bits and probes56/58/60 with both public targets, explicitly raising
+max_rows to2^30 and max_work to2^31. The prior2^29 row cap forced a highly
+unbalanced58-bit split; its failure was not a nonexistence result.
+
+### Open threads
+
+V5sourcef6338418572c72e1bf97ad24903cd5efd17cf7da is running on RunPod
+9fil2lhphdymz0, controller session69390, local launch bundle
+`/home/ec2-user/ecbench-e2e-20261030-v5`. Reconcile that exact job before any
+launch. One GPU, worker4500s/controller4800s; collect the archive and verify
+deletion. The report draft coversv1–v4; appendv5, render and inspect every PDF
+page before publication. PR2896 remains the delivery PR; exact-head CI and
+runtime validation are separate. No GPU tensor backend, matched rho result,
+fastest-tool status or certified speedup is claimed.
+
+### Errors
+
+V1joined two wrapper commands and failed before compilation. V2passed
+preflight but failed compiling the native chart analyzer; neither produced
+ladder data. Both failures and immutable protocols remain. CI found a
+manual-divisibility lint in the wide constructor; it was fixed. Canonical
+export schema/flow/hash checks pass, but its protocol-aware coverage check
+assumes rectangular panels and retains3findings forv3 and5forv4. The frozen
+native analyzers verify the explicitly nonrectangular contracts and stopping
+rules; this is not a full canonical checker pass. A concurrent staging
+attempt hit index.lock; it was retried after the active commit completed,
+without removing a lock or rewriting history. Artifact-bot migrations are
+preserved and checked against archived log hashes. T884owns this continuation;
+T882was released after its implementation phase. The shared daily log remains
+outside this task's scope, so this is the committed project handoff.
