@@ -18,7 +18,7 @@ does not share code with it.
 | Step | Code | Notes |
 |---|---|---|
 | Prime-order curves over F_p | `curve.rs` | Random b-bit curves found by naive point counting (b ≤ 26) |
-| 1. Factor-base selection | `relation.rs` `FactorBases::new`, `FactorBases::new_affine` | m random hashed membership predicates, each with \|F_i\| ≈ (2r)^(1/m). There is no notion of smoothness. The default hash is keyed SHA-256. The gadget path uses a random affine hash, A ∈ F_i iff (α_i x + β_i y + γ_i) mod p < U_i, because that is cheap to check with low-degree gadgets. |
+| 1. Factor-base selection | `relation.rs` `new_factor_bases`, `new_affine_factor_bases` | m random hashed membership predicates, each with \|F_i\| ≈ (2r)^(1/m). There is no notion of smoothness. The default hash is keyed SHA-256. The gadget path uses a random affine hash, A ∈ F_i iff (α_i x + β_i y + γ_i) mod p < U_i, because that is cheap to check with low-degree gadgets. |
 | 2. Relation finding | `relation.rs` `relation_network`, `tensor.rs` | `[u]P+[v]Q = A_1+…+A_m` is encoded as a Boolean tensor network with (2m−1)(2b+1) edges. |
 | Counting → search | `tensor.rs` `find_witness` | Self-reduction fixes one bit at a time, so any **counting** solver works. |
 | 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by Gaussian elimination |
@@ -61,6 +61,17 @@ cargo run --release --bin ecdldemo -- -bits 14 -m 2
 cargo run --release --bin ecdldemo -- -bits 8 -m 2 -gadgets
 ```
 
+From the repository root the same tools are part of the `ic` research CLI,
+with the global `--json` and `--out` report options, and the library is
+re-exported as `crypto_lib::cryptanalysis::tensor_ic`:
+
+```sh
+cargo run --release --bin ic -- tensor scale                  # same table as ecdlscale
+cargo run --release --bin ic -- tensor scale --bits 64,256 --json
+cargo run --release --bin ic -- tensor demo --bits 12 --m 2 --seed 1
+cargo run --release --bin ic -- tensor demo --bits 8 --gadgets
+```
+
 All 19 Go tests are ported (`tests/ecdl_test.rs`, `tests/gadget_test.rs`;
 each carries a `// Go: TestName` marker), with the same primes, curves,
 loop bounds, exhaustive modes and assertions.
@@ -74,6 +85,12 @@ loop bounds, exhaustive modes and assertions.
 - Go's `ProbablyPrime(30)` (Miller–Rabin plus Baillie–PSW) is a Miller–Rabin
   test on 30 fixed prime bases here. It selects the same NTT primes Q at every
   size checked (b = 4 … 16384).
+- Two Go defects are fixed (review findings on PR #2895; regression tests
+  in `tests/regression_test.rs`): `new_factor_bases` redraws its SHA-256
+  keys while any F_i is empty, as the affine version already does (an empty
+  F_i made the solver's relation loop run forever), and `SupportVertex::new`
+  drops duplicate rows (they made `SparseContractor` and `DFSCounter`
+  disagree with `BruteForceCounter`).
 - `Vertex` is an enum and `Counter` a trait; `Var` is `Rc<RefCell<…>>` with
   pointer identity. `Solver::solve_with_stats` returns partial `Stats` on
   error as Go does; `Builder::hint_nil` stands for Go's nil hint generator.
