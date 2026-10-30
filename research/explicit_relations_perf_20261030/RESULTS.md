@@ -91,3 +91,23 @@ preserving user-supplied memory caps and deterministic first-witness order.
 Those optimizations were not implemented or measured by this panel.
 Root crypto/ecbench integration tests, wider-field complete reduction,
 and the separate GPU tensor backend remain outside this run.
+
+## Post-run coverage audit (2026-10-30)
+
+PR review found that the frozen analyzer checked aggregate counts without
+rejecting a duplicated execution or missing warmups. The measurements and
+frozen analyzer are preserved. The separate [strict coverage checker](check-coverage.rs)
+now checks the exact arm × instance × round key set, all seeds, warmup flags,
+finite nonnegative timings, verification labels and cross-arm digests before
+accepting either the normalization panel or the subsequent query panel.
+Both unchanged raw files pass: 120 unique executions, 12 warmups and 108
+measured rows each. The checker also rejects six deliberate faults: duplicate
+execution, missing warmups, wrong seed, wrong warmup flag, unexpected arm and
+changed witness digest. [Audit output](coverage-audit.txt) is retained.
+This is a post-run validation correction, not a new experiment or a change
+to the frozen statistics. Reproduce with a standalone Rust compiler:
+
+```sh
+rustc --edition=2021 -D warnings research/explicit_relations_perf_20261030/check-coverage.rs -o /tmp/check-coverage
+/tmp/check-coverage research/explicit_relations_perf_20261030/results/rows.csv research/explicit_relations_query_20261030/results/rows.csv
+```
