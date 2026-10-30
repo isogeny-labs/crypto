@@ -1,3 +1,4 @@
+import Mathlib.Data.Set.Operations
 import Mathlib.Algebra.Ring.Hom.Defs
 namespace Separation50
 /-- Two evaluations agreeing on a subring but separating x exclude x from

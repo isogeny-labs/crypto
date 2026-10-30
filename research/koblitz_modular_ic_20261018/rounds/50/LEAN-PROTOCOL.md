@@ -4,3 +4,5 @@ Lean4.34.1/mathlibd13f23b723b8a846827a245b89c10fc7d3f11612, -j1-M4096/1200s sepa
 Separate module Separation50, frozen before its data, proves the evaluation-separation exclusion from an actual subring image. Its intended instantiation is the two source-bound boundary evaluations agreeing on t,u and separating v; the native BOUNDARY50 producer must first check those actual points and both conjugates. It uses the same pinned toolchain, caps and transitive axiom audit, with a distinct fresh runner/build. The accepted six Rational50 proofs are reused without rerun.
 
 Before separation50-02: separation50-01 compile exits1 because Ring.Hom.Basic is absent from this pinned Mathlib source/cache. Use the actual cached Ring.Hom.Defs module. The theorem is unchanged; failed compile retained and no audit was run for it.
+
+Before separation50-03: separation50-02 compile exits1 because the minimal ring-hom import does not include Set.range. Its definition is in Mathlib.Data.Set.Operations, whose source and cached olean were checked. Add that exact import; theorem unchanged. Retain both rejected compile workflows.
