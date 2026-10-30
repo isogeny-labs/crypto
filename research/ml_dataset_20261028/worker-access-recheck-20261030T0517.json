@@ -1,0 +1,58 @@
+{
+  "schema": "ml-dataset.worker-access-recheck/v1",
+  "observed_utc": "2026-10-30T05:19:38Z",
+  "role": "isolab-job",
+  "inline_policies": [],
+  "attached_policies": [
+    {
+      "PolicyName": "isolab-job-artifacts",
+      "PolicyArn": "arn:aws:iam::104186811093:policy/isolab-job-artifacts"
+    }
+  ],
+  "attached_default_version": "v1",
+  "attached_policy_document": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Condition": {
+          "StringLike": {
+            "s3:prefix": [
+              "runs/*",
+              "inputs/*"
+            ]
+          }
+        },
+        "Action": [
+          "s3:ListBucket"
+        ],
+        "Resource": "arn:aws:s3:::isolab-results-104186811093-us-east-2",
+        "Effect": "Allow"
+      },
+      {
+        "Action": [
+          "s3:GetObject"
+        ],
+        "Resource": [
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/*",
+          "arn:aws:s3:::isolab-results-104186811093-us-east-2/runs/*"
+        ],
+        "Effect": "Allow"
+      },
+      {
+        "Action": [
+          "s3:PutObject",
+          "s3:AbortMultipartUpload"
+        ],
+        "Resource": "arn:aws:s3:::isolab-results-104186811093-us-east-2/runs/*",
+        "Effect": "Allow"
+      }
+    ]
+  },
+  "approved_dataset_bucket_in_attached_policy": false,
+  "bucket_policy_or_other_grant_not_inferred": true,
+  "worker_roundtrip_performed": false,
+  "iam_modified": false,
+  "new_cloud_job_submitted": false,
+  "pending_worker_policy_approval_received": false,
+  "verified_cloud_dataset_cells": 0
+}

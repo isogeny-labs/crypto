@@ -1,0 +1,40 @@
+.............F....E.........F....................
+======================================================================
+ERROR: test_lab_browser_index_is_current_and_self_consistent (__main__.BuildTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-leads-audit/scripts/site/test_build.py", line 867, in test_lab_browser_index_is_current_and_self_consistent
+    fresh = builder.build()
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_lab_browser.py", line 719, in build
+    attach_covers(curves, load(COVERS, source), source)
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_lab_browser.py", line 702, in attach_covers
+    raise ValueError("cover report schema or registry digest is stale")
+ValueError: cover report schema or registry digest is stale
+
+======================================================================
+FAIL: test_every_scoreboard_panel_has_a_summary_and_the_index_cites_them_all (__main__.BuildTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-leads-audit/scripts/site/test_build.py", line 214, in test_every_scoreboard_panel_has_a_summary_and_the_index_cites_them_all
+    self.assertEqual([p["id"] for p in items if not p["summary"]], [])
+AssertionError: Lists differ: ['three-leads-e2e'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'three-leads-e2e'
+
+- ['three-leads-e2e']
++ []
+
+======================================================================
+FAIL: test_progress_chart_data_file_is_canonical_and_fully_plotted (__main__.BuildTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-leads-audit/scripts/site/test_build.py", line 152, in test_progress_chart_data_file_is_canonical_and_fully_plotted
+    self.assertGreaterEqual(timeline["updated"], newest, "progress-timeline.json `updated` is older than its newest point")
+AssertionError: '2026-10-17' not greater than or equal to '2026-10-19' : progress-timeline.json `updated` is older than its newest point
+
+----------------------------------------------------------------------
+Ran 49 tests in 1.004s
+
+FAILED (failures=2, errors=1)

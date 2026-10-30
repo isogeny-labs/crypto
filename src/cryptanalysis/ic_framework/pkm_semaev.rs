@@ -221,6 +221,9 @@ pub struct PkmSemaevOracle {
     shape: Option<SystemShape>,
     setup_mults: u64,
     native: BTreeMap<String, u64>,
+    // Opt-in dataset snapshots. Ordinary callers pay no JSON/trace cost.
+    dataset_trace: bool,
+    dataset_artifact: Option<serde_json::Value>,
 }
 
 impl PkmSemaevOracle {
@@ -246,6 +249,8 @@ impl PkmSemaevOracle {
             shape: None,
             setup_mults: 0,
             native: BTreeMap::new(),
+            dataset_trace: false,
+            dataset_artifact: None,
         }
     }
 
@@ -254,6 +259,49 @@ impl PkmSemaevOracle {
     pub fn with_budget(mut self, budget: Option<Duration>) -> Self {
         self.budget = budget;
         self
+    }
+
+    /// Retain the exact prepared quotient system, native F4 report, and
+    /// extracted roots for a dataset caller. Private elimination states are
+    /// not exposed by the underlying engine and are explicitly identified.
+    pub fn enable_dataset_trace(&mut self) {
+        self.dataset_trace = true;
+        self.dataset_artifact = None;
+    }
+
+    pub fn dataset_artifact(&self) -> Option<&serde_json::Value> {
+        self.dataset_artifact.as_ref()
+    }
+
+    fn polynomial_artifact(poly: &RPoly) -> serde_json::Value {
+        use crate::cryptanalysis::f4_fp_tower::{free_of, mask_of};
+        serde_json::json!(poly
+            .monos
+            .iter()
+            .zip(&poly.coefs)
+            .map(|(&mono, &coefficient)| {
+                serde_json::json!({"tower_mask_hex":format!("{:x}",mask_of(mono)),
+                "free_exponents":free_of(mono),"coefficient":coefficient.to_string()})
+            })
+            .collect::<Vec<_>>())
+    }
+
+    /// Exact normal-form coefficients of each power of x_R. Together with
+    /// the square rules this defines every target-specialized input exactly.
+    pub fn prepared_system_artifact(&self) -> Option<serde_json::Value> {
+        let prep = self.prepared.as_ref()?;
+        Some(serde_json::json!({"schema":"pkm-prepared-system/v1",
+            "modulus":prep.ring.p.to_string(),"m":self.m,"t":self.t,"g":self.g.to_string(),
+            "mode":format!("{:?}",self.mode),"tower_variables":prep.ring.n_tower(),
+            "free_variables":prep.ring.n_free,"variable_order":"tower blocks by summand, then chain auxiliaries",
+            "summand_map":"x_i = g * y_(i,0)",
+            "square_rule_convention":"y_j^2 = a*y_j*y_next + b*y_next + c*y_j + d",
+            "square_rules":prep.ring.rules.iter().map(|r|serde_json::json!({"next":r.next,
+                "a":r.a.to_string(),"b":r.b.to_string(),"c":r.c.to_string(),"d":r.d.to_string()})).collect::<Vec<_>>(),
+            "equations_by_target_x_power":prep.eqs.iter().map(|parts|parts.iter().map(Self::polynomial_artifact).collect::<Vec<_>>()).collect::<Vec<_>>(),
+            "grid_x":prep.v.iter().map(ToString::to_string).collect::<Vec<_>>(),"original_equation_degrees":prep.degrees,
+            "original_equation_recipe":if self.mode==PkmMode::Chain{"chained S3 with affine intermediate x coordinates"}else{"S_(m+1), m=2 S3 or m=3 S4 resultant"},
+            "trace_gaps":["private internal row/pivot operations and pair rejection witnesses"]}))
     }
 
     fn bump(&mut self, key: &str, by: u64) {
@@ -617,15 +665,33 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
+        if self.dataset_trace {
+            self.dataset_artifact = None;
+        }
         if point.infinity || self.prepared.is_none() {
             return None;
         }
         let curve = ctx.group;
         let x_r = point.x;
+        if self.dataset_trace {
+            self.dataset_artifact = self.prepared_system_artifact();
+            if let Some(snapshot) = &mut self.dataset_artifact {
+                snapshot["target_x"] = serde_json::json!(x_r.to_string());
+                snapshot["grid_extraction_attempted"] = serde_json::json!(false);
+            }
+        }
         let solutions = match self.engine {
             PkmEngine::Exhaustive => {
                 let started = Instant::now();
                 let (sols, mults) = self.grid(curve, x_r, false);
+                if let Some(snapshot) = &mut self.dataset_artifact {
+                    snapshot["grid_extraction_attempted"] = serde_json::json!(true);
+                    snapshot["grid_root_x"] = serde_json::json!(sols
+                        .iter()
+                        .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                        .collect::<Vec<_>>());
+                    snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
+                }
                 self.bump("pkm_grid_fp_mults_uncharged", mults);
                 let shape = self.shape.clone().unwrap_or_default();
                 let cost = SolverCost {
@@ -647,6 +713,12 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             PkmEngine::F4 => {
                 let sys = self.specialise(x_r);
+                if let Some(snapshot) = &mut self.dataset_artifact {
+                    snapshot["specialized_equations"] = serde_json::json!(sys
+                        .iter()
+                        .map(Self::polynomial_artifact)
+                        .collect::<Vec<_>>());
+                }
                 let ring = self.prepared.as_ref().expect("prepared").ring.clone();
                 let mut opts = TowerF4Options::new(self.max_degree);
                 if let Some(b) = self.budget {
@@ -659,6 +731,21 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                     opts = opts.stopping_below(s);
                 }
                 let rep = f4_tower(&sys, &ring, &opts);
+                if let Some(snapshot) = &mut self.dataset_artifact {
+                    snapshot["f4_basis"] = serde_json::json!(rep
+                        .basis
+                        .iter()
+                        .map(Self::polynomial_artifact)
+                        .collect::<Vec<_>>());
+                    snapshot["f4_report"] = serde_json::json!({"inconsistent":rep.inconsistent,
+                        "timed_out":rep.timed_out,"oversize":rep.oversize,"degree_reached":rep.degree_reached,
+                        "observed_productive_degree_max":rep.solving_degree_max,"pairs_above_bound":rep.pairs_above_bound,
+                        "elimination_fp_muladds":rep.muladds,"max_rows":rep.max_rows,"max_cols":rep.max_cols,
+                        "max_nnz":rep.max_nnz,"critical_pairs_reduced":rep.critical_pairs_reduced,
+                        "tower_pairs_reduced":rep.tower_pairs_reduced,"pairs_product_skipped":rep.pairs_product_skipped,
+                        "pairs_chain_skipped":rep.pairs_chain_skipped,"reducer_rows":rep.reducer_rows,
+                        "full_exposed_native_report_debug":format!("{rep:#?}")});
+                }
                 let undecided = !rep.inconsistent
                     && rep.staircase_at_stop.is_none()
                     && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
@@ -694,6 +781,14 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 }
                 // Consistent, or undecided: the grid reads the solutions.
                 let (sols, mults) = self.grid(curve, x_r, false);
+                if let Some(snapshot) = &mut self.dataset_artifact {
+                    snapshot["grid_extraction_attempted"] = serde_json::json!(true);
+                    snapshot["grid_root_x"] = serde_json::json!(sols
+                        .iter()
+                        .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                        .collect::<Vec<_>>());
+                    snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
+                }
                 self.bump("pkm_grid_fp_mults_uncharged", mults);
                 if undecided {
                     self.bump("pkm_undecided_systems", 1);
@@ -710,6 +805,12 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 sols
             }
         };
+        if let Some(snapshot) = &mut self.dataset_artifact {
+            snapshot["grid_root_x"] = serde_json::json!(solutions
+                .iter()
+                .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                .collect::<Vec<_>>());
+        }
         // Lift: every abscissa on the curve, then the signs that sum to R,
         // each try re-added on the counted ledger.
         for xs in &solutions {
