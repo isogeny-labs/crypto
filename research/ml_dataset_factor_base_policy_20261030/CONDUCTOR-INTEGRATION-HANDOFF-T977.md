@@ -1,0 +1,17 @@
+Integration coordination for T-887, T-888 and T-956 from dataset policy task T-936.
+
+Please reconcile and acknowledge the prepared native dataset integration before shared source ownership changes. Preserve current donor semantics; no wholesale source replacement or release of another task is requested.
+
+Passing baseline: isolated enabled V2 proposal03, base 655b690ef56d6869023a41326a127bf319cf4342 plus patch 9980f84225ec6abfec1434aaa440e759ada87dff41fac2d8874d819f34d4257b. Dataset suite355 passed,0 failed,1 ignored; process exit0; source byte/mode/file-set guards passed. Receipt: s3://setec-astronomy-artifacts/store/sha256/6b/6bd6564a2afaed5050fd469f203c8e57b6e1378bb442b9d65a7ec8884cd0d85e. Local source/evidence branch codex/ml-dataset-factor-base-policy-20261030, commit8f9e9f63e620.
+
+T-887: central dispatcher/solver V2 binding and SAT producer must be reconciled with dynamic original-prime F4 and independent replay. Prepared composition preserves donor WidePrimeReplay and censored-m3 predicate after exact occurrence admission. SAT source producer remains separate/unapplied: SHA679dfbd56b70e631e692fb894f8617dd659d78154cfced5249a6fd2a88580aa4. Confirm latest donor commit and any source changes beyond observed0fd2d838db414f45c227bfb6aa7f4f796022aba2 before integration. Your current card names crypto-ml-wide-prime-dynamic-20261030; observed combined donor was crypto-ml-dynamic-adapter-20261030, so this mapping needs owner confirmation.
+
+T-888: preserve typed bounded event serialization, borrowed payload custody, first-witness publication and committed-prefix validation alongside original-byte V2 plan/sidecar/attempt binding. Reviewed composition resolves the capture test insertion without replacing production APIs.
+
+T-956: report/restore earlier parity was reconciled against0dcfd in crypto-pr2972-semantic; confirm newer semantic repairs before delivery. Parent currently holds separate T-965 report/restore reservation after earlier release; please identify conflicts without changing reservations automatically.
+
+Reviewed donor composition01: /home/ec2-user/ml-dataset-work-20261028/unified-v2-donor-composition-01/HANDOFF.md; full patchbd9668356e29b6ec24fcf0f2bc234794136db1858a99bac2da5d9559453a4b14; independent reviewce417ea1f6129b5244e542f81a1e6808984cb7714c2398f6a62335f8bbaddfe6. Exact source map and five contextual conflict resolutions: /home/ec2-user/ml-dataset-work-20261028/donor-reconciliation-02/INTEGRATION-PLAN.md.
+
+New test-only composition02: /home/ec2-user/ml-dataset-work-20261028/unified-v2-donor-composition-02/HANDOFF.md; fulle94feeecbafd8fba2b22a273ec9aa1909ec40355706499811961e316d090e6a0. It adds early interrupted V2 m3 custody controls; independent delta review and execution pending. Native CLI acceptance fixture04 is separate and under review. Dynamic profile remains dormant; no SAT emission or all-arity execution claim.
+
+Requested coordination outcome: confirm exact stable donor source and integration route, preserve all named methods/curves/twists and rejected/censored outcomes, then contextually integrate and run combined native dataset/controller/full-release checks. Current tests establish only isolated proposal software validation. No clean delivered CLI, completed research corpus, full instruction accounting or mathematical theorem is claimed. Verified cloud dataset cells remain0; no cloud execution or IAM change requested.
