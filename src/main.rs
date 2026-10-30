@@ -141,6 +141,8 @@ enum Cmd {
     /// Large files (factor bases, relation tables): push to, pull from, and index
     /// the object store. See docs/store/README.md.
     Store(crypto_lib::store::cli::StoreArgs),
+    /// Replayable synthetic ECDLP/PDP training datasets and immutable artifact receipts.
+    Dataset(crypto_lib::ml_dataset::DatasetArgs),
 }
 
 #[derive(Subcommand)]
@@ -544,6 +546,12 @@ fn main() {
         Cmd::Store(args) => {
             if let Err(e) = crypto_lib::store::cli::run(&args) {
                 eprintln!("store: {e}");
+                std::process::exit(1);
+            }
+        }
+        Cmd::Dataset(args) => {
+            if let Err(e) = crypto_lib::ml_dataset::run(&args) {
+                eprintln!("dataset: {e}");
                 std::process::exit(1);
             }
         }
