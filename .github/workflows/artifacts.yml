@@ -56,3 +56,43 @@ jobs:
           exit 1
       - name: Workflows that read moved data pull it
         run: python3 tools/artifacts/wire_workflows.py --check
+
+  pdf-readback:
+    # Temporary, manual-only retrieval of this PR's four immutable report PDFs.
+    # No PR checkout or repository script executes in this credentialed job.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Read back and hash the original report PDF objects
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+        run: |
+          set -euo pipefail
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/pdf-readback-awscli"
+            "$RUNNER_TEMP/pdf-readback-awscli/bin/pip" install awscli==1.46.2
+            export PATH="$RUNNER_TEMP/pdf-readback-awscli/bin:$PATH"
+          fi
+          out_dir="$RUNNER_TEMP/pr2957-pdfs"
+          mkdir -p "$out_dir"
+          while read -r artifact_digest artifact_name; do
+            aws s3 cp "s3://setec-astronomy-artifacts/store/sha256/${artifact_digest:0:2}/$artifact_digest" "$out_dir/$artifact_name" --only-show-errors
+            printf '%s  %s\n' "$artifact_digest" "$out_dir/$artifact_name" | sha256sum -c -
+          done <<'PDF_OBJECTS'
+          d69e3464a4d542e8c0674bc85973c5e53694ed67243c52a726de7a1b1d1cd231 interim-report.pdf
+          2ce84e9449796ef9470537f96bff7fc4e6eef6a7d8400faf3070aff6e848c89a interim-review-packet.pdf
+          4901cc5917de9ad14ffe607c66a7751ebf671c1bb73acd4a0af542b2c8621c5e terminal-report.pdf
+          765e6b28491dc05846e729e976431e4c41e2c7e17a0e5ea3a5c1b3511e86095d terminal-review-packet.pdf
+          PDF_OBJECTS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr2957-pdf-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/pr2957-pdfs/*.pdf
+          if-no-files-found: error
+          retention-days: 2
