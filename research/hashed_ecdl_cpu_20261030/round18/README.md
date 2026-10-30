@@ -2,7 +2,7 @@
 
 ## What was done
 
-This is preparation, not a frozen protocol or an executed experiment. The runner
+The protocol is frozen; no experiment has been submitted or executed. The runner
 covers six arms, three existing fixtures, and one warmup plus nine measured
 rounds: 180 planned rows, including 162 measured rows and 18 warmups.
 
@@ -37,6 +37,7 @@ Reproduce development checks (no performance experiment):
 ```sh
 rustc --edition 2021 -D warnings -O analyze.rs -o /tmp/round18-analyze
 ANALYZER=/tmp/round18-analyze python3 -W error test_analyze.py
+ANALYZER=/tmp/round18-analyze python3 -W error test_export.py
 bash -n run.sh
 ```
 
@@ -51,11 +52,15 @@ workloads are unchanged. Prior round16/round17 records remain immutable.
 
 ## Open threads
 
-Before any launch: complete and freeze protocol.json, bind the new analyzer hash,
-prepare the six-arm export adapter and build manifest, commit the freeze, and
-stage a verified bundle. The runner deliberately requires these missing inputs;
-this preparation is not launch-ready. Verify eligible EKS capacity immediately
-before submission. The competing `semaev-n47-rand00-d5-reuse-20261030-1600` job was
+Protocol `259ecd8eec7d7c17e99fa3f15c52196aa6b07cf33ac1bf0d60ab3c36f98e26a6`
+validates with zero findings and pins all source revisions, manifest hashes and
+the analyzer hash. The export adapter and build manifest are complete. Three
+additional synthetic packaging tests pass, including manifest mismatch and
+incomplete-row rejection; the exporter refuses to overwrite an existing export.
+The local bundle is assembled, but has not been uploaded. Before submission,
+verify the freeze commit is pushed, eligible EKS capacity is available, then
+stage and verify the bundle. Presigned submission files remain private scratch
+artifacts and must never be committed. The competing `semaev-n47-rand00-d5-reuse-20261030-1600` job was
 observed active during preparation; no round18 job was submitted.
 
 L0 diagnostics cannot establish the further 10x end-to-end goal. Strict-isolation
@@ -70,3 +75,7 @@ exposed a Python ResourceWarning; the CSV reader now closes its file. Inspection
 found that warmup numeric values were not checked, now corrected with regression
 coverage. PR #2979 merged during preparation; its deleted remote branch cannot
 be fetched by name. Subsequent delivery uses a new branch and retains history.
+
+Protocol and packaging completed under T-952 on 2026-10-30. The competing job
+was rechecked Running on ip-10-84-78-223 with 112Gi allocated memory. No
+replacement job was submitted into the previously blocked placement.
