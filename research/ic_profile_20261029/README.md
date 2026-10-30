@@ -124,26 +124,29 @@ session: it is the measured phase split with setup divided by the number of
 targets `P` that share it, and it is an **extrapolation from counted phases**,
 not a new measurement.
 
-`S(P) = (2070/P + 5374) / sqrt(562427)`, from the medians above and the curve's
-`r = 562427` (the 1,024 divisor the record uses is `sqrt(r)` = 749.95):
+`S(P) = (2070/P + 5374) / sqrt(562427)`, using the stated `r = 562427`
+and the saved phase medians: 5,348 GAE for relations plus 26 GAE for verification
+give the 5,374 GAE per-target term. The normaliser is `sqrt(r) = 749.9513`.
+This component-median model assumes unchanged per-target work and no extra
+sharing overhead; it is not a measured multi-target pipeline.
 
 | P (targets sharing one setup) | setup per target | S | vs cold |
 |--:|--:|--:|--:|
 | 1 | 2,070 | 9.93 | 1.00 |
 | 2 | 1,035 | 8.55 | 0.86 |
 | 8 | 259 | 7.51 | 0.76 |
-| 64 | 32 | 7.20 | 0.73 |
+| 64 | 32 | 7.21 | 0.73 |
 | infinity | 0 | 7.17 | 0.72 |
 
-Two things follow. First, the whole amortisation lever is worth **at most 28%**
-(9.93 -> 7.17): it is real, it is free of new code, and it is bounded above by
-the setup share we already measured. Second, it does **not** change the class of
-the result: at `P -> infinity` the pipeline is still **6.7x** matched rho
-(7.17 against 1.08), and the relation phase alone (5,374 GAE) is 4.7x rho. To
-reach parity the relation phase has to fall by about 7x, which setup
-amortisation cannot touch.
+Within this model, removing setup saves **at most 27.8%** (9.93 -> 7.17),
+the saved setup share. A real shared-setup implementation and its costs have
+not been measured. At `P -> infinity`, the modelled total is still about
+**6.7x** matched rho (`7.1658 / 1.077 = 6.6535`, using the saved rho median).
+The relation phase alone is 5,348 GAE, about **6.6x** rho; adding verification
+gives the 5,374 GAE term. Matching rho still requires a substantial reduction
+in per-target relation cost, which setup amortisation cannot supply.
 
-So the order of levers is: amortise setup for the free 28% if and when a shared
-setup method exists (none does today; the cold rule is deliberate), but the only
-lever that can move the class of the result is the relation phase's per-trial
-cost and yield, and the factor-base direction for that is now measured to lose.
+Amortising setup is therefore a bounded hypothetical saving if a shared method
+is implemented and costed; none exists today, and the cold rule is deliberate.
+The model continues to identify relation per-trial cost and yield as the
+dominant remaining work. The factor-base direction above was measured to lose.
