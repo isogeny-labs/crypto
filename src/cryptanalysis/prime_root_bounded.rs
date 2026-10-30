@@ -1419,7 +1419,7 @@ mod tests {
                     Stop::StorageLimit
                 }
                 _ => {
-                    limited.split_attempts = 0;
+                    limited.split_attempts -= 1;
                     Stop::SplitLimit
                 }
             };
@@ -1437,6 +1437,22 @@ mod tests {
                 assert!(report.unresolved_factors > 0);
             }
         }
+        // Preserve the distinct zero-attempt refusal as well as the exact
+        // one-less split boundary above. Three distinct roots need >=2 splits.
+        assert!(full.metrics.splits >= 2);
+        let mut zero_splits = budget();
+        zero_splits.split_attempts = 0;
+        let (refused, prefix) = run(&f, 17, zero_splits);
+        assert_eq!(refused.stop, Stop::SplitLimit);
+        assert_eq!(refused.metrics.splits, 0);
+        assert!(!prefix
+            .iter()
+            .any(|e| matches!(e.kind, EventKind::Split { .. })));
+        assert!(!check(&f, &refused, &prefix).unwrap().finite_complete);
+        let mut forged = refused;
+        forged.stop = Stop::Complete;
+        assert!(check(&f, &forged, &prefix).is_err());
+
         let mut limited = budget();
         limited.work = 4096 + 4 * COPY_WORK;
         let (report, stream) = run(&f, 17, limited);
@@ -1448,6 +1464,48 @@ mod tests {
         remaining.work = full.metrics.work - 1;
         assert_eq!(run(&f, 17, remaining).0.stop, Stop::WorkLimit);
     }
+    #[test]
+    fn bounded_prime_roots_fixed_rejected_split_is_observed_and_replayed() {
+        let field = field(5);
+        let coefficients = [1, 0, 1]; // (X-2)(X-3) over F5.
+                                      // Analytically fixed, not searched: first SplitMix state/word is zero.
+                                      // Thus delta=0 and X^((5-1)/2)-1 = X^2-1 = 3 mod X^2+1,
+                                      // giving monic gcd=1 and a rejected split.
+        let seed = 0u64.wrapping_sub(0x9e3779b97f4a7c15) ^ 0x524f_4f54;
+        let mut limits = budget();
+        limits.split_attempts = 1;
+        let mut events = Vec::new();
+        let report = solve_bounded(&field, &coefficients, seed, limits, deadline(), &mut |e| {
+            events.push(*e);
+            Ok(())
+        });
+        assert_eq!(report.stop, Stop::SplitLimit);
+        assert_eq!(report.metrics.splits, 1);
+        let splits: Vec<_> = events
+            .iter()
+            .filter_map(|e| match e.kind {
+                EventKind::Split {
+                    delta,
+                    factor,
+                    quotient,
+                    accepted,
+                    ..
+                } => Some((delta, factor, quotient, accepted)),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(splits, vec![(0, Poly17::constant(1), Poly17::ZERO, false)]);
+        assert_eq!(report.root_count, 0);
+        assert!(report.unresolved_factors > 0);
+        assert!(!report.root_set_complete());
+        let mut replay =
+            Replay::new(&field, &coefficients, seed, limits, budget(), deadline()).unwrap();
+        for event in &events {
+            replay.push(event).unwrap();
+        }
+        assert!(!replay.finish(&report).unwrap().finite_complete);
+    }
+
     #[test]
     fn bounded_prime_roots_invalid_admission_and_sticky_observer() {
         let field = field(17);
@@ -1559,6 +1617,27 @@ mod tests {
         let mut bad = events.clone();
         bad.insert(1, bad[1]);
         assert!(check(&f, &report, &bad).is_err());
+        // Mutate a local root certificate directly, not only final roots.
+        let mut bad = events.clone();
+        let i = bad
+            .iter()
+            .position(|e| matches!(e.kind, EventKind::LinearRoot { .. }))
+            .unwrap();
+        if let EventKind::LinearRoot { ref mut root, .. } = bad[i].kind {
+            *root = (*root + 1) % 17;
+        }
+        assert!(check(&f, &report, &bad).is_err());
+        // Removing Finish must reject even after adjusting event counters;
+        // Complete cannot be inferred from the preceding LinearRoot events.
+        let mut missing_finish = events.clone();
+        assert!(matches!(
+            missing_finish.pop().unwrap().kind,
+            EventKind::Finish { .. }
+        ));
+        let mut missing_finish_report = report;
+        missing_finish_report.metrics.acknowledged_events -= 1;
+        missing_finish_report.metrics.attempted_events -= 1;
+        assert!(check(&f, &missing_finish_report, &missing_finish).is_err());
         let mut changed = report;
         changed.roots[0] = 4;
         assert!(check(&f, &changed, &events).is_err());
