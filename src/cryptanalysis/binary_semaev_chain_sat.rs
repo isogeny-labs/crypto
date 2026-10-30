@@ -8,6 +8,8 @@
 //! pattern is inconclusive, not a refutation.
 
 use num_bigint::BigUint;
+use serde::{Deserialize, Serialize};
+use std::io::Write;
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
@@ -18,6 +20,164 @@ pub enum ChainBuildError {
     Unsupported,
     VariableCap { required: u64, maximum: u32 },
     DomainClauseCap { required: usize, maximum: usize },
+}
+
+pub const GATE_MAP_SCHEMA: &str = "crypto.binary-semaev-chain-gate-map/v1";
+pub const GATE_MAP_MAX_BYTES: usize = 16 * 1024 * 1024;
+
+/// Public encoding semantics, not solver state or an independently checked proof.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GateMap {
+    pub schema: String,
+    pub n: u32,
+    pub m: usize,
+    pub irreducible_low_terms: Vec<u32>,
+    pub b: String,
+    pub target_x: Option<String>,
+    pub identity_mask: u32,
+    pub variables: u32,
+    pub coordinate_blocks: Vec<Vec<u32>>,
+    /// Each triple is [output, left, right], with 1-based DIMACS wires.
+    pub and_gates: Vec<[u32; 3]>,
+    pub xor_rows: Vec<GateMapXor>,
+    pub unit_literals: Vec<Lit>,
+    pub impossible: bool,
+    pub finite_domain: Option<GateMapDomain>,
+    pub reduction_outputs: Vec<Vec<usize>>,
+    pub square_inputs: Vec<Vec<usize>>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GateMapXor {
+    pub variables: Vec<u32>,
+    pub rhs: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GateMapDomain {
+    /// Numerically sorted, distinct canonical decimal field codes.
+    pub codes: Vec<String>,
+    /// Before root-unit simplification and tautology removal.
+    pub raw_clause_count: usize,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct GateMapLimits {
+    pub max_bytes: usize,
+}
+impl Default for GateMapLimits {
+    fn default() -> Self {
+        Self {
+            max_bytes: GATE_MAP_MAX_BYTES,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "reason", rename_all = "snake_case")]
+pub enum GateMapError {
+    Disabled,
+    ByteCap { maximum: usize },
+    DomainNotInstalled,
+    UnsupportedMutation { operation: &'static str },
+}
+
+enum GateMapCapture {
+    Disabled,
+    Available { map: Box<GateMap>, maximum: usize },
+    Unavailable(GateMapError),
+}
+
+/// Exact serialized byte count with no complete JSON-buffer allocation.
+fn gate_map_bytes(value: &impl Serialize, maximum: usize) -> Option<usize> {
+    struct Counter {
+        bytes: usize,
+        maximum: usize,
+    }
+    impl Write for Counter {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            let Some(total) = self
+                .bytes
+                .checked_add(bytes.len())
+                .filter(|n| *n <= self.maximum)
+            else {
+                return Err(std::io::Error::other("gate map byte cap"));
+            };
+            self.bytes = total;
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    let mut counter = Counter { bytes: 0, maximum };
+    serde_json::to_writer(&mut counter, value).ok()?;
+    Some(counter.bytes)
+}
+
+impl GateMapCapture {
+    fn bounded(map: GateMap, maximum: usize) -> Self {
+        if gate_map_bytes(&map, maximum).is_some() {
+            Self::Available {
+                map: Box::new(map),
+                maximum,
+            }
+        } else {
+            Self::Unavailable(GateMapError::ByteCap { maximum })
+        }
+    }
+
+    fn invalidate(&mut self, operation: &'static str) {
+        if matches!(self, Self::Available { .. }) {
+            *self = Self::Unavailable(GateMapError::UnsupportedMutation { operation });
+        }
+    }
+
+    fn install_domain(&mut self, codes: &[BigUint], raw_clause_count: usize) {
+        let Self::Available { map, maximum } = self else {
+            return;
+        };
+        // Serialize decimal codes one at a time when checking the prospective
+        // size, so a rejected domain never allocates the retained string vector.
+        struct DecimalCodes<'a>(&'a [BigUint]);
+        impl Serialize for DecimalCodes<'_> {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                use serde::ser::SerializeSeq;
+                let mut sequence = serializer.serialize_seq(Some(self.0.len()))?;
+                for code in self.0 {
+                    sequence.serialize_element(&code.to_string())?;
+                }
+                sequence.end()
+            }
+        }
+        #[derive(Serialize)]
+        struct DomainView<'a> {
+            codes: DecimalCodes<'a>,
+            raw_clause_count: usize,
+        }
+        let base_bytes = gate_map_bytes(map, *maximum);
+        let domain_bytes = gate_map_bytes(
+            &DomainView {
+                codes: DecimalCodes(codes),
+                raw_clause_count,
+            },
+            *maximum,
+        );
+        let total = base_bytes
+            .zip(domain_bytes)
+            .and_then(|(base, domain)| base.checked_sub(4)?.checked_add(domain));
+        if total.is_none_or(|bytes| bytes > *maximum) {
+            *self = Self::Unavailable(GateMapError::ByteCap { maximum: *maximum });
+            return;
+        }
+        map.finite_domain = Some(GateMapDomain {
+            codes: codes.iter().map(ToString::to_string).collect(),
+            raw_clause_count,
+        });
+    }
 }
 
 /// Worst-case SAT variable count for the field-product circuit, before a
@@ -261,20 +421,46 @@ impl Circuit {
     }
 
     fn finish(self) -> Solver {
-        let mut solver = Solver::new(self.next - 1);
-        for (gate, left, right) in self.ands {
+        Self::install_parts(
+            self.next - 1,
+            self.ands,
+            self.xors,
+            self.units,
+            self.impossible,
+        )
+    }
+
+    fn install(&self) -> Solver {
+        Self::install_parts(
+            self.next - 1,
+            self.ands.iter().copied(),
+            self.xors.iter().map(|(row, rhs)| (row.as_slice(), *rhs)),
+            self.units.iter().copied(),
+            self.impossible,
+        )
+    }
+
+    fn install_parts<Row: AsRef<[u32]>>(
+        variables: u32,
+        ands: impl IntoIterator<Item = (u32, u32, u32)>,
+        xors: impl IntoIterator<Item = (Row, bool)>,
+        units: impl IntoIterator<Item = (u32, bool)>,
+        impossible: bool,
+    ) -> Solver {
+        let mut solver = Solver::new(variables);
+        for (gate, left, right) in ands {
             let (gate, left, right) = (gate as Lit, left as Lit, right as Lit);
             solver.add_clause(vec![-gate, left]);
             solver.add_clause(vec![-gate, right]);
             solver.add_clause(vec![gate, -left, -right]);
         }
-        for (row, rhs) in self.xors {
-            solver.add_xor(&row, rhs);
+        for (row, rhs) in xors {
+            solver.add_xor(row.as_ref(), rhs);
         }
-        for (wire, value) in self.units {
+        for (wire, value) in units {
             solver.add_clause(vec![if value { wire as Lit } else { -(wire as Lit) }]);
         }
-        if self.impossible {
+        if impossible {
             solver.add_clause(vec![]);
         }
         solver
@@ -299,6 +485,7 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
+    gate_map_capture: GateMapCapture,
 }
 
 impl ChainedS3Encoding {
@@ -309,6 +496,41 @@ impl ChainedS3Encoding {
         target_x: Option<&F2mElement>,
         identity_mask: u32,
         max_variables: u32,
+    ) -> Result<Self, ChainBuildError> {
+        Self::build_internal(m, irr, b, target_x, identity_mask, max_variables, None)
+    }
+
+    /// Opt-in retention of the existing native circuit, with separate byte caps.
+    /// A capped map does not change solver constraints; callers requiring a map
+    /// must check `gate_map()` after installing the finite-coordinate domain.
+    pub fn build_with_gate_map(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+        limits: GateMapLimits,
+    ) -> Result<Self, ChainBuildError> {
+        Self::build_internal(
+            m,
+            irr,
+            b,
+            target_x,
+            identity_mask,
+            max_variables,
+            Some(limits),
+        )
+    }
+
+    fn build_internal(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+        map_limits: Option<GateMapLimits>,
     ) -> Result<Self, ChainBuildError> {
         let n = irr.degree;
         let Some(required) = chain_s3_max_variables(n, m) else {
@@ -376,7 +598,47 @@ impl ChainedS3Encoding {
             previous = output;
         }
         let n_and_gates = circuit.ands.len();
-        let mut solver = circuit.finish();
+        let (mut solver, gate_map_capture) = if let Some(limits) = map_limits {
+            let solver = circuit.install();
+            let mut low_terms = irr.low_terms.clone();
+            low_terms.sort_unstable();
+            let map = GateMap {
+                schema: GATE_MAP_SCHEMA.into(),
+                n,
+                m,
+                irreducible_low_terms: low_terms,
+                b: b.to_biguint().to_string(),
+                target_x: target_x.map(|x| x.to_biguint().to_string()),
+                identity_mask,
+                variables: circuit.next - 1,
+                coordinate_blocks: blocks.clone(),
+                and_gates: circuit
+                    .ands
+                    .into_iter()
+                    .map(|(out, left, right)| [out, left, right])
+                    .collect(),
+                xor_rows: circuit
+                    .xors
+                    .into_iter()
+                    .map(|(variables, rhs)| GateMapXor { variables, rhs })
+                    .collect(),
+                unit_literals: circuit
+                    .units
+                    .into_iter()
+                    .map(|(wire, value)| if value { wire as Lit } else { -(wire as Lit) })
+                    .collect(),
+                impossible: circuit.impossible,
+                finite_domain: None,
+                reduction_outputs: circuit.reductions,
+                square_inputs: circuit.square_inputs,
+            };
+            (
+                solver,
+                GateMapCapture::bounded(map, limits.max_bytes.min(GATE_MAP_MAX_BYTES)),
+            )
+        } else {
+            (circuit.finish(), GateMapCapture::Disabled)
+        };
         solver.set_branch_priority(&(1..=(m as u32 * n)).collect::<Vec<_>>());
         Ok(Self {
             solver,
@@ -393,7 +655,22 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
+            gate_map_capture,
         })
+    }
+
+    /// Complete retained semantics for the supported finite-coordinate route.
+    /// Public `solver` mutations are not observed here: exact formula/snapshot
+    /// verification is still required before treating this map as matched input.
+    pub fn gate_map(&self) -> Result<&GateMap, GateMapError> {
+        match &self.gate_map_capture {
+            GateMapCapture::Disabled => Err(GateMapError::Disabled),
+            GateMapCapture::Unavailable(error) => Err(error.clone()),
+            GateMapCapture::Available { map, .. } if map.finite_domain.is_none() => {
+                Err(GateMapError::DomainNotInstalled)
+            }
+            GateMapCapture::Available { map, .. } => Ok(map),
+        }
     }
 
     /// Add the exact finite set of rational factor-base x-coordinates to
@@ -422,6 +699,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.gate_map_capture.install_domain(&codes, required);
         Ok(required)
     }
 
@@ -481,6 +759,7 @@ impl ChainedS3Encoding {
         }
         let shared = (encoding == FrobeniusOrbitRootEncoding::SharedBits)
             .then(|| shared_root_bits(self.n, &sorted));
+        self.gate_map_capture.invalidate("frobenius_orbit_summands");
         for block in &self.blocks[..self.m] {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
@@ -555,6 +834,7 @@ impl ChainedS3Encoding {
                 maximum: max_domain_clauses,
             });
         }
+        self.gate_map_capture.invalidate("frobenius_orbit_domains");
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
@@ -591,6 +871,7 @@ impl ChainedS3Encoding {
                 maximum: max_variables,
             });
         }
+        self.gate_map_capture.invalidate("order_first_pair");
         add_lex_leq(&mut self.solver, &self.blocks[0], &self.blocks[1]);
         self.first_pair_ordered = true;
         Ok(())
@@ -647,6 +928,7 @@ impl ChainedS3Encoding {
                 Err(ChainBuildError::Unsupported)
             };
         }
+        self.gate_map_capture.invalidate("pin_x_block");
         let bits = value.to_biguint();
         for (bit, &wire) in self.blocks[block_index].iter().enumerate() {
             self.solver.add_clause(vec![if bits.bit(bit as u64) {
@@ -895,6 +1177,246 @@ mod tests {
     use crate::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverProgress};
     use std::sync::Arc;
     use std::time::Instant;
+
+    fn retained_encoding(max_bytes: usize) -> ChainedS3Encoding {
+        let irr = IrreduciblePoly {
+            degree: 4,
+            low_terms: vec![1, 0],
+        };
+        ChainedS3Encoding::build_with_gate_map(
+            3,
+            &irr,
+            &F2mElement::one(4),
+            Some(&F2mElement::one(4)),
+            0,
+            100_000,
+            GateMapLimits { max_bytes },
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn retained_gate_maps_preserve_formula_and_native_counts_for_identity_patterns() {
+        let irr = IrreduciblePoly {
+            degree: 4,
+            low_terms: vec![1, 0],
+        };
+        let b = F2mElement::one(4);
+        let target = F2mElement::from_bit_positions(&[0, 2], 4);
+        let codes = [
+            BigUint::from(3u8),
+            BigUint::from(0u8),
+            BigUint::from(3u8),
+            BigUint::from(1u8),
+        ];
+        for m in 2..=5 {
+            for pattern in 0..1u32 << (m - 2) {
+                for target_x in [None, Some(&target)] {
+                    let mut legacy =
+                        ChainedS3Encoding::build(m, &irr, &b, target_x, pattern, 100_000).unwrap();
+                    let mut retained = ChainedS3Encoding::build_with_gate_map(
+                        m,
+                        &irr,
+                        &b,
+                        target_x,
+                        pattern,
+                        100_000,
+                        GateMapLimits::default(),
+                    )
+                    .unwrap();
+                    assert!(matches!(legacy.gate_map_capture, GateMapCapture::Disabled));
+                    assert_eq!(legacy.gate_map(), Err(GateMapError::Disabled));
+                    assert_eq!(retained.gate_map(), Err(GateMapError::DomainNotInstalled));
+                    let required = legacy.constrain_summands(&codes, 10_000).unwrap();
+                    assert_eq!(retained.constrain_summands(&codes, 10_000), Ok(required));
+                    assert_eq!(
+                        crate::cryptanalysis::sat::to_dimacs_xor(&legacy.solver),
+                        crate::cryptanalysis::sat::to_dimacs_xor(&retained.solver)
+                    );
+                    assert_eq!(legacy.solver.word_ops(), retained.solver.word_ops());
+                    assert_eq!(legacy.n_and_gates, retained.n_and_gates);
+                    assert_eq!(legacy.n_s3_nodes, retained.n_s3_nodes);
+                    let map = retained.gate_map().unwrap();
+                    assert_eq!(map.schema, GATE_MAP_SCHEMA);
+                    assert_eq!(map.irreducible_low_terms, vec![0, 1]);
+                    assert_eq!(map.identity_mask, pattern);
+                    assert_eq!(map.target_x, target_x.map(|x| x.to_biguint().to_string()));
+                    assert_eq!(
+                        map.finite_domain.as_ref().unwrap(),
+                        &GateMapDomain {
+                            codes: vec!["0".into(), "1".into(), "3".into()],
+                            raw_clause_count: required,
+                        }
+                    );
+                    assert_eq!(
+                        map.coordinate_blocks[..m].concat(),
+                        (1..=m as u32 * 4).collect::<Vec<_>>()
+                    );
+                    assert_eq!(map.and_gates.len(), retained.n_and_gates);
+                    for bit in 0..4 {
+                        for output in 0..4 {
+                            assert_eq!(
+                                map.square_inputs[output].contains(&bit),
+                                map.reduction_outputs[2 * bit].contains(&output)
+                            );
+                        }
+                    }
+                    let bytes = serde_json::to_vec(map).unwrap();
+                    assert_eq!(gate_map_bytes(map, bytes.len()), Some(bytes.len()));
+                    assert_eq!(serde_json::from_slice::<GateMap>(&bytes).unwrap(), *map);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn gate_map_byte_caps_are_exact_and_leave_solver_constraints_unchanged() {
+        let codes = [BigUint::from(1u8), BigUint::from(3u8)];
+        let mut full = retained_encoding(GateMapLimits::default().max_bytes);
+        full.constrain_summands(&codes, 10_000).unwrap();
+        let expected = crate::cryptanalysis::sat::to_dimacs_xor(&full.solver);
+        let bytes = serde_json::to_vec(full.gate_map().unwrap()).unwrap().len();
+        for limit in [0, bytes - 1, bytes] {
+            let mut bounded = retained_encoding(limit);
+            bounded.constrain_summands(&codes, 10_000).unwrap();
+            assert_eq!(
+                crate::cryptanalysis::sat::to_dimacs_xor(&bounded.solver),
+                expected
+            );
+            assert_eq!(bounded.solver.word_ops(), full.solver.word_ops());
+            if limit == bytes {
+                assert_eq!(bounded.gate_map(), full.gate_map());
+            } else {
+                assert_eq!(
+                    bounded.gate_map(),
+                    Err(GateMapError::ByteCap { maximum: limit })
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn gate_map_failed_domain_or_mutator_preflight_preserves_capture() {
+        let mut encoding = retained_encoding(GateMapLimits::default().max_bytes);
+        let before = crate::cryptanalysis::sat::to_dimacs_xor(&encoding.solver);
+        assert_eq!(
+            encoding.constrain_summands(&[BigUint::from(16u8)], 10_000),
+            Err(ChainBuildError::Unsupported)
+        );
+        assert!(matches!(
+            encoding.constrain_summands(&[BigUint::from(1u8)], 0),
+            Err(ChainBuildError::DomainClauseCap { .. })
+        ));
+        assert_eq!(encoding.gate_map(), Err(GateMapError::DomainNotInstalled));
+        assert_eq!(
+            crate::cryptanalysis::sat::to_dimacs_xor(&encoding.solver),
+            before
+        );
+        encoding
+            .constrain_summands(&[BigUint::from(1u8), BigUint::from(3u8)], 10_000)
+            .unwrap();
+        let map = encoding.gate_map().unwrap().clone();
+        assert!(encoding.order_first_pair(encoding.solver.n_vars()).is_err());
+        assert!(encoding.pin_x_block(99, &F2mElement::one(4)).is_err());
+        assert!(encoding.constrain_summands(&[], 10_000).is_err());
+        assert!(encoding
+            .constrain_frobenius_orbit_summands(
+                &[BigUint::from(1u8), BigUint::from(3u8)],
+                100_000,
+                10_000
+            )
+            .is_err());
+        assert_eq!(encoding.gate_map(), Ok(&map));
+        // Checking the already pinned target performs no mutation.
+        encoding.pin_x_block(4, &F2mElement::one(4)).unwrap();
+        assert_eq!(encoding.gate_map(), Ok(&map));
+    }
+
+    #[test]
+    fn successful_unsupported_mutations_explicitly_invalidate_gate_maps() {
+        let codes = [BigUint::from(1u8), BigUint::from(3u8)];
+        for operation in [
+            "order_first_pair",
+            "pin_x_block",
+            "frobenius_orbit_summands",
+            "frobenius_orbit_domains",
+        ] {
+            let mut encoding = retained_encoding(GateMapLimits::default().max_bytes);
+            match operation {
+                "order_first_pair" => {
+                    encoding.constrain_summands(&codes, 10_000).unwrap();
+                    encoding.order_first_pair(100_000).unwrap();
+                }
+                "pin_x_block" => {
+                    encoding.constrain_summands(&codes, 10_000).unwrap();
+                    encoding.pin_x_block(0, &F2mElement::one(4)).unwrap();
+                }
+                "frobenius_orbit_summands" => {
+                    encoding
+                        .constrain_frobenius_orbit_summands(&codes, 100_000, 10_000)
+                        .unwrap();
+                }
+                _ => {
+                    encoding
+                        .constrain_frobenius_orbit_domains(
+                            &vec![codes.to_vec(); 3],
+                            100_000,
+                            10_000,
+                        )
+                        .unwrap();
+                }
+            }
+            assert_eq!(
+                encoding.gate_map(),
+                Err(GateMapError::UnsupportedMutation { operation })
+            );
+        }
+    }
+
+    #[test]
+    fn retained_gate_map_keeps_empty_domain_and_wide_field_codes_exact() {
+        let mut empty = retained_encoding(GateMapLimits::default().max_bytes);
+        assert_eq!(empty.constrain_summands(&[], 3), Ok(3));
+        assert_eq!(
+            empty.gate_map().unwrap().finite_domain.as_ref().unwrap(),
+            &GateMapDomain {
+                codes: vec![],
+                raw_clause_count: 3,
+            }
+        );
+        assert_eq!(
+            crate::cryptanalysis::sat::to_dimacs_xor(&empty.solver)
+                .lines()
+                .last(),
+            Some("0")
+        );
+        let irr = IrreduciblePoly {
+            degree: 61,
+            low_terms: vec![0, 1, 2, 5],
+        };
+        let value = F2mElement::from_bit_positions(&[0, 60], 61);
+        let mut wide = ChainedS3Encoding::build_with_gate_map(
+            2,
+            &irr,
+            &F2mElement::one(61),
+            Some(&value),
+            0,
+            100_000,
+            GateMapLimits::default(),
+        )
+        .unwrap();
+        wide.constrain_summands(&[value.to_biguint()], 1_000)
+            .unwrap();
+        let map = wide.gate_map().unwrap();
+        assert_eq!(map.target_x.as_deref(), Some("1152921504606846977"));
+        assert_eq!(
+            map.finite_domain.as_ref().unwrap().codes,
+            vec!["1152921504606846977"]
+        );
+        let json = serde_json::to_value(map).unwrap();
+        assert!(json["target_x"].is_string());
+        assert!(json["finite_domain"]["codes"][0].is_string());
+    }
 
     #[test]
     fn first_pair_lex_constraint_keeps_exactly_one_swap_orientation() {

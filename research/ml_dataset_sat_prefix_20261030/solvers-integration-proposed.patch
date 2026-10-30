@@ -1,0 +1,68 @@
+--- a/src/ml_dataset/solvers.rs
++++ b/src/ml_dataset/solvers.rs
+@@ -329,7 +329,7 @@
+         "solvers":[
+             {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
+             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
+-            {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
++            {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","gate semantics for orbit/order/lazy/model-enumeration profiles; exact finite-coordinate map is retained"]},
+             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
+             {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 only","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+             {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
+@@ -985,13 +985,14 @@
+         if attempts >= limit || Instant::now() >= deadline {
+             break;
+         }
+-        let mut enc = match ChainedS3Encoding::build(
++        let mut enc = match ChainedS3Encoding::build_with_gate_map(
+             config.m,
+             &curve.irreducible,
+             &curve.b,
+             target_x,
+             pattern,
+             100_000,
++            crate::cryptanalysis::binary_semaev_chain_sat::GateMapLimits::default(),
+         ) {
+             Ok(x) => x,
+             Err(e) => {
+@@ -1003,12 +1004,29 @@
+             data.outcome["reason"] = json!(format!("Finite-domain construction cap: {e:?}"));
+             break;
+         }
++        let gate_map = match enc.gate_map() {
++            Ok(map) => serde_json::to_vec(map).map_err(|e| e.to_string())?,
++            Err(error @ crate::cryptanalysis::binary_semaev_chain_sat::GateMapError::ByteCap { .. }) => {
++                data.outcome["reason"] = json!("Native SAT gate-map byte budget exhausted before solve");
++                data.outcome["gate_map_capture_error"] = serde_json::to_value(error).map_err(|e| e.to_string())?;
++                break;
++            }
++            Err(error) => return Err(format!("SAT gate capture unavailable after finite-domain construction: {error:?}")),
++        };
+         let formula = sat::to_dimacs_xor(&enc.solver);
+         let used_bytes: usize = data.artifacts.iter().map(|a| a.bytes.len()).sum();
+-        if used_bytes.saturating_add(formula.len()) > TRACE_BYTE_CAP {
+-            data.outcome["reason"] = json!("Formula trace byte budget exhausted before solve");
++        if used_bytes.saturating_add(formula.len()).saturating_add(gate_map.len()) > TRACE_BYTE_CAP {
++            data.outcome["reason"] = json!("Formula and gate-map trace byte budget exhausted before solve");
+             break;
+         }
++        let map_payload = ArtifactPayload {
++            path: format!("sat-pattern-{pattern}.gate-map.json"),
++            role: "native-binary-s3-gate-map".into(),
++            encoding: "json".into(),
++            bytes: gate_map,
++        };
++        live_payload(&map_payload)?;
++        data.artifacts.push(map_payload);
+         let payload = ArtifactPayload {
+             path: format!("sat-pattern-{pattern}.xor.cnf"),
+             role: "complete-original-cnf-xor".into(),
+@@ -1109,7 +1127,7 @@
+         .lock()
+         .map_err(|_| "SAT trace mutex poisoned".to_string())?;
+     data.outcome["native_event_trace"] = json!({"events":log.events,"bytes":log.bytes.len(),"event_cap":TRACE_EVENT_CAP,"byte_cap":SAT_EVENT_BYTE_CAP,
+-        "proof_checked":false,"scope":"native semantic search events; clause arena IDs and XOR matrix row operations","gate_map":"summand blocks are DIMACS 1..=m*n; bit j is coefficient of field basis element x^j; remaining gate provenance not exported"});
++        "proof_checked":false,"scope":"native semantic search events; clause arena IDs and XOR matrix row operations","gate_map":"per-pattern native-binary-s3-gate-map artifact; exact finite-coordinate domain and raw ordered constraints; export performs separate source binding and bounded semantic replay"});
+     let payload = ArtifactPayload {
+         path: "sat-native-events.jsonl".into(),
+         role: "native-sat-search-events".into(),
