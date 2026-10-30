@@ -1,0 +1,85 @@
+{
+  "construction_candidates": [
+    {
+      "lifts": [
+        {
+          "accepted": true,
+          "cyclic_subgroup_member": true,
+          "lifted": {
+            "x": "1",
+            "y": "28"
+          },
+          "projected": {
+            "x": "110",
+            "y": "16"
+          },
+          "projection_multiplier": "4"
+        },
+        {
+          "accepted": true,
+          "cyclic_subgroup_member": true,
+          "lifted": {
+            "x": "1",
+            "y": "99"
+          },
+          "projected": {
+            "x": "110",
+            "y": "111"
+          },
+          "projection_multiplier": "4"
+        }
+      ],
+      "x": "1"
+    }
+  ],
+  "construction_status": "verified",
+  "cyclic_membership_method": "unique subgroup because r divides N once",
+  "frobenius_action": [
+    0,
+    1
+  ],
+  "frobenius_power": 1,
+  "known_log_features": false,
+  "negation_action": [
+    1,
+    0
+  ],
+  "negation_closed": true,
+  "orbits": [
+    {
+      "closed": true,
+      "points": [
+        {
+          "x": "110",
+          "y": "16"
+        }
+      ],
+      "stabilizer_size": 1
+    },
+    {
+      "closed": true,
+      "points": [
+        {
+          "x": "110",
+          "y": "111"
+        }
+      ],
+      "stabilizer_size": 1
+    }
+  ],
+  "points": [
+    {
+      "x": "110",
+      "y": "16"
+    },
+    {
+      "x": "110",
+      "y": "111"
+    }
+  ],
+  "projection_rule": "multiply by N/r^v_r(N), then trim by r until exact order r; multiplier retained for every candidate",
+  "requested_size": 2,
+  "rule": "small-x-prime-primary-projection-with-cyclic-membership",
+  "schema": "ml-ecdlp-factor-base/v1",
+  "size_policy": "retain-both-signs; may exceed requested size by one; capped by subgroup cardinality"
+}

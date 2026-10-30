@@ -1,0 +1,45 @@
+{
+  "schema": "software-validation-plan/v1",
+  "purpose": "Native versioned plan and orbit-population correctness; not research measurement or corpus generation",
+  "execution_source": "Commit final implementation, scripts and plan before passing exact HEAD to run-phase.sh",
+  "prerequisite": "Consequence pipeline05 must be terminal and shared target free. Authors and reviewer finish source edits before frozen execution. No build started by this plan.",
+  "materialization_inventory": {
+    "path": "/home/ec2-user/ml-dataset-work-20261028/factor-base-policy-materialization-01.json",
+    "sha256": "08704ce563453056624e88b92fcad2497a14e50b33cf0f54bb9119242fbe26e3",
+    "source_commit": "8eddc0107ffa82b95d285a717fa4a47ef244f38d",
+    "files": 2722,
+    "bytes": 253892127
+  },
+  "source_binding": "All tracked files except shared session log and own store-index, plus explicit sparse dependency hashes and ignored/untracked Rust/Cargo input rejection",
+  "first_phase": {
+    "name": "factor-base-policy-dataset-01",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib",
+      "ml_dataset::",
+      "--",
+      "--test-threads=1"
+    ],
+    "scope": "Standalone new plan/core plus all existing dataset regressions; not v2 CLI admission"
+  },
+  "sequence": [
+    "Standalone dataset tests with legacy byte and v2 corruption/cap controls",
+    "strict maintained Clippy",
+    "release binary build",
+    "after coordinated full v2 dispatch: retained curve/twist CLI and export/retry/semantic mutation controls",
+    "full serialized release library suite before push"
+  ],
+  "resource_envelope": {
+    "cargo_build_jobs": 8,
+    "rayon_threads": 8,
+    "test_threads": 1,
+    "rust_toolchain": "1.98",
+    "cargo_target_dir": "/home/ec2-user/crypto-ml-dataset-20261028/target",
+    "target_reuse": "sequential only after live prior run is terminal"
+  },
+  "stop_rule": "Stop on first failure; retain immutable attempted command/log/receipt/source checks. No automatic retry. Archive and compare fresh S3 download.",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}
