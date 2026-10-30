@@ -15,3 +15,33 @@ Reviewed donor composition01: /home/ec2-user/ml-dataset-work-20261028/unified-v2
 New test-only composition02: /home/ec2-user/ml-dataset-work-20261028/unified-v2-donor-composition-02/HANDOFF.md; fulle94feeecbafd8fba2b22a273ec9aa1909ec40355706499811961e316d090e6a0. It adds early interrupted V2 m3 custody controls; independent delta review and execution pending. Native CLI acceptance fixture04 is separate and under review. Dynamic profile remains dormant; no SAT emission or all-arity execution claim.
 
 Requested coordination outcome: confirm exact stable donor source and integration route, preserve all named methods/curves/twists and rejected/censored outcomes, then contextually integrate and run combined native dataset/controller/full-release checks. Current tests establish only isolated proposal software validation. No clean delivered CLI, completed research corpus, full instruction accounting or mathematical theorem is claimed. Verified cloud dataset cells remain0; no cloud execution or IAM change requested.
+
+Update 2026-10-30T19:50Z (new evidence; original handoff above retained):
+
+Combined runtime candidate03 now passes476 dataset tests (0failed,2ignored) and
+20 native controller example tests (0failed,0ignored), both terminal0 with before/
+after source byte/mode/file-set guards. Immutable snapshot manifest:
+dd7ec26277a05f4a12ebd960df7e26cfd198003836ee794f4cb40bbe0eaa8a58.
+Base655b plus complete patch278c1324ca0d7fa3f6304781d19823ca53540c014b8a935674aeba5048f28cda
+includes the exact donor prime_root_bounded.rs dependency. Receipts are committed
+under validation/combined-dataset-02.receipt.json and combined-fixture-01.receipt.json.
+
+Native fixture06 fixes crypto_lib imports and final readback diagnostic retention.
+This is unit validation only; the actual native CLI acceptance workflow has not run.
+
+SAT producer now has a contextual patch preserving donor/V2 behavior and a real
+worker-to-exporter four-occurrence policy/twist test. Candidate04 is currently
+under its own dataset validation, not covered by the476 result:
+validation/sat-producer-contextual-01.patch and sat-producer-test-scope-01.md.
+
+Observed donor3adc85e597558c71042bee745882f7c39e6fb05e adds three-file dynamic claim
+reconciliation. Preserved and reviewed as patcha5049c9ad83511bc6e063b2e21d83d10c4e5b392341ceff59ce6699e2a301bc9;
+candidate05 composes it with04 without activating the dynamic profile. No wholesale
+replacement of donor code or reservation change. Confirm newer donor work before
+delivery; do not infer runtime success for05 from03/04 evidence.
+
+Live T887/T888 cards remain claimed; T977 is still proposed without owner
+acknowledgment. The user already authorized coordination with all three tasks.
+No new messaging permission is requested. Remaining ignored432-case/360-cell
+panels and full native workflow/controls/API/export/whole-worker/cloud gates are
+explicitly preserved. Verified cloud cells0.
