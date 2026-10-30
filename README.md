@@ -5,6 +5,12 @@ For the Bochum v0.2 hashed-factor-base algorithm, see the
 exact contraction, relation collection and certificate replay. Correctness
 controls do not establish the conditional asymptotic bound or a speedup.
 
+The [Hexagon complexity integration](research/hexagon_cscc_20261030/README.md)
+adds exact divisor-prefix factorization, bounded weighted cost profiles, three
+prime-field factor-base recipes, and a searchable, version-pinned review of all
+22 works in the `cs.CC` collection on 2026-10-30. Its implementation and proof
+statuses are recorded separately.
+
 The separately scoped [scalar tensor companion](docs/hashed-ecdl.md#scalar-tensor-companion)
 in cryptanalysis adds binary/prime-field coordinate checks and Certicom ECCp-131
 inputs. No Python execution path is introduced here and neither challenge is solved.
