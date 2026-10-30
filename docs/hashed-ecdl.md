@@ -1,5 +1,13 @@
 # Hashed-factor-base ECDL: native tensor implementation
 
+2026-10-30 engineering follow-up: exact u64 primality, optional checked
+Pocklington parameter proofs and ordered functional witness search are described
+in the [optimization receipt](../research/hashed_ecdl_speed_20261029/README.md).
+It records 34 passing native tests, old/new complete certificate parity and the
+open profiling/A-B access requirements. The original implementation receipt and
+source manifest below remain historical; the new study has its own manifest.
+No runtime, end-to-end or challenge-solve claim follows from these changes.
+
 2026-10-29. The compact encoder, exact contraction algorithm and relation
 pipeline are implemented in Rust in both repositories. Small-case correctness
 checks do not establish the manuscript's asymptotic bound or a practical speedup.
@@ -68,6 +76,13 @@ cryptanalysis it is `cryptanalysis::hashed_ecdl::tensor`. Both also depend on
 the standalone `hashed_ecdl_tensor` crate. The earlier bounded `hashed_ecdl`
 API remains available for comparison; its generic residual-enumeration oracle
 and field bound are not the implementation of the tensor path.
+
+Crypto's [CUDA relation service](../gpu/explicit-relations/README.md) adds
+GPU explicit-x lifting, signed inverse-hash enumeration and a persistent
+meet-in-the-middle oracle to that bounded API. Its Rust driver independently
+replays exported certificates on the CPU. It does not accelerate the separate
+arbitrary-precision tensor implementation. See the GPU validation record for
+the actual build and device-test status.
 
 ```rust
 use crypto_lib::cryptanalysis::hashed_ecdl::tensor::{

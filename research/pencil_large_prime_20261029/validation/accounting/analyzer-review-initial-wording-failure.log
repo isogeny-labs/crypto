@@ -1,0 +1,40 @@
+   Compiling pencil-accounting-price-draft v0.1.0 (/home/ec2-user/pencil-accounting-review-20261029/native_price)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.56s
+     Running unittests src/lib.rs (pencil-accounting-review-20261029/native_price/target/debug/deps/pencil_accounting_price_draft-1c68aa54e4a93419)
+
+running 19 tests
+test importer::tests::exact_identity_and_unknown_coverage ... ok
+test analyzer::tests::atomic_normalization_preserves_overflow_and_missing ... ok
+test analyzer::tests::fixed_map_hand_arithmetic_and_calibration ... ok
+test importer::tests::adapter_partition_is_recomputed_and_missing_is_not_zero ... ok
+test importer::tests::candidate_expansion_normalizes_actual_paths_and_refuses_underflow ... ok
+test tests::no_silent_missing_or_unknown_categories ... ok
+test analyzer::tests::boolean_coverage_cannot_admit_price ... ok
+test analyzer::tests::paired_session_binary_and_seed_are_enforced ... ok
+test analyzer::tests::calibration_tampering_and_missing_components_are_refused ... ok
+test tests::failure_is_not_zero_cost_or_success_ratio ... ok
+test analyzer::tests::missing_and_capped_details_retain_null_rows ... FAILED
+test tests::inverse_models_match_but_reject_impossible_counts ... ok
+test tests::overflow_and_ratio_of_sums ... ok
+test tests::fixed_grid_and_hand_price ... ok
+test importer::tests::failure_and_warmup_retained ... ok
+test importer::tests::missing_scalar_is_not_zero_and_negative_rejected ... ok
+test importer::tests::outer_primality_binds_domain_and_preserves_missing_events ... ok
+test analyzer::tests::whole_pair_without_review_stays_null ... ok
+test analyzer::tests::synthetic_review_fixture_exercises_price_path_and_digest_rejection ... ok
+
+failures:
+
+---- analyzer::tests::missing_and_capped_details_retain_null_rows stdout ----
+
+thread 'analyzer::tests::missing_and_capped_details_retain_null_rows' (1884833) panicked at src/analyzer.rs:720:9:
+assertion failed: analyze(&contradiction).unwrap_err().contains("modulus identity mismatch")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    analyzer::tests::missing_and_capped_details_retain_null_rows
+
+test result: FAILED. 18 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

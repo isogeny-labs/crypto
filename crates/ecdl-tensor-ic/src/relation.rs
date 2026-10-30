@@ -1,0 +1,271 @@
+//! Point encoding, hashed factor bases and the whole-point relation network
+//! (Go: relation.go).
+
+use std::collections::HashMap;
+use std::rc::Rc;
+
+use rand::rngs::StdRng;
+use rand::RngCore;
+use sha2::{Digest, Sha256};
+
+use crate::curve::{Curve, Point, INFINITY};
+use crate::field::{add_mod, mul_mod, rand_below};
+use crate::tensor::{bits_key, FuncVertex, Network, PredVertex, SupportVertex, Vertex};
+
+impl Curve {
+    /// PointWidth is the number of bits used to encode a point: an infinity
+    /// flag followed by x and y, each FieldBits wide, least significant bit
+    /// first. (`impl Curve` block lives here because Go defines it here.)
+    pub fn point_width(&self) -> usize {
+        2 * self.field_bits() + 1
+    }
+
+    /// EncodePoint gives the canonical bit encoding of pt (O is the flag alone).
+    pub fn encode_point(&self, pt: Point) -> Vec<bool> {
+        let b = self.field_bits();
+        let mut v = vec![false; self.point_width()];
+        if pt.inf {
+            v[0] = true;
+            return v;
+        }
+        for i in 0..b {
+            v[1 + i] = (pt.x >> i) & 1 == 1;
+            v[1 + b + i] = (pt.y >> i) & 1 == 1;
+        }
+        v
+    }
+
+    /// DecodePoint inverts EncodePoint. `None` (Go: ok == false) for
+    /// non-canonical encodings and for points not on the curve: this is the
+    /// point-validity predicate.
+    pub fn decode_point(&self, v: &[bool]) -> Option<Point> {
+        let b = self.field_bits();
+        if v[0] {
+            if v[1..].iter().any(|&x| x) {
+                return None;
+            }
+            return Some(INFINITY);
+        }
+        let mut pt = Point::default();
+        for i in 0..b {
+            if v[1 + i] {
+                pt.x |= 1u64 << i;
+            }
+            if v[1 + b + i] {
+                pt.y |= 1u64 << i;
+            }
+        }
+        if self.on_curve(pt) {
+            Some(pt)
+        } else {
+            None
+        }
+    }
+}
+
+/// FactorBases holds m randomly hashed factor bases F_1..F_m. Membership in
+/// F_i is decided by a keyed hash of the point, not by any notion of
+/// smoothness. Columns for linear algebra are indexed by point, since one
+/// point can lie in several F_i.
+#[derive(Debug, Clone, Default)]
+pub struct FactorBases {
+    pub sets: Vec<Vec<Point>>,
+    pub points: Vec<Point>,
+    pub index: HashMap<Point, usize>,
+    pub keys: Vec<[u8; 16]>,
+    pub mods: Vec<u64>,
+
+    /// Affine is set for factor bases from `new_affine_factor_bases`: A is in
+    /// F_i iff (Alpha_i x + Beta_i y + Gamma_i) mod p < Bound_i.
+    pub affine: bool,
+    pub alpha: Vec<u64>,
+    pub beta: Vec<u64>,
+    pub gamma: Vec<u64>,
+    pub bound: Vec<u64>,
+    pub p: u64,
+}
+
+/// NewFactorBases draws m hash keys and sizes each F_i near (2r)^(1/m), so the
+/// expected number of decompositions of a random target is about 2.
+/// Keys: `rng.fill_bytes` on a 16-byte array (Go: rng.Read).
+pub fn new_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases {
+    let target = (2.0 * c.order as f64).powf(1.0 / m as f64).ceil();
+    let modulus = (c.order as f64 / target).round().max(1.0) as u64;
+    // Unlike Go, redraw the keys while any F_i is empty, as
+    // new_affine_factor_bases does: an empty F_i admits no relation, and the
+    // solver's collection loop would never finish.
+    loop {
+        let mut fb = FactorBases {
+            sets: vec![Vec::new(); m],
+            ..Default::default()
+        };
+        for _ in 0..m {
+            let mut key = [0u8; 16];
+            rng.fill_bytes(&mut key);
+            fb.keys.push(key);
+            fb.mods.push(modulus);
+        }
+        fb.list(c);
+        if fb.sets.iter().all(|set| !set.is_empty()) {
+            return fb;
+        }
+    }
+}
+
+/// NewAffineFactorBases draws F_i = {A : (alpha x + beta y + gamma) mod p <
+/// U} with random alpha, beta, gamma and U chosen so |F_i| is near (2r)^(1/m).
+/// The hash family is pairwise independent on distinct (x, y) (up to the
+/// excluded alpha = beta = 0), and unlike SHA-256 its membership test is cheap
+/// to encode with the low-degree gadgets (Builder::membership_check).
+pub fn new_affine_factor_bases(c: &Curve, m: usize, rng: &mut StdRng) -> FactorBases {
+    let target = (2.0 * c.order as f64).powf(1.0 / m as f64).ceil();
+    let mut bound = (c.p as f64 * target / (c.order - 1) as f64)
+        .round()
+        .max(1.0) as u64;
+    if bound > c.p {
+        bound = c.p;
+    }
+    loop {
+        let mut fb = FactorBases {
+            sets: vec![Vec::new(); m],
+            affine: true,
+            p: c.p,
+            ..Default::default()
+        };
+        for _ in 0..m {
+            let mut a = rand_below(rng, c.p);
+            let mut b = rand_below(rng, c.p);
+            while a == 0 && b == 0 {
+                a = rand_below(rng, c.p);
+                b = rand_below(rng, c.p);
+            }
+            fb.alpha.push(a);
+            fb.beta.push(b);
+            fb.gamma.push(rand_below(rng, c.p));
+            fb.bound.push(bound);
+        }
+        fb.list(c);
+        let mut empty = false;
+        for set in &fb.sets {
+            empty = empty || set.is_empty();
+        }
+        if !empty {
+            return fb;
+        }
+    }
+}
+
+impl FactorBases {
+    /// list fills Sets, Points and Index. Toy shortcut: it enumerates the
+    /// group. At scale F_i is only ever accessed through its membership
+    /// predicate.
+    pub(crate) fn list(&mut self, c: &Curve) {
+        let m = self.sets.len();
+        let points = c.points();
+        crate::opcount::bump("fb_points_listed_uncharged", points.len() as u64);
+        crate::opcount::bump("fb_membership_evals_uncharged", (points.len() * m) as u64);
+        for pt in points {
+            for i in 0..m {
+                if self.member(i, pt) {
+                    self.sets[i].push(pt);
+                    if !self.index.contains_key(&pt) {
+                        self.index.insert(pt, self.points.len());
+                        self.points.push(pt);
+                    }
+                }
+            }
+        }
+    }
+
+    /// AffineHash returns (Alpha_i x + Beta_i y + Gamma_i) mod p.
+    pub fn affine_hash(&self, i: usize, pt: Point) -> u64 {
+        let p = self.p;
+        let h = add_mod(
+            mul_mod(self.alpha[i], pt.x, p),
+            mul_mod(self.beta[i], pt.y, p),
+            p,
+        );
+        add_mod(h, self.gamma[i], p)
+    }
+
+    /// Member is the membership predicate of F_i. O is never a member.
+    /// Non-affine: SHA-256(keys[i] || x_le8 || y_le8), first 8 bytes read
+    /// little-endian, `% mods[i] == 0`.
+    pub fn member(&self, i: usize, pt: Point) -> bool {
+        if pt.inf {
+            return false;
+        }
+        if self.affine {
+            return self.affine_hash(i, pt) < self.bound[i];
+        }
+        let mut buf = [0u8; 16];
+        buf[..8].copy_from_slice(&pt.x.to_le_bytes());
+        buf[8..].copy_from_slice(&pt.y.to_le_bytes());
+        let mut h = Sha256::new();
+        h.update(self.keys[i]);
+        h.update(buf);
+        let sum = h.finalize();
+        let v = u64::from_le_bytes(sum[..8].try_into().unwrap());
+        v % self.mods[i] == 0
+    }
+}
+
+/// RelationNetwork encodes the search for A_1 + ... + A_m = R with A_i in F_i
+/// as a Boolean tensor network. Edges are the bits of A_1..A_m and of the
+/// partial sums S_2..S_m (S_1 = A_1). Vertices are:
+///   - membership(i): A_i is a valid point in F_i (a sparse support tensor);
+///   - add(k): S_k = S_{k-1} + A_k on valid points (a function tensor);
+///   - target: S_m = R.
+///
+/// Every edge has exactly two endpoints, so this is a graph. At toy scale each
+/// vertex reads whole points (degree 3w for add, where w = 2b+1); the paper's
+/// construction splits these into gadgets of degree O(b^(3/4)).
+/// It returns the network and the edge indices of each A_i.
+pub fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<Vec<usize>>) {
+    let w = c.point_width();
+    let m = fb.sets.len();
+    let mut next = 0usize;
+    let mut block = || -> Vec<usize> {
+        let e: Vec<usize> = (next..next + w).collect();
+        next += w;
+        e
+    };
+    let mut a: Vec<Vec<usize>> = Vec::with_capacity(m);
+    for _ in 0..m {
+        a.push(block());
+    }
+    let mut n = Network::default();
+    let member = |i: usize| -> Vertex {
+        let rows: Vec<Vec<bool>> = fb.sets[i].iter().map(|&pt| c.encode_point(pt)).collect();
+        Vertex::Support(SupportVertex::new(a[i].clone(), rows))
+    };
+    n.vertices.push(member(0));
+    let mut s = a[0].clone();
+    for k in 1..m {
+        n.vertices.push(member(k));
+        let out = block();
+        let mut in_ = s.clone();
+        in_.extend_from_slice(&a[k]);
+        let cc = *c;
+        n.vertices.push(Vertex::Func(FuncVertex {
+            in_,
+            out: out.clone(),
+            f: Rc::new(move |inp: &[bool]| -> Option<Vec<bool>> {
+                let s = cc.decode_point(&inp[..w]);
+                let a = cc.decode_point(&inp[w..]);
+                match (s, a) {
+                    (Some(s), Some(a)) => Some(cc.encode_point(cc.add(s, a))),
+                    _ => None,
+                }
+            }),
+        }));
+        s = out;
+    }
+    let want = bits_key(&c.encode_point(r));
+    n.vertices.push(Vertex::Pred(PredVertex {
+        e: s,
+        p: Rc::new(move |vals: &[bool]| bits_key(vals) == want),
+    }));
+    n.num_edges = next;
+    (n, a)
+}
