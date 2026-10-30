@@ -12,6 +12,12 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+// Staged adapter: compile its admission and resource controls without activating
+// a CLI profile before native persistence and semantic replay are integrated.
+#[cfg(test)]
+#[path = "koblitz_m3.rs"]
+mod koblitz_m3;
+
 #[path = "prime_f4_wide.rs"]
 mod prime_f4_wide;
 #[path = "prime_f4_wide_dynamic.rs"]

@@ -266,6 +266,47 @@ impl Budget {
     }
 }
 
+/// Admit persisted originals and the actual capture sink before any arithmetic.
+/// This function is staged with the module under test-only registration until
+/// the full adapter and its semantic verifier are ready.
+pub(super) fn admit_original(
+    dir: &std::path::Path,
+    config: &super::super::types::CaseConfig,
+    context: &super::super::execution::SolverExecutionContext,
+    sink: &super::super::capture::CaptureEmitter,
+) -> Result<Budget, String> {
+    use super::super::{admit_capture_context, execution, read_json};
+    // Sample entry before file admission: setup consumes construction time.
+    let entry = Instant::now();
+    let saved: super::super::types::CaseConfig = read_json(&dir.join("config.json"))?;
+    if saved != *config {
+        return Err("Koblitz m3 config differs from original attempt".into());
+    }
+    let original =
+        execution::admit(dir)?.ok_or("Koblitz m3 requires original execution context")?;
+    if original.launch != context.launch {
+        return Err("Koblitz m3 execution context differs from saved original".into());
+    }
+    let (binding, limits) =
+        admit_capture_context(dir)?.ok_or("Koblitz m3 requires original capture context")?;
+    if binding != original.launch.binding {
+        return Err("Koblitz m3 capture and execution attempts differ".into());
+    }
+    sink.verify_attempt_limits(&binding, &limits)?;
+    let mut budget = Budget::new(
+        saved.work_limit,
+        original.launch.memory_bytes,
+        original.launch.trace_bytes,
+        context.deadline.min(original.deadline),
+        entry,
+    )
+    .map_err(|s| format!("Koblitz m3 original resource admission: {s:?}"))?;
+    budget
+        .check(Instant::now())
+        .map_err(|s| format!("Koblitz m3 setup deadline: {s:?}"))?;
+    Ok(budget)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -458,5 +499,163 @@ mod tests {
             assert_eq!(b.observe(r, now), Err(stop));
             assert_eq!(b.native, Reservation::default());
         }
+    }
+}
+
+#[cfg(test)]
+mod admission_tests {
+    use super::*;
+    use crate::ml_dataset::{self as dataset, capture, execution, storage, telemetry};
+    use serde_json::json;
+    use std::path::PathBuf;
+
+    struct Fixture {
+        dir: PathBuf,
+        config: dataset::types::CaseConfig,
+        context: execution::SolverExecutionContext,
+        sink: capture::CaptureEmitter,
+    }
+    impl Fixture {
+        fn new() -> Self {
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let dir = std::env::temp_dir()
+                .join(format!("koblitz-admission-{}-{nonce}", std::process::id()));
+            std::fs::create_dir(&dir).unwrap();
+            let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"Koblitz adapter software admission control"});
+            let body = dataset::protocol_canonical_bytes(&protocol).unwrap();
+            protocol["freeze"] = json!({"status":"frozen", "protocol_sha256":dataset::digest(&body), "filed_before_affected_data":true, "frozen_at":"2026-10-30T00:00:00Z"});
+            let bytes = serde_json::to_vec(&protocol).unwrap();
+            let plan = dataset::DatasetPlan {
+                schema: "crypto.ml-dataset.plan/v1".into(),
+                field_sizes: vec![23],
+                arities: vec![3],
+                families: vec!["koblitz".into()],
+                solvers: vec!["f4".into()],
+                curve_seeds: 1,
+                generators: 1,
+                keys: 1,
+                seed: 42,
+                factor_base_size: 2,
+                degree_bound: 3,
+                work_limit: 100,
+                twists: true,
+                protocol_sha256: Some(dataset::digest(&bytes)),
+                split_rule: "curve-twist-component-sha256-v1".into(),
+            };
+            let hash = plan.binding_sha256().unwrap();
+            let config = plan.cell(0).unwrap();
+            let run = json!({"schema":"crypto.ml-dataset.run/v1", "plan_sha256":hash,
+                "source_commit":"a".repeat(40), "binary_sha256":"b".repeat(64),
+                "seconds_per_case":30,"memory_mib":64,"trace_mib":16,"execution_context_required":true});
+            storage::write_json(&dir, "run.json", "run", &run).unwrap();
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap();
+            storage::write_json(&dir, "config.json", "config", &config).unwrap();
+            storage::write_json(
+                &dir,
+                "attempt.json",
+                "attempt",
+                &json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":0,"plan_sha256":hash}),
+            )
+            .unwrap();
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &bytes).unwrap();
+            execution::create(&dir).unwrap();
+            telemetry::checked::install_policy(&dir).unwrap();
+            let binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
+            let limits = capture::capture_limits(16).unwrap();
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &binding,
+            )
+            .unwrap();
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &limits,
+            )
+            .unwrap();
+            let sink = capture::CaptureEmitter::create(&dir.join("live"), binding, limits).unwrap();
+            let context = execution::admit(&dir).unwrap().unwrap();
+            Self {
+                dir,
+                config,
+                context,
+                sink,
+            }
+        }
+        fn admit(&self) -> Result<Budget, String> {
+            admit_original(&self.dir, &self.config, &self.context, &self.sink)
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.dir);
+        }
+    }
+
+    #[test]
+    fn admission_uses_original_limits_and_never_extends_earlier_deadline() {
+        let mut f = Fixture::new();
+        f.context.deadline = Instant::now() + Duration::from_secs(2);
+        let b = f.admit().unwrap();
+        assert_eq!(b.native_work_limit, 102400);
+        assert_eq!(b.addition_limit, 100);
+        assert_eq!(b.memory_limit, 64 << 20);
+        assert_eq!(b.trace_limit, 16 << 20);
+        assert_eq!(b.deadline, f.context.deadline);
+        let before = std::fs::read(f.dir.join("live/committed.json")).unwrap();
+        f.context.deadline = Instant::now();
+        assert!(f.admit().unwrap_err().contains("Deadline"));
+        assert_eq!(
+            std::fs::read(f.dir.join("live/committed.json")).unwrap(),
+            before
+        );
+    }
+
+    #[test]
+    fn admission_rejects_config_context_capture_and_saved_run_mutations() {
+        let mut f = Fixture::new();
+        f.config.work_limit += 1;
+        assert!(f.admit().unwrap_err().contains("config differs"));
+        f.config.work_limit -= 1;
+        f.context.launch.memory_bytes += 1;
+        assert!(f.admit().unwrap_err().contains("context differs"));
+        f.context.launch.memory_bytes -= 1;
+        let original = std::fs::read(f.dir.join("capture-limits.json")).unwrap();
+        std::fs::write(
+            f.dir.join("capture-limits.json"),
+            serde_json::to_vec(&capture::capture_limits(8).unwrap()).unwrap(),
+        )
+        .unwrap();
+        assert!(f.admit().unwrap_err().contains("capture limits differ"));
+        std::fs::write(f.dir.join("capture-limits.json"), original).unwrap();
+        let mut run: serde_json::Value = dataset::read_json(&f.dir.join("run.json")).unwrap();
+        run["memory_mib"] = json!(128);
+        std::fs::write(f.dir.join("run.json"), serde_json::to_vec(&run).unwrap()).unwrap();
+        assert!(f.admit().is_err());
+    }
+
+    #[test]
+    fn admission_rejects_another_actual_sink_and_missing_context() {
+        let f = Fixture::new();
+        let other = Fixture::new();
+        // Byte-identical fixtures can share their content binding; explicitly
+        // alter the attempt identity to test a genuinely different sink.
+        let mut binding = other.context.launch.binding.clone();
+        binding.attempt_sha256 = "9".repeat(64);
+        let sink = capture::CaptureEmitter::create(
+            &other.dir.join("different"),
+            binding,
+            capture::capture_limits(16).unwrap(),
+        )
+        .unwrap();
+        assert!(admit_original(&f.dir, &f.config, &f.context, &sink).is_err());
+        std::fs::remove_file(f.dir.join(execution::PATH)).unwrap();
+        assert!(f.admit().unwrap_err().contains("execution context missing"));
     }
 }

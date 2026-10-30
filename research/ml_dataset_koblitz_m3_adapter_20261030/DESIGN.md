@@ -152,9 +152,11 @@ conditional immutable upload and fresh byte/hash readback.
 
 `src/ml_dataset/koblitz_m3.rs` now implements the cumulative ledger; runtime
 registration remains pending the original-input binder and adapter pipeline.
-`budget_harness.rs` compiles that exact module with Rust 1.98, edition 2021 and
-warnings denied. Nine boundary controls pass. This is direct module validation,
-not the repository integration suite or dataset generation.
+The initial standalone harness compiled that exact module with Rust 1.98,
+edition 2021 and warnings denied: nine boundary controls passed. That harness
+was retired when original-context admission introduced real dataset-module
+dependencies; the module now registers under solvers for library tests only.
+Its runtime profile remains inactive.
 
 The extraction allowance is fixed at the original configured `work_limit` actual
 group additions, matching the existing prime adapter's separate addition limit.
@@ -175,3 +177,21 @@ callback allocations after a native allowance is issued, setup time inside the
 construction deadline, the unchanged original matrix deadline, exact versus
 one-extra group additions, phase order, arithmetic overflow, zero limits, trace
 caps, sticky observer errors, and rejection before mutation at native caps.
+
+
+## Original-context admission increment
+
+`admit_original` samples its construction entry time before reading original
+files. It compares the passed config to saved config, invokes existing
+`execution::admit` (including original run/attempt binding and boot/clock checks),
+compares the passed launch context to that result, invokes existing
+`admit_capture_context`, and checks the supplied actual `CaptureEmitter` against
+that binding and those limits. The ledger deadline is the minimum of the passed
+and freshly admitted absolute deadlines. Setup time therefore cannot be reclaimed
+by rereading the context. Admission rechecks the deadline after file reads.
+
+This increment binds resource inputs and sink identity. Actual curve, target and
+factor-base mathematical admission remains the next adapter stage; the function
+does not claim to validate those by reading configuration alone. It performs no
+native construction, matrix solve or dataset generation. Integration controls
+use frozen synthetic run files and the real context/capture APIs.
