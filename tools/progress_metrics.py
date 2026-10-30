@@ -552,6 +552,21 @@ def koblitz_root_collector(ref, since):
              source=f"{path}@{commit}")
 
 
+def koblitz_degree13_divisors(ref, since):
+    """Actual fixed-input divisor computations; retained geometric bridge, no IC rank."""
+    path = "research/koblitz_modular_ic_20261018/rounds/47/results.json"
+    for date, commit, text in file_history(ref, path, since):
+        counts = json.loads(text).get("construction_counts", {})
+        for key, unit, label in (
+            ("full_jet_cases", "closed source points", "Degree13 source jets; fixed n5 carrier, not a larger-n transfer"),
+            ("complete_divisor_representations", "effective divisors", "Complete 23Q+P kernels under retained proper/RR bridge"),
+            ("signed_class_cases", "actual source classes", "Degree13 collected signed sums; chosen target images not evaluated"),
+        ):
+            emit("koblitz_modular.degree13_" + key, counts.get(key), date=date,
+                 problem=P_IC, unit=unit, better="neutral", label=label,
+                 source=f"{path}@{commit}")
+
+
 def ghs_ipsec_archive(ref, since):
     """Export recorded archive counters; no cryptographic computation or estimates."""
     path = "research/ghs_ipsec_isogeny_class_20261023/historical_python/search_snapshot.json"
@@ -635,7 +650,7 @@ def main():
     # ordering and the original first-parent/per-day semantics stay unchanged.
     base = "research/koblitz_modular_ic_20261018/rounds/"
     paths = [base + "22/ledger.json"] + [base + f"{n}/results.json"
-             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46)]
+             for n in (24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 42, 43, 44, 45, 46, 47)]
     pool = ThreadPoolExecutor(max_workers=4)
     histories = [pool.submit(_history_rows, a.ref, path, a.since) for path in paths]
     jacobian_catalog(a.ref, a.since)
@@ -661,6 +676,7 @@ def main():
     koblitz_ordinary_orientation(a.ref, a.since)
     koblitz_source_collector(a.ref, a.since)
     koblitz_root_collector(a.ref, a.since)
+    koblitz_degree13_divisors(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
