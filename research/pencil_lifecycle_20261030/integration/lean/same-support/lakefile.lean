@@ -17,3 +17,6 @@ lean_lib SameSupport
 
 @[default_target]
 lean_lib SameSupportClassifier
+
+@[default_target]
+lean_lib WeightedSameSupport
