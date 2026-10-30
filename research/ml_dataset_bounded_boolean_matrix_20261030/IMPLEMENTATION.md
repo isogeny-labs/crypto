@@ -33,3 +33,11 @@ Parent source review and serialized validation; correction of any real diagnosti
 ## Errors retained
 
 Initial Conductor check used obsolete migratedproject-prefixed identifier and returned404; corrected exact UUID check found only parent-owned T868/T876, whose active task cards were read before edits. Sparse docs/CONDUCTOR.md and latest session log were read from tracked Git objects; parent owns shared logging. No compiler/test errors have been observed because no compilation/test was attempted.
+
+## Independent-review correction, 2026-10-30
+
+Independent source review of b8579d2 by binary_integration_audit found that prepare marked backend_invoked after Begin but before any native phase permit. A one-equation entry-only work budget4224 therefore reported invocation despite refusing the main/criterion phase. The original commit and review remain retained; this correction is based on root's f8a12010b138 common lint fix and leaves that fix untouched.
+
+The flag now becomes true only after the named F4 main or F5 criterion phase reservation succeeds. Its explicit meaning is **native phase admitted**, not nonempty work or completion. Main row-cap refusal can follow admission; empty F4 can execute an admitted rank-zero step. EmptyInput/SkippedConstantInput F5 phases remain explicit with zero criterion counters, including a subsequent main-permit refusal. Useful adapter acceptance must require actual nonzero native work and the appropriate active-criterion control, not the flag alone.
+
+Three additional tests are authored (14 total): F4 entry-only/one-less/exact main admission, F5 entry-only/one-less/exact criterion admission followed by main refusal and explicit bypass semantics, and both engines reaching Finish whose callback returns Ok only after the original absolute deadline. The last control asserts actual Finish was reached, all callbacks were acknowledged, native work/storage occurred, and the final result is Deadline with no rank/rows. All14 remain unrun by this implementer. Scoped formatting/static whitespace checks are not compile or test evidence; root retains serialized validation ownership. One initial apply_patch attempt rejected a formatted-context mismatch without changing files; the narrower patch then applied.

@@ -1449,6 +1449,8 @@ pub mod bounded_matrix {
         pub engine: Engine,
         pub degree: u32,
         pub stop: Stop,
+        /// A named native phase passed its resource permit. This does not
+        /// imply nonempty candidates, an active F5 criterion, or completion.
         pub backend_invoked: bool,
         pub native_step_complete: bool,
         pub criterion_status: CriterionStatus,
@@ -1617,7 +1619,6 @@ pub mod bounded_matrix {
                 degrees[i] = p.terms.iter().map(|m| m.degree()).max().unwrap_or(0);
             }
             self.emit(Stage::Begin)?;
-            self.report.backend_invoked = true;
             Ok(degrees)
         }
 
@@ -1648,6 +1649,7 @@ pub mod bounded_matrix {
             pruned: &[u8; MAX_EQUATIONS],
         ) -> Result<(), Stop> {
             self.reserve(main_reservation(polys.len())?)?;
+            self.report.backend_invoked = true;
             let mut supports = [0u8; MAX_ROWS];
             let mut selected = 0usize;
             let mut union = 0u8;
@@ -1972,6 +1974,52 @@ pub mod bounded_matrix {
         }
 
         #[test]
+        fn bounded_f4_invocation_requires_main_phase_admission() {
+            let input = [polynomial(14)];
+            let entry = entry_reservation(input.len()).unwrap();
+            let required = required_reservation(input.len(), Engine::F4Macaulay).unwrap();
+            for work in [entry.work, required.work - 1] {
+                let mut caps = limits();
+                caps.work = work;
+                let mut seen = Vec::new();
+                let report = matrix_f4_f2_bounded(&input, 3, 5, caps, deadline(), |event| {
+                    seen.push(event.stage);
+                    Ok(())
+                });
+                censored(&report, Stop::WorkLimit);
+                assert_eq!(seen, [Stage::Begin]);
+                assert_eq!(report.reserved, entry);
+                assert!(!report.backend_invoked);
+                assert_eq!(report.counters.main_attempts, 0);
+                assert_eq!(report.counters.allocation_requests, 0);
+            }
+            let mut caps = limits();
+            caps.work = required.work;
+            caps.bytes = required.bytes - 1;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::ByteLimit);
+            assert!(!report.backend_invoked);
+            caps.bytes += 1;
+            let report = run(&input, 5, caps);
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert!(report.counters.main_attempts > 0);
+
+            // Admission is distinct from useful work: the phase may then
+            // encounter its first row cap, or complete an empty rank-zero step.
+            caps.main_rows = 0;
+            let report = run(&input, 5, caps);
+            censored(&report, Stop::RowLimit);
+            assert!(report.backend_invoked);
+            assert_eq!(report.counters.main_attempts, 0);
+            let report = run(&[], 5, limits());
+            assert_eq!(report.stop, Stop::Complete);
+            assert!(report.backend_invoked);
+            assert_eq!(report.rank, Some(0));
+            assert_eq!(report.counters.main_attempts, 0);
+        }
+
+        #[test]
         fn bounded_f4_strict_input_rejected_before_callbacks() {
             let good = polynomial(14);
             let mut wrong_vars = good.clone();
@@ -2060,6 +2108,51 @@ pub mod bounded_matrix {
                 report.counters.attempted_events,
                 report.counters.acknowledged_events
             );
+        }
+
+        #[test]
+        fn bounded_matrix_acknowledged_finish_after_deadline_is_censored() {
+            let input = [polynomial(14), polynomial(11)];
+            for engine in [Engine::F4Macaulay, Engine::F5KoszulFrobenius] {
+                let expires = Instant::now() + Duration::from_secs(1);
+                let mut last = None;
+                let mut observer = |event: &Event| {
+                    last = Some(event.stage);
+                    if event.stage == Stage::Finish {
+                        std::thread::sleep(
+                            expires.saturating_duration_since(Instant::now())
+                                + Duration::from_millis(1),
+                        );
+                    }
+                    Ok(())
+                };
+                let report = match engine {
+                    Engine::F4Macaulay => {
+                        matrix_f4_f2_bounded(&input, 3, 5, limits(), expires, &mut observer)
+                    }
+                    Engine::F5KoszulFrobenius => {
+                        crate::cryptanalysis::matrix_f5_f2::matrix_f5_f2_bounded(
+                            &input,
+                            3,
+                            5,
+                            limits(),
+                            expires,
+                            &mut observer,
+                        )
+                    }
+                };
+                // This must reach the actual terminal callback, not pass by
+                // expiring at entry or an earlier phase on a stalled runner.
+                assert_eq!(last, Some(Stage::Finish));
+                censored(&report, Stop::Deadline);
+                assert!(report.backend_invoked);
+                assert!(report.counters.main_attempts > 0);
+                assert!(report.counters.dynamic_layout_bytes > 0);
+                assert_eq!(
+                    report.counters.attempted_events,
+                    report.counters.acknowledged_events
+                );
+            }
         }
     }
 }

@@ -542,6 +542,7 @@ where
         columns, criterion_reservation, pack, product, CriterionStatus, Stage, MULTIPLIERS,
     };
     gate.reserve(criterion_reservation(polys.len())?)?;
+    gate.report.backend_invoked = true;
     let mut pruned = [0u8; 61];
     gate.report.criterion_status = if polys.is_empty() {
         CriterionStatus::EmptyInput
@@ -817,6 +818,75 @@ mod bounded_k2_tests {
         assert!(report.counters.criterion_word_xors > 0);
         assert_eq!(row_space(&report.rows), oracle(&polys, 6));
         compare_criterion(&polys, 6);
+    }
+
+    #[test]
+    fn bounded_f5_invocation_requires_criterion_phase_admission() {
+        let polys = [polynomial(14)];
+        // Frozen one-equation entry=4224, criterion=38016 work units.
+        // Both the entry-only and one-less criterion boundary must stop
+        // before claiming that the named backend phase was admitted.
+        for work in [4224, 42240 - 1] {
+            let mut caps = limits();
+            caps.work = work;
+            let mut seen = Vec::new();
+            let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |event| {
+                seen.push(event.stage);
+                Ok(())
+            });
+            censored(&report, Stop::WorkLimit);
+            assert_eq!(seen, [Stage::Begin]);
+            assert!(!report.backend_invoked);
+            assert_eq!(report.criterion_status, CriterionStatus::NotRequested);
+            assert_eq!(report.reserved.work, 4224);
+            assert_eq!(report.counters.criterion_attempts, 0);
+            assert_eq!(report.counters.main_attempts, 0);
+            assert_eq!(report.counters.allocation_requests, 0);
+        }
+        let mut caps = limits();
+        caps.work = 42240;
+        let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(()));
+        censored(&report, Stop::WorkLimit);
+        assert!(report.backend_invoked);
+        assert_eq!(report.criterion_status, CriterionStatus::Active);
+        assert_eq!(report.reserved.work, 42240);
+        assert!(report.counters.criterion_attempts > 0);
+        assert_eq!(report.counters.main_attempts, 0);
+        assert_eq!(report.counters.allocation_requests, 0);
+
+        let required = required_reservation(polys.len(), Engine::F5KoszulFrobenius).unwrap();
+        caps.work = required.work;
+        caps.bytes = required.bytes;
+        let report = matrix_f5_f2_bounded(&polys, 3, 5, caps, deadline(), |_| Ok(()));
+        assert_eq!(report.stop, Stop::Complete);
+        assert!(report.backend_invoked);
+        assert!(report.counters.main_attempts > 0);
+
+        // An admitted bypass phase is visible but is not active criterion
+        // work, even when a later main reservation is refused.
+        for (input, work, status) in [
+            (vec![], 9216, CriterionStatus::EmptyInput),
+            (
+                vec![polynomial(0)],
+                42240,
+                CriterionStatus::SkippedConstantInput,
+            ),
+            (
+                vec![polynomial(1)],
+                42240,
+                CriterionStatus::SkippedConstantInput,
+            ),
+        ] {
+            let mut caps = limits();
+            caps.work = work;
+            let report = matrix_f5_f2_bounded(&input, 3, 5, caps, deadline(), |_| Ok(()));
+            censored(&report, Stop::WorkLimit);
+            assert!(report.backend_invoked);
+            assert_eq!(report.criterion_status, status);
+            assert_eq!(report.counters.criterion_attempts, 0);
+            assert_eq!(report.counters.criterion_word_xors, 0);
+            assert_eq!(report.counters.main_attempts, 0);
+        }
     }
 
     #[test]
