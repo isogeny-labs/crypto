@@ -1,0 +1,373 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification and command-scoped elapsed nanoseconds"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "One local prime n23 untwisted m2 BSGS worker preflight, with fixed configuration and no publication",
+      "id": "prime23-bsgs-worker",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "config_path": "arm-prime23-bsgs-config.json",
+        "family": "prime",
+        "m": 2,
+        "n": 23,
+        "solver": "bsgs",
+        "twist": false
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "One local prime n23 twisted m2 BSGS worker preflight with the same seed and limits",
+      "id": "prime23-bsgs-twist-worker",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "config_path": "arm-prime23-bsgs-twist-config.json",
+        "family": "prime",
+        "m": 2,
+        "n": 23,
+        "solver": "bsgs",
+        "twist": true
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset runtime-preflight development"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "receipt",
+      "text": "Each of the two local worker preflights has a hash-bound retained command receipt and exact terminal classification."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "no-generalization",
+      "text": "These worker-only observations do not estimate the full generator, other curves, solver advantage, instruction count or statistical scaling."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "One absolute software preflight; no method comparison or timing-effect claim.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "One fixed command with no null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "The purpose is command-path runtime admission, not detector validation; solver outcome is retained without scientific promotion.",
+      "present": false
+    }
+  },
+  "created": "2026-10-30",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: one preflight command",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact receipt validation and terminal classification",
+    "text": "Retain success, failure or timeout. Use duration only as a worker-path planning observation; never infer whole-generate or other-arm time.",
+    "verdict_vocabulary": [
+      "completed",
+      "failed",
+      "timed_out",
+      "invalid_receipt"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "preflight_only": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_runtime_preflight": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "clean_build_receipt_sha256": "0f82585b6203ac020a0561234a7a9b779ceb7dda29724fd951b811b92edbac7a",
+      "cloud_dataset_cells": 0,
+      "command_kind": "worker",
+      "publish": false,
+      "runner_source_sha256": "d3b0856f9f3fc6e24aeac92828419f311f249ecb0fcd76a014eabdd674ed1146",
+      "runtime_preflight_evidence": null,
+      "schema": "ml-dataset.runtime-preflight-arm/v1",
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "timeout_seconds": 90,
+      "arm_configs": [
+        "arm-prime23-bsgs-config.json",
+        "arm-prime23-bsgs-twist-config.json"
+      ]
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": null,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "selecting a replacement seed after a failure",
+    "discarding a failed or timed-out attempt",
+    "using this worker-only duration as full generate or other-arm timing",
+    "using public features from restricted witness artifacts"
+  ],
+  "invalidation_rules": [
+    "Binary or config digest changes during command invalidate runtime use.",
+    "Missing receipt or incomplete stdout/stderr custody invalidates runtime use.",
+    "No scientific solve or comparative claim is drawn from this preflight."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and preflight runtime requirement",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Dataset population, leakage and measurement boundaries",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md",
+      "verified_by": "source package02"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "input config SHA-256 before/after",
+      "command argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes and bytes"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One attempt has stable input/binary hashes, retained stdout/stderr and a classified terminal status under the fixed cap.",
+        "id": "receipt-valid",
+        "kind": "exact",
+        "name": "Valid retained preflight command receipt",
+        "resolution": "1",
+        "source": "runner receipt.json",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around timeout process spawn through wait; excludes input/output hashing and receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-RUNTIME-PREFLIGHT-PRIME23-BSGS-20261030",
+  "question": "What are the observed durations and terminal statuses of one local n=23 prime-curve BSGS worker command for each untwisted and twisted arm under fixed 90-second caps?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Two preflight arms in fixed untwisted-then-twisted order; no comparative timing or effect claim.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical receipt validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Two fixed config files named before commands; no outcome-dependent selection."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Both configs fix seed42, curve_seed7, generator_index1 and key_index1 before execution.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 2,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "One command-path feasibility observation only; no statistical power or effect claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": null,
+      "fixed_seconds": null,
+      "measured_on": null,
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Exactly one worker attempt for each of the two fixed arms."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Stop at 90 seconds; retain timeout and partial files."
+    }
+  ],
+  "study_dir": "research/ml_dataset_runtime_preflight_20261030",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "prime23-bsgs-worker",
+          "prime23-bsgs-twist-worker"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "One immutable receipt per declared arm with stable binary/config hashes and classified terminal status"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Source commit, retained clean-build receipt and binary hash pinned before command.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Two fixed config files differ only in twist flag; each has prime n23 m2 BSGS, seed and indices fixed.",
+        "name": "curve-and-method",
+        "treatment": "fixed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1, one command.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Record host metadata separately; elapsed time supports feasibility only.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "90 seconds, no retry.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "One arm and one attempt, retain every terminal outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 1
+}
