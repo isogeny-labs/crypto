@@ -53,3 +53,8 @@ The initial PDF inspection command used system Python without PyMuPDF.
 It failed before opening a PDF; inspection then used the existing report
 virtualenv, which has fitz. The single rendered page was rasterized and
 visually inspected for readability, labels, scope and clipping.
+
+lean39-03 compiled and its transitive audit passed: eight theorems, zero
+failing and zero trusted declarations. Only standard foundational axioms
+propext/Quot.sound appear. Both rejected attempts remain indexed.
+Five native runs are accepted; no accepted native run was repeated.
