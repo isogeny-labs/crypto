@@ -24,7 +24,11 @@ missing-warmup, seed, flag, arm and digest faults. It supplements the original
 frozen analyzer without rewriting any measurements or statistics.
 
 The subsequent [full-recovery scaling study](../../research/explicit_relations_e2e_20261030/)
-retains all launch failures and bounded solver outcomes. Its current run is
-still being collected; its final inspected report and graph copies will be
-added after its raw records have been committed. No active-run result is
-promoted by this catalog.
+retains all launch failures and bounded solver outcomes through v8: both
+60-bit public targets recovered and passed fresh replay. The [seven-page PDF](e2e-report.pdf)
+and graphs [v3](e2e-scaling-v3.svg), [v4](e2e-scaling-v4.svg),
+[v5](e2e-scaling-v5.svg), [v7](e2e-scaling-v7.svg), [v8](e2e-scaling-v8.svg)
+are accompanied by matching 150-dpi PNGs and hashes in copies.json. All seven
+PDF pages were visually inspected. Raw records were committed and pushed
+before rendering. These remain unadmitted L0 diagnostics, with no matched
+rho or independent scientific validation.

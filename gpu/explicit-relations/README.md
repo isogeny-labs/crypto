@@ -203,8 +203,8 @@ as the candidate default on f6338418572c72e1bf97ad24903cd5efd17cf7da. After its
 matched 52-bit rows showed no gain, the normal build selected the uncached
 path and the same cache implementation became the explicit `cuda-cached`
 option. Do not run historical scripts against a different source revision
-and label the result a replay. The active v5 larger-field probes remain
-unchanged on their pinned source; their final outcomes are recorded separately.
+and label the result a replay. V5 completed nine recoveries and one timeout;
+its exact records remain pinned to that source.
 
 ### Exact compact table (opt-in)
 
@@ -216,5 +216,25 @@ validated prime-field curve, not a probabilistic hash. Partial-sum caching
 remains disabled in this variant. Admission charges three buffers of the
 actual row size; cold execution includes conversion, sorting and indexing.
 The matched panel and larger-field limits are frozen in
-[`protocol-v6.json`](../../research/explicit_relations_e2e_20261030/protocol-v6.json).
-This opt-in variant still awaits its recorded GPU validation.
+[`protocol-v7.json`](../../research/explicit_relations_e2e_20261030/protocol-v7.json).
+V6 passed GPU preflight but failed its first service header. The corrected v7
+panel completed both 58-bit targets and retained two 60-bit timeouts; all
+preflight and query sanitizers passed. See the [raw export](../../research/explicit_relations_e2e_20261030/results-v7/export.json).
+Both attempts are retained, and shared-host timings remain L0 diagnostics.
+
+### Wider prefix index (opt-in, device validated)
+
+`make cuda-wide-index ARCH=sm_120` builds `build/explicit-relations-wide-index`
+with exact compact rows and `ER_WIDE_INDEX`. It permits up to 2^24 buckets
+instead of 2^16, still limiting bucket count to one per 32 left rows and
+to the field's coordinate bits. The largest offset array costs 128 MiB
+plus one u64. Setup and actual storage remain charged to cold execution
+and memory admission. Infinity, full keys and lowest duplicate IDs retain
+the same semantics. The separately frozen [v8 panel](../../research/explicit_relations_e2e_20261030/protocol-v8.json)
+compares both ceilings at 52 bits before probing larger complete recoveries.
+The completed panel records 12/12 verified recoveries through both 60-bit
+targets, including fresh CPU replay and negative controls. Cold solve times
+at 60 bits are 770.270416 and 845.179937 seconds, with all three query
+sanitizers passing. See the [complete report](../../research/explicit_relations_e2e_20261030/RESULTS.md)
+and [v8 export](../../research/explicit_relations_e2e_20261030/results-v8/export.json).
+The default remains the existing index; wider indexing is explicitly selected.
