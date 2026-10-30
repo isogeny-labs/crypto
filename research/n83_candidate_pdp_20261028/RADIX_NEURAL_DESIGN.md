@@ -39,8 +39,9 @@ fixed initialization seeds, and no hyperparameter selection. Average exact
 degree squared error within its group; average one-sided squared lower-bound
 violation within the censored group; give those two group losses equal weight.
 
-Use a fixed five-fold split of exact rows: SHA-256 of the serialized radix
-parts and the frozen domain string, modulo five. In each fold, withhold the
+Use a fixed five-fold split of exact rows: SHA-256 of the fixed byte tag `n83-radix-neural-fold-v1` concatenated with
+the JSON serialization of radix parts; interpret the first eight digest bytes
+big-endian modulo five. In each fold, withhold the
 exact labels in that fold, train on the other exact rows and all censored
 rows, and report held-out exact MAE beside an intercept-only comparator
 optimized under the same grouped objective. This small, related set supports
