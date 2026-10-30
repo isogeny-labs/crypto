@@ -6,8 +6,22 @@ set -eu
 cd "$(dirname "$0")"
 E=${ECBENCH:-../../target/release/ecbench}
 mkdir -p analysis/bounds audits
+# An audit that fails stops the analysis. A receipt already on disk is accepted only if it is for
+# this session, ok, with no problems and every replay reproduced; a failed receipt never stays at its name.
 for b in 20 24 28 32; do
-  [ -f "audits/holdout-P$b.json" ] || "$E" verify --dir "sessions/holdout-P$b" --replay-all --out "audits/holdout-P$b.json" > /dev/null 2>&1 || echo "audit FAILED: holdout-P$b (receipt kept)"
+  r="audits/holdout-P$b.json"
+  if [ ! -f "$r" ]; then
+    if "$E" verify --dir "sessions/holdout-P$b" --replay-all --exit-code --out "$r.tmp" > /dev/null 2>&1; then
+      mv "$r.tmp" "$r"
+    else
+      echo "audit FAILED: holdout-P$b (failed receipt kept as $r.failed)" >&2
+      mv "$r.tmp" "$r.failed" 2>/dev/null || true
+      exit 1
+    fi
+  fi
+  sid=$(jq -r '.session_id' "sessions/holdout-P$b/session.json")
+  jq -e --arg id "$sid" '.session_id == $id and .ok == true and (.problems | length) == 0 and ([.replays[] | select(.reproduced != true)] | length) == 0' "$r" > /dev/null \
+    || { echo "receipt $r is not a passing audit of session $sid" >&2; exit 1; }
 done
 "$E" band --dir sessions/holdout-P20 sessions/holdout-P24 sessions/holdout-P28 sessions/holdout-P32 --weights 0,0.1,1 --json analysis/band.json --ranks > analysis/band.md
 for b in 20 24 28 32; do

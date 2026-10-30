@@ -24,6 +24,8 @@ date: 2026-10-30
 
 **Distance remaining** (pooled, w = 0): `ksum5-sel` is 6.0×, 5.8×, 7.3× and 7.3× rho-neg, and 7.6×, 6.5×, 7.2× and 7.1× bsgs-neg at 20, 24, 28 and 32 bits. The method is generic, so its limit is BSGS, and it stays above BSGS at every size.
 
+External comparison: not run (see §7).
+
 Public synthetic curves and targets; no security claim. Registered in [`PROTOCOL.md`](PROTOCOL.md) before any timed run ([`REGISTRATION.sha256`](REGISTRATION.sha256)); the selection and the holdout specs were hashed before the holdout ran ([`select/FROZEN.sha256`](select/FROZEN.sha256)).
 
 ![Figure 1. Pooled paired ratio of each k-sum arm to the tuned incumbent per size, at w = 0, 0.1 and 1, with the registered k = 5 range. Source: ratio.svg.](ratio.svg)
@@ -118,6 +120,7 @@ Follow-ups 2 to 4 of the #2866 list.
 - **One host.** UNQUALIFIED until a second-host replay and a `claims/*.json` record. The replay of #2866's sessions is in flight; this holdout has not been replayed elsewhere.
 - **Counted unit only.** ecbench GAE with §5a pricing of native work; the table lookups are hash probes priced in that band. Wall time is recorded in the sessions and not analysed.
 - **Four sizes, 20 to 32 bits.** The exponent is a small-size fit. No claim above 32 bits.
+- **External comparison: not run.** This study ranks two generic recipes against each other and against this repository's own matched rho and BSGS, in one `ecbench` session. No external ECDLP implementation was run, so nothing here says that either recipe is the fastest known, and the AGENTS.md external-tool ratio is missing. Outstanding scope: (i) the same targets through an external prime-field ECDLP tool, for example PARI/GP `elllog`, on the same host with the same isolation, with its algorithm and version recorded and its own timer used; (ii) published rho timings at these sizes, cited with their hardware and labelled "published, not reproduced". The reference tool for prime-field ECDLP is an owner decision, so it is not guessed here.
 
 ## 8. Files
 

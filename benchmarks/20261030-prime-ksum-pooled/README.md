@@ -12,6 +12,8 @@ render (`ratio`, `rho_multiple`, `per_curve`), produced by that directory's `plo
 - **Track.** Generic decomposition (bounded by √r; cannot beat rho). A ranking of generic recipes on the same instances.
 - **Distance remaining.** 5.8–7.3× rho and 6.5–7.6× BSGS at w = 0.
 
+**External comparison: not run. No external ECDLP implementation was run; the only references are this repository's matched rho and BSGS in the same session, so the report makes no claim to be the fastest known. Outstanding: the same targets through an external prime-field ECDLP tool (for example PARI/GP `elllog`) on the same host under the same conditions, and published rho timings at these sizes labelled "published, not reproduced". The owner's choice of reference tool is needed.**
+
 **No row in the results table yet.** The validation gate
 ([`docs/VALIDATION_GATE.md`](../../docs/VALIDATION_GATE.md)) admits a row only with an
 independent-host replay certificate and a validator report. This study has one host (13,824 verified runs, every replay identical).
