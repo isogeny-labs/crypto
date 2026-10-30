@@ -145,6 +145,7 @@ Design choices:
 | `AffineHash(i,pt)` | `fn affine_hash(&self, i: usize, pt: Point) -> u64` |
 | `Member(i,pt)` | `fn member(&self, i: usize, pt: Point) -> bool` (sha2::Sha256) |
 | `RelationNetwork(c,fb,R)` | `fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<Vec<usize>>)` |
+| (new, Rust only) | `fn mitm_find_relation(c: &Curve, fb: &FactorBases, r: Point, ...) -> Option<Vec<Point>>`: meet-in-the-middle elimination order; `Solver::mitm`, `ecdldemo -mitm` |
 
 ### `linalg` (linalg.go)
 `LeftKernelVector(rows []map[int]uint64, ncols int, r uint64) ([]uint64, bool)`

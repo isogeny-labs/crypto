@@ -24,6 +24,15 @@ does not share code with it.
 | 3. Linear algebra | `linalg.rs` | Left-kernel vector mod r by Gaussian elimination |
 | 4. Extraction | `solver.rs` | ξ = −U/V, always checked against `[ξ]P == Q`; an unverified answer is never returned. |
 
+Relation search has two elimination orders. The default contracts the
+network forward, which costs |F_1| x ... x |F_m|. `Solver::mitm` instead
+contracts it from both ends toward the middle (`relation::mitm_find_relation`):
+it enumerates the first half of the factor bases into a table keyed by the
+partial sum and looks up the complement from the second half. That is about
+2 sqrt(2r) point additions per attempt instead of 2r — the same network and the
+same set of solutions, only a different elimination order, returning one
+witness rather than a count. `ecdldemo -mitm` selects it.
+
 Counters sit behind the `Counter` trait: `SparseContractor` (exact,
 vertex-by-vertex, sums out each edge once no later vertex uses it),
 `BruteForceCounter` (reference) and `DFSCounter` (depth-first along a hinted
