@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "QT-degree-qualified-F13-20261030",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-30",
   "repository": "crypto",
   "study_dir": "research/quadratic_twist_evidence_20261021",
@@ -290,7 +290,7 @@
   },
   "stopping_rules": [
     {
-      "rule": "Complete all288configurations and1728separate targets or600sec command cap;iteration08:25–09:25UTC.",
+      "rule": "Complete all288configurations and1728separate targets or600sec command cap;iteration08:25\u201309:25UTC.",
       "kind": "fixed_n",
       "preregistered": true
     },
@@ -324,7 +324,7 @@
   "analysis_plan": {
     "script": {
       "path": "research/quadratic_twist_evidence_20261021/native/degree-qualified-audit/main.rs",
-      "sha256": "0466598724f9ceeb026a5f32415527e294bf273806a526e3e30d9e972411b2ce"
+      "sha256": "a1ec55f427c8b61821b0fa9f0d8ab2d1e4b6507d59833b1dd29059ae05903fa1"
     },
     "inputs": [
       "native/uniform-20261029/cases/p13-*",
@@ -366,12 +366,17 @@
       "verified_by": "read frozen source and both old native paths."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "at": "2026-10-30T08:42:00Z",
+      "reason": "BEFORE ANY STUDY DATA:remove duplicate Clone derive;make fixed288file coverage and declared frontier/strongest-source outputs explicit. Initial C++ compile passed,Rust compile101;producer never started. Exact first sources/logs retained."
+    }
+  ],
   "freeze": {
-    "status": "frozen",
-    "protocol_sha256": "ee7cb924fd9a69aebd447624229a6c7c5438192258dc61930d0c4600aa33a687",
-    "commit": "c0c65a2f37e4f8bdba67ba1e5ca7723de7e59121",
-    "frozen_at": "2026-10-30T08:39:39Z",
-    "filed_before_affected_data": true
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
   }
 }
