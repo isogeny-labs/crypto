@@ -1428,3 +1428,35 @@ Wait for exact live controller progress/checkpoints/terminal outcome, then inges
 ### Errors
 
 Source review caught a handoff command using a directory for the canonical export --out argument. Corrected to C1_EXPORT.json and matched check-export path before use; analyzer stdout and renderer directory semantics separately verified. No scientific data or source code changed.
+
+## 2026-10-30T06:34Z — Controller lineage and prospective supervision amendment
+
+### What was done
+
+Reconciled CodeBuild and durable c1 state before any takeover action. Original
+controller ended FAILED/BUILD_TIMED_OUT at06:27:08.972; AWS auto-retry started
+successor592e9381 at06:27:09.164. Same request, Pod, instance, attempt0 and
+restores0. No manual StartBuild or repeated scientific submission occurred.
+Preserved full build/state receipts and pre-discovery manual review.
+Prepared v5 controller-only amendment, native validation passed, independent
+exact-document review confirms scientific and analysis fields unchanged.
+
+### Decisions made
+
+Keep original six-hour allowance and08:10:24/11:17:54 UTC cutoffs. Prospectively
+separate max4 controller invocations from unchanged max2 scientific/worker
+attempts and max1 restore; original v4 and all costs remain. Commit/review and
+separate admission must precede thirdcontroller. No project or IAM changes.
+
+### Open threads
+
+c1 remains running; no new completed candidate result established. Publish
+amendment/admission, follow terminal receipts, retain full1260 and replay gaps.
+
+### Errors
+
+Original controller timed out after45min. Shared project reports1500min; actual
+builds report45min, cause not established. AutoRetryLimit2 allows three total
+builds, discovered during reconciliation. First amendment metadata candidate
+used timestamp for date-only field; native checker rejected it; corrected before
+review/admission. Manual takeover proposal was never executed.
