@@ -1,0 +1,94 @@
+{
+  "kind": "exact-existing-score-audit-execution/v1",
+  "source_revision": "fc7bac88dc217d01c59ff750d973d2796ebba1b4",
+  "classification": "AGENTS9a local development analysis of existing verified results",
+  "raw_run": "/workspace/nist-exact-pair-audit-run-001",
+  "phases": [
+    {
+      "id": "prepare-field",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "prepare-frequency",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "prepare-summary",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "producer",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "producer-control",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "refuse-field",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "refuse-frequency",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "refuse-summary",
+      "native_exit": 1,
+      "expected_exit": 1,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "verifier",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    },
+    {
+      "id": "verifier-control",
+      "native_exit": 0,
+      "expected_exit": 0,
+      "outcome": "completed_as_expected"
+    }
+  ],
+  "all_ten_phases_match": true,
+  "summary_source": {
+    "bytes": 2308,
+    "sha256": "040dd1722ccf895dd21abd6280a8225d1ec08ec6f23606b657b7ae7c1d84434c"
+  },
+  "summary_binary": {
+    "bytes": 50872,
+    "sha256": "9ce843ac047a203510e4cab0bd83fc65d62252b9161a08846e35f739713d727c"
+  },
+  "raw_summary": {
+    "bytes": 514,
+    "sha256": "7cc0d49667ceedc46de5250e6fb3f159b88c9fece6064d57ba6a20b1fdf3f349"
+  },
+  "verification": {
+    "bytes": 369,
+    "sha256": "9ca889b8cf038e3f6b827ddd222f4c9ed5f46acffac9072434648dd2adaf9e0d"
+  },
+  "new_curves": 0,
+  "new_characters": 0,
+  "new_point_counts": 0,
+  "new_random_draws": 0,
+  "DLP_attempted": false,
+  "timing_admitted": false,
+  "S3_checkpoint_claimed": false,
+  "full_real_curve_baseline_completed": false,
+  "external_procedural_history_repaired": false
+}
