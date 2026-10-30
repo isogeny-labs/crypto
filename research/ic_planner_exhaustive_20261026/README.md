@@ -1,4 +1,4 @@
-# The three planner studies, re-tested exhaustively and proven in Lean
+# The three planner studies, re-tested exhaustively, with their arithmetic checked in Lean
 
 Measured 2026-10-26 under [`PROTOCOL.md`](PROTOCOL.md), which was frozen in
 `0ca110399` before any session. PDF: [`REPORT.pdf`](REPORT.pdf). Lean:

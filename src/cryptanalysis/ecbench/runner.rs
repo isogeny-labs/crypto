@@ -51,7 +51,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::signals;
 use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::Workload;
+use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 
@@ -469,6 +469,7 @@ fn run_child(
         timing.hw_solve = o.hw_solve.clone();
         timing.solve = o.solve_obs.clone();
         timing.solve_wall_ns = o.report.as_ref().map(|r| r.solve_wall_ns);
+        timing.method_call_wall_ns = o.method_call_wall_ns;
     }
     Ok(Reaped {
         output,
@@ -926,7 +927,15 @@ fn assemble(
     let exited_cleanly = reaped.exit.as_deref() == Some("exit 0");
     let recovered = report.as_ref().and_then(|r| r.recovered);
     // Verification in the runner's own process: [k]G against the target.
-    let matches_target = recovered.map(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target));
+    // This audit clock is separate from child timing and its isolation grade.
+    let audit_verification = recovered.map(|k| {
+        let started = Instant::now();
+        let matches = inst.mul_generator_hex(k).as_ref() == Some(&w.target);
+        let elapsed_ns = u64::try_from(started.elapsed().as_nanos())
+            .expect("bounded parent audit verification interval");
+        (matches, elapsed_ns)
+    });
+    let matches_target = audit_verification.map(|(matches, _)| matches);
     // A public target has no planted answer: [k]G = Q decides alone.
     let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
     let status = if reaped.spawn_error.is_some() {
@@ -1015,6 +1024,7 @@ fn assemble(
             automorphisms_used: report.as_ref().map(|r| r.automorphisms_used),
             floor_s: floor,
             ratio_to_floor: s.map(|s| s / floor),
+            floor_rule: Some(FLOOR_RULE_V2.into()),
         },
         phases: report
             .as_ref()
@@ -1062,6 +1072,13 @@ fn assemble(
         binary_sha256: capsule.build.binary_sha256.clone(),
         work: None,
     };
+    record.time.parent_audit_verification_ns = audit_verification.map(|(_, ns)| ns);
+    record.time.online_clock_diagnostics =
+        report
+            .as_ref()
+            .map(|r| super::record::OnlineClockDiagnostics {
+                error: r.online_error.clone(),
+            });
     // The record's work in bitop/v1, derived from what it carries; a record
     // that cannot be priced (no report) carries none.
     if report.is_some() {
@@ -1091,6 +1108,7 @@ pub fn read_record_lines_exact(dir: &Path) -> Result<Vec<(String, Record)>, Stri
 }
 
 fn from_str_exact_floats<T: serde::de::DeserializeOwned>(line: &str) -> Result<T, String> {
+    crate::cryptanalysis::ecbench::canonical::reject_duplicate_keys(line)?;
     // Validate the complete typed shape first. In particular, serde's derived
     // record visitors reject duplicate fields; Value alone would keep only the
     // last occurrence. Discard the legacy f64 values from this pass.
@@ -1227,6 +1245,17 @@ mod watchdog_record_tests {
         let completed = make(&reaped);
         assert_eq!(completed.outcome.status, "verified");
         assert_eq!(completed.outcome.matches_target, Some(true));
+        assert!(completed.time.parent_audit_verification_ns.is_some());
+        assert_eq!(
+            completed
+                .time
+                .online_clock_diagnostics
+                .as_ref()
+                .unwrap()
+                .error,
+            output.report.as_ref().unwrap().online_error
+        );
+        assert_eq!(completed.time.solve_wall_ns, reaped.timing.solve_wall_ns);
         assert_eq!(
             completed.cost.total_gae,
             output.report.as_ref().map(|r| r.total_gae)
@@ -1237,6 +1266,8 @@ mod watchdog_record_tests {
         assert_eq!(censored.outcome.exit.as_deref(), Some("exit 0"));
         assert_eq!(censored.outcome.recovered, None);
         assert_eq!(censored.outcome.matches_target, None);
+        assert_eq!(censored.time.parent_audit_verification_ns, None);
+        assert_eq!(censored.time.online_clock_diagnostics, None);
         assert_eq!(censored.cost.total_gae, None);
         assert_eq!(censored.cost.s, None);
         assert!(!censored.cost.deterministic);

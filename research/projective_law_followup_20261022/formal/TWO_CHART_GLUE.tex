@@ -1,0 +1,23 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Two-chart glued scheme: checked construction}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+Pinned Lean constructs a \texttt{Scheme.GlueData} from the affine chart, the infinity chart, their localized overlap spectra, the checked overlap isomorphism, and the two open immersions. It defines the glued scheme and checks that its two chart maps are open immersions and jointly cover the underlying space. All five audited new declarations use only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+The construction uses \texttt{CategoryTheory.GlueData'} indexed by \texttt{Bool}. Mathlib supplies diagonal overlaps through \texttt{GlueData.ofGlueData'}. The triple-index transition and cocycle obligations in \texttt{GlueData'} require three pairwise-distinct Boolean indices and are discharged by contradiction. The off-diagonal transitions are the inverse maps of the previously checked overlap isomorphism.
+
+\begin{center}\begin{tabular}{p{0.67\linewidth}p{0.22\linewidth}}\toprule
+Gate & Status\\\midrule
+Chart schemes and inverse overlap transition & Checked\\
+Complete two-chart gluing datum and glued scheme & Checked\\
+Chart maps open and jointly covering & Checked\\
+Chosen smooth projective genus-2 completion & Open\\
+Infinity stalk, divisor/$\operatorname{Pic}^0$ transport & Open\\
+Rust semantics and rho cost & Open; unmeasured\\\bottomrule\end{tabular}\end{center}
+
+The checked object is a scheme glued from these two affine charts. Its identification with a chosen smooth projective completion, any infinity-stalk or divisor-class theorem, and any runtime cost statement remain separate obligations. The Lean source, CSV, SVG, and proof log accompany this report.
+\end{document}
