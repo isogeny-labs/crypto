@@ -39,10 +39,12 @@ this does not independently verify their algebraic action.
 Optional independent positive PDP arithmetic accepts the saved v2 point
 domain and checks the same public group equation as for v1. It continues to
 report construction, subgroup order, solver independence, UNSAT,
-exhaustiveness, instruction cost and fall degree as unverified. Root artifact
-hashes are preserved, but the consumer adds no independent root-set or
-execution-trace verifier. An explicitly requested producer replay checks those
-producer contracts through the pinned executable and is labelled separately.
+exhaustiveness, instruction cost and fall degree as unverified. The subsequent
+[root-set extension](ROOT_CERTIFICATE_DESIGN.md) independently checks recognized
+completed prime and binary root certificates; its per-call scope does not
+certify a complete execution trace or total cost. An explicitly requested
+producer replay remains separately labelled. The validation records below are
+the frozen pre-extension results and are not rewritten as root-set evidence.
 
 ## Separate static training view
 

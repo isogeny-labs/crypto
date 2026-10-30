@@ -1,0 +1,20 @@
+PASS negative norm_solver args=17 2 2 4 0 0 6 exit=2 reason=nonzero split membership coset required
+PASS negative point_oracle args=17 2 2 4 0 0 6 exit=2 reason=split nonzero coset required
+PASS negative norm_solver args=17 2 2 4 2 0 6 exit=2 reason=nonzero split membership coset required
+PASS negative point_oracle args=17 2 2 4 2 0 6 exit=2 reason=split nonzero coset required
+PASS negative norm_solver args=17 2 2 5 1 0 6 exit=2 reason=nonzero split membership coset required
+PASS negative point_oracle args=17 2 2 5 1 0 6 exit=2 reason=split nonzero coset required
+PASS negative norm_solver args=17 2 2 4 1 1 1 exit=2 reason=target is not on curve
+PASS negative point_oracle args=17 2 2 4 1 1 1 exit=2 reason=off-curve target
+PASS negative norm_solver args=15 2 2 1 1 0 6 exit=2 reason=bounded prime field required:5<=p<=257
+PASS negative point_oracle args=15 2 2 1 1 0 6 exit=2 reason=bounded prime field required
+PASS negative norm_solver args=17 0 0 4 1 0 0 exit=2 reason=singular curve
+PASS negative point_oracle args=17 0 0 4 1 0 0 exit=2 reason=singular curve
+PASS negative norm_solver args=17 0 1 4 1 0 1 exit=2 reason=non-anomalous prime-order whole curve required
+PASS negative point_oracle args=17 0 1 4 1 0 1 exit=2 reason=nonanomalous prime curve order required
+PASS negative norm_solver args=5 3 2 1 1 1 1 exit=2 reason=non-anomalous prime-order whole curve required
+PASS negative point_oracle args=5 3 2 1 1 1 1 exit=2 reason=nonanomalous prime curve order required
+PASS negative norm_solver extra_witness_input exit=2 reason=usage: norm_solver p a b t c target_x target_y
+PASS negative point_oracle extra_witness_input exit=2 reason=usage: point_oracle p a b t c target_x target_y
+PASS complete_model_sets=90 SAT=42 UNSAT=48 negative_cli=18 solver_input_witnesses=0
+scope=one_curve_F17_fixed_correctness; timings=not_collected; scaling_claim=none
