@@ -1410,3 +1410,21 @@ Monitor this controller/build/request identity, retain actual worker/epoch recei
 ### Errors
 
 No submission error. GitHub push warned about existing historical large blobs; scoped artifact check reports no new data files committed. No history rewrite or unrelated cleanup performed.
+
+## 2026-10-30T05:47Z — Running-worker reconciliation and export handoff
+
+### What was done
+
+Re-polled exact c1 controller and EC2 worker: phase running, attempt0, instance i-04d58c2b309fb6549, Pod UID3a7ab215-49d1-4982-8c78-5a0c71646842, no restores/failure. EC2 describes the c8a.2xlarge instance as running with launch05:42:33UTC. Retained source-checked C1_EVIDENCE_HANDOFF.md for native analysis, canonical export and neutral PDF/SVG/CSV/JSON. PR2943 headc91c99d has no failed checks; artifacts,size,validation-gate remain in progress.
+
+### Decisions made
+
+All c1 records, attempt history and resources must derive from actual c1 immutable receipts. Preserve computation/fresh epochs separately; canonical accounting recomputation does not satisfy the15 independent scientific replays. Unobserved rows and costs remain absent/null. The old b1 packet is a shape example only. No additional scientific execution or request submission occurred.
+
+### Open threads
+
+Wait for exact live controller progress/checkpoints/terminal outcome, then ingest and verify raw artifacts. Keep both original cutoff and campaign expiry. Full cohort remains incomplete and conditionally admitted only after complete gate/replay/review. Required CI remains pending.
+
+### Errors
+
+Source review caught a handoff command using a directory for the canonical export --out argument. Corrected to C1_EXPORT.json and matched check-export path before use; analyzer stdout and renderer directory semantics separately verified. No scientific data or source code changed.
