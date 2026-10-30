@@ -2901,7 +2901,31 @@ pub(super) fn verify(e: &Expected<'_>, bundle: &Bundle<'_>, limits: ReplayLimits
             )?;
         }
     } else if bundle.slots[6].is_some() || bundle.committed_witness.is_some() {
-        return Err(Error::Claim);
+        // An interrupted producer can retain a committed first witness without
+        // its terminal record. Recheck its mathematics and bound custody only;
+        // completion, exhaustive negatives and producer lifecycle stay unknown.
+        let artifact = bundle.slots[6].as_ref().ok_or(Error::Identity)?;
+        let captured = bundle.committed_witness.as_ref().ok_or(Error::Identity)?;
+        if captured.original_sequence == 0
+            || captured.sha256 != artifact.sha256
+            || captured.bytes != artifact.bytes
+        {
+            return Err(Error::Identity);
+        }
+        let first = rows.first.as_ref().ok_or(Error::Claim)?;
+        if !first.matched || (n.unit && first.has_coordinates) {
+            return Err(Error::Claim);
+        }
+        witness(
+            &parse(artifact.bytes, &mut b)?,
+            e,
+            &orig,
+            &assigned,
+            first,
+            &mut b,
+        )?;
+        local = true;
+        durable = true;
     }
     Ok(Verified {
         original_input_verified: true,

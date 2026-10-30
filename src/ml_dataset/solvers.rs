@@ -3697,6 +3697,67 @@ mod tests {
             .unwrap()
             .unwrap();
             super::super::capture::verify_captured_delta(&restored, &delta, &initial).unwrap();
+            // Simulate interruption after durable publication but before the
+            // terminal file survives. Preserve the witnessed prefix without
+            // promoting a completed search or a producer lifecycle claim.
+            let terminal_path = "prime-f4-wide-dynamic-result.json";
+            fs::remove_file(cell.join(terminal_path)).unwrap();
+            let prefix_artifacts: Vec<_> = artifacts
+                .iter()
+                .filter(|a| a.path != terminal_path)
+                .cloned()
+                .collect();
+            let prefix = prime_f4_wide_dynamic_replay::verify_files(
+                &cell,
+                &original.expected(),
+                &prefix_artifacts,
+                &binding,
+                &limits,
+                prime_f4_wide_dynamic_replay::ReplayLimits {
+                    work: 10_000_000_000,
+                    allocation_bytes: 128 << 20,
+                    deadline: Instant::now() + Duration::from_secs(20),
+                },
+            )
+            .unwrap();
+            assert!(prefix.first_witness_verified && prefix.witness_capture_committed);
+            assert!(!prefix.solver_completed_verified);
+            assert!(!prefix.independent_group_domain_complete && !prefix.negative_verified);
+            for missing in ["pdp-witness.json", "prime-f4-wide-dynamic-group.json"] {
+                let incomplete: Vec<_> = prefix_artifacts
+                    .iter()
+                    .filter(|a| a.path != missing)
+                    .cloned()
+                    .collect();
+                assert!(
+                    prime_f4_wide_dynamic_replay::verify_files(
+                        &cell,
+                        &original.expected(),
+                        &incomplete,
+                        &binding,
+                        &limits,
+                        prime_f4_wide_dynamic_replay::ReplayLimits {
+                            work: 10_000_000_000,
+                            allocation_bytes: 128 << 20,
+                            deadline: Instant::now() + Duration::from_secs(20),
+                        },
+                    )
+                    .is_err(),
+                    "missing {missing} must not support witnessed prefix"
+                );
+            }
+            let partial = json!({"status":"partial", "solver_completed":false,
+                "pdp_witness_verified":true, "certificate_durably_persisted":true});
+            verify_dynamic_claims(&partial, &prefix).unwrap();
+            for claim in [
+                "solver_completed",
+                "group_domain_complete",
+                "exhaustive_no_decomposition",
+            ] {
+                let mut forged = partial.clone();
+                forged[claim] = json!(true);
+                assert!(verify_dynamic_claims(&forged, &prefix).is_err());
+            }
             fs::remove_dir_all(root).unwrap();
         }
     }
