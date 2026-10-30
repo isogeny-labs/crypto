@@ -24,6 +24,12 @@ output path. Omit the fixture seed for OS randomness. Certificates serialize
 large integers as little-endian 32-bit-limb arrays. Replay checks mathematics,
 not execution counters. All bundled examples are public inputs; the challenge example below is not a tiny fixture.
 
+Problem, receipt, certificate and point records reject duplicate and unknown
+fields at every typed level. An optional field set to null still counts as
+present for duplicate detection. File inputs are limited to 16 MiB of actual
+content; the reader uses one extra byte to reject oversized inputs, including
+growing files and streams.
+
 Sources and implementation boundaries:
 [implementation report](https://github.com/isogeny-labs/crypto/blob/main/docs/hashed-ecdl.md),
 [Bochum v0.2](https://github.com/bochum-crypto/subexponential-ecdl/tree/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f),
@@ -31,6 +37,36 @@ Sources and implementation boundaries:
 
 This crate is mirrored in crypto and cryptanalysis. Its source files must
 remain byte-identical; the owning repositories have separate integration locks.
+
+## Exact validation and witness search
+
+Primality now uses deterministic bounded tests throughout u64, with the first
+twelve prime bases and the published Sorenson/Webster bound. Larger values
+retain AKS unless independently checked Pocklington certificates are supplied.
+`Curve::with_cofactor_and_certificates` verifies every supplied proof node and
+the existing curve/order/cofactor conditions; a missing proof uses the original
+exact fallback. The runner includes proof data in its receipt for replay.
+
+```sh
+cargo run --locked --release -- validate examples/eccp131-certified.json
+```
+
+The certified input supplies four small proof nodes for the official p/r. The
+original `eccp131.json` remains an uncertified-input control. Parameter validation
+does not recover the challenge scalar or establish feasible relation search.
+
+Built-in functional leaves now select the same least interface word in a
+single input search. A free-input interface permits stopping at the first
+valid assignment in interface order; derived interface bits require a complete
+pass to find the least word. Every returned assignment still passes full graph
+evaluation. Exact count queries and the source recursion guards are unchanged.
+Set `Counter::functional_witnesses = false` or call `witness_by_counts` to use
+the original prefix-count control. Arbitrary caller predicates retain it.
+
+Correctness controls compare complete seeded certificates and retain forged
+proof, UNSAT, alias/pin, derived-interface and resource-limit cases. See the
+paired optimization report for actual checks and open benchmark requirements;
+these changes alone do not establish a runtime or end-to-end speedup.
 
 
 ## Certicom ECCp-131 input
@@ -51,3 +87,12 @@ budget is an error with unknown result, not a solution or proof that no solution
 exists. These bounds do not make the challenge feasible. No ECCp-131 scalar
 has been recovered by the development checks. A successful receipt would need
 independent replay with the existing verify command.
+
+## Opt-in finite-size extensions
+
+See [FINITE_SIZE.md](FINITE_SIZE.md) for selector-domain witnesses and graphs,
+optional schoolbook multiplication, bounded exact width planning/conditioning,
+partial-relation elimination and odd-degree binary/Frobenius support. The file
+runner adds `solve-selectors` and `solve-width`; the original `solve` remains
+available. Exact limits return unknown-result errors. Small-parameter source
+packet recursion and scientific performance validation remain open.
