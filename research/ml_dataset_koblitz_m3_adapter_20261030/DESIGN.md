@@ -228,3 +228,26 @@ account for those paths (or reuse independently verified original-input state
 with an exact provenance binding) before calling them under the profile. Do not
 silently count their work as zero or grant fresh phase budgets. Typed persistence
 and independent equation/group replay are still outstanding.
+
+## Bounded S4 bridge increment
+
+`construct_original` now invokes the existing bounded native S4 builder with the
+ledger's remaining construction allowance and its original construction deadline.
+Every cumulative native reservation is observed by the same ledger before the
+external callback. The external callback may reserve its own retained memory and
+trace bytes through that ledger. Its error is sticky; even a callback that ignores
+a failed reservation and returns success cannot suppress the ledger failure.
+
+The returned construction record preserves native failures separately from
+adapter failures. A native failure seals the ledger against later matrix work.
+If the native builder returned original equations but the adapter's final
+boundary fails, the returned equations remain available for typed persistence.
+Construction alone never sets a matrix-invocation or decomposition claim.
+The bridge does not yet implement artifact serialization or matrix dispatch.
+
+The mathematical preflight now caps candidate replay at255 rows and2 lifts per
+row before invoking generic verification. Controls include oversized arrays.
+These are structural limits; they do not replace the remaining complete setup
+accounting. Three bridge controls exercise actual construction and cumulative
+headroom, one-less native work, callback refusal, swallowed trace-cap errors,
+and an already expired construction deadline before any native invocation.

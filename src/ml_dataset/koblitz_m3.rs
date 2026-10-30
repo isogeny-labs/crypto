@@ -21,6 +21,7 @@ pub(super) enum Stop {
     Trace,
     Additions,
     Observer,
+    NativeFailure,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -347,6 +348,16 @@ pub(super) fn original_math(
     if points.len() > 4 || points.is_empty() {
         return Err("Koblitz two-code profile requires at most four original signed points".into());
     }
+    let candidates = case.factor_base["construction_candidates"]
+        .as_array()
+        .ok_or("missing original construction candidates")?;
+    if candidates.len() > 255
+        || candidates
+            .iter()
+            .any(|row| row["lifts"].as_array().is_none_or(|lifts| lifts.len() > 2))
+    {
+        return Err("Koblitz two-code setup candidate replay cap exceeded".into());
+    }
     // Full mathematical checks include actual twist, certified order,
     // irreducibility, subgroup checks and factor-base construction replay.
     // Their setup cost is not represented by native S4 reservation counters.
@@ -400,6 +411,88 @@ pub(super) fn original_math(
         codes,
         signed,
     })
+}
+
+/// Retain completed original equations even if the final adapter boundary fails.
+/// Construction never claims a matrix invocation or a complete decomposition.
+pub(super) struct Construction {
+    pub output: Option<crate::cryptanalysis::koblitz_groebner::bounded_s4::Output>,
+    pub native_failure: Option<crate::cryptanalysis::koblitz_groebner::bounded_s4::Failure>,
+    pub adapter_stop: Option<Stop>,
+}
+
+pub(super) fn construct_original<F>(
+    original: &MathInput,
+    budget: &mut Budget,
+    forward: &mut F,
+) -> Construction
+where
+    F: FnMut(
+        crate::cryptanalysis::koblitz_groebner::bounded_s4::Event,
+        &mut Budget,
+    ) -> Result<(), ()>,
+{
+    use crate::cryptanalysis::koblitz_groebner::bounded_s4 as native;
+    let limits = match budget.begin_native(false, Instant::now()) {
+        Ok(limits) => limits,
+        Err(stop) => {
+            return Construction {
+                output: None,
+                native_failure: None,
+                adapter_stop: Some(stop),
+            }
+        }
+    };
+    let deadline = budget.construction_deadline;
+    let result = native::build(
+        &original.curve.irreducible,
+        1,
+        &original.codes,
+        original.target.0,
+        native::Limits {
+            work: limits.work,
+            bytes: limits.bytes,
+        },
+        deadline,
+        &mut |event| {
+            budget
+                .observe(
+                    Reservation {
+                        work: event.reserved.work,
+                        bytes: event.reserved.bytes,
+                    },
+                    Instant::now(),
+                )
+                .map_err(|_| ())?;
+            if forward(event, budget).is_err() {
+                let _ = budget.observer_failed();
+                return Err(());
+            }
+            // A callback cannot hide a failed ledger reservation by returning Ok.
+            budget.check(Instant::now()).map_err(|_| ())
+        },
+    );
+    match result {
+        Ok(output) => {
+            let adapter_stop = budget.finish_native(Instant::now()).err();
+            Construction {
+                output: Some(output),
+                native_failure: None,
+                adapter_stop,
+            }
+        }
+        Err(failure) => {
+            let adapter_stop = budget.stopped;
+            // Keep the precise native cause in the report; seal the shared
+            // ledger so a caller cannot run a matrix after failed construction.
+            let _ = budget.fail::<()>(Stop::NativeFailure);
+            Construction {
+                output: None,
+                native_failure: Some(failure),
+                adapter_stop,
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -824,7 +917,7 @@ mod mathematical_tests {
         let cfg = config(23, false, 4);
         let case = curves::generate(&cfg).unwrap();
         original_math(&cfg, &case).unwrap();
-        for mutation in 0..6 {
+        for mutation in 0..8 {
             let mut changed = case.clone();
             match mutation {
                 0 => changed.public_instance["curve"]["b"] = json!("2"),
@@ -833,6 +926,14 @@ mod mathematical_tests {
                 3 => changed.factor_base["points"][0] = changed.factor_base["points"][1].clone(),
                 4 => changed.public_instance["field"]["irreducible_low_terms"] = json!([0]),
                 5 => changed.factor_base["requested_size"] = json!(2),
+                6 => {
+                    changed.factor_base["construction_candidates"] =
+                        json!(vec![json!({"lifts":[]}); 256])
+                }
+                7 => {
+                    changed.factor_base["construction_candidates"][0]["lifts"] =
+                        json!([null, null, null])
+                }
                 _ => unreachable!(),
             }
             assert!(
@@ -846,5 +947,122 @@ mod mathematical_tests {
         changed = cfg;
         changed.m = 4;
         assert!(original_math(&changed, &case).is_err());
+    }
+}
+
+#[cfg(test)]
+mod construction_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_groebner::bounded_s4 as native;
+    use crate::ml_dataset::{curves, types::CaseConfig};
+
+    fn fixture() -> MathInput {
+        let config = CaseConfig {
+            family: "koblitz".into(),
+            n: 23,
+            m: 3,
+            twist: false,
+            curve_seed: 7,
+            generator_index: 1,
+            key_index: 1,
+            seed: 42,
+            factor_base_size: 4,
+            degree_bound: 3,
+            work_limit: 16384,
+            solver: "weil".into(),
+        };
+        original_math(&config, &curves::generate(&config).unwrap()).unwrap()
+    }
+    fn budget() -> Budget {
+        let now = Instant::now();
+        Budget::new(
+            16384,
+            512 << 20,
+            16 << 20,
+            now + Duration::from_secs(20),
+            now,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn native_construction_shares_reservations_and_leaves_matrix_headroom() {
+        let input = fixture();
+        let mut budget = budget();
+        let mut events = 0;
+        let result = construct_original(&input, &mut budget, &mut |_, _| {
+            events += 1;
+            Ok(())
+        });
+        assert!(
+            result.native_failure.is_none(),
+            "{:?}",
+            result.native_failure
+        );
+        assert_eq!(result.adapter_stop, None);
+        let output = result.output.unwrap();
+        assert_eq!(output.n_vars, 3);
+        assert_eq!(output.equations.len(), 23);
+        assert!(events > 1);
+        assert!(output.reserved.work > 0);
+        assert_eq!(
+            budget.native,
+            Reservation {
+                work: output.reserved.work,
+                bytes: output.reserved.bytes
+            }
+        );
+        let remaining = budget.begin_native(true, Instant::now()).unwrap();
+        assert_eq!(remaining.work, NATIVE_WORK_MAX - output.reserved.work);
+    }
+
+    #[test]
+    fn native_stop_and_callback_failure_prevent_later_matrix_work() {
+        let input = fixture();
+        let mut baseline = budget();
+        let complete = construct_original(&input, &mut baseline, &mut |_, _| Ok(()));
+        let used = complete.output.unwrap().reserved.work;
+        let mut capped = budget();
+        capped.native_work_limit = used - 1;
+        let result = construct_original(&input, &mut capped, &mut |_, _| Ok(()));
+        assert!(result.output.is_none());
+        assert_eq!(result.native_failure.unwrap().stop, native::Stop::WorkLimit);
+        assert_eq!(result.adapter_stop, None);
+        assert_eq!(
+            capped.begin_native(true, Instant::now()),
+            Err(Stop::NativeFailure)
+        );
+        let mut refused = budget();
+        let result = construct_original(&input, &mut refused, &mut |_, _| Err(()));
+        assert_eq!(result.native_failure.unwrap().stop, native::Stop::Observer);
+        assert_eq!(result.adapter_stop, Some(Stop::Observer));
+        assert_eq!(
+            refused.begin_native(true, Instant::now()),
+            Err(Stop::Observer)
+        );
+    }
+
+    #[test]
+    fn callback_cannot_swallow_ledger_failure_and_expired_setup_does_no_native_work() {
+        let input = fixture();
+        let mut limited = budget();
+        let result = construct_original(&input, &mut limited, &mut |_, b| {
+            let _ = b.reserve_trace(u64::MAX, Instant::now());
+            Ok(())
+        });
+        assert_eq!(result.native_failure.unwrap().stop, native::Stop::Observer);
+        assert_eq!(result.adapter_stop, Some(Stop::Trace));
+        let mut expired = budget();
+        expired.construction_deadline = Instant::now();
+        let mut called = false;
+        let result = construct_original(&input, &mut expired, &mut |_, _| {
+            called = true;
+            Ok(())
+        });
+        assert!(!called);
+        assert!(result.output.is_none());
+        assert!(result.native_failure.is_none());
+        assert_eq!(result.adapter_stop, Some(Stop::Deadline));
+        assert_eq!(expired.native, Reservation::default());
     }
 }
