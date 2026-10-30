@@ -1658,9 +1658,16 @@ mod tests {
                     linear: marker,
                     replay: marker,
                 };
-                let no_clocks =
-                    solve_reduction::<false>(&curve, p, q, &config, &mut Enumerate, &mut untouched)
-                        .unwrap();
+                let no_clocks = solve_reduction::<false>(
+                    &curve,
+                    p,
+                    q,
+                    &config,
+                    &mut Enumerate,
+                    &mut untouched,
+                    20,
+                )
+                .unwrap();
                 assert_eq!(no_clocks, expected);
                 for clock in [
                     untouched.bases,
