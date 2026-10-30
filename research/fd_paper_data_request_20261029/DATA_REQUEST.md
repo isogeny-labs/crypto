@@ -13,7 +13,17 @@ This is a list of the data the paper still needs, one item per gap. Each item na
 - what is missing;
 - how to get it: a new run under a protocol record in `protocols/`, collecting output from a study already running, or work that needs a person (no compute).
 
-**Status.** Nothing here has been run. The three protocol records are `draft`. Each validates against `experiment.protocol/v1` with 0 findings. None is frozen. Freezing waits on the prerequisites listed per protocol. A run then goes through the model tiers (director card, mechanical executor) on `isolab-eks`, after `scripts/checkpoint.sh init` (CLAUDE.md). Loading these files does not authorise a run.
+**Status (2026-10-30).** The owner approved building the prerequisites and launching the runs.
+
+- **The two fall-degree protocols** now use one native instrument, `examples/fd_m2_degrees.rs`.
+  - It builds the $m = 2$ descent in crypto's Boolean-ring library. It runs the full MutantXL closure (= $W_D$) and Boolean F4.
+  - It replaces the draft's lfdclose2 and a new `.sys` driver. crypto forbids Python research tooling, and the 120 GiB runner serves only this repository.
+  - Pilot: it reproduced lfdclose2's recorded $d_F$ on 9 recorded instances. These are R11a, R13a, R15a, R19a, P17a, P21a, P21c and U33a (exact), and T33a ($\ge 5$, with a $W_4$ rank of 48,068 equal to the record).
+  - Planted solvable controls never refuted up to $D = 5$.
+- **The runs** go through `.github/workflows/fd-paper-degrees.yml` on the `crypto-eks-highmem` runner (Karpenter Spot on EKS, 16 CPU, 120 GiB). This is the route `dreg-a3-eks-highmem.yml` uses for closures.
+  - EKS `isolab_k8s_run` takes argv jobs only from the harness host, which this session cannot reach (`research/prime_ic_program_20261029/fall_degree_relaunch/README.md` §1).
+  - The calibrate stage (claim C0) must pass before any new row is read.
+- **Certificates** (checked by `cert_check.py`) for the new $d_F \ge 5$ rows are a separate crypto-autoresearcher run. Until then those rows are reported as `closure_only`.
 
 ![Data on record (filled) and requested (open, stars, circles) for the m = 2 binary descent](coverage.png)
 
@@ -44,8 +54,8 @@ Out of scope for this paper: the frontier chapter's 9 unvalidated leaderboard ro
 
 | protocol | question | arms and controls | size | route | prerequisites before freeze |
 |---|---|---|---|---|---|
-| [`fd-binary-closure-ext`](protocols/fd-binary-closure-ext/protocol.json) | Is $d_F \ge 5$ certified at n = 39–51? Does $d_F$ reach 6 at n = 33–37? | closure A (lfdclose2) against an independent certificate check; A/A on thread count; positive: known refuting instances; negative: satisfiable instances | ~36 instances plus 8 D = 5 closures; ~100 h | isolab-eks spot, search class, 64–128 GiB for D = 5 | extend `mktable.py` for D = 5 rows; pin its sha256; time one D = 5 closure (n = 33) |
-| [`fd-f4-step-degree`](protocols/fd-f4-step-degree/protocol.json) | What is F4's $D_{\rm reg}$ on the same systems? Does it reproduce KW? | Boolean F4 (`pq_f4_f2`) against KW's published values; A/A on variable order; positive: d_F = 3 instances | ~135 instances; up to 72 h per large cell | isolab-eks spot, up to 256 GiB | write `examples/f4_f2_sysfile_degree.rs` (reads `.sys`, reports step degrees); pilot at n = 34, 40; check the KW transcription |
+| [`fd-binary-closure-ext`](protocols/fd-binary-closure-ext/protocol.json) | Is $d_F \ge 5$ at n = 41–51? Does $d_F$ reach 6 at n = 33–37? | native closure against lfdclose2's record (calibration C0); A/A on thread count; positive: recorded refuting instances; negative: planted solvable instances | 93 recorded + 28 drawn + 10 planted + 8 D = 5; ~70 h | ARC `crypto-eks-highmem`, 16 CPU, 120 GiB | done: driver, run.sh, workflow, pilot |
+| [`fd-f4-step-degree`](protocols/fd-f4-step-degree/protocol.json) | What is F4's $D_{\rm reg}$ on the same systems? Does it reproduce KW? | Boolean F4 (`pq_f4_f2`) against KW's published values; positive: d_F = 3 instances | 93 recorded + 30 drawn; steps over 1 GiB are censored | ARC `crypto-eks-highmem` | done: driver (`--f4`); still open: KW transcription check against the PDF |
 | [`k4-char2-replication`](protocols/k4-char2-replication/protocol.json) | At k = 4, is IC below the strongest rho at m = 16 and 17, across w = 0, 0.1, 1? | `ic-wied` against `rho-strong`; `rho-neg` regression; A/A | 4 arms × 4 m × 8 targets; ~30 h | isolab L2 measurement pool | build `rho.negation_strong` (ecbench-extend); `ecbench verify --replay` preflight |
 
 **Protocol details.** Each record states:
