@@ -77,6 +77,13 @@ certificate. These are implementation limits, not demonstrated scale claims.
   to the left table cap. Sort full `(infinity,x,y,tuple_id)` keys on device.
 - Keep the left table resident across targets from the same bases. The Rust
   adapter sends bases only when their exact contents change.
+- Optional `cuda-cached` builds reuse two contiguous right-side partial-sum
+  tables when each fits the explicit chunk bound; otherwise they use direct
+  tuple construction. At most `2*chunk_rows*sizeof(Point)` extra storage is
+  charged to admission and cold setup. Enable with `ER_QUERY_CACHED`;
+  `ER_QUERY_UNCACHED_REFERENCE` overrides it for comparisons. The ordinary
+  `cuda` build retains uncached indexed search: the matched v5 52-bit cases
+  did not show a timing gain from caching. Both paths preserve exact results.
 - Stream right tuples in capped batches. Probe the sorted left table on the
   device; return only witness indices. Large tables use at most 65537 u64
   prefix offsets to restrict full-key binary search to one high-x-bit bucket.
@@ -103,7 +110,8 @@ Blackwell, use CUDA with `sm_120` support:
 make host                  # small C++/Rust reference executables
 make test                  # host arithmetic, protocol driver and reduction
 make all ARCH=sm_120        # select the actual GPU architecture
-make test-cuda ARCH=sm_120
+make test-cuda ARCH=sm_120   # exercises default and optional cached variants
+make cuda-cached ARCH=sm_120 # optional build/explicit-relations-cached service
 compute-sanitizer --tool memcheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool racecheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool synccheck build/explicit-relations-cuda --self-test
@@ -151,7 +159,7 @@ response lines are flushed. Use a dedicated service process per curve.
 
 | Command | Meaning / response |
 | --- | --- |
-| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^30`, chunk no larger than cap. |
+| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^31`, chunk no larger than cap. |
 | `xs n x0 ...` | Strict distinct x list, `n <= max_rows/2`; `BASE npoints x y ...`, sorted by full coordinates, both signs. A missing lift is an error. |
 | `hash s alpha beta tau` | Signed base construction, `tau <= max_rows`; same `BASE` response, possibly empty. |
 | `bases m n0 x y ... n1 x y ...` | 2–8 sorted, distinct signed point lists; `PREPARED split left_rows right_rows`. Empty slot lists are allowed and certify no relation. |
@@ -186,3 +194,27 @@ wall clocks are L0 observations, not certified speedups. The separate `crates/ha
 CPU code; this GPU service accelerates the bounded meet-in-the-middle path.
 The standalone Cargo manifest resolves that crate because the included
 reference module re-exports it, without building the root crypto package.
+
+### Replaying the scaling studies
+
+The frozen `research/explicit_relations_e2e_20261030/run*.sh` instruments must
+be run from their recorded source commits. In particular, v5 measured caching
+as the candidate default on f6338418572c72e1bf97ad24903cd5efd17cf7da. After its
+matched 52-bit rows showed no gain, the normal build selected the uncached
+path and the same cache implementation became the explicit `cuda-cached`
+option. Do not run historical scripts against a different source revision
+and label the result a replay. The active v5 larger-field probes remain
+unchanged on their pinned source; their final outcomes are recorded separately.
+
+### Exact compact table (opt-in)
+
+`make cuda-compact ARCH=sm_120` builds `build/explicit-relations-compact`
+with `ER_COMPACT_ROWS`. It retains an exact x/parity key plus the original
+64-bit tuple ID in a 16-byte row, preserving signed points, infinity and the
+minimum matching tuple ID. This is exact point compression on a fixed,
+validated prime-field curve, not a probabilistic hash. Partial-sum caching
+remains disabled in this variant. Admission charges three buffers of the
+actual row size; cold execution includes conversion, sorting and indexing.
+The matched panel and larger-field limits are frozen in
+[`protocol-v6.json`](../../research/explicit_relations_e2e_20261030/protocol-v6.json).
+This opt-in variant still awaits its recorded GPU validation.

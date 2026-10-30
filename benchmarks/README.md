@@ -54,6 +54,15 @@ SVG and PNG are copied there from the [study directory](../research/koblitz_n83_
 It has no matched rho or cold total-runtime row and remains outside the
 admitted table under the validation gate.
 
+The [2026-10-30 RTX PRO 6000 explicit-relation diagnostics](20261030-explicit-relations-gpu/)
+retain normalization and query reports, SVG/PNG copies and their source hashes.
+Each earlier panel contains 120 executions (12 warmups and 108 measured),
+with a separate strict coverage audit. They are L0 observations; the full
+recovery ladder and its failures are linked from the same entry. These
+records remain outside the admitted table: matched rho and independent
+scientific validation have not been supplied. No fastest-tool or certified
+speedup claim follows from these diagnostic copies.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-ic-aimed-gather`](20261029-ic-aimed-gather/) | IC relation collection (`ic price`, rule v3 `k0n53/T01`, `icv1-f2m53-tm56619371-dac20a85`): the aimed subset's coordinates gathered once per unit instead of on every trial (#2448); 42 same-session rounds of main, main and candidate in all six orders, paired native ratios against a 42-round A/A; independent replay and validator report ([`VALIDATION.json`](20261029-ic-aimed-gather/VALIDATION.json)) | collect phase **1.093× [1.068, 1.136]** (main / candidate, 38/42 rounds above 1; 230.3 → 212.5 ms) against an A/A of [0.977, 1.026]: **established**; whole set-up 1.042× [1.020, 1.082] against [0.946, 1.015]: marginal (+0.005, only after the bootstrap correction), not claimed; intervals corrected: the as-run bootstrap drew only odd-numbered rounds, and a first correction drew every resample half odd and half even ([CORRECTION.md](../research/ic_aimed_gather_20261023/aa2_20261029/CORRECTION.md)); counted operations and the recovered logarithm identical; Callgrind 1.023× fewer instructions at n53 (first session); the board's rule v7 row (IC 8.146 vs rho 1.159 S, 7.03×) predates the change and is not re-priced | Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, AVX-512, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 126 runs contended (71 launches refused and retried); local, not Iso Lab (build-vs-build A/A) | [`research/ic_aimed_gather_20261023/aa2_20261029/`](../research/ic_aimed_gather_20261023/aa2_20261029/), [report](../research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf) |

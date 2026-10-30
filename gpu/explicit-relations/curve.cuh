@@ -159,6 +159,34 @@ struct RowLess {
     return c < 0 || (c == 0 && a.id < b.id);
   }
 };
+// Exact point compression on one validated odd-prime curve (SEC 1 section
+// 2.3.3): the two roots y and p-y have opposite parity. Infinity is key zero;
+// finite keys are 2*(x+1)+(y&1). The service requires p<2^62, so keys and the
+// prefix endpoint at x=2^62 fit u64. This is not a fingerprint and must never
+// be used to compare arbitrary off-curve coordinates or different curves.
+RF_HD U point_key(Point p) {
+  return p.inf ? 0 : ((p.x + 1) << 1) | (p.y & 1);
+}
+struct CompactRow {
+  U key, id;
+};
+static_assert(sizeof(CompactRow) == 16, "compact rows must remain 16 bytes");
+struct CompactRowLess {
+  RF_HD bool operator()(const CompactRow &a, const CompactRow &b) const {
+    return a.key < b.key || (a.key == b.key && a.id < b.id);
+  }
+};
+RF_HD U lookup(const CompactRow *rows, U size, Point point) {
+  U key = point_key(point), lo = 0, hi = size;
+  while (lo < hi) {
+    U mid = lo + (hi - lo) / 2;
+    if (rows[mid].key < key)
+      lo = mid + 1;
+    else
+      hi = mid;
+  }
+  return lo < size && rows[lo].key == key ? rows[lo].id : UINT64_MAX;
+}
 struct Bases {
   const Point *points;
   U offset[9];

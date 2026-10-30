@@ -59,7 +59,24 @@ static Point independent_add(Point a, Point b, U p, U ca) {
   U x = (modmul(slope, slope, p) + 2 * p - a.x - b.x) % p;
   return {x, (modmul(slope, (a.x + p - x) % p, p) + p - a.y) % p, false};
 }
+static void validate_caps(U cap, U chunk) {
+  if (!cap || cap > (U(1) << 31) || !chunk || chunk > cap)
+    throw std::runtime_error("row caps must be in 1..2^31, chunk <= cap");
+}
 static void selftest() {
+  validate_caps(1, 1);
+  validate_caps(U(1) << 31, U(1) << 20);
+  validate_caps(U(1) << 31, U(1) << 31);
+  for (auto caps : {std::pair<U, U>{0, 1}, {U(1) << 31 | 1, 1},
+                    {1, 0}, {1, 2}}) {
+    bool rejected = false;
+    try {
+      validate_caps(caps.first, caps.second);
+    } catch (const std::runtime_error &) {
+      rejected = true;
+    }
+    require(rejected, "invalid row/chunk cap accepted");
+  }
   for (U modulus : {97, 211}) {
     U ca = modulus == 97 ? 2 : 0, cb = modulus == 97 ? 3 : 7;
     Curve c = curve(modulus, ca, cb);
@@ -174,8 +191,7 @@ static void serve() {
   U modulus = number(header), a = number(header), b = number(header),
     cap = number(header), chunk = number(header);
   end(header);
-  if (!cap || cap > (U(1) << 30) || !chunk || chunk > cap)
-    throw std::runtime_error("row caps must be in 1..2^30, chunk <= cap");
+  validate_caps(cap, chunk);
   Curve c = curve(modulus, a, b);
   Backend backend(c, cap, chunk);
   Plan p;

@@ -34,6 +34,28 @@ are a conservative allocation bound, not measured peak device usage.
 and the existing full-key comparator informed this conventional indexing
 change. No new algorithmic exponent or external-tool superiority is claimed.
 
+The next separate panel is frozen as `protocol-v5.json`, hash
+`554c7aff798beddcdbeade7b0107575a7c66059fbac6e030bd982a8a4e55b86f`.
+It reuses two contiguous partial sums of right tuples across targets. Each
+partial table must fit `chunk_rows`; otherwise the original query path is
+used. At most2*chunk_rows*sizeof(Point) extra bytes are charged to admission.
+The mixed-radix right id and lowest matching left id are unchanged, including
+infinity and duplicate sums. `ER_QUERY_UNCACHED_REFERENCE` is the ablation.
+This follows conventional reuse of invariant work, with explicit memory
+accounting and full-workload testing, as discussed in
+[NVIDIA's best-practices guide](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html).
+
+V5 compares b/u/x at52bits for both seeds, then runs u on both targets at
+56/58/60bits: at most12executions. The explicit row cap rises to2^30 and
+work cap to2^31 for every arm; chunk remains2^20 and the GPU admission still
+reserves sort space and leaves25%free. Solve caps are180s at52bits,300s at56,
+and600s at58/60; worker4500s/controller4800s. The same complete-rung stopping
+rule applies. The larger caps probe actual GPU admission beyond v4's planning
+cap; they are not used to make cross-run timing comparisons. A/A timing
+controls apply at52bits only, while every larger result still requires both
+public targets, fresh replay and corrupt-scalar rejection. V4 remains pinned
+and unchanged. No new panel runs concurrently with it.
+
 ## Implementation and mathematical checks
 
 The standalone Rust adapter now accepts a nonzero point killed by the
@@ -115,3 +137,81 @@ frozen analyzer includes every attempted execution and draws incomplete
 rows in red. Two fixed targets do not establish a general success rate.
 The reported frontier means all prescribed cells at that rung completed
 under these exact limits; a timeout is not a mathematical impossibility.
+
+## Exact compact-row panel (v6)
+
+Frozen `protocol-v6.json` has hash
+`2ab44ea0799d563bac3c6a8c1f647b9e637cba1b625e4d68da7ab2c2feb9c450`.
+It was designed while v5's larger cases were still running, after both 56-bit
+recoveries and the matched 52-bit cache loss. The cache remains opt-in.
+
+On one validated odd-prime curve, a canonical x coordinate and y parity
+identify a point exactly, as specified by [SEC 1 v2, section 2.3.3](https://www.secg.org/sec1-v2.pdf).
+The internal key is `2*(x+1)+(y&1)`, with zero reserved for infinity.
+Under the service's `p < 2^62` bound, finite keys and index endpoints fit u64.
+A key plus the original tuple ID occupies 16 bytes instead of the full row's
+32 bytes. This representation is valid only for points on the same curve;
+it is neither a fingerprint nor a comparator for arbitrary coordinate pairs.
+Duplicate keys sort by original ID, preserving the existing witness rule.
+
+`ER_COMPACT_ROWS` enables this representation; `make cuda-compact` exposes it
+without changing the ordinary build. Both arms disable the partial-sum cache.
+The existing full-coordinate index is the matched baseline at 52 bits, with
+identical candidate A/A repeats and both seeds. Candidate-only probes cover
+56/58/60 bits, for at most 12 rows. All curve/target rules remain fixed.
+Every success requires fresh complete replay and corrupt-scalar rejection.
+
+Every arm uses max_rows=2^31, max_work=2^32 and chunk_rows=2^20. Admission
+reserves three buffers of the actual row type plus other allocations and
+leaves 25% of free GPU memory unused. Solve limits are 180/300/900/1200 seconds
+for 52/56/58/60 bits; worker 6900 seconds and controller 7200 seconds. These
+are new explicit bounds, not a cross-host speed comparison. Finish the first
+incomplete rung and leave higher rungs unattempted. No task GPU runs in
+parallel: v5 must be archived and deleted before this panel starts.
+
+New differential checks exhaust every valid point on a small curve against
+full-coordinate lookup, with duplicate IDs, both signs, infinity, missing
+keys and empty index buckets. Endpoint arithmetic is checked separately.
+All existing query/reprepare/recovery tests run for full, cached and compact
+variants; full and compact queries each receive memcheck/racecheck/synccheck.
+Host syntax and native instrument metadata checks passed locally. CUDA
+compilation and this panel's device results remain pending until executed.
+
+### V6 failure and v7 pre-data correction
+
+V6 pod `oazm8b2kvq0wvz` passed all three service builds, the Rust/reduction
+checks and full/compact query sanitizers, then aborted on its first solve:
+the service header still enforced max_rows <= 2^30. The frozen contract
+requested 2^31. No ladder row was recorded; the failed attempt, complete
+archive and verified deletion remain in `failed-launch-v6/`.
+
+Frozen v7 hash
+`b34f5721ad1b074e85e556fb2d8c7a92acaf2d42f6dc22bf03c385a7c6b7dd18`
+authorizes a new run after making that explicit service limit consistent.
+The planner and device use checked u64 cardinalities; memory admission and
+sort reserve remain in force, and the cap does not allocate memory itself.
+New tests cover the upper cap, zero, overflow and oversized chunks. The new
+`run-compact-v7.sh` also sends the actual 2^31-cap service header to both
+measured binaries before any ladder data. Inputs, arms, seeds, solver limits,
+ladder and analyzer are unchanged. V6 remains a failed run with zero rows.
+
+## Separate post-run coverage audit
+
+The frozen analyzers verify unique cells and complete observed rungs, but
+could accept a file truncated immediately after a successful earlier rung.
+They remain unchanged. `check-frontier.rs` is a separate post-run audit that
+requires either the entire prescribed plan or an explicit timeout/limit in
+the final recorded rung, with no later execution. It also checks the exact
+per-version cell set, seeds, replicates, flags, numeric fields and outcomes.
+
+The unchanged v3/v4/v5 rows pass. Deliberate duplicate, missing-cell,
+truncated-prefix, seed, replicate, warmup, arm and verification corruptions
+are rejected. The source/input hashes and audit output are retained in
+`frontier-audit-v3-v5.*`. This strengthens validation after collection; it
+neither changes frozen statistics nor resolves the canonical checker's
+rectangular-coverage findings. Run the same audit on v7 after collection:
+
+```sh
+rustc --edition=2021 -D warnings research/explicit_relations_e2e_20261030/check-frontier.rs -o /tmp/check-frontier
+/tmp/check-frontier 7 research/explicit_relations_e2e_20261030/results-v7/rows.csv
+```
