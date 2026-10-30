@@ -656,3 +656,17 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+
+// Keep the CLI's complete external contract suites available to a selected
+// binary test target. Cargo integration-test mode also builds unrelated bins.
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_framework.rs"]
+mod cli_framework_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_progress.rs"]
+mod cli_progress_contract_tests;
+
+#[cfg(all(test, feature = "ic-cli-contracts"))]
+#[path = "../../tests/ic_tensor.rs"]
+mod cli_tensor_contract_tests;
