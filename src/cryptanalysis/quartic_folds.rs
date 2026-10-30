@@ -4055,3 +4055,500 @@ mod e27_tests {
         }
     }
 }
+
+// ── E28 (§9.26): the GLS fold on the single-`τ_T` line ───────────────────
+
+/// A GLS twist on E19's line (§9.26): `σ(x₀) = −x₀`, `c ∈ F_p^*`,
+/// `a = c² − 3x₀²`, `b = −x₀³ − a x₀`; `ψ(x, y) = (−σ(x), i·σ(y))` with
+/// `ψ = [λ]` on `⟨G⟩`, verified on `G`.  The least cofactor `≤ max_cofactor`
+/// met within the budget is kept (family `Translation`, `gls` set).
+pub fn generate_gls_tau_instance(
+    p: u64,
+    seed: u64,
+    max_cofactor: u64,
+) -> Result<FoldInstance4, String> {
+    if p % 4 != 1 || !is_prime_u64(p) {
+        return Err(format!("p = {p} must be a prime ≡ 1 (mod 4)"));
+    }
+    let i_fp = (2..p)
+        .map(|g| pow_mod(g, (p - 1) / 4, p))
+        .find(|&w| mulm(w, w, p) == p - 1)
+        .ok_or("no square root of −1")?;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE28A_7A0F);
+    let mut best: Option<FoldInstance4> = None;
+    for attempt in 0..400u32 {
+        if best.as_ref().is_some_and(|b| b.cofactor == 4) || (attempt >= 200 && best.is_some()) {
+            break;
+        }
+        let probe = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+        let f = &probe.f;
+        let x0 = E4([0, rng.gen_range(0..p), 0, rng.gen_range(0..p)]);
+        if x0.is_zero() {
+            continue;
+        }
+        let c = rng.gen_range(1..p);
+        let x0sq = f.sq(&x0);
+        let a = f.sub(&f.from_fp(c * c % p), &f.scale(&x0sq, 3));
+        let b = f.neg(&f.add(&f.mul(&x0sq, &x0), &f.mul(&a, &x0)));
+        let a3x4 = f.scale(&f.mul(&f.sq(&a), &a), 4);
+        let disc = f.add(&a3x4, &f.scale(&f.sq(&b), 27));
+        if disc.is_zero() {
+            continue;
+        }
+        let j = f.mul(&a3x4, &f.inv(&disc));
+        if j.in_fp() {
+            continue; // a twist of a curve over F_p: excluded.
+        }
+        let curve = Curve4::with_params(p, a, b);
+        let Some(order) = hasse_multiple(&curve, &mut rng) else {
+            continue;
+        };
+        if order % 4 != 0 {
+            return Err(format!(
+                "#E = {order} is not divisible by 4 although E[2] is rational"
+            ));
+        }
+        let Some(&(n, _)) = factor_u64(order).last() else {
+            continue;
+        };
+        let h = order / n;
+        if h > max_cofactor || order % (n * n) == 0 || n <= p * p * p || n % 4 != 1 {
+            continue;
+        }
+        if best.as_ref().is_some_and(|b| b.cofactor <= h) {
+            continue;
+        }
+        let g = loop {
+            let g = curve.mul(&random_point(&curve, &mut rng), h);
+            if !g.inf {
+                break g;
+            }
+        };
+        if !curve.mul(&g, n).inf {
+            return Err("n·G ≠ O: the order is wrong".into());
+        }
+        let mut inst = FoldInstance4 {
+            family: Family4::Translation,
+            p,
+            a,
+            b,
+            group_order: order,
+            n,
+            cofactor: h,
+            g,
+            d: 0,
+            q: Pt4::INF,
+            omega: 0,
+            lambda: 0,
+            x0,
+            c,
+            gls: Some((f.from_fp(p - 1), f.from_fp(i_fp))),
+        };
+        let psi_g = inst.psi_gls(&curve, &g);
+        if !curve.on_curve(&psi_g) {
+            return Err("ψ(G) is not on the curve".into());
+        }
+        let s = sqrt_mod(n - 1, n).ok_or("−1 is not a square modulo n")?;
+        let Some(&lambda) = [s, n - s].iter().find(|&&l| curve.mul(&g, l) == psi_g) else {
+            return Err("neither square root of −1 is ψ's eigenvalue".into());
+        };
+        inst.lambda = lambda;
+        inst.d = rng.gen_range(1..n);
+        inst.q = curve.mul(&g, inst.d);
+        best = Some(inst);
+    }
+    best.ok_or_else(|| format!("no GLS τ_T instance with h ≤ {max_cofactor} at p = {p}"))
+}
+
+/// E28's base on the line `x = x₀ + u`, `u ∈ F_p ∖ {0, ±c, ±ic}`, folded by
+/// `τ_T` (`u ↦ c²/u`, coefficient `1`) and, with `fold_psi`, by `ψ`
+/// (`u ↦ −u`, coefficient `λ`) and `τ_Tψ` (`u ↦ −c²/u`, `λ`).  Every image
+/// is computed on points and must be a base point.  The points are the same
+/// for both folds.
+pub fn gls_tau_base(
+    inst: &FoldInstance4,
+    rng: &mut StdRng,
+    fold_psi: bool,
+) -> Result<FoldedBase4, String> {
+    let curve = inst.curve();
+    let f = &curve.f;
+    let (p, n, c) = (inst.p, inst.n, inst.c);
+    let i_fp = inst.gls.ok_or("not a GLS τ_T instance")?.1 .0[0];
+    let ic = mulm(i_fp, c, p);
+    let mut points = Vec::new();
+    let mut key: Vec<u64> = Vec::new();
+    for u in 1..p {
+        if u == c || u == p - c || u == ic || u == p - ic {
+            continue;
+        }
+        let x = f.add(&inst.x0, &f.from_fp(u));
+        if let Some(pt) = curve.lift_x(&x, rng) {
+            points.push(pt);
+            key.push(u);
+        }
+    }
+    let index: HashMap<u64, usize> = key.iter().enumerate().map(|(i, &k)| (k, i)).collect();
+    let t = Pt4 {
+        x: inst.x0,
+        y: E4::ZERO,
+        inf: false,
+    };
+    let c2 = mulm(c, c, p);
+    let mut col = vec![usize::MAX; points.len()];
+    let mut coef = vec![0u64; points.len()];
+    let mut columns = 0usize;
+    for i in 0..points.len() {
+        if col[i] != usize::MAX {
+            continue;
+        }
+        let rep = points[i];
+        col[i] = columns;
+        coef[i] = 1;
+        let u = key[i];
+        let tu = mulm(c2, inv_mod(u, p), p);
+        let mut images = vec![(tu, curve.add(&rep, &t), 1u64)];
+        if fold_psi {
+            let ps = inst.psi_gls(&curve, &rep);
+            images.push(((p - u) % p, ps, inst.lambda % n));
+            images.push(((p - tu) % p, curve.add(&ps, &t), inst.lambda % n));
+        }
+        for (k2, img, mult) in images {
+            let Some(&j) = index.get(&k2) else {
+                return Err(format!("the orbit of u = {u} leaves the base"));
+            };
+            if points[j].x != img.x {
+                return Err("an image's abscissa is not the derived base point's".into());
+            }
+            let s = if points[j].y == img.y {
+                mult
+            } else if points[j].y == f.neg(&img.y) {
+                (n - mult) % n
+            } else {
+                return Err("an image is neither P nor −P".into());
+            };
+            if col[j] != usize::MAX && (col[j] != columns || coef[j] != s) {
+                return Err("an orbit closes inconsistently".into());
+            }
+            col[j] = columns;
+            coef[j] = s;
+        }
+        columns += 1;
+    }
+    Ok(FoldedBase4 {
+        points_per_column: points.len() as f64 / columns.max(1) as f64,
+        points,
+        col,
+        coef,
+        columns,
+        build_muls: curve.f.muls(),
+    })
+}
+
+/// One E28 Stage 0 row.
+#[derive(Clone, Debug, Serialize)]
+pub struct GlsTauStage0 {
+    pub p: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub bits: f64,
+    pub cofactor: u64,
+    pub j_in_fp2: bool,
+    pub psi_squared_is_minus_one: bool,
+    pub psi_g_is_lambda_g: bool,
+    pub lambda_squared_is_minus_one: bool,
+    pub psi_fixes_t: bool,
+    pub base_points: usize,
+    pub density: f64,
+    pub cols_tau: usize,
+    pub cols_tau_psi: usize,
+    pub points_per_column_tau: f64,
+    pub points_per_column_tau_psi: f64,
+    /// Every image checked on points (the base builds without error).
+    pub line_checks: bool,
+}
+
+pub fn run_gls_tau_stage0(p: u64, seed: u64) -> Result<GlsTauStage0, String> {
+    let inst = generate_gls_tau_instance(p, seed, 16)?;
+    let curve = inst.curve();
+    let f = &curve.f;
+    let n = inst.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE28B_A5E0);
+    let pts: Vec<Pt4> = (0..8).map(|_| random_point(&curve, &mut rng)).collect();
+    let psi2 = pts.iter().all(|pt| {
+        let q = inst.psi_gls(&curve, &inst.psi_gls(&curve, pt));
+        q == curve.neg(pt)
+    });
+    let t = Pt4 {
+        x: inst.x0,
+        y: E4::ZERO,
+        inf: false,
+    };
+    let psi_t = inst.psi_gls(&curve, &t) == t;
+    let psi_g = inst.psi_gls(&curve, &inst.g) == curve.mul(&inst.g, inst.lambda);
+    let lam2 = mulm(inst.lambda, inst.lambda, n) == n - 1;
+    let a3x4 = f.scale(&f.mul(&f.sq(&inst.a), &inst.a), 4);
+    let disc = f.add(&a3x4, &f.scale(&f.sq(&inst.b), 27));
+    let j = f.mul(&a3x4, &f.inv(&disc));
+    let (tau, both) = (
+        gls_tau_base(&inst, &mut StdRng::seed_from_u64(seed), false),
+        gls_tau_base(&inst, &mut StdRng::seed_from_u64(seed), true),
+    );
+    let ok = tau.is_ok() && both.is_ok();
+    let (tau, both) = (
+        tau.unwrap_or_else(|_| empty_base()),
+        both.unwrap_or_else(|_| empty_base()),
+    );
+    Ok(GlsTauStage0 {
+        p,
+        seed,
+        n,
+        bits: (n as f64).log2(),
+        cofactor: inst.cofactor,
+        j_in_fp2: !not_in_fp2(&j),
+        psi_squared_is_minus_one: psi2,
+        psi_g_is_lambda_g: psi_g,
+        lambda_squared_is_minus_one: lam2,
+        psi_fixes_t: psi_t,
+        base_points: tau.points.len(),
+        density: tau.points.len() as f64 / (p - 5) as f64,
+        cols_tau: tau.columns,
+        cols_tau_psi: both.columns,
+        points_per_column_tau: tau.points_per_column,
+        points_per_column_tau_psi: both.points_per_column,
+        line_checks: ok && tau.points.iter().zip(&both.points).all(|(a, b)| a == b),
+    })
+}
+
+fn empty_base() -> FoldedBase4 {
+    FoldedBase4 {
+        points: Vec::new(),
+        col: Vec::new(),
+        coef: Vec::new(),
+        columns: 0,
+        points_per_column: 0.0,
+        build_muls: 0,
+    }
+}
+
+/// One weighted `D₄` solve of the solve-cost control (§9.26, G2.102).
+#[derive(Clone, Debug, Serialize)]
+pub struct D4ControlCall {
+    pub solved: bool,
+    pub outcome: String,
+    pub degree: u16,
+    /// Weil restriction plus solve, `F_p` multiplications (E19's `C`).
+    pub call_muls: u64,
+    pub decompositions: usize,
+    pub mitm_decompositions: usize,
+    /// The solve's verified decomposition set equals the oracle's.
+    pub agrees: bool,
+    pub ms: f64,
+}
+
+/// E28 Stage A: one curve, both folds on one stream (E18's protocol).
+#[derive(Clone, Debug, Serialize)]
+pub struct GlsTauStageA {
+    pub p: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub bits: f64,
+    pub cofactor: u64,
+    pub base_points: usize,
+    pub residuals: u64,
+    pub decompositions: u64,
+    pub targets_decomposed: u64,
+    pub decompositions_per_target: [u64; 10],
+    /// `F_p` multiplications per target generated (`aG + bQ`).
+    pub generation_muls_per_target: f64,
+    pub tau: ArmReport,
+    pub tau_psi: ArmReport,
+    pub control_calls: Vec<D4ControlCall>,
+    /// Walks priced by E25's arithmetic (serial) and by E27's (batched).
+    pub rho_schoolbook: Vec<RhoRun4F>,
+    pub rho_e27: Vec<RhoRun4F>,
+    pub wall_ms: f64,
+}
+
+/// A decomposition as a sorted multiset of signed base indices, so that
+/// the solve and the oracle can be compared.
+fn dec_key(terms: &[(usize, i64)]) -> Vec<(usize, i64)> {
+    let mut v = terms.to_vec();
+    v.sort_unstable();
+    v
+}
+
+pub fn run_gls_tau_stage_a(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    control_targets: usize,
+    max_residuals: u64,
+) -> Result<GlsTauStageA, String> {
+    let start = Instant::now();
+    let inst = generate_gls_tau_instance(p, seed, 16)?;
+    let curve = inst.curve();
+    let n = inst.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE28A_57A6);
+    let fb_tau = gls_tau_base(&inst, &mut StdRng::seed_from_u64(seed), false)?;
+    let fb_psi = gls_tau_base(&inst, &mut StdRng::seed_from_u64(seed), true)?;
+    assert_eq!(fb_tau.points, fb_psi.points);
+    let base = &fb_tau.points;
+    let table = pair_table(&curve, base);
+    let mut tau = Arm::new("tau", fb_tau.columns);
+    let mut tau_psi = Arm::new("tau-psi", fb_psi.columns);
+    let (mut residuals, mut decompositions, mut targets_decomposed) = (0u64, 0u64, 0u64);
+    let mut per_target = [0u64; 10];
+    let mut gen_muls = 0u64;
+    let fold_row = |fb: &FoldedBase4, terms: &[(usize, i64)], a: u64, b: u64, small: usize| {
+        let mut merged: HashMap<usize, u64> = HashMap::new();
+        for &(i, s) in terms {
+            let v = if s == 1 {
+                fb.coef[i]
+            } else {
+                (n - fb.coef[i]) % n
+            };
+            let e = merged.entry(fb.col[i]).or_insert(0);
+            *e = (*e + v) % n;
+        }
+        let mut cols: Vec<(usize, u64)> = merged.into_iter().filter(|&(_, v)| v != 0).collect();
+        cols.push((small, (n - b) % n));
+        cols.sort_unstable();
+        SparseRel { cols, rhs: a }
+    };
+    while residuals < max_residuals && !(tau.rep.solved && tau_psi.rep.solved) {
+        let batch: Vec<(u64, u64)> = (0..64)
+            .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+            .collect();
+        let found: Vec<(u64, u64, u64, Vec<Vec<(usize, i64)>>)> = batch
+            .par_iter()
+            .map(|&(a, b)| {
+                let c = inst.curve();
+                let r = c.add(&c.mul(&inst.g, a), &c.mul(&inst.q, b));
+                let gm = c.f.muls();
+                let decs = mitm_signed(&c, base, &table, &r);
+                let decs: Vec<Vec<(usize, i64)>> = decs
+                    .into_iter()
+                    .filter(|terms| {
+                        let mut acc = r;
+                        for &(i, s) in terms {
+                            acc = if s == 1 {
+                                c.sub(&acc, &base[i])
+                            } else {
+                                c.add(&acc, &base[i])
+                            };
+                        }
+                        acc.inf
+                    })
+                    .collect();
+                (a, b, gm, decs)
+            })
+            .collect();
+        for (a, b, gm, mut good) in found {
+            residuals += 1;
+            gen_muls += gm;
+            decompositions += good.len() as u64;
+            per_target[good.len().min(9)] += 1;
+            if !good.is_empty() {
+                targets_decomposed += 1;
+                let terms = good.swap_remove(rng.gen_range(0..good.len()));
+                if !tau.rep.solved {
+                    tau.push(fold_row(&fb_tau, &terms, a, b, tau.small));
+                }
+                if !tau_psi.rep.solved {
+                    tau_psi.push(fold_row(&fb_psi, &terms, a, b, tau_psi.small));
+                }
+            }
+            tau.attempt(&inst, &curve, &mut rng, residuals);
+            tau_psi.attempt(&inst, &curve, &mut rng, residuals);
+        }
+    }
+    if !(tau.rep.solved && tau_psi.rep.solved) {
+        return Err(format!(
+            "p = {p} seed {seed}: no solve within {max_residuals} residuals"
+        ));
+    }
+    // The solve-cost control: E19's weighted D₄ solve, unchanged.
+    let d4 = D4Instance {
+        curve: inst.curve(),
+        x0: inst.x0,
+        c: inst.c,
+    };
+    let mut crng = StdRng::seed_from_u64(seed ^ 0xE28C_0571);
+    let pre = SymmetrisedD4::precompute(&d4, &mut crng, 8)?;
+    let mut by_y: HashMap<u64, usize> = HashMap::new();
+    for (i, pt) in base.iter().enumerate() {
+        let y = d4.y_of_x(&pt.x);
+        if !y.in_fp() {
+            return Err("a base point's Y is not in F_p".into());
+        }
+        by_y.insert(y.0[0], i);
+    }
+    let control_calls: Vec<D4ControlCall> = (0..control_targets as u64)
+        .map(|k| {
+            let (a, b) = (crng.gen_range(0..n), crng.gen_range(1..n));
+            let r = curve.add(&curve.mul(&inst.g, a), &curve.mul(&inst.q, b));
+            let out = d4_decompose(&inst, &pre, base, &by_y, &r, seed * 7919 + k);
+            let oracle: std::collections::BTreeSet<Vec<(usize, i64)>> =
+                mitm_signed(&curve, base, &table, &r)
+                    .iter()
+                    .filter(|terms| {
+                        let mut acc = r;
+                        for &(i, s) in terms.iter() {
+                            acc = if s == 1 {
+                                curve.sub(&acc, &base[i])
+                            } else {
+                                curve.add(&acc, &base[i])
+                            };
+                        }
+                        acc.inf
+                    })
+                    .map(|t| dec_key(t))
+                    .collect();
+            let solve: std::collections::BTreeSet<Vec<(usize, i64)>> =
+                out.decs.iter().map(|t| dec_key(t)).collect();
+            D4ControlCall {
+                solved: out.solved,
+                outcome: out.outcome.clone(),
+                degree: out.degree,
+                call_muls: out.call_muls,
+                decompositions: solve.len(),
+                mitm_decompositions: oracle.len(),
+                agrees: !out.solved || solve == oracle,
+                ms: out.ms,
+            }
+        })
+        .collect();
+    let seeds: Vec<u64> = (0..rho_runs as u64).map(|k| seed * 1000 + k).collect();
+    let mut rho_schoolbook = Vec::new();
+    let mut rho_e27 = Vec::new();
+    for fold in [RhoFold::Gls, RhoFold::Negation] {
+        rho_schoolbook.extend(
+            seeds
+                .par_iter()
+                .map(|&s| rho4_folded_with(&inst, fold, s, false))
+                .collect::<Vec<_>>(),
+        );
+        rho_e27.extend(
+            rho4_folded_batched(&inst, fold, &seeds, 16, seed * 1_000_000 + 500_000, true).0,
+        );
+    }
+    Ok(GlsTauStageA {
+        p,
+        seed,
+        n,
+        bits: (n as f64).log2(),
+        cofactor: inst.cofactor,
+        base_points: base.len(),
+        residuals,
+        decompositions,
+        targets_decomposed,
+        decompositions_per_target: per_target,
+        generation_muls_per_target: gen_muls as f64 / residuals.max(1) as f64,
+        tau: tau.rep,
+        tau_psi: tau_psi.rep,
+        control_calls,
+        rho_schoolbook,
+        rho_e27,
+        wall_ms: start.elapsed().as_secs_f64() * 1e3,
+    })
+}
