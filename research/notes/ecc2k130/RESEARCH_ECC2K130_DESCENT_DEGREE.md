@@ -606,6 +606,50 @@ closure degree.
     falls.
   - The orbit-aware split rule (`RESEARCH_EXOTIC_COORDINATES.md` §18).
 
+## Invariant guess at ℓ = 8 (2026-10-29): never worse than a raw guess, not reliably enough
+
+`research/dreg_invariant_guess_20261029/` (pre-registered; `RESULTS.md`,
+`results.pdf`) compares two three-guess sets on the committed (22, 8) draws.
+
+- **The arms.**
+  - The invariant arm fixes `a₇ + b₇`, a coordinate of `s = x₁ + x₂`, which
+    the first link sees in place of the two summands.
+  - The raw arm fixes `a₇`.
+  - Both also fix `c₇` and one intermediate coordinate, so they differ only
+    in the guess that touches the first link.
+- **Result.** The invariant arm refutes at degree 4 on every branch of draws
+  5 and 6; the raw arm does so on draw 6 only.
+  - The registered verdict is mixed (invariant split 2/4, raw fails 1/4).
+  - Paired by draw, the invariant guess is never worse.
+- **Comparison.** The committed raw set `{7, 15, 23}`, which spends two
+  guesses on the pair, suffices on 1 of 4.
+- **What it weakens.** The summand-dimension reading (§12), since the
+  invariant arm leaves both summands at dimension 8.
+- **What it is not.** No row moves: the extrapolated guess count at
+  ℓ = 33 stays far above the break-even of 6.
+- **Disclosure.** The soundness rule was replaced after the data, because the
+  satisfiable branches holding solutions ran out of memory (Amendment 1).
+
+## Invariant guess, eight more draws (2026-10-29): the invariant guess is better (p = 0.031)
+
+`research/dreg_invariant_guess_more_20261029/` (pre-registered on fresh draws
+7–39 of the same seeded sequence; `RESULTS.md`, `results.pdf`).
+
+- **Result.** On the 8 registered unsatisfiable draws, guessing `a₇ + b₇`
+  suffices on 5 and guessing `a₇` on 0.
+  - All 5 discordant draws favour the invariant (one-sided exact sign test
+    p = 0.031).
+  - With the four earlier draws: 6 of 6, p = 0.016, and 7 of 12 draws
+    against 1 of 12.
+- **What it contradicts.** The summand-dimension reading of §12 does not hold
+  at this cell: what governs refutation is the coordinate of `s`, not the
+  dimension of the summands.
+- **What it is.** A measured stage-level improvement in the guess-then-degree-4
+  oracle's guess choice.
+- **What it is not.** No row moves: the guess count at ℓ = 33 is still
+  extrapolated far above the break-even of 6.
+- **Next.** Two invariant guesses on the pair, ℓ = 9, and m = 4.
+
 ## Reproducing
 
 ```sh
