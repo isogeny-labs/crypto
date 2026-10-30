@@ -330,6 +330,105 @@ impl Write for LimitedBytes {
     }
 }
 
+/// Closed kinds for typed solver events. Payload commits remain emitter-owned.
+#[derive(Clone, Copy, Debug, Serialize)]
+pub enum TypedEventKind {
+    #[serde(rename = "wide_prime_dynamic")]
+    WidePrimeDynamic,
+}
+
+/// Reusable requested storage; the caller must debit its own ledger once.
+/// The supplied admission is checked here, not authenticated against that ledger.
+pub struct TypedEventBuffer {
+    bytes: Vec<u8>,
+    limit: usize,
+}
+impl TypedEventBuffer {
+    pub fn requested_bytes(event_cap: u64) -> Result<u64, CaptureError> {
+        if !(512..=MAX_EVENT).contains(&event_cap) {
+            return Err(CaptureError::LimitReached(CaptureStop::EventLimit));
+        }
+        event_cap
+            .checked_add(128)
+            .ok_or_else(|| CaptureError::Integrity("typed capture storage overflow".into()))
+    }
+
+    pub fn try_new(event_cap: u64, admitted_requested_bytes: u64) -> Result<Self, CaptureError> {
+        let requested = Self::requested_bytes(event_cap)?;
+        if requested > admitted_requested_bytes {
+            return Err(CaptureError::LimitReached(CaptureStop::LocalByteLimit));
+        }
+        let limit = usize::try_from(event_cap)
+            .map_err(|_| CaptureError::LimitReached(CaptureStop::EventLimit))?;
+        let mut bytes = Vec::new();
+        bytes
+            .try_reserve_exact(limit)
+            .map_err(|_| CaptureError::Io("typed capture buffer allocation failed".into()))?;
+        Ok(Self { bytes, limit })
+    }
+}
+
+struct CountedEventBytes {
+    len: usize,
+    limit: usize,
+}
+impl Write for CountedEventBytes {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        let next = self
+            .len
+            .checked_add(bytes.len())
+            .filter(|&n| n <= self.limit)
+            .ok_or_else(|| io::Error::other("typed event byte limit"))?;
+        self.len = next;
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+struct AdmittedEventBytes<'a> {
+    bytes: &'a mut Vec<u8>,
+    limit: usize,
+}
+impl Write for AdmittedEventBytes<'_> {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        let next = self
+            .bytes
+            .len()
+            .checked_add(bytes.len())
+            .filter(|&n| n <= self.limit && n <= self.bytes.capacity())
+            .ok_or_else(|| io::Error::other("typed event byte limit"))?;
+        self.bytes.extend_from_slice(bytes);
+        debug_assert_eq!(self.bytes.len(), next);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn typed_encoding_error(error: serde_json::Error) -> CaptureError {
+    if error.is_io() {
+        CaptureError::LimitReached(CaptureStop::EventLimit)
+    } else {
+        CaptureError::Integrity("typed event serialization failed".into())
+    }
+}
+
+#[derive(Serialize)]
+struct TypedSolverEvent<'a, T: Serialize + ?Sized> {
+    kind: TypedEventKind,
+    payload: &'a T,
+}
+#[derive(Serialize)]
+struct TypedEventRecord<'a, T: Serialize + ?Sized> {
+    schema: &'a str,
+    binding_sha256: &'a str,
+    sequence: u64,
+    previous_event_sha256: &'a str,
+    event: TypedSolverEvent<'a, T>,
+}
+
 pub struct CaptureEmitter {
     directory: PathBuf,
     events: File,
@@ -518,6 +617,60 @@ impl CaptureEmitter {
             return Err(self.reject(e));
         }
         self.commit_event(&bytes, self.head.payload_count, self.head.payload_bytes)
+    }
+
+    /// Capture owns the top-level kind: caller serialization is nested, never flattened.
+    /// Both passes are bounded; custom Serialize implementations remain trusted code.
+    pub fn event_typed<T: Serialize + ?Sized>(
+        &mut self,
+        kind: TypedEventKind,
+        payload: &T,
+        buffer: &mut TypedEventBuffer,
+    ) -> Result<(), CaptureError> {
+        self.ready()?;
+        buffer.bytes.clear();
+        let result = (|| {
+            let limit = buffer.limit.min(self.limits.max_event_bytes as usize);
+            let record = TypedEventRecord {
+                schema: EVENT_SCHEMA,
+                binding_sha256: &self.head.binding_sha256,
+                sequence: self
+                    .head
+                    .event_count
+                    .checked_add(1)
+                    .ok_or_else(|| CaptureError::Integrity("event sequence overflow".into()))?,
+                previous_event_sha256: &self.head.last_event_sha256,
+                event: TypedSolverEvent { kind, payload },
+            };
+            let mut counted = CountedEventBytes {
+                len: 0,
+                limit: limit - 1,
+            };
+            serde_json::to_writer(&mut counted, &record).map_err(typed_encoding_error)?;
+            let expected = counted.len + 1;
+            self.check_reservation(expected, self.head.payload_count, self.head.payload_bytes)?;
+            let mut writer = AdmittedEventBytes {
+                bytes: &mut buffer.bytes,
+                limit: limit - 1,
+            };
+            serde_json::to_writer(&mut writer, &record).map_err(typed_encoding_error)?;
+            if writer.bytes.len() != counted.len {
+                return Err(CaptureError::Integrity(
+                    "typed event changed length between passes".into(),
+                ));
+            }
+            // Capacity and logical cap include the newline admitted above.
+            writer.bytes.push(b'\n');
+            Ok(())
+        })();
+        if let Err(error) = result {
+            return Err(self.reject(error));
+        }
+        self.commit_event(
+            &buffer.bytes,
+            self.head.payload_count,
+            self.head.payload_bytes,
+        )
     }
 
     pub fn payload(&mut self, payload: &ArtifactPayload) -> Result<(), CaptureError> {
@@ -1126,6 +1279,280 @@ mod tests {
             max_chunks: 128,
             metadata_reserve_bytes: 4096,
         }
+    }
+
+    fn typed_buffer(cap: u64) -> TypedEventBuffer {
+        TypedEventBuffer::try_new(cap, TypedEventBuffer::requested_bytes(cap).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn typed_capture_requested_storage_and_logical_caps() {
+        assert!(TypedEventBuffer::requested_bytes(511).is_err());
+        assert!(TypedEventBuffer::requested_bytes(MAX_EVENT + 1).is_err());
+        assert!(TypedEventBuffer::requested_bytes(u64::MAX).is_err());
+        assert!(TypedEventBuffer::try_new(512, 639).is_err());
+        let mut buffer = TypedEventBuffer::try_new(512, 640).unwrap();
+        assert_eq!(buffer.limit, 512);
+        let mut writer = AdmittedEventBytes {
+            bytes: &mut buffer.bytes,
+            limit: 3,
+        };
+        writer.write_all(b"abc").unwrap();
+        assert!(writer.write_all(b"d").is_err());
+        assert_eq!(writer.bytes.as_slice(), b"abc");
+    }
+
+    #[test]
+    fn typed_capture_matches_legacy_bytes_hash_chain_and_reuses_buffer() {
+        #[derive(Serialize)]
+        struct Payload {
+            a: u64,
+            z: bool,
+        }
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let mut buffer = typed_buffer(1024);
+        let pointer = buffer.bytes.as_ptr();
+        let capacity = buffer.bytes.capacity();
+        let mut expected_stream = Vec::new();
+        for a in [7, 11] {
+            let expected = emitter
+                .encode_event(&json!({
+                    "kind":"wide_prime_dynamic", "payload":{"a":a,"z":true}
+                }))
+                .unwrap();
+            emitter
+                .event_typed(
+                    TypedEventKind::WidePrimeDynamic,
+                    &Payload { a, z: true },
+                    &mut buffer,
+                )
+                .unwrap();
+            assert_eq!(buffer.bytes, expected);
+            assert_eq!(
+                emitter.head.last_event_sha256,
+                super::super::digest(&expected)
+            );
+            assert_eq!(buffer.bytes.as_ptr(), pointer);
+            assert_eq!(buffer.bytes.capacity(), capacity);
+            expected_stream.extend_from_slice(&expected);
+        }
+        assert_eq!(
+            fs::read(f.live().join("events.jsonl")).unwrap(),
+            expected_stream
+        );
+        assert_eq!(emitter.head.event_count, 2);
+    }
+
+    #[test]
+    fn typed_capture_event_limit_includes_newline_and_rejection_is_sticky() {
+        let probe = Fixture::new();
+        let emitter = probe.emitter();
+        let payload = "x".repeat(300);
+        let length = emitter
+            .encode_event(&json!({
+                "kind":"wide_prime_dynamic", "payload":payload
+            }))
+            .unwrap()
+            .len() as u64;
+        assert!((512..=1024).contains(&length));
+        for cap in [length, length - 1] {
+            let f = Fixture::new();
+            let mut limits = limits();
+            limits.max_event_bytes = cap;
+            let mut emitter = CaptureEmitter::create(&f.live(), binding(), limits).unwrap();
+            let mut buffer = typed_buffer(1024);
+            let result =
+                emitter.event_typed(TypedEventKind::WidePrimeDynamic, &payload, &mut buffer);
+            if cap == length {
+                result.unwrap();
+                assert_eq!(buffer.bytes.len() as u64, length);
+            } else {
+                assert!(matches!(
+                    result,
+                    Err(CaptureError::LimitReached(CaptureStop::EventLimit))
+                ));
+                assert_eq!(emitter.head.event_count, 0);
+                assert!(emitter
+                    .event_typed(TypedEventKind::WidePrimeDynamic, &0, &mut buffer)
+                    .is_err());
+                assert!(fs::read(f.live().join("events.jsonl")).unwrap().is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn typed_capture_aggregate_exact_and_one_less_and_count_limit() {
+        let probe = Fixture::new();
+        let emitter = probe.emitter();
+        let payload = "x".repeat(300);
+        let length = emitter
+            .encode_event(&json!({
+                "kind":"wide_prime_dynamic", "payload":payload
+            }))
+            .unwrap()
+            .len() as u64;
+        for cap in [2 * length, 2 * length - 1] {
+            let f = Fixture::new();
+            let mut limits = limits();
+            limits.max_stream_bytes = cap;
+            let mut emitter = CaptureEmitter::create(&f.live(), binding(), limits).unwrap();
+            let mut buffer = typed_buffer(1024);
+            emitter
+                .event_typed(TypedEventKind::WidePrimeDynamic, &payload, &mut buffer)
+                .unwrap();
+            let result =
+                emitter.event_typed(TypedEventKind::WidePrimeDynamic, &payload, &mut buffer);
+            if cap == 2 * length {
+                result.unwrap();
+                assert_eq!(emitter.head.byte_end, cap);
+            } else {
+                assert!(matches!(
+                    result,
+                    Err(CaptureError::LimitReached(CaptureStop::StreamByteLimit))
+                ));
+                assert_eq!(emitter.head.event_count, 1);
+                assert!(buffer.bytes.is_empty()); // rejected after counting, before writing
+            }
+        }
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.head.event_count = MAX_ITEMS;
+        assert!(matches!(
+            emitter.event_typed(
+                TypedEventKind::WidePrimeDynamic,
+                &0,
+                &mut typed_buffer(1024)
+            ),
+            Err(CaptureError::LimitReached(CaptureStop::EventLimit))
+        ));
+    }
+
+    #[test]
+    fn typed_capture_nested_reserved_kind_cannot_forge_payload_commit() {
+        #[derive(Serialize)]
+        struct FakePayload<'a> {
+            kind: &'a str,
+        }
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let mut buffer = typed_buffer(1024);
+        emitter
+            .event_typed(
+                TypedEventKind::WidePrimeDynamic,
+                &FakePayload { kind: PAYLOAD_KIND },
+                &mut buffer,
+            )
+            .unwrap();
+        let record: Value = serde_json::from_slice(&buffer.bytes).unwrap();
+        assert_eq!(record["event"]["kind"], "wide_prime_dynamic");
+        assert_eq!(record["event"]["payload"]["kind"], PAYLOAD_KIND);
+        assert_eq!(emitter.head.payload_count, 0);
+        assert!(emitter.payloads.is_empty());
+        assert!(emitter.event(&json!({"kind":PAYLOAD_KIND})).is_err());
+    }
+
+    #[test]
+    fn typed_capture_changed_serializer_length_and_error_do_not_commit() {
+        struct Changes(std::cell::Cell<bool>);
+        impl Serialize for Changes {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                serializer.serialize_str(if self.0.replace(true) { "changed" } else { "x" })
+            }
+        }
+        struct Fails;
+        impl Serialize for Fails {
+            fn serialize<S: serde::Serializer>(&self, _: S) -> Result<S::Ok, S::Error> {
+                Err(serde::ser::Error::custom(
+                    "controlled serialization failure",
+                ))
+            }
+        }
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let mut buffer = typed_buffer(1024);
+        assert!(matches!(
+            emitter.event_typed(
+                TypedEventKind::WidePrimeDynamic,
+                &Changes(std::cell::Cell::new(false)),
+                &mut buffer
+            ),
+            Err(CaptureError::Integrity(_))
+        ));
+        assert_eq!(emitter.head.event_count, 0);
+        assert!(emitter
+            .event_typed(TypedEventKind::WidePrimeDynamic, &0, &mut buffer)
+            .is_err());
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        assert!(emitter
+            .event_typed(TypedEventKind::WidePrimeDynamic, &Fails, &mut buffer)
+            .is_err());
+        assert!(emitter.failed);
+        assert!(fs::read(f.live().join("events.jsonl")).unwrap().is_empty());
+    }
+
+    #[test]
+    fn typed_capture_second_pass_still_enforces_cap_and_head_failure_is_sticky() {
+        struct Grows(std::cell::Cell<bool>);
+        impl Serialize for Grows {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                let large = [b'x'; 1024];
+                serializer.serialize_str(if self.0.replace(true) {
+                    std::str::from_utf8(&large).unwrap()
+                } else {
+                    "x"
+                })
+            }
+        }
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let mut buffer = typed_buffer(512);
+        assert!(matches!(
+            emitter.event_typed(
+                TypedEventKind::WidePrimeDynamic,
+                &Grows(std::cell::Cell::new(false)),
+                &mut buffer
+            ),
+            Err(CaptureError::LimitReached(CaptureStop::EventLimit))
+        ));
+        assert!(buffer.bytes.len() < 512);
+        assert_eq!(emitter.head.event_count, 0);
+        assert!(emitter.failed);
+
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let old_head = emitter.head.last_event_sha256.clone();
+        fs::remove_file(f.live().join("committed.json")).unwrap();
+        fs::create_dir(f.live().join("committed.json")).unwrap();
+        assert!(emitter
+            .event_typed(TypedEventKind::WidePrimeDynamic, &0, &mut buffer)
+            .is_err());
+        assert!(!fs::read(f.live().join("events.jsonl")).unwrap().is_empty());
+        assert_eq!(emitter.head.event_count, 0);
+        assert_eq!(emitter.head.last_event_sha256, old_head);
+        assert!(emitter.failed);
+        assert!(emitter
+            .event_typed(TypedEventKind::WidePrimeDynamic, &0, &mut buffer)
+            .is_err());
+    }
+
+    #[test]
+    fn typed_capture_actual_write_failure_is_sticky() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        emitter.events = File::open(f.live().join("events.jsonl")).unwrap();
+        let mut buffer = typed_buffer(1024);
+        assert!(matches!(
+            emitter.event_typed(TypedEventKind::WidePrimeDynamic, &3, &mut buffer),
+            Err(CaptureError::Io(_))
+        ));
+        assert_eq!(emitter.head.event_count, 0);
+        assert!(emitter.failed);
+        assert!(emitter
+            .event_typed(TypedEventKind::WidePrimeDynamic, &4, &mut buffer)
+            .is_err());
+        assert!(emitter.finish().is_err());
     }
 
     #[test]
