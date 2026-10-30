@@ -102,3 +102,18 @@ region differs. A presigned link opens the private object for its lifetime
 - The `_manifests/<commit>.json` object is the authority for what a merge
   uploaded: path, SHA-256, size and S3 URI. Verify a downloaded file against
   the manifest's SHA-256 before treating it as evidence.
+
+## Runner prerequisites and stored inputs
+
+The job checks out `.artifacts/config.json` with the artifact tool, installs
+its pinned AWS CLI, and configures the selected role or key identity before
+hydrating stored report inputs. It uses that same configured identity for
+hydration and uploads; empty per-step access-key variables must not replace
+an assumed role. A selected identity must also be able to read any report
+objects needed from the existing artifact store. The workflow changes no
+identity, bucket policy, trust policy or grant. Failed hydration remains a
+failure; it is never treated as an uploaded report.
+
+Hydration receives the same NUL-delimited file selection as the uploader,
+including its existing manual-run fallback. It does not download unrelated
+research archives. An empty selection does not invoke an unfiltered pull.

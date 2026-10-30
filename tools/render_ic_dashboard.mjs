@@ -286,7 +286,12 @@ const rhoGraph = `<div class="rho-plot" data-measurement-chart role="group" aria
 let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
-const threeLeads = section(oldFront, 'three-leads-e2e');
+// Recover the exact historical panel from its canonical committed source,
+// rather than depending on a previous render retaining it. These bytes come
+// from 0a0cb3e8f9:docs/index-calculus-scoreboard.html without recomputation.
+const threeLeadsRaw = readFileSync(resolve(ROOT, 'docs/ic/three-leads-e2e-panel.html'));
+assert.equal(sha(threeLeadsRaw), '23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084', 'Historical three-leads panel changed; review its original evidence before changing the pin');
+const threeLeads = threeLeadsRaw.toString('utf8');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 // GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
 // summaries only (no arithmetic beyond formatting).
