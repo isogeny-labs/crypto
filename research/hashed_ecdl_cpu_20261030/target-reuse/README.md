@@ -55,7 +55,9 @@ development validation, not performance data.
 
 - Completed: isolated and implemented duplicate target elimination; tested the
   exact patch and checked byte-identical independent verification; published
-  the reviewable artifact on CPU PR #2946.
+  the reviewable artifact on follow-up PR #2963. PR #2946 merged into the
+  parent feature branch while this artifact was being published; its merged
+  source excludes this patch.
 - Decision: retain full independent replay and prepare this as a separate
   candidate so any later measurement can isolate its effect.
 - Remaining: reconcile shared-source ownership, apply against current source,
