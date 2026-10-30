@@ -1,0 +1,88 @@
+{
+  "schema": "n83.proof-bridge-technical-status/v1",
+  "producer_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf",
+  "review_main_revision": "cc5addeba4dd53edc51f2c0ad9331b3ba0307adc",
+  "archival_task": "T-995",
+  "official_scientific_transition": false,
+  "scope": {
+    "family": "prime",
+    "n": 83,
+    "selector_width": 27,
+    "m": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "system": "Exact selector and Semaev chain from blind-statement.md; unrestricted intermediate variables",
+    "field_modulus": "4835703278761981908090881",
+    "weights": "nonzero weights as normalized in assigned template; original and spike40 in blind derivation"
+  },
+  "claims": {
+    "graded": {
+      "mathematical_review": "holds under stated field and template assumptions",
+      "first_non_koszul_syzygy_degree": 17,
+      "joint_reviewer": "TASK-N83-GRADED",
+      "blind_rederived": true
+    },
+    "filtered": {
+      "mathematical_review": "holds conditional on graded hypothesis, supplied by graded review for matching template",
+      "first_strict_fall_degree": 17,
+      "last_fall_degree_lower_bound": 17,
+      "last_fall_degree_upper_bound": null,
+      "exact_last_fall_degree": null,
+      "joint_reviewer": "TASK-N83-FILTERED"
+    },
+    "centered_construction": {
+      "status": "new symbolic derivation from independent blind reviewer",
+      "reviewer": "TASK-N83-BLIND",
+      "strict_fall_degree": 17,
+      "target_exclusions": [],
+      "remainder_degree_generic": 16,
+      "remainder_degree_at_half_weight_sum": 15,
+      "next_check": "Implement independent native centered projection and target controls; obtain adversarial review of the new construction"
+    },
+    "degree_of_regularity": {
+      "first_zero_hilbert_component": "no finite cutoff for stated m3-9 highest-form ideal",
+      "quotient_dimension": "ceil((m-2)/2)",
+      "castelnuovo_mumford_regularity": null,
+      "solving_degree": null
+    },
+    "machine": {
+      "eight_arithmetic_declarations": "verified by fresh Lean and axiom audit",
+      "full_polynomial_theorem": "not_verified",
+      "missing_formalization": [
+        "squarefree primitive/string decomposition",
+        "Koszul transport and selector-square lifting",
+        "bounded representation descent and V_d closure",
+        "centered alternating projection"
+      ]
+    },
+    "source_binding": {
+      "independent_native_cases": [
+        "original-prime-m3-natural"
+      ],
+      "independent_native_case_count": 1,
+      "producer_panel_cases": 42,
+      "producer_panel_record_changes": 0,
+      "rational_point_lookup_ideal_verified": false
+    }
+  },
+  "independence": {
+    "checker_pass": true,
+    "reviewer_count": 3,
+    "scope": "Checks attestations and declared source boundaries, not authenticated operating-system isolation"
+  },
+  "deviations": [
+    "Initial filtered handoff lacked raw inputs/imports; separately committed supplement supplied one case.",
+    "Initial filtered handoff omitted native-language rule. Python attempt and failure retained; accepted arithmetic replay is independently implemented Rust."
+  ],
+  "next_actions": [
+    "Native centered witness and alternating-projection development controls, including centered target.",
+    "Continue last-fall upper-bound/stabilization work separately from first-fall onset.",
+    "Preserve binary/Koblitz and full m2-9 fixed-base scope; no transfer of prime-specific theorem."
+  ]
+}

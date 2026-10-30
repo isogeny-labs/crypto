@@ -1,0 +1,38 @@
+Historical workflow deviation: Python was used before the parent supplied the repository native-language rule. This is not the accepted arithmetic replay.
+First attempt: AttributeError: 'int' object has no attribute 'bit_count'. Replaced bit_count with bin(mask).count('1').
+Second attempt, exit 0:
+{
+  "status": "PASS",
+  "case": "original-prime-m3-natural",
+  "supplement_files_hash_checked": 17,
+  "field_modulus": "4835703278761981908090881",
+  "lucas_n_minus_1_factors": {
+    "2": 42,
+    "5": 1,
+    "677": 1,
+    "13999": 1,
+    "23203": 1
+  },
+  "lucas_witness": 3,
+  "source_sha256": "2f5f832a9c499a53b3120ecd37e2e1ea8bedbff9cddab71991f6cd970ad2b44e",
+  "A_terms": [
+    8192,
+    16384,
+    69632
+  ],
+  "A_degrees": [
+    13,
+    14,
+    14
+  ],
+  "coefficient_terms": 69632,
+  "coefficient_degree": 14,
+  "coefficient_sha256": "507e92a314292d6320e25ef6d63463898f8edd9716d9b29f89dbf0b23d93aa9a",
+  "g_terms": 208896,
+  "g_degree": 16,
+  "delta": "2258563150756227702862489",
+  "pairing": "4087116827087420414291699",
+  "provided_point_and_target_curve_lifts_checked": 4,
+  "full_other_41_case_replay": false
+}
+
