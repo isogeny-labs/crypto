@@ -354,6 +354,7 @@ impl FactorBaseBuilder<PrimeCurve> for HashedAffineBase<'_> {
 }
 
 /// The exact Boolean tensor-contraction oracle over the same slot bases.
+#[derive(Default)]
 pub struct HashedTensorOracle {
     curve: Option<TensorCurve>,
     bases: Vec<TensorBase>,
@@ -365,23 +366,6 @@ pub struct HashedTensorOracle {
     relation_steps: u64,
     limit_hits: u64,
     integrity_failures: u64,
-}
-
-impl Default for HashedTensorOracle {
-    fn default() -> Self {
-        Self {
-            curve: None,
-            bases: Vec::new(),
-            limits: None,
-            slots: Vec::new(),
-            slot_index: Vec::new(),
-            setup_steps: 0,
-            setup_square_roots: 0,
-            relation_steps: 0,
-            limit_hits: 0,
-            integrity_failures: 0,
-        }
-    }
 }
 
 impl HashedTensorOracle {
