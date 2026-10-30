@@ -57,6 +57,20 @@ linear algebra, the expected bound is
 Taking m near(log b)^(1/4) gives the displayed sub-exponential exponent.
 This is an existing publicly released derivation, not an invention in this session.
 
+## Why the tensor theorem does not automatically settle our norm candidate
+
+The [separate size check](norm-encoding-size.md) confirms that the literal
+shared-remainder coefficient system uses Theta(mt) field-state words and
+O(tm^2) dense scalar arithmetic constraints. Translating those constraints
+with the compact O(b)-edge field gadgets gives O(tm^2 b)=O(mb^2) Boolean
+edges when t=Theta(b/m). Even its explicitly exposed state words occupy
+Theta(b^2) bit ports. D.1 then supplies only an upper bound
+2^{O(mb^2/sqrt(log(mb^2)))}, which does not establish exp(o(b)). The hashed
+construction's O(mb) compactness is a separate property, not inherited by
+our coefficient circuit. This is a limitation of this translation and
+bound; it is not a runtime lower bound or an impossibility result for a
+better encoding or symbolic solver.
+
 ## What the primary-proof checks actually support
 
 The [cost review](contraction-cost.md) read D.1 and the full D.4 proof.
