@@ -138,6 +138,37 @@ struct RightPartials {
 inline bool packed_winner_fits(U left, U count) {
   return left && count <= UINT64_MAX / left;
 }
+struct PrefixLayout {
+  U bins;
+  unsigned shift;
+};
+inline PrefixLayout prefix_layout(U prime, U row_count) {
+  U bins = 0;
+  unsigned shift = 0;
+#ifndef ER_QUERY_BINARY_REFERENCE
+  if (row_count >= 4096) {
+    unsigned bits = 0;
+    for (U v = prime - 1; v; v >>= 1)
+      ++bits;
+    bins = 1;
+    unsigned index_bits = 0;
+    // Larger tables otherwise leave thousands of keys in every bucket.
+    // Opt in to at most 2^24 buckets (128 MiB plus one offset); setup
+    // and the actual offsets remain included in cold work and admission.
+#ifdef ER_WIDE_INDEX
+    constexpr U max_bins = U(1) << 24;
+#else
+    constexpr U max_bins = U(1) << 16;
+#endif
+    while (bins < max_bins && bins * 2 <= row_count / 32 && index_bits < bits) {
+      bins *= 2;
+      ++index_bits;
+    }
+    shift = bits - index_bits;
+  }
+#endif
+  return {bins, shift};
+}
 // Index the high x bits of the sorted full-point table. Each bucket retains
 // the original row order (including duplicate-point ids). Infinity sorts
 // before finite points and deliberately uses the unindexed lookup.
@@ -319,21 +350,9 @@ public:
       }
     }
 #endif
-    U bins = 0;
-#ifndef ER_QUERY_BINARY_REFERENCE
-    if (p.left >= 4096) {
-      unsigned bits = 0;
-      for (U v = c.f.p - 1; v; v >>= 1)
-        ++bits;
-      bins = 1;
-      unsigned index_bits = 0;
-      while (bins < 65536 && bins * 2 <= p.left / 32 && index_bits < bits) {
-        bins *= 2;
-        ++index_bits;
-      }
-      prefix_shift = bits - index_bits;
-    }
-#endif
+    const auto layout = prefix_layout(c.f.p, p.left);
+    U bins = layout.bins;
+    prefix_shift = layout.shift;
     // 3 row buffers cover the retained table and conservative sort scratch.
     U bytes = product(p.left, 3 * sizeof(DeviceRow)) +
               product(p.points.size(), sizeof(Point)) +

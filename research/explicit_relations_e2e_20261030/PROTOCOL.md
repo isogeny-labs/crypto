@@ -215,3 +215,23 @@ rectangular-coverage findings. Run the same audit on v7 after collection:
 rustc --edition=2021 -D warnings research/explicit_relations_e2e_20261030/check-frontier.rs -o /tmp/check-frontier
 /tmp/check-frontier 7 research/explicit_relations_e2e_20261030/results-v7/rows.csv
 ```
+
+## Wider prefix index, version 8
+
+Version 8 retains 16-byte exact rows in both arms and changes only the
+index ceiling from 2^16 to 2^24 buckets at the matched 52-bit rung. The
+index consumes at most 128 MiB plus one u64 offset, charged to memory
+admission, and its complete construction remains in cold setup. Larger
+buckets still use the same exact comparator and duplicate-ID ordering.
+The optional `cuda-wide-index` target enables `ER_WIDE_INDEX`; defaults
+remain unchanged pending the recorded panel. NVIDIA's best-practices
+guide section 3.2 discusses the throughput cost of random memory access;
+this conventional indexing change narrows the random binary-search range.
+
+The maximum-size offset array is checked element-by-element against CPU
+lower bounds, with sparse keys, empty buckets, duplicates, infinity and
+the 2^62 endpoint, for full and compact rows. The current merged CPU
+arithmetic is identical across arms. This is not a cross-version timing
+comparison. Fixtures, seeds, row/work caps and stopping rules are retained;
+60-bit solve time is 1800 seconds, worker 9000, controller 9300. One GPU
+may launch only after v7 archive collection and verified deletion.

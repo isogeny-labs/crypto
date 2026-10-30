@@ -418,3 +418,39 @@ findings remain disclosed; the separate audit verifies the actual frozen
 nonrectangular plans. The separate CPU tensor implementation and its open
 independent audit are documented in `problems/hashed-ecdl-tensor-backend.md`;
 this CUDA service does not port that backend.
+
+## 2026-10-30 06:24 UTC: larger prefix index prepared
+
+### What was done
+
+Reconciled the active v7 pod without launching another GPU. Both 58-bit
+public targets passed recovery and fresh replay; 60-bit outcomes remain
+pending. Merged remote CPU work already delivered through PR2933 without
+rewriting evidence. The v7 source stays4014622; the merged CPU changes are
+not retroactively GPU-validated by that run. Added optional ER_WIDE_INDEX,
+a 2^24-bucket ceiling with actual storage charged to admission, and exact
+CPU/device offset and lookup boundary tests. Host syntax and Rust instrument
+metadata checks passed; CUDA validation remains pending.
+
+### Decisions made
+
+Relation lookup dominates the observed large-field stage clocks. The next
+matched52-bit panel changes only the index ceiling on identical16-byte rows
+and the same driver, then probes56/58/60bits. Frozen v8 hash
+fd8bf698d02f02bea73c7ed46c4b55e039ee62927e4f18fa74165b691afc793c;
+worker9000/controller9300seconds,60-bit solve1800seconds. No new GPU before
+v7 collection and verified deletion. Field61/62 widening was assessed but
+not implemented; no task or run for that arithmetic change exists.
+
+### Open threads
+
+Collect v7; preserve every outcome and archive; validate optional wide index
+and the merged CPU driver on the next single RTX PRO6000. Publish raw data
+before the final inspected report and benchmark copies. The progress exporter
+is now reserved by T901, so its shared file remains untouched.
+
+### Errors
+
+The first draft v8 schema check rejected its absent freeze block. Added the
+required draft block, validated and froze it before any affected data. This
+was a metadata preparation error, not a GPU launch.
