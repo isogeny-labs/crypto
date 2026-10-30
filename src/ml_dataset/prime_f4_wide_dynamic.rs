@@ -2393,6 +2393,49 @@ mod tests {
     #[ignore = "explicit original-chain432-case software gate; invoke separately with --ignored --exact --nocapture"]
     fn dynamic_original_chain_all_arity_twist_432_case_panel() {
         use num_traits::ToPrimitive;
+        let source = std::env::var("ML_DYNAMIC_PANEL_SOURCE_COMMIT")
+            .expect("explicit panel requires harness-bound ML_DYNAMIC_PANEL_SOURCE_COMMIT");
+        assert!(
+            source.len() == 40
+                && source
+                    .bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        );
+        // Metadata-only executable identity; the parent additionally retains
+        // immutable executable/source receipts and guards the file hash.
+        let executable = std::env::current_exe().unwrap();
+        let binary = super::super::super::digest(&std::fs::read(&executable).unwrap());
+        let identity = |n: u32, twist: bool, m: usize, k: usize, target_kind: usize| {
+            serde_json::json!({
+                "schema":"crypto.ml-dataset.dynamic-native-software-panel-case/v1",
+                "source_commit":source,"binary_sha256":binary,
+                "seed":42,"curve_seed":7,"generator_index":1,"key_index":1,
+                "n":n,"twist":twist,"m":m,"signed_domain_size":2*k,"distinct_x_count":k,
+                "target_class":match target_kind{0=>"positive",1=>"negative",_=>"exceptional"},
+                "domain_kind":"fixed_custom_software_control_not_cli_default",
+                "original_allowances":{"work_limit":16384,"memory_bytes":256*1024*1024u64,"trace_bytes":128*1024*1024u64,"degree_bound":12,"process_seconds":30,"phase_seconds":5},
+                "input_sha256":serde_json::Value::Null,"native_supplied_limits":serde_json::Value::Null,
+                "scientific_dataset_cell":false,"independent_derivation_verified":false
+            })
+        };
+        let emit = |row: &serde_json::Value| {
+            eprintln!(
+                "DYNAMIC_NATIVE_PANEL {}",
+                serde_json::to_string(row).unwrap()
+            )
+        };
+        let slots = |slots: &Slots| {
+            serde_json::json!(slots
+                .buffers
+                .iter()
+                .enumerate()
+                .map(|(i, b)| serde_json::json!({
+                    "slot_index":i,"logical_cap":b.logical_cap,"bytes":b.bytes().len(),
+                    "sha256":super::super::super::digest(b.bytes()),
+                    "raw_utf8":std::str::from_utf8(b.bytes()).unwrap()
+                }))
+                .collect::<Vec<_>>())
+        };
         let mut failures = Vec::new();
         let mut attempted = 0;
         for n in [47, 53, 61] {
@@ -2412,19 +2455,31 @@ mod tests {
                         work_limit: 16384,
                         solver: "f4".into(),
                     };
-                    let mut case = match super::super::curves::generate(&cfg) {
-                        Ok(case) => case,
+                    let context = (|| {
+                        let mut case = super::super::curves::generate(&cfg)?;
+                        case.private_witness = serde_json::Value::Null;
+                        let group = super::super::Group::read(&case)?;
+                        let generator = group.point(&case.public_instance["generator"])?;
+                        Ok::<_, String>((group, generator))
+                    })();
+                    let (group, generator) = match context {
+                        Ok(context) => context,
                         Err(error) => {
-                            attempted += 6;
-                            failures.push(format!("all six fixed targets failed generation n{n} twist{twist} m{m}: {error}"));
+                            for k in [1, 2] {
+                                for target_kind in 0..3 {
+                                    attempted += 1;
+                                    let mut row = identity(n, twist, m, k, target_kind);
+                                    row["status"] = serde_json::json!("fixed_context_failure");
+                                    row["reason"] = serde_json::json!(error);
+                                    emit(&row);
+                                    failures.push(format!("context n{n} twist{twist} m{m} K{k} target{target_kind}: {error}"));
+                                }
+                            }
                             continue;
                         }
                     };
-                    case.private_witness = serde_json::Value::Null;
-                    let group = super::super::Group::read(&case).unwrap();
-                    let generator = group.point(&case.public_instance["generator"]).unwrap();
                     let super::super::Group::Prime(curve) = &group else {
-                        panic!("wrong curve family")
+                        panic!("prime recipe produced a different family")
                     };
                     let affine = |point: &super::super::Element| match point {
                         super::super::Element::Prime(crate::ecc::Point::Affine { x, y }) => {
@@ -2438,6 +2493,7 @@ mod tests {
                     for k in [1usize, 2] {
                         for target_kind in 0..3 {
                             attempted += 1;
+                            let mut row = identity(n, twist, m, k, target_kind);
                             let bound = 2 * k * m + 1;
                             let preconditions = (1..=bound)
                                 .all(|i| group.mul(&generator, i as u64) != group.zero());
@@ -2449,14 +2505,24 @@ mod tests {
                             }
                             let signed: Option<Vec<_>> = signed.iter().map(&affine).collect();
                             let Some(signed) = signed else {
-                                failures.push(format!("n{n} twist{twist} m{m} K{k} target{target_kind}: nonaffine domain"));
+                                row["status"] = serde_json::json!("precondition_failure");
+                                row["reason"] = serde_json::json!("nonaffine signed domain");
+                                emit(&row);
+                                failures.push(format!(
+                                    "domain n{n} twist{twist} m{m} K{k} target{target_kind}"
+                                ));
                                 continue;
                             };
                             let mut codes: Vec<_> = signed.iter().map(|p| p.x).collect();
                             codes.sort_unstable();
                             codes.dedup();
                             if !preconditions || codes.len() != k {
-                                failures.push(format!("n{n} twist{twist} m{m} K{k} target{target_kind}: failed fixed preconditions"));
+                                row["status"] = serde_json::json!("precondition_failure");
+                                row["reason"]=serde_json::json!("fixed group-order/domain cardinality precondition failed; no resampling");
+                                emit(&row);
+                                failures.push(format!(
+                                    "preconditions n{n} twist{twist} m{m} K{k} target{target_kind}"
+                                ));
                                 continue;
                             }
                             let multiplier = match target_kind {
@@ -2466,8 +2532,11 @@ mod tests {
                             };
                             let Some(target) = affine(&group.mul(&generator, multiplier as u64))
                             else {
+                                row["status"] = serde_json::json!("precondition_failure");
+                                row["reason"] = serde_json::json!("nonaffine fixed target");
+                                emit(&row);
                                 failures.push(format!(
-                                    "nonaffine fixed target n{n} twist{twist} m{m} K{k}"
+                                    "target n{n} twist{twist} m{m} K{k} target{target_kind}"
                                 ));
                                 continue;
                             };
@@ -2478,6 +2547,7 @@ mod tests {
                                 target_x: target.x,
                                 codes: &codes,
                             };
+                            row["curve"] = serde_json::json!({"p":curve.p.to_string(),"a":curve.a.to_string(),"b":curve.b.to_string(),"target_x":target.x.to_string(),"target_y":target.y.to_string()});
                             let prepared = prepare_original(
                                 curve.p.to_u64().unwrap(),
                                 params,
@@ -2491,13 +2561,66 @@ mod tests {
                                 prepared.and_then(|p| invoke_original(p, &mut |_, _| Ok(())));
                             match phase {
                                 Err(error) => {
-                                    eprintln!("native_case n={n} twist={twist} m={m} K={k} target={target_kind} error={error:?}");
-                                    failures.push(format!("preparation/integration n{n} twist{twist} m{m} K{k} target{target_kind}: {:?}",error.stop));
+                                    row["status"] = serde_json::json!("phase_failure");
+                                    row["stop"] = serde_json::json!(error.stop);
+                                    row["reserved_work"] =
+                                        serde_json::json!(error.ledger.reserved_work);
+                                    row["reserved_bytes"] =
+                                        serde_json::json!(error.ledger.reserved_bytes);
+                                    row["setup_failure"] = serde_json::json!(error
+                                        .setup_failure
+                                        .map(|f| format!("{f:?}")));
+                                    if let Some(retained) = &error.retained_slots {
+                                        if !retained.buffers[0].bytes().is_empty() {
+                                            row["input_sha256"] =
+                                                serde_json::json!(super::super::super::digest(
+                                                    retained.buffers[0].bytes()
+                                                ));
+                                        }
+                                        row["retained_slots"] = slots(retained);
+                                    }
+                                    emit(&row);
+                                    failures.push(format!("phase n{n} twist{twist} m{m} K{k} target{target_kind}: {:?}",error.stop));
                                 }
                                 Ok(phase) => {
                                     let useful = phase.report.matrix_rows_reduced > 0
                                         && phase.report.pivot_updates > 0;
-                                    eprintln!("native_case n={n} twist={twist} m={m} K={k} target={target_kind} stop={:?} invoked={} rows={} pivots={} useful={} retained={} retention={:?} work={} bytes={} input_sha256={}",phase.report.stop,phase.report.native_backend_invoked,phase.report.matrix_rows_reduced,phase.report.pivot_updates,useful,phase.basis_retained,phase.retention_stop,phase.prepared.ledger.reserved_work,phase.prepared.ledger.reserved_bytes,super::super::super::digest(phase.prepared.slots.buffers[0].bytes()));
+                                    let limits = dynamic::Limits {
+                                        work: phase.settlement.supplied.work,
+                                        bytes: phase.settlement.supplied.bytes,
+                                        events: 4096 - phase.prepared.observer.setup,
+                                        max_pair_degree: 12,
+                                        ..dynamic::Limits::default()
+                                    };
+                                    row["status"] = serde_json::json!("native_returned");
+                                    row["native_supplied_limits"] =
+                                        serde_json::to_value(NativeLimitRecord::from(&limits))
+                                            .unwrap();
+                                    row["input_sha256"] =
+                                        serde_json::json!(super::super::super::digest(
+                                            phase.prepared.slots.buffers[0].bytes()
+                                        ));
+                                    row["native"] = serde_json::to_value(NativeMetadata::new(
+                                        m,
+                                        &phase.report,
+                                        &limits,
+                                        phase.basis_retained,
+                                        phase.retention_stop,
+                                    ))
+                                    .unwrap();
+                                    row["useful_native_work"] = serde_json::json!(useful);
+                                    row["diagnostic_stop"] =
+                                        serde_json::json!(phase.diagnostic_stop);
+                                    row["native_settlement"] =
+                                        serde_json::to_value(phase.settlement).unwrap();
+                                    row["observer_settlement"] =
+                                        serde_json::to_value(phase.observer_settlement).unwrap();
+                                    row["reserved_work"] =
+                                        serde_json::json!(phase.prepared.ledger.reserved_work);
+                                    row["reserved_bytes"] =
+                                        serde_json::json!(phase.prepared.ledger.reserved_bytes);
+                                    row["retained_slots"] = slots(&phase.prepared.slots);
+                                    emit(&row);
                                     if !phase.report.native_backend_invoked || !useful {
                                         failures.push(format!("useful native gate n{n} twist{twist} m{m} K{k} target{target_kind}"));
                                     }
@@ -2511,10 +2634,14 @@ mod tests {
                 }
             }
         }
+        eprintln!(
+            "DYNAMIC_NATIVE_PANEL_SUMMARY {}",
+            serde_json::json!({"source_commit":source,"binary_sha256":binary,"attempted":attempted,"required":432,"failures":failures})
+        );
         assert_eq!(attempted, 432);
         assert!(
             failures.is_empty(),
-            "all432 fixed cells retained; {} failed gates: {failures:?}",
+            "all432 fixed cases retained; {} failed gates",
             failures.len()
         );
     }
