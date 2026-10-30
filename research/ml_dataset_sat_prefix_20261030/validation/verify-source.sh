@@ -33,6 +33,13 @@ git ls-files --others -z -- \
   ':(glob)tools/volcano-cli/src/**/*.rs' tools/volcano-cli/Cargo.toml \
   ':(glob)research/pencil_large_prime_20261029/src/**/*.rs' \
   research/pencil_large_prime_20261029/Cargo.toml >> "$temporary/untracked"
+# Inventory02 enumerates whole restored dependency trees. Cargo may discover
+# ignored inputs there as well, including optional local dependencies.
+while IFS= read -r scope_root; do
+  git ls-files --others -z -- \
+    ":(glob)$scope_root/**/*.rs" ":(glob)$scope_root/**/*.toml" \
+    ":(glob)$scope_root/**/Cargo.lock" >> "$temporary/untracked"
+done < <(jq -r '.materialized_tree_roots // [] | .[]' "$inventory")
 if [[ -s "$temporary/untracked" ]]; then
   printf 'Untracked Rust/Cargo/config inputs are outside the frozen source:\n' >&2
   tr '\0' '\n' < "$temporary/untracked" >&2

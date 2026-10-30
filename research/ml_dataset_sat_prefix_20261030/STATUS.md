@@ -57,3 +57,16 @@ Semantic corrections are now implemented and independently re-reviewed at
 SHA19f180408a0e3b1114cb510386741d02d5ea951acc4e9f6b3fcc9a047f9c21db.
 No outstanding blocker was found in that scoped correction review. There are
 13 authored replay tests; none has executed. See replay-semantic-review-02.json.
+
+Dependency restoration02 is complete and byte-verified:2722 files,253892127 bytes,
+SHA d72f4ce44858dd813031eba098b618a0c02c58d2f521c655cfbbc647455eb004.
+It covers eight recursive Cargo manifests, complete local dependency trees and
+maintained targets. Every selected dependency blob is identical between source
+27f12537ea4a and corrected runtime356e6af19ff7. No modified source was replaced.
+The first pass retained its expected HEAD-change rejection; a separate parity
+pass issued the immutable inventory. Dataset02 is prepared, not started.
+
+The installed protocol skill's referenced official schema/checker is absent from
+the inspected local repositories; PROTOCOL-TOOLING.md records the search scope.
+CLI preparation drafts a substantive contract and separates freeze/commit from
+execution. Official schema/export validation remains unavailable, not fabricated.

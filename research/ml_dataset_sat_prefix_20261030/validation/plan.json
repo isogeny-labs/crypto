@@ -4,16 +4,17 @@
   "execution_source": "Commit integrated runtime, fixture, validation scripts and this plan; pass exact resulting commit to run-phase.sh. No validation has been launched by preparing this plan.",
   "prerequisite": "Preceding full-library run is terminal and shared target exclusively available. Initial scoped module tests may precede shared adapter integration; end-to-end CLI admission requires coordinated adapter integration and a new source freeze.",
   "materialization_inventory": {
-    "path": "/home/ec2-user/ml-dataset-work-20261028/sat-prefix-materialization-01.json",
-    "sha256": "035f0bc084cd1c78bd9e08ef96015b5685db084d0a745cca3ac04e3deb0ad2fc",
-    "source_commit": "7501f38e8be1d1eb94cfd6ea203f55010e1f2a9b",
-    "files": 151,
-    "bytes": 210027745,
-    "binding": "Before and after every phase verify inventory SHA, every recorded blob against execution commit with one git ls-tree read, and each materialized file SHA and size"
+    "path": "/home/ec2-user/ml-dataset-work-20261028/sat-prefix-materialization-02.json",
+    "sha256": "d72f4ce44858dd813031eba098b618a0c02c58d2f521c655cfbbc647455eb004",
+    "source_commit": "27f12537ea4a4e9eab243b23947a94764e719c3f",
+    "current_head_dependency_parity_verified": "356e6af19ff70af2d89b84a7c942d75023abaa91",
+    "files": 2722,
+    "bytes": 253892127,
+    "binding": "Before and after every phase verify inventory SHA, all2722 recorded blobs against the execution commit with one git ls-tree read, and each materialized file SHA and size. Includes recursive local Cargo dependency trees, maintained examples/tests/benches, explicit target paths and retained fixtures."
   },
   "source_binding": "Compare all tracked paths against execution commit except docs/session-logs/** and research/ml_dataset_sat_prefix_20261030/store-index.json; require phase runner, source guard and plan committed; reject untracked Rust/Cargo/config inputs, including ignored source inputs; explicitly hash restored sparse inputs.",
   "first_phase": {
-    "name": "sat-prefix-dataset-01",
+    "name": "sat-prefix-dataset-02",
     "command": [
       "cargo",
       "test",
@@ -42,7 +43,7 @@
     "target_reuse": "sequential only after parent confirms previous pipeline terminal"
   },
   "stop_rule": "Stop on first failure. Preserve immutable phase log and receipt including source preflight/readback and original command status. Parent archives evidence with existing archive.sh and fresh byte readback; no automatic retry or build/test launch by this setup.",
-  "attempt_identity": "Explicit SAT-prefixed phase name ending in a two-digit attempt; first attempt01. Refuse existing log/receipt and symlink paths. Later attempts require a new frozen source and explicit parent decision.",
+  "attempt_identity": "Explicit SAT-prefixed phase name ending in a two-digit attempt. Attempt01 failed before compilation and remains immutable; attempt02 requires a newly frozen source and inventory02. Refuse existing log/receipt and symlink paths; no automatic retries.",
   "claim_boundary": [
     "No generated research samples",
     "No cloud worker validation",
@@ -58,5 +59,73 @@
     "research/ml_dataset_algebraic_targets_20261030/validation/verify-source.sh",
     "research/ml_dataset_algebraic_targets_20261030/validation/plan.json",
     "research/ml_dataset_sat_prefix_20261030/CONTRACT.md"
-  ]
+  ],
+  "prior_attempt": {
+    "attempt": "01",
+    "source_commit": "27f12537ea4a4e9eab243b23947a94764e719c3f",
+    "phase": "sat-prefix-dataset-01",
+    "exit_code": 101,
+    "stage": "command_failed",
+    "source_preflight_matches": true,
+    "source_readback_matches": true,
+    "failure": "Cargo failed before compilation because tools/factor-base/Cargo.toml was absent from the sparse worktree; inventory01 had fixture inputs but omitted dependency source trees",
+    "receipt": "/home/ec2-user/ml-dataset-work-20261028/sat-prefix-dataset-01.receipt.json",
+    "preserved": true
+  },
+  "materialization_repair": {
+    "dependency_manifests": [
+      "Cargo.toml",
+      "crates/ecdl-tensor-ic/Cargo.toml",
+      "crates/hashed-ecdl-tensor/Cargo.toml",
+      "isogeny_algos/Cargo.toml",
+      "research/five_leads_e2e_20261019/native/Cargo.toml",
+      "research/pencil_large_prime_20261029/Cargo.toml",
+      "tools/factor-base/Cargo.toml",
+      "tools/volcano-cli/Cargo.toml"
+    ],
+    "dependency_edges": [
+      [
+        "Cargo.toml",
+        "hashed-ecdl-tensor",
+        "crates/hashed-ecdl-tensor/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "ecdl-tensor-ic",
+        "crates/ecdl-tensor-ic/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "pencil-symbolic-graph",
+        "research/pencil_large_prime_20261029/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "factor-base",
+        "tools/factor-base/Cargo.toml"
+      ],
+      [
+        "Cargo.toml",
+        "volcano-cli",
+        "tools/volcano-cli/Cargo.toml"
+      ],
+      [
+        "tools/volcano-cli/Cargo.toml",
+        "isogeny_algos",
+        "isogeny_algos/Cargo.toml"
+      ],
+      [
+        "research/pencil_large_prime_20261029/Cargo.toml",
+        "five-leads-study",
+        "research/five_leads_e2e_20261019/native/Cargo.toml"
+      ]
+    ],
+    "previous_inventory": "sat-prefix-materialization-01.json",
+    "previous_inventory_sha256": "035f0bc084cd1c78bd9e08ef96015b5685db084d0a745cca3ac04e3deb0ad2fc",
+    "added_inventory_entries": 2571,
+    "added_inventory_bytes": 43864382,
+    "existing_modified_files_overwritten": false,
+    "first_pass_head_change_guard": "sat-materialization-02-first-pass-status.json",
+    "final_parity_log": "sat-materialize-02-parity.log"
+  }
 }
