@@ -53,3 +53,10 @@ historical and are not relabelled as current configuration checks.
 No performance, ECDLP recovery, asymptotic improvement, or larger/growing-base
 formalization is claimed. Existing performance dashboards and numerical
 proof-study diagrams remain unchanged because none of their data changed.
+
+Current validation: pinned default Lake build **1,706 jobs**; transitive audit
+**28 declarations, zero forbidden axioms or trusted native evaluation**;
+new module fresh kernel replay passed; full source-bound repository library
+**5,430 passed, zero failed, 123 ignored**, actual exit zero. Native draft-card
+validation passed after exact tracked schema restoration; its original missing-
+schema failure is preserved separately. See [final validation](validation/final-validation.json).

@@ -104,9 +104,13 @@ in Proposition 1.
 New source, toolchain/configuration hashes, actual build/audit/kernel-replay
 outcomes and retained development failures are in `validation/`. All earlier
 proof-study source/certificate bytes remain unchanged; the new Lake target
-configuration is recorded separately. A full repository library check is
-required before publication and its actual terminal outcome will be recorded.
-No partial or nested test summary is a complete-suite pass.
+configuration is recorded separately. The complete source-bound repository library check passed **5,430 tests, zero
+failed, 123 ignored**, with actual exit zero and all 5,553 entries retained.
+The native draft-card check also passed after restoring the exact tracked
+backlog schema; its original exit-two missing-schema failure is preserved.
+[The separate completed receipt](validation/final-validation.json) binds source,
+binary, raw/archive hashes and terminal counts without rewriting the earlier
+formal-check snapshot. No nested subprocess result substitutes for the outer suite.
 
 The exhaustive prime/binary campaign is **not executed**. Its designed arms,
 controls and exact certification requirements are in `STUDY_DESIGN.md`.
