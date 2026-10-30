@@ -4,7 +4,6 @@
 // plotted-point row and its panel.  Every number is copied from
 // analysis/band.json and analysis/compare-*.json.  Run from the repository root.
 import { readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 
 const DATE = process.argv[2] ?? "2026-10-29";
 const DIR = "research/prime_ksum_vs_incumbent_20261029";
@@ -42,17 +41,37 @@ const point = {
   anchor: ANCHOR,
   source: SOURCE,
 };
-// The file is written by Python's json (indent 1, ASCII-escaped, float
-// literals kept), so the edit goes through it and leaves every other line alone.
-execFileSync("python3", ["-c", `
-import json, sys
-path, date, point = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
-tl = json.load(open(path))
-s = next(x for x in tl["series"] if x["id"] == "ec-bounded-counts")
-s["points"] = [p for p in s["points"] if p["anchor"] != point["anchor"]] + [point]
-tl["updated"] = max(tl["updated"], date)
-open(path, "w").write(json.dumps(tl, indent=1) + "\\n")
-`, tlPath, DATE, JSON.stringify(point)]);
+// The file keeps Python json formatting (indent 1, ASCII-escaped, float
+// literals as written), so the point is spliced into the text of its series and
+// every other byte is left alone.  A rerun replaces the point with this anchor.
+const ascii = (x) => x.replace(/[\u0080-\uffff]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+const close = (text, i) => { // index of the bracket closing the one at text[i]
+  let depth = 0, str = false;
+  for (; i < text.length; i++) {
+    const c = text[i];
+    if (str) { if (c === "\\") i++; else if (c === "\"") str = false; continue; }
+    if (c === "\"") str = true;
+    else if (c === "[" || c === "{") depth++;
+    else if ((c === "]" || c === "}") && --depth === 0) return i;
+  }
+  throw new Error("unbalanced timeline file");
+};
+let tl0 = readFileSync(tlPath, "utf8");
+const sid = tl0.indexOf(`"id": "ec-bounded-counts"`);
+const open = tl0.indexOf("\"points\": [", sid) + "\"points\": ".length;
+const end = close(tl0, open);
+const spans = [];
+for (let i = tl0.indexOf("{", open); i > 0 && i < end; i = tl0.indexOf("{", i)) {
+  const j = close(tl0, i);
+  spans.push(tl0.slice(i, j + 1));
+  i = j + 1;
+}
+const kept = spans.filter((sp) => JSON.parse(sp).anchor !== point.anchor);
+kept.push(ascii(JSON.stringify(point, null, 1)).replace(/\n/g, "\n    "));
+const tail = tl0.slice(tl0.lastIndexOf("}", end) + 1, end);
+tl0 = tl0.slice(0, open + 1) + "\n    " + kept.join(",\n    ") + tail + tl0.slice(end);
+tl0 = tl0.replace(/"updated": "([0-9-]+)"/, (_, d) => `"updated": "${d > DATE ? d : DATE}"`);
+writeFileSync(tlPath, tl0);
 const tlText = readFileSync(tlPath, "utf8");
 
 const pagePath = "docs/index-calculus-scoreboard.html";
@@ -65,14 +84,18 @@ const row =
   `<tr><td>${DATE}</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Prime-field IC, ${NAME} sum table vs the mitm incumbent, ${best.b}-bit holdout <code>${CURVE}</code></td>` +
   `<td class="n">${f(best.v)}&times; <small>counted GAE lower-bound diagnostic; was ${f(was)}&times; (mitm incumbent, same session)</small></td><td>matched</td><td><span class="chip">engineering</span></td>` +
   `<td><a href="${ANCHOR}">panel</a> &middot; <a href="${SOURCE}">source</a></td></tr>`;
-if (!page.includes(`href="${ANCHOR}">panel`)) {
+const rowRe = new RegExp(`<tr><td>[0-9-]+</td>(?:(?!</tr>)[\\s\\S])*?href="${ANCHOR}">panel[\\s\\S]*?</tr>`);
+if (rowRe.test(page)) page = page.replace(rowRe, row);
+else {
   page = page.replace(/(<summary>Every plotted point as a table<\/summary>[\s\S]*?)(<\/tbody>)/, (_, a, b) => a + row + "\n" + b);
 }
 const panel =
   `<p id="prime-ksum-vs-incumbent-20261029">${DATE}: <a href="${SOURCE}">the k-sum table against the prime-field mitm incumbent, same session and targets</a>. ` +
   `On the incumbent's own holdout curves, targets and seeds (its recorded means reproduced exactly), the k = 5 sum table costs ${f(r(20))}&times;, ${f(r(24))}&times;, ${f(r(28))}&times; and ${f(r(32))}&times; the incumbent at 20, 24, 28 and 32 bits (w = 0), below 1 at every band weight; registered test at 24&ndash;32 bits. ` +
   `Track: generic decomposition (bounded by &radic;r; cannot beat rho); a ranking of two generic recipes, not algebraic progress. Still ${f(s("ksum5", 32)[0] / s("rho-neg", 32)[0], 1)}&times; rho and ${f(s("ksum5", 32)[0] / s("bsgs-neg", 32)[0], 1)}&times; BSGS at 32 bits. Same host only; a second-host replay is owed.</p>`;
-if (!page.includes('id="prime-ksum-vs-incumbent-20261029"')) {
+const panelRe = /<p id="prime-ksum-vs-incumbent-20261029">[\s\S]*?<\/p>/;
+if (panelRe.test(page)) page = page.replace(panelRe, panel);
+else {
   page = page.replace(/(<p id="prime-ksum-k5-20261028">[\s\S]*?<\/p>)/, (m) => m + "\n" + panel);
 }
 writeFileSync(pagePath, page);
