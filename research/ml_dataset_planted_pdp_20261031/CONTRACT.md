@@ -6,6 +6,8 @@ or measured result is claimed by this file. This contract extends the
 control that can be implemented without changing the existing natural-target
 population. No trials may start until an `experiment.protocol/v1` binds a
 specific plan, constructor binary, limits, population counts, and analysis.
+The [native integration handoff](INTEGRATION.md) locates the reserved planner
+touchpoints and lists the source-level merge gates.
 
 ## Purpose and denominator
 
