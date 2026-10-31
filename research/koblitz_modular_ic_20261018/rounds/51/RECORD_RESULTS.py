@@ -3,7 +3,7 @@ from pathlib import Path
 from collections import Counter
 import json, hashlib, re, html
 h=Path(__file__).resolve().parent
-markers={'diamond':'DIAMOND51_ALL_CHECKS_PASS','glue-prep':'GLUE_PREP51_ALL_CHECKS_PASS','glue-forward':'GLUE51_ALL_CHECKS_PASS','glue-reverse':'GLUE51_ALL_CHECKS_PASS','glue-reload':'GLUE_RELOAD51_ALL_CHECKS_PASS','universal':'UNIVERSAL51_ALL_CHECKS_PASS','twist':'TWIST51_ALL_CHECKS_PASS','base23':'BASE23_51_ALL_CHECKS_PASS','fiber':'FIBER51_ALL_CHECKS_PASS','hecke3-':'HECKE3_51_ALL_CHECKS_PASS'}
+markers={'diamond':'DIAMOND51_ALL_CHECKS_PASS','glue-prep':'GLUE_PREP51_ALL_CHECKS_PASS','glue-forward':'GLUE51_ALL_CHECKS_PASS','glue-reverse':'GLUE51_ALL_CHECKS_PASS','glue-reload':'GLUE_RELOAD51_ALL_CHECKS_PASS','universal':'UNIVERSAL51_ALL_CHECKS_PASS','twist':'TWIST51_ALL_CHECKS_PASS','base23':'BASE23_51_ALL_CHECKS_PASS','base23-struct':'BASE23_STRUCT51_ALL_CHECKS_PASS','fiber':'FIBER51_ALL_CHECKS_PASS','hecke3-':'HECKE3_51_ALL_CHECKS_PASS'}
 rows=[]
 for p in sorted((h/'runs').iterdir()):
     if not p.is_dir(): continue
@@ -25,6 +25,7 @@ for p in sorted((h/'runs').iterdir()):
 result={'scope':'R51 actual chart maps and larger marked23 QR construction','status_counts':dict(Counter(r['status'] for r in rows)),'runs':rows,'retained_source_field_degree':32,'normalization_generators_per_direction':32,'directional_regularity_certificates':64,'clearing_power':62,'lean_theorems':sum(x.get('audited_theorems',0) for x in rows if x['status']=='accepted' and x.get('kind')=='Lean'),'scope_limits':['native arrays and RR/open-cover premises are not encoded in Lean','marked23 quotient dimension is not primality','selected modular-factor action and polarized embedding remain separate']}
 (h/'results.json').write_text(json.dumps(result,indent=2)+'\n')
 state={k:next((r['status'] for r in reversed(rows) if r['attempt'].startswith(k+'51-') or (k=='base23' and r['attempt'].startswith('base23-51-'))),'prepared') for k in markers}
+if any(x['attempt'].startswith('base23-struct51-') and x['status']=='accepted' for x in rows): state['base23']='accepted'
 nodes=[('diamond','Actual diamond / tenth identity'),('glue-forward','32 forward normalized generators'),('glue-reverse','32 inverse normalized generators'),('glue-reload','64 independent compatibility checks'),('universal','Universal QR polynomial certificate'),('twist','Quadratic twist / F2 descent'),('base23','Marked23 specialization / rank112'),('fiber','Exhaustive finite QR7 cycle test')]
 svg=['<svg xmlns="http://www.w3.org/2000/svg" width="980" height="470" viewBox="0 0 980 470">','<rect width="980" height="470" fill="white"/>','<g font-family="DejaVu Sans,sans-serif" fill="#17304a">','<text x="24" y="34" font-size="23">R51 exact chart maps and larger-carrier evidence</text>']
 for i,(key,label) in enumerate(nodes):
