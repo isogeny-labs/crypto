@@ -1,0 +1,76 @@
+{
+  "schema": "research.proof-component/v1",
+  "utc": "2026-10-31T08:13:54.686896+00:00",
+  "declarations": [
+    "PencilWordRefinement.guardB_literal_identity",
+    "PencilWordRefinement.ordered_double_bzero_preserves"
+  ],
+  "prime_bounds": "5 <= p < 2^31",
+  "extension_degree": 1,
+  "lookup_tables": null,
+  "compiled_main": true,
+  "new_fixed_propositions_passed": 6,
+  "reused_fixture_byte_identical": true,
+  "reused_fixture_sha256": "3037d19428a4d6e6269ed14031bf056f9e80b0077fd430568acf4480cd7f4f24",
+  "separate_axiom_readback_passed": true,
+  "axioms": {
+    "guardB_literal_identity": [
+      "propext"
+    ],
+    "ordered_double_bzero_preserves": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "independent_review_complete": false,
+  "dependencies_independent_review_complete": false,
+  "canonical_integration": false,
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "output_validity_claim": "normalized Mumford validity for selected B-zero helper route",
+  "full_dispatch_claim": false,
+  "divisor_class_sum_claim": false,
+  "compiler_correspondence_claim": false,
+  "derived_not_assumed": "a.s != 0 from ordered sameUDouble and literal B=0",
+  "checks": {
+    "attempt1": {
+      "exit_code": 0,
+      "source_sha256": "d0179ad8a81704640e6cbbbb2e7ce7d5c555f710733e82ff7a9e5e1fbf04687c",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 170,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "fixtures1": {
+      "exit_code": 0,
+      "source_sha256": "3037d19428a4d6e6269ed14031bf056f9e80b0077fd430568acf4480cd7f4f24",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 174,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "controls1": {
+      "exit_code": 0,
+      "source_sha256": "cb660cde473d048d798e16895962bff5d83d261b1c733caecbf638f6b96ad7e1",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 175,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    },
+    "readback1": {
+      "exit_code": 0,
+      "source_sha256": "cc21a81f80dbb015b7d346e8a9351231128cbb342c9e509ffdb4d18e19692d2c",
+      "input_bindings": {
+        "unchanged": true,
+        "files": 176,
+        "toolchain": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)"
+      }
+    }
+  },
+  "pdf_visual_inspection": "one page; formula, diagram, fixture coordinates and limits legible",
+  "trust_boundary": "Lean compiler/kernel and installed imported dependency binaries; no independent binary/kernel rechecker"
+}

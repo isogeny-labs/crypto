@@ -75,6 +75,11 @@ records remain outside the admitted table: matched rho and independent
 scientific validation have not been supplied. No fastest-tool or certified
 speedup claim follows from these diagnostic copies.
 
+The [retained characteristic-two k=4 observations](UNADMITTED_PR2596_20261030.md)
+include unreplayed and interrupted sessions and remain outside the admitted
+results table pending the required independent validation. Original reports,
+figures and exact proposed row are preserved there.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-29 | [`20261029-jv-cover-hilbert-stop`](20261029-jv-cover-hilbert-stop/) ([PDF](20261029-jv-cover-hilbert-stop/REPORT.pdf); [validation](20261029-jv-cover-hilbert-stop/VALIDATION.json)) | Hilbert early stop in the Joux–Vitse cover index calculus (`jv_cover --exp dlp`, six-quadric cover over `F_p`, `--stop hilbert:16` with an incremental staircase) against unmodified full F4 and an A/A copy; p = 53, 101, 251, 503 (25 cells, 8/8/6/3 seeds), same relations and relation digest, every logarithm verified; weak class, lower-bound framing (counted `F_p` multiplications only) | paired S_A/S_B 1.848 [1.825, 1.878] (p=53), 1.875 [1.870, 1.879] (101), 1.868 [1.866, 1.870] (251), 1.849 [1.848, 1.850] (503), all 25 cells pass; emitted native-ops ratio 0.988/0.985/0.984/0.983; the as-found `hilbert:1` + scan form is a relabelling (S 2.53–2.64× lower, native ops 8.3–8.5× higher); log–log slope of S/rho −2.27; counted unit only, IC is a lower bound (F4 driver's pair selection, assembly and lookups unpriced); validation is a same-host replay plus a negation-map rho reference measured after the run | Intel Xeon 2.10 GHz, 4 vCPU shared VM, load 3–6, one thread (`RAYON_NUM_THREADS=1`); deterministic counts | [`research/ic_cover_weakclass_20261023`](../research/ic_cover_weakclass_20261023/) ([report](../research/ic_cover_weakclass_20261023/REPORT.md)) |

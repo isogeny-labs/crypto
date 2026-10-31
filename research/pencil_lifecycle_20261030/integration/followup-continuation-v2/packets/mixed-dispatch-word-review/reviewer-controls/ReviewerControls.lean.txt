@@ -1,0 +1,15 @@
+import WordDispatch
+open PencilWordRefinement FullMixed
+-- Zero ordinate follows cancellation before the equal-x tripling test.
+example : dispatch 5 0 0 0 0 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩ =
+ (some (.inl ⟨0,0,1,1⟩),.cancellation) := by decide
+-- Explicit mismatch is retained outside original validity assumptions.
+example : dispatch 5 1 0 0 0 ⟨0,2,1,1⟩ ⟨0,0,0,1,1,1⟩ =
+ (none,.mismatch) := by decide
+-- Literal branch payload mapping: repeated support returns the triple payload.
+example : dispatch 5 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩ =
+ (some (.inr (tripleWords 5 0 0 0 ⟨0,1,1,1⟩)),.tripling) := by decide
+-- Nonunit positive-distinct input: aggregate uses p4 first and doubled point second.
+example : dispatch 7 1 6 0 0 ⟨0,1,2,2⟩ ⟨5,0,0,3,3,2⟩ =
+ ((genericWordDispatch 7 (mixedWords 7 ⟨0,1,2,2⟩ ⟨5,0,0,3,3,2⟩).point
+  (dblWordPayload 7 1 6 0 0 ⟨0,1,2,2⟩) 0).map Sum.inr,.positiveDistinct) := by decide
