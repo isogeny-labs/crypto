@@ -51,3 +51,9 @@ REJECTED twist51-01: nativeexit0 but question-mark errors
 TWIST51_FULL_F4_PRODUCTS and TWIST51_GAMMA_SYZYGIES. LatePASS is invalid.
 Freeze entrywise scalar reduction/checking and complete gamma reconstruction
 before the repaired attempt. Reuse accepted universal51-01 unchanged.
+
+twist51-02 accepted exit0/noerrors/exactmarker. All3QR and2triangular
+equations descend individually,exact Gtw=G+(1+c)^16,entrywise F4/F2
+products,gamma reconstructions/syzygies,corruption and serialized reload pass.
+Original twist51-01 stays rejected. BASE23 uses only repaired accepted02.
+base23-51-01 admitted under the original native caps.

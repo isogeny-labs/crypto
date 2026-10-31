@@ -10,6 +10,9 @@ actual receipt status.
 == Terminal evidence and pending work
 #table(columns: (2.4fr,1fr,1.6fr), stroke: 0.4pt,
 [Attempt],[Status],[Receipt],
+text("base23-51-01"),
+text("running"),
+text("exit pending"),
 text("diamond51-01"),
 text("accepted"),
 text("exit 0"),
@@ -28,9 +31,15 @@ text("exit 0"),
 text("overlap-lean51-01"),
 text("accepted"),
 text("compile 0, audit 0"),
+text("twist51-01"),
+text("rejected"),
+text("exit 0"),
+text("twist51-02"),
+text("accepted"),
+text("exit 0"),
 text("universal51-01"),
-text("running"),
-text("exit pending"))
+text("accepted"),
+text("exit 0"))
 == Formal scope
 Five Overlap51 declarations compile and pass the axiom audit with zero
 failing and zero trusted declarations. They prove three characteristic-two

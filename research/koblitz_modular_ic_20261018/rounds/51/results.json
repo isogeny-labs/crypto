@@ -1,10 +1,16 @@
 {
   "scope": "R51 actual chart maps and larger marked23 QR construction",
   "status_counts": {
-    "accepted": 6,
-    "running": 1
+    "running": 1,
+    "accepted": 8,
+    "rejected": 1
   },
   "runs": [
+    {
+      "attempt": "base23-51-01",
+      "status": "running",
+      "source_revision": null
+    },
     {
       "attempt": "diamond51-01",
       "status": "accepted",
@@ -59,9 +65,34 @@
       "audit_exit": 0
     },
     {
+      "attempt": "twist51-01",
+      "status": "rejected",
+      "source_revision": "be11236ad148a03242b0101a9a8335537e53dbe4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "TWIST51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? TWIST51_FULL_F4_PRODUCTS",
+        "   ? TWIST51_GAMMA_SYZYGIES"
+      ]
+    },
+    {
+      "attempt": "twist51-02",
+      "status": "accepted",
+      "source_revision": "8e71bda0f8000507d1d858eeddc81288466d3fad",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "TWIST51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
       "attempt": "universal51-01",
-      "status": "running",
-      "source_revision": null
+      "status": "accepted",
+      "source_revision": "0ac9aeca3a5fea98b915589f5ed01caae7bebffc",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "UNIVERSAL51_ALL_CHECKS_PASS",
+      "error_lines": []
     }
   ],
   "retained_source_field_degree": 32,
