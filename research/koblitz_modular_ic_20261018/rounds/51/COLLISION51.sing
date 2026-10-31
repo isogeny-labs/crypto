@@ -13,7 +13,7 @@ poly remainder51;poly reconstruction51;poly residual51;matrix quotient51;matrix 
 link out51="ASCII:w collision-certificate51.sing";open(out51);
 write(out51,"ring collisionCertificate51=(2,b,c),(t),dp;short=0;poly delta51="+string(delta51)+";poly psi3_51="+string(psi3_51)+";poly psi7_51="+string(psi7_51)+";ideal factors51="+string(factors51)+";ideal columnQuotients51;");
 for(case51=1;case51<=3;case51++){
- M51=0;write(out51,"matrix multiplication51_"+string(case51)+"[4][4];");
+ matrix M51[4][4];write(out51,"matrix multiplication51_"+string(case51)+"[4][4];");
  for(col51=1;col51<=4;col51++){
   remainder51=reduce(factors51[case51]*t^(col51-1),baseStandard51);
   while(remainder51!=0){position51=deg(lead(remainder51))+1;if(position51>4 || denominator(leadcoef(remainder51))!=1){ERROR("COLLISION51_NONINTEGRAL_MULTIPLICATION_ENTRY");quit;}M51[position51,col51]=leadcoef(remainder51);remainder51=remainder51-lead(remainder51);}
@@ -40,7 +40,7 @@ ideal coefficientCheck51=U51,V51;
 for(case51=1;case51<=2;case51++){remainder51=coefficientCheck51[case51];while(remainder51!=0){if(denominator(leadcoef(remainder51))!=1){ERROR("COLLISION51_BEZOUT_NOT_POLYNOMIAL");quit;}remainder51=remainder51-lead(remainder51);}}
 write(out51,"poly U51="+string(U51)+";poly V51="+string(V51)+";");close(out51);
 execute(read("collision-certificate51.sing"));
-intvec powers51=1,5,16;total51=0;
+poly reconstruction51;intvec powers51=1,5,16;total51=0;
 for(case51=1;case51<=3;case51++){
  execute("matrix reloaded51=multiplication51_"+string(case51)+";");
  if(det(reloaded51)!=delta51^powers51[case51]){ERROR("COLLISION51_RELOADED_NORM");quit;}

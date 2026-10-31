@@ -23,6 +23,11 @@ ideal mappedSource51=doubling51(source51);int i51;
 for(i51=1;i51<=3;i51++){if(normal51(mappedSource51[i51])!=0){ERROR("LINE51_DOUBLING_PRESERVES_ACTUAL_SOURCE");quit;}}
 poly second51=normal51(doubling51(rDouble51));poly third51=normal51(doubling51(second51));
 if(third51!=r){ERROR("LINE51_THREE_DOUBLINGS_IDENTITY");quit;}
+link coreOut51="ASCII:w qr-line-core51.sing";open(coreOut51);
+write(coreOut51,"ring QRlineCore51=(2,b,c),(r,n,l),lp;short=0;ideal source51="+string(source51)+";poly residual51="+string(lineResidual51)+";poly den51="+string(den51)+";poly derivative51="+string(derivative51)+";poly rDouble51="+string(rDouble51)+";poly second51="+string(second51)+";poly third51="+string(third51)+";matrix lineLift51[3][1];matrix denominatorLift51[4][1];matrix derivativeLift51[4][1];");
+for(i51=1;i51<=3;i51++){write(coreOut51,"lineLift51["+string(i51)+",1]="+string(lineLift51[i51,1])+";");}
+for(i51=1;i51<=4;i51++){write(coreOut51,"denominatorLift51["+string(i51)+",1]="+string(denominatorLift51[i51,1])+";derivativeLift51["+string(i51)+",1]="+string(derivativeLift51[i51,1])+";");}close(coreOut51);
+print("LINE51_STAGE complete_line_product=true denominator_and_cubic_derivative_units=true three_doublings_identity=true core_export_closed=true");
 poly psi2_51=A51*r+b;poly psi3_51=r^4+A51^2*r^3+A51*b*r^2+b^2*r+b^3;
 poly psi4_51=psi2_51*(A51^2*r^5+A51*b*r^4+A51*c*b^3*r+c*b^4);
 poly psi5_51=psi4_51*psi2_51^3+psi3_51^3;poly psi7_51=psi5_51*psi3_51^3+psi2_51*psi4_51^3;
