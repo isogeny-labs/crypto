@@ -1517,6 +1517,10 @@ fn report(ctx: &Ctx) -> J {
         ("model_fidelity_e19", J::Arr(fid.iter().map(|x| obj(vec![("p", ju(x.0)), ("seed", ju(x.1)), ("measured_over_model_median_c", jf(x.2)), ("measured_over_model_mean_c", jf(x.3))])).collect())),
         ("controls_g2_102_within30", J::Arr(within30.iter().map(|x| obj(vec![("p", ju(x.0)), ("seed", ju(x.1)), ("uniform_over_e19", jf(x.2)), ("decomposed_over_e19", jf(x.3))])).collect())),
         ("gae_band_walk_iii", obj(vec![("definition", js("IC: S_model(w) = R C + R g + 16 LA + w * 97 * R * (E19's Macaulay entries per residual at the same p), the producer's band, one native operation per Macaulay entry; rho: E27's <±psi> walk (iii) (Karatsuba products, batched inversions, the cheapest arithmetic built; the walk is the same walk as (i), checked in A.6) + w * 97 * mean steps. GAE = 97 F_p multiplications (E25's affine addition), as E27's validation. Medians over the 10 curves.")), ("weights", J::Arr(band_med)), ("order_holds_across_band", jb(order_holds))])),
+        ("measured_vs_modelled", obj(vec![
+            ("measured", js("Stage 0 (40 curves: psi, lambda, T and line checks, h, density, columns); Stage A (10 curves: columns, residuals to the logarithm R, relations, y, decompositions per target, generation cost g, LA, both logarithms, 640 walks in two arithmetics); the registered solve-cost control (30 weighted-D4 calls on uniform targets: C, agreement 0 = 0) and the supplementary control (30 calls on decomposable targets: C, exact agreement). All replayed.")),
+            ("modelled", js("Stage A2: S_model = R C + R g + 16 LA for each arm, S_model / rho at 0, 0.1 and 1 GAE (IC native operations borrowed from E19's Macaulay entries per residual), E19/E28, and every comparison with E31 A built on them (G2.103). Recomputed from the measured inputs above, not replayed: no end-to-end run with the D4 solve exists.")),
+        ])),
         ("errata", errata),
         ("verdicts_recomputed", verdicts),
         ("registered_control_deviation", deviation),
