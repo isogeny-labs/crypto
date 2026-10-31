@@ -1,0 +1,39 @@
+# R51 ordered continuation
+
+1. Reconcile overlap-lean51-01. Compile exit0 and all five audit declarations
+   are printed with zero failures/trust; the original process was blocked
+   on filesystem teardown before writing audit.exit. Never duplicate it.
+2. Run the frozen independent GLUE_RELOAD51 checker as glue-reload51-01.
+   All64 direct numerator identities, both32-column PID products, source
+   lift products and principal-open units must pass. A late marker following
+   any question-mark error is rejected.
+3. Run UNIVERSAL51 as universal51-01: replay the archived universal QR circuit
+   and full certificates,clear every actual coefficient denominator,verify
+   the two polynomial matrix products. No old Groebner search is repeated.
+4. Run TWIST51 as twist51-01 only after universal acceptance. Require descent
+   of all original QR and triangular equations,exact G+(1+c)^16,fullF4/F2
+   products,gamma syzygies and serialized reload. Then run BASE23_51 as
+   base23-51-01 with the actual full marked23 specialization and denominator
+   inverse witnesses. Dimension112 is an algebra statement until primality.
+5. Run FIBER51 as fiber51-01,exhausting the1008 square-determinant matrices
+   on16 QR classes. If no16-cycle,do not search for an irreducible16-degree
+   ordinary fiber as a connectedness criterion. Its moduli interpretation
+   remains a separate identified-action premise.
+6. After marked23 acceptance,freeze a bounded symbolic primality check and
+   actual constants/descent checks. Retain the untwisted/sign controls from
+   R15;the selected order991 action remains the transfer acceptance test.
+7. Use universal descended N to recover nu on the actual level77 source,
+   check its diamond transport formula independently,and lift nu into the
+   existing normal PID algebra to certify exceptional denominator cancellation.
+8. Then continue the complete prescribed RR map/correspondence and132-section
+   intersection. Keep target modular factor/nonzero11 action,proper polarized
+   embedding,node187 coupled divisors,and arbitrary reverse-divisor evaluation
+   as separate obligations. Earlier accepted norm-zero recovery results and
+   Klein/same-field regression controls are reused,not repeated by default.
+
+Only serialized local native jobs under the original4GiB/1200s limits;
+Lean -j1/-M4096 with1200s per compile/audit. No new EKS,Diem/freezer,
+Conductor claim,delegation or agent merge. R27-R50 remain sealed. R51 needs
+terminal receipt reconciliation,results/proof map,visual report,raw seal and
+fresh correct-bucket readback before scientific publication. Existing PR2995
+has all six checks green at18ce6ba68;new local commits are not yet pushed.
