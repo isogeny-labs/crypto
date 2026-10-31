@@ -70,3 +70,9 @@ The existing guards count the assembled outcome, frame and final outcome; draft 
 
 
 Integration note: both reviewed changes are applied. The terminal test append was separated from its final EOF hunk because the single-pass patch also appends controls. No semantic change was made. The stale external-draft source comment was removed. Compilation and runtime validation are pending.
+
+## Terminal validation at d6f3865a9301
+
+Native suite:141 passed,2 failed,0 ignored,exit101. Capture suite:40 passed,0 failed,exit0. All seven source hashes remained unchanged. New serializer/closed-schema controls passed. Frozen n47 F4 plain direct/collision controls and actual worker now pass. The direct suite next fails at n47 F4 twist: event117539bytes stored after3826784work reservation, then group24066bytes quote835648 refused with265330work remaining. Actual-worker suite next fails at n47 F5 plain: nativeevents100660bytes quote3286656 refused with2803789remaining. Both complete192producer group additions; no original limits changed. Later cases remain unexecuted. Two failed raw fixtures and terminal evidence archived with verified S3 readback, SHA c1bca20f999dfe013d99b53b279ad00d2b197f2dafdc92323a9450cd3dd92948.
+
+Next: review actual dedicated parent-storage operation accounting; keep original controls. Full-library and real CLI gates remain pending.

@@ -676,16 +676,17 @@ pub(super) fn solve_with_bound_event_sink_context(
 }
 
 pub fn capabilities() -> Value {
+    let koblitz_m3_profile = json!({"adapter_id":"koblitz-m3-native-v1","family":"koblitz","m":[3,3],"n_ranges_inclusive":[[23,31],[47,61]],"degree_bound_inclusive":[1,6],"factor_base_size":4,"signed_domain_points":4,"distinct_x_codes":2,"requires_sign_closed_factor_base":true,"requires_positive_work_limit":true,"requires_original_execution_context":true,"requires_bound_capture":true,"twists":[false,true],"extraction":"bounded ordered signed triples including infinity prefixes","replay":"original input, native boundary consistency, signed group prefix and canonical delivery","costs":"modeled work and memory reservations; actual group addition calls","gaps":["independent matrix basis derivation","retired hardware instructions","first and last fall degree certification","larger factor bases","generic binary curves","m greater than 3"],"requires_verified_worker_originals":true,"requires_distinct_signed_points":true,"scope":"dispatch eligibility; completion remains subject to original resource and evidence gates"});
     json!({
         "schema":"ml-dataset.capabilities/v1",
         "solvers":[
-            {"id":"f4-wide-dynamic-v1","families":["prime"],"n":[33,61],"m":[4,15],"degree_bound":12,"requires_original_execution_context":true,"requires_bound_capture":true,"maximum_signed_domain_points":64,"maximum_x_codes":32,"kind":"bounded native dynamic prime F4 and independently replayed finite-domain PDP evidence","trace":"original equations, native boundary reports, linear transitions, group prefixes and durable witnesses","unsupported_cells":"retained with explicit status","gaps":["independent native basis derivation","full instruction trajectory"]},
+            {"id":"f4-wide-dynamic-v1","families":["prime"],"n":[33,61],"m":[4,15],"degree_bound":12,"requires_original_execution_context":true,"requires_bound_capture":true,"requires_positive_work_limit":true,"requires_positive_original_memory_trace":true,"requires_whole_mib_trace_limit":true,"minimum_signed_domain_points":1,"minimum_x_codes":1,"selection":"explicit f4-wide-dynamic-v1 solver id; not selected automatically by f4","maximum_signed_domain_points":64,"maximum_x_codes":32,"kind":"bounded native dynamic prime F4 and independently replayed finite-domain PDP evidence","trace":"original equations, native boundary reports, linear transitions, group prefixes and durable witnesses","unsupported_cells":"retained with explicit status","gaps":["independent native basis derivation","full instruction trajectory"]},
             {"id":"enumerate","families":["koblitz","binary","prime"],"m":[2,15],"kind":"bounded exact signed finite-domain PDP","trace":"all visited group transitions"},
             {"id":"bsgs","families":["koblitz","binary","prime"],"m":[2,15],"kind":"independent ECDLP baseline","trace":"baby table and giant probes"},
             {"id":"sat","families":["koblitz","binary"],"m":[2,15],"kind":"native chained S3 CNF/XOR subject to preflight caps","trace":"bounded native decisions, assignments and copied reasons, conflicts, analysis reasons, learned/deleted clauses, backjumps, restarts, XOR row operations; original formulas and checked models","gaps":["independently checked UNSAT proof","internal watch/heap operations and minimization derivations","full gate semantic map"]},
             {"id":"weil","families":["koblitz","binary"],"m":[2,2],"kind":"exact finite-domain selector Weil restriction","trace":"complete ANF equations and coordinate lift map","solver_completed":false},
-            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination requires supervised context and is currently m2 or m3","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
-            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
+            {"id":"f4","families":["koblitz","binary","prime"],"m":[2,15],"m_by_family":{"koblitz":[2,2],"binary":[2,2],"prime":[2,15]},"prime_modulus_limit_exclusive":"4294967296","supervised_wide_prime_profile":{"m":[2,2],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true},"supervised_wide_prime_m3_profile":{"m":[3,3],"modulus_min_inclusive":"4294967296","modulus_max_inclusive":"2305843009213693951","requires_original_execution_context":true,"extraction":"bounded ordered signed triples including infinity prefixes"},"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"kind":"native Boolean matrix F4 plus splitting; prime m2 finite-domain reference; prime m3..15 affine S3-chain traced visitor","trace":"original systems also retained for unsupported wide primes; bounded recursive systems, branch assignments, native bases and useful-row schedules, candidate and independent group-lift events","gaps":["wide-prime elimination under solver id f4 requires supervised context and m2 or m3; m4..15 uses separate f4-wide-dynamic-v1","affine-chain exceptional infinity branches prevent general negative PDP conclusions","private pivot operations and zero rows","internal univariate factorization/GCD states","complete critical-pair stream"]},
+            {"id":"f5","families":["koblitz","binary"],"m":[2,2],"m_scope":"base routes; additional supervised profiles are separately gated","supervised_koblitz_m3_profile":koblitz_m3_profile.clone(),"kind":"native Boolean matrix F5 row criterion plus splitting; not general incremental F5","trace":"original ANF, bounded reduced rows, F5 report, splitting nodes","gaps":["per-row signatures and rejected signature witnesses"]},
             {"id":"f6","families":["koblitz","binary"],"m":[4,4],"kind":"native F6WidePairIndex geometric four-sum; not a general Groebner algorithm","trace":"pair sums, domain, verified indices","gaps":["native internal lookup sequence"]},
             {"id":"root","families":["koblitz","binary","prime"],"m":[2,2],"kind":"native S3 univariate root finding with exact domain and group lift","trace":"prime bounded field, power, GCD and split states; binary bounded quadratic, trace, half-trace and matrix states; independent distinct-root certificates","gaps":["higher-m root elimination","complete execution and total cost verification"]},
             {"id":"pkm","families":["prime"],"m":[2,3],"modulus_limit_exclusive":"2147483648","kind":"native PKM Kummer-tower F4 with finite-grid extraction","trace":"exact alternative Kummer base, quotient rules, prepared and specialized equations, native F4 report, extracted roots","gaps":["private elimination pivots and row operations","m>3 or p>=2^31"]},
@@ -6377,5 +6378,147 @@ mod verified_worker_original_tests {
             assert!(!f.root.join("factor-base.json").exists());
             assert!(!f.root.join("live").exists());
         }
+    }
+}
+#[cfg(test)]
+mod capability_dispatch_metadata_controls {
+    use super::*;
+    fn config() -> CaseConfig {
+        CaseConfig {
+            family: "koblitz".into(),
+            n: 23,
+            m: 3,
+            twist: false,
+            curve_seed: 1,
+            generator_index: 0,
+            key_index: 0,
+            seed: 42,
+            factor_base_size: 4,
+            degree_bound: 3,
+            work_limit: 16384,
+            solver: "f4".into(),
+        }
+    }
+    fn entry(caps: &Value, id: &str) -> Value {
+        caps["solvers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|e| e["id"] == id)
+            .unwrap()
+            .clone()
+    }
+    #[test]
+    fn koblitz_metadata_describes_only_the_supervised_dispatch_extension() {
+        let caps = capabilities();
+        let f4 = entry(&caps, "f4");
+        let f5 = entry(&caps, "f5");
+        assert_eq!(f4["m_by_family"]["binary"], json!([2, 2]));
+        assert_eq!(f4["m_by_family"]["koblitz"], json!([2, 2]));
+        assert_eq!(f5["m"], json!([2, 2]));
+        let p = &f4["supervised_koblitz_m3_profile"];
+        assert_eq!(p, &f5["supervised_koblitz_m3_profile"]);
+        assert_eq!(p["family"], "koblitz");
+        assert_eq!(p["m"], json!([3, 3]));
+        assert_eq!(p["n_ranges_inclusive"], json!([[23, 31], [47, 61]]));
+        assert_eq!(p["degree_bound_inclusive"], json!([1, 6]));
+        assert_eq!(p["factor_base_size"], 4);
+        assert_eq!(p["signed_domain_points"], 4);
+        assert_eq!(p["distinct_x_codes"], 2);
+        assert_eq!(p["twists"], json!([false, true]));
+        for key in [
+            "requires_verified_worker_originals",
+            "requires_original_execution_context",
+            "requires_bound_capture",
+            "requires_positive_work_limit",
+            "requires_distinct_signed_points",
+            "requires_sign_closed_factor_base",
+        ] {
+            assert_eq!(p[key], true, "{key}");
+        }
+        for id in ["weil", "f6", "root", DYNAMIC_PROFILE] {
+            assert!(entry(&caps, id)["supervised_koblitz_m3_profile"].is_null());
+        }
+        // Shape-only dispatcher control, not a mathematical curve fixture.
+        // Original-input verification remains a separate mandatory gate.
+        let case = CaseData {
+            public_instance: Value::Null,
+            private_witness: Value::Null,
+            factor_base: json!({"points":[{"x":"1","y":"2"},{"x":"1","y":"3"},{"x":"2","y":"4"},{"x":"2","y":"6"}]}),
+        };
+        for n in 20..=63 {
+            for solver in ["f4", "f5"] {
+                let mut c = config();
+                c.n = n;
+                c.solver = solver.into();
+                assert_eq!(
+                    koblitz_worker_profile(&c, &case),
+                    (23..=31).contains(&n) || (47..=61).contains(&n)
+                );
+            }
+        }
+        for family in ["binary", "prime"] {
+            let mut c = config();
+            c.family = family.into();
+            assert!(!koblitz_worker_profile(&c, &case));
+        }
+        for m in 2..=15 {
+            let mut c = config();
+            c.m = m;
+            assert_eq!(koblitz_worker_profile(&c, &case), m == 3);
+        }
+        for degree in 0..=7 {
+            let mut c = config();
+            c.degree_bound = degree;
+            assert_eq!(koblitz_worker_profile(&c, &case), (1..=6).contains(&degree));
+        }
+    }
+    #[test]
+    fn dynamic_metadata_preserves_its_separate_solver_and_runtime_gates() {
+        let p = entry(&capabilities(), DYNAMIC_PROFILE);
+        assert_eq!(p["families"], json!(["prime"]));
+        assert_eq!(p["n"], json!([33, 61]));
+        assert_eq!(p["m"], json!([4, 15]));
+        assert_eq!(p["degree_bound"], 12);
+        assert_eq!(p["minimum_signed_domain_points"], 1);
+        assert_eq!(p["maximum_signed_domain_points"], 64);
+        assert_eq!(p["minimum_x_codes"], 1);
+        assert_eq!(p["maximum_x_codes"], 32);
+        for key in [
+            "requires_original_execution_context",
+            "requires_bound_capture",
+            "requires_positive_work_limit",
+            "requires_positive_original_memory_trace",
+            "requires_whole_mib_trace_limit",
+        ] {
+            assert_eq!(p[key], true, "{key}");
+        }
+        for family in ["prime", "binary", "koblitz"] {
+            for n in [23, 32, 33, 47, 61, 62] {
+                for m in [2, 3, 4, 15] {
+                    let mut c = config();
+                    c.family = family.into();
+                    c.n = n;
+                    c.m = m;
+                    c.degree_bound = 12;
+                    c.solver = DYNAMIC_PROFILE.into();
+                    assert_eq!(
+                        dynamic_supported(&c),
+                        family == "prime" && (33..=61).contains(&n) && (4..=15).contains(&m)
+                    );
+                }
+            }
+        }
+        let mut c = config();
+        c.family = "prime".into();
+        c.n = 33;
+        c.m = 4;
+        c.solver = DYNAMIC_PROFILE.into();
+        c.degree_bound = 12;
+        c.work_limit = 0;
+        assert!(!dynamic_supported(&c));
+        c.work_limit = 1;
+        c.degree_bound = 11;
+        assert!(!dynamic_supported(&c));
     }
 }
