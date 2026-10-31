@@ -135,3 +135,19 @@ Outcome: exit 127, `/bin/bash: line 1: cargo: command not found`. No Rust source
 or build manifest changed in this task. JSON/schema, curve-name, render and PDF
 checks above completed; the unavailable Cargo toolchain remains a validation
 environment limitation rather than a passing test.
+
+## Remote delivery attempt
+
+The study was committed locally as
+`9d6074a2cf46f25f53363b74281909384be0a84a`. The required branch push was then
+attempted:
+
+```sh
+git push -u origin codex/prime-ic-lead-review-20261031
+```
+
+Outcome: exit 128,
+`fatal: could not read Username for 'https://github.com': No such device or address`.
+The managed environment has no GitHub credential/identity. No remote branch,
+pull request or auto-merge was created; those delivery requirements remain
+blocked rather than reported as complete.
