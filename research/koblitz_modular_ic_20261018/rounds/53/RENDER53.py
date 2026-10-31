@@ -74,7 +74,9 @@ source+='''
 Every failed implementation attempt is retained, including late markers after
 errors. Exact native limits: seed53,one thread,4GiBvirtual,1200s. No accepted
 producer rerun for publication. Lean uses4.34.1,pinned mathlibd13f23b,-j1,
--M4096,1200s separately for compile/audit,without a virtual-memory cap.
+-M4096,1200s separately for compile/audit,without a virtual-memory cap. Native wall times are recorded in results.json;
+complete CPU times were not recorded. These are exact identity checks,not
+statistical or performance comparisons.
 
 The three Lean implications cover determinant change,composed alpha product
 and the resulting unit. Actual arrays,trace semantics,source specialization

@@ -1,0 +1,39 @@
+# Next constructions after the R53 source geometry
+
+1. Finish the frozen `PACKET53` evaluation before changing its inputs. It uses
+   the actual saved alpha inverse and Tate coefficients,not an independent
+   scalar model. A cap leaves coordinates saved before modular-power work.
+   If generic all5identities pass,preserve them and proceed to descent.
+2. Establish F2descent of the normalized line coordinates. The proposed formulas
+   are lnew=(L+s)/u,nnew=(L*r+N+q)/u³. R52sign covariance and the verified
+   h/u³=bnew suggest target shifts A/u and bnew. Check the actual coefficient
+   products after the quadratic zeta substitution,and the twisted QR source
+   equations;do not infer descent solely from the untwisted generic map.
+3. Specialize the base to actual level11. In an exact degree8algebra over F2(z)
+   use V²+z²V+z+z³ and the actual psi3,then build r,q,s,u directly. Test the
+   target inverse-base coordinates znew=cnew²/(bnew+cnew),Rnew=bnew/cnew,
+   Vnew=(Rnew+znew³)/(1+znew). Their target base equation and all denominator
+   products are outstanding. This keeps a high-degree generic coefficient
+   substitution from becoming the only available route.
+4. Prove extension across exceptional branches on the proper normalized model.
+   Compute actual valuations/leading coefficients and residue-field descent,
+   especially z0and1. The verified determinant factors and R52elementary types
+   now give exact local targets. A matching semigroup or discriminant does
+   not identify a completed subring on its own.
+5. Determine the integral/odd-adic correspondence action on the intended11part.
+   Preserve the shared-residual-Hecke obstruction as an explicit acceptance
+   gate. Generic rational maps and a correct source field do not compute this
+   action. Continue full quotient saturation and proper polarized embedding
+   obligations separately.
+6. Scale the marked23degree112function field to its proper normalized model
+   and selected991action. Reuse all3810accepted source fibers and their DVR/
+   constant-field argument from R52;do not regenerate them for custody.
+7. Preserve the coupled-divisor/node187 and arbitrary reverse-evaluator lanes,
+   including all inverse/Kummer/descent blocks,exceptional ordinary fibers,
+   and Frobenius/deck rank dependencies. See retained R52/NEXT.md and the
+   original round21CM obligations. The n3Klein and same-field n5solvers remain
+   regression controls;the F2modular-factor transfer remains its own test.
+
+Every new mathematical stage must freeze its own inputs/protocol before data,
+keep4GiBvirtual/1200s/one native thread and serialize with Lean. No new EKS,
+Diem/freezer restart,Conductor claim,delegation,merge or auto-merge change.
