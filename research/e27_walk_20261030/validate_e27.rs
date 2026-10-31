@@ -166,11 +166,16 @@ impl<'a> Parser<'a> {
             Some(c) if c == b'-' || c.is_ascii_digit() => {
                 let st = self.i;
                 while self.i < self.s.len()
-                    && matches!(self.s[self.i], b'0'..=b'9' | b'-' | b'+' | b'.' | b'e' | b'E')
+                    && matches!(
+                        self.s[self.i],
+                        b'0'..=b'9' | b'-' | b'+' | b'.' | b'e' | b'E'
+                    )
                 {
                     self.i += 1;
                 }
-                Ok(J::Num(String::from_utf8(self.s[st..self.i].to_vec()).unwrap()))
+                Ok(J::Num(
+                    String::from_utf8(self.s[st..self.i].to_vec()).unwrap(),
+                ))
             }
             _ => Err(format!("unexpected byte at {}", self.i)),
         }
@@ -178,8 +183,13 @@ impl<'a> Parser<'a> {
 }
 
 fn parse(text: &str) -> J {
-    let mut p = Parser { s: text.as_bytes(), i: 0 };
-    let v = p.value().unwrap_or_else(|e| panic!("JSON parse error: {e}"));
+    let mut p = Parser {
+        s: text.as_bytes(),
+        i: 0,
+    };
+    let v = p
+        .value()
+        .unwrap_or_else(|e| panic!("JSON parse error: {e}"));
     p.ws();
     assert_eq!(p.i, text.len(), "trailing bytes after JSON value");
     v
@@ -188,7 +198,11 @@ fn parse(text: &str) -> J {
 impl J {
     fn get(&self, k: &str) -> &J {
         match self {
-            J::Obj(o) => o.iter().find(|(kk, _)| kk == k).map(|(_, v)| v).unwrap_or(&NULL),
+            J::Obj(o) => o
+                .iter()
+                .find(|(kk, _)| kk == k)
+                .map(|(_, v)| v)
+                .unwrap_or(&NULL),
             _ => &NULL,
         }
     }
@@ -200,7 +214,9 @@ impl J {
     }
     fn u(&self) -> u64 {
         match self {
-            J::Num(s) => s.parse::<u64>().unwrap_or_else(|_| panic!("not a u64: {s}")),
+            J::Num(s) => s
+                .parse::<u64>()
+                .unwrap_or_else(|_| panic!("not a u64: {s}")),
             _ => panic!("not a number: {self:?}"),
         }
     }
@@ -331,22 +347,43 @@ fn sha256(data: &[u8]) -> String {
     for chunk in msg.chunks(64) {
         let mut w = [0u32; 64];
         for t in 0..16 {
-            w[t] = u32::from_be_bytes([chunk[4 * t], chunk[4 * t + 1], chunk[4 * t + 2], chunk[4 * t + 3]]);
+            w[t] = u32::from_be_bytes([
+                chunk[4 * t],
+                chunk[4 * t + 1],
+                chunk[4 * t + 2],
+                chunk[4 * t + 3],
+            ]);
         }
         for t in 16..64 {
             let s0 = w[t - 15].rotate_right(7) ^ w[t - 15].rotate_right(18) ^ (w[t - 15] >> 3);
             let s1 = w[t - 2].rotate_right(17) ^ w[t - 2].rotate_right(19) ^ (w[t - 2] >> 10);
-            w[t] = w[t - 16].wrapping_add(s0).wrapping_add(w[t - 7]).wrapping_add(s1);
+            w[t] = w[t - 16]
+                .wrapping_add(s0)
+                .wrapping_add(w[t - 7])
+                .wrapping_add(s1);
         }
         let mut v = h;
         for t in 0..64 {
             let s1 = v[4].rotate_right(6) ^ v[4].rotate_right(11) ^ v[4].rotate_right(25);
             let ch = (v[4] & v[5]) ^ (!v[4] & v[6]);
-            let t1 = v[7].wrapping_add(s1).wrapping_add(ch).wrapping_add(K[t]).wrapping_add(w[t]);
+            let t1 = v[7]
+                .wrapping_add(s1)
+                .wrapping_add(ch)
+                .wrapping_add(K[t])
+                .wrapping_add(w[t]);
             let s0 = v[0].rotate_right(2) ^ v[0].rotate_right(13) ^ v[0].rotate_right(22);
             let maj = (v[0] & v[1]) ^ (v[0] & v[2]) ^ (v[1] & v[2]);
             let t2 = s0.wrapping_add(maj);
-            v = [t1.wrapping_add(t2), v[0], v[1], v[2], v[3].wrapping_add(t1), v[4], v[5], v[6]];
+            v = [
+                t1.wrapping_add(t2),
+                v[0],
+                v[1],
+                v[2],
+                v[3].wrapping_add(t1),
+                v[4],
+                v[5],
+                v[6],
+            ];
         }
         for k in 0..8 {
             h[k] = h[k].wrapping_add(v[k]);
@@ -432,7 +469,16 @@ impl Walk {
     }
     /// The fields the bit-identity claim (G2.95) is about.
     fn identity(&self) -> (u64, u64, u64, Option<u64>, bool, Option<u64>, u64, u64) {
-        (self.seed, self.steps, self.gops, self.rec, self.correct, self.digest, self.esc, self.vgops)
+        (
+            self.seed,
+            self.steps,
+            self.gops,
+            self.rec,
+            self.correct,
+            self.digest,
+            self.esc,
+            self.vgops,
+        )
     }
 }
 
@@ -470,12 +516,27 @@ struct Headlines {
 }
 
 impl Headlines {
-    fn add(&mut self, name: &str, source: &str, printed: &str, claimed: f64, half_unit: f64, recomputed: f64, def: &str) {
-        let rel_tol = if half_unit == 0.0 { 1e-12 } else { half_unit / claimed.abs() * (1.0 + 1e-9) };
+    fn add(
+        &mut self,
+        name: &str,
+        source: &str,
+        printed: &str,
+        claimed: f64,
+        half_unit: f64,
+        recomputed: f64,
+        def: &str,
+    ) {
+        let rel_tol = if half_unit == 0.0 {
+            1e-12
+        } else {
+            half_unit / claimed.abs() * (1.0 + 1e-9)
+        };
         let scale = claimed.abs().max(recomputed.abs()).max(1e-300);
         let agrees = (claimed - recomputed).abs() <= rel_tol * scale;
         if !agrees {
-            self.bad.push(format!("{name}: printed {printed}, recomputed {recomputed}"));
+            self.bad.push(format!(
+                "{name}: printed {printed}, recomputed {recomputed}"
+            ));
         }
         self.items.push(obj(vec![
             ("name", js(name)),
@@ -513,7 +574,11 @@ fn leaves(path: &str, a: &J, b: &J, out: &mut LeafDiff) {
         }
         (J::Arr(xa), J::Arr(xb)) => {
             if xa.len() != xb.len() {
-                out.mismatches.push((format!("{path}.length"), ju(xa.len() as u64), ju(xb.len() as u64)));
+                out.mismatches.push((
+                    format!("{path}.length"),
+                    ju(xa.len() as u64),
+                    ju(xb.len() as u64),
+                ));
             }
             for (k, (va, vb)) in xa.iter().zip(xb).enumerate() {
                 leaves(&format!("{path}[{k}]"), va, vb, out);
@@ -533,7 +598,8 @@ fn leaves(path: &str, a: &J, b: &J, out: &mut LeafDiff) {
             if same {
                 out.identical += 1;
             } else {
-                out.mismatches.push((path.to_string(), a.clone(), b.clone()));
+                out.mismatches
+                    .push((path.to_string(), a.clone(), b.clone()));
             }
         }
     }
@@ -613,8 +679,14 @@ fn compare(ctx: &Ctx) -> J {
         all_identical += d.identical;
         runs.push(obj(vec![
             ("run", js(&name)),
-            ("committed", obj(vec![("path", js(&committed)), ("sha256", js(&ha))])),
-            ("replay", obj(vec![("path", js(&replay)), ("sha256", js(&hb))])),
+            (
+                "committed",
+                obj(vec![("path", js(&committed)), ("sha256", js(&ha))]),
+            ),
+            (
+                "replay",
+                obj(vec![("path", js(&replay)), ("sha256", js(&hb))]),
+            ),
             ("fields_compared", ju(d.compared)),
             ("fields_identical", ju(d.identical)),
             (
@@ -622,18 +694,36 @@ fn compare(ctx: &Ctx) -> J {
                 J::Arr(
                     d.mismatches
                         .iter()
-                        .map(|(p, x, y)| obj(vec![("path", js(p)), ("committed", x.clone()), ("replay", y.clone())]))
+                        .map(|(p, x, y)| {
+                            obj(vec![
+                                ("path", js(p)),
+                                ("committed", x.clone()),
+                                ("replay", y.clone()),
+                            ])
+                        })
                         .collect(),
                 ),
             ),
-            ("only_in_committed", J::Arr(d.only_a.iter().map(|p| js(p)).collect())),
-            ("only_in_replay", J::Arr(d.only_b.iter().map(|p| js(p)).collect())),
+            (
+                "only_in_committed",
+                J::Arr(d.only_a.iter().map(|p| js(p)).collect()),
+            ),
+            (
+                "only_in_replay",
+                J::Arr(d.only_b.iter().map(|p| js(p)).collect()),
+            ),
             (
                 "timing_not_compared",
                 J::Arr(
                     d.timing
                         .iter()
-                        .map(|(p, x, y)| obj(vec![("path", js(p)), ("committed", x.clone()), ("replay", y.clone())]))
+                        .map(|(p, x, y)| {
+                            obj(vec![
+                                ("path", js(p)),
+                                ("committed", x.clone()),
+                                ("replay", y.clone()),
+                            ])
+                        })
                         .collect(),
                 ),
             ),
@@ -689,7 +779,10 @@ fn report(ctx: &Ctx) -> J {
     let mut raw: Vec<J> = Vec::new();
     let mut pin = |rel: &str, h: &str| {
         let depth = ctx.ev.split('/').count();
-        raw.push(obj(vec![("path", js(&format!("{}{}", "../".repeat(depth), rel))), ("sha256", js(h))]));
+        raw.push(obj(vec![
+            ("path", js(&format!("{}{}", "../".repeat(depth), rel))),
+            ("sha256", js(h)),
+        ]));
     };
     let mut checks: Vec<J> = Vec::new();
     let mut failures: Vec<String> = Vec::new();
@@ -697,7 +790,11 @@ fn report(ctx: &Ctx) -> J {
         if !ok {
             failures.push(format!("{name}: {detail}"));
         }
-        checks.push(obj(vec![("check", js(name)), ("holds", jb(ok)), ("detail", js(&detail))]));
+        checks.push(obj(vec![
+            ("check", js(name)),
+            ("holds", jb(ok)),
+            ("detail", js(&detail)),
+        ]));
     };
 
     // ---------------------------------------------------------- Stage W
@@ -707,9 +804,15 @@ fn report(ctx: &Ctx) -> J {
     check(
         "stage W covers E25's ten curves, 16 walks per fold, pool 16",
         curves.len() == 10 && sw.get("walks_per_fold").u() == 16 && sw.get("pool").u() == 16,
-        format!("{} curves, walks_per_fold {}, pool {}", curves.len(), sw.get("walks_per_fold").u(), sw.get("pool").u()),
+        format!(
+            "{} curves, walks_per_fold {}, pool {}",
+            curves.len(),
+            sw.get("walks_per_fold").u(),
+            sw.get("pool").u()
+        ),
     );
-    let (mut identical3, mut total_walks, mut e25_match_a, mut e25_match_b, mut correct_all) = (0u64, 0u64, 0u64, 0u64, 0u64);
+    let (mut identical3, mut total_walks, mut e25_match_a, mut e25_match_b, mut correct_all) =
+        (0u64, 0u64, 0u64, 0u64, 0u64);
     let mut ratio_i_iii: Vec<(u64, u64, &str, f64)> = Vec::new();
     let mut ratio_i_ii: Vec<f64> = Vec::new();
     let mut shares: Vec<(u64, u64, &str, f64)> = Vec::new();
@@ -732,10 +835,14 @@ fn report(ctx: &Ctx) -> J {
         let mut d_curve: BTreeSet<Option<u64>> = BTreeSet::new();
         for fold in FOLDS {
             let fj = c.get("folds").get(fold);
-            let ws: Vec<Vec<Walk>> = ARITH.iter().map(|a| walks(fj.get("walks").get(a))).collect();
+            let ws: Vec<Vec<Walk>> = ARITH
+                .iter()
+                .map(|a| walks(fj.get("walks").get(a)))
+                .collect();
             let expect_seeds: Vec<u64> = (0..16).map(|k| 1000 * s + k).collect();
             for w in &ws {
-                seeds_ok &= w.len() == 16 && w.iter().map(|x| x.seed).collect::<Vec<_>>() == expect_seeds;
+                seeds_ok &=
+                    w.len() == 16 && w.iter().map(|x| x.seed).collect::<Vec<_>>() == expect_seeds;
                 seeds_ok &= w.iter().all(|x| x.fold == fold);
             }
             let mut n_ident = 0u64;
@@ -753,7 +860,10 @@ fn report(ctx: &Ctx) -> J {
                     d_curve.insert(w.rec);
                 }
                 let matches = |rec: &[Walk]| {
-                    rec.iter().filter(|r| r.fold == fold && r.seed == a.seed).count() == 1
+                    rec.iter()
+                        .filter(|r| r.fold == fold && r.seed == a.seed)
+                        .count()
+                        == 1
                         && rec.iter().any(|r| {
                             r.fold == fold
                                 && r.seed == a.seed
@@ -771,9 +881,15 @@ fn report(ctx: &Ctx) -> J {
                     e25_match_b += 1;
                 }
             }
-            let sums: Vec<u64> = ws.iter().map(|w| w.iter().map(|x| x.walk_muls()).sum()).collect();
+            let sums: Vec<u64> = ws
+                .iter()
+                .map(|w| w.iter().map(|x| x.walk_muls()).sum())
+                .collect();
             let means: Vec<f64> = sums.iter().map(|&x| x as f64 / 16.0).collect();
-            let vmeans: Vec<f64> = ws.iter().map(|w| w.iter().map(|x| x.vmuls).sum::<u64>() as f64 / 16.0).collect();
+            let vmeans: Vec<f64> = ws
+                .iter()
+                .map(|w| w.iter().map(|x| x.vmuls).sum::<u64>() as f64 / 16.0)
+                .collect();
             let steps = ws[0].iter().map(|x| x.steps).sum::<u64>() as f64 / 16.0;
             let gops = ws[0].iter().map(|x| x.walk_gops()).sum::<u64>() as f64 / 16.0;
             for (k, a) in ARITH.iter().enumerate() {
@@ -781,7 +897,9 @@ fn report(ctx: &Ctx) -> J {
                 means_ok &= fj.get("mean_verify_fp_muls").get(a).f() == vmeans[k];
             }
             means_ok &= fj.get("mean_steps").f() == steps && fj.get("mean_group_ops").f() == gops;
-            flags_ok &= fj.get("replay_matches_e25").b() && fj.get("karatsuba_identical").b() && fj.get("batched_identical").b();
+            flags_ok &= fj.get("replay_matches_e25").b()
+                && fj.get("karatsuba_identical").b()
+                && fj.get("batched_identical").b();
             flags_ok &= fj.get("e25_records").u() == 16;
             let r13 = sums[0] as f64 / sums[2] as f64;
             ratio_i_iii.push((p, s, fold, r13));
@@ -817,7 +935,10 @@ fn report(ctx: &Ctx) -> J {
                 ("mean_walk_fp_muls_i", jf(means[0])),
                 ("mean_walk_fp_muls_ii", jf(means[1])),
                 ("mean_walk_fp_muls_iii", jf(means[2])),
-                ("mean_verify_fp_muls_i_ii_iii", J::Arr(vmeans.iter().map(|&v| jf(v)).collect())),
+                (
+                    "mean_verify_fp_muls_i_ii_iii",
+                    J::Arr(vmeans.iter().map(|&v| jf(v)).collect()),
+                ),
                 ("mean_steps", jf(steps)),
                 ("mean_walk_group_ops", jf(gops)),
                 ("ratio_i_over_iii", jf(r13)),
@@ -827,7 +948,10 @@ fn report(ctx: &Ctx) -> J {
                 ("inversion_share", jf(share)),
                 ("batched_addition_fp_muls", jf(79.0 - 16.0 + share)),
                 ("kara_minus_batched_total_eq_16inv_minus_share", jb(ident)),
-                ("pool_batch_muls_eq_3inv_plus_13rounds", jb(bm == 3 * inv + 13 * rounds)),
+                (
+                    "pool_batch_muls_eq_3inv_plus_13rounds",
+                    jb(bm == 3 * inv + 13 * rounds),
+                ),
                 ("filler_walks", ju(bt.get("filler_walks").u())),
             ]));
         }
@@ -838,12 +962,24 @@ fn report(ctx: &Ctx) -> J {
             logs.push((p, s, u64::MAX));
         }
     }
-    check("every walk uses E25's seeds 1000*seed + k, k < 16, in order, for its fold", seeds_ok, format!("{seeds_ok}"));
+    check(
+        "every walk uses E25's seeds 1000*seed + k, k < 16, in order, for its fold",
+        seeds_ok,
+        format!("{seeds_ok}"),
+    );
     check("320 walks identical under (i), (ii), (iii) (seed, steps, group ops, recovered, correct, visit digest, cycle escapes, verify group ops)", identical3 == 320 && total_walks == 320, format!("{identical3} of {total_walks}"));
     check("every walk under every arithmetic is correct (recovered = planted d and [d]G = Q in the producing binary)", correct_all == 320, format!("{correct_all} of 320 walk triples"));
     check("(i) equals E25's arm-A walk record field for field (steps, group ops and F_p mults without the [d]G check, cycle escapes, correct)", e25_match_a == 320, format!("{e25_match_a} of 320"));
-    check("(i) equals E25's arm-B walk record field for field (E25 records each walk in both arms)", e25_match_b == 320, format!("{e25_match_b} of 320"));
-    check("one logarithm per curve across all 96 walks", logs.iter().all(|x| x.2 != u64::MAX), format!("{:?}", logs));
+    check(
+        "(i) equals E25's arm-B walk record field for field (E25 records each walk in both arms)",
+        e25_match_b == 320,
+        format!("{e25_match_b} of 320"),
+    );
+    check(
+        "one logarithm per curve across all 96 walks",
+        logs.iter().all(|x| x.2 != u64::MAX),
+        format!("{:?}", logs),
+    );
     // The planted secrets were checked independently by E25's validator
     // (its own arithmetic: G, Q on the curve, n prime, nG = O, dG = Q, ...).
     let e25cert_rel = "benchmarks/20261018-k4-gls-v4/replay-certificate.json";
@@ -852,8 +988,12 @@ fn report(ctx: &Ctx) -> J {
     let mut planted_ok = 0u64;
     for ic in e25cert.get("instance_checks").arr() {
         let (p, s) = (ic.get("p").u(), ic.get("seed").u());
-        let n_ok = per_curve_n.iter().any(|x| x.0 == p && x.1 == s && x.2 == ic.get("n").u() && x.3 == ic.get("cofactor").u());
-        let d_ok = logs.iter().any(|x| x.0 == p && x.1 == s && x.2 == ic.get("planted_d").u());
+        let n_ok = per_curve_n.iter().any(|x| {
+            x.0 == p && x.1 == s && x.2 == ic.get("n").u() && x.3 == ic.get("cofactor").u()
+        });
+        let d_ok = logs
+            .iter()
+            .any(|x| x.0 == p && x.1 == s && x.2 == ic.get("planted_d").u());
         if n_ok && d_ok && ic.get("all_checks_pass").b() && ic.get("experiment").s() == "e25" {
             planted_ok += 1;
         }
@@ -905,7 +1045,10 @@ fn report(ctx: &Ctx) -> J {
             let (e25, _) = ctx.read(&e25_rel(p, s));
             pin(&e27_rel(p, s), &h27);
             pin(&e31_rel(p, s), &h31);
-            let c = curves.iter().find(|c| c.get("p").u() == p && c.get("seed").u() == s).unwrap();
+            let c = curves
+                .iter()
+                .find(|c| c.get("p").u() == p && c.get("seed").u() == s)
+                .unwrap();
             let d = logs.iter().find(|x| x.0 == p && x.1 == s).unwrap().2;
             let gm = gls_means.iter().find(|x| x.0 == p && x.1 == s).unwrap();
             let kara_gls = walks(c.get("folds").get("Gls").get("walks").get("karatsuba"));
@@ -914,17 +1057,21 @@ fn report(ctx: &Ctx) -> J {
                 let r27 = &e27.arr()[ai];
                 let r31 = &e31.arr()[ai];
                 let r25 = &e25.arr()[ai];
-                ic_ok &= r27.get("arm").s() == *arm && r31.get("arm").s() == *arm && r25.get("arm").s() == *arm;
+                ic_ok &= r27.get("arm").s() == *arm
+                    && r31.get("arm").s() == *arm
+                    && r25.get("arm").s() == *arm;
                 ic_ok &= r27.get("solver").s() == "chain" && r31.get("solver").s() == "chain";
                 ic_ok &= r27.get("fp4_product").s() == "karatsuba";
                 ic_ok &= r27.get("p").u() == p && r27.get("seed").u() == s;
                 for k in ["n", "group_order", "cofactor", "base_points"] {
                     instance_ok &= r27.get(k) == r31.get(k) && r27.get(k) == r25.get(k);
                 }
-                instance_ok &= r27.get("n").u() == c.get("n").u() && r27.get("cofactor").u() == c.get("cofactor").u();
+                instance_ok &= r27.get("n").u() == c.get("n").u()
+                    && r27.get("cofactor").u() == c.get("cofactor").u();
                 // Scalars: the index calculus's own logarithm equals the walks'.
                 let fo = r27.get("folded");
-                ic_log_ok &= fo.get("solved").b() && fo.get("correct").b() && fo.get("recovered").u() == d;
+                ic_log_ok &=
+                    fo.get("solved").b() && fo.get("correct").b() && fo.get("recovered").u() == d;
                 ic_log_ok &= r31.get("folded").get("correct").b();
                 // Every leaf of E31's record against E27's.
                 let mut ld = LeafDiff::default();
@@ -942,15 +1089,27 @@ fn report(ctx: &Ctx) -> J {
                 }
                 // The totals.
                 let comp = |r: &J| {
-                    ["generation_muls", "base_muls", "precompute_muls", "weil_muls", "lift_muls", "check_muls", "solve_muls", "la_fp_muls"]
-                        .iter()
-                        .map(|k| r.get(k).u())
-                        .sum::<u64>()
+                    [
+                        "generation_muls",
+                        "base_muls",
+                        "precompute_muls",
+                        "weil_muls",
+                        "lift_muls",
+                        "check_muls",
+                        "solve_muls",
+                        "la_fp_muls",
+                    ]
+                    .iter()
+                    .map(|k| r.get(k).u())
+                    .sum::<u64>()
                 };
-                ic_ok &= comp(r27) == r27.get("total_muls").u() && comp(r31) == r31.get("total_muls").u();
-                ic_ok &= r27.get("solve_muls") == r31.get("solve_muls") && r27.get("la_fp_muls") == r31.get("la_fp_muls");
+                ic_ok &= comp(r27) == r27.get("total_muls").u()
+                    && comp(r31) == r31.get("total_muls").u();
+                ic_ok &= r27.get("solve_muls") == r31.get("solve_muls")
+                    && r27.get("la_fp_muls") == r31.get("la_fp_muls");
                 ic_ok &= r27.get("macaulay_entries") == r31.get("macaulay_entries");
-                ic_ok &= r31.get("fp_muls_per_add").f() == 97.0 && r27.get("fp_muls_per_add").f() == 79.0;
+                ic_ok &= r31.get("fp_muls_per_add").f() == 97.0
+                    && r27.get("fp_muls_per_add").f() == 79.0;
                 let s_a = r31.get("total_muls").u() as f64;
                 let s_k = r27.get("total_muls").u() as f64;
                 let e = r31.get("macaulay_entries").u() as f64;
@@ -970,7 +1129,11 @@ fn report(ctx: &Ctx) -> J {
                 for (fold, sw_w) in [("Gls", &kara_gls), ("Negation", &kara_neg)] {
                     for w in sw_w.iter() {
                         e2e_walks_total += 1;
-                        if pw.iter().filter(|x| x.fold == fold && x.seed == w.seed).count() == 1
+                        if pw
+                            .iter()
+                            .filter(|x| x.fold == fold && x.seed == w.seed)
+                            .count()
+                            == 1
                             && pw.iter().any(|x| x == w)
                         {
                             e2e_walks_eq_stage_w += 1;
@@ -980,7 +1143,19 @@ fn report(ctx: &Ctx) -> J {
                 let incl: f64 = kara_gls.iter().map(|w| w.muls).sum::<u64>() as f64 / 16.0;
                 e2e_rho_field_incl_verify &= r27.get("rho_matched_muls").f() == incl;
                 e2e_field_factor.push(r27.get("rho_matched_muls").f() / gm.3);
-                let row = Row { p, s, arm, s_a, s_k, e, rho_e31: gm.2, rho_iii: gm.3, steps: gm.4, share_gls: gm.5, inv };
+                let row = Row {
+                    p,
+                    s,
+                    arm,
+                    s_a,
+                    s_k,
+                    e,
+                    rho_e31: gm.2,
+                    rho_iii: gm.3,
+                    steps: gm.4,
+                    share_gls: gm.5,
+                    inv,
+                };
                 ic_rows_json.push(obj(vec![
                     ("p", ju(p)),
                     ("seed", ju(s)),
@@ -1025,14 +1200,33 @@ fn report(ctx: &Ctx) -> J {
     check("the pipeline process's own <±psi> and negation walks equal Stage W's walk (ii) record for record (cost included)", e2e_walks_eq_stage_w == e2e_walks_total, format!("{e2e_walks_eq_stage_w} of {e2e_walks_total}"));
     check("disclosure: the E27 e2e records' rho_matched_muls is walk (ii) WITH the [d]G check, so their `ratio` field is not the E27 distance", e2e_rho_field_incl_verify, format!("{e2e_rho_field_incl_verify}"));
     let allowed_diff: BTreeSet<&str> = [
-        "$.total_muls", "$.ratio", "$.generation_muls", "$.base_muls", "$.precompute_muls", "$.weil_muls",
-        "$.lift_muls", "$.check_muls", "$.fp_muls_per_add", "$.call.max", "$.call.mean", "$.call.median",
-        "$.call.min", "$.call.p10", "$.call.p90", "$.rho_matched_muls", "$.rho_negation_muls",
-        "$.rho_unfolded_muls", "$.rho[*].fp_muls", "$.rho[*].group_ops",
+        "$.total_muls",
+        "$.ratio",
+        "$.generation_muls",
+        "$.base_muls",
+        "$.precompute_muls",
+        "$.weil_muls",
+        "$.lift_muls",
+        "$.check_muls",
+        "$.fp_muls_per_add",
+        "$.call.max",
+        "$.call.mean",
+        "$.call.median",
+        "$.call.min",
+        "$.call.p10",
+        "$.call.p90",
+        "$.rho_matched_muls",
+        "$.rho_negation_muls",
+        "$.rho_unfolded_muls",
+        "$.rho[*].fp_muls",
+        "$.rho[*].group_ops",
     ]
     .into_iter()
     .collect();
-    let unexpected: Vec<&String> = diff_paths.iter().filter(|p| !allowed_diff.contains(p.as_str())).collect();
+    let unexpected: Vec<&String> = diff_paths
+        .iter()
+        .filter(|p| !allowed_diff.contains(p.as_str()))
+        .collect();
     check(
         "every other field of E31 A's records reproduced: differing leaves are only multiplication counts and what derives from them, walk group ops (the [d]G check, now charged), and wall times",
         unexpected.is_empty() && removed_paths.is_empty(),
@@ -1040,76 +1234,352 @@ fn report(ctx: &Ctx) -> J {
     );
 
     // ---------------------------------------------------------- headlines
-    let mut h = Headlines { items: Vec::new(), bad: Vec::new() };
+    let mut h = Headlines {
+        items: Vec::new(),
+        bad: Vec::new(),
+    };
     let po_s = po.get("schoolbook");
     let po_k = po.get("karatsuba");
-    h.add("Fp4::mul schoolbook", note, "19", 19.0, 0.0, po_s.get("fp4_mul").u() as f64, "per_op_costs.schoolbook.fp4_mul (counter)");
-    h.add("Fp4::mul Karatsuba", note, "13", 13.0, 0.0, po_k.get("fp4_mul").u() as f64, "per_op_costs.karatsuba.fp4_mul (counter)");
-    h.add("affine addition, schoolbook (E25 reference)", note, "97", 97.0, 0.0, po_s.get("add_distinct_unbatched").u() as f64, "per_op_costs.schoolbook.add_distinct_unbatched");
-    h.add("affine addition, Karatsuba unbatched", note, "79", 79.0, 0.0, po_k.get("add_distinct_unbatched").u() as f64, "per_op_costs.karatsuba.add_distinct_unbatched");
-    h.add("doubling, schoolbook", note, "116", 116.0, 0.0, po_s.get("double_unbatched").u() as f64, "per_op_costs.schoolbook.double_unbatched");
-    h.add("doubling, Karatsuba unbatched", note, "92", 92.0, 0.0, po_k.get("double_unbatched").u() as f64, "per_op_costs.karatsuba.double_unbatched");
-    h.add("GLS map psi, schoolbook", note, "38", 38.0, 0.0, po_s.get("psi_gls").u() as f64, "per_op_costs.schoolbook.psi_gls");
-    h.add("GLS map psi, Karatsuba", note, "26", 26.0, 0.0, po_k.get("psi_gls").u() as f64, "per_op_costs.karatsuba.psi_gls");
+    h.add(
+        "Fp4::mul schoolbook",
+        note,
+        "19",
+        19.0,
+        0.0,
+        po_s.get("fp4_mul").u() as f64,
+        "per_op_costs.schoolbook.fp4_mul (counter)",
+    );
+    h.add(
+        "Fp4::mul Karatsuba",
+        note,
+        "13",
+        13.0,
+        0.0,
+        po_k.get("fp4_mul").u() as f64,
+        "per_op_costs.karatsuba.fp4_mul (counter)",
+    );
+    h.add(
+        "affine addition, schoolbook (E25 reference)",
+        note,
+        "97",
+        97.0,
+        0.0,
+        po_s.get("add_distinct_unbatched").u() as f64,
+        "per_op_costs.schoolbook.add_distinct_unbatched",
+    );
+    h.add(
+        "affine addition, Karatsuba unbatched",
+        note,
+        "79",
+        79.0,
+        0.0,
+        po_k.get("add_distinct_unbatched").u() as f64,
+        "per_op_costs.karatsuba.add_distinct_unbatched",
+    );
+    h.add(
+        "doubling, schoolbook",
+        note,
+        "116",
+        116.0,
+        0.0,
+        po_s.get("double_unbatched").u() as f64,
+        "per_op_costs.schoolbook.double_unbatched",
+    );
+    h.add(
+        "doubling, Karatsuba unbatched",
+        note,
+        "92",
+        92.0,
+        0.0,
+        po_k.get("double_unbatched").u() as f64,
+        "per_op_costs.karatsuba.double_unbatched",
+    );
+    h.add(
+        "GLS map psi, schoolbook",
+        note,
+        "38",
+        38.0,
+        0.0,
+        po_s.get("psi_gls").u() as f64,
+        "per_op_costs.schoolbook.psi_gls",
+    );
+    h.add(
+        "GLS map psi, Karatsuba",
+        note,
+        "26",
+        26.0,
+        0.0,
+        po_k.get("psi_gls").u() as f64,
+        "per_op_costs.karatsuba.psi_gls",
+    );
     let sh: Vec<f64> = shares.iter().map(|x| x.3).collect();
     let (sh_lo, sh_hi) = minmax(&sh);
-    h.add("norm-inversion share per inversion, min over 20 pools", note, "3.27", 3.27, 0.005, sh_lo, "recorded_batch_muls / recorded_inversions per (curve, fold) pool");
-    h.add("norm-inversion share per inversion, max over 20 pools", note, "3.75", 3.75, 0.005, sh_hi, "recorded_batch_muls / recorded_inversions per (curve, fold) pool");
+    h.add(
+        "norm-inversion share per inversion, min over 20 pools",
+        note,
+        "3.27",
+        3.27,
+        0.005,
+        sh_lo,
+        "recorded_batch_muls / recorded_inversions per (curve, fold) pool",
+    );
+    h.add(
+        "norm-inversion share per inversion, max over 20 pools",
+        note,
+        "3.75",
+        3.75,
+        0.005,
+        sh_hi,
+        "recorded_batch_muls / recorded_inversions per (curve, fold) pool",
+    );
     h.add("affine addition, batched (iii), min", note, "66.3", 66.3, 0.05, 79.0 - 16.0 + sh_lo, "Karatsuba add 79 with the 16 of its F_p inversion replaced by the pool's share (identity checked per pool)");
-    h.add("affine addition, batched (iii), max", note, "66.7", 66.7, 0.05, 79.0 - 16.0 + sh_hi, "as above");
-    h.add("walks identical under (i), (ii), (iii)", note, "320", 320.0, 0.0, identical3 as f64, "count of walks whose identity fields agree three ways");
-    h.add("(i) reproduces E25's walk records field for field", note, "320", 320.0, 0.0, e25_match_a as f64, "count of (i) walks equal to E25's arm-A record (E25 convention)");
+    h.add(
+        "affine addition, batched (iii), max",
+        note,
+        "66.7",
+        66.7,
+        0.05,
+        79.0 - 16.0 + sh_hi,
+        "as above",
+    );
+    h.add(
+        "walks identical under (i), (ii), (iii)",
+        note,
+        "320",
+        320.0,
+        0.0,
+        identical3 as f64,
+        "count of walks whose identity fields agree three ways",
+    );
+    h.add(
+        "(i) reproduces E25's walk records field for field",
+        note,
+        "320",
+        320.0,
+        0.0,
+        e25_match_a as f64,
+        "count of (i) walks equal to E25's arm-A record (E25 convention)",
+    );
     let all13: Vec<f64> = ratio_i_iii.iter().map(|x| x.3).collect();
-    let gls13: Vec<f64> = ratio_i_iii.iter().filter(|x| x.2 == "Gls").map(|x| x.3).collect();
-    let neg13: Vec<f64> = ratio_i_iii.iter().filter(|x| x.2 == "Negation").map(|x| x.3).collect();
+    let gls13: Vec<f64> = ratio_i_iii
+        .iter()
+        .filter(|x| x.2 == "Gls")
+        .map(|x| x.3)
+        .collect();
+    let neg13: Vec<f64> = ratio_i_iii
+        .iter()
+        .filter(|x| x.2 == "Negation")
+        .map(|x| x.3)
+        .collect();
     let (a_lo, a_hi) = minmax(&all13);
     let (g_lo, g_hi) = minmax(&gls13);
     let (n_lo, n_hi) = minmax(&neg13);
-    h.add("walk cost (i)/(iii), min over both walks and ten curves", note, "1.4533", 1.4533, 0.00005, a_lo, "sum over 16 walks of (fp_muls - verify_fp_muls), (i) over (iii)");
-    h.add("walk cost (i)/(iii), max over both walks and ten curves", note, "1.4634", 1.4634, 0.00005, a_hi, "as above");
-    h.add("<±psi> walk cost (i)/(iii), min", note, "1.4559", 1.4559, 0.00005, g_lo, "Gls fold only");
-    h.add("<±psi> walk cost (i)/(iii), max", note, "1.4634", 1.4634, 0.00005, g_hi, "Gls fold only");
-    h.add("negation walk cost (i)/(iii), min", note, "1.4533", 1.4533, 0.00005, n_lo, "Negation fold only");
-    h.add("negation walk cost (i)/(iii), max", note, "1.4621", 1.4621, 0.00005, n_hi, "Negation fold only");
+    h.add(
+        "walk cost (i)/(iii), min over both walks and ten curves",
+        note,
+        "1.4533",
+        1.4533,
+        0.00005,
+        a_lo,
+        "sum over 16 walks of (fp_muls - verify_fp_muls), (i) over (iii)",
+    );
+    h.add(
+        "walk cost (i)/(iii), max over both walks and ten curves",
+        note,
+        "1.4634",
+        1.4634,
+        0.00005,
+        a_hi,
+        "as above",
+    );
+    h.add(
+        "<±psi> walk cost (i)/(iii), min",
+        note,
+        "1.4559",
+        1.4559,
+        0.00005,
+        g_lo,
+        "Gls fold only",
+    );
+    h.add(
+        "<±psi> walk cost (i)/(iii), max",
+        note,
+        "1.4634",
+        1.4634,
+        0.00005,
+        g_hi,
+        "Gls fold only",
+    );
+    h.add(
+        "negation walk cost (i)/(iii), min",
+        note,
+        "1.4533",
+        1.4533,
+        0.00005,
+        n_lo,
+        "Negation fold only",
+    );
+    h.add(
+        "negation walk cost (i)/(iii), max",
+        note,
+        "1.4621",
+        1.4621,
+        0.00005,
+        n_hi,
+        "Negation fold only",
+    );
     // (i)/(ii) is printed as "≈ 1.27" for both walks; it is an erratum, not a headline.
-    let gls12: Vec<f64> = ratio_i_ii.iter().zip(&ratio_i_iii).filter(|(_, x)| x.2 == "Gls").map(|(v, _)| *v).collect();
-    let neg12: Vec<f64> = ratio_i_ii.iter().zip(&ratio_i_iii).filter(|(_, x)| x.2 == "Negation").map(|(v, _)| *v).collect();
+    let gls12: Vec<f64> = ratio_i_ii
+        .iter()
+        .zip(&ratio_i_iii)
+        .filter(|(_, x)| x.2 == "Gls")
+        .map(|(v, _)| *v)
+        .collect();
+    let neg12: Vec<f64> = ratio_i_ii
+        .iter()
+        .zip(&ratio_i_iii)
+        .filter(|(_, x)| x.2 == "Negation")
+        .map(|(v, _)| *v)
+        .collect();
     let (g12_lo, g12_hi) = minmax(&gls12);
     let (n12_lo, n12_hi) = minmax(&neg12);
     // The [d]G = Q check main's 652238c03 began charging inside every walk.
-    let c101 = curves.iter().find(|c| c.get("p").u() == 101 && c.get("seed").u() == 1).unwrap();
+    let c101 = curves
+        .iter()
+        .find(|c| c.get("p").u() == 101 && c.get("seed").u() == 1)
+        .unwrap();
     let w101 = walks(c101.get("folds").get("Gls").get("walks").get("schoolbook"));
     let vg: BTreeSet<u64> = w101.iter().map(|w| w.vgops).collect();
     let vm: BTreeSet<u64> = w101.iter().map(|w| w.vmuls).collect();
-    h.add("[d]G check at p=101 seed 1: group operations per <±psi> walk", note, "+31", 31.0, 0.0, if vg.len() == 1 { *vg.iter().next().unwrap() as f64 } else { -1.0 }, "verify_group_ops of every (i) walk (one value)");
-    h.add("[d]G check at p=101 seed 1: F_p multiplications per <±psi> walk", note, "+3,309", 3309.0, 0.0, if vm.len() == 1 { *vm.iter().next().unwrap() as f64 } else { -1.0 }, "verify_fp_muls of every (i) walk (one value)");
+    h.add(
+        "[d]G check at p=101 seed 1: group operations per <±psi> walk",
+        note,
+        "+31",
+        31.0,
+        0.0,
+        if vg.len() == 1 {
+            *vg.iter().next().unwrap() as f64
+        } else {
+            -1.0
+        },
+        "verify_group_ops of every (i) walk (one value)",
+    );
+    h.add(
+        "[d]G check at p=101 seed 1: F_p multiplications per <±psi> walk",
+        note,
+        "+3,309",
+        3309.0,
+        0.0,
+        if vm.len() == 1 {
+            *vm.iter().next().unwrap() as f64
+        } else {
+            -1.0
+        },
+        "verify_fp_muls of every (i) walk (one value)",
+    );
     let vshare: Vec<f64> = curves
         .iter()
         .map(|c| {
             let w = walks(c.get("folds").get("Gls").get("walks").get("schoolbook"));
-            w.iter().map(|x| x.vmuls).sum::<u64>() as f64 / w.iter().map(|x| x.walk_muls()).sum::<u64>() as f64
+            w.iter().map(|x| x.vmuls).sum::<u64>() as f64
+                / w.iter().map(|x| x.walk_muls()).sum::<u64>() as f64
         })
         .collect();
     let (vs_lo, vs_hi) = minmax(&vshare);
-    h.add("[d]G check, % of a <±psi> walk, min over the ten curves", note, "0.13", 0.13, 0.005, 100.0 * vs_lo, "sum verify_fp_muls / sum (fp_muls - verify_fp_muls), walk (i), per curve");
-    h.add("[d]G check, % of a <±psi> walk, max over the ten curves", note, "0.78", 0.78, 0.005, 100.0 * vs_hi, "as above");
+    h.add(
+        "[d]G check, % of a <±psi> walk, min over the ten curves",
+        note,
+        "0.13",
+        0.13,
+        0.005,
+        100.0 * vs_lo,
+        "sum verify_fp_muls / sum (fp_muls - verify_fp_muls), walk (i), per curve",
+    );
+    h.add(
+        "[d]G check, % of a <±psi> walk, max over the ten curves",
+        note,
+        "0.78",
+        0.78,
+        0.005,
+        100.0 * vs_hi,
+        "as above",
+    );
     let (sr_lo, sr_hi) = minmax(&s_ratio);
-    h.add("S_A / S_A,K, min over 20 rows", note, "1.00475", 1.00475, 0.000005, sr_lo, "E31 total_muls over E27 total_muls, same (p, seed, arm)");
-    h.add("S_A / S_A,K, max over 20 rows", note, "1.00566", 1.00566, 0.000005, sr_hi, "as above");
+    h.add(
+        "S_A / S_A,K, min over 20 rows",
+        note,
+        "1.00475",
+        1.00475,
+        0.000005,
+        sr_lo,
+        "E31 total_muls over E27 total_muls, same (p, seed, arm)",
+    );
+    h.add(
+        "S_A / S_A,K, max over 20 rows",
+        note,
+        "1.00566",
+        1.00566,
+        0.000005,
+        sr_hi,
+        "as above",
+    );
     let (ns_lo, ns_hi) = minmax(&nonsolve);
-    h.add("non-solve F_p4 work, % of S_A, min", note, "2.00", 2.00, 0.005, 100.0 * ns_lo, "(generation + base + precompute + weil + lift + check) / total_muls on E31's records");
-    h.add("non-solve F_p4 work, % of S_A, max", note, "2.48", 2.48, 0.005, 100.0 * ns_hi, "as above");
+    h.add(
+        "non-solve F_p4 work, % of S_A, min",
+        note,
+        "2.00",
+        2.00,
+        0.005,
+        100.0 * ns_lo,
+        "(generation + base + precompute + weil + lift + check) / total_muls on E31's records",
+    );
+    h.add(
+        "non-solve F_p4 work, % of S_A, max",
+        note,
+        "2.48",
+        2.48,
+        0.005,
+        100.0 * ns_hi,
+        "as above",
+    );
     let (iv_lo, iv_hi) = minmax(&ic_inv);
-    h.add("IC-side F_p inversions per run, min", note, "4.7e5", 4.7e5, 0.05e5, iv_lo, "ic_fp_inversions");
-    h.add("IC-side F_p inversions per run, max", note, "2.6e7", 2.6e7, 0.05e7, iv_hi, "ic_fp_inversions");
+    h.add(
+        "IC-side F_p inversions per run, min",
+        note,
+        "4.7e5",
+        4.7e5,
+        0.05e5,
+        iv_lo,
+        "ic_fp_inversions",
+    );
+    h.add(
+        "IC-side F_p inversions per run, max",
+        note,
+        "2.6e7",
+        2.6e7,
+        0.05e7,
+        iv_hi,
+        "ic_fp_inversions",
+    );
     let (b13_lo, b13_hi) = minmax(&bound13);
     let (b16_lo, b16_hi) = minmax(&bound16);
     // The printed figure reproduces with the saving (16 - that curve's <±psi>
     // pool share) per inversion; see errata for why it is not an upper bound.
-    let bshare: Vec<f64> = rows.iter().map(|r| (16.0 - r.share_gls) * r.inv / r.s_k).collect();
+    let bshare: Vec<f64> = rows
+        .iter()
+        .map(|r| (16.0 - r.share_gls) * r.inv / r.s_k)
+        .collect();
     let (bs_lo, bs_hi) = minmax(&bshare);
     h.add("saving from batching the IC side's inversions, % of S, min", note, "0.127", 0.127, 0.0005, 100.0 * bs_lo, "(16 - the curve's <±psi> pool share) * ic_fp_inversions / S_A,K (the definition the printed figure uses; errata E2)");
-    h.add("saving from batching the IC side's inversions, % of S, max", note, "0.170", 0.170, 0.0005, 100.0 * bs_hi, "as above");
+    h.add(
+        "saving from batching the IC side's inversions, % of S, max",
+        note,
+        "0.170",
+        0.170,
+        0.0005,
+        100.0 * bs_hi,
+        "as above",
+    );
     for (k, g) in WEIGHTS {
         let d31: Vec<f64> = rows.iter().map(|r| r.d_e31(g)).collect();
         let d27: Vec<f64> = rows.iter().map(|r| r.d_e27(g)).collect();
@@ -1118,37 +1588,149 @@ fn report(ctx: &Ctx) -> J {
         let (lo27, hi27) = minmax(&d27);
         let (glo, ghi) = minmax(&gr);
         let printed: [(&str, f64, f64, &str, f64, f64, &str, f64, &str, f64); 3] = [
-            ("4.42e3", 4.42e3, 0.005e3, "2.79e5", 2.79e5, 0.005e5, "6.39e3", 6.39e3, "4.06e5", 4.06e5),
-            ("1.50e4", 1.50e4, 0.005e4, "9.77e5", 9.77e5, 0.005e5, "2.13e4", 2.13e4, "1.39e6", 1.39e6),
-            ("7.33e4", 7.33e4, 0.005e4, "5.22e6", 5.22e6, 0.005e6, "9.07e4", 9.07e4, "6.64e6", 6.64e6),
+            (
+                "4.42e3", 4.42e3, 0.005e3, "2.79e5", 2.79e5, 0.005e5, "6.39e3", 6.39e3, "4.06e5",
+                4.06e5,
+            ),
+            (
+                "1.50e4", 1.50e4, 0.005e4, "9.77e5", 9.77e5, 0.005e5, "2.13e4", 2.13e4, "1.39e6",
+                1.39e6,
+            ),
+            (
+                "7.33e4", 7.33e4, 0.005e4, "5.22e6", 5.22e6, 0.005e6, "9.07e4", 9.07e4, "6.64e6",
+                6.64e6,
+            ),
         ];
-        let growth_printed = [("1.4477", 1.4477, "1.4564", 1.4564), ("1.4150", 1.4150, "1.4427", 1.4427), ("1.2364", 1.2364, "1.3252", 1.3252)];
+        let growth_printed = [
+            ("1.4477", 1.4477, "1.4564", 1.4564),
+            ("1.4150", 1.4150, "1.4427", 1.4427),
+            ("1.2364", 1.2364, "1.3252", 1.3252),
+        ];
         let i = WEIGHTS.iter().position(|w| w.0 == k).unwrap();
         let pr = printed[i];
         let gp = growth_printed[i];
         let unit = |v: f64| 0.5 * 10f64.powi(v.log10().floor() as i32 - 2);
         let def31 = format!("(S_A + {k} * 97 * macaulay_entries) / (rho_E31 + {k} * 97 * steps), E31 solver-A records against E25's walk (i)");
         let def27 = format!("(S_A,K + {k} * 97 * macaulay_entries) / (rho_iii + {k} * 97 * steps), E27 records against Stage W walk (iii), E25 convention");
-        h.add(&format!("S/rho E31 A at {k} GAE, min"), note, pr.0, pr.1, pr.2, lo31, &def31);
-        h.add(&format!("S/rho E31 A at {k} GAE, max"), note, pr.3, pr.4, pr.5, hi31, &def31);
-        h.add(&format!("S/rho E27 at {k} GAE, min"), note, pr.6, pr.7, unit(pr.7), lo27, &def27);
-        h.add(&format!("S/rho E27 at {k} GAE, max"), note, pr.8, pr.9, unit(pr.9), hi27, &def27);
-        h.add(&format!("growth of S/rho per row at {k} GAE, min"), note, gp.0, gp.1, 0.00005, glo, "E27 S/rho over E31 S/rho, same row");
-        h.add(&format!("growth of S/rho per row at {k} GAE, max"), note, gp.2, gp.3, 0.00005, ghi, "as above");
+        h.add(
+            &format!("S/rho E31 A at {k} GAE, min"),
+            note,
+            pr.0,
+            pr.1,
+            pr.2,
+            lo31,
+            &def31,
+        );
+        h.add(
+            &format!("S/rho E31 A at {k} GAE, max"),
+            note,
+            pr.3,
+            pr.4,
+            pr.5,
+            hi31,
+            &def31,
+        );
+        h.add(
+            &format!("S/rho E27 at {k} GAE, min"),
+            note,
+            pr.6,
+            pr.7,
+            unit(pr.7),
+            lo27,
+            &def27,
+        );
+        h.add(
+            &format!("S/rho E27 at {k} GAE, max"),
+            note,
+            pr.8,
+            pr.9,
+            unit(pr.9),
+            hi27,
+            &def27,
+        );
+        h.add(
+            &format!("growth of S/rho per row at {k} GAE, min"),
+            note,
+            gp.0,
+            gp.1,
+            0.00005,
+            glo,
+            "E27 S/rho over E31 S/rho, same row",
+        );
+        h.add(
+            &format!("growth of S/rho per row at {k} GAE, max"),
+            note,
+            gp.2,
+            gp.3,
+            0.00005,
+            ghi,
+            "as above",
+        );
     }
     // The rounded forms quoted in G2.99's verdict.
-    for (k, g, lo_p, lo, hi_p, hi) in [("0", 0.0, "1.448", 1.448, "1.456", 1.456), ("0.1", 0.1, "1.415", 1.415, "1.443", 1.443), ("1", 1.0, "1.236", 1.236, "1.325", 1.325)] {
+    for (k, g, lo_p, lo, hi_p, hi) in [
+        ("0", 0.0, "1.448", 1.448, "1.456", 1.456),
+        ("0.1", 0.1, "1.415", 1.415, "1.443", 1.443),
+        ("1", 1.0, "1.236", 1.236, "1.325", 1.325),
+    ] {
         let gr: Vec<f64> = rows.iter().map(|r| r.d_e27(g) / r.d_e31(g)).collect();
         let (glo, ghi) = minmax(&gr);
-        h.add(&format!("G2.99 verdict growth at {k} GAE, min (rounded)"), note, lo_p, lo, 0.0005, glo, "as above, three decimals");
-        h.add(&format!("G2.99 verdict growth at {k} GAE, max (rounded)"), note, hi_p, hi, 0.0005, ghi, "as above, three decimals");
+        h.add(
+            &format!("G2.99 verdict growth at {k} GAE, min (rounded)"),
+            note,
+            lo_p,
+            lo,
+            0.0005,
+            glo,
+            "as above, three decimals",
+        );
+        h.add(
+            &format!("G2.99 verdict growth at {k} GAE, max (rounded)"),
+            note,
+            hi_p,
+            hi,
+            0.0005,
+            ghi,
+            "as above, three decimals",
+        );
     }
-    let best = rows.iter().find(|r| r.p == 397 && r.s == 1 && r.arm == "B").unwrap();
-    h.add("best row p=397 s1 arm B, S/rho at 0 GAE, E31", note, "4.42e3", 4.42e3, 0.005e3, best.d_e31(0.0), "that row");
-    h.add("best row p=397 s1 arm B, S/rho at 0 GAE, E27", note, "6.39e3", 6.39e3, 0.005e3, best.d_e27(0.0), "that row");
-    let p101s2: Vec<f64> = rows.iter().filter(|r| r.p == 101 && r.s == 2).map(|r| r.d_e27(1.0) / r.d_e31(1.0)).collect();
+    let best = rows
+        .iter()
+        .find(|r| r.p == 397 && r.s == 1 && r.arm == "B")
+        .unwrap();
+    h.add(
+        "best row p=397 s1 arm B, S/rho at 0 GAE, E31",
+        note,
+        "4.42e3",
+        4.42e3,
+        0.005e3,
+        best.d_e31(0.0),
+        "that row",
+    );
+    h.add(
+        "best row p=397 s1 arm B, S/rho at 0 GAE, E27",
+        note,
+        "6.39e3",
+        6.39e3,
+        0.005e3,
+        best.d_e27(0.0),
+        "that row",
+    );
+    let p101s2: Vec<f64> = rows
+        .iter()
+        .filter(|r| r.p == 101 && r.s == 2)
+        .map(|r| r.d_e27(1.0) / r.d_e31(1.0))
+        .collect();
     let (q_lo, _q_hi) = minmax(&p101s2);
-    h.add("growth at 1 GAE on the p=101 seed 2 rows (both above G2.99's 1.30)", note, "1.3252", 1.3252, 0.00005, q_lo, "min over the two rows");
+    h.add(
+        "growth at 1 GAE on the p=101 seed 2 rows (both above G2.99's 1.30)",
+        note,
+        "1.3252",
+        1.3252,
+        0.00005,
+        q_lo,
+        "min over the two rows",
+    );
 
     // G2.99 band per row and "rho ahead of every row at every weight".
     let bands = [(0.0, 1.37, 1.50), (0.1, 1.30, 1.48), (1.0, 1.12, 1.30)];
@@ -1158,20 +1740,33 @@ fn report(ctx: &Ctx) -> J {
         for (g, lo, hi) in bands {
             let gr = r.d_e27(g) / r.d_e31(g);
             if gr < lo || gr > hi {
-                outside.push(format!("p={} s{} arm {} at {} GAE: {:.4} (band [{lo}, {hi}])", r.p, r.s, r.arm, g, gr));
+                outside.push(format!(
+                    "p={} s{} arm {} at {} GAE: {:.4} (band [{lo}, {hi}])",
+                    r.p, r.s, r.arm, g, gr
+                ));
             }
             min_dist = min_dist.min(r.d_e27(g)).min(r.d_e31(g));
         }
     }
     let falsified_as_reported = outside.len() == 2
-        && outside.iter().all(|x| x.starts_with("p=101 s2") && x.contains("at 1 GAE"));
+        && outside
+            .iter()
+            .all(|x| x.starts_with("p=101 s2") && x.contains("at 1 GAE"));
     check("G2.99: rows outside the registered growth bands are exactly the two p=101 seed 2 rows at 1 GAE (falsified high), as reported", falsified_as_reported, format!("{outside:?}"));
     check("rho ahead of every row at every weight (min S/rho over 20 rows x 3 weights, both references)", min_dist > 1.0, format!("min S/rho {min_dist}"));
     // G2.96-G2.98 registered bands.
     let g96 = sh_lo + 63.0 >= 64.0 && sh_hi + 63.0 <= 70.0 && a_lo >= 1.38 && a_hi <= 1.50;
     check("G2.96: Fp4::mul = 13; batched distinct addition in [64, 70]; per group op (i)/(iii) in [1.38, 1.50]", g96 && po_k.get("fp4_mul").u() == 13, format!("addition {:.3}-{:.3}, ratio {a_lo:.4}-{a_hi:.4}", 63.0 + sh_lo, 63.0 + sh_hi));
-    check("G2.97: (i)/(iii) in [1.38, 1.50] on every curve, both walks", a_lo >= 1.38 && a_hi <= 1.50, format!("{a_lo:.4}-{a_hi:.4}"));
-    check("G2.98: S_A/S_A,K in [1.001, 1.008] on every row", sr_lo >= 1.001 && sr_hi <= 1.008, format!("{sr_lo:.6}-{sr_hi:.6}"));
+    check(
+        "G2.97: (i)/(iii) in [1.38, 1.50] on every curve, both walks",
+        a_lo >= 1.38 && a_hi <= 1.50,
+        format!("{a_lo:.4}-{a_hi:.4}"),
+    );
+    check(
+        "G2.98: S_A/S_A,K in [1.001, 1.008] on every row",
+        sr_lo >= 1.001 && sr_hi <= 1.008,
+        format!("{sr_lo:.6}-{sr_hi:.6}"),
+    );
 
     // Sensitivity: GAE re-measured under (iii) on the E27 side (secondary).
     let sens: Vec<f64> = rows
@@ -1199,23 +1794,36 @@ fn report(ctx: &Ctx) -> J {
     for (k, g) in WEIGHTS {
         let ic: Vec<f64> = arm_b.iter().map(|r| r.ic_k(g)).collect();
         let rho: Vec<f64> = arm_b.iter().map(|r| r.rho_k(g)).collect();
-        band.push((k.to_string(), obj(vec![("ic", jf(median(&ic))), ("rho", jf(median(&rho)))])));
+        band.push((
+            k.to_string(),
+            obj(vec![("ic", jf(median(&ic))), ("rho", jf(median(&rho)))]),
+        ));
     }
-    let order_all = rows.iter().all(|r| WEIGHTS.iter().all(|(_, g)| r.ic_k(*g) > r.rho_k(*g)));
+    let order_all = rows
+        .iter()
+        .all(|r| WEIGHTS.iter().all(|(_, g)| r.ic_k(*g) > r.rho_k(*g)));
     check("§5a: the matched walk (iii) is below the index calculus on all 20 rows at 0, 0.1 and 1 GAE", order_all, format!("{order_all}"));
 
     // Checks run outside this program (git ancestry, build, unit tests), each
     // with its command and output, recorded by the validator in one file.
     let (manual, hmanual) = ctx.read(&format!("{}/replay/manual_checks.json", ctx.ev));
     for m in manual.get("checks").arr() {
-        check(&format!("manual: {}", m.get("check").s()), m.get("holds").b(), m.get("result").s().to_string());
+        check(
+            &format!("manual: {}", m.get("check").s()),
+            m.get("holds").b(),
+            m.get("result").s().to_string(),
+        );
     }
     let unit_tests_pass = manual
         .get("checks")
         .arr()
         .iter()
         .any(|m| m.get("id").s() == "unit_tests_e27" && m.get("holds").b());
-    check("G2.95's unit tests (e27_) were run by the validator and passed", unit_tests_pass, format!("{unit_tests_pass}"));
+    check(
+        "G2.95's unit tests (e27_) were run by the validator and passed",
+        unit_tests_pass,
+        format!("{unit_tests_pass}"),
+    );
 
     let (ef_lo, ef_hi) = minmax(&e2e_field_factor);
     let errata = J::Arr(vec![
@@ -1257,7 +1865,11 @@ fn report(ctx: &Ctx) -> J {
         js("Unit tests ran on the recorded tree plus the producer's later test-only repair of an unrelated test helper (src/ml_dataset/storage.rs, commit ed49f1378), without which the lib test target does not compile at af2504ef1."),
     ]);
 
-    let status = if failures.is_empty() && h.bad.is_empty() { "pass" } else { "fail" };
+    let status = if failures.is_empty() && h.bad.is_empty() {
+        "pass"
+    } else {
+        "fail"
+    };
     obj(vec![
         ("schema", js("validator-report/v1")),
         ("status", js(status)),
@@ -1315,7 +1927,10 @@ fn main() {
         eprintln!("usage: validate_e27 compare|report|certificate <repo> <evidence-dir>");
         std::process::exit(2);
     }
-    let ctx = Ctx { repo: args[2].clone(), ev: args[3].clone() };
+    let ctx = Ctx {
+        repo: args[2].clone(),
+        ev: args[3].clone(),
+    };
     let out = match args[1].as_str() {
         "compare" => compare(&ctx),
         "report" => report(&ctx),
@@ -1351,7 +1966,11 @@ fn certificate(ctx: &Ctx) -> J {
                 }
             }
         }
-        let d = if ds.len() == 1 { ds.into_iter().next().unwrap().unwrap_or(u64::MAX) } else { u64::MAX };
+        let d = if ds.len() == 1 {
+            ds.into_iter().next().unwrap().unwrap_or(u64::MAX)
+        } else {
+            u64::MAX
+        };
         logs.push((c.get("p").u(), c.get("seed").u(), d));
     }
     let mut ic_ok = 0u64;
@@ -1376,9 +1995,14 @@ fn certificate(ctx: &Ctx) -> J {
             for rec in rep.arr() {
                 ic_total += 1;
                 let (p, s) = (rec.get("p").u(), rec.get("seed").u());
-                let d = logs.iter().find(|x| x.0 == p && x.1 == s).map(|x| x.2).unwrap_or(u64::MAX);
+                let d = logs
+                    .iter()
+                    .find(|x| x.0 == p && x.1 == s)
+                    .map(|x| x.2)
+                    .unwrap_or(u64::MAX);
                 let fo = rec.get("folded");
-                let ok = fo.get("solved").b() && fo.get("correct").b() && fo.get("recovered").u() == d;
+                let ok =
+                    fo.get("solved").b() && fo.get("correct").b() && fo.get("recovered").u() == d;
                 if ok {
                     ic_ok += 1;
                 }
@@ -1401,12 +2025,24 @@ fn certificate(ctx: &Ctx) -> J {
         } else {
             entry.push(("walks", ju(walks_total)));
             entry.push(("walks_correct", ju(walks_correct)));
-            entry.push(("logarithms", J::Arr(logs.iter().map(|(p, s, d)| obj(vec![("p", ju(*p)), ("seed", ju(*s)), ("d", ju(*d))])).collect())));
+            entry.push((
+                "logarithms",
+                J::Arr(
+                    logs.iter()
+                        .map(|(p, s, d)| obj(vec![("p", ju(*p)), ("seed", ju(*s)), ("d", ju(*d))]))
+                        .collect(),
+                ),
+            ));
         }
         runs.push(obj(entry.into_iter().collect()));
     }
     let all_identical = cmp.get("all_identical").b();
-    let scalars = walks_correct == walks_total && walks_total == 960 && ic_ok == ic_total && ic_total == 20 && ic_walks_correct && logs.iter().all(|x| x.2 != u64::MAX);
+    let scalars = walks_correct == walks_total
+        && walks_total == 960
+        && ic_ok == ic_total
+        && ic_total == 20
+        && ic_walks_correct
+        && logs.iter().all(|x| x.2 != u64::MAX);
     obj(vec![
         ("schema", js("replay-certificate/v1")),
         ("status", js(if all_identical && scalars { "verified" } else { "failed" })),
