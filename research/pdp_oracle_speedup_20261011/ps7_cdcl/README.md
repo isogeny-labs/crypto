@@ -26,7 +26,7 @@ an end-to-end ECDLP cost, `S` is not computed, and nothing here touches the rati
 | Stop: no pruning at three rungs: close the direction and record it | **met**: leaves visited equal the pair count on all 39 refuted targets (13 per rung) for every realisation of arms 2 and 3 | §5 |
 | The library solver copy behaves as the library | **verified complete**: `a2h` against `a2`, 48 targets, every solver counter equal | §2 |
 | Counted field operations cross-checked against instrumented counters | **partial**: done on the tree of `exp/pdp-ps2-scalar` (records kept), **not reproducible on `main`**: `main`'s `semaev_decomp.rs` has no `opcount` module although `Cargo.toml` still declares the feature | §9 |
-| Wall time as a note, A/A | **see §8** | §8 |
+| Wall time as a note, A/A | **verified complete as a note**: 3 interleaved rounds per rung, `a1` twice (A/A, up to 12% between a pair), one isolated block not marked contended; per-run isolation records not made | §8 |
 | Report, graph, PDF (research-visuals) | **verified complete** | [`../reports/run-20261031T2114Z/`](../reports/run-20261031T2114Z/) |
 | `benchmarks/` entry and row; validation gate | **not added, deliberately**: a counted-unit null result with a wall note, no rho reference; the gate keeps such results in their research directory | §10 |
 
@@ -162,7 +162,36 @@ Not done: the upstream WDSat inputs themselves, and any WDSat/Xorricane/Bosphoru
 
 ## 8. Wall time (a note)
 
-@@WALL@@
+Wall nanoseconds are **not** the metric (AGENTS.md section 6); they are a practicality note.  One pass, no accounting hooks (`--no-log`, so the hooked arms do not pay for the pair accounting), the 16 uniform targets of each rung (13 refuted and
+3 found, as drawn), three rounds, each round running each arm once per rung in the order `a1, a1b, a1u, a2, a2l, a3` (`a1b` is `a1` again: the A/A).  All 54 runs ran inside **one** `tools/isolated_bench.py run --cpus 3` acquisition
+(label `timing-block`, `raw/iso.jsonl`: reserved CPU 3, 685.0 s, other processes used 33.3 CPU-seconds during it, i.e. 0.049 CPU on average, **not marked contended**); the tool's record covers the block, not each run, which is a deviation from per-run
+records (PS-2's way).  Host: Intel Xeon @ 2.10 GHz, 4 vCPU, KVM guest, kernel 6.18.44-fc-v185: a different host class from PS-0..PS-3's 2.80 GHz Xeon; nothing here is pooled with their figures.  Milliseconds per target, rounds 1, 2, 3 (`raw/times.jsonl`):
+
+| `ℓ` | arm | round 1 | round 2 | round 3 |
+|--:|:--|--:|--:|--:|
+| 8 | `a1` | 0.198 | 0.200 | 0.205 |
+| 8 | `a1b` (A/A) | 0.201 | 0.199 | 0.209 |
+| 8 | `a1u` | 1.161 | 1.145 | 1.169 |
+| 8 | `a2` | 62 | 67 | 68 |
+| 8 | `a2l` | 53 | 48 | 46 |
+| 8 | `a3` | 77 | 76 | 79 |
+| 9 | `a1` | 0.668 | 0.674 | 0.628 |
+| 9 | `a1b` (A/A) | 0.705 | 0.678 | 0.703 |
+| 9 | `a1u` | 4.399 | 4.427 | 4.527 |
+| 9 | `a2` | 569 | 554 | 564 |
+| 9 | `a2l` | 414 | 447 | 380 |
+| 9 | `a3` | 547 | 585 | 529 |
+| 10 | `a1` | 2.075 | 1.614 | 2.169 |
+| 10 | `a1b` (A/A) | 2.072 | 1.615 | 2.110 |
+| 10 | `a1u` | 16 | 13 | 18 |
+| 10 | `a2` | 5,041 | 5,056 | 5,130 |
+| 10 | `a2l` | 3,326 | 3,498 | 3,633 |
+| 10 | `a3` | 3,942 | 3,942 | 3,987 |
+
+* The A/A (`a1` against `a1b`, derived as `a1b / a1 − 1` per round) differs by 1.5%, −0.5%, 2.0% at `ℓ = 8`; 5.5%, 0.6%, **12.0%** at `ℓ = 9` (0.628 against 0.703 in round 3); 0.1%, 0.1%, −2.7% at `ℓ = 10`.  The round-to-round drift of the whole block at `ℓ = 10`
+  is larger than the A/A (`a1`: 2.075, 1.614, 2.169, and `a1b` moves with it), so millisecond-scale differences are not resolved; the comparisons below are ratios of hundreds to thousands.
+* Round-1 ratios to the plain loop (derived, `arm / a1`): `a2`, `a2l`, `a3` = 315, 270, 389 at `ℓ = 8`; 852, 620, 819 at `ℓ = 9`; 2,430, 1,603, 1,900 at `ℓ = 10`; `a1u` = 6, 7, 8.  The bit-operation ratios of §4 (with the 64-per-step convention) are 10 to 38; wall time includes memory and branch behaviour of the solver that the counted
+  unit does not model, so the two do not agree in size and are not meant to.  Wall figures are wall figures: no speedup or slowdown claim is made beyond them.
 
 ## 9. Counted field operations against instrumented counters (cross-check)
 

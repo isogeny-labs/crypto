@@ -77,3 +77,32 @@ fig.text(0.01, 0.01, "recorded means over the refuted targets of the rung; shell
 fig.tight_layout(rect=(0, 0.04, 1, 0.94))
 fig.savefig(sys.argv[3])
 fig.savefig(sys.argv[3].replace(".svg", ".png"), dpi=150)
+
+# ── wall note: per-round values of ns per target (all 16 targets of a rung), from the recorded timing rows ──
+if len(sys.argv) > 5:
+    import statistics
+
+    trows = [json.loads(l) for l in open(sys.argv[4]) if l.strip()]
+    tags = {}
+    for r in trows:
+        tags.setdefault(r["label"].rsplit("-l", 1)[0], []).append(r)
+    order = [t for t in ("a1", "a1b", "a1u", "a2", "a2l", "a3") if t in tags]
+    ls = sorted({r["l"] for r in trows})
+    fig, ax = plt.subplots(figsize=(7.4, 4.0))
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    for ti, tag in enumerate(order):
+        for i, l in enumerate(ls):
+            pts = [r for r in tags[tag] if r["l"] == l]
+            off = (ti - (len(order) - 1) / 2) * 0.13
+            ax.scatter([i + off] * len(pts), [r["ns_per_target"] for r in pts], s=18, color=colors[ti % 10], zorder=3, label=tag if i == 0 else None)
+            ax.hlines(statistics.median(r["ns_per_target"] for r in pts), i + off - 0.05, i + off + 0.05, color="black", lw=1.2, zorder=4)
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(ls)))
+    ax.set_xticklabels([f"l={l}\n(n={3 * l})" for l in ls])
+    ax.set_ylabel("wall ns per target (16 targets of the rung)")
+    ax.set_title("PS-7 wall note: three rounds per arm, no accounting hooks", fontsize=9)
+    ax.grid(axis="y", alpha=0.3)
+    ax.legend(fontsize=7, ncol=2)
+    fig.text(0.01, 0.01, f"{len(trows)} recorded runs in one isolated_bench block; a1b = a1 again (A/A); black bars = median of the 3 rounds", fontsize=7)
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.savefig(sys.argv[5])
