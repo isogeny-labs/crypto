@@ -8,7 +8,7 @@ universal QR7 equations, not the old order11 base constraints.
 Work over F2(x)[y]/f23 with monic degree7 f23. Require the specialized common
 certificate denominator and the nu coefficient C=(1+c)^2*b^3*(b+c*(1+c)^3)
 nonzero, with full univariate Bezout inverse products and corruption controls.
-Evaluate coefficient powers with reduction modulo f23 at every multiplication.
+Evaluate the actual arrays in the quotient ring by f23, using its native reduction.
 Specialize all actual polynomial arrays and require both full certificate
 products in the base quotient. Normalize the linear nu equation, combine it
 with monic degree16 G and f23, and require Groebner dimension112. Serialize

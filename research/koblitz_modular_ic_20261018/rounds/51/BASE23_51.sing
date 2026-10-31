@@ -1,0 +1,59 @@
+execute(read("../../source-data/marked23-field51.sing"));
+execute(read("../twist51-01/universal-twisted51.sing"));
+ring base23Workspace51=(2,x),(y),dp;short=0;
+map oldBase51=marked23Certificate50,y;
+poly f51=oldBase51(f23);poly b51=oldBase51(b23);poly c51=oldBase51(c23);
+if(deg(f51)!=7 || leadcoef(f51)!=1){ERROR("BASE23_51_RETAINED_BASE_SHAPE");quit;}
+ideal baseStandard51=std(ideal(f51));
+qring base23Residue51=baseStandard51;
+map baseData51=base23Workspace51,y;
+poly residueB51=baseData51(b51);poly residueC51=baseData51(c51);
+map specializeBase51=universalTwistedCertificate51,0,0,residueB51,residueC51;
+poly specializedD51=specializeBase51(D51);
+poly specializedC51=(1+residueC51)^2*residueB51^3*(residueB51+residueC51*(1+residueC51)^3);
+if(specializedD51==0 || specializedC51==0){ERROR("BASE23_51_SPECIALIZATION_DENOMINATOR_ZERO");quit;}
+setring base23Workspace51;
+map residueLift51=base23Residue51,y;
+poly actualD51=residueLift51(specializedD51);poly actualC51=residueLift51(specializedC51);
+matrix denominatorInverse51=lift(ideal(f51,actualD51),ideal(1));
+matrix nuInverse51=lift(ideal(f51,actualC51),ideal(1));
+if(matrix(ideal(f51,actualD51))*denominatorInverse51!=matrix(ideal(1)) || matrix(ideal(f51,actualC51))*nuInverse51!=matrix(ideal(1))){ERROR("BASE23_51_FULL_BASE_INVERSE_PRODUCTS");quit;}
+if(reduce(actualD51*(denominatorInverse51[2,1]+1)+1,baseStandard51)==0 || reduce(actualC51*(nuInverse51[2,1]+1)+1,baseStandard51)==0){ERROR("BASE23_51_BASE_INVERSE_CORRUPTION");quit;}
+link inverseOut51="ASCII:w marked23-inverses51.sing";open(inverseOut51);
+write(inverseOut51,"ring marked23InverseCertificate51=(2,x),(y),dp;short=0;poly f51="+string(f51)+";poly D51="+string(actualD51)+";poly C51="+string(actualC51)+";matrix denominatorInverse51[2][1];matrix nuInverse51[2][1];");
+int i51;for(i51=1;i51<=2;i51++){write(inverseOut51,"denominatorInverse51["+string(i51)+",1]="+string(denominatorInverse51[i51,1])+";nuInverse51["+string(i51)+",1]="+string(nuInverse51[i51,1])+";");}
+close(inverseOut51);
+poly denominatorInversePoly51=denominatorInverse51[2,1];poly nuInversePoly51=nuInverse51[2,1];
+ring expanded23Workspace51=(2,x),(n,l,y),lp;short=0;
+map expandBase51=base23Workspace51,y;
+poly expandedF51=expandBase51(f51);poly expandedB51=expandBase51(b51);poly expandedC51=expandBase51(c51);
+poly expandedDenominator51=expandBase51(actualD51);poly expandedNuCoefficient51=expandBase51(actualC51);
+poly inverseD51=expandBase51(denominatorInversePoly51);poly inverseC51=expandBase51(nuInversePoly51);
+ideal expandedBaseStandard51=std(ideal(expandedF51));
+qring expanded23Residue51=expandedBaseStandard51;
+map residueData51=expanded23Workspace51,n,l,y;
+poly baseB51=residueData51(expandedB51);poly baseC51=residueData51(expandedC51);
+poly baseF51=residueData51(expandedF51);poly baseD51=residueData51(expandedDenominator51);poly baseNuC51=residueData51(expandedNuCoefficient51);
+poly baseInvD51=residueData51(inverseD51);poly baseInvC51=residueData51(inverseC51);
+map specialize51=universalTwistedCertificate51,n,l,baseB51,baseC51;
+ideal sourceQR51=specialize51(qr51);ideal sourceGB51=specialize51(generic51);
+poly sourceG51=specialize51(G51);poly sourceN51=specialize51(N51);
+matrix sourceForward51=specialize51(F51);matrix sourceBackward51=specialize51(B51);
+if(matrix(sourceQR51)*sourceForward51!=matrix(sourceGB51) || matrix(sourceGB51)*sourceBackward51!=baseD51^2*matrix(sourceQR51)){ERROR("BASE23_51_COMPLETE_SPECIALIZED_PRODUCTS");quit;}
+if(diff(sourceN51,n)!=baseNuC51 || sourceG51!=sourceGB51[1]*baseInvD51 || sourceN51!=sourceGB51[2]*baseInvD51){ERROR("BASE23_51_UNCLEARED_TRIANGULAR_BINDING");quit;}
+poly normalizedNu51=n+baseInvC51*subst(sourceN51,n,0);
+if(normalizedNu51*baseNuC51!=sourceN51){ERROR("BASE23_51_LINEAR_NU_NORMALIZATION");quit;}
+matrix bad51=sourceForward51;bad51[1,1]=bad51[1,1]+1;
+if(matrix(sourceQR51)*bad51==matrix(sourceGB51)){ERROR("BASE23_51_SOURCE_CORRUPTION_ACCEPTED");quit;}
+string sourceGString51=string(sourceG51);string sourceNString51=string(normalizedNu51);
+link sourceOut51="ASCII:w marked23-qr51.sing";open(sourceOut51);
+write(sourceOut51,"ring marked23QRcertificate51=(2,x),(n,l,y),lp;short=0;poly f51="+string(baseF51)+";poly b51="+string(baseB51)+";poly c51="+string(baseC51)+";poly D51="+string(baseD51)+";ideal qr51="+string(sourceQR51)+";ideal generic51="+string(sourceGB51)+";poly G51="+sourceGString51+";poly normalizedNu51="+sourceNString51+";matrix F51[3][2];matrix B51[2][3];");
+int j51;for(i51=1;i51<=3;i51++){for(j51=1;j51<=2;j51++){write(sourceOut51,"F51["+string(i51)+","+string(j51)+"]="+string(sourceForward51[i51,j51])+";");}}
+for(i51=1;i51<=2;i51++){for(j51=1;j51<=3;j51++){write(sourceOut51,"B51["+string(i51)+","+string(j51)+"]="+string(sourceBackward51[i51,j51])+";");}}
+close(sourceOut51);
+setring expanded23Workspace51;
+execute("poly actualG51="+sourceGString51+";poly actualN51="+sourceNString51+";");
+ideal completePresentation51=std(ideal(expandedF51,actualG51,actualN51));
+if(vdim(completePresentation51)!=112){ERROR("BASE23_51_QUOTIENT_DIMENSION");quit;}
+print("BASE23_51_RESULT base_degree=7 lambda_degree=16 F2x_quotient_dimension=112 full_inverse_products=2 full_specialized_certificate_products=2 normalized_nu_checked=true corruption_rejected=true primality_not_yet_tested=true");
+print("BASE23_51_ALL_CHECKS_PASS");quit;
