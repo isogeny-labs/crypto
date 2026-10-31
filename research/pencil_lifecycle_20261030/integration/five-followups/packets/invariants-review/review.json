@@ -1,0 +1,53 @@
+{
+  "schema": "research.proof-review/v1",
+  "plan_before_proof": true,
+  "producer_modified": false,
+  "claims": [
+    {
+      "name": "weight_decode",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped_field_statement"
+    },
+    {
+      "name": "weight_validity",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped_field_statement"
+    },
+    {
+      "name": "negation_validity",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped_field_statement"
+    },
+    {
+      "name": "shared_zero_q_implies_same_support",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped_field_statement"
+    },
+    {
+      "name": "shared_zero_q_excluded",
+      "machine": "passed",
+      "fidelity": "faithful_scoped",
+      "outcome": "validated_scoped_field_statement"
+    }
+  ],
+  "compile_exits": [
+    0,
+    0,
+    0
+  ],
+  "controls": 4,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "implementation_correspondence": "open",
+  "collector_inductive_closure": "open",
+  "source_sha256": "311cfff853ac3435ce4f1da7ce9b8cbbde967429de1b7c3b4ee3e685d6d4d328",
+  "cost_ratio": null,
+  "scientific_trials": 0
+}

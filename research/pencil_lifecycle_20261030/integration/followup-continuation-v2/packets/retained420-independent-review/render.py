@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,hashlib,html,textwrap,subprocess,datetime
+p=Path(__file__).parent;d=Path('/var/tmp/pencil-kummer-retained-duplicate-frozen-v2-20261031');h=lambda x:hashlib.sha256(x.read_bytes()).hexdigest()
+rm=json.loads((d/'results/manifest.json').read_text());print(type(rm),list(rm)[:4])
+report='''Independent review: retained signed-duplicate audit
+
+420 / 420 recorded cases matched the frozen index, in exact physical-row/case order. The input contains180 records; selection p=739 produces60 targets, each with7 cases. All26 frozen source/input entries and6 external control references passed hash readback. Native receipt exit0 binds the admitted preexecution manifest. No native rerun was performed: the authorized single attempt was preserved.
+
+Recomputed dispositions:218 collector-ineligible;202 eligible ingests;174 first occurrences;28 redundant duplicates;0 informative candidates. Graph forwarding records174 inserted edges and28 duplicate suppressions, with0 cycles and0 terminal answers. No post-terminal cases occurred. No failed or missing disposition was observed.
+
+The28 duplicates are all case6 against case3 in the same target. Across all60 targets, case3 has labels(1,1), case6 has labels(34146,34146) modulo34147, and their divisors are negatives. Every eligible duplicate therefore normalizes to coefficient difference(0,0). The reviewer independently reconstructed eligibility using the nonzero-square discriminant over F739, lexicographic signed divisor normalization, both normalized coefficients, target-local first occurrence and resulting duplicate classification from the raw values. This is a fixed designed pair, not a naturally sampled collision rate.
+
+All60 once-per-target ledger entries were independently reconstructed. Every repeated setup copy agreed; none was counted seven times. Setup validation totals:3904 Jacobian operations,438198 M,8436 S,14252 I,760038 field additions. Constructor totals:2640 Jacobian operations,299213 M,5631 S,9823 I,519770 field additions. Raw phase totals and scalar deltas remain separate in recomputed.json; no weighted cost ratio is formed.
+
+Source-fidelity checks: archive_target checks valid/nonidentity G, rG=rQ=0 and Q=kG using the retained public known answer; native Ring checks prime r>2. For every incoming divisor it checks canonical labels, Mumford validity and D=aG+bQ before collector eligibility. Each target constructs a new table and graph. Duplicate normalization negates both coefficients; first graph edges retain the original signed divisor and labels. Graph processing checks dense-equation agreement and factor reconstruction. These native assertions are supported by source inspection and the successful retained run, not a second native execution by this reviewer.
+
+Controls: the eight-case planted helper packet and root's independent replay are hash-bound external controls. They include informative same/opposite-sign pairs, redundant pairs and rejection conditions. The archival arm does not rerun those controls. Its zero informative count is scoped to these preserved labels. The frozen protocol remains textually candidate/not_admitted; a later separate root admission binds its manifest, one attempt and120-second cap with5-second grace. The earlier preparation assertion failure and prospective correction are retained.
+
+Accounting limits: this is an instrumented audit schedule, including repeated validation and eligibility work. Hash-map lookup, comparisons, allocations, serialization, primality arithmetic, uninstrumented dense reference arithmetic, internal operation expansion and full runtime work are not fully priced. Native duration was collected concurrently with unrelated validation and is not a comparative clock. Whole-cost ratio and natural yield remain null. No extrapolated yield or method ranking follows.
+
+Review judgment: supported_within_scope for exact archive coverage, normalized duplicate dispositions, once-per-target accounting and retained native validation. No blocking discrepancy found at that scope. Full scientific cohort, natural-trajectory frequency, complete costs and production stopping-rule performance are not evaluated here. Recommendation:no_action for this archival correctness packet; any different corpus or execution requires its own prospective contract.
+
+Evidence: original raw rows remain untouched. This review includes its own recomputation script, raw-source digests, per-target ledger totals, pattern checks and standardized JSON. Reviewer invariants_branches was not the producer of this archival run. Shared source was inspected; no binary or scientific trials were run.
+'''
+(p/'REVIEW.md').write_text(report)
+s={'schema':'research.component-review/v1','reviewer':'invariants_branches','producer':'kummer_transitions','independence':{'produced_run':False,'shares_code_for_source_inspection':True,'native_replay':False,'reason_no_replay':'single admitted attempt; independent saved-row arithmetic only'},'producer_preexecution_manifest_sha256':h(d/'pre-execution-manifest.json'),'producer_results_manifest_sha256':h(d/'results/manifest.json'),'judgments':[{'claim':x,'judgment':'supported_within_scope'}for x in ['420 exact archived cases','202 eligible =174 first+28 redundant','28 designed inverse pairs yield zero normalized coefficient differences','60 consistent once-per-target accounting entries']],'blocking_discrepancies':[],'natural_yield':None,'complete_cost_ratio':None,'recommendation':'no_action','scope':'fixed archival correctness audit only','recomputation':'recomputed.json','patterns':'pattern.json','source_bindings':'input-bindings.json','generic_experiment_export_present':False,'generic_review_schema_validation_claimed':False}
+(p/'review.json').write_text(json.dumps(s,indent=2)+'\n')
+lines=[]
+for x in report.splitlines():lines.extend(textwrap.wrap(x,106)or[''])
+height=130+len(lines)*18
+svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="980" height="{height}" viewBox="0 0 980 {height}"><rect width="100%" height="100%" fill="white"/><g font-family="DejaVu Sans" font-size="14" fill="#193047">'
+for i,x in enumerate(lines):svg+=f'<text x="35" y="{35+i*18}">{html.escape(x)}</text>'
+svg+='</g></svg>';(p/'review.svg').write_text(svg);subprocess.run(['rsvg-convert','-f','pdf','-o',str(p/'review.pdf'),str(p/'review.svg')],check=True)
+(p/'manifest.json').write_text(json.dumps({x.name:h(x)for x in sorted(p.iterdir())if x.is_file() and x.name!='manifest.json'},indent=2)+'\n');print(h(p/'manifest.json'))

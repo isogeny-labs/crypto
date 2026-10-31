@@ -1,0 +1,14 @@
+import Storage
+namespace CoefficientStorageControls
+open CoefficientStorage
+ theorem first : put #[1,2,3] 0 7 (by decide)=#[7,2,3] := by decide
+ theorem middle : put #[1,2,3] 1 7 (by decide)=#[1,7,3] := by decide
+ theorem last : put #[1,2,3] 2 7 (by decide)=#[1,2,7] := by decide
+ theorem neighbour : (put #[1,2,3] 1 7 (by decide))[2]=3 := by decide
+ theorem empty_size : (#[] : Array UInt64).size=0 := by decide
+ theorem excluded_index : ¬(3<(#[1,2,3] : Array UInt64).size) := by decide
+ theorem zero_canonical : Canonical 17 #[0,0,0] := by
+  intro i hi
+  interval_cases i <;> decide
+ theorem generated_slot : update 17 #[1,10,3] 4 2 3 2 ⟨2,by decide⟩ ⟨1,by decide⟩ (by decide)=#[1,0,3] := by decide
+end CoefficientStorageControls

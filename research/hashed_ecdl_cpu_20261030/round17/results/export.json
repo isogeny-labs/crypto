@@ -1,0 +1,140 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "HASHED-ECDL-CPU-CURVE-RECIPROCAL-20261030-scheduling-timeout",
+  "created": "2026-10-30T16:12:24.164642+00:00",
+  "protocol": {
+    "path": "../protocol.json",
+    "sha256": "d5f974403ab76e04927ff53b75cf89e6fcd42b9011921b9a3c88a8a2022fa084",
+    "protocol_id": "HASHED-ECDL-CPU-CURVE-RECIPROCAL-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "hashed-ecdl-cpu-20261030",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "23ff0e6bda635d428417024a8ab17e233f7d9af4",
+    "dirty": false
+  },
+  "backend": "isolab-k8s",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+      "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf"
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "binary_sha256": "7f04085b90f5757548700c51dda9bf5fa75112cd770eb4f501b9276367d79395",
+      "commit": "23ff0e6bda635d428417024a8ab17e233f7d9af4"
+    },
+    {
+      "id": "w",
+      "role": "reference",
+      "binary_sha256": "7f04085b90f5757548700c51dda9bf5fa75112cd770eb4f501b9276367d79395",
+      "commit": "23ff0e6bda635d428417024a8ab17e233f7d9af4"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+      "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf"
+    },
+    {
+      "id": "y",
+      "role": "reference",
+      "binary_sha256": "95346300ac11ffcaa242ab59bda50067e1d15370705a71943195ca0e6355b07d",
+      "commit": "5d7dcb67616c38f2afd04002992ceee0192c5cab"
+    }
+  ],
+  "runs": [],
+  "flow": {
+    "planned": 0,
+    "attempted": 0,
+    "completed": 0,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "build.json",
+      "sha256": "8f6f0ea819c069527049e3adb22972bfa7004eed14abeceeaa636fdb15abe367",
+      "bytes": 8531,
+      "kind": "raw"
+    },
+    {
+      "path": "pending-observation.json",
+      "sha256": "40052ea550af2f14fe0c95302a2cf58c8f1a29002698e8087bd24ceef4ac1223",
+      "bytes": 1234,
+      "kind": "raw"
+    },
+    {
+      "path": "results-object-observation.json",
+      "sha256": "08791d549cc2609e943a5732ce6d40a6e6ef36bd83c18ca8c10a8ec5df38397b",
+      "bytes": 169,
+      "kind": "raw"
+    },
+    {
+      "path": "status.json",
+      "sha256": "319520551861928d8a6cf800fc6b6f0f42570986294f5141e63b691a603854ca",
+      "bytes": 986,
+      "kind": "raw"
+    },
+    {
+      "path": "submit.json",
+      "sha256": "5b1d00682704c57e2ece92b301f97998065ae8f553b74325574347082bdd5b1e",
+      "bytes": 977,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "e4219c5b105bda7c91b4357a09057997042ddc5823525b0ae9b6ee194306bc49",
+      "bytes": 3965,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "One EKS submission reached DeadlineExceeded after300seconds with the pod last observed Pending/Unschedulable. No worker was assigned. All150 protocol-planned executions (135 measured,15 warmups) have no recorded attempt; no rows, certificates, host measurements or algorithm times exist. The empty export flow counts recorded executions only; it does not replace the protocol planned count of150."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "No retry was launched. The300second scheduling deadline is not algorithm time. S3 HEAD for the expected results object returned404. The native analyzer did not run; its frozen identity is retained only for provenance."
+    },
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "The strict completeness checker must reject this empty export against the150 planned cells. Retain its findings as an incomplete infrastructure failure record. No fabricated rows or retrospective sample-size changes fill the gap. No speedup or equivalence is inferred."
+    }
+  ],
+  "reviews_dir": "reviews"
+}
