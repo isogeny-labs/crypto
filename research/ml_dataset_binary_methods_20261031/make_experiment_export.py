@@ -91,7 +91,9 @@ def main():
             assert status["independently_solved_ecdlp_cells"] == 1
             assert manifest["outcome"]["scalar_recovered_without_witness"] is True
             assert manifest["outcome"]["scalar_replay_verified"] is True
-        if status["verified_and_exported"]:
+        if status["verified_and_exported"] and status["native_status"] == "timeout":
+            export_status, verification = "timeout", "verified"
+        elif status["verified_and_exported"]:
             export_status, verification = "succeeded", "verified"
         elif status["launcher"].get("timed_out") or (receipt and receipt.get("timed_out")):
             export_status, verification = "timeout", "no_claim"
