@@ -1,0 +1,96 @@
+LIB "linalg.lib";
+proc require55(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump55(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../52/source-data/compact-pid51.sing"));matrix H55=matrix(basis51);
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents55=parents50;
+map source55=compactPid51,u;
+require55(source55(H55)*sourceLift50==source55(commonDenominator51)*unitmat(32),"QUOTIENT55_GLOBAL_NORMAL_SOURCE_BINDING");
+proc multiply55(matrix x,matrix table){
+ matrix M[32][32];int p;int i;int j;int k;
+ for(p=1;p<=528;p++){i=parents55[p,1];j=parents55[p,2];for(k=1;k<=32;k++){M[k,j]=M[k,j]+x[i,1]*table[k,p];if(i!=j){M[k,i]=M[k,i]+x[j,1]*table[k,p];}}}return(M);
+}
+matrix one55[32][1];matrix v55[32][1];matrix lambda55[32][1];int i55;int j55;int k55;
+for(i55=1;i55<=32;i55++){one55[i55,1]=sourceLift50[i55,1];lambda55[i55,1]=sourceLift50[i55,2];v55[i55,1]=sourceLift50[i55,17];}
+matrix V55=multiply55(v55,table50);matrix I55=unitmat(32);matrix Z55[32][32];
+require55(multiply55(one55,table50)==I55,"QUOTIENT55_GLOBAL_UNIT");
+require55(V55*V55+u^2*V55+(u+u^3)*I55==Z55,"QUOTIENT55_GLOBAL_BASE_EQUATION");
+matrix R55=(1+u)*V55+u^3*I55;
+matrix A55=I55+u*(R55+I55);matrix conjugate55=A55+(u^3+u^4)*I55;
+poly f55=u^5+u^2+1;
+require55(A55*conjugate55==f55*I55 && conjugate55*A55==f55*I55,"QUOTIENT55_FULL_ANNIHILATOR_PRODUCTS");
+matrix bad55=conjugate55;bad55[1,1]=bad55[1,1]+1;
+require55(A55*bad55!=f55*I55,"QUOTIENT55_CHANGED_ANNIHILATOR_REJECTED");
+link sourceOut55="source-annihilator55.sing";write(sourceOut55,"ring sourceAnnihilator55=2,(u),(c,dp);short=0;poly f55="+string(f55)+";");dump55(sourceOut55,"A55",A55);dump55(sourceOut55,"conjugate55",conjugate55);dump55(sourceOut55,"one55",one55);close(sourceOut55);
+matrix tableReduced55=reduce(table50,std(ideal(f55)));matrix AReduced55=reduce(A55,std(ideal(f55)));matrix oneReduced55=reduce(one55,std(ideal(f55)));
+ring crt55=2,(w),dp;short=0;
+list norms55;list rhos55;matrix pointValues55[4][32];int point55;
+for(point55=1;point55<=4;point55++){
+ execute(read("../../../54/runs/flatpoints54-01/flat-point"+string(point55)+"54.sing"));
+ setring crt55;map pointMap55=flatPointCertificate54,0,w;
+ norms55[point55]=pointMap55(norm54);rhos55[point55]=pointMap55(rho54);matrix values55=pointMap55(flatValues54);
+ for(j55=1;j55<=32;j55++){pointValues55[point55,j55]=values55[1,j55];}
+}
+poly norm55=1;for(i55=1;i55<=4;i55++){require55(deg(norms55[i55])==20,"QUOTIENT55_NORM_DEGREE");norm55=norm55*norms55[i55];}
+require55(deg(norm55)==80 && deg(gcd(norm55,diff(norm55,w)))==0,"QUOTIENT55_BINARY_SQUAREFREE_DEGREE80");
+ideal normGB55=std(ideal(norm55));matrix idempotents55[1][4];poly cofactor55;matrix bezout55;matrix gcdLifts55[2][4];
+for(i55=1;i55<=4;i55++){
+ cofactor55=norm55/norms55[i55];require55(cofactor55*norms55[i55]==norm55,"QUOTIENT55_EXACT_COFACTOR");
+ bezout55=lift(ideal(norms55[i55],cofactor55),ideal(1));
+ require55(matrix(ideal(norms55[i55],cofactor55))*bezout55==matrix(ideal(1)),"QUOTIENT55_CRT_BEZOUT_PRODUCT");
+ gcdLifts55[1,i55]=bezout55[1,1];gcdLifts55[2,i55]=bezout55[2,1];
+ idempotents55[1,i55]=reduce(cofactor55*bezout55[2,1],normGB55);
+}
+poly sum55=0;poly rho55=0;matrix values55[1][32];
+for(i55=1;i55<=4;i55++){
+ sum55=sum55+idempotents55[1,i55];rho55=rho55+idempotents55[1,i55]*rhos55[i55];
+ for(j55=1;j55<=32;j55++){values55[1,j55]=values55[1,j55]+idempotents55[1,i55]*pointValues55[i55,j55];}
+ for(j55=1;j55<=4;j55++){
+  require55(reduce(idempotents55[1,i55],std(ideal(norms55[j55])))==(i55==j55),"QUOTIENT55_CRT_FOUR_PROJECTIONS");
+  require55(reduce(idempotents55[1,i55]*idempotents55[1,j55]+(i55==j55)*idempotents55[1,i55],normGB55)==0,"QUOTIENT55_CRT_ALL_ORTHOGONAL_PRODUCTS");
+ }
+}
+require55(reduce(sum55+1,normGB55)==0,"QUOTIENT55_CRT_PARTITION_UNITY");
+rho55=reduce(rho55,normGB55);values55=reduce(values55,normGB55);
+require55(reduce(rho55^5+rho55^2+1,normGB55)==0,"QUOTIENT55_BASE_RECOVERY_F_A");
+// Source coefficients are first reduced modulo f_A before composition.
+map sourceMap55=tablePidCertificate50,rho55;
+matrix table55=reduce(sourceMap55(tableReduced55),normGB55);matrix one55=reduce(sourceMap55(oneReduced55),normGB55);
+require55(reduce(values55*one55,normGB55)==matrix(ideal(1)),"QUOTIENT55_CRT_ACTUAL_UNIT");
+poly residual55;
+for(i55=1;i55<=528;i55++){
+ residual55=values55[1,parents55[i55,1]]*values55[1,parents55[i55,2]];
+ for(j55=1;j55<=32;j55++){residual55=residual55+table55[j55,i55]*values55[1,j55];}
+ require55(reduce(residual55,normGB55)==0,"QUOTIENT55_ALL_CRT_SOURCE_PRODUCTS");
+}
+// E expands all z^k*e_j, k=0..4, in the degree80 binary coordinate basis.
+matrix evaluation55[80][160];poly entry55;poly remainder55;intvec ex55;int column55;int row55;
+for(k55=0;k55<5;k55++){for(j55=1;j55<=32;j55++){
+ column55=32*k55+j55;entry55=reduce(rho55^k55*values55[1,j55],normGB55);
+ while(entry55!=0){ex55=leadexp(entry55);evaluation55[ex55[1]+1,column55]=leadcoef(entry55);entry55=entry55-lead(entry55);}
+}}
+// Expand multiplication by A modulo f_A in the same160-dimensional basis.
+setring tablePidCertificate50;matrix binaryA55[160][160];poly entry55;intvec ex55;int column55;int row55;
+for(k55=0;k55<5;k55++){for(j55=1;j55<=32;j55++){
+ column55=32*k55+j55;
+ for(i55=1;i55<=32;i55++){
+  entry55=reduce(u^k55*AReduced55[i55,j55],std(ideal(f55)));
+  while(entry55!=0){ex55=leadexp(entry55);row55=32*ex55[1]+i55;binaryA55[row55,column55]=leadcoef(entry55);entry55=entry55-lead(entry55);}
+ }
+}}
+setring crt55;map binaryMap55=tablePidCertificate50,0;matrix binaryA55=binaryMap55(binaryA55);
+int rankA55=mat_rk(binaryA55);int rankE55=mat_rk(evaluation55);
+require55(rankA55==80 && rankE55==80,"QUOTIENT55_EXACT_BINARY_RANKS");
+matrix zero55[80][160];require55(evaluation55*binaryA55==zero55,"QUOTIENT55_SOURCE_IDEAL_IN_KERNEL");
+matrix recovery55=lift(module(evaluation55),module(unitmat(80)));
+require55(evaluation55*recovery55==unitmat(80),"QUOTIENT55_FULL_RIGHT_INVERSE");
+matrix residualMatrix55=unitmat(160)+recovery55*evaluation55;
+matrix kernelLift55=lift(module(binaryA55),module(residualMatrix55));
+require55(binaryA55*kernelLift55==residualMatrix55,"QUOTIENT55_FULL_KERNEL_IMAGE_RECOVERY");
+int controlIndex55=1;while(recovery55[controlIndex55,1]==0){controlIndex55++;}
+matrix badEvaluation55=evaluation55;badEvaluation55[1,controlIndex55]=badEvaluation55[1,controlIndex55]+1;
+require55(badEvaluation55*recovery55!=unitmat(80) || badEvaluation55*binaryA55!=zero55,"QUOTIENT55_CORRUPTED_EVALUATION_REJECTED");
+link out55="crt-quotient55.sing";write(out55,"ring crtQuotient55=2,(w),dp;short=0;poly norm55="+string(norm55)+";poly rho55="+string(rho55)+";");
+for(i55=1;i55<=4;i55++){write(out55,"poly norm"+string(i55)+"55="+string(norms55[i55])+";");}
+dump55(out55,"idempotents55",idempotents55);dump55(out55,"gcdLifts55",gcdLifts55);dump55(out55,"values55",values55);dump55(out55,"evaluation55",evaluation55);dump55(out55,"binaryA55",binaryA55);dump55(out55,"recovery55",recovery55);dump55(out55,"kernelLift55",kernelLift55);close(out55);
+print("RESULT55 quotient_dimension=80 rank_A=80 rank_E=80 CRT_degree=80 source_products=528 source_values=32 full_annihilator=1 full_recovery=1");
+print("QUOTIENT55_ALL_CHECKS_PASS");quit;
