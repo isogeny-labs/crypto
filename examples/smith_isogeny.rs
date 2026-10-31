@@ -54,11 +54,17 @@ fn main() {
     let q: u64 = arg(&args, "--q").map(|s| s.parse().unwrap()).unwrap_or(11);
     let out = arg(&args, "--out")
         .unwrap_or_else(|| "research/smith_isogeny_divisor_map_20261018/data".into());
-    let ncurves: usize = arg(&args, "--curves").map(|s| s.parse().unwrap()).unwrap_or(6);
+    let ncurves: usize = arg(&args, "--curves")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(6);
     let name = format!("{}_q{}", cmd.replace('-', "_"), q);
     if !matches!(cmd.as_str(), "cost-fit" | "summarize") {
-        emit(&out, &name, json!({"rec": "start", "cmd": cmd, "q": q, "seed": SEED,
-        "git_head": git_head(), "args": args}));
+        emit(
+            &out,
+            &name,
+            json!({"rec": "start", "cmd": cmd, "q": q, "seed": SEED,
+        "git_head": git_head(), "args": args}),
+        );
     }
     match cmd.as_str() {
         "verify" => verify(q, ncurves, &out, &name, &args),
@@ -72,16 +78,25 @@ fn main() {
 }
 
 fn route_s(q: u64, out: &str, name: &str, args: &[String]) {
-    let mi: usize = arg(args, "--max-instances").map(|s| s.parse().unwrap()).unwrap_or(usize::MAX);
-    let md: usize = arg(args, "--max-dlp").map(|s| s.parse().unwrap()).unwrap_or(usize::MAX);
-    let cap: f64 = arg(args, "--cap-s").map(|s| s.parse().unwrap()).unwrap_or(3600.0);
+    let mi: usize = arg(args, "--max-instances")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(usize::MAX);
+    let md: usize = arg(args, "--max-dlp")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(usize::MAX);
+    let cap: f64 = arg(args, "--cap-s")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(3600.0);
     let t = Instant::now();
     let run = rs::route_s(q as u32, mi, md, cap, SEED);
     for r in &run.records {
         emit(out, name, json!({"rec": "instance", "data": r}));
     }
     let c = |f: &dyn Fn(&rs::RouteSRecord) -> bool| run.records.iter().filter(|r| f(r)).count();
-    emit(out, name, json!({"rec": "summary", "q": q,
+    emit(
+        out,
+        name,
+        json!({"rec": "summary", "q": q,
         "split_candidates": run.split_candidates,
         "filter_instances": run.filter_instances,
         "old_rule_instances": run.old_rule_instances,
@@ -102,7 +117,8 @@ fn route_s(q: u64, out: &str, name: &str, args: &[String]) {
         "verified_on_e": c(&|r| r.verified_on_e),
         "k_equals_planted": c(&|r| r.k_found == Some(r.k_planted)),
         "skipped": c(&|r| r.skip_reason.is_some()),
-        "seconds": t.elapsed().as_secs_f64()}));
+        "seconds": t.elapsed().as_secs_f64()}),
+    );
 }
 
 fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
@@ -132,8 +148,12 @@ fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
             row["quartic"] = json!(qc.f.coeffs());
             match si::W1Bridge::new(&qc) {
                 Ok(w1) => {
-                    let s = sm.draw_sample(&sg, cr.n_jac as u128,
-                        (sizes[0], sizes[1], sizes[2], sizes[3]), &mut rng);
+                    let s = sm.draw_sample(
+                        &sg,
+                        cr.n_jac as u128,
+                        (sizes[0], sizes[1], sizes[2], sizes[3]),
+                        &mut rng,
+                    );
                     row["n_s_rational"] = json!(s.n_s_rational);
                     row["base_fallbacks"] = json!(s.base_fallbacks);
                     row["t5_ells"] = json!(si::odd_prime_factors(cr.n_jac as u128));
@@ -145,7 +165,13 @@ fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
                         }
                     }
                     if image {
-                        row["image"] = json!(si::image_structure(&sm, &w1, &sg, cr.n_jac as u128, &mut rng));
+                        row["image"] = json!(si::image_structure(
+                            &sm,
+                            &w1,
+                            &sg,
+                            cr.n_jac as u128,
+                            &mut rng
+                        ));
                     }
                     row["w1_bad_cubic_space"] = json!(w1.bad_cubic_space.get());
                 }
@@ -155,7 +181,11 @@ fn verify(q: u64, ncurves: usize, out: &str, name: &str, args: &[String]) {
         row["seconds"] = json!(t0.elapsed().as_secs_f64());
         emit(out, name, row);
     }
-    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found}));
+    emit(
+        out,
+        name,
+        json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found}),
+    );
 }
 
 fn deg8(q: u64, ncurves: usize, out: &str, name: &str) {
@@ -172,7 +202,10 @@ fn deg8(q: u64, ncurves: usize, out: &str, name: &str) {
             for s in co.subgroups.iter().filter(|s| s.trig_rational()) {
                 for m in s.maps.iter().filter(|m| m.valid() && m.alpha_chi == -1) {
                     tw_maps += 1;
-                    match (h != q as i64 + 1).then(|| x_point_count(&f, &m.map, q)).flatten() {
+                    match (h != q as i64 + 1)
+                        .then(|| x_point_count(&f, &m.map, q))
+                        .flatten()
+                    {
                         None => tw_na += 1,
                         Some(x) if x as i64 == 2 * (q as i64 + 1) - h => tw_agree += 1,
                         Some(_) => tw_disagree += 1,
@@ -187,12 +220,20 @@ fn deg8(q: u64, ncurves: usize, out: &str, name: &str) {
         found += 1;
         let sm = si::Smith::new(sd);
         let (cr, _) = sm.t1_curve(&mut rng);
-        emit(out, name, json!({"rec": "curve_deg8", "q": q, "index": idx - 1, "scanned": idx,
-            "f": f, "t1": cr, "t1_pass": cr.pass()}));
+        emit(
+            out,
+            name,
+            json!({"rec": "curve_deg8", "q": q, "index": idx - 1, "scanned": idx,
+            "f": f, "t1": cr, "t1_pass": cr.pass()}),
+        );
     }
-    emit(out, name, json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found,
+    emit(
+        out,
+        name,
+        json!({"rec": "scan", "q": q, "curves_scanned": idx, "curves_used": found,
         "t1f_twist_maps": tw_maps, "t1f_agree": tw_agree, "t1f_disagree": tw_disagree,
-        "t1f_not_applicable": tw_na}));
+        "t1f_not_applicable": tw_na}),
+    );
 }
 
 fn cost(q: u64, out: &str, name: &str, args: &[String]) {
@@ -238,12 +279,16 @@ fn cost(q: u64, out: &str, name: &str, args: &[String]) {
     let (mm, mi, mt) = (q4(&mut muls), q4(&mut invs), q4(&mut ns));
     // an F_{q^6} multiplication counts 6^2 + 6*5 = 66 F_q multiplications
     let fq6_mul_units = 66.0;
-    emit(out, name, json!({"rec": "cost", "q": q, "curve_index": scanned - 1, "n": n,
+    emit(
+        out,
+        name,
+        json!({"rec": "cost", "q": q, "curve_index": scanned - 1, "n": n,
         "degenerate": degenerate, "fq_mul_q1_med_q3": mm, "fqd_inv_q1_med_q3": mi,
         "inv_over_fq6_mul_time": inv_ratio, "fq6_mul_ns": mul_ns,
         "inv_price_fq_mul": inv_ratio * fq6_mul_units,
         "priced_fq_mul_median": mm[1] + inv_ratio * fq6_mul_units * mi[1],
-        "wall_ns_q1_med_q3": mt}));
+        "wall_ns_q1_med_q3": mt}),
+    );
 }
 
 /// T7 fit: OLS of log2(cost) on log2(q) over the recorded `cost` rows, with a
@@ -278,11 +323,17 @@ fn cost_fit(out: &str) {
         let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
         let b = sxy / sxx;
         let a = my - b * mx;
-        let rss: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - a - b * x).powi(2)).sum();
+        let rss: f64 = xs
+            .iter()
+            .zip(&ys)
+            .map(|(x, y)| (y - a - b * x).powi(2))
+            .sum();
         let se = (rss / (n - 2.0) / sxx).sqrt();
         // t_{0.975, df} for df = n - 2 (table, df 1..30)
-        let tt = [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
-            2.201, 2.179, 2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086];
+        let tt = [
+            12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179,
+            2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086,
+        ];
         let t = tt[((n as usize).saturating_sub(3)).min(tt.len() - 1)];
         json!({"n": n, "slope": b, "intercept": a, "slope_lo": b - t * se, "slope_hi": b + t * se, "t": t})
     };
@@ -291,7 +342,11 @@ fn cost_fit(out: &str) {
         "priced": fit(pts.iter().map(|p| p.1).collect()),
         "mul": fit(pts.iter().map(|p| p.2).collect()),
         "wall": fit(pts.iter().map(|p| p.3).collect())});
-    std::fs::write(format!("{out}/cost_fit.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    std::fs::write(
+        format!("{out}/cost_fit.json"),
+        serde_json::to_string_pretty(&v).unwrap(),
+    )
+    .unwrap();
     println!("{}", v);
 }
 
@@ -302,18 +357,33 @@ fn summarize(out: &str) {
     use serde_json::Value;
     let read = |n: &str| -> Vec<Value> {
         std::fs::read_to_string(format!("{out}/{n}"))
-            .map(|t| t.lines().map(|l| serde_json::from_str(l).unwrap()).collect())
+            .map(|t| {
+                t.lines()
+                    .map(|l| serde_json::from_str(l).unwrap())
+                    .collect()
+            })
             .unwrap_or_default()
     };
-    let checks = ["t2_well_defined", "t3_homomorphism", "t4_kernel_s", "t4_outside_nonzero",
-        "t5_order_nonzero", "t5_order_annihilated", "t6_group_order"];
+    let checks = [
+        "t2_well_defined",
+        "t3_homomorphism",
+        "t4_kernel_s",
+        "t4_outside_nonzero",
+        "t5_order_nonzero",
+        "t5_order_annihilated",
+        "t6_group_order",
+    ];
     let mut verify = Vec::new();
     let mut deg8 = Vec::new();
     let mut routes = Vec::new();
     for q in [7u64, 11, 13, 17, 19, 23] {
         let rows = read(&format!("verify_q{q}.jsonl"));
         let curves: Vec<&Value> = rows.iter().filter(|r| r["rec"] == "curve").collect();
-        let scan = rows.iter().find(|r| r["rec"] == "scan").cloned().unwrap_or(Value::Null);
+        let scan = rows
+            .iter()
+            .find(|r| r["rec"] == "scan")
+            .cloned()
+            .unwrap_or(Value::Null);
         let mut eng = serde_json::Map::new();
         for e in ["w1", "deg6"] {
             let mut m = serde_json::Map::new();
@@ -331,22 +401,54 @@ fn summarize(out: &str) {
             eng.insert(e.into(), Value::Object(m));
         }
         let t1_pass = curves.iter().filter(|r| r["t1_pass"] == true).count();
-        let hyper = curves.iter().filter(|r| r["t1"]["fit_error"].as_str().map_or(false, |s| s.contains("hyperelliptic"))).count();
-        let holdout: u64 = curves.iter().map(|r| r["t1"]["holdout_points"].as_u64().unwrap_or(0)).sum();
-        let holdout_fail: u64 = curves.iter().map(|r| r["t1"]["holdout_failures"].as_u64().unwrap_or(0)).sum();
+        let hyper = curves
+            .iter()
+            .filter(|r| {
+                r["t1"]["fit_error"]
+                    .as_str()
+                    .map_or(false, |s| s.contains("hyperelliptic"))
+            })
+            .count();
+        let holdout: u64 = curves
+            .iter()
+            .map(|r| r["t1"]["holdout_points"].as_u64().unwrap_or(0))
+            .sum();
+        let holdout_fail: u64 = curves
+            .iter()
+            .map(|r| r["t1"]["holdout_failures"].as_u64().unwrap_or(0))
+            .sum();
         let imgs: Vec<&Value> = curves.iter().filter_map(|r| r.get("image")).collect();
-        let img_ok = imgs.iter().filter(|i| i["kernel_equals_s"] == true && i["errors"] == 0
-            && i["fibre_min"] == i["n_s_rational"] && i["fibre_max"] == i["n_s_rational"]
-            && i["n_jac_enumerated"].as_u64() == i["n_jac_lpoly"].as_u64()).count();
-        let img_elems: u64 = imgs.iter().map(|i| i["n_jac_enumerated"].as_u64().unwrap()).sum();
-        let img_retry: u64 = imgs.iter().map(|i| i["first_try_errors"].as_u64().unwrap()).sum();
-        verify.push(json!({"q": q, "curves": curves.len(), "curves_scanned": scan["curves_scanned"],
+        let img_ok = imgs
+            .iter()
+            .filter(|i| {
+                i["kernel_equals_s"] == true
+                    && i["errors"] == 0
+                    && i["fibre_min"] == i["n_s_rational"]
+                    && i["fibre_max"] == i["n_s_rational"]
+                    && i["n_jac_enumerated"].as_u64() == i["n_jac_lpoly"].as_u64()
+            })
+            .count();
+        let img_elems: u64 = imgs
+            .iter()
+            .map(|i| i["n_jac_enumerated"].as_u64().unwrap())
+            .sum();
+        let img_retry: u64 = imgs
+            .iter()
+            .map(|i| i["first_try_errors"].as_u64().unwrap())
+            .sum();
+        verify.push(
+            json!({"q": q, "curves": curves.len(), "curves_scanned": scan["curves_scanned"],
             "t1_pass": t1_pass, "x_hyperelliptic": hyper, "holdout_points": holdout,
             "holdout_failures": holdout_fail, "engines": eng, "image_curves": imgs.len(),
-            "image_ok": img_ok, "image_elements": img_elems, "image_first_try_errors": img_retry}));
+            "image_ok": img_ok, "image_elements": img_elems, "image_first_try_errors": img_retry}),
+        );
         let d8 = read(&format!("deg8_q{q}.jsonl"));
         let dc: Vec<&Value> = d8.iter().filter(|r| r["rec"] == "curve_deg8").collect();
-        let ds = d8.iter().find(|r| r["rec"] == "scan").cloned().unwrap_or(Value::Null);
+        let ds = d8
+            .iter()
+            .find(|r| r["rec"] == "scan")
+            .cloned()
+            .unwrap_or(Value::Null);
         deg8.push(json!({"q": q, "curves": dc.len(),
             "t1_pass": dc.iter().filter(|r| r["t1_pass"] == true).count(),
             "x_hyperelliptic": dc.iter().filter(|r| r["t1"]["fit_error"].as_str().map_or(false, |s| s.contains("hyperelliptic"))).count(),
@@ -357,6 +459,10 @@ fn summarize(out: &str) {
         }
     }
     let v = json!({"verify": verify, "deg8": deg8, "route_s": routes});
-    std::fs::write(format!("{out}/summary.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    std::fs::write(
+        format!("{out}/summary.json"),
+        serde_json::to_string_pretty(&v).unwrap(),
+    )
+    .unwrap();
     println!("{}", serde_json::to_string_pretty(&v).unwrap());
 }

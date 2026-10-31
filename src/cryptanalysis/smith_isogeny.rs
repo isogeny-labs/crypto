@@ -108,7 +108,7 @@ fn pw(b: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 fn inv(a: u64, p: u64) -> u64 {
-    assert!(a % p != 0, "inverse of zero");
+    assert!(!a.is_multiple_of(p), "inverse of zero");
     pw(a, p - 2, p)
 }
 fn chi_p(a: u64, p: u64) -> i8 {
@@ -3561,7 +3561,7 @@ mod tests {
                 "line {:?} degs {:?}: canon6 -> {:?}",
                 l,
                 degs,
-                r.as_ref().map(|d| div_degree(d))
+                r.as_ref().map(div_degree)
             );
             if let Ok(a) = &r {
                 // a should equal chosen's class: canon6(a + omega) == canon6(chosen + omega)
