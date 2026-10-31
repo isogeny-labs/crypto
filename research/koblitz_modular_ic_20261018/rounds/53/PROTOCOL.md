@@ -70,3 +70,15 @@ by G,N,psi3. Save the full certificate before this quotient check. The unit is
 over generic F2(b,c), with Delta inverted; registered coefficient denominators
 and exceptional specializations are separate obligations. No coefficient-box
 or new inversion search, no asymptotic or speed claim, same native limits.
+
+## Generic Tate marked-model stage, frozen before execution
+
+TATE53 reads the accepted generic quotient functions, maps the marked origin
+to (r,q), and constructs h=A*r+b,s=(r²+a4+A*q)/h,D2=b+r+s²+A*s,
+u=h/D2. Require exact psi3 Bezout units for t,h,D2,u, the marked-point
+equation, and equality bnew=D2/u²=h/u³. Preserve each full unit product before
+checking the complete curve change oldX=u²*x+r,oldY=u³*y+s*u²*x+q.
+The full residual must equal its explicit psi3 multiple; a changed x
+coefficient must fail. This stage is generic over F2(b,c)[t]/psi3. It does
+not assert all exceptional specializations, target QR equations or F2
+descent. Same fixed exact workload and native limits; retain caps/partials.
