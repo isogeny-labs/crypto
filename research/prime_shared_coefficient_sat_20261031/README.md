@@ -1,0 +1,155 @@
+# Prime-field shared-coefficient solver discriminator
+
+## Outcome
+
+The next prime-field index-calculus lead to pursue is the **odd-arity
+shared-divisor-coefficient system with quotient/remainder membership**, tested
+as one canonical predicate across exact enumeration, F4, CDCL/CNF, CNF-XOR and
+finite-field SMT.
+
+This is the second-ranked lead in the
+[31 October lead review](../prime_ic_lead_review_20261031/REPORT.md), after the
+hashed-factor-base Boolean-tensor lead. It is the best next experiment because
+it has an exact quadratic input, known witnesses at growing arity, and a clean
+way to test the user's SAT hypothesis without confusing a solver with a
+different mathematical predicate.
+
+The implemented E0 gate passes:
+
+- the historical `m=3,5,7`, `t=4` selected-chart witnesses satisfy exactly
+  `35`, `60`, and `85` generated equations over F17;
+- corrupting `a0` is rejected in every fixture;
+- for every one of the 18 affine targets on
+  `y^2=x^3+2x+2` over F17, an algebraic coefficient enumerator and an
+  algorithmically separate elliptic-curve group/interpolation oracle produce
+  the same projected coefficient-model set;
+- the census is 6 SAT targets, 12 UNSAT targets, and 6 models in each
+  implementation, with 18/18 exact set matches.
+
+This is development correctness, not solver evidence. No msolve, CaDiCaL,
+CryptoMiniSat or cvc5 run was made, no timing was collected, and no
+index-calculus speedup is claimed.
+
+## Claim ledger
+
+| Statement | Status | Evidence or obligation |
+|---|---|---|
+| The selected-chart remainder construction has a deterministic quadratic IR | supported for the implemented construction | strict generator/parser plus legacy fixture conformance |
+| The arity-three F17 predicate represents the intended rational, distinct-root decompositions | supported on the complete fixed toy panel | 18/18 exact projected coefficient-model-set matches against an algorithmically separate same-author group/interpolation oracle |
+| SAT/XOR beats F4 or enumeration | unknown | E1 exporter equivalence and the held-out E3 tournament have not run |
+| The mechanism scales better with arity | unknown | requires complete-work slopes on all four frozen rungs |
+| The mechanism improves relation collection or ECDLP | unknown | requires E4 relation extraction, matrix construction, log replay and complete cost accounting |
+| A finite solver panel proves a subexponential algorithm | out of scope | requires a family theorem and a complete asymptotic cost proof |
+
+## Construction under test
+
+For odd `m=2h-1`, use a monic polynomial `A` of degree `h`, a polynomial `C`
+of degree at most `h-2`, and a monic root polynomial `U` of degree `m`. For an
+affine target `R=(r_x,r_y)`, impose
+
+```text
+A(r_x) - r_y C(r_x) = 0
+A(X)^2 - (X^3+aX+b) C(X)^2 = (X-r_x) U(X).
+```
+
+Membership in the split `2^t`-power coset is represented by shared remainder
+coefficients:
+
+```text
+R_0 = X
+R_{j-1}^2 = Q_j U + R_j       for 1 <= j <= t
+R_t = c.
+```
+
+Bezout equations enforce `gcd(U,C)=1` and `gcd(U,U')=1`; one inverse equation
+enforces `U(r_x) != 0`. Every generated input equation has total degree at most
+two. All field elements are canonical decimal strings in the JSON IR, variable
+and monomial order is deterministic, and malformed or trailing input is
+rejected.
+
+The native tool in [`native`](native/) emits:
+
+- strict canonical JSON (`prime-shared-coefficient.ir/v1`);
+- msolve prime-field polynomial input;
+- cvc5 `QF_FF` input;
+- the exhaustive E0 F17 census.
+
+CNF and CNF-XOR lowering are intentionally not improvised here. They are an E1
+gate: their projected model sets and checked UNSAT proofs must agree with the
+canonical evaluator before any performance row is admissible.
+
+## Experiments
+
+The staged protocol is in [PROTOCOL.md](PROTOCOL.md), and the machine-readable
+status is in [experiment-matrix.json](experiment-matrix.json).
+
+| Stage | Question | Current status | Decisive output |
+|---|---|---|---|
+| E0 | Is the canonical predicate internally and independently correct on tiny complete domains? | complete | exact set equality, legacy conformance, mutation rejection |
+| E1 | Do JSON, msolve, QF_FF, CNF and CNF-XOR preserve the same projected models? | next | exhaustive backend equivalence and checked UNSAT certificates |
+| E2 | Are the detector, limits and planned sample powered on disjoint scratch instances? | blocked | frozen binaries, limits, seed list and power receipt |
+| E3 | Does a SAT bundle have lower complete-work growth than enumeration and F4? | draft | held-out four-rung tournament with A/A, planted and matched-null controls |
+| E4 | Does an advancing bundle improve a complete relation-collection pipeline? | conditional | verified relations, matrix rank/log replay and end-to-end cost |
+| E5 | Can an observed mechanism be proved for the family? | conditional | a theorem bounding solver work or a certified structural invariant |
+
+E3 advances a SAT bundle only if it is exactly correct, completes all four
+natural rungs, has a corrected upper 95% growth-slope interval at most `0.85`
+on the three largest rungs, and beats F4 in retired instructions on both
+largest jointly completed rungs outside the A/A interval. A lower slope bound
+at least `0.95` over three consecutive rungs, or all SAT bundles censoring
+before F4 on both largest common rungs, is evidence not to advance under this
+protocol. Other censoring is inconclusive.
+
+## Why this is the SAT test worth running
+
+Prior direct Semaev bit-blasts and prime-field QF_FF coordinate encodings were
+poor, but they did not test this shared-coefficient predicate. Here the same
+`U` coefficients occur in every remainder layer. That repeated incidence is a
+specific propagation hypothesis. The matched-null arm preserves the field,
+equation/variable/degree multiset and support graph while randomizing the
+elliptic coefficients, so a SAT win can be separated from generic sparse-shape
+effects.
+
+The comparison object is the complete **representation plus solver bundle**.
+It would be invalid to attribute a win to CDCL alone, or to compare SAT on the
+selected chart with F4 on a larger repeated-root chart.
+
+## Sources and prior work checked
+
+- Petit--Kosters--Messeng, *Algebraic Approaches for the Elliptic Curve
+  Discrete Logarithm Problem over Prime Fields* (PKC 2016), sections 3.1--3.5,
+  4.2 and 5; pinned PDF SHA-256
+  `a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b`
+  in the [source register](../prime_one_shot_20261029/SOURCES.json).
+- The [one-shot construction report](../prime_one_shot_20261029/README.md),
+  prototype exports and continuation reviews, including the rationality and
+  repeated-root chart cautions.
+- The [prime-field lead review](../prime_ic_lead_review_20261031/README.md) and
+  its [formal draft protocol](../prime_ic_lead_review_20261031/protocol.draft.json).
+- The [prior SAT/SMT design](../sat_smt_prime_ic_design_20261030/DESIGN.md),
+  which rules out merely repeating the direct Semaev representation.
+- Official msolve input documentation, cvc5 finite-field documentation,
+  CaDiCaL DIMACS/proof documentation and CryptoMiniSat CNF-XOR/XLRUP
+  documentation were checked for exporter and certificate obligations. They
+  were not installed or benchmarked in E0.
+
+No novelty claim is made for divisor coefficients, quotient/remainder
+membership, SAT, XOR reasoning, F4, or PKM factor bases. The open contribution
+is a fair exact discriminator and, only if it survives, a scalable mechanism
+and complete index-calculus cost proof.
+
+## Reproduction
+
+With Rust 1.78 or newer:
+
+```bash
+cd research/prime_shared_coefficient_sat_20261031/native
+cargo test --release --locked
+cargo run --release --locked -- e0-panel
+cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 json
+cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 msolve
+cargo run --release --locked -- emit 17 2 2 3 4 1 0 6 qf-ff
+```
+
+See [VALIDATION.md](VALIDATION.md) for the exact checks and environment
+limitations of this handoff.
