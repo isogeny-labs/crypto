@@ -47,3 +47,9 @@ mathlibd13f23b,-j1,-M4096,1200s separately compile/audit,no virtual cap.
 Subsequent stages need fresh pre-data freezes: independently reload all
 closure products; formalize the relevant module-stability implication; then
 actual Hecke3 cubic-packet transport and the larger112 algebra obligations.
+
+Amendment before closure52-02: closure52-01 rejected because integer parent
+arrays are global in Singular and cannot be imported with imap from a ring.
+Copy both parent arrays immediately after loading each donor and compare
+both complete528-entry parent lists. All downstream output of01 is invalid.
+No mathematical scope,controls or limit changed.

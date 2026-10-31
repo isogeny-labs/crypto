@@ -2,14 +2,16 @@ execute(read("../../source-data/compact-pid51.sing"));
 execute(read("../../source-data/nu-pid-certificate51.sing"));
 execute(read("../../source-data/nu-field-certificate51.sing"));
 execute(read("../../source-data/rr-table50.sing"));
+intmat tableParents52=parents50;
 execute(read("../../source-data/rr-products50.sing"));
+intmat productParents52=parents50;
 execute(read("../../source-data/relative-infinity50.sing"));
 setring compactPid51;short=0;option(redSB);
 map nuMap52=nuPidCertificate51,u;map tableMap52=tablePidCertificate50,u;map productMap52=productPidCertificate50,u;
 matrix H52=matrix(basis51);matrix nuH52=nuMap52(H51);matrix nc52=nuMap52(lift51);
 matrix table52=tableMap52(table50);matrix embedding52=tableMap52(sourceLift50);
 module products52=productMap52(productNumerators50);
-intmat parents52=imap(tablePidCertificate50,parents50);
+intmat parents52=tableParents52;
 matrix identity52[32][32];int i52;int j52;int k52;int p52;
 for(i52=1;i52<=32;i52++){identity52[i52,i52]=1;}
 if(H52!=nuH52 || embedding52!=sourceLift51 || H52*embedding52!=commonDenominator51*identity52 || commonDenominator51*H52*table52!=matrix(products52)) {ERROR("CLOSURE52_FULL_DONOR_PRODUCTS");quit;}
@@ -18,7 +20,7 @@ if(commonDenominator51*H52*badTable52==matrix(products52)){ERROR("CLOSURE52_BAD_
 matrix T52[32][32];p52=0;
 for(i52=1;i52<=32;i52++){for(j52=i52;j52<=32;j52++){
  p52++;
- if(parents52[p52,1]!=i52 || parents52[p52,2]!=j52){ERROR("CLOSURE52_TABLE_PARENTS");quit;}
+ if(parents52[p52,1]!=i52 || parents52[p52,2]!=j52 || productParents52[p52,1]!=i52 || productParents52[p52,2]!=j52){ERROR("CLOSURE52_TABLE_PARENTS");quit;}
  for(k52=1;k52<=32;k52++){
  T52[k52,j52]=T52[k52,j52]+nc52[i52,1]*table52[k52,p52];
  if(i52!=j52){T52[k52,i52]=T52[k52,i52]+nc52[j52,1]*table52[k52,p52];}
