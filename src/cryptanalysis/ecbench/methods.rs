@@ -2710,8 +2710,8 @@ fn solve_inner(
         };
         let f = &i.curve.f;
         let target = PtB {
-            x: f.unpack(tx),
-            y: f.unpack(ty),
+            x: f.unpack(u128::from(tx)),
+            y: f.unpack(u128::from(ty)),
             inf: false,
         };
         return solve_neg_strong(m, i, target, seed);
@@ -5593,7 +5593,12 @@ fn solve_neg_strong(
     seed: u64,
 ) -> Result<SolveReport, String> {
     use super::negation_strong::{NegStrongRho, CANON_FQ_MULS, JUMPS};
-    let params = neg_strong_params(m, inst.r)?;
+    if inst.curve.f.f.m > 16 {
+        return Err("rho.negation_strong requires a one-word packed point key".into());
+    }
+    let r = u64::try_from(inst.r)
+        .map_err(|_| "rho.negation_strong supports subgroup orders through u64".to_string())?;
+    let params = neg_strong_params(m, r)?;
     if !inst.curve.on_curve(&target) {
         return Err("the target is not on the curve".into());
     }
@@ -5863,7 +5868,7 @@ fn solve_f2m4_wide(
                 &fb,
                 |q| CountedGroup::key(c, q),
             )?;
-            let mut rep = ic_report(m, run.report, &calib, facts, wall, 2);
+            let mut rep = ic_report(m, run.report, &calib, Some(facts), wall, 2);
             rep.recovered = run.recovered;
             rep.exhausted = run.recovered.is_none();
             Ok(rep)
@@ -5901,6 +5906,7 @@ fn bin_oracle<'a>(
         frobenius,
         sparsest: flag("sparsest")?,
         replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
     };
     let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
     oracle.charge_unsolved = flag("charge_unsolved")?;

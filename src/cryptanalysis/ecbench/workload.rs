@@ -992,7 +992,7 @@ impl Instance {
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
-            Instance::F2m4(i) => u128::from(i.r),
+            Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
@@ -1840,12 +1840,20 @@ mod tests {
                     Instance::F2m4(i) => {
                         let c = &i.curve;
                         let point = crate::cryptanalysis::gaudry_quartic_bin::PtB {
-                            x: c.f.unpack(x),
-                            y: c.f.unpack(y),
+                            x: c.f.unpack(u128::from(x)),
+                            y: c.f.unpack(u128::from(y)),
                             inf: false,
                         };
                         assert!(c.on_curve(&point));
-                        assert!(CountedGroup::mul(c, &mut scratch, point, i.r).inf);
+                        assert!(
+                            CountedGroup::mul(
+                                c,
+                                &mut scratch,
+                                point,
+                                u64::try_from(i.r).expect("small test subgroup order"),
+                            )
+                            .inf
+                        );
                     }
                     _ => unreachable!(),
                 }
