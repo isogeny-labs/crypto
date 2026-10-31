@@ -177,7 +177,16 @@ def finalize(shard, index):
         status = {"verify": "missing_native_attempt", "report": "missing_native_attempt", "export": "missing_native_attempt"}
     status["runner_receipt_present"] = (shard / "runner" / "receipt.json").is_file()
     status["launcher"] = json.loads((shard / "launcher.json").read_text())
-    status["verified_and_exported"] = all(status.get(k) == 0 for k in ("verify", "report", "export"))
+    status["independently_solved_ecdlp_cells"] = 0
+    status["artifact_hashes_verified"] = False
+    if status.get("verify") == 0:
+        try:
+            verified = json.loads((shard / "verify.stdout").read_text())
+            status["independently_solved_ecdlp_cells"] = verified.get("independently_solved_ecdlp_cells", 0)
+            status["artifact_hashes_verified"] = verified.get("artifact_hashes_verified") is True
+        except (ValueError, OSError):
+            pass
+    status["verified_and_exported"] = (all(status.get(k) == 0 for k in ("verify", "report", "export")) and status["artifact_hashes_verified"] and status["independently_solved_ecdlp_cells"] == 1)
     write_json(shard / "local-status.json", status)
     return status
 
@@ -234,6 +243,25 @@ def custody(shard, index, status):
     return receipt
 
 
+def git_ready_checkpoint(index):
+    pointer = ROOT / "custody" / f"shard-{index:02d}.json"
+    published = ROOT / "custody" / f"shard-{index:02d}-published.json"
+    if not pointer.is_file() or not published.is_file():
+        raise RuntimeError(f"missing local custody checkpoint for shard {index}")
+    saved = HERE / "checkpoints" / f"shard-{index:02d}.json"
+    content = {"schema": "ml-dataset.local-campaign-git-checkpoint/v1", "index": index, "custody": json.loads(pointer.read_text()), "published": json.loads(published.read_text()), "store_index_sha256": digest(ROOT / "store-index.json")}
+    if saved.exists():
+        if json.loads(saved.read_text()) != content:
+            # The mutable logical-name index gains later entries. The original
+            # per-cell snapshot is immutable and remains the Git checkpoint.
+            old = json.loads(saved.read_text())
+            content["store_index_sha256"] = old.get("store_index_sha256")
+            if old != content:
+                raise RuntimeError(f"Git checkpoint differs for shard {index}")
+    else:
+        write_json(saved, content)
+
+
 def run():
     admission_receipt = admission()
     ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -244,8 +272,12 @@ def run():
     except BlockingIOError:
         raise RuntimeError("another campaign controller owns the lock")
     if not (ROOT / "admission.json").exists():
+        admission_receipt["campaign_started_unix_ns"] = str(time.time_ns())
         write_json(ROOT / "admission.json", admission_receipt)
-    start = time.monotonic()
+    admitted = json.loads((ROOT / "admission.json").read_text())
+    if admitted.get("protocol_file_sha256") != HASHES[HERE / "protocol.json"] or admitted.get("plan_sha256") != HASHES[HERE / "plan.json"]:
+        raise RuntimeError("existing campaign admission binds different frozen inputs")
+    deadline_ns = int(admitted["campaign_started_unix_ns"]) + 12 * 3600 * 10 ** 9
     for index in range(64):
         shard = ROOT / f"shard-{index:02d}"
         cell_receipt = ROOT / "custody" / f"shard-{index:02d}-published.json"
@@ -255,13 +287,15 @@ def run():
             archive = ROOT / "archives" / f"shard-{index:02d}.tar.gz"
             if not pointer.is_file() or not archive.is_file() or digest(pointer) != published.get("pointer_sha256") or digest(archive) != published.get("archive_sha256"):
                 raise RuntimeError(f"published shard {index} has a local custody mismatch")
+            git_ready_checkpoint(index)
             continue
-        if time.monotonic() - start > 12 * 3600:
+        if time.time_ns() > deadline_ns:
             raise RuntimeError("12-hour campaign admission ceiling reached")
         shard.mkdir(exist_ok=True)
         attempt(shard, index)
         status = finalize(shard, index)
         receipt = custody(shard, index, status)
+        git_ready_checkpoint(index)
         print(json.dumps({"index": index, "verified_and_exported": status["verified_and_exported"], "archive_sha256": receipt["archive_sha256"], "fresh_get": True}), flush=True)
     print(json.dumps({"planned": 64, "custody_receipts": 64, "complete": True}), flush=True)
 

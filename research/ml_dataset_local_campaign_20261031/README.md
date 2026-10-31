@@ -31,3 +31,31 @@ the two-cell pilot's frozen protocol, outcome receipts and S3 readbacks; the
 official experiment protocol checker at f755085ff951888dbe64682c210c9ef7d167b40c;
 and the corpus design/operations documents above. No comparative speed or
 method novelty claim is proposed.
+
+The draft was filed at commit 850055f73953d2adca7a403e237ce74dcc47147a
+and passed the pinned official checker with zero findings. The official
+freeze produced protocol file SHA-256
+1dab5a5381b1b34fa884738e38dfe555eaea912299f2f59cf6b829ba544f70d8.
+The rebound plan file SHA-256 is
+8d2b36b9200cec6c64005f8cdfa5eff99d837538395896f186eaa062fd0fcb1a;
+native preflight reported 64 planned cells, both twists, and zero generated
+cells. Protocol and plan were committed at cd7ee385d0f9 before generation.
+
+After owner review, the exact launch from the repository root is:
+
+    PYTHONDONTWRITEBYTECODE=1 python3 research/ml_dataset_local_campaign_20261031/campaign.py check
+    PYTHONDONTWRITEBYTECODE=1 python3 research/ml_dataset_local_campaign_20261031/campaign.py run
+
+The run subcommand uses a nonblocking exclusive lock and an atomic marker per
+shard before it invokes the native runner. A restart sees that marker and never
+launches a second solver attempt for the same shard. Native verify, report and
+strict export receive separate receipts. A completed custody checkpoint has a
+restricted archive in the graph store, a small content-addressed custody
+pointer in the same store, fresh GET comparisons for both, and a local
+published receipt. The graph-store logical-name index at the local XFS root
+is mirrored by immutable per-cell checkpoints under this research directory;
+commit those checkpoints after each batch to retain discovery if the local
+disk is lost. The controller halts on an active worker, changed frozen
+inputs, less than 4 GiB local XFS free, custody failure, or the 12-hour frozen
+admission deadline. These stops preserve unfinished indices as unattempted;
+they do not replace them with different samples.
