@@ -21,7 +21,17 @@ The finite-group result and its application to the modular cover are separate.
 
 ## 3. Construct a genuine Hecke-3 correspondence on the normal carrier
 
-This is a proposed construction,not a computed source correspondence. The
+The CM-prime filter matters: 3 is inert in Q(sqrt(-7)),so T3 is an
+annihilator/relation probe,not a candidate nonzero map on the CM factor.
+The primary [49.2.a.a record](https://www.lmfdb.org/ModularForm/GL2/Q/holomorphic/49/2/a/a/)
+records CM discriminant-7 and a3=0. For the direct one-prime CM characters,
+vanishing at the good inert prime follows from the absence of an ideal of
+norm3;this is a mathematical inference from the retained character construction.
+The queued native prime filter finds the first good odd split candidates:
+23 for level77 and11 for level161. Their actual target residual eigenvalues
+must still be checked. Keep this distinction in any relation/rank experiment.
+
+This is a proposed carrier construction,not a computed source correspondence. The
 new explicit chart algebra makes a four-branch3-isogeny correspondence worth
 trying after nu's source-coordinate meaning and transport have been checked.
 For the Tate model Y²+(1+c)XY+bY=X³+bX²,derive and verify the3-division

@@ -15,3 +15,10 @@ an unsuitable irreducible16-fiber criterion; symbolic primality remains.
 Rust native exact integer arithmetic only; no Python mathematics. Same local
 manual authorization,4GiB virtual/1200s,serialized math and preserved failures.
 Freeze source/runner before data. Exit0 and FIBER51_ALL_CHECKS_PASS required.
+
+Before data,also exhaust the odd primes through29 by trial division and
+classify residue in{1,2,4}mod7 and coprimality with77/161. Require smallest
+good split odd candidates23 at level77 and11 at level161. This is a candidate
+filter,not a nonzero target eigenvalue certificate. The CM interpretation
+uses the retained discriminant-7 construction;3 is inert,so its control
+correspondence is an annihilator/relation probe rather than a nonzero-factor map.

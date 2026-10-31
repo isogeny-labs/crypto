@@ -40,5 +40,17 @@ fn main() {
     assert_eq!(sl_count,336); assert_eq!(qr_count,1008);
     for (cycles,count) in histogram { println!("FIBER51_CYCLE_TYPE {:?} count={}",cycles,count); }
     println!("FIBER51_RESULT points=16 SL2_matrices={} QR_determinant_matrices={} longest_cycle={} degree16_single_cycles=0 scalar_normalization_checked=true",sl_count,qr_count,longest);
+    let primes=[3u32,5,7,11,13,17,19,23,29];
+    let mut first77=None; let mut first161=None;
+    for p in primes {
+        assert!((2..p).any(|d| p%d==0));
+        let split=[1,2,4].contains(&(p%7));
+        let good77=split && 77%p!=0; let good161=split && 161%p!=0;
+        if good77 && first77.is_none() { first77=Some(p); }
+        if good161 && first161.is_none() { first161=Some(p); }
+        println!("FIBER51_PRIME_FILTER prime={} QR_mod7={} good_split_level77={} good_split_level161={}",p,split,good77,good161);
+    }
+    assert_eq!(first77,Some(23)); assert_eq!(first161,Some(11));
+    println!("FIBER51_PRIME_RESULT first_good_split_odd_prime_level77=23 first_good_split_odd_prime_level161=11 target_residual_eigenvalue_not_inferred=true");
     println!("FIBER51_ALL_CHECKS_PASS");
 }

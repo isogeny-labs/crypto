@@ -23,3 +23,8 @@ Do not count a source elliptic identity as completed carrier-map gluing.
 Same original manual local scope,seed51,one Singular/FLINT thread,4GiB
 virtual/1200s,serialize mathematical jobs. Freeze before data,preserve every
 failure,strict exit0/no question-mark lines/HECKE3_51_ALL_CHECKS_PASS.
+
+CM role:3 is inert for discriminant-7. This generic quotient is a control
+and an annihilator/relation-correspondence probe,not an expected nonzero
+map on the CM target. Good split prime correspondences require the separate
+prime/eigenvalue filter;do not label T3 as that construction.
