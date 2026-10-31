@@ -25,7 +25,7 @@ for(step52=1;step52<=savedExtensions52;step52++){
  execute("matrix nextNative52=basis"+string(step52)+"_52;matrix forwardNative52=forward"+string(step52)+"_52;matrix reverseNative52=reverse"+string(step52)+"_52;");
  setring compactPid51;
  next52=saved52(nextNative52);forward52=saved52(forwardNative52);reverse52=saved52(reverseNative52);
- combined52=matrix(module(current52),module(T52*current52));
+ module combinedModule52=module(current52),module(T52*current52);combined52=matrix(combinedModule52);
  if(combined52*forward52!=next52 || next52*reverse52!=combined52 || vdim(std(module(next52)))!=savedLengths52[step52+1]){ERROR("RELOAD52_STEP_PRODUCTS_OR_LENGTH");quit;}
  current52=next52;
 }
